@@ -1,0 +1,174 @@
+// =============================================================================
+//  PregnancyController
+// -----------------------------------------------------------------------------
+//  Single source of truth for the Week-on-Week Card Stack:
+//    * loads + parses the weekly content from the JSON asset
+//    * derives the CURRENT gestational week from a (placeholder) due date
+//    * decides which weeks are unlocked (now or past) vs locked (future)
+//    * holds the English / Hinglish language toggle
+//
+//  It is a plain ChangeNotifier so the UI can listen without any extra
+//  state-management package.
+// =============================================================================
+
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
+import '../localization/app_language.dart';
+import '../models/week_content.dart';
+
+class PregnancyController extends ChangeNotifier {
+  PregnancyController({DateTime? dueDate, DateTime? now})
+      : _now = now ?? DateTime.now(),
+        _dueDate = dueDate ?? _placeholderDueDate(now ?? DateTime.now());
+
+  static const String _assetPath = 'lib/data/weekContent.json';
+
+  /// Content runs from week 4 to week 40.
+  static const int firstContentWeek = 4;
+  static const int lastContentWeek = 40;
+
+  /// A full term is measured as 40 weeks from the due date.
+  static const int _termWeeks = 40;
+
+  // --- mutable state ---------------------------------------------------------
+  final DateTime _now;
+  DateTime _dueDate;
+  AppLanguage _language = AppLanguage.hinglish;
+
+  List<WeekContent> _weeks = const [];
+  bool _isLoading = true;
+  Object? _error;
+
+  /// When true, every week is viewable (used so the full journey — including
+  /// the week-40 celebration — can be reached and reviewed).
+  bool unlockAllWeeks = true;
+
+  /// Week currently being viewed in the stack (defaults to the current week).
+  int? _selectedWeek;
+
+  // --- public getters --------------------------------------------------------
+  bool get isLoading => _isLoading;
+  Object? get error => _error;
+  bool get hasError => _error != null;
+
+  AppLanguage get language => _language;
+  DateTime get dueDate => _dueDate;
+
+  List<WeekContent> get weeks => List.unmodifiable(_weeks);
+
+  /// The mother's current gestational week, clamped to available content.
+  int get currentWeek {
+    final raw = _termWeeks - (_dueDate.difference(_dateOnly(_now)).inDays / 7).floor();
+    return raw.clamp(firstContentWeek, lastContentWeek);
+  }
+
+  /// The week the user is presently viewing in the stack.
+  int get selectedWeek => _selectedWeek ?? currentWeek;
+
+  /// All week numbers we have content for, ascending.
+  List<int> get availableWeeks => _weeks.map((w) => w.week).toList();
+
+  /// With [unlockAllWeeks] on, nothing is locked. Otherwise future weeks lock.
+  bool isLocked(int week) => unlockAllWeeks ? false : week > currentWeek;
+
+  /// Convenience: the data for the currently-selected week (null while loading
+  /// or if the week is missing from the dataset).
+  WeekContent? get selectedWeekData => weekData(selectedWeek);
+
+  WeekContent? weekData(int week) {
+    for (final w in _weeks) {
+      if (w.week == week) return w;
+    }
+    return null;
+  }
+
+  /// Calendar date range (start..end) for a given pregnancy week, derived from
+  /// the due date (week 40 sits at the due date).
+  ({DateTime start, DateTime end}) weekDates(int week) {
+    final start = _dateOnly(_dueDate)
+        .subtract(Duration(days: (lastContentWeek - week) * 7));
+    return (start: start, end: start.add(const Duration(days: 6)));
+  }
+
+  /// Days remaining until the due date (never negative).
+  int get daysToDueDate {
+    final d = _dueDate.difference(_dateOnly(_now)).inDays;
+    return d < 0 ? 0 : d;
+  }
+
+  // --- actions ---------------------------------------------------------------
+
+  /// Load + parse the bundled content. Safe to call once at startup.
+  Future<void> load() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final raw = await rootBundle.loadString(_assetPath);
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) {
+        throw const FormatException('weekContent.json must be a JSON array');
+      }
+      final parsed = <WeekContent>[];
+      for (final entry in decoded) {
+        if (entry is Map<String, dynamic>) {
+          parsed.add(WeekContent.fromJson(entry));
+        } else if (entry is Map) {
+          parsed.add(WeekContent.fromJson(Map<String, dynamic>.from(entry)));
+        }
+      }
+      parsed.sort((a, b) => a.week.compareTo(b.week));
+      _weeks = parsed;
+      _selectedWeek ??= currentWeek;
+    } catch (e) {
+      _error = e;
+      _weeks = const [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void toggleLanguage() {
+    _language =
+        _language.isEnglish ? AppLanguage.hinglish : AppLanguage.english;
+    notifyListeners();
+  }
+
+  void setLanguage(AppLanguage language) {
+    if (_language == language) return;
+    _language = language;
+    notifyListeners();
+  }
+
+  /// Move the viewer to [week] (clamped to the available content range).
+  void selectWeek(int week) {
+    final clamped = week.clamp(firstContentWeek, lastContentWeek);
+    if (_selectedWeek == clamped) return;
+    _selectedWeek = clamped;
+    notifyListeners();
+  }
+
+  /// Test / preview hook: pretend the due date is something else so we can
+  /// demo locked + unlocked weeks on an emulator.
+  void overrideDueDate(DateTime dueDate) {
+    _dueDate = dueDate;
+    _selectedWeek = currentWeek;
+    notifyListeners();
+  }
+
+  // --- helpers ---------------------------------------------------------------
+
+  static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// Placeholder due date so the demo opens mid-journey (~week 24), giving a
+  /// healthy mix of unlocked past weeks and locked future weeks.
+  static DateTime _placeholderDueDate(DateTime now) {
+    const demoCurrentWeek = 24;
+    final weeksRemaining = _termWeeks - demoCurrentWeek; // 16 weeks out
+    return _dateOnly(now).add(Duration(days: weeksRemaining * 7));
+  }
+}
