@@ -275,7 +275,7 @@ class S {
 
   // ---- Week-40 keepsake PDF booklet ----------------------------------------
   String get createBooklet =>
-      _p('Create your keepsake booklet', 'Apni yaadon ki kitaab banayein');
+      _p('Download your Keepsake Booklet', 'Apni yaadon ki kitaab download karein');
   String get buildingBooklet =>
       _p('Building your booklet…', 'Aapki kitaab ban rahi hai…');
   String get bookletReady =>
@@ -314,4 +314,166 @@ class S {
       'Ek din tum yeh padhoge, nanhe, aur jaanoge ki har hafte tumhe kitna chaaha gaya.');
   String get bookletEmptyEntry =>
       _p('A quiet week, simply held close.', 'Ek shaant hafta, bas dil ke kareeb.');
+
+  // ===========================================================================
+  //  HOME SCREEN — Daily Moment
+  // ===========================================================================
+
+  // ---- Header --------------------------------------------------------------
+  String greeting(int hour, String name) {
+    final part = hour < 12
+        ? _p('Good Morning', 'Shubh Prabhat')
+        : hour < 17
+            ? _p('Good Afternoon', 'Shubh Dopahar')
+            : _p('Good Evening', 'Shubh Sandhya');
+    return '$part, $name';
+  }
+
+  /// Encouraging, journey-style progress line (never task language).
+  String journeyLine(int week) {
+    if (week == 20) {
+      return _p("Week 20 · You're halfway there 💜",
+          'Hafta 20 · Aap aadhe safar tak aa gayi 💜');
+    }
+    if (week >= 36) {
+      return _p('Week $week · Almost there, mamma 💜',
+          'Hafta $week · Bas thoda aur, mamma 💜');
+    }
+    if (week <= 13) {
+      return _p('Week $week · A new chapter begins 💜',
+          'Hafta $week · Ek naya adhyay shuru 💜');
+    }
+    return _p('Week $week · Growing together 💜',
+        'Hafta $week · Saath badh rahe hain 💜');
+  }
+
+  String littleOneSize(String fruit) => _p(
+      'Your little one is the size of $fruit this week',
+      'Aapka nanha is hafte $fruit jitna bada hai');
+  String sizeAndLearning(String length, String learning) =>
+      '$length · $learning';
+
+  String get todaysMoment => _p("Today's Moment", 'Aaj Ka Pal');
+  String get momentMinutes => _p('~6 min', '~6 min');
+  String get momentSummary => _p('A small moment for you and your baby.',
+      'Aap aur aapke baby ke liye ek chhota sa pal.');
+
+  // ---- Module eyebrows -----------------------------------------------------
+  String get growEyebrow => _p('Grow', 'Grow');
+  String get readEyebrow => _p('Read To Your Baby', 'Apne Baby Ko Sunaayein');
+  String get talkEyebrow => _p('Talk To Your Baby', 'Apne Baby Se Baat Karein');
+  String get momentForYouEyebrow => _p('A Moment For You', 'Aapke Liye Ek Pal');
+  String get movementEyebrow =>
+      _p('Baby Movement Check-In', 'Baby Movement Check-In');
+
+  // ---- Shared CTAs / labels ------------------------------------------------
+  String get readMore => _p('Read More', 'Aur Padhein');
+  String get readCta => _p('Read', 'Padhein');
+  String get listenCta => _p('Listen', 'Sunein');
+  String get recordCta => _p('Record', 'Record karein');
+  String get writeCta => _p('Write', 'Likhein');
+  String get maybeLater => _p('Maybe later', 'Baad mein');
+  String get playCta => _p('Play', 'Chalayein');
+  String get beginCta => _p('Begin', 'Shuru karein');
+  String get keepThisWithMe =>
+      _p('Keep This With Me', 'Ise Apne Paas Rakhein');
+  String get keptLabel => _p('Kept 💜', 'Rakh liya 💜');
+  String get rememberLabel => _p('Remember', 'Yaad rakhein');
+  String get deepDiveLabel => _p('A little deeper', 'Thoda gehraai mein');
+
+  // ---- Garbh Sanskar (home) ------------------------------------------------
+  String get todaysPractice => _p("Today's Practice", 'Aaj Ka Abhyas');
+  String get ragaLabel => _p('RAGA', 'RAAG');
+  String get meditationLabel => _p('GUIDED MEDITATION', 'GUIDED MEDITATION');
+  String get affirmationLabel => _p('AFFIRMATION', 'AFFIRMATION');
+  String minutesShort(int m) => _p('$m min', '$m min');
+  String get aboutGarbhTitle =>
+      _p('About Garbh Sanskar', 'Garbh Sanskar ke baare mein');
+  String get whyItMatters => _p('Why it matters', 'Yeh kyun maayne rakhta hai');
+  String get howToUseIt => _p('How to use it', 'Ise kaise istemaal karein');
+  String get infoTooltip =>
+      _p('What is this?', 'Yeh kya hai?');
+  String get gotIt => _p('Got it', 'Samajh gayi');
+
+  // ---- Talk To Your Baby ---------------------------------------------------
+  String get talkWriteHint => _p('Write your message to your baby…',
+      'Apne baby ke liye apna sandesh likhein…');
+  String get talkListening =>
+      _p('Listening… speak now', 'Sun rahe hain… ab bolein');
+  String get talkSpeakHint => _p(
+      'Tap the mic and speak — we will gently write it down.',
+      'Mic dabaayein aur bolein — hum use pyaar se likh denge.');
+  String get talkSaved =>
+      _p('Saved to Dear Baby 💜', 'Dear Baby mein save ho gaya 💜');
+  String get talkSaveCta => _p('Save to Dear Baby', 'Dear Baby mein save karein');
+  String get talkSavedBadge => _p('Saved to Dear Baby', 'Dear Baby mein save');
+
+  // ---- Completion ----------------------------------------------------------
+  String get completionTitle => _p('You gave yourself 6 minutes today.',
+      'Aaj aapne khud ko 6 minute diye.');
+  String get completionSubtitle => _p('That matters more than you know.',
+      'Yeh aapki soch se zyada maayne rakhta hai.');
+
+  // ---- Emotional Check-In --------------------------------------------------
+  String get feelingQuestion => _p('How are you feeling right now?',
+      'Abhi aap kaisa mehsoos kar rahi hain?');
+  String get feelingSubtext => _p('No right answer. Just checking in with you.',
+      'Koi sahi jawaab nahi. Bas aapka haal pooch rahe hain.');
+  String get moodSaved => _p('Saved 💜', 'Save ho gaya 💜');
+  String moodLabel(String id) {
+    switch (id) {
+      case 'happy':
+        return _p('Happy', 'Khush');
+      case 'grateful':
+        return _p('Grateful', 'Shukrguzaar');
+      case 'calm':
+        return _p('Calm', 'Shaant');
+      case 'hopeful':
+        return _p('Hopeful', 'Umeed se bhari');
+      case 'tired':
+        return _p('Tired', 'Thaki hui');
+      case 'anxious':
+        return _p('Anxious', 'Chintit');
+      case 'overwhelmed':
+        return _p('Overwhelmed', 'Bojh mehsoos');
+      case 'loved':
+        return _p('Loved', 'Pyaar mehsoos');
+      default:
+        return id;
+    }
+  }
+
+  // ---- Baby Movement (Week 28+) --------------------------------------------
+  String get movementQuestion =>
+      _p('Did your baby move today?', 'Kya aaj aapke baby ne movement ki?');
+  String get movementSubtext => _p('No counting. No targets. Just awareness.',
+      'Koi ginti nahi. Koi target nahi. Bas dhyan.');
+  String get yesWord => _p('Yes', 'Haan');
+  String get notYet => _p('Not yet', 'Abhi nahi');
+  String get movementYes =>
+      _p('Wonderful 💚 Your baby is active today.',
+         'Bahut achha 💚 Aapka baby aaj active hai.');
+  String get movementNotYet => _p(
+      "That's okay. Try lying on your left side, drink something cold, and spend 30 minutes focusing on movement.",
+      'Koi baat nahi. Apni baayi karwat letne ki koshish karein, kuch thanda piyein, aur 30 minute movement par dhyan dein.');
+  String get movementEscalation => _p(
+      'Still not feeling movement? Contact your doctor.',
+      'Phir bhi movement mehsoos nahi ho rahi? Apne doctor se sampark karein.');
+
+  // ---- Bottom navigation + tabs --------------------------------------------
+  String get homeTab => _p('Home', 'Home');
+  String get myBabyTab => _p('My Baby', 'My Baby');
+  String get dearBabyTab => _p('Dear Baby', 'Dear Baby');
+  String get exploreTab => _p('Explore', 'Explore');
+  String get profileTab => _p('Profile', 'Profile');
+
+  String get weeklyJourneyTitle => _p('Weekly Journey', 'Saptahik Safar');
+  String get weeklyJourneySubtitle => _p(
+      "Your week-by-week guide — baby's growth, your body, nutrition, bonding and more.",
+      'Aapka hafte-dar-hafte guide — baby ki growth, aapka body, poshan, bonding aur bahut kuch.');
+  String get openWeeklyJourney => _p('Open Weekly Journey', 'Saptahik Safar kholein');
+  String get comingSoon => _p('Coming soon', 'Jaldi aa raha hai');
+  String comingSoonBody(String tab) => _p(
+      '$tab is on its way. For now, enjoy your daily moment and weekly journey.',
+      '$tab jaldi aa raha hai. Abhi ke liye, apne daily pal aur saptahik safar ka anand lein.');
 }
