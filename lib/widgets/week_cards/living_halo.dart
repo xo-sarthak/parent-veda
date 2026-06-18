@@ -11,7 +11,6 @@
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
-import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../cards/food_emoji.dart';
 
@@ -65,23 +64,16 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  double get _growth {
-    const first = PregnancyController.firstContentWeek;
-    const last = PregnancyController.lastContentWeek;
-    final t = ((widget.week - first) / (last - first)).clamp(0.0, 1.0);
-    return 0.42 + 0.58 * t; // baby fills from ~42% to 100%
-  }
-
   /// Picks the right "baby mode" art for this week. The earliest weeks show
-  /// genuinely different *stages* (a ball of cells, then a curled embryo) rather
-  /// than the same silhouette zoomed in. Later weeks keep the soft
-  /// growing-bump silhouette.
+  /// genuinely different *stages* (a ball of cells, then a curled embryo); from
+  /// week 6 on, a single curled figure that *develops* week by week — never the
+  /// same silhouette zoomed in.
   CustomPainter _babyPainter() {
     final entry = 0.6 + 0.4 * _morph.value; // gentle flipbook scale-in
     if (widget.week <= 5) {
       return _EmbryoStagePainter(week: widget.week, t: entry);
     }
-    return _BabyBumpPainter(growth: _growth * entry);
+    return _GrowingBabyPainter(week: widget.week, t: entry);
   }
 
   @override
@@ -141,10 +133,10 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 320),
                   child: widget.babyMode
-                      ? CustomPaint(
+                      ? _BabyFigure(
                           key: ValueKey('baby${widget.week}'),
-                          size: const Size(122, 122),
-                          painter: _babyPainter(),
+                          week: widget.week,
+                          fallback: _babyPainter(),
                         )
                       : Text(
                           foodEmojiForWeek(widget.week),
@@ -156,6 +148,35 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Shows the per-week baby illustration from `assets/baby/week_NN.png` when one
+/// exists, and otherwise falls back to the built-in vector drawing. This lets
+/// real artwork be dropped in week by week without any code change.
+class _BabyFigure extends StatelessWidget {
+  const _BabyFigure({super.key, required this.week, required this.fallback});
+
+  final int week;
+  final CustomPainter fallback;
+
+  String get _asset =>
+      'assets/baby/week_${week.toString().padLeft(2, '0')}.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      _asset,
+      width: 152,
+      height: 152,
+      fit: BoxFit.contain,
+      gaplessPlayback: true,
+      // No image for this week yet → use the vector figure.
+      errorBuilder: (context, error, stack) => CustomPaint(
+        size: const Size(122, 122),
+        painter: fallback,
       ),
     );
   }
@@ -276,46 +297,171 @@ class _EmbryoStagePainter extends CustomPainter {
       old.week != week || old.t != t;
 }
 
-/// An original soft "baby bump" silhouette: a curled cartoon baby that grows
-/// with [growth] (0..1 of the inner circle).
-class _BabyBumpPainter extends CustomPainter {
-  _BabyBumpPainter({required this.growth});
-  final double growth;
+/// An original, soft-shaded "growing baby": a curled, left-facing side-profile
+/// figure that genuinely *develops* with the week — a big-headed early fetus
+/// (~wk 6) that lengthens, rounds out, grows real arms and legs, and gains
+/// facial features (closed eye, nose, mouth, ear, chubby cheek) toward a full
+/// curled newborn (~wk 40). Proportions are driven by [week], so each week
+/// looks distinct rather than the same shape scaled. [t] (0.6..1) is the gentle
+/// flipbook scale-in when the figure appears.
+class _GrowingBabyPainter extends CustomPainter {
+  _GrowingBabyPainter({required this.week, required this.t});
+  final int week;
+  final double t;
+
+  static const Color _light = Color(0xFFFFE2D1);
+  static const Color _mid = Color(0xFFFFC8AE);
+  static const Color _deep = Color(0xFFF3A083);
+  static const Color _crease = Color(0xFFE08C6B);
+
+  // Developmental progress 0 (wk6) → 1 (wk40).
+  double get _p => ((week - 6) / (40 - 6)).clamp(0.0, 1.0);
+  // Facial features fade in ~wk10 → wk23.
+  double get _face => ((week - 10) / 13).clamp(0.0, 1.0);
+  // Arms/legs grow in ~wk8 → wk18.
+  double get _limb => ((week - 8) / 10).clamp(0.0, 1.0);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final c = size.center(Offset.zero);
-    final s = size.width * 0.5 * growth.clamp(0.2, 1.0);
-    final body = Paint()..color = const Color(0xFFFFD9C2); // soft peach
-    final shade = Paint()..color = const Color(0xFFFFC4A8);
+    final w = size.width, h = size.height;
+    final s = size.shortestSide;
+    final p = _p, face = _face, limb = _limb;
 
-    // Curled body (a soft kidney/bean shape)
-    final bodyPath = Path()
-      ..addOval(Rect.fromCircle(center: Offset(c.dx + s * 0.18, c.dy + s * 0.30), radius: s * 0.62));
-    canvas.drawPath(bodyPath, body);
+    // Flipbook scale-in around the centre.
+    canvas.save();
+    canvas.translate(w / 2, h / 2);
+    canvas.scale(t);
+    canvas.translate(-w / 2, -h / 2);
 
-    // Head
-    final headC = Offset(c.dx - s * 0.30, c.dy - s * 0.34);
-    canvas.drawCircle(headC, s * 0.46, body);
-    // cheek shade
-    canvas.drawCircle(Offset(headC.dx - s * 0.12, headC.dy + s * 0.16), s * 0.12, shade);
+    Offset pt(double nx, double ny) => Offset(nx * w, ny * h);
 
-    // tiny knee bump
-    canvas.drawCircle(Offset(c.dx + s * 0.55, c.dy + s * 0.55), s * 0.22, shade);
+    final fill = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_light, _deep],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
 
-    // closed eye + smile on the head (only when big enough to read)
-    if (growth > 0.45) {
+    // 1) Soft grounding shadow beneath the curl.
+    canvas.drawOval(
+      Rect.fromCenter(center: pt(0.52, 0.88), width: s * 0.5, height: s * 0.11),
+      Paint()..color = _crease.withValues(alpha: 0.12),
+    );
+
+    // 2) A leg, behind the body, curling up toward the belly (lengthens later).
+    if (limb > 0) {
+      final legPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = s * (0.13 + 0.06 * p)
+        ..color = _mid;
+      final hip = pt(0.62, 0.72);
+      final knee = pt(0.40 - 0.05 * limb, 0.66);
+      final foot = pt(0.47, 0.82);
+      canvas.drawPath(
+        Path()
+          ..moveTo(hip.dx, hip.dy)
+          ..quadraticBezierTo(knee.dx, knee.dy - s * 0.10, knee.dx, knee.dy)
+          ..quadraticBezierTo(knee.dx, knee.dy + s * 0.12, foot.dx, foot.dy),
+        legPaint,
+      );
+    }
+
+    // 3) Body (torso + rump) — a single smooth curled mass, belly facing left.
+    final body = Path()
+      ..moveTo(w * 0.50, h * 0.44)
+      ..cubicTo(w * 0.66, h * 0.40, w * 0.78, h * 0.50, w * 0.76, h * 0.62)
+      ..cubicTo(w * 0.74, h * 0.77, w * 0.62, h * 0.87, w * 0.50, h * 0.85)
+      ..cubicTo(w * 0.40, h * 0.835, w * 0.37, h * 0.70, w * 0.395, h * 0.60)
+      ..cubicTo(w * 0.405, h * 0.52, w * 0.45, h * 0.46, w * 0.50, h * 0.44)
+      ..close();
+    canvas.drawPath(body, fill);
+
+    // Soft belly crease for depth (where the leg tucks in).
+    canvas.drawPath(
+      Path()
+        ..moveTo(w * 0.42, h * 0.58)
+        ..quadraticBezierTo(w * 0.52, h * 0.66, w * 0.60, h * 0.64),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = s * 0.02
+        ..strokeCap = StrokeCap.round
+        ..color = _crease.withValues(alpha: 0.18),
+    );
+
+    // 4) An arm across the chest, in front of the body (grows in).
+    if (limb > 0) {
+      final armPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = s * (0.09 + 0.04 * p)
+        ..color = _mid;
+      canvas.drawLine(pt(0.55, 0.50), pt(0.42, 0.48 + 0.02 * (1 - limb)), armPaint);
+    }
+
+    // 5) Head — large early, a touch smaller (relatively) later.
+    final headR = s * (0.255 - 0.045 * p);
+    final headC = pt(0.44, 0.355);
+    canvas.drawCircle(headC, headR, fill);
+    // Soft sheen, upper-left (gives the figure a gentle 3D roundness).
+    canvas.drawCircle(
+      Offset(headC.dx - headR * 0.32, headC.dy - headR * 0.36),
+      headR * 0.5,
+      Paint()..color = Colors.white.withValues(alpha: 0.26),
+    );
+
+    // 6) Face / eye.
+    if (face > 0) {
       final ink = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = s * 0.05
         ..strokeCap = StrokeCap.round
-        ..color = AppTheme.neutral700;
-      final eye = Path()
-        ..moveTo(headC.dx - s * 0.02, headC.dy - s * 0.06)
-        ..quadraticBezierTo(headC.dx + s * 0.10, headC.dy + s * 0.02, headC.dx + s * 0.20, headC.dy - s * 0.06);
-      canvas.drawPath(eye, ink);
+        ..color = _crease.withValues(alpha: 0.85 * face);
+      // Chubby cheek (rounder with age).
+      canvas.drawCircle(
+        Offset(headC.dx - headR * 0.34, headC.dy + headR * 0.30),
+        headR * (0.20 + 0.16 * p),
+        Paint()..color = _light.withValues(alpha: 0.45),
+      );
+      // Closed, content eye.
+      final eyeC = Offset(headC.dx - headR * 0.42, headC.dy - headR * 0.05);
+      ink.strokeWidth = headR * 0.09;
+      canvas.drawPath(
+        Path()
+          ..moveTo(eyeC.dx - headR * 0.17, eyeC.dy)
+          ..quadraticBezierTo(
+              eyeC.dx, eyeC.dy + headR * 0.16, eyeC.dx + headR * 0.17, eyeC.dy),
+        ink,
+      );
+      // Tiny mouth.
+      ink.strokeWidth = headR * 0.07;
+      canvas.drawPath(
+        Path()
+          ..moveTo(headC.dx - headR * 0.46, headC.dy + headR * 0.34)
+          ..quadraticBezierTo(headC.dx - headR * 0.34, headC.dy + headR * 0.42,
+              headC.dx - headR * 0.24, headC.dy + headR * 0.34),
+        ink,
+      );
+    } else {
+      // Early embryo: a single dark eye spot, no formed face yet.
+      canvas.drawCircle(
+        Offset(headC.dx - headR * 0.38, headC.dy),
+        headR * 0.16,
+        Paint()..color = _crease.withValues(alpha: 0.85),
+      );
     }
+
+    // 7) A little ear, appearing with the face.
+    if (face > 0) {
+      canvas.drawCircle(
+        Offset(headC.dx + headR * 0.58, headC.dy + headR * 0.06),
+        headR * (0.16 + 0.04 * p),
+        fill,
+      );
+    }
+
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_BabyBumpPainter old) => old.growth != growth;
+  bool shouldRepaint(_GrowingBabyPainter old) => old.week != week || old.t != t;
 }
