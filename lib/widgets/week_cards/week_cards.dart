@@ -233,8 +233,9 @@ class SizeRevealCard extends StatelessWidget {
   }
 }
 
-/// A single horizontal segmented pill — two equal segments ("Fruit" / "Baby")
-/// with a soft elevation and a thumb that slides smoothly to the selection.
+/// A single horizontal segmented pill — two equal halves ("Fruit" / "Baby").
+/// Each half fills its side completely and centres its icon + label both
+/// horizontally and vertically; the selected half gets a soft coral fill.
 class _FruitBabyToggle extends StatelessWidget {
   const _FruitBabyToggle({
     required this.baby,
@@ -243,63 +244,42 @@ class _FruitBabyToggle extends StatelessWidget {
   final bool baby;
   final ValueChanged<bool> onChanged;
 
-  static const double _width = 208;
-  static const double _height = 44;
-  static const double _pad = 4;
+  static const double _width = 224;
+  static const double _height = 46;
 
   @override
   Widget build(BuildContext context) {
-    const segW = (_width - _pad * 2) / 2;
     return Container(
       width: _width,
       height: _height,
-      padding: const EdgeInsets.all(_pad),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.92),
+        color: AppTheme.surfaceContainer,
         borderRadius: BorderRadius.circular(40),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary900.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
+            color: AppTheme.primary900.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Stack(
+      child: Row(
         children: [
-          // Sliding thumb behind the selected segment.
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            alignment: baby ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              width: segW,
-              height: _height - _pad * 2,
-              decoration: BoxDecoration(
-                color: AppTheme.secondary500,
-                borderRadius: BorderRadius.circular(40),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.secondary500.withValues(alpha: 0.30),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Row(children: [
-            _seg(context,
+          Expanded(
+            child: _seg(context,
                 label: 'Fruit',
                 icon: Icons.eco_rounded,
                 selected: !baby,
                 onTap: () => onChanged(false)),
-            _seg(context,
+          ),
+          Expanded(
+            child: _seg(context,
                 label: 'Baby',
                 icon: Icons.child_care_rounded,
                 selected: baby,
                 onTap: () => onChanged(true)),
-          ]),
+          ),
         ],
       ),
     );
@@ -312,20 +292,38 @@ class _FruitBabyToggle extends StatelessWidget {
       required VoidCallback onTap}) {
     final text = Theme.of(context).textTheme;
     final fg = selected ? Colors.white : AppTheme.neutral500;
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: Icon(icon, key: ValueKey(selected), size: 16, color: fg),
-          ),
-          const SizedBox(width: 6),
-          Text(label,
-              style: text.labelMedium
-                  ?.copyWith(color: fg, fontWeight: FontWeight.w700)),
-        ]),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        height: double.infinity,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.secondary500 : Colors.transparent,
+          borderRadius: BorderRadius.circular(40),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.secondary500.withValues(alpha: 0.30),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: fg),
+            const SizedBox(width: 6),
+            Text(label,
+                style: text.labelMedium
+                    ?.copyWith(color: fg, fontWeight: FontWeight.w700)),
+          ],
+        ),
       ),
     );
   }
