@@ -173,11 +173,16 @@ class SizeRevealCard extends StatelessWidget {
       title: s.howBig,
       icon: Icons.spa_rounded,
       accent: AppTheme.secondary500,
+      // Mockup header: purple filled icon chip, muted eyebrow, purple title,
+      // and a calm neutral speaker.
+      iconChipColor: AppTheme.primary500,
+      eyebrowColor: AppTheme.neutral400,
+      titleColor: AppTheme.primary600,
       trailing: SpeakerButton(
         text: snap.reveal.of(lang),
         cardKey: BabyVoiceService.keyFor(w.week, 'size_reveal'),
         lang: lang,
-        accent: AppTheme.secondary500,
+        accent: AppTheme.neutral500,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

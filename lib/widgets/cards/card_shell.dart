@@ -37,6 +37,9 @@ class CardShell extends StatelessWidget {
     required this.child,
     this.footer,
     this.trailing,
+    this.iconChipColor,
+    this.eyebrowColor,
+    this.titleColor,
   });
 
   /// Small uppercase-ish label above the title (e.g. "Baby's whisper").
@@ -58,6 +61,16 @@ class CardShell extends StatelessWidget {
 
   /// Optional trailing widget in the header (e.g. a speaker button).
   final Widget? trailing;
+
+  /// When set, the header icon chip is filled with this colour and the icon is
+  /// drawn white (instead of the default soft accent-tinted chip).
+  final Color? iconChipColor;
+
+  /// Overrides the eyebrow colour (defaults to [accent]).
+  final Color? eyebrowColor;
+
+  /// Overrides the title colour (defaults to the theme's heading colour).
+  final Color? titleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +118,10 @@ class CardShell extends StatelessWidget {
                         title: title,
                         icon: icon,
                         accent: accent,
-                        trailing: trailing),
+                        trailing: trailing,
+                        iconChipColor: iconChipColor,
+                        eyebrowColor: eyebrowColor,
+                        titleColor: titleColor),
                     const SizedBox(height: 20),
                     child,
                     const SizedBox(height: 12),
@@ -167,6 +183,9 @@ class _Header extends StatelessWidget {
     required this.icon,
     required this.accent,
     this.trailing,
+    this.iconChipColor,
+    this.eyebrowColor,
+    this.titleColor,
   });
 
   final String eyebrow;
@@ -174,10 +193,14 @@ class _Header extends StatelessWidget {
   final IconData icon;
   final Color accent;
   final Widget? trailing;
+  final Color? iconChipColor;
+  final Color? eyebrowColor;
+  final Color? titleColor;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final bool filled = iconChipColor != null;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -185,10 +208,10 @@ class _Header extends StatelessWidget {
           width: 46,
           height: 46,
           decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.12),
+            color: filled ? iconChipColor : accent.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(icon, color: accent, size: 24),
+          child: Icon(icon, color: filled ? Colors.white : accent, size: 24),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -198,13 +221,13 @@ class _Header extends StatelessWidget {
               Text(
                 eyebrow.toUpperCase(),
                 style: text.labelSmall?.copyWith(
-                  color: accent,
+                  color: eyebrowColor ?? accent,
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 2),
-              Text(title, style: text.headlineSmall),
+              Text(title, style: text.headlineSmall?.copyWith(color: titleColor)),
             ],
           ),
         ),
