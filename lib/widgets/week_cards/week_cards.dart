@@ -187,30 +187,16 @@ class SizeRevealCard extends StatelessWidget {
           ValueListenableBuilder<bool>(
             valueListenable: SizeViewPref.babyMode,
             builder: (context, baby, _) {
-              // Weeks 4–5: a big floating figure with a single horizontal
-              // segmented toggle centred directly below it — a deliberate,
-              // calm control rather than side-stacked pills.
-              if (w.week <= 5) {
-                return Column(children: [
-                  SizedBox(
-                    height: 200,
-                    child: Center(
-                        child: LivingHalo(week: w.week, babyMode: baby, lang: lang)),
-                  ),
-                  const SizedBox(height: 14),
-                  Center(
-                    child: _FruitBabyToggle(
-                        baby: baby, onChanged: SizeViewPref.set),
-                  ),
-                ]);
-              }
+              // Every week: the figure (fruit emoji or baby illustration),
+              // then a single horizontal segmented Fruit/Baby pill centred
+              // directly below it — one calm, consistent layout.
               return Column(children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: _FruitBabyToggle(baby: baby, onChanged: SizeViewPref.set),
-                ),
-                const SizedBox(height: 8),
                 Center(child: LivingHalo(week: w.week, babyMode: baby, lang: lang)),
+                const SizedBox(height: 14),
+                Center(
+                  child:
+                      _FruitBabyToggle(baby: baby, onChanged: SizeViewPref.set),
+                ),
               ]);
             },
           ),
