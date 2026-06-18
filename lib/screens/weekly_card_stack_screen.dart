@@ -70,26 +70,32 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final s = S(_c.language);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 20,
+        titleSpacing: 16,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 30,
-              height: 30,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
                 color: AppTheme.primary500,
-                borderRadius: BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 18),
+              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 17),
             ),
-            const SizedBox(width: 10),
-            Text(
-              s.appName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppTheme.primary600,
-                    fontWeight: FontWeight.w800,
-                  ),
+            const SizedBox(width: 8),
+            // Flexible so a tight app bar (mute + EN/Hi toggle on the right)
+            // never overflows — it shrinks/ellipsises instead of clipping.
+            Flexible(
+              child: Text(
+                s.appName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppTheme.primary600,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
             ),
           ],
         ),
