@@ -1,13 +1,12 @@
 // =============================================================================
 //  LivingHalo
 // -----------------------------------------------------------------------------
-//  The Size Reveal centrepiece: soft concentric rings that gently pulse, a slow
-//  rotating shimmer arc, and a centre that crossfades between the week's Fruit
-//  emoji and an original cartoon Baby silhouette that grows week by week (with a
-//  quick flipbook morph each time a new week appears in Baby mode).
+//  The Size Reveal centrepiece: one calm container for every week — soft
+//  concentric rings with the week's figure gently floating at the centre. The
+//  figure crossfades between the week's Fruit emoji and an original cartoon
+//  Baby illustration (a stage-accurate embryo for weeks 4–5, a growing
+//  silhouette for later weeks). No rotating shimmer or hard pulse.
 // =============================================================================
-
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -33,19 +32,16 @@ class LivingHalo extends StatefulWidget {
 }
 
 class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
-  late final AnimationController _pulse;   // outer ring breathing (classic)
-  late final AnimationController _shimmer; // rotating glow arc (classic)
-  late final AnimationController _morph;   // flipbook entry in baby mode
-  late final AnimationController _float;   // slow vertical float (early weeks)
+  late final AnimationController _morph; // flipbook entry in baby mode
+  late final AnimationController _float; // slow vertical float
 
   @override
   void initState() {
     super.initState();
-    _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 2500))
-      ..repeat(reverse: true);
-    _shimmer = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
-    _morph = AnimationController(vsync: this, duration: const Duration(milliseconds: 150), value: 1);
-    _float = AnimationController(vsync: this, duration: const Duration(milliseconds: 3800))
+    _morph = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 150), value: 1);
+    _float = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 3800))
       ..repeat(reverse: true);
     if (widget.babyMode) _morph.forward(from: 0);
   }
@@ -64,8 +60,6 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _pulse.dispose();
-    _shimmer.dispose();
     _morph.dispose();
     _float.dispose();
     super.dispose();
@@ -80,8 +74,8 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
 
   /// Picks the right "baby mode" art for this week. The earliest weeks show
   /// genuinely different *stages* (a ball of cells, then a curled embryo) rather
-  /// than the same silhouette zoomed in — so the journey visibly transforms.
-  /// Later weeks keep the soft growing-bump silhouette for now.
+  /// than the same silhouette zoomed in. Later weeks keep the soft
+  /// growing-bump silhouette.
   CustomPainter _babyPainter() {
     final entry = 0.6 + 0.4 * _morph.value; // gentle flipbook scale-in
     if (widget.week <= 5) {
@@ -92,123 +86,71 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Weeks 4–5: a clean, big figure that slowly floats in open space — no
-    // rings, no rotating shimmer (per the calmer reference design).
-    if (widget.week <= 5) return _buildFloating(context);
-    return _buildClassic(context);
-  }
-
-  /// Big image gently floating in space with a soft ambient glow (no hard ring).
-  Widget _buildFloating(BuildContext context) {
     return SizedBox(
       width: 220,
-      height: 196,
+      height: 210,
       child: AnimatedBuilder(
         animation: Listenable.merge([_float, _morph]),
         builder: (context, _) {
           final f = Curves.easeInOut.transform(_float.value); // 0..1
-          final dy = (f - 0.5) * 16; // ~±8px slow bob
-          final scale = 1.0 + 0.015 * math.sin(_float.value * math.pi * 2);
+          final dy = (f - 0.5) * 12; // gentle ~±6px bob
           return Stack(
             alignment: Alignment.center,
             children: [
-              // Soft ambient glow — fades fully to transparent, so it reads as
-              // light, never as a circle behind the figure.
+              // Outer soft ring.
               Container(
-                width: 200,
-                height: 200,
+                width: 196,
+                height: 196,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: RadialGradient(colors: [
-                    AppTheme.secondary100.withValues(alpha: 0.5),
-                    AppTheme.secondary100.withValues(alpha: 0.0),
-                  ], stops: const [0.2, 1.0]),
+                  color: AppTheme.secondary100.withValues(alpha: 0.35),
                 ),
               ),
+              // Middle ring.
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.secondary100.withValues(alpha: 0.6),
+                ),
+              ),
+              // Inner clean disc the figure sits on.
+              Container(
+                width: 118,
+                height: 118,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppTheme.surface, AppTheme.secondary50],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.secondary500.withValues(alpha: 0.12),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+              ),
+              // The gently floating figure: fruit emoji or baby illustration.
               Transform.translate(
                 offset: Offset(0, dy),
-                child: Transform.scale(
-                  scale: scale,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    child: widget.babyMode
-                        ? CustomPaint(
-                            key: ValueKey('baby${widget.week}'),
-                            size: const Size(148, 148),
-                            painter: _babyPainter(),
-                          )
-                        : Text(
-                            foodEmojiForWeek(widget.week),
-                            key: ValueKey('fruit${widget.week}'),
-                            style: const TextStyle(fontSize: 96),
-                          ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildClassic(BuildContext context) {
-    return SizedBox(
-      width: 168,
-      height: 168,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_pulse, _shimmer, _morph]),
-        builder: (context, _) {
-          final pulse = 1.0 + 0.06 * Curves.easeInOut.transform(_pulse.value);
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              Transform.scale(
-                scale: pulse,
-                child: Container(
-                  width: 168, height: 168,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.secondary100.withValues(alpha: 0.45)),
-                ),
-              ),
-              Transform.scale(
-                scale: 1 + (pulse - 1) * 0.6,
-                child: Container(
-                  width: 130, height: 130,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppTheme.secondary100),
-                ),
-              ),
-              // rotating shimmer arc
-              CustomPaint(size: const Size(150, 150), painter: _ShimmerPainter(_shimmer.value)),
-              // inner content
-              Container(
-                width: 98, height: 98,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppTheme.surface, AppTheme.secondary50]),
-                  boxShadow: [BoxShadow(color: AppTheme.secondary500.withValues(alpha: 0.18), blurRadius: 20, offset: const Offset(0, 8))],
-                ),
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 320),
                   child: widget.babyMode
                       ? CustomPaint(
-                          key: const ValueKey('baby'),
-                          size: const Size(78, 78),
+                          key: ValueKey('baby${widget.week}'),
+                          size: const Size(122, 122),
                           painter: _babyPainter(),
                         )
-                      : Text(foodEmojiForWeek(widget.week),
-                          key: const ValueKey('fruit'), style: const TextStyle(fontSize: 46)),
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(40), boxShadow: [
-                    BoxShadow(color: AppTheme.primary900.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4)),
-                  ]),
-                  child: Text(widget.lang.isEnglish ? 'Week ${widget.week}' : 'Hafta ${widget.week}',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w700)),
+                      : Text(
+                          foodEmojiForWeek(widget.week),
+                          key: ValueKey('fruit${widget.week}'),
+                          style: const TextStyle(fontSize: 66),
+                        ),
                 ),
               ),
             ],
@@ -217,36 +159,6 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
       ),
     );
   }
-}
-
-class _ShimmerPainter extends CustomPainter {
-  _ShimmerPainter(this.t);
-  final double t;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.width * 0.46;
-    final rect = Rect.fromCircle(center: center, radius: radius);
-    final sweep = math.pi * 0.5;
-    final start = t * 2 * math.pi;
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..shader = SweepGradient(
-        startAngle: start,
-        endAngle: start + sweep,
-        colors: [
-          AppTheme.primary500.withValues(alpha: 0.0),
-          AppTheme.primary500.withValues(alpha: 0.18),
-          AppTheme.primary500.withValues(alpha: 0.0),
-        ],
-      ).createShader(rect);
-    canvas.drawArc(rect, start, sweep, false, paint);
-  }
-
-  @override
-  bool shouldRepaint(_ShimmerPainter old) => old.t != t;
 }
 
 /// Stage-accurate early-pregnancy art (weeks 4–5), drawn fresh per stage so the
