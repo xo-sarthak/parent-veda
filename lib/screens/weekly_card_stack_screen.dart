@@ -70,15 +70,32 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final s = S(_c.language);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 20,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        titleSpacing: 16,
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(s.appName, style: Theme.of(context).textTheme.headlineSmall),
-            Text(
-              s.weekOf(_c.selectedWeek, PregnancyController.lastContentWeek),
-              style: Theme.of(context).textTheme.bodySmall,
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: AppTheme.primary500,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 17),
+            ),
+            const SizedBox(width: 8),
+            // Flexible so a tight app bar (mute + EN/Hi toggle on the right)
+            // never overflows — it shrinks/ellipsises instead of clipping.
+            Flexible(
+              child: Text(
+                s.appName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppTheme.primary600,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
             ),
           ],
         ),
@@ -126,7 +143,18 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
     return Column(
       children: [
-        const SizedBox(height: 6),
+        const SizedBox(height: 2),
+        Center(
+          child: Text(
+            S(_c.language)
+                .weekOf(selectedWeek, PregnancyController.lastContentWeek),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: AppTheme.neutral500),
+          ),
+        ),
+        const SizedBox(height: 10),
         _TrimesterBar(controller: _c),
         const SizedBox(height: 6),
         _WeekStrip(controller: _c, onScrollActive: _onWeekScroll),
@@ -340,7 +368,7 @@ class _TrimesterBar extends StatelessWidget {
             children: [
               Text(
                 s.trimesterName(week),
-                style: text.labelMedium?.copyWith(
+                style: text.headlineSmall?.copyWith(
                   color: AppTheme.primary600,
                   fontWeight: FontWeight.w700,
                 ),
@@ -362,7 +390,7 @@ class _TrimesterBar extends StatelessWidget {
                 value: value,
                 minHeight: 4,
                 backgroundColor: AppTheme.surfaceContainerHigh,
-                valueColor: const AlwaysStoppedAnimation(AppTheme.primary500),
+                valueColor: const AlwaysStoppedAnimation(AppTheme.secondary500),
               ),
             ),
           ),
@@ -481,14 +509,16 @@ class _WeekStripState extends State<_WeekStrip> {
         Text(
           _fmtRange(selRange.start, selRange.end),
           style: text.labelMedium?.copyWith(
-            color: AppTheme.primary500,
+            color: AppTheme.neutral600,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
           ),
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 60,
+          // Tall enough that the selected circle's soft glow isn't clipped flat
+          // at the top/bottom (which made the round shadow look rectangular).
+          height: 88,
           child: LayoutBuilder(
             builder: (context, constraints) {
               final padH =
@@ -509,6 +539,8 @@ class _WeekStripState extends State<_WeekStrip> {
                   controller: _scroll,
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
+                  // Don't clip children — let the round glow spill past cells.
+                  clipBehavior: Clip.none,
                   padding: EdgeInsets.symmetric(horizontal: padH),
                   itemExtent: _extent,
                   itemCount: weeks.length,
@@ -537,8 +569,9 @@ class _WeekStripState extends State<_WeekStrip> {
         Text(
           S(c.language).weeksLabel,
           style: text.labelSmall?.copyWith(
-            color: AppTheme.neutral400,
+            color: AppTheme.secondary500,
             letterSpacing: 1.2,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -583,9 +616,10 @@ class _WeekDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final double size = isSelected ? 56 : 46;
-    final Color bg =
-        isSelected ? AppTheme.primary500 : AppTheme.primary50.withValues(alpha: 0.7);
-    final Color fg = isSelected ? Colors.white : AppTheme.primary300;
+    final Color bg = isSelected
+        ? AppTheme.secondary500
+        : AppTheme.neutral100.withValues(alpha: 0.7);
+    final Color fg = isSelected ? Colors.white : AppTheme.neutral400;
 
     return GestureDetector(
       onTap: onTap,
@@ -600,14 +634,22 @@ class _WeekDot extends StatelessWidget {
           color: bg,
           shape: BoxShape.circle,
           border: isCurrent && !isSelected
-              ? Border.all(color: AppTheme.primary300, width: 1.5)
+              ? Border.all(color: AppTheme.secondary300, width: 1.5)
               : null,
           boxShadow: isSelected
               ? [
+                  // Wide soft coral glow…
                   BoxShadow(
-                    color: AppTheme.primary400.withValues(alpha: 0.35),
-                    blurRadius: 14,
-                    offset: const Offset(0, 5),
+                    color: AppTheme.secondary500.withValues(alpha: 0.45),
+                    blurRadius: 24,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 9),
+                  ),
+                  // …with a tighter close shadow for depth.
+                  BoxShadow(
+                    color: AppTheme.secondary300.withValues(alpha: 0.40),
+                    blurRadius: 7,
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,

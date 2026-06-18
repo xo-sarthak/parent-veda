@@ -1,11 +1,10 @@
 // =============================================================================
 //  Week 40 · Celebration finale
 // -----------------------------------------------------------------------------
-//  The grand finale shown as the very last card on week 40 — a festive, joyful
-//  "Welcome, little one." moment with confetti that re-fires EVERY time the card
-//  becomes visible, celebration emojis and a baby orb. A button opens the
-//  keepsake-booklet flow: fill any missing weeks, then generate a multi-page PDF
-//  of the whole journey. Fully bilingual.
+//  A calm, premium "Welcome, little one." moment: a soft baby orb, an elegant
+//  title, a short message, and a single button to download the keepsake booklet.
+//  Gentle bokeh drifts behind it and re-fires every time the card appears.
+//  Deliberately simple — no emoji clutter, no on-card memories grid.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -14,9 +13,7 @@ import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../screens/journey_booklet_screen.dart';
-import '../../services/memory_store.dart';
 import '../../theme/app_theme.dart';
-import '../memories/memories_section.dart';
 
 class CelebrationCard extends StatefulWidget {
   const CelebrationCard({
@@ -38,39 +35,39 @@ class CelebrationCard extends StatefulWidget {
 
 class _CelebrationCardState extends State<CelebrationCard>
     with TickerProviderStateMixin {
-  // Continuous gentle confetti fall.
-  late final AnimationController _confetti;
-  // A quick pop for the emojis + baby orb each time the card appears.
+  // Slow drifting bokeh behind the scene.
+  late final AnimationController _drift;
+  // A soft entrance for the orb + title each time the card appears.
   late final AnimationController _intro;
 
   @override
   void initState() {
     super.initState();
-    _confetti = AnimationController(
-        vsync: this, duration: const Duration(seconds: 6))
+    _drift = AnimationController(
+        vsync: this, duration: const Duration(seconds: 9))
       ..repeat();
     _intro = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900));
+        vsync: this, duration: const Duration(milliseconds: 1100));
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Re-fire the celebration every time the card becomes visible again.
+    // Re-fire the gentle celebration every time the card becomes visible.
     _intro.forward(from: 0);
-    _confetti
+    _drift
       ..reset()
       ..repeat();
   }
 
   @override
   void dispose() {
-    _confetti.dispose();
+    _drift.dispose();
     _intro.dispose();
     super.dispose();
   }
 
-  void _openBooklet(S s) {
+  void _openBooklet() {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => JourneyBookletScreen(
         lang: widget.language,
@@ -88,104 +85,109 @@ class _CelebrationCardState extends State<CelebrationCard>
     return Column(
       children: [
         Expanded(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppTheme.primary100,
-                    AppTheme.secondary100,
-                    AppTheme.surface,
-                  ],
-                  stops: [0.0, 0.4, 1.0],
-                ),
-                border: Border.all(color: AppTheme.outlineVariant, width: 1),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                // Soft blush easing into clean white — calm, not loud.
+                colors: [AppTheme.secondary50, AppTheme.primary50, Colors.white],
+                stops: [0.0, 0.5, 1.0],
               ),
-              child: Stack(
-                children: [
-                  // Festive, looping confetti behind everything.
-                  Positioned.fill(
-                    child: AnimatedBuilder(
-                      animation: _confetti,
-                      builder: (context, _) => CustomPaint(
-                        painter: _ConfettiPainter(_confetti.value),
+              border: Border.all(color: AppTheme.outlineVariant, width: 1),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                // Gentle drifting bokeh.
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _drift,
+                    builder: (context, _) =>
+                        CustomPaint(painter: _BokehPainter(_drift.value)),
+                  ),
+                ),
+                LayoutBuilder(
+                  builder: (context, c) => SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: c.maxHeight),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _badge(text, s),
+                            const SizedBox(height: 34),
+                            _intro1(child: _babyOrb()),
+                            const SizedBox(height: 30),
+                            _intro1(
+                              child: Text(
+                                s.celebrationTitle,
+                                textAlign: TextAlign.center,
+                                style: text.displaySmall?.copyWith(
+                                  fontSize: 38,
+                                  color: AppTheme.primary800,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.08,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              s.celebrationSubtitle,
+                              textAlign: TextAlign.center,
+                              style: text.titleMedium?.copyWith(
+                                color: AppTheme.primary500,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 320),
+                              child: Text(
+                                s.celebrationBody,
+                                textAlign: TextAlign.center,
+                                style: text.bodyMedium?.copyWith(
+                                  color: AppTheme.neutral600,
+                                  height: 1.7,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              s.appName.toUpperCase(),
+                              style: text.labelSmall?.copyWith(
+                                color: AppTheme.primary400,
+                                letterSpacing: 3,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 26, 24, 26),
-                    child: Column(
-                      children: [
-                        _badge(text, s),
-                        const SizedBox(height: 22),
-                        _pop(child: const Text('🎉  🥳  🎊',
-                            style: TextStyle(fontSize: 26))),
-                        const SizedBox(height: 18),
-                        _pop(child: _babyOrb()),
-                        const SizedBox(height: 22),
-                        Text(
-                          s.celebrationTitle,
-                          textAlign: TextAlign.center,
-                          style: text.displayMedium
-                              ?.copyWith(color: AppTheme.primary800),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          s.celebrationSubtitle,
-                          textAlign: TextAlign.center,
-                          style: text.titleLarge?.copyWith(
-                            color: AppTheme.primary600,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surface.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            s.celebrationBody,
-                            textAlign: TextAlign.center,
-                            style: text.bodyLarge?.copyWith(height: 1.6),
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                        // A small on-card preview of the journey's memories.
-                        AnimatedBuilder(
-                          animation: MemoryStore.instance,
-                          builder: (context, _) =>
-                              MemoryCollage(lang: widget.language),
-                        ),
-                        const SizedBox(height: 8),
-                        Text('💕  ${s.appName}  💕',
-                            style: text.labelMedium?.copyWith(
-                                color: AppTheme.primary500,
-                                fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: () => _openBooklet(s),
+            onPressed: _openBooklet,
             style: FilledButton.styleFrom(
               backgroundColor: AppTheme.primary500,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18)),
             ),
-            icon: const Icon(Icons.auto_stories_rounded, color: Colors.white),
+            icon: const Icon(Icons.download_rounded, color: Colors.white),
             label: Text(
               s.createBooklet,
               style: text.labelLarge?.copyWith(color: Colors.white),
@@ -197,15 +199,15 @@ class _CelebrationCardState extends State<CelebrationCard>
     );
   }
 
-  /// Gentle scale + fade-in driven by the intro controller.
-  Widget _pop({required Widget child}) {
+  /// Soft fade + rise entrance driven by the intro controller.
+  Widget _intro1({required Widget child}) {
     return AnimatedBuilder(
       animation: _intro,
       builder: (context, c) {
-        final t = Curves.elasticOut.transform(_intro.value.clamp(0.0, 1.0));
+        final v = Curves.easeOutCubic.transform(_intro.value.clamp(0.0, 1.0));
         return Opacity(
-          opacity: _intro.value.clamp(0.0, 1.0),
-          child: Transform.scale(scale: 0.6 + 0.4 * t, child: c),
+          opacity: v,
+          child: Transform.translate(offset: Offset(0, (1 - v) * 14), child: c),
         );
       },
       child: child,
@@ -215,19 +217,22 @@ class _CelebrationCardState extends State<CelebrationCard>
   Widget _badge(TextTheme text, S s) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: AppTheme.surface.withValues(alpha: 0.8),
+          color: AppTheme.surface.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(40),
+          border: Border.all(color: AppTheme.secondary100),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.celebration_rounded, size: 16, color: AppTheme.primary600),
+            Icon(Icons.auto_awesome_rounded,
+                size: 15, color: AppTheme.secondary500),
             const SizedBox(width: 8),
             Text(
               s.celebrationBadge,
               style: text.labelMedium?.copyWith(
                 color: AppTheme.primary700,
                 fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
               ),
             ),
           ],
@@ -235,74 +240,57 @@ class _CelebrationCardState extends State<CelebrationCard>
       );
 
   Widget _babyOrb() => Container(
-        width: 132,
-        height: 132,
+        width: 150,
+        height: 150,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppTheme.surface, AppTheme.primary50],
+          gradient: const RadialGradient(
+            colors: [Colors.white, AppTheme.secondary50],
+            stops: [0.55, 1.0],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary400.withValues(alpha: 0.30),
-              blurRadius: 36,
-              spreadRadius: 2,
+              color: AppTheme.secondary400.withValues(alpha: 0.28),
+              blurRadius: 44,
+              spreadRadius: 4,
             ),
           ],
         ),
-        child: const Text('👶', style: TextStyle(fontSize: 60)),
+        child: const Text('👶', style: TextStyle(fontSize: 68)),
       );
 }
 
-/// Soft, deterministic confetti — little dots and tilted ribbons in the app's
-/// palette that fall gently and loop, so the finale always feels celebratory.
-class _ConfettiPainter extends CustomPainter {
-  _ConfettiPainter(this.t);
+/// Soft, slow-drifting pastel bokeh — a calm celebratory shimmer, far quieter
+/// than confetti. Deterministic layout, gentle downward drift, low opacity.
+class _BokehPainter extends CustomPainter {
+  _BokehPainter(this.t);
 
-  /// 0..1 loop phase driving the fall.
+  /// 0..1 loop phase driving the slow drift.
   final double t;
 
   static const _colors = [
-    AppTheme.primary400,
-    AppTheme.secondary400,
-    AppTheme.tertiary400,
-    AppTheme.primary300,
+    AppTheme.secondary200,
+    AppTheme.primary200,
+    AppTheme.secondary100,
   ];
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rng = math.Random(7); // fixed seed → stable, pleasing layout
-    final count = (size.width * size.height / 9000).clamp(24, 80).toInt();
+    final rng = math.Random(11); // fixed seed → stable, pleasing layout
+    final count = (size.width * size.height / 18000).clamp(10, 26).toInt();
     for (var i = 0; i < count; i++) {
       final x = rng.nextDouble() * size.width;
-      // Each piece falls at its own speed and wraps around.
-      final speed = 0.5 + rng.nextDouble();
+      final speed = 0.25 + rng.nextDouble() * 0.4;
       final startY = rng.nextDouble();
       final y = ((startY + t * speed) % 1.0) * size.height;
+      final r = 4.0 + rng.nextDouble() * 9.0;
       final color = _colors[i % _colors.length]
-          .withValues(alpha: 0.18 + 0.22 * rng.nextDouble());
-      final paint = Paint()..color = color;
-      if (i.isEven) {
-        canvas.drawCircle(Offset(x, y), 2.0 + rng.nextDouble() * 2.5, paint);
-      } else {
-        canvas.save();
-        canvas.translate(x, y);
-        canvas.rotate(rng.nextDouble() * math.pi + t * math.pi * 2);
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset.zero, width: 4, height: 9),
-            const Radius.circular(2),
-          ),
-          paint,
-        );
-        canvas.restore();
-      }
+          .withValues(alpha: 0.10 + 0.12 * rng.nextDouble());
+      canvas.drawCircle(Offset(x, y), r, Paint()..color = color);
     }
   }
 
   @override
-  bool shouldRepaint(_ConfettiPainter oldDelegate) => oldDelegate.t != t;
+  bool shouldRepaint(_BokehPainter oldDelegate) => oldDelegate.t != t;
 }
