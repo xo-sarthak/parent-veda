@@ -61,3 +61,21 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk20 d140 (act5): favourite childhood memory
 - wk04 (act1 Welcoming You): first felt real · chose your name feeling · what you mean to me · the day we found out · how I imagine your face · first hopes whispered · welcoming you to our family
 - wk05 (act2 Who I Am): what makes me, me · my favourite things · what I do / my work · my friendships · my faith & what calms me · a fear I'm working on · the kind of parent I hope to be
+
+## Batch weeks 6-9 (authored) — arc adjusted: calm covered in wk5, so wk6-9 take fresh themes
+### Grow used (cont.)
+- wk06 (Trust & The Body's Wisdom): Your Body Already Knows The Way · You Can Trust What You Cannot See · Worry Is Not Preparation · Let Go Of The Perfect Plan · Uncertainty Can Be Gentle · Faith In Small Steps · Tomorrow Will Teach You Tomorrow
+- wk07 (The Bond Before Words): Love Speaks Before Words · Your Voice Is Already Home · They Feel What You Feel · Connection Is The First Lesson · A Heartbeat They Already Know · Presence Over Perfection · The Bond Grows Both Ways
+- wk08 (Your Own Path, no comparison): Your Way Is A Good Way · Advice Is Not Instruction · No Two Journeys Match · Trust Your Quiet Instinct · Comparison Steals Joy · You Know Your Baby Best · Write Your Own Story
+- wk09 (Everyday Love & Joy): Joy Is Not Frivolous · Little Rituals, Lasting Roots · Play Is Serious Work · The Magic Of Ordinary Days · Laughter Is A Language Too · Slow Moments Matter Most · Wonder Is Worth Keeping
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk06: The Elephant And The Rope · The Clever Rabbit And The Lion · Krishna And The Govardhan Hill · The Golden Swan · Tenali Rama And The Thieves · The Farmer And The Well · The Seed That Waited
+- wk07: The Ant And The Grasshopper · The Talkative Tortoise · Hanuman And The Mountain · The Monkey King's Bridge · Birbal And The Three Questions · The Kind Merchant · The River And The Mountain
+- wk08: The Peacock And The Crane · The Blue Jackal · Shravan Kumar's Devotion · The Wise Quail · Tenali Rama And The Well Dispute · The Potter's Promise · The Mountain Stream
+- wk09: The Mice That Ate Iron · The Wind And The Sun · Krishna And The Stolen Butter · The Banyan Deer · Birbal's Khichdi · The Two Brothers And The Field · The First Rain
+### Talk prompts used (cont., by act)
+- wk06 (act3 Where You Come From): your mother · grandparents & origins · a family tradition · hometown · a relative awaiting them · family food/language/roots · the day the family heard
+- wk07 (act4 Our Love Story): how we met · a favourite memory · why we chose each other · a hard time we got through · the moment we knew · the home we're building · a promise we made
+- wk08 (act5 Hopes & Dreams): one big dream · who I hope you become · an experience to share · a place to take you · what I hope you never doubt · the world you'll help build · a small everyday hope
+- wk09 (act6 Lessons I've Learned): the most important lesson · something learned the hard way · what kindness taught me · what 'enough' means · what failure taught me · who taught me most · a lesson to learn sooner
+### Garbh ragas used (T1): Bhupali(wk4) · Bhairav(wk5) · Bilawal/morning(wk6 d40) · Desh/evening(wk7 d46) · Kafi/afternoon(wk8 d54) · Khamaj/evening(wk9 d60)
