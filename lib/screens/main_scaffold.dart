@@ -10,12 +10,13 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_language.dart';
+import '../services/baby_voice_service.dart';
 import '../services/father_content_controller.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'home_screen.dart';
-import 'my_baby_screen.dart';
+import 'weekly_card_stack_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({
@@ -51,7 +52,9 @@ class _MainScaffoldState extends State<MainScaffold> {
             fatherMode: _fatherMode,
             onFatherModeChanged: (v) => setState(() => _fatherMode = v),
           ),
-          MyBabyScreen(controller: widget.pregnancy),
+          // My Baby opens straight into the weekly journey (the card-stack),
+          // no intermediate landing card.
+          WeeklyCardStackScreen(controller: widget.pregnancy),
           _ComingSoon(tab: s.dearBabyTab, icon: Icons.favorite_rounded, lang: widget.pregnancy.language),
           _ComingSoon(tab: s.exploreTab, icon: Icons.explore_rounded, lang: widget.pregnancy.language),
           _ComingSoon(tab: s.profileTab, icon: Icons.person_rounded, lang: widget.pregnancy.language),
@@ -61,7 +64,17 @@ class _MainScaffoldState extends State<MainScaffold> {
           body: IndexedStack(index: _index, children: pages),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
-            onDestinationSelected: (i) => setState(() => _index = i),
+            onDestinationSelected: (i) {
+              // Leaving a surface always stops any baby voice, so audio never
+              // bleeds across tabs.
+              BabyVoiceService.instance.stop();
+              // My Baby always opens at the mother's current week, regardless of
+              // which week she last browsed to.
+              if (i == 1) {
+                widget.pregnancy.selectWeek(widget.pregnancy.currentWeek);
+              }
+              setState(() => _index = i);
+            },
             destinations: [
               NavigationDestination(
                   icon: const Icon(Icons.home_outlined),

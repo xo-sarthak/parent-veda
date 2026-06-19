@@ -47,6 +47,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   @override
   void dispose() {
     _c.removeListener(_onControllerChanged);
+    // Stop any baby voice when this screen goes away (tab switch, pop, etc.) so
+    // narration never keeps playing after you leave.
+    BabyVoiceService.instance.stop();
     _pageController.dispose();
     super.dispose();
   }
