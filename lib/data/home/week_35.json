@@ -1,0 +1,282 @@
+[
+  {
+    "day": 239,
+    "week": 35,
+    "babyLearning": { "en": "growing rounder and softer, settling lower as the weeks turn", "hi": "gol aur naram hota ja raha hai, hafton ke saath neeche bas raha hai" },
+    "grow": {
+      "title": { "en": "Listen To Understand, Not To Reply", "hi": "Samajhne Ke Liye Suno, Jawaab Dene Ke Liye Nahi" },
+      "insight": { "en": "Most of us listen while quietly preparing what we will say next. Real listening asks us to set that aside and simply receive.", "hi": "Hum mein se zyadatar tab sunte hain jab hum chupchaap taiyaar kar rahe hote hain ki aage kya kahenge. Sachi sunna humse maangti hai ki use kinaare rakhein aur bas grahan karein." },
+      "expanded": { "en": "There is a quiet difference between listening to reply and listening to understand. When we listen to reply, our mind is half-busy building an answer, and the other person feels it. When we listen to understand, we let go of the answer and stay with what is being said. Your baby will one day come to you with small worries and big ones, and what they will need most is not your quick solution but your full, unhurried attention. You can begin growing that patience now, in these calm last weeks — practising the rare art of being fully present to another's words.", "hi": "Jawaab dene ke liye sunne aur samajhne ke liye sunne ke beech ek shaant farq hai. Jab hum jawaab dene ke liye sunte hain, hamara mann aadha jawaab banane mein vyast hota hai, aur saamne wala use mehsoos karta hai. Jab hum samajhne ke liye sunte hain, hum jawaab ko jaane dete hain aur jo kaha ja raha hai uske saath rehte hain. Aapka baby ek din chhoti aur badi chintaayein leke aapke paas aayega, aur use sabse zyada aapka jaldi wala hal nahi, balki aapka poora, bina jaldi ka dhyan chahiye. Aap woh sabra abhi se badha sakti hain, in shaant aakhri hafton mein." },
+      "deepDive": { "en": "Researchers in communication call true listening 'empathic attention,' and find that simply feeling heard lowers a person's stress and builds trust faster than any advice. Children who feel listened to grow more confident in sharing.", "hi": "Communication ke researchers sachi sunne ko 'empathic attention' kehte hain, aur paate hain ki bas suna jaana mehsoos karna kisi vyakti ka stress kam karta hai aur kisi bhi salah se tezi se bharosa banata hai. Jo bachche suna jaana mehsoos karte hain woh saanjha karne mein zyada aatmavishwaasi bante hain." },
+      "remember": { "en": "To understand someone, listen with your whole self, not just your ears.", "hi": "Kisi ko samajhne ke liye, apne poore aap se suno, sirf kaanon se nahi." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Donkey And The Lapdog", "hi": "Gadha Aur Chhota Pillai" },
+      "summary": { "en": "A jealous donkey learns that copying another without understanding only brings trouble.", "hi": "Ek eershaalu gadha seekhta hai ki bina samjhe doosre ki nakal karna sirf museebat laata hai." },
+      "body": { "en": "A farmer kept a hardworking donkey in the barn and a little lapdog in the house. The donkey worked all day carrying loads, yet the dog did no work at all — it simply jumped onto the farmer's lap, licked his face, and was petted and fed sweet treats in return.\n\nWatching this, the donkey grew envious. 'If the dog earns such love by being playful,' he thought, 'I shall do the same.' So one day he broke loose, trotted into the house, and clumsily threw his heavy legs onto the startled farmer's shoulders, braying loudly and trying to lick his face.\n\nThe poor farmer cried out in alarm, and the servants came running with sticks to drive the confused donkey back to the barn. Bruised and bewildered, the donkey finally understood. He had copied the dog's actions without ever understanding what truly made the dog loved. What suits one is not always right for another.", "hi": "Ek kisaan ke paas khalihaan mein ek mehnati gadha tha aur ghar mein ek chhota pillai. Gadha din bhar bojh dho kar kaam karta, phir bhi kutta koi kaam nahi karta tha — woh bas kisaan ki god mein kood jaata, uska chehra chaatta, aur badle mein use pyaar aur meethi cheezein milti.\n\nYeh dekh kar gadha jal-bhun gaya. 'Agar kutta khelkood se itna pyaar paata hai,' usne socha, 'to main bhi wahi karunga.' To ek din woh khul kar bhaaga, ghar mein ghus gaya, aur behudi tarah apne bhaari pair chaunke hue kisaan ke kandhon par de maare, zor se renkta aur uska chehra chaatne ki koshish karta.\n\nbechaara kisaan ghabra kar chillaaya, aur naukar lathiyon ke saath daude chale aaye taaki bhramit gadhe ko wapas khalihaan bhej dein. Choton aur uljhan se bhara, gadhe ko aakhir samajh aaya. Usne kutte ki harkaton ki nakal ki thi par yeh kabhi samjha hi nahi ki kutte ko asal mein kis cheez ne pyaara banaaya. Jo ek ke liye theek hai woh hamesha doosre ke liye sahi nahi hota." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will always stop and listen when they need to be heard.", "hi": "Apne baby ko bataayein ki jab unhe suna jaana ho to aap hamesha ruk kar sunengi." },
+      "motivation": { "en": "A child who knows they will be heard grows up unafraid to speak.", "hi": "Jo bachcha jaanta hai ki use suna jaayega woh bolne se daare bina bada hota hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Listening To The Quiet Within", "hi": "Andar Ki Shaanti Ko Sunna" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on quiet, attentive listening", "hi": "Shaant, dhyan se sunne par ek chhota dhyan" },
+      "affirmation": { "en": "I grow quiet enough to hear you, and quiet enough to hear myself.", "hi": "Main itni shaant hoti hoon ki tumhe sun saku, aur itni shaant ki khud ko bhi sun saku." },
+      "introduction": { "en": "Settle comfortably and let your eyes close. Take three slow breaths and let the noise of the day fall away. Now simply listen — to your breath, to the small sounds around you, and to the quiet presence of your baby within. There is nothing to do but listen.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein aur din ka shor girne dein. Ab bas suno — apni saans ko, aas-paas ki chhoti aawaazon ko, aur andar apne baby ki shaant maujoodgi ko. Sunne ke alawa kuch nahi karna." },
+      "closingThought": { "en": "In this quiet, you and your baby simply listened to each other. Carry that stillness with you.", "hi": "Is shaanti mein, aapne aur aapke baby ne bas ek doosre ko suna. Us thehraav ko apne saath le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Down Into The Belly", "hi": "Saans Ko Pet Tak Le Jaayein" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly so your hand rises gently, then let it fall as you breathe out. Five slow rounds settle both you and your baby.", "hi": "Ek haath pet par neeche rakhein. Dheere saans lein taaki aapka haath pyaar se uthe, phir saans chhodte hue use girne dein. Paanch dheemi baar aap aur aapke baby dono ko thehra deti hain." },
+      "remember": { "en": "A slow breath is the simplest way back to calm.", "hi": "Ek dheemi saans shaanti mein wapas jaane ka sabse saadhaaran tareeka hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 240,
+    "week": 35,
+    "babyLearning": { "en": "filling out gently, soft and snug in your warmth", "hi": "pyaar se bhar raha hai, aapki garmjoshi mein naram aur aaram se" },
+    "grow": {
+      "title": { "en": "Small Voices, Big Thoughts", "hi": "Chhoti Aawaazein, Bade Vichaar" },
+      "insight": { "en": "A small child's words may be simple, but the thoughts and feelings behind them are often surprisingly large.", "hi": "Ek chhote bachche ke shabd saadhaaran ho sakte hain, par unke peeche ke vichaar aur bhaavnaayein aksar hairaan kar dene wali badi hoti hain." },
+      "expanded": { "en": "It is easy to half-listen to a small child, to nod along while thinking the thoughts of a busy adult. But behind their simple sentences are real feelings, real questions, real attempts to make sense of a vast world. When you take a child's small voice seriously, you tell them that their inner life matters. Your baby is not here yet, but you can decide now to be the kind of parent who leans in for the little things — because to a child, the little things are everything, and being heard about them builds a lasting trust.", "hi": "Ek chhote bachche ko aadha-adhoora sunna aasaan hai, ek vyast bade ke vichaar sochte hue bas haan mein sir hilaana. Par unke saadhaaran vaakyon ke peeche asli bhaavnaayein, asli sawaal, ek vishaal duniya ko samajhne ki asli koshishein hoti hain. Jab aap ek bachche ki chhoti aawaaz ko gambheerta se lete hain, aap use batate hain ki uska andaruni jeevan maayne rakhta hai. Aapka baby abhi yahan nahi hai, par aap abhi tay kar sakti hain ki aap us tarah ki parent banengi jo chhoti baaton ke liye jhukti hai — kyunki ek bachche ke liye, chhoti baatein hi sab kuch hoti hain." },
+      "deepDive": { "en": "Child development experts note that when adults respond seriously to a young child's thoughts, the child's language and reasoning grow faster. Being taken seriously is itself a form of teaching.", "hi": "Child development ke experts bataate hain ki jab bade ek chhote bachche ke vichaaron par gambheerta se jawaab dete hain, bachche ki bhaasha aur soch tezi se badhti hai. Gambheerta se liya jaana khud mein sikhaane ka ek tareeka hai." },
+      "remember": { "en": "Take the small voice seriously, and you honour the big thoughts inside it.", "hi": "Chhoti aawaaz ko gambheerta se lo, aur uske andar ke bade vichaaron ka samman karo." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Sage Who Would Not Listen", "hi": "Woh Rishi Jo Sunna Nahi Chahta Tha" },
+      "summary": { "en": "A learned sage ignores a simple warning and pays a heavy price for not listening.", "hi": "Ek vidwaan rishi ek saadhaaran chetawni anasuni karta hai aur na sunne ki badi keemat chukaata hai." },
+      "body": { "en": "In an old forest hermitage lived a sage famed for his learning. One morning a humble cowherd boy ran to him, breathless. 'Revered one,' he panted, 'the river upstream is rising fast. Please move your hut to higher ground before dusk.' The sage waved him away. 'I have read a thousand scriptures, boy. What can a cowherd teach me about the world?'\n\nThe boy bowed and left, troubled. He warned the other forest dwellers, who quietly carried their belongings up the slope. Only the proud sage stayed where he was, certain his great knowledge protected him.\n\nThat night the river burst its banks and swept through the low ground, carrying off the sage's books and forcing him to scramble up a tree in the dark. By dawn, soaked and humbled, he climbed down to find the cowherd waiting with dry clothes and warm food. 'Wisdom,' the boy said gently, 'sometimes speaks in the smallest voice.' The sage never refused to listen again.", "hi": "Ek puraane van ke aashram mein apni vidya ke liye mashhoor ek rishi rehta tha. Ek subah ek vinamra gwaala ladka haanphta hua uske paas daud kar aaya. 'Pujya,' usne saans bharte hue kaha, 'upar ki taraf nadi tezi se badh rahi hai. Kripya shaam se pehle apni kutiya ooche zameen par le jaayein.' Rishi ne use haath se hata diya. 'Maine hazaar granth padhe hain, ladke. Ek gwaala mujhe duniya ke baare mein kya sikhaayega?'\n\nLadka jhuk kar pareshaan chala gaya. Usne baaki van waasiyon ko chetaaya, jinhone chupchaap apna saamaan dhalaan par le jaaya. Sirf ghamandi rishi wahin ruka raha, yaqeen kar ki uska bada gyaan use bachaayega.\n\nUs raat nadi apne kinaare tod kar neeche ki zameen mein bah gayi, rishi ki kitaabein bahaa le gayi aur use andhere mein ek ped par chadhne par majboor kar diya. Subah tak, bheega aur jhuka hua, woh neeche utra to gwaale ko sookhe kapde aur garm khaane ke saath intezaar karte paaya. 'Buddhimatta,' ladke ne pyaar se kaha, 'kabhi-kabhi sabse chhoti aawaaz mein bolti hai.' Rishi ne phir kabhi sunne se inkaar nahi kiya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you long to hear their every little thought and wonder.", "hi": "Apne baby ko bataayein ki aap unka har chhota vichaar aur sawaal sunne ke liye taras rahi hain." },
+      "motivation": { "en": "A child whose thoughts are welcomed never stops sharing them.", "hi": "Jis bachche ke vichaaron ka swagat hota hai woh unhe saanjha karna kabhi nahi rokta." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Shahana", "hi": "Raag Shahana" },
+      "durationMinutes": 4,
+      "description": { "en": "A gentle night raga for deep rest and peace", "hi": "Gehre aaram aur shaanti ke liye ek naram raat ka raag" },
+      "affirmation": { "en": "As this night melody softens the dark, a deep peace settles over us both.", "hi": "Jaise yeh raat ki dhun andhere ko naram karti hai, ek gehri shaanti hum dono par utar aati hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Ready In My Own Time", "hi": "Main Apne Samay Par Taiyaar Hoon" },
+      "content": { "en": "I do not need to have every answer before my baby arrives. I will learn each thing as it comes, and that is enough.", "hi": "Baby ke aane se pehle mujhe har jawaab paane ki zaroorat nahi. Main har cheez jaise-jaise aayegi seekhungi, aur yeh kaafi hai." },
+      "remember": { "en": "You will grow into each moment as it comes.", "hi": "Aap har pal mein jaise woh aayega waise badh jaayengi." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 241,
+    "week": 35,
+    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "nanhi saansein abhyaas kar raha hai, duniya ke liye taiyaar ho raha hai" },
+    "grow": {
+      "title": { "en": "Hear The Feeling Beneath The Words", "hi": "Shabdon Ke Neeche Ki Bhaavna Suno" },
+      "insight": { "en": "Children, like all of us, often say one thing while feeling another. The real message lives beneath the words.", "hi": "Bachche, hum sab ki tarah, aksar ek cheez kehte hain jab kuch aur mehsoos kar rahe hote hain. Asli sandesh shabdon ke neeche rehta hai." },
+      "expanded": { "en": "When a tired child snaps 'I don't care,' they often mean the very opposite. The words are only the surface; the feeling beneath is what truly asks to be heard. Learning to listen for that feeling — the hurt under the anger, the fear under the stubbornness — is one of the most loving skills a parent can grow. You can begin tuning your ear now, by noticing the feelings beneath your own words and the words of those around you. The gentler your listening, the safer your child will feel bringing you their tender, unspoken truths.", "hi": "Jab ek thaka hua bachcha jhalla kar kehta hai 'mujhe parwah nahi,' woh aksar bilkul ulta matlab rakhta hai. Shabd to sirf satah hain; neeche ki bhaavna hi woh hai jo sach mein suni jaana maangti hai. Us bhaavna ko sunna seekhna — gusse ke neeche ki chot, zid ke neeche ka dar — ek parent ke sabse pyaare kaushalon mein se ek hai. Aap apni aur aas-paas ke logon ke shabdon ke neeche ki bhaavnaon ko note kar ke abhi se apna kaan tuning kar sakti hain. Aapki sunna jitni naram hogi, aapka bachcha apne komal, ankahe sach laane mein utna hi surakshit mehsoos karega." },
+      "deepDive": { "en": "Psychologists call this 'emotional attunement' — sensing the feeling behind behaviour. Children whose parents attune to their emotions tend to manage their own feelings better as they grow.", "hi": "Psychologists ise 'emotional attunement' kehte hain — vyavhaar ke peeche ki bhaavna ko mehsoos karna. Jin bachchon ke parents unki bhaavnaon se attune hote hain woh bade hote hue apni bhaavnaon ko behtar sambhaalte hain." },
+      "remember": { "en": "Listen past the words to the feeling asking to be held.", "hi": "Shabdon se aage us bhaavna ko suno jo thaame jaane ko keh rahi hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Wisdom Of Vidura", "hi": "Vidur Ki Buddhimatta" },
+      "summary": { "en": "A wise counsellor is valued for hearing the truth others were afraid to speak.", "hi": "Ek buddhimaan salaahkaar isliye saraaha jaata hai kyunki woh woh sach sunta tha jise kehne se baaki darte the." },
+      "body": { "en": "In the great court of Hastinapura served Vidura, counsellor to the king and known throughout the land for his fairness. While other ministers spoke only the words the king wished to hear, Vidura listened carefully to everyone — the powerful and the powerless alike — and spoke the truth as he understood it.\n\nWhen the king's heart grew troubled, it was Vidura he called, not for flattery but for honest counsel. Vidura would sit quietly, hearing not just the king's words but the worry beneath them, and only then offer his measured advice. He never spoke to please; he spoke to help.\n\nThough his words were not always welcome, Vidura was trusted above all others, for everyone knew he truly listened before he spoke. His name endured through the ages as a symbol of wise listening — proof that the one who hears deeply, and answers honestly, becomes the one whose voice is most valued.", "hi": "Hastinapur ke mahaan darbaar mein Vidur seva karta tha, raja ka salaahkaar aur poori dharti mein apni nyaaypriyata ke liye jaana jaata. Jahaan baaki mantri sirf wahi shabd kehte jo raja sunna chahta, Vidur dhyaan se sab ki sunta — taakatwar aur taakat-heen dono ki — aur jaisa woh samajhta waisa sach kehta.\n\nJab raja ka dil pareshaan hota, woh Vidur ko hi bulaata, chaaploosi ke liye nahi balki imaandaar salah ke liye. Vidur shaanti se baithta, raja ke sirf shabd hi nahi balki unke neeche ki chinta bhi sunta, aur tabhi apni soch-samajh kar di gayi salah deta. Woh kabhi khush karne ke liye nahi bola; woh madad karne ke liye bola.\n\nHalaanki uske shabd hamesha swaagat nahi paate the, Vidur par sab se zyada bharosa kiya jaata, kyunki sab jaante the ki woh bolne se pehle sach mein sunta tha. Uska naam yugon tak buddhimaan sunne ke prateek ke roop mein bana raha — is baat ka saboot ki jo gehre se sunta hai aur imaandaari se jawaab deta hai, wahi woh banta hai jiski aawaaz sabse zyada keemti hoti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will always make room for their voice, even on busy days.", "hi": "Apne baby ko bataayein ki aap hamesha unki aawaaz ke liye jagah banaayengi, vyast dinon mein bhi." },
+      "motivation": { "en": "A child given space to speak learns their voice has value.", "hi": "Jis bachche ko bolne ki jagah milti hai woh seekhta hai ki uski aawaaz ki keemat hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Listen With An Open Heart", "hi": "Main Khule Dil Se Sunti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "An affirmation of open, loving listening", "hi": "Khule, pyaar bhare sunne ka ek affirmation" },
+      "affirmation": { "en": "I open my heart to hear you fully, today and in every year to come.", "hi": "Main apna dil khol kar tumhe poori tarah sunti hoon, aaj aur aane wale har saal mein." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Heartburn Steals Your Sleep", "hi": "Jab Seene Ki Jalan Neend Churaaye" },
+      "content": { "en": "If a rising baby is pressing up under your ribs and bringing heartburn, try eating smaller meals more often and finishing dinner a couple of hours before bed. Cool milk or a little curd can soothe the burn gently.", "hi": "Agar badhta baby aapki pasliyon ke neeche dabaa raha hai aur seene mein jalan laa raha hai, to chhote-chhote khaane baar-baar khaane ki koshish karein aur raat ka khaana sone se do ghante pehle khatam karein. Thanda doodh ya thoda dahi jalan ko pyaar se shaant kar sakta hai." },
+      "remember": { "en": "Small, gentle meals are kinder to a crowded belly.", "hi": "Chhote, naram khaane ek bhare pet ke saath zyada dayaalu hote hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 242,
+    "week": 35,
+    "babyLearning": { "en": "growing aware of your voice, soothed by its sound", "hi": "aapki aawaaz se vaakif ho raha hai, uski dhwani se shaant" },
+    "grow": {
+      "title": { "en": "Get Down To Their Level", "hi": "Unke Star Tak Aao" },
+      "insight": { "en": "When you kneel down to a child's height and meet their eyes, you tell them without words that they matter.", "hi": "Jab aap ek bachche ki ooonchaai tak jhukti hain aur unki aankhon se milti hain, aap unhe bina shabdon ke batati hain ki woh maayne rakhte hain." },
+      "expanded": { "en": "A small child lives in a world of towering legs and faraway faces. When a parent crouches down to meet them eye to eye, the whole conversation changes — the child feels seen, equal, safe. This simple act says, 'I am here with you, not above you.' Listening is not only with the ears; it is with the body, the eyes, the whole turned-toward presence. You can carry this into parenthood as a quiet habit: when your child speaks of something that matters to them, get down to their level and truly be there, and they will feel the depth of being heard.", "hi": "Ek chhota bachcha ooche paairon aur door ke chehron ki duniya mein rehta hai. Jab ek parent unse aankh-se-aankh milaane ke liye jhukta hai, poori baatcheet badal jaati hai — bachcha dekha hua, barabar, surakshit mehsoos karta hai. Yeh saadhaaran kaam kehta hai, 'main tumhare saath hoon, tumse ooper nahi.' Sunna sirf kaanon se nahi hota; yeh sharir se, aankhon se, poori muddi hui maujoodgi se hota hai. Aap ise parenthood mein ek shaant aadat ki tarah le ja sakti hain: jab aapka bachcha kisi aisi baat ka zikr kare jo unke liye maayne rakhti hai, unke star tak jhukein aur sach mein wahan hon." },
+      "deepDive": { "en": "Researchers find that getting to a child's eye level lowers their stress and increases cooperation, because it signals respect and safety rather than command from above.", "hi": "Researchers paate hain ki bachche ki aankhon ke star tak aana unka stress kam karta hai aur sehyog badhata hai, kyunki yeh ooper se hukm ke bajaaye samman aur surakshaa ka sanket deta hai." },
+      "remember": { "en": "Meet a child at their level, and they feel met in their heart.", "hi": "Ek bachche se unke star par milo, aur woh apne dil mein mila hua mehsoos karte hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The King Who Learned To Listen", "hi": "Woh Raja Jisne Sunna Seekha" },
+      "summary": { "en": "A distant king discovers true rule begins with hearing his humblest subjects.", "hi": "Ek door rehne wala raja jaanta hai ki sachi hukoomat apni sabse vinamra praja ko sunne se shuru hoti hai." },
+      "body": { "en": "Long ago, a king ruled from a high golden throne, giving orders he believed were wise. Yet his kingdom grew unhappy, and he could not understand why. Troubled, he sought the counsel of a wise old hermit at the edge of the forest.\n\n'Great king,' said the hermit, 'you speak to your people from far above. Have you ever come down to listen to them?' Stung but thoughtful, the king disguised himself in plain clothes and walked among his people. He sat with farmers in their fields, with mothers at the village well, with children in the dust. For the first time, he heard their real worries — not the polished reports of his ministers.\n\nWhen he returned to his throne, the king ruled differently. He lowered his seat, opened his court to the humblest voices, and listened before he decreed. His kingdom flourished, and he understood at last that a true ruler must first come down and listen.", "hi": "Bahut samay pehle, ek raja ek ooche sunhre sinhaasan se shaasan karta tha, aise aadesh deta jinhe woh buddhimaan maanta tha. Phir bhi uska raajya dukhi hota gaya, aur woh samajh nahi paaya kyun. Pareshaan ho kar, usne van ke kinaare ek buddhimaan boodhe sanyaasi ki salah maangi.\n\n'Mahaan raja,' sanyaasi ne kaha, 'aap apni praja se bahut ooper se baat karte hain. Kya aap kabhi unhe sunne ke liye neeche aaye hain?' Chubha par soch mein pada, raja ne saadhaaran kapdon mein bhes badla aur apni praja ke beech ghoom aaya. Woh kisaanon ke saath unke khethon mein baitha, maaon ke saath gaon ke kuein par, bachchon ke saath dhool mein. Pehli baar, usne unki asli chintaayein suni — apne mantriyon ki chamkdaar reports nahi.\n\nJab woh apne sinhaasan par lauta, raja ne alag tarah se shaasan kiya. Usne apni gaddi neeche ki, apne darbaar ko sabse vinamra aawaazon ke liye khola, aur aadesh dene se pehle suna. Uska raajya phala-phoola, aur use aakhir samajh aaya ki ek sache shaasak ko pehle neeche aana aur sunna chahiye." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how their feelings will always matter to you, big or small.", "hi": "Apne baby ko bataayein ki unki bhaavnaayein, badi ho ya chhoti, aapke liye hamesha maayne rakhengi." },
+      "motivation": { "en": "A child whose feelings are honoured learns to trust their own heart.", "hi": "Jis bachche ki bhaavnaon ka samman hota hai woh apne dil par bharosa karna seekhta hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Coming Down To Meet You", "hi": "Tumse Milne Neeche Aana" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on tender, level presence", "hi": "Komal, barabari ki maujoodgi par ek chhota dhyan" },
+      "affirmation": { "en": "I lower myself gently to where you are, and meet you with all my heart.", "hi": "Main pyaar se neeche aati hoon jahaan tum ho, aur tumse apne poore dil se milti hoon." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take three slow breaths and let your shoulders soften. Now imagine gently lowering all your worries and busyness, coming down to a quiet, warm place where only you and your baby are. Rest there together for a few breaths.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein aur apne kandhon ko naram hone dein. Ab apni saari chintaaon aur vyastata ko pyaar se neeche utaarte hue sochein, ek shaant, garm jagah par aate hue jahaan sirf aap aur aapka baby hain. Kuch saanson ke liye wahan saath aaram karein." },
+      "closingThought": { "en": "You met your baby where they are, with nothing in the way. Let that closeness stay with you.", "hi": "Aap apne baby se wahan mili jahaan woh hain, beech mein kuch nahi. Us nazdeeki ko apne saath rehne dein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Three Soft Sighs", "hi": "Teen Naram Aahein" },
+      "content": { "en": "Breathe in gently through your nose, then let the air out through your mouth with a soft, audible sigh. Three of these release the tension you did not know you were holding.", "hi": "Apni naak se pyaar se saans lein, phir munh se ek naram, sunaayi dene wali aah ke saath hawa baahar chhodein. Aise teen woh tanaav chhod dete hain jise aap pakad rahi thi par jaanti nahi thi." },
+      "remember": { "en": "A sigh is the body's own way of letting go.", "hi": "Ek aah sharir ka khud jaane dene ka tareeka hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 243,
+    "week": 35,
+    "babyLearning": { "en": "resting and turning gently, getting cosy", "hi": "aaram karta aur pyaar se ghoomta, aaram se bas raha hai" },
+    "grow": {
+      "title": { "en": "Silence Makes Room To Speak", "hi": "Khaamoshi Bolne Ki Jagah Banaati Hai" },
+      "insight": { "en": "Sometimes the kindest thing we can offer is not words at all, but a patient silence that invites another to speak.", "hi": "Kabhi-kabhi sabse dayaalu cheez jo hum de sakte hain woh shabd nahi, balki ek sabra bhari khaamoshi hai jo doosre ko bolne ka nyota deti hai." },
+      "expanded": { "en": "We are often uncomfortable with silence, rushing to fill every pause with words or advice. But a gentle, unhurried quiet can be a gift — it tells the other person there is room here, take your time. Children especially need this space; their thoughts come slowly, and they often need a few quiet beats to find the words for what they feel. When you learn to wait in warm silence instead of jumping in, you give your child the priceless message that they need not hurry to be heard. The pause itself becomes an open door.", "hi": "Hum aksar khaamoshi se asahaj hote hain, har thehraav ko shabdon ya salah se bharne ki jaldi mein. Par ek naram, bina jaldi ki khaamoshi ek tohfa ho sakti hai — yeh doosre vyakti ko batati hai ki yahan jagah hai, apna samay lo. Bachchon ko khaas taur par yeh jagah chahiye; unke vichaar dheere aate hain, aur unhe aksar kuch shaant pal chahiye taaki woh apni bhaavna ke liye shabd dhoondh saken. Jab aap beech mein koodne ke bajaaye garm khaamoshi mein intezaar karna seekhti hain, aap apne bachche ko yeh anmol sandesh deti hain ki suna jaane ke liye unhe jaldi karne ki zaroorat nahi." },
+      "deepDive": { "en": "Educators find that waiting a few extra seconds after a child speaks — a 'pause for thought' — leads to richer, fuller answers. Silence, given with warmth, draws out the words.", "hi": "Shikshak paate hain ki bachche ke bolne ke baad kuch aur second intezaar karna — ek 'sochne ka thehraav' — zyada bharpoor jawaab laata hai. Khaamoshi, garmjoshi ke saath di gayi, shabdon ko baahar laati hai." },
+      "remember": { "en": "A warm silence often says more than the right words.", "hi": "Ek garm khaamoshi aksar sahi shabdon se zyada kehti hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The Judge Who Would Not Listen", "hi": "Tenali Rama Aur Woh Nyaayadheesh Jo Sunta Nahi Tha" },
+      "summary": { "en": "Clever Tenali Rama teaches a hasty judge to listen before he decides.", "hi": "Chalaak Tenali Rama ek jaldbaaz nyaayadheesh ko faisla karne se pehle sunna sikhaata hai." },
+      "body": { "en": "In a town near Vijayanagara sat a judge famous for his speed. He passed his rulings so quickly that he rarely let anyone finish speaking, certain he already knew the truth. Many felt wronged, but none dared complain. So they quietly asked Tenali Rama for help.\n\nThe next day Tenali stood before the judge and began a tale. 'Sir, my neighbour borrowed my pot and—' 'Guilty! Return the pot!' snapped the judge at once. Tenali bowed. 'But sir, in my story the neighbour is me, and the pot was never borrowed at all. You ruled before you heard a single fact.'\n\nThe court fell silent. The judge's face reddened as he realised how often his haste had wronged the innocent. From that day he learned to hear every word before he spoke, and Tenali smiled, for he had taught a powerful man the simplest lesson: justice begins with listening.", "hi": "Vijayanagara ke paas ek shehar mein ek nyaayadheesh baithta tha jo apni tezi ke liye mashhoor tha. Woh apne faisle itni jaldi sunaata ki kisi ko bhi kabhi poora bolne nahi deta, yaqeen kar ki use sach pehle se pata hai. Bahut log apne saath anyaay mehsoos karte, par koi shikaayat karne ki himmat nahi karta. To unhone chupchaap Tenali Rama se madad maangi.\n\nAgle din Tenali nyaayadheesh ke saamne khada hua aur ek kahani shuru ki. 'Mahoday, mere padosi ne mera ghada udhaar liya aur—' 'Doshi! Ghada wapas karo!' nyaayadheesh turant jhalla pada. Tenali jhuka. 'Par mahoday, meri kahani mein padosi to main hi hoon, aur ghada kabhi udhaar liya hi nahi gaya. Aapne ek bhi baat sunne se pehle faisla de diya.'\n\nDarbaar mein khaamoshi cha gayi. Nyaayadheesh ka chehra laal ho gaya jab use ehsaas hua ki uski jaldbaazi ne kitni baar nirdoshon ke saath anyaay kiya. Us din se usne bolne se pehle har shabd sunna seekha, aur Tenali muskuraaya, kyunki usne ek taakatwar aadmi ko sabse saadhaaran sabak sikhaaya tha: nyaay sunne se shuru hota hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will kneel down to meet their eyes when they speak to you.", "hi": "Apne baby ko bataayein ki jab woh aapse bolenge to aap unki aankhon se milne ke liye jhuk jaayengi." },
+      "motivation": { "en": "Meeting a child eye to eye tells them they are truly seen.", "hi": "Ek bachche se aankh-se-aankh milna unhe batata hai ki unhe sach mein dekha gaya hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Make Quiet Space For You", "hi": "Main Tumhare Liye Shaant Jagah Banaati Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "An affirmation of patient, spacious listening", "hi": "Sabra bhari, khuli sunne ka ek affirmation" },
+      "affirmation": { "en": "I will hold a calm and patient space, so you never need to hurry to be heard.", "hi": "Main ek shaant aur sabra bhari jagah rakhungi, taaki tumhe suna jaane ke liye kabhi jaldi na karni pade." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Can Rest Without Earning It", "hi": "Main Bina Kamaaye Aaram Kar Sakti Hoon" },
+      "content": { "en": "In these last weeks, my body is doing quiet, heavy work. I am allowed to rest simply because I need it.", "hi": "In aakhri hafton mein, mera sharir shaant, bhaari kaam kar raha hai. Mujhe sirf isliye aaram karne ki ijaazat hai kyunki mujhe iski zaroorat hai." },
+      "remember": { "en": "Rest is not a reward; it is a need you may meet freely.", "hi": "Aaram inaam nahi hai; yeh ek zaroorat hai jise aap khulkar poora kar sakti hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 244,
+    "week": 35,
+    "babyLearning": { "en": "growing curious, soothed by gentle sounds", "hi": "jigyaasu ho raha hai, naram aawaazon se shaant" },
+    "grow": {
+      "title": { "en": "Their Questions Deserve Answers", "hi": "Unke Sawaalon Ke Jawaab Milne Chahiye" },
+      "insight": { "en": "A child's endless questions are not interruptions to manage. They are the sound of a mind reaching out to understand the world.", "hi": "Ek bachche ke anant sawaal sambhaalne wale vighn nahi hain. Yeh duniya ko samajhne ke liye haath badhaate ek mann ki aawaaz hain." },
+      "expanded": { "en": "Children ask question after question — why is the sky blue, where does the rain go, why must we sleep. It can feel tiring, but each question is a small act of trust: they believe you are someone worth asking. How you answer matters less than that you answer warmly, taking their curiosity seriously even when you do not know the answer. 'That's a wonderful question, let us find out together' is one of the most loving sentences a parent can say. You can decide now to be a parent who welcomes questions rather than rushing them away.", "hi": "Bachche sawaal par sawaal poochte hain — aasmaan neela kyun hai, baarish kahaan jaati hai, humein sona kyun padta hai. Yeh thaka dene wala lag sakta hai, par har sawaal bharose ka ek chhota kaam hai: woh maante hain ki aap poochne layak hain. Aap kaise jawaab dete hain yeh us se kam maayne rakhta hai ki aap garmjoshi se jawaab dete hain, unki jigyaasa ko gambheerta se lete hain tab bhi jab aapko jawaab na pata ho. 'Yeh ek shaandaar sawaal hai, chalo saath dhoondhte hain' ek parent ke sabse pyaare vaakyon mein se ek hai. Aap abhi tay kar sakti hain ki aap aisi parent banengi jo sawaalon ka swagat kare." },
+      "deepDive": { "en": "Researchers find that children whose questions are answered warmly ask more, learn more, and keep their natural curiosity alive far longer. How we receive a question shapes whether a child keeps asking.", "hi": "Researchers paate hain ki jin bachchon ke sawaalon ka garmjoshi se jawaab milta hai woh zyada poochte hain, zyada seekhte hain, aur apni svaabhaavik jigyaasa ko kahin lambe samay tak zinda rakhte hain. Hum ek sawaal ko kaise lete hain yeh tay karta hai ki bachcha poochta rahega ya nahi." },
+      "remember": { "en": "Every question welcomed keeps a child's curiosity alive.", "hi": "Har swaagat kiya gaya sawaal ek bachche ki jigyaasa ko zinda rakhta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Boy And The Seashell", "hi": "Ladka Aur Samundar Ka Sippi" },
+      "summary": { "en": "A curious boy learns that a true answer is often found by patient listening.", "hi": "Ek jigyaasu ladka seekhta hai ki sacha jawaab aksar sabra se sunne par milta hai." },
+      "body": { "en": "A small boy in a fishing village found a beautiful seashell on the shore. Holding it up, he asked everyone he met, 'What sound does the sea make?' The busy fishermen had no time; the merchant gave a careless answer; even his own father, tired from work, said only, 'The sea makes a roaring noise, now run along.'\n\nUnsatisfied, the boy carried his shell to his old grandmother, who was mending nets by the door. She did not answer right away. Instead she gently lifted the shell to his own ear and said, 'Listen, child. Do not ask the sea what it sounds like — let it tell you itself.'\n\nThe boy pressed the shell close and grew very still. And there, in the quiet, he heard a soft and endless whispering, like waves breathing far away. He smiled. The grandmother had given him the finest answer of all — not by telling him, but by teaching him to listen.", "hi": "Ek machhuaare gaon ka ek chhota ladka kinaare par ek sundar sippi le aaya. Use upar uthaa kar, woh har milne wale se poochta, 'Samundar kaisi aawaaz karta hai?' Vyast machhuaaron ke paas samay nahi tha; vyapaari ne laaparwaah jawaab diya; uske apne pita ne bhi, kaam se thake, sirf itna kaha, 'Samundar garajne wali aawaaz karta hai, ab jaa.'\n\nasantusht, ladka apni sippi apni boodhi daadi ke paas le gaya, jo darwaaze ke paas jaal seel rahi thi. Usne turant jawaab nahi diya. Balki usne pyaar se sippi ladke ke apne kaan tak uthaayi aur kaha, 'Suno, bachche. Samundar se mat poocho ki woh kaisa lagta hai — use khud batane do.'\n\nLadke ne sippi paas dabaayi aur bilkul shaant ho gaya. Aur wahan, us khaamoshi mein, usne ek naram aur anant phusphusaahat suni, jaise door saansein leti leherein. Woh muskuraaya. Daadi ne use sab se behtareen jawaab diya tha — use bata kar nahi, balki use sunna sikhaa kar." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about all the questions you cannot wait to answer for them one day.", "hi": "Apne baby ko un saare sawaalon ke baare mein bataayein jinka jawaab dene ke liye aap ek din bekrar hain." },
+      "motivation": { "en": "Welcoming a child's questions keeps their wonder alive for life.", "hi": "Ek bachche ke sawaalon ka swagat unke aashcharya ko jeevan bhar zinda rakhta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Vibhas", "hi": "Raag Vibhas" },
+      "durationMinutes": 4,
+      "description": { "en": "A serene dawn raga for a calm, hopeful morning", "hi": "Ek shaant, ummeed bhari subah ke liye ek shaant bhor ka raag" },
+      "affirmation": { "en": "As this dawn melody rises, a fresh and hopeful calm awakens in me, for you.", "hi": "Jaise yeh bhor ki dhun uthti hai, ek taazi aur ummeed bhari shaanti mujhmein jaagti hai, tumhare liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Your Belly Feels Too Full To Eat", "hi": "Jab Pet Khaane Ke Liye Bahut Bhara Lage" },
+      "content": { "en": "As your baby grows, there is less room for big meals. If you feel full quickly, try gentle, nourishing little plates spread through the day — a handful of nuts, some fruit, a small bowl of dal — so you and your baby stay well fed without strain.", "hi": "Jaise aapka baby badhta hai, bade khaane ke liye kam jagah bachti hai. Agar aap jaldi bhara mehsoos karein, to din bhar mein naram, poshak chhoti plates lein — mutthi bhar nuts, kuch phal, ek chhoti katori dal — taaki aap aur aapka baby bina takleef ke achhe se khaaye rahein." },
+      "remember": { "en": "Many small bites can nourish as well as one big meal.", "hi": "Kai chhote nivaale ek bade khaane jitna hi poshan de sakte hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 245,
+    "week": 35,
+    "babyLearning": { "en": "closing the week, growing calm and ready", "hi": "hafta poora karte hue, shaant aur taiyaar hote hue" },
+    "grow": {
+      "title": { "en": "To Listen Is To Honour", "hi": "Sunna Hi Samman Karna Hai" },
+      "insight": { "en": "When you truly listen to someone, you are telling them, without a single word, that they matter to you.", "hi": "Jab aap kisi ko sach mein sunti hain, aap unhe ek bhi shabd ke bina batati hain ki woh aapke liye maayne rakhte hain." },
+      "expanded": { "en": "Listening is one of the deepest forms of respect we can offer another person. To set aside our own thoughts and give someone our full attention says, 'you are worth my time, my patience, my presence.' Much of what our children feel about themselves is shaped by whether the people they love truly listen to them. Often a child says little in words but much in silence, in a held breath, in a look. To listen is to honour even what is not spoken. As you grow into this role, let your gift of listening be one of the first ways your child learns they are loved.", "hi": "Sunna kisi doosre vyakti ko diye jaa sakne wale samman ke sabse gehre roopon mein se ek hai. Apne vichaaron ko kinaare rakh kar kisi ko apna poora dhyan dena kehta hai, 'tum mere samay, mere sabra, meri maujoodgi ke layak ho.' Hamare bachche apne baare mein jo mehsoos karte hain uska bahut hissa is se gadta hai ki jinhe woh pyaar karte hain woh unhe sach mein sunte hain ya nahi. Aksar ek bachcha shabdon mein kam kehta hai par khaamoshi mein, ek ruki saans mein, ek nazar mein bahut kuch. Sunna woh bhi samman karna hai jo kaha nahi gaya." },
+      "deepDive": { "en": "Researchers in attachment find that children who feel deeply listened to develop stronger self-worth and trust. The simple experience of being truly heard tells a child that who they are is enough.", "hi": "Attachment ke researchers paate hain ki jo bachche gehre se suna jaana mehsoos karte hain woh majboot aatma-mulya aur bharosa vikasit karte hain. Sach mein suna jaane ka saadhaaran anubhav ek bachche ko batata hai ki woh jaise hain waise hi kaafi hain." },
+      "remember": { "en": "To listen deeply is to tell someone they matter.", "hi": "Gehre se sunna hi kisi ko batana hai ki woh maayne rakhte hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "What The Forest Tells The Quiet", "hi": "Jungle Shaant Ko Kya Batata Hai" },
+      "summary": { "en": "A restless wanderer learns the forest only reveals itself to those who grow still and listen.", "hi": "Ek bechain bhatakne wala seekhta hai ki jungle sirf un par khulta hai jo shaant ho kar sunte hain." },
+      "body": { "en": "A young traveller walked into a great forest, eager to see all its wonders. He hurried down the paths, his footsteps loud, calling out and crashing through the leaves. 'Where are the birds I was promised? Where are the deer?' he complained. The forest seemed empty and silent, and he grew frustrated.\n\nAn old woodcutter resting beneath a tree watched him and smiled. 'You are listening with your feet, not your ears,' he said. 'Sit. Be still. Let the forest forget you are here.' The traveller, tired, finally sat down and grew quiet.\n\nLittle by little, the forest came alive around him. A bird returned to a branch and sang. A deer stepped softly into the clearing. Beetles, breezes, the trickle of a hidden stream — all the hushed life he had frightened away crept gently back. He understood at last: the forest, like all living things, gives itself only to those who grow quiet enough to truly listen.", "hi": "Ek jawaan musafir ek bade jungle mein chala, uske saare ajoobe dekhne ko bekrar. Woh raahon par jaldi-jaldi chala, uske kadam zor se padte, chillaata aur patton ko tod-modta. 'Jin pakshiyon ka vaada tha woh kahaan hain? Hiran kahaan hain?' usne shikaayat ki. Jungle khaali aur shaant lagta tha, aur woh jhunjhla gaya.\n\nEk ped ke neeche aaram karta ek boodha lakadhara use dekh kar muskuraaya. 'Tum apne pairon se sun rahe ho, kaanon se nahi,' usne kaha. 'Baitho. Shaant ho jaao. Jungle ko bhool jaane do ki tum yahaan ho.' Musafir, thaka hua, aakhir baith gaya aur shaant ho gaya.\n\nThode-thode kar ke, jungle uske around zinda ho gaya. Ek pakshi ek tehni par laut aaya aur gaaya. Ek hiran narmi se khuli jagah mein aaya. Bhrang, hawaayein, ek chhupi nadi ki dhaar — woh saari dhimi zindagi jise usne daraa kar bhaga diya tha, pyaar se laut aayi. Use aakhir samajh aaya: jungle, sabhi jeevit cheezon ki tarah, khud ko sirf un par khol deta hai jo sach mein sunne ke liye kaafi shaant ho jaate hain." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will learn to hear even the things they do not say aloud.", "hi": "Apne baby ko bataayein ki aap woh cheezein bhi sunna seekhengi jo woh bolkar nahi kehte." },
+      "motivation": { "en": "A parent who hears the unspoken makes a child feel truly known.", "hi": "Jo parent ankaha sunta hai woh ek bachche ko sach mein jaana hua mehsoos karaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Hearing What Is Unspoken", "hi": "Ankahe Ko Sunna" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on deep, wordless attention", "hi": "Gehre, bina shabdon ke dhyan par ek chhota dhyan" },
+      "affirmation": { "en": "I grow still enough to feel what you feel, even before you have words.", "hi": "Main itni shaant hoti hoon ki jo tum mehsoos karte ho use mehsoos kar saku, shabdon se bhi pehle." },
+      "introduction": { "en": "Settle comfortably and let your eyes close. Take three slow breaths and let everything quieten. Now rest your attention gently on your baby, without thoughts or words — simply feel their presence, and let yourself be present in return. Stay here together in this wordless quiet.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein aur sab kuch shaant hone dein. Ab apna dhyan pyaar se apne baby par tikaayein, bina vichaar ya shabdon ke — bas unki maujoodgi ko mehsoos karein, aur badle mein khud ko maujood hone dein. Is bina shabdon ki shaanti mein saath rahein." },
+      "closingThought": { "en": "Without a single word, you and your baby understood each other. Let that gentle knowing stay.", "hi": "Ek bhi shabd ke bina, aap aur aapke baby ne ek doosre ko samjha. Us naram samajh ko rehne dein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe And Lengthen The Spine", "hi": "Saans Lein Aur Reedh Ko Lamba Karein" },
+      "content": { "en": "Sit tall and breathe in slowly, gently lengthening your spine and making a little more room inside. As you breathe out, soften your shoulders. Five slow rounds ease a heavy, crowded body.", "hi": "Seedha baithein aur dheere saans lein, apni reedh ko pyaar se lamba karte hue aur andar thodi aur jagah banaate hue. Saans chhodte hue apne kandhon ko naram karein. Paanch dheemi baar ek bhaari, bhare sharir ko aaram deti hain." },
+      "remember": { "en": "A little more breath makes a little more room.", "hi": "Thodi aur saans thodi aur jagah banaati hai." },
+      "durationMinutes": 2
+    }
+  }
+]

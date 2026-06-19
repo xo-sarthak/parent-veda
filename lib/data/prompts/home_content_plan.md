@@ -183,3 +183,21 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk31 (What I Hope You'll Treasure): what truly matters · the wonder to never lose · why gratitude matters · a simple joy to treasure · what I find meaningful · the kind of rich to become · finding peace within
 ### Garbh ragas used (cont., T3): Bhatiyar/dawn(wk28 d191) · Jhinjhoti/eve(wk28 d194) · Gorakh Kalyan/eve(wk29 d199) · Pahadi/eve(wk29 d202) · Chhayanat/eve(wk30 d204) · Kamod/eve(wk30 d208) · Puriya Kalyan/eve(wk31 d212) · Saraswati/eve(wk31 d216)
 ### T3 cadence: Garbh per wk = 3 meditation / 2 raga / 2 affirm (meditation-led). Nurture per wk = 3 breathe / 2 food / 2 affirm (breathe-led; calm, rest, birth-prep). Tone = grounding, preparing-to-meet.
+
+## Batch weeks 32-35 (T3 cont.) — Patience & Presence
+### Grow used (cont.)
+- wk32 (The Gift Of Your Full Attention): Your Attention Is Love · Put The Phone Down · Presence Over Presents · Five Minutes Of Just You · The Magic Of Being Seen · Undivided Is Unforgettable · A Moment Of True Attention
+- wk33 (Patience Is A Practice): Patience Is A Daily Practice · The Slow Yes · Rushing Teaches Rushing · Let The Pace Be Gentle · Repeat, Without Resentment · Patience Outlasts Frustration · Breathe Through The Wait
+- wk34 (Childhood Is Not A Race): Childhood Is Not A Race · Let Them Be Little · Milestones Aren't Deadlines · There's No Rush To Grow Up · Every Child Has Their Own Clock · Don't Wish The Stages Away · Slow Days Make Strong Roots
+- wk35 (Listen To Understand): Listen To Understand, Not To Reply · Small Voices, Big Thoughts · Hear The Feeling Beneath The Words · Get Down To Their Level · Silence Makes Room To Speak · Their Questions Deserve Answers · To Listen Is To Honour
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk32: The Hare With Many Friends · The Washerman's Dog · Krishna Plays With The Cowherds · The Deer Who Watched And Listened · Tenali Rama And The King's Distraction · The Busy Merchant And His Son · The Gardener Who Truly Watched
+- wk33: The Pumpkin And The Oak Tree · The Heron Who Could Not Wait · How Valmiki Became A Poet · The Restless Young Monk · Birbal And The King Who Wanted It Now · The Farmer Who Rushed His Crops · The Patient Bamboo
+- wk34: The Ant And The Chrysalis · The Fledgling Who Flew Too Soon · Yashoda And Krishna's First Steps · The Lion Cub Among The Goats · Birbal And The Hasty Builder · The Butterfly's Struggle · The Fruit That Ripened In Its Time
+- wk35: The Donkey And The Lapdog · The Sage Who Would Not Listen · The Wisdom Of Vidura · The King Who Learned To Listen · Tenali Rama And The Judge Who Would Not Listen · The Boy And The Seashell · What The Forest Tells The Quiet
+### Talk prompts (cont.)
+- wk32 (Being Present With You): my full attention · putting away distractions · little daily moments · being there for small things · how I'll truly see you · slowing down for you · time that's just ours
+- wk33 (Patience & Time): patience I'm learning · never rush you · waiting these months · letting you take your time · the calm I'll bring · good things take time · growing patience as I wait
+- wk34 (Watching You Grow): stages I look forward to · let you be little · cheering each milestone · not wishing childhood away · joy of watching you discover · your own pace · savouring you at every age
+- wk35 (I'm Listening): always listen · hear your every thought · space for your voice · your feelings matter · get to your level · questions I'll answer · hear what you don't say
+### Garbh ragas used (cont., T3): Nat Bhairav/morn(wk32 d219) · Hem Kalyan/eve(wk32 d222) · Megh/monsoon(wk33 d227) · Suha/aft(wk33 d230) · Bihagda/night(wk34 d232) · Nayaki Kanada/night(wk34 d236) · Shahana/night(wk35 d240) · Vibhas/dawn(wk35 d244)
