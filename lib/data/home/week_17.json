@@ -1,0 +1,282 @@
+[
+  {
+    "day": 113,
+    "week": 17,
+    "babyLearning": { "en": "growing fast, soft fat beginning to cushion them", "hi": "tezi se badh raha hai, naram charbi unhe gaddi dene lagi" },
+    "grow": {
+      "title": { "en": "Warmth Shapes The Brain", "hi": "Garmjoshi Dimaag Ko Gadhti Hai" },
+      "insight": { "en": "Every warm moment you share does more than feel good — it quietly helps build the very wiring of your baby's brain.", "hi": "Har garm pal jo aap baantti hain woh sirf achha nahi lagta — woh chupchaap aapke baby ke dimaag ki taar-baar banane mein madad karta hai." },
+      "expanded": { "en": "Warmth is not a soft extra on top of 'real' parenting — it is the work itself. The cuddles, the soothing voice, the unhurried attention you imagine giving your child are not just sweet; they shape how their brain learns to feel safe, to trust, to calm down. A baby held in warmth grows the pathways for confidence and connection. So the affection welling up in you now is not something to ration or worry about. It is one of the most important things you will ever give, and you are already learning to give it freely.", "hi": "Garmjoshi 'asli' parenting ke upar ek naram extra nahi hai — yahi to asli kaam hai. Woh jhappiyaan, woh shaant aawaz, woh bina jaldi ka dhyan jo aap apne bachche ko dene ki kalpana karti hain, woh sirf pyaare nahi; woh gadhte hain ki unka dimaag surakshit mehsoos karna, bharosa karna, shaant hona kaise seekhta hai. Garmjoshi mein thaama gaya baby aatmavishwaas aur judaav ki raahein banata hai. To jo pyaar abhi aap mein umad raha hai use raashan karne ya chinta karne ki zaroorat nahi. Yeh sabse zaroori cheezon mein se ek hai jo aap kabhi denge, aur aap pehle se hi use khulkar dena seekh rahi hain." },
+      "deepDive": { "en": "Neuroscientists find that warm, responsive care literally strengthens the neural connections tied to emotional regulation and learning. Affection is not just emotional nourishment — it is brain-building.", "hi": "Neuroscientists paate hain ki garmjoshi bhari, responsive dekhbhaal sach mein un neural connections ko mazboot karti hai jo emotional regulation aur seekhne se jude hain. Pyaar sirf bhaavnaatmak poshan nahi — yeh dimaag banata hai." },
+      "remember": { "en": "Your warmth is not a luxury — it is your baby's foundation.", "hi": "Aapki garmjoshi koi aiyaashi nahi — yeh aapke baby ki neenv hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Two Friends And The Bear", "hi": "Do Dost Aur Bhaalu" },
+      "summary": { "en": "Two friends learn that true friendship is shown in how we stand by each other.", "hi": "Do dost seekhte hain ki sachi dosti is mein dikhti hai ki hum ek doosre ke saath kaise khade rehte hain." },
+      "body": { "en": "Two friends were walking through a forest, promising they would always look after each other. Suddenly a large bear came lumbering out from the trees. One friend, thinking only of himself, scrambled quickly up into the branches and hid, leaving the other below.\n\nThe second friend had no time to climb. Remembering that bears rarely touch the still, he lay flat on the ground and held his breath, lying as quiet as if he were asleep. The bear came close, sniffed at his ear, and finding him still, wandered away.\n\nWhen the danger had passed, the first friend climbed down. 'What did the bear whisper in your ear?' he asked, half joking. The other smiled gently and said, 'It told me something simple — never trust a friend who leaves your side the moment trouble comes.'", "hi": "Do dost ek jungle se guzar rahe the, ek doosre ka hamesha khayal rakhne ka vaada karte hue. Achaanak ek bada bhaalu pedon ke beech se bhaari kadmon se nikla. Ek dost, sirf apne baare mein soch kar, jaldi se tehniyon par chadh kar chhup gaya, doosre ko neeche chhod kar.\n\nDoosre dost ke paas chadhne ka samay nahi tha. Yaad karte hue ki bhaalu sthir cheez ko shayad hi chhuta hai, woh zameen par seedha let gaya aur saans rok li, itna shaant pada jaise so raha ho. Bhaalu paas aaya, uske kaan ke paas sungha, aur use sthir paakar, chala gaya.\n\nJab khatra tal gaya, pehla dost neeche utra. 'Bhaalu ne tumhare kaan mein kya kaha?' usne aadhe mazaak mein poocha. Doosre ne pyaar se muskuraaya aur kaha, 'Usne mujhe kuch saadi baat batayi — us dost par kabhi bharosa mat karo jo museebat aate hi tumhara saath chhod de.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about one small everyday thing you love about their other parent.", "hi": "Apne baby ko ek chhoti rozana cheez ke baare mein bataayein jo aapko unke doosre parent mein pyaari lagti hai." },
+      "motivation": { "en": "The little things you cherish are the warmth your baby is being born into.", "hi": "Woh chhoti cheezein jo aapko pyaari hain wahi garmjoshi hai jismein aapka baby janm le raha hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "My Warmth Reaches You", "hi": "Meri Garmjoshi Tum Tak Pohanchti Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A warm bond affirmation", "hi": "Ek garm bond affirmation" },
+      "affirmation": { "en": "There is no limit to the warmth I hold for you. With every quiet moment, I let it reach you.", "hi": "Tumhare liye jo garmjoshi main rakhti hoon uski koi seema nahi. Har shaant pal ke saath, main use tum tak pohanchne deti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Your Energy Dips In The Afternoon", "hi": "Jab Dopahar Mein Aapki Energy Girti Hai" },
+      "content": { "en": "If the afternoon leaves you drained, reach for something simple and warm — a handful of soaked almonds, a few dates, a glass of milk. Small, gentle snacks steady you better than waiting until you are truly worn out.", "hi": "Agar dopahar aapko thaka deti hai, kuch saada aur garm lein — ek muthhi bheege badaam, kuch khajoor, ek glass doodh. Chhote, naram snacks aapko us se behtar sambhaalte hain ki aap sach mein thakne ka intezaar karein." },
+      "remember": { "en": "Feeding yourself gently is feeding your baby too.", "hi": "Khud ko pyaar se khilaana aapke baby ko bhi khilaana hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 114,
+    "week": 17,
+    "babyLearning": { "en": "tiny fingerprints quietly forming", "hi": "nanhe ungliyon ke nishaan chupchaap ban rahe hain" },
+    "grow": {
+      "title": { "en": "Affection Is Never Spoiling", "hi": "Pyaar Kabhi Bigaadta Nahi" },
+      "insight": { "en": "You cannot spoil a baby with love. Holding them, soothing them, answering their cries — that is not indulgence, it is care.", "hi": "Aap ek baby ko pyaar se nahi bigaad sakti. Use thaamna, shaant karna, uske rone ka jawaab dena — yeh laad nahi, yeh dekhbhaal hai." },
+      "expanded": { "en": "You may already hear the old warnings: don't hold them too much, don't come too quickly, you'll spoil them. But a baby is not a habit to be managed — they are a small person learning whether the world responds. Answering with warmth does not make a child clingy or demanding; it teaches them that they are safe, and safe children grow braver, not needier. The love you long to pour out is exactly what your baby is built to receive. You can give it as fully as your heart wants.", "hi": "Aap shayad purani chetawaniyaan pehle se sunti hon: zyada mat thaamo, itni jaldi mat aao, bigaad dogi. Par ek baby koi aadat nahi jise sambhaalna hai — woh ek chhota insaan hai jo seekh raha hai ki duniya jawaab deti hai ya nahi. Garmjoshi se jawaab dena ek bachche ko chipku ya zid'di nahi banata; yeh use sikhaata hai ki woh surakshit hai, aur surakshit bachche zyada himmati bante hain, zyada zaroratmand nahi. Jo pyaar aap undelna chahti hain wahi to aapka baby paane ke liye bana hai. Aap use utna poora de sakti hain jitna aapka dil chahe." },
+      "deepDive": { "en": "Decades of research are clear: promptly comforting a baby does not spoil them. Babies whose cries are answered tend to cry less and grow more secure, not less independent.", "hi": "Dashakon ki research saaf hai: ek baby ko turant dilaasa dena use bigaadta nahi. Jin babies ke rone ka jawaab milta hai woh aksar kam rote hain aur zyada surakshit bante hain, kam swatantra nahi." },
+      "remember": { "en": "Love given freely builds security, never spoiling.", "hi": "Khulkar diya gaya pyaar surakshaa banata hai, bigaad kabhi nahi." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Mice And The Elephants", "hi": "Chuhe Aur Haathi" },
+      "summary": { "en": "A grateful herd of elephants learns that even the smallest friends can repay kindness.", "hi": "Ehsaanmand haathiyon ka jhund seekhta hai ki sabse chhote dost bhi dayaalta ka badla chuka sakte hain." },
+      "body": { "en": "Near an old ruined village lived a great family of mice. One day a herd of elephants passed through on their way to a lake, and their heavy feet crushed many little mouse homes. The mouse king bravely went to the elephant king and said, 'Great one, please choose another path. Spare our small homes, and one day we may help you in return.' The elephant king, kind at heart, smiled and led his herd around.\n\nMonths later, hunters trapped that very herd in strong rope nets. The elephants struggled but could not break free. Then the elephant king remembered the mice, and sent word. At once the mice came swarming, and with their tiny sharp teeth they gnawed through every rope.\n\nBy nightfall the whole herd walked free. The mighty had been saved by the small — for no kindness, however little it seems, is ever wasted.", "hi": "Ek purane ujde gaon ke paas chuhon ka ek bada parivar rehta tha. Ek din haathiyon ka jhund ek jheel ki or jaate hue wahan se guzra, aur unke bhaari pairon ne kai nanhe chuhon ke ghar kuchal diye. Chuhon ka raja himmat se haathiyon ke raja ke paas gaya aur bola, 'Maharaj, kripya doosra raasta chunein. Hamare chhote ghar bachayein, aur ek din hum aapki madad kar sakte hain.' Haathiyon ka raja, dil ka achha, muskuraaya aur apne jhund ko ghuma kar le gaya.\n\nMaheenon baad, shikaariyon ne usi jhund ko mazboot rassi ke jaalon mein phansa liya. Haathi chhootne ki koshish karte rahe par toot nahi paaye. Tab haathiyon ke raja ne chuhon ko yaad kiya, aur sandesh bheja. Turant chuhe jhund mein aa gaye, aur apne nanhe tez daanton se unhone har rassi kaat di.\n\nRaat tak poora jhund aazaad ghoom raha tha. Taakatwar ko chhoton ne bachaaya tha — kyunki koi dayaalta, chaahe kitni hi chhoti lage, kabhi bekaar nahi jaati." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a way you and their other parent quietly support each other.", "hi": "Apne baby ko ek tareeke ke baare mein bataayein jisse aap aur unke doosre parent chupchaap ek doosre ka sahaara dete hain." },
+      "motivation": { "en": "Your child will grow up inside the support you give each other.", "hi": "Aapka bachcha us sahaare ke andar bada hoga jo aap ek doosre ko dete hain." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Bhairavi", "hi": "Raag Bhairavi" },
+      "durationMinutes": 4,
+      "description": { "en": "A gentle concluding morning raga for warmth and grace", "hi": "Garmjoshi aur sundarta ke liye ek naram samaapan subah ka raag" },
+      "affirmation": { "en": "As this tender melody unfolds, my heart softens and opens, warm and full, for you.", "hi": "Jaise yeh komal dhun khulti hai, mera dil naram aur khulta hai, garm aur bhara, tumhare liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Love Is Safe To Give", "hi": "Mera Pyaar Dena Surakshit Hai" },
+      "content": { "en": "I will not hold back my tenderness for fear of giving too much. There is no such thing as too much love.", "hi": "Main zyada dene ke dar se apni komalta nahi rokungi. Zyada pyaar jaisi koi cheez hoti hi nahi." },
+      "remember": { "en": "Love poured out only ever multiplies.", "hi": "Undela gaya pyaar hamesha sirf badhta hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 115,
+    "week": 17,
+    "babyLearning": { "en": "stretching and curling, exploring the cosy space", "hi": "khinch-mud raha hai, aaramdayak jagah ko khojte hue" },
+    "grow": {
+      "title": { "en": "A Safe Base To Explore From", "hi": "Khojne Ke Liye Ek Surakshit Aadhaar" },
+      "insight": { "en": "Children are brave not in spite of being held close, but because of it. Warmth is the base they explore the world from.", "hi": "Bachche himmati paas thaame jaane ke bavjood nahi, balki uski wajah se hote hain. Garmjoshi woh aadhaar hai jahaan se woh duniya khojte hain." },
+      "expanded": { "en": "It can seem that comforting a child too much will keep them timid, tied to your side. The truth is the opposite. A child who knows there is a warm, reliable place to return to is the child who wanders furthest, tries hardest, risks most. Your arms are not a cage; they are a launch pad. The security you build now becomes the quiet confidence behind every brave thing your child ever does. Hold them close today, and you are teaching them to step out boldly tomorrow.", "hi": "Aisa lag sakta hai ki ek bachche ko zyada dilaasa dena use daraponk rakhega, aapse chipka. Sach iska ulta hai. Jo bachcha jaanta hai ki lautne ke liye ek garm, bharosemand jagah hai wahi bachcha sabse door bhatakta hai, sabse zyada koshish karta hai, sabse zyada jokhim leta hai. Aapki baahein pinjra nahi; woh ek launch pad hain. Jo surakshaa aap abhi banati hain wahi har himmati cheez ke peeche ka shaant aatmavishwaas ban jaati hai jo aapka bachcha kabhi karta hai. Aaj use paas thaamein, aur aap use kal himmat se kadam baahar rakhna sikha rahi hain." },
+      "deepDive": { "en": "Attachment researchers call it the 'secure base' — children who feel safely connected explore more freely and recover from setbacks faster. Closeness fuels courage, it does not weaken it.", "hi": "Attachment researchers ise 'secure base' kehte hain — jo bachche surakshit jude mehsoos karte hain woh zyada khulkar khojte hain aur thokron se jaldi sambhalte hain. Nazdeeki himmat ko badhati hai, use kamzor nahi karti." },
+      "remember": { "en": "A held child becomes a brave one.", "hi": "Thaama gaya bachcha himmati banta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Krishna Protects Draupadi", "hi": "Krishna Draupadi Ki Raksha Karte Hain" },
+      "summary": { "en": "In her darkest hour, a devoted heart calls out and finds it is never truly alone.", "hi": "Apne sabse mushkil pal mein, ek samarpit dil pukaarta hai aur paata hai ki woh kabhi vaakai akela nahi." },
+      "body": { "en": "In the great hall of kings, Draupadi found herself surrounded and helpless, with no one willing to stand for her. Powerful men looked away, and it seemed there was no protection left in all the world. In that moment of fear, she stopped looking to the people around her and instead closed her eyes and called out with her whole heart to Krishna, her dearest friend and guide.\n\nHer call was answered at once, though no one could see how. As her enemies tried to shame her, an endless length of cloth appeared, flowing on and on without ever ending, so that she could not be harmed. The hall fell silent in wonder.\n\nDraupadi understood then what she would never forget: when we call out in true faith, we are held by a love far greater than ourselves — and we are never as alone as we fear.", "hi": "Raajaaon ke bade darbaar mein, Draupadi khud ko ghiri aur bebas paati hai, koi uske liye khada hone ko taiyaar nahi tha. Taakatwar log nazrein chura rahe the, aur lagta tha ki saari duniya mein koi rakshaa bachi hi nahi. Us dar ke pal mein, usne apne aaspaas ke logon ki or dekhna chhod diya aur iske bajaaye aankhein band ki aur apne poore dil se Krishna ko pukaara, apne sabse pyaare dost aur margdarshak ko.\n\nUski pukaar turant suni gayi, halaanki koi nahi dekh saka kaise. Jab uske dushman use sharmindaa karne ki koshish kar rahe the, kapde ka ek anant tukda prakat hua, behta hi gaya bina kabhi khatam hue, taaki use koi nuksaan na pohancha sake. Darbaar hairaani mein chup ho gaya.\n\nDraupadi tab samjhi jo woh kabhi nahi bhoolegi: jab hum sachi shraddha se pukaarte hain, hum khud se kahin bade pyaar dwara thaame jaate hain — aur hum utne akele kabhi nahi jitna hum darte hain." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a trip or adventure you and their other parent once took together.", "hi": "Apne baby ko ek trip ya adventure ke baare mein bataayein jo aap aur unke doosre parent ne kabhi saath kiya tha." },
+      "motivation": { "en": "Your shared adventures are part of the family story your baby is joining.", "hi": "Aapke saath kiye adventures us parivar ki kahani ka hissa hain jismein aapka baby aa raha hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Circle Of Warmth", "hi": "Garmjoshi Ka Ek Ghera" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to wrap your baby in warmth", "hi": "Apne baby ko garmjoshi mein lapetne ka ek chhota dhyan" },
+      "affirmation": { "en": "I wrap you in a warm, gentle circle that nothing can break.", "hi": "Main tumhe ek garm, naram ghere mein lapetti hoon jise kuch nahi tod sakta." },
+      "introduction": { "en": "Sit or lie back comfortably and let your eyes close. Take three slow breaths and feel your body settle. Now imagine a soft circle of warm light surrounding you and your baby — a gentle, glowing ring where you are both completely safe.", "hi": "Aaram se baithein ya letein aur aankhein band hone dein. Teen dheemi saansein lein aur apne sharir ko thamta mehsoos karein. Ab ek naram garm roshni ka ghera sochein jo aapko aur aapke baby ko gher raha hai — ek naram, chamakta ghera jahaan aap dono poori tarah surakshit hain." },
+      "closingThought": { "en": "Carry this warm circle with you. Wherever you go today, your baby is safe inside it.", "hi": "Is garm ghere ko apne saath le jaayein. Aaj aap jahaan bhi jaayein, aapka baby uske andar surakshit hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Nothing Sounds Appealing To Eat", "hi": "Jab Kuch Bhi Khaane Ka Man Na Ho" },
+      "content": { "en": "On days when food feels boring, let warmth tempt you — a bowl of soft khichdi, warm dal with rice, a comforting soup. Gentle, cooked meals are easy on you and your baby, and they often bring the appetite back.", "hi": "Jin dinon khaana boring lage, garmjoshi ko apni or kheenchne dein — ek katori naram khichdi, garm dal chawal, ek dilaasa dene wala soup. Naram, pakaaye gaye khaane aap aur aapke baby par halke hote hain, aur woh aksar bhookh wapas le aate hain." },
+      "remember": { "en": "A warm, simple meal is care you can taste.", "hi": "Ek garm, saada khaana woh dekhbhaal hai jise aap chakh sakti hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 116,
+    "week": 17,
+    "babyLearning": { "en": "ears settling into place, sounds drawing near", "hi": "kaan apni jagah par baithte hue, aawazein paas aati hui" },
+    "grow": {
+      "title": { "en": "Hugs Are Good Science", "hi": "Jhappiyaan Achha Vigyaan Hain" },
+      "insight": { "en": "A warm hug is not just sweet — it releases the very chemistry of calm, trust and bonding in both of you.", "hi": "Ek garm jhappi sirf pyaari nahi — yeh aap dono mein shaanti, bharosa aur bonding ki asli rasaayan choddti hai." },
+      "expanded": { "en": "When you hold someone you love, your body quietly releases a wave of warmth-chemistry — the same gentle tide that will wash over you each time you hold your baby. A hug slows the heart, eases worry, and signals safety in a language older than words. This is why touch matters so much for little ones: a cuddle is not just comfort, it is communication. As you imagine holding your baby, know that those embraces will be doing real, good work — soothing them, soothing you, and weaving the two of you closer together.", "hi": "Jab aap kisi apne ko thaamti hain, aapka sharir chupchaap garmjoshi ki rasaayan ki ek lehar choddta hai — wahi naram lehar jo har baar aapke baby ko thaamne par aap par bahegi. Ek jhappi dil ko dheema karti hai, chinta ghatati hai, aur shabdon se purani bhaasha mein surakshaa ka sandesh deti hai. Isiliye chhoton ke liye sparsh itna maayne rakhta hai: ek jhappi sirf dilaasa nahi, yeh baatcheet hai. Jaise aap apne baby ko thaamne ki kalpana karti hain, jaan lein ki woh aalingan asli, achha kaam karenge — unhe shaant karte, aapko shaant karte, aur aap dono ko aur paas bunte." },
+      "deepDive": { "en": "Warm physical touch triggers the release of oxytocin, the 'bonding hormone,' which lowers stress and deepens connection. A hug is biology working in love's favour.", "hi": "Garm sharirik sparsh oxytocin choddta hai, 'bonding hormone,' jo tanaav ghatata hai aur judaav gehra karta hai. Ek jhappi pyaar ke haq mein kaam karta biology hai." },
+      "remember": { "en": "Every hug quietly tells the body: you are safe.", "hi": "Har jhappi chupchaap sharir ko kehti hai: tum surakshit ho." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Woodpecker And The Lion", "hi": "Kathfodwa Aur Sher" },
+      "summary": { "en": "A kind woodpecker helps a lion in pain and discovers that goodness is its own reward.", "hi": "Ek dayaalu kathfodwa dard mein ek sher ki madad karta hai aur paata hai ki achhai apna inaam khud hai." },
+      "body": { "en": "A lion was eating his meal in the forest when a sharp bone stuck fast in his throat. He roared in pain, unable to swallow or breathe easily, and begged the animals nearby for help. They were all too afraid to go near his great jaws.\n\nThen a small woodpecker, moved by his suffering, flew down. 'Open your mouth wide and keep very still,' she said. Trusting her, the lion did, and with her slender beak she carefully reached in and drew out the bone. The lion sighed with sweet relief.\n\nLater the woodpecker, hungry one day, gently reminded the lion of her kindness. The lion grumbled that letting her live, after being so near his teeth, was reward enough. The little bird simply flew off — for she knew the truest goodness is given freely, expecting nothing in return.", "hi": "Ek sher jungle mein apna khaana kha raha tha jab ek tez haddi uske gale mein phans gayi. Woh dard se dahaada, na nigal paa raha tha na aasaani se saans le paa raha tha, aur paas ke jaanwaron se madad ki bheekh maangi. Woh sab uske bade jabdon ke paas jaane se bahut darte the.\n\nTab ek chhota kathfodwa, uske dukh se pighal kar, neeche uda. 'Apna munh chaudaa kholo aur bilkul sthir raho,' usne kaha. Us par bharosa karte hue, sher ne waisa hi kiya, aur apni patli chonch se usne dhyaan se andar pohanch kar haddi nikaal di. Sher meethi raahat se aah bhar utha.\n\nBaad mein kathfodwa, ek din bhookha, ne pyaar se sher ko apni dayaalta yaad dilayi. Sher budbudaaya ki use jeene dena, uske daanton ke itne paas aakar bhi, kaafi inaam tha. Nanhi chidiya bas uda chali gayi — kyunki woh jaanti thi ki sabse sachi achhai khulkar di jaati hai, badle mein kuch ki ummeed kiye bina." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby what you and their other parent each most look forward to as parents.", "hi": "Apne baby ko bataayein ki parent banne mein aap aur unke doosre parent dono kis cheez ka sabse zyada intezaar kar rahe hain." },
+      "motivation": { "en": "Sharing what you each long for knits your hopes together for your baby.", "hi": "Jo aap dono chahte hain use baantna aapke baby ke liye aapki ummeedein joddta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Jog", "hi": "Raag Jog" },
+      "durationMinutes": 4,
+      "description": { "en": "A soothing night raga for warmth and rest", "hi": "Garmjoshi aur aaram ke liye ek dilaasa dene wala raat ka raag" },
+      "affirmation": { "en": "As night settles and this melody glows, my warmth wraps gently all around you.", "hi": "Jaise raat thamti hai aur yeh dhun chamakti hai, meri garmjoshi pyaar se tumhare charon or lipatti hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "A Hug For Yourself", "hi": "Khud Ke Liye Ek Jhappi" },
+      "content": { "en": "Cross your arms and rest a hand on each shoulder, holding yourself gently. Breathe in slowly, and as you breathe out, give your arms the softest squeeze. Stay here for five warm breaths.", "hi": "Apni baahein cross karein aur har kandhe par ek haath rakhein, khud ko pyaar se thaamte hue. Dheere saans lein, aur saans chhodte waqt, apni baahon ko sabse naram dabaav dein. Yahan paanch garm saanson tak rukein." },
+      "remember": { "en": "You deserve the same warmth you are learning to give.", "hi": "Aap usi garmjoshi ke haqdaar hain jo aap dena seekh rahi hain." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 117,
+    "week": 17,
+    "babyLearning": { "en": "growing stronger, little movements quietly practising", "hi": "aur mazboot hote hue, chhoti harkatein chupchaap abhyaas karti hui" },
+    "grow": {
+      "title": { "en": "Comfort Builds Courage", "hi": "Dilaasa Himmat Banata Hai" },
+      "insight": { "en": "Comforting a frightened child does not make them weak. It is exactly what gives them the courage to try again.", "hi": "Ek dari hui bachche ko dilaasa dena use kamzor nahi banata. Yahi to use phir koshish karne ki himmat deta hai." },
+      "expanded": { "en": "When a child stumbles, scares, or fails, the instinct to comfort them is sometimes second-guessed — won't it make them soft? In truth, the child who is met with warmth after a fall is the child who gets back up. Comfort does not coddle courage out of a person; it pours it in. Knowing someone will catch them is precisely what lets a child dare to leap. As you imagine soothing your little one's tears one day, know that each gentle 'you're okay' is quietly building a braver heart.", "hi": "Jab ek bachcha ladkhadaata, darta, ya fail hota hai, use dilaasa dene ka man kabhi-kabhi shak mein pad jaata hai — kya yeh use naram nahi bana dega? Sach mein, jis bachche ko girne ke baad garmjoshi milti hai wahi bachcha phir se uthta hai. Dilaasa kisi se himmat nahi nikaalta; yeh use bharta hai. Yeh jaanna ki koi unhe thaam lega yahi to ek bachche ko chhalaang lagaane ki himmat deta hai. Jaise aap ek din apne nanhe ke aansu pochhne ki kalpana karti hain, jaan lein ki har naram 'tum theek ho' chupchaap ek himmati dil bana raha hai." },
+      "deepDive": { "en": "Studies show children who are comforted after distress recover faster and take more healthy risks. Soothing does not soften courage — it is the soil courage grows in.", "hi": "Studies dikhaati hain ki jin bachchon ko pareshaani ke baad dilaasa milta hai woh jaldi sambhalte hain aur zyada swasth jokhim lete hain. Dilaasa himmat ko naram nahi karta — yeh woh mitti hai jismein himmat ugti hai." },
+      "remember": { "en": "Comforted children become courageous ones.", "hi": "Dilaasa paaye bachche himmati bante hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "Birbal And The Magic Stick", "hi": "Birbal Aur Jaadui Chhadi" },
+      "summary": { "en": "Clever Birbal finds a thief using nothing but a simple stick and a guilty heart.", "hi": "Chalaak Birbal ek chor ko sirf ek saadi chhadi aur ek doshi dil se dhoond leta hai." },
+      "body": { "en": "A wealthy merchant came to Emperor Akbar's court in great distress — a valuable ring had been stolen, and he was sure one of his own servants was the thief. Akbar turned the puzzle over to wise Birbal.\n\nBirbal gathered all the servants and gave each one a stick of exactly the same length. 'These are magic sticks,' he announced calmly. 'Take them home tonight. The stick belonging to the thief will grow two inches longer by morning.' The servants went home uneasy.\n\nThe next day, Birbal examined every stick. One was shorter than the rest — for the guilty servant, terrified his stick would grow, had cut two inches off his own to be safe. 'Here is your thief,' Birbal smiled. 'A clear conscience has nothing to fear, but a guilty one always gives itself away.'", "hi": "Ek ameer vyapaari bade dukh mein Badshah Akbar ke darbaar mein aaya — ek keemti anguthi chori ho gayi thi, aur use yaqeen tha ki uske apne naukron mein se ek chor hai. Akbar ne yeh paheli buddhimaan Birbal ko saunp di.\n\nBirbal ne saare naukron ko ikattha kiya aur har ek ko bilkul ek hi lambai ki chhadi di. 'Yeh jaadui chhadiyaan hain,' usne shaanti se elaan kiya. 'Inhe aaj raat ghar le jaao. Chor ki chhadi subah tak do inch lambi ho jaayegi.' Naukar bechain ghar gaye.\n\nAgle din, Birbal ne har chhadi jaanchi. Ek baaki se chhoti thi — kyunki doshi naukar, is dar se ki uski chhadi badh jaayegi, ne surakshit rehne ke liye apni chhadi se do inch kaat liye the. 'Yeh raha aapka chor,' Birbal muskuraaya. 'Ek saaf zameer ko darne ki koi cheez nahi, par ek doshi zameer hamesha khud ko zaahir kar deta hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you and their other parent imagine parenting as a team.", "hi": "Apne baby ko bataayein ki aap aur unke doosre parent ek team ki tarah parenting kaise socha karte hain." },
+      "motivation": { "en": "Your baby will be raised by two people leaning the same way, together.", "hi": "Aapke baby ko do log ek hi or jhukte hue, saath mein, paalenge." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Am Your Soft Place To Land", "hi": "Main Tumhari Girne Ki Naram Jagah Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A comforting bond affirmation", "hi": "Ek dilaasa dene wala bond affirmation" },
+      "affirmation": { "en": "Whenever the world feels big, I am your soft place to land — warm, steady, and always here.", "hi": "Jab bhi duniya badi lage, main tumhari girne ki naram jagah hoon — garm, sthir, aur hamesha yahan." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Softness Is My Strength", "hi": "Meri Narmi Hi Meri Taakat Hai" },
+      "content": { "en": "I do not have to be hard to be strong. The gentleness in me is exactly what my baby will lean on.", "hi": "Mazboot hone ke liye mujhe kathor hone ki zaroorat nahi. Mujhmein jo narmi hai usi par mera baby tikega." },
+      "remember": { "en": "Your gentleness is a quiet kind of power.", "hi": "Aapki narmi ek shaant kism ki taakat hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 118,
+    "week": 17,
+    "babyLearning": { "en": "starting to hear the muffled music of your world", "hi": "aapki duniya ki dabi hui dhun sunna shuru karte hue" },
+    "grow": {
+      "title": { "en": "Love Out Loud", "hi": "Pyaar Khulkar Bolein" },
+      "insight": { "en": "Love that is felt is precious, but love that is spoken aloud is what a child carries with them for life.", "hi": "Mehsoos kiya gaya pyaar keemti hai, par bolkar kaha gaya pyaar woh hai jo ek bachcha zindagi bhar saath le jaata hai." },
+      "expanded": { "en": "Many of us were loved deeply by people who rarely said the words. We knew it, but a part of us still longed to hear it. Your baby will not have to guess. Saying 'I love you,' naming what you adore about them, telling them they are wanted — this turns invisible love into something a child can hold. You can begin now, speaking softly over your belly. The habit of loving out loud, started today, becomes a voice your child will carry inside them forever.", "hi": "Hum mein se kai logon ko unhone gehraai se pyaar kiya jo shaayad hi shabd kehte the. Hum jaante the, par hamare andar ka ek hissa phir bhi use sunne ko tarasta tha. Aapke baby ko andaaza nahi lagaana padega. 'Main tumse pyaar karti hoon' kehna, jo aapko unmein pyaara lagta hai use naam dena, unhe yeh batana ki woh chaahe gaye hain — yeh andekhe pyaar ko kuch aisa bana deta hai jise bachcha thaam sake. Aap abhi shuru kar sakti hain, apne pet ke upar dheere bolte hue. Khulkar pyaar bolne ki aadat, aaj shuru ki gayi, ek aisi aawaz ban jaati hai jise aapka bachcha hamesha apne andar le jaayega." },
+      "deepDive": { "en": "Children who hear love expressed openly tend to develop stronger self-worth and warmer relationships. Spoken affection becomes the inner voice they grow up alongside.", "hi": "Jo bachche pyaar ko khulkar kehte sunte hain woh aksar zyada mazboot self-worth aur garm rishte banate hain. Bola gaya pyaar woh andaruni aawaz ban jaata hai jiske saath woh bade hote hain." },
+      "remember": { "en": "Say the love out loud — it becomes theirs forever.", "hi": "Pyaar ko khulkar bolein — yeh hamesha ke liye unka ban jaata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Three Wishes", "hi": "Teen Vardaan" },
+      "summary": { "en": "A poor couple learns that the greatest gift is being content with what they already share.", "hi": "Ek gareeb jodi seekhti hai ki sabse bada tohfa wahi mein khush rehna hai jo unke paas pehle se hai." },
+      "body": { "en": "A poor but loving woodcutter and his wife once helped a tired traveller, sharing their small meal without complaint. The traveller, who was secretly a kind spirit, granted them three wishes as thanks before going on his way.\n\nThat evening, tired and hungry, the woodcutter sighed without thinking, 'How I wish we had a hot sausage for supper.' At once a sausage appeared. His wife, upset at wasting a wish so foolishly, cried, 'I wish that sausage were stuck to your nose!' And so it was. Now two wishes were gone, and the poor man sat with a sausage dangling from his face.\n\nThey looked at each other and began to laugh. With their last wish, they simply wished the sausage gone. They had no riches — but they had each other, and a warm meal, and that, they agreed, was wealth enough.", "hi": "Ek gareeb par pyaar karne wala lakadhara aur uski patni ne ek baar ek thake musafir ki madad ki, apna chhota khaana bina shikaayat baant kar. Musafir, jo chupke se ek dayaalu aatma tha, jaane se pehle dhanyavaad mein unhe teen vardaan diye.\n\nUs shaam, thake aur bhookhe, lakadhare ne bina soche aah bhari, 'Kaash humare paas raat ke khaane ke liye ek garm sausage hota.' Turant ek sausage prakat ho gaya. Uski patni, ek vardaan itni bewakoofi se barbaad karne par naaraaz, chillaayi, 'Kaash woh sausage tumhari naak par chipak jaaye!' Aur waisa hi hua. Ab do vardaan ja chuke the, aur gareeb aadmi apne chehre se latakta sausage liye baith gaya.\n\nUnhone ek doosre ko dekha aur hanske lge. Apne aakhri vardaan se, unhone bas sausage ko gaayab hone ki kaamna ki. Unke paas dhan nahi tha — par unke paas ek doosra tha, aur ek garm khaana, aur wahi, dono maan gaye, kaafi daulat thi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a tradition the two of you have started together.", "hi": "Apne baby ko ek aisi parampara ke baare mein bataayein jo aap dono ne saath shuru ki hai." },
+      "motivation": { "en": "The little rituals you share will soon become your baby's too.", "hi": "Woh chhoti rituals jo aap baantte hain jald hi aapke baby ki bhi ban jaayengi." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Rageshri", "hi": "Raag Rageshri" },
+      "durationMinutes": 4,
+      "description": { "en": "A flowing night raga for love and tenderness", "hi": "Pyaar aur komalta ke liye ek behta raat ka raag" },
+      "affirmation": { "en": "As this loving melody flows through the night, I let my heart speak its warmth to you.", "hi": "Jaise yeh pyaar bhari dhun raat mein behti hai, main apne dil ko apni garmjoshi tumse kehne deti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When You Crave Something Sweet", "hi": "Jab Aapka Kuch Meetha Khaane Ka Man Ho" },
+      "content": { "en": "A sweet craving is not something to scold yourself for. Reach for the gentle kind — a ripe banana, a little stewed fruit, a few dates with milk. Let yourself enjoy it slowly, with no guilt at all.", "hi": "Meethe ki ichha khud ko daantne ki cheez nahi hai. Naram waale lein — ek paka kela, thoda pakaaya hua phal, kuch khajoor doodh ke saath. Use dheere se enjoy karein, bina kisi guilt ke." },
+      "remember": { "en": "A little sweetness, enjoyed gently, is its own kind of care.", "hi": "Thodi meethaas, pyaar se enjoy ki gayi, apni ek dekhbhaal hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 119,
+    "week": 17,
+    "babyLearning": { "en": "closing the week, growing warm and strong inside you", "hi": "hafta poora karte hue, aapke andar garm aur mazboot badhte hue" },
+    "grow": {
+      "title": { "en": "The Warmth They Carry Forever", "hi": "Woh Garmjoshi Jo Woh Hamesha Saath Le Jaate Hain" },
+      "insight": { "en": "The warmth you give your child does not end with childhood. They carry it inside them, and one day pass it on.", "hi": "Jo garmjoshi aap apne bachche ko deti hain woh bachpan ke saath khatam nahi hoti. Woh use apne andar le jaate hain, aur ek din aage badhaate hain." },
+      "expanded": { "en": "The love you pour into these early years does something quietly lasting: it becomes the inner warmth your child carries for the rest of their life. Long after they have grown, the steadiness, tenderness and safety you give now will live on in how they comfort themselves, love others, and one day hold their own children. You are not only raising a child — you are warming a future you may never see. Every gentle moment is a small fire passed forward, hand to hand, heart to heart, across the years.", "hi": "Jo pyaar aap in shuruaati saalon mein undelti hain woh kuch chupchaap sthayi karta hai: yeh woh andaruni garmjoshi ban jaata hai jo aapka bachcha apni baaki zindagi saath le jaata hai. Unke bade hone ke bahut baad bhi, jo sthirta, komalta aur surakshaa aap abhi deti hain woh is mein jeeti rahegi ki woh khud ko kaise dilaasa dete hain, doosron ko pyaar karte hain, aur ek din apne bachchon ko thaamte hain. Aap sirf ek bachche ko nahi paal rahi — aap ek aisa bhavishya garm kar rahi hain jise aap shaayad kabhi na dekhein. Har naram pal ek chhoti aag hai jo aage badhaayi jaati hai, haath se haath, dil se dil, saalon ke paar." },
+      "deepDive": { "en": "Research on warmth shows it passes down generations — children raised with affection tend to parent with affection themselves. The warmth you give today ripples far beyond you.", "hi": "Garmjoshi par hui research dikhaati hai ki yeh peedhiyon mein aage jaati hai — pyaar ke saath paale gaye bachche aksar khud bhi pyaar se parenting karte hain. Jo garmjoshi aap aaj deti hain woh aapse bahut aage tak failti hai." },
+      "remember": { "en": "The warmth you give today travels far beyond today.", "hi": "Jo garmjoshi aap aaj deti hain woh aaj se bahut aage tak jaati hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Old Mango Tree", "hi": "Purana Aam Ka Ped" },
+      "summary": { "en": "An old mango tree shows that the truest love keeps on giving, long after its own season.", "hi": "Ek purana aam ka ped dikhaata hai ki sabse sachcha pyaar dete rehta hai, apne mausam ke bahut baad tak." },
+      "body": { "en": "At the edge of a village stood an old mango tree, planted long ago by a grandmother for children she would never meet. Each summer it gave sweet, golden fruit, and beneath its wide branches the village children played, napped and laughed in its cool shade.\n\nAs the years passed, the tree grew slower to fruit, and some said it should be cut for firewood. But the village elders shook their heads. 'This tree has shaded three generations,' they said. 'It still gives us its shade, its birds, its quiet. Let it stand.' And so it did.\n\nWhen at last the old tree dropped its final mango, a child picked the seed and planted it nearby. The grandmother's gift, given freely so long ago, lived on — for warmth, once planted with love, never truly ends; it only finds new ground to grow in.", "hi": "Ek gaon ke kinare ek purana aam ka ped khada tha, bahut samay pehle ek daadi ne un bachchon ke liye lagaaya jinse woh kabhi nahi milegi. Har garmi yeh meetha, sunehra phal deta, aur uski chaudi tehniyon ke neeche gaon ke bachche khelte, sote aur uski thandi chhaaya mein haste.\n\nSaalon ke saath, ped dheere phal dene laga, aur kuchh ne kaha ise jalaane ki lakdi ke liye kaat dena chahiye. Par gaon ke bujurgon ne sir hilaa diya. 'Is ped ne teen peedhiyon ko chhaaya di hai,' unhone kaha. 'Yeh abhi bhi humein apni chhaaya, apni chidiyaan, apni shaanti deta hai. Ise khada rehne do.' Aur waisa hi raha.\n\nJab aakhir purane ped ne apna aakhri aam giraaya, ek bachche ne beej uthaaya aur paas hi laga diya. Daadi ka tohfa, itne samay pehle khulkar diya gaya, jeeta raha — kyunki garmjoshi, ek baar pyaar se boyi jaaye, sach mein kabhi khatam nahi hoti; woh bas ugne ke liye nayi zameen dhoond leti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the family the two of you are becoming together.", "hi": "Apne baby ko us parivar ke baare mein bataayein jo aap dono saath mil kar ban rahe hain." },
+      "motivation": { "en": "Your baby is the heart of the family you are growing into.", "hi": "Aapka baby us parivar ka dil hai jismein aap badh rahe hain." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "The Warmth We Pass On", "hi": "Woh Garmjoshi Jo Hum Aage Badhaate Hain" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on warmth flowing forward", "hi": "Aage behti garmjoshi par ek chhota dhyan" },
+      "affirmation": { "en": "The love I hold for you flows on far beyond me, warm and unending.", "hi": "Tumhare liye jo pyaar main rakhti hoon woh mujhse bahut aage behta hai, garm aur anant." },
+      "introduction": { "en": "Settle comfortably and let your eyes close. Take three slow breaths and feel yourself grow calm. Now picture the warmth in your heart as a soft golden light, flowing gently down to your baby — and imagine it carrying on, through them, into all the years to come.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein aur khud ko shaant hote mehsoos karein. Ab apne dil ki garmjoshi ko ek naram sunhri roshni ki tarah sochein, pyaar se apne baby tak behti hui — aur use aage jaate hue sochein, unke zariye, aane wale saare saalon mein." },
+      "closingThought": { "en": "The warmth you shared just now does not stop with you. It flows quietly into your baby's whole life.", "hi": "Jo garmjoshi aapne abhi baanti woh aap tak nahi rukti. Yeh chupchaap aapke baby ki poori zindagi mein behti hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathing In The Warmth", "hi": "Garmjoshi Andar Lena" },
+      "content": { "en": "Breathe in slowly and imagine drawing warmth into your chest like sunlight. As you breathe out, let that warmth spread softly through your whole body. Repeat for five gentle breaths.", "hi": "Dheere saans lein aur sochein ki aap apne seene mein dhoop jaisi garmjoshi kheench rahi hain. Saans chhodte waqt, us garmjoshi ko apne poore sharir mein naram tarah failne dein. Paanch naram saanson tak dohraayein." },
+      "remember": { "en": "Warmth breathed in is warmth you can give.", "hi": "Andar li gayi garmjoshi woh hai jo aap de sakti hain." },
+      "durationMinutes": 2
+    }
+  }
+]

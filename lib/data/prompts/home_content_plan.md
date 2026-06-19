@@ -97,3 +97,22 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk12 (act9 Promises To You): to always listen · to keep you safe · to let you be yourself · to be there in hard times · to laugh and play · to say sorry when wrong · to love you no matter what
 - wk13 (act10 Counting Down To You): how I'm getting ready · the first meeting I imagine · the first thing I'll say · who's waiting to hold you · a hope for your first day · what I'll whisper holding you · a welcome as T1 closes
 ### Garbh ragas used (cont.): Todi/morning(wk10 d68) · Bageshri/night(wk11 d74) · Durga/evening(wk12 d82) · Hansdhwani/evening(wk13 d88)
+
+## Batch weeks 14-17 (Trimester 2 begins) — tone shifts to energy/bonding; Garbh raga-led; Nurture food-led; Talk arc 2nd pass (acts 1-4)
+### Grow used (cont.)
+- wk14 (Tuning In — responsiveness): The Quiet Conversation · Babies Speak In Signals · Responding Builds Trust · Tune In Before You Fix · Every Cue Is A Word · The Dance Of Back And Forth · To Be Heard Is To Be Loved
+- wk15 (How Little Ones Learn): Curiosity Lights The Way · Learning Looks Like Play · Every Question Is A Gift · They Learn By Watching You · Boredom Sparks Imagination · The World Is Their Classroom · Slow Learning Lasts Longest
+- wk16 (You Are The First Teacher): You Are The First Teacher · They Copy, They Don't Obey · Your Habits Become Theirs · Show, Don't Just Tell · Little Eyes Are Watching · Values Are Caught, Not Taught · Be What You Hope To See
+- wk17 (Warmth Shapes Everything): Warmth Shapes The Brain · Affection Is Never Spoiling · A Safe Base To Explore From · Hugs Are Good Science · Comfort Builds Courage · Love Out Loud · The Warmth They Carry Forever
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk14: The Goose That Laid Golden Eggs · The Crane And The Crab · Dhruva, The Steadfast Star · The Elephant And The Dog · Tenali Rama And The Cat · The King's Seed · The Squirrel And The Mountain
+- wk15: The Milkmaid And Her Pail · The Jackal And The Drum · Nachiketa's Questions · The Monkey And The Handful Of Peas · Birbal And The Centre Of The Earth · The Tailor And The Elephant · The Little Cloud's Journey
+- wk16: The Dog And Its Reflection · The Jackal And The Bowstring · Prahlad And His Faith · The Selfless Hare · Tenali Rama And The Brinjal Curry · The Grateful Elephant · The Roots And The Leaves
+- wk17: The Two Friends And The Bear · The Mice And The Elephants · Krishna Protects Draupadi · The Woodpecker And The Lion · Birbal And The Magic Stick · The Three Wishes · The Old Mango Tree
+### Talk prompts (cont.) — 2nd pass through arc, fresh angles
+- wk14 (act1 Welcoming You, 2nd): bump growing/showing · feeling closer to meeting you · nicknames already · how my days have changed · imagining your first movements · what I can't wait to feel next · welcome to the second trimester
+- wk15 (act2 Who I Am, 2nd): a talent I have · how I handle a bad day · what I was like as a child · a lifelong dream · my favourite weekend · what always makes me laugh · how I've changed over the years
+- wk16 (act3 Where You Come From, 2nd): a story of your grandparents' lives · where your/our name comes from · a family recipe passed down · a place in our family history · a family value I'm proud of · an elder I admire · how we mark milestones
+- wk17 (act4 Our Love Story, 2nd): a small everyday thing I love about your other parent · how we support each other · a trip we took together · what we each look forward to as parents · parenting as a team · a tradition we two started · the family we're becoming
+### Garbh ragas used (T2, raga-led): Bhimpalasi/aft(wk14 d93) · Bihag/night(wk14 d95) · Ahir Bhairav/morn(wk14 d97) · Patdeep/aft(wk15 d99) · Kedar/night(wk15 d101) · Gaud Malhar/eve(wk15 d104) · Madhuvanti/eve(wk16 d107) · Jaunpuri/morn(wk16 d109) · Shivaranjani/night(wk16 d111) · Bhairavi/morn(wk17 d114) · Jog/night(wk17 d116) · Rageshri/night(wk17 d118)
+### T2 cadence: Garbh per wk = 3 raga / 2 affirm / 2 med. Nurture per wk = 3 food / 2 affirm / 2 breathe (food = problem-led, warm, not nutrition-science).
