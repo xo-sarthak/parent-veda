@@ -55,3 +55,6 @@ app.*.map.json
 
 # Local dev phone IP (machine-specific)
 tools/.phone-ip
+
+# Session handoff notes — local working doc, not part of the repo
+HANDOFF.md
