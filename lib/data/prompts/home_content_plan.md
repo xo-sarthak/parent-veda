@@ -116,3 +116,21 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk17 (act4 Our Love Story, 2nd): a small everyday thing I love about your other parent · how we support each other · a trip we took together · what we each look forward to as parents · parenting as a team · a tradition we two started · the family we're becoming
 ### Garbh ragas used (T2, raga-led): Bhimpalasi/aft(wk14 d93) · Bihag/night(wk14 d95) · Ahir Bhairav/morn(wk14 d97) · Patdeep/aft(wk15 d99) · Kedar/night(wk15 d101) · Gaud Malhar/eve(wk15 d104) · Madhuvanti/eve(wk16 d107) · Jaunpuri/morn(wk16 d109) · Shivaranjani/night(wk16 d111) · Bhairavi/morn(wk17 d114) · Jog/night(wk17 d116) · Rageshri/night(wk17 d118)
 ### T2 cadence: Garbh per wk = 3 raga / 2 affirm / 2 med. Nurture per wk = 3 food / 2 affirm / 2 breathe (food = problem-led, warm, not nutrition-science).
+
+## Batch weeks 18-21 (T2 cont.) — wk18 hearing milestone; wk20 anchor folds in approved day-137 verbatim
+### Grow used (cont.)
+- wk18 (Your Baby Is Listening — sound/voice): They Can Hear You Now · Your Voice Is Their Favourite Sound · Speak, Sing, Be Heard · Words Carry Feeling · The Music You Share · A Lullaby Before Birth · Sound Becomes Memory
+- wk19 (Feelings Are Welcome): All Feelings Are Allowed · Feelings Need A Witness · Big Emotions, Small People · You Can Hold The Hard Ones · Tears Are Not Trouble · Anger Has A Message · Comfort Comes Before Calm
+- wk20 (Influence, Not Control; d137 ANCHOR=Children Borrow Calm From Adults): You Cannot Force A Flower · Lead, Don't Drag · The Calm Adult Wins · [d137 Children Borrow Calm From Adults] · Guidance Over Orders · Respect Grows Respect · Your Calm Is The Anchor
+- wk21 (Calm Is Contagious — co-regulation): Calm Is Contagious · Be The Thermostat, Not The Thermometer · Your Peace Sets The Room · Kind Words Move More Than Loud Ones · Steady Beats Strict · Breathe First, Speak Second · The Calm You Keep, They Keep
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk18: The Ant And The Dove · The Crows And The Serpent · Krishna And The Music Of The Flute · The Crow Who Would Sing · Tenali Rama And The Royal Musician · The Magic Drum · The Song Of The Koel
+- wk19: The Boy And The Nettle · The Hermit And The Mouse · Arjuna's Doubt · The Quarrel Of The Quails · Birbal And The Beggar's Bowl · The Princess Who Could Not Cry · Why The Clouds Must Rain
+- wk20: The Stargazer · The Cunning Cat's Justice · The Elephant And The Robbers' Talk · [d137 Krishna And Sudama — ANCHOR, verbatim] · Tenali Rama Calms The King · The Two Gardeners · How The Gentle River Shaped The Stone
+- wk21: The Hares And The Frogs · The Talking Cave · Yashoda's Calm Love · The Ox Who Pulled For Kind Words · Birbal And The Panic In The Court · The Fisherman Who Stayed Calm · The Eye Of The Storm
+### Talk prompts (cont.) — 2nd pass, acts 5-8 (d137 talk FIXED from legacy)
+- wk18 (act5 Hopes & Dreams, 2nd): a hope for their health & joy · a skill to nurture · who I hope you're kind to · a dream for your curiosity · an adventure to give you · how I hope you face hard times · a hope for who you love one day
+- wk19 (act6 Lessons, 2nd): handling anger · what sadness taught me · about forgiveness · what patience taught me · about honesty · what disappointment taught me · about starting over
+- wk20 (act7 The World, 2nd): the languages of our world · a tradition you'll grow in · a problem I'm hopeful about · nature & animals to show you · the music of our world · how people help each other · the wonder of everyday life
+- wk21 (act8 Little Joys, 2nd): a comfort food I'll make · a bedtime ritual I imagine · a silly family thing · a holiday to share · a calming place I'll take you · a song to soothe you · a small daily joy
+### Garbh ragas used (cont.): Brindavani Sarang/aft(wk18 d121) · Marwa/eve(wk18 d123) · Malkauns/night(wk18 d125) · Gunkali/morn(wk19 d127) · Multani/aft(wk19 d129) · Darbari Kanada/night(wk19 d132) · Tilak Kamod/eve(wk20 d135) · Yaman/eve(wk20 d137 ANCHOR) · Jaijaivanti/eve(wk20 d139) · Basant/eve(wk21 d142) · Hameer/eve(wk21 d144) · Adana/night(wk21 d146)
