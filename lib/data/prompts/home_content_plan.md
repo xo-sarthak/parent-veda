@@ -79,3 +79,21 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk08 (act5 Hopes & Dreams): one big dream · who I hope you become · an experience to share · a place to take you · what I hope you never doubt · the world you'll help build · a small everyday hope
 - wk09 (act6 Lessons I've Learned): the most important lesson · something learned the hard way · what kindness taught me · what 'enough' means · what failure taught me · who taught me most · a lesson to learn sooner
 ### Garbh ragas used (T1): Bhupali(wk4) · Bhairav(wk5) · Bilawal/morning(wk6 d40) · Desh/evening(wk7 d46) · Kafi/afternoon(wk8 d54) · Khamaj/evening(wk9 d60)
+
+## Batch weeks 10-13 (authored) — closes Trimester 1; completes the 10-act Talk arc
+### Grow used (cont.)
+- wk10 (Patience Is Love In Practice): Patience Is Love, Slowed Down · The Long Game Of Love · Nothing Good Is Rushed · Slow Is Its Own Gift · Let Things Unfold · Waiting Can Be Tender · One Day Holds Enough
+- wk11 (Courage, Quietly): Courage Is Quiet · Brave Is Not Fearless · You Are Stronger Than The Doubt · Small Acts Of Bravery · Fear And Love Can Coexist · Showing Up Is Courage · You Can Do Hard Things
+- wk12 (You Are Not Alone): You Were Never Meant To Do This Alone · It Takes A Village · Leaning Is Not Weakness · Let Love Help You · Share The Load · Together Is Lighter · Accept The Hand Offered
+- wk13 (Looking Forward With Hope): Hope Is Worth Holding · The Best Is Still Coming · A Season Of Becoming · Anticipation Is A Kind Of Love · Gratitude For The Journey · Trust What Comes Next · Ready In Your Own Time
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk10: The Fox And The Grapes · The Brahmin And The Three Crooks · Krishna And The Serpent Kaliya · The Patient Buffalo · Tenali Rama And The King's Dream · The Magic Pot · The Brook That Became A River
+- wk11: The Lion And The Gnat · The Lion-Makers · Abhimanyu's Courage · The Quail And The Falcon · Birbal And The Crow Count · Punyakoti, The Honest Cow · The Sapling In The Storm
+- wk12: The Bundle Of Sticks · The Pigeons And The Net · Krishna, Friend Of Arjuna · The United Quails · Tenali Rama And The Shared Feast · Stone Soup · The Weaver Birds' Colony
+- wk13: The Two Seeds · The Three Fish · Rama's Return To Ayodhya · The Brave Little Parrot · Birbal And The Most Beautiful Child · The Kind Farmer's Harvest · The First Bud Of Spring
+### Talk prompts used (cont., by act) — arc completes at wk13
+- wk10 (act7 The World You're Joining): the season you'll be born into · the place & home · what the world is like now · something beautiful to show you · a challenge I hope you help with · the community awaiting you · the world's wonder
+- wk11 (act8 Little Joys & Traditions): a festival to share · a special family food · a song/music tradition · a daily ritual I love · a yearly place we visit · a game I'll teach you · a small joy that lifts me
+- wk12 (act9 Promises To You): to always listen · to keep you safe · to let you be yourself · to be there in hard times · to laugh and play · to say sorry when wrong · to love you no matter what
+- wk13 (act10 Counting Down To You): how I'm getting ready · the first meeting I imagine · the first thing I'll say · who's waiting to hold you · a hope for your first day · what I'll whisper holding you · a welcome as T1 closes
+### Garbh ragas used (cont.): Todi/morning(wk10 d68) · Bageshri/night(wk11 d74) · Durga/evening(wk12 d82) · Hansdhwani/evening(wk13 d88)
