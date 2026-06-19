@@ -153,9 +153,14 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
   }
 }
 
-/// Shows the per-week baby illustration from `assets/baby/week_NN.png` when one
+/// Shows the per-week baby illustration from `assets/baby/week_NN.jpg` when one
 /// exists, and otherwise falls back to the built-in vector drawing. This lets
 /// real artwork be dropped in week by week without any code change.
+///
+/// The provided artwork has a soft-pink background baked in (not transparent),
+/// so the image is clipped to a circle: the square edges vanish and the image's
+/// own pink blends into the surrounding rings — the figure reads as floating in
+/// the halo rather than sitting in a square box.
 class _BabyFigure extends StatelessWidget {
   const _BabyFigure({super.key, required this.week, required this.fallback});
 
@@ -163,20 +168,23 @@ class _BabyFigure extends StatelessWidget {
   final CustomPainter fallback;
 
   String get _asset =>
-      'assets/baby/week_${week.toString().padLeft(2, '0')}.png';
+      'assets/baby/week_${week.toString().padLeft(2, '0')}.jpg';
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      _asset,
-      width: 152,
-      height: 152,
-      fit: BoxFit.contain,
-      gaplessPlayback: true,
-      // No image for this week yet → use the vector figure.
-      errorBuilder: (context, error, stack) => CustomPaint(
-        size: const Size(122, 122),
-        painter: fallback,
+    return ClipOval(
+      child: Image.asset(
+        _asset,
+        width: 150,
+        height: 150,
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+        // No image for this week yet → use the vector figure (it sits well
+        // within the circle, so the clip never crops it).
+        errorBuilder: (context, error, stack) => CustomPaint(
+          size: const Size(122, 122),
+          painter: fallback,
+        ),
       ),
     );
   }

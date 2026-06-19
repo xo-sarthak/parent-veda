@@ -6,18 +6,25 @@ without an image falls back to the built-in vector drawing, so partial sets are
 fine.
 
 ## File naming
-- `week_04.png`, `week_05.png`, … `week_40.png`  (two-digit, zero-padded week)
+- `week_04.jpg`, `week_05.jpg`, … `week_40.jpg`  (two-digit, zero-padded week)
 - One file per week (weeks 4–40). Add as many as you have; missing weeks use the
   vector fallback.
+- Source masters live in `lib/data/baby-images/` (named like `Week 20.jpeg`);
+  they're copied + normalized into this folder as `week_NN.jpg`.
 
 ## Image specs
-- **Format:** PNG with a **transparent background** (the figure floats inside a
-  soft ring — no background, no app UI in the image).
+- **Format:** the current set is **JPEG with a soft-pink background baked in**
+  (not transparent). The loader (`_BabyFigure` in
+  `lib/widgets/week_cards/living_halo.dart`) **clips the image to a circle** so
+  the square edges vanish and the image's own pink blends into the surrounding
+  halo rings — the figure reads as floating in the ring. (A transparent PNG
+  would also work; clipping is harmless on those.)
 - **Content:** just the baby/fetus figure, centred, roughly filling the frame.
   Keep a consistent orientation across weeks (e.g. curled, facing left) so the
-  progression reads smoothly.
-- **Size:** square, ~**600×600 px** (renders crisp at the ~150–200 dp display
-  size). Same size for every week so they don't jump.
+  progression reads smoothly. Keep the background pink in the same family as the
+  app's `secondary` tones so the circular blend stays seamless.
+- **Size:** square, ~**600×600 px** (renders crisp at the ~150 dp display size,
+  `BoxFit.cover`). Same size for every week so they don't jump.
 - **Style:** your call, but keep it consistent week to week.
 
 ## Licensing — important
