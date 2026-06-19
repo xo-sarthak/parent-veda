@@ -149,3 +149,18 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk23 (Things I Want You To Know): it's okay to make mistakes · you are loved unconditionally · asking for help is strength · kindness beats winning · your feelings are valid · you needn't be perfect · I'll always believe in you
 - wk24 (Lessons from my own mistakes): a mistake that taught me most · how I forgave myself · a failure that led to good · what trying again taught me · a time I was wrong and grew · patience with myself · a lesson I'm still learning
 ### Garbh ragas used (cont.): Shree/sunset(wk22 d149) · Chandrakauns/night(wk22 d151) · Puriya/sunset(wk22 d153) · Hindol/morn(wk23 d155) · Shankara/night(wk23 d157) · Kalavati/night(wk23 d160) · Nand/night(wk24 d163) · Maru Bihag/eve(wk24 d165) · Tilang/eve(wk24 d167)
+
+## Batch weeks 25-27 (closes Trimester 2) — independence / imagination / gratitude
+### Grow used (cont.)
+- wk25 (Room To Grow — independence): Let Them Do It Themselves · Confidence Is Built, Not Given · The Space To Try · Help Less, Trust More · Struggle Is Not Suffering · Small Freedoms, Big Growth · Step Back To Let Them Rise
+- wk26 (The Magic Of Imagination): Imagination Is Intelligence At Play · A Cardboard Box Is A Universe · Pretend Is Practice For Life · Wonder Needs No Screen · Daydreams Are Not Wasted Time · Stories Build Inner Worlds · Let Them Make-Believe
+- wk27 (Savour The Moments — gratitude, closes T2): These Days Are The Good Old Days · Savour, Don't Just Survive · Gratitude Changes The Day · The Ordinary Is The Extraordinary · Be Where Your Feet Are · Notice The Small Wonders · Halfway, And Wholly In Love
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk25: The Eaglet's First Flight · The Two-Headed Bird · Lava And Kusha · The Deer Who Learned The Forest Ways · Tenali Rama And The Wise Dolls · The Young Weaver's Own Design · The Stream That Found Its Way
+- wk26: The Boy Who Painted The Wind · Castles In The Air · The Universe In Krishna's Mouth · The Painter And The Painted Door · Birbal And The Picture Of A Story · The Magic Paintbrush · The Shapes In The Clouds
+- wk27: The Town Mouse And The Country Mouse · The Four Friends · Shabari's Berries · The Monkey King's Sacrifice · Birbal And The Most Precious Thing · The Stonecutter's Wishes · The Blossom And Its Season
+### Talk prompts (cont.)
+- wk25 (Cheering You On): cheer loudest · celebrate tries not wins · a skill to watch you master · your safe place to fall · the independence I hope you find · proud just watching · trust you to find your way
+- wk26 (Imagining You): your laugh · games I dream of · stories I'll make up · an adventure we'll imagine · who I wonder you'll be · the world we'll build in play · a daydream about you
+- wk27 (Gratitude For You): grateful you chose us · the joy you've brought · a moment I'm savouring · most thankful today · how you've changed my heart · the gift of these months · how loved you are, halfway here
+### Garbh ragas used (cont.): Deshkar/morn(wk25 d170) · Gavti/eve(wk25 d172) · Bhinna Shadja/night(wk25 d174) · Shuddh Sarang/aft(wk26 d176) · Lalit/dawn(wk26 d178) · Sohni/late-night(wk26 d181) · Bahar/spring(wk27 d184) · Gurjari Todi/morn(wk27 d186) · Kirwani/eve(wk27 d188)
