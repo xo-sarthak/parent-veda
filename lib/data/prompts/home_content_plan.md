@@ -164,3 +164,22 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk26 (Imagining You): your laugh · games I dream of · stories I'll make up · an adventure we'll imagine · who I wonder you'll be · the world we'll build in play · a daydream about you
 - wk27 (Gratitude For You): grateful you chose us · the joy you've brought · a moment I'm savouring · most thankful today · how you've changed my heart · the gift of these months · how loved you are, halfway here
 ### Garbh ragas used (cont.): Deshkar/morn(wk25 d170) · Gavti/eve(wk25 d172) · Bhinna Shadja/night(wk25 d174) · Shuddh Sarang/aft(wk26 d176) · Lalit/dawn(wk26 d178) · Sohni/late-night(wk26 d181) · Bahar/spring(wk27 d184) · Gurjari Todi/morn(wk27 d186) · Kirwani/eve(wk27 d188)
+
+## Batch weeks 28-31 (TRIMESTER 3 begins) — Roots & Values; Garbh meditation-led (3m/2r/2a), Nurture breathe-led (3b/2f/2a); wk28+ Movement check-in in UI
+### Grow used (cont.)
+- wk28 (Roots & Belonging): Where You Come From Matters · Belonging Is A Gift · Roots Give Wings · You Carry Generations · Home Is A Feeling · Know Your Story · A Place To Always Return
+- wk29 (Values Are Lived, Not Lectured): Values Are Lived, Not Lectured · Honesty Starts At Home · Kindness Is Taught By Kindness · What You Tolerate, You Teach · Integrity In The Small Things · Generosity Is Learned At The Table · Character Over Achievement
+- wk30 (The Stories We Carry): Every Family Has A Story · Tell Them Where They Began · Stories Are How We Remember · The Past Lives In Us · Pass Down The Good · Names Carry Meaning · Memory Is A Kind Of Love
+- wk31 (Raising With Meaning): Raise Them With Meaning · Wonder Is A Doorway To Faith · Gratitude Is A Family Habit · Teach Them To Look Up · Purpose Over Possessions · The Sacred In The Ordinary · What Truly Lasts
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk28: The Acorn's Dream · The Wise Bird And The Foolish Monkeys · Krishna's Two Mothers · The Elephant Who Remembered · Birbal Finds The True Heir · The Swallows Who Came Home · The Seed And The Forest
+- wk29: The Wolf In Sheep's Clothing · The Sparrow And The King's Justice · King Harishchandra's Promise · The Honest Merchant And The Greedy One · Tenali Rama And The Honest Thief · The King Who Loved Gold · The Generous Spring
+- wk30: The Storyteller Of The Village · The Clever Parrot's Stories · Ganesha Writes The Great Story · The Old Deer's Lessons · Birbal And The Never-Ending Story · The Quilt Of Memories · The Rings Of The Old Tree
+- wk31: The Three Stonecutters · The Bird Who Chose Freedom · Krishna's Counsel On Duty · The Monkeys Who Chased The Moon · Birbal On True Riches · The Fisherman And The Rich Merchant · The Tree That Bowed With Fruit
+### Talk prompts (cont.)
+- wk28 (Where You Belong): the family you're born into · grandparents' love · the home waiting · where we come from · a place that feels like home · the community that'll know you · how you already belong
+- wk29 (Values I'll Live For You): why honesty matters · kindness I'll model · how I'll show respect · valuing effort · generosity to see · owning my mistakes · the character I hope you build
+- wk30 (Our Family Stories): a grandparents' story · how our families met · a family legend · where your name comes from · a tradition to share · a childhood memory · the story of how you came to be
+- wk31 (What I Hope You'll Treasure): what truly matters · the wonder to never lose · why gratitude matters · a simple joy to treasure · what I find meaningful · the kind of rich to become · finding peace within
+### Garbh ragas used (cont., T3): Bhatiyar/dawn(wk28 d191) · Jhinjhoti/eve(wk28 d194) · Gorakh Kalyan/eve(wk29 d199) · Pahadi/eve(wk29 d202) · Chhayanat/eve(wk30 d204) · Kamod/eve(wk30 d208) · Puriya Kalyan/eve(wk31 d212) · Saraswati/eve(wk31 d216)
+### T3 cadence: Garbh per wk = 3 meditation / 2 raga / 2 affirm (meditation-led). Nurture per wk = 3 breathe / 2 food / 2 affirm (breathe-led; calm, rest, birth-prep). Tone = grounding, preparing-to-meet.

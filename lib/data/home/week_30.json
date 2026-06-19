@@ -1,0 +1,282 @@
+[
+  {
+    "day": 204,
+    "week": 30,
+    "babyLearning": { "en": "growing softer and rounder, learning the sound of your voice", "hi": "narm aur gol hota ja raha hai, aapki aawaz ki dhun seekh raha hai" },
+    "grow": {
+      "title": { "en": "Every Family Has A Story", "hi": "Har Parivar Ki Ek Kahani Hoti Hai" },
+      "insight": { "en": "Your baby is not arriving into an empty world. They are joining a long, living story that began far before them.", "hi": "Aapka baby kisi khaali duniya mein nahi aa raha. Woh ek lambi, jeevit kahani mein judh raha hai jo unse bahut pehle shuru hui thi." },
+      "expanded": { "en": "Long before your baby takes their first breath, they belong to a story — of grandparents and great-grandparents, of journeys made, homes built, hardships carried and joys shared. None of us begin from nothing; we each step into a tale already in motion. As your due date draws near, it is worth pausing to feel this. You are not handing your child a blank page but a chapter that follows many others. Knowing where they come from will one day give them a quiet strength, a sense that they are held by more than they can see.", "hi": "Aapke baby ke pehli saans lene se bahut pehle, woh ek kahani se judhe hote hain — dada-dadi aur unke maa-baap ki, kiye gaye safar ki, bose gaye gharon ki, jhele gaye dukh aur baante gaye sukh ki. Hum mein se koi shoonya se shuru nahi hota; hum sab ek pehle se chalti kahani mein kadam rakhte hain. Jaise aapki due date paas aati hai, is baat ko mehsoos karne ke liye rukna achha hai. Aap apne bachche ko koi khaali panna nahi, balki ek aisa adhyay de rahi hain jo kai auron ke baad aata hai. Woh kahan se aaye hain yeh jaanna unhe ek din ek shaant taakat dega, ek ehsaas ki unhe us se zyada thaama gaya hai jitna woh dekh sakte hain." },
+      "deepDive": { "en": "Researchers studying family narratives found that children who know their family's stories tend to have stronger self-esteem and resilience. A sense of belonging to something larger steadies us through life's storms.", "hi": "Family narratives par research karne wale researchers ne paaya ki jo bachche apne parivar ki kahaniyaan jaante hain, unmein aksar zyada aatm-vishwaas aur lachilapan hota hai. Kisi badi cheez se judhe hone ka ehsaas humein zindagi ke toofanon mein sthir rakhta hai." },
+      "remember": { "en": "Your child is born into a story already rich with love.", "hi": "Aapka bachcha ek aisi kahani mein janm leta hai jo pehle se pyaar se bhari hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Storyteller Of The Village", "hi": "Gaon Ka Kissagoyi" },
+      "summary": { "en": "An old storyteller shows a village that the tales we keep alive keep us alive too.", "hi": "Ek boodha kissagoyi ek gaon ko dikhaata hai ki jo kahaniyaan hum zinda rakhte hain woh humein bhi zinda rakhti hain." },
+      "body": { "en": "In a small village at the foot of the hills lived an old man known only as the storyteller. Each evening, when the cooking fires glowed, the children gathered at his doorstep, and he would begin: 'Long, long ago, in this very village...' His tales were of brave grandmothers, clever farmers, and the rivers that once changed their course.\n\nOne summer the old man fell ill, and the village feared his stories would be lost with him. But a small girl who had listened most carefully climbed onto his stool one evening. 'Long, long ago,' she began, her voice trembling, 'in this very village...' And the children leaned in, just as before.\n\nThe old man, listening from his window, smiled. He understood now that a story does not belong to the one who tells it. It belongs to everyone who carries it forward, passing it gently from one heart to the next.", "hi": "Pahaadon ke neeche ek chhote gaon mein ek boodha aadmi rehta tha jise sab sirf kissagoyi ke naam se jaante the. Har shaam, jab khaana pakane ki aag jalti, bachche uske darwaaze par jamaa hote, aur woh shuru karta: 'Bahut, bahut pehle, isi gaon mein...' Uski kahaniyaan bahaadur dadiyon ki, chalaak kisaanon ki, aur un nadiyon ki hoti jinhone kabhi apna raasta badal liya tha.\n\nEk garmi mein boodha aadmi beemar pad gaya, aur gaon ko dar tha ki uski kahaniyaan uske saath kho jaayengi. Par ek nanhi ladki jisne sabse dhyan se suna tha, ek shaam uske stool par chadh gayi. 'Bahut, bahut pehle,' usne shuru kiya, uski aawaz kaanp rahi thi, 'isi gaon mein...' Aur bachche aage jhuk gaye, bilkul pehle ki tarah.\n\nBoodha aadmi, apni khidki se sunte hue, muskuraaya. Use ab samajh aaya ki ek kahani us ki nahi hoti jo use sunaata hai. Woh har us insaan ki hoti hai jo use aage le jaata hai, use pyaar se ek dil se doosre tak pohanchaata." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a story about their grandparents — who they were and the world they lived in.", "hi": "Apne baby ko unke dada-dadi ya nana-nani ke baare mein ek kahani sunaayein — woh kaun the aur kis duniya mein rehte the." },
+      "motivation": { "en": "You are giving your child their first roots, long before they can ask where they come from.", "hi": "Aap apne bachche ko unki pehli jadein de rahi hain, unke yeh poochhne se bahut pehle ki woh kahan se aaye hain." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Chhayanat", "hi": "Raag Chhayanat" },
+      "durationMinutes": 4,
+      "description": { "en": "Evening raga for a calm, settled heart", "hi": "Shaam ka raag, shaant aur thami hui dil ke liye" },
+      "affirmation": { "en": "As this evening melody flows, I let the day settle softly, holding you close.", "hi": "Jaise yeh shaam ki dhun behti hai, main din ko narmi se thamne deti hoon, tumhe paas thaame." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Down To The Belly", "hi": "Pet Tak Saans Lein" },
+      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel it rise gently under your palms, then let it fall as you breathe out. Stay with five soft breaths.", "hi": "Dono haath apne pet ke neeche rakhein. Dheere saans lein aur use apni hatheliyon ke neeche narmi se uthte mehsoos karein, phir saans chhodte hue use girne dein. Paanch naram saanson ke saath rahein." },
+      "remember": { "en": "Your breath is a place you and your baby share.", "hi": "Aapki saans woh jagah hai jise aap aur aapka baby baantte hain." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 205,
+    "week": 30,
+    "babyLearning": { "en": "filling out, practising tiny breaths in the warm dark", "hi": "bhar raha hai, garm andhere mein nanhi saansein abhyaas kar raha hai" },
+    "grow": {
+      "title": { "en": "Tell Them Where They Began", "hi": "Unhe Bataayein Woh Kahan Se Shuru Hue" },
+      "insight": { "en": "One day your child will want to know how their story began — and that story starts with you and the people who came before.", "hi": "Ek din aapka bachcha jaanna chaahega ki unki kahani kaise shuru hui — aur woh kahani aapse aur un logon se shuru hoti hai jo pehle aaye." },
+      "expanded": { "en": "Every child eventually asks the same quiet questions: How did you and the family come to be? Where did we all begin? These are not just curiosities; they are how a child finds their place in the world. The story of how your parents met, how families joined, how a name or a home came to be — these become a map your child can hold. You do not need a grand tale, only an honest one. The simple facts of where you began, told with warmth, give your child something solid to stand on.", "hi": "Har bachcha aakhir mein wahi shaant sawaal poochhta hai: Aap aur parivar kaise bane? Hum sab kahan se shuru hue? Yeh sirf jigyaasa nahi; yeh hai ki ek bachcha duniya mein apni jagah kaise dhoondhta hai. Aapke maa-baap kaise mile, parivar kaise jude, ek naam ya ghar kaise bana — yeh ek aisa naksha ban jaate hain jise aapka bachcha thaam sakta hai. Aapko koi badi kahani nahi chahiye, bas ek sachi. Aap kahan se shuru hue iski saadi baatein, garmjoshi se kahi gayi, aapke bachche ko khade rehne ke liye kuch thos deti hain." },
+      "deepDive": { "en": "Family psychologists note that children who hear how their parents and grandparents overcame difficulties develop a stronger 'intergenerational self' — a sense that they belong to a family that endures.", "hi": "Family psychologists batate hain ki jo bachche sunte hain ki unke maa-baap aur dada-dadi ne mushkilon ko kaise paar kiya, unmein ek mazboot 'intergenerational self' viksit hota hai — ek ehsaas ki woh ek aise parivar se hain jo tikta hai." },
+      "remember": { "en": "Knowing where they began helps a child know who they are.", "hi": "Kahan se shuru hue yeh jaanna ek bachche ko yeh jaanne mein madad karta hai ki woh kaun hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Clever Parrot's Stories", "hi": "Chalaak Tote Ki Kahaniyaan" },
+      "summary": { "en": "A wise parrot keeps a kingdom kind by telling the right story at the right time.", "hi": "Ek samajhdaar tota sahi samay par sahi kahani sunaakar ek rajya ko dayaalu banaaye rakhta hai." },
+      "body": { "en": "In a palace garden lived a parrot famed for his stories. A young prince, quick to anger, would often sit beneath the parrot's perch when his temper flared. Each time, the parrot would softly begin a tale — of a king who learned patience, of a hunter who spared a deer, of a quarrel mended by a kind word.\n\nThe prince never noticed he was being taught. He only knew that after each story his heart felt lighter and his anger had quietly slipped away. Years passed, and the prince became a fair and gentle king.\n\nWhen at last the parrot grew old, the king asked, 'How did you make me wise?' The parrot ruffled his feathers and laughed. 'I did not make you wise. I only told you stories, and the stories did the rest. A good tale, told at the right moment, can shape a heart more gently than any command ever could.'", "hi": "Ek mahal ke baag mein ek tota rehta tha jo apni kahaniyon ke liye mashhoor tha. Ek jawaan rajkumar, jise jaldi gussa aata, aksar apna paara chadhne par tote ke thikaane ke neeche baith jaata. Har baar, tota narmi se ek kahani shuru karta — ek raja ki jisne sabra seekha, ek shikaari ki jisne ek hiran ko chhod diya, ek jhagde ki jise ek dayaalu shabd ne sudhaar diya.\n\nRajkumar ko kabhi ehsaas nahi hua ki use sikhaaya ja raha hai. Use bas itna pata tha ki har kahani ke baad uska dil halka mehsoos karta aur uska gussa chupchaap khisak gaya hota. Saal beete, aur rajkumar ek nyaaypriya aur naram raja ban gaya.\n\nJab aakhir mein tota boodha ho gaya, raja ne poocha, 'Tumne mujhe samajhdaar kaise banaaya?' Tote ne apne pankh phadphadaaye aur hansa. 'Maine tumhe samajhdaar nahi banaaya. Maine bas tumhe kahaniyaan sunaayi, aur kahaniyon ne baaki kaam kiya. Ek achhi kahani, sahi pal par kahi gayi, ek dil ko kisi bhi hukm se zyada narmi se gadh sakti hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how your parents' families first met — the small story behind your own beginning.", "hi": "Apne baby ko bataayein ki aapke maa-baap ke parivar pehli baar kaise mile — aapki apni shuruaat ke peeche ki chhoti kahani." },
+      "motivation": { "en": "Every story of how a family began is a story of how love found its way.", "hi": "Ek parivar kaise bana iski har kahani is baat ki kahani hai ki pyaar ne apna raasta kaise dhoondha." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "The Thread That Holds Us", "hi": "Woh Dhaaga Jo Humein Thaame" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on belonging to a long line of love", "hi": "Pyaar ki ek lambi kataar se judhe hone ka ek chhota dhyan" },
+      "affirmation": { "en": "I am held by all who came before me, and I hold you now.", "hi": "Mujhe un sabne thaama hai jo mujhse pehle aaye, aur main ab tumhe thaame hoon." },
+      "introduction": { "en": "Settle comfortably and let your eyes close. Take three slow breaths. Imagine a soft golden thread running back through the mothers and fathers before you, all the way to you — and feel it carry gently forward into your baby.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein. Ek naram sunhra dhaaga sochein jo aapse pehle ki maaon aur baapon se hokar aap tak aata hai — aur use pyaar se aage apne baby tak jaate mehsoos karein." },
+      "closingThought": { "en": "You are one warm link in a long chain of love. Rest in that belonging.", "hi": "Aap pyaar ki ek lambi zanjeer ki ek garm kadi hain. Us apnepan mein aaram karein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Heartburn Creeps Up", "hi": "Jab Seene Mein Jalan Badhe" },
+      "content": { "en": "If a burning feeling rises after meals now, try eating smaller portions more often, and stay sitting upright for a while after you eat. Cool milk or a little curd can soothe it gently.", "hi": "Agar ab khaane ke baad jalan ka ehsaas badhe, to chhote hisson mein zyada baar khaane ki koshish karein, aur khaane ke baad thodi der seedhe baithi rahein. Thanda doodh ya thoda dahi ise narmi se shaant kar sakta hai." },
+      "remember": { "en": "Small, frequent meals are kinder to a crowded belly.", "hi": "Chhote, baar-baar khaaye gaye bhojan ek bhare pet par zyada dayaalu hote hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 206,
+    "week": 30,
+    "babyLearning": { "en": "gaining gentle weight, settling into your rhythm", "hi": "narmi se vazan badha raha hai, aapki dhun mein bas raha hai" },
+    "grow": {
+      "title": { "en": "Stories Are How We Remember", "hi": "Kahaniyaan Hi Hai Jaise Hum Yaad Rakhte Hain" },
+      "insight": { "en": "Facts fade, but a story stays. A family remembers itself not in dates, but in the tales it tells again and again.", "hi": "Tathya dhundhle pad jaate hain, par ek kahani bani rehti hai. Ek parivar khud ko taarikhon mein nahi, balki un kahaniyon mein yaad rakhta hai jo woh baar-baar sunaata hai." },
+      "expanded": { "en": "We rarely remember our families through facts and figures. We remember them through stories — the time grandfather got lost on the way to a wedding, the dish a grandmother made that no one could quite copy, the night a storm brought everyone together. These tales are how a family keeps its heart alive across generations. When you tell your child these stories, you are not just passing time; you are handing them the memory of people they may never meet, keeping the family whole. A story told is a person remembered.", "hi": "Hum apne parivaron ko shaayad hi tathyon aur ankdon se yaad rakhte hain. Hum unhe kahaniyon ke zariye yaad rakhte hain — woh waqt jab dadaji shaadi ke raaste mein kho gaye the, woh pakwaan jo dadi banaati thi jise koi theek se nakal nahi kar pata, woh raat jab ek toofan ne sabko ek saath le aaya. Yeh kahaniyaan hi hai jaise ek parivar peedhiyon ke paar apne dil ko zinda rakhta hai. Jab aap apne bachche ko yeh kahaniyaan sunaati hain, aap sirf samay nahi bitaati; aap unhe un logon ki yaad de rahi hain jinse woh shaayad kabhi na milein, parivar ko poora rakhte hue. Ek kahani sunaayi gayi ek insaan yaad rakha gaya." },
+      "deepDive": { "en": "Memory researchers find that stories are remembered far better than isolated facts, because the brain naturally stores experience in narrative form. We are, quite literally, built to remember through tales.", "hi": "Memory researchers paate hain ki kahaniyaan alag-thalag tathyon se kahin behtar yaad rehti hain, kyunki dimaag kudrati taur par anubhav ko kahani ke roop mein store karta hai. Hum, sach mein, kahaniyon ke zariye yaad rakhne ke liye bane hain." },
+      "remember": { "en": "To tell a story is to keep someone alive in memory.", "hi": "Ek kahani sunaana kisi ko yaad mein zinda rakhna hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Ganesha Writes The Great Story", "hi": "Ganesha Mahaakahani Likhte Hain" },
+      "summary": { "en": "The sage Vyasa and Lord Ganesha together set down an epic so it would never be lost.", "hi": "Rishi Vyas aur Bhagwan Ganesha milkar ek mahaakaavya likhte hain taaki woh kabhi na kho jaaye." },
+      "body": { "en": "Long ago, the sage Vyasa held a vast story in his heart — the tale of a great family, their loves and quarrels, their wars and wisdom. It was so large he feared it would be lost if he did not write it down. But no ordinary hand could keep pace with so mighty a tale.\n\nSo Vyasa asked Lord Ganesha to be his scribe. Ganesha agreed, on one condition: Vyasa must never pause in his telling. Vyasa, just as clever, made his own condition: Ganesha must understand each verse before he wrote it.\n\nAnd so it went. Whenever Vyasa needed a moment to think, he would speak a knotty, puzzling verse, and while Ganesha paused to unravel its meaning, the sage caught his breath. Verse by verse, the great story was set down — a treasure of a family's memory, saved so that it could be told again for thousands of years.", "hi": "Bahut samay pehle, rishi Vyas apne dil mein ek vishaal kahani thaame the — ek mahaan parivar ki kahani, unke pyaar aur jhagde, unke yuddh aur gyaan. Yeh itni badi thi ki unhe dar tha ki agar woh ise na likhein to yeh kho jaayegi. Par koi saadhaaran haath itni mahaan kahani ke saath kadam nahi mila sakta tha.\n\nIsliye Vyas ne Bhagwan Ganesha se unka lekhak banne ko kaha. Ganesha ek shart par maan gaye: Vyas ko apni kahani sunaane mein kabhi rukna nahi chahiye. Vyas, utne hi chalaak, ne apni shart rakhi: Ganesha ko har shlok likhne se pehle use samajhna hoga.\n\nAur aise hi chalta raha. Jab bhi Vyas ko sochne ke liye ek pal chahiye hota, woh ek gootha, paheli jaisa shlok bolte, aur jab Ganesha uska arth suljhaane ke liye rukte, rishi apni saans le lete. Shlok dar shlok, mahaan kahani likhi gayi — ek parivar ki yaad ka khazaana, bachaaya gaya taaki use hazaaron saal tak phir se kaha ja sake." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a family legend or a favourite tale that has been passed down to you.", "hi": "Apne baby ko ek parivaarik daastaan ya ek pasandeeda kahani sunaayein jo aap tak pohanchaayi gayi hai." },
+      "motivation": { "en": "The tales you pass on today will be the ones your child tells their own children one day.", "hi": "Jo kahaniyaan aap aaj aage badhaati hain wahi aapka bachcha ek din apne bachchon ko sunaayega." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Carry Our Story Forward", "hi": "Main Hamari Kahani Aage Le Jaati Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation of heritage and memory", "hi": "Viraasat aur yaad ka ek bond affirmation" },
+      "affirmation": { "en": "I hold the stories of those before me, and I will gently pass them on to you.", "hi": "Main apne se pehle aaye logon ki kahaniyaan thaame hoon, aur main unhe pyaar se tum tak pohanchaaungi." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Memories Are A Gift To Give", "hi": "Meri Yaadein Ek Dene Layak Tohfa Hain" },
+      "content": { "en": "The stories I carry are not only mine. They are a quiet inheritance I get to hand to my child.", "hi": "Jo kahaniyaan main thaame hoon woh sirf meri nahi. Woh ek shaant viraasat hain jo main apne bachche ko de sakti hoon." },
+      "remember": { "en": "What you remember, your child gets to keep.", "hi": "Jo aap yaad rakhti hain, woh aapka bachcha sambhaal sakta hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 207,
+    "week": 30,
+    "babyLearning": { "en": "opening and closing tiny eyes, sensing soft light", "hi": "nanhi aankhein khol-band kar raha hai, naram roshni mehsoos kar raha hai" },
+    "grow": {
+      "title": { "en": "The Past Lives In Us", "hi": "Beeta Kal Hum Mein Jeeta Hai" },
+      "insight": { "en": "The people who shaped you are not gone. They live on in the way you love, laugh, and care for your baby.", "hi": "Jin logon ne aapko gadha woh chale nahi gaye. Woh us tarah jeete hain jaise aap pyaar karti hain, hansti hain, aur apne baby ka khayal rakhti hain." },
+      "expanded": { "en": "Look closely and you will see the past living inside you. The way you hum a tune may be your mother's; your patience may be your father's; the recipe in your hands once belonged to a grandmother you barely remember. None of these were taught on purpose — they were absorbed, lovingly, over years. Now, without trying, you will pass them on to your child. This is the quiet miracle of family: those who loved us are not lost, but folded into who we are, and gently carried forward into who our children become.", "hi": "Gaur se dekhein aur aap beete kal ko apne andar jeeta hua paayengi. Jis tarah aap ek dhun gungunaati hain woh shaayad aapki maa ki ho; aapka sabra shaayad aapke pita ka; aapke haathon ka pakwaan kabhi ek aisi dadi ka tha jise aap mushkil se yaad karti hain. Inmein se kuch bhi jaan-boojh kar nahi sikhaaya gaya — yeh saalon mein, pyaar se, soch liya gaya. Ab, bina koshish ke, aap unhe apne bachche ko de dengi. Yeh parivar ka shaant chamatkaar hai: jinhone humse pyaar kiya woh khoye nahi, balki hum jo hain usmein mude hue hain, aur pyaar se aage le jaaye gaye hain ki hamare bachche kya banenge." },
+      "deepDive": { "en": "Studies of habit and language show we inherit far more than genes — gestures, phrases, ways of comforting, even recipes pass invisibly from one generation to the next. We carry our ancestors in our everyday acts.", "hi": "Aadat aur bhaasha ke adhyayan dikhaate hain ki hum genes se kahin zyada viraasat mein paate hain — ishaare, vaakya, dilaasa dene ke tareeke, yahaan tak ki pakwaan bhi ek peedhi se doosri tak andekhe paas hote hain. Hum apne poorvajon ko apne rozana ke kaamon mein dhote hain." },
+      "remember": { "en": "Those who loved you live on in how you love your child.", "hi": "Jinhone aapse pyaar kiya woh us mein jeete hain ki aap apne bachche se kaise pyaar karti hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Old Deer's Lessons", "hi": "Boodhe Hiran Ke Sabak" },
+      "summary": { "en": "An old deer teaches a young fawn the wisdom that once kept the whole herd safe.", "hi": "Ek boodha hiran ek jawaan harin ko woh samajh sikhaata hai jisne kabhi poore jhund ko surakshit rakha." },
+      "body": { "en": "In a green forest lived an old deer who had survived many seasons. He had learned which leaves were safe to eat, which paths the hunters watched, and how to listen for danger in the rustle of the grass. The young fawns thought him slow and old-fashioned, and rarely listened.\n\nBut one small fawn loved to walk beside the old deer and ask him questions. 'Why do you always stop at the stream's edge before drinking?' 'Why do you smell the wind before crossing the meadow?' Patiently, the old deer explained each lesson, just as his own mother had once explained them to him.\n\nYears later, when hunters came to the forest, it was that grown fawn who led the herd to safety, using everything the old deer had taught. The wisdom of one generation had quietly become the survival of the next — passed on, like a gift, through patient listening.", "hi": "Ek hare jungle mein ek boodha hiran rehta tha jo kai mausam dekh chuka tha. Usne seekh liya tha ki kaun se patte khaane ke liye surakshit hain, kaun se raaste shikaari dekhte hain, aur ghaas ki sarsaraahat mein khatre ko kaise sunna hai. Jawaan harin use dheema aur purane khayaal ka samajhte, aur shaayad hi sunte.\n\nPar ek nanha harin boodhe hiran ke saath chalna aur use sawaal poochhna pasand karta. 'Aap peene se pehle hamesha nadi ke kinare kyun rukte hain?' 'Maidaan paar karne se pehle hawa kyun soonghte hain?' Sabra se, boodhe hiran ne har sabak samjhaaya, bilkul jaise uski apni maa ne kabhi use samjhaaya tha.\n\nSaalon baad, jab shikaari jungle mein aaye, wahi bada hua harin tha jisne jhund ko surakshit jagah pohanchaaya, woh sab istemaal karte hue jo boodhe hiran ne sikhaaya tha. Ek peedhi ki samajh chupchaap agli peedhi ka bachaav ban gayi thi — aage di gayi, ek tohfe ki tarah, sabra bhare sunne ke zariye." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby where their name comes from, or how you are still searching for the right one.", "hi": "Apne baby ko bataayein ki unka naam kahan se aata hai, ya aap kaise abhi bhi sahi naam dhoondh rahi hain." },
+      "motivation": { "en": "A name carries a history; sharing it gives your child their first sense of belonging.", "hi": "Ek naam ek itihaas thaame rakhta hai; use baant na aapke bachche ko apnepan ka pehla ehsaas deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Carried By Many Hands", "hi": "Kai Haathon Se Thaame" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on the love that came before", "hi": "Us pyaar par ek chhota dhyan jo pehle aaya" },
+      "affirmation": { "en": "All the love that made me is now flowing gently into you.", "hi": "Woh saara pyaar jisne mujhe banaaya ab pyaar se tum mein beh raha hai." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Breathe slowly three times. Picture the warm faces of those who cared for you when you were small, and feel their gentleness still resting in you, ready to pass on to your baby.", "hi": "Aaram se baithein aur aankhein band karein. Teen baar dheere saans lein. Un garm chehron ko sochein jinhone aap chhoti thi tab aapka khayal rakha, aur unki narmi ko abhi bhi aap mein tikti mehsoos karein, aapke baby tak pohanchne ke liye taiyaar." },
+      "closingThought": { "en": "You hold the warmth of many hands, and you give it onward. Carry that quietly.", "hi": "Aap kai haathon ki garmjoshi thaame hain, aur use aage deti hain. Use shaanti se le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Slow Down The Out-Breath", "hi": "Saans Chhodna Dheema Karein" },
+      "content": { "en": "Breathe in gently for a count of four, then let your breath out slowly for a count of six. The longer out-breath tells your body it is safe to rest. Repeat for a quiet minute.", "hi": "Chaar tak ginte hue narmi se saans lein, phir chhah tak ginte hue dheere saans baahar chhodein. Lambi saans chhodna aapke sharir ko batata hai ki aaram karna surakshit hai. Ek shaant minute tak dohraayein." },
+      "remember": { "en": "A long, slow out-breath is a quiet signal of safety.", "hi": "Ek lambi, dheemi saans chhodna surakshit hone ka ek shaant ishaara hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 208,
+    "week": 30,
+    "babyLearning": { "en": "growing stronger, kicking and stretching with purpose", "hi": "mazboot ho raha hai, maqsad se laat maar aur khinch raha hai" },
+    "grow": {
+      "title": { "en": "Pass Down The Good", "hi": "Achhaai Aage Pohanchaayein" },
+      "insight": { "en": "Not everything in a family must be carried forward. You get to choose which threads to pass on — and which to gently set down.", "hi": "Ek parivar mein sab kuch aage le jaane ki zaroorat nahi. Aap chun sakti hain ki kaun se dhaage aage badhaane hain — aur kaun se pyaar se rakh dene hain." },
+      "expanded": { "en": "Every family carries both gifts and burdens — the warm traditions and the old hurts, the kind habits and the harsh words. As you become a parent, you hold something powerful: the chance to choose. You can keep the laughter, the recipes, the gentleness, and lovingly let go of what caused pain. This is not a betrayal of where you come from; it is the truest honouring of it. To pass down the good and quietly stop the rest is one of the bravest, most loving things a parent can do.", "hi": "Har parivar tohfe aur bojh dono dhota hai — garm parampraayein aur purane zakhm, dayaalu aadtein aur kathor shabd. Jaise aap ek parent banti hain, aap kuch shaktishaali thaame hain: chunne ka mauka. Aap hansi, pakwaan, narmi rakh sakti hain, aur pyaar se use chhod sakti hain jisne dard diya. Yeh aap kahan se aayi hain uska vishwaasghaat nahi; yeh uska sabse sachcha samman hai. Achhaai aage pohanchaana aur baaki ko chupchaap rok dena ek parent ke kiye sabse bahaadur, sabse pyaar bhare kaamon mein se ek hai." },
+      "deepDive": { "en": "Psychologists describe 'breaking the cycle' — the way one mindful parent can end patterns of harshness and pass on warmth instead. A single generation's choice can change a family's story for good.", "hi": "Psychologists 'cycle todne' ka varnan karte hain — jis tarah ek soch-samajh wala parent kathorta ke pattern khatam kar sakta hai aur uski jagah garmjoshi aage de sakta hai. Ek peedhi ka faisla ek parivar ki kahani hamesha ke liye badal sakta hai." },
+      "remember": { "en": "You can keep the warmth and gently leave the rest behind.", "hi": "Aap garmjoshi rakh sakti hain aur baaki ko pyaar se peeche chhod sakti hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "Birbal And The Never-Ending Story", "hi": "Birbal Aur Khatam Na Hone Wali Kahani" },
+      "summary": { "en": "Clever Birbal answers a king's impossible wish with a single endless tale.", "hi": "Chalaak Birbal ek raja ki namumkin ichha ka jawaab ek hi anant kahani se deta hai." },
+      "body": { "en": "Emperor Akbar loved stories so much that he grew impossible to please. 'I want a story that never ends,' he announced to his court. 'Whoever tells me one will be richly rewarded — and whoever fails will be punished.' One by one, the storytellers tried and failed, for every tale must finish somewhere.\n\nThen Birbal stepped forward with a smile. 'Once,' he began, 'a farmer filled an enormous granary with grain, leaving only a tiny hole. Through that hole, a sparrow flew in, took one grain, and flew out. Then another sparrow flew in, took one grain, and flew out. Then another flew in, took one grain, and flew out...'\n\nOn and on Birbal went, sparrow after sparrow, grain after grain. Hours passed. 'Enough!' cried Akbar at last, laughing. 'Your story truly never ends!' And Birbal bowed, his clever reward well earned.", "hi": "Badshah Akbar ko kahaniyaan itni pasand thi ki use khush karna namumkin ho gaya. 'Mujhe ek aisi kahani chahiye jo kabhi khatam na ho,' usne apne darbaar mein elaan kiya. 'Jo mujhe sunaayega use bhaari inaam milega — aur jo fail hoga use saza milegi.' Ek-ek karke, kissagoyi koshish karte aur fail hote, kyunki har kahani kahin to khatam hoti hai.\n\nTabhi Birbal muskuraate hue aage aaya. 'Ek baar,' usne shuru kiya, 'ek kisaan ne ek vishaal anaaj-ghar anaaj se bhar diya, sirf ek nanha sa chhed chhod kar. Us chhed se, ek gauraiya andar aayi, ek daana liya, aur baahar udh gayi. Phir ek aur gauraiya andar aayi, ek daana liya, aur baahar udh gayi. Phir ek aur andar aayi, ek daana liya, aur baahar udh gayi...'\n\nBirbal aage aur aage chalta gaya, gauraiya ke baad gauraiya, daane ke baad daana. Ghante beet gaye. 'Bas!' Akbar aakhir chillaaya, hanste hue. 'Tumhari kahani sach mein kabhi khatam nahi hoti!' Aur Birbal jhuka, uska chalaak inaam achhi tarah kamaaya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a tradition you cannot wait to share with them one day.", "hi": "Apne baby ko ek aisi parampara ke baare mein bataayein jise unke saath baantne ke liye aap bekarar hain." },
+      "motivation": { "en": "A tradition becomes precious the moment you pass it lovingly to the next pair of hands.", "hi": "Ek parampara us pal keemti ban jaati hai jab aap use pyaar se agle haathon mein pohanchaati hain." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Kamod", "hi": "Raag Kamod" },
+      "durationMinutes": 4,
+      "description": { "en": "Evening raga for a warm, settling calm", "hi": "Shaam ka raag, garm aur thami hui shaanti ke liye" },
+      "affirmation": { "en": "As this melody rises and rests, I choose to carry forward only what is warm and good.", "hi": "Jaise yeh dhun uthti aur thamti hai, main sirf wahi aage le jaane ka chunaav karti hoon jo garm aur achha hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Iron Feels Low", "hi": "Jab Iron Kam Lage" },
+      "content": { "en": "If you feel more tired or breathless than usual now, your iron may be running low. Pair iron-rich foods like spinach, dates and lentils with a little lemon or amla — the vitamin C helps your body absorb the iron.", "hi": "Agar ab aap aam se zyada thaki ya saans phoolti mehsoos karein, to aapka iron kam ho sakta hai. Iron se bharpoor cheezein jaise palak, khajoor aur daal ko thode nimbu ya amla ke saath lein — vitamin C aapke sharir ko iron sokhne mein madad karta hai." },
+      "remember": { "en": "A squeeze of lemon helps your body take in more iron.", "hi": "Ek nichuda nimbu aapke sharir ko zyada iron lene mein madad karta hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 209,
+    "week": 30,
+    "babyLearning": { "en": "softening into your lullabies, knowing your touch", "hi": "aapki loriyon mein naram ho raha hai, aapke sparsh ko jaanta hai" },
+    "grow": {
+      "title": { "en": "Names Carry Meaning", "hi": "Naam Arth Thaame Hote Hain" },
+      "insight": { "en": "A name is the first story you tell about your child — a small word holding a wish, a memory, or a love.", "hi": "Ek naam pehli kahani hai jo aap apne bachche ke baare mein sunaati hain — ek chhota shabd jo ek ichha, ek yaad, ya ek pyaar thaame hota hai." },
+      "expanded": { "en": "The name you choose for your child is more than a label; it is the first gift of identity, carried for a lifetime. Some names honour a beloved grandparent, some hold the meaning of a virtue you hope your child will grow into, some simply sounded like love the moment you heard them. Whatever you choose, your child will one day ask, 'Why this name?' — and your answer will become part of their story. A name is a tiny inheritance, a wish folded into a single word, spoken every day with affection.", "hi": "Aap apne bachche ke liye jo naam chunti hain woh ek label se kahin zyada hai; yeh pehchaan ka pehla tohfa hai, jeevan bhar thaama jaata hai. Kuch naam ek pyaare dada-dadi ka samman karte hain, kuch ek aise gun ka arth thaame hote hain jismein aap chahti hain ki aapka bachcha bade, kuch bas pyaar jaise lage jis pal aapne unhe suna. Aap jo bhi chunein, aapka bachcha ek din poochhega, 'Yeh naam kyun?' — aur aapka jawaab unki kahani ka hissa ban jaayega. Ek naam ek nanhi viraasat hai, ek ichha ek hi shabd mein mudi, har din pyaar se boli jaati." },
+      "deepDive": { "en": "Across cultures, naming has always been a sacred act — in many Indian traditions the naamkaran ceremony welcomes a child by speaking their name aloud, marking their place in the family for the first time.", "hi": "Sanskritiyon ke paar, naam dena hamesha ek pavitra kaam raha hai — kai Bharatiya paramparaaon mein naamkaran sanskaar ek bachche ka swagat unka naam bolkar karta hai, pehli baar parivar mein unki jagah ko ankit karta hai." },
+      "remember": { "en": "A name is a love and a wish, spoken every day.", "hi": "Ek naam ek pyaar aur ek ichha hai, har din boli jaati." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Quilt Of Memories", "hi": "Yaadon Ki Razaai" },
+      "summary": { "en": "A grandmother stitches a quilt where every scrap of cloth holds a family memory.", "hi": "Ek dadi ek razaai seeti hai jahan kapde ka har tukda ek parivaarik yaad thaame hai." },
+      "body": { "en": "An old grandmother sat by her window each evening, sewing a great patchwork quilt. Her granddaughter watched, puzzled, as the old woman stitched together mismatched scraps of cloth — faded, frayed, and far from new. 'Why not buy a fine new blanket, Naani?' the girl asked.\n\nThe grandmother smiled and pointed to each piece. 'This blue square was your mother's first dress. This red one was your grandfather's festival shirt. This soft yellow was the shawl I wrapped you in when you were born.' Scrap by scrap, she told a story for every patch, and the quilt grew warm with memory.\n\nWhen at last it was finished, she laid it over her granddaughter's bed. 'Now,' she said, 'when you sleep, you sleep beneath everyone who loves you.' And the girl understood that the old, worn pieces were the most precious of all — because each one held a story worth keeping.", "hi": "Ek boodhi dadi har shaam apni khidki ke paas baithti, ek badi pacchikaari wali razaai seeti. Uski poti hairaan dekhti, jab boodhi aurat kapde ke be-mel tukde ek saath seeti — phike, ghise, aur naye se bahut door. 'Ek achhi nayi kambal kyun nahi khareed leti, Naani?' ladki ne poocha.\n\nDadi muskuraayi aur har tukde ki taraf ishaara kiya. 'Yeh neela tukda tumhari maa ki pehli frock thi. Yeh laal tumhare nana ki tyohaar ki kameez thi. Yeh naram peela woh shawl thi jismein maine tumhe janm par lapeta tha.' Tukde dar tukde, usne har patch ke liye ek kahani sunaayi, aur razaai yaad se garm hoti gayi.\n\nJab aakhir mein woh poori hui, usne use apni poti ke bistar par bichhaaya. 'Ab,' usne kaha, 'jab tum soti ho, tum un sabke neeche soti ho jo tumse pyaar karte hain.' Aur ladki ko samajh aaya ki purane, ghise tukde sabse keemti the — kyunki har ek ne rakhne layak ek kahani thaami thi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a memory you treasure from your own childhood.", "hi": "Apne baby ko apne bachpan ki ek aisi yaad ke baare mein bataayein jise aap sambhaal kar rakhti hain." },
+      "motivation": { "en": "Sharing your childhood lets your baby know the child you once were, too.", "hi": "Apna bachpan baant na aapke baby ko us bachche se bhi milata hai jo kabhi aap thi." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Choose A Name Made Of Love", "hi": "Main Pyaar Se Bana Ek Naam Chunti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation of welcome and identity", "hi": "Swagat aur pehchaan ka ek bond affirmation" },
+      "affirmation": { "en": "Whatever name I give you, it will be spoken with love, every day of your life.", "hi": "Main tumhe jo bhi naam doon, woh pyaar se bola jaayega, tumhari zindagi ke har din." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Childhood Has Gifts To Give", "hi": "Mere Bachpan Ke Paas Dene Layak Tohfe Hain" },
+      "content": { "en": "The joys I knew as a child are not behind me. They are waiting to be shared again with my own little one.", "hi": "Jo khushiyaan main bachche ke roop mein jaanti thi woh mere peeche nahi. Woh apne nanhe ke saath phir baante jaane ka intezaar kar rahi hain." },
+      "remember": { "en": "Your happiest childhood memories can become your child's too.", "hi": "Aapki sabse khush bachpan ki yaadein aapke bachche ki bhi ban sakti hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 210,
+    "week": 30,
+    "babyLearning": { "en": "closing the week curled close, listening to your heartbeat", "hi": "hafta poora karte hue paas simta hua, aapki dhadkan sunta hua" },
+    "grow": {
+      "title": { "en": "Memory Is A Kind Of Love", "hi": "Yaad Ek Tarah Ka Pyaar Hai" },
+      "insight": { "en": "To remember someone is to keep loving them. The stories we hold are love that refuses to fade.", "hi": "Kisi ko yaad rakhna use pyaar karte rehna hai. Jo kahaniyaan hum thaame hain woh aisa pyaar hai jo dhundhla hone se inkaar karta hai." },
+      "expanded": { "en": "When you tell your child about a grandparent they will never meet, a home long left behind, or a tradition handed down through time, you are doing something tender and powerful: you are keeping love alive. Memory is not just the past held in the mind; it is a way of continuing to love those we cannot hold. As you prepare to meet your baby, know that every story you choose to carry forward is a gift of love — one that lets your child belong to people and places far beyond their own short life. To remember, and to tell, is itself an act of love.", "hi": "Jab aap apne bachche ko ek aise dada-dadi ke baare mein bataati hain jinse woh kabhi nahi milenge, ek ghar jo bahut pehle chhoot gaya, ya ek parampara jo samay ke paar di gayi, aap kuch naazuk aur shaktishaali kar rahi hain: aap pyaar ko zinda rakh rahi hain. Yaad sirf mann mein thaama beeta kal nahi; yeh un logon se pyaar karte rehne ka ek tareeka hai jinhe hum thaam nahi sakte. Jaise aap apne baby se milne ki taiyaari karti hain, jaan lein ki har kahani jo aap aage le jaane ka chunaav karti hain woh pyaar ka ek tohfa hai — ek jo aapke bachche ko un logon aur jagahon se judne deta hai jo unki apni chhoti zindagi se bahut aage hain. Yaad rakhna, aur sunaana, khud mein pyaar ka ek kaam hai." },
+      "deepDive": { "en": "Grief researchers describe 'continuing bonds' — the way remembering and retelling keeps a loved one present in our lives. Far from being unhealthy, this is one of the most natural ways love endures.", "hi": "Grief researchers 'continuing bonds' ka varnan karte hain — jis tarah yaad rakhna aur dohraana ek pyaare ko hamari zindagi mein maujood rakhta hai. Ye anhealthy hone se door, pyaar ke tikne ke sabse kudrati tareekon mein se ek hai." },
+      "remember": { "en": "Every story you keep is love that refuses to fade.", "hi": "Har kahani jo aap thaame rakhti hain woh pyaar hai jo dhundhla hone se inkaar karta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Rings Of The Old Tree", "hi": "Boodhe Ped Ke Chhalle" },
+      "summary": { "en": "An ancient tree teaches a curious child that every year leaves its quiet mark within.", "hi": "Ek prachin ped ek jigyaasu bachche ko sikhaata hai ki har saal apna shaant nishaan andar chhod jaata hai." },
+      "body": { "en": "At the heart of a forest stood a tree so old that no one knew its age. A curious child often sat in its shade and wondered how long it had been growing. One day a gentle woodcutter, who never harmed living trees, pointed to the stump of one that had fallen in a storm.\n\n'Look closely,' he said, tracing the rings inside. 'Each circle is a year the tree has lived. Here is a wide ring — that was a year of plenty rain. Here is a thin, tight one — that was a year of drought. The tree carries every season inside it, even the hard ones.'\n\nThe child pressed a small hand to the living tree. 'So it remembers everything?' 'Yes,' the woodcutter smiled. 'Nothing it has lived through is truly lost. It is all still there, holding the tree up, ring upon ring, season upon season — just as the years we live quietly hold up each of us.'", "hi": "Ek jungle ke dil mein ek ped khada tha jo itna boodha tha ki uski umar koi nahi jaanta tha. Ek jigyaasu bachcha aksar uski chhaaya mein baithta aur sochta ki yeh kitne samay se badh raha hai. Ek din ek naram lakadhara, jo kabhi jeevit pedon ko nuksaan nahi pohanchaata tha, ek aise ped ke thunth ki taraf ishaara kiya jo ek toofan mein girr gaya tha.\n\n'Gaur se dekho,' usne andar ke chhalle par ungli ferte hue kaha. 'Har gola ek saal hai jo ped ne jiya. Yeh ek chauda chhalla hai — woh bharpoor baarish ka saal tha. Yeh ek patla, kasa hua — woh sookhe ka saal tha. Ped har mausam apne andar thaame rakhta hai, mushkil waale bhi.'\n\nBachche ne ek nanha haath jeevit ped par rakha. 'To yeh sab kuch yaad rakhta hai?' 'Haan,' lakadhara muskuraaya. 'Jo bhi yeh jiya hai woh sach mein khoya nahi. Yeh sab abhi bhi wahan hai, ped ko thaame, chhalle par chhalla, mausam par mausam — bilkul jaise jo saal hum jeete hain woh chupchaap hum mein se har ek ko thaame rakhte hain.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby the story of how they came to be — your own beginning of their life.", "hi": "Apne baby ko yeh kahani sunaayein ki woh kaise aaye — unki zindagi ki aapki apni shuruaat." },
+      "motivation": { "en": "Of all the stories you will ever tell, the story of them is the one they will treasure most.", "hi": "Aap jo bhi kahaniyaan kabhi sunaayengi, unmein se unki kahani woh hai jise woh sabse zyada sambhaalenge." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Holding All Our Stories", "hi": "Hamari Saari Kahaniyaan Thaame" },
+      "durationMinutes": 3,
+      "description": { "en": "A short closing meditation on love that endures", "hi": "Tikne wale pyaar par ek chhota samaapan dhyan" },
+      "affirmation": { "en": "Every story of love I carry now lives gently in you, too.", "hi": "Pyaar ki har kahani jo main thaame hoon ab pyaar se tum mein bhi jeeti hai." },
+      "introduction": { "en": "Sit quietly and let your eyes close. Take three slow breaths. Imagine your heart as a warm room where everyone you have loved still rests, and feel that whole gathering of love quietly surrounding your baby.", "hi": "Shaanti se baithein aur aankhein band hone dein. Teen dheemi saansein lein. Apne dil ko ek garm kamre ki tarah sochein jahan har woh insaan jise aapne pyaar kiya abhi bhi aaram karta hai, aur us poore pyaar ke mele ko chupchaap apne baby ko gherte mehsoos karein." },
+      "closingThought": { "en": "Your baby is born into a whole gathering of love. Rest in how full that is.", "hi": "Aapka baby pyaar ke ek poore mele mein janm leta hai. Yeh kitna bhara hai us mein aaram karein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe In Gratitude", "hi": "Aabhaar Ki Saans Lein" },
+      "content": { "en": "Breathe in slowly and silently name one person you are grateful for. Breathe out and let that warmth settle in your chest. Repeat with a new name for five gentle breaths.", "hi": "Dheere saans lein aur mann hi mann ek aise insaan ka naam lein jiske aap aabhaari hain. Saans chhodein aur us garmjoshi ko apne seene mein basne dein. Ek naye naam ke saath paanch naram saanson ke liye dohraayein." },
+      "remember": { "en": "Gratitude is a quiet way of holding our people close.", "hi": "Aabhaar apne logon ko paas thaame rakhne ka ek shaant tareeka hai." },
+      "durationMinutes": 2
+    }
+  }
+]
