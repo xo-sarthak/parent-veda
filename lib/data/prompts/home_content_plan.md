@@ -134,3 +134,18 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk20 (act7 The World, 2nd): the languages of our world · a tradition you'll grow in · a problem I'm hopeful about · nature & animals to show you · the music of our world · how people help each other · the wonder of everyday life
 - wk21 (act8 Little Joys, 2nd): a comfort food I'll make · a bedtime ritual I imagine · a silly family thing · a holiday to share · a calming place I'll take you · a song to soothe you · a small daily joy
 ### Garbh ragas used (cont.): Brindavani Sarang/aft(wk18 d121) · Marwa/eve(wk18 d123) · Malkauns/night(wk18 d125) · Gunkali/morn(wk19 d127) · Multani/aft(wk19 d129) · Darbari Kanada/night(wk19 d132) · Tilak Kamod/eve(wk20 d135) · Yaman/eve(wk20 d137 ANCHOR) · Jaijaivanti/eve(wk20 d139) · Basant/eve(wk21 d142) · Hameer/eve(wk21 d144) · Adana/night(wk21 d146)
+
+## Batch weeks 22-24 (T2 cont.) — boundaries/discipline/resilience; Talk tuned to weekly theme
+### Grow used (cont.)
+- wk22 (Boundaries With Love): Boundaries Are A Form Of Love · Limits Make Them Feel Safe · Kind And Firm Can Coexist · A 'No' Can Be Gentle · Structure Is Security · Loving Does Not Mean Always Yes · Consistency Is Comfort
+- wk23 (Teaching, Not Punishing): Discipline Means To Teach · Behind Every Behaviour Is A Need · Connect Before You Correct · Punishment Ends, Teaching Lasts · Mistakes Are Not Misbehaviour · Calm Correction Sticks · Repair, Don't Shame
+- wk24 (Mistakes Help Us Grow): Mistakes Are How We Grow · Failing Is Part Of Learning · Let Them Try And Stumble · The Gift Of A Second Try · Praise The Effort, Not Just The Win · Safe To Fail, Safe To Grow · Every Expert Was Once A Beginner
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk22: The Dog In The Manger · The Lapwing And The Sea · Bhishma's Vow · The Foolish Gardener Monkeys · Birbal Settles The Boundary · The King's Garden Wall · The Riverbanks That Held The Flood
+- wk23: The Fox And The Crow · The Monkey And The Wedge · Yudhishthira And The Yaksha's Questions · The Archery Teacher's Test · Tenali Rama And The Boastful Pundit · The Two Teachers · The Gardener And The Young Sapling
+- wk24: The Bear And The Beehive · The Monkey Who Rang The Bell · Drona And The Bird's Eye · The Young Elephant's First Steps · Birbal And The Spilt Milk · The Young Potter's First Pot · The Sapling That Grew Through Rock
+### Talk prompts (cont.) — tuned to weekly Grow theme
+- wk22 (Promises, 2nd): set loving limits · be consistent · keep my own calm · apologise & repair · protect your spirit · make our home safe · grow alongside you
+- wk23 (Things I Want You To Know): it's okay to make mistakes · you are loved unconditionally · asking for help is strength · kindness beats winning · your feelings are valid · you needn't be perfect · I'll always believe in you
+- wk24 (Lessons from my own mistakes): a mistake that taught me most · how I forgave myself · a failure that led to good · what trying again taught me · a time I was wrong and grew · patience with myself · a lesson I'm still learning
+### Garbh ragas used (cont.): Shree/sunset(wk22 d149) · Chandrakauns/night(wk22 d151) · Puriya/sunset(wk22 d153) · Hindol/morn(wk23 d155) · Shankara/night(wk23 d157) · Kalavati/night(wk23 d160) · Nand/night(wk24 d163) · Maru Bihag/eve(wk24 d165) · Tilang/eve(wk24 d167)
