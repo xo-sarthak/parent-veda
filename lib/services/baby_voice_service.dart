@@ -17,19 +17,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 
+/// Which surface a voice request belongs to. Mute is tracked independently per
+/// scope, so muting the Weekly Journey never silences the Home screen and vice
+/// versa.
+enum VoiceScope { home, journey }
+
 class BabyVoiceService extends ChangeNotifier {
   BabyVoiceService._();
   static final BabyVoiceService instance = BabyVoiceService._();
 
-  static const _mutedKey = 'baby_voice_muted';
+  // Per-scope persisted mute. The legacy single key migrates into `journey`.
+  static const _mutedKeyHome = 'baby_voice_muted_home';
+  static const _mutedKeyJourney = 'baby_voice_muted_journey';
+  static const _legacyMutedKey = 'baby_voice_muted';
 
   final FlutterTts _tts = FlutterTts();
   bool _ready = false;
-  bool _isMuted = false;
+  final Map<VoiceScope, bool> _muted = {
+    VoiceScope.home: false,
+    VoiceScope.journey: false,
+  };
   String? _playingKey;
+  VoiceScope? _playingScope;
   final Set<String> _playedThisSession = {};
 
-  bool get isMuted => _isMuted;
+  bool isMutedFor(VoiceScope scope) => _muted[scope] ?? false;
   String? get playingKey => _playingKey;
   bool isPlaying(String cardKey) => _playingKey == cardKey;
 
@@ -37,7 +49,9 @@ class BabyVoiceService extends ChangeNotifier {
     if (_ready) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      _isMuted = prefs.getBool(_mutedKey) ?? false;
+      final legacy = prefs.getBool(_legacyMutedKey) ?? false;
+      _muted[VoiceScope.home] = prefs.getBool(_mutedKeyHome) ?? false;
+      _muted[VoiceScope.journey] = prefs.getBool(_mutedKeyJourney) ?? legacy;
       await _tts.setPitch(1.8);
       await _tts.setSpeechRate(0.4);
       await _tts.setVolume(1.0);
@@ -47,14 +61,17 @@ class BabyVoiceService extends ChangeNotifier {
       });
       _tts.setCompletionHandler(() {
         _playingKey = null;
+        _playingScope = null;
         notifyListeners();
       });
       _tts.setCancelHandler(() {
         _playingKey = null;
+        _playingScope = null;
         notifyListeners();
       });
       _tts.setErrorHandler((_) {
         _playingKey = null;
+        _playingScope = null;
         notifyListeners();
       });
     } catch (_) {
@@ -69,8 +86,9 @@ class BabyVoiceService extends ChangeNotifier {
   Future<void> speak(String text, {
     required String cardKey,
     required AppLanguage lang,
+    VoiceScope scope = VoiceScope.journey,
   }) async {
-    if (_isMuted || text.trim().isEmpty) return;
+    if (isMutedFor(scope) || text.trim().isEmpty) return;
     await init();
     try {
       await _tts.stop();
@@ -80,10 +98,12 @@ class BabyVoiceService extends ChangeNotifier {
         await _tts.setLanguage('en-IN');
       }
       _playingKey = cardKey;
+      _playingScope = scope;
       notifyListeners();
       await _tts.speak(text);
     } catch (_) {
       _playingKey = null;
+      _playingScope = null;
       notifyListeners();
     }
   }
@@ -93,6 +113,7 @@ class BabyVoiceService extends ChangeNotifier {
       await _tts.stop();
     } catch (_) {}
     _playingKey = null;
+    _playingScope = null;
     notifyListeners();
   }
 
@@ -100,40 +121,47 @@ class BabyVoiceService extends ChangeNotifier {
   Future<void> toggleCard(String text, {
     required String cardKey,
     required AppLanguage lang,
+    VoiceScope scope = VoiceScope.journey,
   }) async {
     if (isPlaying(cardKey)) {
       await stop();
     } else {
       markPlayed(cardKey);
-      await speak(text, cardKey: cardKey, lang: lang);
+      await speak(text, cardKey: cardKey, lang: lang, scope: scope);
     }
   }
 
-  /// Auto-play once per card per session (respects mute).
+  /// Auto-play once per card per session (respects that scope's mute).
   Future<void> autoPlay(String text, {
     required String cardKey,
     required AppLanguage lang,
+    VoiceScope scope = VoiceScope.journey,
   }) async {
-    if (_isMuted || _playedThisSession.contains(cardKey)) return;
+    if (isMutedFor(scope) || _playedThisSession.contains(cardKey)) return;
     markPlayed(cardKey);
-    await speak(text, cardKey: cardKey, lang: lang);
+    await speak(text, cardKey: cardKey, lang: lang, scope: scope);
   }
 
   bool hasPlayed(String cardKey) => _playedThisSession.contains(cardKey);
   void markPlayed(String cardKey) => _playedThisSession.add(cardKey);
 
-  Future<void> setMuted(bool muted) async {
-    if (_isMuted == muted) return;
-    _isMuted = muted;
-    if (muted) await stop();
+  Future<void> setMutedFor(VoiceScope scope, bool muted) async {
+    if (isMutedFor(scope) == muted) return;
+    _muted[scope] = muted;
+    // Only stop playback if the scope being muted is the one currently speaking.
+    if (muted && _playingScope == scope) await stop();
     notifyListeners();
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_mutedKey, muted);
+      await prefs.setBool(
+        scope == VoiceScope.home ? _mutedKeyHome : _mutedKeyJourney,
+        muted,
+      );
     } catch (_) {}
   }
 
-  Future<void> toggleMute() => setMuted(!_isMuted);
+  Future<void> toggleMuteFor(VoiceScope scope) =>
+      setMutedFor(scope, !isMutedFor(scope));
 
   /// Stable per-card key, e.g. "week_21_size_reveal".
   static String keyFor(int week, String card) => 'week_${week}_$card';

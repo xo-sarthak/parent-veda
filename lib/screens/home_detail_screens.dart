@@ -229,9 +229,13 @@ class StoryReaderScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 12),
                   child: TextButton.icon(
                     onPressed: () => BabyVoiceService.instance.toggleCard(
-                      story.body.of(lang),
+                      // Always narrate the English text with an English voice —
+                      // TTS can't read Roman-script Hinglish. (UI text below
+                      // still follows the selected language.)
+                      story.body.en,
                       cardKey: _key,
-                      lang: lang,
+                      lang: AppLanguage.english,
+                      scope: VoiceScope.home,
                     ),
                     icon: Icon(playing ? Icons.stop_rounded : Icons.graphic_eq_rounded, size: 18),
                     label: Text(s.listenCta),

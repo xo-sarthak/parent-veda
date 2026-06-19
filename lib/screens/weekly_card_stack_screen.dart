@@ -103,10 +103,12 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           AnimatedBuilder(
             animation: BabyVoiceService.instance,
             builder: (context, _) {
-              final muted = BabyVoiceService.instance.isMuted;
+              final muted =
+                  BabyVoiceService.instance.isMutedFor(VoiceScope.journey);
               return IconButton(
                 tooltip: muted ? 'Unmute baby voice' : 'Mute baby voice',
-                onPressed: () => BabyVoiceService.instance.toggleMute(),
+                onPressed: () =>
+                    BabyVoiceService.instance.toggleMuteFor(VoiceScope.journey),
                 icon: Icon(
                   muted ? Icons.hearing_disabled_rounded : Icons.hearing_rounded,
                   color: muted ? AppTheme.neutral400 : AppTheme.primary500,

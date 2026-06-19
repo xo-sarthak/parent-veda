@@ -233,6 +233,36 @@ class HomeHeader extends StatelessWidget {
             const Spacer(),
             LangToggle(lang: lang, onChanged: onLanguageChanged),
             const SizedBox(width: 10),
+            // Home-scoped mute for the baby voice — independent of the Weekly
+            // Journey's mute, so neither surface can silence the other.
+            AnimatedBuilder(
+              animation: BabyVoiceService.instance,
+              builder: (context, _) {
+                final muted =
+                    BabyVoiceService.instance.isMutedFor(VoiceScope.home);
+                return GestureDetector(
+                  onTap: () => BabyVoiceService.instance
+                      .toggleMuteFor(VoiceScope.home),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Icon(
+                      muted
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_up_outlined,
+                      color: muted ? AppTheme.neutral400 : AppTheme.neutral600,
+                      size: 22,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 10),
             Container(
               width: 40,
               height: 40,
@@ -518,10 +548,15 @@ class ReadModule extends StatelessWidget {
                     ),
                     onPressed: () {
                       home.markEngaged(DailyModule.read);
+                      // Listen always narrates the ENGLISH story text with an
+                      // English voice. TTS can't synthesise Roman-script
+                      // Hinglish (a Hindi engine expects Devanagari), so we
+                      // force English here regardless of the UI language.
                       BabyVoiceService.instance.toggleCard(
-                        st.body.of(lang),
+                        st.body.en,
                         cardKey: _listenKey,
-                        lang: lang,
+                        lang: AppLanguage.english,
+                        scope: VoiceScope.home,
                       );
                     },
                     icon: Icon(playing ? Icons.stop_rounded : Icons.graphic_eq_rounded,
