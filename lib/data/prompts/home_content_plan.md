@@ -201,3 +201,24 @@ Food items are problem-led ("Feeling tired? …"), never nutrition-science-led.
 - wk34 (Watching You Grow): stages I look forward to · let you be little · cheering each milestone · not wishing childhood away · joy of watching you discover · your own pace · savouring you at every age
 - wk35 (I'm Listening): always listen · hear your every thought · space for your voice · your feelings matter · get to your level · questions I'll answer · hear what you don't say
 ### Garbh ragas used (cont., T3): Nat Bhairav/morn(wk32 d219) · Hem Kalyan/eve(wk32 d222) · Megh/monsoon(wk33 d227) · Suha/aft(wk33 d230) · Bihagda/night(wk34 d232) · Nayaki Kanada/night(wk34 d236) · Shahana/night(wk35 d240) · Vibhas/dawn(wk35 d244)
+
+## Batch weeks 36-40 (FINAL — completes all 280 days) — Confidence/Enough/Courage/Preparing/Welcome
+### Grow used (cont.)
+- wk36 (Confidence Without Comparison): Your Journey Is Not A Competition · Comparison Is A Thief · No Two Babies Are The Same · Run Your Own Race · Trust Beats Comparison · Other People's Highlights Aren't Your Reality · Your Baby Needs You, Not A Copy
+- wk37 (You Are Already Enough): You Are Already Enough · There Is No Perfect Parent · Your Love Is Qualification Enough · Doubt Does Not Mean Failure · This Is What You're Here For · Trust What You Already Know · Enough Is A Beautiful Word
+- wk38 (Releasing Fear, Welcoming Courage): Fear And Excitement Feel The Same · Your Body Was Made For This · Brave Is Not The Absence Of Fear · Breathe Into The Unknown · More Capable Than You Feel · Trust The Process · Let Go, And Trust
+- wk39 (Preparing To Meet You): Almost Time To Meet You · Ready Is A Feeling That Grows · The Nest Is Almost Ready · The First Days Will Be A Blur Of Love · Pack Light, Love Heavy · Rest Now For What's Ahead · Your Arms Are Almost Full
+- wk40 (Welcome, Little One — FINALE): The Wait Is Nearly Over · You Were Worth Every Moment · Hello Is Coming · A Love Like No Other · You Made Us A Family · Welcome To The World, Little One · The Beginning Of Everything
+### Story titles used (cont.) — rotation: universal · Panchatantra · epic/Krishna · Jataka · wit · folk · nature
+- wk36: The Jackdaw And The Borrowed Feathers · The Two Sparrows And Their Nests · How Each Found Krishna · The Peacock And The Goose · Birbal And Every Garden's Flower · The Fish Who Envied The Birds · The Rose And The Lotus
+- wk37: The Lark And Her Little Ones · The Mouse Who Became A Tiger · Sita's Inner Strength · The Little Quail's Truth · Birbal And The Priceless Servant · The Woman Who Had Enough · The Little Stream That Reached The Sea
+- wk38: The Lion And His Own Shadow · The Brave Little Mouse · Hanuman's Leap · When The Hare Heard A Thud · Birbal And The King's Nightmare · The Girl Who Walked Through The Storm · The Seed That Dared To Open
+- wk39: The Birds Who Made Ready · The Ants Who Made Ready For The Rains · The Night Krishna Came · The Nest Made Ready · Birbal And The Honoured Guest · The Cradle Made With Love · Just Before The Dawn
+- wk40: The Long-Awaited Guest · When The Fawn Was Born · Gokul Rejoices · The Herd Welcomes The Calf · Birbal And The Greatest Treasure · The Child They Wished For · The Flower That Finally Bloomed
+### Talk prompts (cont.) — final stretch toward the welcome
+- wk36 (Believing In You): never compare you · the unique you · no need to be like anyone · believing your gifts · celebrating what makes you you · exactly who we wanted · run your own race
+- wk37 (You Are Enough To Me): already enough · needn't earn my love · love without conditions · you matter · worth beyond achievement · being you is plenty · enough as you are
+- wk38 (Facing This Together): courage we'll find · face hard days as a team · hopes as you near · letting go of fears · trusting my body · brave I'm learning to be · meeting you whatever it takes
+- wk39 (Getting Ready For You): the space we made · things we gathered · who's getting ready · first cuddle I dream of · resting up for you · the welcome waiting · counting the days
+- wk40 (Welcome, Hello): first thing I'll whisper · how long we waited · the moment I'll hold you · who's here to welcome you · a promise as you arrive · loved from the first breath · welcome to the world
+### Garbh ragas used (cont., final): Gaud Sarang/aft(wk36 d247) · Shuddh Kalyan/eve(wk36 d250) · Devgandhar/morn(wk37 d255) · Madhukauns/night(wk37 d258) · Ramkali/dawn(wk38 d260) · Kalingada/dawn(wk38 d264) · Puriya Dhanashri/sunset(wk39 d268) · Sindhura/eve(wk39 d272) · Basant Mukhari/morn(wk40 d275) · Pilu/eve(wk40 d279)
