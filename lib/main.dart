@@ -8,6 +8,7 @@ import 'services/home_content_controller.dart';
 import 'services/memory_store.dart';
 import 'services/pregnancy_controller.dart';
 import 'services/size_view_pref.dart';
+import 'services/tools_store.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -50,6 +51,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     MemoryStore.instance.init();
     // Load Daily Moment persistence (moods, Talk-to-baby, kept affirmations).
     DailyStore.instance.init();
+    // Load Tools persistence (movement, weight, kegel, contractions).
+    ToolsStore.instance.init();
   }
 
   @override

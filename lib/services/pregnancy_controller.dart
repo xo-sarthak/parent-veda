@@ -36,7 +36,7 @@ class PregnancyController extends ChangeNotifier {
   // --- mutable state ---------------------------------------------------------
   final DateTime _now;
   DateTime _dueDate;
-  AppLanguage _language = AppLanguage.hinglish;
+  AppLanguage _language = AppLanguage.english;
 
   List<WeekContent> _weeks = const [];
   bool _isLoading = true;
@@ -84,6 +84,25 @@ class PregnancyController extends ChangeNotifier {
 
   /// The week the user is presently viewing in the stack.
   int get selectedWeek => _selectedWeek ?? currentWeek;
+
+  // --- journey-map progress helpers -----------------------------------------
+  //  Derived purely from [currentDay] / [termDays] so the Journey map and the
+  //  Home screen always agree on "how far along".
+
+  /// Days of pregnancy completed so far (1–280). Alias for [currentDay].
+  int get daysCompleted => currentDay;
+
+  /// Days of pregnancy still remaining (0–279).
+  int get daysRemaining => (termDays - currentDay).clamp(0, termDays);
+
+  /// Day within the current gestational week (1–7), e.g. "Day 3".
+  int get dayOfWeek => ((currentDay - 1) % 7) + 1;
+
+  /// Overall journey progress as a fraction (0.0–1.0).
+  double get progress => (currentDay / termDays).clamp(0.0, 1.0);
+
+  /// Overall journey progress as a whole percentage (0–100).
+  int get progressPercent => (progress * 100).round();
 
   /// All week numbers we have content for, ascending.
   List<int> get availableWeeks => _weeks.map((w) => w.week).toList();

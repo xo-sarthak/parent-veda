@@ -16,6 +16,8 @@ import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'home_screen.dart';
+import 'profile_screen.dart';
+import 'tools_screen.dart';
 import 'weekly_card_stack_screen.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -55,9 +57,9 @@ class _MainScaffoldState extends State<MainScaffold> {
           // My Baby opens straight into the weekly journey (the card-stack),
           // no intermediate landing card.
           WeeklyCardStackScreen(controller: widget.pregnancy),
-          _ComingSoon(tab: s.dearBabyTab, icon: Icons.favorite_rounded, lang: widget.pregnancy.language),
+          ToolsScreen(controller: widget.pregnancy),
           _ComingSoon(tab: s.exploreTab, icon: Icons.explore_rounded, lang: widget.pregnancy.language),
-          _ComingSoon(tab: s.profileTab, icon: Icons.person_rounded, lang: widget.pregnancy.language),
+          ProfileScreen(controller: widget.pregnancy),
         ];
         return Scaffold(
           backgroundColor: AppTheme.scaffoldBackground,
@@ -85,9 +87,9 @@ class _MainScaffoldState extends State<MainScaffold> {
                   selectedIcon: const Icon(Icons.child_care_rounded),
                   label: s.myBabyTab),
               NavigationDestination(
-                  icon: const Icon(Icons.favorite_outline_rounded),
-                  selectedIcon: const Icon(Icons.favorite_rounded),
-                  label: s.dearBabyTab),
+                  icon: const Icon(Icons.widgets_outlined),
+                  selectedIcon: const Icon(Icons.widgets_rounded),
+                  label: s.toolsTab),
               NavigationDestination(
                   icon: const Icon(Icons.explore_outlined),
                   selectedIcon: const Icon(Icons.explore_rounded),

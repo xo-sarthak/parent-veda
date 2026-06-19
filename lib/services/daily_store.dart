@@ -202,6 +202,29 @@ class DailyStore extends ChangeNotifier {
     return null;
   }
 
+  /// Appends a free-standing note to the Dear Baby vault (does NOT dedup by
+  /// day, unlike [saveTalk]). Used by tools — e.g. a Baby Movement memory.
+  Future<TalkEntry> addDearBabyNote({
+    required int week,
+    required String prompt,
+    required String text,
+  }) async {
+    final entry = TalkEntry(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      day: 0,
+      week: week,
+      prompt: prompt,
+      text: text,
+      dateIso: _todayIso(),
+      spoken: false,
+    );
+    _talk.add(entry);
+    notifyListeners();
+    await _persist(
+        _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+    return entry;
+  }
+
   Future<void> toggleKept(String text) async {
     final t = text.trim();
     if (!_kept.remove(t)) _kept.add(t);
