@@ -51,3 +51,6 @@ app.*.map.json
 /voice_samples/
 /lib/data/reference-images/
 /lib/data/Week on Week Pregnancy Tracker.pdf
+
+# Local dev phone IP (machine-specific)
+tools/.phone-ip
