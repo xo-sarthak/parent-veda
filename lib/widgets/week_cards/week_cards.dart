@@ -217,7 +217,7 @@ class SizeRevealCard extends StatelessWidget {
           Row(children: [
             Expanded(child: _Metric(s.lengthLabel, snap.length.of(lang), Icons.straighten_rounded)),
             const SizedBox(width: 12),
-            Expanded(child: _Metric(s.weightLabel, snap.weight.of(lang), Icons.monitor_weight_outlined)),
+            Expanded(child: _Metric(s.weightLabel, snap.weight.of(lang), Icons.hourglass_empty_rounded)),
           ]),
           const SizedBox(height: 18),
           Container(
