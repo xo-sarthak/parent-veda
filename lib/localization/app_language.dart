@@ -476,4 +476,64 @@ class S {
   String comingSoonBody(String tab) => _p(
       '$tab is on its way. For now, enjoy your daily moment and weekly journey.',
       '$tab jaldi aa raha hai. Abhi ke liye, apne daily pal aur saptahik safar ka anand lein.');
+
+  // ===========================================================================
+  //  FATHER MODE — Daily Moment
+  // ===========================================================================
+
+  /// Wordmark shown in the Father Mode header (kept as a brand label).
+  String get fatherWordmark => 'Fatherhood';
+
+  String fatherGreeting(int hour, String name) => '${greeting(hour, name)} ❤️';
+
+  String fatherDayLine(int week, int day) =>
+      _p('Week $week • Day $day', 'Hafta $week • Din $day');
+
+  // ---- Today's Moment card -------------------------------------------------
+  String get fatherMomentMinutes => _p('~4 min', '~4 min');
+  String get startMoment => _p('Start Moment', 'Shuru Karein');
+
+  // ---- Learn ---------------------------------------------------------------
+  String get learnOpen => _p('Open', 'Kholein');
+  String get learnReaderTitle => _p("Today's Lesson", 'Aaj Ka Sabak');
+
+  // ---- Mission -------------------------------------------------------------
+  String get missionEyebrow => _p("Today's Mission", 'Aaj Ka Mission');
+  String get missionMarkDone => _p('Done', 'Ho Gaya');
+  String get missionDoneLabel => _p('Done 💪', 'Ho Gaya 💪');
+
+  // ---- Father completion + check-in ----------------------------------------
+  String get fatherCompletionTitle =>
+      _p('You showed up today.', 'Aaj aap haazir the.');
+  String get fatherCompletionSubtitle => _p(
+      "That's how fathers are made — one day at a time.",
+      'Pita aise hi bante hain — ek-ek din karke.');
+  String get fatherFeelingQuestion => _p(
+      'How are you feeling today?', 'Aaj aap kaisa mehsoos kar rahe hain?');
+  String fatherMoodLabel(String id) {
+    switch (id) {
+      case 'happy':
+        return _p('Happy', 'Khush');
+      case 'grateful':
+        return _p('Grateful', 'Shukrguzaar');
+      case 'hopeful':
+        return _p('Hopeful', 'Umeed Se Bhara');
+      case 'calm':
+        return _p('Calm', 'Shaant');
+      case 'connected':
+        return _p('Connected', 'Juda Hua');
+      case 'nervous':
+        return _p('Nervous', 'Ghabraya');
+      case 'anxious':
+        return _p('Anxious', 'Chintit');
+      case 'tired':
+        return _p('Tired', 'Thaka');
+      case 'emotional':
+        return _p('Emotional', 'Bhaavuk');
+      case 'overwhelmed':
+        return _p('Overwhelmed', 'Bojh Mehsoos');
+      default:
+        return id;
+    }
+  }
 }

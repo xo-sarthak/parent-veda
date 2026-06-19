@@ -87,6 +87,27 @@ class AppTheme {
   static const Color tertiary800 = Color(0xFF492A00);
   static const Color tertiary900 = Color(0xFF331D00);
 
+  // ---- Father slate (charcoal) ----------------------------------------------
+  //  Father Mode's signature accent. Same four-colour palette as the mother
+  //  experience, but the lead role shifts from purple to this grounded slate
+  //  (board value #2D3436) — a calm, masculine counterpart. Coral stays for
+  //  warmth, amber for the daily Mission. Used only inside Father Mode.
+  static const Color fatherSlate = Color(0xFF2D3436); // base
+  static const Color fatherSlate50 = Color(0xFFEDEEEE);
+  static const Color fatherSlate100 = Color(0xFFD8DADA);
+  static const Color fatherSlate200 = Color(0xFFB0B4B5);
+  static const Color fatherSlate300 = Color(0xFF888E8F);
+  static const Color fatherSlate400 = Color(0xFF5B6264);
+  static const Color fatherSlate500 = Color(0xFF2D3436); // base
+  static const Color fatherSlate600 = Color(0xFF272D2F);
+  static const Color fatherSlate700 = Color(0xFF202527);
+  static const Color fatherSlate800 = Color(0xFF181C1D);
+  static const Color fatherSlate900 = Color(0xFF101314);
+
+  /// Warm amber used for Father Mode's "Today's Mission" accent (kept out of the
+  /// mother palette; sits between the saffron and gold already used elsewhere).
+  static const Color fatherAmber = Color(0xFFE0921C);
+
   // ---- Neutral (warm grey, for text + structure) ----------------------------
   static const Color neutral50 = Color(0xFFF4F3F5);
   static const Color neutral100 = Color(0xFFE4E2E5);

@@ -57,12 +57,29 @@ class PregnancyController extends ChangeNotifier {
   AppLanguage get language => _language;
   DateTime get dueDate => _dueDate;
 
+  /// Placeholder mother's name for the Home greeting until a real profile /
+  /// onboarding name exists (mirrors the placeholder due date).
+  String get motherName => 'Priya';
+
+  /// Placeholder father's name for the Father Mode greeting (same placeholder
+  /// pattern as [motherName], until onboarding captures a real name).
+  String get fatherName => 'Dad';
+
   List<WeekContent> get weeks => List.unmodifiable(_weeks);
 
   /// The mother's current gestational week, clamped to available content.
   int get currentWeek {
     final raw = _termWeeks - (_dueDate.difference(_dateOnly(_now)).inDays / 7).floor();
     return raw.clamp(firstContentWeek, lastContentWeek);
+  }
+
+  /// Total length of a full-term pregnancy in days (40 weeks).
+  static const int termDays = _termWeeks * 7; // 280
+
+  /// The mother's current day of pregnancy (1–280), derived from the due date.
+  int get currentDay {
+    final raw = termDays - daysToDueDate;
+    return raw.clamp(1, termDays);
   }
 
   /// The week the user is presently viewing in the stack.
@@ -164,10 +181,11 @@ class PregnancyController extends ChangeNotifier {
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  /// Placeholder due date so the demo opens mid-journey (~week 24), giving a
-  /// healthy mix of unlocked past weeks and locked future weeks.
+  /// Placeholder due date so the demo opens mid-journey (~week 20 — "halfway
+  /// there"), giving a healthy mix of unlocked past weeks and locked future
+  /// weeks while matching the Home Screen daily-moment prototype.
   static DateTime _placeholderDueDate(DateTime now) {
-    const demoCurrentWeek = 24;
+    const demoCurrentWeek = 20;
     final weeksRemaining = _termWeeks - demoCurrentWeek; // 16 weeks out
     return _dateOnly(now).add(Duration(days: weeksRemaining * 7));
   }
