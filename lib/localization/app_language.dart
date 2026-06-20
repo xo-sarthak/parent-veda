@@ -1460,6 +1460,77 @@ class S {
   String get cmPosts => _p('Posts', 'Posts');
   String get cmPostTo => _p('Post to', 'Yahaan post karein');
   String get cmTypeLabel => _p('Type', 'Prakaar');
+  String get cmSuggestedTags =>
+      _p('Auto-detected topics', 'Auto-detect kiye gaye topics');
+
+  // ---- Products ❤️ (Tools) -------------------------------------------------
+  String get prTitle => _p('Products', 'Products');
+  String get prTabRecommended => _p('Recommended', 'Recommended');
+  String get prTabBrowse => _p('Browse all', 'Sabhi');
+  String get prTabSaved => _p('Saved', 'Saved');
+  String prRecommendedFor(int week) =>
+      _p('Recommended for Week $week', 'Week $week ke liye recommended');
+  String get prRecommendedSub => _p(
+      'Selected because they are most relevant at your current stage.',
+      'Aapke current stage ke liye sabse relevant cheezein.');
+  String get prGuidance => _p('ParentVeda Guidance', 'ParentVeda Guidance');
+  String get prLookFor => _p('Look for', 'Yeh dekhein');
+  String get prAvoid => _p('Avoid', 'Inse bachein');
+  String get prPicks => _p('ParentVeda Picks', 'ParentVeda Picks');
+  String get prUsefulDuring => _p('Useful during', 'Kab kaam aata hai');
+  String get prYouAreHere => _p('You are here', 'Aap yahaan');
+  String get prWhenHelps => _p('When this helps', 'Yeh kab kaam aata hai');
+  String prYouWeek(int week) => _p('You · Wk $week', 'Aap · Wk $week');
+  String get prRelevantNow => _p('Useful for you now', 'Abhi aapke liye useful');
+  String prComingUp(int week) =>
+      _p('Useful from around Week $week', 'Lagbhag Week $week se useful');
+  String prHelpsSentence(int from, String toLabel) {
+    final en = toLabel == 'Postpartum' ? 'after birth' : 'birth';
+    final hi = toLabel == 'Postpartum' ? 'janm ke baad tak' : 'janm tak';
+    return _p('Recommended from Week $from through $en.',
+        'Week $from se $hi recommended.');
+  }
+  String get prScore => _p('ParentVeda Score', 'ParentVeda Score');
+  String get prBestFor => _p('Best for', 'Kiske liye behtar');
+  String get prWhy => _p('Why ParentVeda recommends this',
+      'ParentVeda ise kyun recommend karta hai');
+  String get prConsider => _p('Things to consider', 'Dhyaan rakhne ki baatein');
+  String get prBuyNow => _p('Buy now', 'Abhi khareedein');
+  String get prCompare => _p('Compare', 'Compare');
+  String prBrowseAllCount(int n) => _p('Browse all $n', 'Sabhi $n dekhein');
+  String get prVerdict => _p('ParentVeda Verdict', 'ParentVeda Verdict');
+  String get prReviewSummary => _p('What parents say', 'Parents kya kehte hain');
+  String get prMostLoved => _p('Most loved', 'Sabse pasand');
+  String get prPraise => _p('Most mentioned praise', 'Sabse zyada taareef');
+  String get prDrawback => _p('Most mentioned drawback', 'Sabse zyada kami');
+  String get prWouldBuyAgain => _p('Would buy again', 'Dobara khareedenge');
+  String get prReviews => _p('Real parent reviews', 'Asli parent reviews');
+  String get prUsedDuring => _p('Used during', 'Kab istemaal kiya');
+  String get prLiked => _p('What I liked', 'Mujhe kya pasand aaya');
+  String get prWatchOut => _p('Watch out for', 'Iska dhyaan rakhein');
+  String get prRelated => _p('Related products', 'Milte-julte products');
+  String get prSavedEmpty => _p(
+      'Nothing saved yet. Tap the heart on any product to keep it here.',
+      'Abhi kuch save nahi hua. Kisi bhi product par heart dabakar yahaan rakhein.');
+  String get prComingSoon =>
+      _p('Buying opens soon — saving works now ❤️', 'Buying jald — saving abhi chalta hai ❤️');
+  String get prSearchHint => _p('Search products', 'Products search karein');
+  String prBadge(String key) {
+    switch (key) {
+      case 'bestOverall':
+        return _p('Best Overall', 'Best Overall');
+      case 'bestBudget':
+        return _p('Best Budget', 'Best Budget');
+      case 'bestPremium':
+        return _p('Best Premium', 'Best Premium');
+      case 'sensitiveSkin':
+        return _p('Best for Sensitive Skin', 'Sensitive Skin ke liye');
+      case 'newborns':
+        return _p('Best for Newborns', 'Newborns ke liye');
+      default:
+        return '';
+    }
+  }
   String get cmShareSomething =>
       _p('What would you like to share?', 'Aap kya share karna chahengi?');
   String get cmShare => _p('Share', 'Share karein');

@@ -67,6 +67,7 @@ class CommunityPost {
     this.likes = 0,
     this.comments = 0,
     this.saves = 0,
+    this.upvotes = 0,
     this.pollOptions = const [],
     this.image = '',
     this.isUser = false,
@@ -83,6 +84,7 @@ class CommunityPost {
   final int likes;
   final int comments;
   final int saves;
+  final int upvotes; // expert-post endorsements ("upvote", experts only)
   final List<String> pollOptions; // non-empty only for polls
   final String image; // emoji stand-in for a photo; '' otherwise
   final bool isUser; // created by the user this session
@@ -99,6 +101,7 @@ class CommunityPost {
         'likes': likes,
         'comments': comments,
         'saves': saves,
+        'upvotes': upvotes,
         'pollOptions': pollOptions,
         'image': image,
         'isUser': isUser,
@@ -117,6 +120,7 @@ class CommunityPost {
         likes: j['likes'] as int? ?? 0,
         comments: j['comments'] as int? ?? 0,
         saves: j['saves'] as int? ?? 0,
+        upvotes: j['upvotes'] as int? ?? 0,
         pollOptions: (j['pollOptions'] as List?)?.cast<String>() ?? const [],
         image: j['image'] as String? ?? '',
         isUser: j['isUser'] as bool? ?? false,

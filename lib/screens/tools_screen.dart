@@ -14,6 +14,7 @@ import '../theme/app_theme.dart';
 import 'community_screen.dart';
 import 'garbh_screen.dart';
 import 'journey_map_screen.dart';
+import 'products_screen.dart';
 import 'report_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
@@ -56,6 +57,8 @@ class ToolsScreen extends StatelessWidget {
           onTap: () => open(() => GarbhScreen(controller: controller))),
       _ToolInfo(s.cmTitle, Icons.forum_rounded, AppTheme.secondary500,
           onTap: () => open(() => CommunityScreen(controller: controller))),
+      _ToolInfo(s.prTitle, Icons.shopping_bag_rounded, AppTheme.primary500,
+          onTap: () => open(() => ProductsScreen(controller: controller))),
     ];
 
     return SafeArea(

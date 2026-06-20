@@ -23,6 +23,7 @@ class CommunityStore extends ChangeNotifier {
   static const _mutedKey = 'comm_muted';
   static const _likedKey = 'comm_liked';
   static const _savedKey = 'comm_saved';
+  static const _upvotedKey = 'comm_upvoted';
   static const _votesKey = 'comm_votes';
   static const _postsKey = 'comm_posts';
   static const _commentsKey = 'comm_comments';
@@ -33,6 +34,7 @@ class CommunityStore extends ChangeNotifier {
   final Set<String> _muted = {};
   final Set<String> _liked = {};
   final Set<String> _saved = {};
+  final Set<String> _upvoted = {};
   final Map<String, String> _votes = {};
   final List<CommunityPost> _created = [];
   final Map<String, List<String>> _userComments = {};
@@ -52,6 +54,9 @@ class CommunityStore extends ChangeNotifier {
     _saved
       ..clear()
       ..addAll(p.getStringList(_savedKey) ?? const []);
+    _upvoted
+      ..clear()
+      ..addAll(p.getStringList(_upvotedKey) ?? const []);
 
     // First run: auto-join the pregnancy-stage communities.
     if (!(p.getBool(_seededKey) ?? false)) {
@@ -80,6 +85,7 @@ class CommunityStore extends ChangeNotifier {
   bool isMuted(String id) => _muted.contains(id);
   bool isLiked(String id) => _liked.contains(id);
   bool isSaved(String id) => _saved.contains(id);
+  bool isUpvoted(String id) => _upvoted.contains(id);
   String? votedOption(String id) => _votes[id];
   List<CommunityPost> get createdPosts => List.unmodifiable(_created);
 
@@ -90,6 +96,7 @@ class CommunityStore extends ChangeNotifier {
 
   int likeCount(CommunityPost p) => p.likes + (_liked.contains(p.id) ? 1 : 0);
   int saveCount(CommunityPost p) => p.saves + (_saved.contains(p.id) ? 1 : 0);
+  int upvoteCount(CommunityPost p) => p.upvotes + (_upvoted.contains(p.id) ? 1 : 0);
   int commentCount(CommunityPost p) =>
       p.comments + (_userComments[p.id]?.length ?? 0);
   List<String> userComments(String postId) =>
@@ -147,6 +154,12 @@ class CommunityStore extends ChangeNotifier {
   void toggleSave(String id) {
     if (!_saved.remove(id)) _saved.add(id);
     _prefs?.setStringList(_savedKey, _saved.toList());
+    notifyListeners();
+  }
+
+  void toggleUpvote(String id) {
+    if (!_upvoted.remove(id)) _upvoted.add(id);
+    _prefs?.setStringList(_upvotedKey, _upvoted.toList());
     notifyListeners();
   }
 

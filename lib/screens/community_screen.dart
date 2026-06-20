@@ -79,9 +79,12 @@ class CommunityScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: _accent,
         foregroundColor: Colors.white,
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 22),
+        isExtended: true,
         onPressed: () => _push(context, CreatePostScreen(controller: controller)),
-        icon: const Icon(Icons.edit_rounded),
-        label: Text(s.cmCreatePost),
+        icon: const Icon(Icons.edit_rounded, size: 20),
+        label: Text(s.cmCreatePost,
+            style: text.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
       ),
       body: AnimatedBuilder(
         animation: CommunityStore.instance,
@@ -550,6 +553,18 @@ class _PostCard extends StatelessWidget {
               label: '${store.likeCount(post)}',
               onTap: () => store.toggleLike(post.id),
             ),
+            // Upvote — endorsing an expert's answer (expert posts only).
+            if (post.type == PostType.expert)
+              _ActionButton(
+                icon: store.isUpvoted(post.id)
+                    ? Icons.thumb_up_rounded
+                    : Icons.thumb_up_outlined,
+                color: store.isUpvoted(post.id)
+                    ? const Color(0xFF7A4FC2)
+                    : AppTheme.neutral500,
+                label: '${store.upvoteCount(post)}',
+                onTap: () => store.toggleUpvote(post.id),
+              ),
             _ActionButton(
               icon: Icons.mode_comment_outlined,
               color: AppTheme.neutral500,
@@ -917,6 +932,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final _textCtrl = TextEditingController();
   String? _communityId;
   PostType _type = PostType.question;
+  List<String> _autoTags = const [];
 
   @override
   void initState() {
@@ -941,6 +957,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       authorEmoji: '🙂',
       text: t,
       type: _type,
+      topics: inferTopics(t), // auto-tag from the text
       isUser: true,
     );
     CommunityStore.instance.addPost(post);
@@ -1011,6 +1028,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             minLines: 5,
             maxLines: 12,
             autofocus: true,
+            onChanged: (v) => setState(() => _autoTags = inferTopics(v)),
             decoration: InputDecoration(
               hintText: s.cmShareSomething,
               filled: true,
@@ -1025,6 +1043,33 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
           ),
+          if (_autoTags.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Row(children: [
+              const Icon(Icons.auto_awesome_rounded, size: 16, color: _accent),
+              const SizedBox(width: 6),
+              Text(s.cmSuggestedTags,
+                  style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+            ]),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final tag in _autoTags)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: _accent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text('#$tag',
+                        style: text.labelSmall
+                            ?.copyWith(color: _accent, fontWeight: FontWeight.w700)),
+                  ),
+              ],
+            ),
+          ],
         ],
       ),
     );

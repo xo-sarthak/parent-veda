@@ -176,6 +176,7 @@ const List<CommunityPost> kSeedPosts = [
     likes: 140,
     comments: 19,
     saves: 88,
+    upvotes: 76,
   ),
   CommunityPost(
     id: 'p6',
@@ -348,3 +349,28 @@ Community? communityById(String id) {
 
 List<CommunityComment> seedCommentsFor(String postId) =>
     kSeedComments[postId] ?? const [];
+
+// ---------------------------------------------------------------------------
+//  Auto-tagging: guess topic hashtags from a post's text (keyword match).
+//  Powers the recommendation/feed metadata without asking the user to tag.
+// ---------------------------------------------------------------------------
+const Map<String, List<String>> _topicKeywords = {
+  'Nutrition': ['eat', 'food', 'diet', 'nutrition', 'craving', 'fried', 'water', 'meal', 'hungry', 'snack', 'weight gain'],
+  'Sleep': ['sleep', 'nap', 'insomnia', 'awake', 'rest', 'night'],
+  'Breastfeeding': ['breastfeed', 'breast', 'latch', 'milk supply', 'nursing', 'pump', 'feeding'],
+  'Labor': ['labor', 'labour', 'delivery', 'contraction', 'hospital bag', 'birth', 'c-section', 'csection', 'due date', 'induction'],
+  'Pregnancy Symptoms': ['pain', 'nausea', 'vomit', 'kick', 'swelling', 'back', 'cramp', 'heartburn', 'acidity', 'breathless', 'scan', 'symptom', 'bp', 'blood pressure', 'dizzy'],
+  'Brain Development': ['brain', 'development', 'music', 'talk to baby', 'garbh', 'read to'],
+  'Pregnancy Fitness': ['yoga', 'exercise', 'walk', 'fitness', 'workout', 'gym', 'stretch'],
+  'Vaccination': ['vaccine', 'vaccination', 'tetanus', 'flu shot', 'jab'],
+};
+
+/// Reads [text] and returns up to 3 topic hashtags it appears to be about.
+List<String> inferTopics(String text) {
+  final t = text.toLowerCase();
+  final found = <String>[];
+  _topicKeywords.forEach((topic, keys) {
+    if (keys.any(t.contains)) found.add(topic);
+  });
+  return found.take(3).toList();
+}
