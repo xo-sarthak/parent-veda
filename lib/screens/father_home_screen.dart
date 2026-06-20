@@ -19,7 +19,7 @@ import '../theme/app_theme.dart';
 import '../widgets/father/father_modules.dart';
 import '../widgets/home/home_modules.dart' show ModeToggle;
 
-class FatherHomeScreen extends StatelessWidget {
+class FatherHomeScreen extends StatefulWidget {
   const FatherHomeScreen({
     super.key,
     required this.pregnancy,
@@ -34,14 +34,24 @@ class FatherHomeScreen extends StatelessWidget {
   final ValueChanged<bool> onFatherModeChanged;
 
   @override
+  State<FatherHomeScreen> createState() => _FatherHomeScreenState();
+}
+
+class _FatherHomeScreenState extends State<FatherHomeScreen> {
+  /// false = Today (Daily Moment), true = This Week (Weekly Journey).
+  bool _thisWeek = false;
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([pregnancy, father]),
+      animation: Listenable.merge([widget.pregnancy, widget.father]),
       builder: (context, _) => _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
+    final pregnancy = widget.pregnancy;
+    final father = widget.father;
     final lang = pregnancy.language;
     final s = S(lang);
 
@@ -61,7 +71,9 @@ class FatherHomeScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
           children: [
-            ModeToggle(fatherMode: fatherMode, onChanged: onFatherModeChanged),
+            ModeToggle(
+                fatherMode: widget.fatherMode,
+                onChanged: widget.onFatherModeChanged),
             const SizedBox(height: 64),
             Center(
               child: Padding(
@@ -75,13 +87,16 @@ class FatherHomeScreen extends StatelessWidget {
     }
 
     final hour = DateTime.now().hour;
+    final weekData = father.weekFor(week);
 
     return SafeArea(
       bottom: false,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
         children: [
-          ModeToggle(fatherMode: fatherMode, onChanged: onFatherModeChanged),
+          ModeToggle(
+              fatherMode: widget.fatherMode,
+              onChanged: widget.onFatherModeChanged),
           const SizedBox(height: 12),
           _FatherPreviewBar(
             father: father,
@@ -98,18 +113,33 @@ class FatherHomeScreen extends StatelessWidget {
             hour: hour,
             onLanguageChanged: pregnancy.setLanguage,
           ),
-          const SizedBox(height: 20),
-          FatherMomentCard(intro: day.intro.of(lang), lang: lang),
-          const SizedBox(height: 16),
-          FatherLearnModule(day: day, lang: lang, father: father),
-          const SizedBox(height: 16),
-          FatherTalkModule(day: day, lang: lang, father: father),
-          const SizedBox(height: 16),
-          FatherMissionModule(day: day, lang: lang, father: father),
-          const SizedBox(height: 28),
-          FatherCompletionBanner(lang: lang),
-          const SizedBox(height: 22),
-          FatherEmotionalCheckIn(day: day.day, lang: lang),
+          const SizedBox(height: 18),
+          FatherSectionToggle(
+            thisWeek: _thisWeek,
+            lang: lang,
+            onChanged: (v) => setState(() => _thisWeek = v),
+          ),
+          const SizedBox(height: 18),
+          // Today (Daily Moment) — exactly three modules, no check-in.
+          if (!_thisWeek) ...[
+            FatherMomentCard(intro: day.intro.of(lang), lang: lang),
+            const SizedBox(height: 16),
+            FatherLearnModule(day: day, lang: lang, father: father),
+            const SizedBox(height: 16),
+            FatherTalkModule(day: day, lang: lang, father: father),
+            const SizedBox(height: 16),
+            FatherMissionModule(day: day, lang: lang, father: father),
+            const SizedBox(height: 28),
+            FatherCompletionBanner(lang: lang),
+          ]
+          // This Week (Weekly Journey) — four short sections.
+          else if (weekData != null)
+            FatherWeeklyView(week: weekData, lang: lang)
+          else
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 40, 8, 8),
+              child: Text(s.noContent, textAlign: TextAlign.center),
+            ),
         ],
       ),
     );

@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/father_day.dart';
+import '../models/father_week.dart';
 
 /// The three modules that make up a complete Father daily moment.
 enum FatherModule { learn, talk, mission }
@@ -33,6 +34,7 @@ class FatherContentController extends ChangeNotifier {
   static const String _legacyPath = 'lib/data/father/fatherDailyContent.json';
 
   final List<FatherDay> _days = [];
+  final List<FatherWeek> _weeks = []; // Weekly Journey (once-per-week)
   bool _isLoading = true;
   Object? _error;
 
@@ -58,14 +60,17 @@ class FatherContentController extends ChangeNotifier {
     _error = null;
     notifyListeners();
     _days.clear();
+    _weeks.clear();
     try {
       for (int w = _firstWeek; w <= _lastWeek; w++) {
-        final path = '$_weekDir/week_${w.toString().padLeft(2, '0')}.json';
-        await _tryLoadInto(path);
+        final pad = w.toString().padLeft(2, '0');
+        await _tryLoadInto('$_weekDir/week_$pad.json');
+        await _tryLoadWeek('$_weekDir/journey_week_$pad.json');
       }
       await _tryLoadInto(_legacyPath, fallbackOnly: true);
 
       _days.sort((a, b) => a.day.compareTo(b.day));
+      _weeks.sort((a, b) => a.week.compareTo(b.week));
       if (_days.isEmpty) {
         throw const FormatException('No Father daily content could be loaded');
       }
@@ -93,6 +98,19 @@ class FatherContentController extends ChangeNotifier {
     }
   }
 
+  /// Load one Weekly Journey file (a single week object). Missing files are
+  /// skipped so the weekly rollout can grow week by week.
+  Future<void> _tryLoadWeek(String path) async {
+    try {
+      final raw = await rootBundle.loadString(path);
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return;
+      _weeks.add(FatherWeek.fromJson(Map<String, dynamic>.from(decoded)));
+    } catch (_) {
+      // Missing / unparseable file — skipped (expected during rollout).
+    }
+  }
+
   /// The father moment for [day] of pregnancy (1–280), within [week]. Prefers an
   /// exact day match, then the nearest authored day in the same week, then the
   /// nearest authored day overall. Null if nothing loaded.
@@ -114,6 +132,21 @@ class FatherContentController extends ChangeNotifier {
     FatherDay nearest = _days.first;
     for (final d in _days) {
       if ((d.day - day).abs() < (nearest.day - day).abs()) nearest = d;
+    }
+    return nearest;
+  }
+
+  /// The Weekly Journey for [week] (4–40). Prefers an exact match, else the
+  /// nearest authored week (so the prototype shows while the rollout grows).
+  /// Null if no weekly content is loaded yet.
+  FatherWeek? weekFor(int week) {
+    if (_weeks.isEmpty) return null;
+    for (final w in _weeks) {
+      if (w.week == week) return w;
+    }
+    FatherWeek nearest = _weeks.first;
+    for (final w in _weeks) {
+      if ((w.week - week).abs() < (nearest.week - week).abs()) nearest = w;
     }
     return nearest;
   }

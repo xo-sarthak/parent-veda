@@ -1,0 +1,43 @@
+{
+  "week": 20,
+  "father_insight": {
+    "title": {
+      "en": "Halfway there — and you're becoming a father too",
+      "hi": "Aadha safar — aur aap bhi ek pita ban rahe hain"
+    },
+    "body": {
+      "en": "She is carrying your baby, but both of you are becoming parents. Halfway is a good moment to ask yourself what kind of father you want to be.",
+      "hi": "Woh aapke baby ko carry kar rahi hai, lekin aap dono parent ban rahe hain. Aadhe safar par khud se poochne ka achha pal hai ki aap kaise pita banna chahte hain."
+    }
+  },
+  "supporting_partner": {
+    "title": {
+      "en": "This is a big week for her",
+      "hi": "Yeh uske liye ek bada hafta hai"
+    },
+    "body": {
+      "en": "Stronger kicks, new aches, and the anomaly scan can bring excitement and nerves at once. Ask what would lighten her load — and offer to be there for the scan.",
+      "hi": "Tej kicks, nayi aches, aur anomaly scan ek saath utsaah aur ghabraahat la sakte hain. Poochein ki uska bojh kaise halka karein — aur scan par saath chalein."
+    }
+  },
+  "connecting_with_baby": {
+    "title": {
+      "en": "Your baby can hear you now",
+      "hi": "Aapka baby ab aapko sun sakta hai"
+    },
+    "body": {
+      "en": "Around now your baby starts to hear sounds. A few minutes of your voice each day helps them know their father before they are even born.",
+      "hi": "Is samay aapka baby awaazein sunne lagta hai. Rozaana kuch minute aapki awaaz unhe janm se pehle hi apne pita se jod deti hai."
+    }
+  },
+  "mission": {
+    "title": {
+      "en": "Go to the scan — and make it a moment you share",
+      "hi": "Scan par jaayein — aur use ek saanjha pal banayein"
+    },
+    "body": {
+      "en": "Go with her to the anomaly scan if you can. If you can't, ask about every detail afterwards and celebrate this halfway milestone together.",
+      "hi": "Ho sake toh anomaly scan par uske saath jaayein. Agar nahi ja sakte, toh baad mein har baat poochein aur is aadhe safar ke padaav ko saath manaayein."
+    }
+  }
+}

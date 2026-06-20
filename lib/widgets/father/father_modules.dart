@@ -16,11 +16,12 @@ import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/father_day.dart';
+import '../../models/father_week.dart';
 import '../../screens/home_detail_screens.dart';
 import '../../services/daily_store.dart';
 import '../../services/father_content_controller.dart';
 import '../../theme/app_theme.dart';
-import '../home/home_modules.dart' show HomeCard, HomePrimaryButton, LangToggle;
+import '../home/home_modules.dart' show HomeCard, LangToggle;
 
 // Father Mode accent roles, drawn from the shared palette.
 const Color _slate = AppTheme.fatherSlate500;
@@ -116,12 +117,10 @@ class FatherMomentCard extends StatelessWidget {
     super.key,
     required this.intro,
     required this.lang,
-    this.onStart,
   });
 
   final String intro;
   final AppLanguage lang;
-  final VoidCallback? onStart;
 
   @override
   Widget build(BuildContext context) {
@@ -175,12 +174,6 @@ class FatherMomentCard extends StatelessWidget {
             ]),
             const SizedBox(height: 10),
             Text(intro, style: text.bodyLarge?.copyWith(height: 1.45)),
-            const SizedBox(height: 16),
-            HomePrimaryButton(
-              label: s.startMoment,
-              color: _slate,
-              onTap: onStart ?? () {},
-            ),
           ]),
         ),
       ),
@@ -478,99 +471,146 @@ class FatherCompletionBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Emotional Check-In — "How are you feeling today?" (chip style)
+//  Today | This Week — the segmented toggle between Daily Moment & Weekly Journey
 // ---------------------------------------------------------------------------
 
-class FatherEmotionalCheckIn extends StatelessWidget {
-  const FatherEmotionalCheckIn({super.key, required this.day, required this.lang});
-  final int day;
-  final AppLanguage lang;
+class FatherSectionToggle extends StatelessWidget {
+  const FatherSectionToggle({
+    super.key,
+    required this.thisWeek,
+    required this.lang,
+    required this.onChanged,
+  });
 
-  static const List<String> _moods = [
-    'happy', 'grateful', 'hopeful', 'calm', 'connected',
-    'nervous', 'anxious', 'tired', 'emotional', 'overwhelmed',
-  ];
+  final bool thisWeek;
+  final AppLanguage lang;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final s = S(lang);
     return Container(
-      width: double.infinity,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppTheme.outlineVariant, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.fatherSlate900.withValues(alpha: 0.05),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: AppTheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(40),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
-      child: ListenableBuilder(
-        listenable: DailyStore.instance,
-        builder: (context, _) {
-          final selected = DailyStore.instance.moodForDay(day);
-          return Column(children: [
-            Text(s.fatherFeelingQuestion,
-                textAlign: TextAlign.center, style: text.headlineSmall),
-            const SizedBox(height: 18),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final id in _moods)
-                  _MoodChip(
-                    label: s.fatherMoodLabel(id),
-                    selected: selected == id,
-                    onTap: () {
-                      if (selected == id) {
-                        DailyStore.instance.clearMood(day);
-                      } else {
-                        DailyStore.instance.setMood(day, id);
-                      }
-                    },
-                  ),
-              ],
-            ),
-          ]);
-        },
-      ),
+      child: Row(children: [
+        Expanded(
+            child: _seg(context, s.fatherTabToday, !thisWeek,
+                () => onChanged(false))),
+        Expanded(
+            child:
+                _seg(context, s.fatherTabThisWeek, thisWeek, () => onChanged(true))),
+      ]),
     );
   }
-}
 
-class _MoodChip extends StatelessWidget {
-  const _MoodChip({required this.label, required this.selected, required this.onTap});
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
+  Widget _seg(BuildContext context, String label, bool selected, VoidCallback onTap) {
     final text = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? _slate : AppTheme.surfaceContainerLow,
+          color: selected ? _slate : Colors.transparent,
           borderRadius: BorderRadius.circular(40),
-          border: Border.all(
-            color: selected ? _slate : AppTheme.outlineVariant,
-            width: 1.2,
-          ),
         ),
         child: Text(label,
             style: text.labelLarge?.copyWith(
-                color: selected ? Colors.white : AppTheme.neutral700,
+                color: selected ? Colors.white : AppTheme.neutral600,
                 fontWeight: FontWeight.w700)),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Weekly Journey — the deeper once-a-week experience (4 sections)
+// ---------------------------------------------------------------------------
+
+class FatherWeeklyView extends StatelessWidget {
+  const FatherWeeklyView({super.key, required this.week, required this.lang});
+
+  final FatherWeek week;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final s = S(lang);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(s.fatherWeeklyIntro,
+          style: text.bodyMedium?.copyWith(color: AppTheme.neutral600)),
+      const SizedBox(height: 14),
+      _section(context, s.fatherSecInsight, Icons.lightbulb_rounded, _slate,
+          week.insight),
+      const SizedBox(height: 14),
+      _section(context, s.fatherSecSupport, Icons.volunteer_activism_rounded,
+          _coral, week.support),
+      const SizedBox(height: 14),
+      _section(context, s.fatherSecConnect, Icons.child_care_rounded, _slate,
+          week.connect),
+      const SizedBox(height: 14),
+      _section(context, s.fatherSecMission, Icons.handyman_rounded, _amber,
+          week.mission),
+    ]);
+  }
+
+  Widget _section(BuildContext context, String label, IconData icon, Color accent,
+      FatherWeekSection sec) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppTheme.outlineVariant, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.fatherSlate900.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, size: 18, color: accent),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(label.toUpperCase(),
+                style: text.labelSmall?.copyWith(
+                    color: accent,
+                    letterSpacing: 1.0,
+                    fontWeight: FontWeight.w800)),
+          ),
+        ]),
+        const SizedBox(height: 12),
+        Text(sec.title.of(lang),
+            style: text.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700, height: 1.35)),
+        if (sec.hasBody) ...[
+          const SizedBox(height: 8),
+          Text(sec.body!.of(lang),
+              style: text.bodyMedium
+                  ?.copyWith(color: AppTheme.neutral700, height: 1.5)),
+        ],
+      ]),
     );
   }
 }

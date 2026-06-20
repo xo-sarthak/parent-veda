@@ -1267,8 +1267,21 @@ class S {
       _p('Week $week • Day $day', 'Hafta $week • Din $day');
 
   // ---- Today's Moment card -------------------------------------------------
-  String get fatherMomentMinutes => _p('~4 min', '~4 min');
+  String get fatherMomentMinutes => _p('~3 min', '~3 min');
   String get startMoment => _p('Start Moment', 'Shuru Karein');
+
+  // ---- Today | This Week toggle + Weekly Journey ---------------------------
+  String get fatherTabToday => _p('Today', 'Aaj');
+  String get fatherTabThisWeek => _p('This Week', 'Is Hafte');
+  String get fatherWeeklyIntro => _p(
+      "This week, through a father's eyes.",
+      'Is hafte, ek pita ki nazar se.');
+  String get fatherSecInsight => _p('Father Insight', 'Pita Ki Soch');
+  String get fatherSecSupport =>
+      _p('Supporting Your Partner', 'Partner Ka Saath');
+  String get fatherSecConnect =>
+      _p('Connecting With Your Baby', 'Baby Se Judaav');
+  String get fatherSecMission => _p("This Week's Mission", 'Is Hafte Ka Mission');
 
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');
