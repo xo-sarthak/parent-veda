@@ -1,0 +1,282 @@
+[
+  {
+    "day": 50,
+    "week": 8,
+    "babyLearning": { "en": "growing tiny fingers, soft and new", "hi": "nanhi ungliyaan badh rahi hain, naram aur nayi" },
+    "grow": {
+      "title": { "en": "Your Way Is A Good Way", "hi": "Aapka Tareeka Ek Achha Tareeka Hai" },
+      "insight": { "en": "There is no single right way to do this. The way you love your baby, in your own rhythm, is already a good way.", "hi": "Ise karne ka koi ek sahi tareeka nahi hai. Jis tarah aap apne baby ko pyaar karti hain, apni hi taal mein, woh pehle se hi ek achha tareeka hai." },
+      "expanded": { "en": "You will hear a hundred opinions about how pregnancy and parenting 'should' look — what to eat, how to rest, what to feel. It is easy to start doubting your own quiet sense of things. But there is no one perfect path that every mother must walk. Your home, your body, your instincts are unlike anyone else's, and the way you care, in your own rhythm, fits your baby better than any borrowed plan ever could. Trust that your way, gentle and imperfect, is a good way — because it is yours, and it is full of love.", "hi": "Aap sau raaye sunengi ki pregnancy aur parenting 'kaisi honi chahiye' — kya khaayein, kaise aaram karein, kya mehsoos karein. Apni hi shaant samajh par shaq karna shuru karna aasaan hai. Par koi ek perfect raasta nahi hai jis par har maa ko chalna ho. Aapka ghar, aapka sharir, aapki instincts kisi aur jaisi nahi hain, aur jis tarah aap khayal rakhti hain, apni hi taal mein, woh aapke baby ke liye kisi udhaar liye plan se behtar baithta hai. Bharosa rakhein ki aapka tareeka, naram aur adhoora, ek achha tareeka hai — kyunki yeh aapka hai, aur pyaar se bhara hai." },
+      "deepDive": { "en": "Researchers note there is no single 'optimal' parenting style across cultures; warmth and responsiveness, not a fixed method, are what consistently support a child. Your instinct is a valid guide.", "hi": "Researchers note karte hain ki sanskritiyon mein koi ek 'optimal' parenting style nahi hai; garmjoshi aur responsiveness, na ki koi tay tareeka, wahi hai jo lagaataar ek bachche ki madad karti hai. Aapki instinct ek sahi raasta dikhati hai." },
+      "remember": { "en": "Your own way, full of love, is a good way.", "hi": "Aapka apna tareeka, pyaar se bhara, ek achha tareeka hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Peacock And The Crane", "hi": "Mor Aur Saaras" },
+      "summary": { "en": "A boastful peacock learns that every creature's gifts are its own.", "hi": "Ek sheykhi baghaarta mor seekhta hai ki har jeev ke tofey uske apne hote hain." },
+      "body": { "en": "A peacock and a crane met one morning by a wide lake. The peacock spread his shimmering tail, blue and green and gold, and laughed at the plain grey crane. 'Look at me,' he boasted. 'I wear the colours of a king. You are dull and dressed in dust. How sad to be so ordinary.'\n\nThe crane listened quietly, then stretched out his great wings. With a few calm beats he lifted from the ground, rising higher and higher into the open sky, until he was sailing far above the lake toward the distant hills.\n\nThe peacock, weighed down by his heavy, splendid tail, could only watch from the earth. 'Your feathers are beautiful,' the crane called down kindly, 'but I would not trade my plain wings and the whole open sky for all your colours. Each of us is given our own gift — and mine is enough for me.'", "hi": "Ek mor aur ek saaras ek subah ek chaudi jheel ke paas mile. Mor ne apni chamakti poonch failaayi, neeli aur hari aur sunhri, aur saade slety saaras par hansa. 'Mujhe dekho,' usne sheykhi maari. 'Main ek raja ke rang pehente hoon. Tum pheeke ho aur dhool mein lipte. Itna aam hona kitna dukhad hai.'\n\nSaaras ne chupchaap suna, phir apne bade pankh failaaye. Kuch shaant phadphadaahaton se woh zameen se uthaa, ooncha aur oonchaa khule aasmaan mein chadhta gaya, jab tak woh jheel se bahut upar door pahaadon ki taraf udta na chala gaya.\n\nMor, apni bhaari, shaandaar poonch se dabaa hua, bas zameen se dekhta raha. 'Tumhare pankh sundar hain,' saaras ne dayaalta se neeche pukara, 'par main apne saade pankh aur poora khula aasmaan tumhare saare rangon ke liye nahi badlunga. Hum mein se har ek ko apna tofa diya gaya hai — aur mera mere liye kaafi hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby one big dream you quietly hold for them.", "hi": "Apne baby ko ek bada sapna bataayein jo aap chupchaap unke liye sambhaal kar rakhti hain." },
+      "motivation": { "en": "Speaking a dream aloud is the first gentle way of believing in it.", "hi": "Ek sapne ko bolkar kehna us par yaqeen karne ka pehla naram tareeka hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Just As You Are", "hi": "Jaise Aap Ho Waise Hi" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation of self-acceptance for two", "hi": "Do ke liye khud ko apnaane ka ek chhota dhyan" },
+      "affirmation": { "en": "I do not need to be anyone else. Just as I am, I am the right mother for you.", "hi": "Mujhe kisi aur jaisa hone ki zaroorat nahi. Jaisi main hoon waisi hi, main tumhare liye sahi maa hoon." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take three slow breaths and let your shoulders settle. With each breath out, gently let go of one thing you wish were different about you, and simply rest in being exactly who you are, here with your baby.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein aur apne kandhon ko thamne dein. Har saans baahar chhodte waqt, apne baare mein ek aisi cheez ko pyaar se jaane dein jo aap chahti hain alag hoti, aur bas wahi hone mein aaram karein jo aap hain, yahan apne baby ke saath." },
+      "closingThought": { "en": "You did not need to change a thing to be enough for your baby just now.", "hi": "Abhi apne baby ke liye kaafi hone ke liye aapko kuch badalne ki zaroorat nahi thi." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Don't Need To Compare", "hi": "Mujhe Tulna Karne Ki Zaroorat Nahi" },
+      "content": { "en": "Other mothers' journeys are not a measure of mine. I will keep my eyes gently on my own path.", "hi": "Doosri maaon ka safar mere safar ka paimana nahi hai. Main apni nazar pyaar se apne hi raaste par rakhungi." },
+      "remember": { "en": "Your only fair comparison is to yourself yesterday.", "hi": "Aapki ekmaatra theek tulna kal ki khud se hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 51,
+    "week": 8,
+    "babyLearning": { "en": "little arms and legs beginning to move", "hi": "nanhe haath aur pair hilna shuru kar rahe hain" },
+    "grow": {
+      "title": { "en": "Advice Is Not Instruction", "hi": "Salah Hukm Nahi Hoti" },
+      "insight": { "en": "Advice is something offered, not something you must obey. You are always free to keep what fits and let the rest go.", "hi": "Salah di jaane wali cheez hai, woh nahi jise aapko maanna hi pade. Aap hamesha aazaad hain jo baithe use rakhne aur baaki ko jaane dene ke liye." },
+      "expanded": { "en": "Pregnancy seems to invite advice from everyone — family, friends, strangers in a queue. Most of it is kind, but it can pile up until you feel you must follow it all, even when pieces contradict each other. Remember that advice is a gift laid at your feet, not a command. You can thank someone warmly and still quietly decide it is not for you. Listening does not mean obeying. You get to be the one who weighs each suggestion against your own heart and chooses what truly belongs in your home.", "hi": "Pregnancy har kisi se salah ko nyota deti lagti hai — parivar, dost, line mein khade ajnabi. Zyadatar dayaalu hoti hai, par yeh tab tak jamaa ho sakti hai jab aapko lage ki aapko sab kuch maanna hi hai, tab bhi jab tukde ek doosre ke khilaaf hon. Yaad rakhein ki salah aapke paairon mein rakha ek tofa hai, ek hukm nahi. Aap kisi ka garmjoshi se shukriya kar sakti hain aur phir bhi chupchaap tay kar sakti hain ki yeh aapke liye nahi hai. Sunna maanna nahi hota. Aap hi woh hain jo har sujhaav ko apne dil ke saath taulti hain aur chunti hain ki aapke ghar mein sach mein kya rakhna hai." },
+      "deepDive": { "en": "Experts note that unsolicited advice can raise a new parent's anxiety more than it helps. Filtering it through your own judgement is itself a healthy parenting skill.", "hi": "Experts note karte hain ki bina maangi salah ek naye parent ki ghabraahat ko madad se zyada badha sakti hai. Use apne khud ke faisle se chhaanna khud ek swasth parenting kaushal hai." },
+      "remember": { "en": "Keep what fits you; let the rest gently pass.", "hi": "Jo aap par baithe use rakhein; baaki ko pyaar se guzar jaane dein." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Blue Jackal", "hi": "Neela Siyaar" },
+      "summary": { "en": "A jackal who pretends to be something he is not is undone by his own nature.", "hi": "Ek siyaar jo wahi banne ka dhong karta hai jo woh nahi hai, apni hi fitrat se pakda jaata hai." },
+      "body": { "en": "A hungry jackal once wandered into a town and, chased by dogs, fell into a dyer's vat of deep blue. When he climbed out, his fur shone a strange and brilliant blue, like nothing the forest had ever seen. The other animals, amazed and a little afraid, bowed before him. 'Surely such a wondrous creature must be our king,' they said.\n\nThe jackal liked this very much. He sat upon a high rock, gave grand orders, and let the lions and tigers serve him. He pretended to be something far greater than a humble jackal, and for a while the trick held.\n\nThen one moonlit night, a pack of jackals began to howl in the distance. Without thinking, the blue jackal lifted his head and howled right back — and at once every animal knew exactly what he truly was. We may dress ourselves in borrowed colours, but our own true nature always sings out in the end.", "hi": "Ek bhookha siyaar ek baar ek shehar mein bhatak gaya aur, kutton ka peecha karte, ek rangrez ke gehre neele rang ke tab mein girr gaya. Jab woh bahar nikla, uski khaal ek ajeeb aur chamakdaar neele rang mein damak rahi thi, jaisa jungle ne kabhi nahi dekha tha. Doosre jaanwar, hairaan aur thode dare hue, uske aage jhuk gaye. 'Itna anokha jeev zaroor hamara raja hoga,' unhone kaha.\n\nSiyaar ko yeh bahut pasand aaya. Woh ek ooonchi chattan par baith gaya, bade hukm diye, aur sher-baagh se apni seva karwaayi. Usne ek saade siyaar se kahin bade hone ka dhong kiya, aur kuch der ke liye chaal chal gayi.\n\nPhir ek chaandni raat, door siyaaron ka ek jhund hoonkne laga. Bina soche, neele siyaar ne apna sir uthaaya aur waapas hoonk diya — aur turant har jaanwar ko theek pata chal gaya ki woh sach mein kya tha. Hum khud ko udhaar liye rangon mein laad sakte hain, par hamari apni sachi fitrat aakhir mein hamesha gaa hi uthti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby the kind of person you quietly hope they grow into.", "hi": "Apne baby ko bataayein ki aap chupchaap ummeed karti hain ki woh kis tarah ke insaan banein." },
+      "motivation": { "en": "Naming the heart you wish for them is part of growing it together.", "hi": "Jis dil ki aap unke liye kaamna karti hain use naam dena use saath badhane ka hissa hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Trust My Own Heart", "hi": "Main Apne Hi Dil Par Bharosa Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A grounding bond affirmation", "hi": "Ek sthir karta bond affirmation" },
+      "affirmation": { "en": "I will listen to the world kindly, but I trust my own heart to choose what is right for us.", "hi": "Main duniya ko dayaalta se sunungi, par hamare liye jo sahi hai use chunne ke liye main apne hi dil par bharosa karti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Out The Noise", "hi": "Shor Ko Saans Se Baahar Karein" },
+      "content": { "en": "Breathe in slowly for a count of four. As you breathe out for six, imagine letting go of one piece of advice or worry you do not need to carry today.", "hi": "Chaar tak ginte hue dheere saans lein. Jab aap chhah tak saans chhodein, sochein ki aap ek aisi salah ya chinta ko jaane de rahi hain jise aapko aaj uthaane ki zaroorat nahi." },
+      "remember": { "en": "Not every voice deserves a place inside you.", "hi": "Har aawaz aapke andar jagah ki haqdaar nahi hoti." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 52,
+    "week": 8,
+    "babyLearning": { "en": "eyelids slowly forming over tiny eyes", "hi": "nanhi aankhon par dheere se palkein ban rahi hain" },
+    "grow": {
+      "title": { "en": "No Two Journeys Match", "hi": "Koi Do Safar Ek Jaise Nahi Hote" },
+      "insight": { "en": "Your pregnancy will not look like anyone else's, and it is not meant to. Each journey has its own shape.", "hi": "Aapki pregnancy kisi aur jaisi nahi dikhegi, aur ise dikhna bhi nahi chahiye. Har safar ka apna aakaar hota hai." },
+      "expanded": { "en": "It is natural to glance sideways — at the friend who glowed, the cousin who never felt sick, the stranger online who seems to have it all figured out. But a pregnancy is not a race with a single finish line that everyone crosses the same way. Your body, your feelings, your days will follow a path that belongs only to you and your baby. Some parts will be harder than others' and some far easier, and none of it makes your journey lesser. Let yours unfold at its own pace, in its own shape, without measuring it against a map that was never yours.", "hi": "Aaju-baaju dekhna swabhaavik hai — us dost ko jo chamak rahi thi, us cousin ko jise kabhi tabiyat kharaab nahi hui, us online ajnabi ko jise sab kuch samajh aa gaya lagta hai. Par pregnancy ek aisi daud nahi hai jiski ek hi finish line ho jise sab ek hi tarah paar karte hain. Aapka sharir, aapki bhaavnaayein, aapke din ek aisi raah par chalenge jo sirf aapki aur aapke baby ki hai. Kuch hisse doosron se mushkil honge aur kuch kahin aasaan, aur in mein se kuch bhi aapke safar ko chhota nahi banaata. Apne safar ko apni hi raftaar mein, apne hi aakaar mein khulne dein, use ek aise naqshe se bina naape jo kabhi aapka tha hi nahi." },
+      "deepDive": { "en": "Doctors stress that healthy pregnancies vary enormously from person to person and even between a woman's own pregnancies. Difference is the norm, not a sign that something is wrong.", "hi": "Doctors zor dete hain ki swasth pregnancies har insaan ke beech, aur ek aurat ki apni pregnancies ke beech bhi, behad alag hoti hain. Alag hona aam baat hai, koi nishaani nahi ki kuch galat hai." },
+      "remember": { "en": "Your journey has a shape all its own.", "hi": "Aapke safar ka apna ek aakaar hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Shravan Kumar's Devotion", "hi": "Shravan Kumar Ki Bhakti" },
+      "summary": { "en": "A devoted son carries his blind parents on a journey of pure love.", "hi": "Ek samarpit beta apne andhe maa-baap ko shuddh pyaar ke safar par le jaata hai." },
+      "body": { "en": "Long ago there lived a young man named Shravan Kumar, whose mother and father had both grown old and blind. They had only one wish left in their hearts: to visit the holy places before their days were done. Shravan listened, and he did not hesitate.\n\nHe fashioned two large baskets and hung them from the ends of a strong pole. Settling his mother in one and his father in the other, he lifted the pole across his shoulders and set off on foot. Over hills and across rivers, through forests and along dusty roads, he carried his parents mile after mile, never once complaining of the weight.\n\nWhen they grew thirsty, he set them down gently and went to fetch cool water. His devotion became famous across the land — a quiet reminder that love shown in patient, daily care is among the most beautiful things a heart can offer.", "hi": "Bahut samay pehle Shravan Kumar naam ka ek jawaan aadmi rehta tha, jiski maa aur pita dono boodhe aur andhe ho chuke the. Unke dil mein bas ek hi ichha bachi thi: apne din poore hone se pehle teerth sthalon ke darshan karna. Shravan ne suna, aur usne zara bhi der nahi ki.\n\nUsne do badi tokriyaan banaayi aur unhe ek mazboot dande ke sirhon se latkaaya. Apni maa ko ek mein aur pita ko doosri mein bithaakar, usne danda apne kandhon par uthaaya aur paidal nikal pada. Pahaadon ke paar aur nadiyon ke aar, jungle se hoke aur dhool bhare raaston par, usne apne maa-baap ko meel-dar-meel uthaaya, ek baar bhi bojh ki shikaayat nahi ki.\n\nJab unhe pyaas lagti, woh unhe pyaar se neeche utaarta aur thanda paani laane jaata. Uski bhakti poori dharti mein mashhoor ho gayi — ek shaant yaad ki sabra bhari, rozana dekhbhaal mein dikhaaya gaya pyaar un sabse sundar cheezon mein se hai jo ek dil de sakta hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about an experience you cannot wait to share with them one day.", "hi": "Apne baby ko ek aise anubhav ke baare mein bataayein jise unke saath baantne ka aap besabri se intezaar kar rahi hain." },
+      "motivation": { "en": "The things you long to share are the love you are already saving up.", "hi": "Jo cheezein aap baantne ko taraste hain woh wahi pyaar hai jo aap pehle se jamaa kar rahi hain." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "Our Path Is Our Own", "hi": "Hamara Raasta Hamara Apna Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A reassuring bond affirmation", "hi": "Ek aashwasan dene wala bond affirmation" },
+      "affirmation": { "en": "I will not measure us against anyone. Our path is our own, and it is unfolding just right.", "hi": "Main hum dono ko kisi se nahi naapungi. Hamara raasta hamara apna hai, aur woh bilkul theek khul raha hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "Slower Is Still Forward", "hi": "Dheema Bhi Aage Hi Hai" },
+      "content": { "en": "If my journey feels slower than someone else's, that is fine. Slower is still moving forward, in my own time.", "hi": "Agar mera safar kisi aur se dheema lage, to theek hai. Dheema bhi aage badhna hi hai, apne hi samay mein." },
+      "remember": { "en": "Forward is forward, at any pace.", "hi": "Aage badhna aage badhna hi hai, kisi bhi raftaar par." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 53,
+    "week": 8,
+    "babyLearning": { "en": "a little nose taking gentle shape", "hi": "ek nanhi naak naram aakaar le rahi hai" },
+    "grow": {
+      "title": { "en": "Trust Your Quiet Instinct", "hi": "Apni Shaant Instinct Par Bharosa Karein" },
+      "insight": { "en": "Beneath all the noise, you carry a quiet knowing about your baby. It is worth listening to.", "hi": "Saare shor ke neeche, aap apne baby ke baare mein ek shaant jaankari rakhti hain. Use sunna zaroori hai." },
+      "expanded": { "en": "Long before you can explain why, you will often simply sense what your baby needs — a feeling that arrives soft and sure beneath your busy thoughts. It is easy to override this quiet instinct with books, apps and other people's certainty. But that inner sense is real, shaped by the deep bond already forming between you. You do not have to follow it blindly, and you can still ask for help. Yet learning to pause and listen to your own quiet knowing is one of the truest skills of parenthood, and it grows stronger every time you trust it.", "hi": "Aap kyun samjha paayein us se bahut pehle, aap aksar bas mehsoos kar lengi ki aapke baby ko kya chahiye — ek ehsaas jo aapke vyast vichaaron ke neeche naram aur pakka aata hai. Is shaant instinct ko kitaabon, apps aur doosron ki nishchitta se dabaa dena aasaan hai. Par woh andaruni ehsaas asli hai, us gehre bond se gadha jo pehle se aapke beech ban raha hai. Aapko use aankh moond kar follow nahi karna, aur aap phir bhi madad maang sakti hain. Phir bhi rukna aur apni shaant jaankari ko sunna seekhna parenthood ke sabse sachche kaushalon mein se ek hai, aur woh har baar jab aap us par bharosa karti hain mazboot hota jaata hai." },
+      "deepDive": { "en": "Studies of maternal intuition suggest mothers often pick up on subtle cues about their baby before they can consciously name them. Your instincts are informed, not imaginary.", "hi": "Maa ki intuition par hui studies sujhaati hain ki maayein aksar apne baby ke baare mein bareek sanketon ko pakad leti hain us se pehle ki woh unhe soch-samajh kar naam de sakein. Aapki instincts jaankaar hain, kaalpanik nahi." },
+      "remember": { "en": "Your quiet inner knowing is worth trusting.", "hi": "Aapki shaant andaruni jaankari par bharosa karne layak hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Wise Quail", "hi": "Samajhdaar Bater" },
+      "summary": { "en": "A clever flock of quails escapes a hunter through patient teamwork.", "hi": "Baateron ka ek samajhdaar jhund sabra bhare saath se ek shikaari se bach nikalta hai." },
+      "body": { "en": "In a wide field lived a large flock of quails, watched over by a wise old quail who had seen many dangers. A hunter began to trap them by throwing a great net over the feeding birds and dragging them away. The flock grew frightened.\n\nThe wise quail gathered them and spoke calmly. 'When the net falls upon us, do not panic and pull in different directions. Instead, each of you slip your head through a hole, and all together, as one, lift the net and fly to a thornbush. There it will catch and we can slip free below.' The quails listened and trusted his quiet wisdom.\n\nThe next time the net came down, they did exactly as he had said. As one body they rose, carried the net to a thornbush, and escaped beneath it, every bird safe. By staying calm and acting together, the small birds had outwitted the hunter completely.", "hi": "Ek chaude khet mein baateron ka ek bada jhund rehta tha, jiski rakhwaali ek samajhdaar boodha bater karta tha jisne kayi khatre dekhe the. Ek shikaari unhe phasaane laga, daana chugte panchhiyon par ek bada jaal phenk kar aur unhe ghaseet kar le jaakar. Jhund darr gaya.\n\nSamajhdaar bater ne unhe ikattha kiya aur shaanti se bola. 'Jab jaal hum par gire, ghabraakar alag-alag dishaaon mein mat kheencho. Iske bajaaye, tum mein se har ek apna sir ek chhed se nikaalo, aur sab saath, ek hoke, jaal uthaakar ek kaante ki jhaadi tak udo. Wahan woh atak jaayega aur hum neeche se nikal sakte hain.' Baateron ne suna aur uski shaant samajh par bharosa kiya.\n\nAgli baar jab jaal gira, unhone theek waisa hi kiya jaisa usne kaha tha. Ek sharir ki tarah woh uthe, jaal ko ek kaante ki jhaadi tak le gaye, aur uske neeche se nikal bhaage, har panchhi surakshit. Shaant rehkar aur saath kaam karke, un chhote panchhiyon ne shikaari ko poori tarah maat de di thi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a place you dream of taking them one day.", "hi": "Apne baby ko ek aisi jagah ke baare mein bataayein jahan le jaane ka aap ek din sapna dekhti hain." },
+      "motivation": { "en": "Picturing a place together is a small promise of all the world you'll share.", "hi": "Ek jagah ki saath kalpana karna us poori duniya ka ek chhota vaada hai jo aap baantengi." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Listen Within", "hi": "Main Andar Sunti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "An inward-listening bond affirmation", "hi": "Andar sunne wala bond affirmation" },
+      "affirmation": { "en": "When the world grows loud, I grow quiet, and I listen to the gentle knowing within me.", "hi": "Jab duniya tez ho jaati hai, main shaant ho jaati hoon, aur apne andar ki naram jaankari ko sunti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Settle Into Stillness", "hi": "Sthirta Mein Tham Jaayein" },
+      "content": { "en": "Sit still and breathe in for a slow count of four. Hold gently for four, then release for four. As you settle, let your busy thoughts grow quiet enough to hear yourself.", "hi": "Sthir baithein aur chaar tak dheere ginte hue saans lein. Chaar tak pyaar se rokein, phir chaar tak chhodein. Jaise aap thamti hain, apne vyast vichaaron ko itna shaant hone dein ki aap khud ko sun sakein." },
+      "remember": { "en": "Stillness is where your own voice becomes clear.", "hi": "Sthirta wahi hai jahan aapki apni aawaz saaf hoti hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 54,
+    "week": 8,
+    "babyLearning": { "en": "growing steadily, every day a little more", "hi": "sthirta se badh raha hai, har din thoda aur" },
+    "grow": {
+      "title": { "en": "Comparison Steals Joy", "hi": "Tulna Khushi Chura Leti Hai" },
+      "insight": { "en": "The moment you start comparing, the joy of your own moment quietly slips away. Your story is not theirs.", "hi": "Jis pal aap tulna karna shuru karti hain, aapke apne pal ki khushi chupchaap khisak jaati hai. Aapki kahani unki nahi hai." },
+      "expanded": { "en": "Comparison rarely makes us happier; more often it dims a joy that was glowing just fine on its own. You can be content with your own pregnancy until you scroll past someone else's, and suddenly your own beautiful moment feels lacking. But the truth is your experience was never meant to match theirs. When you notice comparison creeping in, gently turn your attention back to what is real and present for you — the small flutter of hope, the quiet of this very day. Joy lives in your own story, not in the gap between yours and someone else's.", "hi": "Tulna shaayad hi humein zyada khush banaati hai; aksar yeh ek aisi khushi ko mand kar deti hai jo apne aap mein theek chamak rahi thi. Aap apni pregnancy se sukoon mein ho sakti hain jab tak aap kisi aur ki scroll na karein, aur achaanak aapka apna sundar pal kam lagne lagta hai. Par sach yeh hai ki aapka anubhav unke jaisa hone ke liye banaa hi nahi tha. Jab aap tulna ko aate hue mehsoos karein, pyaar se apna dhyan wapas us par modein jo aapke liye asli aur maujood hai — ummeed ki ek chhoti dhadkan, is khaas din ka sukoon. Khushi aapki apni kahani mein basti hai, aapki aur kisi aur ke beech ke faasle mein nahi." },
+      "deepDive": { "en": "Psychologists find that frequent social comparison, especially online, is linked to lower mood and higher anxiety. Turning attention back to your own present moment reliably protects wellbeing.", "hi": "Psychologists paate hain ki baar-baar ki social tulna, khaaskar online, kam mood aur zyada ghabraahat se judi hai. Apna dhyan apne maujooda pal par wapas modna bharose se bhalai ki raksha karta hai." },
+      "remember": { "en": "Your joy is safest kept in your own story.", "hi": "Aapki khushi apni hi kahani mein sabse surakshit rehti hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The Well Dispute", "hi": "Tenali Rama Aur Kuein Ka Jhagda" },
+      "summary": { "en": "Witty Tenali Rama settles a cheating dispute with one clever question.", "hi": "Hazirjawaab Tenali Rama ek dhokebaazi ke jhagde ko ek chalaak sawaal se sulhaa deta hai." },
+      "body": { "en": "A poor farmer once bought a well from a wealthy man so he could water his fields. But when he came to draw water, the rich man stopped him. 'I sold you the well,' he said slyly, 'but not the water inside it. If you want my water, you must pay me again.' The farmer, helpless, took his complaint to the king's court.\n\nThe king turned to his clever minister, Tenali Rama, to settle the matter. Tenali listened to both men, then faced the rich man calmly. 'So you agree the well belongs to the farmer, but the water is yours?' 'Yes, exactly,' said the rich man, pleased.\n\n'Then you are storing your water in another man's well,' said Tenali. 'Either pay him rent for the space at once, or remove every drop today.' The court burst into laughter, and the greedy man, trapped by his own trick, slunk quietly away.", "hi": "Ek gareeb kisaan ne ek baar ek ameer aadmi se ek kuaan khareeda taaki woh apne khet seench sake. Par jab woh paani nikaalne aaya, ameer aadmi ne use roka. 'Maine tumhe kuaan becha,' usne chaalaaki se kaha, 'par uske andar ka paani nahi. Agar tumhe mera paani chahiye, to tumhe mujhe phir se paisa dena hoga.' Kisaan, bebas, apni shikaayat raja ke darbaar le gaya.\n\nRaja ne maamla sulhaane ke liye apne chalaak mantri, Tenali Rama, ki taraf rukh kiya. Tenali ne dono aadmiyon ko suna, phir ameer aadmi ka shaanti se saamna kiya. 'To tum maante ho ki kuaan kisaan ka hai, par paani tumhara?' 'Haan, bilkul,' ameer aadmi ne khush hokar kaha.\n\n'To tum apna paani doosre aadmi ke kuein mein jamaa kar rahe ho,' Tenali ne kaha. 'Ya to jagah ka kiraaya turant do, ya aaj hi har boond hata lo.' Darbaar hansi se goonj uthaa, aur laalchi aadmi, apni hi chaal mein phasaa, chupchaap khisak gaya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby what you hope they will never doubt about themselves.", "hi": "Apne baby ko bataayein ki aap ummeed karti hain woh apne baare mein kis baat par kabhi shaq na karein." },
+      "motivation": { "en": "The certainty you wish for them begins as your steady belief in them.", "hi": "Jis nishchitta ki aap unke liye kaamna karti hain woh aapke unmein pakke yaqeen se shuru hoti hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Kafi", "hi": "Raag Kafi" },
+      "durationMinutes": 4,
+      "description": { "en": "An afternoon raga for gentle, contented calm", "hi": "Ek dopahar ka raag, naram aur santusht shaanti ke liye" },
+      "affirmation": { "en": "As this melody flows softly, I rest content in the moment that is mine, with you.", "hi": "Jaise yeh dhun naram behti hai, main us pal mein santusht aaram karti hoon jo mera hai, tumhare saath." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "Enough For Me Is Enough", "hi": "Mere Liye Kaafi Hi Kaafi Hai" },
+      "content": { "en": "What I have today is enough for me. I do not need someone else's version of this season to feel full.", "hi": "Jo aaj mere paas hai woh mere liye kaafi hai. Bhare mehsoos karne ke liye mujhe is daur ka kisi aur ka roop nahi chahiye." },
+      "remember": { "en": "Enough is found by looking inward, not sideways.", "hi": "Kaafi andar dekhne se milta hai, aaju-baaju nahi." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 55,
+    "week": 8,
+    "babyLearning": { "en": "tiny features growing clearer each day", "hi": "nanhe naqsh har din saaf hote ja rahe hain" },
+    "grow": {
+      "title": { "en": "You Know Your Baby Best", "hi": "Aap Apne Baby Ko Sabse Behtar Jaanti Hain" },
+      "insight": { "en": "No book or expert spends every moment with your baby the way you do. In time, you will be the true expert on this little one.", "hi": "Koi kitaab ya expert aapke baby ke saath har pal nahi bitaata jaise aap bitaati hain. Samay ke saath, aap hi is nanhe par sachi expert banengi." },
+      "expanded": { "en": "There is so much knowledge out there, and it can make you feel that everyone understands your baby better than you do. But no expert lives inside this closeness you share. You are the one who feels every shift, every quiet rhythm, every flicker of this little life. Knowledge from others is useful, and you should welcome it — yet it works best when it sits alongside your own deepening understanding, not above it. Slowly, day by day, you are becoming the person who knows this child most tenderly and most truly in all the world.", "hi": "Bahar itna gyaan hai, aur woh aapko aisa mehsoos karaa sakta hai ki har koi aapke baby ko aapse behtar samajhta hai. Par koi expert is nazdeeki ke andar nahi rehta jo aap baantti hain. Aap hi woh hain jo har badlaav, har shaant taal, is nanhi zindagi ki har jhalak mehsoos karti hain. Doosron ka gyaan kaam ka hai, aur aapko use swagat karna chahiye — par woh tab sabse achha kaam karta hai jab woh aapki apni gehraati samajh ke saath baithe, uske upar nahi. Dheere-dheere, din-ba-din, aap woh insaan ban rahi hain jo is bachche ko poori duniya mein sabse pyaar se aur sabse sachhayi se jaanta hai." },
+      "deepDive": { "en": "Paediatricians often remind parents that they are the foremost observers of their own child. Professional guidance works best when paired with a parent's close, daily knowledge.", "hi": "Paediatricians aksar parents ko yaad dilaate hain ki woh apne hi bachche ke sabse aage observer hain. Professional salah tab sabse achha kaam karti hai jab woh ek parent ke nazdeeki, rozana gyaan ke saath jodi jaaye." },
+      "remember": { "en": "You are becoming the true expert on your baby.", "hi": "Aap apne baby par sachi expert ban rahi hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Potter's Promise", "hi": "Kumhaar Ka Vaada" },
+      "summary": { "en": "A humble potter keeps his word and earns trust worth more than gold.", "hi": "Ek vinamra kumhaar apna vachan nibhaata hai aur sone se zyada keemti bharosa kamaata hai." },
+      "body": { "en": "In a small village lived a potter known for his honesty. One day a merchant ordered a hundred clay pots for a festival and promised to pay well, but he needed them by sunrise the very next day. The potter looked at his wheel and his small kiln and knew it would take all night without rest.\n\nHe could have made fewer pots, or rushed them thin and weak, and the merchant might never have noticed before the festival. But the potter had given his word. Through the whole dark night he worked, shaping each pot with care and firing them properly, never once cutting a corner.\n\nAt dawn, a hundred strong, beautiful pots stood ready. The merchant was so moved by the potter's honest work that he sent every customer he knew to that little shop. Keeping his quiet promise, even when no one was watching, had built the potter a name worth far more than a single sale.", "hi": "Ek chhote gaon mein ek kumhaar rehta tha jo apni imaandaari ke liye jaana jaata tha. Ek din ek vyapaari ne ek tyohaar ke liye sau mitti ke ghade order kiye aur achha daam dene ka vaada kiya, par use woh agle hi din suraj nikalne tak chahiye the. Kumhaar ne apne chaak aur apne chhote bhatti ko dekha aur jaan gaya ki bina aaram ke poori raat lagegi.\n\nWoh kam ghade banaa sakta tha, ya unhe patla aur kamzor jaldbaazi mein banaa sakta tha, aur vyapaari ko tyohaar se pehle shaayad pata bhi na chalta. Par kumhaar ne apna vachan diya tha. Poori kaali raat woh kaam karta raha, har ghade ko khayal se gadhta aur unhe theek se pakaata, ek baar bhi koi kasar nahi chhodi.\n\nBhor mein, sau mazboot, sundar ghade taiyaar khade the. Vyapaari kumhaar ke imaandaar kaam se itna prabhaavit hua ki usne har jaan-pehchaan ke graahak ko us chhoti dukaan bheja. Apna shaant vaada nibhaana, tab bhi jab koi nahi dekh raha tha, ne kumhaar ko ek aisa naam banaa diya jo ek bikri se kahin zyada keemti tha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the kind of world you hope they help build.", "hi": "Apne baby ko us tarah ki duniya ke baare mein bataayein jise banane mein aap ummeed karti hain woh madad karein." },
+      "motivation": { "en": "Sharing your hopes for the world plants the first seeds of their kindness.", "hi": "Duniya ke liye apni ummeedein baantna unki dayaalta ke pehle beej bota hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Know You Already", "hi": "Main Tumhe Pehle Se Jaanti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A knowing, intimate bond affirmation", "hi": "Ek jaanne wala, nazdeeki bond affirmation" },
+      "affirmation": { "en": "No one knows you the way I am beginning to. Day by day, I am learning your quiet ways.", "hi": "Koi tumhe waise nahi jaanta jaise main jaanna shuru kar rahi hoon. Din-ba-din, main tumhare shaant tareeke seekh rahi hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Knowing Counts", "hi": "Meri Jaankari Maayne Rakhti Hai" },
+      "content": { "en": "What I sense about my baby matters. I will let my own knowing have a seat at the table.", "hi": "Jo main apne baby ke baare mein mehsoos karti hoon woh maayne rakhta hai. Main apni jaankari ko bhi ek jagah dungi." },
+      "remember": { "en": "Your knowing belongs in every decision.", "hi": "Aapki jaankari har faisle mein shaamil hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 56,
+    "week": 8,
+    "babyLearning": { "en": "closing the week, stronger and more whole", "hi": "hafta poora karte hue, aur mazboot aur poora" },
+    "grow": {
+      "title": { "en": "Write Your Own Story", "hi": "Apni Khud Ki Kahani Likhein" },
+      "insight": { "en": "This pregnancy, and the parent you become, is a story only you can write. No one else holds the pen.", "hi": "Yeh pregnancy, aur jo parent aap banti hain, ek aisi kahani hai jise sirf aap likh sakti hain. Kalam kisi aur ke haath mein nahi." },
+      "expanded": { "en": "All week we have touched the same gentle truth: your path is your own. As this week closes, let it settle in deeply. You will gather wisdom from many places — elders, books, friends, this very app — but you are the author of how your family will live and love. The story you are writing does not have to look like your mother's, your friend's, or anyone else's. It only has to be honest, and warm, and truly yours. Pick up the pen with confidence. The most beautiful family stories are the ones written from the heart, one ordinary, loving day at a time.", "hi": "Poora hafta hum usi naram sachai ko chhute rahe: aapka raasta aapka apna hai. Jaise yeh hafta band hota hai, ise gehraai se bas jaane dein. Aap kayi jagahon se gyaan ikattha karengi — bujurg, kitaabein, dost, yahi app — par aap hi is baat ki lekhak hain ki aapka parivar kaise jiyega aur pyaar karega. Jo kahani aap likh rahi hain use aapki maa, aapki dost, ya kisi aur ki jaisi dikhne ki zaroorat nahi. Use bas sachhi, garm, aur sach mein aapki honi chahiye. Vishwaas ke saath kalam uthaayein. Sabse sundar parivaar ki kahaaniyaan woh hoti hain jo dil se likhi jaati hain, ek aam, pyaar bhare din ke saath." },
+      "deepDive": { "en": "Family researchers find that parents who feel confident authoring their own approach, rather than copying others, tend to be calmer and more consistent. Ownership steadies you.", "hi": "Parivaar par kaam karne wale researchers paate hain ki jo parents doosron ki nakal karne ke bajaaye apna khud ka tareeka likhne mein vishwaas mehsoos karte hain, woh zyada shaant aur sthir hote hain. Apnapan aapko thaam deta hai." },
+      "remember": { "en": "You hold the pen to your own family story.", "hi": "Apni parivaar ki kahani ka kalam aapke haath mein hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Mountain Stream", "hi": "Pahaadi Jharna" },
+      "summary": { "en": "A little stream finds its own way to the sea by trusting its own path.", "hi": "Ek nanha jharna apne hi raaste par bharosa karke samundar tak apna khud ka raasta khoj leta hai." },
+      "body": { "en": "High in the mountains, a little stream was born from melting snow. As it trickled downhill, it passed a wide, rushing river that thundered straight down the valley. 'You should flow as I do,' roared the river, 'fast and loud and in a straight line. That is the only proper way to reach the sea.'\n\nThe little stream tried for a while, hurrying and forcing itself forward. But it grew tired and lost, for that was not its nature. So it slowed, and listened to the land instead. It wound gently around mossy rocks, slipped between ferns, paused in quiet pools, and curved wherever the earth invited it.\n\nIts way was slow and winding, nothing like the river's — yet step by patient step, it reached the very same sea. The water it carried was clear and cool, and along its banks grew the greenest valley of all. Each of us, it seemed, finds the sea by following our own true course.", "hi": "Pahaadon mein ooonche, ek nanha jharna pighalti barf se janma. Jaise woh dhalaan par behta, woh ek chaude, tez behte dariya se guzra jo seedha ghaati mein garajta utar raha tha. 'Tumhe mere jaise behna chahiye,' dariya garja, 'tez aur zor se aur ek seedhi line mein. Samundar tak pohanchne ka yahi ekmaatra theek tareeka hai.'\n\nNanhe jharne ne kuch der koshish ki, jaldbaazi karte aur khud ko aage dhakelte. Par woh thak gaya aur kho gaya, kyunki yeh uski fitrat nahi thi. To woh dheema hua, aur uske bajaaye zameen ko suna. Woh kaai bhare patharon ke girad naram tarah ghooma, ferns ke beech se khiska, shaant taalaabon mein ruka, aur jahan bhi dharti ne nyota diya wahan muda.\n\nUska raasta dheema aur tedha-medha tha, dariya jaisa bilkul nahi — phir bhi sabra bhare kadam-dar-kadam, woh usi samundar tak pohancha. Jo paani woh laaya woh saaf aur thanda tha, aur uske kinaaron par sabse hari ghaati ugi. Hum mein se har ek, aisa lagta hai, apne hi sachhe raaste par chalkar samundar khoj leta hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a small, everyday hope you hold for them.", "hi": "Apne baby ko ek chhoti, roz-marra ki ummeed ke baare mein bataayein jo aap unke liye rakhti hain." },
+      "motivation": { "en": "The little hopes you whisper are as precious as the grand ones.", "hi": "Jo chhoti ummeedein aap dheere se kehti hain woh badi waali jitni hi keemti hain." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "This Story Is Ours", "hi": "Yeh Kahani Hamari Hai" },
+      "durationMinutes": 3,
+      "description": { "en": "A closing meditation on your own path", "hi": "Apne hi raaste par ek samaapan dhyan" },
+      "affirmation": { "en": "Quietly and surely, I am writing a loving story — yours and mine, and no one else's.", "hi": "Shaanti se aur pakke taur par, main ek pyaar bhari kahani likh rahi hoon — tumhari aur meri, aur kisi aur ki nahi." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take a few slow breaths and feel the week behind you. Imagine your days together as a quiet, unwritten book in your hands, and let yourself feel that the pen is yours to hold, gently and without hurry.", "hi": "Aaram se baithein aur aankhein band karein. Kuch dheemi saansein lein aur apne peeche ke hafte ko mehsoos karein. Apne saath ke dinon ko apne haathon mein ek shaant, bina likhi kitaab ki tarah sochein, aur khud ko mehsoos karne dein ki kalam aapke thaamne ke liye hai, naram aur bina jaldi ke." },
+      "closingThought": { "en": "Whatever this week held, the story is yours, and it is being written with love.", "hi": "Is hafte mein chaahe jo bhi raha, kahani aapki hai, aur woh pyaar se likhi ja rahi hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "A Breath To Begin", "hi": "Shuru Karne Ke Liye Ek Saans" },
+      "content": { "en": "Breathe in slowly and imagine a fresh, blank page before you. As you breathe out, gently let go of how things 'should' be, and feel free to begin your own way.", "hi": "Dheere saans lein aur apne saamne ek taaza, khaali panna sochein. Jab aap saans chhodein, pyaar se yeh jaane dein ki cheezein kaisi 'honi chahiye', aur apne hi tareeke se shuru karne ke liye aazaad mehsoos karein." },
+      "remember": { "en": "Every breath is a clean page to begin again.", "hi": "Har saans phir se shuru karne ka ek saaf panna hai." },
+      "durationMinutes": 2
+    }
+  }
+]

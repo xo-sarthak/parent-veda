@@ -50,4 +50,11 @@ app.*.map.json
 # Local media — not needed in the repo
 /voice_samples/
 /lib/data/reference-images/
+/lib/data/baby-images/
 /lib/data/Week on Week Pregnancy Tracker.pdf
+
+# Local dev phone IP (machine-specific)
+tools/.phone-ip
+
+# Session handoff notes — local working doc, not part of the repo
+HANDOFF.md

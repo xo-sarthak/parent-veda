@@ -1,0 +1,282 @@
+[
+  {
+    "day": 183,
+    "week": 27,
+    "babyLearning": { "en": "growing rounder and stronger, dreaming in the quiet", "hi": "gol aur mazboot hote hue, shaanti mein sapne dekhte hue" },
+    "grow": {
+      "title": { "en": "These Days Are The Good Old Days", "hi": "Yahi Din Hain Woh Purane Achhe Din" },
+      "insight": { "en": "One day you will look back on this very season and miss it. These ordinary days are already the good old days.", "hi": "Ek din aap isi daur ko mud kar dekhengi aur ise miss karengi. Yeh aam din pehle se hi woh purane achhe din hain." },
+      "expanded": { "en": "It is easy to spend pregnancy waiting — for the next scan, the next milestone, the day the baby finally arrives. But the slow, in-between days you are living right now are precious in a way you may only see later. The quiet evenings, the small kicks, the wondering — one day these will be memories you reach for with a soft ache of love. You do not have to wait for some better moment to begin treasuring this one. The good old days are not behind you or ahead of you. They are happening now, gently, all around you.", "hi": "Pregnancy ko intezaar mein bitaana aasaan hai — agle scan ka, agle milestone ka, us din ka jab baby aakhir aaye. Par jo dheeme, beech ke din aap abhi jee rahi hain woh ek aise tareeke se keemti hain jo shayad aap baad mein hi dekhengi. Woh shaant shaamein, woh chhoti kicks, woh sochna — ek din yeh woh yaadein bann jaayengi jinhe aap pyaar ki ek naram tees ke saath yaad karengi. Is pal ko sambhaalna shuru karne ke liye aapko kisi behtar pal ka intezaar nahi karna. Purane achhe din na aapke peeche hain na aage. Woh abhi ho rahe hain, narmi se, aapke chaaron taraf." },
+      "deepDive": { "en": "Psychologists call savouring the active practice of noticing and lingering on good moments. Studies link it to greater wellbeing — not because life is better, but because we let ourselves feel it fully.", "hi": "Psychologists savouring ko achhe palon ko note karne aur unmein theharne ke ek active abhyaas ke roop mein bataate hain. Studies ise zyada bhalai se jodti hain — isliye nahi ki zindagi behtar hai, balki isliye ki hum khud ko use poori tarah mehsoos karne dete hain." },
+      "remember": { "en": "The days you are in now will one day feel golden.", "hi": "Jin dinon mein aap abhi hain woh ek din sunehre lagenge." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Town Mouse And The Country Mouse", "hi": "Shehri Chuhiya Aur Gaon Ki Chuhiya" },
+      "summary": { "en": "Two mice learn that a simple, peaceful life can be the richest of all.", "hi": "Do chuhiyaan seekhti hain ki ek saadi, shaant zindagi sabse ameer ho sakti hai." },
+      "body": { "en": "A town mouse once visited her cousin in the countryside. The country mouse welcomed her warmly with simple food — a few grains, some roots, a quiet meal under the stars. 'How plain this is!' laughed the town mouse. 'Come to the city, and I will show you how to truly live.'\n\nSo the country mouse followed her to a grand house full of fine cheese and sweet cakes. But just as they began to feast, a great cat leapt out, and the two mice fled for their lives. Again and again the rich food was snatched away by danger, until the country mouse was trembling.\n\n'Cousin,' she said gently, 'your table is full, but your heart is never at rest. I would rather eat my plain grains in peace than feast in fear. A quiet life, savoured slowly, is the sweetest feast of all.' And she went happily home to her simple, peaceful fields.", "hi": "Ek shehri chuhiya ek baar gaon mein apni cousin se milne gayi. Gaon ki chuhiya ne use garmjoshi se saadi khaane se swagat kiya — kuch daane, kuch jadein, taaron ke neeche ek shaant bhojan. 'Yeh kitna saada hai!' shehri chuhiya hansi. 'Shehar aao, aur main tumhe dikhaungi ki sach mein kaise jeena hai.'\n\nTo gaon ki chuhiya uske peeche ek bade ghar gayi jo achhe cheese aur meethe cakes se bhara tha. Par jaise hi unhone khaana shuru kiya, ek badi billi kood padi, aur dono chuhiyaan apni jaan bachaane bhaag gayi. Baar-baar woh ameer khaana khatre ke kaaran chhin gaya, jab tak gaon ki chuhiya kaanpne na lagi.\n\n'Cousin,' usne pyaar se kaha, 'tumhari mez bhari hai, par tumhara dil kabhi aaram mein nahi. Main dar mein daawat karne se behtar apne saade daane shaanti mein khaaungi. Ek shaant zindagi, dheere se savour ki gayi, sabse meethi daawat hai.' Aur woh khushi-khushi apne saade, shaant khaeton mein wapas chali gayi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how grateful you are that they chose your family to come to.", "hi": "Apne baby ko bataayein ki aap kitni aabhaari hain ki unhone aapke parivar mein aana chuna." },
+      "motivation": { "en": "Gratitude spoken aloud lets your baby feel how deeply they are wanted.", "hi": "Bolkar kahi gayi aabhaar aapke baby ko mehsoos karaati hai ki unhe kitni gehrai se chaaha gaya hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Savouring This Moment", "hi": "Is Pal Ko Savour Karna" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to savour the present with your baby", "hi": "Apne baby ke saath vartamaan ko savour karne ka ek chhota dhyan" },
+      "affirmation": { "en": "Right now, in this quiet moment, I have everything I need — you and me, together.", "hi": "Abhi, is shaant pal mein, mere paas sab kuch hai jo mujhe chahiye — tum aur main, saath." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Take three slow breaths, and let the day's hurry fall away. Rest a hand on your belly and simply notice this moment — the warmth, the quiet, the small life within. There is nowhere else you need to be.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein, aur din ki jaldbaazi ko jhad jaane dein. Ek haath pet par rakhein aur bas is pal ko note karein — woh garmjoshi, woh shaanti, andar ki woh nanhi zindagi. Aapko aur kahin hone ki zaroorat nahi." },
+      "closingThought": { "en": "You just gave this moment your full, loving attention. That is a gift you and your baby shared.", "hi": "Aapne abhi is pal ko apna poora, pyaar bhara dhyan diya. Yeh ek tohfa hai jo aapne aur aapke baby ne baanta." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Heartburn Visits In The Evening", "hi": "Jab Shaam Ko Heartburn Aaye" },
+      "content": { "en": "As your baby grows, a warm burn after meals is common now. Try eating smaller portions more often, and sip cool milk or coconut water to soothe it. Avoid lying down right after eating — let your meal settle first.", "hi": "Jaise aapka baby badhta hai, khaane ke baad ek garm jalan ab aam hai. Chhote hisson mein zyada baar khaane ki koshish karein, aur use shaant karne ke liye thanda doodh ya naariyal paani peeyein. Khaane ke turant baad letne se bachein — pehle apne khaane ko settle hone dein." },
+      "remember": { "en": "Small, gentle meals are kinder to your changing body.", "hi": "Chhote, naram bhojan aapke badalte sharir ke liye zyada dayaalu hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 184,
+    "week": 27,
+    "babyLearning": { "en": "tiny eyes beginning to open and close", "hi": "nanhi aankhein khulna aur band hona shuru" },
+    "grow": {
+      "title": { "en": "Savour, Don't Just Survive", "hi": "Savour Karein, Sirf Guzaara Nahi" },
+      "insight": { "en": "There is a difference between getting through your days and truly living them. This season asks you to savour, not just survive.", "hi": "Apne dinon ko bas kaat dene aur unhe sach mein jeene mein ek farak hai. Yeh daur aapse savour karne ko kehta hai, sirf guzaara karne ko nahi." },
+      "expanded": { "en": "Some weeks pass in a blur of tasks and tiredness, and it can feel like enough simply to make it to bedtime. That is human, and there is no shame in it. But this gentle stretch of pregnancy is also asking something sweeter of you: to pause now and then and actually taste your life. The warmth of morning tea, the flutter of a kick, a laugh shared with someone you love — these moments are not in the way of your day. They are the point of it. Surviving keeps you going; savouring is what makes the going worth it.", "hi": "Kuch hafte kaamon aur thakaan ke dhundhle mein guzar jaate hain, aur bas sone ke samay tak pohanchna hi kaafi lag sakta hai. Yeh insaani hai, aur ismein koi sharm nahi. Par pregnancy ka yeh naram daur aapse kuch meetha bhi maang raha hai: bich-bich mein rukna aur sach mein apni zindagi ko chakhna. Subah ki chai ki garmjoshi, ek kick ki phadphadaahat, kisi pyaare ke saath baanti gayi ek hansi — yeh pal aapke din ke raaste mein nahi hain. Yahi to uska matlab hain. Guzaara aapko chalaaye rakhta hai; savouring use chalne layak banata hai." },
+      "deepDive": { "en": "Researchers find that people who deliberately savour everyday pleasures report more joy and less stress than those who rush past them. Attention, not abundance, is what makes a moment rich.", "hi": "Researchers paate hain ki jo log jaan-boojh kar rozana ki khushiyon ko savour karte hain woh unse zyada khushi aur kam tanaav bataate hain jo unhe daud kar paar kar jaate hain. Dhyan, na ki bahutaayat, ek pal ko ameer banata hai." },
+      "remember": { "en": "Don't just pass through your days — taste them.", "hi": "Apne dinon se sirf guzrein mat — unhe chakhein." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Four Friends", "hi": "Chaar Dost" },
+      "summary": { "en": "A deer, a crow, a mouse and a tortoise show that true friends savour life together.", "hi": "Ek hiran, ek kauwa, ek chuha aur ek kachhua dikhaate hain ki sachche dost zindagi ko saath savour karte hain." },
+      "body": { "en": "In a green forest lived four unlikely friends — a gentle deer, a clever crow, a quick little mouse and a slow, wise tortoise. Each day they would gather by the lake at dusk to share food, swap stories and simply enjoy one another's company. Their friendship was the warmest thing in the whole forest.\n\nOne evening the deer did not arrive. The friends grew worried and went searching, and found him caught in a hunter's net. At once they made a plan. The mouse gnawed busily at the ropes, the crow kept watch from above, and the tortoise lent his steady calm. Working together, they freed the deer just in time.\n\nThat night, safe again by the lake, the four friends laughed and feasted under the stars. 'It is not the food that makes this sweet,' said the tortoise softly, 'but the company. A life shared with those you love is a life truly savoured.'", "hi": "Ek hare-bhare jungle mein chaar anokhe dost rehte the — ek naram hiran, ek chalaak kauwa, ek phurtila chhota chuha aur ek dheema, samajhdaar kachhua. Har din woh shaam ko jheel ke kinare ikatthe hote, khaana baantte, kahaniyaan sunaate aur bas ek-doosre ka saath enjoy karte. Unki dosti poore jungle ki sabse garm cheez thi.\n\nEk shaam hiran nahi aaya. Dost chintit ho gaye aur dhoondhne nikle, aur use ek shikaari ke jaal mein phansa paaya. Turant unhone ek plan banaaya. Chuhe ne lagan se rassiyaan kutarni shuru ki, kauwe ne upar se nazar rakhi, aur kachhue ne apni sthir shaanti di. Saath kaam karte hue, unhone hiran ko theek samay par aazaad kar diya.\n\nUs raat, jheel ke kinare phir surakshit, chaaron dost taaron ke neeche hanse aur daawat ki. 'Yeh khaana nahi jo ise meetha banata hai,' kachhue ne dheere se kaha, 'balki yeh saath. Apne pyaaron ke saath baanti gayi zindagi sach mein savour ki gayi zindagi hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the joy they have already brought you, long before arriving.", "hi": "Apne baby ko us khushi ke baare mein bataayein jo unhone aane se bahut pehle hi aapko di hai." },
+      "motivation": { "en": "Your baby is already a giver of joy, and saying so makes it real.", "hi": "Aapka baby pehle se hi khushi dene wala hai, aur ise kehna use asli bana deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Bahar", "hi": "Raag Bahar" },
+      "durationMinutes": 4,
+      "description": { "en": "A spring raga for joy and gentle delight", "hi": "Khushi aur naram aanand ke liye basant ka raag" },
+      "affirmation": { "en": "As this spring melody blooms, so does the quiet joy I carry for you.", "hi": "Jaise yeh basant ki dhun khilti hai, waise hi woh shaant khushi khilti hai jo main tumhare liye rakhti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Allowed To Enjoy This", "hi": "Mujhe Ise Enjoy Karne Ki Ijaazat Hai" },
+      "content": { "en": "I do not have to earn my joy or wait for the 'right' time. I can let myself enjoy this season exactly as it is.", "hi": "Mujhe apni khushi kamani ya 'sahi' samay ka intezaar karna nahi padta. Main khud ko is daur ko jaisa hai waisa hi enjoy karne de sakti hoon." },
+      "remember": { "en": "Joy does not have to be earned to be deserved.", "hi": "Khushi ka haqdaar hone ke liye use kamana zaroori nahi." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 185,
+    "week": 27,
+    "babyLearning": { "en": "fingers growing nimble, often near the face", "hi": "ungliyaan phurtili ho rahi hain, aksar chehre ke paas" },
+    "grow": {
+      "title": { "en": "Gratitude Changes The Day", "hi": "Aabhaar Din Ko Badal Deta Hai" },
+      "insight": { "en": "Nothing about your day has to change for gratitude to change it. One grateful thought can soften an entire afternoon.", "hi": "Aapke din ke baare mein kuch badalne ki zaroorat nahi ki aabhaar use badal de. Ek aabhaari vichaar ek poori dopahar ko naram kar sakta hai." },
+      "expanded": { "en": "On a tiring or worried day, gratitude can feel like the last thing you have energy for. Yet it asks for so little — just a single moment of noticing what is already good. The roof above you, the kick beneath your hand, the cup of warmth in your fingers. None of these fix what is hard, but they quietly widen the picture, reminding you that even a difficult day holds gifts. Gratitude is not pretending everything is perfect. It is choosing to see the good that is already, quietly, there.", "hi": "Ek thake ya chintit din mein, aabhaar woh aakhri cheez lag sakti hai jiske liye aapke paas oorja ho. Phir bhi yeh itna kam maangta hai — bas ek pal jo pehle se achha hai use note karne ka. Aapke upar ki chhat, aapke haath ke neeche ki kick, aapki ungliyon mein garmjoshi ka cup. Inmein se koi jo mushkil hai use theek nahi karta, par yeh chupchaap tasveer ko chaudaa kar deta hai, aapko yaad dilaata hai ki ek kathin din mein bhi tohfe hote hain. Aabhaar yeh dikhaava nahi hai ki sab kuch perfect hai. Yeh us achhe ko dekhne ka chunaav hai jo pehle se, chupchaap, wahan hai." },
+      "deepDive": { "en": "Research on gratitude shows that naming even three small good things a day can measurably lift mood and lower stress over time. The brain leans towards whatever we practise noticing.", "hi": "Aabhaar par hui research dikhaati hai ki din mein teen chhoti achhi cheezon ko naam dena bhi samay ke saath mood ko maapne layak uthata aur tanaav ko ghatata hai. Dimaag us taraf jhukta hai jise hum note karne ka abhyaas karte hain." },
+      "remember": { "en": "Gratitude does not change the day; it changes how the day feels.", "hi": "Aabhaar din ko nahi badalta; yeh badalta hai ki din kaisa mehsoos hota hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Shabari's Berries", "hi": "Shabari Ke Ber" },
+      "summary": { "en": "A humble devotee's love turns simple berries into the sweetest of gifts.", "hi": "Ek vinamra bhakt ka pyaar saade beron ko sabse meethe tohfe mein badal deta hai." },
+      "body": { "en": "Deep in the forest lived Shabari, an old woman of simple means but a heart full of devotion. For many years she had waited, believing that one day Lord Rama would pass by her humble hut. Each morning she swept the path clean and gathered the sweetest berries she could find, just in case he came.\n\nWhen at last Rama arrived, Shabari had nothing grand to offer — only the wild berries she had picked. To make sure they were sweet, she had gently tasted each one first, setting aside any that were sour. With trembling, loving hands she offered them to him.\n\nRama ate the berries with great joy, for he saw the love behind them. 'These are the sweetest offering I have ever received,' he said warmly, 'because they are given with a pure and grateful heart.' And Shabari's small, devoted gift was remembered forever.", "hi": "Jungle mein gehre Shabari rehti thi, ek boodhi mahila saade saadhanon ki par bhakti se bhare dil ki. Kai saalon se woh intezaar kar rahi thi, yeh maan kar ki ek din Bhagwan Ram uski vinamra kutiya ke paas se guzrenge. Har subah woh raasta saaf jhaadti aur sabse meethe ber jo mil sakein woh ikatthe karti, agar woh aayein to.\n\nJab aakhir Ram aaye, Shabari ke paas dene ke liye kuch bada nahi tha — sirf woh jungli ber jo usne chune the. Yeh pakka karne ke liye ki woh meethe hain, usne pyaar se pehle har ek ko chakha tha, khatte ko alag rakh diya tha. Kaanpte, pyaar bhare haathon se usne woh unhe diye.\n\nRam ne ber bade aanand se khaaye, kyunki unhone unke peeche ka pyaar dekha. 'Yeh sabse meetha bhent hai jo maine kabhi paaya hai,' unhone garmjoshi se kaha, 'kyunki yeh ek shuddh aur aabhaari dil se diye gaye hain.' Aur Shabari ka chhota, samarpit tohfa hamesha ke liye yaad rakha gaya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about one small, ordinary moment you are savouring right now.", "hi": "Apne baby ko ek chhote, aam pal ke baare mein bataayein jise aap abhi savour kar rahi hain." },
+      "motivation": { "en": "Sharing a small joy teaches your baby that wonder lives in ordinary things.", "hi": "Ek chhoti khushi baantna aapke baby ko sikhaata hai ki aam cheezon mein hi adbhut basta hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "My Heart Is Full Of Thanks", "hi": "Mera Dil Aabhaar Se Bhara Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A grateful bond affirmation", "hi": "Ek aabhaari bond affirmation" },
+      "affirmation": { "en": "For every quiet day we have shared so far, my heart is full of thanks. You are my greatest gift.", "hi": "Ab tak humne jo bhi shaant din baante, un sab ke liye mera dil aabhaar se bhara hai. Tum mera sabse bada tohfa ho." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When You Feel Hungrier Than Before", "hi": "Jab Aapko Pehle Se Zyada Bhookh Lage" },
+      "content": { "en": "Your appetite may grow now as your baby does, and that is perfectly natural. Reach for filling, steady foods — dal, whole grains, fruit, a handful of nuts — that nourish you both and keep your energy even through the day.", "hi": "Aapki bhookh ab badh sakti hai jaise aapka baby badhta hai, aur yeh bilkul swabhaavik hai. Pet bharne wale, sthir khaane lein — dal, sabut anaaj, phal, mutthi bhar nuts — jo aap dono ko poshan dein aur din bhar aapki oorja barabar rakhein." },
+      "remember": { "en": "A growing appetite is your body asking for what it needs.", "hi": "Badhti bhookh aapka sharir woh maang raha hai jo use chahiye." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 186,
+    "week": 27,
+    "babyLearning": { "en": "settling into gentle rhythms of sleep and waking", "hi": "neend aur jagne ke naram chakron mein bas rahe hain" },
+    "grow": {
+      "title": { "en": "The Ordinary Is The Extraordinary", "hi": "Aam Hi Asaadhaaran Hai" },
+      "insight": { "en": "The most extraordinary thing in your life right now is happening quietly inside an ordinary day. A whole person is being made.", "hi": "Aapki zindagi mein abhi sabse asaadhaaran cheez ek aam din ke andar chupchaap ho rahi hai. Ek poora insaan ban raha hai." },
+      "expanded": { "en": "It is strange how the most miraculous things become ordinary to us. Right now, inside the most regular of days, a heart is beating that did not exist a year ago, fingers are learning to curl, a brain is folding itself into being. You carry a small miracle while you wash dishes and answer messages. The ordinary days are not separate from the extraordinary one — they are the very place where wonder is happening. When you remember this, even a dull afternoon becomes quietly sacred.", "hi": "Ajeeb hai ki sabse chamatkaari cheezein hamare liye kaise aam ban jaati hain. Abhi, sabse saadharan dinon ke andar, ek dil dhadak raha hai jo ek saal pehle tha hi nahi, ungliyaan mudna seekh rahi hain, ek dimaag khud ko aakaar de raha hai. Aap ek chhota chamatkaar dhoti hain jab aap bartan dhoti aur message ka jawaab deti hain. Aam din asaadhaaran din se alag nahi hain — yeh wahi jagah hain jahaan adbhut ho raha hai. Jab aap yeh yaad rakhti hain, ek phika dopahar bhi chupchaap pavitra ban jaata hai." },
+      "deepDive": { "en": "Mindfulness researchers note that awe and wonder can be found in everyday moments, not just grand events — and these small doses of awe are linked to greater calm and connection.", "hi": "Mindfulness researchers note karte hain ki vismay aur adbhut rozana ke palon mein mil sakte hain, sirf bade aayojanon mein nahi — aur vismay ki yeh chhoti khuraakein zyada shaanti aur judaav se judi hain." },
+      "remember": { "en": "The miracle is hiding inside your most ordinary day.", "hi": "Chamatkaar aapke sabse aam din ke andar chhupa hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Monkey King's Sacrifice", "hi": "Vaanar Raja Ka Tyaag" },
+      "summary": { "en": "A wise monkey king teaches that a loving heart finds joy in giving to others.", "hi": "Ek samajhdaar vaanar raja sikhaata hai ki ek pyaar bhara dil doosron ko dene mein khushi paata hai." },
+      "body": { "en": "Long ago, a great monkey king ruled over a troop that lived in a magnificent mango tree by a river. The mangoes were the sweetest in all the land, and the king watched over his people with a loving, grateful heart, treasuring each ordinary day they spent together.\n\nOne day a human king tasted a mango that had floated downstream and, craving more, sent soldiers to seize the tree. The soldiers surrounded it as the frightened monkeys huddled high in the branches, trapped with no way across the wide river.\n\nWithout hesitation, the monkey king stretched his own body across the gap to form a living bridge, so that every one of his troop could climb to safety over his back. Watching this selfless act, the human king was deeply moved. 'I came seeking sweet fruit,' he said softly, 'but I have found something far sweeter — a heart that gives everything for those it loves.'", "hi": "Bahut samay pehle, ek mahaan vaanar raja ek jhund par raaj karta tha jo ek nadi ke kinare ek shaandaar aam ke ped par rehta tha. Aam poori dharti mein sabse meethe the, aur raja apne logon par ek pyaar bhare, aabhaari dil se nazar rakhta tha, har aam din ko sambhaal kar jo woh saath bitaate the.\n\nEk din ek insaani raja ne ek aam chakha jo nadi mein behkar aaya tha aur, aur chaahte hue, ped ko qabze mein lene sainikon ko bheja. Sainikon ne use gher liya jab dare hue vaanar tehniyon mein ooper dubke baithe rahe, phans gaye bina chaudi nadi paar karne ke koi raaste ke.\n\nBina jhijhak, vaanar raja ne apne sharir ko us khaayi par failaakar ek jeevit pul banaaya, taaki uske jhund ka har ek uski peeth par chadh kar surakshit pohanch sake. Is nishvaarth karya ko dekhkar, insaani raja gehrai se dravit ho gaya. 'Main meetha phal dhoondhne aaya tha,' usne dheere se kaha, 'par maine kuch kahin meetha paaya hai — ek dil jo apne pyaaron ke liye sab kuch deta hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby what you are most thankful for today, however small.", "hi": "Apne baby ko bataayein ki aaj aap kis cheez ke liye sabse zyada aabhaari hain, chaahe woh kitni hi chhoti ho." },
+      "motivation": { "en": "Naming today's gift aloud helps your baby grow inside a grateful world.", "hi": "Aaj ke tohfe ko bolkar naam dena aapke baby ko ek aabhaari duniya ke andar badhne mein madad karta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Gurjari Todi", "hi": "Raag Gurjari Todi" },
+      "durationMinutes": 4,
+      "description": { "en": "A morning raga for tender, grateful stillness", "hi": "Komal, aabhaari sthirta ke liye subah ka raag" },
+      "affirmation": { "en": "As this morning melody settles around me, I rest in quiet gratitude for you.", "hi": "Jaise yeh subah ki dhun mere chaaron taraf thamti hai, main tumhare liye shaant aabhaar mein theharti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathing In The Good", "hi": "Achhe Ko Saans Mein Lena" },
+      "content": { "en": "Breathe in slowly and silently name one good thing in this moment. Breathe out and let it settle in your chest. Repeat for five gentle breaths, gathering small gratitudes.", "hi": "Dheere se saans lein aur mann hi mann is pal mein ek achhi cheez ka naam lein. Saans chhodein aur use apne seene mein bas jaane dein. Paanch naram saanson tak dohraayein, chhoti aabhaarein samete hue." },
+      "remember": { "en": "Gratitude breathed in slowly settles deep.", "hi": "Dheere se saans mein li gayi aabhaar gehre bas jaati hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 187,
+    "week": 27,
+    "babyLearning": { "en": "hearing your voice more clearly now", "hi": "ab aapki aawaz aur saaf sun raha hai" },
+    "grow": {
+      "title": { "en": "Be Where Your Feet Are", "hi": "Wahan Rahein Jahaan Aapke Pair Hain" },
+      "insight": { "en": "So much of life is missed by being half-here, our minds racing ahead. Peace begins by being where your feet are.", "hi": "Zindagi ka bahut hissa aadha-yahan rehkar chhoot jaata hai, hamara mann aage daudta hua. Shaanti wahin rehne se shuru hoti hai jahaan aapke pair hain." },
+      "expanded": { "en": "The mind loves to leap ahead — to the birth, the sleepless nights, the years to come. But while it races forward, you can miss the only moment you ever truly have, which is this one. To be where your feet are means to gently bring yourself back: to feel the chair beneath you, the breath in your body, the baby you are carrying right now. The future will arrive in its own time, and you will meet it then. For now, this quiet present is enough, and it is yours to fully inhabit.", "hi": "Mann aage chhalaang lagaana pasand karta hai — janm tak, bina neend ki raaton tak, aane wale saalon tak. Par jab woh aage daudta hai, aap woh ekmaatra pal khoo sakti hain jo aapke paas sach mein hai, jo yahi hai. Wahan rehna jahaan aapke pair hain ka matlab hai khud ko pyaar se wapas laana: apne neeche ki kursi ko mehsoos karna, apne sharir mein saans, woh baby jise aap abhi dho rahi hain. Bhavishya apne samay par aayega, aur aap use tab milengi. Abhi ke liye, yeh shaant vartamaan kaafi hai, aur yeh aapka hai poori tarah ismein basne ke liye." },
+      "deepDive": { "en": "Studies of mind-wandering suggest people are happiest when their attention rests on what they are actually doing. Presence itself, regardless of the activity, tends to lift our wellbeing.", "hi": "Mann ke bhatakne par hui studies bataati hain ki log tab sabse khush hote hain jab unka dhyan us par tika ho jo woh sach mein kar rahe hote hain. Maujoodgi khud, gatividhi chaahe jo bhi ho, hamari bhalai ko uthaati hai." },
+      "remember": { "en": "Your life is happening here, not somewhere ahead.", "hi": "Aapki zindagi yahan ho rahi hai, kahin aage nahi." }
+    },
+    "readToBaby": {
+      "title": { "en": "Birbal And The Most Precious Thing", "hi": "Birbal Aur Sabse Keemti Cheez" },
+      "summary": { "en": "Clever Birbal shows the emperor that the present moment is the truest treasure.", "hi": "Chalaak Birbal badshah ko dikhaata hai ki vartamaan pal hi sabse sachcha khazaana hai." },
+      "body": { "en": "One evening Emperor Akbar grew thoughtful and turned to Birbal. 'Tell me,' he said, 'what is the most precious thing a person can ever possess? Is it gold? Jewels? A grand palace?' The other ministers quickly offered their answers, each naming some great treasure.\n\nBirbal listened quietly, then smiled. 'None of those, Your Majesty,' he said. 'The most precious thing anyone can possess is the present moment — for it is the only thing we truly have, and once it slips by, no amount of gold can buy it back.'\n\nAkbar considered this. 'But the present moment seems so small and ordinary,' he said. Birbal nodded gently. 'And yet, Your Majesty, the whole of our lives is made only of such ordinary moments. The one who learns to treasure this moment, plainly as it is, has found the richest treasure of all.'", "hi": "Ek shaam Badshah Akbar vichaarmagn ho gaya aur Birbal ki taraf muda. 'Batao,' usne kaha, 'sabse keemti cheez kya hai jo koi insaan kabhi rakh sakta hai? Kya yeh sona hai? Jawaharaat? Ek bada mahal?' Doosre mantriyon ne jaldi apne jawaab diye, har ek ne koi bada khazaana bataaya.\n\nBirbal shaanti se sunta raha, phir muskuraaya. 'Inmein se koi nahi, jahaanpanah,' usne kaha. 'Sabse keemti cheez jo koi rakh sakta hai woh vartamaan pal hai — kyunki yahi ek cheez hai jo sach mein hamari hai, aur ek baar yeh phisal jaaye, to kitna bhi sona use wapas nahi khareed sakta.'\n\nAkbar ne is par socha. 'Par vartamaan pal to itna chhota aur aam lagta hai,' usne kaha. Birbal pyaar se sir hilaaya. 'Phir bhi, jahaanpanah, hamari poori zindagi sirf aise aam palon se bani hai. Jo is pal ko, jaisa hai waisa hi, sambhaalna seekh leta hai, usne sabse ameer khazaana paa liya.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how they have already changed your heart, even before you meet.", "hi": "Apne baby ko bataayein ki unhone milne se pehle hi aapka dil kaise badal diya hai." },
+      "motivation": { "en": "Your baby is shaping who you are becoming, and they deserve to hear it.", "hi": "Aapka baby gadh raha hai ki aap kaun ban rahi hain, aur woh ise sunne ka haqdaar hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Am Fully Here With You", "hi": "Main Poori Tarah Tumhare Saath Yahan Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A present-moment bond affirmation", "hi": "Vartamaan pal ka ek bond affirmation" },
+      "affirmation": { "en": "I let go of all that is ahead and all that is behind. Right now, I am fully here, with you.", "hi": "Main woh sab chhodti hoon jo aage hai aur jo peeche hai. Abhi, main poori tarah yahan hoon, tumhare saath." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "This Moment Is Enough", "hi": "Yeh Pal Kaafi Hai" },
+      "content": { "en": "I do not need to be anywhere but here. This quiet moment, just as it is, is already enough.", "hi": "Mujhe yahan ke alawa kahin hone ki zaroorat nahi. Yeh shaant pal, jaisa hai waisa hi, pehle se kaafi hai." },
+      "remember": { "en": "Right here, right now, is enough.", "hi": "Theek yahan, theek abhi, kaafi hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 188,
+    "week": 27,
+    "babyLearning": { "en": "responding gently to light and sound", "hi": "roshni aur aawaz par naram tareeke se jawaab dete hue" },
+    "grow": {
+      "title": { "en": "Notice The Small Wonders", "hi": "Chhote Adbhut Ko Note Karein" },
+      "insight": { "en": "Wonder does not always arrive in grand moments. It hides in small ones, waiting only to be noticed.", "hi": "Adbhut hamesha bade palon mein nahi aata. Yeh chhote palon mein chhupa rehta hai, bas note kiye jaane ka intezaar karte hue." },
+      "expanded": { "en": "It is tempting to wait for the big milestones to feel amazed — the first scan, the first kick, the birth. But wonder is far more generous than that. It is in the way your body softens to hold this life, the small flutter you feel while resting, the way you already love someone you have not yet seen. When you slow down enough to notice these small wonders, life feels fuller, and your gratitude grows. The extraordinary is not somewhere far away. It is scattered, quietly, through your most ordinary hours.", "hi": "Vismit mehsoos karne ke liye bade milestones ka intezaar karna sahaj hai — pehla scan, pehli kick, janm. Par adbhut is se kahin zyada udaar hai. Yeh is tarah mein hai jis tarah aapka sharir is zindagi ko thaamne ke liye naram hota hai, woh chhoti phadphadaahat jo aap aaram karte hue mehsoos karti hain, jis tarah aap pehle se kisi se pyaar karti hain jise aapne abhi dekha bhi nahi. Jab aap in chhote adbhut ko note karne ke liye itna dheema hoti hain, zindagi zyada bhari lagti hai, aur aapki aabhaar badhti hai. Asaadhaaran kahin door nahi hai. Yeh bikhra hua hai, chupchaap, aapke sabse aam ghanton mein." },
+      "deepDive": { "en": "Researchers studying 'micro-moments' of positivity find that noticing small good things, repeated daily, builds lasting emotional resources over time — a slow, gentle kind of resilience.", "hi": "Sakaaratmakta ke 'micro-moments' ka adhyayan karne wale researchers paate hain ki chhoti achhi cheezein note karna, rozana dohraaya jaaye, samay ke saath sthayi bhaavnatmak sansaadhan banata hai — ek dheemi, naram kism ki lachilta." },
+      "remember": { "en": "Small wonders, noticed daily, become a grateful life.", "hi": "Chhote adbhut, rozana note kiye gaye, ek aabhaari zindagi ban jaate hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Stonecutter's Wishes", "hi": "Patthar Todne Wale Ki Ichhaayein" },
+      "summary": { "en": "A restless stonecutter learns that contentment was his all along.", "hi": "Ek bechain patthar todne wala seekhta hai ki santosh hamesha se uska hi tha." },
+      "body": { "en": "A humble stonecutter spent his days chipping stone from the mountainside. One day, resting in the shade, he sighed, 'How I wish I were rich.' A passing spirit heard him and granted his wish — and at once he became a wealthy merchant.\n\nBut soon he envied the king, and wished to be king; and so he was. Then, feeling the sun beat down, he wished to be the sun. As the sun, he found a cloud could block his light, so he became a cloud. As a cloud, he saw he could not move a great mountain, so he wished to become the mountain, mighty and unmovable.\n\nBut as the mountain, he felt a small chip-chip at his base — a stonecutter, carving away at him. He realised the humble stonecutter had a power he had overlooked all along. He wished to be himself once more, and this time he returned to his work content, grateful for the simple, steady life that had been his from the start.", "hi": "Ek vinamra patthar todne wala apne din pahaad se patthar kaatte bitaata tha. Ek din, chhaaya mein aaram karte hue, usne aah bhari, 'Kaash main ameer hota.' Ek guzarti aatma ne use suna aur uski ichha poori ki — aur turant woh ek dhanwaan vyapaari ban gaya.\n\nPar jald hi usne raja se eershya ki, aur raja banna chaaha; aur woh ban gaya. Phir, dhoop ki maar mehsoos karte hue, usne sooraj banna chaaha. Sooraj ke roop mein, usne paaya ki ek baadal uski roshni rok sakta hai, to woh baadal ban gaya. Baadal ke roop mein, usne dekha ki woh ek bade pahaad ko hila nahi sakta, to usne pahaad banna chaaha, vishaal aur na hilne wala.\n\nPar pahaad ke roop mein, usne apne aadhaar par ek chhoti chip-chip mehsoos ki — ek patthar todne wala, use kaat raha tha. Use ehsaas hua ki vinamra patthar todne wale ke paas ek taakat thi jise usne hamesha andekha kiya tha. Usne phir se khud banna chaaha, aur is baar woh apne kaam par santosht laut aaya, us saade, sthir zindagi ke liye aabhaari jo shuru se uski thi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby what a gift these months of carrying them have been to you.", "hi": "Apne baby ko bataayein ki unhe dhone ke yeh mahine aapke liye kitna bada tohfa rahe hain." },
+      "motivation": { "en": "Letting your baby hear your gratitude wraps them in a sense of welcome.", "hi": "Apne baby ko apni aabhaar sunne dena unhe swagat ke ehsaas mein lapet deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Kirwani", "hi": "Raag Kirwani" },
+      "durationMinutes": 4,
+      "description": { "en": "An evening raga for soft reflection and warmth", "hi": "Naram chintan aur garmjoshi ke liye shaam ka raag" },
+      "affirmation": { "en": "As this evening melody glows, I gather the day's small wonders close to us both.", "hi": "Jaise yeh shaam ki dhun chamakti hai, main din ke chhote adbhut ko hum dono ke paas samet leti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When You Crave Something Sweet", "hi": "Jab Aapka Kuch Meetha Khaane Ka Man Kare" },
+      "content": { "en": "A sweet craving is normal and fine to enjoy. Reach gently for naturally sweet foods — a ripe mango, a date, a little jaggery with milk — which satisfy you and bring goodness too, instead of leaving you tired soon after.", "hi": "Meetha khaane ka man karna aam hai aur ise enjoy karna theek hai. Pyaar se prakritik roop se meethe khaane lein — ek paka aam, ek khajoor, doodh ke saath thoda gud — jo aapko santusht karein aur achhaai bhi laayein, bajaaye iske ki aapko jald hi thaka dein." },
+      "remember": { "en": "Naturally sweet foods satisfy the craving and nourish too.", "hi": "Prakritik roop se meethe khaane ichha bhi poori karte hain aur poshan bhi dete hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 189,
+    "week": 27,
+    "babyLearning": { "en": "closing the week, well past the halfway point", "hi": "hafta poora karte hue, aadhe se aage nikal kar" },
+    "grow": {
+      "title": { "en": "Halfway, And Wholly In Love", "hi": "Aadhe Raaste, Aur Poori Tarah Pyaar Mein" },
+      "insight": { "en": "You have come more than halfway, and somewhere along this road, love quietly became the whole of it.", "hi": "Aap aadhe se zyada raasta aa chuki hain, aur is raah mein kahin, pyaar chupchaap iska poora hissa ban gaya." },
+      "expanded": { "en": "Look how far you have travelled. The early weeks of wonder and worry, the slow unfolding of these months — all of it has carried you well past the halfway mark. And somewhere along the way, without a single grand moment to mark it, something shifted. This is no longer just a pregnancy you are managing; it is a person you wholly love. The road ahead still holds the unknown, but you do not face it as the same person who began. You are more, now — softer, stronger, and full of a love that has quietly become the centre of everything.", "hi": "Dekhiye aap kitni door aa chuki hain. Adbhut aur chinta ke shuruaati hafte, in mahinon ka dheere se khulna — yeh sab aapko aadhe nishaan se kaafi aage le aaya hai. Aur is raah mein kahin, ise nishaanit karne ke liye ek bhi bade pal ke bina, kuch badal gaya. Yeh ab sirf ek pregnancy nahi jise aap sambhaal rahi hain; yeh ek insaan hai jise aap poori tarah pyaar karti hain. Aage ki raah abhi bhi anjaana rakhti hai, par aap use us hi insaan ki tarah saamna nahi karti jisne shuruaat ki thi. Aap ab zyada hain — naram, mazboot, aur ek aise pyaar se bhari jo chupchaap har cheez ka kendra ban gaya hai." },
+      "deepDive": { "en": "By the late second trimester, many parents describe a deepening sense of attachment as the baby's movements and rhythms grow familiar. This felt bond is part of how nature gently prepares you to love and protect.", "hi": "Doosri trimester ke aakhir tak, kai parents ek gehraate judaav ki bhaavna bataate hain jaise baby ki harkatein aur chakr jaane-pehchaane lagte hain. Yeh mehsoos kiya gaya bond us tarah ka hissa hai jisse prakriti aapko pyaar aur raksha karne ke liye pyaar se taiyaar karti hai." },
+      "remember": { "en": "More than halfway, and already wholly in love.", "hi": "Aadhe se zyada, aur pehle se poori tarah pyaar mein." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Blossom And Its Season", "hi": "Phool Aur Uska Mausam" },
+      "summary": { "en": "A young blossom learns that every season of growing has its own quiet beauty.", "hi": "Ek nanha phool seekhta hai ki badhne ke har mausam ki apni shaant sundarta hoti hai." },
+      "body": { "en": "On a slender branch, a young bud waited impatiently to bloom. All around, the older flowers were already open and glowing, and the little bud felt it was being left behind. 'When will my turn come?' it sighed to the breeze. 'I want to be beautiful now.'\n\nThe wise old tree rustled gently. 'Little one, you are not behind. You are exactly in your own season. The bud that rushes its bloom opens weak and fades fast. But the one that takes its time, drinking in sun and rain, opens fullest of all.'\n\nSo the bud breathed, and waited, and let itself grow at its own pace. When at last it opened, it bloomed wider and lived longer than any flower on the branch. 'I see now,' it whispered. 'Each season of growing was never wasted — it was making me ready to bloom.'", "hi": "Ek patli tehni par, ek nanhi kali besabri se khilne ka intezaar kar rahi thi. Chaaron taraf, purane phool pehle se khile aur damak rahe the, aur nanhi kali ko laga ki woh peeche reh rahi hai. 'Mera number kab aayega?' usne hawa se aah bhari. 'Main abhi sundar banna chaahti hoon.'\n\nSamajhdaar purana ped pyaar se sarsaraaya. 'Nanhi, tum peeche nahi ho. Tum theek apne mausam mein ho. Jo kali apne khilne mein jaldi karti hai woh kamzor khulti aur jaldi murjha jaati hai. Par jo apna samay leti hai, dhoop aur baarish pee kar, woh sabse poori khilti hai.'\n\nTo kali ne saans li, aur intezaar kiya, aur khud ko apni gati se badhne diya. Jab aakhir woh khili, woh tehni ke kisi bhi phool se zyada chaudi khili aur zyada lambi jee. 'Ab samajh aaya,' usne dheere se kaha. 'Badhne ka har mausam kabhi bekaar nahi gaya — woh mujhe khilne ke liye taiyaar kar raha tha.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how deeply loved they are, now that you are well past halfway together.", "hi": "Apne baby ko bataayein ki unhe kitni gehrai se pyaar kiya jaata hai, ab jab aap saath mein aadhe se aage nikal aaye hain." },
+      "motivation": { "en": "Reaching this milestone together is a moment of love worth naming aloud.", "hi": "Is milestone tak saath pohanchna pyaar ka ek aisa pal hai jise bolkar kehna chahiye." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "How Far We Have Come", "hi": "Hum Kitni Door Aa Gaye" },
+      "durationMinutes": 3,
+      "description": { "en": "A reflective meditation on your journey so far", "hi": "Ab tak ke aapke safar par ek chintanshil dhyan" },
+      "affirmation": { "en": "We have travelled so far together, you and I, and the love between us has only grown.", "hi": "Hum saath itni door aa gaye hain, tum aur main, aur hamare beech ka pyaar bas badha hi hai." },
+      "introduction": { "en": "Settle comfortably and close your eyes. Take a few slow breaths and let your body soften. Gently look back over these months — the early days, the first flutters, all you have carried. Rest a hand on your belly and feel how far you and your baby have come, together.", "hi": "Aaram se baithein aur aankhein band karein. Kuch dheemi saansein lein aur apne sharir ko naram hone dein. Pyaar se in mahinon par peeche dekhein — shuruaati din, pehli phadphadaahat, sab kuch jo aapne dhoya. Ek haath pet par rakhein aur mehsoos karein ki aap aur aapka baby kitni door aa gaye, saath." },
+      "closingThought": { "en": "You and your baby have come a long, loving way. Let that quiet pride and gratitude stay with you.", "hi": "Aap aur aapka baby ek lambi, pyaar bhari raah aa gaye hain. Us shaant garv aur aabhaar ko apne saath rehne dein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "A Breath Of Thanks", "hi": "Aabhaar Ki Ek Saans" },
+      "content": { "en": "Rest a hand on your belly. Breathe in slowly and silently say 'thank you' for how far you have come. Breathe out and let warmth spread through you. Repeat for five gentle breaths.", "hi": "Ek haath pet par rakhein. Dheere se saans lein aur mann hi mann 'shukriya' kahein ki aap kitni door aa gayi hain. Saans chhodein aur garmjoshi ko apne andar failne dein. Paanch naram saanson tak dohraayein." },
+      "remember": { "en": "A breath of thanks turns this moment into a gift.", "hi": "Aabhaar ki ek saans is pal ko ek tohfe mein badal deti hai." },
+      "durationMinutes": 1
+    }
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "day": 143,
+    "week": 20,
+    "intro": {
+      "en": "A moment to build the father you want to be.",
+      "hi": "Wo pita banne ka ek pal, jo aap banna chahte hain."
+    },
+    "learn": {
+      "module": {
+        "en": "Becoming A Father",
+        "hi": "Pita Banna"
+      },
+      "title": {
+        "en": "Presence Over Provision",
+        "hi": "Saath Hona, Sirf Dena Nahi"
+      },
+      "insight": {
+        "en": "Your presence is the first and greatest gift you will ever give. It lays the foundation for trust and security.",
+        "hi": "Aapka saath hi pehla aur sabse bada tohfa hai jo aap denge. Yahi bharose aur surakshakti ki neev rakhta hai."
+      },
+      "expanded": {
+        "en": "Many men believe that being a good father means being a good provider. Providing matters — but a child rarely remembers the size of the house. They remember whether you were there. Presence is not grand or expensive. It is showing up, again and again, in small ordinary moments: a hand on the shoulder, a question asked and truly listened to, a bedtime you did not miss. The work you do to provide is one kind of love. The time you choose to give is the proof of it.",
+        "hi": "Kai mard maante hain ki achha pita banne ka matlab hai achha kamaane wala banna. Dena zaroori hai — par bachcha shaayad hi ghar ka size yaad rakhta hai. Wo yeh yaad rakhta hai ki aap uske saath the ya nahi. Saath hona bhaari ya mehnga nahi hota. Yeh baar-baar chhote, aam palon mein haazir hona hai: kandhe par ek haath, ek sawaal jo poochha aur sach mein suna gaya, ek raat jo aapne miss nahi ki. Jo aap kamaane ke liye karte hain wo ek tarah ka pyaar hai. Jo waqt aap dena chunte hain, wahi uska saboot hai."
+      },
+      "deepDive": {
+        "en": "Decades of work on child development point to one quiet truth: a child's sense of safety grows from a caregiver who is consistently present and responsive — not from what the family owns. Long before your baby can speak, they are quietly learning whether the world, and you, can be relied upon. The good news is gentle, not pressured: you do not have to be perfect or always available. You only have to keep returning. That steady returning is what your child will one day carry into the world as their own quiet confidence.",
+        "hi": "Bachchon ke vikaas par dashakon ki research ek shaant sach ki taraf ishaara karti hai: bachche ki surakshakti ka ehsaas us caregiver se badhta hai jo lagataar saath aur responsive ho — is se nahi ki parivaar ke paas kya hai. Aapka baby bolne se bahut pehle hi yeh seekh raha hota hai ki duniya, aur aap, bharose ke laayak hain ya nahi. Achhi baat pyaar bhari hai, pressure nahi: aapko perfect ya har waqt available rehne ki zaroorat nahi. Aapko bas baar-baar lautna hai. Yahi sthir lautna ek din aapka bachcha apne andar ke shaant aatmvishwaas ki tarah duniya mein le jayega."
+      },
+      "remember": {
+        "en": "A child remembers who showed up, not what was bought.",
+        "hi": "Bachche ko yaad rehta hai kaun saath tha, na ki kya khareeda gaya."
+      }
+    },
+    "talkToBaby": {
+      "title": {
+        "en": "Your Biggest Life Lesson",
+        "hi": "Aapki Zindagi Ka Sabse Bada Sabak"
+      },
+      "prompt": {
+        "en": "Tell your baby about the one lesson that changed everything for you.",
+        "hi": "Apne baby ko us ek sabak ke baare mein bataayein jisne aap ke liye sab kuch badal diya."
+      },
+      "motivation": {
+        "en": "One day your child will stand at the same crossroads you once did — and your voice will already be there.",
+        "hi": "Ek din aapka bachcha usi mod par khada hoga jahan kabhi aap the — aur aapki aawaz pehle se wahan hogi."
+      }
+    },
+    "mission": {
+      "title": {
+        "en": "The Quiet Support",
+        "hi": "Khamosh Saath"
+      },
+      "action": {
+        "en": "Bring her a glass of water or her favourite snack — without being asked.",
+        "hi": "Use ek glass paani ya uska pasandeeda snack laakar dein — bina maange."
+      },
+      "durationMinutes": 5
+    }
+  }
+]

@@ -32,6 +32,15 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   final PageController _pageController = PageController(viewportFraction: 0.92);
   int _cardIndex = 0;
 
+  /// Keeps the week strip's State (scroll position, controller) alive across the
+  /// many rebuilds the collapsing header triggers while scrolling.
+  final GlobalKey _stripKey = GlobalKey();
+
+  /// Collapsing-header geometry: the compact info row (trimester + week + date +
+  /// progress) is always pinned; the week-dot carousel below it collapses away.
+  static const double _compactHeaderHeight = 64;
+  static const double _stripHeaderHeight = 76;
+
   /// Tracks which week the PageView is currently built for, so we can reset to
   /// the first card whenever the user switches weeks.
   int? _builtForWeek;
@@ -47,6 +56,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   @override
   void dispose() {
     _c.removeListener(_onControllerChanged);
+    // Stop any baby voice when this screen goes away (tab switch, pop, etc.) so
+    // narration never keeps playing after you leave.
+    BabyVoiceService.instance.stop();
     _pageController.dispose();
     super.dispose();
   }
@@ -103,10 +115,12 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           AnimatedBuilder(
             animation: BabyVoiceService.instance,
             builder: (context, _) {
-              final muted = BabyVoiceService.instance.isMuted;
+              final muted =
+                  BabyVoiceService.instance.isMutedFor(VoiceScope.journey);
               return IconButton(
                 tooltip: muted ? 'Unmute baby voice' : 'Mute baby voice',
-                onPressed: () => BabyVoiceService.instance.toggleMute(),
+                onPressed: () =>
+                    BabyVoiceService.instance.toggleMuteFor(VoiceScope.journey),
                 icon: Icon(
                   muted ? Icons.hearing_disabled_rounded : Icons.hearing_rounded,
                   color: muted ? AppTheme.neutral400 : AppTheme.primary500,
@@ -141,37 +155,139 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final selectedWeek = _c.selectedWeek;
     _builtForWeek ??= selectedWeek;
 
-    return Column(
-      children: [
-        const SizedBox(height: 2),
-        Center(
-          child: Text(
-            S(_c.language)
-                .weekOf(selectedWeek, PregnancyController.lastContentWeek),
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: AppTheme.neutral500),
+    final selRange = _c.weekDates(selectedWeek);
+    final dateText = _fmtRange(selRange.start, selRange.end);
+
+    // One persistent strip instance (GlobalKey) so its scroll survives the
+    // collapsing header's frequent rebuilds.
+    final strip = _WeekStrip(
+      key: _stripKey,
+      controller: _c,
+      onScrollActive: _onWeekScroll,
+    );
+
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerScrolled) => [
+        SliverOverlapAbsorber(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+          sliver: SliverPersistentHeader(
+            pinned: true,
+            delegate: _WeekHeaderDelegate(
+              controller: _c,
+              strip: strip,
+              dateText: dateText,
+              compactHeight: _compactHeaderHeight,
+              stripHeight: _stripHeaderHeight,
+            ),
           ),
         ),
-        const SizedBox(height: 10),
-        _TrimesterBar(controller: _c),
-        const SizedBox(height: 6),
-        _WeekStrip(controller: _c, onScrollActive: _onWeekScroll),
-        const SizedBox(height: 8),
-        Expanded(
-          child: _c.isLocked(selectedWeek)
-              ? Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: LockedWeekView(
-                    week: selectedWeek,
-                    currentWeek: _c.currentWeek,
-                    language: _c.language,
-                  ),
-                )
-              : _buildCardStack(selectedWeek),
+      ],
+      body: _c.isLocked(selectedWeek)
+          ? _lockedBody(selectedWeek)
+          : _pagerBody(selectedWeek),
+    );
+  }
+
+  /// Locked weeks: a single non-scrolling panel that still sits under the header.
+  Widget _lockedBody(int week) {
+    return Builder(
+      builder: (context) => CustomScrollView(
+        slivers: [
+          SliverOverlapInjector(
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: LockedWeekView(
+                week: week,
+                currentWeek: _c.currentWeek,
+                language: _c.language,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The swipeable card carousel. Each card is its own vertical scroll view so
+  /// scrolling a card collapses the shared header; page dots float at the foot.
+  Widget _pagerBody(int week) {
+    final cards = _cardsFor(week);
+    if (cards.isEmpty) {
+      return Center(child: Text(S(_c.language).noContent));
+    }
+
+    // Auto-play the active dialogue card after this frame settles.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _autoPlayActive(week);
+    });
+
+    return Stack(
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          itemCount: cards.length,
+          onPageChanged: (i) {
+            BabyVoiceService.instance.stop();
+            setState(() => _cardIndex = i);
+            _autoPlayActive(week);
+          },
+          itemBuilder: (context, index) => _cardPage(week, index, cards[index]),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 12,
+          child: IgnorePointer(
+            child: Center(
+              child: _DotsPill(
+                count: cards.length,
+                active: _cardIndex.clamp(0, cards.length - 1),
+              ),
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  /// One card as a vertical scroll view tied to the NestedScrollView. The
+  /// week-40 finale stays full-bleed (it manages its own internal scroll).
+  Widget _cardPage(int week, int index, Widget card) {
+    final bool fullBleed = card is CelebrationCard;
+    return Builder(
+      builder: (context) {
+        final injector = SliverOverlapInjector(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        );
+        final chrome = CardChrome(
+          gradient: gradientForWeek(week),
+          child: card,
+        );
+        return CustomScrollView(
+          key: PageStorageKey('wk${week}_c$index'),
+          slivers: [
+            injector,
+            if (fullBleed)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                  child: chrome,
+                ),
+              )
+            else
+              SliverPadding(
+                // Bottom room so content clears the floating page dots.
+                padding: const EdgeInsets.fromLTRB(8, 10, 8, 92),
+                sliver: SliverToBoxAdapter(child: chrome),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -204,47 +320,6 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (key == _lastAutoKey) return;
     _lastAutoKey = key;
     BabyVoiceService.instance.autoPlay(text, cardKey: key, lang: lang);
-  }
-
-  Widget _buildCardStack(int week) {
-    final cards = _cardsFor(week);
-    if (cards.isEmpty) {
-      return Center(child: Text(S(_c.language).noContent));
-    }
-
-    // Auto-play the active dialogue card after this frame settles.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _autoPlayActive(week);
-    });
-
-    return Column(
-      children: [
-        Expanded(
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: cards.length,
-            onPageChanged: (i) {
-              // Swiping to a different card stops the previous card's audio
-              // immediately; auto-play (if any) then fires for the new card.
-              BabyVoiceService.instance.stop();
-              setState(() => _cardIndex = i);
-              _autoPlayActive(week);
-            },
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-                child: CardChrome(
-                  gradient: gradientForWeek(week),
-                  child: cards[index],
-                ),
-              );
-            },
-          ),
-        ),
-        _PageDots(count: cards.length, active: _cardIndex.clamp(0, cards.length - 1)),
-        const SizedBox(height: 14),
-      ],
-    );
   }
 
   /// The ordered card list for a week. Reflect & Remember is second-last and
@@ -344,53 +419,112 @@ class _Segment extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Trimester indicator + progress
+//  Collapsing header: trimester + week + date (pinned) over the week strip
 // ---------------------------------------------------------------------------
 
-class _TrimesterBar extends StatelessWidget {
-  const _TrimesterBar({required this.controller});
+/// The pinned, collapsing header for the weekly stack. A compact info row
+/// (trimester name · week · date range · progress) stays visible at all times;
+/// the week-dot carousel underneath collapses smoothly as the cards scroll.
+class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _WeekHeaderDelegate({
+    required this.controller,
+    required this.strip,
+    required this.dateText,
+    required this.compactHeight,
+    required this.stripHeight,
+  });
+
   final PregnancyController controller;
+  final Widget strip;
+  final String dateText;
+  final double compactHeight;
+  final double stripHeight;
 
   @override
-  Widget build(BuildContext context) {
+  double get minExtent => compactHeight;
+
+  @override
+  double get maxExtent => compactHeight + stripHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final extent = (maxExtent - shrinkOffset).clamp(minExtent, maxExtent);
+    final stripArea = (extent - compactHeight).clamp(0.0, stripHeight);
+    // 1 when fully open, 0 when fully collapsed.
+    final reveal = stripHeight == 0 ? 0.0 : (stripArea / stripHeight);
+
     final text = Theme.of(context).textTheme;
     final s = S(controller.language);
     final week = controller.selectedWeek;
-    final progress = (week / PregnancyController.lastContentWeek).clamp(0.0, 1.0);
+    final progress =
+        (week / PregnancyController.lastContentWeek).clamp(0.0, 1.0);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      // A hairline that fades in as the strip collapses, separating the pinned
+      // header from the scrolling cards beneath.
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                s.trimesterName(week),
-                style: text.headlineSmall?.copyWith(
-                  color: AppTheme.primary600,
-                  fontWeight: FontWeight.w700,
-                ),
+          SizedBox(
+            height: compactHeight,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          s.trimesterName(week),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.titleLarge?.copyWith(
+                            color: AppTheme.primary600,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${s.weekWord} $week · $dateText',
+                        style: text.labelMedium?.copyWith(
+                          color: AppTheme.neutral600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 7),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 4,
+                      backgroundColor: AppTheme.surfaceContainerHigh,
+                      valueColor:
+                          const AlwaysStoppedAnimation(AppTheme.secondary500),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                '${s.weekWord} $week · ${(progress * 100).round()}%',
-                style: text.labelSmall,
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(40),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: progress),
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOutCubic,
-              builder: (context, value, _) => LinearProgressIndicator(
-                value: value,
-                minHeight: 4,
-                backgroundColor: AppTheme.surfaceContainerHigh,
-                valueColor: const AlwaysStoppedAnimation(AppTheme.secondary500),
+          // Collapsible week-dot carousel: shrinks in height and fades together.
+          ClipRect(
+            child: SizedBox(
+              height: stripArea,
+              width: double.infinity,
+              child: OverflowBox(
+                minHeight: 0,
+                maxHeight: stripHeight,
+                alignment: Alignment.topCenter,
+                child: Opacity(
+                  opacity: reveal.clamp(0.0, 1.0),
+                  child: SizedBox(height: stripHeight, child: strip),
+                ),
               ),
             ),
           ),
@@ -398,6 +532,14 @@ class _TrimesterBar extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool shouldRebuild(covariant _WeekHeaderDelegate old) =>
+      old.dateText != dateText ||
+      old.controller.selectedWeek != controller.selectedWeek ||
+      old.controller.language != controller.language ||
+      old.compactHeight != compactHeight ||
+      old.stripHeight != stripHeight;
 }
 
 // ---------------------------------------------------------------------------
@@ -405,7 +547,11 @@ class _TrimesterBar extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _WeekStrip extends StatefulWidget {
-  const _WeekStrip({required this.controller, required this.onScrollActive});
+  const _WeekStrip({
+    super.key,
+    required this.controller,
+    required this.onScrollActive,
+  });
 
   final PregnancyController controller;
 
@@ -422,7 +568,7 @@ class _WeekStripState extends State<_WeekStrip> {
 
   /// Each week occupies a fixed slot; with symmetric padding of half the
   /// leftover width, a week is centred exactly when scrollOffset == i * extent.
-  static const double _extent = 64;
+  static const double _extent = 58;
 
   /// True while we drive the scroll ourselves (tap-to-center / snap), so the
   /// scroll listener doesn't fight the animation by re-selecting.
@@ -499,82 +645,60 @@ class _WeekStripState extends State<_WeekStrip> {
   @override
   Widget build(BuildContext context) {
     final c = _c;
-    final text = Theme.of(context).textTheme;
     final weeks = c.availableWeeks;
-    final selRange = c.weekDates(c.selectedWeek);
 
-    return Column(
-      children: [
-        // Selected week's date range — one calm line, not crammed per pill.
-        Text(
-          _fmtRange(selRange.start, selRange.end),
-          style: text.labelMedium?.copyWith(
-            color: AppTheme.neutral600,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          // Tall enough that the selected circle's soft glow isn't clipped flat
-          // at the top/bottom (which made the round shadow look rectangular).
-          height: 88,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final padH =
-                  ((constraints.maxWidth - _extent) / 2).clamp(0.0, 9999.0);
-              return NotificationListener<ScrollNotification>(
-                onNotification: (n) {
-                  if (n is ScrollStartNotification) {
-                    if (!_programmatic) widget.onScrollActive(true);
-                  } else if (n is ScrollUpdateNotification) {
-                    _onScrollUpdate();
-                  } else if (n is ScrollEndNotification) {
-                    _snapToNearest();
-                    widget.onScrollActive(false);
-                  }
-                  return false;
+    // Just the tightened week-dot carousel — the date range now lives in the
+    // pinned header line, and the redundant "weeks" caption is gone.
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 2),
+      child: SizedBox(
+        height: 70,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final padH =
+                ((constraints.maxWidth - _extent) / 2).clamp(0.0, 9999.0);
+            return NotificationListener<ScrollNotification>(
+              onNotification: (n) {
+                if (n is ScrollStartNotification) {
+                  if (!_programmatic) widget.onScrollActive(true);
+                } else if (n is ScrollUpdateNotification) {
+                  _onScrollUpdate();
+                } else if (n is ScrollEndNotification) {
+                  _snapToNearest();
+                  widget.onScrollActive(false);
+                }
+                return false;
+              },
+              child: ListView.builder(
+                controller: _scroll,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                // Don't clip children — let the round glow spill past cells.
+                clipBehavior: Clip.none,
+                padding: EdgeInsets.symmetric(horizontal: padH),
+                itemExtent: _extent,
+                itemCount: weeks.length,
+                itemBuilder: (context, i) {
+                  final week = weeks[i];
+                  return Center(
+                    child: _WeekDot(
+                      week: week,
+                      locked: c.isLocked(week),
+                      isCurrent: week == c.currentWeek,
+                      isSelected: week == c.selectedWeek,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        c.selectWeek(week);
+                        _centerSelected();
+                      },
+                    ),
+                  );
                 },
-                child: ListView.builder(
-                  controller: _scroll,
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  // Don't clip children — let the round glow spill past cells.
-                  clipBehavior: Clip.none,
-                  padding: EdgeInsets.symmetric(horizontal: padH),
-                  itemExtent: _extent,
-                  itemCount: weeks.length,
-                  itemBuilder: (context, i) {
-                    final week = weeks[i];
-                    return Center(
-                      child: _WeekDot(
-                        week: week,
-                        locked: c.isLocked(week),
-                        isCurrent: week == c.currentWeek,
-                        isSelected: week == c.selectedWeek,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          c.selectWeek(week);
-                          _centerSelected();
-                        },
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-        const SizedBox(height: 4),
-        Text(
-          S(c.language).weeksLabel,
-          style: text.labelSmall?.copyWith(
-            color: AppTheme.secondary500,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -615,7 +739,7 @@ class _WeekDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final double size = isSelected ? 56 : 46;
+    final double size = isSelected ? 50 : 42;
     final Color bg = isSelected
         ? AppTheme.secondary500
         : AppTheme.neutral100.withValues(alpha: 0.7);
@@ -638,17 +762,16 @@ class _WeekDot extends StatelessWidget {
               : null,
           boxShadow: isSelected
               ? [
-                  // Wide soft coral glow…
+                  // Soft coral glow — kept compact so it reads round in the
+                  // tighter strip without clipping at the row edges.
                   BoxShadow(
-                    color: AppTheme.secondary500.withValues(alpha: 0.45),
-                    blurRadius: 24,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 9),
+                    color: AppTheme.secondary500.withValues(alpha: 0.42),
+                    blurRadius: 16,
+                    offset: const Offset(0, 5),
                   ),
-                  // …with a tighter close shadow for depth.
                   BoxShadow(
-                    color: AppTheme.secondary300.withValues(alpha: 0.40),
-                    blurRadius: 7,
+                    color: AppTheme.secondary300.withValues(alpha: 0.38),
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ]
@@ -669,6 +792,34 @@ class _WeekDot extends StatelessWidget {
 // ---------------------------------------------------------------------------
 //  Page indicator dots
 // ---------------------------------------------------------------------------
+
+/// The page dots wrapped in a soft floating pill so they stay legible over the
+/// scrolling card content at the foot of the carousel.
+class _DotsPill extends StatelessWidget {
+  const _DotsPill({required this.count, required this.active});
+
+  final int count;
+  final int active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(40),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary900.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: _PageDots(count: count, active: active),
+    );
+  }
+}
 
 class _PageDots extends StatelessWidget {
   const _PageDots({required this.count, required this.active});

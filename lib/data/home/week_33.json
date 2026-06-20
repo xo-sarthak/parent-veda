@@ -1,0 +1,282 @@
+[
+  {
+    "day": 225,
+    "week": 33,
+    "babyLearning": { "en": "growing rounder and softer, settling lower in your belly", "hi": "aur gol aur naram hote hue, pet mein neeche bas rahe hue" },
+    "grow": {
+      "title": { "en": "Patience Is A Daily Practice", "hi": "Sabra Ek Rozana Abhyaas Hai" },
+      "insight": { "en": "Patience is not a trait you are born with or without. It is a small practice you return to, day after day.", "hi": "Sabra koi aisi cheez nahi jo aap leke paida hoti hain ya nahi. Yeh ek chhota abhyaas hai jismein aap din-ba-din lautti hain." },
+      "expanded": { "en": "We often imagine patient people simply have it easy — calm by nature, never tested. But patience is built, not given. It is the slow choice to wait one more breath before reacting, to soften when you would rather rush. In these final weeks, life keeps asking you to wait: for appointments, for sleep, for your baby's arrival. Each small wait is quiet training. You are not behind for finding it hard; you are practising the very steadiness your child will one day lean against. Patience grows the way muscles do — through gentle, repeated use.", "hi": "Hum aksar sochte hain ki sabra wale logon ko aasaani hoti hai — swabhaav se shaant, kabhi pareeksha mein nahi. Par sabra banaya jaata hai, diya nahi jaata. Yeh react karne se pehle ek aur saans rukne ka dheema faisla hai, jhalla padne ki jagah naram ho jaane ka. In aakhri hafton mein, zindagi aapse baar-baar intezaar maangti hai: appointments ke liye, neend ke liye, apne baby ke aane ke liye. Har chhota intezaar ek shaant training hai. Ise mushkil paana aapko peeche nahi karta; aap wahi sthirta abhyaas kar rahi hain jis par aapka bachcha ek din tikega. Sabra waise hi badhta hai jaise muscles — naram, baar-baar istemaal se." },
+      "deepDive": { "en": "Psychologists find patience is less a fixed personality and more a skill that strengthens with practice, especially when we pause and name what we feel. Each small wait you handle calmly rewires you toward calm.", "hi": "Psychologists paate hain ki sabra ek tay personality se kam aur ek aisa kaushal zyada hai jo abhyaas se mazboot hota hai, khaaskar jab hum rukte hain aur jo mehsoos karte hain use naam dete hain. Har chhota intezaar jo aap shaanti se sambhaalti hain, aapko shaanti ki taraf naye sire se gadhta hai." },
+      "remember": { "en": "Patience is built one small wait at a time.", "hi": "Sabra ek-ek chhote intezaar se banta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Pumpkin And The Oak Tree", "hi": "Kaddu Aur Bargad Ka Ped" },
+      "summary": { "en": "A boastful vine learns that quick growth is not the same as lasting strength.", "hi": "Ek sheykhibaaz bel seekhti hai ki tezi se badhna aur tikne wali taakat ek baat nahi." },
+      "body": { "en": "In a quiet garden, a pumpkin vine sprang up beside an old oak tree. In a single summer the vine raced along the ground, swelled into a great round pumpkin, and grew so fast it could hardly believe itself. 'Look at me,' it laughed at the oak. 'In one season I have grown enormous, while you have barely changed at all. Why do you grow so slowly, old tree?'\n\nThe oak only rustled its leaves. 'I have stood here for a hundred years,' it said gently. 'I grow slowly because I grow to last.'\n\nWhen autumn came, the first hard frost touched the garden. By morning the proud pumpkin had softened and sunk into the earth, its fast life over in a single season. But the old oak stood firm against the cold wind, as it had through a hundred winters before. Some things, it knew, are worth growing slowly for.", "hi": "Ek shaant baageeche mein, ek bargad ke purane ped ke bagal mein ek kaddu ki bel ug aayi. Ek hi garmi mein bel zameen par tezi se phaili, ek bade gol kaddu mein phool gayi, aur itni jaldi badhi ki use khud par yaqeen nahi hua. 'Mujhe dekho,' usne bargad par hanste hue kaha. 'Ek hi mausam mein main vishaal ho gayi, jabki tum mushkil se badle ho. Tum itne dheere kyun badhte ho, boodhe ped?'\n\nBargad ne bas apne patte sarsaraaye. 'Main yahan sau saal se khada hoon,' usne pyaar se kaha. 'Main dheere isliye badhta hoon kyunki main tikne ke liye badhta hoon.'\n\nJab patjhad aaya, pehli kadi paale ne baageeche ko chhua. Subah tak ghamandi kaddu naram pad kar zameen mein dhans gaya, uska tez jeevan ek hi mausam mein khatam. Par boodha bargad thandi hawa ke saamne mazboot khada raha, jaise woh pehle sau sardiyon mein khada raha tha. Kuch cheezein, woh jaanta tha, dheere badhne layak hoti hain." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the patience you are learning right now, so that you can carry it gently to them.", "hi": "Apne baby ko us sabra ke baare mein bataayein jo aap abhi seekh rahi hain, taaki aap use pyaar se untak le ja sakein." },
+      "motivation": { "en": "The calm you practise today becomes the calm your child will feel in your arms.", "hi": "Aaj jo shaanti aap abhyaas karti hain, wahi shaanti aapka bachcha aapki baahon mein mehsoos karega." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Slowing Down Together", "hi": "Saath Mein Dheere Hona" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to soften the pace of your day", "hi": "Apne din ki raftaar ko naram karne ka ek chhota dhyan" },
+      "affirmation": { "en": "There is no hurry here. We have all the time we need, you and I.", "hi": "Yahan koi jaldi nahi hai. Hamare paas utna samay hai jitna chahiye, tum aur main." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Take three slow breaths, making each one a little longer than the last. Imagine the whole day slowing down around you, like a river easing into a calm, wide pool, with you and your baby resting at its centre.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein, har ek ko pichli se thoda lamba banaate hue. Sochein ki poora din aapke aas-paas dheema ho raha hai, jaise ek nadi ek shaant, chaude taalaab mein dhal rahi ho, jiske beech mein aap aur aapka baby aaram kar rahe hain." },
+      "closingThought": { "en": "Carry this slower pace with you. There is nothing you cannot do a little more gently today.", "hi": "Is dheemi raftaar ko apne saath le jaayein. Aaj aisa kuch nahi jo aap thodi aur narmi se na kar sakein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "The Slow Count", "hi": "Dheemi Ginti" },
+      "content": { "en": "Breathe in for a count of four, then breathe out for a count of six, letting the out-breath be longer and softer. Repeat for one slow minute and feel your body settle.", "hi": "Chaar tak ginte hue saans andar lein, phir chhah tak ginte hue saans baahar chhodein, baahar ki saans ko lamba aur naram rakhte hue. Ek dheeme minute tak dohraayein aur apne sharir ko thamte mehsoos karein." },
+      "remember": { "en": "A longer out-breath is a quiet signal of safety to your body.", "hi": "Lambi saans baahar chhodna aapke sharir ke liye surakshit hone ka ek shaant ishaara hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 226,
+    "week": 33,
+    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "nanhi saansein abhyaas karte hue, duniya ke liye taiyaar hote hue" },
+    "grow": {
+      "title": { "en": "The Slow Yes", "hi": "Dheema Haan" },
+      "insight": { "en": "A quick yes can come from pressure. A slow yes comes from your own heart — and it is far kinder.", "hi": "Ek jaldi haan dabaav se aa sakti hai. Ek dheema haan aapke apne dil se aata hai — aur woh kahin zyada dayaalu hota hai." },
+      "expanded": { "en": "When others want answers from us — visitors, advice-givers, even our own racing thoughts — we often rush to say yes just to ease the moment. But a hurried yes can quietly cost us our peace. Learning to take a breath before answering is a gentle act of patience with yourself. 'Let me think about that' is a complete sentence. In these tender weeks, you are allowed to slow your yeses, to feel into what truly fits. The slow yes protects your calm — and a calm mother is exactly what your baby is waiting for.", "hi": "Jab doosre humse jawaab chaahte hain — milne aane wale, salah dene wale, ya hamare apne tez vichaar — hum aksar pal ko aasaan karne ke liye jaldi haan keh dete hain. Par ek jaldbaaz haan chupchaap hamari shaanti ki keemat le sakti hai. Jawaab dene se pehle ek saans lena seekhna khud ke saath sabra ka ek naram kaam hai. 'Mujhe is par sochne dein' ek poora vaakya hai. In naazuk hafton mein, aapko apne haan ko dheema karne ki ijaazat hai, yeh mehsoos karne ki ki kya sach mein theek baithta hai. Dheema haan aapki shaanti bachaata hai — aur ek shaant maa hi to woh hai jiska aapka baby intezaar kar raha hai." },
+      "deepDive": { "en": "Researchers note that pausing before committing reduces later resentment and decision-fatigue. A few seconds of reflection helps you answer from your values rather than from pressure.", "hi": "Researchers note karte hain ki haami bharne se pehle rukna baad ki naraazgi aur decision-fatigue ko kam karta hai. Kuch second ka sochna aapko dabaav ke bajaaye apne mool-bhaavon se jawaab dene mein madad karta hai." },
+      "remember": { "en": "You are allowed to take a breath before you answer.", "hi": "Aapko jawaab dene se pehle ek saans lene ki ijaazat hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Heron Who Could Not Wait", "hi": "Bagula Jo Intezaar Nahi Kar Saka" },
+      "summary": { "en": "A greedy heron's impatience leaves him with nothing at all.", "hi": "Ek laalchi bagule ki betaabi use kuch bhi nahi chhodti." },
+      "body": { "en": "An old heron lived beside a shallow pond full of fish. But he was lazy and impatient, and disliked the work of catching them one by one. So he hatched a cunning plan. 'Friends,' he told the fish, 'a great drought is coming and this pond will dry up. Let me carry you, one at a time, to a deep lake over the hill where you will be safe.'\n\nThe frightened fish agreed. But the heron, too impatient to keep his promise, simply flew each fish to a rock and ate it. Day by day the pond emptied, until only a clever old crab remained.\n\n'Carry me too,' said the crab. The heron, greedy and quick, agreed at once. But as they flew, the crab saw the bones below and understood the trick. With his sharp claws he gripped the heron's neck and held tight until the deceitful bird fell. The crab walked calmly home — patience and a clear eye had saved him where haste had ruined the rest.", "hi": "Ek boodha bagula machhliyon se bhare ek chhichhle taalaab ke kinare rehta tha. Par woh aalsi aur betaab tha, aur unhe ek-ek karke pakadne ka kaam pasand nahi karta tha. To usne ek chalaak yojana banaayi. 'Doston,' usne machhliyon se kaha, 'ek bada sookha aane wala hai aur yeh taalaab sookh jaayega. Mujhe tumhe ek-ek karke pahaadi ke us paar ek gehri jheel mein le jaane do jahan tum surakshit rahoge.'\n\nDari hui machhliyaan maan gayi. Par bagula, apna vaada nibhaane ke liye bahut betaab, har machhli ko bas ek chattan tak udaata aur khaa jaata. Din-ba-din taalaab khaali hota gaya, jab tak sirf ek chalaak boodha kekda baaki na raha.\n\n'Mujhe bhi le chalo,' kekde ne kaha. Bagula, laalchi aur jaldbaaz, turant maan gaya. Par udte waqt, kekde ne neeche haddiyaan dekhi aur chaal samajh gaya. Apne tez panjon se usne bagule ki gardan pakdi aur tab tak kasi rakhi jab tak woh dhokhebaaz pakshi gir na gaya. Kekda shaanti se ghar chala gaya — sabra aur ek saaf nazar ne use bachaaya jahan jaldbaazi ne baaki sabko barbaad kiya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby that you will never rush them, that they can take all the time they need to come and to grow.", "hi": "Apne baby ko bataayein ki aap unhe kabhi jaldbaazi nahi karaayengi, ki woh aane aur badhne ke liye jitna samay chahiye le sakte hain." },
+      "motivation": { "en": "Telling them now teaches your own heart to wait without worry.", "hi": "Abhi unhe yeh kehna aapke apne dil ko bina chinta ke intezaar karna sikhaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Wait With An Open Heart", "hi": "Main Khule Dil Se Intezaar Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A patient bond affirmation", "hi": "Ek sabra bhara bond affirmation" },
+      "affirmation": { "en": "I do not need to hurry these days along. I wait for you with a calm, open heart.", "hi": "Mujhe in dinon ko jaldi guzaarne ki zaroorat nahi. Main tumhara intezaar ek shaant, khule dil se karti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Heartburn Keeps You Up", "hi": "Jab Seene Ki Jalan Sone Na De" },
+      "content": { "en": "If a burning feeling rises after meals these days, try eating smaller portions more often, and avoid lying down for an hour after you eat. A glass of cool milk or a few soaked almonds can soothe the burn gently.", "hi": "Agar in dinon khaane ke baad seene mein jalan uthti hai, to thodi-thodi maatra mein zyada baar khaane ki koshish karein, aur khaane ke ek ghante tak letne se bachein. Ek glass thanda doodh ya kuch bhige badaam jalan ko pyaar se shaant kar sakte hain." },
+      "remember": { "en": "Smaller, slower meals are kinder to your body now.", "hi": "Chhote, dheeme khaane abhi aapke sharir ke liye zyada dayaalu hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 227,
+    "week": 33,
+    "babyLearning": { "en": "bones growing firm, kicks feeling stronger", "hi": "haddiyaan mazboot hote hue, laatein zyada tez lagte hue" },
+    "grow": {
+      "title": { "en": "Rushing Teaches Rushing", "hi": "Jaldbaazi Jaldbaazi Sikhaati Hai" },
+      "insight": { "en": "Children learn pace from us. A rushed home raises a rushed child; a calm one offers a different gift.", "hi": "Bachche raftaar humse seekhte hain. Ek jaldbaaz ghar ek jaldbaaz bachcha paalta hai; ek shaant ghar ek alag tohfa deta hai." },
+      "expanded": { "en": "Long before a child understands hurry, they absorb its feeling — the clipped voice, the tight shoulders, the sense that there is never quite enough time. Just as easily, they absorb calm: a parent who moves slowly, speaks gently, and treats moments as roomy rather than rushed. You are setting the pace your child will one day call normal. In these last weeks, practising an unhurried rhythm is not only kinder to you; it is the first tempo your baby will learn to live by. Slow is something you can teach simply by being it.", "hi": "Ek bachche ke jaldbaazi samajhne se bahut pehle, woh uska ehsaas seekh leta hai — kati hui aawaz, kasse hue kandhe, yeh ehsaas ki samay kabhi kaafi nahi. Utni hi aasaani se, woh shaanti bhi seekhta hai: ek parent jo dheere chalta hai, narmi se bolta hai, aur palon ko jaldbaaz nahi, khula maanta hai. Aap woh raftaar tay kar rahi hain jise aapka bachcha ek din normal kahega. In aakhri hafton mein, ek bina jaldbaazi wali laya abhyaas karna sirf aapke liye dayaalu nahi; yeh woh pehli taal hai jis par aapka baby jeena seekhega. Dheere hona aap bas use hokar sikha sakti hain." },
+      "deepDive": { "en": "Child development research shows children mirror a caregiver's tempo and stress level long before they understand words. A calm, unhurried pace literally helps shape their developing nervous system.", "hi": "Child development research dikhaati hai ki bachche caregiver ki raftaar aur tanaav ke star ki nakal shabd samajhne se bahut pehle karte hain. Ek shaant, bina jaldbaazi wali raftaar sach mein unke vikasit hote nervous system ko gadhne mein madad karti hai." },
+      "remember": { "en": "The pace you keep becomes the pace your child knows.", "hi": "Jo raftaar aap rakhti hain wahi raftaar aapka bachcha jaanta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "How Valmiki Became A Poet", "hi": "Valmiki Kaise Kavi Bane" },
+      "summary": { "en": "A wandering man finds his life's work through years of quiet, patient devotion.", "hi": "Ek bhatakta hua aadmi saalon ki shaant, sabra bhari bhakti se apne jeevan ka kaam paata hai." },
+      "body": { "en": "Long ago there lived a man named Ratnakar who had lost his way in life. One day he met a wise sage who asked him a single gentle question that changed everything, and Ratnakar resolved to sit and meditate until his heart grew clear.\n\nHe sat so still and so long that he did not move for years. Seasons passed. Vines crept over him, and a great anthill — a 'valmika' — slowly rose around his body, until he was almost hidden within it. Still he waited, patient and unhurried, his mind growing quieter and deeper with each passing season.\n\nAt last he rose from the anthill, calm and transformed, and was given the new name Valmiki, 'the one who came from the anthill.' With his still, patient mind he went on to compose the great Ramayana. His story whispers a truth worth keeping: the deepest things in us are not rushed into being — they ripen slowly, in their own quiet time.", "hi": "Bahut samay pehle Ratnakar naam ka ek aadmi rehta tha jo jeevan mein apna raasta kho chuka tha. Ek din usse ek gyaani sant mile jinhone use ek hi naram sawaal poocha jisne sab kuch badal diya, aur Ratnakar ne thaan liya ki woh tab tak baith kar dhyan karega jab tak uska dil saaf na ho jaaye.\n\nWoh itna sthir aur itni der baitha ki saalon tak nahi hila. Mausam guzar gaye. Bel uske upar chadh aayi, aur ek bada bambi ka tila — ek 'valmika' — dheere-dheere uske sharir ke around uth gaya, jab tak woh uske andar lagbhag chhup na gaya. Phir bhi woh intezaar karta raha, sabra bhara aur bina jaldbaazi ke, har guzarte mausam ke saath uska mann zyada shaant aur gehra hota gaya.\n\nAakhir mein woh bambi se utha, shaant aur badla hua, aur use naya naam mila Valmiki, 'jo bambi se aaya.' Apne sthir, sabra bhare mann se usne aage chalkar mahaan Ramayana rachi. Uski kahani ek rakhne layak sachai dheere se kehti hai: hamare andar ki sabse gehri cheezein jaldbaazi mein nahi banti — woh dheere pakti hain, apne hi shaant samay mein." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you have been waiting for them through all these long months, and how the wait has been worth it.", "hi": "Apne baby ko bataayein ki aap in saare lambe mahinon mein unka intezaar kar rahi hain, aur yeh intezaar kitna sahi raha hai." },
+      "motivation": { "en": "Naming the wait aloud turns it from something endured into something treasured.", "hi": "Intezaar ko bolkar kehna use sehne wali cheez se ek sambhaali jaane wali cheez bana deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Megh", "hi": "Raag Megh" },
+      "durationMinutes": 4,
+      "description": { "en": "A monsoon raga to play any time for calm", "hi": "Ek baarish ka raag, shaanti ke liye kisi bhi samay sunne ko" },
+      "affirmation": { "en": "Like rain that comes in its own time, all good things arrive when they are ready.", "hi": "Jaise baarish apne samay par aati hai, waise hi sabhi achhi cheezein taiyaar hone par aati hain." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Do Not Have To Hurry", "hi": "Mujhe Jaldbaazi Nahi Karni" },
+      "content": { "en": "There is time enough for what truly matters today. I can move slowly and still do everything I need to.", "hi": "Aaj jo sach mein maayne rakhta hai uske liye kaafi samay hai. Main dheere chal sakti hoon aur phir bhi woh sab kar sakti hoon jiski zaroorat hai." },
+      "remember": { "en": "Slowing down rarely costs as much as we fear.", "hi": "Dheere hona utna mehnga shaayad hi pade jitna hum darte hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 228,
+    "week": 33,
+    "babyLearning": { "en": "filling out softly, curling snug in less space", "hi": "naram tarah se bharte hue, kam jagah mein aaram se simatte hue" },
+    "grow": {
+      "title": { "en": "Let The Pace Be Gentle", "hi": "Raftaar Ko Naram Rehne Dein" },
+      "insight": { "en": "Not everything has to be fast to be good. Some of the best things in life unfold at a gentle, unhurried pace.", "hi": "Achha hone ke liye har cheez ka tez hona zaroori nahi. Zindagi ki kuch sabse achhi cheezein ek naram, bina jaldbaazi wali raftaar par khulti hain." },
+      "expanded": { "en": "The world rewards speed — quick replies, fast results, doing more in less time. But babies live by a different clock. They feed slowly, settle slowly, grow at their own pace, and ask us to slow down to meet them. This is not a delay to push through; it is an invitation. Practising a gentle pace now, in these final weeks, prepares you for the unhurried rhythm of life with a newborn. Let some things take as long as they take. A gentle pace is not falling behind — it is choosing to be fully present.", "hi": "Duniya tezi ko inaam deti hai — jaldi jawaab, tez nateeje, kam samay mein zyada karna. Par babies ek alag ghadi se jeete hain. Woh dheere doodh peete hain, dheere thamte hain, apni raftaar par badhte hain, aur humse unse milne ke liye dheere hone ko kehte hain. Yeh koi der nahi jise dhakelna hai; yeh ek nyota hai. Abhi, in aakhri hafton mein, ek naram raftaar abhyaas karna aapko ek navjaat ke saath jeevan ki bina jaldbaazi wali laya ke liye taiyaar karta hai. Kuch cheezon ko utna samay lene dein jitna woh lein. Naram raftaar peeche rehna nahi hai — yeh poori tarah maujood rehna chunna hai." },
+      "deepDive": { "en": "Infant specialists note that newborns set their own pace for feeding, sleeping and soothing, and rushing them often backfires. Parents who attune to a baby's slower rhythm tend to find feeding and bonding easier.", "hi": "Infant specialists note karte hain ki navjaat doodh peene, sone aur shaant hone ki apni raftaar tay karte hain, aur unhe jaldbaazi karaana aksar ulta padta hai. Jo parents baby ki dheemi laya ke saath dhal jaate hain unhe doodh pilaana aur bonding aasaan lagta hai." },
+      "remember": { "en": "A gentle pace lets you be fully present.", "hi": "Naram raftaar aapko poori tarah maujood rehne deti hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Restless Young Monk", "hi": "Betaab Naujawaan Bhikshu" },
+      "summary": { "en": "A young monk learns that wisdom cannot be hurried into being.", "hi": "Ek naujawaan bhikshu seekhta hai ki gyaan ko jaldbaazi mein nahi laaya ja sakta." },
+      "body": { "en": "In a forest monastery there lived a young monk who was always in a hurry. He wanted to become wise at once. 'Master,' he begged the old teacher, 'tell me the shortest way to enlightenment. I cannot bear to wait years for it.'\n\nThe old monk smiled and handed him an empty bowl. 'Fill this with water from the river, but you must walk slowly,' he said. Eager and quick, the young monk ran to the river and raced back — but he had spilled nearly all the water on the way. Three times he hurried, and three times the bowl arrived almost empty.\n\nThe fourth time, tired of failing, he walked back slowly, watching each careful step. The bowl arrived brimming full. The old monk nodded. 'You see? What you carry within is the same. Rush, and it spills away. Move with patience, and it stays. Wisdom is not won by hurrying — only by walking gently, step by step.'", "hi": "Ek jangal ke math mein ek naujawaan bhikshu rehta tha jo hamesha jaldbaazi mein rehta tha. Woh turant gyaani banna chaahta tha. 'Guru,' usne boodhe shikshak se vinti ki, 'mujhe gyaan ka sabse chhota raasta bataayein. Main iske liye saalon intezaar nahi kar sakta.'\n\nBoodhe bhikshu ne muskuraate hue use ek khaali katora diya. 'Ise nadi ke paani se bharo, par tumhe dheere chalna hoga,' usne kaha. Utsaahit aur tez, naujawaan bhikshu nadi ki taraf dauda aur wapas bhaaga — par woh raaste mein lagbhag saara paani gira aaya. Teen baar usne jaldbaazi ki, aur teeno baar katora lagbhag khaali pohancha.\n\nChauthi baar, baar-baar fail hone se thakkar, woh dheere chalkar lauta, apne har dhyaan bhare kadam ko dekhte hue. Katora labalab bhara pohancha. Boodhe bhikshu ne sir hilaaya. 'Dekha? Jo tum andar le jaate ho woh bhi yahi hai. Jaldbaazi karo, aur woh chhalak jaata hai. Sabra se chalo, aur woh ruka rehta hai. Gyaan jaldbaazi se nahi jeeta jaata — sirf narmi se chalkar, kadam-dar-kadam.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby that they may take their own time with everything, and that you will be patient with them always.", "hi": "Apne baby ko bataayein ki woh har cheez mein apna samay le sakte hain, aur aap unke saath hamesha sabra rakhengi." },
+      "motivation": { "en": "The freedom to go slowly is one of the safest gifts a parent can give.", "hi": "Dheere chalne ki aazaadi ek parent ke de sakne wale sabse surakshit tohfon mein se ek hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Quiet, Roomy Moment", "hi": "Ek Shaant, Khula Pal" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to make time feel spacious", "hi": "Samay ko khula mehsoos karaane ka ek chhota dhyan" },
+      "affirmation": { "en": "In this moment, there is nowhere to rush and nothing to chase. We can simply be.", "hi": "Is pal mein, kahin jaldi nahi karni aur kuch peeche nahi bhaagna. Hum bas reh sakte hain." },
+      "introduction": { "en": "Settle into a comfortable position and let your eyes close. Take a few slow breaths, and with each one imagine the moment around you growing wider and roomier, as if time itself has softened. Rest your hands on your belly and feel that there is space enough for both of you to simply be, with nothing pulling at you.", "hi": "Ek aaramdayak position mein baithein aur aankhein band hone dein. Kuch dheemi saansein lein, aur har ek ke saath sochein ki aapke aas-paas ka pal chaude aur khula ho raha hai, jaise samay khud naram ho gaya ho. Apne haath pet par rakhein aur mehsoos karein ki aap dono ke bas rehne ke liye kaafi jagah hai, jismein kuch aapko kheench na raha ho." },
+      "closingThought": { "en": "Time was always roomy enough. Carry this spaciousness into the rest of your day.", "hi": "Samay hamesha kaafi khula tha. Is khulepan ko apne baaki din mein le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Into The Belly", "hi": "Pet Tak Saans Lein" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise gently under your hand, then breathe out and feel it fall. Stay with this soft rise and fall for one quiet minute.", "hi": "Ek haath pet ke neeche rakhein. Dheere saans andar lein aur use apne haath ke neeche naram se uthte mehsoos karein, phir saans baahar chhodein aur use girte mehsoos karein. Ek shaant minute tak is naram uthne-girne ke saath rahein." },
+      "remember": { "en": "Belly breathing tells your whole body it is safe to slow down.", "hi": "Pet se saans lena aapke poore sharir ko batata hai ki dheere hona surakshit hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 229,
+    "week": 33,
+    "babyLearning": { "en": "skin growing smooth, eyes opening and closing", "hi": "tvacha chikni hote hue, aankhein khulte aur band hote hue" },
+    "grow": {
+      "title": { "en": "Repeat, Without Resentment", "hi": "Dohraayein, Bina Naraazgi Ke" },
+      "insight": { "en": "Much of loving care is repetition. The grace lies in doing the same gentle thing again, without bitterness.", "hi": "Pyaar bhari dekhbhaal ka bahut hissa dohraana hai. Sundarta usi naram cheez ko phir se karne mein hai, bina kadwaahat ke." },
+      "expanded": { "en": "Caring for a baby means doing the same things over and over: the same soothing, the same feeding, the same answer to the same small need. It can wear on us — the part of the mind that whispers, 'I just did this.' But resentment is not in the repeating; it is in resisting the repeating. When you can meet a familiar task as if for the first time, patience returns. These weeks of waiting are practice for that grace: doing what must be done again, gently, without keeping score. Repetition, met with softness, becomes a kind of love.", "hi": "Ek baby ki dekhbhaal ka matlab hai wahi cheezein baar-baar karna: wahi dilaasa, wahi doodh pilaana, wahi chhoti zaroorat ka wahi jawaab. Yeh humein thaka sakta hai — mann ka woh hissa jo phusphusaata hai, 'maine abhi to yeh kiya.' Par naraazgi dohraane mein nahi hai; yeh dohraane ka virodh karne mein hai. Jab aap ek jaane-pehchaane kaam se aise mil sakti hain jaise pehli baar, sabra laut aata hai. Intezaar ke yeh hafte usi sundarta ka abhyaas hain: jo phir karna hai use narmi se karna, bina hisaab rakhe. Dohraana, narmi se mila, ek tarah ka pyaar ban jaata hai." },
+      "deepDive": { "en": "Psychologists find that resentment grows not from a task itself but from the resistance we add to it. Meeting repetitive care with acceptance lowers stress and protects the warmth in the relationship.", "hi": "Psychologists paate hain ki naraazgi kaam se nahi balki us virodh se badhti hai jo hum uske saath jodte hain. Baar-baar wali dekhbhaal ko sweekaar ke saath milna tanaav kam karta hai aur rishte ki garmjoshi bachaata hai." },
+      "remember": { "en": "It is the resisting, not the repeating, that tires us.", "hi": "Humein dohraana nahi, uska virodh karna thakaata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Birbal And The King Who Wanted It Now", "hi": "Birbal Aur Woh Raja Jo Abhi Chaahta Tha" },
+      "summary": { "en": "Clever Birbal shows the emperor that some things simply cannot be hurried.", "hi": "Chalaak Birbal badshah ko dikhaata hai ki kuch cheezon mein jaldbaazi nahi ho sakti." },
+      "body": { "en": "One morning Emperor Akbar woke impatient. 'Birbal,' he announced, 'I want a baby boy raised into a wise full-grown man by the end of this month. See that it is done!' The ministers trembled, for the demand was impossible. But Birbal only bowed calmly and said, 'As you wish, Your Majesty.'\n\nThe month passed, and Birbal returned empty-handed. 'Where is my grown man?' the emperor frowned. Birbal spread his hands. 'Your Majesty, I planted the finest mango seed the very day you ordered it. I watered it daily and begged it to hurry — yet it refuses to give ripe fruit before its season. Some things will not be rushed, however great the one who commands them.'\n\nAkbar's frown melted into a laugh. 'You are right, Birbal. A child, like a tree, grows in its own good time. Even a king cannot hurry what nature ripens slowly.'", "hi": "Ek subah Badshah Akbar betaab uthe. 'Birbal,' unhone elaan kiya, 'main is mahine ke ant tak ek nanhe ladke ko ek gyaani poore bade aadmi mein bada hua chahta hoon. Iska intezaam karo!' Mantri kaanp gaye, kyunki maang namumkin thi. Par Birbal ne bas shaanti se jhuk kar kaha, 'Jaisa aap chahein, jahaanpanah.'\n\nMahina guzra, aur Birbal khaali haath lauta. 'Mera bada aadmi kahan hai?' badshah ne tyoriyaan chadhaayi. Birbal ne haath phailaaye. 'Jahaanpanah, maine usi din sabse achha aam ka beej boya jis din aapne hukm diya tha. Maine roz use paani diya aur jaldi karne ki vinti ki — par woh apne mausam se pehle paka phal dene se inkaar karta hai. Kuch cheezon mein jaldbaazi nahi hoti, hukm dene wala chaahe kitna bhi bada ho.'\n\nAkbar ki tyoriyaan ek hansi mein pighal gayi. 'Tum sahi ho, Birbal. Ek bachcha, ek ped ki tarah, apne achhe samay par badhta hai. Ek raja bhi use jaldi nahi kar sakta jise kudrat dheere pakaati hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the calm you most want to bring them, the quiet steadiness you hope they always feel near you.", "hi": "Apne baby ko us shaanti ke baare mein bataayein jo aap sabse zyada unke paas laana chaahti hain, woh shaant sthirta jo aap chahti hain woh aapke paas hamesha mehsoos karein." },
+      "motivation": { "en": "Speaking the calm you wish for them is the first way you begin offering it.", "hi": "Jo shaanti aap unke liye chaahti hain use bolkar kehna use dena shuru karne ka pehla tareeka hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Begin Again With Love", "hi": "Main Pyaar Se Phir Shuru Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A patient bond affirmation", "hi": "Ek sabra bhara bond affirmation" },
+      "affirmation": { "en": "However many times I must begin again, I will do it gently, for you and for me.", "hi": "Mujhe jitni bhi baar phir se shuru karna pade, main use narmi se karungi, tumhare liye aur apne liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Your Appetite Feels Small", "hi": "Jab Bhookh Kam Lage" },
+      "content": { "en": "As your baby takes up more room now, big meals can feel too heavy. Try eating little and often — a handful of fruit, some curd, a few nuts spread through the day keep your energy steady without crowding your stomach.", "hi": "Ab jab aapka baby zyada jagah le raha hai, bade khaane bahut bhaari lag sakte hain. Thoda aur baar-baar khaane ki koshish karein — mutthi bhar phal, thoda dahi, kuch nuts din bhar mein faila kar lein, isse aapki energy sthir rehti hai bina pet bhare." },
+      "remember": { "en": "Little and often is easier on a crowded belly.", "hi": "Thoda aur baar-baar ek bhare pet par zyada aasaan hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 230,
+    "week": 33,
+    "babyLearning": { "en": "gaining gentle weight, rounding out a little more", "hi": "naram vazan badhaate hue, thoda aur gol hote hue" },
+    "grow": {
+      "title": { "en": "Patience Outlasts Frustration", "hi": "Sabra Jhunjhlaahat Se Zyada Tikta Hai" },
+      "insight": { "en": "Frustration burns hot and fades fast. Patience burns low and steady — and it is what remains.", "hi": "Jhunjhlaahat tez jalti hai aur jaldi bujh jaati hai. Sabra dheema aur sthir jalta hai — aur wahi bacha rehta hai." },
+      "expanded": { "en": "Frustration feels powerful in the moment — loud, urgent, sure it will solve things. But it rarely lasts, and it rarely helps; it flares up and burns out, often leaving regret behind. Patience is quieter and far stronger. It does not roar; it simply stays, holding on a little longer than the difficulty does. In the long stretch of parenting, the calm that endures matters more than the heat that erupts. When frustration rises in you, you do not have to fight it. Just outlast it. Wait one breath longer, and patience will still be standing when the frustration has burned itself out.", "hi": "Jhunjhlaahat us pal mein shaktishaali lagti hai — zoradaar, foran, yaqeen ki yeh sab theek kar degi. Par yeh shaayad hi tikti hai, aur shaayad hi madad karti hai; yeh bhadakti hai aur bujh jaati hai, aksar peeche pachhtaava chhodte hue. Sabra zyada shaant aur kahin zyada mazboot hai. Yeh garajta nahi; yeh bas ruka rehta hai, mushkil se thoda zyada der tak thaame. Parenting ke lambe safar mein, jo shaanti tikti hai woh us garmi se zyada maayne rakhti hai jo phootti hai. Jab aapmein jhunjhlaahat uthe, aapko usse ladne ki zaroorat nahi. Bas use se zyada tik jaayein. Ek saans zyada rukein, aur jab jhunjhlaahat khud bujh chuki hogi tab bhi sabra khada hoga." },
+      "deepDive": { "en": "Emotion research shows that intense feelings like anger and frustration peak quickly and naturally subside within minutes if we do not feed them. Patience often means simply giving the storm time to pass.", "hi": "Emotion research dikhaati hai ki gussa aur jhunjhlaahat jaisi tez bhaavnaayein jaldi apne shikhar par pohanchti hain aur agar hum unhe na badhaayein to kuch minton mein khud shaant ho jaati hain. Sabra ka matlab aksar bas toofan ko guzarne ka samay dena hota hai." },
+      "remember": { "en": "Outlast the frustration; the patience will still be there.", "hi": "Jhunjhlaahat se zyada tik jaayein; sabra phir bhi wahin hoga." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Farmer Who Rushed His Crops", "hi": "Woh Kisaan Jisne Apni Fasal Mein Jaldbaazi Ki" },
+      "summary": { "en": "An impatient farmer learns the hard way that growth cannot be forced.", "hi": "Ek betaab kisaan kathin tareeke se seekhta hai ki badhne ko zabardasti nahi karaya ja sakta." },
+      "body": { "en": "A young farmer planted rice in his field and waited eagerly for it to grow. Each morning he walked out to check the tender green shoots. But to his eyes they seemed to grow far too slowly. 'At this rate the harvest will never come,' he grumbled impatiently.\n\nSo one evening he had a foolish idea. He went into the field and, one by one, gently pulled each little shoot upward, just a bit, to help it grow taller faster. Pleased with his clever work, he went home and told his family the crop was now well ahead.\n\nBut the next morning he returned to find every single shoot wilted and dying, their roots torn loose by his tugging. His whole crop was ruined. The old farmer next door shook his head kindly. 'Rice grows in its own time, my son. You cannot pull a living thing into being faster — you can only tend it, and wait.'", "hi": "Ek naujawaan kisaan ne apne khet mein dhaan boya aur use badhte dekhne ka besabri se intezaar karne laga. Har subah woh naazuk hare ankuron ko dekhne baahar jaata. Par uski nazron mein woh bahut hi dheere badhte lagte. 'Is raftaar se to fasal kabhi nahi aayegi,' woh betaabi se budbudaaya.\n\nTo ek shaam use ek bewakoofi ka khayaal aaya. Woh khet mein gaya aur, ek-ek karke, har chhote ankur ko thoda upar kheencha, taaki woh tezi se lamba badhe. Apne chalaak kaam se khush, woh ghar gaya aur apne parivar ko bataaya ki fasal ab kaafi aage hai.\n\nPar agli subah woh laut kar dekhta hai ki har ek ankur murjha kar mar raha hai, unki jadein uske kheenchne se ukhad gayi thi. Uski poori fasal barbaad ho gayi. bagal wale boodhe kisaan ne pyaar se sir hilaaya. 'Dhaan apne samay par badhta hai, mere bete. Tum ek jeevit cheez ko tezi se hone ke liye kheench nahi sakte — tum use sirf sambhaal sakte ho, aur intezaar kar sakte ho.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how the very best things in life take time, just as they have taken these long, patient months.", "hi": "Apne baby ko bataayein ki zindagi ki sabse achhi cheezein samay leti hain, bilkul jaise unhone yeh lambe, sabra bhare mahine liye hain." },
+      "motivation": { "en": "Teaching them that good things grow slowly begins with how you wait for them.", "hi": "Unhe yeh sikhana ki achhi cheezein dheere badhti hain is se shuru hota hai ki aap unka kaise intezaar karti hain." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Suha", "hi": "Raag Suha" },
+      "durationMinutes": 4,
+      "description": { "en": "An afternoon raga for gentle, settled calm", "hi": "Ek dopahar ka raag, naram, thami hui shaanti ke liye" },
+      "affirmation": { "en": "As this afternoon melody settles, so does my heart, easy and unhurried.", "hi": "Jaise yeh dopahar ki dhun thamti hai, waise hi mera dil bhi, sehaj aur bina jaldbaazi ke." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "Good Things Are Worth The Wait", "hi": "Achhi Cheezein Intezaar Ke Layak Hain" },
+      "content": { "en": "I will not measure these days by how slowly they pass. The wait is part of the gift, and the gift is on its way.", "hi": "Main in dinon ko is se nahi naapungi ki woh kitne dheere guzarte hain. Intezaar tohfe ka hissa hai, aur tohfa apne raaste par hai." },
+      "remember": { "en": "The wait is part of the gift.", "hi": "Intezaar tohfe ka hissa hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 231,
+    "week": 33,
+    "babyLearning": { "en": "closing the week, settling and growing steadily", "hi": "hafta poora karte hue, sthir thamte aur badhte hue" },
+    "grow": {
+      "title": { "en": "Breathe Through The Wait", "hi": "Intezaar Mein Saans Lein" },
+      "insight": { "en": "When the waiting feels long, your breath is always there — a steady place to return to, one moment at a time.", "hi": "Jab intezaar lamba lage, aapki saans hamesha wahin hai — ek sthir jagah jahan lautna hai, ek-ek pal karke." },
+      "expanded": { "en": "These final weeks can stretch out long — the body heavy, the heart eager, the question of 'when' always near. Waiting is its own quiet work, and it asks for patience you cannot force. But you do not have to carry the whole wait at once. You only have to breathe through this one moment, and then the next. Your breath is a steady companion through the longest stretch, gently returning you to now, where your baby already is. The wait will end exactly when it should. Until then, you breathe, and you are already where you need to be.", "hi": "Yeh aakhri hafte lambe khinch sakte hain — sharir bhaari, dil betaab, 'kab' ka sawaal hamesha paas. Intezaar apne aap mein ek shaant kaam hai, aur yeh ek aisa sabra maangta hai jise zabardasti nahi laaya ja sakta. Par aapko poora intezaar ek saath nahi uthaana. Aapko bas is ek pal mein saans leni hai, aur phir agle mein. Aapki saans sabse lambe safar mein ek sthir saathi hai, pyaar se aapko abhi mein lautaati hai, jahan aapka baby pehle se hai. Intezaar theek tab khatam hoga jab usse hona chahiye. Tab tak, aap saans lein, aur aap pehle se hi wahin hain jahan aapko hona chahiye." },
+      "deepDive": { "en": "Researchers find that slow, mindful breathing during periods of waiting lowers stress hormones and helps time feel less heavy. The breath anchors us in the present, where anxiety about the future cannot reach.", "hi": "Researchers paate hain ki intezaar ke daur mein dheemi, dhyaan bhari saans tanaav ke hormones kam karti hai aur samay ko kam bhaari mehsoos karaati hai. Saans humein vartmaan mein thaam leti hai, jahan bhavishya ki chinta nahi pohanch sakti." },
+      "remember": { "en": "You only have to breathe through this one moment.", "hi": "Aapko bas is ek pal mein saans leni hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Patient Bamboo", "hi": "Sabra Wala Baans" },
+      "summary": { "en": "A bamboo seed teaches that long, unseen waiting is part of great growth.", "hi": "Ek baans ka beej sikhaata hai ki lamba, andekha intezaar badi badhotri ka hissa hai." },
+      "body": { "en": "A gardener once planted two seeds side by side — a fern and a bamboo. He watered them both faithfully. Within weeks the fern sprang up, bright and green, filling its corner with soft leaves. But the bamboo showed nothing at all. Season after season the gardener watered the bare earth where the bamboo lay, and still nothing rose.\n\nA whole year passed, then two, then three. The fern flourished while the bamboo stayed hidden. Anyone else might have given up, but the gardener kept faith and kept watering. In the fifth year, at last, a tiny green shoot appeared. And then the bamboo grew — not slowly now, but soaring upward many feet in just a few weeks, taller than the gardener had ever dreamed.\n\nAll those quiet years, the bamboo had not been idle. Deep below the soil, unseen, it had been growing a vast network of roots, strong enough to hold up everything that was to come. Some growth simply takes its time, and is all the stronger for it.", "hi": "Ek maali ne kabhi do beej saath-saath boye — ek fern aur ek baans. Usne dono ko lagan se paani diya. Kuch hafton mein fern ug aaya, chamakdaar aur hara, apne kone ko naram pattiyon se bharte hue. Par baans ne kuch bhi nahi dikhaya. Mausam dar mausam maali us khaali zameen ko paani deta jahan baans pada tha, aur phir bhi kuch nahi uga.\n\nPoora ek saal guzra, phir do, phir teen. Fern phoolta-phaltaa raha jabki baans chhupa raha. Koi aur shaayad haar maan leta, par maali ne bharosa rakha aur paani deta raha. Paanchve saal, aakhirkaar, ek nanha hara ankur ubhra. Aur phir baans badha — ab dheere nahi, balki kuch hafton mein hi kai feet ooper uthte hue, maali ke kabhi soche se bhi lamba.\n\nUn saare shaant saalon mein, baans bekaar nahi tha. Mitti ke gehre neeche, andekha, woh jadon ka ek vishaal jaal uga raha tha, itna mazboot ki aage jo aane wala tha use thaam sake. Kuch badhotri bas apna samay leti hai, aur isi se aur bhi mazboot hoti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how your patience has been growing right alongside them, deepening quietly as you wait to meet.", "hi": "Apne baby ko bataayein ki aapka sabra unke saath-saath badh raha hai, jab aap milne ka intezaar karti hain to chupchaap gehra hote hue." },
+      "motivation": { "en": "The patience you grow now is the calm your baby will be born into.", "hi": "Jo sabra aap abhi badhaati hain wahi shaanti hai jismein aapka baby janm lega." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Breathing Through The Wait", "hi": "Intezaar Mein Saans Lena" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to rest in the present moment", "hi": "Vartmaan pal mein aaram karne ka ek chhota dhyan" },
+      "affirmation": { "en": "I do not need to carry all the waiting at once. This one breath is enough.", "hi": "Mujhe saara intezaar ek saath uthaane ki zaroorat nahi. Yeh ek saans kaafi hai." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Bring your attention to your breath, just as it is. Breathe in slowly, breathe out slowly, and let go of any thought of when or how long. There is only this breath, and then the next, carrying you and your baby gently through the moment.", "hi": "Aaram se baithein aur aankhein band hone dein. Apna dhyan apni saans par laayein, bilkul jaisi woh hai. Dheere saans andar lein, dheere saans baahar chhodein, aur kab ya kitni der ka koi vichaar chhod dein. Bas yeh saans hai, aur phir agli, jo aapko aur aapke baby ko pyaar se is pal mein le jaati hai." },
+      "closingThought": { "en": "You carried this moment, one breath at a time. That is all the waiting ever asks.", "hi": "Aapne is pal ko uthaaya, ek-ek saans karke. Intezaar bas itna hi maangta hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Three Slow Sighs", "hi": "Teen Dheemi Aahein" },
+      "content": { "en": "Take a deep breath in through your nose, then let it out through your mouth with a soft, audible sigh. Do this three times, letting your shoulders drop a little lower with each one.", "hi": "Apni naak se ek gehri saans andar lein, phir use apne munh se ek naram, sunaayi deti aah ke saath baahar chhodein. Aisa teen baar karein, har ek ke saath apne kandhon ko thoda aur neeche girne dete hue." },
+      "remember": { "en": "A sigh is the body's own way of letting go.", "hi": "Aah bharna sharir ka khud ka chhodne ka tareeka hai." },
+      "durationMinutes": 1
+    }
+  }
+]

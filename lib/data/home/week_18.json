@@ -1,0 +1,282 @@
+[
+  {
+    "day": 120,
+    "week": 18,
+    "babyLearning": { "en": "tiny ears forming, soon ready to hear your voice", "hi": "nanhe kaan ban rahe hain, jald aapki aawaz sunne ko taiyaar" },
+    "grow": {
+      "title": { "en": "They Can Hear You Now", "hi": "Ab Woh Aapko Sun Sakte Hain" },
+      "insight": { "en": "Around this week, your baby's hearing awakens. The sounds of your life are becoming their very first world.", "hi": "Lagbhag is hafte, aapke baby ki sunne ki shakti jaag rahi hai. Aapki zindagi ki aawazein unki sabse pehli duniya ban rahi hain." },
+      "expanded": { "en": "Something tender happens around week eighteen: your baby begins to hear. Not words yet, but the steady drum of your heartbeat, the rhythm of your breath, the warm hum of your voice carrying through your body. You do not have to do anything special — simply by living your day, you are filling your baby's world with sound. The gentle truth is that your baby is no longer only feeling you; they are starting to listen. Every ordinary moment you speak is quietly becoming the soundtrack of their beginning.", "hi": "Lagbhag athaarvein hafte ek naazuk baat hoti hai: aapka baby sunna shuru karta hai. Abhi shabd nahi, par aapke dil ki sthir dhadkan, aapki saans ki taal, aapke sharir se guzarti aapki aawaz ki garm gunguni. Aapko kuch khaas karne ki zaroorat nahi — bas apna din jeekar, aap apne baby ki duniya ko aawaz se bhar rahi hain. Pyaari sachai yeh hai ki aapka baby ab sirf aapko mehsoos hi nahi kar raha; woh sunna shuru kar raha hai. Aap jo bhi aam pal bolti hain woh chupchaap unki shuruaat ka sangeet ban raha hai." },
+      "deepDive": { "en": "Researchers find that by the second trimester a baby's auditory system is forming, and the sound they hear most is their mother's voice, carried through her body. Newborns recognise that voice at birth.", "hi": "Researchers paate hain ki doosri trimester tak baby ka sunne wala system ban raha hota hai, aur woh jo aawaz sabse zyada sunta hai woh apni maa ki hai, uske sharir se guzarti hui. Naye janme bachche janm par us aawaz ko pehchaante hain." },
+      "remember": { "en": "Your voice is the first sound your baby learns to love.", "hi": "Aapki aawaz woh pehli aawaz hai jise aapka baby pyaar karna seekhta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Ant And The Dove", "hi": "Cheenti Aur Kabootar" },
+      "summary": { "en": "A small ant repays a dove's kindness and shows no good deed is ever wasted.", "hi": "Ek chhoti cheenti ek kabootar ki dayaalta ka badla deti hai aur dikhaati hai ki koi achha kaam kabhi bekaar nahi jaata." },
+      "body": { "en": "A tiny ant, thirsty on a hot day, climbed to the edge of a stream to drink. But she slipped on the wet stone and tumbled into the rushing water. The current swept her along, and she struggled, too small to reach the bank.\n\nA dove resting in a tree above saw the ant in trouble. Quickly she plucked a leaf and let it drift down onto the water. The ant scrambled onto the floating leaf and rode it safely to the shore, grateful for her life.\n\nNot long after, the ant saw a hunter creeping near, raising his net to trap the very same dove. Without a moment's pause, the brave little ant ran up and bit the hunter hard on the foot. He yelped and jerked, and the startled dove flew away to safety. 'Even the smallest creature,' the ant smiled, 'can return a kindness.'", "hi": "Ek nanhi cheenti, ek garam din pyaasi, paani peene ke liye ek nadi ke kinare chadhi. Par woh geele patthar par phisli aur tez behte paani mein gir gayi. Dhaara use bahaa le gayi, aur woh sangharsh karti rahi, itni chhoti ki kinare tak na pohanch sake.\n\nUpar ek ped par baithe ek kabootar ne cheenti ko mushkil mein dekha. Jhat se usne ek patta toda aur use paani par girne diya. Cheenti tairte patte par chadh gayi aur surakshit kinare tak pohanch gayi, apni jaan ke liye shukraguzaar.\n\nKuch hi der baad, cheenti ne ek shikaari ko paas aate dekha, apna jaal uthaate hue us hi kabootar ko phasaane ko. Ek pal ruke bina, bahaadur nanhi cheenti daud kar gayi aur shikaari ke pair par zor se kaata. Woh cheekha aur jhatka, aur dara hua kabootar surakshit ud gaya. 'Sabse chhota jeev bhi,' cheenti muskuraayi, 'ek dayaalta ka badla de sakta hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a hope you hold for their health and their joy.", "hi": "Apne baby ko ek ummeed bataayein jo aap unki sehat aur unki khushi ke liye rakhti hain." },
+      "motivation": { "en": "Now that they can hear you, your hopes reach them in your own warm voice.", "hi": "Ab jab woh aapko sun sakte hain, aapki ummeedein unhe aapki apni garm aawaz mein pohanchti hain." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "My Voice Carries My Love", "hi": "Meri Aawaz Mera Pyaar Le Jaati Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A bonding affirmation for your baby's new hearing", "hi": "Baby ki nayi sunne ki shakti ke liye ek bond affirmation" },
+      "affirmation": { "en": "Every word I speak to you is wrapped in love. You hear me now, and I am here.", "hi": "Main tumse jo bhi shabd bolti hoon woh pyaar mein lipta hai. Tum mujhe ab sunte ho, aur main yahan hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Heartburn Creeps In", "hi": "Jab Seene Mein Jalan Aaye" },
+      "content": { "en": "If a warm, burning feeling rises after meals, try eating a little less at a time and a little more often. A cool glass of milk or a few soaked almonds can soothe it gently.", "hi": "Agar khaane ke baad seene mein ek garm, jalan bhara ehsaas uthe, to ek baar mein thoda kam aur thodi-thodi der mein khaane ki koshish karein. Ek thanda glass doodh ya kuch bhige badaam ise pyaar se shaant kar sakte hain." },
+      "remember": { "en": "Smaller, gentler meals are kinder to a growing belly.", "hi": "Chhote, naram bhojan ek badhte pet ke liye zyada dayaalu hote hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 121,
+    "week": 18,
+    "babyLearning": { "en": "starting to catch the muffled music of your world", "hi": "aapki duniya ka dheema sangeet pakadna shuru" },
+    "grow": {
+      "title": { "en": "Your Voice Is Their Favourite Sound", "hi": "Aapki Aawaz Unki Pasandeeda Aawaz Hai" },
+      "insight": { "en": "Of every sound in the world, none will be as dear to your baby as the gentle sound of you.", "hi": "Duniya ki har aawaz mein se, koi bhi aapke baby ko utni pyaari nahi hogi jitni aapki naram aawaz." },
+      "expanded": { "en": "Your baby is surrounded by sound — the world outside, the rhythms of your body — but one sound rises above the rest, and it is yours. Carried through you, your voice reaches your baby clearer and closer than anything else. You need not perform or read aloud all day; even your everyday chatter, your laugh, your sighs are teaching your baby the music of you. After birth, it is this familiar voice that will calm them fastest. So speak freely, dear one. Your baby is already falling in love with the sound of their mother.", "hi": "Aapka baby aawazon se ghira hai — baahar ki duniya, aapke sharir ki taalein — par ek aawaz baaki sab se upar uthti hai, aur woh aapki hai. Aapke zariye pohanchti, aapki aawaz aapke baby tak kisi bhi cheez se saaf aur kareeb pohanchti hai. Aapko poora din padhne ya pradarshan karne ki zaroorat nahi; aapki rozana baatein, aapki hansi, aapki aahein bhi aapke baby ko aapka sangeet sikhaa rahi hain. Janm ke baad, yahi jaani-pehchaani aawaz unhe sabse jaldi shaant karegi. To khulkar boliye, pyaari. Aapka baby pehle se hi apni maa ki aawaz se pyaar karne laga hai." },
+      "deepDive": { "en": "Studies show newborns prefer their mother's voice over any other from the very first day, and may even quiet down when they hear it — a recognition built entirely in the womb.", "hi": "Studies dikhaati hain ki naye janme bachche pehle hi din se apni maa ki aawaz ko kisi bhi aur aawaz par tarjeeh dete hain, aur use sunkar shaant bhi ho sakte hain — ek pehchaan jo poori tarah garbh mein hi banti hai." },
+      "remember": { "en": "Your everyday voice is your baby's lifelong comfort.", "hi": "Aapki rozana aawaz aapke baby ki umar bhar ki tasalli hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Crows And The Serpent", "hi": "Kauwe Aur Saanp" },
+      "summary": { "en": "A clever pair of crows outwit a serpent through cunning rather than force.", "hi": "Ek chalaak kauwon ki jodi taakat ke bajaaye chaturaai se ek saanp ko maat de deti hai." },
+      "body": { "en": "A pair of crows had built their nest in a tall tree, but at the foot of that tree lived a hungry black serpent. Each time the crows laid eggs, the serpent slithered up and swallowed them. The poor crows wept, for no matter where they nested, the serpent found their young.\n\nThe crows went to a wise old jackal for advice. He smiled and gave them a clever plan. The next morning, the mother crow flew to the royal pond where a princess was bathing. She snatched up the princess's golden necklace and flew slowly, so the guards would chase her — then dropped the shining necklace right into the serpent's hole.\n\nWhen the guards reached up to fetch the gold, they found the serpent hissing inside. With their sticks they quickly drove it out and killed it. The clever crows raised their chicks in peace ever after, for wit had won where strength could not.", "hi": "Ek kauwon ki jodi ne ek oonche ped par apna ghonsla banaaya tha, par us ped ki jad mein ek bhookha kaala saanp rehta tha. Jab bhi kauwe ande dete, saanp upar rengta aur unhe nigal jaata. Bechaare kauwe rote, kyunki woh jahaan bhi ghonsla banaate, saanp unke bachchon ko dhoondh leta.\n\nKauwe ek buddhimaan boodhe siyaar ke paas salah lene gaye. Woh muskuraaya aur unhe ek chalaak yojana di. Agli subah, maa kauwa shaahi talaab tak udi jahaan ek rajkumari nahaa rahi thi. Usne rajkumari ka sona ka haar uthaaya aur dheere se uda, taaki sipaahi uska peecha karein — phir chamakta haar seedha saanp ke bil mein gira diya.\n\nJab sipaahi sona nikaalne ko upar pohanche, unhe andar saanp phunkaarta mila. Apni laathiyon se unhone use jaldi bahar nikaala aur maar diya. Chalaak kauwe hamesha ke liye shaanti se apne bachche paalne lage, kyunki chaturaai ne wahaan jeet liya jahaan taakat nahi kar paati." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a skill you hope to nurture in them one day.", "hi": "Apne baby ko ek aise hunar ke baare mein bataayein jise aap ek din unmein paalna chahti hain." },
+      "motivation": { "en": "Speaking your hopes aloud plants the first quiet seeds of who they'll become.", "hi": "Apni ummeedein bolkar kehna unke banne ke pehle shaant beej bo deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Brindavani Sarang", "hi": "Raag Brindavani Sarang" },
+      "durationMinutes": 4,
+      "description": { "en": "Afternoon raga for a bright, soothing calm", "hi": "Dopahar ka raag, ek ujli, sukoon bhari shaanti ke liye" },
+      "affirmation": { "en": "As this afternoon melody flows, a gentle brightness settles in me, for you to hear.", "hi": "Jaise yeh dopahar ki dhun behti hai, mujhmein ek naram ujaala tham jaata hai, tumhare sunne ke liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Voice Is Enough", "hi": "Meri Aawaz Kaafi Hai" },
+      "content": { "en": "I do not need perfect words or a sweet singing voice. Simply speaking to my baby is already a gift.", "hi": "Mujhe perfect shabd ya meethi gaane wali aawaz ki zaroorat nahi. Apne baby se bas baat karna hi ek tohfa hai." },
+      "remember": { "en": "Your baby loves your voice exactly as it is.", "hi": "Aapka baby aapki aawaz ko bilkul waise hi pyaar karta hai jaisi woh hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 122,
+    "week": 18,
+    "babyLearning": { "en": "soothed by the gentle hum of sound around them", "hi": "around ki aawaz ki naram gunguni se shaant" },
+    "grow": {
+      "title": { "en": "Speak, Sing, Be Heard", "hi": "Boliye, Gaaiye, Sune Jaayein" },
+      "insight": { "en": "You do not need to be a singer or a storyteller. Your baby simply loves to hear you be you.", "hi": "Aapko gaayak ya kahaani sunaane wala hone ki zaroorat nahi. Aapka baby bas aapko aap hote sunna pasand karta hai." },
+      "expanded": { "en": "Now that your baby can hear, it is tempting to think you must do it 'right' — the perfect song, the perfect words. But your baby does not judge the tune. A lullaby hummed off-key, a story read sleepily, a few words spoken while you cook — all of it reaches them as warmth. Speaking and singing also slows your own breath and softens your mood, and your baby feels that calm too. So let your voice be ordinary and free. The simplest sounds you make are already the sweetest music your baby will ever know.", "hi": "Ab jab aapka baby sun sakta hai, yeh sochna sahaj hai ki aapko ise 'sahi' karna hai — perfect geet, perfect shabd. Par aapka baby dhun ko nahi parakhta. Besuri gungunaayi ek lori, neend mein padhi ek kahaani, khaana banaate hue kahe kuch shabd — yeh sab unhe garmjoshi ki tarah pohanchte hain. Bolna aur gaana aapki apni saans ko bhi dheema karta hai aur aapke mood ko naram, aur aapka baby woh shaanti bhi mehsoos karta hai. To apni aawaz ko aam aur khula rehne dein. Aap jo sabse saadi aawazein nikaalti hain wahi sabse meetha sangeet hai jo aapka baby kabhi jaanega." },
+      "deepDive": { "en": "Experts say it is not the quality of the sound but its warmth and repetition that matter most. A familiar melody or phrase, sung often, can even soothe the same baby after birth.", "hi": "Visheshagya kehte hain ki sabse zyada aawaz ki quality nahi balki uski garmjoshi aur baar-baar hona maayne rakhta hai. Ek jaani-pehchaani dhun ya vaakya, aksar gaaya jaaye, to wahi baby ko janm ke baad bhi shaant kar sakta hai." },
+      "remember": { "en": "Your baby hears the love, not the notes.", "hi": "Aapka baby pyaar sunta hai, sur nahi." }
+    },
+    "readToBaby": {
+      "title": { "en": "Krishna And The Music Of The Flute", "hi": "Krishna Aur Bansuri Ka Sangeet" },
+      "summary": { "en": "Young Krishna's flute calls every heart in Vrindavan into a gentle peace.", "hi": "Baal Krishna ki bansuri Vrindavan ke har dil ko ek naram shaanti mein bula leti hai." },
+      "body": { "en": "In the green meadows of Vrindavan, young Krishna would sit beneath a tree at dusk and raise his bamboo flute to his lips. The moment the first soft notes drifted into the air, something gentle happened all around him.\n\nThe cows stopped grazing and lifted their heads to listen. The birds grew quiet in the branches. The river itself seemed to slow, as if to catch each tender sound. From the village, the gopis left their chores and walked towards the music, drawn by a sweetness they could not name. Even the breeze hushed to hear him play.\n\nKrishna did not play to be praised. He played because the music was love made into sound, and love, he knew, calls every heart home. When at last he lowered the flute, the whole of Vrindavan sat wrapped in a deep and happy peace, as though the evening itself had been gently rocked to rest.", "hi": "Vrindavan ke hare maidaanon mein, baal Krishna shaam ko ek ped ke neeche baithte aur apni baans ki bansuri honthon tak uthaate. Jis pal pehle naram sur hawa mein behte, unke around kuch naram ho jaata.\n\nGaayein charna chhod kar sunne ko apne sir uthaa leti. Pakshi tehniyon mein shaant ho jaate. Nadi khud dheemi ho jaati, maano har komal aawaz ko thaamne ko. Gaon se, gopiyaan apne kaam chhod kar sangeet ki taraf chal padti, ek aisi mithaas se kheenchi jise woh naam na de sakti. Hawa bhi unhe bajaate sunne ko tham jaati.\n\nKrishna taareef ke liye nahi bajaate. Woh isliye bajaate kyunki sangeet pyaar ki banaayi gayi aawaz tha, aur pyaar, woh jaante the, har dil ko ghar bula leta hai. Jab aakhir mein unhone bansuri neeche ki, poora Vrindavan ek gehri aur khush shaanti mein lipta baitha tha, maano shaam ko hi pyaar se sulaa diya gaya ho." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby who you hope they grow up kind to.", "hi": "Apne baby ko bataayein ki aap unhe kiske saath dayaalu bante dekhna chahti hain." },
+      "motivation": { "en": "The kindness you wish for them begins as a voice they trust today.", "hi": "Jo dayaalta aap unke liye chahti hain woh aaj ek aisi aawaz se shuru hoti hai jise woh bharosa karte hain." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Song Just For You", "hi": "Sirf Tumhare Liye Ek Geet" },
+      "durationMinutes": 3,
+      "description": { "en": "A gentle meditation to share a quiet melody with your baby", "hi": "Apne baby ke saath ek shaant dhun baantne ka ek naram dhyan" },
+      "affirmation": { "en": "When I hum to you, my whole body becomes a soft cradle of sound.", "hi": "Jab main tumhare liye gungunaati hoon, mera poora sharir aawaz ka ek naram jhoola ban jaata hai." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take three slow breaths and rest a hand on your belly. Now hum a soft, simple tune — any one you love — letting the gentle vibration travel inward to your baby.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein aur ek haath pet par rakhein. Ab ek naram, saadi dhun gungunaayein — koi bhi jo aapko pyaari ho — naram kampan ko andar apne baby tak jaane dein." },
+      "closingThought": { "en": "Your baby just heard a melody made only for them. Let that warmth linger.", "hi": "Aapke baby ne abhi sirf unke liye banaayi ek dhun suni. Us garmjoshi ko thehrne dein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Before You Speak", "hi": "Bolne Se Pehle Saans Lein" },
+      "content": { "en": "Before you speak or sing to your baby, take one slow breath in and a long breath out. Feel your chest soften, then let your voice come from that calm place.", "hi": "Apne baby se bolne ya gaane se pehle, ek dheemi saans andar lein aur ek lambi saans baahar chhodein. Apne seene ko naram hota mehsoos karein, phir apni aawaz us shaant jagah se aane dein." },
+      "remember": { "en": "A calm breath gives your voice a calm warmth.", "hi": "Ek shaant saans aapki aawaz ko ek shaant garmjoshi deti hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 123,
+    "week": 18,
+    "babyLearning": { "en": "feeling the rise and fall of feeling in your words", "hi": "aapke shabdon mein bhaav ke utaar-chadhaav ko mehsoos karte hue" },
+    "grow": {
+      "title": { "en": "Words Carry Feeling", "hi": "Shabd Bhaav Le Jaate Hain" },
+      "insight": { "en": "Long before your baby knows what words mean, they feel the emotion riding inside them.", "hi": "Aapke baby ke shabdon ke arth jaanne se bahut pehle, woh unke andar baithi bhaavna ko mehsoos karte hain." },
+      "expanded": { "en": "Your baby cannot yet understand a single word, but they can feel its colour. A soft, loving tone reaches them as comfort; a tense, hurried one reaches them as a ripple of unease. This is not a reason for worry — no one speaks gently every moment. It is simply a quiet invitation to notice how you sound, especially when you speak to your baby. When you slow down and let warmth into your voice, you are not just sharing words. You are giving your baby their very first lesson in what it feels like to be spoken to with love.", "hi": "Aapka baby abhi ek bhi shabd nahi samajh sakta, par woh uska rang mehsoos kar sakta hai. Ek naram, pyaar bhara lehja unhe tasalli ki tarah pohanchta hai; ek tana hua, jaldbaaz lehja unhe bechaini ki ek lehar ki tarah. Yeh chinta ki baat nahi — koi har pal narmi se nahi bolta. Yeh bas ek shaant nyota hai yeh note karne ka ki aap kaisi sunaayi deti hain, khaaskar jab aap apne baby se bolti hain. Jab aap dheemi hoti hain aur apni aawaz mein garmjoshi aane deti hain, aap sirf shabd nahi baant rahi. Aap apne baby ko unka pehla sabak de rahi hain ki pyaar se bola jaana kaisa lagta hai." },
+      "deepDive": { "en": "Babies in the womb respond to the emotional tone of speech far earlier than its meaning. The rhythm and warmth of your voice are their first language of feeling.", "hi": "Garbh mein bachche bolne ke bhaav bhare lehje par uske arth se bahut pehle pratikriya dete hain. Aapki aawaz ki taal aur garmjoshi unki bhaav ki pehli bhaasha hai." },
+      "remember": { "en": "Your baby hears how you feel before they hear what you say.", "hi": "Aapka baby yeh sunta hai ki aap kaisa mehsoos karti hain, is se pehle ki aap kya kehti hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Crow Who Would Sing", "hi": "Kauwa Jo Gaana Chahta Tha" },
+      "summary": { "en": "A crow learns that pretending to be what he is not only brings him trouble.", "hi": "Ek kauwa seekhta hai ki jo woh nahi hai woh dikhne ka dhong sirf mushkil laata hai." },
+      "body": { "en": "A crow once lived near a garden where a flock of bright swans sang sweetly each morning. Listening to their lovely voices, the crow grew envious. 'If only I could sing like that,' he thought, 'everyone would admire me too.' So he began to copy them, opening his beak to warble and trill.\n\nBut a crow's voice is not a swan's. However hard he tried, only harsh caws came out, and the other birds laughed. Hurt and stubborn, the crow stopped eating his own food and tried to live like the swans, drifting on the pond and refusing his usual ways. Soon he grew thin and weak, for he was neglecting all that was truly his own.\n\nAt last a wise old owl spoke kindly to him. 'You were given your own voice and your own gifts, little crow. There is more joy in being fully yourself than in being a poor copy of another.' The crow took the words to heart, and he was content ever after.", "hi": "Ek kauwa kabhi ek baag ke paas rehta tha jahaan ujle hanson ka ek jhund har subah meetha gaata. Unki pyaari aawazein sunkar, kauwe ko jalan hone lagi. 'Kaash main bhi aise gaa paata,' usne socha, 'to sab meri bhi taareef karte.' To woh unki nakal karne laga, apni chonch khol kar koohne aur sur nikaalne lagi.\n\nPar kauwe ki aawaz hans ki nahi hoti. Kitna bhi koshish ki, sirf kathor kaanv-kaanv nikalti, aur doosre pakshi haste. Aahat aur zidi, kauwe ne apna khaana khaana band kar diya aur hanson ki tarah jeene laga, talaab par tairta aur apne aam tareeke chhod kar. Jald hi woh dubla aur kamzor ho gaya, kyunki woh apna sab kuch andekha kar raha tha jo sach mein uska apna tha.\n\nAakhir mein ek buddhimaan boodha ullu use pyaar se bola. 'Tumhe apni aawaz aur apne tohfe diye gaye hain, nanhe kauwe. Doosre ki ek kharaab nakal hone se zyada khushi poori tarah khud hone mein hai.' Kauwe ne baat dil se le li, aur woh hamesha ke liye santusht raha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a dream you hold for their curiosity and their learning.", "hi": "Apne baby ko ek sapna bataayein jo aap unki jigyaasa aur unki seekh ke liye rakhti hain." },
+      "motivation": { "en": "A child's love of learning often begins with a parent who wondered aloud.", "hi": "Ek bachche ka seekhne se pyaar aksar us parent se shuru hota hai jisne bolkar sochaa." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Marwa", "hi": "Raag Marwa" },
+      "durationMinutes": 4,
+      "description": { "en": "Sunset raga for a deep, reflective calm", "hi": "Sooraj dhalne ka raag, ek gehri, vichaarshil shaanti ke liye" },
+      "affirmation": { "en": "As the day softens into evening, this melody settles a deep stillness in me, for you.", "hi": "Jaise din shaam mein naram hota hai, yeh dhun mujhmein ek gehri sthirta thehraa deti hai, tumhare liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Sweet Cravings Call", "hi": "Jab Meethe Ki Talab Ho" },
+      "content": { "en": "If you long for something sweet, reach first for fruit, a date or two, or a little jaggery. They satisfy the craving gently while giving your body something kind.", "hi": "Agar aapko kuch meetha chaahiye, to pehle phal, ek-do khajoor, ya thoda gud lein. Yeh talab ko narmi se shaant karte hain aur saath hi aapke sharir ko kuch dayaalu dete hain." },
+      "remember": { "en": "A craving met gently is a craving cared for.", "hi": "Narmi se poori ki gayi talab ek sambhaali gayi talab hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 124,
+    "week": 18,
+    "babyLearning": { "en": "swaying to the shared rhythm of sound and movement", "hi": "aawaz aur harkat ki saanjhi taal par jhoolte hue" },
+    "grow": {
+      "title": { "en": "The Music You Share", "hi": "Woh Sangeet Jo Aap Baantti Hain" },
+      "insight": { "en": "The songs you love can become a gift you share with your baby, long before they are born.", "hi": "Jo geet aapko pyaare hain woh ek tohfa ban sakte hain jise aap apne baby ke saath baantti hain, unke janm se bahut pehle." },
+      "expanded": { "en": "Music has a special way of reaching your baby. A song you play often — a lullaby, a favourite tune, something that calms you — becomes part of the world your baby is learning. They feel the rhythm, the rise and fall, and the ease it brings to your body. Choosing one or two gentle songs to return to is like building a small, familiar room of sound for your baby to grow in. And there is a quiet wonder waiting: a melody heard often now can soothe the very same baby once they are in your arms.", "hi": "Sangeet ka aapke baby tak pohanchne ka ek khaas tareeka hai. Ek geet jo aap aksar chalaati hain — ek lori, ek pasandeeda dhun, kuch jo aapko shaant karta hai — us duniya ka hissa ban jaata hai jise aapka baby seekh raha hai. Woh taal mehsoos karte hain, utaar-chadhaav, aur woh sehjta jo woh aapke sharir mein laata hai. Ek-do naram geet chunna jin par aap laut sakein, aapke baby ke badhne ke liye aawaz ka ek chhota, jaana-pehchaana kamra banaane jaisa hai. Aur ek shaant chamatkaar intezaar kar raha hai: ab aksar suni gayi ek dhun us hi baby ko shaant kar sakti hai jab woh aapki baahon mein ho." },
+      "deepDive": { "en": "Researchers have found that babies remember melodies heard in the womb for weeks after birth, often calming or alerting to a familiar tune. Music becomes one of their earliest memories.", "hi": "Researchers ne paaya hai ki bachche garbh mein suni dhunein janm ke kai hafton baad tak yaad rakhte hain, aksar ek jaani-pehchaani dhun par shaant ya satark ho jaate hain. Sangeet unki sabse pehli yaadon mein se ek ban jaata hai." },
+      "remember": { "en": "A song shared now can comfort your baby for years.", "hi": "Ab baanta gaya ek geet aapke baby ko saalon tak tasalli de sakta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The Royal Musician", "hi": "Tenali Rama Aur Shaahi Sangeetkaar" },
+      "summary": { "en": "Witty Tenali Rama teaches a boastful musician a gentle lesson in humility.", "hi": "Hazirjawab Tenali Rama ek sheykhibaaz sangeetkaar ko vinamrata ka ek naram sabak sikhaata hai." },
+      "body": { "en": "A famous musician came to the court of King Krishnadevaraya and played so beautifully that the king rewarded him with a bag of gold. But the musician grew proud, boasting that no one in the kingdom could match his art, and looking down on everyone around him.\n\nClever Tenali Rama decided to teach him a small lesson. The next day he invited the musician to perform in his garden, promising a grand reward. The musician played for hours in the hot sun, certain of riches. When he finished, Tenali handed him an empty cloth bag. 'But where is my reward?' the musician cried.\n\n'Your music was the sound of coins to my ears,' Tenali smiled, 'so I am paying you with the sound of a reward. You enjoyed praising yourself; now enjoy the praise.' The court burst into laughter, and the musician, red-faced, finally understood. From that day he played as humbly as he once played proudly.", "hi": "Ek mashhoor sangeetkaar Raja Krishnadevaraya ke darbaar mein aaya aur itna sundar bajaaya ki raja ne use sone ki ek theli inaam mein di. Par sangeetkaar ghamandi ho gaya, sheykhi maarte hue ki raajya mein koi uski kala ka muqaabla nahi kar sakta, aur apne around sab ko neecha dikhaata.\n\nChalaak Tenali Rama ne use ek chhota sabak sikhaane ki socha. Agle din usne sangeetkaar ko apne baag mein bajaane ka nyota diya, ek bada inaam ka vaada karte hue. Sangeetkaar tez dhoop mein ghanton bajaata raha, dhan ka yaqeen kiye hue. Jab usne khatm kiya, Tenali ne use ek khaali kapde ki theli thama di. 'Par mera inaam kahaan?' sangeetkaar cheekha.\n\n'Tumhara sangeet mere kaanon ko sikkon ki aawaz tha,' Tenali muskuraaya, 'to main tumhe inaam ki aawaz se chuka raha hoon. Tumne khud ki taareef ka maza liya; ab taareef ka maza lo.' Darbaar hansi se goonj utha, aur sangeetkaar, sharm se laal, aakhir samajh gaya. Us din se woh utni hi vinamrata se bajaata jitni ghamand se kabhi bajaaya tha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about an adventure you dream of giving them one day.", "hi": "Apne baby ko ek aise safar ke baare mein bataayein jo aap unhe ek din dene ka sapna dekhti hain." },
+      "motivation": { "en": "Dreaming aloud weaves your baby into the journeys still ahead of you both.", "hi": "Bolkar sapna dekhna aapke baby ko un safron mein piro deta hai jo aap dono ke aage hain." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Fill Your World With Gentle Sound", "hi": "Main Tumhari Duniya Ko Naram Aawaz Se Bharti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A bonding affirmation about the sounds you share", "hi": "Jo aawazein aap baantti hain unke baare mein ek bond affirmation" },
+      "affirmation": { "en": "The songs I love and the words I speak become the gentle world you grow inside.", "hi": "Jo geet mujhe pyaare hain aur jo shabd main bolti hoon woh wahi naram duniya ban jaate hain jismein tum badhte ho." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Allowed To Enjoy This", "hi": "Mujhe Ise Maza Lene Ki Ijaazat Hai" },
+      "content": { "en": "Amid all the planning and worry, I am allowed to simply delight in this season and the little life I carry.", "hi": "Saare plan aur chinta ke beech, mujhe is daur aur jo nanhi zindagi main thaame hoon usmein bas khush hone ki ijaazat hai." },
+      "remember": { "en": "Joy is a part of this journey too.", "hi": "Khushi bhi is safar ka hissa hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 125,
+    "week": 18,
+    "babyLearning": { "en": "lulled by the slow, steady sound of you", "hi": "aapki dheemi, sthir aawaz se sukoon mein" },
+    "grow": {
+      "title": { "en": "A Lullaby Before Birth", "hi": "Janm Se Pehle Ek Lori" },
+      "insight": { "en": "A lullaby you sing now is not too early. It is the first song of a bond that will last a lifetime.", "hi": "Ek lori jo aap ab gaati hain woh bahut jaldi nahi hai. Yeh ek aise bond ka pehla geet hai jo umar bhar chalega." },
+      "expanded": { "en": "There is something timeless about singing a lullaby to a baby still within you. Pick one gentle song and let it become 'yours' — sung at night, sung when you rest, sung simply because you love them. Your baby learns its rhythm and links it to your calm and your warmth. Then, on the long nights after birth, that same lullaby will work like quiet magic, telling your baby in a language older than words: I know this sound, I am safe, I am home. You are not just singing. You are building a small, sure comfort to carry you both for years.", "hi": "Apne andar abhi paal rahi baby ke liye lori gaane mein kuch kaalateet hai. Ek naram geet chunein aur use 'apna' ban jaane dein — raat ko gaaya, aaram karte gaaya, bas isliye gaaya kyunki aap unse pyaar karti hain. Aapka baby uski taal seekhta hai aur use aapki shaanti aur aapki garmjoshi se jodta hai. Phir, janm ke baad ki lambi raaton mein, wahi lori shaant jaadu ki tarah kaam karegi, aapke baby ko shabdon se purani bhaasha mein kehti: main yeh aawaz jaanta hoon, main surakshit hoon, main ghar par hoon. Aap sirf gaa nahi rahi. Aap ek chhoti, pakki tasalli bana rahi hain jo aap dono ko saalon tak thaame rakhegi." },
+      "deepDive": { "en": "Music therapists find that lullabies sung repeatedly in pregnancy can settle a newborn's heartbeat and breathing after birth — the familiar song works as a bridge from the womb to the world.", "hi": "Music therapists paate hain ki pregnancy mein baar-baar gaayi lori janm ke baad ek naye janme bachche ki dhadkan aur saans ko thehraa sakti hai — jaana-pehchaana geet garbh se duniya tak ek pul ki tarah kaam karta hai." },
+      "remember": { "en": "One song, sung often, becomes a lifelong comfort.", "hi": "Ek geet, aksar gaaya, umar bhar ki tasalli ban jaata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Magic Drum", "hi": "Jaadui Dhol" },
+      "summary": { "en": "A kind young man's generosity, and a magic drum, bring him more than he ever lost.", "hi": "Ek dayaalu naujawaan ki udaarta, aur ek jaadui dhol, use is se zyada laate hain jitna usne kabhi khoya." },
+      "body": { "en": "A poor but kind young man set out to seek his fortune with nothing but a handful of grain. On the road he met a hungry old woman and shared his grain with her. In return she gave him a small bamboo flute, telling him it would help when he needed it.\n\nLater he gave the flute to a boy in exchange for a drum, and the drum, he soon discovered, was magic. Whenever he beat it and called out, whatever he wished for in kindness would appear — food for the hungry, help for the lost. The young man used it not to grow rich, but to feed travellers and cheer sad hearts along the road.\n\nWord of his goodness spread, and people welcomed him everywhere with open doors and full tables. He realised the true magic was never in the drum at all, but in a generous heart that gave freely — for kindness, once shared, always finds its way back.", "hi": "Ek gareeb par dayaalu naujawaan apni kismat dhoondhne nikla, paas mein sirf mutthi bhar anaaj liye. Raaste mein use ek bhookhi boodhi aurat mili aur usne apna anaaj usse baant liya. Badle mein usne use ek chhoti baans ki bansuri di, kehte hue ki yeh tab kaam aayegi jab use zaroorat hogi.\n\nBaad mein usne bansuri ek ladke ko ek dhol ke badle de di, aur dhol, use jald pata chala, jaadui tha. Jab bhi woh use bajaata aur pukaarta, jo bhi woh dayaalta mein maangta woh prakat ho jaata — bhookhon ke liye khaana, bhatkon ke liye madad. Naujawaan ne ise ameer banne ke liye nahi, balki raaste ke musaafiron ko khilaane aur dukhi dilon ko khush karne ke liye istemaal kiya.\n\nUski achhaai ki baat phaili, aur log use har jagah khule darwaazon aur bhare daston se swagat karte. Use samajh aaya ki asli jaadu kabhi dhol mein tha hi nahi, balki ek udaar dil mein jo khulkar deta tha — kyunki dayaalta, ek baar baanti jaaye, hamesha apni raah wapas dhoondh leti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you hope they will handle the hard times in life.", "hi": "Apne baby ko bataayein ki aap chahti hain ki woh zindagi ke mushkil samay ko kaise sambhaalein." },
+      "motivation": { "en": "The courage you wish for them is first felt in the steadiness of your voice.", "hi": "Jo himmat aap unke liye chahti hain woh pehle aapki aawaz ki sthirta mein mehsoos hoti hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Malkauns", "hi": "Raag Malkauns" },
+      "durationMinutes": 4,
+      "description": { "en": "Night raga for a deep, restful calm", "hi": "Raat ka raag, ek gehri, aaram bhari shaanti ke liye" },
+      "affirmation": { "en": "As the night grows still, this deep melody cradles us both in quiet rest.", "hi": "Jaise raat thehrti hai, yeh gehri dhun hum dono ko shaant aaram mein thaam leti hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Sleep Comes Uneasy", "hi": "Jab Neend Mushkil Se Aaye" },
+      "content": { "en": "If nights feel restless, a small warm cup of milk with a pinch of turmeric before bed can settle you. Keep evening meals light so your body can rest, not work.", "hi": "Agar raatein bechain lagein, to sone se pehle ek chhota garm cup doodh ek chutki haldi ke saath aapko thehraa sakta hai. Shaam ka khaana halka rakhein taaki aapka sharir aaram kar sake, kaam nahi." },
+      "remember": { "en": "A light, warm evening prepares the body for rest.", "hi": "Ek halki, garm shaam sharir ko aaram ke liye taiyaar karti hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 126,
+    "week": 18,
+    "babyLearning": { "en": "quietly storing the familiar sounds of home", "hi": "ghar ki jaani-pehchaani aawazein chupchaap sambhaalte hue" },
+    "grow": {
+      "title": { "en": "Sound Becomes Memory", "hi": "Aawaz Yaad Ban Jaati Hai" },
+      "insight": { "en": "The sounds your baby hears today do not simply pass by. They are quietly becoming their very first memories.", "hi": "Jo aawazein aapka baby aaj sunta hai woh bas guzar nahi jaati. Woh chupchaap unki sabse pehli yaadein ban rahi hain." },
+      "expanded": { "en": "Something quietly remarkable is happening: the sounds filling your baby's world are not just heard, they are being remembered. Your voice, a favourite song, the warm bustle of home — your baby is gathering these into the first soft memories of belonging. This is why a newborn turns towards a mother's voice, settles to a familiar tune, calms in the home they have somehow always known. The world you are surrounding your baby with now becomes the first 'home' they recognise. Let it be gentle, let it be loving — and trust that your baby is already learning, in sound, that they are safe.", "hi": "Kuch chupchaap anokha ho raha hai: jo aawazein aapke baby ki duniya bhar rahi hain woh sirf suni nahi jaa rahi, woh yaad rakhi jaa rahi hain. Aapki aawaz, ek pasandeeda geet, ghar ki garm chehel-pehel — aapka baby inhe apnepan ki pehli naram yaadon mein samet raha hai. Isiliye ek naya janma bachcha maa ki aawaz ki taraf mudta hai, ek jaani-pehchaani dhun par thehra jaata hai, us ghar mein shaant hota hai jise woh kisi tarah hamesha se jaanta tha. Jis duniya se aap ab apne baby ko gher rahi hain wahi pehla 'ghar' ban jaata hai jise woh pehchaanta hai. Use naram rehne dein, use pyaar bhara rehne dein — aur bharosa rakhein ki aapka baby pehle se hi, aawaz mein, seekh raha hai ki woh surakshit hai." },
+      "deepDive": { "en": "Newborns have been shown to recognise a story, a song, even a particular phrase heard repeatedly before birth — proof that memory begins forming in the womb, woven from sound.", "hi": "Naye janme bachche ek kahaani, ek geet, yahan tak ki ek khaas vaakya bhi pehchaante dikhe hain jo janm se pehle baar-baar suna gaya — is baat ka saboot ki yaad garbh mein hi banna shuru hoti hai, aawaz se buni." },
+      "remember": { "en": "The sounds of home today are your baby's first memories.", "hi": "Aaj ke ghar ki aawazein aapke baby ki pehli yaadein hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Song Of The Koel", "hi": "Koyal Ka Geet" },
+      "summary": { "en": "A koel learns that her own true song, not borrowed praise, is what the world loves.", "hi": "Ek koyal seekhti hai ki uska apna sachcha geet, udhaar li gayi taareef nahi, wahi hai jise duniya pyaar karti hai." },
+      "body": { "en": "When the first warm days of spring arrived, a young koel sat hidden among the mango leaves, too shy to sing. All around her the louder birds called out — the crow with his harsh caw, the parrot with his chatter, the peacock with his proud cry. 'They are all so bold,' thought the little koel. 'Who would want to hear quiet me?'\n\nSo she stayed silent through the bright mornings. But the orchard felt strangely empty, as though it were waiting for something it could not name. One evening, unable to hold it in any longer, the koel finally opened her throat and sang. Her sweet, clear notes rose through the trees, and at once the whole orchard fell still to listen.\n\nThe other birds hushed their noise. 'That,' whispered an old gardener below, 'is the true voice of spring.' The koel understood at last: the world had been waiting not for the loudest song, but for hers — the one only she could sing.", "hi": "Jab basant ke pehle garm din aaye, ek jawaan koyal aam ke patton mein chhupi baithi, gaane mein itni sharmili. Uske around tez aawaz wale pakshi pukaarte — kauwa apni kathor kaanv se, tota apni bakbak se, mor apni ghamandi cheekh se. 'Yeh sab kitne nidar hain,' nanhi koyal ne socha. 'Shaant mujhe kaun sunna chaahega?'\n\nTo woh ujli subahon bhar chup rahi. Par baagicha ajeeb tarah khaali laga, maano kisi aisi cheez ka intezaar kar raha ho jise woh naam na de sake. Ek shaam, ise aur na rok paate hue, koyal ne aakhir apna gala khola aur gaaya. Uske meethe, saaf sur peadon ke beech uthe, aur turant poora baagicha sunne ko thehra gaya.\n\nDoosre pakshiyon ne apna shor shaant kar diya. 'Yeh,' neeche ek boodhe maali ne dheere se kaha, 'basant ki sachi aawaz hai.' Koyal aakhir samajh gayi: duniya sabse tez geet ka nahi, balki uske geet ka intezaar kar rahi thi — wahi jo sirf woh gaa sakti thi." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a hope you hold for the person they will love one day.", "hi": "Apne baby ko ek ummeed bataayein jo aap us insaan ke liye rakhti hain jise woh ek din pyaar karenge." },
+      "motivation": { "en": "The love they will give one day grows from the love they hear from you now.", "hi": "Jo pyaar woh ek din denge woh us pyaar se badhta hai jo woh ab aapse sunte hain." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Sounds Of Home", "hi": "Ghar Ki Aawazein" },
+      "durationMinutes": 3,
+      "description": { "en": "A gentle meditation to share the calm sounds around you", "hi": "Apne around ki shaant aawazein baantne ka ek naram dhyan" },
+      "affirmation": { "en": "The gentle sounds of our home are becoming your first feeling of safety.", "hi": "Hamare ghar ki naram aawazein tumhari surakshit hone ki pehli bhaavna ban rahi hain." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take three slow breaths and listen — to the quiet of the room, a distant sound, your own breathing. Imagine your baby gathering these gentle sounds as their first memories of home.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein aur sunein — kamre ki shaanti ko, ek door ki aawaz ko, apni hi saans ko. Sochein ki aapka baby in naram aawazon ko ghar ki apni pehli yaadon ki tarah samet raha hai." },
+      "closingThought": { "en": "You just shared the quiet sounds of home with your baby. Carry that peace with you.", "hi": "Aapne abhi ghar ki shaant aawazein apne baby ke saath baanti. Us shaanti ko apne saath le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Listen To One Sound", "hi": "Ek Aawaz Ko Sunein" },
+      "content": { "en": "Breathe slowly and choose one gentle sound around you — a fan, a bird, your own breath. Rest your attention softly on it for a quiet minute, and let everything else fade.", "hi": "Dheere saans lein aur apne around ek naram aawaz chunein — ek pankha, ek pakshi, apni hi saans. Ek shaant minute tak apna dhyan pyaar se us par tikaayein, aur baaki sab ko dheere se gum hone dein." },
+      "remember": { "en": "Listening to one sound gently quiets the busy mind.", "hi": "Ek aawaz ko sunna vyast mann ko narmi se shaant karta hai." },
+      "durationMinutes": 2
+    }
+  }
+]

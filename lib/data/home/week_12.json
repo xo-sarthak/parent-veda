@@ -1,0 +1,282 @@
+[
+  {
+    "day": 78,
+    "week": 12,
+    "babyLearning": { "en": "growing fast, tiny fingers and toes taking shape", "hi": "tezi se badh raha hai, nanhi ungliyaan aur paer ke nakhun aakaar le rahe hain" },
+    "grow": {
+      "title": { "en": "You Were Never Meant To Do This Alone", "hi": "Aap Yeh Akele Karne Ke Liye Kabhi Nahi Bani Thi" },
+      "insight": { "en": "Raising a child was never designed to be a solo task. Leaning on others is not failing — it is how parenting was always meant to work.", "hi": "Ek bachche ko paalna kabhi akele ka kaam banaaya hi nahi gaya tha. Doosron ka sahaara lena fail hona nahi hai — parenting hamesha se aise hi kaam karne ke liye bani thi." },
+      "expanded": { "en": "Somewhere along the way, we began to believe a good parent must manage everything alone, asking for nothing. But for most of human history, no mother ever raised a child by herself. There were always hands to hold the baby, voices to soothe, elders to advise. The longing you sometimes feel for support is not weakness — it is wisdom, your heart remembering how this was always meant to be. You do not have to carry it all. Letting others in is part of loving your baby well.", "hi": "Kahin na kahin raaste mein, hum yeh maanne lage ki ek achhi parent ko sab kuch akele sambhaalna chahiye, kuch maange bina. Par maanav itihaas ke zyadatar samay mein, kisi maa ne kabhi akele bachcha nahi paala. Hamesha baby ko thaamne ke liye haath the, dilaasa dene ki aawaazein theen, salah dene ke liye bade the. Jo sahaare ki chaah aap kabhi-kabhi mehsoos karti hain woh kamzori nahi — yeh samajhdaari hai, aapka dil yaad kar raha hai ki yeh hamesha se aise hi hona tha. Aapko sab kuch akele uthaane ki zaroorat nahi. Doosron ko andar aane dena aapke baby ko achhe se pyaar karne ka hissa hai." },
+      "deepDive": { "en": "Anthropologists describe humans as 'cooperative breeders' — we evolved to raise children together, with shared care from family and community. The instinct to seek support is built into us.", "hi": "Anthropologists insaanon ko 'cooperative breeders' bataate hain — hum bachchon ko saath milkar paalne ke liye viksit hue, parivar aur samudaay ki saajha dekhbhaal ke saath. Sahaara dhoondhne ki prakriti hum mein basi hui hai." },
+      "remember": { "en": "Needing others is not a flaw in you — it is how parenting was built.", "hi": "Doosron ki zaroorat aap mein koi kami nahi — parenting aise hi banayi gayi thi." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Bundle Of Sticks", "hi": "Lakdiyon Ka Gattha" },
+      "summary": { "en": "A dying father teaches his quarrelling sons that together they cannot be broken.", "hi": "Ek marta hua pita apne jhagadte beton ko sikhaata hai ki saath mein woh toote nahi ja sakte." },
+      "body": { "en": "An old farmer had several sons who quarrelled constantly, each going his own way. The father worried what would become of them once he was gone. So one day he called them all to his bedside and laid before them a tight bundle of sticks tied with rope.\n\n'Whoever can break this bundle in two,' he said, 'may have my whole fortune.' One by one, each strong son tried with all his might. They pushed and strained, but the bundle would not snap. At last they gave up.\n\nThen the father untied the rope and handed each son a single stick. 'Now break it,' he said. Easily, every stick snapped in two. 'You see, my sons,' he smiled gently. 'Apart, you are each easily broken. But bound together, no trouble in the world can break you.' From that day, the brothers stood as one.", "hi": "Ek boodhe kisaan ke kayi bete the jo lagaataar jhagadte rehte, har ek apni raah chalta. Pita ko chinta thi ki uske jaane ke baad unka kya hoga. To ek din usne sabhi ko apne bistar ke paas bulaaya aur unke saamne rassi se bandha lakdiyon ka ek kasa hua gattha rakha.\n\n'Jo bhi is gatthe ko do tukdon mein tod dega,' usne kaha, 'use meri saari daulat milegi.' Ek-ek karke, har mazboot bete ne apni poori taakat lagaayi. Unhone dhakka diya aur zor lagaaya, par gattha tootta nahi tha. Aakhir mein unhone haar maan li.\n\nPhir pita ne rassi kholi aur har bete ko ek-ek lakdi thama di. 'Ab todo,' usne kaha. Aasaani se, har lakdi do tukdon mein toot gayi. 'Dekha, mere beto,' woh pyaar se muskuraaya. 'Alag-alag, tum sab aasaani se toote ja sakte ho. Par saath bandhe hue, duniya ki koi musibat tumhe nahi tod sakti.' Us din se, bhaai ek hokar khade rahe." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby a promise: that you will always stop and listen when they need you.", "hi": "Apne baby se ek vaada karein: ki jab bhi unhe aapki zaroorat hogi, aap hamesha rukkar sunengi." },
+      "motivation": { "en": "Being truly heard is one of the first ways a child learns they matter.", "hi": "Sach mein suna jaana un pehle tareekon mein se ek hai jisse ek bachcha seekhta hai ki woh maayne rakhta hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Am Held, So I Can Hold You", "hi": "Mujhe Thaama Gaya Hai, To Main Tumhe Thaam Sakti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about being supported", "hi": "Sahaara paaye jaane ka ek bond affirmation" },
+      "affirmation": { "en": "I do not carry you alone. I am held by loving hands, and from that warmth, I hold you.", "hi": "Main tumhe akele nahi uthaati. Mujhe pyaar bhare haathon ne thaama hai, aur usi garmjoshi se, main tumhe thaamti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Don't Have To Hold It All", "hi": "Mujhe Sab Kuch Sambhaalna Nahi Padta" },
+      "content": { "en": "Today I will let one thing be shared or set down. Carrying less does not make me less.", "hi": "Aaj main ek cheez ko baant dungi ya rakh dungi. Kam uthaana mujhe kam nahi banata." },
+      "remember": { "en": "You can set something down without letting your baby down.", "hi": "Aap kuch rakh sakti hain bina apne baby ko niraash kiye." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 79,
+    "week": 12,
+    "babyLearning": { "en": "tiny reflexes beginning, curling and stretching gently", "hi": "nanhe reflexes shuru ho rahe hain, naram tarah simatna aur khinchna" },
+    "grow": {
+      "title": { "en": "It Takes A Village", "hi": "Ek Poora Gaon Lagta Hai" },
+      "insight": { "en": "The old saying is true: it takes a village to raise a child. Gathering your village now is real preparation.", "hi": "Purani kahaawat sach hai: ek bachche ko paalne ke liye ek poora gaon lagta hai. Apna gaon ab jodna asli taiyaari hai." },
+      "expanded": { "en": "A child is not raised by two arms alone, but by a whole web of love — grandparents, friends, neighbours, the people who show up. This 'village' is not a luxury; it is how children come to feel that the world is wide and safe and full of belonging. You can begin weaving yours now: the friend who checks in, the relative who'll cook, the voice you can call at midnight. Every connection you nurture today becomes a thread of safety your baby will one day rest in.", "hi": "Ek bachcha sirf do baahon se nahi paala jaata, balki pyaar ke ek poore jaal se — daada-daadi, dost, padosi, woh log jo saamne aate hain. Yeh 'gaon' koi aiyaashi nahi; yahi tareeqa hai jisse bachche mehsoos karte hain ki duniya badi, surakshit aur apnepan se bhari hai. Aap apna gaon ab bunna shuru kar sakti hain: woh dost jo haal poochta hai, woh rishtedaar jo khaana banayega, woh aawaz jise aap aadhi raat ko bula sakti hain. Aaj aap jis bhi rishte ko poshit karti hain woh surakshit ka ek dhaaga ban jaata hai jismein aapka baby ek din aaram karega." },
+      "deepDive": { "en": "Studies show parents with strong support networks report lower stress and warmer parenting. A child's wellbeing rests not on one perfect parent, but on a web of caring relationships.", "hi": "Studies dikhaati hain ki mazboot support network waale parents kam stress aur zyada garmjoshi bhari parenting bataate hain. Ek bachche ki bhalai ek perfect parent par nahi, balki dekhbhaal karne waale rishton ke jaal par tikti hai." },
+      "remember": { "en": "Your village is not a backup plan — it is part of the plan.", "hi": "Aapka gaon koi backup plan nahi — yeh plan ka hissa hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Pigeons And The Net", "hi": "Kabootar Aur Jaal" },
+      "summary": { "en": "A flock of trapped pigeons escapes by flying as one.", "hi": "Phanse hue kabootaron ka ek jhund ek hokar udkar bach nikalta hai." },
+      "body": { "en": "A flock of pigeons was flying over a forest when they spotted grains of rice scattered on the ground below. Hungry, they swooped down to eat — and at once a hunter's net dropped over them all. The pigeons fluttered and pulled in every direction, but the net only tightened, and the hunter came running with a grin.\n\nTheir wise king pigeon called out calmly, 'Friends, do not pull apart! If each flies his own way, we are lost. But if we beat our wings together, all at once, we can lift the net and fly!' So on his count, every pigeon flapped as one. The net rose from the ground, and the whole flock carried it up into the sky.\n\nThey flew to a kind mouse who gnawed the net free. The hunter watched, amazed, as the pigeons soared away — saved not by strength, but by acting together.", "hi": "Kabootaron ka ek jhund ek jungle ke upar ud raha tha jab unhe neeche zameen par bikhre chaawal ke daane dikhe. Bhookhe, woh khaane ke liye neeche jhapate — aur turant ek shikaari ka jaal un sab par girr gaya. Kabootar phadphadaaye aur har disha mein kheenche, par jaal aur kasta gaya, aur shikaari muskuraate hue daud aaya.\n\nUnke samajhdaar raja kabootar ne shaanti se pukaara, 'Doston, alag-alag mat kheencho! Agar har ek apni raah uda, to hum kho jaayenge. Par agar hum sab ek saath apne pankh ek hokar maarein, to hum jaal ko uthaa kar ud sakte hain!' To uski ginti par, har kabootar ek hokar phadphadaaya. Jaal zameen se uthaa, aur poora jhund use aasmaan mein le gaya.\n\nWoh ek dayaalu chuhe ke paas ude jisne jaal kaat kar unhe aazaad kar diya. Shikaari dang rehkar dekhta raha jab kabootar ud gaye — taakat se nahi, balki saath milkar bach gaye." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Make your baby a promise: that you will always do your best to keep them safe.", "hi": "Apne baby se ek vaada karein: ki aap hamesha unhe surakshit rakhne ki poori koshish karengi." },
+      "motivation": { "en": "Feeling safe is the ground a child needs before they can grow brave.", "hi": "Surakshit mehsoos karna woh zameen hai jo ek bachche ko himmati banne se pehle chahiye." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "We Are Surrounded By Love", "hi": "Hum Pyaar Se Ghire Hue Hain" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about belonging", "hi": "Apnepan ka ek bond affirmation" },
+      "affirmation": { "en": "You and I are not alone. We are held by a wide circle of love, ready to welcome you.", "hi": "Tum aur main akele nahi hain. Humein pyaar ka ek bada ghera thaame hue hai, tumhara swagat karne ko taiyaar." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Out The Worry", "hi": "Chinta Ko Saans Ke Saath Chhodein" },
+      "content": { "en": "Breathe in slowly for a count of four. As you breathe out for a count of six, imagine one worry leaving you with the air. Repeat four gentle times.", "hi": "Chaar tak ginte hue dheere se saans lein. Jab aap chhah tak ginte hue saans chhodein, sochein ki ek chinta hawa ke saath aapko chhod rahi hai. Chaar baar narmi se dohraayein." },
+      "remember": { "en": "A longer breath out tells your body it is safe to soften.", "hi": "Lambi saans baahar aapke sharir ko batati hai ki naram hona surakshit hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 80,
+    "week": 12,
+    "babyLearning": { "en": "small movements beginning, though too gentle to feel yet", "hi": "chhoti harkatein shuru ho rahi hain, halaanki abhi mehsoos hone ke liye bahut naram" },
+    "grow": {
+      "title": { "en": "Leaning Is Not Weakness", "hi": "Sahaara Lena Kamzori Nahi" },
+      "insight": { "en": "Leaning on someone does not make you less strong. The strongest people are often the ones who know how to ask.", "hi": "Kisi ka sahaara lena aapko kam mazboot nahi banata. Sabse mazboot log aksar woh hote hain jo maangna jaante hain." },
+      "expanded": { "en": "Many of us were quietly taught that needing help is something to hide — that the capable person manages alone. But true strength includes the courage to be open, to say 'I am tired,' or 'I need you.' A tree that never bends in the wind eventually snaps; the one that leans and sways endures. When you let yourself lean now, you are not collapsing — you are teaching yourself, and one day your child, that asking for help is brave, healthy and deeply human.", "hi": "Hum mein se kayi ko chupchaap sikhaaya gaya ki madad ki zaroorat ek aisi cheez hai jise chhupaana chahiye — ki saksham insaan akele sambhaalta hai. Par sachi taakat mein khula hone ki himmat shaamil hai, yeh kehne ki 'main thak gayi hoon,' ya 'mujhe tumhari zaroorat hai.' Jo ped hawa mein kabhi nahi jhukta woh aakhir mein toot jaata hai; jo jhukta aur lehraata hai woh tikta hai. Jab aap khud ko abhi sahaara lene deti hain, aap girr nahi rahin — aap khud ko, aur ek din apne bachche ko, sikhaa rahi hain ki madad maangna himmati, swasth aur gehrai se insaani hai." },
+      "deepDive": { "en": "Psychologists find that asking for help builds connection rather than lowering others' respect for us — people generally see help-seekers as warm, not weak. We underestimate how willingly others want to support us.", "hi": "Psychologists paate hain ki madad maangna connection banata hai bajaaye doosron ke samman ko kam karne ke — log aam taur par madad maangne waalon ko garmjoshi bhara dekhte hain, kamzor nahi. Hum kam aankte hain ki doosre kitni khushi se humein sahaara dena chahte hain." },
+      "remember": { "en": "Asking for help is a sign of strength, not the lack of it.", "hi": "Madad maangna taakat ki nishaani hai, uski kami ki nahi." }
+    },
+    "readToBaby": {
+      "title": { "en": "Krishna, Friend Of Arjuna", "hi": "Krishna, Arjun Ke Mitra" },
+      "summary": { "en": "On a battlefield, a great warrior finds his strength by leaning on a trusted friend.", "hi": "Ek yuddh ke maidaan mein, ek mahaan yoddha ek vishwaspaatra mitra ka sahaara lekar apni taakat paata hai." },
+      "body": { "en": "Long ago, the brave warrior Arjuna stood at the edge of a great battlefield, his bow heavy in his hands. Though he was among the finest archers in all the land, his heart filled with doubt and sorrow, and his courage began to slip away. He felt utterly alone.\n\nBeside him stood his dear friend Krishna, who had chosen to guide his chariot. Seeing Arjuna's trembling spirit, Krishna spoke to him gently and patiently, helping him see clearly again and steadying his troubled mind. Arjuna did not have to find his courage all by himself; he found it by leaning on a friend who stayed close.\n\nWith Krishna beside him, Arjuna lifted his bow once more, calm and sure. The greatest warrior of his age was great not only for his skill, but because he knew when to let a trusted friend hold him steady.", "hi": "Bahut samay pehle, veer yoddha Arjun ek vishaal yuddh ke maidaan ke kinare khada tha, uska dhanush uske haathon mein bhaari tha. Halaanki woh saari dharti ke sabse behtareen dhanurdharon mein se tha, uska dil shak aur dukh se bhar gaya, aur uski himmat khisakne lagi. Use bilkul akela mehsoos hua.\n\nUske bagal mein uska pyaara mitra Krishna khada tha, jisne uske rath ko chalaane ka faisla kiya tha. Arjun ki kaanpti aatma ko dekhkar, Krishna ne use pyaar se aur sabra se samjhaaya, use phir se saaf dekhne mein madad ki aur uske vichlit mann ko sthir kiya. Arjun ko apni himmat poori tarah khud nahi dhoondhni padi; usne use ek aise mitra ka sahaara lekar paaya jo paas raha.\n\nKrishna ke saath, Arjun ne ek baar phir apna dhanush uthaaya, shaant aur nishchint. Apne yug ka sabse mahaan yoddha sirf apne hunar ke liye mahaan nahi tha, balki isliye ki woh jaanta tha ki kab ek vishwaspaatra mitra ko use sthir thaamne dena hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Promise your baby this: that you will let them be exactly who they are.", "hi": "Apne baby se yeh vaada karein: ki aap unhe bilkul wahi banne dengi jo woh hain." },
+      "motivation": { "en": "A child who is loved as themselves grows up free to become their fullest self.", "hi": "Jis bachche ko uske apne roop mein pyaar kiya jaata hai, woh apna poora roop banne ke liye aazaad badhta hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Resting In Open Hands", "hi": "Khule Haathon Mein Aaram" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on being supported", "hi": "Sahaara paaye jaane par ek chhota dhyan" },
+      "affirmation": { "en": "I do not have to hold everything tightly. I can rest, and let myself be held.", "hi": "Mujhe sab kuch kaskar pakadne ki zaroorat nahi. Main aaram kar sakti hoon, aur khud ko thaame jaane de sakti hoon." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Take three slow breaths. Picture your hands resting open in your lap, palms soft and upward, letting go of all you have been gripping. Imagine you and your baby being gently held by something warm and larger than you both.", "hi": "Aaram se baithein aur aankhein band hone dein. Teen dheemi saansein lein. Sochein ki aapke haath aapki god mein khule pade hain, hatheliyaan naram aur upar ki taraf, sab kuch jo aap pakde hue theen use chhodte hue. Sochein ki aap aur aapka baby kisi garm aur aap dono se bade ke dwaara pyaar se thaame ja rahe hain." },
+      "closingThought": { "en": "You loosened your grip for a few moments and were still held. Carry that ease with you.", "hi": "Aapne kuch palon ke liye apni pakad dheeli ki aur phir bhi thaami gayi. Us sehjta ko apne saath le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "Receiving Is A Gift Too", "hi": "Lena Bhi Ek Tohfa Hai" },
+      "content": { "en": "When I let someone help me, I give them the joy of being needed. Receiving is its own kind of grace.", "hi": "Jab main kisi ko apni madad karne deti hoon, main unhe zaroorat ke kaam aane ki khushi deti hoon. Lena apni ek tarah ka aashirvaad hai." },
+      "remember": { "en": "Letting people help you is a gift to them as well.", "hi": "Logon ko apni madad karne dena unke liye bhi ek tohfa hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 81,
+    "week": 12,
+    "babyLearning": { "en": "growing rounder and stronger, settling into a rhythm", "hi": "gol aur mazboot hota ja raha hai, ek laya mein bas raha hai" },
+    "grow": {
+      "title": { "en": "Let Love Help You", "hi": "Pyaar Ko Apni Madad Karne Dein" },
+      "insight": { "en": "The people who love you want to help — not out of duty, but out of love. Letting them in is a gift to you both.", "hi": "Jo log aapse pyaar karte hain woh madad karna chahte hain — kisi farz se nahi, balki pyaar se. Unhe andar aane dena aap dono ke liye ek tohfa hai." },
+      "expanded": { "en": "When someone we love offers help, we so often say, 'No, I'm fine, don't worry.' We do not want to be a burden. But think of how it feels when you long to help someone you love — the gladness of being trusted, of being let in. By gently accepting the soup, the company, the offer to sit with you, you are not taking from others; you are giving them the joy of loving you well. Let love help you. It was always meant to flow both ways.", "hi": "Jab koi jise hum pyaar karte hain madad ki peshkash karta hai, hum aksar kehte hain, 'Nahi, main theek hoon, chinta mat karo.' Hum bojh nahi banna chahte. Par sochein ki kaisa lagta hai jab aap kisi apne ki madad karna chahti hain — bharosa kiye jaane ki, andar liye jaane ki khushi. Narmi se woh soup, woh saath, aapke paas baithne ki peshkash sweekaar karke, aap doosron se kuch chheen nahi rahin; aap unhe aapko achhe se pyaar karne ki khushi de rahi hain. Pyaar ko apni madad karne dein. Yeh hamesha se dono taraf behne ke liye tha." },
+      "deepDive": { "en": "Research on giving and receiving finds that accepting help deepens relationships, while always refusing it can quietly create distance. Connection grows when care can flow in both directions.", "hi": "Dene aur lene par hui research paati hai ki madad sweekaar karna rishton ko gehra karta hai, jabki use hamesha thukraana chupchaap doori bana sakta hai. Connection tab badhta hai jab dekhbhaal dono taraf beh sake." },
+      "remember": { "en": "Letting love help you lets love grow.", "hi": "Pyaar ko apni madad karne dena pyaar ko badhne deta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The United Quails", "hi": "Ekjut Bater" },
+      "summary": { "en": "A flock of quails stays safe by sticking together, until they forget.", "hi": "Bateron ka ek jhund saath rehkar surakshit rehta hai, jab tak woh bhool nahi jaate." },
+      "body": { "en": "In a wide field lived a large flock of quails. A fowler often came with his net, throwing it over them to catch them all at once. The quails were small, and alone they were helpless. But their wise leader had taught them a trick.\n\n'When the net falls,' he said, 'each of you put your head through a hole, and together, all at once, lift the net and fly to the thornbush. The net will catch on the thorns, and we slip free.' And so they did. Again and again the fowler threw his net, and again and again the quails rose as one and escaped. The fowler went home empty-handed.\n\nBut one day, two quails began to quarrel over who worked harder. When the net fell, they bickered instead of lifting. The flock could not rise together — and that day, divided, they were caught. United, they had been free; divided, they fell.", "hi": "Ek chaude khet mein bateron ka ek bada jhund rehta tha. Ek baheliya aksar apna jaal leke aata, use un sab par phenkkar ek saath pakadne ke liye. Bater chhote the, aur akele woh bebas the. Par unke samajhdaar mukhiya ne unhe ek tarkeeb sikhaayi thi.\n\n'Jab jaal gire,' usne kaha, 'tum sab apna sir ek-ek chhed se nikaalo, aur saath, ek saath, jaal ko uthaakar kaante ki jhaadi tak udo. Jaal kaanton mein phans jaayega, aur hum chhootkar bach jaayenge.' Aur unhone aisa hi kiya. Baar-baar baheliye ne apna jaal phenka, aur baar-baar bater ek hokar uthe aur bach gaye. Baheliya khaali haath ghar gaya.\n\nPar ek din, do bater is baat par jhagadne lage ki kaun zyada mehnat karta hai. Jab jaal gira, woh uthaane ke bajaaye behes karte rahe. Jhund saath nahi uth saka — aur us din, bante hue, woh pakde gaye. Ekjut, woh aazaad the; bante hue, woh girr gaye." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Promise your baby that you will be right there beside them in their hardest moments.", "hi": "Apne baby se vaada karein ki unke sabse mushkil palon mein aap theek unke saath rahengi." },
+      "motivation": { "en": "Knowing someone stays through the hard parts is what teaches a child to trust.", "hi": "Yeh jaanna ki koi mushkil hisson mein bhi saath rehta hai, yahi ek bachche ko bharosa karna sikhaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Open My Heart To Help", "hi": "Main Apna Dil Madad Ke Liye Kholti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about accepting love", "hi": "Pyaar sweekaar karne ka ek bond affirmation" },
+      "affirmation": { "en": "I let love reach me as freely as I give it. As I am cared for, so are you.", "hi": "Main pyaar ko khud tak utni hi aazaadi se aane deti hoon jitna main use deti hoon. Jaise mera khayal rakha jaata hai, waise tumhara bhi." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "Feeling Tired Today?", "hi": "Aaj Thaki Hui Hain?" },
+      "content": { "en": "If your energy is low today, be gentle with yourself. Keep something easy and warm within reach, sip water slowly through the day, and let a small comforting bite be enough. You do not have to do it all at once.", "hi": "Agar aaj aapki energy kam hai, to khud ke saath narmi se pesh aayein. Kuch aasaan aur garm apne paas rakhein, din bhar dheere-dheere paani piyein, aur ek chhota sukoon dene wala niwaala kaafi hone dein. Aapko sab kuch ek saath karne ki zaroorat nahi." },
+      "remember": { "en": "On low days, gentle and small is more than enough.", "hi": "Kam energy waale dinon mein, naram aur chhota kaafi se zyada hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 82,
+    "week": 12,
+    "babyLearning": { "en": "tiny vocal cords beginning to form, quiet and unseen", "hi": "nanhe vocal cords banna shuru ho rahe hain, shaant aur andekhe" },
+    "grow": {
+      "title": { "en": "Share The Load", "hi": "Bojh Baant Lein" },
+      "insight": { "en": "A weight shared is a weight halved. You do not have to carry every task of parenting alone.", "hi": "Baanta hua bojh aadha bojh hota hai. Aapko parenting ka har kaam akele uthaane ki zaroorat nahi." },
+      "expanded": { "en": "There is a quiet pride in doing it all yourself — but it can slowly wear you thin. Parenting holds a thousand small tasks, and you were never meant to hold every one. Sharing the load is not handing away your role; it is making room to be present where it matters most. When you let a partner, a parent, or a friend take a piece, you are not stepping back from your baby — you are saving your warmth for the moments that truly need it. A rested, supported you is the best gift of all.", "hi": "Sab kuch khud karne mein ek shaant garv hai — par yeh dheere-dheere aapko thakaa sakta hai. Parenting mein hazaar chhote kaam hote hain, aur aap kabhi har ek uthaane ke liye nahi bani theen. Bojh baantna apni bhoomika de dena nahi hai; yeh wahan maujood rehne ki jagah banana hai jahaan sabse zyada maayne rakhta hai. Jab aap kisi partner, maa-baap, ya dost ko ek hissa lene deti hain, aap apne baby se peeche nahi hat rahin — aap apni garmjoshi un palon ke liye bacha rahi hain jinhe sach mein uski zaroorat hai. Ek aaram paayi, sahaara paayi aap hi sabse achha tohfa hain." },
+      "deepDive": { "en": "Research on shared caregiving shows that when the load is distributed, parents are less exhausted and more responsive — and children benefit from a wider circle of attentive, loving adults.", "hi": "Saajha dekhbhaal par hui research dikhaati hai ki jab bojh baant diya jaata hai, parents kam thake aur zyada responsive hote hain — aur bachchon ko dhyan dene waale, pyaar karne waale badon ke ek bade ghere ka faayda milta hai." },
+      "remember": { "en": "Sharing the load keeps your warmth for what matters most.", "hi": "Bojh baantna aapki garmjoshi us cheez ke liye bachaata hai jo sabse zyada maayne rakhti hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The Shared Feast", "hi": "Tenali Rama Aur Saajha Bhoj" },
+      "summary": { "en": "Clever Tenali Rama shows a boastful cook that a feast is made by many hands.", "hi": "Chalaak Tenali Rama ek ghamandi bawarchi ko dikhaata hai ki ek bhoj kayi haathon se banta hai." },
+      "body": { "en": "The king's head cook was a proud man who boasted that the grand royal feast was his work alone. 'Without me,' he declared, 'not a single dish would reach the king's table!' The other kitchen workers — those who fetched water, chopped vegetables, and tended the fire — said nothing, but felt unseen.\n\nTenali Rama heard of this and devised a gentle lesson. At the next feast, he quietly asked the water-carriers, the wood-gatherers and the spice-grinders to rest for a single day. The proud cook stood in his kitchen with his fine recipes — but with no water, no fire, and no chopped spices, not one dish could be made.\n\nThe king laughed kindly when Tenali explained. 'A feast,' said Tenali, 'is never one man's doing. It rises from many quiet hands working together.' The cook bowed his head, and from then on thanked every helper in his kitchen.", "hi": "Raja ka mukhya bawarchi ek ghamandi aadmi tha jo sheykhi maarta ki shaandaar raj-bhoj sirf uska kaam hai. 'Mere bina,' usne ghoshna ki, 'ek bhi vyanjan raja ki mez tak nahi pohanchega!' baaki rasoi ke kaamgaar — jo paani laate, sabziyaan kaatte, aur aag sambhaalte — kuch nahi bole, par andekhe mehsoos karte.\n\nTenali Rama ne yeh suna aur ek narm sabak socha. Agle bhoj par, usne chupchaap paani laane waalon, lakdi joadne waalon aur masala peesne waalon se ek din aaram karne ko kaha. Ghamandi bawarchi apne badhiya recipes ke saath apni rasoi mein khada raha — par bina paani, bina aag, aur bina pise masale ke, ek bhi vyanjan nahi ban saka.\n\nRaja dayaalta se hansa jab Tenali ne samjhaaya. 'Ek bhoj,' Tenali ne kaha, 'kabhi ek aadmi ka kaam nahi hota. Yeh kayi shaant haathon ke saath milkar kaam karne se uthta hai.' Bawarchi ne apna sir jhukaaya, aur us din se apni rasoi ke har madadgaar ka shukriya ada karta raha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Promise your baby that you will laugh and play with them, even on busy days.", "hi": "Apne baby se vaada karein ki aap unke saath hansengi aur khelengi, vyast dinon mein bhi." },
+      "motivation": { "en": "Play is how children feel joy is welcome between you — and that joy is safe to share.", "hi": "Khel woh tareeqa hai jisse bachche mehsoos karte hain ki aap dono ke beech khushi ka swagat hai — aur woh khushi baantna surakshit hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Durga", "hi": "Raag Durga" },
+      "durationMinutes": 4,
+      "description": { "en": "An evening raga for calm and quiet strength", "hi": "Ek shaam ka raag, shaanti aur shaant taakat ke liye" },
+      "affirmation": { "en": "As this evening melody settles, a quiet, steady strength settles in me, for us both.", "hi": "Jaise yeh shaam ki dhun thamti hai, ek shaant, sthir taakat mujhmein thamti hai, hum dono ke liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Drop The Shoulders", "hi": "Kandhe Gira Dein" },
+      "content": { "en": "Notice if your shoulders have crept up towards your ears. Breathe in, then let them sink down with a long, slow breath out. Do this five gentle times.", "hi": "Dhyan dein agar aapke kandhe kaanon ki taraf upar chadh gaye hain. Saans lein, phir ek lambi, dheemi saans baahar ke saath unhe neeche girne dein. Ise paanch baar narmi se karein." },
+      "remember": { "en": "The body lets go of more than we realise when we simply soften.", "hi": "Sharir utne se zyada chhodta hai jitna hum sochte hain, jab hum bas naram ho jaate hain." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 83,
+    "week": 12,
+    "babyLearning": { "en": "growing steadily, every part working quietly together", "hi": "lagaataar badh raha hai, har hissa shaanti se saath kaam kar raha hai" },
+    "grow": {
+      "title": { "en": "Together Is Lighter", "hi": "Saath Mein Halka Hai" },
+      "insight": { "en": "What feels heavy alone becomes lighter the moment it is shared. Togetherness changes the weight of everything.", "hi": "Jo akele bhaari lagta hai woh baantte hi halka ho jaata hai. Saath hona har cheez ka bojh badal deta hai." },
+      "expanded": { "en": "There is a strange magic in shared effort: the same task that felt impossible alone becomes almost easy with another beside you. It is not only that the work is divided — it is that you no longer feel alone in it. Worry shared with a kind ear grows smaller. A long night with someone beside you feels shorter. As you move toward parenthood, remember that you do not need to make every burden lighter by yourself. Simply not being alone in it is often the lightening you need most.", "hi": "Saajhe prayaas mein ek ajeeb jaadu hai: wahi kaam jo akele namumkin lagta tha, kisi ke saath hone par lagbhag aasaan ho jaata hai. Yeh sirf yeh nahi ki kaam baant jaata hai — yeh ki ab aap usmein akele nahi mehsoos karti. Ek dayaalu kaan ke saath baanti gayi chinta chhoti ho jaati hai. Kisi ke saath hone par ek lambi raat chhoti lagti hai. Jaise aap parenthood ki taraf badhti hain, yaad rakhein ki aapko har bojh khud halka nahi karna. Bas usmein akele na hona aksar wahi halkapan hai jiski aapko sabse zyada zaroorat hai." },
+      "deepDive": { "en": "Studies show that even imagining a supportive person nearby makes a difficult task feel less daunting. Our brains literally register challenges as smaller when we feel we are not facing them alone.", "hi": "Studies dikhaati hain ki ek sahaara dene waale insaan ko paas sochne bhar se ek mushkil kaam kam bhaari lagta hai. Hamara dimaag sach mein chunautiyon ko chhota maapta hai jab humein lagta hai ki hum unka saamna akele nahi kar rahe." },
+      "remember": { "en": "You don't have to make it lighter — you just have to not be alone.", "hi": "Aapko ise halka nahi karna — bas akele nahi hona hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Stone Soup", "hi": "Patthar Ka Soup" },
+      "summary": { "en": "A traveller teaches a wary village that a feast grows from everyone's small share.", "hi": "Ek musafir ek shankaalu gaon ko sikhaata hai ki ek bhoj sabke chhote hisse se banta hai." },
+      "body": { "en": "A tired traveller arrived at a village where no one would share their food, for times were hard and each family kept its doors shut. Undismayed, the traveller set a large pot of water to boil in the square, dropped in a smooth stone, and stirred it with a smile.\n\nA curious villager asked what he was making. 'Stone soup,' he said. 'Delicious on its own — though a carrot would make it even better.' A woman fetched a carrot. 'And perhaps a potato?' Another brought one. Soon, drawn in one by one, villagers added an onion, a handful of beans, a pinch of salt, a few herbs.\n\nBefore long the pot brimmed with a rich, fragrant soup, enough for everyone. They sat together and ate, laughing, as no one had in months. The 'magic stone' had simply reminded them that, shared, even a little from each becomes plenty for all.", "hi": "Ek thaka hua musafir ek gaon pohancha jahaan koi apna khaana nahi baantta tha, kyunki samay kathin tha aur har parivar apne darwaaze band rakhta. Bina ghabraaye, musafir ne chowk mein paani ka ek bada bartan ubaalne rakha, usmein ek chikna patthar daala, aur muskuraate hue use chalaaya.\n\nEk jigyaasu gaon waale ne poocha ki woh kya bana raha hai. 'Patthar ka soup,' usne kaha. 'Apne aap mein laajawaab — halaanki ek gaajar ise aur behtar bana degi.' Ek aurat ek gaajar le aayi. 'Aur shayad ek aalu?' Doosra ek le aaya. Jald hi, ek-ek karke kheenche chale aaye, gaon waalon ne ek pyaaz, mutthi bhar beans, ek chutki namak, kuch jadi-bootiyaan daali.\n\nThodi hi der mein bartan ek gaadhe, khushboodaar soup se bhar gaya, sabke liye kaafi. Woh saath baithe aur khaaye, hanste hue, jaise kayi mahinon mein koi nahi hansa tha. 'Jaadui patthar' ne unhe bas yaad dilaaya ki, baanti gayi, har ek se thodi cheez bhi sabke liye bahut ban jaati hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Promise your baby that you will say sorry to them when you get it wrong.", "hi": "Apne baby se vaada karein ki jab aap galti karengi to aap unse maafi maangengi." },
+      "motivation": { "en": "A child who hears a parent apologise learns that love and humility can live together.", "hi": "Jo bachcha ek parent ko maafi maangte sunta hai woh seekhta hai ki pyaar aur vinamrata saath reh sakte hain." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "We Carry It Together", "hi": "Hum Ise Saath Uthaate Hain" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about togetherness", "hi": "Saath hone ka ek bond affirmation" },
+      "affirmation": { "en": "Whatever this journey brings, I do not face it alone. We carry it together, gently, you and I.", "hi": "Yeh safar chaahe jo bhi laaye, main ise akele nahi jhelti. Hum ise saath uthaate hain, narmi se, tum aur main." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Not A Burden", "hi": "Main Ek Bojh Nahi Hoon" },
+      "content": { "en": "When I ask for help, I am not too much. I am a person worth showing up for, and so is my baby.", "hi": "Jab main madad maangti hoon, main zyada nahi ho jaati. Main ek aisi insaan hoon jiske liye saamne aana sahi hai, aur mera baby bhi." },
+      "remember": { "en": "Your needs are not too much for people who love you.", "hi": "Aapki zarooratein un logon ke liye zyada nahi jo aapse pyaar karte hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 84,
+    "week": 12,
+    "babyLearning": { "en": "closing the week, fully formed in miniature and growing on", "hi": "hafta poora karte hue, chhote roop mein poori tarah bana aur aage badhta hua" },
+    "grow": {
+      "title": { "en": "Accept The Hand Offered", "hi": "Badhaaya Gaya Haath Sweekaar Karein" },
+      "insight": { "en": "When someone reaches out to help, let them. A hand offered and taken builds the very bonds your baby will grow up inside.", "hi": "Jab koi madad ke liye haath badhaaye, use lene dein. Badhaaya aur thaama gaya haath wahi rishte banata hai jinke andar aapka baby bada hoga." },
+      "expanded": { "en": "All week we have seen that no parent stands alone. Today, let it become simple practice: when a hand is offered, take it. Say yes to the meal, the lift, the company, the listening ear. It can feel easier to refuse, to prove you can manage — but every time you accept, you strengthen a bond and widen the circle of care around your child. Your baby will grow inside a web of relationships, and that web is woven from a thousand small moments of one person letting another in. Let yourself be one of them.", "hi": "Poore hafte humne dekha ki koi parent akela khada nahi hota. Aaj, ise ek saadi aadat banne dein: jab koi haath badhaaye, use thaam lein. Khaane ko, lift ko, saath ko, sunne waale kaan ko haan kahein. Mana karna aasaan lag sakta hai, yeh saabit karna ki aap sambhaal sakti hain — par har baar jab aap sweekaar karti hain, aap ek rishta mazboot karti hain aur apne bachche ke around dekhbhaal ka ghera badhaati hain. Aapka baby rishton ke ek jaal ke andar badhega, aur woh jaal ek insaan dwaara doosre ko andar aane dene ke hazaar chhote palon se buna jaata hai. Khud ko unmein se ek hone dein." },
+      "deepDive": { "en": "Researchers find that children thrive most within rich networks of warm relationships, not from a single tireless caregiver. Every connection you accept becomes part of your child's safety net.", "hi": "Researchers paate hain ki bachche garmjoshi bhare rishton ke samriddh jaalon ke andar sabse zyada phalte-phulte hain, kisi ek na thakne waale caregiver se nahi. Aap jo bhi connection sweekaar karti hain woh aapke bachche ke surakshit jaal ka hissa ban jaata hai." },
+      "remember": { "en": "Every hand you accept becomes part of your baby's safety net.", "hi": "Aap jo bhi haath sweekaar karti hain woh aapke baby ke surakshit jaal ka hissa ban jaata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Weaver Birds' Colony", "hi": "Bunkar Pakshiyon Ki Basti" },
+      "summary": { "en": "A colony of weaver birds shows that many nests close together keep everyone safe.", "hi": "Bunkar pakshiyon ki ek basti dikhaati hai ki saath-saath kayi ghonsle sabko surakshit rakhte hain." },
+      "body": { "en": "High in a tall tree by the river lived a colony of weaver birds. Each pair wove its own clever, hanging nest of grass and reeds, but they all built close together on the very same branches, so that the tree hung heavy with their woven homes, swaying side by side.\n\nA young weaver once wished to build far off, alone. 'I will have peace and quiet,' he thought, and wove his nest on a distant tree. But one evening a hungry snake climbed up, and there was no one to raise the alarm. The lonely weaver barely escaped.\n\nHe flew back to the colony, where the birds welcomed him. There, the moment any danger came near, a hundred voices cried out together, and the whole colony rose to drive it away. The young bird understood at last: built side by side, their many small nests had become one great fortress of safety.", "hi": "Nadi ke kinare ek ooche ped par ooper bunkar pakshiyon ki ek basti rehti thi. Har jodi ghaas aur sarkande se apna chalaak, latakta ghonsla bunti, par woh sab ek hi tehniyon par saath-saath banaate, taaki ped unke bune gharon se bhaari latakta, ek doosre ke bagal mein lehraata.\n\nEk jawaan bunkar ne ek baar door, akele banana chaaha. 'Mujhe shaanti aur sukoon milega,' usne socha, aur ek door ke ped par apna ghonsla buna. Par ek shaam ek bhookha saanp chadh aaya, aur khatre ki chetawni dene waala koi nahi tha. Akela bunkar mushkil se bach paaya.\n\nWoh wapas basti mein uda, jahaan pakshiyon ne uska swagat kiya. Wahan, jaise hi koi khatra paas aata, sau aawaazein ek saath cheekhtin, aur poori basti use bhagaane ko uth khadi hoti. Jawaan pakshi ko aakhir samajh aaya: saath-saath bane, unke kayi chhote ghonsle suraksha ka ek bada kila ban gaye the." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Promise your baby that you will love them, no matter what, always.", "hi": "Apne baby se vaada karein ki aap unhe pyaar karengi, chaahe kuch bhi ho, hamesha." },
+      "motivation": { "en": "Knowing your love has no conditions is the safest feeling a child can ever hold.", "hi": "Yeh jaanna ki aapke pyaar ki koi shart nahi, ek bachche ke liye sabse surakshit ehsaas hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Held In A Wider Circle", "hi": "Ek Bade Ghere Mein Thaame Hue" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on belonging", "hi": "Apnepan par ek chhota dhyan" },
+      "affirmation": { "en": "We are not a single thread, but part of a wide, warm weave of love.", "hi": "Hum ek akela dhaaga nahi, balki pyaar ke ek chaude, garm bunaayi ka hissa hain." },
+      "introduction": { "en": "Settle comfortably and close your eyes. Take three slow breaths. Picture yourself and your baby at the centre of a soft, glowing circle, and around it, the faces of all who love you — family, friends, those near and far. Feel that warm ring holding you both gently.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein. Khud ko aur apne baby ko ek naram, chamakte ghere ke beech mein sochein, aur uske around, un sabke chehre jo aapse pyaar karte hain — parivar, dost, paas aur door ke. Us garm ghere ko aap dono ko pyaar se thaame hue mehsoos karein." },
+      "closingThought": { "en": "You closed this week wrapped in a circle of love. Let it stay around you as you go.", "hi": "Aapne yeh hafta pyaar ke ek ghere mein lipte hue poora kiya. Use aage badhte hue apne around rehne dein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Belong To A Circle Of Love", "hi": "Main Pyaar Ke Ek Ghere Ka Hissa Hoon" },
+      "content": { "en": "I am part of something larger than myself. I am held, and I am never truly alone in this.", "hi": "Main khud se kuch bade ka hissa hoon. Mujhe thaama gaya hai, aur main ismein kabhi sach mein akeli nahi hoon." },
+      "remember": { "en": "You belong, and you are held.", "hi": "Aap kisi ke hain, aur aapko thaama gaya hai." },
+      "durationMinutes": 0
+    }
+  }
+]

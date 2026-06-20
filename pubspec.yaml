@@ -90,7 +90,11 @@ flutter:
 
   assets:
     - lib/data/weekContent.json
+    - lib/data/homeDailyContent.json
+    - lib/data/home/
+    - lib/data/father/
     - assets/audio/raga_drone.wav
+    - assets/baby/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

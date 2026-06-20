@@ -1,0 +1,282 @@
+[
+  {
+    "day": 218,
+    "week": 32,
+    "babyLearning": { "en": "growing rounder and stronger, settling lower and snug", "hi": "gol aur mazboot ho raha hai, neeche aaram se bas raha hai" },
+    "grow": {
+      "title": { "en": "Your Attention Is Love", "hi": "Aapka Dhyan Hi Pyaar Hai" },
+      "insight": { "en": "To a child, attention and love are the same thing. The fullest way to say 'I love you' is simply to be fully there.", "hi": "Ek bachche ke liye, dhyan aur pyaar ek hi cheez hai. 'Main tumse pyaar karti hoon' kehne ka sabse poora tareeka hai bas poori tarah wahan hona." },
+      "expanded": { "en": "Children do not measure love by what we buy or say. They measure it by how it feels to have our eyes, our ears, our whole self turned towards them. When you stop, look, and truly listen, a child feels a quiet certainty: 'I matter.' As you near the end of this journey, this is worth holding close. The undivided attention you are learning to give now — to your breath, to your belly, to your baby's small movements — is the very same gift your child will need most. Attention is love made visible.", "hi": "Bachche pyaar ko is se nahi naapte ki hum kya khareedte ya kehte hain. Woh ise is se naapte hain ki hamari aankhein, hamare kaan, hamara poora vajood unki taraf mudna kaisa lagta hai. Jab aap rukti hain, dekhti hain, aur sach mein sunti hain, ek bachche ko ek shaant yaqeen mehsoos hota hai: 'main maayne rakhta hoon.' Jaise aap is safar ke ant ke paas aati hain, yeh paas rakhne layak hai. Jo poora dhyan aap abhi dena seekh rahi hain — apni saans ko, apne pet ko, apne baby ki chhoti harkaton ko — wahi tohfa aapke bachche ko sabse zyada chahiye. Dhyan pyaar ka dikhne wala roop hai." },
+      "deepDive": { "en": "Researchers find that responsive, focused attention in the early years builds the neural pathways for trust and emotional security. Children read undivided attention as a message of worth.", "hi": "Researchers paate hain ki shuruaati saalon mein responsive, kendrit dhyan bharose aur bhaavnaatmak suraksha ke neural raaste banaata hai. Bachche poore dhyan ko apni keemat ke sandesh ki tarah padhte hain." },
+      "remember": { "en": "When you give your full attention, you are saying 'I love you.'", "hi": "Jab aap apna poora dhyan dete hain, aap keh rahe hain 'main tumse pyaar karti hoon.'" }
+    },
+    "readToBaby": {
+      "title": { "en": "The Hare With Many Friends", "hi": "Bahut Doston Wala Khargosh" },
+      "summary": { "en": "A friendly hare learns that many casual friends are not the same as a few who truly show up.", "hi": "Ek milansaar khargosh seekhta hai ki bahut se halke dost un kuch ke jaise nahi jo sach mein saath aate hain." },
+      "body": { "en": "A gentle hare was loved by everyone in the meadow. She greeted each animal warmly and called them all her friends — the horse, the bull, the goat, the ram. 'I have so many friends,' she would say happily, 'I shall never be in trouble.'\n\nOne morning the hare heard hounds approaching and her heart pounded. She ran first to the horse. 'Carry me away, dear friend!' But the horse was busy and trotted off. She begged the bull, who said his horns were needed elsewhere. The goat feared his back was too weak; the ram worried the hounds might chase him too. Each friend had a reason, and not one stayed.\n\nThe hare darted into the bushes alone and barely escaped. Resting at last, she understood softly: a crowd of easy friends is not the same as a few who truly turn towards you when it matters most.", "hi": "Ek narm khargosh ko maidaan mein har koi pyaar karta tha. Woh har jaanwar se garmjoshi se milti aur sabhi ko apna dost kehti — ghoda, saand, bakri, mendha. 'Mere itne dost hain,' woh khushi se kehti, 'main kabhi mushkil mein nahi padungi.'\n\nEk subah khargosh ne shikaari kutton ko paas aate suna aur uska dil zor se dhadka. Woh pehle ghode ke paas daudi. 'Mujhe le chalo, pyaare dost!' Par ghoda vyast tha aur chala gaya. Usne saand se vinti ki, jisne kaha uske seengon ki zaroorat kahin aur hai. Bakri ko dar tha uski peeth bahut kamzor hai; mendhe ko chinta thi ki kutte use bhi daudaa sakte hain. Har dost ke paas ek wajah thi, aur ek bhi nahi ruka.\n\nKhargosh akeli jhaadiyon mein bhaagi aur mushkil se bachi. Aakhir mein aaram karte hue, usne dheere se samjha: aasaan doston ki bheed un kuch ke jaisi nahi jo tab sach mein aapki taraf mudte hain jab sabse zyada maayne rakhta ho." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will give them your full attention — eyes, ears and whole heart turned just to them.", "hi": "Apne baby ko bataayein ki aap unhe apna poora dhyan kaise dengi — aankhein, kaan aur poora dil bas unki taraf muda hua." },
+      "motivation": { "en": "The promise of your full attention is the first thing your child will feel as love.", "hi": "Aapke poore dhyan ka vaada woh pehli cheez hai jise aapka bachcha pyaar ki tarah mehsoos karega." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "All My Attention On You", "hi": "Mera Saara Dhyan Tum Par" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to rest your full attention on your baby", "hi": "Apna poora dhyan apne baby par tikaane ka ek chhota dhyan" },
+      "affirmation": { "en": "For these few minutes, nothing else needs me. There is only you, and my quiet attention.", "hi": "In kuch minuton ke liye, mujhe aur kisi cheez ki zaroorat nahi. Bas tum ho, aur mera shaant dhyan." },
+      "introduction": { "en": "Sit comfortably and let your phone and your to-do list drift far away. Close your eyes, take three slow breaths, and gently bring all of your attention to your belly, as if your baby were the only thing in the world right now.", "hi": "Aaram se baithein aur apna phone aur kaam ki list door behne dein. Aankhein band karein, teen dheemi saansein lein, aur apna saara dhyan pyaar se apne pet par le aayein, jaise abhi duniya mein bas aapka baby hi ho." },
+      "closingThought": { "en": "You just gave your baby your whole, undivided attention. That is exactly the love they will grow on.", "hi": "Aapne abhi apne baby ko apna poora, abhinn dhyan diya. Yahi woh pyaar hai jis par woh badhega." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "One Breath, Fully Here", "hi": "Ek Saans, Pooori Tarah Yahan" },
+      "content": { "en": "Take one slow breath and, just for it, let everything else go. Feel only the air coming in and going out. One fully present breath can bring you back to now.", "hi": "Ek dheemi saans lein aur, bas usi ke liye, baaki sab kuch jaane dein. Sirf aati aur jaati hawa ko mehsoos karein. Ek pooori tarah maujood saans aapko abhi mein wapas laa sakti hai." },
+      "remember": { "en": "Presence begins with a single breath.", "hi": "Maujoodgi ek hi saans se shuru hoti hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 219,
+    "week": 32,
+    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "nanhi saansein abhyaas kar raha hai, duniya ke liye taiyaar hote hue" },
+    "grow": {
+      "title": { "en": "Put The Phone Down", "hi": "Phone Neeche Rakh Dein" },
+      "insight": { "en": "A child can feel the difference between you looking at them and you looking past them at a screen.", "hi": "Ek bachcha is farak ko mehsoos kar sakta hai ki aap unhe dekh rahi hain ya unke aar-paar kisi screen ko." },
+      "expanded": { "en": "The most ordinary distraction of our time is the small glowing rectangle in our hands. It is not bad — but it quietly competes for the very attention a child longs for. When you put the phone down and turn fully towards your little one, even for a few minutes, you give them something rare: the feeling of being more interesting than anything else in the room. You do not need to be perfect about this. But practising now, in these last weeks, the simple act of setting the screen aside, prepares you to offer your child the undistracted presence that tells them they come first.", "hi": "Hamare samay ka sabse aam distraction hamare haathon mein woh chhota chamakta rectangle hai. Yeh bura nahi hai — par yeh chupchaap usi dhyan ke liye competition karta hai jiske liye ek bachcha tarsta hai. Jab aap phone neeche rakhti hain aur pooori tarah apne nanhe ki taraf mudti hain, kuch minute ke liye bhi, aap unhe kuch durlabh dete hain: kamre ki kisi bhi cheez se zyada dilchasp hone ka ehsaas. Aapko is mein perfect hone ki zaroorat nahi. Par in aakhri hafton mein abhi se screen ko ek taraf rakhne ki saadi aadat ka abhyaas, aapko taiyaar karta hai apne bachche ko woh bina distraction wali maujoodgi dene ke liye jo unhe batati hai ki woh pehle aate hain." },
+      "deepDive": { "en": "Studies of 'technoference' show that frequent device interruptions during caregiving are linked to more behaviour difficulties in young children. Children notice, and respond to, divided attention.", "hi": "'Technoference' ke studies dikhaate hain ki dekhbhaal ke dauraan baar-baar device ki rukaawatein chhote bachchon mein zyada vyavhaar ki mushkilon se judi hain. Bachche baant diye gaye dhyan ko note karte hain, aur uspe react karte hain." },
+      "remember": { "en": "Setting the screen aside is one of the kindest things you can do.", "hi": "Screen ko ek taraf rakhna sabse dayaalu cheezon mein se ek hai jo aap kar sakti hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Washerman's Dog", "hi": "Dhobi Ka Kutta" },
+      "summary": { "en": "A confused dog tries to belong everywhere and learns the worth of one true place.", "hi": "Ek uljha hua kutta har jagah ka banne ki koshish karta hai aur ek sachi jagah ki keemat seekhta hai." },
+      "body": { "en": "A washerman kept a dog at the riverbank where he washed clothes each day. The dog spent his mornings by the water and his evenings near the village houses. He could not decide where he truly belonged.\n\nDown by the river, the washerman's donkey worked hard, and the dog tried to act like the donkey, even braying clumsily. The donkey only blinked at him. Up in the village, the dog tried to behave like the house dogs who guarded the gates, but they growled and chased him away, for he carried the river's smell and did not know their ways. Each group saw at once that his attention was scattered, never fully given to anyone.\n\nTired and unwelcome everywhere, the dog finally returned to his master's side and stayed there. From that day he gave his loyalty to one place, one person — and at last he was truly at home. A saying grew from his tale: one who chases two places fully belongs to neither.", "hi": "Ek dhobi nadi ke kinare ek kutta rakhta tha jahan woh har din kapde dhota. Kutta apni subah paani ke paas aur shaam gaon ke gharon ke paas bitaata. Woh tay nahi kar paata ki woh sach mein kahan ka hai.\n\nNadi ke neeche, dhobi ka gadha mehnat karta, aur kutta gadhe ki tarah behave karne ki koshish karta, behdangi se rainkta tak. Gadha bas use dekhta. Gaon mein, kutta un ghar ke kutton ki tarah behave karne ki koshish karta jo gate pe pehra dete, par woh ghurraate aur use bhagaa dete, kyunki usmein nadi ki gandh thi aur woh unke tareeke nahi jaanta tha. Har samooh ne turant dekha ki uska dhyan bikhra hua hai, kabhi kisi ko pooora nahi diya gaya.\n\nThaka aur har jagah anchaaha, kutta aakhir apne maalik ke paas laut aaya aur wahin ruk gaya. Us din se usne apni wafaadaari ek jagah, ek insaan ko di — aur aakhir woh sach mein ghar par tha. Uski kahani se ek kehaawat bani: jo do jagahon ka peecha karta hai woh kisi ka bhi pooora nahi hota." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will put away your distractions, so the time you share is truly theirs.", "hi": "Apne baby ko bataayein ki aap apne distractions kaise door rakhengi, taaki jo samay aap baantein woh sach mein unka ho." },
+      "motivation": { "en": "Choosing to be undistracted is how you tell your child they are worth your whole self.", "hi": "Bina distraction rehne ka chunaav aise aap apne bachche ko batate hain ki woh aapke poore vajood ke laayak hain." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Nat Bhairav", "hi": "Raag Nat Bhairav" },
+      "durationMinutes": 4,
+      "description": { "en": "Morning raga for a calm, attentive start", "hi": "Subah ka raag, shaant aur dhyan bhari shuruaat ke liye" },
+      "affirmation": { "en": "As this morning melody fills the air, my scattered thoughts settle, and I turn gently towards you.", "hi": "Jaise yeh subah ki dhun hawa mein bharti hai, mere bikhre vichaar tham jaate hain, aur main pyaar se tumhari taraf mudti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Can Be Where My Feet Are", "hi": "Main Wahan Ho Sakti Hoon Jahan Mere Pair Hain" },
+      "content": { "en": "I do not have to be everywhere at once. Right now, I can simply be here, in this one quiet moment.", "hi": "Mujhe ek saath har jagah hone ki zaroorat nahi. Abhi, main bas yahan ho sakti hoon, is ek shaant pal mein." },
+      "remember": { "en": "Being fully in one place is its own kind of rest.", "hi": "Ek hi jagah pooori tarah hona apni ek tarah ka aaram hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 220,
+    "week": 32,
+    "babyLearning": { "en": "soft and snug, knowing your voice well by now", "hi": "naram aur aaram se, ab tak aapki aawaz achhe se jaanta hua" },
+    "grow": {
+      "title": { "en": "Presence Over Presents", "hi": "Tohfon Se Zyada Maujoodgi" },
+      "insight": { "en": "Years from now, your child will not remember most of the gifts. They will remember the moments you were truly there.", "hi": "Saalon baad, aapka bachcha zyadatar tohfe yaad nahi rakhega. Woh woh pal yaad rakhega jab aap sach mein wahan thin." },
+      "expanded": { "en": "There is a quiet pressure to give children more and more things, as if love could be measured in toys. But ask any grown person about their happiest childhood memories, and they rarely name objects. They name a parent who sat on the floor and played, who listened to a long rambling story, who simply stayed. Presents are easily forgotten; presence is woven into who a child becomes. As you wait to meet your baby, let this lift a weight from you. The most treasured thing you will ever give costs nothing but your time and your full, warm attention.", "hi": "Bachchon ko aur zyada cheezein dene ka ek shaant dabaav hota hai, jaise pyaar khilaunon mein naapa ja sakta ho. Par kisi bhi bade insaan se uski sabse khush bachpan ki yaadein poochein, woh shaayad hi cheezein bataate hain. Woh ek parent bataate hain jo farsh par baith kar khela, jisne ek lambi behakti kahani suni, jo bas ruka raha. Tohfe aasaani se bhul jaate hain; maujoodgi us mein bun jaati hai ki ek bachcha kya banta hai. Jaise aap apne baby se milne ka intezaar karti hain, ise aapse ek bojh utarne dein. Sabse keemti cheez jo aap kabhi dengi uski keemat kuch nahi sivaay aapke samay aur aapke poore, garm dhyan ke." },
+      "deepDive": { "en": "Longitudinal research finds that warm parental engagement predicts adult wellbeing far more strongly than family income or material provision. Time and attention outlast things.", "hi": "Longitudinal research paati hai ki garmjoshi bhari parental judaav adult bhalai ko parivar ki income ya cheezon se kahin zyada mazbooti se bataata hai. Samay aur dhyan cheezon se zyada tikte hain." },
+      "remember": { "en": "What a child treasures most is you, not what you give.", "hi": "Ek bachcha sabse zyada aapko keemti samajhta hai, na ki jo aap dete hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "Krishna Plays With The Cowherds", "hi": "Krishna Gwaalon Ke Saath Khelte Hain" },
+      "summary": { "en": "Even a beloved prince finds his deepest joy in being fully present with simple friends.", "hi": "Ek pyaara rajkumar bhi apni sabse gehri khushi saadhe doston ke saath pooori tarah maujood hone mein paata hai." },
+      "body": { "en": "In the green pastures of Vrindavan, young Krishna was loved by all, yet he chose to spend his days among the simple cowherd boys. He could have asked for jewels and grand games, but he wanted only to be with his friends.\n\nEach morning he ran barefoot through the fields with them, racing the calves, climbing trees, and sharing whatever small lunch each boy had carried from home. When one friend dropped his bread in the dust, Krishna laughed and shared his own. He listened to their silly worries as though they were the most important things in the world. He was not half-present, thinking of grander matters; he was wholly there, in the dust and laughter.\n\nThe cowherds never forgot those golden days. It was not the wonder of who Krishna was that they remembered most, but the simple, glowing fact that he had truly been with them, giving each of them his whole, undivided heart.", "hi": "Vrindavan ke hare charaagaahon mein, nanhe Krishna ko sab pyaar karte the, phir bhi unhone apne din saadhe gwaale ladkon ke beech bitaane chune. Woh heere aur shaandaar khel maang sakte the, par woh bas apne doston ke saath rehna chahte the.\n\nHar subah woh unke saath nange pair khaiton mein daudte, bachhdon se race lagaate, ped chadhte, aur jo bhi chhota khaana har ladka ghar se laaya hota use baantte. Jab ek dost ki roti dhool mein girr gayi, Krishna hanse aur apni baant di. Woh unki bewakoof chintaaon ko aise sunte jaise woh duniya ki sabse zaroori cheezein hon. Woh aadhe-maujood nahi the, bade vishayon ke baare mein sochte hue; woh pooori tarah wahan the, dhool aur hansi mein.\n\nGwaale un sunhre dinon ko kabhi nahi bhoole. Unhe sabse zyada Krishna ke kaun hone ka achambha yaad nahi raha, balki yeh saadhi, jagmagaati baat ki woh sach mein unke saath the, har ek ko apna poora, abhinn dil dete hue." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the small daily moments you already long to share — a song, a walk, a quiet morning.", "hi": "Apne baby ko un chhote rozana palon ke baare mein bataayein jinhe baantne ko aap abhi se tarasti hain — ek geet, ek sair, ek shaant subah." },
+      "motivation": { "en": "It is the smallest ordinary moments, not the big ones, that your child will hold forever.", "hi": "Woh sabse chhote aam pal, na ki bade, hi hain jinhe aapka bachcha hamesha thaame rakhega." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Just Being Here Together", "hi": "Bas Yahan Saath Hona" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to simply be present with your baby", "hi": "Apne baby ke saath bas maujood hone ka ek chhota dhyan" },
+      "affirmation": { "en": "I do not need to do anything special. Just being here with you, quietly, is the gift.", "hi": "Mujhe kuch khaas karne ki zaroorat nahi. Bas yahan tumhare saath, shaanti se, hona hi tohfa hai." },
+      "introduction": { "en": "Settle comfortably and close your eyes. Take a few slow breaths and let go of every task waiting for you. Rest your hands on your belly and simply be here with your baby, asking nothing of this moment but to share it.", "hi": "Aaram se baithein aur aankhein band karein. Kuch dheemi saansein lein aur har woh kaam jaane dein jo aapka intezaar kar raha hai. Apne haath pet par rakhein aur bas yahan apne baby ke saath rahein, is pal se kuch na maangte hue sivaay use baantne ke." },
+      "closingThought": { "en": "You gave your baby nothing but your quiet presence — and that is the most precious gift of all.", "hi": "Aapne apne baby ko kuch nahi diya sivaay apni shaant maujoodgi ke — aur yahi sabse keemti tohfa hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When Eating Feels Like A Chore", "hi": "Jab Khaana Ek Bojh Lage" },
+      "content": { "en": "If meals feel heavy or rushed near the end, set the screen aside and eat just one small thing slowly — a few warm bites, fully tasted. Eating with a little attention can make even a simple plate feel more nourishing and calm.", "hi": "Agar ant ke paas khaana bhaari ya jaldbaazi mein lage, screen ek taraf rakhein aur bas ek chhoti cheez dheere se khaayein — kuch garm nivaale, pooori tarah chakhte hue. Thode dhyan se khaana ek saadhi plate ko bhi zyada poshak aur shaant bana sakta hai." },
+      "remember": { "en": "How you eat matters as gently as what you eat.", "hi": "Aap kaise khaate hain woh utni hi narmi se maayne rakhta hai jitna aap kya khaate hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 221,
+    "week": 32,
+    "babyLearning": { "en": "tiny eyes opening and closing, sensing light and dark", "hi": "nanhi aankhein khulti aur band hoti, roshni aur andhera mehsoos karti" },
+    "grow": {
+      "title": { "en": "Five Minutes Of Just You", "hi": "Sirf Aapke Paanch Minute" },
+      "insight": { "en": "A child does not need hours of your time. They need small windows where they have all of you.", "hi": "Ek bachche ko aapke ghanton ki zaroorat nahi. Unhe chhoti khidkiyaan chahiye jahan unke paas aapka sab kuch ho." },
+      "expanded": { "en": "Many parents carry quiet guilt about not having enough time. But children rarely measure love by the clock. What fills their cup is concentrated attention — a few minutes where nothing else is competing, where your eyes truly meet theirs. Five unhurried minutes of complete presence can mean more to a child than an entire distracted afternoon. As you prepare to meet your baby, let this free you. You do not need endless time to be a wonderful parent. You need small, regular moments where, for those minutes, your child is the only thing in the world.", "hi": "Bahut se parents apne paas kaafi samay na hone ka shaant guilt lekar chalte hain. Par bachche pyaar ko shaayad hi ghadi se naapte hain. Jo unka cup bharta hai woh kendrit dhyan hai — kuch minute jahan aur kuch competition nahi karta, jahan aapki aankhein sach mein unki aankhon se milti hain. Pooori maujoodgi ke paanch bina jaldbaazi wale minute ek bachche ke liye ek poore distracted dopahar se zyada maayne rakh sakte hain. Jaise aap apne baby se milne ki taiyaari karti hain, ise aapko aazaad karne dein. Ek shaandaar parent banne ke liye aapko ananth samay ki zaroorat nahi. Aapko chhote, niyamit pal chahiye jahan, un minuton ke liye, aapka bachcha duniya ki ekmaatra cheez ho." },
+      "deepDive": { "en": "Child development experts emphasise 'special time' — short, regular bursts of one-on-one attention — as more powerful for bonding than long stretches of divided presence. Quality concentrates what quantity dilutes.", "hi": "Child development experts 'special time' par zor dete hain — ek-par-ek dhyan ke chhote, niyamit jhonke — jo bonding ke liye baante gaye samay ke lambe daur se zyada shaktishaali hai. Quality use kendrit karti hai jise quantity patla kar deti hai." },
+      "remember": { "en": "A few minutes of all of you beats hours of half of you.", "hi": "Aapke sab kuch ke kuch minute aapke aadhe ke ghanton se behtar hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Deer Who Watched And Listened", "hi": "Woh Hiran Jo Dekhta Aur Sunta Tha" },
+      "summary": { "en": "A young deer survives by giving the forest his full, patient attention.", "hi": "Ek jawaan hiran jungle ko apna poora, sabra bhara dhyan dekar bach jaata hai." },
+      "body": { "en": "In a forest long ago, a wise old deer took his young nephew aside to teach him the one lesson that mattered most. 'The forest is full of dangers,' he said, 'but it is also full of signs. If you give it your full attention, it will keep you safe.'\n\nThe young deer was eager and quick, but his mind often wandered. So the old deer taught him to stand still, to watch the swaying grass, to listen for the snap of a twig, to notice the silence of birds. 'Do not let your thoughts drift,' he said. 'Be wholly here, with your eyes and your ears and your heart.'\n\nOne dusk, the young deer stood at the forest edge. Most of him wanted to graze carelessly, but he remembered, and he truly watched and listened. In the stillness he heard the faint pad of a tiger's paw, and slipped away unseen. His full attention had saved his life. From then on he understood: to be truly present is to be truly safe.", "hi": "Bahut samay pehle ek jungle mein, ek samajhdaar boodha hiran apne jawaan bhatije ko alag le gaya woh ek sabak sikhaane jo sabse zyada maayne rakhta tha. 'Jungle khatron se bhara hai,' usne kaha, 'par yeh nishaaniyon se bhi bhara hai. Agar tum ise apna poora dhyan doge, yeh tumhe surakshit rakhega.'\n\nJawaan hiran utsuk aur tez tha, par uska mann aksar bhatakta. To boodhe hiran ne use sthir khade rehna sikhaaya, lehraati ghaas ko dekhna, tinke ke tootne ki aawaz sunna, pakshiyon ki khaamoshi ko note karna. 'Apne vichaaron ko behakne mat do,' usne kaha. 'Pooori tarah yahan raho, apni aankhon aur kaanon aur dil ke saath.'\n\nEk shaam, jawaan hiran jungle ke kinare khada tha. Uska zyadatar mann laaparwaahi se charna chahta tha, par use yaad aaya, aur usne sach mein dekha aur suna. Sannaate mein usne ek baagh ke panje ki halki aahat suni, aur bina dikhe khisak gaya. Uske poore dhyan ne uski jaan bachaayi thi. Tab se usne samjha: sach mein maujood hona hi sach mein surakshit hona hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will be there for the small things — a scraped knee, a first word, a quiet worry.", "hi": "Apne baby ko bataayein ki aap chhoti cheezon ke liye kaise wahan hongi — ek chhila ghutna, pehla shabd, ek shaant chinta." },
+      "motivation": { "en": "Showing up for the small things is how a child learns they will never be alone with the big ones.", "hi": "Chhoti cheezon ke liye wahan hona aise ek bachcha seekhta hai ki badi cheezon mein woh kabhi akela nahi hoga." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "These Few Minutes Are Ours", "hi": "Yeh Kuch Minute Hamare Hain" },
+      "durationMinutes": 0,
+      "description": { "en": "A present-moment bond affirmation", "hi": "Maujooda pal ka ek bond affirmation" },
+      "affirmation": { "en": "I cannot give you every hour, but I can give you my whole heart in the minutes we share.", "hi": "Main tumhe har ghanta nahi de sakti, par jo minute hum baantte hain unmein apna poora dil de sakti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Five Slow Breaths", "hi": "Paanch Dheemi Saansein" },
+      "content": { "en": "Set everything down and take five slow, easy breaths — in through the nose, gently out through the mouth. Just five, given your full attention, can reset a whole afternoon.", "hi": "Sab kuch neeche rakhein aur paanch dheemi, aasaan saansein lein — naak se andar, pyaar se munh se baahar. Bas paanch, apna poora dhyan dekar, ek poore dopahar ko phir se set kar sakti hain." },
+      "remember": { "en": "Five attentive breaths are a small gift to yourself.", "hi": "Paanch dhyan bhari saansein khud ko ek chhota tohfa hain." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 222,
+    "week": 32,
+    "babyLearning": { "en": "filling out softly, curled close and warm", "hi": "naram tarah se bharta hua, paas simta aur garm" },
+    "grow": {
+      "title": { "en": "The Magic Of Being Seen", "hi": "Dekhe Jaane Ka Jaadu" },
+      "insight": { "en": "There is a quiet magic in being truly seen by someone. It is one of the deepest gifts you will give your child.", "hi": "Kisi dwaara sach mein dekhe jaane mein ek shaant jaadu hai. Yeh sabse gehre tohfon mein se ek hai jo aap apne bachche ko dengi." },
+      "expanded": { "en": "To be 'seen' is more than being looked at. It is to be noticed, understood, taken seriously exactly as we are. When a child feels truly seen by a parent, something settles deep inside them: a sense that they are real, that they matter, that they belong. You give this not through grand gestures but through small acts of attention — noticing their mood, remembering what delights them, meeting their eyes when they speak. As you wait to hold your baby, know that this quiet seeing is a kind of magic. It tells a child, again and again, 'You are worth paying attention to.'", "hi": "'Dekha jaana' sirf dekhe jaane se zyada hai. Yeh note kiya jaana, samjha jaana, theek jaise hum hain waise hi gambheerta se liya jaana hai. Jab ek bachcha ek parent dwaara sach mein dekha mehsoos karta hai, unke andar gehraai mein kuch baith jaata hai: ek ehsaas ki woh asli hain, ki woh maayne rakhte hain, ki woh apne hain. Aap yeh bade ishaaron se nahi balki dhyan ki chhoti harkaton se dete hain — unka mood note karna, yaad rakhna kya unhe khush karta hai, jab woh bolein to unki aankhon se milna. Jaise aap apne baby ko thaamne ka intezaar karti hain, jaan lein ki yeh shaant dekhna ek tarah ka jaadu hai. Yeh ek bachche ko, baar-baar, batata hai, 'tum dhyan dene laayak ho.'" },
+      "deepDive": { "en": "Attachment researchers describe 'attunement' — a caregiver accurately sensing and responding to a child's inner state — as the foundation of secure bonds. Feeling seen literally shapes a child's developing self.", "hi": "Attachment researchers 'attunement' ka varnan karte hain — ek caregiver dwaara ek bachche ki andaruni sthiti ko theek se mehsoos karna aur uspe react karna — surakshit bonds ki neenv ke roop mein. Dekha mehsoos karna sach mein ek bachche ke badhte vajood ko gadhta hai." },
+      "remember": { "en": "To truly see your child is to tell them they matter.", "hi": "Apne bachche ko sach mein dekhna unhe yeh batana hai ki woh maayne rakhte hain." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The King's Distraction", "hi": "Tenali Rama Aur Raja Ka Distraction" },
+      "summary": { "en": "Clever Tenali Rama gently shows the king the cost of never giving his full attention.", "hi": "Chalaak Tenali Rama raja ko narmi se dikhaata hai ki kabhi poora dhyan na dene ki keemat kya hai." },
+      "body": { "en": "King Krishnadevaraya was a wise ruler, but lately he had grown distracted, hearing his ministers while his eyes wandered, nodding without truly listening. One day a poor farmer came with a serious complaint, but the king barely glanced at him, his mind elsewhere, and waved him away unheard.\n\nTenali Rama noticed. The next morning he began telling the king a wonderful story, but kept stopping mid-sentence to admire a bird, to count the courtyard tiles, to gaze at the clouds. The king grew frustrated. 'Finish your tale, Tenali! How can I follow when you keep drifting away?'\n\nTenali bowed with a smile. 'Forgive me, Your Majesty. I only wished to show how the farmer felt yesterday, speaking his heart to a king whose attention was drifting away.' The king fell silent, understanding at last. From that day he learned to give whoever stood before him his whole, undivided attention — for to be heard, a person must first be truly seen.", "hi": "Raja Krishnadevaraya ek samajhdaar shaasak the, par haal hi mein woh distracted ho gaye the, apne mantriyon ko sunte hue aankhein bhatkaate, bina sach mein sune sir hilaate. Ek din ek gareeb kisaan ek gambheer shikaayat lekar aaya, par raja ne use mushkil se dekha, unka mann kahin aur tha, aur use bina sune jaane ka ishaara kar diya.\n\nTenali Rama ne note kiya. Agli subah usne raja ko ek shaandaar kahani sunaani shuru ki, par baar-baar beech mein ruk jaata ek pakshi ko nihaarne, aangan ki tiles ginne, baadlon ko taakne. Raja chidh gaye. 'Apni kahani poori karo, Tenali! Main kaise samjhoon jab tum baar-baar behak jaate ho?'\n\nTenali muskuraate hue jhuka. 'Maaf karein, maharaj. Main bas dikhaana chahta tha ki kal kisaan kaisa mehsoos kar raha tha, ek aise raja ko apna dil bata raha jiska dhyan behak raha tha.' Raja chup ho gaye, aakhir samajh gaye. Us din se unhone seekha ki jo bhi unke saamne khada ho use apna poora, abhinn dhyan dein — kyunki suna jaane ke liye, ek insaan ko pehle sach mein dekha jaana chahiye." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you will truly see them — not who you wish they were, but exactly who they are.", "hi": "Apne baby ko bataayein ki aap unhe sach mein kaise dekhengi — woh nahi jo aap chahti hain ki woh hon, balki theek jaise woh hain." },
+      "motivation": { "en": "Being seen exactly as they are is how a child learns they are loved without conditions.", "hi": "Theek jaise woh hain waise dekha jaana aise ek bachcha seekhta hai ki use bina shart pyaar kiya jaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Hem Kalyan", "hi": "Raag Hem Kalyan" },
+      "durationMinutes": 4,
+      "description": { "en": "Evening raga for calm, attentive stillness", "hi": "Shaam ka raag, shaant, dhyan bhari sthirta ke liye" },
+      "affirmation": { "en": "As this evening melody settles around me, I grow quiet enough to truly see and feel you.", "hi": "Jaise yeh shaam ki dhun mere around thamti hai, main itni shaant ho jaati hoon ki tumhe sach mein dekh aur mehsoos kar sakoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Worth Noticing Too", "hi": "Main Bhi Note Kiye Jaane Laayak Hoon" },
+      "content": { "en": "As I learn to truly see my baby, I will remember to gently notice myself too — my needs, my tiredness, my quiet wins.", "hi": "Jaise main apne baby ko sach mein dekhna seekhti hoon, main khud ko bhi pyaar se note karna yaad rakhungi — apni zarooratein, apni thakaan, apni shaant jeetein." },
+      "remember": { "en": "You deserve the same gentle attention you give others.", "hi": "Aap usi narm dhyan ke haqdaar hain jo aap doosron ko deti hain." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 223,
+    "week": 32,
+    "babyLearning": { "en": "growing steadily, plump and ready for cuddles", "hi": "sthir tarah se badhta hua, gol-matol aur pyaar ke liye taiyaar" },
+    "grow": {
+      "title": { "en": "Undivided Is Unforgettable", "hi": "Abhinn Hi Anbhula Hai" },
+      "insight": { "en": "The moments your child will carry forever are the ones where you were undivided — all there, nowhere else.", "hi": "Woh pal jinhe aapka bachcha hamesha thaame rakhega woh hain jahan aap abhinn thin — poori tarah wahan, kahin aur nahi." },
+      "expanded": { "en": "We live in a hurried world, often half-present even when our bodies are in the room. But a child can always tell the difference between a parent who is partly listening and one who is wholly there. Undivided attention is rare, and that is exactly what makes it unforgettable. A child who is met this way — looked at fully, listened to completely — carries the warmth of it for life. As you prepare to slow down for your little one, remember that you do not need to be undivided every hour. You only need to mean it when you are. Those whole, unhurried moments become the memories your child will keep forever.", "hi": "Hum ek jaldbaazi bhari duniya mein rehte hain, aksar aadhe-maujood tab bhi jab hamare sharir kamre mein hote hain. Par ek bachcha hamesha us parent mein farak bata sakta hai jo thoda sun raha hai aur us mein jo poori tarah wahan hai. Abhinn dhyan durlabh hai, aur yahi use anbhula banata hai. Ek bachcha jise is tarah mila jaaye — poori tarah dekha gaya, poori tarah suna gaya — uski garmjoshi jeevan bhar thaame rakhta hai. Jaise aap apne nanhe ke liye dheema hone ki taiyaari karti hain, yaad rakhein ki aapko har ghanta abhinn hone ki zaroorat nahi. Aapko bas us samay use sach se nibhana hai jab aap hain. Woh poore, bina jaldbaazi wale pal woh yaadein ban jaate hain jinhe aapka bachcha hamesha rakhega." },
+      "deepDive": { "en": "Memory researchers note that emotionally rich, focused interactions are encoded far more deeply than fragmented, multitasked ones. Undivided moments quite literally last longer in the mind.", "hi": "Memory researchers note karte hain ki bhaavnaatmak roop se samriddh, kendrit interactions tukdon mein baante, multitask kiye gaye se kahin gehraai se dakht hote hain. Abhinn pal sach mein mann mein zyada der tak tikte hain." },
+      "remember": { "en": "Undivided attention is the thing your child will never forget.", "hi": "Abhinn dhyan woh cheez hai jise aapka bachcha kabhi nahi bhulega." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Busy Merchant And His Son", "hi": "Vyast Vyapaari Aur Uska Beta" },
+      "summary": { "en": "A hurried merchant discovers what his son truly wanted was never money, but his time.", "hi": "Ek jaldbaazi bhara vyapaari janta hai ki uska beta kabhi paisa nahi, balki uska samay chahta tha." },
+      "body": { "en": "A hardworking merchant rose before dawn and returned long after dark, always busy, always counting his coins. His little son would tug at his sleeve, asking him to look at a drawing or hear a story, but the merchant would say, 'Not now, I am busy. Tomorrow.'\n\nOne evening the boy asked, 'Father, how much money do you earn in one hour?' Surprised, the merchant answered. The boy then quietly emptied his small clay savings pot, counted his coins, and held them up. 'I have saved exactly that much,' he said. 'Please, will you sell me one hour of your time, just to sit with me?'\n\nThe merchant's heart broke open. He saw at last that all his hurry had earned everything except the one thing his son wanted — him, fully present. He set down his ledgers, sat on the floor, and gave the boy his whole undivided evening. It was the richest hour either of them had ever known.", "hi": "Ek mehnati vyapaari subah hone se pehle uthta aur andhera hone ke bahut baad lautta, hamesha vyast, hamesha apne sikke ginta. Uska nanha beta uski baanh kheenchta, use ek drawing dekhne ya ek kahani sunne ko kehta, par vyapaari kehta, 'Abhi nahi, main vyast hoon. Kal.'\n\nEk shaam bete ne poocha, 'Papa, aap ek ghante mein kitna paisa kamaate hain?' Hairaan vyapaari ne jawaab diya. Phir bete ne chupchaap apni chhoti mitti ki gullak khaali ki, apne sikke gine, aur unhe upar uthaaya. 'Maine theek utna hi bachaaya hai,' usne kaha. 'Kripya, kya aap mujhe apne samay ka ek ghanta bechenge, bas mere saath baithne ke liye?'\n\nVyapaari ka dil toot kar khul gaya. Usne aakhir dekha ki uski saari jaldbaazi ne sab kuch kamaaya sivaay us ek cheez ke jo uska beta chahta tha — use, poori tarah maujood. Usne apne bahi-khaate neeche rakhe, farsh par baitha, aur bete ko apni poori abhinn shaam di. Yeh sabse ameer ghanta tha jo un dono ne kabhi jaana tha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Make your baby a gentle promise to slow down for them, even when the world is rushing.", "hi": "Apne baby se ek narm vaada karein ki aap unke liye dheema hongi, tab bhi jab duniya bhaag rahi ho." },
+      "motivation": { "en": "Slowing down is the quiet way you tell your child they are worth your time.", "hi": "Dheema hona woh shaant tareeka hai jisse aap apne bachche ko batate hain ki woh aapke samay ke laayak hain." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Will Slow Down For You", "hi": "Main Tumhare Liye Dheema Hounga" },
+      "durationMinutes": 0,
+      "description": { "en": "A promise-of-presence bond affirmation", "hi": "Maujoodgi ke vaade ka ek bond affirmation" },
+      "affirmation": { "en": "When the world hurries, I will choose to slow down for you, and give you all of me.", "hi": "Jab duniya jaldbaazi karegi, main tumhare liye dheema hone ka chunaav karungi, aur tumhe apna sab kuch dungi." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "food",
+      "title": { "en": "When You Forget To Slow Down And Eat", "hi": "Jab Aap Dheema Hokar Khaana Bhul Jaayein" },
+      "content": { "en": "On busy, distracted days it is easy to eat standing up or skip a meal. Try to sit, even for five minutes, with something warm and simple. A calm, unhurried bite nourishes you more deeply than a rushed one ever can.", "hi": "Vyast, distracted dinon mein khade-khade khaana ya ek meal chhodna aasaan hai. Koshish karein ki baithein, paanch minute ke liye bhi, kuch garm aur saadhe ke saath. Ek shaant, bina jaldbaazi wala nivaala aapko ek jaldbaazi wale se kahin gehraai se poshan deta hai." },
+      "remember": { "en": "Slowing down to eat is a small act of self-care.", "hi": "Khaane ke liye dheema hona apni dekhbhaal ki ek chhoti harkat hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 224,
+    "week": 32,
+    "babyLearning": { "en": "closing the week, calm and growing day by day", "hi": "hafta poora karte hue, shaant aur din-ba-din badhta hua" },
+    "grow": {
+      "title": { "en": "A Moment Of True Attention", "hi": "Sache Dhyan Ka Ek Pal" },
+      "insight": { "en": "A single moment of true attention can fill a child more than a whole day of half-noticed care.", "hi": "Sache dhyan ka ek pal ek bachche ko aadhe-note kiye gaye dekhbhaal ke poore din se zyada bhar sakta hai." },
+      "expanded": { "en": "As this week of presence draws to a close, hold on to its simplest truth: attention is not about quantity but about quality of heart. One moment where you stop, soften, and turn your whole self towards your child can carry more love than hours spent merely nearby. These are the moments a child reaches for in memory — when someone truly attended to them. You are practising this now, every time you pause to feel your baby move, to send a quiet thought their way. Soon you will offer it in countless small ways. A single moment of true attention is a gift that quietly lasts a lifetime.", "hi": "Jaise maujoodgi ka yeh hafta apne ant ki taraf aata hai, iski sabse saadhi sachai ko thaame rakhein: dhyan quantity ke baare mein nahi balki dil ki quality ke baare mein hai. Ek pal jahan aap rukti hain, naram hoti hain, aur apna poora vajood apne bachche ki taraf mod deti hain woh bas paas bitaaye ghanton se zyada pyaar le ja sakta hai. Yeh woh pal hain jinhe ek bachcha yaad mein dhoondhta hai — jab kisi ne sach mein unpe dhyan diya. Aap abhi yeh abhyaas kar rahi hain, har baar jab aap apne baby ko hilte mehsoos karne ko rukti hain, unki taraf ek shaant vichaar bhejti hain. Jald hi aap ise ginti se zyada chhote tareekon se dengi. Sache dhyan ka ek pal ek aisa tohfa hai jo chupchaap jeevan bhar tikta hai." },
+      "deepDive": { "en": "Researchers studying parent-child bonds find that brief moments of full, attuned attention have a lasting effect on a child's sense of being valued — far beyond the few minutes they take.", "hi": "Parent-bachche ke bonds ka adhyayan karne wale researchers paate hain ki poore, attuned dhyan ke chhote pal ek bachche ki keemti hone ki bhaavna par tikne wala asar daalte hain — un kuch minuton se kahin aage jo woh lete hain." },
+      "remember": { "en": "One moment of true attention can last a lifetime.", "hi": "Sache dhyan ka ek pal jeevan bhar tik sakta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Gardener Who Truly Watched", "hi": "Woh Maali Jo Sach Mein Dekhta Tha" },
+      "summary": { "en": "A patient gardener learns that close, loving attention is what truly makes a garden bloom.", "hi": "Ek sabra bhara maali seekhta hai ki paas se, pyaar bhara dhyan hi sach mein ek baag ko khilaata hai." },
+      "body": { "en": "In a village lived two gardeners. The first was always rushing — watering quickly, glancing at his plants between other chores, never really looking. The second moved slowly through his garden each morning, kneeling beside each plant, truly watching.\n\nThe second gardener noticed the small things: a leaf curling for want of shade, a stem leaning towards the light, a patch of soil drying faster than the rest. Because he gave his plants his full attention, he saw what they needed before they wilted. He spoke to them softly and tended each one as if it were the only plant in the world.\n\nWhen summer came, the hurried gardener's plants grew thin and tired. But the watchful gardener's garden burst into bloom, lush and bright, the envy of the whole village. 'What is your secret?' they asked. He smiled and said, 'I do not water more than you. I simply pay closer attention — and things grow well when they are truly seen.'", "hi": "Ek gaon mein do maali rehte the. Pehla hamesha jaldbaazi mein rehta — jaldi paani deta, doosre kaamon ke beech apne paudhon ko dekh leta, kabhi sach mein nahi dekhta. Doosra har subah apne baag mein dheere se chalta, har paudhe ke paas ghutne tek kar baithta, sach mein dekhta.\n\nDoosre maali ne chhoti cheezein note ki: chhaaya ki kami se mudta ek patta, roshni ki taraf jhukta ek tana, baaki se tez sookhti mitti ka ek tukda. Kyunki woh apne paudhon ko apna poora dhyan deta, woh dekh leta ki unhe kya chahiye uske murjhaane se pehle. Woh unse narmi se baat karta aur har ek ko aise sambhaalta jaise woh duniya ka ekmaatra paudha ho.\n\nJab garmi aayi, jaldbaaz maali ke paudhe patle aur thake ho gaye. Par dhyan dene wale maali ka baag khil utha, hara-bhara aur chamakta, poore gaon ki eershya. 'Tumhara raaz kya hai?' unhone poocha. Woh muskuraaya aur bola, 'Main tumse zyada paani nahi deta. Main bas zyada paas se dhyan deta hoon — aur cheezein achhe se badhti hain jab unhe sach mein dekha jaata hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the time that will be just yours together — unhurried, undistracted, simply present.", "hi": "Apne baby ko us samay ke baare mein bataayein jo bas aapka saath hoga — bina jaldbaazi, bina distraction, bas maujood." },
+      "motivation": { "en": "Time that belongs only to the two of you is where your deepest bond will quietly grow.", "hi": "Woh samay jo sirf aap dono ka ho wahin aapka sabse gehra bond chupchaap badhega." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Quiet Moment, Just Us", "hi": "Ek Shaant Pal, Bas Hum" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to share one moment of pure attention", "hi": "Shuddh dhyan ka ek pal baantne ka ek chhota dhyan" },
+      "affirmation": { "en": "In this single quiet moment, there is nothing to do and nowhere to be — only you, and me, fully here.", "hi": "Is ek shaant pal mein, kuch karna nahi aur kahin hona nahi — bas tum, aur main, poori tarah yahan." },
+      "introduction": { "en": "Sit or lie down comfortably and let your eyes close. Take three slow breaths and let the whole busy world fall quiet around you. For these few minutes, give your baby your single, complete, undivided attention — as if this one moment were all there is.", "hi": "Aaram se baithein ya letein aur aankhein band hone dein. Teen dheemi saansein lein aur poori vyast duniya ko apne around shaant hone dein. In kuch minuton ke liye, apne baby ko apna ekal, poora, abhinn dhyan dein — jaise yahi ek pal sab kuch ho." },
+      "closingThought": { "en": "You and your baby just shared one perfect, undivided moment. Let it remind you how little it takes to give so much.", "hi": "Aapne aur aapke baby ne abhi ek poora, abhinn pal baanta. Use aapko yaad dilaane dein ki itna kuch dene ke liye kitna kam lagta hai." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "A Breath Held With Care", "hi": "Dhyan Se Thaami Ek Saans" },
+      "content": { "en": "Breathe in slowly and, at the top, pause for a soft moment of complete stillness. Then let it go gently. Repeat three times, giving each breath your full, kind attention.", "hi": "Dheere se saans andar lein aur, sabse upar, poori sthirta ke ek narm pal ke liye rukein. Phir use pyaar se jaane dein. Teen baar dohraayein, har saans ko apna poora, dayaalu dhyan dete hue." },
+      "remember": { "en": "Even one breath, given full attention, is a moment of peace.", "hi": "Ek saans bhi, poora dhyan dekar, shaanti ka ek pal hai." },
+      "durationMinutes": 1
+    }
+  }
+]

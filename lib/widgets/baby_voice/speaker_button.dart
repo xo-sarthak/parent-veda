@@ -24,12 +24,16 @@ class SpeakerButton extends StatelessWidget {
     required this.lang,
     this.accent,
     this.size = 42,
+    this.scope = VoiceScope.journey,
   });
 
   final String text;
   final String cardKey;
   final AppLanguage lang;
   final Color? accent;
+
+  /// Which mute scope this speaker belongs to (defaults to the Weekly Journey).
+  final VoiceScope scope;
 
   /// Diameter of the round button. Defaults to the header size (42).
   final double size;
@@ -44,7 +48,7 @@ class SpeakerButton extends StatelessWidget {
       animation: svc,
       builder: (context, _) {
         final playing = svc.isPlaying(cardKey);
-        final muted = svc.isMuted;
+        final muted = svc.isMutedFor(scope);
         final IconData icon = muted
             ? Icons.volume_off_rounded
             : (playing ? Icons.volume_up_rounded : Icons.volume_up_outlined);
@@ -54,7 +58,8 @@ class SpeakerButton extends StatelessWidget {
           child: GestureDetector(
             onTap: muted
                 ? null
-                : () => svc.toggleCard(text, cardKey: cardKey, lang: lang),
+                : () => svc.toggleCard(text,
+                    cardKey: cardKey, lang: lang, scope: scope),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: size,

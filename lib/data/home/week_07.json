@@ -1,0 +1,282 @@
+[
+  {
+    "day": 43,
+    "week": 7,
+    "babyLearning": { "en": "growing softly, tiny arms beginning to bud", "hi": "naram tarah se badh raha hai, nanhe haath kaliyon ki tarah ubharne lage" },
+    "grow": {
+      "title": { "en": "Love Speaks Before Words", "hi": "Pyaar Shabdon Se Pehle Bolta Hai" },
+      "insight": { "en": "Long before your baby learns a single word, they are already learning love — through your warmth, your voice, the way you hold the day.", "hi": "Aapke baby ke ek bhi shabd seekhne se bahut pehle, woh pyaar seekh raha hai — aapki garmjoshi se, aapki aawaz se, aap din ko jaise thaamte hain us se." },
+      "expanded": { "en": "Words come late in a child's story. What comes first is the language of being loved — the softness of a touch, the music of a familiar voice, the calm that settles a room. Your baby is learning this language now, inside you, long before they will ever speak it back. Every gentle thought you have, every moment you turn toward them with tenderness, is a quiet sentence in a conversation that has already begun. You do not need the right words yet. The love beneath them is what your baby is listening for.", "hi": "Ek bachche ki kahani mein shabd der se aate hain. Pehle aata hai pyaar kiye jaane ki bhaasha — ek sparsh ki narmi, ek jaani-pehchaani aawaz ka sangeet, woh shaanti jo ek kamre ko tham deti hai. Aapka baby yeh bhaasha abhi seekh raha hai, aapke andar, us se bahut pehle ki woh ise wapas bol paaye. Aapka har naram vichaar, har woh pal jab aap narmi se unki taraf mudte hain, ek aisi baatcheet ka shaant vaakya hai jo pehle hi shuru ho chuki hai. Aapko abhi sahi shabdon ki zaroorat nahi. Unke neeche ka pyaar hi woh hai jise aapka baby sun raha hai." },
+      "deepDive": { "en": "Researchers find that the earliest bonding happens through tone, rhythm and warmth long before language. Babies absorb the feeling of being loved well before they understand a word of it.", "hi": "Researchers paate hain ki sabse pehla bonding bhaasha se bahut pehle lehje, laya aur garmjoshi ke zariye hota hai. Babies pyaar kiye jaane ka ehsaas us se bahut pehle hi soch lete hain jab woh uska ek shabd bhi samajhte hain." },
+      "remember": { "en": "Your baby learns love long before they learn words.", "hi": "Aapka baby shabdon se bahut pehle pyaar seekh leta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Ant And The Grasshopper", "hi": "Cheenti Aur Tiddha" },
+      "summary": { "en": "A busy ant and a carefree grasshopper learn the value of preparing with care.", "hi": "Ek mehnati cheenti aur ek beparwah tiddha dekhbhaal se taiyaari ka mol seekhte hain." },
+      "body": { "en": "All through the warm summer, a little ant worked from dawn to dusk, carrying grains of food back to her nest, one tiny piece at a time. Nearby, a grasshopper hopped and sang in the sunshine, laughing at her. 'Why work so hard?' he chirped. 'The days are long and the sun is sweet. Come and play!' But the ant only smiled and kept on with her steady, patient work.\n\nThen the cold winds came, and the fields turned bare and white with frost. The grasshopper, hungry and shivering, found nothing left to eat. He remembered the busy little ant and made his way to her warm nest. Kindly, she shared her store of food, and as he ate she said gently, 'There is a time to play and a time to prepare. Both have their season.' The grasshopper never forgot, and the two stayed friends through every winter after.", "hi": "Poore garm garmi ke mausam mein, ek nanhi cheenti subah se shaam tak kaam karti rahi, anaaj ke daane ek-ek karke apne ghar le jaati. Paas hi, ek tiddha dhoop mein kood-kood kar gaata, aur us par hansta. 'Itni mehnat kyun?' woh chahchahaata. 'Din lambe hain aur dhoop meethi. Aao khelein!' Par cheenti bas muskuraati aur apne sthir, sabra bhare kaam mein lagi rehti.\n\nPhir thandi hawayein aayin, aur khet sune aur tushaar se safed ho gaye. Tiddha, bhookha aur kaanpta, khaane ko kuch na paaya. Use mehnati nanhi cheenti yaad aayi aur woh uske garm ghar ki taraf chala. Dayaalta se, usne apna jamaa khaana baant diya, aur jab woh khaa raha tha to usne pyaar se kaha, 'Khelne ka bhi samay hota hai aur taiyaari ka bhi. Dono ka apna mausam hai.' Tiddha kabhi nahi bhoola, aur dono har sardi ke baad dost bane rahe." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby how you and their other parent first met.", "hi": "Apne baby ko bataayein ki aap aur unke doosre parent pehli baar kaise mile the." },
+      "motivation": { "en": "Your love story is the very first chapter of theirs.", "hi": "Aapki pyaar ki kahani unki kahani ka sabse pehla adhyay hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "Our Love Began Before You", "hi": "Hamara Pyaar Tumse Pehle Shuru Hua" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about love's beginning", "hi": "Pyaar ki shuruaat ke baare mein ek bond affirmation" },
+      "affirmation": { "en": "You were born from love that began long before you. You are its sweetest answer.", "hi": "Tum us pyaar se janme ho jo tumse bahut pehle shuru hua. Tum uska sabse meetha jawaab ho." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Into The Heart", "hi": "Dil Mein Saans Lein" },
+      "content": { "en": "Rest a hand on your chest and breathe in slowly, imagining the breath filling the space around your heart. Let it out with a soft sigh. Repeat five gentle times.", "hi": "Ek haath apne seene par rakhein aur dheere se saans lein, sochein ki saans aapke dil ke around ki jagah bhar rahi hai. Use ek naram aah ke saath chhodein. Paanch baar narmi se dohraayein." },
+      "remember": { "en": "The heart softens when we breathe toward it.", "hi": "Jab hum dil ki taraf saans lete hain to woh naram ho jaata hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 44,
+    "week": 7,
+    "babyLearning": { "en": "tiny ears beginning to take shape", "hi": "nanhe kaan aakaar lena shuru kar rahe hain" },
+    "grow": {
+      "title": { "en": "Your Voice Is Already Home", "hi": "Aapki Aawaz Pehle Se Ghar Hai" },
+      "insight": { "en": "Of all the sounds your baby will ever hear, your voice will feel the most like home — and that bond is forming already.", "hi": "Aapka baby kabhi jitni bhi aawazein sunega, unmein aapki aawaz sabse zyada ghar jaisi lagegi — aur woh bond abhi se ban raha hai." },
+      "expanded": { "en": "There is a reason a baby calms at the sound of their parent's voice, even from the very first days. That voice has been their constant companion, the steady hum beneath everything, the sound that means safety. Though your baby's hearing is only just beginning to form, the closeness you build now lays the ground for that recognition. When you speak softly, hum a tune, or simply talk through your day, you are not waiting for them to understand. You are becoming the sound they will always reach for — the one that says, you are not alone, you are home.", "hi": "Ek vajah hai ki ek baby apne parent ki aawaz par shaant ho jaata hai, pehle hi din se. Woh aawaz uski sthir saathi rahi hai, har cheez ke neeche ki dheemi gunjan, woh aawaz jiska matlab surakshit hona hai. Halaanki aapke baby ki sunne ki shakti abhi banna shuru hi ho rahi hai, aap abhi jo nazdeeki banaati hain woh us pehchaan ki neenv rakhti hai. Jab aap dheere se bolti hain, ek dhun gungunaati hain, ya bas apne din ke baare mein baat karti hain, aap unke samajhne ka intezaar nahi kar rahi. Aap woh aawaz ban rahi hain jiski woh hamesha taraf bhaagega — woh jo kehti hai, tum akele nahi ho, tum ghar par ho." },
+      "deepDive": { "en": "By the third trimester, babies can recognise and prefer their mother's voice, having heard its rhythm and warmth from within. The familiarity you build now becomes lifelong comfort.", "hi": "Teesre trimester tak, babies apni maa ki aawaz pehchaan lete hain aur use pasand karte hain, kyunki unhone uski laya aur garmjoshi andar se suni hoti hai. Aap abhi jo apnapan banaati hain woh jeevan bhar ka sukoon ban jaata hai." },
+      "remember": { "en": "Your voice will always feel like home to your baby.", "hi": "Aapki aawaz aapke baby ko hamesha ghar jaisi lagegi." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Talkative Tortoise", "hi": "Baatuni Kachhua" },
+      "summary": { "en": "A tortoise learns that knowing when to stay quiet is its own kind of wisdom.", "hi": "Ek kachhua seekhta hai ki kab chup rehna hai yeh jaanna apni ek tarah ki samajh hai." },
+      "body": { "en": "Beside a still lake lived a tortoise who loved to talk more than anything in the world. His two friends were a pair of geese, and when the lake began to dry up, the kind geese decided to carry him to a new home with deeper water.\n\nThey held a sturdy stick in their beaks and told the tortoise to bite the middle and hold tight. 'But you must not speak,' they warned, 'no matter what.' Up they flew, the tortoise dangling happily between them. People below pointed and called out in wonder, 'Look at that clever tortoise!'\n\nBursting with pride and longing to reply, the tortoise opened his mouth to answer them — and at once let go of the stick. Down he tumbled. He landed softly in a soft patch of mud, unhurt, and learned a lasting lesson: there is a time to speak, and a far wiser time to stay silent.", "hi": "Ek shaant jheel ke kinare ek kachhua rehta tha jise duniya mein sabse zyada baatein karna pasand tha. Uske do dost hans the, aur jab jheel sookhne lagi, dayaalu hanson ne use gehre paani wale naye ghar le jaane ki socha.\n\nUnhone apni chonchon mein ek mazboot lakdi pakdi aur kachhue se kaha ki woh beech mein katega aur kasske pakde rahega. 'Par tum bolna mat,' unhone chetaaya, 'chaahe kuch bhi ho.' Woh upar ud chale, kachhua unke beech khushi se latka hua. Neeche log ungli dikhaate aur hairaani se pukaarte, 'Dekho us chalaak kachhue ko!'\n\nGarv se phoolte aur jawaab dene ko tadapte, kachhue ne unhe jawaab dene ko munh khola — aur turant lakdi chhod di. Woh neeche girr pada. Woh naram keechad ke ek tukde par naram se utra, bina chot ke, aur ek sthayi seekh paayi: bolne ka bhi samay hota hai, aur chup rehne ka kahin samajhdaar samay." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a favourite memory you share with their other parent.", "hi": "Apne baby ko ek pasandeeda yaad ke baare mein bataayein jo aap unke doosre parent ke saath baantti hain." },
+      "motivation": { "en": "Sharing your happy memories warms the world your baby is arriving into.", "hi": "Apni khushi bhari yaadein baantna us duniya ko garm karta hai jismein aapka baby aa raha hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Thread Of Love", "hi": "Pyaar Ka Ek Dhaaga" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation on the love that holds you", "hi": "Aapko thaame pyaar par ek chhota dhyan" },
+      "affirmation": { "en": "A thread of love runs through me, to you, and back again.", "hi": "Pyaar ka ek dhaaga mujhse hokar, tum tak, aur phir wapas behta hai." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Take three slow breaths. Imagine a soft golden thread that begins in your heart, flows gently down to your baby, and loops back to you — a quiet circle of love that needs no words.", "hi": "Aaram se baithein aur aankhein band karein. Teen dheemi saansein lein. Ek naram sunhre dhaage ki kalpana karein jo aapke dil se shuru hota hai, pyaar se aapke baby tak behta hai, aur wapas aap tak laut aata hai — pyaar ka ek shaant ghera jise shabdon ki zaroorat nahi." },
+      "closingThought": { "en": "That thread is always there, even when you cannot feel it. You are gently tied to one another.", "hi": "Woh dhaaga hamesha wahan hai, tab bhi jab aap use mehsoos na kar sakein. Aap dono pyaar se ek doosre se bandhe hain." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Not Doing This Alone", "hi": "Main Yeh Akeli Nahi Kar Rahi" },
+      "content": { "en": "I am held by the people who love me. I can let their care carry some of the weight today.", "hi": "Mujhe un logon ne thaama hai jo mujhse pyaar karte hain. Main aaj unki dekhbhaal ko thoda bojh uthaane de sakti hoon." },
+      "remember": { "en": "Leaning on love is not weakness — it is wisdom.", "hi": "Pyaar ka sahaara lena kamzori nahi — yeh samajhdaari hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 45,
+    "week": 7,
+    "babyLearning": { "en": "the heart now beating in a steady rhythm", "hi": "dil ab ek sthir laya mein dhadak raha hai" },
+    "grow": {
+      "title": { "en": "They Feel What You Feel", "hi": "Woh Wahi Mehsoos Karte Hain Jo Aap" },
+      "insight": { "en": "Your baby does not yet know your words, but they are already tuned to your feelings — your joy and your calm reach them quietly.", "hi": "Aapka baby abhi aapke shabd nahi jaanta, par woh pehle se hi aapki bhaavnaon se juda hai — aapki khushi aur aapki shaanti chupchaap untak pohanchti hai." },
+      "expanded": { "en": "The bond between you and your baby is not built on understanding yet — it is built on feeling. When you are content, a soft ease moves through you that your baby shares. When you laugh, when you feel loved, when peace settles over you, that warmth becomes the world they are growing in. This is not pressure to feel happy all the time; no one can. It is simply a tender reminder that your inner weather is shared weather. The kindest thing you can offer your baby is to let yourself feel cared for and content, as often as you gently can.", "hi": "Aapke aur aapke baby ke beech ka bond abhi samajh par nahi bana — yeh bhaavna par bana hai. Jab aap santusht hoti hain, ek naram sehjta aapmein se behti hai jise aapka baby baantta hai. Jab aap hansti hain, jab aap pyaar mehsoos karti hain, jab shaanti aap par tham jaati hai, woh garmjoshi woh duniya ban jaati hai jismein woh badh raha hai. Yeh har waqt khush rehne ka dabaav nahi; koi nahi reh sakta. Yeh bas ek naram yaad-dilaana hai ki aapka andaruni mausam baanta hua mausam hai. Aap apne baby ko jo sabse dayaalu cheez de sakti hain woh hai khud ko dekhbhaal paaya aur santusht mehsoos karne dena, jitni baar narmi se aap kar sakein." },
+      "deepDive": { "en": "A mother's emotional state shapes the chemical environment her baby grows in. Moments of contentment and connection are felt by your baby as a gentle, steady calm.", "hi": "Ek maa ki bhaavnaatmak sthiti us rasaayanik mahaul ko gadhti hai jismein uska baby badhta hai. Santushti aur judaav ke pal aapka baby ek naram, sthir shaanti ki tarah mehsoos karta hai." },
+      "remember": { "en": "Your contentment becomes your baby's calm.", "hi": "Aapki santushti aapke baby ki shaanti ban jaati hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Hanuman And The Mountain", "hi": "Hanuman Aur Parvat" },
+      "summary": { "en": "Brave Hanuman shows that true devotion finds a way through any obstacle.", "hi": "Veer Hanuman dikhaate hain ki sachcha samarpan har rukaawat se raasta nikaal leta hai." },
+      "body": { "en": "Long ago, when the brave warrior Lakshman lay wounded and still, only one rare healing herb could save his life — and it grew far away, high on a mountain in the Himalayas. There was little time. Hanuman, strong and loyal of heart, vowed to bring it.\n\nHe leapt across the sky and reached the great mountain, but the slopes were covered in countless plants, and he could not tell which single herb would heal. He did not waste a moment in worry. With his mighty arms, Hanuman lifted the entire mountain and carried it whole through the night sky, so the healers could find the herb themselves.\n\nThanks to his devotion and quick courage, Lakshman was saved. Hanuman's story is loved across the land for one shining truth: when we act out of pure love, no task is ever too great to attempt.", "hi": "Bahut samay pehle, jab veer yoddha Lakshman ghaayal aur nishchal pade the, sirf ek durlabh aushadhi unki jaan bacha sakti thi — aur woh bahut door, Himalaya ke ek parvat par ooper ugti thi. Samay kam tha. Hanuman, taakatwar aur sachche dil ke, use laane ka pran liya.\n\nWoh aakaash paar kood gaye aur uss vishaal parvat tak pohanche, par dhaal ginti se zyada paudhon se dhaki thi, aur woh nahi bata sake ki kaunsi ek aushadhi theek karegi. Unhone ek pal bhi chinta mein nahi gawaaya. Apni vishaal bhujaaon se, Hanuman ne poora parvat utha liya aur use raat ke aakaash se poora le aaye, taaki vaidya khud aushadhi dhoond lein.\n\nUnke samarpan aur tez himmat ki vajah se, Lakshman bach gaye. Hanuman ki kahani poori dharti mein ek chamakti sachai ke liye pyaari hai: jab hum shuddh pyaar se kaam karte hain, to koi kaam itna bada nahi hota jise aazmaaya na ja sake." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby what made you choose each other.", "hi": "Apne baby ko bataayein ki kis cheez ne aapko ek doosre ko chunne ke liye prerit kiya." },
+      "motivation": { "en": "The choice that made your family is a story worth telling first.", "hi": "Jis chunaav ne aapka parivar banaya woh ek aisi kahani hai jo pehle batane layak hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "We Chose This Love", "hi": "Humne Yeh Pyaar Chuna" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about chosen love", "hi": "Chune gaye pyaar ke baare mein ek bond affirmation" },
+      "affirmation": { "en": "Two hearts chose each other, and from that choosing, you came to be. You are loved on purpose.", "hi": "Do dilon ne ek doosre ko chuna, aur us chunaav se, tum bane. Tum jaan-boojh kar pyaar kiye gaye ho." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "My Joy Matters Too", "hi": "Meri Khushi Bhi Maayne Rakhti Hai" },
+      "content": { "en": "Letting myself feel happy is not a distraction from this journey. It is a gift I share with my baby.", "hi": "Khud ko khush mehsoos karne dena is safar se dhyan hatana nahi hai. Yeh ek tohfa hai jo main apne baby ke saath baantti hoon." },
+      "remember": { "en": "Your happiness is part of your baby's world.", "hi": "Aapki khushi aapke baby ki duniya ka hissa hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 46,
+    "week": 7,
+    "babyLearning": { "en": "tiny eyes forming as dark gentle spots", "hi": "nanhi aankhein gehre naram dhabbon ki tarah ban rahi hain" },
+    "grow": {
+      "title": { "en": "Connection Is The First Lesson", "hi": "Judaav Hi Pehla Sabak Hai" },
+      "insight": { "en": "Before your child learns anything else, they will learn whether the world is a place where they belong. Connection is that first lesson.", "hi": "Aapka bachcha kuch aur seekhne se pehle, yeh seekhega ki kya duniya ek aisi jagah hai jahaan woh apna hai. Judaav hi woh pehla sabak hai." },
+      "expanded": { "en": "Long before letters and numbers, a child's deepest early learning is about belonging — am I wanted, am I safe, will someone come when I reach out? The answer to these quiet questions shapes everything that follows. And you are already answering them now, simply by holding your baby in your thoughts with warmth and care. Connection is not something you must teach later; it is the ground all teaching stands on. Every loving moment you offer is laying that ground, gently, before your baby even arrives.", "hi": "Akshar aur ankon se bahut pehle, ek bachche ki sabse gehri shuruaati seekh apnepan ke baare mein hai — kya main chaaha gaya hoon, kya main surakshit hoon, kya koi aayega jab main haath badhaaoon? In shaant sawaalon ka jawaab us sab ko gadhta hai jo aage aata hai. Aur aap unka jawaab abhi de rahi hain, bas apne baby ko garmjoshi aur dekhbhaal ke saath apne vichaaron mein thaam kar. Judaav koi aisi cheez nahi jo aapko baad mein sikhaani hai; yeh woh zameen hai jis par har seekh khadi hoti hai. Aapka diya har pyaar bhara pal woh zameen rakh raha hai, narmi se, aapke baby ke aane se bhi pehle." },
+      "deepDive": { "en": "Developmental research shows secure connection in the earliest years builds the foundation for learning, confidence and relationships. Belonging comes first; everything else grows from it.", "hi": "Developmental research dikhaati hai ki shuruaati saalon mein surakshit judaav seekhne, aatmavishwaas aur rishton ki neenv banata hai. Apnapan pehle aata hai; baaki sab usse hi badhta hai." },
+      "remember": { "en": "Belonging is the first lesson every child learns.", "hi": "Apnapan har bachche ka pehla sabak hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Monkey King's Bridge", "hi": "Bandar Raja Ka Pul" },
+      "summary": { "en": "A wise monkey king becomes a living bridge to save his troop.", "hi": "Ek samajhdaar bandar raja apne jhund ko bachaane ke liye ek jeevit pul ban jaata hai." },
+      "body": { "en": "On a tall mango tree by a river lived a great king of the monkeys with his large and happy troop. The tree bore the sweetest mangoes in all the land. One day the river carried a single mango downstream to a human king, who tasted it and longed for more. He sent his archers to seize the tree, surrounding it as the frightened monkeys huddled together.\n\nThe monkey king saw the only escape lay across the wide river to another tree. The leap was too far for his troop. So he stretched his own body out as a bridge, gripping a branch with his feet and the far tree with his hands, and one by one his monkeys ran safely across his back to freedom.\n\nMoved by such love, the human king gently cared for the brave monkey, and from that day ruled his own people with the same selfless heart.", "hi": "Ek nadi ke kinare ek oonche aam ke ped par bandaron ka ek mahaan raja apne bade aur khush jhund ke saath rehta tha. Us ped par poori dharti ke sabse meethe aam lagte the. Ek din nadi ek aam baha kar ek insaani raja tak le gayi, jisne use chakha aur aur ki tadap mein aa gaya. Usne apne dhanurdharon ko ped pakadne bheja, aur unhone use gher liya jab dare hue bandar ek saath simat gaye.\n\nBandar raja ne dekha ki ekmaatra bachne ka raasta chaudi nadi paar doosre ped tak hai. Chalaang uske jhund ke liye bahut door thi. Isliye usne apne sharir ko ek pul ki tarah faila diya, paeron se ek shaakh aur haathon se door ka ped pakad kar, aur ek-ek karke uske bandar surakshit uski peeth par se daud kar aazaadi ki taraf bhaag gaye.\n\nIs pyaar se dravit hokar, insaani raja ne veer bandar ki pyaar se dekhbhaal ki, aur us din se apne logon par usi nisswaarth dil se raaj kiya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a hard time you and their other parent got through together.", "hi": "Apne baby ko ek mushkil samay ke baare mein bataayein jise aap aur unke doosre parent ne saath paar kiya." },
+      "motivation": { "en": "Showing how love holds through hard times is a quiet gift of strength.", "hi": "Yeh dikhana ki pyaar mushkil samay mein bhi thaame rehta hai, taakat ka ek shaant tohfa hai." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Desh", "hi": "Raag Desh" },
+      "durationMinutes": 4,
+      "description": { "en": "Evening monsoon raga, tender and flowing", "hi": "Shaam ka barsaat ka raag, komal aur behta hua" },
+      "affirmation": { "en": "Like soft rain on a quiet evening, this melody settles gently over us both.", "hi": "Ek shaant shaam par naram baarish ki tarah, yeh dhun hum dono par pyaar se tham jaati hai." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "The Falling Breath", "hi": "Girti Saans" },
+      "content": { "en": "Breathe in for a count of four, then let the breath fall out slowly for a count of six, like rain easing off. Repeat for one calm minute.", "hi": "Chaar tak ginte hue saans lein, phir saans ko chhah tak ginte hue dheere girne dein, jaise baarish dheemi pad rahi ho. Ek shaant minute tak dohraayein." },
+      "remember": { "en": "A longer breath out tells the body it is safe.", "hi": "Lambi saans baahar chhodna sharir ko batata hai ki woh surakshit hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 47,
+    "week": 7,
+    "babyLearning": { "en": "tiny fingers beginning to separate", "hi": "nanhi ungliyaan alag hona shuru kar rahi hain" },
+    "grow": {
+      "title": { "en": "A Heartbeat They Already Know", "hi": "Ek Dhadkan Jise Woh Pehle Se Jaante Hain" },
+      "insight": { "en": "Your steady heartbeat is the very first rhythm your baby ever knows — the original sound of safety and home.", "hi": "Aapki sthir dhadkan woh sabse pehli laya hai jise aapka baby kabhi jaanta hai — surakshit hone aur ghar ki asli aawaz." },
+      "expanded": { "en": "Inside you, your baby is held in a world of gentle sound — and at its centre is the soft, constant drum of your heartbeat. It is the first rhythm they ever live to, steady and reassuring, day and night. This is why a newborn so often calms when held close to a chest: they are returning to a sound they have always known. The bond you share is written in this rhythm. You do not have to do anything special to give it; just by being, your heart is already singing your baby the oldest lullaby there is.", "hi": "Aapke andar, aapka baby naram aawaz ki ek duniya mein thama hai — aur uske kendra mein hai aapke dil ka naram, lagaataar dhol. Yeh woh pehli laya hai jiske saath woh kabhi jeeta hai, sthir aur aashwast karta, din aur raat. Yahi vajah hai ki ek navjaat aksar tab shaant ho jaata hai jab use seene ke paas thaama jaaye: woh ek aisi aawaz mein laut raha hota hai jise woh hamesha se jaanta hai. Aapka baanta hua bond is laya mein likha hai. Use dene ke liye aapko kuch khaas karne ki zaroorat nahi; bas hone se hi, aapka dil pehle se aapke baby ko duniya ki sabse purani lori sunaa raha hai." },
+      "deepDive": { "en": "Newborns calm and settle to the sound of a heartbeat, which they have heard since the womb. That rhythm is wired into their earliest sense of comfort and safety.", "hi": "Navjaat dil ki dhadkan ki aawaz par shaant aur sthir ho jaate hain, jise unhone garbh se hi suna hai. Woh laya unki sabse shuruaati sukoon aur suraksha ki bhaavna mein basi hoti hai." },
+      "remember": { "en": "Your heartbeat is the first song your baby ever hears.", "hi": "Aapki dhadkan woh pehla geet hai jo aapka baby kabhi sunta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Birbal And The Three Questions", "hi": "Birbal Aur Teen Sawaal" },
+      "summary": { "en": "Clever Birbal answers three impossible riddles with calm, simple wit.", "hi": "Chalaak Birbal teen namumkin paheliyon ka jawaab shaant, saadi samajhdaari se deta hai." },
+      "body": { "en": "One day a proud scholar came to Emperor Akbar's court, boasting that no one could answer his questions. 'Where is the centre of the earth? How many stars fill the sky? And where does God dwell?' he challenged. The ministers fell silent, but Birbal rose calmly and asked to reply.\n\nFor the first, Birbal drove a stake into the ground. 'Here is the centre,' he said. 'If you doubt it, measure the earth and prove me wrong.' The scholar could not. For the second, Birbal brought in a woolly sheep. 'There are as many stars as there are hairs on this sheep. Count them if you dare.' Again the scholar was stumped.\n\nFor the last, Birbal lit a lamp. 'Tell me first where the light does not reach,' he smiled, 'and there I will show you where God does not dwell.' The scholar bowed, humbled — true wisdom is often simple, calm, and kind.", "hi": "Ek din ek ghamandi vidwaan Badshah Akbar ke darbaar mein aaya, sheykhi maarta ki koi uske sawaalon ka jawaab nahi de sakta. 'Dharti ka kendra kahaan hai? Aakaash mein kitne taare hain? Aur Bhagwaan kahaan rehte hain?' usne chunauti di. Mantri chup ho gaye, par Birbal shaanti se utha aur jawaab dene ki ijaazat maangi.\n\nPehle ke liye, Birbal ne zameen mein ek khoonti gaad di. 'Yeh raha kendra,' usne kaha. 'Agar shak ho to dharti naap kar mujhe galat saabit karo.' Vidwaan nahi kar saka. Doosre ke liye, Birbal ek roo'edaar bhed le aaya. 'Aakaash mein utne hi taare hain jitne is bhed par baal. Himmat ho to gino.' Phir vidwaan haar gaya.\n\nAakhri ke liye, Birbal ne ek deepak jalaaya. 'Pehle batao yeh roshni kahaan nahi pohanchti,' woh muskuraaya, 'aur wahaan main tumhe dikhaaoonga ki Bhagwaan kahaan nahi rehte.' Vidwaan jhuk gaya, vinamra — sachi samajh aksar saadi, shaant aur dayaalu hoti hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the moment you knew you would be a family.", "hi": "Apne baby ko us pal ke baare mein bataayein jab aapko pata chala ki aap ek parivar banoge." },
+      "motivation": { "en": "The moment your family began is a memory your baby will love to carry.", "hi": "Jis pal aapka parivar shuru hua woh ek aisi yaad hai jise aapka baby thaamna pasand karega." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "My Heart Beats For You", "hi": "Mera Dil Tumhare Liye Dhadakta Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A bond affirmation about the heartbeat", "hi": "Dhadkan ke baare mein ek bond affirmation" },
+      "affirmation": { "en": "My heart has kept its steady beat for you since before you knew the world. It always will.", "hi": "Mera dil tumhare duniya ko jaanne se pehle se hi tumhare liye sthir dhadakta raha hai. Hamesha dhadakta rahega." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Carry Steadiness Within", "hi": "Main Andar Sthirta Rakhti Hoon" },
+      "content": { "en": "Even on uncertain days, there is a steady centre in me — calm, dependable, and entirely my own.", "hi": "Anishchit dinon mein bhi, mujhmein ek sthir kendra hai — shaant, bharosemand, aur poori tarah mera apna." },
+      "remember": { "en": "Your calm centre is always there to return to.", "hi": "Aapka shaant kendra hamesha wahan hai, jismein laut sakein." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 48,
+    "week": 7,
+    "babyLearning": { "en": "tiny eyelids beginning to form", "hi": "nanhi palkein banna shuru kar rahi hain" },
+    "grow": {
+      "title": { "en": "Presence Over Perfection", "hi": "Perfection Se Zyada Maujoodgi" },
+      "insight": { "en": "Your baby will not need a perfect parent. They will need a present one — someone simply, warmly there.", "hi": "Aapke baby ko ek perfect parent ki zaroorat nahi hogi. Unhe ek maujood parent chahiye — koi jo bas, garmjoshi se, wahan ho." },
+      "expanded": { "en": "It is easy to feel you must get everything right — the perfect routine, the perfect calm, the perfect words. But children do not remember perfection; they remember presence. They remember who showed up, who listened, who was warm even when tired. The bond you are building is not made of flawless days but of real ones, lived together. Let go of the pressure to be the perfect parent, and lean into the simpler, deeper gift: being truly there. That is the one thing your baby will feel most, and remember longest.", "hi": "Aisa mehsoos karna aasaan hai ki aapko sab kuch sahi karna hai — perfect routine, perfect shaanti, perfect shabd. Par bachche perfection yaad nahi rakhte; woh maujoodgi yaad rakhte hain. Woh yaad rakhte hain ki kaun aaya, kaun ne suna, kaun thake hue bhi garmjosh raha. Aap jo bond bana rahi hain woh bekhot dinon se nahi, balki asli dinon se bana hai, saath jiye gaye. Perfect parent banne ke dabaav ko jaane dein, aur us saade, gehre tohfe ki taraf jhukein: sach mein wahan hona. Yahi woh ek cheez hai jise aapka baby sabse zyada mehsoos karega, aur sabse lambe samay tak yaad rakhega." },
+      "deepDive": { "en": "Psychologists describe the 'good enough' parent who is present and responsive most of the time — not perfect. Children thrive on consistent warmth far more than flawless caregiving.", "hi": "Psychologists 'good enough' parent ki baat karte hain jo zyadatar samay maujood aur responsive hota hai — perfect nahi. Bachche bekhot dekhbhaal se kahin zyada sthir garmjoshi par phalte-phulte hain." },
+      "remember": { "en": "Being there matters more than getting it perfect.", "hi": "Wahan hona perfect karne se zyada maayne rakhta hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Kind Merchant", "hi": "Dayaalu Vyapaari" },
+      "summary": { "en": "A merchant learns that small acts of kindness return in unexpected ways.", "hi": "Ek vyapaari seekhta hai ki dayaalta ke chhote kaam anokhe tareekon se lautte hain." },
+      "body": { "en": "In a bustling town lived a merchant known not for his riches but for his kindness. Each morning, before opening his shop, he set out a little food and water for any traveller, beggar or stray animal who passed his door. His neighbours teased him. 'You give away too much,' they said. 'You will never grow rich this way.' But the merchant only smiled and carried on.\n\nOne year a terrible drought struck the land, and crops failed everywhere. Many shops closed their doors. But the people the merchant had quietly helped over the years did not forget him. A farmer brought him grain, a traveller sent word of distant markets, a poor woman shared her well. Through their kindness, his family weathered the hard season safely.\n\n'You see,' the old merchant told his children, 'kindness is never wasted. What we give in love has a quiet way of returning.'", "hi": "Ek choham-chaman wale kasbe mein ek vyapaari rehta tha jo apni daulat ke liye nahi balki apni dayaalta ke liye jaana jaata tha. Har subah, apni dukaan kholne se pehle, woh kisi bhi musafir, bhikhaari ya aawaara jaanwar ke liye thoda khaana aur paani rakh deta jo uske darwaaze se guzarta. Uske padosi use chidhaate. 'Tum bahut zyada de dete ho,' woh kehte. 'Tum is tareeke se kabhi ameer nahi banoge.' Par vyapaari bas muskuraata aur lagaa rehta.\n\nEk saal ek bhayanak sookha dharti par pada, aur har jagah fasal kharaab ho gayi. Kayi dukaanein band ho gayin. Par jin logon ki vyapaari ne saalon chupchaap madad ki thi woh use nahi bhoole. Ek kisaan use anaaj laaya, ek musafir ne door ke bazaaron ki khabar bheji, ek gareeb aurat ne apna kuaan baanta. Unki dayaalta se, uska parivar mushkil mausam surakshit paar kar gaya.\n\n'Dekha,' boodhe vyapaari ne apne bachchon se kaha, 'dayaalta kabhi bekaar nahi jaati. Jo hum pyaar mein dete hain woh chupchaap laut aane ka apna tareeka rakhti hai.'" },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the home you and their other parent are building for them.", "hi": "Apne baby ko us ghar ke baare mein bataayein jo aap aur unke doosre parent unke liye bana rahe hain." },
+      "motivation": { "en": "Describing their home aloud makes the welcome feel real and near.", "hi": "Unke ghar ko bolkar bataana us swagat ko asli aur paas mehsoos karaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "A Home In My Arms", "hi": "Meri Baahon Mein Ek Ghar" },
+      "durationMinutes": 2,
+      "description": { "en": "A short meditation imagining holding your baby", "hi": "Apne baby ko thaame hue sochne ka ek chhota dhyan" },
+      "affirmation": { "en": "Wherever I am, my arms are already a home that waits for you.", "hi": "Main jahaan bhi hoon, meri baahein pehle se ek ghar hain jo tumhara intezaar kar rahi hain." },
+      "introduction": { "en": "Sit comfortably and close your eyes. Breathe slowly a few times. Picture yourself one day soon, holding your baby close in your arms — warm, safe and completely at peace. Let that gentle picture fill you for a few quiet breaths.", "hi": "Aaram se baithein aur aankhein band karein. Kuch baar dheere saans lein. Khud ko ek din jald, apne baby ko apni baahon mein paas thaame hue sochein — garm, surakshit aur poori tarah shaant. Us naram tasveer ko kuch shaant saanson tak apne andar bharne dein." },
+      "closingThought": { "en": "That home in your arms is already being made, with every loving breath you take.", "hi": "Aapki baahon mein woh ghar pehle se ban raha hai, aapki har pyaar bhari saans ke saath." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Soften The Hands", "hi": "Haathon Ko Naram Karein" },
+      "content": { "en": "Notice if your hands are clenched. Breathe in, then as you breathe out let your fingers uncurl and your palms open softly. Repeat five slow times.", "hi": "Note karein agar aapke haath bhinche hue hain. Saans lein, phir saans chhodte waqt apni ungliyon ko khulne aur hatheliyon ko naram se khulne dein. Paanch baar dheere dohraayein." },
+      "remember": { "en": "Open hands invite a calmer mind.", "hi": "Khule haath ek shaant mann ko bulaate hain." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 49,
+    "week": 7,
+    "babyLearning": { "en": "closing the week, growing rounder and stronger", "hi": "hafta poora karte hue, aur gol aur mazboot hote hue" },
+    "grow": {
+      "title": { "en": "The Bond Grows Both Ways", "hi": "Bond Dono Taraf Badhta Hai" },
+      "insight": { "en": "This bond is not only something you give to your baby. As you love them, they are quietly making you into a parent, too.", "hi": "Yeh bond sirf woh nahi jo aap apne baby ko deti hain. Jaise aap unhe pyaar karti hain, woh bhi chupchaap aapko ek parent bana rahe hain." },
+      "expanded": { "en": "We often think of bonding as flowing in one direction — from parent to child. But love between you and your baby moves both ways. Even now, this little life is changing you: softening you, opening your heart wider, teaching you a patience and tenderness you did not know you had. As you grow your baby, your baby is growing you. The bond you share is a quiet exchange, each of you shaping the other. By the time you finally meet, you will already be deeply, beautifully bound — made for one another by all these unseen days of love.", "hi": "Hum aksar bonding ko ek taraf behta hua sochte hain — parent se bachche tak. Par aapke aur aapke baby ke beech pyaar dono taraf chalta hai. Abhi bhi, yeh nanhi zindagi aapko badal rahi hai: aapko naram kar rahi, aapke dil ko aur chaudaa khol rahi, aapko ek aisi sabra aur narmi sikhaa rahi jo aap nahi jaanti thi ki aapmein hai. Jaise aap apne baby ko badhaati hain, aapka baby aapko badha raha hai. Aapka baanta hua bond ek shaant aadan-pradan hai, har ek doosre ko gadhta hua. Jab tak aap aakhir mein milte hain, aap pehle se hi gehraai se, sundarta se bandhe honge — pyaar ke in saare andekhe dinon se ek doosre ke liye bane." },
+      "deepDive": { "en": "Studies show pregnancy reshapes a parent's brain toward empathy and bonding. The relationship is mutual from the start — you and your baby are forming each other.", "hi": "Studies dikhaati hain ki pregnancy ek parent ke dimaag ko empathy aur bonding ki taraf gadhti hai. Rishta shuru se hi do-tarafa hai — aap aur aapka baby ek doosre ko bana rahe hain." },
+      "remember": { "en": "As you grow your baby, your baby grows you.", "hi": "Jaise aap apne baby ko badhaati hain, aapka baby aapko badhaata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The River And The Mountain", "hi": "Nadi Aur Pahaad" },
+      "summary": { "en": "A river and a mountain learn that giving and receiving shape each other in time.", "hi": "Ek nadi aur ek pahaad seekhte hain ki dena aur lena samay ke saath ek doosre ko gadhte hain." },
+      "body": { "en": "High in the hills, a great mountain stood proud and unmoving, while at its feet a young river rushed and curved her way toward the distant sea. 'I am strong and steady,' boomed the mountain. 'You are restless and forever changing. What can you ever shape?' The river only laughed softly and flowed on.\n\nYear after year, the river ran along the same patient path, brushing against the mountain's stone. She asked for nothing and never hurried. And year after year, grain by grain, she carved a deep and beautiful valley through the rock, while the mountain in turn gave her banks their shape and gathered the rains that kept her full.\n\nIn time the mountain understood. 'We have been shaping one another all along,' it said gently. And the river smiled, for the truest bonds are those where each one helps the other grow.", "hi": "Pahaadon mein ooper, ek vishaal pahaad ghamand se aur achal khada tha, jabki uske paeron mein ek jawaan nadi bhaagti aur mudti door samundar ki taraf apni raah banaati. 'Main mazboot aur sthir hoon,' pahaad garaja. 'Tum bechain aur hamesha badalti rehti ho. Tum bhala kya gadh sakti ho?' Nadi bas dheere se hansi aur behti rahi.\n\nSaal-dar-saal, nadi usi sabra bhari raah par chalti rahi, pahaad ke patthar se chhuti hui. Usne kuch nahi maanga aur kabhi jaldi nahi ki. Aur saal-dar-saal, kan-dar-kan, usne patthar mein se ek gehri aur sundar ghaati gaadh di, jabki pahaad ne badle mein uske kinaron ko aakaar diya aur woh baarish jamaa ki jo use bhari rakhti.\n\nSamay ke saath pahaad samajh gaya. 'Hum to shuru se hi ek doosre ko gadh rahe the,' usne pyaar se kaha. Aur nadi muskuraayi, kyunki sabse sachche bond woh hain jahaan har ek doosre ko badhne mein madad karta hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a promise you and their other parent have made.", "hi": "Apne baby ko ek vaade ke baare mein bataayein jo aap aur unke doosre parent ne kiya hai." },
+      "motivation": { "en": "A promise spoken aloud becomes a foundation your baby can stand on.", "hi": "Bolkar kaha gaya vaada ek aisi neenv ban jaata hai jis par aapka baby khada ho sakta hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "We Are Growing Each Other", "hi": "Hum Ek Doosre Ko Badha Rahe Hain" },
+      "durationMinutes": 0,
+      "description": { "en": "A closing bond affirmation for the week", "hi": "Hafte ke liye ek samaapan bond affirmation" },
+      "affirmation": { "en": "As I help you grow, you are gently making me into your parent. We are becoming together.", "hi": "Jaise main tumhe badhne mein madad karti hoon, tum pyaar se mujhe tumhara parent bana rahe ho. Hum saath ban rahe hain." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Am Becoming Who They Need", "hi": "Main Wahi Ban Rahi Hoon Jo Unhe Chahiye" },
+      "content": { "en": "With each passing day, I am gently growing into the parent my baby will need — and I trust that becoming.", "hi": "Har guzarte din ke saath, main pyaar se woh parent ban rahi hoon jo mere baby ko chahiye — aur main us banne par bharosa karti hoon." },
+      "remember": { "en": "You are becoming exactly who your baby needs.", "hi": "Aap theek wahi ban rahi hain jo aapke baby ko chahiye." },
+      "durationMinutes": 0
+    }
+  }
+]

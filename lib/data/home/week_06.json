@@ -1,0 +1,282 @@
+[
+  {
+    "day": 36,
+    "week": 6,
+    "babyLearning": { "en": "a little heart fluttering quickly, taking shape", "hi": "ek nanha dil tezi se phadphadaata, aakaar leta hua" },
+    "grow": {
+      "title": { "en": "Your Body Already Knows The Way", "hi": "Aapka Sharir Pehle Se Raasta Jaanta Hai" },
+      "insight": { "en": "You do not have to instruct your body how to grow your baby. Deep within, it already knows the way.", "hi": "Aapko apne sharir ko sikhaane ki zaroorat nahi ki baby kaise badhe. Gehre andar, woh pehle se raasta jaanta hai." },
+      "expanded": { "en": "There is an ancient wisdom moving through you right now — a knowing far older than any book or worry. Without a single instruction from you, your body is forming a heart, weaving tiny cells into a whole new person. You do not have to manage it or understand it for it to work beautifully. This is your first lesson in trust: some of the most important things happen not because we control them, but because we step back and let a deeper wisdom do its quiet work. Your only task today is to rest in that trust.", "hi": "Abhi aapke andar ek prachin gyaan beh raha hai — ek aisi samajh jo kisi bhi kitaab ya chinta se kahin purani hai. Aapse ek bhi nirdesh ke bina, aapka sharir ek dil bana raha hai, nanhi koshikaon ko ek poore naye insaan mein bun raha hai. Ise sundar tareeke se kaam karne ke liye aapko ise sambhaalne ya samajhne ki zaroorat nahi. Yeh bharose ka aapka pehla sabak hai: kuch sabse zaroori cheezein is liye nahi hoti ki hum unhe control karein, balki is liye ki hum peeche hatte hain aur ek gehri samajh ko apna shaant kaam karne dete hain. Aaj aapka ekmaatra kaam hai us bharose mein aaram karna." },
+      "deepDive": { "en": "From a single cell, your body orchestrates billions of precise developmental steps without any conscious effort from you. Scientists who study it call early development one of nature's most reliable processes.", "hi": "Ek hi koshika se, aapka sharir aapke kisi sajag prayaas ke bina arabon sateek vikaas ke kadam tay karta hai. Ise padhne wale scientists shuruaati vikaas ko prakriti ki sabse bharosemand prakriyaon mein se ek kehte hain." },
+      "remember": { "en": "Trust your body — it has been doing this longer than time itself.", "hi": "Apne sharir par bharosa karein — yeh samay se bhi pehle se yeh karta aaya hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Elephant And The Rope", "hi": "Haathi Aur Rassi" },
+      "summary": { "en": "A mighty elephant discovers that the only thing holding him was an old belief.", "hi": "Ek vishaal haathi paata hai ki use bas ek purana vishwaas baandhe hue tha." },
+      "body": { "en": "A traveller passing through a village stopped to watch a row of great elephants resting in the shade. Each one was held only by a thin rope tied to its front leg and a small wooden peg in the ground. No chains, no cages — just a slender rope that any of these huge creatures could have snapped in a moment.\n\nPuzzled, the traveller asked the keeper why the elephants did not simply walk away. The keeper smiled. 'When they were very small,' he said, 'we tied them with that same rope. Back then it was strong enough to hold them. They tried to pull free, could not, and in time stopped trying. Now they are grown and powerful, but they still believe the rope can hold them.'\n\nThe traveller walked on, thinking how often we, too, are held back not by what is truly strong — but only by what we have long believed.", "hi": "Ek gaon se guzarta ek musafir vishaal haathiyon ki kataar ko chhaaon mein aaram karte dekhne ruka. Har ek bas ek patli rassi se bandha tha jo uski agli taang aur zameen mein gade ek chhote lakdi ke khoonte se judi thi. Na zanjeer, na pinjra — bas ek patli rassi jise inme se koi bhi vishaal jeev ek pal mein tod sakta tha.\n\nHairaan musafir ne mahaut se poocha ki haathi yun hi chal kar kyun nahi chale jaate. Mahaut muskuraaya. 'Jab yeh bahut chhote the,' usne kaha, 'humne unhe isi rassi se baandha tha. Tab yeh unhe thaame rakhne ke liye kaafi mazboot thi. Unhone chhootne ki koshish ki, nahi kar paaye, aur samay ke saath koshish karna chhod diya. Ab yeh bade aur taakatwar hain, par abhi bhi maante hain ki rassi unhe rok sakti hai.'\n\nMusafir aage chal pada, yeh sochte hue ki kitni baar hum bhi kisi sach mein mazboot cheez se nahi — balki bas us se ruke rehte hain jo humne der se maan rakha hai." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about your own mother and the things she taught you.", "hi": "Apne baby ko apni khud ki maa ke baare mein bataayein aur woh cheezein jo unhone aapko sikhaayi." },
+      "motivation": { "en": "The love you were given is the first love you will pass on.", "hi": "Jo pyaar aapko mila, wahi pehla pyaar hai jo aap aage dengi." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "My Body Knows And I Trust It", "hi": "Mera Sharir Jaanta Hai Aur Main Us Par Bharosa Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A trusting bond affirmation", "hi": "Ek bharose wala bond affirmation" },
+      "affirmation": { "en": "I do not need to understand it all. My body knows how to hold you, and I trust it completely.", "hi": "Mujhe sab kuch samajhne ki zaroorat nahi. Mera sharir jaanta hai tumhe kaise thaamna hai, aur main us par poora bharosa karti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Can Let Go Of Controlling Everything", "hi": "Main Har Cheez Control Karna Chhod Sakti Hoon" },
+      "content": { "en": "Not everything is mine to manage today. I can loosen my grip and let the day carry some of it.", "hi": "Aaj har cheez sambhaalna mera kaam nahi hai. Main apni pakad dheeli kar sakti hoon aur din ko thoda bojh uthaane de sakti hoon." },
+      "remember": { "en": "Letting go is its own kind of strength.", "hi": "Chhod dena bhi apni ek tarah ki taakat hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 37,
+    "week": 6,
+    "babyLearning": { "en": "tiny buds of arms and legs beginning to appear", "hi": "haath aur paer ki nanhi kaliyaan dikhna shuru" },
+    "grow": {
+      "title": { "en": "You Can Trust What You Cannot See", "hi": "Jo Aap Dekh Nahi Sakti Us Par Bhi Bharosa Kar Sakti Hain" },
+      "insight": { "en": "Just because you cannot see your baby growing does not mean it is not happening. The unseen can still be trusted.", "hi": "Sirf is liye ki aap apne baby ko badhte nahi dekh sakti iska matlab yeh nahi ki yeh ho nahi raha. Andekhe par bhi bharosa kiya ja sakta hai." },
+      "expanded": { "en": "In these early weeks there is so little to show — no rounded belly, no fluttering kicks, sometimes nothing but tiredness and faith. It can be hard to trust in something you cannot yet feel. But the deepest things in life are often invisible: love, growth, the slow turning of a seed into a sprout underground. Your baby is busily becoming, even in this quiet. Learning to trust what you cannot see is a gift you give yourself now — and, one day, the very steadiness your child will sense in you.", "hi": "In shuruaati hafton mein dikhaane ke liye itna kam hai — na gol pet, na phadphadaati laat, kabhi sirf thakaan aur vishwaas ke. Kisi aisi cheez par bharosa karna mushkil ho sakta hai jise aap abhi mehsoos bhi nahi kar sakti. Par zindagi ki sabse gehri cheezein aksar andekhi hoti hain: pyaar, vikaas, ek beej ka zameen ke neeche dheere-dheere ankur banna. Aapka baby is shaanti mein bhi vyast ban raha hai. Jise aap dekh nahi sakti us par bharosa karna seekhna ek aisa tohfa hai jo aap khud ko abhi deti hain — aur, ek din, wahi sthirta jise aapka bachcha aapmein mehsoos karega." },
+      "deepDive": { "en": "Even before a bump appears, the placenta is fully nourishing your baby and hormone levels rise steadily to support the pregnancy. Much of the most vital work is simply invisible from the outside.", "hi": "Pet ubharne se pehle hi, placenta poori tarah aapke baby ko poshan de raha hai aur hormone ka star pregnancy ko sambhaalne ke liye sthir roop se badhta hai. Sabse zaroori kaam ka zyadatar hissa bas bahar se andekha hota hai." },
+      "remember": { "en": "What you cannot see is often working hardest of all.", "hi": "Jo aap dekh nahi sakti woh aksar sabse zyada kaam kar raha hota hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Clever Rabbit And The Lion", "hi": "Chalaak Khargosh Aur Sher" },
+      "summary": { "en": "A small rabbit uses calm cleverness to free the forest from a fearsome lion.", "hi": "Ek chhota khargosh shaant chalaaki se jungle ko ek bhayanak sher se aazaad karaata hai." },
+      "body": { "en": "A fierce lion ruled a forest and devoured so many animals that the creatures feared none would be left. At last they struck a bargain: one animal would go to the lion each day, so the rest could live in peace. When the turn fell to a small, clever rabbit, he did not panic. He simply walked very slowly, arriving late.\n\nThe lion roared with hunger. 'Forgive me,' said the rabbit calmly, 'but another lion in the forest stopped me. He claims he is the true king.' Furious, the lion demanded to see this rival. The rabbit led him to an old well and pointed inside. There, in the still water, the lion saw his own reflection glaring back.\n\nRoaring at the 'other lion,' he leapt straight into the well — and was never seen again. The little rabbit had saved them all, not with strength, but with a cool and clever head.", "hi": "Ek bhayanak sher ek jungle par raaj karta tha aur itne saare jaanwar kha gaya ki jeevon ko dar tha ki koi nahi bachega. Aakhir mein unhone ek samjhauta kiya: har din ek jaanwar sher ke paas jaayega, taaki baaki shaanti se jee sakein. Jab baari ek chhote, chalaak khargosh ki aayi, woh ghabraaya nahi. Woh bas bahut dheere chala, der se pohancha.\n\nSher bhookh se dahaada. 'Maaf karein,' khargosh ne shaanti se kaha, 'par jungle mein ek doosre sher ne mujhe roka. Woh kehta hai ki wahi asli raja hai.' Gusse mein, sher ne us pratidwandi ko dekhne ki maang ki. Khargosh use ek purane kuein tak le gaya aur andar ishaara kiya. Wahan, sthir paani mein, sher ne apni hi parchhaayi ko ghoorte dekha.\n\n'Doosre sher' par dahaadte hue, woh seedha kuein mein kood gaya — aur phir kabhi nahi dikha. Nanhe khargosh ne sabko bachaa liya tha, taakat se nahi, balki ek thande aur chalaak dimaag se." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about their grandparents and where the family comes from.", "hi": "Apne baby ko unke dada-dadi, naana-naani ke baare mein bataayein aur ki parivar kahaan se aata hai." },
+      "motivation": { "en": "Knowing where they come from gives your child a place to stand.", "hi": "Yeh jaanna ki woh kahaan se aate hain aapke bachche ko khade hone ki ek jagah deta hai." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Trust The Quiet Work Within", "hi": "Main Andar Ke Shaant Kaam Par Bharosa Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A faith-filled bond affirmation", "hi": "Ek vishwaas se bhara bond affirmation" },
+      "affirmation": { "en": "Even when I cannot feel you yet, I know you are growing. I trust the quiet work happening within me.", "hi": "Jab main tumhe abhi mehsoos bhi nahi kar sakti, tab bhi main jaanti hoon ki tum badh rahe ho. Main apne andar ho rahe shaant kaam par bharosa karti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Breathe Into The Belly", "hi": "Pet Mein Saans Lein" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise gently under your palm, then breathe out and feel it soften. Stay with five quiet breaths.", "hi": "Ek haath apne pet par neeche rakhein. Dheere se saans andar lein aur use apni hatheli ke neeche halke se uthte mehsoos karein, phir saans chhodein aur use naram hote mehsoos karein. Paanch shaant saanson tak rukein." },
+      "remember": { "en": "Your breath is a quiet hello to the life within.", "hi": "Aapki saans andar ki zindagi ko ek shaant hello hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 38,
+    "week": 6,
+    "babyLearning": { "en": "the early shape of a face beginning to form", "hi": "chehre ki shuruaati banaawat banne lagi" },
+    "grow": {
+      "title": { "en": "Worry Is Not Preparation", "hi": "Chinta Taiyaari Nahi Hai" },
+      "insight": { "en": "Worrying about your baby can feel like caring for them, but the two are not the same.", "hi": "Apne baby ki chinta karna unka khayal rakhne jaisa lag sakta hai, par dono ek nahi hain." },
+      "expanded": { "en": "When we love someone deeply, our minds often try to protect them by rehearsing every possible fear. It feels responsible, even loving. But worry rarely changes what will happen — it only borrows tomorrow's troubles to spend on today's peace. Real preparation is gentle and practical: rest, nourishment, kindness to yourself. The rest you can hand over to trust. Each time you notice worry and softly set it down, you are not being careless. You are choosing the calm that truly serves both you and your baby.", "hi": "Jab hum kisi se gehra pyaar karte hain, hamara mann aksar har mumkin dar ko dohraa kar unhe bachaane ki koshish karta hai. Yeh zimmedaar, balki pyaar bhara lagta hai. Par chinta shaayad hi badalti hai ki kya hoga — yeh bas kal ki mushkilon ko aaj ki shaanti par kharch karne ke liye udhaar leti hai. Asli taiyaari naram aur vyavhaarik hoti hai: aaram, poshan, khud par dayaalta. Baaki aap bharose ko saunp sakti hain. Har baar jab aap chinta ko note karti hain aur use narmi se neeche rakhti hain, aap laaparwaah nahi ho rahin. Aap woh shaanti chun rahi hain jo sach mein aap aur aapke baby dono ka bhala karti hai." },
+      "deepDive": { "en": "Psychologists distinguish 'productive worry,' which leads to a clear action, from 'unproductive worry,' which only loops. Naming which kind you are in helps the mind let the looping kind go.", "hi": "Psychologists 'productive worry', jo ek saaf kaam ki taraf le jaati hai, ko 'unproductive worry' se alag karte hain, jo bas ghoomti rehti hai. Yeh naam dena ki aap kis kism mein hain mann ko ghoomne wali kism ko chhodne mein madad karta hai." },
+      "remember": { "en": "Worry borrows trouble; trust returns peace.", "hi": "Chinta mushkil udhaar leti hai; bharosa shaanti laut aata hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Krishna And The Govardhan Hill", "hi": "Krishna Aur Govardhan Parvat" },
+      "summary": { "en": "A young Krishna lifts a great hill to shelter his village from a terrible storm.", "hi": "Ek baalak Krishna apne gaon ko ek bhayanak toofan se bachaane ke liye ek vishaal parvat utha leta hai." },
+      "body": { "en": "Long ago, the villagers of Vrindavan held a yearly festival to honour the rain. But young Krishna asked them instead to honour Govardhan Hill, which gave their cattle grass and shaded their homes. The villagers agreed and turned their thanks to the mountain.\n\nThis angered the proud god of rain, who sent down a furious storm to flood the village. Sheets of rain poured and the people trembled in fear. But Krishna, though only a boy, walked calmly to Govardhan Hill. With one finger he lifted the entire mountain into the air, holding it up like a great umbrella.\n\nAll the villagers, with their children and cattle, gathered safely beneath it. For seven days and nights the storm raged, and for seven days Krishna held the hill steady, never wavering. At last the rains gave up. Calm and faith, the village learned, can shelter us through any storm.", "hi": "Bahut samay pehle, Vrindavan ke gaonwale baarish ke samman mein ek saalana utsav manaate the. Par baalak Krishna ne unse kaha ki woh iske bajaaye Govardhan Parvat ka samman karein, jo unke maweshiyon ko ghaas aur unke gharon ko chhaaon deta tha. Gaonwale maan gaye aur apna aabhaar parvat ki taraf moda.\n\nIs se baarish ke ghamandi devta ko gussa aaya, jisne gaon ko dubaane ke liye ek bhayanak toofan bheja. Mooseladhaar baarish barsi aur log dar se kaanp uthe. Par Krishna ne, ek baalak hote hue bhi, shaanti se Govardhan Parvat tak chalkar gaye. Ek ungli se unhone poore parvat ko hawa mein utha liya, use ek vishaal chhate ki tarah thaame.\n\nSaare gaonwale, apne bachchon aur maweshiyon ke saath, uske neeche surakshit ikatthe ho gaye. Saat din aur saat raat toofan garja, aur saat din Krishna ne parvat ko sthir thaame rakha, kabhi nahi dige. Aakhir baarish ne haar maan li. Gaon ne seekha ki shaanti aur vishwaas humein kisi bhi toofan se bachaa sakte hain." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a family tradition you love and hope to pass on.", "hi": "Apne baby ko ek aisi parivar ki parampara ke baare mein bataayein jo aapko pasand hai aur jise aap aage badhaane ki ummeed rakhti hain." },
+      "motivation": { "en": "Traditions are the threads that quietly tie one generation to the next.", "hi": "Paramparaayein woh dhaage hain jo ek peedhi ko agli se chupchaap baandhti hain." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "Setting Down The Worry", "hi": "Chinta Ko Neeche Rakhna" },
+      "durationMinutes": 3,
+      "description": { "en": "A short meditation to release worry", "hi": "Chinta ko chhodne ka ek chhota dhyan" },
+      "affirmation": { "en": "I gently set my worries down, and I rest here with you.", "hi": "Main apni chintaon ko pyaar se neeche rakhti hoon, aur yahan tumhare saath aaram karti hoon." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Take a few slow breaths. Imagine your worries as small stones you are holding in your hands, and with each breath out, picture yourself gently setting one down until your hands are open and empty.", "hi": "Aaram se baithein aur aankhein band hone dein. Kuch dheemi saansein lein. Apni chintaon ko chhote pattharon ki tarah sochein jo aap apne haathon mein thaame hain, aur har saans baahar chhodte waqt, khud ko ek pyaar se neeche rakhte dekhein jab tak aapke haath khule aur khaali na ho jaayein." },
+      "closingThought": { "en": "Your hands and your heart are lighter now. Carry this lightness gently to your baby.", "hi": "Aapke haath aur aapka dil ab halke hain. Is halkepan ko pyaar se apne baby tak le jaayein." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Will Meet Today, Not Tomorrow", "hi": "Main Aaj Se Milungi, Kal Se Nahi" },
+      "content": { "en": "I do not have to solve every future moment right now. Today asks only for today.", "hi": "Mujhe abhi har aane wale pal ko sulhaane ki zaroorat nahi. Aaj sirf aaj maangta hai." },
+      "remember": { "en": "Today is the only day you are asked to live.", "hi": "Aaj hi woh ekmaatra din hai jise jeene ko aapse kaha gaya hai." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 39,
+    "week": 6,
+    "babyLearning": { "en": "growing rounder, settling deeper into its cosy home", "hi": "gol hote hue, apne aaramdayak ghar mein gehre bas-te hue" },
+    "grow": {
+      "title": { "en": "Let Go Of The Perfect Plan", "hi": "Perfect Plan Ko Jaane Dein" },
+      "insight": { "en": "You can prepare with love, but you cannot script everything. The most beautiful parts of this journey will surprise you.", "hi": "Aap pyaar se taiyaari kar sakti hain, par har cheez ka script nahi likh sakti. Is safar ke sabse sundar hisse aapko chaunka denge." },
+      "expanded": { "en": "Many of us cope with the unknown by planning — the perfect birth, the perfect nursery, the perfect first year. There is comfort in a plan, and some planning is wise. But life with a child is gloriously unpredictable, and the tightest plan often cracks at the first surprise. The gift is to hold your plans loosely, like an open hand rather than a clenched fist. When you make room for things to unfold their own way, you trade the brittle pressure of perfect for something far steadier: the freedom to meet whatever comes with grace.", "hi": "Hum mein se kayi anjaane se planning karke nibatte hain — perfect janm, perfect nursery, perfect pehla saal. Ek plan mein sukoon hota hai, aur thodi planning samajhdaari hai. Par ek bachche ke saath zindagi shaandaar tareeke se anishchit hoti hai, aur sabse kasa hua plan aksar pehle hi chaunkaane par toot jaata hai. Tohfa yeh hai ki aap apne plans ko dheela thaamein, ek khuli hatheli ki tarah, na ki ek bandhi mutthi ki tarah. Jab aap cheezon ko apne tareeke se khulne ki jagah deti hain, aap perfect ke naazuk dabaav ko kuch zyada sthir cheez se badal deti hain: jo bhi aaye use vinamrata se milne ki aazaadi." },
+      "deepDive": { "en": "Studies of new parents find that flexibility predicts wellbeing far better than rigid expectations. Those who hold plans loosely adapt more easily when reality, as it always does, arrives differently.", "hi": "Naye parents ke adhyayan paate hain ki lacheelapan sakht ummeedon se kahin behtar bhalai bataata hai. Jo apne plans ko dheela thaamte hain woh tab zyada aasaani se dhal jaate hain jab haqeeqat, jaisa woh hamesha karti hai, alag tareeke se aati hai." },
+      "remember": { "en": "Hold your plans like an open hand, not a clenched fist.", "hi": "Apne plans ko bandhi mutthi nahi, khuli hatheli ki tarah thaamein." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Golden Swan", "hi": "Sunehra Hans" },
+      "summary": { "en": "A graceful swan teaches that greed for more can cost us what we already have.", "hi": "Ek sundar hans sikhaata hai ki aur ki laalach humse woh chheen sakti hai jo hamare paas pehle se hai." },
+      "body": { "en": "Long ago there lived a swan whose feathers shone like pure gold. Nearby lived a poor woman and her two daughters, who struggled to make ends meet. The kind swan, seeing their hardship, came to them and said, 'Pluck one of my golden feathers each time you are in need, and sell it. It will keep you well.'\n\nSo it was. From time to time the swan returned, and gently gave a single shining feather. Slowly the family's troubles eased. But the mother grew greedy. 'Next time the swan comes,' she told her daughters, 'we will pull out all his feathers at once and be rich forever.'\n\nWhen the trusting swan next arrived, she seized him and pulled every feather out. Yet the moment she did, each feather turned to plain white. The swan, now bare, flew slowly away and never came back. In grasping for everything, she had lost the steady gift she already had.", "hi": "Bahut samay pehle ek hans rehta tha jiske par shuddh sone ki tarah chamakte the. Paas hi ek gareeb aurat aur uski do betiyaan rehti thi, jo guzaara karne ke liye sangharsh karti thi. Dayaalu hans ne unki takleef dekhkar unke paas aakar kaha, 'Jab bhi zaroorat ho, mera ek sunehra par nikaal kar bech dena. Yeh tumhe theek rakhega.'\n\nAur aisa hi hua. Samay-samay par hans lautta, aur pyaar se ek chamakta par de deta. Dheere-dheere parivar ki mushkilein kam hui. Par maa laalchi ho gayi. 'Agli baar jab hans aaye,' usne apni betiyon se kaha, 'hum ek saath uske saare par nikaal lenge aur hamesha ke liye ameer ho jaayenge.'\n\nJab bharosa karne wala hans agli baar aaya, usne use pakad liya aur har par nikaal liya. Par jaise hi usne aisa kiya, har par saadi safed roshni mein badal gaya. Hans, ab nanga, dheere se ud gaya aur phir kabhi nahi laut-a. Sab kuch paane ki chaah mein, usne woh sthir tohfa kho diya jo uske paas pehle se tha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the town or place where you grew up.", "hi": "Apne baby ko us shehar ya jagah ke baare mein bataayein jahaan aap badi hui." },
+      "motivation": { "en": "The places that shaped you are part of the story they will carry too.", "hi": "Jin jagahon ne aapko gadha woh us kahani ka hissa hain jo woh bhi le jaayenge." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Welcome What I Cannot Plan", "hi": "Main Jise Plan Nahi Kar Sakti Uska Swagat Karti Hoon" },
+      "durationMinutes": 0,
+      "description": { "en": "A surrendering bond affirmation", "hi": "Ek samarpan wala bond affirmation" },
+      "affirmation": { "en": "I release my need for everything to be perfect. I welcome our journey just as it unfolds, with you.", "hi": "Main har cheez ke perfect hone ki apni zaroorat ko chhod deti hoon. Main hamare safar ka swagat karti hoon jaise woh khulta hai, tumhare saath." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "The Unclenching Breath", "hi": "Mutthi Kholti Saans" },
+      "content": { "en": "Make a soft fist as you breathe in. As you breathe out slowly, let your fingers open and your hand fall loose and relaxed. Repeat five times, releasing a little more each time.", "hi": "Saans andar lete waqt ek naram mutthi banaayein. Jab aap dheere se saans chhodein, apni ungliyon ko khulne dein aur apne haath ko dheela aur relaxed girne dein. Paanch baar dohraayein, har baar thoda aur chhodte hue." },
+      "remember": { "en": "An open hand holds peace more easily than a closed one.", "hi": "Ek khuli hatheli shaanti ko bandh hatheli se zyada aasaani se thaamti hai." },
+      "durationMinutes": 2
+    }
+  },
+  {
+    "day": 40,
+    "week": 6,
+    "babyLearning": { "en": "tiny eyes beginning to take their place", "hi": "nanhi aankhein apni jagah lena shuru kar rahi hain" },
+    "grow": {
+      "title": { "en": "Uncertainty Can Be Gentle", "hi": "Anishchitta Naram Ho Sakti Hai" },
+      "insight": { "en": "Not knowing what comes next does not have to feel frightening. Uncertainty can be a soft, open space too.", "hi": "Yeh na jaanna ki aage kya aata hai darawna mehsoos hona zaroori nahi. Anishchitta ek naram, khuli jagah bhi ho sakti hai." },
+      "expanded": { "en": "We are often taught to fear the unknown, to fill every blank with a plan or a worry. But uncertainty is simply the space where new things are still becoming — and not all of it is heavy. The same not-knowing that can feel anxious is also full of wonder: who your baby will be, what their laugh will sound like, the surprises waiting in ordinary days. When you can let uncertainty be gentle rather than threatening, it softens into something almost like hope. The future is unwritten, and that means it is still open to all that is good.", "hi": "Humein aksar anjaane se darna sikhaaya jaata hai, har khaali jagah ko ek plan ya chinta se bharna. Par anishchitta bas woh jagah hai jahaan nayi cheezein abhi ban rahi hain — aur yeh saara bhaari nahi hai. Wahi na-jaanna jo bechain mehsoos ho sakta hai, ascharya se bhi bhara hai: aapka baby kaun hoga, unki hansi kaisi sunaayi degi, aam dinon mein chhupe surprise. Jab aap anishchitta ko khatre ke bajaaye naram hone deti hain, yeh kuch aise mein naram ho jaati hai jo lagbhag ummeed jaisa hai. Bhavishya likha nahi gaya hai, aur iska matlab hai ki yeh abhi bhi har achhe ke liye khula hai." },
+      "deepDive": { "en": "Researchers note that the very same uncertainty the brain reads as anxiety can be reappraised as excitement, since both share the same bodily signals. The story we tell ourselves shapes how the not-knowing feels.", "hi": "Researchers note karte hain ki wahi anishchitta jise dimaag ghabraahat samajhta hai, use utsaah ki tarah dobaara dekha ja sakta hai, kyunki dono ek hi sharirik sanket baantte hain. Jo kahani hum khud ko sunaate hain woh tay karti hai ki na-jaanna kaisa mehsoos hota hai." },
+      "remember": { "en": "An open future is also an open door to wonder.", "hi": "Ek khula bhavishya ascharya ka bhi ek khula darwaaza hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "Tenali Rama And The Thieves", "hi": "Tenali Rama Aur Chor" },
+      "summary": { "en": "Quick-thinking Tenali Rama turns a band of thieves into his own gardeners.", "hi": "Tezi se sochne wala Tenali Rama choron ke ek girah ko apne maali bana leta hai." },
+      "body": { "en": "One night, the witty poet Tenali Rama overheard a group of thieves whispering in his garden, planning to rob his house. Most people would have panicked. Tenali Rama only smiled to himself and thought of a clever plan.\n\nHe called loudly to his wife, just within the thieves' hearing. 'There are robbers about these days,' he said. 'Let us hide all our gold and jewels in a heavy pot and sink it deep in the well, where no thief will ever find it.' Then, with a great show, the two carried a pot to the well and dropped it in with a splash, before going inside to sleep.\n\nThe thieves, delighted, spent the whole night drawing up bucket after bucket of water to empty the well — only to find nothing. By dawn they had watered Tenali Rama's entire garden! He stepped out, thanked them warmly, and they fled in embarrassment, outwitted by a calm and clever mind.", "hi": "Ek raat, hazirjawaab kavi Tenali Rama ne apne baagh mein choron ke ek group ko phusphusaate suna, jo uske ghar ko lootne ki yojana bana rahe the. Zyadatar log ghabraa jaate. Tenali Rama bas mann hi mann muskuraaya aur ek chalaak plan socha.\n\nUsne zor se apni patni ko pukaara, theek choron ke sunne ke andar. 'Aajkal chor ghoom rahe hain,' usne kaha. 'Chalo hum apna saara sona aur gehne ek bhaari ghade mein chhupa kar kuein mein gehra dubaa dein, jahaan koi chor kabhi nahi paayega.' Phir, bade dikhaawe ke saath, dono ek ghada kuein tak le gaye aur use chhapaak ke saath gira diya, phir andar sone chale gaye.\n\nChor, khush hokar, poori raat balti par balti paani kheench kar kuaan khaali karte rahe — par kuch nahi mila. Subah tak unhone Tenali Rama ka poora baagh seench diya tha! Woh bahar aaya, unka garmjoshi se shukriya kiya, aur woh sharminda hokar bhaag nikle, ek shaant aur chalaak dimaag se maat khaakar." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about a relative who simply cannot wait to meet them.", "hi": "Apne baby ko ek aise rishtedaar ke baare mein bataayein jo unse milne ka bas intezaar nahi kar pa raha." },
+      "motivation": { "en": "Your baby is already awaited by hearts they have never seen.", "hi": "Aapke baby ka un dilon dwara pehle se intezaar ho raha hai jinhe unhone kabhi nahi dekha." }
+    },
+    "garbhSanskar": {
+      "type": "raga",
+      "title": { "en": "Raga Bilawal", "hi": "Raag Bilawal" },
+      "durationMinutes": 4,
+      "description": { "en": "Morning raga for ease and gentle openness", "hi": "Subah ka raag, sehjta aur naram khulepan ke liye" },
+      "affirmation": { "en": "As this bright morning melody flows, I open gently to all that is good, for you.", "hi": "Jaise yeh roshan subah ki dhun behti hai, main har achhe ke liye narmi se khulti hoon, tumhare liye." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Ragas are classical Indian melodies, each tied to a mood and time of day. From about week 18 your baby can hear; even now, the calm a raga brings you surrounds your baby and gently shapes a peaceful environment around your pregnancy.", "hi": "Raag classical Bharatiya dhunein hain, har ek kisi mood aur din ke samay se judi. Lagbhag 18ve hafte se aapka baby sun sakta hai; abhi bhi, raag se aane wali shaanti aapke baby ko gher leti hai aur aapki pregnancy ke around ek shaant mahaul banati hai." },
+      "howToUse": { "en": "Play the raga softly while you sit or rest with a hand on your belly. You needn't focus hard — let the sound fill the room as you breathe slowly. Two to five minutes, ideally at the raga's time of day, makes it a ritual your baby will one day recognise.", "hi": "Raag dheere se chalaayein jab aap baithein ya pet par haath rakh kar aaram karein. Zyada dhyan lagane ki zaroorat nahi — aawaz ko kamre mein bhar jaane dein jab aap dheere saans lein. Do se paanch minute, ho sake to raag ke samay par, ise ek aisa ritual bana deta hai jise aapka baby ek din pehchaanega." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Can Be Curious, Not Afraid", "hi": "Main Jigyaasu Ho Sakti Hoon, Darri Nahi" },
+      "content": { "en": "When I do not know what is ahead, I can meet it with wonder instead of worry.", "hi": "Jab mujhe nahi pata aage kya hai, main use chinta ke bajaaye ascharya se mil sakti hoon." },
+      "remember": { "en": "Wonder and worry look at the same unknown — choose wonder.", "hi": "Ascharya aur chinta ek hi anjaane ko dekhte hain — ascharya chunein." },
+      "durationMinutes": 0
+    }
+  },
+  {
+    "day": 41,
+    "week": 6,
+    "babyLearning": { "en": "tiny hands beginning to bud at the ends of the arms", "hi": "nanhe haath baahon ke siron par kaliyon ki tarah ban-ne lage" },
+    "grow": {
+      "title": { "en": "Faith In Small Steps", "hi": "Chhote Kadmon Mein Vishwaas" },
+      "insight": { "en": "You do not have to see the whole staircase. You only have to trust the next single step.", "hi": "Aapko poori seedhi nahi dekhni hai. Aapko bas agle ek kadam par bharosa karna hai." },
+      "expanded": { "en": "The road to becoming a parent can look impossibly long from the bottom — so many weeks, so much to learn, so much unknown. But no one crosses that distance all at once. It is walked one ordinary day at a time: one good meal, one calm breath, one small kindness to yourself. You do not need faith in the entire journey today. You only need a little faith in the very next step. Take that, and then the next, and you will find that the long road has a way of quietly carrying you forward.", "hi": "Parent banne ka raasta neeche se namumkin tak lamba dikh sakta hai — itne saare hafte, itna kuch seekhna, itna kuch anjaana. Par koi bhi woh doori ek saath paar nahi karta. Use ek-ek aam din karke chala jaata hai: ek achha khaana, ek shaant saans, khud par ek chhoti dayaalta. Aapko aaj poore safar par vishwaas ki zaroorat nahi. Aapko bas agle ek kadam par thoda vishwaas chahiye. Use lein, phir agla, aur aap paayengi ki lamba raasta aapko chupchaap aage le jaane ka ek tareeka rakhta hai." },
+      "deepDive": { "en": "Behavioural science shows that breaking a daunting goal into the smallest possible next step sharply lowers anxiety and makes follow-through far more likely. Small is not weak — small is how big things actually get done.", "hi": "Behavioural science dikhaati hai ki ek darawne lakshya ko sabse chhote mumkin agle kadam mein todna ghabraahat ko tezi se kam karta hai aur use poora karna kahin zyada mumkin banata hai. Chhota kamzor nahi hai — chhota hi woh tareeka hai jisse badi cheezein asal mein hoti hain." },
+      "remember": { "en": "Faith in the next small step is enough to keep you moving.", "hi": "Agle chhote kadam mein vishwaas aapko chalte rakhne ke liye kaafi hai." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Farmer And The Well", "hi": "Kisaan Aur Kuaan" },
+      "summary": { "en": "A patient farmer learns that steady digging matters more than choosing one perfect spot.", "hi": "Ek dhiraj wala kisaan seekhta hai ki sthir khudaai ek perfect jagah chunne se zyada maayne rakhti hai." },
+      "body": { "en": "A farmer's land had gone dry, and he decided to dig a well to reach the water below. He chose a spot and began to dig with great energy. But after digging a little way and finding no water, he grew impatient. 'This spot is wrong,' he thought, and he moved to another and began again.\n\nDay after day he did the same — digging a shallow pit here, abandoning it, starting fresh somewhere else. Soon his field was dotted with half-dug holes, and still he had found no water. A wise old neighbour came by and shook his head gently.\n\n'My friend,' he said, 'the water is there, deep beneath every one of these spots. But you keep stopping just before you reach it. Choose one place, and keep digging steadily — and you will drink.' The farmer returned to a single hole, dug on patiently, and at last the cool water rose to meet him.", "hi": "Ek kisaan ki zameen sookh gayi thi, aur usne neeche ke paani tak pohanchne ke liye ek kuaan khodne ka faisla kiya. Usne ek jagah chuni aur bade josh se khodna shuru kiya. Par thoda khodne aur paani na milne par, woh bechain ho gaya. 'Yeh jagah galat hai,' usne socha, aur woh doosri jagah jaakar phir se shuru ho gaya.\n\nDin-ba-din usne yahi kiya — yahan ek chhota gaddha khodta, use chhod deta, kahin aur naya shuru karta. Jald hi uska khet aadhe-khode gaddhon se bhar gaya, aur phir bhi use paani nahi mila. Ek samajhdaar boodha padosi aaya aur dheere se sir hilaaya.\n\n'Mere dost,' usne kaha, 'paani wahan hai, in har jagah ke gehre neeche. Par tum bas uske pohanchne se theek pehle rukte raho. Ek jagah chuno, aur sthir khodte raho — aur tum paani piyoge.' Kisaan ek hi gaddhe par lauta, dhiraj se khodta raha, aur aakhir thanda paani upar uthkar usse milne aaya." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about your family's food, language and the roots you carry.", "hi": "Apne baby ko apne parivar ke khaane, bhaasha aur un jadon ke baare mein bataayein jo aap saath rakhti hain." },
+      "motivation": { "en": "Flavours and words are how a family's love is handed down.", "hi": "Swaad aur shabd hi woh tareeka hain jisse ek parivar ka pyaar aage diya jaata hai." }
+    },
+    "garbhSanskar": {
+      "type": "meditation",
+      "title": { "en": "One Gentle Step", "hi": "Ek Naram Kadam" },
+      "durationMinutes": 2,
+      "description": { "en": "A short meditation to find faith in the present", "hi": "Vartaman mein vishwaas paane ka ek chhota dhyan" },
+      "affirmation": { "en": "I do not carry the whole journey today — only this gentle, present moment with you.", "hi": "Main aaj poora safar nahi uthaati — bas tumhare saath yeh naram, vartaman pal." },
+      "introduction": { "en": "Sit comfortably and let your eyes close. Breathe slowly and bring your attention to this single moment — the air on your skin, the gentle rise of your breath. Let the past and the future drift away, and rest here, where you and your baby simply are.", "hi": "Aaram se baithein aur aankhein band hone dein. Dheere se saans lein aur apna dhyan is ek pal par laayein — apni twacha par hawa, apni saans ka naram uthna. Beete kal aur aane wale kal ko behne dein, aur yahan aaram karein, jahaan aap aur aapka baby bas hain." },
+      "closingThought": { "en": "This single moment was enough. The next one will be too, when it comes.", "hi": "Yeh ek pal kaafi tha. Agla bhi hoga, jab woh aayega." },
+      "about": { "en": "Garbh Sanskar meditations are short, gentle practices to connect with your baby — not generic mindfulness, but a few minutes of sending warmth and love inward. Your calm becomes your baby's calm.", "hi": "Garbh Sanskar meditations chhote, pyaare abhyaas hain apne baby se judne ke liye — koi aam mindfulness nahi, balki kuch minute garmjoshi aur pyaar andar bhejne ke. Aapki shaanti aapke baby ki shaanti ban jaati hai." },
+      "howToUse": { "en": "Find a quiet spot, sit comfortably and close your eyes. Follow the introduction, breathe slowly, and rest your attention gently on your baby. Two to three minutes is plenty. Doing it daily, ideally at the same hour, deepens the bond.", "hi": "Ek shaant jagah chunein, aaram se baithein aur aankhein band karein. Introduction follow karein, dheere se saans lein, aur apna dhyan pyaar se apne baby par tikaayein. Do se teen minute kaafi hai. Ise rozana, ho sake to ek hi samay karne se bond gehra hota hai." }
+    },
+    "nurture": {
+      "type": "breathe",
+      "title": { "en": "Counting Down To Calm", "hi": "Shaanti Tak Ulti Ginti" },
+      "content": { "en": "Breathe in gently and silently count three. Breathe out and count down — three, two, one — letting your body settle a little more with each number. Repeat a few times.", "hi": "Halke se saans andar lein aur mann hi mann teen tak ginein. Saans chhodein aur ulti ginti karein — teen, do, ek — har number ke saath apne sharir ko thoda aur thamne dein. Kuch baar dohraayein." },
+      "remember": { "en": "Calm often arrives one slow number at a time.", "hi": "Shaanti aksar ek-ek dheere number karke aati hai." },
+      "durationMinutes": 1
+    }
+  },
+  {
+    "day": 42,
+    "week": 6,
+    "babyLearning": { "en": "closing the week, growing steadily day by day", "hi": "hafta poora karte hue, din-ba-din sthir roop se badhte hue" },
+    "grow": {
+      "title": { "en": "Tomorrow Will Teach You Tomorrow", "hi": "Kal Aapko Kal Sikhaayega" },
+      "insight": { "en": "You do not need today the wisdom that only tomorrow can give. Each day arrives with its own lessons in hand.", "hi": "Aapko aaj woh samajh nahi chahiye jo sirf kal de sakta hai. Har din apne sabak haath mein liye aata hai." },
+      "expanded": { "en": "We often try to feel ready for things that are still far away — birth, sleepless nights, the first day of school. But wisdom does not arrive all at once, in advance. It comes exactly when it is needed, grown from the very moment you are living. The patience you will need as a parent will meet you on the day you need it; the strength will come with the struggle that asks for it. You do not have to be ready for everything now. Trust that tomorrow, with all you will have lived by then, will quietly teach you what tomorrow requires.", "hi": "Hum aksar un cheezon ke liye taiyaar mehsoos karne ki koshish karte hain jo abhi door hain — janm, neend bhari raatein, school ka pehla din. Par samajh ek saath, pehle se nahi aati. Yeh theek tab aati hai jab iski zaroorat ho, usi pal se ugi jise aap jee rahi hain. Jo sabra aapko parent ke roop mein chahiye hoga woh aapse us din milega jis din zaroorat hogi; taakat us sangharsh ke saath aayegi jo use maangta hai. Aapko abhi har cheez ke liye taiyaar hone ki zaroorat nahi. Bharosa rakhein ki kal, us sab ke saath jo aap tab tak jee chuki hongi, aapko chupchaap sikhaayega jo kal maangta hai." },
+      "deepDive": { "en": "Psychologists find that 'anticipatory coping' — rehearsing distant problems in advance — tends to drain energy without improving outcomes. We adapt best when challenges and our capacity to meet them arrive together.", "hi": "Psychologists paate hain ki 'anticipatory coping' — door ki samasyaon ko pehle se dohraana — natije sudhaare bina urja nichod deta hai. Hum tab sabse achha dhalte hain jab chunautiyaan aur unhe milne ki hamari kshamta saath aati hain." },
+      "remember": { "en": "The wisdom you need will arrive exactly when you need it.", "hi": "Jo samajh aapko chahiye woh theek tab aayegi jab aapko zaroorat hogi." }
+    },
+    "readToBaby": {
+      "title": { "en": "The Seed That Waited", "hi": "Woh Beej Jo Ruka Raha" },
+      "summary": { "en": "A small seed learns that its long, dark wait is part of growing into the light.", "hi": "Ek chhota beej seekhta hai ki uska lamba, andhera intezaar roshni mein badhne ka hissa hai." },
+      "body": { "en": "Deep in the cool, dark earth lay a small seed. All around it the soil was silent and still, and the seed could see nothing at all. 'Have I been forgotten?' it wondered. 'Nothing is happening. Perhaps I will stay here in the dark forever.'\n\nBut beneath that stillness, quiet things were stirring. The seed drank in the rain that soaked down to it, and softened in the warmth that reached through the soil. Slowly, in the dark where no one could see, it sent down a thread of root and pushed up a pale, tender shoot. It did not rush, and it did not know exactly when its day would come.\n\nThen one morning the shoot broke through the surface into the golden sun, and unfurled its first green leaf. The long wait in the dark had not been emptiness at all. It had been everything the seed needed to become.", "hi": "Thandi, andheri zameen mein gehre ek chhota beej pada tha. Uske charon or mitti khamosh aur sthir thi, aur beej kuch bhi nahi dekh sakta tha. 'Kya mujhe bhula diya gaya hai?' usne socha. 'Kuch nahi ho raha. Shaayad main hamesha is andhere mein hi rahunga.'\n\nPar us sthirta ke neeche, shaant cheezein hil rahi thi. Beej ne us baarish ko piya jo neeche tak rishi, aur mitti se aati garmjoshi mein naram pad gaya. Dheere-dheere, us andhere mein jahaan koi nahi dekh sakta tha, usne ek jad ka dhaaga neeche bheja aur ek halka, naazuk ankur upar dhakela. Usne jaldi nahi ki, aur use theek se nahi pata tha ki uska din kab aayega.\n\nPhir ek subah ankur sataah todkar sunehri dhoop mein nikla, aur apna pehla hara patta khol diya. Andhere mein woh lamba intezaar khaalipan tha hi nahi. Woh sab kuch tha jo beej ko ban-ne ke liye chahiye tha." },
+      "audioAvailable": true
+    },
+    "talkToBaby": {
+      "title": { "en": "Tell your baby about the day the whole family first heard about them.", "hi": "Apne baby ko us din ke baare mein bataayein jab poore parivar ne pehli baar unke baare mein suna." },
+      "motivation": { "en": "Their arrival was joyful news long before they could know it.", "hi": "Unka aana ek khushi bhari khabar thi, unke jaanne se bahut pehle." }
+    },
+    "garbhSanskar": {
+      "type": "affirmation",
+      "title": { "en": "I Trust Each Day As It Comes", "hi": "Main Har Din Par Bharosa Karti Hoon Jaise Woh Aata Hai" },
+      "durationMinutes": 0,
+      "description": { "en": "A closing bond affirmation for the week", "hi": "Hafte ke liye ek samaapan bond affirmation" },
+      "affirmation": { "en": "I will not borrow tomorrow's worries today. Day by day, I trust this journey, and I trust us.", "hi": "Main aaj kal ki chintaayein udhaar nahi loongi. Din-ba-din, main is safar par bharosa karti hoon, aur hum par bharosa karti hoon." },
+      "introduction": { "en": "", "hi": "" },
+      "closingThought": { "en": "", "hi": "" },
+      "about": { "en": "Garbh Sanskar affirmations are gentle, spiritually-rooted sentences a mother shares with her baby. The calm and love behind your words begin shaping a peaceful inner world for you both, long before your baby is born.", "hi": "Garbh Sanskar affirmations woh pyaari, aadhyatmik vaakya hain jo ek maa apne baby se kehti hai. Aapke shabdon ke peeche ki shaanti aur pyaar, baby ke janm se bahut pehle hi, aap dono ke liye ek shaant andaruni duniya banane lagte hain." },
+      "howToUse": { "en": "Sit quietly, rest a hand on your belly, and read the affirmation slowly — once silently, once aloud. Let yourself believe it for these few moments. A minute is enough, and repeating it at the same time each day makes it a calming ritual.", "hi": "Shaanti se baithein, ek haath pet par rakhein, aur affirmation dheere se padhein — ek baar mann mein, ek baar bolkar. In kuch palon ke liye use sach maan lein. Ek minute kaafi hai, aur ise har din ek hi samay dohraana ise ek shaant ritual bana deta hai." }
+    },
+    "nurture": {
+      "type": "affirm",
+      "title": { "en": "I Have Grown In Trust This Week", "hi": "Main Is Hafte Bharose Mein Badhi Hoon" },
+      "content": { "en": "I will pause to notice how I have practised letting go and trusting this week. That quiet growth counts.", "hi": "Main ruk kar dekhungi ki maine is hafte chhodna aur bharosa karna kaise abhyaas kiya. Woh shaant vikaas maayne rakhta hai." },
+      "remember": { "en": "Trust is a muscle, and you have been gently building it.", "hi": "Bharosa ek maaspeshi hai, aur aap use pyaar se banaa rahi hain." },
+      "durationMinutes": 0
+    }
+  }
+]
