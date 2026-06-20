@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'screens/main_scaffold.dart';
 import 'services/baby_voice_service.dart';
+import 'services/can_i_store.dart';
 import 'services/daily_store.dart';
 import 'services/father_content_controller.dart';
 import 'services/home_content_controller.dart';
@@ -56,6 +57,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     ToolsStore.instance.init();
     // Load My Hospital Bag persistence.
     HospitalBagStore.instance.init();
+    // Load Can I? saved-questions persistence.
+    CanIStore.instance.init();
   }
 
   @override

@@ -15,6 +15,7 @@ import '../services/father_content_controller.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'can_i_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import 'tools_screen.dart';
@@ -58,7 +59,8 @@ class _MainScaffoldState extends State<MainScaffold> {
           // no intermediate landing card.
           WeeklyCardStackScreen(controller: widget.pregnancy),
           ToolsScreen(controller: widget.pregnancy),
-          _ComingSoon(tab: s.exploreTab, icon: Icons.explore_rounded, lang: widget.pregnancy.language),
+          // Explore hosts the "Can I?" quick-answer feature.
+          CanIScreen(controller: widget.pregnancy),
           ProfileScreen(controller: widget.pregnancy),
         ];
         return Scaffold(
@@ -102,45 +104,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           ),
         );
       },
-    );
-  }
-}
-
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.tab, required this.icon, required this.lang});
-  final String tab;
-  final IconData icon;
-  final AppLanguage lang;
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final s = S(lang);
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(36),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 72,
-              height: 72,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(icon, size: 34, color: AppTheme.primary400),
-            ),
-            const SizedBox(height: 20),
-            Text(tab, style: text.headlineSmall),
-            const SizedBox(height: 8),
-            Text(s.comingSoon,
-                style: text.titleMedium?.copyWith(color: AppTheme.secondary600)),
-            const SizedBox(height: 10),
-            Text(s.comingSoonBody(tab),
-                textAlign: TextAlign.center, style: text.bodyMedium),
-          ]),
-        ),
-      ),
     );
   }
 }

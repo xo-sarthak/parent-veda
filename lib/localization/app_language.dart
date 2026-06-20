@@ -1283,6 +1283,69 @@ class S {
       _p('Connecting With Your Baby', 'Baby Se Judaav');
   String get fatherSecMission => _p("This Week's Mission", 'Is Hafte Ka Mission');
 
+  // ---- Can I? (Explore tab) ------------------------------------------------
+  String get canITitle => _p('Can I?', 'Can I?');
+  String get canISubtitle => _p(
+      'Quick, trustworthy answers to everyday pregnancy questions.',
+      'Pregnancy ke rozmarra sawaalon ke turant, bharosemand jawaab.');
+  String get canISearchHint => _p(
+      'Search food, drinks, medicines or activities',
+      'Khaana, drinks, dawai ya activities search karein');
+  String get canIPopularTitle => _p('Popular searches', 'Popular searches');
+  String get canIBrowseTitle => _p('Browse by category', 'Category se dekhein');
+  String get canICatEat => _p('Can I eat?', 'Kya main kha sakti hoon?');
+  String get canICatDrink => _p('Can I drink?', 'Kya main pee sakti hoon?');
+  String get canICatTake => _p('Can I take?', 'Kya main le sakti hoon?');
+  String get canICatDo => _p('Can I do?', 'Kya main kar sakti hoon?');
+  String canIDuringPregnancy(String name) =>
+      _p('$name during pregnancy', 'Pregnancy mein: $name');
+  String get canIWhy => _p('Why?', 'Kyun?');
+  String get canITrimesterNotes => _p('Trimester notes', 'Trimester notes');
+  String canITrimesterLabel(int i) => _p(
+      const ['First trimester', 'Second trimester', 'Third trimester']
+          [i.clamp(0, 2)],
+      const ['Pehli trimester', 'Doosri trimester', 'Teesri trimester']
+          [i.clamp(0, 2)]);
+  String get canINowBadge => _p("You're here", 'Aap yahaan');
+  String get canIIndianContext =>
+      _p('In the Indian context', 'Indian context mein');
+  String get canIRelated => _p('Related questions', 'Milte-julte sawaal');
+  String get canIAskTitle =>
+      _p('Still have a question?', 'Abhi bhi koi sawaal hai?');
+  String get canIAskBody => _p('Ask Veda for guidance made for you.',
+      'Apne liye banayi gayi guidance ke liye Ask Veda.');
+  String get canIAskCta => _p('Ask Veda', 'Ask Veda');
+  String get canIAskComingSoon => _p(
+      'Ask Veda is coming soon — your personal AI guide.',
+      'Ask Veda jald aa raha hai — aapka personal AI guide.');
+  String get canISave => _p('Save', 'Save');
+  String get canISavedBadge => _p('Saved', 'Saved');
+  String get canISavedTitle => _p('Saved questions', 'Saved sawaal');
+  String get canISavedEmpty => _p(
+      'Nothing saved yet. Tap the bookmark on any answer to keep it here.',
+      'Abhi kuch save nahi hua. Kisi bhi answer par bookmark dabakar yahaan rakhein.');
+  String get canIDisclaimer => _p(
+      "General guidance, not a substitute for your doctor's advice.",
+      'Yeh general guidance hai, aapke doctor ki salah ka vikalp nahi.');
+  String get canINoResults => _p('No match yet. Try another word — or ask Veda.',
+      'Abhi koi match nahi. Doosra shabd try karein — ya Veda se poochein.');
+  String canIVerdictLabel(String key) {
+    switch (key) {
+      case 'safe':
+        return _p('Safe', 'Surakshit');
+      case 'moderation':
+        return _p('Safe in moderation', 'Seemit maatra mein theek');
+      case 'depends':
+        return _p('It depends', 'Yeh nirbhar karta hai');
+      case 'avoid':
+        return _p('Best avoided', 'Behtar hai na karein');
+      case 'askDoctor':
+        return _p('Ask your doctor', 'Apne doctor se poochein');
+      default:
+        return '';
+    }
+  }
+
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');
   String get learnReaderTitle => _p("Today's Lesson", 'Aaj Ka Sabak');
