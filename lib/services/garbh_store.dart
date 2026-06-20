@@ -1,9 +1,9 @@
 // =============================================================================
-//  GarbhStore — persistence for the Garbh Sanskar Journey
+//  GarbhStore — Garbh Sanskar daily-ritual state (v2.0)
 // -----------------------------------------------------------------------------
-//  Favorites (across all four pillars), a "continue your practice" pointer, and
-//  a PURELY REFLECTIVE session tally (listening / reflection / connection /
-//  breathing). No streaks, points, badges or leaderboards — by design.
+//  Garbh Sanskar is a daily ritual, not a content library. This store tracks the
+//  5 daily pillars completed TODAY (resets each day), a gentle day streak, and
+//  favorites. The goal is ritual formation — 5/5 pillars a day.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -13,32 +13,51 @@ class GarbhStore extends ChangeNotifier {
   GarbhStore._();
   static final GarbhStore instance = GarbhStore._();
 
+  static const int dailyGoal = 5;
+
   static const _favsKey = 'garbh_favs';
-  static const _listenKey = 'garbh_listening';
-  static const _reflectKey = 'garbh_reflection';
-  static const _connectKey = 'garbh_connection';
-  static const _breatheKey = 'garbh_breathing';
-  static const _lastIdKey = 'garbh_last_id';
-  static const _lastTypeKey = 'garbh_last_type';
-  static const _lastTitleKey = 'garbh_last_title';
+  static const _doneKey = 'garbh_done';
+  static const _doneDateKey = 'garbh_done_date';
+  static const _streakKey = 'garbh_streak';
+  static const _streakDateKey = 'garbh_streak_date';
 
   SharedPreferences? _prefs;
   final Set<String> _favs = {};
-  int _listening = 0, _reflection = 0, _connection = 0, _breathing = 0;
-  String? _lastId, _lastType, _lastTitle;
+  final Set<String> _doneToday = {}; // pillar ids completed today
+  String _doneDate = '';
+  int _streak = 0;
+  String _streakDate = '';
+
+  // --- date helpers (app runtime) ---
+  static String _ymd(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  String get _today => _ymd(DateTime.now());
+  String get _yesterday => _ymd(DateTime.now().subtract(const Duration(days: 1)));
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+    final p = _prefs!;
     _favs
       ..clear()
-      ..addAll(_prefs?.getStringList(_favsKey) ?? const []);
-    _listening = _prefs?.getInt(_listenKey) ?? 0;
-    _reflection = _prefs?.getInt(_reflectKey) ?? 0;
-    _connection = _prefs?.getInt(_connectKey) ?? 0;
-    _breathing = _prefs?.getInt(_breatheKey) ?? 0;
-    _lastId = _prefs?.getString(_lastIdKey);
-    _lastType = _prefs?.getString(_lastTypeKey);
-    _lastTitle = _prefs?.getString(_lastTitleKey);
+      ..addAll(p.getStringList(_favsKey) ?? const []);
+    _streak = p.getInt(_streakKey) ?? 0;
+    _streakDate = p.getString(_streakDateKey) ?? '';
+    _doneDate = p.getString(_doneDateKey) ?? '';
+    _doneToday
+      ..clear()
+      ..addAll(p.getStringList(_doneKey) ?? const []);
+
+    // New day → today's completions reset.
+    if (_doneDate != _today) {
+      _doneToday.clear();
+      _doneDate = _today;
+      await p.setStringList(_doneKey, const []);
+      await p.setString(_doneDateKey, _doneDate);
+    }
+    // If the streak was not touched yesterday or today, it has lapsed.
+    if (_streakDate != _today && _streakDate != _yesterday) {
+      _streak = 0;
+    }
     notifyListeners();
   }
 
@@ -51,41 +70,40 @@ class GarbhStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- reflective tally ---
-  int get listening => _listening;
-  int get reflection => _reflection;
-  int get connection => _connection;
-  int get breathing => _breathing;
+  // --- daily rituals ---
+  bool isDone(String pillarId) => _doneToday.contains(pillarId);
+  int get doneCount => _doneToday.length;
+  int get streak => _streak;
 
-  void addListening() => _bump(_listenKey, () => _listening++);
-  void addReflection() => _bump(_reflectKey, () => _reflection++);
-  void addConnection() => _bump(_connectKey, () => _connection++);
-  void addBreathing() => _bump(_breatheKey, () => _breathing++);
-
-  void _bump(String key, VoidCallback inc) {
-    inc();
-    final v = {
-      _listenKey: _listening,
-      _reflectKey: _reflection,
-      _connectKey: _connection,
-      _breatheKey: _breathing,
-    }[key]!;
-    _prefs?.setInt(key, v);
+  void markDone(String pillarId) {
+    if (_doneDate != _today) {
+      _doneToday.clear();
+      _doneDate = _today;
+    }
+    if (_doneToday.contains(pillarId)) return;
+    final wasFirstToday = _doneToday.isEmpty;
+    _doneToday.add(pillarId);
+    if (wasFirstToday) {
+      // First ritual of the day → advance the streak.
+      if (_streakDate == _yesterday) {
+        _streak += 1;
+      } else if (_streakDate != _today) {
+        _streak = 1;
+      }
+      _streakDate = _today;
+    }
+    _prefs
+      ?..setStringList(_doneKey, _doneToday.toList())
+      ..setString(_doneDateKey, _doneDate)
+      ..setInt(_streakKey, _streak)
+      ..setString(_streakDateKey, _streakDate);
     notifyListeners();
   }
 
-  // --- continue your practice ---
-  bool get hasLast => _lastId != null;
-  String? get lastId => _lastId;
-  String? get lastType => _lastType;
-  String? get lastTitle => _lastTitle;
-  void setLast({required String type, required String id, required String title}) {
-    _lastType = type;
-    _lastId = id;
-    _lastTitle = title;
-    _prefs?.setString(_lastTypeKey, type);
-    _prefs?.setString(_lastIdKey, id);
-    _prefs?.setString(_lastTitleKey, title);
-    notifyListeners();
+  void undoDone(String pillarId) {
+    if (_doneToday.remove(pillarId)) {
+      _prefs?.setStringList(_doneKey, _doneToday.toList());
+      notifyListeners();
+    }
   }
 }

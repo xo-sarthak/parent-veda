@@ -1,14 +1,11 @@
 // =============================================================================
-//  Garbh Sanskar Journey™  — the deep practice layer (Tools tab)
+//  Garbh Sanskar Journey v2.0 — a daily 5-ritual companion (Tools)
 // -----------------------------------------------------------------------------
-//  A premium, calm destination — not a 4-tab library. Entering feels like a
-//  sacred, quiet space: a soft hero, a "continue your practice" card, and four
-//  beautiful pillars:
-//    Shravan (Sacred Listening, Spotify-like) · Samvad (Womb Connection →
-//    Memory Vault) · Vichara (Positive Contemplation, Kindle-like) ·
-//    Kriya (Breath & Grounding, Headspace-like).
-//  Warm creams, muted greens, subtle gold. No gamification; the only "progress"
-//  is a gentle reflective tally.
+//  Not a content library — a 5–15 minute daily pregnancy ritual. The home is
+//  "Today": greeting, week/day, baby size, progress (N/5) and a streak, then the
+//  five pillars — Shravan (sound), Vichara (mindset), Samvad (connection),
+//  Kriya (movement & breath), Ahara (nourishment). Each is trimester-aware and
+//  answers "what to do / why it matters / how long", with a completion tick.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -16,320 +13,381 @@ import 'package:flutter/material.dart';
 import '../data/garbh_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
-import '../services/daily_store.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../widgets/cards/raga_player.dart';
 import 'home_detail_screens.dart' show TalkComposerScreen;
 
-// --- warm palette (local to the feature) ---
+// --- warm palette ---
 const _cream = Color(0xFFFBF6EE);
 const _surface = Color(0xFFFFFFFF);
 const _ink = Color(0xFF4A463E);
 const _muted = Color(0xFF8C857A);
 const _line = Color(0xFFE9E0D2);
 const _accShravan = Color(0xFFBE9C4E); // gold
-const _accSamvad = Color(0xFFB98A7E); // warm rose-beige
 const _accVichara = Color(0xFF6E8C74); // muted green
+const _accSamvad = Color(0xFFB98A7E); // warm rose
 const _accKriya = Color(0xFF5E8B7E); // teal-green
+const _accAhara = Color(0xFFC97B4A); // terracotta
+const _green = Color(0xFF3FA56A);
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
 
+({String emoji, Color accent}) _pillarVisual(String id) {
+  switch (id) {
+    case 'shravan':
+      return (emoji: '🎵', accent: _accShravan);
+    case 'vichara':
+      return (emoji: '📖', accent: _accVichara);
+    case 'samvad':
+      return (emoji: '🎙️', accent: _accSamvad);
+    case 'kriya':
+      return (emoji: '🌿', accent: _accKriya);
+    default:
+      return (emoji: '🍲', accent: _accAhara);
+  }
+}
+
 // ===========================================================================
-//  Home — the sacred calm space
+//  Today (home)
 // ===========================================================================
 
 class GarbhScreen extends StatelessWidget {
   const GarbhScreen({super.key, required this.controller});
   final PregnancyController controller;
 
-  void _openLast(BuildContext context) {
-    final st = GarbhStore.instance;
-    final lang = controller.language;
-    switch (st.lastType) {
-      case 'shravan':
-        final a = shravanById(st.lastId ?? '');
-        if (a != null) _push(context, _ShravanPlayer(audio: a, lang: lang));
-        break;
-      case 'vichara':
-        final s = vicharaById(st.lastId ?? '');
-        if (s != null) _push(context, _VicharaReader(story: s, lang: lang));
-        break;
-      case 'kriya':
-        final p = kriyaById(st.lastId ?? '');
-        if (p != null) _push(context, _BreathingScreen(practice: p, lang: lang));
-        break;
-      case 'samvad':
-        _push(context, SamvadScreen(controller: controller));
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
+    final week = controller.currentWeek;
+    final t = garbhTrimester(week);
+    final dayInWeek = controller.dayOfWeek;
+    final snapshot = controller.weekData(week)?.snapshot;
+    final hour = DateTime.now().hour;
+
+    // Per-pillar "what to do today" + duration.
+    final pillars = <({String id, String name, String tag, String todo, String duration})>[
+      (id: 'shravan', name: s.gsShravan, tag: s.gsShravanTag, todo: shravanForTrimester(t).title, duration: s.gsMinutes(shravanForTrimester(t).minutes)),
+      (id: 'vichara', name: s.gsVichara, tag: s.gsVicharaTag, todo: 'A reflection, a gentle puzzle, or an uplifting read', duration: '2–5 min'),
+      (id: 'samvad', name: s.gsSamvad, tag: s.gsSamvadTag, todo: promptForDay(controller.currentDay).text, duration: '3 min'),
+      (id: 'kriya', name: s.gsKriya, tag: s.gsKriyaTag, todo: kriyaForTrimester(t).title, duration: s.gsMinutes(kriyaForTrimester(t).minutes)),
+      (id: 'ahara', name: s.gsAhara, tag: s.gsAharaTag, todo: nutritionForTrimester(t).tip, duration: '2 min'),
+    ];
+
     return Scaffold(
       backgroundColor: _cream,
-      appBar: AppBar(
-        backgroundColor: _cream,
-        elevation: 0,
-        foregroundColor: _ink,
-        actions: [
-          IconButton(
-            tooltip: s.gsFavorites,
-            icon: const Icon(Icons.favorite_border_rounded),
-            onPressed: () => _push(context, _FavoritesScreen(controller: controller)),
-          ),
-        ],
-      ),
+      appBar: AppBar(backgroundColor: _cream, elevation: 0, foregroundColor: _ink),
       body: AnimatedBuilder(
         animation: GarbhStore.instance,
-        builder: (context, _) => ListView(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-          children: [
-            // Hero
-            Center(
-              child: Column(children: [
-                Container(
-                  width: 84,
-                  height: 84,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFFEDE6D6), Color(0xFFDDE7DC)],
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text('🌿', style: TextStyle(fontSize: 38)),
-                ),
-                const SizedBox(height: 16),
-                Text(s.gsTitle,
-                    textAlign: TextAlign.center,
-                    style: text.headlineMedium
-                        ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
+        builder: (context, _) {
+          final store = GarbhStore.instance;
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
+            children: [
+              // Header
+              Text(s.greeting(hour, controller.motherName),
+                  style: text.headlineMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              Text('Week $week · ${s.gsDayOfWeek(dayInWeek, week)}',
+                  style: text.titleSmall?.copyWith(color: _muted)),
+              if (snapshot != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(s.gsSubtitle,
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text('${s.gsBabySize}: ${snapshot.fruit.of(lang)}',
+                      style: text.bodyMedium?.copyWith(color: _muted)),
+                ),
+              const SizedBox(height: 18),
+              // Progress + streak
+              _ProgressCard(done: store.doneCount, streak: store.streak, s: s),
+              const SizedBox(height: 22),
+              Text(s.gsTodaysRituals,
+                  style: text.titleMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 12),
+              for (final p in pillars) ...[
+                _PillarCard(
+                  pillar: p,
+                  done: store.isDone(p.id),
+                  onTap: () => _openPillar(context, p.id),
+                ),
+                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 6),
+              if (store.doneCount >= GarbhStore.dailyGoal)
+                Center(
+                  child: Text(s.gsAllDone,
                       textAlign: TextAlign.center,
-                      style: text.bodyMedium?.copyWith(color: _muted, height: 1.5)),
+                      style: text.titleSmall?.copyWith(color: _green, fontWeight: FontWeight.w800)),
+                )
+              else
+                Center(
+                  child: Text(s.gsDailyGoalLine(GarbhStore.dailyGoal),
+                      style: text.labelMedium?.copyWith(color: _muted)),
                 ),
-              ]),
-            ),
-            const SizedBox(height: 26),
-
-            // Continue your practice
-            if (GarbhStore.instance.hasLast)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 18),
-                child: _ContinueCard(
-                  label: s.gsContinue,
-                  title: GarbhStore.instance.lastTitle ?? '',
-                  cta: s.gsContinueCta,
-                  onTap: () => _openLast(context),
-                ),
-              ),
-
-            // Pillars
-            _PillarCard(
-              emoji: '🎵',
-              title: s.gsShravan,
-              tagline: s.gsShravanTag,
-              accent: _accShravan,
-              onTap: () => _push(context, ShravanScreen(controller: controller)),
-            ),
-            const SizedBox(height: 14),
-            _PillarCard(
-              emoji: '🎙️',
-              title: s.gsSamvad,
-              tagline: s.gsSamvadTag,
-              accent: _accSamvad,
-              onTap: () => _push(context, SamvadScreen(controller: controller)),
-            ),
-            const SizedBox(height: 14),
-            _PillarCard(
-              emoji: '📖',
-              title: s.gsVichara,
-              tagline: s.gsVicharaTag,
-              accent: _accVichara,
-              onTap: () => _push(context, VicharaScreen(controller: controller)),
-            ),
-            const SizedBox(height: 14),
-            _PillarCard(
-              emoji: '🌿',
-              title: s.gsKriya,
-              tagline: s.gsKriyaTag,
-              accent: _accKriya,
-              onTap: () => _push(context, KriyaScreen(controller: controller)),
-            ),
-
-            const SizedBox(height: 28),
-            _JourneyStats(s: s),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
-}
 
-class _ContinueCard extends StatelessWidget {
-  const _ContinueCard({
-    required this.label,
-    required this.title,
-    required this.cta,
-    required this.onTap,
-  });
-  final String label, title, cta;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
-        decoration: BoxDecoration(
-          color: _ink,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label,
-                  style: text.labelSmall?.copyWith(
-                      color: Colors.white70, letterSpacing: 0.6, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.titleMedium
-                      ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-            ]),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(cta,
-                  style: text.labelLarge
-                      ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-              const SizedBox(width: 4),
-              const Icon(Icons.play_arrow_rounded, size: 18, color: _ink),
-            ]),
-          ),
-        ]),
-      ),
-    );
+  void _openPillar(BuildContext context, String id) {
+    switch (id) {
+      case 'shravan':
+        _push(context, ShravanScreen(controller: controller));
+        break;
+      case 'vichara':
+        _push(context, VicharaScreen(controller: controller));
+        break;
+      case 'samvad':
+        _push(context, SamvadScreen(controller: controller));
+        break;
+      case 'kriya':
+        _push(context, KriyaScreen(controller: controller));
+        break;
+      default:
+        _push(context, AharaScreen(controller: controller));
+    }
   }
 }
 
-class _PillarCard extends StatelessWidget {
-  const _PillarCard({
-    required this.emoji,
-    required this.title,
-    required this.tagline,
-    required this.accent,
-    required this.onTap,
-  });
-  final String emoji, title, tagline;
-  final Color accent;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [accent.withValues(alpha: 0.16), _surface],
-            stops: const [0.0, 0.85],
-          ),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: accent.withValues(alpha: 0.22), width: 1),
-        ),
-        child: Row(children: [
-          Container(
-            width: 52,
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(emoji, style: const TextStyle(fontSize: 26)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title,
-                  style: text.titleLarge?.copyWith(
-                      color: _ink, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 2),
-              Text(tagline, style: text.bodyMedium?.copyWith(color: _muted)),
-            ]),
-          ),
-          Icon(Icons.arrow_forward_rounded, color: accent, size: 20),
-        ]),
-      ),
-    );
-  }
-}
-
-class _JourneyStats extends StatelessWidget {
-  const _JourneyStats({required this.s});
+class _ProgressCard extends StatelessWidget {
+  const _ProgressCard({required this.done, required this.streak, required this.s});
+  final int done;
+  final int streak;
   final S s;
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final st = GarbhStore.instance;
-    Widget stat(String label, int value, Color c) => Expanded(
-          child: Column(children: [
-            Text('$value',
-                style: text.headlineSmall
-                    ?.copyWith(color: c, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 2),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: text.labelSmall?.copyWith(color: _muted)),
-          ]),
-        );
+    final frac = (done / GarbhStore.dailyGoal).clamp(0.0, 1.0);
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: _surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _line, width: 1),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _line),
       ),
-      child: Column(children: [
-        Text(s.gsYourJourney,
-            style: text.titleSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 14),
-        Row(children: [
-          stat(s.gsStatListening, st.listening, _accShravan),
-          stat(s.gsStatConnections, st.connection, _accSamvad),
-          stat(s.gsStatReflections, st.reflection, _accVichara),
-          stat(s.gsStatBreathing, st.breathing, _accKriya),
-        ]),
+      child: Row(children: [
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: Stack(alignment: Alignment.center, children: [
+            SizedBox(
+              width: 56,
+              height: 56,
+              child: CircularProgressIndicator(
+                value: frac,
+                strokeWidth: 6,
+                backgroundColor: _line,
+                valueColor: const AlwaysStoppedAnimation(_green),
+              ),
+            ),
+            Text('$done/${GarbhStore.dailyGoal}',
+                style: text.labelMedium?.copyWith(fontWeight: FontWeight.w800, color: _ink)),
+          ]),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(s.gsTodaysProgress,
+                style: text.titleSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 2),
+            Text(s.gsRitualsDone(done, GarbhStore.dailyGoal),
+                style: text.bodyMedium?.copyWith(color: _muted)),
+            if (streak > 0) ...[
+              const SizedBox(height: 6),
+              Row(children: [
+                const Text('🔥', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 5),
+                Text(s.gsDayStreak(streak),
+                    style: text.labelMedium?.copyWith(
+                        color: _accAhara, fontWeight: FontWeight.w800)),
+              ]),
+            ],
+          ]),
+        ),
       ]),
     );
   }
 }
 
+class _PillarCard extends StatelessWidget {
+  const _PillarCard({required this.pillar, required this.done, required this.onTap});
+  final ({String id, String name, String tag, String todo, String duration}) pillar;
+  final bool done;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final v = _pillarVisual(pillar.id);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [v.accent.withValues(alpha: done ? 0.10 : 0.16), _surface],
+            stops: const [0.0, 0.85],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: v.accent.withValues(alpha: 0.22)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: v.accent.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(v.emoji, style: const TextStyle(fontSize: 24)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Text(pillar.name,
+                    style: text.titleMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+                const SizedBox(width: 8),
+                Text('· ${pillar.duration}',
+                    style: text.labelSmall?.copyWith(color: _muted)),
+              ]),
+              Text(pillar.tag, style: text.labelSmall?.copyWith(color: v.accent, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(pillar.todo,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(color: _muted, height: 1.3)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          // completion circle
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: done ? _green : Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(color: done ? _green : _line, width: 2),
+            ),
+            child: done
+                ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+                : null,
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
 // ===========================================================================
-//  Shravan — Sacred Listening
+//  Shared widgets
+// ===========================================================================
+
+class _PillarScaffold extends StatelessWidget {
+  const _PillarScaffold({required this.title, required this.child});
+  final String title;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: _cream,
+        appBar: AppBar(
+            backgroundColor: _cream, elevation: 0, foregroundColor: _ink, title: Text(title)),
+        body: child,
+      );
+}
+
+class _WhyCard extends StatelessWidget {
+  const _WhyCard({required this.label, required this.text, required this.accent});
+  final String label;
+  final String text;
+  final Color accent;
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.22)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(),
+            style: t.labelSmall?.copyWith(color: accent, letterSpacing: 0.5, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 6),
+        Text(text, style: t.bodyMedium?.copyWith(height: 1.45, color: _ink)),
+      ]),
+    );
+  }
+}
+
+class _MarkComplete extends StatelessWidget {
+  const _MarkComplete({required this.pillarId, required this.accent, this.lang});
+  final String pillarId;
+  final Color accent;
+  final AppLanguage? lang;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang ?? AppLanguage.english);
+    final text = Theme.of(context).textTheme;
+    return AnimatedBuilder(
+      animation: GarbhStore.instance,
+      builder: (context, _) {
+        final done = GarbhStore.instance.isDone(pillarId);
+        return SizedBox(
+          width: double.infinity,
+          child: done
+              ? OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _green,
+                    side: const BorderSide(color: _green, width: 1.4),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  onPressed: () {},
+                  icon: const Icon(Icons.check_circle_rounded, size: 18),
+                  label: Text(s.gsCompletedToday),
+                )
+              : FilledButton(
+                  style: FilledButton.styleFrom(
+                      backgroundColor: accent, padding: const EdgeInsets.symmetric(vertical: 13)),
+                  onPressed: () => GarbhStore.instance.markDone(pillarId),
+                  child: Text(s.gsMarkDone,
+                      style: text.labelLarge?.copyWith(color: Colors.white)),
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _LearnMore extends StatelessWidget {
+  const _LearnMore({required this.lang});
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: () => ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(s.gsLearnMoreSoon))),
+        icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+        label: Text(s.gsLearnMore),
+      ),
+    );
+  }
+}
+
+// ===========================================================================
+//  Pillar 1 — Shravan
 // ===========================================================================
 
 class ShravanScreen extends StatelessWidget {
@@ -340,179 +398,58 @@ class ShravanScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final featured = kShravan.first;
-    final rest = kShravan.skip(1).toList();
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(s.gsShravan)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+    final t = garbhTrimester(controller.currentWeek);
+    final audio = shravanForTrimester(t);
+    final more = kShravan.where((a) => a.id != audio.id).take(4).toList();
+    return _PillarScaffold(
+      title: s.gsShravan,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
         children: [
-          Text(s.gsShravanTag, style: text.bodyMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 16),
-          // Featured
-          GestureDetector(
-            onTap: () => _push(context, _ShravanPlayer(audio: featured, lang: lang)),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [_accShravan.withValues(alpha: 0.22), _surface],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: _accShravan.withValues(alpha: 0.25)),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(featured.emoji, style: const TextStyle(fontSize: 40)),
-                const SizedBox(height: 12),
-                Text(featured.title,
-                    style: text.headlineSmall
-                        ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 4),
-                Text('${featured.subtitle} · ${s.gsMinutes(featured.minutes)}',
-                    style: text.bodyMedium?.copyWith(color: _muted)),
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                  decoration: BoxDecoration(
-                      color: _accShravan, borderRadius: BorderRadius.circular(30)),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
-                    const SizedBox(width: 6),
-                    Text(s.gsPlay,
-                        style: text.labelLarge
-                            ?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-                  ]),
-                ),
-              ]),
-            ),
-          ),
-          const SizedBox(height: 18),
-          for (final a in rest) ...[
-            _AudioRow(
-                audio: a,
-                lang: lang,
-                onTap: () => _push(context, _ShravanPlayer(audio: a, lang: lang))),
-            const SizedBox(height: 10),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _AudioRow extends StatelessWidget {
-  const _AudioRow({required this.audio, required this.lang, required this.onTap});
-  final GarbhAudio audio;
-  final AppLanguage lang;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final s = S(lang);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: _surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _line, width: 1),
-        ),
-        child: Row(children: [
-          Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: _accShravan.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(audio.emoji, style: const TextStyle(fontSize: 22)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(audio.title,
-                  style: text.titleSmall?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
-              Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.labelSmall?.copyWith(color: _muted)),
-            ]),
-          ),
-          const Icon(Icons.play_circle_outline_rounded, color: _accShravan),
-        ]),
-      ),
-    );
-  }
-}
-
-class _ShravanPlayer extends StatefulWidget {
-  const _ShravanPlayer({required this.audio, required this.lang});
-  final GarbhAudio audio;
-  final AppLanguage lang;
-  @override
-  State<_ShravanPlayer> createState() => _ShravanPlayerState();
-}
-
-class _ShravanPlayerState extends State<_ShravanPlayer> {
-  @override
-  void initState() {
-    super.initState();
-    GarbhStore.instance.addListening();
-    GarbhStore.instance
-        .setLast(type: 'shravan', id: widget.audio.id, title: widget.audio.title);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final a = widget.audio;
-    final text = Theme.of(context).textTheme;
-    final s = S(widget.lang);
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(backgroundColor: _cream, elevation: 0, foregroundColor: _ink),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
-        children: [
+          Text(s.gsTodaysSession, style: text.labelMedium?.copyWith(color: _muted)),
+          const SizedBox(height: 12),
           Center(
             child: Container(
-              width: 180,
-              height: 180,
+              width: 150,
+              height: 150,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [_accShravan.withValues(alpha: 0.30), const Color(0xFFEDE6D6)],
-                ),
-                borderRadius: BorderRadius.circular(28),
+                gradient: LinearGradient(colors: [
+                  _accShravan.withValues(alpha: 0.30),
+                  const Color(0xFFEDE6D6),
+                ]),
+                borderRadius: BorderRadius.circular(26),
               ),
-              child: Text(a.emoji, style: const TextStyle(fontSize: 76)),
+              child: Text(audio.emoji, style: const TextStyle(fontSize: 64)),
             ),
           ),
-          const SizedBox(height: 22),
-          Text(a.title,
+          const SizedBox(height: 16),
+          Text(audio.title,
               textAlign: TextAlign.center,
               style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          Text(a.subtitle,
+          Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
               textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 20),
-          RagaPlayer(title: a.title, subtitle: '${a.minutes} min'),
-          const SizedBox(height: 14),
-          Center(child: _HeartButton(id: a.id)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          _WhyCard(label: s.gsWhyToday, text: shravanWhy(t), accent: _accShravan),
+          const SizedBox(height: 16),
+          RagaPlayer(title: audio.title, subtitle: '${audio.minutes} min'),
+          const SizedBox(height: 8),
           Text(s.gsSampleAudio,
-              textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: _muted)),
+              textAlign: TextAlign.center, style: text.labelSmall?.copyWith(color: _muted)),
+          const SizedBox(height: 16),
+          _MarkComplete(pillarId: 'shravan', accent: _accShravan, lang: lang),
+          _LearnMore(lang: lang),
+          const SizedBox(height: 12),
+          for (final a in more)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Text(a.emoji, style: const TextStyle(fontSize: 24)),
+              title: Text(a.title, style: text.titleSmall),
+              subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
+                  style: text.labelSmall?.copyWith(color: _muted)),
+              trailing: const Icon(Icons.play_circle_outline_rounded, color: _accShravan),
+              onTap: () {},
+            ),
         ],
       ),
     );
@@ -520,7 +457,231 @@ class _ShravanPlayerState extends State<_ShravanPlayer> {
 }
 
 // ===========================================================================
-//  Samvad — Womb Connection
+//  Pillar 2 — Vichara (3 tabs)
+// ===========================================================================
+
+class VicharaScreen extends StatelessWidget {
+  const VicharaScreen({super.key, required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: _cream,
+        appBar: AppBar(
+          backgroundColor: _cream,
+          elevation: 0,
+          foregroundColor: _ink,
+          title: Text(s.gsVichara),
+          bottom: TabBar(
+            labelColor: _accVichara,
+            unselectedLabelColor: _muted,
+            indicatorColor: _accVichara,
+            isScrollable: true,
+            tabs: [
+              Tab(text: s.gsTabSacred),
+              Tab(text: s.gsTabBrain),
+              Tab(text: s.gsTabUplifting),
+            ],
+          ),
+        ),
+        body: TabBarView(children: [
+          _SacredTab(controller: controller),
+          _BrainTab(controller: controller),
+          _UpliftingTab(controller: controller),
+        ]),
+      ),
+    );
+  }
+}
+
+class _SacredTab extends StatelessWidget {
+  const _SacredTab({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final text = Theme.of(context).textTheme;
+    final ins = insightForTrimester(garbhTrimester(controller.currentWeek));
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [_accVichara.withValues(alpha: 0.14), _surface]),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: _accVichara.withValues(alpha: 0.22)),
+          ),
+          child: Text('"${ins.sloka}"',
+              style: text.headlineSmall?.copyWith(
+                  color: _ink, height: 1.4, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)),
+        ),
+        const SizedBox(height: 16),
+        _miniSection(context, s.gsMeaning, ins.meaning),
+        _miniSection(context, s.gsLesson, ins.lesson),
+        const SizedBox(height: 6),
+        _WhyCard(label: s.gsReflectMoment, text: ins.reflection, accent: _accVichara),
+        const SizedBox(height: 18),
+        _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+      ],
+    );
+  }
+}
+
+Widget _miniSection(BuildContext context, String label, String body) {
+  final t = Theme.of(context).textTheme;
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label.toUpperCase(),
+          style: t.labelSmall?.copyWith(color: _muted, letterSpacing: 0.5, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 4),
+      Text(body, style: t.bodyLarge?.copyWith(color: _ink, height: 1.5)),
+    ]),
+  );
+}
+
+class _BrainTab extends StatelessWidget {
+  const _BrainTab({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final text = Theme.of(context).textTheme;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+      children: [
+        Text('A few quiet minutes of focused calm.',
+            style: text.bodyMedium?.copyWith(color: _muted)),
+        const SizedBox(height: 14),
+        for (final p in kPuzzles)
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: _line),
+            ),
+            child: Row(children: [
+              Text(p.emoji, style: const TextStyle(fontSize: 26)),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(p.title, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                  Text(p.blurb, style: text.labelSmall?.copyWith(color: _muted)),
+                ]),
+              ),
+              TextButton(
+                onPressed: () {
+                  GarbhStore.instance.markDone('vichara');
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(s.gsPuzzleSoon)));
+                },
+                child: Text(s.gsStart),
+              ),
+            ]),
+          ),
+      ],
+    );
+  }
+}
+
+class _UpliftingTab extends StatelessWidget {
+  const _UpliftingTab({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final text = Theme.of(context).textTheme;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+      children: [
+        for (final story in kVichara)
+          GestureDetector(
+            onTap: () => _push(context, _VicharaReader(story: story, controller: controller)),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _line),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _accVichara.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(story.theme,
+                      style: text.labelSmall?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
+                ),
+                const SizedBox(height: 10),
+                Text(story.title,
+                    style: text.titleLarge?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 6),
+                Text(story.blurb, style: text.bodyMedium?.copyWith(color: _muted, height: 1.4)),
+                const SizedBox(height: 10),
+                Row(children: [
+                  Text(s.gsRead,
+                      style: text.labelLarge?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
+                  const Icon(Icons.arrow_forward_rounded, size: 16, color: _accVichara),
+                  const Spacer(),
+                  Text(s.gsMinRead(story.minutes),
+                      style: text.labelSmall?.copyWith(color: _muted)),
+                ]),
+              ]),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _VicharaReader extends StatelessWidget {
+  const _VicharaReader({required this.story, required this.controller});
+  final GarbhStory story;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final text = Theme.of(context).textTheme;
+    return _PillarScaffold(
+      title: story.theme,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(22, 6, 22, 32),
+        children: [
+          Text(story.title,
+              style: text.headlineMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text(s.gsMinRead(story.minutes), style: text.labelSmall?.copyWith(color: _muted)),
+          const SizedBox(height: 18),
+          for (final para in story.body.split('\n\n')) ...[
+            Text(para, style: text.bodyLarge?.copyWith(color: _ink, height: 1.7, fontSize: 17)),
+            const SizedBox(height: 16),
+          ],
+          _WhyCard(label: s.gsReflectMoment, text: story.reflection, accent: _accVichara),
+          const SizedBox(height: 18),
+          _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+        ],
+      ),
+    );
+  }
+}
+
+// ===========================================================================
+//  Pillar 3 — Samvad
 // ===========================================================================
 
 class SamvadScreen extends StatefulWidget {
@@ -532,7 +693,6 @@ class SamvadScreen extends StatefulWidget {
 
 class _SamvadScreenState extends State<SamvadScreen> {
   late int _index;
-
   @override
   void initState() {
     super.initState();
@@ -543,42 +703,32 @@ class _SamvadScreenState extends State<SamvadScreen> {
 
   Future<void> _compose(bool voice) async {
     final c = widget.controller;
-    final lang = c.language;
-    final s = S(lang);
+    final s = S(c.language);
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => TalkComposerScreen(
         day: c.currentDay,
         week: c.currentWeek,
         prompt: _prompt.text,
         motivation: s.gsSamvadTag,
-        lang: lang,
+        lang: c.language,
         startWithVoice: voice,
       ),
     ));
     if (!mounted) return;
-    final saved = DailyStore.instance.talkForDay(c.currentDay);
-    if (saved != null) {
-      GarbhStore.instance.addConnection();
-      GarbhStore.instance
-          .setLast(type: 'samvad', id: _prompt.id, title: s.gsTodaysConnection);
-      if (!mounted) return;
-      _push(context, _MemorySavedScreen(controller: c));
-    }
+    GarbhStore.instance.markDone('samvad');
+    _push(context, _MemorySavedScreen(controller: c));
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = S(widget.controller.language);
+    final lang = widget.controller.language;
+    final s = S(lang);
     final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(s.gsSamvad)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+    final t = garbhTrimester(widget.controller.currentWeek);
+    return _PillarScaffold(
+      title: s.gsSamvad,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
         children: [
           Text(s.gsTodaysConnection,
               style: text.labelMedium?.copyWith(
@@ -586,43 +736,34 @@ class _SamvadScreenState extends State<SamvadScreen> {
           const SizedBox(height: 12),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [_accSamvad.withValues(alpha: 0.16), _surface],
-              ),
-              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(colors: [_accSamvad.withValues(alpha: 0.16), _surface]),
+              borderRadius: BorderRadius.circular(22),
               border: Border.all(color: _accSamvad.withValues(alpha: 0.22)),
             ),
             child: Text(_prompt.text,
-                style: text.headlineSmall
-                    ?.copyWith(color: _ink, height: 1.4, fontWeight: FontWeight.w700)),
+                style: text.headlineSmall?.copyWith(color: _ink, height: 1.4, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(height: 12),
+          _WhyCard(label: s.gsWhyMatters, text: samvadThemeForTrimester(t), accent: _accSamvad),
+          const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: () => setState(
-                  () => _index = (_index + 1) % kSamvad.length),
+              onPressed: () => setState(() => _index = (_index + 1) % kSamvad.length),
               icon: const Icon(Icons.refresh_rounded, size: 18, color: _accSamvad),
-              label: Text(s.gsAnotherPrompt,
-                  style: text.labelLarge?.copyWith(color: _accSamvad)),
+              label: Text(s.gsAnotherPrompt, style: text.labelLarge?.copyWith(color: _accSamvad)),
             ),
           ),
-          const SizedBox(height: 8),
           Row(children: [
             Expanded(
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: _accSamvad,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
+                    backgroundColor: _accSamvad, padding: const EdgeInsets.symmetric(vertical: 13)),
                 onPressed: () => _compose(true),
                 icon: const Icon(Icons.mic_rounded, size: 18, color: Colors.white),
-                label: Text(s.gsRecordVoice,
-                    style: text.labelLarge?.copyWith(color: Colors.white)),
+                label: Text(s.gsRecordVoice, style: text.labelLarge?.copyWith(color: Colors.white)),
               ),
             ),
             const SizedBox(width: 12),
@@ -631,7 +772,7 @@ class _SamvadScreenState extends State<SamvadScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: _accSamvad,
                   side: const BorderSide(color: _accSamvad, width: 1.4),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
                 ),
                 onPressed: () => _compose(false),
                 icon: const Icon(Icons.edit_rounded, size: 18),
@@ -639,6 +780,8 @@ class _SamvadScreenState extends State<SamvadScreen> {
               ),
             ),
           ]),
+          const SizedBox(height: 14),
+          _MarkComplete(pillarId: 'samvad', accent: _accSamvad, lang: lang),
         ],
       ),
     );
@@ -652,10 +795,9 @@ class _MemorySavedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(backgroundColor: _cream, elevation: 0, foregroundColor: _ink),
-      body: Center(
+    return _PillarScaffold(
+      title: s.gsSamvad,
+      child: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -683,176 +825,7 @@ class _MemorySavedScreen extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Vichara — Positive Contemplation
-// ===========================================================================
-
-class VicharaScreen extends StatelessWidget {
-  const VicharaScreen({super.key, required this.controller});
-  final PregnancyController controller;
-  @override
-  Widget build(BuildContext context) {
-    final lang = controller.language;
-    final s = S(lang);
-    final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(s.gsVichara)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-        children: [
-          Text(s.gsVicharaTag, style: text.bodyMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 16),
-          for (final story in kVichara) ...[
-            _StoryCard(
-                story: story,
-                readLabel: s.gsRead,
-                minLabel: s.gsMinRead(story.minutes),
-                onTap: () => _push(context, _VicharaReader(story: story, lang: lang))),
-            const SizedBox(height: 14),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _StoryCard extends StatelessWidget {
-  const _StoryCard({
-    required this.story,
-    required this.readLabel,
-    required this.minLabel,
-    required this.onTap,
-  });
-  final GarbhStory story;
-  final String readLabel, minLabel;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: _surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: _line, width: 1),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: _accVichara.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Text(story.theme,
-                style: text.labelSmall
-                    ?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
-          ),
-          const SizedBox(height: 10),
-          Text(story.title,
-              style: text.titleLarge?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          Text(story.blurb,
-              style: text.bodyMedium?.copyWith(color: _muted, height: 1.4)),
-          const SizedBox(height: 12),
-          Row(children: [
-            Text(readLabel,
-                style: text.labelLarge
-                    ?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
-            const SizedBox(width: 6),
-            const Icon(Icons.arrow_forward_rounded, size: 16, color: _accVichara),
-            const Spacer(),
-            Text(minLabel, style: text.labelSmall?.copyWith(color: _muted)),
-          ]),
-        ]),
-      ),
-    );
-  }
-}
-
-class _VicharaReader extends StatefulWidget {
-  const _VicharaReader({required this.story, required this.lang});
-  final GarbhStory story;
-  final AppLanguage lang;
-  @override
-  State<_VicharaReader> createState() => _VicharaReaderState();
-}
-
-class _VicharaReaderState extends State<_VicharaReader> {
-  @override
-  void initState() {
-    super.initState();
-    GarbhStore.instance.addReflection();
-    GarbhStore.instance
-        .setLast(type: 'vichara', id: widget.story.id, title: widget.story.title);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final story = widget.story;
-    final s = S(widget.lang);
-    final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-        backgroundColor: _cream,
-        elevation: 0,
-        foregroundColor: _ink,
-        actions: [_HeartButton(id: story.id)],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 4, 24, 36),
-        children: [
-          Text(story.theme.toUpperCase(),
-              style: text.labelSmall?.copyWith(
-                  color: _accVichara, letterSpacing: 1.0, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          Text(story.title,
-              style: text.headlineMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          Text(s.gsMinRead(story.minutes),
-              style: text.labelSmall?.copyWith(color: _muted)),
-          const SizedBox(height: 20),
-          for (final para in story.body.split('\n\n')) ...[
-            Text(para,
-                style: text.bodyLarge?.copyWith(color: _ink, height: 1.7, fontSize: 17)),
-            const SizedBox(height: 16),
-          ],
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: _accVichara.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _accVichara.withValues(alpha: 0.22)),
-            ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                const Text('❤️', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 8),
-                Text(s.gsReflectMoment,
-                    style: text.labelLarge
-                        ?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
-              ]),
-              const SizedBox(height: 10),
-              Text(story.reflection,
-                  style: text.titleMedium?.copyWith(color: _ink, height: 1.45)),
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ===========================================================================
-//  Kriya — Breath & Grounding
+//  Pillar 4 — Kriya
 // ===========================================================================
 
 class KriyaScreen extends StatelessWidget {
@@ -863,57 +836,37 @@ class KriyaScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(s.gsKriya)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+    final t = garbhTrimester(controller.currentWeek);
+    final practice = kriyaForTrimester(t);
+    return _PillarScaffold(
+      title: s.gsKriya,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
         children: [
-          Text(s.gsKriyaTag, style: text.bodyMedium?.copyWith(color: _muted)),
+          Text(s.gsTodaysPractice, style: text.labelMedium?.copyWith(color: _muted)),
+          const SizedBox(height: 12),
+          Center(child: Text(practice.emoji, style: const TextStyle(fontSize: 52))),
+          const SizedBox(height: 10),
+          Text(practice.title,
+              textAlign: TextAlign.center,
+              style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+          Text('${practice.blurb} · ${s.gsMinutes(practice.minutes)}',
+              textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: _muted)),
           const SizedBox(height: 16),
-          for (final p in kKriya) ...[
-            GestureDetector(
-              onTap: () => _push(context, _BreathingScreen(practice: p, lang: lang)),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _surface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: _line, width: 1),
-                ),
-                child: Row(children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: _accKriya.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    child: Text(p.emoji, style: const TextStyle(fontSize: 22)),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(p.title,
-                          style: text.titleSmall
-                              ?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
-                      Text('${p.blurb} · ${s.gsMinutes(p.minutes)}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: text.labelSmall?.copyWith(color: _muted)),
-                    ]),
-                  ),
-                  const Icon(Icons.play_circle_outline_rounded, color: _accKriya),
-                ]),
-              ),
+          _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t), accent: _accKriya),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  backgroundColor: _accKriya, padding: const EdgeInsets.symmetric(vertical: 14)),
+              onPressed: () => _push(context, _BreathingScreen(practice: practice, lang: lang)),
+              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+              label: Text(s.gsStart, style: text.labelLarge?.copyWith(color: Colors.white)),
             ),
-            const SizedBox(height: 10),
-          ],
+          ),
+          const SizedBox(height: 12),
+          _MarkComplete(pillarId: 'kriya', accent: _accKriya, lang: lang),
         ],
       ),
     );
@@ -942,9 +895,6 @@ class _BreathingScreenState extends State<_BreathingScreen>
   @override
   void initState() {
     super.initState();
-    GarbhStore.instance.addBreathing();
-    GarbhStore.instance.setLast(
-        type: 'kriya', id: widget.practice.id, title: widget.practice.title);
     _ctrl = AnimationController(vsync: this);
     _ctrl.addStatusListener((st) {
       if (st == AnimationStatus.completed && mounted) {
@@ -978,14 +928,9 @@ class _BreathingScreenState extends State<_BreathingScreen>
   Widget build(BuildContext context) {
     final s = S(widget.lang);
     final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(widget.practice.title)),
-      body: Center(
+    return _PillarScaffold(
+      title: widget.practice.title,
+      child: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           AnimatedBuilder(
             animation: _ctrl,
@@ -1009,15 +954,13 @@ class _BreathingScreenState extends State<_BreathingScreen>
                         ]),
                       ),
                       child: Text('$remaining',
-                          style: text.displaySmall
-                              ?.copyWith(color: _ink, fontWeight: FontWeight.w300)),
+                          style: text.displaySmall?.copyWith(color: _ink, fontWeight: FontWeight.w300)),
                     ),
                   ),
                 ),
                 const SizedBox(height: 28),
                 Text(_label,
-                    style: text.headlineSmall
-                        ?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
+                    style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
               ]);
             },
           ),
@@ -1029,6 +972,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 13),
             ),
             onPressed: () {
+              GarbhStore.instance.markDone('kriya');
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('${s.gsWellDone} — ${s.gsWellDoneBody}')),
@@ -1043,89 +987,80 @@ class _BreathingScreenState extends State<_BreathingScreen>
 }
 
 // ===========================================================================
-//  Favorites
+//  Pillar 5 — Ahara
 // ===========================================================================
 
-class _FavoritesScreen extends StatelessWidget {
-  const _FavoritesScreen({required this.controller});
+class AharaScreen extends StatelessWidget {
+  const AharaScreen({super.key, required this.controller});
   final PregnancyController controller;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(
-          backgroundColor: _cream,
-          elevation: 0,
-          foregroundColor: _ink,
-          title: Text(s.gsFavorites)),
-      body: AnimatedBuilder(
-        animation: GarbhStore.instance,
-        builder: (context, _) {
-          final ids = GarbhStore.instance.favIds;
-          final audios = ids.map(shravanById).whereType<GarbhAudio>().toList();
-          final stories = ids.map(vicharaById).whereType<GarbhStory>().toList();
-          if (audios.isEmpty && stories.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(36),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.favorite_border_rounded, size: 44, color: _muted),
-                  const SizedBox(height: 14),
-                  Text(s.gsFavEmpty,
-                      textAlign: TextAlign.center,
-                      style: text.bodyMedium?.copyWith(color: _muted)),
-                ]),
-              ),
-            );
-          }
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-            children: [
-              for (final a in audios) ...[
-                _AudioRow(
-                    audio: a,
-                    lang: lang,
-                    onTap: () => _push(context, _ShravanPlayer(audio: a, lang: lang))),
-                const SizedBox(height: 10),
-              ],
-              for (final story in stories) ...[
-                _StoryCard(
-                    story: story,
-                    readLabel: s.gsRead,
-                    minLabel: s.gsMinRead(story.minutes),
-                    onTap: () => _push(context, _VicharaReader(story: story, lang: lang))),
-                const SizedBox(height: 14),
-              ],
-            ],
-          );
-        },
+    final n = nutritionForTrimester(garbhTrimester(controller.currentWeek));
+    return _PillarScaffold(
+      title: s.gsAhara,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+        children: [
+          Text(s.gsTodaysNutrition, style: text.labelMedium?.copyWith(color: _muted)),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [_accAhara.withValues(alpha: 0.14), _surface]),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: _accAhara.withValues(alpha: 0.22)),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const Text('🍲', style: TextStyle(fontSize: 28)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(n.tip,
+                      style: text.titleMedium?.copyWith(color: _ink, fontWeight: FontWeight.w700, height: 1.3)),
+                ),
+              ]),
+            ]),
+          ),
+          const SizedBox(height: 14),
+          _WhyCard(label: s.gsWhyMatters, text: n.why, accent: _accAhara),
+          const SizedBox(height: 14),
+          _aharaRow(context, '🍽️', s.gsRecipe, n.recipe),
+          _aharaRow(context, '🔄', s.gsFoodSwap, n.swap),
+          _aharaRow(context, '🌙', s.gsLifestyleHabit, n.habit),
+          const SizedBox(height: 14),
+          _MarkComplete(pillarId: 'ahara', accent: _accAhara, lang: lang),
+          _LearnMore(lang: lang),
+        ],
       ),
     );
   }
 }
 
-// ===========================================================================
-//  Shared: heart / favorite toggle
-// ===========================================================================
-
-class _HeartButton extends StatelessWidget {
-  const _HeartButton({required this.id});
-  final String id;
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: GarbhStore.instance,
-      builder: (context, _) {
-        final fav = GarbhStore.instance.isFav(id);
-        return IconButton(
-          icon: Icon(fav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              color: fav ? _accSamvad : _muted),
-          onPressed: () => GarbhStore.instance.toggleFav(id),
-        );
-      },
-    );
-  }
+Widget _aharaRow(BuildContext context, String emoji, String label, String body) {
+  final t = Theme.of(context).textTheme;
+  return Container(
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: _surface,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: _line),
+    ),
+    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(emoji, style: const TextStyle(fontSize: 22)),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label.toUpperCase(),
+              style: t.labelSmall?.copyWith(color: _muted, letterSpacing: 0.5, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 3),
+          Text(body, style: t.bodyMedium?.copyWith(color: _ink, height: 1.4)),
+        ]),
+      ),
+    ]),
+  );
 }

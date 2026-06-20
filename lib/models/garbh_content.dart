@@ -89,3 +89,44 @@ class GarbhPrompt {
   final String id;
   final String text;
 }
+
+// ---- Vichara: Sacred Insights (Tab A) ----
+@immutable
+class GarbhInsight {
+  const GarbhInsight({
+    required this.sloka,
+    required this.meaning,
+    required this.lesson,
+    required this.reflection,
+  });
+  final String sloka; // a gentle line (no heavy religious language)
+  final String meaning; // simple interpretation
+  final String lesson; // life lesson
+  final String reflection; // reflection prompt
+}
+
+// ---- Vichara: Brain Fitness (Tab B) ----
+@immutable
+class GarbhPuzzle {
+  const GarbhPuzzle(this.title, this.emoji, this.blurb);
+  final String title;
+  final String emoji;
+  final String blurb;
+}
+
+// ---- Ahara: Nourishment (Pillar 5) ----
+@immutable
+class GarbhNutrition {
+  const GarbhNutrition({
+    required this.tip,
+    required this.why,
+    required this.recipe,
+    required this.swap,
+    required this.habit,
+  });
+  final String tip; // today's nutrition tip (what to do)
+  final String why; // why it matters
+  final String recipe; // recommended recipe
+  final String swap; // food swap
+  final String habit; // lifestyle habit
+}

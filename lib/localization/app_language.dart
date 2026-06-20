@@ -1432,6 +1432,51 @@ class S {
       _p('A calming sample plays here — full audio coming soon.',
           'Yahaan ek calming sample bajta hai — poora audio jald aayega.');
 
+  // ---- Garbh Sanskar v2.0 (daily ritual) ----------------------------------
+  String get gsAhara => _p('Ahara', 'Ahara');
+  String get gsAharaTag => _p('Nourishment', 'Poshan');
+  String gsDayOfWeek(int day, int week) =>
+      _p('Day $day of Week $week', 'Week $week ka Din $day');
+  String get gsBabySize => _p('Baby size', 'Baby ka size');
+  String get gsTodaysProgress => _p("Today's progress", 'Aaj ki pragati');
+  String gsRitualsDone(int done, int goal) =>
+      _p('$done / $goal rituals completed', '$done / $goal rituals poore');
+  String gsDayStreak(int n) => _p('$n day streak', '$n din ki streak');
+  String get gsTodaysRituals => _p("Today's rituals", 'Aaj ke rituals');
+  String gsDailyGoalLine(int goal) =>
+      _p('Goal: $goal / $goal each day', 'Lakshya: roz $goal / $goal');
+  String get gsAllDone =>
+      _p('All 5 rituals complete — beautiful 💛', 'Saare 5 rituals poore — bahut sundar 💛');
+  String get gsWhatToDo => _p('What to do', 'Kya karna hai');
+  String get gsWhyMatters => _p('Why it matters', 'Yeh kyun zaroori hai');
+  String get gsStart => _p('Start', 'Shuru karein');
+  String get gsMarkDone => _p('Mark complete', 'Poora hua');
+  String get gsCompletedToday => _p('Completed today', 'Aaj poora hua');
+  String get gsTodaysSession => _p("Today's listening session", 'Aaj ka listening session');
+  String get gsWhyToday =>
+      _p('Why this is recommended today', 'Yeh aaj kyun recommend kiya');
+  String get gsTabSacred => _p('Sacred Insights', 'Pavitra Vichar');
+  String get gsTabBrain => _p('Brain Fitness', 'Brain Fitness');
+  String get gsTabUplifting => _p('Uplifting Vibrations', 'Uplifting Vibrations');
+  String get gsMeaning => _p('What it means', 'Iska matlab');
+  String get gsLesson => _p('Life lesson', 'Jeevan ka sabak');
+  String get gsReadAloud => _p('Read aloud', 'Padh kar sunaayein');
+  String get gsTodaysPractice => _p("Today's practice", 'Aaj ka abhyaas');
+  String get gsSafetyNotes => _p('Safety notes', 'Suraksha note');
+  String get gsTodaysNutrition => _p("Today's nutrition", 'Aaj ka poshan');
+  String get gsRecipe => _p('Recommended recipe', 'Recommended recipe');
+  String get gsFoodSwap => _p('Food swap', 'Food swap');
+  String get gsLifestyleHabit => _p('Lifestyle habit', 'Lifestyle habit');
+  String get gsLearnMore => _p('Learn more', 'Aur jaanein');
+  String get gsLearnMoreSoon =>
+      _p('Ask Veda is coming soon — your personal AI guide.',
+          'Ask Veda jald aa raha hai — aapka personal AI guide.');
+  String get gsRelatedDiscussions =>
+      _p('Mothers are also discussing', 'Maaayein ispar baat kar rahi hain');
+  String get gsPuzzleSoon =>
+      _p('This puzzle opens soon — counts as done for today ❤️',
+          'Yeh puzzle jald — aaj ke liye poora maana jaayega ❤️');
+
   // ---- Community (Tools) ---------------------------------------------------
   String get cmTitle => _p('Community', 'Community');
   String get cmSearchHint => _p(

@@ -238,3 +238,123 @@ GarbhPractice? kriyaById(String id) {
 /// Today's connection prompt, rotating gently by day of pregnancy.
 GarbhPrompt promptForDay(int day) =>
     kSamvad[(day.clamp(1, 280) - 1) % kSamvad.length];
+
+// ===========================================================================
+//  v2.0 — trimester engine + per-pillar "today" pickers
+// ===========================================================================
+int garbhTrimester(int week) => week <= 13 ? 1 : (week <= 27 ? 2 : 3);
+
+// --- Shravan (today's listening session) ---
+GarbhAudio shravanForTrimester(int t) {
+  switch (t) {
+    case 1:
+      return shravanById('morning_raga') ?? kShravan.first;
+    case 2:
+      return shravanById('bonding_raga') ?? kShravan.first;
+    default:
+      return shravanById('relax_raga') ?? kShravan.first;
+  }
+}
+
+String shravanWhy(int t) {
+  switch (t) {
+    case 1:
+      return 'Calming sound can ease early-pregnancy stress and help you settle into the day.';
+    case 2:
+      return 'Your baby is beginning to hear — gentle melodies are soothing for you both.';
+    default:
+      return 'Calming music may help create a relaxing environment as birth approaches.';
+  }
+}
+
+// --- Vichara: Sacred Insights ---
+const List<GarbhInsight> _insights = [
+  GarbhInsight(
+    sloka: 'Begin gently; the smallest steady step still moves you forward.',
+    meaning: 'You do not have to do everything at once — showing up softly is enough.',
+    lesson: 'Consistency, not intensity, builds calm.',
+    reflection: 'What is one small, kind thing you can do for yourself today?',
+  ),
+  GarbhInsight(
+    sloka: 'A calm mind is a quiet gift you pass to your child.',
+    meaning: 'Your peace becomes your baby\'s first felt experience of the world.',
+    lesson: 'Tending to your own calm is also caring for your baby.',
+    reflection: 'What helped you feel most at ease this week?',
+  ),
+  GarbhInsight(
+    sloka: 'Trust the body that has carried you this far.',
+    meaning: 'As birth nears, confidence and rest matter as much as preparation.',
+    lesson: 'Strength can be soft — trusting is its own kind of courage.',
+    reflection: 'What are you most looking forward to about meeting your baby?',
+  ),
+];
+GarbhInsight insightForTrimester(int t) => _insights[(t - 1).clamp(0, 2)];
+
+// --- Vichara: Brain Fitness (gentle puzzles for focused calm) ---
+const List<GarbhPuzzle> kPuzzles = [
+  GarbhPuzzle('Word Search', '🔤', 'Find the hidden words — a quiet few minutes.'),
+  GarbhPuzzle('Sudoku', '🔢', 'A gentle number puzzle to settle a busy mind.'),
+  GarbhPuzzle('Logic Puzzle', '🧩', 'A light brain-teaser for focused calm.'),
+  GarbhPuzzle('Memory Match', '🃏', 'A simple memory game to relax into.'),
+];
+
+// --- Samvad: theme line per trimester (the prompt rotates by day) ---
+String samvadThemeForTrimester(int t) {
+  switch (t) {
+    case 1:
+      return 'Welcome your baby and be kind to yourself as your body changes.';
+    case 2:
+      return 'Your baby can hear you now — talk, tell stories, share your day.';
+    default:
+      return 'Speak words of welcome and calm as you prepare to meet your baby.';
+  }
+}
+
+// --- Kriya: today's practice + a safety note ---
+GarbhPractice kriyaForTrimester(int t) {
+  switch (t) {
+    case 1:
+      return kriyaById('calm') ?? kKriya.first;
+    case 2:
+      return kriyaById('deep_belly') ?? kKriya.first;
+    default:
+      return kriyaById('bhramari') ?? kKriya.first;
+  }
+}
+
+String kriyaSafety(int t) {
+  switch (t) {
+    case 1:
+      return 'Move gently and stop if you feel dizzy or unwell.';
+    case 2:
+      return 'Avoid lying flat on your back for long; keep movements slow.';
+    default:
+      return 'Support your bump, go slow, and rest whenever you need to.';
+  }
+}
+
+// --- Ahara: Nourishment per trimester ---
+const List<GarbhNutrition> _nutrition = [
+  GarbhNutrition(
+    tip: 'Sip water through the day and eat small, frequent meals.',
+    why: 'Steady hydration and small meals ease nausea and keep energy stable in the first trimester.',
+    recipe: 'Lemon-ginger water with a few soaked almonds.',
+    swap: 'Swap one heavy meal for lighter, frequent snacks.',
+    habit: 'Keep a glass of water by your bed for the morning.',
+  ),
+  GarbhNutrition(
+    tip: 'Add a good source of protein and iron to today\'s meals.',
+    why: 'The second trimester is a growth phase — protein, iron and healthy fats support it.',
+    recipe: 'Moong dal khichdi with a side of curd.',
+    swap: 'Swap white rice for a dal-and-vegetable bowl.',
+    habit: 'Pair iron-rich food with vitamin C (lemon, amla) for absorption.',
+  ),
+  GarbhNutrition(
+    tip: 'Focus on fibre and a light, early dinner.',
+    why: 'Fibre eases the constipation common late in pregnancy, and a light dinner supports sleep.',
+    recipe: 'Vegetable soup with a fruit for dessert.',
+    swap: 'Swap a late, heavy dinner for a lighter early one.',
+    habit: 'Dim the lights and screens an hour before bed.',
+  ),
+];
+GarbhNutrition nutritionForTrimester(int t) => _nutrition[(t - 1).clamp(0, 2)];
