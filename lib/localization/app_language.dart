@@ -1354,6 +1354,7 @@ class S {
   String get rSearchHint => _p(
       'Search a report finding or condition', 'Koi finding ya condition search karein');
   String get rPopularTitle => _p('Popular topics', 'Popular topics');
+  String get rAllTopics => _p('All topics', 'Sabhi topics');
   String get rSecMeans => _p('What does this mean?', 'Iska matlab kya hai?');
   String get rSecCommon => _p('How common is it?', 'Yeh kitna aam hai?');
   String get rSecNext =>
@@ -1383,6 +1384,53 @@ class S {
   String get rAskComingSoon => _p(
       'Ask Veda is coming soon — your personal AI guide.',
       'Ask Veda jald aa raha hai — aapka personal AI guide.');
+
+  // ---- Garbh Sanskar Journey (Tools) ---------------------------------------
+  String get gsTitle => _p('Garbh Sanskar Journey', 'Garbh Sanskar Journey');
+  String get gsSubtitle => _p(
+      'A space for calm, connection and reflection during pregnancy.',
+      'Pregnancy mein calm, judaav aur reflection ke liye ek jagah.');
+  String get gsContinue => _p('Continue your practice', 'Apni practice jaari rakhein');
+  String get gsContinueCta => _p('Continue', 'Jaari rakhein');
+  String get gsWhatToday => _p('What would you like today?', 'Aaj aap kya karna chahengi?');
+  String get gsShravan => _p('Shravan', 'Shravan');
+  String get gsShravanTag => _p('Sacred Listening', 'Pavitra Shravan');
+  String get gsSamvad => _p('Samvad', 'Samvad');
+  String get gsSamvadTag => _p('Womb Connection', 'Garbh Se Judaav');
+  String get gsVichara => _p('Vichara', 'Vichara');
+  String get gsVicharaTag => _p('Positive Contemplation', 'Sakaratmak Vichar');
+  String get gsKriya => _p('Kriya', 'Kriya');
+  String get gsKriyaTag => _p('Breath & Grounding', 'Saans Aur Sthirta');
+  String get gsYourJourney => _p('Your journey', 'Aapka safar');
+  String get gsStatListening => _p('Listening', 'Shravan');
+  String get gsStatReflections => _p('Reflections', 'Vichar');
+  String get gsStatConnections => _p('Connections', 'Judaav');
+  String get gsStatBreathing => _p('Breathing', 'Saans');
+  String get gsFavorites => _p('Favorites', 'Pasandeeda');
+  String get gsFavEmpty => _p(
+      'Nothing saved yet. Tap the heart on anything you love.',
+      'Abhi kuch save nahi hua. Jo pasand aaye uspar heart dabayein.');
+  String get gsPlay => _p('Play', 'Chalayein');
+  String get gsRead => _p('Read', 'Padhein');
+  String get gsStartPractice => _p('Start practice', 'Practice shuru karein');
+  String get gsTodaysConnection => _p("Today's connection", 'Aaj ka judaav');
+  String get gsAnotherPrompt => _p('Another prompt', 'Doosra prompt');
+  String get gsRecordVoice => _p('Record voice', 'Awaaz record karein');
+  String get gsWriteMessage => _p('Write message', 'Sandesh likhein');
+  String get gsSaveMemory => _p('Save to Memory Vault', 'Memory Vault mein save karein');
+  String get gsMemorySaved => _p('Memory saved', 'Memory save ho gayi');
+  String get gsMemorySavedBody =>
+      _p('One day, your child may hear this.', 'Ek din, aapka bachcha ise sun sakta hai.');
+  String get gsReflectMoment => _p('A moment to reflect', 'Ek pal thaharne ka');
+  String gsMinutes(int m) => _p('$m min', '$m min');
+  String gsMinRead(int m) => _p('$m minute read', '$m minute padhein');
+  String get gsFinish => _p('Finish', 'Samaapt');
+  String get gsWellDone => _p('Well done', 'Bahut achhe');
+  String get gsWellDoneBody =>
+      _p('Carry this calm with you.', 'Is shaanti ko apne saath le jaayein.');
+  String get gsSampleAudio =>
+      _p('A calming sample plays here — full audio coming soon.',
+          'Yahaan ek calming sample bajta hai — poora audio jald aayega.');
 
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');

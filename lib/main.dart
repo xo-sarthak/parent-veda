@@ -4,6 +4,7 @@ import 'screens/main_scaffold.dart';
 import 'services/baby_voice_service.dart';
 import 'services/can_i_store.dart';
 import 'services/daily_store.dart';
+import 'services/garbh_store.dart';
 import 'services/father_content_controller.dart';
 import 'services/home_content_controller.dart';
 import 'services/hospital_bag_store.dart';
@@ -59,6 +60,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     HospitalBagStore.instance.init();
     // Load Can I? saved-questions persistence.
     CanIStore.instance.init();
+    // Load Garbh Sanskar Journey persistence (favorites, reflective tally).
+    GarbhStore.instance.init();
   }
 
   @override

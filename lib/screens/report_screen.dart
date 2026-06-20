@@ -50,6 +50,8 @@ class ReportScreen extends StatelessWidget {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     final popular = kReportPopular.map(reportById).whereType<ReportFinding>().toList();
+    final all = [...kReportFindings]
+      ..sort((a, b) => a.name.of(lang).compareTo(b.name.of(lang)));
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(title: Text(s.rTitle)),
@@ -65,6 +67,18 @@ class ReportScreen extends StatelessWidget {
               style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final f in popular) ...[
+            _TopicRow(
+              finding: f,
+              lang: lang,
+              onTap: () => _openArticle(context, f, controller),
+            ),
+            const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 18),
+          Text(s.rAllTopics,
+              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 12),
+          for (final f in all) ...[
             _TopicRow(
               finding: f,
               lang: lang,
