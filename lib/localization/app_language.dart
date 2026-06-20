@@ -1559,6 +1559,39 @@ class S {
     }
   }
 
+  // ---- Read Next ❤️ (Home) -------------------------------------------------
+  String get rnTitle => _p('Read Next', 'Read Next');
+  String get rnSubtitle => _p('Handpicked reading for your stage of pregnancy.',
+      'Aapki pregnancy stage ke liye chuni hui reading.');
+  String get rnThisWeekPick => _p("This Week's Pick", 'Is Hafte Ki Pick');
+  String get rnWhyNow => _p('Why this matters now', 'Yeh abhi kyun zaroori hai');
+  String get rnReadNow => _p('Read now', 'Abhi padhein');
+  String get rnRecommended => _p('Recommended for this week', 'Is hafte ke liye recommended');
+  String get rnLookingAhead => _p('Looking ahead', 'Aage ki taiyaari');
+  String rnComingUp(int week) => _p('Coming up around Week $week', 'Lagbhag Week $week ke aaspaas');
+  String get rnBooks => _p('Books we love', 'Pasandeeda kitaabein');
+  String get rnResearch => _p('Research simplified', 'Research aasaan bhaasha mein');
+  String get rnExperts => _p('Expert recommendations', 'Expert ki salah');
+  String get rnRecommendedBy => _p('Recommended by', 'Recommend kiya');
+  String get rnWhyRecommend =>
+      _p('Why ParentVeda recommends it', 'ParentVeda ise kyun recommend karta hai');
+  String get rnSavedSection => _p('Saved for later', 'Baad ke liye saved');
+  String get rnSavedEmpty => _p(
+      'Nothing saved yet. Tap the heart on anything you want to read later.',
+      'Abhi kuch save nahi hua. Jo baad mein padhna ho uspar heart dabayein.');
+  String get rnSaveBadge => _p('Saved', 'Saved');
+  String get rnMarkReading => _p('Mark as reading', 'Reading par lagayein');
+  String get rnReadingBadge => _p('Reading', 'Reading');
+  String get rnMarkDone => _p('Mark as completed', 'Completed par lagayein');
+  String get rnCompletedBadge => _p('Completed', 'Completed');
+  String get rnMoreReading => _p('More reading', 'Aur reading');
+  String get rnKnowMore => _p('Know more', 'Aur jaanein');
+  String get rnBuyNow => _p('Buy now', 'Abhi khareedein');
+  String get rnBuyComingSoon =>
+      _p('Buying opens soon — saving works now ❤️', 'Buying jald — saving abhi chalta hai ❤️');
+  String get rnSearchHint => _p('Search reading', 'Reading search karein');
+  String get rnNewResearch => _p('New research', 'Nayi research');
+
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');
   String get learnReaderTitle => _p("Today's Lesson", 'Aaj Ka Sabak');

@@ -1,0 +1,445 @@
+// =============================================================================
+//  Read Next ❤️ — curated, week-aware content (prototype)
+// -----------------------------------------------------------------------------
+//  A small, curated set across articles, research summaries, books and expert
+//  picks. Each item is tagged with the week window where it is relevant, so the
+//  engine can surface "the right thing right now" for the mother's stage.
+// =============================================================================
+
+import '../models/read_item.dart';
+
+const List<ReadItem> kReadItems = [
+  // ---- Articles ----
+  ReadItem(
+    id: 'managing_nausea',
+    title: 'Managing Morning Sickness',
+    type: ReadType.article,
+    weekStart: 5,
+    weekEnd: 14,
+    priority: 'high',
+    reason: 'Nausea is common in the first trimester — small, gentle changes help.',
+    readingTime: '4 min',
+    category: 'Mother Changes',
+    emoji: '🤢',
+    body:
+        'Morning sickness affects many mothers in the first trimester, and despite the name it can strike at any time of day.\n\n'
+        'Small, frequent meals keep your stomach from getting empty, which often makes nausea worse. Dry foods like toast or crackers before getting out of bed can help. Ginger — in tea, or a little ginger-honey water — is one of the better-studied natural settlers.\n\n'
+        'Stay hydrated in small sips, and rest when you can. For most mothers this eases by the second trimester. If you cannot keep fluids down, tell your doctor — there is safe, effective help available.',
+  ),
+  ReadItem(
+    id: 'first_scan',
+    title: 'Your First Scan, Explained',
+    type: ReadType.article,
+    weekStart: 7,
+    weekEnd: 13,
+    priority: 'medium',
+    reason: 'Your early dating scan is around now — here is what to expect.',
+    readingTime: '3 min',
+    category: 'Preparation',
+    emoji: '🩻',
+    body:
+        'The first scan, often called the dating scan, confirms your due date and checks the early heartbeat.\n\n'
+        'You may be asked to come with a comfortably full bladder, which helps the image. The scan is painless. Many parents find hearing or seeing the heartbeat a deeply moving first moment.\n\n'
+        'Write down any questions beforehand, and remember it is perfectly normal to feel both excited and nervous.',
+  ),
+  ReadItem(
+    id: 'first_trimester',
+    title: 'Understanding the First Trimester',
+    type: ReadType.article,
+    weekStart: 4,
+    weekEnd: 13,
+    priority: 'medium',
+    reason: 'So much is happening quietly in these early weeks.',
+    readingTime: '5 min',
+    category: 'Baby Development',
+    emoji: '🌱',
+    body:
+        'The first trimester is a time of enormous, mostly invisible change. Your baby grows from a tiny cluster of cells to a recognisable form with a beating heart.\n\n'
+        'You may feel tired, queasy or emotional — your body is doing remarkable work. Rest is not laziness; it is part of the process. Be gentle with yourself, and know that energy often returns in the second trimester.',
+  ),
+  ReadItem(
+    id: 'halfway',
+    title: 'You Are Halfway — What Changes Now',
+    type: ReadType.article,
+    weekStart: 18,
+    weekEnd: 22,
+    priority: 'high',
+    reason: 'Around week 20 you reach the halfway point of your journey.',
+    readingTime: '4 min',
+    category: 'Mother Changes',
+    emoji: '🌗',
+    body:
+        'Reaching the halfway mark is a real milestone. Many mothers feel more energetic now, the bump becomes visible, and the first kicks often arrive.\n\n'
+        'This is a lovely window to connect — talk or sing to your baby, who is beginning to hear sounds. It is also a practical time to start thinking gently about the months ahead, without rushing.',
+  ),
+  ReadItem(
+    id: 'anomaly_scan',
+    title: 'Making the Most of the Anomaly Scan',
+    type: ReadType.article,
+    weekStart: 18,
+    weekEnd: 22,
+    priority: 'high',
+    reason: 'The detailed anatomy scan usually happens around weeks 18–22.',
+    readingTime: '4 min',
+    category: 'Preparation',
+    emoji: '🔍',
+    body:
+        'The anomaly scan is a detailed look at how your baby is developing — the heart, brain, spine, limbs and organs.\n\n'
+        'It takes longer than earlier scans. You can usually bring your partner. It is okay to ask the sonographer to explain what they are measuring. If anything needs a closer look, your doctor will guide the next steps calmly — most findings are reassuring.',
+  ),
+  ReadItem(
+    id: 'baby_sound',
+    title: 'How Babies Begin Responding to Sound',
+    type: ReadType.article,
+    weekStart: 20,
+    weekEnd: 28,
+    priority: 'high',
+    reason: 'Your baby is becoming increasingly responsive to sounds during this stage.',
+    readingTime: '5 min',
+    category: 'Baby Development',
+    emoji: '🎵',
+    body:
+        'Around the middle of pregnancy, your baby\'s hearing develops quickly. They begin to pick up sounds — your heartbeat, your voice, and music from the world outside.\n\n'
+        'This is why talking, reading or singing to your bump is more than sweet ritual: your baby is genuinely starting to recognise the rhythm and tone of familiar voices. A few quiet minutes each day is a beautiful way to begin your bond.',
+  ),
+  ReadItem(
+    id: 'talking_baby',
+    title: 'Talking to Your Baby Before Birth',
+    type: ReadType.article,
+    weekStart: 18,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'Your voice is becoming familiar to your baby.',
+    readingTime: '3 min',
+    category: 'Emotional Wellbeing',
+    emoji: '💬',
+    body:
+        'You do not need a script. Tell your baby about your day, describe the people who cannot wait to meet them, or simply share what you are feeling.\n\n'
+        'These small moments lower your own stress and begin a connection that continues after birth, when your familiar voice becomes an instant comfort.',
+  ),
+  ReadItem(
+    id: 'back_pain',
+    title: 'Easing Back Pain in Pregnancy',
+    type: ReadType.article,
+    weekStart: 20,
+    weekEnd: 36,
+    priority: 'medium',
+    reason: 'As the bump grows, back comfort becomes more important.',
+    readingTime: '3 min',
+    category: 'Mother Changes',
+    emoji: '🧘',
+    body:
+        'A growing bump shifts your posture and can strain your lower back. Gentle prenatal yoga, a supportive pillow, warm (not hot) compresses, and being mindful of how you sit and lift all help.\n\n'
+        'Avoid standing for very long stretches, and bend at the knees. If pain is severe or sudden, mention it to your doctor.',
+  ),
+  ReadItem(
+    id: 'nutrition_t2',
+    title: 'Eating Well in the Second Trimester',
+    type: ReadType.article,
+    weekStart: 14,
+    weekEnd: 27,
+    priority: 'medium',
+    reason: 'Your appetite often returns now — a good time to nourish well.',
+    readingTime: '4 min',
+    category: 'Nutrition',
+    emoji: '🥗',
+    body:
+        'With nausea easing, the second trimester is a great time to focus on balanced, nourishing meals — iron-rich greens and dal, calcium from dairy, fruit, and steady hydration.\n\n'
+        'You do not need to eat for two; quality matters more than quantity. Keep taking your prescribed supplements, and enjoy your food.',
+  ),
+  ReadItem(
+    id: 'third_tri_prep',
+    title: 'Getting Ready for the Third Trimester',
+    type: ReadType.article,
+    weekStart: 24,
+    weekEnd: 30,
+    priority: 'medium',
+    reason: 'The third trimester is coming up — a gentle heads-up helps.',
+    readingTime: '4 min',
+    category: 'Preparation',
+    emoji: '🗓️',
+    body:
+        'The third trimester brings a bigger bump, more movement, and the first thoughts of birth. Energy can dip again, and rest becomes important.\n\n'
+        'There is no need to rush — but knowing what is ahead, from growth scans to birth planning, helps you feel calm and prepared.',
+  ),
+  ReadItem(
+    id: 'movement_awareness',
+    title: 'Preparing for Baby Movement Awareness',
+    type: ReadType.article,
+    weekStart: 24,
+    weekEnd: 30,
+    priority: 'medium',
+    reason: 'Tracking your baby\'s movements becomes important soon.',
+    readingTime: '3 min',
+    category: 'Baby Development',
+    emoji: '👣',
+    body:
+        'As you move through pregnancy, you will get to know your baby\'s unique pattern of movement. Later on, noticing changes in that pattern becomes an important way to check on their wellbeing.\n\n'
+        'For now, simply enjoy getting familiar with when and how your baby likes to move.',
+  ),
+  ReadItem(
+    id: 'partner_support',
+    title: 'How Your Partner Can Support You Now',
+    type: ReadType.article,
+    weekStart: 12,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'Support makes the journey lighter — share this with your partner.',
+    readingTime: '3 min',
+    category: 'Partner Support',
+    emoji: '🤝',
+    body:
+        'Partners often want to help but are not sure how. Small, specific acts matter most: coming to scans, taking a task off your plate, listening without trying to fix, and learning alongside you.\n\n'
+        'Becoming a parent is a shared journey — and feeling supported is good for both you and your baby.',
+  ),
+  ReadItem(
+    id: 'hospital_bag',
+    title: 'Preparing Your Hospital Bag',
+    type: ReadType.article,
+    weekStart: 32,
+    weekEnd: 40,
+    priority: 'high',
+    reason: 'You are entering the final weeks before delivery.',
+    readingTime: '4 min',
+    category: 'Preparation',
+    emoji: '🧳',
+    body:
+        'Packing your bag a few weeks early brings real peace of mind. Think in three parts: things for labour, things for after delivery, and things for your baby.\n\n'
+        'ParentVeda\'s Hospital Bag planner can build the full checklist for you — this is a good time to start it.',
+  ),
+  ReadItem(
+    id: 'labour_prep',
+    title: 'Labour, Step by Step',
+    type: ReadType.article,
+    weekStart: 34,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'Knowing the stages of labour helps you feel calmer.',
+    readingTime: '6 min',
+    category: 'Preparation',
+    emoji: '🌅',
+    body:
+        'Labour usually unfolds in stages, often more gradually than films suggest. Understanding early signs, when to head in, and what each stage feels like can replace fear with confidence.\n\n'
+        'Your birth plan is a guide, not a rulebook — staying flexible and trusting your care team matters most.',
+  ),
+  ReadItem(
+    id: 'first_24h',
+    title: 'The First 24 Hours After Birth',
+    type: ReadType.article,
+    weekStart: 36,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'A gentle picture of what the first day with your baby looks like.',
+    readingTime: '5 min',
+    category: 'Preparation',
+    emoji: '👶',
+    body:
+        'The first day is a blur of firsts — skin-to-skin, the first feed, tiny checks by the team. Your baby may be sleepy, and that is normal.\n\n'
+        'Rest whenever you can, accept help, and know that you and your baby are learning each other. There is no need to have everything figured out at once.',
+  ),
+
+  // ---- Research summaries ----
+  ReadItem(
+    id: 'res_voices',
+    title: 'Babies Recognise Familiar Voices Before Birth',
+    type: ReadType.research,
+    weekStart: 20,
+    weekEnd: 32,
+    priority: 'high',
+    reason: 'Your baby is increasingly able to hear sounds around this stage.',
+    readingTime: '2 min',
+    category: 'Baby Development',
+    emoji: '🔬',
+    body:
+        'Research suggests that in the later months, babies begin to recognise voices and sounds they hear often — especially their mother\'s.\n\n'
+        'After birth, newborns tend to turn toward familiar voices and can be soothed by them. It is a lovely reason to talk and read aloud now.',
+  ),
+  ReadItem(
+    id: 'res_music',
+    title: 'What Research Says About Music and the Womb',
+    type: ReadType.research,
+    weekStart: 18,
+    weekEnd: 36,
+    priority: 'medium',
+    reason: 'Gentle sound and music can be calming for you and your baby.',
+    readingTime: '3 min',
+    category: 'Baby Development',
+    emoji: '🎶',
+    body:
+        'Studies on music in pregnancy point to a simple, reassuring idea: calm, gentle sound is soothing — mostly because it helps the mother relax, and that calm is shared.\n\n'
+        'There is no magic playlist that makes babies smarter. Choose what relaxes you.',
+  ),
+  ReadItem(
+    id: 'res_stress',
+    title: 'Calm Matters: Stress and Pregnancy',
+    type: ReadType.research,
+    weekStart: 6,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'Looking after your own calm is good for your baby too.',
+    readingTime: '2 min',
+    category: 'Emotional Wellbeing',
+    emoji: '🌿',
+    body:
+        'Some stress in pregnancy is completely normal. What research highlights is the value of everyday calming habits — rest, breathing, connection, and asking for support.\n\n'
+        'You do not need to be perfectly serene. Small moments of calm, repeated, are what matter.',
+  ),
+
+  // ---- Books ----
+  ReadItem(
+    id: 'book_whole_brain',
+    title: 'The Whole-Brain Child',
+    type: ReadType.book,
+    weekStart: 4,
+    weekEnd: 44,
+    reason: 'A gentle look ahead at how your child will grow and learn.',
+    readingTime: 'Book',
+    category: 'Baby Development',
+    emoji: '📘',
+    author: 'Daniel J. Siegel & Tina Payne Bryson',
+    why:
+        'A practical, parent-friendly guide to how a child\'s brain develops, with simple everyday strategies to nurture calm, connection and learning. Written by a neuropsychiatrist and a parenting expert, it stays warm and readable rather than academic. Most useful from late pregnancy through the early years, so it keeps giving long after birth.',
+    rating: 4.7,
+    ratingCount: 3200,
+  ),
+  ReadItem(
+    id: 'book_expecting_better',
+    title: 'Expecting Better',
+    type: ReadType.book,
+    weekStart: 4,
+    weekEnd: 40,
+    reason: 'A calm, evidence-based companion for pregnancy questions.',
+    readingTime: 'Book',
+    category: 'Mother Changes',
+    emoji: '📗',
+    author: 'Emily Oster',
+    why:
+        'An economist calmly weighs the evidence behind the common dos and don\'ts of pregnancy, so you can make confident decisions instead of worrying about conflicting advice. Honest about where the data is strong and where it is not. Ideal if you like understanding the "why" behind a recommendation.',
+    rating: 4.6,
+    ratingCount: 2800,
+  ),
+  ReadItem(
+    id: 'book_first_forty',
+    title: 'The First Forty Days',
+    type: ReadType.book,
+    weekStart: 28,
+    weekEnd: 44,
+    reason: 'Worth reading before birth — nourishing yourself afterwards.',
+    readingTime: 'Book',
+    category: 'Preparation',
+    emoji: '📙',
+    author: 'Heng Ou',
+    why:
+        'A warm guide to the often-overlooked first weeks after birth — rest, recovery and nourishing food — so you feel cared for, not just the baby. It blends traditional postpartum wisdom with practical recipes. Best read before delivery, while you still have time to prepare.',
+    rating: 4.5,
+    ratingCount: 1100,
+  ),
+  ReadItem(
+    id: 'book_garbh',
+    title: 'Garbh Sanskar',
+    type: ReadType.book,
+    weekStart: 4,
+    weekEnd: 40,
+    reason: 'A traditional perspective on bonding and calm during pregnancy.',
+    readingTime: 'Book',
+    category: 'Emotional Wellbeing',
+    emoji: '📕',
+    author: 'Dr. Balaji Tambe',
+    why:
+        'A well-loved Indian perspective on bonding, diet, music and calm during pregnancy, blending Ayurvedic wisdom with day-to-day practices many families value. Gentle and ritual-focused rather than clinical. A comforting companion if you would like a traditional lens alongside modern guidance.',
+    rating: 4.4,
+    ratingCount: 1500,
+  ),
+
+  // ---- Expert picks ----
+  ReadItem(
+    id: 'exp_priya',
+    title: 'Building Emotional Connection Before Birth',
+    type: ReadType.expert,
+    weekStart: 16,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'Connecting now helps many families feel more confident.',
+    readingTime: '4 min',
+    category: 'Emotional Wellbeing',
+    emoji: '👩‍⚕️',
+    author: 'Dr. Priya Sharma',
+    authorRole: 'Pediatrician',
+    why: 'Understanding emotional connection before birth helps many families feel more confident.',
+    body:
+        'Bonding does not begin at birth — it begins now. Talking to your baby, responding to movements, and taking quiet moments together build a foundation of security.\n\n'
+        'Parents who connect during pregnancy often feel more confident and calm when their baby arrives.',
+  ),
+  ReadItem(
+    id: 'exp_meera',
+    title: 'Why Early Breastfeeding Prep Helps',
+    type: ReadType.expert,
+    weekStart: 28,
+    weekEnd: 40,
+    priority: 'medium',
+    reason: 'A little preparation now makes the first week far smoother.',
+    readingTime: '4 min',
+    category: 'Preparation',
+    emoji: '🤱',
+    author: 'Dr. Meera Nair',
+    authorRole: 'Lactation Consultant',
+    why: 'Learning the basics before birth makes those first days much easier.',
+    body:
+        'Breastfeeding is natural, but it is also a skill that both you and your baby learn together. Knowing the basics of positioning and latch before birth removes a lot of first-week stress.\n\n'
+        'You do not have to master it now — just gently familiarise yourself.',
+  ),
+];
+
+// ---------------------------------------------------------------------------
+//  Lookups + stage-aware selection
+// ---------------------------------------------------------------------------
+ReadItem? readById(String id) {
+  for (final r in kReadItems) {
+    if (r.id == id) return r;
+  }
+  return null;
+}
+
+int _rank(ReadItem r) => r.isHigh ? 0 : 1;
+
+/// Items relevant at [week] (articles/research/expert), high-priority first.
+List<ReadItem> recommendedForWeek(int week) {
+  final list = kReadItems
+      .where((r) =>
+          r.type != ReadType.book && r.relevantAt(week))
+      .toList()
+    ..sort((a, b) => _rank(a).compareTo(_rank(b)));
+  return list;
+}
+
+/// The single hero pick for [week].
+ReadItem? heroForWeek(int week) {
+  final rec = recommendedForWeek(week);
+  return rec.isEmpty ? null : rec.first;
+}
+
+/// Items that become relevant soon (start within the next ~8 weeks).
+List<ReadItem> lookingAhead(int week) {
+  final list = kReadItems
+      .where((r) =>
+          r.type != ReadType.book &&
+          r.weekStart > week &&
+          r.weekStart <= week + 8)
+      .toList()
+    ..sort((a, b) => a.weekStart.compareTo(b.weekStart));
+  return list;
+}
+
+List<ReadItem> readByType(ReadType type) =>
+    kReadItems.where((r) => r.type == type).toList();
+
+List<ReadItem> readSearch(String query) {
+  final q = query.trim().toLowerCase();
+  if (q.isEmpty) return const [];
+  return kReadItems
+      .where((r) =>
+          r.title.toLowerCase().contains(q) ||
+          r.category.toLowerCase().contains(q) ||
+          r.author.toLowerCase().contains(q))
+      .toList();
+}

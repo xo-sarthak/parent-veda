@@ -7,6 +7,7 @@ import 'services/community_store.dart';
 import 'services/daily_store.dart';
 import 'services/garbh_store.dart';
 import 'services/product_store.dart';
+import 'services/read_next_store.dart';
 import 'services/father_content_controller.dart';
 import 'services/home_content_controller.dart';
 import 'services/hospital_bag_store.dart';
@@ -68,6 +69,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     CommunityStore.instance.init();
     // Load Products saved-list persistence.
     ProductStore.instance.init();
+    // Load Read Next saved/reading/completed states.
+    ReadNextStore.instance.init();
   }
 
   @override

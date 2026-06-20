@@ -16,6 +16,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home/home_modules.dart';
 import 'father_home_screen.dart';
+import 'read_next_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -119,6 +120,9 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             MovementModule(day: day, lang: lang, home: home),
           ],
+          const SizedBox(height: 22),
+          // Read Next — stage-aware reading discovery, surfaced on Home.
+          ReadNextHomeCard(controller: pregnancy, lang: lang),
           const SizedBox(height: 28),
           CompletionBanner(lang: lang),
           const SizedBox(height: 22),
