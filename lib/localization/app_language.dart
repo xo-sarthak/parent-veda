@@ -1432,6 +1432,62 @@ class S {
       _p('A calming sample plays here — full audio coming soon.',
           'Yahaan ek calming sample bajta hai — poora audio jald aayega.');
 
+  // ---- Community (Tools) ---------------------------------------------------
+  String get cmTitle => _p('Community', 'Community');
+  String get cmSearchHint => _p(
+      'Search communities, topics or posts', 'Communities, topics ya posts search karein');
+  String get cmJoinedSection => _p('Your communities', 'Aapki communities');
+  String get cmRecommended => _p('Recommended for you', 'Aapke liye recommended');
+  String get cmPulse => _p('Community Pulse', 'Community Pulse');
+  String get cmFeed => _p('For you', 'Aapke liye');
+  String get cmJoin => _p('Join', 'Join karein');
+  String get cmJoinedBadge => _p('Joined', 'Joined');
+  String get cmLeave => _p('Leave community', 'Community chhodein');
+  String get cmMute => _p('Mute community', 'Community mute karein');
+  String get cmUnmute => _p('Unmute community', 'Unmute karein');
+  String cmMembers(int n) => _p('$n members', '$n members');
+  String get cmCreatePost => _p('Create post', 'Post banayein');
+  String get cmVote => _p('Vote', 'Vote');
+  String get cmVoted => _p('Thanks for voting', 'Vote ke liye shukriya');
+  String get cmViewDiscussion => _p('View discussion', 'Discussion dekhein');
+  String get cmComments => _p('Comments', 'Comments');
+  String get cmEmptyComments =>
+      _p('Be the first to comment.', 'Sabse pehle comment karein.');
+  String get cmAddComment => _p('Add a comment…', 'Comment likhein…');
+  String get cmRelated => _p('Related discussions', 'Milti-julti discussions');
+  String get cmSuggested => _p('Suggested communities', 'Suggested communities');
+  String get cmAbout => _p('About', 'Iske baare mein');
+  String get cmPosts => _p('Posts', 'Posts');
+  String get cmPostTo => _p('Post to', 'Yahaan post karein');
+  String get cmTypeLabel => _p('Type', 'Prakaar');
+  String get cmShareSomething =>
+      _p('What would you like to share?', 'Aap kya share karna chahengi?');
+  String get cmShare => _p('Share', 'Share karein');
+  String get cmPosted => _p('Posted to your community ❤️', 'Aapki community mein post ho gaya ❤️');
+  String get cmExpertBadge => _p('Expert', 'Expert');
+  String get cmComingSoon => _p('Coming soon', 'Jald aa raha hai');
+  String get cmRemindMe => _p('Remind me', 'Yaad dilayein');
+  String cmPostType(String key) {
+    switch (key) {
+      case 'question':
+        return _p('Question', 'Sawaal');
+      case 'experience':
+        return _p('Experience', 'Anubhav');
+      case 'poll':
+        return _p('Poll', 'Poll');
+      case 'photo':
+        return _p('Photo', 'Photo');
+      case 'milestone':
+        return _p('Milestone', 'Padaav');
+      case 'expert':
+        return _p('Expert', 'Expert');
+      case 'parentVeda':
+        return _p('ParentVeda', 'ParentVeda');
+      default:
+        return '';
+    }
+  }
+
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');
   String get learnReaderTitle => _p("Today's Lesson", 'Aaj Ka Sabak');

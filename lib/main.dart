@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/main_scaffold.dart';
 import 'services/baby_voice_service.dart';
 import 'services/can_i_store.dart';
+import 'services/community_store.dart';
 import 'services/daily_store.dart';
 import 'services/garbh_store.dart';
 import 'services/father_content_controller.dart';
@@ -62,6 +63,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).
     GarbhStore.instance.init();
+    // Load Community persistence (joins, likes, saves, votes, posts).
+    CommunityStore.instance.init();
   }
 
   @override

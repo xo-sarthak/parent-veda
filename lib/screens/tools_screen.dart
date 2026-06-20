@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'community_screen.dart';
 import 'garbh_screen.dart';
 import 'journey_map_screen.dart';
 import 'report_screen.dart';
@@ -53,6 +54,8 @@ class ToolsScreen extends StatelessWidget {
           onTap: () => open(() => ReportScreen(controller: controller))),
       _ToolInfo(s.gsTitle, Icons.spa_rounded, AppTheme.tertiary500,
           onTap: () => open(() => GarbhScreen(controller: controller))),
+      _ToolInfo(s.cmTitle, Icons.forum_rounded, AppTheme.secondary500,
+          onTap: () => open(() => CommunityScreen(controller: controller))),
     ];
 
     return SafeArea(
