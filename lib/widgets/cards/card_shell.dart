@@ -101,77 +101,32 @@ class CardShell extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 14, 24, 18),
+        // Cards now flow at their natural height inside the screen-level scroll
+        // (the weekly stack owns scrolling), so the content is a plain Column —
+        // no inner scroll view, no Expanded.
+        padding: const EdgeInsets.fromLTRB(24, 18, 24, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // The header scrolls *with* the content (it is no longer pinned), and
-            // a soft fade at the top/bottom edges means nothing looks hard-cut.
-            Expanded(
-              child: _FadeScroll(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    _Header(
-                        eyebrow: eyebrow,
-                        title: title,
-                        icon: icon,
-                        accent: accent,
-                        trailing: trailing,
-                        iconChipColor: iconChipColor,
-                        eyebrowColor: eyebrowColor,
-                        titleColor: titleColor),
-                    const SizedBox(height: 20),
-                    child,
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            ),
+            _Header(
+                eyebrow: eyebrow,
+                title: title,
+                icon: icon,
+                accent: accent,
+                trailing: trailing,
+                iconChipColor: iconChipColor,
+                eyebrowColor: eyebrowColor,
+                titleColor: titleColor),
+            const SizedBox(height: 20),
+            child,
             if (footer != null) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
               footer!,
             ],
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Wraps a scroll view in a gentle top/bottom alpha fade so scrolled content
-/// dissolves softly at the card edges instead of being sharply clipped.
-class _FadeScroll extends StatelessWidget {
-  const _FadeScroll({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final h = constraints.maxHeight;
-        final topStop = (14 / h).clamp(0.0, 0.45);
-        final bottomStop = 1 - (22 / h).clamp(0.0, 0.45);
-        return ShaderMask(
-          shaderCallback: (rect) => LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: const [
-              Colors.transparent,
-              Colors.black,
-              Colors.black,
-              Colors.transparent,
-            ],
-            stops: [0.0, topStop, bottomStop, 1.0],
-          ).createShader(rect),
-          blendMode: BlendMode.dstIn,
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: child,
-          ),
-        );
-      },
     );
   }
 }
