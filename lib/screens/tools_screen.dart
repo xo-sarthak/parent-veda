@@ -12,6 +12,7 @@ import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'journey_map_screen.dart';
+import 'report_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
 import 'tools/hospital_bag_screen.dart';
@@ -47,6 +48,8 @@ class ToolsScreen extends StatelessWidget {
               open(() => ContractionTrackerScreen(controller: controller))),
       _ToolInfo(s.hbName, Icons.luggage_rounded, AppTheme.tertiary500,
           onTap: () => open(() => HospitalBagScreen(controller: controller))),
+      _ToolInfo(s.rTitle, Icons.description_rounded, AppTheme.primary500,
+          onTap: () => open(() => ReportScreen(controller: controller))),
     ];
 
     return SafeArea(

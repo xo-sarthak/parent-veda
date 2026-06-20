@@ -1346,6 +1346,44 @@ class S {
     }
   }
 
+  // ---- Understanding Your Report (Tools) -----------------------------------
+  String get rTitle => _p('Understanding Your Report', 'Apni Report Samjhein');
+  String get rSubtitle => _p(
+      'Simple explanations for common pregnancy findings and conditions.',
+      'Aam pregnancy findings aur conditions ke saral explanation.');
+  String get rSearchHint => _p(
+      'Search a report finding or condition', 'Koi finding ya condition search karein');
+  String get rPopularTitle => _p('Popular topics', 'Popular topics');
+  String get rSecMeans => _p('What does this mean?', 'Iska matlab kya hai?');
+  String get rSecCommon => _p('How common is it?', 'Yeh kitna aam hai?');
+  String get rSecNext =>
+      _p('What usually happens next?', 'Aage aam taur par kya hota hai?');
+  String get rSecWhen =>
+      _p('When is it usually discussed?', 'Yeh aam taur par kab dekha jaata hai?');
+  String get rTypicallyAround =>
+      _p('Typically identified around', 'Aam taur par pata chalta hai');
+  String rWeekRange(int? from, int? to) {
+    if (from != null && to != null) return _p('Week $from–$to', 'Week $from–$to');
+    if (from != null) return _p('From Week $from', 'Week $from se');
+    if (to != null) return _p('Up to Week $to', 'Week $to tak');
+    return '';
+  }
+
+  String get rSecQuestions => _p(
+      'Questions you may want to ask your doctor',
+      'Sawaal jo aap apne doctor se pooch sakti hain');
+  String get rSecRemember => _p('Things to remember', 'Yaad rakhne ki baatein');
+  String get rReassurance => _p(
+      'Every pregnancy is unique. Your healthcare provider understands your specific situation and will guide you on the right path for you and your baby.',
+      'Har pregnancy alag hoti hai. Aapke doctor aapki situation ko samajhte hain aur aapko aur aapke baby ke liye sahi raah dikhaayenge.');
+  String get rAskTitle => _p('Still worried?', 'Abhi bhi chinta ho rahi hai?');
+  String get rAskBody => _p('Need help understanding your situation? Ask Veda.',
+      'Apni situation samajhne mein madad chahiye? Ask Veda.');
+  String get rAskCta => _p('Ask Veda', 'Ask Veda');
+  String get rAskComingSoon => _p(
+      'Ask Veda is coming soon — your personal AI guide.',
+      'Ask Veda jald aa raha hai — aapka personal AI guide.');
+
   // ---- Learn ---------------------------------------------------------------
   String get learnOpen => _p('Open', 'Kholein');
   String get learnReaderTitle => _p("Today's Lesson", 'Aaj Ka Sabak');
