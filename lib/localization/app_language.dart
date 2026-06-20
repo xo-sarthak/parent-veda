@@ -518,6 +518,11 @@ class S {
   // ---- Journey map chrome --------------------------------------------------
   String get journeyTitle => _p('Your Pregnancy Journey', 'Aapka Pregnancy Safar');
   String get youAreHere => _p('YOU ARE HERE', 'AAP YAHAN HAIN');
+  String trimesterBandLabel(int i) => i == 0
+      ? _p('First Trimester', 'Pehli Trimester')
+      : i == 1
+          ? _p('Second Trimester', 'Doosri Trimester')
+          : _p('Third Trimester', 'Teesri Trimester');
   String get currentWeekLabel => _p('Current Week', 'Yeh Hafta');
   String get completedLabel => _p('Completed', 'Poora hua');
   String journeyWeekDay(int week, int day) =>

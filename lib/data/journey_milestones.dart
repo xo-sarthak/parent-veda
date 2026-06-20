@@ -50,7 +50,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w12',
     type: JourneyNodeType.achievement,
     anchorWeek: 12,
-    emoji: '🎉',
+    emoji: '🌿',
     title: LocalizedText(en: 'First Trimester Complete', hi: 'Pehli Trimester Poori'),
     ctaWeek: 12,
     sections: [
@@ -84,7 +84,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w20',
     type: JourneyNodeType.achievement,
     anchorWeek: 20,
-    emoji: '🎉',
+    emoji: '🌗',
     title: LocalizedText(en: 'Halfway Point', hi: 'Aadha Safar'),
     sections: [
       CardSection(
@@ -100,7 +100,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w24',
     type: JourneyNodeType.achievement,
     anchorWeek: 24,
-    emoji: '🎉',
+    emoji: '💪',
     title: LocalizedText(en: 'Viability Milestone', hi: 'Viability Milestone'),
     sections: [
       CardSection(
@@ -116,7 +116,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w28',
     type: JourneyNodeType.achievement,
     anchorWeek: 28,
-    emoji: '🎉',
+    emoji: '🌅',
     title: LocalizedText(en: 'Third Trimester Begins', hi: 'Teesri Trimester Shuru'),
     sections: [
       CardSection(
@@ -132,7 +132,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w37',
     type: JourneyNodeType.achievement,
     anchorWeek: 37,
-    emoji: '🎉',
+    emoji: '✅',
     title: LocalizedText(en: 'Full Term', hi: 'Full Term'),
     sections: [
       CardSection(
@@ -148,7 +148,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     id: 'a_w40',
     type: JourneyNodeType.achievement,
     anchorWeek: 40,
-    emoji: '🎉',
+    emoji: '🍼',
     title: LocalizedText(en: 'Due Date', hi: 'Due Date'),
     sections: [
       CardSection(
@@ -540,7 +540,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     type: JourneyNodeType.mother,
     anchorWeek: 20,
     emoji: '🌸',
-    title: LocalizedText(en: 'Halfway Through Pregnancy', hi: 'Aadha Safar Poora'),
+    title: LocalizedText(en: 'Bump & First Kicks', hi: 'Bump Aur Pehli Kicks'),
     sections: [
       CardSection(
         LocalizedText(en: 'What many mothers experience', hi: 'Kai maayein kya mehsoos karti hain'),
@@ -651,7 +651,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     anchorWeek: 20,
     anchorDay: 140,
     emoji: '❤️',
-    title: LocalizedText(en: 'Halfway Through Pregnancy', hi: 'Aadha Safar Poora'),
+    title: LocalizedText(en: '140 Days Together', hi: '140 Din Saath'),
     sections: [
       CardSection(
         LocalizedText(en: '', hi: ''),

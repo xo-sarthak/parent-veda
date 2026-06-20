@@ -22,6 +22,23 @@ class JourneyColors {
   static const Color current = Color(0xFFE6A817); // gold   — you are here
   static const Color future = Color(0xFFD2CCDB); // soft grey-lavender — ahead
 
+  // ---- Arrival / destination (the end of the journey, near Birth) ----------
+  static const Color arrivalGold = Color(0xFFE6A817);
+  static const Color arrivalRose = Color(0xFFEF6F8E);
+
+  // ---- Trimester backdrop bands (soft washes behind the trail) -------------
+  // index 0 = first trimester, 1 = second, 2 = third.
+  static const List<Color> trimesterFill = [
+    Color(0xFFFBEAE0), // soft peach   — first trimester
+    Color(0xFFEDE6F7), // soft lavender — second trimester
+    Color(0xFFE2F1E8), // soft mint    — third trimester
+  ];
+  static const List<Color> trimesterInk = [
+    Color(0xFFC07A4E), // muted terracotta
+    Color(0xFF7A4FC2), // muted purple
+    Color(0xFF3E9A66), // muted green
+  ];
+
   // ---- Milestone TYPE colours (used as nodes are added in later phases) -----
   static const Color typeAchievement = Color(0xFFE6A817); // gold
   static const Color typeMedical = Color(0xFF7A4FC2); // purple
