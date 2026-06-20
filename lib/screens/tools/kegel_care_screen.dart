@@ -7,20 +7,30 @@
 //  Per the product spec.
 // =============================================================================
 
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/app_theme.dart';
 
-/// A resolved routine for the current week + adaptive offsets.
-({String Function(S) stage, int hold, int relax, int reps, int minutes})
-    _routineFor(int week) {
-  // Base routine by pregnancy stage.
+typedef _Routine = ({
+  String Function(S) stage,
+  int hold,
+  int relax,
+  int reps,
+  int minutes,
+});
+
+int _minutesFor(int hold, int relax, int reps) =>
+    (((hold + relax) * reps) / 60).ceil();
+
+/// The RECOMMENDED routine for the current week + adaptive offsets.
+_Routine _recommendedFor(int week) {
   int baseHold;
   int baseReps;
   String Function(S) stage;
@@ -41,8 +51,33 @@ import '../../theme/app_theme.dart';
   final hold = (baseHold + store.kegelHoldAdjust).clamp(3, 10);
   final reps = (baseReps + store.kegelRepAdjust).clamp(8, 15);
   final relax = hold;
-  final minutes = (((hold + relax) * reps) / 60).ceil();
-  return (stage: stage, hold: hold, relax: relax, reps: reps, minutes: minutes);
+  return (
+    stage: stage,
+    hold: hold,
+    relax: relax,
+    reps: reps,
+    minutes: _minutesFor(hold, relax, reps),
+  );
+}
+
+/// The EFFECTIVE routine that's actually used — the user's custom one if set,
+/// otherwise the recommended one.
+_Routine _routineFor(int week) {
+  final rec = _recommendedFor(week);
+  final store = ToolsStore.instance;
+  if (store.hasCustomKegelRoutine) {
+    final hold = store.kegelCustomHold!;
+    final relax = store.kegelCustomRelax!;
+    final reps = store.kegelCustomReps!;
+    return (
+      stage: rec.stage,
+      hold: hold,
+      relax: relax,
+      reps: reps,
+      minutes: _minutesFor(hold, relax, reps),
+    );
+  }
+  return rec;
 }
 
 class KegelCareScreen extends StatefulWidget {
@@ -113,32 +148,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
               ),
               const SizedBox(height: 14),
               // Current routine
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppTheme.outlineVariant),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(s.currentRoutineLabel,
-                          style: text.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 4),
-                      Text(r.stage(s),
-                          style: text.labelMedium
-                              ?.copyWith(color: AppTheme.secondary600)),
-                      const SizedBox(height: 12),
-                      _routineRow(text, s.holdLabel, '${r.hold} ${s.secShort}'),
-                      _routineRow(
-                          text, s.relaxLabel, '${r.relax} ${s.secShort}'),
-                      _routineRow(text, s.repsLabel, '${r.reps}'),
-                      _routineRow(
-                          text, s.estTimeLabel, s.minutesShort(r.minutes)),
-                    ]),
-              ),
+              _currentRoutineCard(context, s, text, r),
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -231,6 +241,250 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                   style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
             ]),
       );
+
+  /// The "Current routine" card: shows the effective routine, an info (i) that
+  /// explains the recommendation, and a Customize button (with Reset when a
+  /// custom routine is active).
+  Widget _currentRoutineCard(
+      BuildContext context, S s, TextTheme text, _Routine r) {
+    final rec = _recommendedFor(widget.controller.currentWeek);
+    final isCustom = _store.hasCustomKegelRoutine;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Flexible(
+                  child: Text(s.currentRoutineLabel,
+                      style: text.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                ),
+                if (isCustom) ...[
+                  const SizedBox(width: 8),
+                  _badge(text, s.customLabel),
+                ],
+              ]),
+              const SizedBox(height: 2),
+              Text(r.stage(s),
+                  style:
+                      text.labelMedium?.copyWith(color: AppTheme.secondary600)),
+            ]),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            tooltip: s.recommendedLabel,
+            onPressed: () => _showRecommendInfo(context, s, rec),
+            icon: const Icon(Icons.info_outline_rounded, size: 20),
+          ),
+        ]),
+        const SizedBox(height: 8),
+        _routineRow(text, s.holdLabel, '${r.hold} ${s.secShort}'),
+        _routineRow(text, s.relaxLabel, '${r.relax} ${s.secShort}'),
+        _routineRow(text, s.repsLabel, '${r.reps}'),
+        _routineRow(text, s.estTimeLabel, s.minutesShort(r.minutes)),
+        if (isCustom) ...[
+          const SizedBox(height: 6),
+          Text(
+            '${s.recommendedLabel}: ${rec.hold} ${s.secShort} · '
+            '${rec.relax} ${s.secShort} · ${rec.reps} '
+            '${s.repsLabel.toLowerCase()}',
+            style: text.bodySmall?.copyWith(color: AppTheme.neutral500),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _showCustomize(context, s, rec),
+              icon: const Icon(Icons.tune_rounded, size: 18),
+              label: Text(s.customizeLabel),
+            ),
+          ),
+          if (isCustom) ...[
+            const SizedBox(width: 10),
+            TextButton(
+              onPressed: _store.clearKegelCustomRoutine,
+              child: Text(s.resetToRecommended),
+            ),
+          ],
+        ]),
+      ]),
+    );
+  }
+
+  Widget _badge(TextTheme text, String label) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: AppTheme.secondary50,
+          borderRadius: BorderRadius.circular(40),
+        ),
+        child: Text(label.toUpperCase(),
+            style: text.labelSmall?.copyWith(
+              color: AppTheme.secondary600,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            )),
+      );
+
+  Future<void> _showRecommendInfo(BuildContext context, S s, _Routine rec) {
+    final text = Theme.of(context).textTheme;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.recommendedLabel),
+        content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${rec.hold} ${s.secShort} · ${rec.relax} ${s.secShort} · '
+                '${rec.reps} ${s.repsLabel.toLowerCase()}',
+                style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              Text(s.kegelCustomizeInfo, style: text.bodyMedium),
+            ]),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(), child: Text(s.gotIt)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showCustomize(BuildContext context, S s, _Routine rec) async {
+    int hold = _store.kegelCustomHold ?? rec.hold;
+    int relax = _store.kegelCustomRelax ?? rec.relax;
+    int reps = _store.kegelCustomReps ?? rec.reps;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: AppTheme.surface,
+      builder: (ctx) {
+        final text = Theme.of(ctx).textTheme;
+        return StatefulBuilder(builder: (ctx, setSheet) {
+          final minutes = _minutesFor(hold, relax, reps);
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+                22, 4, 22, MediaQuery.of(ctx).viewInsets.bottom + 24),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(s.customizeRoutineTitle, style: text.headlineSmall),
+                  const SizedBox(height: 6),
+                  Text(s.kegelCustomizeInfo,
+                      style:
+                          text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                  const SizedBox(height: 12),
+                  _stepper(text, s.holdLabel, '${s.recommendedLabel}: ${rec.hold}',
+                      '$hold ${s.secShort}',
+                      () => setSheet(() => hold = (hold - 1).clamp(2, 15)),
+                      () => setSheet(() => hold = (hold + 1).clamp(2, 15))),
+                  _stepper(
+                      text,
+                      s.relaxLabel,
+                      '${s.recommendedLabel}: ${rec.relax}',
+                      '$relax ${s.secShort}',
+                      () => setSheet(() => relax = (relax - 1).clamp(2, 15)),
+                      () => setSheet(() => relax = (relax + 1).clamp(2, 15))),
+                  _stepper(text, s.repsLabel, '${s.recommendedLabel}: ${rec.reps}',
+                      '$reps',
+                      () => setSheet(() => reps = (reps - 1).clamp(5, 25)),
+                      () => setSheet(() => reps = (reps + 1).clamp(5, 25))),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(s.estTimeLabel, style: text.bodyMedium),
+                          Text(s.minutesShort(minutes),
+                              style: text.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w800)),
+                        ]),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        _store.setKegelCustomRoutine(
+                            hold: hold, relax: relax, reps: reps);
+                        Navigator.of(ctx).pop();
+                      },
+                      child: Text(s.saveCta),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () {
+                        _store.clearKegelCustomRoutine();
+                        Navigator.of(ctx).pop();
+                      },
+                      child: Text(s.resetToRecommended),
+                    ),
+                  ),
+                ]),
+          );
+        });
+      },
+    );
+  }
+
+  Widget _stepper(TextTheme text, String label, String sub, String value,
+      VoidCallback onMinus, VoidCallback onPlus) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label,
+                style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
+            Text(sub,
+                style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+          ]),
+        ),
+        _roundBtn(Icons.remove_rounded, onMinus),
+        SizedBox(
+          width: 64,
+          child: Text(value,
+              textAlign: TextAlign.center,
+              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        ),
+        _roundBtn(Icons.add_rounded, onPlus),
+      ]),
+    );
+  }
+
+  Widget _roundBtn(IconData icon, VoidCallback onTap) => Material(
+        color: AppTheme.secondary50,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Icon(icon, size: 20, color: AppTheme.secondary600),
+          ),
+        ),
+      );
 }
 
 class _Expandable extends StatelessWidget {
@@ -295,58 +549,99 @@ class _SessionScreen extends StatefulWidget {
   State<_SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends State<_SessionScreen> {
-  Timer? _timer;
+class _SessionScreenState extends State<_SessionScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  final FlutterTts _tts = FlutterTts();
   bool _holding = true; // hold phase vs relax
   int _rep = 1;
-  late int _remaining;
-  bool _paused = false;
   bool _done = false;
+  bool _sound = true;
+
+  int get _phaseSeconds => _holding ? widget.hold : widget.relax;
+  int get _remaining =>
+      (_phaseSeconds * (1 - _ctrl.value)).ceil().clamp(0, _phaseSeconds);
+  bool get _paused => !_ctrl.isAnimating && !_done;
 
   @override
   void initState() {
     super.initState();
-    _remaining = widget.hold;
-    _start();
+    _sound = ToolsStore.instance.kegelVoiceOn;
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: widget.hold),
+    )..addStatusListener(_onStatus);
+    _initTts();
+    _startPhase(); // begin the first hold
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _ctrl.dispose();
+    _tts.stop();
     super.dispose();
   }
 
-  void _start() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_paused) return;
-      setState(() {
-        _remaining--;
-        if (_remaining <= 0) _advance();
-      });
-    });
+  /// A normal-pitch voice (deliberately NOT the baby voice) for hold/relax cues.
+  Future<void> _initTts() async {
+    try {
+      await _tts.setPitch(1.0);
+      await _tts.setSpeechRate(0.5);
+      await _tts.setVolume(1.0);
+      await _tts.setLanguage('en-IN');
+    } catch (_) {/* audio is an enhancement, never fatal */}
   }
 
-  void _advance() {
+  Future<void> _speak(String word) async {
+    if (!_sound) return;
+    try {
+      await _tts.stop();
+      await _tts.speak(word);
+    } catch (_) {}
+  }
+
+  void _startPhase() {
+    _ctrl.duration = Duration(seconds: _phaseSeconds);
+    _ctrl.forward(from: 0);
     HapticFeedback.lightImpact();
+    _speak(_holding ? 'Hold' : 'Relax');
+  }
+
+  void _onStatus(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
     if (_holding) {
-      _holding = false;
-      _remaining = widget.relax;
+      setState(() => _holding = false);
+      _startPhase();
+    } else if (_rep >= widget.reps) {
+      _finish();
     } else {
-      // finished a full rep
-      if (_rep >= widget.reps) {
-        _finish();
-        return;
-      }
-      _rep++;
-      _holding = true;
-      _remaining = widget.hold;
+      setState(() {
+        _rep++;
+        _holding = true;
+      });
+      _startPhase();
     }
   }
 
   void _finish() {
-    _timer?.cancel();
+    _ctrl.stop();
+    _speak('Well done');
     setState(() => _done = true);
+  }
+
+  void _togglePause() {
+    if (_ctrl.isAnimating) {
+      _ctrl.stop();
+    } else {
+      _ctrl.forward(); // resume from where it paused
+    }
+    setState(() {});
+  }
+
+  void _toggleSound() {
+    setState(() => _sound = !_sound);
+    ToolsStore.instance.setKegelVoice(_sound);
+    if (!_sound) _tts.stop();
   }
 
   Future<void> _saveFeedback(String feedback) async {
@@ -372,6 +667,14 @@ class _SessionScreenState extends State<_SessionScreen> {
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            tooltip: s.voiceCuesLabel,
+            onPressed: _toggleSound,
+            icon: Icon(
+                _sound ? Icons.volume_up_rounded : Icons.volume_off_rounded),
+          ),
+        ],
       ),
       body: SafeArea(
         child: _done
@@ -380,26 +683,40 @@ class _SessionScreenState extends State<_SessionScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(children: [
                   const Spacer(),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 400),
-                    width: 240,
-                    height: 240,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: color.withValues(alpha: 0.16),
-                      border: Border.all(color: color, width: 4),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(_holding ? s.holdLabel : s.relaxLabel,
-                            style: text.headlineMedium?.copyWith(color: color)),
-                        const SizedBox(height: 6),
-                        Text('$_remaining',
-                            style: text.displayLarge
-                                ?.copyWith(fontWeight: FontWeight.w800)),
-                      ],
-                    ),
+                  // Animated ring that depletes over the phase + a gentle
+                  // inflate-while-holding / settle-while-relaxing pulse.
+                  AnimatedBuilder(
+                    animation: _ctrl,
+                    builder: (context, _) {
+                      final frac = (1 - _ctrl.value).clamp(0.0, 1.0);
+                      final scale = _holding
+                          ? 1 + 0.05 * _ctrl.value
+                          : 1.05 - 0.05 * _ctrl.value;
+                      return SizedBox(
+                        width: 250,
+                        height: 250,
+                        child: CustomPaint(
+                          painter: _RingPainter(progress: frac, color: color),
+                          child: Center(
+                            child: Transform.scale(
+                              scale: scale,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(_holding ? s.holdLabel : s.relaxLabel,
+                                      style: text.headlineSmall
+                                          ?.copyWith(color: color)),
+                                  const SizedBox(height: 4),
+                                  Text('$_remaining',
+                                      style: text.displayLarge?.copyWith(
+                                          fontWeight: FontWeight.w800)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 28),
                   Text(s.repOf(_rep, widget.reps), style: text.titleMedium),
@@ -408,7 +725,7 @@ class _SessionScreenState extends State<_SessionScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       OutlinedButton.icon(
-                        onPressed: () => setState(() => _paused = !_paused),
+                        onPressed: _togglePause,
                         icon: Icon(_paused
                             ? Icons.play_arrow_rounded
                             : Icons.pause_rounded),
@@ -560,4 +877,50 @@ class _CareJourneyScreen extends StatelessWidget {
       ]),
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+//  Session ring — a soft disc with a depleting arc for the current phase.
+// ---------------------------------------------------------------------------
+
+class _RingPainter extends CustomPainter {
+  _RingPainter({required this.progress, required this.color});
+
+  /// 1.0 = phase just started (full ring), 0.0 = phase complete (empty).
+  final double progress;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.width / 2 - 8;
+
+    // Soft inner disc behind the text.
+    canvas.drawCircle(
+        center, radius - 6, Paint()..color = color.withValues(alpha: 0.10));
+
+    // Track + depleting arc.
+    final track = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..color = color.withValues(alpha: 0.15);
+    canvas.drawCircle(center, radius, track);
+
+    final arc = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..color = color;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2,
+      progress.clamp(0.0, 1.0) * 2 * math.pi,
+      false,
+      arc,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _RingPainter old) =>
+      old.progress != progress || old.color != color;
 }

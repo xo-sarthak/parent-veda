@@ -634,11 +634,44 @@ class S {
   String get noMovementsYet => _p(
       'No movements recorded yet. Tap the heart whenever you feel your baby move.',
       'Abhi koi movement record nahi hui. Jab bhi baby move kare, dil par tap karein.');
+  // Session-based tracking
+  String get babyMovementTracker =>
+      _p('Baby Movement Tracker', 'Baby Movement Tracker');
+  String get startSession => _p('Start Session', 'Session Shuru Karein');
+  String get endSession => _p('End Session', 'Session Khatm Karein');
+  String get sessionWord => _p('Session', 'Session');
+  String sessionNumber(int n) => _p('Session $n', 'Session $n');
+  String get thisSessionLabel => _p('This session', 'Yeh session');
+  String get startSessionTitle =>
+      _p('Start a movement session', 'Ek movement session shuru karein');
+  String get startSessionSub => _p(
+      'Begin a session, then tap the heart each time you feel your baby move. The session ends when you tap End — or when you leave this screen.',
+      'Session shuru karein, phir jab bhi baby move kare dil par tap karein. Session tab khatm hota hai jab aap End dabaayein — ya is screen se bahar jaayein.');
+  String sessionStartedAt(String time) =>
+      _p('Started at $time', '$time par shuru');
+  String lastMovementAt(String time) => _p('Last at $time', 'Aakhri $time par');
+  String get viewAllTimes => _p('View all times', 'Saare times dekhein');
+  String get hideTimesLabel => _p('Hide times', 'Times chhupayein');
+  String get sessionSavedMsg =>
+      _p('Session saved to history 💜', 'Session history mein save ho gaya 💜');
+  String get noMovementsThisSession => _p(
+      'No movements logged yet — tap the heart above whenever you feel one.',
+      'Abhi koi movement note nahi hui — jab bhi mehsoos ho, upar dil par tap karein.');
 
   // ===========================================================================
   //  TOOLS — Weight Tracker
   // ===========================================================================
   String get weightToolTitle => _p('Weight Tracker', 'Weight Tracker');
+  String get addWeightShort => _p('Add weight', 'Weight add karein');
+  String get heightOptional => _p('Height (optional)', 'Height (optional)');
+  String get gainNeedsHeight => _p(
+      'Add your height anytime to see a personalized weight-gain range.',
+      'Personalized weight-gain range dekhne ke liye kabhi bhi apni height add karein.');
+  String get changeLabel => _p('Change', 'Badlaav');
+  String get timeLabel => _p('Time', 'Samay');
+  String get noWeightEntriesYet => _p(
+      'No entries yet. Add your weight to start your gentle record.',
+      'Abhi koi entry nahi. Apna record shuru karne ke liye wazan add karein.');
   String get weightWelcomeBody => _p(
       'Understanding your starting point helps us personalize your journey and offer gentle weight guidance. Your information is private and can be updated later.',
       'Aapka shuruaati point samajhne se hum aapka safar personalize kar sakte hain aur halki weight guidance de sakte hain. Aapki jaankaari private hai aur baad mein badli ja sakti hai.');
@@ -796,6 +829,205 @@ class S {
   String get lastCompletedLabel => _p('Last completed', 'Aakhri baar');
   String get neverWord => _p('Not yet', 'Abhi nahi');
   String get careJourneyCta => _p('Care Journey', 'Care Safar');
+  // Routine customization + voice cues
+  String get customizeLabel => _p('Customize', 'Customize');
+  String get customizeRoutineTitle =>
+      _p('Customize routine', 'Routine customize karein');
+  String get recommendedLabel => _p('Recommended', 'Recommended');
+  String get customLabel => _p('Custom', 'Custom');
+  String get resetToRecommended =>
+      _p('Reset to recommended', 'Recommended par reset karein');
+  String get usingCustomRoutine =>
+      _p('Using your custom routine', 'Aapki custom routine chal rahi hai');
+  String get kegelCustomizeInfo => _p(
+      'We recommend the routine set for your stage. If it feels too easy or too hard, you can gently adjust it — always listen to your body and your doctor. Estimated time updates automatically.',
+      'Hum aapke stage ke liye banayi routine recommend karte hain. Agar yeh bahut aasaan ya bahut mushkil lage, toh aap ise halke se badal sakti hain — hamesha apne sharir aur doctor ki sunein. Anumaanit samay apne aap update hota hai.');
+  String get voiceCuesLabel => _p('Voice cues', 'Voice cues');
+
+  // ===========================================================================
+  //  TOOLS — My Hospital Bag
+  // ===========================================================================
+  String get hbName => _p('My Hospital Bag', 'My Hospital Bag');
+  String rupees(int n) => '₹$n';
+  // Locked / "time to prepare" state
+  String get hbTimeToPrepareTitle =>
+      _p('Time to start preparing', 'Taiyaari shuru karne ka samay');
+  String get hbTimeToPrepareBody => _p(
+      'Most mothers begin preparing their hospital bag around this stage.',
+      'Zyadatar maayein is samay ke aas-paas apna hospital bag taiyaar karna shuru karti hain.');
+  String get hbCreateMyBag => _p('Create my bag', 'Mera bag banayein');
+  // Onboarding
+  String get hbWelcomeTitle =>
+      _p('Build your hospital bag', 'Apna hospital bag banayein');
+  String get hbWelcomeSub => _p(
+      "Let's prepare for one of the most special days of your life. You can build your bag over time and come back whenever you want.",
+      'Aaiye apni zindagi ke sabse khaas dinon mein se ek ki taiyaari karein. Aap apna bag dheere-dheere bana sakti hain aur jab chahein wapas aa sakti hain.');
+  String get hbStartBuilding => _p('Start building', 'Banana shuru karein');
+  String get hbDeliveryTitle =>
+      _p('Any idea about your delivery?', 'Apni delivery ke baare mein koi andaaza?');
+  String get hbDeliveryHelper => _p(
+      'This just helps us suggest a few extra items. You can change everything later.',
+      'Yeh sirf kuch extra cheezein suggest karne mein madad karta hai. Aap baad mein sab kuch badal sakti hain.');
+  String get hbDeliveryVaginal => _p('Vaginal', 'Vaginal');
+  String get hbDeliveryCsection => _p('C-section', 'C-section');
+  String get hbDeliveryUnsure => _p('Not sure yet', 'Abhi pakka nahi');
+  String get hbBuildMyBag => _p('Build my bag', 'Mera bag banayein');
+  // Tabs
+  String get hbTabBag => _p('Bag', 'Bag');
+  String get hbTabPlanner => _p('Planner', 'Planner');
+  String get hbTabShopping => _p('Shopping', 'Shopping');
+  // Progress
+  String get hbPreparationProgress =>
+      _p('Preparation progress', 'Taiyaari ki pragati');
+  String hbPercentReady(int p) => _p('$p% Ready', '$p% Taiyaar');
+  String hbSelectedCount(int n) => _p('$n selected', '$n chune');
+  String hbPackedCountLabel(int n) => _p('$n packed', '$n pack ho gaye');
+  String hbRemainingCount(int n) => _p('$n remaining', '$n baaki');
+  String hbProgressLine(int p) {
+    if (p == 0) {
+      return _p("Let's begin, one item at a time ❤️",
+          'Aaiye shuru karein, ek-ek cheez ❤️');
+    }
+    if (p < 40) {
+      return _p('A lovely start. Your bag is taking shape ❤️',
+          'Pyaari shuruaat. Aapka bag ban raha hai ❤️');
+    }
+    if (p < 75) {
+      return _p("You're well on your way ❤️",
+          'Aap achhe se aage badh rahi hain ❤️');
+    }
+    if (p < 100) {
+      return _p("You've prepared most of what you'll need for the big day ❤️",
+          'Bade din ke liye zaroori zyadatar cheezein taiyaar hain ❤️');
+    }
+    return _p('Your bag is ready ❤️', 'Aapka bag taiyaar hai ❤️');
+  }
+  String get hbLastUpdatedLabel => _p('Last updated', 'Aakhri update');
+  String get hbToday => _p('today', 'aaj');
+  String get hbYesterday => _p('yesterday', 'kal');
+  String hbDaysAgo(int n) => _p('$n days ago', '$n din pehle');
+  // Categories
+  String hbCategory(String key) {
+    switch (key) {
+      case 'labour':
+        return _p('For me during labour', 'Labour ke dauraan mere liye');
+      case 'afterDelivery':
+        return _p('For me after delivery', 'Delivery ke baad mere liye');
+      case 'baby':
+        return _p('For baby', 'Baby ke liye');
+      case 'partner':
+        return _p('For partner', 'Partner ke liye');
+      case 'documents':
+        return _p('Documents', 'Documents');
+      case 'comfort':
+        return _p('Comfort items', 'Aaraam ki cheezein');
+      default:
+        return _p('My own items', 'Meri apni cheezein');
+    }
+  }
+  String hbItemsCount(int n) => _p(n == 1 ? '1 item' : '$n items',
+      n == 1 ? '1 cheez' : '$n cheezein');
+  String hbReadyCount(int n) => _p('$n ready', '$n taiyaar');
+  // Item states
+  String get hbStateNeeded => _p('To plan', 'Plan karna hai');
+  String get hbStateHave => _p('Already have', 'Pehle se hai');
+  String get hbStateBuyVeda => _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hbStateBuyElse => _p('Buy elsewhere', 'Kahin aur se khareedein');
+  String get hbStateSkip => _p('Skip', 'Chhodein');
+  String get hbStatusLabel => _p('Status', 'Sthiti');
+  String get hbMarkPacked => _p('Mark as packed', 'Packed mark karein');
+  String get hbPackedLabel => _p('Packed', 'Pack ho gaya');
+  String get hbRestore => _p('Restore', 'Wapas laayein');
+  // Recommendation / trust layer
+  String get hbRecommendation =>
+      _p('ParentVeda Recommendation', 'ParentVeda Sujhaav');
+  String get hbBestOverall => _p('Best Overall', 'Sabse Behtar');
+  String get hbWhyRecommend =>
+      _p('Why ParentVeda recommends this', 'ParentVeda yeh kyun suggest karta hai');
+  String get hbThingsToConsider =>
+      _p('Things to consider', 'Dhyaan dene yogya baatein');
+  String get hbBuyVedaCta => _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hbStoreComingSoon => _p(
+      'Our store is coming soon. For now it\'s saved to your plan — you can also buy it elsewhere.',
+      'Hamaara store jald aa raha hai. Abhi yeh aapke plan mein save hai — aap ise kahin aur se bhi khareed sakti hain.');
+  // Buy elsewhere
+  String get hbWhereBuy => _p('Where will you buy it?', 'Aap kahan se khareedengi?');
+  String get hbProductLinkOptional =>
+      _p('Product link (optional)', 'Product link (optional)');
+  String get hbPriceOptional => _p('Price (optional)', 'Price (optional)');
+  String get hbNotesOptional => _p('Notes (optional)', 'Notes (optional)');
+  String get hbLinkSaved => _p('Link saved', 'Link save');
+  String get hbPurchasePending => _p('Purchase pending', 'Khareedna baaki');
+  // Add custom
+  String get hbAddCustom => _p('Add custom item', 'Apni cheez jodein');
+  String get hbAddCustomTitle => _p('Add your own item', 'Apni cheez jodein');
+  String get hbCustomNameHint =>
+      _p('e.g. Special blanket, family photo…', 'jaise special blanket, family photo…');
+  String get hbWhichSection => _p('Which section?', 'Kaunsa section?');
+  String get hbItemAdded => _p('Added to your bag ❤️', 'Aapke bag mein jud gaya ❤️');
+  // Suggested essentials
+  String get hbSuggestedTitle => _p('Most mothers also pack', 'Zyadatar maayein yeh bhi rakhti hain');
+  String get hbAddWord => _p('Add', 'Jodein');
+  // Planner filters
+  String hbFilter(String key) {
+    switch (key) {
+      case 'veda':
+        return _p('ParentVeda', 'ParentVeda');
+      case 'else':
+        return _p('Elsewhere', 'Kahin aur');
+      case 'owned':
+        return _p('Owned', 'Pehle se');
+      case 'packed':
+        return _p('Packed', 'Packed');
+      case 'pending':
+        return _p('Pending', 'Baaki');
+      case 'skipped':
+        return _p('Skipped', 'Chhoda');
+      default:
+        return _p('All', 'Sab');
+    }
+  }
+  // Shopping
+  String get hbShoppingTitle => _p('Shopping summary', 'Shopping summary');
+  String get hbVedaPurchases => _p('ParentVeda purchases', 'ParentVeda se khareed');
+  String get hbExternalPurchases => _p('External purchases', 'Baahar se khareed');
+  String get hbAlreadyOwnedTotal => _p('Already owned', 'Pehle se');
+  String get hbTotalPlanned => _p('Total planned spend', 'Kul anumaanit kharch');
+  String get hbBuyingFromVeda => _p('Buying from ParentVeda', 'ParentVeda se khareed rahe');
+  String get hbBuyingElsewhere => _p('Buying elsewhere', 'Kahin aur se khareed rahe');
+  String get hbOwnedGroup => _p('Already owned', 'Pehle se hai');
+  String get hbPendingGroup => _p('Still to plan', 'Abhi plan karna hai');
+  String get hbNothingHere =>
+      _p('Nothing here yet.', 'Yahan abhi kuch nahi.');
+  // Partner share
+  String get hbSharePartner => _p('Share with partner', 'Partner ke saath share karein');
+  String hbShareProgress(int p) => _p(
+      'Our hospital bag is $p% ready ❤️',
+      'Hamaara hospital bag $p% taiyaar hai ❤️');
+  String get hbShareCanHelp =>
+      _p('Things you can help with:', 'Jin cheezon mein aap madad kar sakte hain:');
+  String get hbShareNothingPending =>
+      _p('Everything is planned for now ❤️', 'Filhaal sab plan ho chuka hai ❤️');
+  // Emotional moments
+  String hbCategoryReady(String name) => _p('$name ready 🎉', '$name taiyaar 🎉');
+  String get hbCategoryReadyBody =>
+      _p('This section is all prepared.', 'Yeh section poori tarah taiyaar hai.');
+  String get hbBagReadyTitle =>
+      _p('Your hospital bag is ready ❤️', 'Aapka hospital bag taiyaar hai ❤️');
+  String get hbBagReadyBody => _p(
+      "You are prepared for one of life's most beautiful moments.",
+      'Aap zindagi ke sabse khoobsurat palon mein se ek ke liye taiyaar hain.');
+  // Search
+  String get hbSearchHint => _p('Search your bag…', 'Apne bag mein dhoondhein…');
+  String get hbNoResults => _p('Nothing found.', 'Kuch nahi mila.');
+  // Product / marketplace
+  String get hbChooseOption =>
+      _p('Choose what works for you', 'Jo aapke liye sahi ho woh chunein');
+  String get hbDecideHow =>
+      _p('Or, how will you get it?', 'Ya, aap ise kaise lengi?');
+  String get hbEditDetails => _p('Edit details', 'Vivran badlein');
+  String get hbOrderFromVeda =>
+      _p('Order from ParentVeda', 'ParentVeda se order karein');
 
   // ===========================================================================
   //  TOOLS — Contraction Tracker
@@ -837,6 +1069,125 @@ class S {
       'Vyakhya ke liye apne doctor se sampark karein.');
   String secLabel(int n) => _p('$n sec', '$n sec');
   String minLabel(int n) => _p('$n min', '$n min');
+  // Compact minutes + seconds (e.g. "8s", "1m 5s", "2m") — so short intervals
+  // never read as "0 min".
+  String minSecLabel(int seconds) {
+    final m = seconds ~/ 60;
+    final sec = seconds % 60;
+    if (m == 0) return '${sec}s';
+    if (sec == 0) return '${m}m';
+    return '${m}m ${sec}s';
+  }
+  String contractionNumber(int n) => _p('Contraction #$n', 'Contraction #$n');
+  String get thisSessionContractions =>
+      _p('This session', 'Yeh session');
+  // Live labour-signal banner (gentle, never a diagnosis)
+  String get laborTrackingTitle => _p('Keep tracking', 'Tracking jaari rakhein');
+  String get laborTrackingBody => _p(
+      "Log a few more and we'll show you the pattern.",
+      'Kuch aur log karein, hum aapko pattern dikhayenge.');
+  String get laborIrregularTitle =>
+      _p('Irregular for now', 'Abhi anymit');
+  String get laborIrregularBody => _p(
+      'Your contractions are still spaced out and irregular — often early days.',
+      'Aapke contractions abhi door-door aur anymit hain — aksar shuruaati samay.');
+  String get laborEarlyTitle => _p('Looks like early labour', 'Shuruaati labour lagta hai');
+  String get laborEarlyBody => _p(
+      'A pattern is forming. Rest, hydrate and keep tracking.',
+      'Ek pattern ban raha hai. Aaram karein, paani peein aur tracking jaari rakhein.');
+  String get laborActiveTitle =>
+      _p('This could be active labour', 'Yeh active labour ho sakta hai');
+  String get laborActiveBody => _p(
+      'Your contractions look regular and strong. Only you know how you feel — if unsure, it is always okay to call your doctor.',
+      'Aapke contractions niyamit aur tej lag rahe hain. Aap hi jaanti hain aap kaisa feel kar rahi hain — agar pakka nahi, toh doctor ko call karna hamesha theek hai.');
+  // Labour confirmation prompt
+  String get laborPromptTitle =>
+      _p('Does this feel like labour?', 'Kya yeh labour jaisa lagta hai?');
+  String get laborPromptBody => _p(
+      'Your recent contractions show a regular, strong pattern often seen in active labour. How are you feeling?',
+      'Aapke haal ke contractions niyamit aur tej pattern dikhate hain jo aksar active labour mein hota hai. Aap kaisa mehsoos kar rahi hain?');
+  String get laborYes => _p('Yes, I think so', 'Haan, lagta hai');
+  String get laborNo => _p('Not yet', 'Abhi nahi');
+  String get laborSavedNote =>
+      _p('Saved to this session 💜', 'Is session mein save ho gaya 💜');
+  String feltInLabour(bool yes) => yes
+      ? _p('Felt like labour', 'Labour jaisa laga')
+      : _p('Not labour yet', 'Abhi labour nahi');
+  // Two-layer assessment (pattern classification + medical override)
+  String assessTitle(String level) {
+    switch (level) {
+      case 'emergency':
+        return _p('Please seek medical advice', 'Kripya medical salah lein');
+      case 'preterm':
+        return _p('Before 37 weeks — please check in',
+            '37 hafte se pehle — kripya sampark karein');
+      case 'active':
+        return _p('Active labour likely', 'Active labour ki sambhavna');
+      case 'likely':
+        return _p('Labour pattern likely', 'Labour pattern ki sambhavna');
+      case 'early':
+        return _p('Possible early labour', 'Sambhavit shuruaati labour');
+      case 'noPattern':
+        return _p('No clear pattern yet', 'Abhi koi saaf pattern nahi');
+      default:
+        return _p('Keep tracking', 'Tracking jaari rakhein');
+    }
+  }
+
+  String assessSummary(String level) {
+    switch (level) {
+      case 'emergency':
+        return _p(
+            "Some symptoms you've reported may require prompt medical assessment. Contact your healthcare provider, maternity unit, or emergency services immediately.",
+            'Aapke bataaye kuch lakshanon ke liye turant medical jaanch zaroori ho sakti hai. Apne doctor, maternity unit, ya emergency services se turant sampark karein.');
+      case 'preterm':
+        return _p(
+            'Regular contractions before 37 weeks may require medical assessment. Contact your healthcare provider promptly.',
+            '37 hafte se pehle niyamit contractions ke liye medical jaanch zaroori ho sakti hai. Apne doctor se jaldi sampark karein.');
+      case 'active':
+        return _p(
+            'Contractions are frequent, lasting longer, and occurring at relatively regular intervals. Contact your healthcare provider or follow your birth plan instructions.',
+            'Contractions baar-baar, lambe aur kaafi niyamit ho rahe hain. Apne doctor se sampark karein ya apne birth plan ke nirdesh follow karein.');
+      case 'likely':
+        return _p(
+            'A consistent labor-like contraction pattern appears to be developing. Consider contacting your healthcare provider for guidance.',
+            'Ek niyamit labour-jaisa pattern banta dikh raha hai. Margdarshan ke liye apne doctor se sampark karne par vichaar karein.');
+      case 'early':
+        return _p(
+            'Contractions may be showing an early labor pattern. Continue monitoring frequency and duration.',
+            'Contractions shuruaati labour pattern dikha sakte hain. Frequency aur duration par nazar rakhein.');
+      case 'noPattern':
+        return _p(
+            'Current recordings do not show a clear labor pattern. Continue tracking additional contractions.',
+            'Abhi tak ke record saaf labour pattern nahi dikhate. Aur contractions track karte rahein.');
+      default:
+        return _p(
+            'More contractions need to be recorded before a pattern can be identified.',
+            'Pattern pehchaanne se pehle aur contractions record karne hongi.');
+    }
+  }
+
+  // Safety check (Layer 2 inputs)
+  String get safetyCheckTitle => _p('Quick safety check', 'Quick safety check');
+  String get safetyCheckSub => _p(
+      'A few questions help us flag anything that may need prompt attention.',
+      'Kuch sawaal hamein aisi cheezein pehchaanne mein madad karte hain jin par turant dhyan zaroori ho.');
+  String get safetyUpdate => _p('Update', 'Update karein');
+  String get safetyAllClear =>
+      _p('No concerning symptoms reported', 'Koi chinta wala lakshan nahi');
+  String get safetyReported => _p('Symptoms reported', 'Lakshan darj kiye');
+  String get qWaterBroken => _p('Has your water broken?', 'Kya aapka paani toot gaya?');
+  String get qBleeding => _p('Any bleeding?', 'Koi bleeding?');
+  String get qMovementReduced =>
+      _p('Reduced baby movement?', 'Baby ki movement kam?');
+  String get qSeverePain => _p('Severe constant pain between contractions?',
+      'Contractions ke beech tej lagataar dard?');
+  String get optYes => _p('Yes', 'Haan');
+  String get optNo => _p('No', 'Nahi');
+  String get optNotSure => _p('Not sure', 'Pakka nahi');
+  String get bleedNone => _p('None', 'Koi nahi');
+  String get bleedLight => _p('Light spotting', 'Halki spotting');
+  String get bleedHeavy => _p('Heavy', 'Tej');
   String get timeColumn => _p('Time', 'Samay');
   String get durationColumn => _p('Duration', 'Duration');
   String get intervalColumn => _p('Interval', 'Interval');

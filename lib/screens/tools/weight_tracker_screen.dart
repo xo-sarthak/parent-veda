@@ -1,11 +1,14 @@
 // =============================================================================
 //  Weight Tracker
 // -----------------------------------------------------------------------------
-//  Two experiences: a one-time onboarding (pre-pregnancy weight + height →
-//  personalized gain range) and an ongoing dashboard that reframes weight as
-//  "my body is supporting my baby" — never a scorecard. Per the product spec:
-//  the gain number is shown calmly, never celebrated or judged, and the chart
-//  never shows above/below-target or warning colours.
+//  Two experiences: a one-time onboarding (pre-pregnancy weight, with an
+//  OPTIONAL height → personalized gain range) and an ongoing dashboard that
+//  reframes weight as "my body is supporting my baby" — never a scorecard.
+//  Per the product spec: the gain number is shown calmly, never celebrated or
+//  judged, and the chart never shows above/below-target or warning colours.
+//
+//  Entries are kept individually — multiple weigh-ins per day are allowed and
+//  never overwrite each other (so the record never appears to "reset").
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -37,7 +40,30 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     return Scaffold(
-      appBar: AppBar(title: Text(s.weightToolTitle)),
+      appBar: AppBar(
+        title: Text(s.weightToolTitle),
+        actions: [
+          // The single top-level add affordance — labelled so it's obvious what
+          // the + does. (Only once the profile is set.)
+          AnimatedBuilder(
+            animation: _store,
+            builder: (context, _) => _store.weightOnboarded
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: TextButton.icon(
+                      onPressed: () =>
+                          showAddWeight(context, widget.controller),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppTheme.secondary600,
+                      ),
+                      icon: const Icon(Icons.add_rounded, size: 20),
+                      label: Text(s.addWeightShort),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
       body: AnimatedBuilder(
         animation: _store,
         builder: (context, _) {
@@ -55,7 +81,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  Onboarding
+//  Onboarding (height optional)
 // ---------------------------------------------------------------------------
 
 class _SetupFlow extends StatefulWidget {
@@ -72,7 +98,7 @@ class _SetupFlowState extends State<_SetupFlow> {
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
   double? _weight;
-  double? _height;
+  double? _height; // optional
 
   @override
   void dispose() {
@@ -94,8 +120,8 @@ class _SetupFlowState extends State<_SetupFlow> {
     final s = S(widget.controller.language);
     final text = Theme.of(context).textTheme;
 
-    if (_step == 1 && _weight != null && _height != null) {
-      final gain = _gainFor(_weight!, _height!);
+    if (_step == 1 && _weight != null) {
+      final gain = _height != null ? _gainFor(_weight!, _height!) : null;
       return ListView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
         children: [
@@ -105,18 +131,22 @@ class _SetupFlowState extends State<_SetupFlow> {
           const SizedBox(height: 24),
           _summaryCard(s.startingWeightLabel,
               '${_weight!.toStringAsFixed(1)} ${s.kgUnit}', text),
-          _summaryCard(s.heightLabel,
-              '${_height!.toStringAsFixed(0)} ${s.cmUnit}', text),
-          _summaryCard(
-            s.recommendedGainLabel,
-            '${gain.min.toStringAsFixed(1)} – ${gain.max.toStringAsFixed(1)} ${s.kgUnit}',
-            text,
-            note: s.weightGuidelineNote,
-          ),
+          if (_height != null)
+            _summaryCard(s.heightLabel,
+                '${_height!.toStringAsFixed(0)} ${s.cmUnit}', text),
+          if (gain != null)
+            _summaryCard(
+              s.recommendedGainLabel,
+              '${gain.min.toStringAsFixed(1)} – ${gain.max.toStringAsFixed(1)} ${s.kgUnit}',
+              text,
+              note: s.weightGuidelineNote,
+            )
+          else
+            _noteCard(s.gainNeedsHeight, text),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () async {
-              await _store(context).setWeightProfile(_weight!, _height!);
+              await ToolsStore.instance.setWeightProfile(_weight!, _height);
               widget.onDone();
             },
             child: Text(s.startTrackingCta),
@@ -144,7 +174,7 @@ class _SetupFlowState extends State<_SetupFlow> {
           ),
         ),
         const SizedBox(height: 20),
-        Text(s.heightLabel, style: text.titleMedium),
+        Text(s.heightOptional, style: text.titleMedium),
         const SizedBox(height: 8),
         TextField(
           controller: _heightCtrl,
@@ -159,11 +189,11 @@ class _SetupFlowState extends State<_SetupFlow> {
         FilledButton(
           onPressed: () {
             final w = double.tryParse(_weightCtrl.text.trim());
+            if (w == null) return; // weight required; height optional
             final h = double.tryParse(_heightCtrl.text.trim());
-            if (w == null || h == null || h <= 0) return;
             setState(() {
               _weight = w;
-              _height = h;
+              _height = (h != null && h > 0) ? h : null;
               _step = 1;
             });
           },
@@ -172,8 +202,6 @@ class _SetupFlowState extends State<_SetupFlow> {
       ],
     );
   }
-
-  ToolsStore _store(BuildContext _) => ToolsStore.instance;
 
   Widget _summaryCard(String label, String value, TextTheme text,
       {String? note}) {
@@ -200,6 +228,16 @@ class _SetupFlowState extends State<_SetupFlow> {
       ),
     );
   }
+
+  Widget _noteCard(String note, TextTheme text) => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.primary50,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(note, style: text.bodyMedium),
+      );
 }
 
 // ---------------------------------------------------------------------------
@@ -234,6 +272,7 @@ class _Dashboard extends StatelessWidget {
     final latest = store.latestWeight;
     final pre = store.prePregnancyWeight ?? 0;
     final gain = latest != null ? latest.weight - pre : null;
+    final entries = store.weightEntries; // newest first
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
@@ -306,22 +345,29 @@ class _Dashboard extends StatelessWidget {
             child: Text(s.weeklyWeightInsight(week), style: text.bodyLarge)),
         const SizedBox(height: 14),
         // Chart.
-        if (store.weightEntries.isNotEmpty)
+        if (entries.isNotEmpty)
           _card(context, title: s.weightChartTitle, child: _ChartView(
             controller: controller,
           )),
-        if (store.weightEntries.isNotEmpty) const SizedBox(height: 14),
-        // History.
-        if (store.weightEntries.isNotEmpty)
+        if (entries.isNotEmpty) const SizedBox(height: 14),
+        // History — every entry, with column headings.
+        if (entries.isNotEmpty)
           _card(context, title: s.weightHistoryTitle, child: Column(
             children: [
-              for (final e in store.weightEntries)
-                _historyRow(context, e, pre, s, text),
+              _historyHeader(s, text),
+              const Divider(height: 16),
+              for (int i = 0; i < entries.length; i++) ...[
+                _historyRow(context, entries[i], pre, s, text),
+                Divider(height: 1, color: AppTheme.outlineVariant),
+              ],
+              // The starting (pre-pregnancy) weight — the baseline every "change"
+              // is measured from. Tinted + badged so it reads as the origin.
+              if (pre > 0) _startingRow(pre, s, text),
             ],
           )),
         const SizedBox(height: 18),
         FilledButton.icon(
-          onPressed: () => _addWeight(context),
+          onPressed: () => showAddWeight(context, controller),
           icon: const Icon(Icons.add_rounded),
           label: Text(s.addTodaysWeight),
         ),
@@ -330,11 +376,11 @@ class _Dashboard extends StatelessWidget {
   }
 
   String _lastUpdated(S s, WeightEntry e) {
-    final d = DateTime.tryParse(e.dateIso);
+    final d = DateTime.tryParse(e.timeIso);
     if (d == null) return e.dateIso;
     final now = DateTime.now();
     if (d.year == now.year && d.month == now.month && d.day == now.day) {
-      return s.todayWord;
+      return '${s.todayWord} · ${s.formatClock(d)}';
     }
     return s.formatShortDate(d);
   }
@@ -404,113 +450,247 @@ class _Dashboard extends StatelessWidget {
     ]);
   }
 
+  /// Column headings for the history table.
+  Widget _historyHeader(S s, TextTheme text) {
+    final style = text.labelSmall?.copyWith(
+      color: AppTheme.neutral500,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.4,
+    );
+    return Row(children: [
+      Expanded(flex: 5, child: Text(s.dateLabel, style: style)),
+      Expanded(flex: 3, child: Text(s.weekWord, style: style)),
+      Expanded(flex: 4, child: Text(s.weightLabel, style: style)),
+      SizedBox(width: 56, child: Text(s.changeLabel, style: style, textAlign: TextAlign.right)),
+    ]);
+  }
+
   Widget _historyRow(
       BuildContext context, WeightEntry e, double pre, S s, TextTheme text) {
-    final d = DateTime.tryParse(e.dateIso);
+    final d = DateTime.tryParse(e.timeIso) ?? DateTime.tryParse(e.dateIso);
     final change = e.weight - pre;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return InkWell(
+      onLongPress: () => _confirmDelete(context, e, s),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Expanded(
+            flex: 5,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(d != null ? s.formatShortDate(d) : e.dateIso,
+                  style: text.bodyMedium),
+              if (d != null)
+                Text(s.formatClock(d),
+                    style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+            ]),
+          ),
+          Expanded(flex: 3, child: Text('${e.week}', style: text.bodyMedium)),
+          Expanded(
+            flex: 4,
+            child: Text('${e.weight.toStringAsFixed(1)} ${s.kgUnit}',
+                style: text.bodyLarge),
+          ),
+          SizedBox(
+            width: 56,
+            child: Text(
+              '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}',
+              textAlign: TextAlign.right,
+              style: text.labelMedium?.copyWith(color: AppTheme.neutral500),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// The pre-pregnancy starting weight, shown as the origin row of the history —
+  /// a leading "START" chip + label (sharing the Date+Week width so it never
+  /// crowds), with the weight aligned under the Weight column.
+  Widget _startingRow(double pre, S s, TextTheme text) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.primary50,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(children: [
+        // Date + Week columns combined (flex 8) → roomy for chip + label.
         Expanded(
-          child: Text(d != null ? s.formatShortDate(d) : e.dateIso,
-              style: text.bodyMedium),
+          flex: 8,
+          child: Row(children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppTheme.primary100,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Text(
+                s.startWord.toUpperCase(),
+                style: text.labelSmall?.copyWith(
+                  color: AppTheme.primary700,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(width: 9),
+            Flexible(
+              child: Text(
+                s.startingWeightLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.primary800,
+                ),
+              ),
+            ),
+          ]),
         ),
+        // Weight column (flex 4) — lines up with the Weight heading above.
         Expanded(
-          child: Text('${s.weekWord} ${e.week}', style: text.bodyMedium),
+          flex: 4,
+          child: Text(
+            '${pre.toStringAsFixed(1)} ${s.kgUnit}',
+            style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
         ),
-        Expanded(
-          child: Text('${e.weight.toStringAsFixed(1)} ${s.kgUnit}',
-              style: text.bodyLarge),
+        // Change column (fixed 56) — baseline, so a quiet dash.
+        SizedBox(
+          width: 56,
+          child: Text('—',
+              textAlign: TextAlign.right,
+              style: text.labelMedium?.copyWith(color: AppTheme.neutral400)),
         ),
-        Text('${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}',
-            style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
       ]),
     );
   }
 
-  Future<void> _addWeight(BuildContext context) async {
-    final s = S(controller.language);
-    final ctrl = TextEditingController();
-    final notesCtrl = TextEditingController();
-    DateTime date = DateTime.now();
-
-    await showModalBottomSheet<void>(
+  Future<void> _confirmDelete(BuildContext context, WeightEntry e, S s) async {
+    final ok = await showDialog<bool>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
-      showDragHandle: true,
-      builder: (ctx) {
-        final text = Theme.of(ctx).textTheme;
-        return StatefulBuilder(builder: (ctx, setSheet) {
-          return Padding(
-            padding: EdgeInsets.fromLTRB(
-                22, 4, 22, MediaQuery.of(ctx).viewInsets.bottom + 24),
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.addWeightTitle, style: text.headlineSmall),
-              const SizedBox(height: 16),
-              TextField(
-                controller: ctrl,
-                autofocus: true,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                    labelText: s.currentWeightLabel, suffixText: s.kgUnit),
-              ),
-              const SizedBox(height: 14),
-              InkWell(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: ctx,
-                    initialDate: date,
-                    firstDate: DateTime(date.year - 1),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) setSheet(() => date = picked);
-                },
-                child: InputDecorator(
-                  decoration: InputDecoration(labelText: s.dateLabel),
-                  child: Text(s.formatLongDate(date)),
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: notesCtrl,
-                decoration: InputDecoration(labelText: s.notesOptional),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    final w = double.tryParse(ctrl.text.trim());
-                    if (w == null) return;
-                    ToolsStore.instance.addWeightEntry(WeightEntry(
-                      dateIso:
-                          '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-                      week: controller.currentWeek,
-                      weight: w,
-                      notes: notesCtrl.text.trim(),
-                    ));
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(s.saveCta),
-                ),
-              ),
-            ]),
-          );
-        });
-      },
+      builder: (ctx) => AlertDialog(
+        content: Text(s.deleteEntryQ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false), child: Text(s.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true), child: Text(s.delete)),
+        ],
+      ),
     );
+    if (ok == true) await ToolsStore.instance.deleteWeightEntry(e.id);
   }
 }
 
+/// The add-weight bottom sheet, shared by the top app-bar button and the bottom
+/// button. Allows any past date; multiple entries per day are kept.
+Future<void> showAddWeight(
+    BuildContext context, PregnancyController controller) async {
+  final s = S(controller.language);
+  final ctrl = TextEditingController();
+  final notesCtrl = TextEditingController();
+  DateTime date = DateTime.now();
+
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppTheme.surface,
+    showDragHandle: true,
+    builder: (ctx) {
+      final text = Theme.of(ctx).textTheme;
+      return StatefulBuilder(builder: (ctx, setSheet) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+              22, 4, 22, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(s.addWeightTitle, style: text.headlineSmall),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ctrl,
+                  autofocus: true,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                      labelText: s.currentWeightLabel, suffixText: s.kgUnit),
+                ),
+                const SizedBox(height: 14),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: date,
+                      firstDate: DateTime(date.year - 1),
+                      lastDate: DateTime.now(),
+                    );
+                    if (picked != null) setSheet(() => date = picked);
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(labelText: s.dateLabel),
+                    child: Text(s.formatLongDate(date)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: notesCtrl,
+                  decoration: InputDecoration(labelText: s.notesOptional),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      final w = double.tryParse(ctrl.text.trim());
+                      if (w == null) return;
+                      final now = DateTime.now();
+                      final ts = DateTime(date.year, date.month, date.day,
+                          now.hour, now.minute, now.second);
+                      ToolsStore.instance.addWeightEntry(WeightEntry(
+                        id: 'w_${now.microsecondsSinceEpoch}',
+                        dateIso:
+                            '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+                        timeIso: ts.toIso8601String(),
+                        week: controller.currentWeek,
+                        weight: w,
+                        notes: notesCtrl.text.trim(),
+                      ));
+                      Navigator.of(ctx).pop();
+                    },
+                    child: Text(s.saveCta),
+                  ),
+                ),
+              ]),
+        );
+      });
+    },
+  );
+}
+
 // ---------------------------------------------------------------------------
-//  Simple weight chart: actual line over a soft recommended-range band.
+//  Weight chart: actual line (by date) over a soft recommended-range band.
 // ---------------------------------------------------------------------------
 
 class _ChartView extends StatelessWidget {
   const _ChartView({required this.controller});
   final PregnancyController controller;
+
+  /// Fractional gestational week for an entry, from its actual date — so two
+  /// entries on different days land at different x positions (and same-day ones
+  /// sit together), instead of every entry snapping to an integer week.
+  double _weekOf(WeightEntry e) {
+    final raw = DateTime.tryParse(e.timeIso) ?? DateTime.tryParse(e.dateIso);
+    if (raw == null) return controller.currentWeek.toDouble();
+    final today = DateTime.now();
+    final daysAgo =
+        DateTime(today.year, today.month, today.day).difference(
+            DateTime(raw.year, raw.month, raw.day)).inDays;
+    final pday = (controller.currentDay - daysAgo).clamp(1, 280);
+    return (pday / 7.0).clamp(4.0, 40.0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -519,8 +699,10 @@ class _ChartView extends StatelessWidget {
     final store = ToolsStore.instance;
     final pre = store.prePregnancyWeight ?? 0;
     final gain = store.recommendedGain;
-    final entries = [...store.weightEntries]
-      ..sort((a, b) => a.week.compareTo(b.week));
+    final points = [
+      for (final e in store.weightEntries)
+        (week: _weekOf(e), weight: e.weight),
+    ]..sort((a, b) => a.week.compareTo(b.week));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(
@@ -528,7 +710,7 @@ class _ChartView extends StatelessWidget {
         width: double.infinity,
         child: CustomPaint(
           painter: _WeightChartPainter(
-            entries: entries,
+            points: points,
             preWeight: pre,
             gainMin: gain?.min ?? 11.5,
             gainMax: gain?.max ?? 16.0,
@@ -558,28 +740,34 @@ class _ChartView extends StatelessWidget {
 
 class _WeightChartPainter extends CustomPainter {
   _WeightChartPainter({
-    required this.entries,
+    required this.points,
     required this.preWeight,
     required this.gainMin,
     required this.gainMax,
   });
 
-  final List<WeightEntry> entries;
+  final List<({double week, double weight})> points;
   final double preWeight;
   final double gainMin;
   final double gainMax;
 
-  static const int _wkStart = 4;
-  static const int _wkEnd = 40;
+  static const double _wkStart = 4;
+  static const double _wkEnd = 40;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final minW = preWeight;
-    final maxW = preWeight + gainMax + 3;
-    double x(int week) =>
+    // Y range covers the recommended band and any actual entries, with padding.
+    var minW = preWeight;
+    var maxW = preWeight + gainMax + 3;
+    for (final p in points) {
+      if (p.weight < minW) minW = p.weight - 1;
+      if (p.weight > maxW) maxW = p.weight + 1;
+    }
+    final span = (maxW - minW) <= 0 ? 1 : (maxW - minW);
+
+    double x(double week) =>
         (week - _wkStart) / (_wkEnd - _wkStart) * size.width;
-    double y(double w) =>
-        size.height - ((w - minW) / (maxW - minW)) * size.height;
+    double y(double w) => size.height - ((w - minW) / span) * size.height;
 
     // Recommended range band.
     final band = Path()
@@ -591,8 +779,8 @@ class _WeightChartPainter extends CustomPainter {
     canvas.drawPath(
         band, Paint()..color = AppTheme.primary100.withValues(alpha: 0.6));
 
-    // Actual line.
-    if (entries.isNotEmpty) {
+    // Actual line + dots.
+    if (points.isNotEmpty) {
       final line = Paint()
         ..color = AppTheme.primary500
         ..style = PaintingStyle.stroke
@@ -600,8 +788,8 @@ class _WeightChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
       final path = Path();
-      for (int i = 0; i < entries.length; i++) {
-        final p = Offset(x(entries[i].week), y(entries[i].weight));
+      for (int i = 0; i < points.length; i++) {
+        final p = Offset(x(points[i].week), y(points[i].weight));
         if (i == 0) {
           path.moveTo(p.dx, p.dy);
         } else {
@@ -610,15 +798,15 @@ class _WeightChartPainter extends CustomPainter {
       }
       canvas.drawPath(path, line);
       final dot = Paint()..color = AppTheme.primary500;
-      for (final e in entries) {
-        canvas.drawCircle(Offset(x(e.week), y(e.weight)), 4, dot);
+      for (final p in points) {
+        canvas.drawCircle(Offset(x(p.week), y(p.weight)), 4, dot);
       }
     }
   }
 
   @override
   bool shouldRepaint(covariant _WeightChartPainter old) =>
-      old.entries != entries ||
+      old.points != points ||
       old.preWeight != preWeight ||
       old.gainMin != gainMin ||
       old.gainMax != gainMax;

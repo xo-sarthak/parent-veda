@@ -5,6 +5,7 @@ import 'services/baby_voice_service.dart';
 import 'services/daily_store.dart';
 import 'services/father_content_controller.dart';
 import 'services/home_content_controller.dart';
+import 'services/hospital_bag_store.dart';
 import 'services/memory_store.dart';
 import 'services/pregnancy_controller.dart';
 import 'services/size_view_pref.dart';
@@ -53,6 +54,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     DailyStore.instance.init();
     // Load Tools persistence (movement, weight, kegel, contractions).
     ToolsStore.instance.init();
+    // Load My Hospital Bag persistence.
+    HospitalBagStore.instance.init();
   }
 
   @override

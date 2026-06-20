@@ -14,6 +14,7 @@ import '../theme/app_theme.dart';
 import 'journey_map_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
+import 'tools/hospital_bag_screen.dart';
 import 'tools/kegel_care_screen.dart';
 import 'tools/weight_tracker_screen.dart';
 
@@ -31,7 +32,8 @@ class ToolsScreen extends StatelessWidget {
         MaterialPageRoute(builder: (_) => builder()));
 
     final tools = <_ToolInfo>[
-      _ToolInfo(s.toolKickTitle, Icons.favorite_rounded, AppTheme.secondary500,
+      _ToolInfo(
+          s.babyMovementTracker, Icons.favorite_rounded, AppTheme.secondary500,
           onTap: () => open(() => BabyMovementScreen(controller: controller))),
       _ToolInfo(s.toolWeightTitle, Icons.monitor_weight_rounded,
           AppTheme.tertiary400,
@@ -43,9 +45,8 @@ class ToolsScreen extends StatelessWidget {
           AppTheme.primary400,
           onTap: () =>
               open(() => ContractionTrackerScreen(controller: controller))),
-      // Hospital Bag Planner is not built yet — stays a coming-soon tile.
-      _ToolInfo(s.toolHospitalBagTitle, Icons.luggage_rounded,
-          AppTheme.tertiary500),
+      _ToolInfo(s.hbName, Icons.luggage_rounded, AppTheme.tertiary500,
+          onTap: () => open(() => HospitalBagScreen(controller: controller))),
     ];
 
     return SafeArea(
