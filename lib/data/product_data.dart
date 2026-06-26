@@ -483,6 +483,35 @@ Product? productById(String id) {
   return null;
 }
 
+/// A real photo URL for [p]: its own [Product.imageUrl] if set, else a stable
+/// placeholder photo (consistent per product) so cards show real images now.
+/// Swap in exact product/Amazon image URLs on the model later.
+String productImageUrl(Product p) => p.imageUrl.isNotEmpty
+    ? p.imageUrl
+    : 'https://picsum.photos/seed/pv_${p.id}/300/300';
+
+/// An Amazon India search URL for [p] (used by affiliate Buy on Amazon).
+String amazonSearchUrl(Product p) =>
+    'https://www.amazon.in/s?k=${Uri.encodeComponent(p.name)}';
+
+/// The ~half of the catalogue treated as AFFILIATE (bought on Amazon), spread
+/// across every category; each category's `_overall` hero pick stays ParentVeda.
+/// 12 of 24 products. (A product can also opt in via `Product.isAffiliate`.)
+const Set<String> _kAffiliateProductIds = {
+  'pp_budget', 'pp_premium',
+  'sc_budget',
+  'mw_premium', 'mw_budget',
+  'bb_budget',
+  'cs_premium',
+  'nb_budget',
+  'bp_budget', 'bp_premium',
+  'sw_budget', 'sw_premium',
+};
+
+/// Is [p] an affiliate (Amazon) product, vs a ParentVeda (in-app cart) product?
+bool productIsAffiliate(Product p) =>
+    p.isAffiliate || _kAffiliateProductIds.contains(p.id);
+
 List<Product> productsForCategory(String categoryId) =>
     kProducts.where((p) => p.categoryId == categoryId).toList();
 

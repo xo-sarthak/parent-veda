@@ -7,21 +7,23 @@
 //  here" marker anchor the mother in her journey.
 // =============================================================================
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/journey_node.dart';
+import '../services/journey_dates_store.dart';
 import '../services/journey_nodes.dart';
 import '../services/pregnancy_controller.dart';
-import '../widgets/journey/journey_backdrop.dart';
+import '../theme/app_theme.dart';
 import '../widgets/journey/journey_geometry.dart';
 import '../widgets/journey/journey_node.dart';
 import '../widgets/journey/journey_palette.dart';
 import '../widgets/journey/journey_celebration.dart';
 import '../widgets/journey/journey_path.dart';
-import '../widgets/journey/journey_progress_card.dart';
 import '../widgets/journey/node_cards.dart';
-import '../widgets/journey/upcoming_section.dart';
 import 'weekly_card_stack_screen.dart';
 
 class JourneyMapScreen extends StatefulWidget {
@@ -39,20 +41,15 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
   late final Animation<double> _pulse;
   late final List<MapNode> _nodes;
 
-  /// Active category filter; null means "All".
-  JourneyNodeType? _filter;
-
   /// Drives the one-time auto-scroll that lands the map on the current week.
   final ScrollController _scroll = ScrollController();
   final GlobalKey _hereKey = GlobalKey();
   bool _landed = false;
+  bool _catchUpDismissed = false;
 
   static const double _slotSpacing = 96;
-  static const double _weekSize = 52;
-  static const double _milestoneSize = 40;
-  static const double _destSize = 62;
-  static const double _topPad = 40;
-  static const double _bottomPad = 70;
+  static const double _topPad = 44;
+  static const double _bottomPad = 104;
 
   PregnancyController get _c => widget.controller;
 
@@ -74,8 +71,9 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     super.dispose();
   }
 
-  /// On first open, gently scroll so the "you are here" marker lands in view —
-  /// a small reveal that anchors the mother on her current week.
+  /// On first open, scroll so the "you are here" marker sits in the upper-middle
+  /// of the viewport (~45% down): the mother opens focused on where she is now,
+  /// with the road ahead toward Birth extending downward and away.
   void _maybeLandOnCurrent() {
     if (_landed || !mounted) return;
     final ctx = _hereKey.currentContext;
@@ -83,17 +81,39 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     _landed = true;
     Scrollable.ensureVisible(
       ctx,
-      alignment: 0.42,
+      alignment: 0.45,
       duration: const Duration(milliseconds: 700),
       curve: Curves.easeInOutCubic,
     );
   }
 
-  /// The nodes currently shown: everything for "All", else only the selected
-  /// category (week checkpoints appear only in "All").
-  List<MapNode> get _visibleNodes {
-    if (_filter == null) return _nodes;
-    return _nodes.where((n) => n.type == _filter).toList();
+  /// The mother's current position as a DISPLAY index. The trail renders in
+  /// NATURAL order (0 = the start / Week 4 at the top, count-1 = Birth at the
+  /// bottom), so the display index is simply the ascending day-index.
+  double _currentDisplayIndex() {
+    if (_nodes.isEmpty) return 0;
+    return _indexForDay(_c.currentDay.toDouble(), _nodes);
+  }
+
+  /// Index (in display order) of the node to LAND on when the map opens: the
+  /// week checkpoint for the current week if present, else the nearest week
+  /// checkpoint. Landing is WEEKLY — it always settles squarely on a week node,
+  /// never on the fractional day-point between two weeks.
+  int _currentWeekNodeIndex(List<MapNode> display) {
+    final cw = _c.currentWeek;
+    var best = 0;
+    var bestDist = 1 << 30;
+    for (var i = 0; i < display.length; i++) {
+      final n = display[i];
+      if (!n.isWeekCheckpoint || n.weekLabel == null) continue;
+      if (n.weekLabel == cw) return i; // exact current-week checkpoint
+      final d = (n.weekLabel! - cw).abs();
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    return best;
   }
 
   /// Fractional slot index for an arbitrary pregnancy [day], over [list].
@@ -112,10 +132,6 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     }
     return (list.length - 1).toDouble();
   }
-
-  /// Fractional slot index for the mother's current pregnancy day, over [list].
-  double _currentIndex(List<MapNode> list) =>
-      _indexForDay(_c.currentDay.toDouble(), list);
 
   NodeState _weekState(int week) {
     if (week < _c.currentWeek) return NodeState.completed;
@@ -150,356 +166,493 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final s = S(_c.language);
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, _) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _maybeLandOnCurrent());
-        return Scaffold(
-          appBar: AppBar(title: Text(s.journeyTitle)),
-          body: ListView(
-            controller: _scroll,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-            children: [
-              JourneyProgressCard(controller: _c),
-              const SizedBox(height: 14),
-              _buildFilters(context, s),
-              const SizedBox(height: 8),
-              _buildTrail(context, s),
-              const SizedBox(height: 8),
-              UpcomingSection(
-                controller: _c,
-                nodes: _nodes,
-                onTap: _openMilestone,
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  // --- late-joiner catch-up + overdue (additive — the trail is unchanged) -----
+
+  /// Editable personal milestones already behind "now" that she hasn't dated yet
+  /// — the moments a late-joiner can fill in so the map reflects HER journey.
+  List<JourneyMilestone> _catchUpCandidates() {
+    final cur = _c.currentDay;
+    return _nodes
+        .where((n) => n.milestone != null)
+        .map((n) => n.milestone!)
+        .where((m) =>
+            m.isDatable &&
+            m.posDay <= cur &&
+            !JourneyDatesStore.instance.isEdited(m.id))
+        .toList();
   }
 
-  Widget _buildFilters(BuildContext context, S s) {
-    final chips = <(String, JourneyNodeType?)>[
-      (s.filterAll, null),
-      ('🏆 ${s.filterAchievements}', JourneyNodeType.achievement),
-      ('👶 ${s.filterBaby}', JourneyNodeType.babyDev),
-      ('🩺 ${s.filterMedical}', JourneyNodeType.medical),
-      ('🌸 ${s.filterMother}', JourneyNodeType.mother),
-      ('🔓 ${s.filterFeatures}', JourneyNodeType.feature),
-      ('📍 ${s.filterJourney}', JourneyNodeType.pvJourney),
-    ];
-    return SizedBox(
-      height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: chips.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, i) {
-          final (label, type) = chips[i];
-          final selected = _filter == type;
-          return ChoiceChip(
-            label: Text(label),
-            selected: selected,
-            onSelected: (_) => setState(() => _filter = type),
+  Widget _overdueBanner(S s) => Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: AppTheme.secondary100,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(children: [
+          const Text('💛', style: TextStyle(fontSize: 20)),
+          const SizedBox(width: 10),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(s.jmOverdueTitle,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 2),
+              Text(s.jmOverdueBody(_c.daysPastDue),
+                  style: GoogleFonts.manrope(
+                      fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
+            ]),
+          ),
+        ]),
+      );
+
+  Widget _catchUpBanner(S s) => Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [Color(0xFFFFF1E6), Color(0xFFFDE8F0)]),
+          borderRadius: BorderRadius.circular(16),
+          border:
+              Border.all(color: AppTheme.secondary500.withValues(alpha: 0.16)),
+        ),
+        child: Row(children: [
+          const Text('🧭', style: TextStyle(fontSize: 20)),
+          const SizedBox(width: 10),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(s.jmCatchUpTitle,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 2),
+              Text(s.jmCatchUpBody,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: _showCatchUp,
+                behavior: HitTestBehavior.opaque,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(s.jmCatchUpCta,
+                      style: GoogleFonts.manrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.secondary600)),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 15, color: AppTheme.secondary600),
+                ]),
+              ),
+            ]),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.close_rounded,
+                size: 18, color: AppTheme.neutral500),
+            onPressed: () => setState(() => _catchUpDismissed = true),
+          ),
+        ]),
+      );
+
+  void _showCatchUp() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => AnimatedBuilder(
+        animation: JourneyDatesStore.instance,
+        builder: (ctx, _) {
+          final s = S(_c.language);
+          final list = _catchUpCandidates();
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Center(
+                  child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: AppTheme.outlineVariant,
+                          borderRadius: BorderRadius.circular(99))),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(s.jmCatchUpSheet,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primary900)),
+                ),
+                const SizedBox(height: 12),
+                if (list.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(s.jmAllCaughtUp,
+                        style: GoogleFonts.manrope(
+                            fontSize: 14, color: AppTheme.neutral600)),
+                  )
+                else
+                  for (final m in list) _catchUpRow(s, m),
+              ]),
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildTrail(BuildContext context, S s) {
-    final nodes = _visibleNodes;
-    if (nodes.isEmpty) return const SizedBox.shrink();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final height = JourneyGeometry.heightFor(
-          nodes.length,
-          _slotSpacing,
-          topPad: _topPad,
-          bottomPad: _bottomPad,
-        );
-        final geometry = JourneyGeometry(
-          size: Size(width, height),
-          count: nodes.length,
-          topPad: _topPad,
-          bottomPad: _bottomPad,
-        );
-        final currentIndex = _currentIndex(nodes);
-        final herePoint = geometry.pointAtIndex(currentIndex);
-        const hereBox = _weekSize * 3.0;
+  Widget _catchUpRow(S s, JourneyMilestone m) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: JourneyColors.forType(m.type).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12)),
+            child: Text(m.emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(m.title.of(_c.language),
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary900)),
+          ),
+          OutlinedButton.icon(
+            onPressed: () => _pickCatchUpDate(m),
+            icon: const Icon(Icons.edit_calendar_rounded, size: 16),
+            label: Text(s.jmSetWhen),
+          ),
+        ]),
+      );
 
-        // The destination (end of the journey) only reads as such in the full
-        // "All" view — in a filtered view the last node is just a category item.
-        final destinationIndex = _filter == null ? nodes.length - 1 : -1;
-        final arrivalCenter = destinationIndex >= 0
-            ? geometry.pointAtIndex(destinationIndex.toDouble())
-            : null;
+  Future<void> _pickCatchUpDate(JourneyMilestone m) async {
+    final due = _c.dueDate;
+    final current = JourneyDatesStore.instance.dateFor(m.id) ??
+        _c.dateForDay(m.posDay.round());
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: _c.dateForDay(1).subtract(const Duration(days: 30)),
+      lastDate:
+          DateTime(due.year, due.month, due.day).add(const Duration(days: 45)),
+      helpText: S(_c.language).jmCatchUpSheet,
+    );
+    if (picked != null) JourneyDatesStore.instance.setDate(m.id, picked);
+  }
 
-        // Trimester regions: split the trail where weeks 13→14 and 27→28 fall.
-        final idxT1 = _indexForDay(91, nodes);
-        final idxT2 = _indexForDay(189, nodes);
-        final t1End = geometry.pointAtIndex(idxT1).dy;
-        final t2End = geometry.pointAtIndex(idxT2).dy;
-        // Slot index of each band's top, used to place its chip clear of the trail.
-        final bandTopIdx = <double>[0, idxT1, idxT2];
-        final bands = <TrimesterBand>[
-          TrimesterBand(top: 0, bottom: t1End, fill: JourneyColors.trimesterFill[0]),
-          TrimesterBand(top: t1End, bottom: t2End, fill: JourneyColors.trimesterFill[1]),
-          TrimesterBand(top: t2End, bottom: height, fill: JourneyColors.trimesterFill[2]),
-        ];
-
-        return SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            children: [
-              // 1 · soft trimester regions + dotted texture + arrival glow
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: JourneyBackdropPainter(
-                    bands: bands,
-                    arrivalCenter: arrivalCenter,
-                  ),
-                ),
+  @override
+  Widget build(BuildContext context) {
+    final s = S(_c.language);
+    return AnimatedBuilder(
+      animation: Listenable.merge([_c, JourneyDatesStore.instance]),
+      builder: (context, _) {
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _maybeLandOnCurrent());
+        return Scaffold(
+          backgroundColor: AppTheme.surfaceContainer,
+          appBar: AppBar(
+            backgroundColor: AppTheme.surfaceContainer,
+            elevation: 0,
+            title: Text(s.journeyTitle),
+          ),
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFF3EEF7), Color(0xFFEAF1EA)],
+                stops: [0.0, 0.9],
               ),
-              // 2 · trimester chips at the top of each region, placed on the
-              //     side opposite the trail so they never sit on a node/label
-              for (int i = 0; i < bands.length; i++)
-                _bandLabel(
-                  i,
-                  bands[i].top,
-                  geometry.pointAtIndex(bandTopIdx[i]).dx < width / 2,
-                  s,
+            ),
+            // Fixed header on top; the winding trail is the sole scroll content
+            // (so a node's viewport-Y = nodeY − scrollOffset drives the depth).
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                  child: _TrailHeaderCard(controller: _c),
                 ),
-              // 3 · the winding trail (completed green / future grey)
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: JourneyPathPainter(
-                    geometry: geometry,
-                    currentIndex: currentIndex,
-                  ),
-                ),
-              ),
-              // 4 · node circles (last node becomes the glowing destination)
-              for (int i = 0; i < nodes.length; i++)
-                _positionedNode(
-                  geometry.pointAtIndex(i.toDouble()),
-                  nodes[i],
-                  isDestination: i == destinationIndex,
-                ),
-              // 5 · caption pills beside each node (meaning at a glance)
-              for (int i = 0; i < nodes.length; i++)
-                _positionedLabel(
-                  geometry.pointAtIndex(i.toDouble()),
-                  nodes[i],
-                  width,
-                  s,
-                  isDestination: i == destinationIndex,
-                ),
-              // tiny anchor used to auto-scroll the map onto the current week
-              Positioned(
-                left: herePoint.dx,
-                top: herePoint.dy,
-                child: SizedBox(key: _hereKey, width: 1, height: 1),
-              ),
-              // 6 · "you are here" (week · day)
-              Positioned(
-                left: herePoint.dx - hereBox / 2,
-                top: herePoint.dy - hereBox / 2,
-                child: YouAreHereMarker(
-                  pulse: _pulse,
-                  eyebrow: s.youAreHere,
-                  detail: s.journeyWeekDay(_c.currentWeek, _c.dayOfWeek),
-                  diameter: _weekSize,
-                ),
-              ),
-            ],
+                // Overdue: a calm "baby comes when ready" note past the due date.
+                if (_c.isOverdue) _overdueBanner(s),
+                // Late-joiner catch-up: set real dates for moments already behind.
+                if (!_catchUpDismissed && _catchUpCandidates().isNotEmpty)
+                  _catchUpBanner(s),
+                Expanded(child: _buildTrail(context, s)),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _positionedNode(Offset point, MapNode node,
-      {bool isDestination = false}) {
-    // The destination gets a larger, glowing marker in a roomy box so its halo
-    // isn't clipped.
+  Widget _buildTrail(BuildContext context, S s) {
+    // Natural display order: index 0 = the start / Week 4 (TOP), last = Birth
+    // (BOTTOM) — reading top→bottom moves forward in time toward birth.
+    final display = _nodes;
+    final count = display.length;
+    if (count == 0) return const SizedBox.shrink();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = JourneyGeometry.heightFor(
+          count,
+          _slotSpacing,
+          topPad: _topPad,
+          bottomPad: _bottomPad,
+        );
+        final geometry = JourneyGeometry(
+          size: Size(width, height),
+          count: count,
+          topPad: _topPad,
+          bottomPad: _bottomPad,
+        );
+        final points = [
+          for (int i = 0; i < count; i++) geometry.pointAtIndex(i.toDouble())
+        ];
+        final double currentIndex =
+            _currentDisplayIndex().clamp(0.0, (count - 1).toDouble()).toDouble();
+        // Landing anchor = the CURRENT WEEK checkpoint node (integer index), not
+        // the fractional day-point — so opening lands squarely on the week
+        // you're in regardless of the day-within-week. (The path painter still
+        // uses the fractional currentIndex for progress colouring.)
+        final int hereNodeIndex =
+            _currentWeekNodeIndex(display).clamp(0, count - 1);
+        final herePoint = geometry.pointAtIndex(hereNodeIndex.toDouble());
+
+        // Crisp static nodes + caption pills (no perspective) — reference look.
+        final nodeWidgets = <Widget>[];
+        for (int i = 0; i < count; i++) {
+          nodeWidgets.add(_node(points[i], display[i], i, count));
+          final pill = _pill(points[i], display[i], i, count, width, s);
+          if (pill != null) nodeWidgets.add(pill);
+        }
+
+        return SingleChildScrollView(
+          controller: _scroll,
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // the winding trail (white base + dotted overlay, ahead lighter)
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: JourneyPathPainter(
+                      geometry: geometry,
+                      currentIndex: currentIndex,
+                    ),
+                  ),
+                ),
+                // Crisp nodes + pills (no perspective scaling/fading).
+                ...nodeWidgets,
+                // tiny anchor used to auto-scroll the map onto the current node
+                Positioned(
+                  left: herePoint.dx,
+                  top: herePoint.dy,
+                  child: SizedBox(key: _hereKey, width: 1, height: 1),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Diameter for a node by role/state — the MapB sizes.
+  double _diameterFor(MapNode node, {required bool isDestination}) {
+    if (isDestination) return 58;
+    if (node.isWeekCheckpoint) {
+      switch (_weekState(node.weekLabel!)) {
+        case NodeState.current:
+          return 60;
+        case NodeState.completed:
+          return 40;
+        case NodeState.future:
+          return 44;
+      }
+    }
+    return 36; // milestone — a colour disc with a type icon
+  }
+
+  Widget _markerFor(MapNode node, bool isDestination, double size) {
     if (isDestination) {
-      const box = _destSize * 1.9;
-      return Positioned(
-        left: point.dx - box / 2,
-        top: point.dy - box / 2,
-        width: box,
-        height: box,
-        child: DestinationMarker(
-          emoji: '👶',
-          pulse: _pulse,
-          diameter: _destSize,
-          onTap: () => _onNodeTap(node),
+      final unlocked = node.posDay <= _c.currentDay;
+      // The journey's end (Birth) — a clean white disc labelled "Birth".
+      final disc = Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: Color(0x1F2D144C), blurRadius: 12, offset: Offset(0, 4)),
+          ],
+        ),
+        child: Text(S(_c.language).journeyBirth,
+            style: const TextStyle(
+                color: Color(0xFFB2AEB5),
+                fontWeight: FontWeight.w700,
+                fontSize: 13)),
+      );
+      // A soft radiating glow behind Birth: faint & small while LOCKED ("something
+      // special waits here, not yet"), bright, warm & wide once UNLOCKED ("something
+      // joyful is happening"). Same white disc; the glow is the addition.
+      final glow = unlocked ? JourneyColors.arrivalGold : AppTheme.secondary300;
+      final auraAlpha = unlocked ? 0.40 : 0.12;
+      final pingAlpha = unlocked ? 0.55 : 0.18;
+      final pingScale = unlocked ? 0.95 : 0.42;
+      return GestureDetector(
+        onTap: () => _onNodeTap(node),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedBuilder(
+          animation: _pulse,
+          builder: (context, child) {
+            final v = _pulse.value;
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // Steady aura — always on, much brighter once unlocked.
+                OverflowBox(
+                  maxWidth: double.infinity,
+                  maxHeight: double.infinity,
+                  child: Container(
+                    width: size * 1.3,
+                    height: size * 1.3,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: glow.withValues(alpha: auraAlpha),
+                    ),
+                  ),
+                ),
+                // Expanding ping — small/faint when locked, wide/bright unlocked.
+                OverflowBox(
+                  maxWidth: double.infinity,
+                  maxHeight: double.infinity,
+                  child: Container(
+                    width: size * (1.0 + v * pingScale),
+                    height: size * (1.0 + v * pingScale),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: glow.withValues(alpha: pingAlpha * (1 - v)),
+                    ),
+                  ),
+                ),
+                child!,
+              ],
+            );
+          },
+          child: disc,
         ),
       );
-    }
-
-    final isWeek = node.isWeekCheckpoint;
-    final size = isWeek ? _weekSize : _milestoneSize;
-    final Widget marker;
-    if (isWeek) {
+    } else if (node.isWeekCheckpoint) {
       final week = node.weekLabel!;
       final state = _weekState(week);
-      marker = JourneyNodeMarker(
+      return JourneyNodeMarker(
         label: '$week',
         state: state,
-        diameter: _weekSize,
+        diameter: size,
         pulse: state == NodeState.current ? _pulse : null,
         onTap: () => _openWeek(week),
       );
     } else {
       final m = node.milestone!;
-      marker = MilestoneMarker(
-        emoji: m.emoji,
+      return MilestoneMarker(
         color: JourneyColors.forType(m.type),
+        icon: JourneyColors.iconForType(m.type),
         reached: node.posDay <= _c.currentDay,
-        diameter: _milestoneSize,
+        diameter: size,
         onTap: () => _openMilestone(m),
       );
     }
+  }
+
+  /// A crisp node positioned on the trail (no perspective).
+  Widget _node(Offset point, MapNode node, int di, int count) {
+    final isDestination = di == count - 1;
+    final size = _diameterFor(node, isDestination: isDestination);
     return Positioned(
       left: point.dx - size / 2,
       top: point.dy - size / 2,
       width: size,
       height: size,
-      child: marker,
+      child: _markerFor(node, isDestination, size),
     );
   }
 
-  /// A small trimester chip at the top of each region, so the three sections
-  /// read clearly as First / Second / Third trimester. [onRight] places it on
-  /// the side away from the trail at that point, avoiding overlap with nodes.
-  Widget _bandLabel(int i, double top, bool onRight, S s) {
-    final ink = JourneyColors.trimesterInk[i];
+  /// A caption pill centred below a node, clamped to stay fully on-screen.
+  /// Shown for Birth ("Welcome"), the start ("Start"), the current stop
+  /// ("You're here") and every milestone (its title, wrapping to 2 lines).
+  Widget? _pill(
+      Offset point, MapNode node, int di, int count, double width, S s) {
+    final isDestination = di == count - 1;
+    final isStart = di == 0;
+    final size = _diameterFor(node, isDestination: isDestination);
+
+    String? text;
+    var dark = false;
+    if (isDestination) {
+      text = s.journeyWelcome;
+    } else if (isStart) {
+      text = s.journeyStart;
+    } else if (node.isWeekCheckpoint) {
+      if (_weekState(node.weekLabel!) == NodeState.current) {
+        text = s.journeyHerePill;
+        dark = true;
+      }
+    } else {
+      // Milestone — show WHEN it falls. For an editable personal moment she's
+      // already passed but hasn't dated yet, nudge with "· Set date" so it's
+      // obvious she can tell us when it actually happened.
+      final m = node.milestone!;
+      final edited = JourneyDatesStore.instance.dateFor(m.id);
+      final reached = m.posDay <= _c.currentDay;
+      if (m.isDatable && reached && edited == null) {
+        text = '${m.title.of(_c.language)} · ${s.jmSetWhen}';
+      } else {
+        final date = edited ?? _c.dateForDay(m.posDay.round());
+        text = '${m.title.of(_c.language)} · ${s.jmShortDate(date)}';
+      }
+    }
+    if (text == null) return null;
+
+    // Centre the pill under its node, but clamp so it's never cut at an edge.
+    const pillW = 168.0;
+    final left = (point.dx - pillW / 2)
+        .clamp(8.0, math.max(8.0, width - pillW - 8.0))
+        .toDouble();
     return Positioned(
-      left: onRight ? null : 12,
-      right: onRight ? 12 : null,
-      top: top + 8,
-      child: IgnorePointer(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: JourneyColors.trimesterFill[i].withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(40),
-            border: Border.all(color: ink.withValues(alpha: 0.30), width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(color: ink, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 7),
-              Text(
-                s.trimesterBandLabel(i).toUpperCase(),
-                style: TextStyle(
-                  color: ink,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
+      left: left,
+      top: point.dy + size / 2 + 7,
+      width: pillW,
+      child: Center(
+        child: JourneyNodeLabel(
+          text: text,
+          dark: dark,
+          maxWidth: pillW,
+          onTap: () => _onNodeTap(node),
         ),
       ),
     );
-  }
-
-  /// The caption pill beside a node. It sits on the OUTER side of the curve
-  /// (right for nodes right-of-centre, left otherwise) so it never crosses the
-  /// trail, and grows toward the nearest screen edge.
-  Widget _positionedLabel(Offset point, MapNode node, double width, S s,
-      {bool isDestination = false}) {
-    final isWeek = node.isWeekCheckpoint;
-    final size = isDestination
-        ? _destSize
-        : (isWeek ? _weekSize : _milestoneSize);
-
-    final String text;
-    final String? subtitle;
-    final Color color;
-    final bool reached;
-    if (isWeek) {
-      final week = node.weekLabel!;
-      final state = _weekState(week);
-      // The current week is labelled by the "you are here" pill, so we skip its
-      // own side label to avoid two pills fighting for the same spot.
-      if (state == NodeState.current) return const SizedBox.shrink();
-      text = '${s.weekWord} $week';
-      subtitle = null; // the title already says the week
-      color = JourneyColors.forState(state);
-      reached = state != NodeState.future;
-    } else {
-      final m = node.milestone!;
-      text = m.title.of(_c.language);
-      subtitle =
-          m.rangeLabel?.of(_c.language) ?? '${s.weekWord} ${m.anchorWeek}';
-      color = isDestination
-          ? JourneyColors.arrivalRose
-          : JourneyColors.forType(m.type);
-      reached = node.posDay <= _c.currentDay;
-    }
-
-    const gap = 8.0;
-    const vOffset = 15.0; // ~half a single-line pill, to centre on the node
-    final rightSide = point.dx >= width / 2;
-
-    if (rightSide) {
-      final left = point.dx + size / 2 + gap;
-      final maxW = width - left - 4;
-      if (maxW < 30) return const SizedBox.shrink();
-      return Positioned(
-        left: left,
-        top: point.dy - vOffset,
-        width: maxW,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: JourneyNodeLabel(
-            text: text,
-            subtitle: subtitle,
-            color: color,
-            reached: reached,
-            maxWidth: maxW,
-            onTap: () => _onNodeTap(node),
-          ),
-        ),
-      );
-    } else {
-      final rightEdge = point.dx - size / 2 - gap;
-      final maxW = rightEdge - 4;
-      if (maxW < 30) return const SizedBox.shrink();
-      return Positioned(
-        left: 0,
-        top: point.dy - vOffset,
-        width: rightEdge,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: JourneyNodeLabel(
-            text: text,
-            subtitle: subtitle,
-            color: color,
-            reached: reached,
-            maxWidth: maxW,
-            alignEnd: true,
-            onTap: () => _onNodeTap(node),
-          ),
-        ),
-      );
-    }
   }
 
   /// Tapping a node (circle or its caption) opens the same destination.
@@ -509,5 +662,81 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     } else {
       _openMilestone(node.milestone!);
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Trail header card — design's "Your trail to birth · N weeks to go" + ring
+// ---------------------------------------------------------------------------
+class _TrailHeaderCard extends StatelessWidget {
+  const _TrailHeaderCard({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(controller.language);
+    final c = controller;
+    final togo = PregnancyController.lastContentWeek - c.currentWeek;
+    final pct = c.progress;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x0F2D144C), blurRadius: 14, offset: Offset(0, 4)),
+        ],
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              s.journeyTrailKicker.toUpperCase(),
+              style: GoogleFonts.manrope(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: AppTheme.secondary600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              togo <= 0 ? s.weeksToGoNow : s.weeksToGo(togo),
+              style: GoogleFonts.fraunces(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primary900,
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: Stack(alignment: Alignment.center, children: [
+            SizedBox(
+              width: 56,
+              height: 56,
+              child: CircularProgressIndicator(
+                value: pct,
+                strokeWidth: 6,
+                strokeCap: StrokeCap.round,
+                backgroundColor: AppTheme.secondary100,
+                valueColor: const AlwaysStoppedAnimation(AppTheme.secondary500),
+              ),
+            ),
+            Text(
+              '${(pct * 100).round()}%',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primary900,
+              ),
+            ),
+          ]),
+        ),
+      ]),
+    );
   }
 }

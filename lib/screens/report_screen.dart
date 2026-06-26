@@ -17,6 +17,7 @@ import '../localization/app_language.dart';
 import '../models/report_finding.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'tools/ask_veda_screen.dart';
 
 const Color _calm = Color(0xFF18A39B); // teal — calm, non-alarming accent
 const Color _reassure = Color(0xFF3FA56A); // soft green — "things to remember"
@@ -186,8 +187,12 @@ class ReportArticleScreen extends StatelessWidget {
   final PregnancyController controller;
 
   void _askVeda(BuildContext context, S s) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(s.rAskComingSoon)));
+    // Ask Veda is live — open it pre-filled with this finding (it has the data).
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => AskVedaScreen(
+          controller: controller,
+          initialQuery: finding.name.of(controller.language)),
+    ));
   }
 
   @override

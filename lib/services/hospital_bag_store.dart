@@ -88,6 +88,7 @@ class BagItem {
     this.recommendation,
     this.status = BagItemStatus.needed,
     this.packed = false,
+    this.favourite = false,
     this.store = '',
     this.link = '',
     this.price,
@@ -104,6 +105,7 @@ class BagItem {
   // Mutable planning state.
   BagItemStatus status;
   bool packed;
+  bool favourite; // the mother's own "favourites" list (her must-haves)
   String store; // for buyElse
   String link; // for buyElse
   int? price; // chosen product price (buyVeda) or user-entered (buyElse)
@@ -131,6 +133,7 @@ class BagItem {
         'recommendation': recommendation?.toJson(),
         'status': status.name,
         'packed': packed,
+        'favourite': favourite,
         'store': store,
         'link': link,
         'price': price,
@@ -154,6 +157,7 @@ class BagItem {
               Map<String, dynamic>.from(j['recommendation'])),
       status: _statusFromString((j['status'] ?? 'needed').toString()),
       packed: j['packed'] == true,
+      favourite: j['favourite'] == true,
       store: (j['store'] ?? '').toString(),
       link: (j['link'] ?? '').toString(),
       price: (j['price'] as num?)?.toInt(),
@@ -247,9 +251,11 @@ class HospitalBagStore extends ChangeNotifier {
           !i.packed)
       .toList();
 
-  /// Planner filter. [key] ∈ all|veda|else|owned|packed|pending|skipped.
+  /// Planner filter. [key] ∈ all|fav|veda|else|owned|packed|pending|skipped.
   List<BagItem> filter(String key) {
     switch (key) {
+      case 'fav':
+        return _items.where((i) => i.favourite).toList();
       case 'veda':
         return withStatus(BagItemStatus.buyVeda);
       case 'else':
@@ -347,6 +353,18 @@ class HospitalBagStore extends ChangeNotifier {
     i.packed = !i.packed;
     await _touch();
   }
+
+  /// The mother's own favourites — her must-have items, regardless of category.
+  Future<void> toggleFavourite(String id) async {
+    final i = byId(id);
+    if (i == null) return;
+    i.favourite = !i.favourite;
+    await _touch();
+  }
+
+  List<BagItem> get favourites =>
+      _items.where((i) => i.favourite).toList();
+  int get favouriteCount => favourites.length;
 
   Future<void> setBuyElse(
     String id, {

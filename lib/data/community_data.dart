@@ -11,6 +11,18 @@ import '../models/community_models.dart';
 // Stable id used for the Community Pulse "question of the week" poll.
 const String kPulseKicksPollId = 'pulse_kicks';
 
+/// Specialties a mother can request when she asks for expert verification — so
+/// the request reaches the right kind of doctor (curating the doctor feed).
+const List<String> kVerifySpecialties = [
+  'all',
+  'gynae',
+  'pediatric',
+  'lactation',
+  'nutrition',
+  'physio',
+  'mental',
+];
+
 const List<Community> kCommunities = [
   // --- Auto-joined for a pregnancy user (cohort / trimester / location) ---
   Community(
@@ -127,6 +139,7 @@ const List<CommunityPost> kSeedPosts = [
     likes: 84,
     comments: 37,
     saves: 12,
+    wantsVerification: true,
   ),
   CommunityPost(
     id: 'p2',
@@ -139,6 +152,9 @@ const List<CommunityPost> kSeedPosts = [
     likes: 210,
     comments: 45,
     saves: 30,
+    endorsedBy: 'Dr. Meera',
+    endorsedByCred: 'IBCLC',
+    expertEndorseCount: 240,
   ),
   CommunityPost(
     id: 'p3',
@@ -164,11 +180,12 @@ const List<CommunityPost> kSeedPosts = [
     likes: 56,
     comments: 22,
     saves: 8,
+    wantsVerification: true,
   ),
   CommunityPost(
     id: 'p5',
     communityId: 'breastfeeding_prep',
-    author: 'Dr. Meera (IBCLC)',
+    author: 'Dr. Meera',
     authorEmoji: '👩‍⚕️',
     text: 'Lactation tip: start learning the latch positions now — it makes the first week so much easier.',
     type: PostType.expert,
@@ -177,6 +194,8 @@ const List<CommunityPost> kSeedPosts = [
     comments: 19,
     saves: 88,
     upvotes: 76,
+    cred: 'IBCLC',
+    expertEndorseCount: 180,
   ),
   CommunityPost(
     id: 'p6',
@@ -288,6 +307,98 @@ const List<CommunityPost> kSeedPosts = [
     comments: 56,
     saves: 1,
   ),
+  CommunityPost(
+    id: 'p15',
+    communityId: 'first_time',
+    author: 'Aisha',
+    authorEmoji: '🌷',
+    text:
+        'My birth story 💕 After a long labour we did skin-to-skin right away and started feeding within the first hour. To every first-time mom reading this — trust your body, it truly knows the way.',
+    type: PostType.milestone,
+    topics: ['Labor', 'Breastfeeding'],
+    likes: 264,
+    comments: 52,
+    saves: 73,
+    endorsedBy: 'Dr. Meera',
+    endorsedByCred: 'IBCLC',
+    expertEndorseCount: 320,
+  ),
+  // --- General feed (no community) — your main timeline ---
+  CommunityPost(
+    id: 'g1',
+    communityId: '',
+    author: 'Tanvi',
+    authorEmoji: '🌼',
+    text:
+        'Reminder to every mama scrolling tonight: you are doing so much better than you think. Rest when you can 💛',
+    type: PostType.experience,
+    topics: ['Pregnancy Symptoms'],
+    likes: 152,
+    comments: 28,
+    saves: 19,
+  ),
+  CommunityPost(
+    id: 'g2',
+    communityId: '',
+    author: 'Dr. Aarti Desai',
+    authorEmoji: '👩‍⚕️',
+    text:
+        'Quick iron tip: pair your dal, spinach or beans with something rich in vitamin C (lemon, tomato, orange) and keep tea/coffee away from meals — you absorb a lot more iron that way.',
+    type: PostType.expert,
+    topics: ['Nutrition'],
+    likes: 198,
+    comments: 21,
+    saves: 96,
+    upvotes: 64,
+    cred: 'RD',
+    expertEndorseCount: 150,
+  ),
+  CommunityPost(
+    id: 'g3',
+    communityId: '',
+    author: 'Meghna',
+    authorEmoji: '🤰',
+    text:
+        'How is everyone managing the third-trimester sleep struggle? Pillows everywhere and I still wake up at 3am 😅',
+    type: PostType.question,
+    topics: ['Pregnancy Symptoms', 'Sleep'],
+    likes: 73,
+    comments: 33,
+    saves: 7,
+    wantsVerification: true,
+  ),
+];
+
+/// One verified expert in the (dummy) endorsement pool.
+typedef CommunityExpert = ({String name, String cred, String specialty});
+
+/// The pool of verified experts shown in the "who verified this" sheet.
+/// All fictional — placeholder data until real doctor accounts exist.
+const List<CommunityExpert> kCommunityExperts = [
+  (name: 'Dr. Meera Nair', cred: 'IBCLC', specialty: 'Lactation'),
+  (name: 'Dr. Priya Sharma', cred: 'MD', specialty: 'Pediatrics'),
+  (name: 'Dr. Ananya Rao', cred: 'OB-GYN', specialty: 'Obstetrics'),
+  (name: 'Dr. Kavita Menon', cred: 'MD', specialty: 'Gynaecology'),
+  (name: 'Dr. Sneha Iyer', cred: 'DNB', specialty: 'Fetal Medicine'),
+  (name: 'Dr. Riya Kapoor', cred: 'MD', specialty: 'Neonatology'),
+  (name: 'Dr. Aarti Desai', cred: 'RD', specialty: 'Prenatal Nutrition'),
+  (name: 'Dr. Neha Bansal', cred: 'MD', specialty: 'Pediatrics'),
+  (name: 'Dr. Pooja Reddy', cred: 'OB-GYN', specialty: 'High-risk Pregnancy'),
+  (name: 'Dr. Shalini Verma', cred: 'IBCLC', specialty: 'Breastfeeding'),
+  (name: 'Dr. Ritu Agarwal', cred: 'MD', specialty: 'Obstetrics'),
+  (name: 'Dr. Divya Pillai', cred: 'PT', specialty: 'Prenatal Fitness'),
+  (name: 'Dr. Sana Khan', cred: 'MD', specialty: 'Gynaecology'),
+  (name: 'Dr. Tara Joshi', cred: 'PsyD', specialty: 'Perinatal Mental Health'),
+  (name: 'Dr. Ishita Gupta', cred: 'DCH', specialty: 'Child Health'),
+  (name: 'Dr. Lakshmi Subramanian', cred: 'MD', specialty: 'Maternal Medicine'),
+  (name: 'Dr. Farah Ahmed', cred: 'IBCLC', specialty: 'Lactation'),
+  (name: 'Dr. Megha Saxena', cred: 'OB-GYN', specialty: 'Obstetrics'),
+  (name: 'Dr. Nandini Rao', cred: 'RD', specialty: 'Nutrition'),
+  (name: 'Dr. Sweta Mishra', cred: 'MD', specialty: 'Neonatology'),
+  (name: 'Dr. Aisha Sheikh', cred: 'DNB', specialty: 'Gynaecology'),
+  (name: 'Dr. Vidya Hegde', cred: 'MD', specialty: 'Pediatrics'),
+  (name: 'Dr. Charita Reddy', cred: 'PT', specialty: 'Pelvic Health'),
+  (name: 'Dr. Ramya Krishnan', cred: 'OB-GYN', specialty: 'Fetal Medicine'),
 ];
 
 const Map<String, List<CommunityComment>> kSeedComments = {

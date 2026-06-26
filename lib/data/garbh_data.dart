@@ -358,3 +358,32 @@ const List<GarbhNutrition> _nutrition = [
   ),
 ];
 GarbhNutrition nutritionForTrimester(int t) => _nutrition[(t - 1).clamp(0, 2)];
+
+// ===========================================================================
+//  Daily rotation pickers — used ONLY by the Home daily Garbh section, where
+//  each pillar shows a different item each day (no recommendation lists). The
+//  full Tools Garbh keeps the trimester pickers above.
+// ===========================================================================
+int _dayIdx(int day, int n) => (day.clamp(1, 280) - 1) % n;
+
+List<GarbhAudio> get _dailyRagas =>
+    kShravan.where((a) => a.kind == GarbhKind.raga).toList();
+
+/// A different raga each day (cycles through the raga set).
+GarbhAudio shravanForDay(int day) {
+  final r = _dailyRagas;
+  return r[_dayIdx(day, r.length)];
+}
+
+/// A different sacred insight each day.
+GarbhInsight insightForDay(int day) => _insights[_dayIdx(day, _insights.length)];
+
+/// One uplifting read per day (rotates through the library).
+GarbhStory vicharaStoryForDay(int day) => kVichara[_dayIdx(day, kVichara.length)];
+
+/// A different breath practice each day.
+GarbhPractice kriyaForDay(int day) => kKriya[_dayIdx(day, kKriya.length)];
+
+/// A different nourishment focus each day.
+GarbhNutrition nutritionForDay(int day) =>
+    _nutrition[_dayIdx(day, _nutrition.length)];

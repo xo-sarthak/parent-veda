@@ -91,6 +91,7 @@ class KegelCareScreen extends StatefulWidget {
 class _KegelCareScreenState extends State<KegelCareScreen> {
   final _store = ToolsStore.instance;
   bool _whyExpanded = false;
+  bool _howExpanded = false;
 
   @override
   void initState() {
@@ -145,6 +146,14 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                       const SizedBox(height: 8),
                       Text(s.kegelFollowProvider, style: text.bodySmall),
                     ]),
+              ),
+              const SizedBox(height: 14),
+              // What is a Kegel & how to do it — right at the top for first-timers.
+              _Expandable(
+                title: s.kegelHowTitle,
+                body: s.kegelHowBody,
+                expanded: _howExpanded,
+                onToggle: () => setState(() => _howExpanded = !_howExpanded),
               ),
               const SizedBox(height: 14),
               // Current routine

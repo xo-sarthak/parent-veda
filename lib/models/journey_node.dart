@@ -80,6 +80,20 @@ class JourneyMilestone {
 
   /// Pregnancy day this milestone sits at (for trail ordering / position).
   double get posDay => (anchorDay ?? anchorWeek * 7).toDouble();
+
+  /// A clinic-scheduled appointment (a scan / medical visit). The exact date is
+  /// set by the doctor — usually in the FUTURE — so it's "set", not a past event.
+  bool get isAppointment => type == JourneyNodeType.medical;
+
+  /// Whether this milestone has a real, personal date worth editing. Only two
+  /// kinds qualify, so the map stays simple and never asks for a date that can't
+  /// exist:
+  ///   • appointments the clinic schedules (every medical scan/visit), and
+  ///   • the handful of moments the mother actually witnesses on a day —
+  ///     first movements felt (a_w18) and the bump's first kicks (mo_w20).
+  /// Gestational/educational growth, the "N days together" counters and feature
+  /// unlocks are derived from her dates and shown read-only (no edit button).
+  bool get isDatable => isAppointment || id == 'a_w18' || id == 'mo_w20';
 }
 
 /// A resolved stop on the trail — either a week checkpoint or a milestone.

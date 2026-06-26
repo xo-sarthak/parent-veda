@@ -18,6 +18,7 @@ import '../models/can_i_entry.dart';
 import '../services/can_i_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'tools/ask_veda_screen.dart';
 
 // ---------------------------------------------------------------------------
 //  Verdict + category visual language
@@ -424,9 +425,12 @@ class CanIAnswerScreen extends StatelessWidget {
   final PregnancyController controller;
 
   void _askVeda(BuildContext context, S s) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(s.canIAskComingSoon)),
-    );
+    // Ask Veda is live — open it pre-filled with this question (it has the data).
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => AskVedaScreen(
+          controller: controller,
+          initialQuery: entry.name.of(controller.language)),
+    ));
   }
 
   @override

@@ -17,13 +17,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
 import '../../localization/app_language.dart';
+import '../../services/cart_store.dart';
 import '../../services/hospital_bag_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
+import '../cart_screen.dart';
 
 class HospitalBagScreen extends StatefulWidget {
   const HospitalBagScreen({super.key, required this.controller});
@@ -254,6 +257,13 @@ class _BagHome extends StatelessWidget {
               icon: const Icon(Icons.ios_share_rounded),
               onPressed: () => _sharePartner(context, s, store),
             ),
+            IconButton(
+              tooltip: s.cartAddAllToCart,
+              icon: const Icon(Icons.add_shopping_cart_rounded),
+              onPressed: () => _addPlannedToCart(context, controller),
+            ),
+            cartIconButton(context, controller,
+                cartId: kHospitalCartId, title: s.cartHospitalTitle),
           ],
           bottom: TabBar(
             tabs: [
@@ -263,62 +273,132 @@ class _BagHome extends StatelessWidget {
             ],
           ),
         ),
-        body: AnimatedBuilder(
-          animation: store,
-          builder: (context, _) => TabBarView(
-            children: [
-              _BagView(controller: controller),
-              _PlannerView(controller: controller),
-              _ShoppingView(controller: controller),
-            ],
-          ),
+        // Each tab listens to the store itself (see below). The TabBarView is NOT
+        // wrapped in an AnimatedBuilder anymore — rebuilding it on every store
+        // change, combined with a lazy DefaultTabController.of() in an onTap, left
+        // a stale tab-controller dependent and crashed with "_dependents.isEmpty".
+        body: TabBarView(
+          children: [
+            _BagView(controller: controller),
+            _PlannerView(controller: controller),
+            _ShoppingView(controller: controller),
+          ],
         ),
       ),
     );
   }
 }
 
+/// Add the planned hospital-bag items to the (separate) hospital-bag cart.
+void _addPlannedToCart(BuildContext context, PregnancyController controller) {
+  final s = S(controller.language);
+  final lang = controller.language;
+  final store = HospitalBagStore.instance;
+  var added = 0;
+  for (final item in store.planned) {
+    if (CartStore.instance.contains(kHospitalCartId, item.id)) continue;
+    final price =
+        item.plannedCost > 0 ? item.plannedCost.toDouble() : mockPriceFor(item.id);
+    CartStore.instance.add(
+      kHospitalCartId,
+      productId: item.id,
+      name: item.name.of(lang),
+      emoji: '🧳',
+      unitPrice: price,
+    );
+    added++;
+  }
+  ScaffoldMessenger.of(context)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+      content: Text(added == 0 ? s.cartAllInCart : s.cartAddedN(added)),
+      action: added == 0
+          ? null
+          : SnackBarAction(
+              label: s.cartViewCart,
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => CartScreen(
+                      controller: controller,
+                      cartId: kHospitalCartId,
+                      title: s.cartHospitalTitle))),
+            ),
+    ));
+}
+
 // ---------------------------------------------------------------------------
 //  Bag View
 // ---------------------------------------------------------------------------
 
-class _BagView extends StatelessWidget {
+class _BagView extends StatefulWidget {
   const _BagView({required this.controller});
   final PregnancyController controller;
 
   @override
-  Widget build(BuildContext context) {
-    final s = S(controller.language);
-    final lang = controller.language;
-    final store = HospitalBagStore.instance;
+  State<_BagView> createState() => _BagViewState();
+}
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-      children: [
-        _progressCard(context, s, store),
-        const SizedBox(height: 18),
-        // Category cards
-        for (final c in store.activeCategories) ...[
-          _categoryCard(context, s, lang, store, c),
-          const SizedBox(height: 12),
-        ],
-        const SizedBox(height: 6),
-        // Suggested essentials
-        _suggestedSection(context, s, lang, store),
-        const SizedBox(height: 18),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () => showAddCustomBag(context, s),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(s.hbAddCustom),
+class _BagViewState extends State<_BagView> {
+  // Category cards expanded to show their items inline — so she can pack /
+  // favourite right there, without drilling into a separate screen.
+  final Set<BagCategory> _expanded = {};
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(widget.controller.language);
+    final lang = widget.controller.language;
+    final store = HospitalBagStore.instance;
+    // Capture the TabController during BUILD so its dependency is registered (and
+    // cleaned up) properly — not lazily inside an onTap, which was the crash.
+    final tabs = DefaultTabController.of(context);
+
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        children: [
+          _progressCard(context, s, store, tabs),
+          const SizedBox(height: 18),
+          // Category cards — tap to expand and pack items inline.
+          for (final c in store.activeCategories) ...[
+            _categoryCard(context, s, lang, store, c),
+            if (_expanded.contains(c)) ...[
+              const SizedBox(height: 8),
+              for (final i in store.itemsIn(c))
+                _ItemRow(
+                    controller: widget.controller, item: i, lang: lang, s: s),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => _CategoryScreen(
+                        controller: widget.controller, category: c),
+                  )),
+                  icon: const Icon(Icons.add_rounded, size: 16),
+                  label: Text(s.hbAddCustom),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 6),
+          // Suggested essentials
+          _suggestedSection(context, s, lang, store),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => showAddCustomBag(context, s),
+              icon: const Icon(Icons.add_rounded),
+              label: Text(s.hbAddCustom),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _progressCard(BuildContext context, S s, HospitalBagStore store) {
+  Widget _progressCard(
+      BuildContext context, S s, HospitalBagStore store, TabController tabs) {
     final text = Theme.of(context).textTheme;
     final p = store.percentReady;
     final updated = _relativeUpdated(s, store.lastUpdated);
@@ -326,8 +406,9 @@ class _BagView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
-        // Tap to jump to the Planner (the full list of items in the bag).
-        onTap: () => DefaultTabController.of(context).animateTo(1),
+        // Tap to jump to the Planner (the full list of items in the bag) — uses
+        // the controller captured during build, not a lazy .of() in the callback.
+        onTap: () => tabs.animateTo(1),
         child: Ink(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -404,9 +485,9 @@ class _BagView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => _CategoryScreen(controller: controller, category: c),
-        )),
+        onTap: () => setState(() {
+          if (!_expanded.remove(c)) _expanded.add(c);
+        }),
         child: Ink(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -453,7 +534,11 @@ class _BagView extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
+            Icon(
+                _expanded.contains(c)
+                    ? Icons.expand_less_rounded
+                    : Icons.expand_more_rounded,
+                color: AppTheme.neutral400),
           ]),
         ),
       ),
@@ -607,8 +692,26 @@ class _ItemRow extends StatelessWidget {
                 _chip('❤️ ${s.hbRecommendation}', AppTheme.primary400),
             ]),
           ),
-          trailing: const Icon(Icons.chevron_right_rounded,
-              color: AppTheme.neutral400),
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            // Favourite heart — builds the mother's own must-have list.
+            IconButton(
+              tooltip: s.hbMarkFavourite,
+              visualDensity: VisualDensity.compact,
+              onPressed: () =>
+                  HospitalBagStore.instance.toggleFavourite(item.id),
+              icon: Icon(
+                item.favourite
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                size: 20,
+                color: item.favourite
+                    ? AppTheme.secondary500
+                    : AppTheme.neutral400,
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppTheme.neutral400),
+          ]),
           onTap: () {
             if (sellable) {
               Navigator.of(context).push(MaterialPageRoute(
@@ -656,10 +759,22 @@ class _PlannerViewState extends State<_PlannerView> {
     final s = S(widget.controller.language);
     final lang = widget.controller.language;
     final store = HospitalBagStore.instance;
-    final items = store.filter(_filter);
-    const keys = ['all', 'veda', 'else', 'owned', 'packed', 'pending', 'skipped'];
+    const keys = [
+      'all',
+      'fav',
+      'veda',
+      'else',
+      'owned',
+      'packed',
+      'pending',
+      'skipped'
+    ];
 
-    return Column(children: [
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final items = store.filter(_filter);
+        return Column(children: [
       const SizedBox(height: 10),
       SizedBox(
         height: 40,
@@ -695,6 +810,8 @@ class _PlannerViewState extends State<_PlannerView> {
               ),
       ),
     ]);
+      },
+    );
   }
 }
 
@@ -713,9 +830,11 @@ class _ShoppingView extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final store = HospitalBagStore.instance;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-      children: [
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        children: [
         // Cost totals — kept strictly separate.
         Container(
           padding: const EdgeInsets.all(18),
@@ -769,6 +888,7 @@ class _ShoppingView extends StatelessWidget {
           ),
         ),
       ],
+        ),
     );
   }
 
@@ -1034,15 +1154,35 @@ class _ProductScreen extends StatelessWidget {
           if (item == null) return const SizedBox.shrink();
           final text = Theme.of(context).textTheme;
           final products = bagProductsFor(itemId, isCustom: item.isCustom);
+          final pvPicks = products.where((p) => !p.isAffiliate).toList();
+          final affiliate = products.where((p) => p.isAffiliate).toList();
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
             children: [
-              Text(s.hbChooseOption,
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              for (final p in products) ...[
-                _productCard(context, s, item, p),
+              if (pvPicks.isNotEmpty) ...[
+                Text(s.hbChooseOption,
+                    style:
+                        text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
+                for (final p in pvPicks) ...[
+                  _productCard(context, s, item, p),
+                  const SizedBox(height: 12),
+                ],
+              ],
+              // Affiliate split — also available elsewhere (external links).
+              if (affiliate.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(s.hbAlsoElsewhere,
+                    style:
+                        text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(s.hbAffiliateNote,
+                    style: text.bodySmall?.copyWith(color: AppTheme.neutral500)),
+                const SizedBox(height: 12),
+                for (final p in affiliate) ...[
+                  _productCard(context, s, item, p),
+                  const SizedBox(height: 12),
+                ],
               ],
               if (item.status == BagItemStatus.buyVeda) ...[
                 const SizedBox(height: 2),
@@ -1096,14 +1236,32 @@ class _ProductScreen extends StatelessWidget {
 /// it as the mother's "buy from ParentVeda" choice.
 Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
   final text = Theme.of(context).textTheme;
-  final selected =
-      item.status == BagItemStatus.buyVeda && item.selectedProductId == p.id;
+  final affiliate = p.isAffiliate;
+  // ParentVeda picks select as "buy from ParentVeda"; affiliate options select
+  // as "buy elsewhere" + open the external store.
+  final selected = affiliate
+      ? (item.status == BagItemStatus.buyElse && item.store == p.store)
+      : (item.status == BagItemStatus.buyVeda &&
+          item.selectedProductId == p.id);
+
+  void onTap() {
+    if (affiliate) {
+      HospitalBagStore.instance
+          .setBuyElse(item.id, store: p.store, link: p.link, price: p.price);
+      if (p.link.isNotEmpty) {
+        launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
+      }
+    } else {
+      HospitalBagStore.instance
+          .chooseVedaProduct(item.id, productId: p.id, price: p.price);
+    }
+  }
+
   return Material(
     color: Colors.transparent,
     child: InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => HospitalBagStore.instance
-          .chooseVedaProduct(item.id, productId: p.id, price: p.price),
+      onTap: onTap,
       child: Ink(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -1122,12 +1280,17 @@ Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (p.topPick)
+                    if (affiliate)
+                      Text('🔗 ${p.store}',
+                          style: text.labelSmall?.copyWith(
+                              color: AppTheme.secondary600,
+                              fontWeight: FontWeight.w800))
+                    else if (p.topPick)
                       Text('❤️ ${s.hbBestOverall}',
                           style: text.labelSmall?.copyWith(
                               color: AppTheme.primary600,
                               fontWeight: FontWeight.w800)),
-                    Text(p.name,
+                    Text(affiliate ? s.hbBuyOn(p.store) : p.name,
                         style: text.titleSmall
                             ?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
@@ -1137,10 +1300,14 @@ Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
                   ]),
             ),
             Icon(
-              selected
-                  ? Icons.check_circle_rounded
-                  : Icons.radio_button_unchecked_rounded,
-              color: selected ? AppTheme.primary500 : AppTheme.neutral300,
+              affiliate
+                  ? Icons.open_in_new_rounded
+                  : (selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded),
+              color: affiliate
+                  ? AppTheme.secondary500
+                  : (selected ? AppTheme.primary500 : AppTheme.neutral300),
             ),
           ]),
           if (p.why.isNotEmpty) ...[

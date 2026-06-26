@@ -9,14 +9,17 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../theme/app_theme.dart';
 import '../widgets/cards/raga_player.dart';
 import 'home_detail_screens.dart' show TalkComposerScreen;
+import 'tools/ask_veda_screen.dart';
 
 // --- warm palette ---
 const _cream = Color(0xFFFBF6EE);
@@ -64,9 +67,6 @@ class GarbhScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final week = controller.currentWeek;
     final t = garbhTrimester(week);
-    final dayInWeek = controller.dayOfWeek;
-    final snapshot = controller.weekData(week)?.snapshot;
-    final hour = DateTime.now().hour;
 
     // Per-pillar "what to do today" + duration.
     final pillars = <({String id, String name, String tag, String todo, String duration})>[
@@ -78,8 +78,11 @@ class GarbhScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: _cream,
-      appBar: AppBar(backgroundColor: _cream, elevation: 0, foregroundColor: _ink),
+      backgroundColor: AppTheme.surfaceContainer,
+      appBar: AppBar(
+          backgroundColor: AppTheme.surfaceContainer,
+          elevation: 0,
+          foregroundColor: AppTheme.primary900),
       body: AnimatedBuilder(
         animation: GarbhStore.instance,
         builder: (context, _) {
@@ -87,18 +90,26 @@ class GarbhScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
             children: [
-              // Header
-              Text(s.greeting(hour, controller.motherName),
-                  style: text.headlineMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+              // Header (design: kicker + serif title)
+              Text(s.gsKicker(week).toUpperCase(),
+                  style: GoogleFonts.manrope(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: AppTheme.secondary600)),
               const SizedBox(height: 6),
-              Text('Week $week · ${s.gsDayOfWeek(dayInWeek, week)}',
-                  style: text.titleSmall?.copyWith(color: _muted)),
-              if (snapshot != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text('${s.gsBabySize}: ${snapshot.fruit.of(lang)}',
-                      style: text.bodyMedium?.copyWith(color: _muted)),
-                ),
+              Text(s.gsFiveRituals,
+                  style: GoogleFonts.fraunces(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 18),
+              // Raga / breathing hero (design)
+              _RagaHero(
+                controller: controller,
+                onTap: () =>
+                    _push(context, ShravanScreen(controller: controller)),
+              ),
               const SizedBox(height: 18),
               // Progress + streak
               _ProgressCard(done: store.doneCount, streak: store.streak, s: s),
@@ -150,6 +161,78 @@ class GarbhScreen extends StatelessWidget {
       default:
         _push(context, AharaScreen(controller: controller));
     }
+  }
+}
+
+// The design's calm raga/breathing hero: a purple gradient with soft concentric
+// rings, a play button and the week's session — tap to open Shravan (sound).
+class _RagaHero extends StatelessWidget {
+  const _RagaHero({required this.controller, required this.onTap});
+  final PregnancyController controller;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(controller.language);
+    final audio = shravanForTrimester(garbhTrimester(controller.currentWeek));
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppTheme.primary400, AppTheme.primary700],
+            ),
+          ),
+          child: Stack(alignment: Alignment.center, children: [
+            for (final d in const [110.0, 170.0, 230.0])
+              Container(
+                width: d,
+                height: d,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                ),
+              ),
+            Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 92,
+                height: 92,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    shape: BoxShape.circle),
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: const Icon(Icons.play_arrow_rounded,
+                      size: 30, color: AppTheme.primary600),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(audio.title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.fraunces(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white)),
+              const SizedBox(height: 2),
+              Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                      fontSize: 13, color: Colors.white.withValues(alpha: 0.85))),
+            ]),
+          ]),
+        ),
+      ),
+    );
   }
 }
 
@@ -369,16 +452,18 @@ class _MarkComplete extends StatelessWidget {
 }
 
 class _LearnMore extends StatelessWidget {
-  const _LearnMore({required this.lang});
-  final AppLanguage lang;
+  const _LearnMore({required this.controller});
+  final PregnancyController controller;
   @override
   Widget build(BuildContext context) {
-    final s = S(lang);
+    final s = S(controller.language);
+    // Ask Veda is live — open it (it can pull the whole app for guidance).
     return Align(
       alignment: Alignment.centerLeft,
       child: TextButton.icon(
-        onPressed: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(s.gsLearnMoreSoon))),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => AskVedaScreen(controller: controller),
+        )),
         icon: const Icon(Icons.auto_awesome_rounded, size: 16),
         label: Text(s.gsLearnMore),
       ),
@@ -391,15 +476,19 @@ class _LearnMore extends StatelessWidget {
 // ===========================================================================
 
 class ShravanScreen extends StatelessWidget {
-  const ShravanScreen({super.key, required this.controller});
+  const ShravanScreen({super.key, required this.controller, this.daily = false});
   final PregnancyController controller;
+
+  /// Daily (Home) mode: rotate the raga by day and hide the recommendations.
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(controller.currentWeek);
-    final audio = shravanForTrimester(t);
+    final audio =
+        daily ? shravanForDay(controller.currentDay) : shravanForTrimester(t);
     final more = kShravan.where((a) => a.id != audio.id).take(4).toList();
     return _PillarScaffold(
       title: s.gsShravan,
@@ -438,18 +527,21 @@ class ShravanScreen extends StatelessWidget {
               textAlign: TextAlign.center, style: text.labelSmall?.copyWith(color: _muted)),
           const SizedBox(height: 16),
           _MarkComplete(pillarId: 'shravan', accent: _accShravan, lang: lang),
-          _LearnMore(lang: lang),
+          _LearnMore(controller: controller),
           const SizedBox(height: 12),
-          for (final a in more)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Text(a.emoji, style: const TextStyle(fontSize: 24)),
-              title: Text(a.title, style: text.titleSmall),
-              subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
-                  style: text.labelSmall?.copyWith(color: _muted)),
-              trailing: const Icon(Icons.play_circle_outline_rounded, color: _accShravan),
-              onTap: () {},
-            ),
+          // Recommendations — hidden in daily (Home) mode.
+          if (!daily)
+            for (final a in more)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Text(a.emoji, style: const TextStyle(fontSize: 24)),
+                title: Text(a.title, style: text.titleSmall),
+                subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
+                    style: text.labelSmall?.copyWith(color: _muted)),
+                trailing: const Icon(Icons.play_circle_outline_rounded,
+                    color: _accShravan),
+                onTap: () {},
+              ),
         ],
       ),
     );
@@ -461,8 +553,9 @@ class ShravanScreen extends StatelessWidget {
 // ===========================================================================
 
 class VicharaScreen extends StatelessWidget {
-  const VicharaScreen({super.key, required this.controller});
+  const VicharaScreen({super.key, required this.controller, this.daily = false});
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
@@ -489,9 +582,9 @@ class VicharaScreen extends StatelessWidget {
           ),
         ),
         body: TabBarView(children: [
-          _SacredTab(controller: controller),
+          _SacredTab(controller: controller, daily: daily),
           _BrainTab(controller: controller),
-          _UpliftingTab(controller: controller),
+          _UpliftingTab(controller: controller, daily: daily),
         ]),
       ),
     );
@@ -499,14 +592,17 @@ class VicharaScreen extends StatelessWidget {
 }
 
 class _SacredTab extends StatelessWidget {
-  const _SacredTab({required this.controller});
+  const _SacredTab({required this.controller, this.daily = false});
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final ins = insightForTrimester(garbhTrimester(controller.currentWeek));
+    final ins = daily
+        ? insightForDay(controller.currentDay)
+        : insightForTrimester(garbhTrimester(controller.currentWeek));
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
@@ -595,17 +691,21 @@ class _BrainTab extends StatelessWidget {
 }
 
 class _UpliftingTab extends StatelessWidget {
-  const _UpliftingTab({required this.controller});
+  const _UpliftingTab({required this.controller, this.daily = false});
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
+    // Daily (Home) mode shows a single read; the full library is hidden.
+    final stories =
+        daily ? [vicharaStoryForDay(controller.currentDay)] : kVichara;
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
-        for (final story in kVichara)
+        for (final story in stories)
           GestureDetector(
             onTap: () => _push(context, _VicharaReader(story: story, controller: controller)),
             child: Container(
@@ -829,15 +929,17 @@ class _MemorySavedScreen extends StatelessWidget {
 // ===========================================================================
 
 class KriyaScreen extends StatelessWidget {
-  const KriyaScreen({super.key, required this.controller});
+  const KriyaScreen({super.key, required this.controller, this.daily = false});
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(controller.currentWeek);
-    final practice = kriyaForTrimester(t);
+    final practice =
+        daily ? kriyaForDay(controller.currentDay) : kriyaForTrimester(t);
     return _PillarScaffold(
       title: s.gsKriya,
       child: ListView(
@@ -991,14 +1093,17 @@ class _BreathingScreenState extends State<_BreathingScreen>
 // ===========================================================================
 
 class AharaScreen extends StatelessWidget {
-  const AharaScreen({super.key, required this.controller});
+  const AharaScreen({super.key, required this.controller, this.daily = false});
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final n = nutritionForTrimester(garbhTrimester(controller.currentWeek));
+    final n = daily
+        ? nutritionForDay(controller.currentDay)
+        : nutritionForTrimester(garbhTrimester(controller.currentWeek));
     return _PillarScaffold(
       title: s.gsAhara,
       child: ListView(
@@ -1033,7 +1138,7 @@ class AharaScreen extends StatelessWidget {
           _aharaRow(context, '🌙', s.gsLifestyleHabit, n.habit),
           const SizedBox(height: 14),
           _MarkComplete(pillarId: 'ahara', accent: _accAhara, lang: lang),
-          _LearnMore(lang: lang),
+          _LearnMore(controller: controller),
         ],
       ),
     );

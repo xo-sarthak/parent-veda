@@ -61,11 +61,19 @@ class Product {
     this.consider = const [],
     this.reviewSummary,
     this.reviews = const [],
+    this.imageUrl = '',
+    this.isAffiliate = false,
   });
   final String id;
   final String categoryId;
   final String name;
   final String emoji;
+  // Affiliate product (sold elsewhere, e.g. Amazon) → Buy opens the external
+  // site, NO in-app cart. ParentVeda products (false) get Add-to-cart + Buy now.
+  final bool isAffiliate;
+  // Real product photo URL. Empty → callers fall back to a stable placeholder
+  // photo (see productImageUrl) or the emoji.
+  final String imageUrl;
   final String summary; // one line
   final String bestFor; // "Most mothers"
   final String price; // "₹1,899"

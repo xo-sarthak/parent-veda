@@ -7,12 +7,22 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../services/bump_store.dart';
 import '../services/daily_store.dart';
+import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/read_next_store.dart';
+import '../services/read_to_baby_saved_store.dart';
+import '../services/video_store.dart';
 import '../theme/app_theme.dart';
+import 'auth/auth_flow_screen.dart';
+import 'bump_journey_screen.dart';
 import 'dear_baby_vault_screen.dart';
+import 'journal_screen.dart';
+import 'saved_hub_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key, required this.controller});
@@ -26,12 +36,18 @@ class ProfileScreen extends StatelessWidget {
     final name = controller.motherName;
     final initial = name.isNotEmpty ? name.characters.first : '🌸';
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+    return Scaffold(
+      backgroundColor: AppTheme.surfaceContainer,
+      appBar: AppBar(
+        backgroundColor: AppTheme.surfaceContainer,
+        elevation: 0,
+        title: Text(s.profileTitle, style: text.titleLarge),
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
         children: [
-          Text(s.profileTitle, style: text.headlineMedium),
-          const SizedBox(height: 18),
           // --- Profile header ---------------------------------------------
           Row(
             children: [
@@ -66,6 +82,48 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          // --- My Journal -------------------------------------------------
+          AnimatedBuilder(
+            animation: JournalStore.instance,
+            builder: (context, _) {
+              final count = JournalStore.instance.manualEntries.length;
+              return _VaultCard(
+                title: s.jrTitle,
+                subtitle: s.jrSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.auto_stories_rounded,
+                accent: AppTheme.primary500,
+                accentBg: AppTheme.primary50,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => JournalScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+          // --- My Bump Journey --------------------------------------------
+          AnimatedBuilder(
+            animation: BumpStore.instance,
+            builder: (context, _) {
+              final count = BumpStore.instance.count;
+              return _VaultCard(
+                title: s.bumpTitle,
+                subtitle: s.bumpSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.pregnant_woman_rounded,
+                accent: AppTheme.secondary500,
+                accentBg: AppTheme.secondary50,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BumpJourneyScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
           // --- Dear Baby memory vault -------------------------------------
           AnimatedBuilder(
             animation: DailyStore.instance,
@@ -85,15 +143,78 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 14),
+          // --- Saved (bookmarked videos) ----------------------------------
+          AnimatedBuilder(
+            animation: Listenable.merge([
+              VideoStore.instance,
+              ReadNextStore.instance,
+              ReadToBabySavedStore.instance,
+            ]),
+            builder: (context, _) {
+              final count = VideoStore.instance.savedIds.length +
+                  ReadNextStore.instance.savedIds.length +
+                  ReadToBabySavedStore.instance.recent().length;
+              return _VaultCard(
+                title: s.savedVaultTitle,
+                subtitle: s.savedHubSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.bookmark_rounded,
+                accent: const Color(0xFF3FA56A),
+                accentBg: const Color(0xFFEAF3EF),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SavedHubScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
+          const SizedBox(height: 16),
+          // --- Sign out (replays the auth flow) ---------------------------
+          OutlinedButton.icon(
+            onPressed: () => _signOut(context),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: Text(s.profileSignOut),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.secondary600,
+              side: BorderSide(
+                  color: AppTheme.secondary500.withValues(alpha: 0.35)),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
           const SizedBox(height: 24),
           Center(
             child: Text(s.moreComingSoon, style: text.labelMedium),
           ),
         ],
       ),
+      ),
     );
+  }
+
+  /// "Sign out" — clears the local auth flag and replays the auth flow over the
+  /// app; completing it re-sets the flag (and feeds any picked due date in).
+  Future<void> _signOut(BuildContext context) async {
+    final nav = Navigator.of(context);
+    try {
+      await (await SharedPreferences.getInstance())
+          .setBool(kAuthCompletedKey, false);
+    } catch (_) {/* best-effort */}
+    nav.push(MaterialPageRoute(
+      builder: (_) => AuthFlowScreen(onDone: (due) async {
+        try {
+          await (await SharedPreferences.getInstance())
+              .setBool(kAuthCompletedKey, true);
+        } catch (_) {/* best-effort */}
+        if (due != null) await controller.setDueDate(due);
+        nav.pop();
+      }),
+    ));
   }
 }
 
@@ -103,12 +224,18 @@ class _VaultCard extends StatelessWidget {
     required this.subtitle,
     required this.trailing,
     required this.onTap,
+    this.icon = Icons.favorite_rounded,
+    this.accent = AppTheme.secondary500,
+    this.accentBg = AppTheme.secondary50,
   });
 
   final String title;
   final String subtitle;
   final String trailing;
   final VoidCallback onTap;
+  final IconData icon;
+  final Color accent;
+  final Color accentBg;
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +259,10 @@ class _VaultCard extends StatelessWidget {
                 height: 50,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppTheme.secondary50,
+                  color: accentBg,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(Icons.favorite_rounded,
-                    color: AppTheme.secondary500, size: 26),
+                child: Icon(icon, color: accent, size: 26),
               ),
               const SizedBox(width: 14),
               Expanded(

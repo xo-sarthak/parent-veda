@@ -7,10 +7,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../app_constants.dart';
 import '../localization/app_language.dart';
+import '../services/app_nav.dart';
 import '../services/baby_voice_service.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
@@ -18,6 +19,7 @@ import '../widgets/cards/card_shell.dart';
 import '../widgets/locked_week_view.dart';
 import '../widgets/week_cards/celebration_card.dart';
 import '../widgets/week_cards/week_cards.dart';
+import 'week_flow_screen.dart';
 
 class WeeklyCardStackScreen extends StatefulWidget {
   const WeeklyCardStackScreen({super.key, required this.controller});
@@ -32,14 +34,15 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   final PageController _pageController = PageController(viewportFraction: 0.92);
   int _cardIndex = 0;
 
-  /// Keeps the week strip's State (scroll position, controller) alive across the
-  /// many rebuilds the collapsing header triggers while scrolling.
-  final GlobalKey _stripKey = GlobalKey();
+  /// Week-20 V2 flow preview toggle (Classic ⟷ New). Defaults to New.
+  bool _v2 = true;
 
   /// Collapsing-header geometry: the compact info row (trimester + week + date +
-  /// progress) is always pinned; the week-dot carousel below it collapses away.
-  static const double _compactHeaderHeight = 64;
-  static const double _stripHeaderHeight = 76;
+  /// progress) is always pinned; the compact week bar below it collapses away.
+  static const double _compactHeaderHeight = 74;
+  // A little extra room so the selected week's round shadow renders fully and
+  // isn't clipped (straightened) at the header's bottom edge.
+  static const double _stripHeaderHeight = 62;
 
   /// Tracks which week the PageView is currently built for, so we can reset to
   /// the first card whenever the user switches weeks.
@@ -77,64 +80,143 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (mounted) setState(() {});
   }
 
+  /// Classic ⟷ New (V2) toggle for the week-20 flow preview.
+  Widget _v2Toggle() {
+    final s = S(_c.language);
+    Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: on ? AppTheme.primary500 : Colors.transparent,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(label,
+                style: GoogleFonts.manrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: on ? Colors.white : AppTheme.neutral500)),
+          ),
+        );
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          seg(s.wfClassic, !_v2, () => setState(() => _v2 = false)),
+          seg(s.wfNew, _v2, () => setState(() => _v2 = true)),
+        ]),
+      ),
+    );
+  }
+
+  /// A smooth, minimal "‹ Daily" pill that returns to the Today (Daily) tab —
+  /// the mirror of the Home → weekly hop, so the loop feels two-way.
+  Widget _backToDaily() {
+    final s = S(_c.language);
+    return Center(
+      child: GestureDetector(
+        onTap: AppNav.instance.goToday,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(left: 4, right: 2),
+          padding: const EdgeInsets.fromLTRB(7, 6, 11, 6),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.chevron_left_rounded,
+                size: 16, color: AppTheme.primary600),
+            const SizedBox(width: 1),
+            Text(s.weeklyBackToDaily,
+                style: GoogleFonts.manrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary600)),
+          ]),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final s = S(_c.language);
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppTheme.primary500,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 17),
-            ),
+            Image.asset('assets/brand/pv-mark.png', height: 26),
             const SizedBox(width: 8),
             // Flexible so a tight app bar (mute + EN/Hi toggle on the right)
             // never overflows — it shrinks/ellipsises instead of clipping.
             Flexible(
               child: Text(
-                s.appName,
+                'ParentVeda',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.primary600,
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primary600,
+                  letterSpacing: -0.5,
+                ),
               ),
             ),
           ],
         ),
         actions: [
+          // Mirror of Home → weekly: hop back to the Daily tab.
+          _backToDaily(),
+          // Week-20 only: compare the classic cards vs the new vertical flow.
+          if (_c.selectedWeek == 20) _v2Toggle(),
+          // Mute / unmute baby voice — design's soft round speaker button.
           AnimatedBuilder(
             animation: BabyVoiceService.instance,
             builder: (context, _) {
               final muted =
                   BabyVoiceService.instance.isMutedFor(VoiceScope.journey);
-              return IconButton(
-                tooltip: muted ? 'Unmute baby voice' : 'Mute baby voice',
-                onPressed: () =>
-                    BabyVoiceService.instance.toggleMuteFor(VoiceScope.journey),
-                icon: Icon(
-                  muted ? Icons.hearing_disabled_rounded : Icons.hearing_rounded,
-                  color: muted ? AppTheme.neutral400 : AppTheme.primary500,
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: GestureDetector(
+                  onTap: () => BabyVoiceService.instance
+                      .toggleMuteFor(VoiceScope.journey),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary500.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                      size: 20,
+                      color: muted ? AppTheme.neutral400 : AppTheme.primary600,
+                    ),
+                  ),
                 ),
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _LanguageToggle(
-              language: _c.language,
-              onChanged: _c.setLanguage,
-            ),
-          ),
+          // EN / Hindi toggle — hidden for now per request. Kept (commented) for
+          // an easy revert; _LanguageToggle is preserved below.
+          // Padding(
+          //   padding: const EdgeInsets.only(right: 16),
+          //   child: _LanguageToggle(
+          //     language: _c.language,
+          //     onChanged: _c.setLanguage,
+          //   ),
+          // ),
         ],
       ),
       body: SafeArea(
@@ -158,20 +240,18 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final selRange = _c.weekDates(selectedWeek);
     final dateText = _fmtRange(selRange.start, selRange.end);
 
-    // One persistent strip instance (GlobalKey) so its scroll survives the
-    // collapsing header's frequent rebuilds.
-    final strip = _WeekStrip(
-      key: _stripKey,
-      controller: _c,
-      onScrollActive: _onWeekScroll,
-    );
+    // The compact week bar (design): current week ±2 on one row, dots between.
+    final strip = _WeekBar(controller: _c);
 
     return NestedScrollView(
       headerSliverBuilder: (context, innerScrolled) => [
         SliverOverlapAbsorber(
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           sliver: SliverPersistentHeader(
-            pinned: true,
+            // Only the ParentVeda app bar stays fixed; the trimester / progress
+            // / week-bar header scrolls away with the content (better scroll
+            // experience on a short page).
+            pinned: false,
             delegate: _WeekHeaderDelegate(
               controller: _c,
               strip: strip,
@@ -182,9 +262,13 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           ),
         ),
       ],
+      // Week-20 "New" flow (V2) keeps this scrolling trimester/week header and
+      // swaps the swipe-carousel body for the vertical section flow.
       body: _c.isLocked(selectedWeek)
           ? _lockedBody(selectedWeek)
-          : _pagerBody(selectedWeek),
+          : (selectedWeek == 20 && _v2
+              ? WeekFlowView(controller: _c)
+              : _pagerBody(selectedWeek)),
     );
   }
 
@@ -240,7 +324,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
         Positioned(
           left: 0,
           right: 0,
-          bottom: 12,
+          // Sit above the floating bottom nav pill so the dots' white pill no
+          // longer peeks out behind it.
+          bottom: 86,
           child: IgnorePointer(
             child: Center(
               child: _DotsPill(
@@ -291,18 +377,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     );
   }
 
-  /// True while the user is dragging the week strip — keeps the baby voice
-  /// quiet so browsing weeks isn't a wall of audio.
-  bool _weekScrolling = false;
-  void _onWeekScroll(bool active) {
-    _weekScrolling = active;
-    if (active) BabyVoiceService.instance.stop();
-  }
-
   /// Auto-plays the active card's baby dialogue (once per card per session).
   String? _lastAutoKey;
   void _autoPlayActive(int week) {
-    if (_weekScrolling) return;
     final data = _c.weekData(week);
     if (data == null) return;
     final lang = _c.language;
@@ -311,7 +388,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (_cardIndex == 0) {
       text = data.snapshot.reveal.of(lang);
       card = 'size_reveal';
-    } else if (_cardIndex == 1) {
+    } else if (_cardIndex == 2 && week != 20) {
+      // Card 1 is the Weekly Video; Baby Update sits at index 2 — except week 20,
+      // whose overview card folds Baby into an accordion (no separate card).
       text = data.development.whatImDoing.of(lang);
       card = 'baby_update';
     }
@@ -350,6 +429,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 //  English / Hinglish toggle
 // ---------------------------------------------------------------------------
 
+// ignore: unused_element  (EN/Hi toggle hidden for now; kept for an easy revert)
 class _LanguageToggle extends StatelessWidget {
   const _LanguageToggle({required this.language, required this.onChanged});
 
@@ -453,9 +533,9 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
     // 1 when fully open, 0 when fully collapsed.
     final reveal = stripHeight == 0 ? 0.0 : (stripArea / stripHeight);
 
-    final text = Theme.of(context).textTheme;
     final s = S(controller.language);
     final week = controller.selectedWeek;
+    final togo = PregnancyController.lastContentWeek - controller.currentWeek;
     final progress =
         (week / PregnancyController.lastContentWeek).clamp(0.0, 1.0);
 
@@ -474,39 +554,72 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Trimester + weeks-to-go (design: bold title, pink count).
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       Expanded(
                         child: Text(
                           s.trimesterName(week),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: text.titleLarge?.copyWith(
-                            color: AppTheme.primary600,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 20,
                             fontWeight: FontWeight.w700,
+                            color: AppTheme.primary900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        togo <= 0 ? s.weeksToGoNow : s.weeksToGo(togo),
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.secondary500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 9),
+                  // Progress bar (purple gradient) + "Week N · dates".
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 9,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary500.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: progress,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppTheme.primary500,
+                                    AppTheme.primary400
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Text(
                         '${s.weekWord} $week · $dateText',
-                        style: text.labelMedium?.copyWith(
-                          color: AppTheme.neutral600,
-                          fontWeight: FontWeight.w600,
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary600,
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 7),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 4,
-                      backgroundColor: AppTheme.surfaceContainerHigh,
-                      valueColor:
-                          const AlwaysStoppedAnimation(AppTheme.secondary500),
-                    ),
                   ),
                 ],
               ),
@@ -543,9 +656,10 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 // ---------------------------------------------------------------------------
-//  Week navigation strip
+//  Week navigation strip — OLD scrollable carousel, replaced by the compact
+//  _WeekBar (design). Kept (commented) for an easy revert.
 // ---------------------------------------------------------------------------
-
+/*
 class _WeekStrip extends StatefulWidget {
   const _WeekStrip({
     super.key,
@@ -702,6 +816,100 @@ class _WeekStripState extends State<_WeekStrip> {
     );
   }
 }
+*/
+
+// ---------------------------------------------------------------------------
+//  Week bar (design) — current week ±2 on one compact row, dots between, the
+//  selected week a filled purple disc. Tapping a neighbour steps the week.
+// ---------------------------------------------------------------------------
+/// A horizontally scrollable week strip — all weeks in one row, the selected
+/// week a filled purple disc. Scrolls left/right to browse; tap to switch; the
+/// selected week auto-centres.
+class _WeekBar extends StatefulWidget {
+  const _WeekBar({required this.controller});
+  final PregnancyController controller;
+  @override
+  State<_WeekBar> createState() => _WeekBarState();
+}
+
+class _WeekBarState extends State<_WeekBar> {
+  final ScrollController _sc = ScrollController();
+  static const double _cell = 56; // week cell (40) + gap (16)
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onChange);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _center(animate: false));
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onChange);
+    _sc.dispose();
+    super.dispose();
+  }
+
+  void _onChange() => WidgetsBinding.instance
+      .addPostFrameCallback((_) => _center(animate: true));
+
+  void _center({required bool animate}) {
+    if (!mounted || !_sc.hasClients) return;
+    final weeks = widget.controller.availableWeeks;
+    final idx = weeks.indexOf(widget.controller.selectedWeek);
+    if (idx < 0) return;
+    final screenW = MediaQuery.of(context).size.width;
+    final target = ((idx * _cell) + 20 - screenW / 2 + _cell / 2)
+        .clamp(0.0, _sc.position.maxScrollExtent);
+    if (animate) {
+      _sc.animateTo(target,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    } else {
+      _sc.jumpTo(target);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.controller;
+    final weeks = c.availableWeeks;
+    if (weeks.isEmpty) return const SizedBox.shrink();
+    return SingleChildScrollView(
+      controller: _sc,
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+      child: Row(children: [
+        for (int i = 0; i < weeks.length; i++) ...[
+          SizedBox(
+            width: 40,
+            child: _WeekDot(
+              week: weeks[i],
+              locked: c.isLocked(weeks[i]),
+              isCurrent: weeks[i] == c.currentWeek,
+              isSelected: weeks[i] == c.selectedWeek,
+              onTap: () => c.selectWeek(weeks[i]),
+            ),
+          ),
+          if (i < weeks.length - 1)
+            const SizedBox(
+              width: 16,
+              child: Center(
+                child: SizedBox(
+                  width: 4,
+                  height: 4,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        color: Color(0xFFD8CAEC), shape: BoxShape.circle),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ]),
+    );
+  }
+}
 
 const _months = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -738,51 +946,70 @@ class _WeekDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final double size = isSelected ? 50 : 42;
-    final Color bg = isSelected
-        ? AppTheme.secondary500
-        : AppTheme.neutral100.withValues(alpha: 0.7);
-    final Color fg = isSelected ? Colors.white : AppTheme.neutral400;
-
+    // Selected week — a filled purple disc with a soft glow (design).
+    if (isSelected) {
+      return GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppTheme.primary500,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary500.withValues(alpha: 0.30),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Text(
+              '$week',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    // Other weeks — a soft number; the current week gets a small purple dot.
+    final color = locked
+        ? AppTheme.neutral300
+        : (isCurrent ? AppTheme.primary500 : AppTheme.neutral400);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
-        width: size,
-        height: size,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: bg,
-          shape: BoxShape.circle,
-          border: isCurrent && !isSelected
-              ? Border.all(color: AppTheme.secondary300, width: 1.5)
-              : null,
-          boxShadow: isSelected
-              ? [
-                  // Soft coral glow — kept compact so it reads round in the
-                  // tighter strip without clipping at the row edges.
-                  BoxShadow(
-                    color: AppTheme.secondary500.withValues(alpha: 0.42),
-                    blurRadius: 16,
-                    offset: const Offset(0, 5),
-                  ),
-                  BoxShadow(
-                    color: AppTheme.secondary300.withValues(alpha: 0.38),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          '$week',
-          style: (isSelected ? text.titleLarge : text.titleMedium)?.copyWith(
-            color: fg,
-            fontWeight: FontWeight.w700,
-          ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$week',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+            if (isCurrent) ...[
+              const SizedBox(height: 4),
+              Container(
+                width: 5,
+                height: 5,
+                decoration: const BoxDecoration(
+                    color: AppTheme.primary500, shape: BoxShape.circle),
+              ),
+            ],
+          ],
         ),
       ),
     );

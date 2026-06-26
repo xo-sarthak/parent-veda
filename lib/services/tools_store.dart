@@ -288,6 +288,19 @@ class ToolsStore extends ChangeNotifier {
 
   int get currentSessionCount => activeMovementSession?.times.length ?? 0;
 
+  /// Total movements logged today across all sessions (active or ended) — used
+  /// by the Home quick-row "Kicks" tile.
+  int get kicksToday {
+    final today = _isoDate(DateTime.now());
+    var n = 0;
+    for (final s in _movementSessions) {
+      for (final t in s.times) {
+        if (_isoDate(t) == today) n++;
+      }
+    }
+    return n;
+  }
+
   /// Ended sessions (with at least one movement), newest first, each tagged with
   /// its ordinal within its calendar day (e.g. "Session 2" on 20 June).
   List<MovementSessionRecord> get movementSessionHistory {

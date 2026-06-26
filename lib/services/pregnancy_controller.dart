@@ -15,6 +15,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import '../models/week_content.dart';
@@ -26,6 +27,9 @@ class PregnancyController extends ChangeNotifier {
 
   static const String _assetPath = 'lib/data/weekContent.json';
 
+  /// Persisted real due date once the mother uses the Due Date Calculator.
+  static const String _dueDateKey = 'pregnancy_due_date';
+
   /// Content runs from week 4 to week 40.
   static const int firstContentWeek = 4;
   static const int lastContentWeek = 40;
@@ -36,6 +40,13 @@ class PregnancyController extends ChangeNotifier {
   // --- mutable state ---------------------------------------------------------
   final DateTime _now;
   DateTime _dueDate;
+
+  /// True once the mother has a REAL due date (set via the Due Date Calculator
+  /// and/or restored from prefs). While false we're showing the week-20
+  /// placeholder, so the calculator opens on its input form rather than a saved
+  /// roadmap.
+  bool _dueDateIsSet = false;
+
   AppLanguage _language = AppLanguage.english;
 
   List<WeekContent> _weeks = const [];
@@ -56,6 +67,9 @@ class PregnancyController extends ChangeNotifier {
 
   AppLanguage get language => _language;
   DateTime get dueDate => _dueDate;
+
+  /// Whether the mother has set her real due date (vs the week-20 placeholder).
+  bool get isDueDateSet => _dueDateIsSet;
 
   /// Placeholder mother's name for the Home greeting until a real profile /
   /// onboarding name exists (mirrors the placeholder due date).
@@ -129,11 +143,27 @@ class PregnancyController extends ChangeNotifier {
     return (start: start, end: start.add(const Duration(days: 6)));
   }
 
+  /// Calendar date for a pregnancy [day] (1–280, where day 280 = the due date),
+  /// derived from the due date. Mirrors [weekDates] (for day = week*7 this
+  /// equals `weekDates(week).start`). Used by the Journey map's milestone dates.
+  DateTime dateForDay(int day) =>
+      _dateOnly(_dueDate).subtract(Duration(days: termDays - day));
+
   /// Days remaining until the due date (never negative).
   int get daysToDueDate {
     final d = _dueDate.difference(_dateOnly(_now)).inDays;
     return d < 0 ? 0 : d;
   }
+
+  /// Days the mother is PAST her due date (0 if not overdue). Lets the journey
+  /// map cater to overdue pregnancies ("baby comes when ready") without changing
+  /// the trail — currentWeek/currentDay still clamp at 40 / 280.
+  int get daysPastDue {
+    final d = _dateOnly(_now).difference(_dateOnly(_dueDate)).inDays;
+    return d > 0 ? d : 0;
+  }
+
+  bool get isOverdue => daysPastDue > 0;
 
   // --- actions ---------------------------------------------------------------
 
@@ -158,6 +188,20 @@ class PregnancyController extends ChangeNotifier {
       }
       parsed.sort((a, b) => a.week.compareTo(b.week));
       _weeks = parsed;
+      // Restore the mother's REAL due date if she set one via the Due Date
+      // Calculator — it persists across restarts, so she SEES her saved date on
+      // reopen instead of it being recomputed. If she hasn't set one, _dueDate
+      // stays at the week-20 placeholder (so a fresh / testing install still
+      // opens on the week-20 V2 flow).
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final saved = prefs.getString(_dueDateKey);
+        final d = saved == null ? null : DateTime.tryParse(saved);
+        if (d != null) {
+          _dueDate = _dateOnly(d);
+          _dueDateIsSet = true;
+        }
+      } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
     } catch (e) {
       _error = e;
@@ -194,6 +238,19 @@ class PregnancyController extends ChangeNotifier {
     _dueDate = dueDate;
     _selectedWeek = currentWeek;
     notifyListeners();
+  }
+
+  /// Persisted due date set from the Due Date Calculator — drives the whole app
+  /// (current week/day everywhere). Survives restarts.
+  Future<void> setDueDate(DateTime dueDate) async {
+    _dueDate = _dateOnly(dueDate);
+    _dueDateIsSet = true;
+    _selectedWeek = currentWeek;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
+    } catch (_) {/* best-effort */}
   }
 
   // --- helpers ---------------------------------------------------------------

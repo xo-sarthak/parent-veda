@@ -8,13 +8,17 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../data/product_data.dart';
 import '../localization/app_language.dart';
 import '../models/product_models.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/product_store.dart';
+import '../services/cart_store.dart';
 import '../theme/app_theme.dart';
+import 'cart_screen.dart';
+import 'tools/product_checklist_screen.dart';
 
 const Color _score = Color(0xFFE6A817); // warm gold for the score
 const Color _accent = AppTheme.primary500;
@@ -67,6 +71,8 @@ class ProductsScreen extends StatelessWidget {
                   context: context,
                   delegate: _ProductSearchDelegate(controller)),
             ),
+            cartIconButton(context, controller,
+                cartId: kProductsCartId, title: s.cartProductsTitle),
           ],
           bottom: TabBar(
             labelColor: _accent,
@@ -280,6 +286,25 @@ class _ProductCard extends StatelessWidget {
                 child: Text('${bv.emoji} ${s.prBadge(bv.key)}',
                     style: text.labelSmall?.copyWith(color: bv.color, fontWeight: FontWeight.w800)),
               ),
+            if (productIsAffiliate(product)) ...[
+              if (product.badge != ProductBadge.none) const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF9900).withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.open_in_new_rounded,
+                      size: 11, color: Color(0xFFB36B00)),
+                  const SizedBox(width: 4),
+                  Text(s.prAffiliate,
+                      style: text.labelSmall?.copyWith(
+                          color: const Color(0xFFB36B00),
+                          fontWeight: FontWeight.w800)),
+                ]),
+              ),
+            ],
             const Spacer(),
             _SaveHeart(id: product.id),
           ]),
@@ -337,12 +362,21 @@ class _ProductCard extends StatelessWidget {
             const Spacer(),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: _accent,
+                backgroundColor: productIsAffiliate(product)
+                    ? const Color(0xFFFF9900)
+                    : _accent,
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               ),
-              onPressed: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(s.prComingSoon))),
-              child: Text(s.prBuyNow,
+              onPressed: () {
+                if (productIsAffiliate(product)) {
+                  launchUrl(Uri.parse(amazonSearchUrl(product)),
+                      mode: LaunchMode.externalApplication);
+                } else {
+                  showSingleItemBuyNow(context, controller, product);
+                }
+              },
+              child: Text(
+                  productIsAffiliate(product) ? s.prBuyOnAmazon : s.prBuyNow,
                   style: text.labelLarge?.copyWith(color: Colors.white)),
             ),
           ]),
@@ -678,7 +712,18 @@ class ProductDetailScreen extends StatelessWidget {
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
         title: Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-        actions: [_SaveHeart(id: product.id), const SizedBox(width: 8)],
+        actions: [
+          IconButton(
+            tooltip: s.pclAddToChecklist,
+            icon: const Icon(Icons.playlist_add_rounded),
+            onPressed: () =>
+                showAddToChecklistSheet(context, controller, product),
+          ),
+          cartIconButton(context, controller,
+              cartId: kProductsCartId, title: s.cartProductsTitle),
+          _SaveHeart(id: product.id),
+          const SizedBox(width: 8),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -695,6 +740,26 @@ class ProductDetailScreen extends StatelessWidget {
             child: Column(children: [
               Text(product.emoji, style: const TextStyle(fontSize: 64)),
               const SizedBox(height: 10),
+              if (productIsAffiliate(product)) ...[
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF9900).withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.open_in_new_rounded,
+                        size: 13, color: Color(0xFFB36B00)),
+                    const SizedBox(width: 5),
+                    Text(s.prAffiliate,
+                        style: text.labelMedium?.copyWith(
+                            color: const Color(0xFFB36B00),
+                            fontWeight: FontWeight.w800)),
+                  ]),
+                ),
+                const SizedBox(height: 8),
+              ],
               if (product.badge != ProductBadge.none)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -809,21 +874,69 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
             for (final r in product.reviews) _reviewCard(context, r, s),
           ],
-          // Buy
+          // Buy actions — affiliate (Amazon only) vs ParentVeda (cart + buy now).
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: _accent,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+          if (productIsAffiliate(product)) ...[
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF9900),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+                icon: const Icon(Icons.open_in_new_rounded,
+                    size: 18, color: Colors.white),
+                label: Text(s.prBuyOnAmazon,
+                    style: text.titleSmall?.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.w800)),
+                onPressed: () => launchUrl(Uri.parse(amazonSearchUrl(product)),
+                    mode: LaunchMode.externalApplication),
               ),
-              onPressed: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(s.prComingSoon))),
-              child: Text('${s.prBuyNow}  ·  ${product.price}',
-                  style: text.titleSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
             ),
-          ),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(s.prAffiliateNote,
+                  style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+            ),
+          ] else
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _accent,
+                    side: BorderSide(color: _accent.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
+                  label: Text(s.cartAddToCart,
+                      style: text.labelLarge
+                          ?.copyWith(fontWeight: FontWeight.w800)),
+                  onPressed: () =>
+                      showAddToCartFlow(context, controller, product),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _accent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  // ParentVeda Buy now → a real (mock) single-item checkout.
+                  onPressed: () =>
+                      showSingleItemBuyNow(context, controller, product),
+                  child: Text(s.cartBuyNow,
+                      style: text.titleSmall?.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ]),
           // Related
           if (related.isNotEmpty) ...[
             const SizedBox(height: 22),

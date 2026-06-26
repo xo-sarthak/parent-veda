@@ -18,12 +18,12 @@ class JourneyColors {
   JourneyColors._();
 
   // ---- Path / node STATE colours -------------------------------------------
-  static const Color completed = Color(0xFF3FA56A); // green  — past, achieved
-  static const Color current = Color(0xFFE6A817); // gold   — you are here
+  static const Color completed = Color(0xFF6A30B6); // purple — past, achieved
+  static const Color current = Color(0xFFFF5A79); // coral  — you are here
   static const Color future = Color(0xFFD2CCDB); // soft grey-lavender — ahead
 
   // ---- Arrival / destination (the end of the journey, near Birth) ----------
-  static const Color arrivalGold = Color(0xFFE6A817);
+  static const Color arrivalGold = Color(0xFF6A30B6); // purple (Warm Nest)
   static const Color arrivalRose = Color(0xFFEF6F8E);
 
   // ---- Trimester backdrop bands (soft washes behind the trail) -------------
@@ -76,6 +76,27 @@ class JourneyColors {
         return typeFeature;
       case JourneyNodeType.week:
         return current;
+    }
+  }
+
+  /// A tasteful Material icon for each milestone TYPE — shown inside the marker
+  /// so a milestone reads as a real checkpoint, without emoji clutter.
+  static IconData iconForType(JourneyNodeType type) {
+    switch (type) {
+      case JourneyNodeType.achievement:
+        return Icons.emoji_events_rounded;
+      case JourneyNodeType.medical:
+        return Icons.medical_services_rounded;
+      case JourneyNodeType.babyDev:
+        return Icons.child_care_rounded;
+      case JourneyNodeType.mother:
+        return Icons.favorite_rounded;
+      case JourneyNodeType.pvJourney:
+        return Icons.auto_awesome_rounded;
+      case JourneyNodeType.feature:
+        return Icons.star_rounded;
+      case JourneyNodeType.week:
+        return Icons.flag_rounded;
     }
   }
 }

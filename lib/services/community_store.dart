@@ -15,6 +15,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/community_data.dart';
 import '../models/community_models.dart';
 
+/// The identity used while testing "Doctor mode" (until real doctor logins
+/// exist). When the test doctor verifies a post, it counts as one expert.
+const String kTestDoctorName = 'Dr. (You)';
+const String kTestDoctorCred = 'OB-GYN';
+
 class CommunityStore extends ChangeNotifier {
   CommunityStore._();
   static final CommunityStore instance = CommunityStore._();
@@ -28,6 +33,9 @@ class CommunityStore extends ChangeNotifier {
   static const _postsKey = 'comm_posts';
   static const _commentsKey = 'comm_comments';
   static const _seededKey = 'comm_seeded';
+  static const _doctorModeKey = 'comm_doctor_mode';
+  static const _docEndorsedKey = 'comm_doc_endorsed';
+  static const _repostedKey = 'comm_reposted';
 
   SharedPreferences? _prefs;
   final Set<String> _joined = {};
@@ -38,6 +46,10 @@ class CommunityStore extends ChangeNotifier {
   final Map<String, String> _votes = {};
   final List<CommunityPost> _created = [];
   final Map<String, List<String>> _userComments = {};
+  bool _doctorMode = false;
+  final Set<String> _doctorEndorsed = {};
+  final Set<String> _reposted = {};
+  final Set<String> _hidden = {}; // "Not interested" — session only, not saved
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -76,6 +88,13 @@ class CommunityStore extends ChangeNotifier {
     _created
       ..clear()
       ..addAll(_decodePosts(p.getString(_postsKey)));
+    _doctorMode = p.getBool(_doctorModeKey) ?? false;
+    _doctorEndorsed
+      ..clear()
+      ..addAll(p.getStringList(_docEndorsedKey) ?? const []);
+    _reposted
+      ..clear()
+      ..addAll(p.getStringList(_repostedKey) ?? const []);
     notifyListeners();
   }
 
@@ -88,6 +107,16 @@ class CommunityStore extends ChangeNotifier {
   bool isUpvoted(String id) => _upvoted.contains(id);
   String? votedOption(String id) => _votes[id];
   List<CommunityPost> get createdPosts => List.unmodifiable(_created);
+
+  // --- "My Activity" / "My Bookmarks" views ---
+  List<CommunityPost> get savedPosts =>
+      _allPosts.where((p) => _saved.contains(p.id)).toList();
+  List<CommunityPost> get likedPosts =>
+      _allPosts.where((p) => _liked.contains(p.id)).toList();
+  List<CommunityPost> get upvotedPosts =>
+      _allPosts.where((p) => _upvoted.contains(p.id)).toList();
+  List<CommunityPost> get commentedPosts =>
+      _allPosts.where((p) => _userComments[p.id]?.isNotEmpty ?? false).toList();
 
   List<Community> get joinedCommunities =>
       kCommunities.where((c) => _joined.contains(c.id) && !_muted.contains(c.id)).toList();
@@ -119,13 +148,23 @@ class CommunityStore extends ChangeNotifier {
   List<CommunityPost> feed() {
     final posts = _allPosts.where((p) => !_muted.contains(p.communityId)).toList();
     int score(CommunityPost p) {
-      var s = likeCount(p) + commentCount(p) * 2 + saveCount(p) * 3;
+      // Rank on the post's BASE engagement only — NOT the viewer's own live
+      // like/save/repost toggles. Otherwise bookmarking or liking a post bumps
+      // its score and re-ranks the feed, making rows jump up and down under your
+      // finger. Stable score = the row stays put when you tap save.
+      var s = p.likes + p.comments * 2 + p.saves * 3;
       if (p.isUser) s += 1000000; // pin the user's own posts to the top
       if (_joined.contains(p.communityId)) s += 5000; // ~80% joined-first
       return s;
     }
 
-    posts.sort((a, b) => score(b).compareTo(score(a)));
+    posts.sort((a, b) {
+      final byScore = score(b).compareTo(score(a));
+      if (byScore != 0) return byScore;
+      // Tie-break newest-first so a freshly created post sits on top (Dart's
+      // sort isn't stable, so we order ties explicitly by creation time).
+      return b.createdAt.compareTo(a.createdAt);
+    });
     return posts;
   }
 
@@ -163,9 +202,56 @@ class CommunityStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Twitter-style: reposts + "not interested" --------------------------
+  bool isReposted(String id) => _reposted.contains(id);
+
+  /// A base repost count derived from likes so the number reads realistically,
+  /// plus the user's own repost.
+  int repostCount(CommunityPost p) =>
+      (p.likes / 6).round() + (_reposted.contains(p.id) ? 1 : 0);
+
+  void toggleRepost(String id) {
+    if (!_reposted.remove(id)) _reposted.add(id);
+    _prefs?.setStringList(_repostedKey, _reposted.toList());
+    notifyListeners();
+  }
+
+  /// "Not interested" hides a post for the rest of the session (not persisted).
+  bool isHidden(String id) => _hidden.contains(id);
+  void hidePost(String id) {
+    _hidden.add(id);
+    notifyListeners();
+  }
+
   void vote(String pollId, String option) {
     _votes[pollId] = option;
     _prefs?.setString(_votesKey, jsonEncode(_votes));
+    notifyListeners();
+  }
+
+  // --- doctor (test) mode + expert endorsements ----------------------------
+  bool get doctorMode => _doctorMode;
+  bool isDoctorEndorsed(String id) => _doctorEndorsed.contains(id);
+
+  /// A post shows the verified-expert banner if a seed expert OR the (test)
+  /// doctor has backed it.
+  bool isEndorsed(CommunityPost p) =>
+      p.endorsedBy.isNotEmpty || _doctorEndorsed.contains(p.id);
+
+  /// Total verified experts behind a post (seed count + the test doctor).
+  int endorseCount(CommunityPost p) =>
+      p.expertEndorseCount + (_doctorEndorsed.contains(p.id) ? 1 : 0);
+
+  void setDoctorMode(bool v) {
+    if (_doctorMode == v) return;
+    _doctorMode = v;
+    _prefs?.setBool(_doctorModeKey, v);
+    notifyListeners();
+  }
+
+  void toggleDoctorEndorse(String id) {
+    if (!_doctorEndorsed.remove(id)) _doctorEndorsed.add(id);
+    _prefs?.setStringList(_docEndorsedKey, _doctorEndorsed.toList());
     notifyListeners();
   }
 
@@ -177,6 +263,15 @@ class CommunityStore extends ChangeNotifier {
 
   void addComment(String postId, String text) {
     (_userComments[postId] ??= []).add(text);
+    // A doctor commenting on a post that ASKED for verification verifies it —
+    // this replaces the old explicit "Verify this" button.
+    if (_doctorMode) {
+      final p = postById(postId);
+      if (p != null && p.wantsVerification && !isEndorsed(p)) {
+        _doctorEndorsed.add(postId);
+        _prefs?.setStringList(_docEndorsedKey, _doctorEndorsed.toList());
+      }
+    }
     _prefs?.setString(_commentsKey, jsonEncode(_userComments));
     notifyListeners();
   }

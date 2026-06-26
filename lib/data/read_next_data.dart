@@ -433,6 +433,34 @@ List<ReadItem> lookingAhead(int week) {
 List<ReadItem> readByType(ReadType type) =>
     kReadItems.where((r) => r.type == type).toList();
 
+/// Daily Reads — [count] article picks for [week], rotating by [day] so the set
+/// refreshes each day. Week-relevant articles come first; if there are fewer
+/// than [count], it tops up with other articles so the section always fills.
+List<ReadItem> dailyArticleReads(int week, int day, {int count = 3}) {
+  final relevant = kReadItems
+      .where((r) => r.type == ReadType.article && r.relevantAt(week))
+      .toList()
+    ..sort((a, b) => _rank(a).compareTo(_rank(b)));
+  final pool = <ReadItem>[...relevant];
+  if (pool.length < count) {
+    pool.addAll(kReadItems
+        .where((r) => r.type == ReadType.article && !pool.contains(r)));
+  }
+  if (pool.isEmpty) return const [];
+  final n = pool.length;
+  final start = day % n;
+  return List.generate(count.clamp(0, n), (i) => pool[(start + i) % n]);
+}
+
+/// Daily Reads — [count] book picks, rotating by [day].
+List<ReadItem> dailyBookReads(int day, {int count = 3}) {
+  final books = readByType(ReadType.book);
+  if (books.isEmpty) return const [];
+  final n = books.length;
+  final start = day % n;
+  return List.generate(count.clamp(0, n), (i) => books[(start + i) % n]);
+}
+
 List<ReadItem> readSearch(String query) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return const [];

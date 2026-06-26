@@ -4,6 +4,14 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ParentVeda uses the microphone so you can record voice notes in your journal.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>ParentVeda uses speech recognition to turn your spoken words into journal text.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ParentVeda lets you add photos to your journal memories.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>ParentVeda lets you capture photo memories for your journal.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
