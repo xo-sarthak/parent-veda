@@ -1048,6 +1048,35 @@ class S {
   String get vedaWhenChecked =>
       _p('When to get checked', 'Kab doctor ko dikhayein');
   String get vedaMoreInfo => _p('More information', 'Aur jaankari');
+  // Retrieval-path 7-section answer: personalization default, default actions,
+  // community social-proof, and content-TYPE labels for Section 4.
+  String get vedaMeansDefault => _p(
+      "Here's what ParentVeda's guidance suggests for where you are right now.",
+      'ParentVeda ki guidance aapki abhi ki sthiti ke liye yeh sujhaati hai.');
+  String get vedaActionExplore => _p(
+      'Explore the related ParentVeda content below.',
+      'Neeche di gayi ParentVeda content dekhein.');
+  String get vedaActionTrack => _p(
+      'Note how you\'re feeling and track it over the next few days.',
+      'Aap kaisa mehsoos kar rahi hain, note karein aur agle kuch din track karein.');
+  String get vedaActionDoctor => _p(
+      'If it persists or worries you, check with your doctor.',
+      'Agar yeh bana rahe ya chinta ho, to apne doctor se baat karein.');
+  String vedaCommunitySocial(int n) => _p(
+      'Other ParentVeda mothers have asked about this too.',
+      'ParentVeda ki doosri mummies ne bhi iske baare mein poocha hai.');
+  String get vedaTypeCanI => _p('Can-I guide', 'Can-I guide');
+  String get vedaTypeSymptom => _p('Symptom guide', 'Lakshan guide');
+  String get vedaTypeWeekly => _p('Weekly journey', 'Weekly journey');
+  String get vedaTypeRead => _p('Read', 'Read');
+  String get vedaTypeTip => _p('Trimester tip', 'Trimester tip');
+  String get vedaTypeReflection => _p('Reflection', 'Reflection');
+  String get vedaTypeReadBaby => _p('Read to baby', 'Read to baby');
+  String get vedaTypeGarbh => _p('Garbh Sanskar', 'Garbh Sanskar');
+  String get vedaTypeBody => _p('Body changes', 'Body changes');
+  String get vedaTypeTool => _p('Tool', 'Tool');
+  String get vedaTypeProduct => _p('Product', 'Product');
+  String get vedaTypeCommunity => _p('Community', 'Community');
   String get vedaTalkExpert => _p('Talk to an expert', 'Expert se baat karein');
   String get vedaProductsHint =>
       _p('Suggested for your question', 'Aapke sawaal ke hisaab se');
@@ -1810,6 +1839,100 @@ class S {
   // ===========================================================================
   String get hbName => _p('My Hospital Bag', 'My Hospital Bag');
   String rupees(int n) => '₹$n';
+
+  // --- Simplified hospital bag (v2): the joyful, tap-only experience ---------
+  String get hb2MyBag => _p('My Hospital Bag', 'Mera Hospital Bag');
+  String get hb2FillingUp =>
+      _p('Your bag is filling up 💛', 'Aapka bag bhar raha hai 💛');
+  String get hb2ReadyBanner => _p('Your bag is ready for baby! 🎉',
+      'Aapka bag baby ke liye taiyaar hai! 🎉');
+  String get hb2HeroEmpty =>
+      _p("Let's pack for the big day", 'Bade din ke liye pack karein');
+  String hb2DaysToGo(int n) => _p('$n days to go', '$n din baaki');
+  String hb2ReadyPct(int n) => _p('$n% ready', '$n% taiyaar');
+  String get hb2AddItems => _p('Add items', 'Items add karein');
+  String get hb2EmptyTitle =>
+      _p("Let's start your bag 🎒", 'Apna bag shuru karein 🎒');
+  String get hb2EmptySub => _p(
+      "Add the things you'd love to have for the big day.",
+      'Bade din ke liye jo cheezein chahiye, unhe add karein.');
+  String get hb2GroupVeda =>
+      _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hb2GroupElse =>
+      _p('Buy elsewhere', 'Kahin aur se khareedein');
+  String get hb2GroupHave => _p('Already have', 'Pehle se hai');
+  String get hb2GroupNeeded =>
+      _p('Where will you get these?', 'Ye kahan se laaengi?');
+  String hb2Buy(int price) => _p('Buy ₹$price', '₹$price mein lein');
+  String get hb2ToBuy => _p('To buy', 'Lena hai');
+  String get hb2Bought => _p('Bought', 'Le liya');
+  String get hb2Pack => _p('Pack', 'Pack karein');
+  String get hb2Packed => _p('Packed', 'Pack ho gaya');
+  String get hb2ChooseSource =>
+      _p('Where will you get this?', 'Ye kahan se laaengi?');
+  String get hb2SrcVeda =>
+      _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hb2SrcElse => _p('Buy elsewhere', 'Kahin aur se khareedein');
+  String get hb2SrcHave => _p('I already have it', 'Ye mere paas hai');
+  String get hb2Remove => _p('Remove from bag', 'Bag se hatayein');
+  String get hb2LinkOptional =>
+      _p('Paste a link (optional)', 'Link daalein (optional)');
+  String get hb2Save => _p('Save', 'Save karein');
+  String hb2PackedCheer(int i) {
+    const en = [
+      'One less thing to worry about 💛',
+      'Your bag is getting ready ✨',
+      'Lovely — packed! 🎒',
+      "You're doing so well, mama 💛",
+    ];
+    const hi = [
+      'Ek chinta kam 💛',
+      'Aapka bag taiyaar ho raha hai ✨',
+      'Bahut khoob — pack ho gaya! 🎒',
+      'Aap bahut achha kar rahi hain, mama 💛',
+    ];
+    final n = i % en.length;
+    return _p(en[n], hi[n]);
+  }
+
+  String get hb2AddTitle => _p('Add to my bag', 'Mere bag mein add karein');
+  String get hb2Done => _p('Done', 'Done');
+  String get hb2Search => _p('Search items…', 'Items dhoondein…');
+  String get hb2MumsAlsoPacked => _p(
+      'Mums like you also packed', 'Aap jaisi mummies ne ye bhi packing kiya');
+  String get hb2SocialProof =>
+      _p('9 in 10 mums pack this', '10 mein 9 mummies ye packing karti hain');
+  String get hb2Add => _p('Add', 'Add');
+  String get hb2CatLabour => _p('For labour', 'Labour ke liye');
+  String get hb2CatAfter => _p('After delivery', 'Delivery ke baad');
+  String get hb2CatBaby => _p('For baby', 'Baby ke liye');
+  String get hb2CatPartner => _p('For partner', 'Partner ke liye');
+  String get hb2CatDocs => _p('Documents', 'Documents');
+  String get hb2CatComfort => _p('Comfort', 'Aaram ke liye');
+  String get hb2CatCustom => _p('My own', 'Mere apne');
+  String get hb2ShareTitle => _p('Share my bag', 'Mera bag share karein');
+  String get hb2ShareToBuy => _p('Still to buy', 'Abhi lena hai');
+  String hb2SharePacked(int a, int b) =>
+      _p('Packed: $a of $b 💛', 'Pack hua: $b mein se $a 💛');
+  String get hb2RemindMe => _p('Remind me to prep', 'Mujhe yaad dilayein');
+  String get hb2RemindOff => _p('Turn off reminder', 'Reminder band karein');
+  String get hb2ReminderTitle =>
+      _p('Your hospital bag 💛', 'Aapka hospital bag 💛');
+  String get hb2ReminderBody => _p(
+      'A few minutes to add or pack something today?',
+      'Aaj kuch add ya pack karne ke liye kuch minute?');
+  String get hb2ReminderSet => _p("Reminder set — I'll nudge you daily 💛",
+      'Reminder set — main roz yaad dilaungi 💛');
+  String get hb2ReminderOff =>
+      _p('Reminder turned off', 'Reminder band ho gaya');
+  String get hb2KeepsakeTitle =>
+      _p("Baby's bag is ready! 💛", 'Baby ka bag taiyaar hai! 💛');
+  String hb2KeepsakeSub(String date) =>
+      _p('Packed on $date', '$date ko packed');
+  String get hb2KeepsakeShare => _p('Share the moment', 'Ye pal share karein');
+  String hb2KeepsakeShareText(String date) => _p(
+      'Our hospital bag is all packed and ready for baby 💛 ($date) — ParentVeda',
+      'Hamara hospital bag baby ke liye taiyaar hai 💛 ($date) — ParentVeda');
   // Locked / "time to prepare" state
   String get hbTimeToPrepareTitle =>
       _p('Time to start preparing', 'Taiyaari shuru karne ka samay');
@@ -1898,6 +2021,88 @@ class S {
   String get hbStatusLabel => _p('Status', 'Sthiti');
   String get hbMarkPacked => _p('Mark as packed', 'Packed mark karein');
   String get hbPackedLabel => _p('Packed', 'Pack ho gaya');
+
+  // ===== Hospital Bag V2 (toggle-able redesign) =============================
+  String get hb2vClassic => _p('Classic', 'Classic');
+  String get hb2vNew => _p('New', 'Naya');
+  // Onboarding
+  String get hb2v2Title => _p('Build your hospital bag', 'Apna hospital bag taiyaar karein');
+  String get hb2v2Sub => _p(
+      "Let's prepare for one of the most special days of your life. You don't need to finish today — we'll build it together over the coming weeks.",
+      "Aapki zindagi ke sabse khaas din ki taiyaari karein. Aaj poora karna zaroori nahi — hum ise aane wale hafton mein saath milkar banayenge.");
+  String get hb2v2StartCta => _p('Start preparing', 'Taiyaari shuru karein');
+  String get hb2v2DeliveryQ =>
+      _p('How are you planning to deliver?', 'Aap delivery kaise plan kar rahi hain?');
+  // Plain-language stages
+  String get hb2v2StageDecision => _p('Needs your decision', 'Aapka faisla chahiye');
+  String get hb2v2StagePlanning => _p('Planning to buy', 'Khareedne ka plan');
+  String get hb2v2StageHome => _p('Ready at home', 'Ghar par taiyaar');
+  String get hb2v2StagePacked => _p('Packed', 'Pack ho gaya');
+  String get hb2v2StageLater => _p('Maybe later', 'Shaayad baad mein');
+  // Home
+  String get hb2v2Attention => _p('Needs your attention', 'Aapke dhyaan ki zaroorat');
+  String get hb2v2AllSorted => _p("You're all caught up 💛", 'Sab sambhal liya 💛');
+  String get hb2v2Categories => _p('Your bag, by area', 'Aapka bag, hisson mein');
+  String get hb2v2Shopping => _p('Shopping', 'Shopping');
+  String get hb2v2Packing => _p('Packing', 'Packing');
+  String hb2v2DaysToGo(int n) => _p('$n days to go', '$n din baaki');
+  String get hb2v2HeroReady => _p('Your bag is almost ready 💛', 'Aapka bag lagbhag taiyaar 💛');
+  String get hb2v2HeroBuilding => _p('Building your bag, gently', 'Aapka bag, aaraam se ban raha hai');
+  // Action sheet
+  String hb2v2WhatDo(String item) => _p('$item — what would you like to do?',
+      '$item — aap kya karna chahengi?');
+  String get hb2v2ChooseOne => _p('Help me choose one', 'Ek chunne mein madad karein');
+  String get hb2v2HaveOne => _p('I already have one', 'Mere paas pehle se hai');
+  String get hb2v2BuyElse => _p("I'll buy elsewhere", 'Main kahin aur se loongi');
+  String get hb2v2Later => _p("I'll decide later", 'Baad mein decide karoongi');
+  String get hb2v2NotNeed => _p("I don't think I need this", 'Mujhe shaayad iski zaroorat nahi');
+  // Product experience
+  String get hb2v2PvPick => _p('ParentVeda pick', 'ParentVeda ki pasand');
+  String get hb2v2WhyRec => _p('Why ParentVeda recommends this', 'ParentVeda yeh kyun suggest karta hai');
+  String get hb2v2Consider => _p('Things to consider', 'Dhyaan dene ki baatein');
+  String get hb2v2BuyingGuide => _p('Buying guide', 'Khareedne ki guide');
+  String get hb2v2BuyingGuideBody => _p(
+      'Look for soft, breathable fabric and an easy fit. One or two is usually enough to start — you can always add more later.',
+      'Naram, saans lene wala kapda aur aaramdaayak fit dekhein. Shuru mein ek-do kaafi hote hain — baad mein aur le sakti hain.');
+  String get hb2v2Reviews => _p('Real parent reviews', 'Asli parent reviews');
+  String get hb2v2ReviewsSoon => _p('Reviews from ParentVeda parents are coming soon.',
+      'ParentVeda parents ke reviews jaldi aa rahe hain.');
+  String get hb2v2Compare => _p('Compare options', 'Options compare karein');
+  String get hb2v2SeeAll => _p('See all options', 'Sabhi options dekhein');
+  String get hb2v2Selected => _p('Selected', 'Chuna gaya');
+  String get hb2v2ChooseThis => _p('Choose this', 'Yeh chunein');
+  String get hb2v2BuyOnPv => _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  // Buy elsewhere
+  String get hb2v2WhereBuy => _p('Where will you buy it?', 'Aap ise kahaan se lengi?');
+  String get hb2v2SkipForNow => _p('Skip for now', 'Abhi chhod dein');
+  String get hb2v2AddDetails => _p('Add price / link / note (optional)',
+      'Daam / link / note jodein (optional)');
+  // Maybe later
+  String get hb2v2MaybeLaterTitle => _p('Maybe later', 'Shaayad baad mein');
+  String get hb2v2RestoreItem => _p('Add back to bag', 'Bag mein wapas jodein');
+  // Packing
+  String get hb2v2TimeToPack => _p('Time to pack your bag', 'Bag pack karne ka samay');
+  String get hb2v2InBag => _p('In my hospital bag', 'Mere hospital bag mein');
+  String get hb2v2PackThis => _p('Pack this', 'Ise pack karein');
+  // Custom
+  String get hb2v2AddOwn => _p('Add my own item', 'Apni cheez jodein');
+  String get hb2v2ItemName => _p('Item name', 'Cheez ka naam');
+  String get hb2v2NotesOptional => _p('Notes (optional)', 'Note (optional)');
+  String get hb2v2RemoveItem => _p('Remove item', 'Cheez hatayein');
+  // Shopping summary
+  String get hb2v2SummaryTitle => _p('Shopping summary', 'Shopping summary');
+  String get hb2v2SecFromPv => _p('Buying from ParentVeda', 'ParentVeda se khareed rahi hain');
+  String get hb2v2SecElse => _p('Buying elsewhere', 'Kahin aur se');
+  String get hb2v2SecHome => _p('Already at home', 'Ghar par pehle se');
+  String get hb2v2SecWaiting => _p('Waiting to buy', 'Khareedna baaki');
+  String get hb2v2SecPacked => _p('Packed', 'Pack ho gaya');
+  String get hb2v2PvSpend => _p('ParentVeda spend', 'ParentVeda kharcha');
+  String get hb2v2ExtSpend => _p('External spend', 'Baahar ka kharcha');
+  String get hb2v2TotalSpend => _p('Total planned', 'Kul planned');
+  String get hb2v2SummaryCta => _p('Shopping summary', 'Shopping summary');
+  // Mark bought (elsewhere)
+  String get hb2v2MarkBought => _p('Mark as bought', 'Khareeda mark karein');
+  String get hb2v2Bought => _p('Bought', 'Khareed liya');
   String get hbMarkFavourite =>
       _p('Add to favourites', 'Favourites mein jodein');
   String get hbFavourites => _p('Favourites', 'Favourites');
@@ -2058,6 +2263,38 @@ class S {
   String get rmdRemoved => _p('Reminder removed', 'Reminder hata diya');
   String get rmdScheduleNote => _p('We\'ll nudge you at the time you set.',
       'Aapke set kiye samay par hum yaad dilaayenge.');
+  // Extended repeat labels (used by medication reminders).
+  String get rmdFortnightly => _p('Fortnightly', 'Har 2 hafte');
+  String get rmdMonthly => _p('Monthly', 'Har maheene');
+  String get rmdCustomDays => _p('Specific days', 'Chuni hui din');
+  // --- Medication reminders (Daily Medication card; never tied to a medicine) -
+  String get mrTitle => _p('My reminders', 'Mere reminder');
+  String get mrAdd => _p('Add reminder', 'Reminder jodein');
+  String get mrNew => _p('Add a reminder', 'Reminder jodein');
+  String get mrEdit => _p('Edit reminder', 'Reminder badlein');
+  String get mrFreq => _p('How often?', 'Kitni baar?');
+  String get mrFreqOnce => _p('Once a day', 'Din mein ek baar');
+  String get mrFreqTwice => _p('Twice a day', 'Din mein do baar');
+  String get mrFreqThrice => _p('Thrice a day', 'Din mein teen baar');
+  String get mrFreqWeekly => _p('Weekly', 'Har hafte');
+  String get mrFreqFortnightly => _p('Fortnightly', 'Har 2 hafte');
+  String get mrFreqMonthly => _p('Monthly', 'Har maheene');
+  String get mrFreqCustom => _p('Custom', 'Custom');
+  String get mrTimes => _p('At these times', 'In samay par');
+  String mrTimeN(int n) => _p('Time $n', 'Samay $n');
+  String get mrDayOfMonth => _p('Day of month', 'Maheene ka din');
+  String get mrOnDays => _p('On these days', 'In dino par');
+  String get mrNote => _p('Note (what should it say?)', 'Note (kya likhein?)');
+  String get mrNoteHint =>
+      _p('e.g. Iron tablet after lunch', 'jaise: lunch ke baad iron tablet');
+  String get mrDefaultTitle =>
+      _p('Medication reminder 💊', 'Dawai reminder 💊');
+  String get mrSave => _p('Save reminder', 'Reminder save karein');
+  String get mrDelete => _p('Delete', 'Hataayein');
+  String get mrEmpty => _p('No reminders yet — tap the bell to add one.',
+      'Abhi koi reminder nahi — bell dabaakar jodein.');
+  String get mrSaved => _p('Reminder set 💜', 'Reminder set ho gaya 💜');
+  String mrTimesPerDay(int n) => _p('$n× daily', 'Rozana $n baar');
   String rmdWeekdayShort(int wd) {
     const en = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const hi = ['Som', 'Mang', 'Budh', 'Guru', 'Shukra', 'Shani', 'Ravi'];
@@ -2445,6 +2682,31 @@ class S {
   String get gsVicharaTag => _p('Positive Contemplation', 'Sakaratmak Vichar');
   String get gsKriya => _p('Kriya', 'Kriya');
   String get gsKriyaTag => _p('Breath & Grounding', 'Saans Aur Sthirta');
+  // Tools Garbh Sanskar = a calm LIBRARY (no "today" framing). Intro + tiles.
+  String get gsAboutBody => _p(
+      'Garbh Sanskar is the gentle, age-old practice of nurturing your bond and your baby\'s growth through sound, positive thoughts, loving connection and mindful movement during pregnancy.',
+      'Garbh Sanskar pregnancy ke dauraan dhwani, sakaratmak vichaaron, pyaar bhare judaav aur mindful movement se aapke rishte aur baby ke vikas ko poshit karne ki saumya, praacheen practice hai.');
+  String get gsAboutMeaning => _p(
+      'A calm space to explore — pick whatever feels right for you today.',
+      'Ek shaant jagah jise explore karein — aaj jo aapko theek lage wo chunein.');
+  String get gsShravanDesc => _p(
+      'Calming ragas, tones and sounds for you and your baby.',
+      'Aapke aur baby ke liye shaant ragas, sur aur dhwaniyan.');
+  String get gsVicharaDesc => _p(
+      'Sacred insights, gentle brain games and uplifting reads.',
+      'Pavitra insights, halke brain games aur uplifting reads.');
+  String get gsSamvadDesc => _p(
+      'Speaking cards to read aloud — your voice, for your baby.',
+      'Padhne ke liye speaking cards — aapki awaaz, aapke baby ke liye.');
+  String get gsKriyaDesc => _p(
+      'Gentle, safe prenatal movement and breathing practices.',
+      'Saumya, surakshit prenatal movement aur saans ki practices.');
+  String get gsBrowseAll =>
+      _p('Browse the full collection.', 'Poora sangrah dekhein.');
+  String get gsSamvadAffirm => _p('Affirmations', 'Affirmations');
+  String get gsSamvadScripts =>
+      _p('Read-aloud stories', 'Padhkar sunane wali kahaniyan');
+  String get gsSamvadVisualize => _p('Visualizations', 'Visualizations');
   String get gsYourJourney => _p('Your journey', 'Aapka safar');
   String get gsStatListening => _p('Listening', 'Shravan');
   String get gsStatReflections => _p('Reflections', 'Vichar');
@@ -2522,6 +2784,26 @@ class S {
   String get gsPuzzleSoon =>
       _p('This puzzle opens soon — counts as done for today ❤️',
           'Yeh puzzle jald — aaj ke liye poora maana jaayega ❤️');
+  // Vichara brain games — shared chrome.
+  String get gsGameDone =>
+      _p('Well done — a calm few minutes 🌿', 'Shabaash — kuch shaant pal 🌿');
+  String get gsPlayAgain => _p('Play again', 'Phir se khelein');
+  String get gsGameClose => _p('Done', 'Ho gaya');
+  String get gsWordSearchHow => _p(
+      'Tap the first and last letter of a hidden word.',
+      'Chhupe shabd ke pehle aur aakhri akshar par tap karein.');
+  String gsWordsFound(int a, int b) =>
+      _p('$a of $b found', '$b mein se $a mile');
+  String get gsSudokuHow => _p(
+      'Fill 1–4 so every row, column and box has no repeats.',
+      'Aise bharein ki har row, column aur box mein 1–4 dohraayein nahi.');
+  String get gsLogicHow =>
+      _p('Pick the answer that fits.', 'Sahi jawaab chunein.');
+  String get gsLogicNudge =>
+      _p('Not quite — try another 🌸', 'Bilkul nahi — doosra try karein 🌸');
+  String gsLogicProgress(int a, int b) => _p('$a of $b', '$b mein se $a');
+  String get gsMemoryHow => _p('Flip two cards to find the matching pairs.',
+      'Do cards palatein aur jodi milayein.');
 
   // ---- Community (Tools) ---------------------------------------------------
   String get cmTitle => _p('Community', 'Community');
@@ -2929,8 +3211,9 @@ class S {
   String get drBooks => _p('Books', 'Kitaabein');
   String get drSeeAll => _p('See all', 'Sabhi dekhein');
 
-  // ---- Library ❤️ (formerly "Read Next") -----------------------------------
-  String get rnTitle => _p('Library', 'Library');
+  // ---- Read recommendations ❤️ (formerly "Read Next" / "Library") ----------
+  String get rnTitle =>
+      _p('Read recommendations', 'Read recommendations');
   String get rnSubtitle => _p('Handpicked reading for your stage of pregnancy.',
       'Aapki pregnancy stage ke liye chuni hui reading.');
   String get rnThisWeekPick => _p("This Week's Pick", 'Is Hafte Ki Pick');

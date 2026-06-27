@@ -453,6 +453,35 @@ void showSingleItemBuyNow(
           title: s.cartProductsTitle));
 }
 
+/// Buy-now for a RAW catalogue line (e.g. a hospital-bag ParentVeda product),
+/// not tied to the [Product] model. Reuses the preview checkout; once the order
+/// is "placed", the [productId] is marked in BoughtStore.
+void showSingleBuyNow(
+  BuildContext context,
+  PregnancyController controller, {
+  required String productId,
+  required String name,
+  required String emoji,
+  required double unitPrice,
+  String? title,
+}) {
+  final s = S(controller.language);
+  CartStore.instance.clear(kBuyNowCartId);
+  CartStore.instance.add(
+    kBuyNowCartId,
+    productId: productId,
+    name: name,
+    emoji: emoji,
+    unitPrice: unitPrice,
+  );
+  _push(
+      context,
+      _CheckoutScreen(
+          controller: controller,
+          cartId: kBuyNowCartId,
+          title: title ?? s.cartProductsTitle));
+}
+
 // ===========================================================================
 //  Preview checkout
 // ===========================================================================

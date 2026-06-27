@@ -48,6 +48,11 @@ class ReminderStore extends ChangeNotifier {
   List<Reminder> get active => _items.where((r) => r.enabled).toList();
   bool get isEmpty => _items.isEmpty;
 
+  /// Just the medication reminders (shown on the Daily Medication card). These
+  /// are never tied to a specific medicine — they're free self-reminders.
+  List<Reminder> get medication =>
+      _items.where((r) => r.category == 'medication').toList();
+
   Reminder? byId(String id) {
     for (final r in _items) {
       if (r.id == id) return r;
@@ -66,7 +71,7 @@ class ReminderStore extends ChangeNotifier {
     if (r.enabled) {
       NotificationService.instance.schedule(r);
     } else {
-      NotificationService.instance.cancel(r.notificationId);
+      NotificationService.instance.cancelReminder(r);
     }
     _persistNotify();
   }
@@ -74,7 +79,7 @@ class ReminderStore extends ChangeNotifier {
   void remove(String id) {
     final r = byId(id);
     _items.removeWhere((x) => x.id == id);
-    if (r != null) NotificationService.instance.cancel(r.notificationId);
+    if (r != null) NotificationService.instance.cancelReminder(r);
     _persistNotify();
   }
 
@@ -86,7 +91,7 @@ class ReminderStore extends ChangeNotifier {
     if (updated.enabled) {
       NotificationService.instance.schedule(updated);
     } else {
-      NotificationService.instance.cancel(updated.notificationId);
+      NotificationService.instance.cancelReminder(updated);
     }
     _persistNotify();
   }

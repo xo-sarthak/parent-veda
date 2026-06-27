@@ -528,31 +528,252 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     final r = _result!;
     final lang = p.language;
     final sc = r.showcase;
+    final List<Widget> children;
+    if (sc != null) {
+      children = [
+        _vedaAnswerCard(sc, s, lang),
+        _whatMeans(sc, s, lang, personalLine: r.personalLine),
+        _nextActions(sc, s, lang),
+        if (sc.pvContent.isNotEmpty) _moreInfoShowcase(sc, s, lang),
+        _community(sc, s, lang),
+        if (sc.products.isNotEmpty) _products(sc, s, lang),
+        if (sc.services.isNotEmpty) _services(sc, s, lang),
+        _disclaimer(s),
+      ];
+    } else if (r.view != null) {
+      // Retrieval answers now render the SAME fixed 7 sections — the content is
+      // pulled from across the app as context (typed by content-kind, never a
+      // raw "Can I"/"Week N" source card; community is social-proof only).
+      children = _viewSections(r.view!, s, lang);
+    } else {
+      // The honest "I don't have a confident answer yet" case.
+      children = [_plainAnswerCard(r.answer, s), _disclaimer(s)];
+    }
     return ListView(
       key: const ValueKey('result'),
       controller: _scroll,
       padding: const EdgeInsets.fromLTRB(18, 78, 18, 44),
-      children: sc != null
-          ? [
-              _vedaAnswerCard(sc, s, lang),
-              _whatMeans(sc, s, lang),
-              _nextActions(sc, s, lang),
-              if (sc.pvContent.isNotEmpty) _moreInfoShowcase(sc, s, lang),
-              _community(sc, s, lang),
-              if (sc.products.isNotEmpty) _products(sc, s, lang),
-              if (sc.services.isNotEmpty) _services(sc, s, lang),
-              _disclaimer(s),
-            ]
-          : [
-              _plainAnswerCard(r.answer, s),
-              if (r.sources.isNotEmpty) ...[
-                _sectionHead(Icons.library_books_rounded, s.vedaMoreInfo),
-                for (final src in r.sources) _sourceCard(src),
-              ],
-              _disclaimer(s),
-            ],
+      children: children,
     );
   }
+
+  // ===========================================================================
+  //  RETRIEVAL view — the SAME 7 sections as the showcase page, built from
+  //  vetted app content. Community is excluded from S1–S4 (social proof only).
+  // ===========================================================================
+  List<Widget> _viewSections(VedaAnswerView v, S s, AppLanguage lang) => [
+        _plainAnswerCard(v.answer, s), // S1 — Veda Answer
+        _viewMeaning(v, s), // S2
+        if (v.actions.isNotEmpty) _viewActions(v, s), // S3
+        if (v.content.isNotEmpty) _viewContent(v, s), // S4
+        if (v.community != null) _viewCommunity(v.community!, s), // S5
+        if (v.products.isNotEmpty) _viewProducts(v, s, lang), // S6
+        _disclaimer(s),
+      ];
+
+  Widget _viewMeaning(VedaAnswerView v, S s) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHead(Icons.favorite_rounded, s.vedaWhatMeans),
+          _card(
+            padding: const EdgeInsets.fromLTRB(17, 17, 18, 17),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(v.meaning,
+                  style: GoogleFonts.manrope(
+                      fontSize: 14.5, height: 1.62, color: _vBody2)),
+              if (v.urgent) ...[
+                const SizedBox(height: 14),
+                _whenChecked(s),
+              ],
+            ]),
+          ),
+        ],
+      );
+
+  Widget _viewActions(VedaAnswerView v, S s) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHead(Icons.task_alt_rounded, s.vedaNextActions),
+          _card(
+            padding: EdgeInsets.zero,
+            child: Column(children: [
+              for (int i = 0; i < v.actions.length; i++)
+                _viewActionRow(v.actions[i], last: i == v.actions.length - 1),
+            ]),
+          ),
+        ],
+      );
+
+  Widget _viewActionRow(String action, {required bool last}) {
+    final en = action.toLowerCase();
+    final coral = en.contains('call') ||
+        en.contains('doctor') ||
+        en.contains('maternity unit');
+    final icon = coral
+        ? Icons.call_rounded
+        : en.contains('track') || en.contains('note') || en.contains('feel')
+            ? Icons.event_note_rounded
+            : en.contains('read') || en.contains('explore')
+                ? Icons.menu_book_rounded
+                : Icons.task_alt_rounded;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        border:
+            last ? null : const Border(bottom: BorderSide(color: _vDivider)),
+      ),
+      child: Row(children: [
+        Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: coral
+                    ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)]
+                    : const [Color(0xFFF3E9FF), Color(0xFFEDE2FC)]),
+            borderRadius: BorderRadius.circular(13),
+          ),
+          child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(action,
+              style: GoogleFonts.manrope(
+                  fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
+        ),
+      ]),
+    );
+  }
+
+  Widget _viewContent(VedaAnswerView v, S s) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHead(Icons.library_books_rounded, s.vedaMoreInfo),
+          for (final c in v.content) _viewContentCard(c),
+        ],
+      );
+
+  Widget _viewContentCard(VedaContentRef ref) {
+    final c = _kindColor(ref.kind);
+    return GestureDetector(
+      onTap: () => _openContentRef(ref),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 11),
+        padding: const EdgeInsets.all(13),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _vCardBorder),
+          boxShadow: _vCardShadow,
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 56,
+            height: 56,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: c.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14)),
+            child: Icon(_kindIcon(ref.kind), size: 24, color: c),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Content TYPE label (e.g. "Weekly journey") — NOT a raw source.
+              Text(ref.typeLabel.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.7,
+                      color: _vPurple2)),
+              const SizedBox(height: 4),
+              Text(ref.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      color: _vInk)),
+              const SizedBox(height: 3),
+              Text(ref.snippet,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12, height: 1.35, color: _vMuted)),
+            ]),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 4, top: 18),
+            child: Icon(Icons.chevron_right_rounded,
+                size: 20, color: Color(0xFFCBBFDD)),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  // A content card routes exactly like a source did, keyed by its kind.
+  void _openContentRef(VedaContentRef ref) => _openSource(VedaSource(
+        kind: ref.kind,
+        sourceLabel: ref.typeLabel,
+        title: ref.title,
+        snippet: ref.snippet,
+        body: ref.body,
+      ));
+
+  Widget _viewCommunity(String text, S s) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHead(Icons.forum_rounded, s.vedaCommunityInsights),
+          GestureDetector(
+            onTap: _openCommunityPage,
+            behavior: HitTestBehavior.opaque,
+            child: _card(
+              padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
+              child: Row(children: [
+                _avatarStack(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(text,
+                      style: GoogleFonts.manrope(
+                          fontSize: 13.5, height: 1.5, color: _vBody2)),
+                ),
+                const Icon(Icons.chevron_right_rounded,
+                    size: 20, color: Color(0xFFCBBFDD)),
+              ]),
+            ),
+          ),
+        ],
+      );
+
+  Widget _viewProducts(VedaAnswerView v, S s, AppLanguage lang) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHead(Icons.redeem_rounded, s.vedaProductsHdr, top: 28),
+          Padding(
+            padding: const EdgeInsets.only(left: 30, bottom: 13),
+            child: Text(s.vedaProductsHint,
+                style: GoogleFonts.manrope(fontSize: 12, color: _vMuted2)),
+          ),
+          SizedBox(
+            height: 188,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: v.products.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 13),
+              itemBuilder: (_, i) => _productCard(
+                  LocalizedText(en: v.products[i], hi: v.products[i]), lang),
+            ),
+          ),
+        ],
+      );
 
   // ---- shared building blocks ----
   Widget _card(
@@ -707,7 +928,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   }
 
   // S2 — What this means for you ----------------------------------------------
-  Widget _whatMeans(VedaShowcase sc, S s, AppLanguage lang) => Column(
+  Widget _whatMeans(VedaShowcase sc, S s, AppLanguage lang,
+          {String? personalLine}) =>
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionHead(Icons.favorite_rounded, s.vedaWhatMeans),
@@ -717,6 +940,17 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(sc.meaning.of(lang),
                   style: GoogleFonts.manrope(
                       fontSize: 14.5, height: 1.62, color: _vBody2)),
+              // Personalized to HER (logged symptoms / medications), appended to
+              // the curated explanation.
+              if (personalLine != null) ...[
+                const SizedBox(height: 11),
+                Text(personalLine,
+                    style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        height: 1.6,
+                        fontWeight: FontWeight.w600,
+                        color: _vPurple2)),
+              ],
               if (sc.urgent) ...[
                 const SizedBox(height: 14),
                 _whenChecked(s),
@@ -1248,6 +1482,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
+  // Old retrieval "source card" (raw Can-I/Week-N label). Replaced by the typed
+  // 7-section view (_viewContentCard); kept for revert.
+  // ignore: unused_element
   Widget _sourceCard(VedaSource src) {
     final c = _kindColor(src.kind);
     return GestureDetector(

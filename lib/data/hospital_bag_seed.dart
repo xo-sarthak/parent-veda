@@ -165,3 +165,18 @@ List<BagItem> generateDefaultBag(DeliveryType delivery) => [
 /// The optional suggested-essentials a mother can tap to add.
 List<BagItem> suggestedEssentials() =>
     [for (final s in _suggested) _itemFromSeed(s)];
+
+/// EVERY catalogue item (default + suggested) as fresh templates — for the
+/// "Add items" browser, which shows them all and ticks the ones already in her
+/// bag. (Delivery-specific items are included; the bag onboarding filters them.)
+List<BagItem> allBagCatalogItems() =>
+    [for (final s in [..._seed, ..._suggested]) _itemFromSeed(s)];
+
+/// The catalogue grouped by section, in display order — for the browser.
+Map<BagCategory, List<BagItem>> bagCatalogByCategory() {
+  final out = <BagCategory, List<BagItem>>{};
+  for (final s in [..._seed, ..._suggested]) {
+    out.putIfAbsent(s.category, () => []).add(_itemFromSeed(s));
+  }
+  return out;
+}

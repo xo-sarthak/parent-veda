@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import 'bought_store.dart';
 
 /// The six default sections, plus a "custom" bucket for the mother's own items.
 enum BagCategory { labour, afterDelivery, baby, partner, documents, comfort, custom }
@@ -88,6 +89,7 @@ class BagItem {
     this.recommendation,
     this.status = BagItemStatus.needed,
     this.packed = false,
+    this.purchased = false,
     this.favourite = false,
     this.store = '',
     this.link = '',
@@ -105,6 +107,7 @@ class BagItem {
   // Mutable planning state.
   BagItemStatus status;
   bool packed;
+  bool purchased; // bought (separate from packed). Auto-set for ParentVeda buys.
   bool favourite; // the mother's own "favourites" list (her must-haves)
   String store; // for buyElse
   String link; // for buyElse
@@ -133,6 +136,7 @@ class BagItem {
         'recommendation': recommendation?.toJson(),
         'status': status.name,
         'packed': packed,
+        'purchased': purchased,
         'favourite': favourite,
         'store': store,
         'link': link,
@@ -157,6 +161,7 @@ class BagItem {
               Map<String, dynamic>.from(j['recommendation'])),
       status: _statusFromString((j['status'] ?? 'needed').toString()),
       packed: j['packed'] == true,
+      purchased: j['purchased'] == true,
       favourite: j['favourite'] == true,
       store: (j['store'] ?? '').toString(),
       link: (j['link'] ?? '').toString(),
@@ -308,10 +313,43 @@ class HospitalBagStore extends ChangeNotifier {
       }
     } catch (_) {/* start empty */}
     _loaded = true;
+    // Auto-reflect in-app ParentVeda purchases as "bought" — now and on change.
+    BoughtStore.instance.addListener(markBoughtFromBought);
+    markBoughtFromBought();
     notifyListeners();
   }
 
   // ---- Mutations ------------------------------------------------------------
+
+  Future<void> togglePurchased(String id) async {
+    final i = byId(id);
+    if (i == null) return;
+    i.purchased = !i.purchased;
+    await _touch();
+  }
+
+  Future<void> setPurchased(String id, bool value) async {
+    final i = byId(id);
+    if (i == null || i.purchased == value) return;
+    i.purchased = value;
+    await _touch();
+  }
+
+  /// Set [purchased] for any "buy from ParentVeda" item whose chosen product has
+  /// been bought through the in-app preview checkout (BoughtStore). Idempotent.
+  void markBoughtFromBought() {
+    var changed = false;
+    for (final i in _items) {
+      if (i.status == BagItemStatus.buyVeda && !i.purchased) {
+        final pid = i.selectedProductId ?? '${i.id}_pv';
+        if (BoughtStore.instance.isBought(pid)) {
+          i.purchased = true;
+          changed = true;
+        }
+      }
+    }
+    if (changed) _touch();
+  }
 
   /// Replace the bag with a freshly generated default set and mark onboarded.
   Future<void> createBag(List<BagItem> defaults, DeliveryType delivery) async {

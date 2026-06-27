@@ -91,7 +91,7 @@ class KegelCareScreen extends StatefulWidget {
 class _KegelCareScreenState extends State<KegelCareScreen> {
   final _store = ToolsStore.instance;
   bool _whyExpanded = false;
-  bool _howExpanded = false;
+  bool _howExpanded = true; // "What is a Kegel" opens by default, at the top.
 
   @override
   void initState() {
@@ -126,18 +126,31 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
             children: [
-              // Hero
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary50,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              // Hero ("Pelvic Floor Care") removed per request — its intro now
+              // lives inside the "Why am I doing this?" collapsible below.
+              // What is a Kegel & how to do it — at the top, OPEN by default.
+              _Expandable(
+                title: s.kegelHowTitle,
+                body: s.kegelHowBody,
+                expanded: _howExpanded,
+                onToggle: () => setState(() => _howExpanded = !_howExpanded),
+              ),
+              const SizedBox(height: 14),
+              // Current routine — now contains the ℹ️ "Why this routine?", the
+              // Edit ✏️ (Customize), and the Start session button.
+              _currentRoutineCard(context, s, text, r),
+              const SizedBox(height: 14),
+              // "Why this routine?" box removed — it opens from the ℹ️ in the
+              // card. Standalone "Start Care Session" button removed — now in card.
+              // Why am I doing this? — now holds the Pelvic Floor Care intro
+              // (its old text dropped).
+              _Expandable(
+                title: s.whyAmIDoingThis,
+                expanded: _whyExpanded,
+                onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s.kegelHeroTitle, style: text.titleLarge),
-                      const SizedBox(height: 8),
                       Text(s.kegelHeroBody, style: text.bodyMedium),
                       const SizedBox(height: 10),
                       _benefit(text, s.kegelBenefitBladder),
@@ -148,69 +161,32 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                     ]),
               ),
               const SizedBox(height: 14),
-              // What is a Kegel & how to do it — right at the top for first-timers.
-              _Expandable(
-                title: s.kegelHowTitle,
-                body: s.kegelHowBody,
-                expanded: _howExpanded,
-                onToggle: () => setState(() => _howExpanded = !_howExpanded),
-              ),
-              const SizedBox(height: 14),
-              // Current routine
-              _currentRoutineCard(context, s, text, r),
-              const SizedBox(height: 14),
+              // Safety — styled as a clear WARNING banner, not a plain text box.
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceContainer,
+                  color: const Color(0xFFFFF4E5),
                   borderRadius: BorderRadius.circular(16),
+                  border:
+                      Border.all(color: const Color(0x66E08A2B), width: 1.4),
                 ),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s.whyThisRoutine,
-                          style: text.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 6),
-                      Text(s.whyThisRoutineBody, style: text.bodyMedium),
-                    ]),
-              ),
-              const SizedBox(height: 18),
-              FilledButton.icon(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => _SessionScreen(
-                    controller: widget.controller,
-                    hold: r.hold,
-                    relax: r.relax,
-                    reps: r.reps,
-                  ),
-                )),
-                icon: const Icon(Icons.play_arrow_rounded),
-                label: Text(s.startCareSession),
-              ),
-              const SizedBox(height: 18),
-              // Why am I doing this (collapsible)
-              _Expandable(
-                title: s.whyAmIDoingThis,
-                body: s.whyAmIDoingThisBody,
-                expanded: _whyExpanded,
-                onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
-              ),
-              const SizedBox(height: 14),
-              // Safety
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppTheme.fatherAmber.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(s.kegelSafetyTitle,
-                          style: text.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 8),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.warning_amber_rounded,
+                                color: Color(0xFFC9700F), size: 22),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(s.kegelSafetyTitle,
+                                  style: text.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: const Color(0xFFA85B0C))),
+                            ),
+                          ]),
+                      const SizedBox(height: 10),
                       _bullet(text, s.kegelSafetyPain),
                       _bullet(text, s.kegelSafetyBleeding),
                       _bullet(text, s.kegelSafetyDizziness),
@@ -280,17 +256,34 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                   _badge(text, s.customLabel),
                 ],
               ]),
-              const SizedBox(height: 2),
-              Text(r.stage(s),
-                  style:
-                      text.labelMedium?.copyWith(color: AppTheme.secondary600)),
+              const SizedBox(height: 4),
+              // Replaces the old stage line ("Building consistency"). Tapping
+              // this ℹ️ opens the "Why this routine?" explanation.
+              InkWell(
+                onTap: () => _showWhyThisRoutine(context, s),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.info_outline_rounded,
+                        size: 16, color: AppTheme.secondary600),
+                    const SizedBox(width: 5),
+                    Text(s.whyThisRoutine,
+                        style: text.labelMedium?.copyWith(
+                            color: AppTheme.secondary600,
+                            fontWeight: FontWeight.w700)),
+                  ]),
+                ),
+              ),
             ]),
           ),
+          // Edit (✏️) — opens the Customize sheet (moved here from the old
+          // bottom "Customize" button; Reset-to-recommended lives in the sheet).
           IconButton(
             visualDensity: VisualDensity.compact,
-            tooltip: s.recommendedLabel,
-            onPressed: () => _showRecommendInfo(context, s, rec),
-            icon: const Icon(Icons.info_outline_rounded, size: 20),
+            tooltip: s.customizeLabel,
+            onPressed: () => _showCustomize(context, s, rec),
+            icon: const Icon(Icons.edit_rounded, size: 20),
           ),
         ]),
         const SizedBox(height: 8),
@@ -307,23 +300,24 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             style: text.bodySmall?.copyWith(color: AppTheme.neutral500),
           ),
         ],
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () => _showCustomize(context, s, rec),
-              icon: const Icon(Icons.tune_rounded, size: 18),
-              label: Text(s.customizeLabel),
-            ),
+        const SizedBox(height: 14),
+        // Start session — replaces the old "Customize" button (the standalone
+        // Start Care Session button was removed; Customize is now the ✏️ above).
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => _SessionScreen(
+                controller: widget.controller,
+                hold: r.hold,
+                relax: r.relax,
+                reps: r.reps,
+              ),
+            )),
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: Text(s.startCareSession),
           ),
-          if (isCustom) ...[
-            const SizedBox(width: 10),
-            TextButton(
-              onPressed: _store.clearKegelCustomRoutine,
-              child: Text(s.resetToRecommended),
-            ),
-          ],
-        ]),
+        ),
       ]),
     );
   }
@@ -342,6 +336,25 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             )),
       );
 
+  /// Opens the "Why this routine?" explanation (from the ℹ️ in the card).
+  Future<void> _showWhyThisRoutine(BuildContext context, S s) {
+    final text = Theme.of(context).textTheme;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.whyThisRoutine),
+        content: Text(s.whyThisRoutineBody, style: text.bodyMedium),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(), child: Text(s.gotIt)),
+        ],
+      ),
+    );
+  }
+
+  // Old recommended-routine info popup — no longer used (the ℹ️ now shows "Why
+  // this routine?"); kept for revert.
+  // ignore: unused_element
   Future<void> _showRecommendInfo(BuildContext context, S s, _Routine rec) {
     final text = Theme.of(context).textTheme;
     return showDialog<void>(
@@ -499,12 +512,14 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
 class _Expandable extends StatelessWidget {
   const _Expandable({
     required this.title,
-    required this.body,
+    this.body,
+    this.child,
     required this.expanded,
     required this.onToggle,
   });
   final String title;
-  final String body;
+  final String? body; // simple text body
+  final Widget? child; // OR a rich body (e.g. the pelvic-floor intro)
   final bool expanded;
   final VoidCallback onToggle;
 
@@ -530,7 +545,7 @@ class _Expandable extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(body, style: text.bodyMedium),
+              child: child ?? Text(body ?? '', style: text.bodyMedium),
             ),
           ),
       ]),

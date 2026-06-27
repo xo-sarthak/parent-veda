@@ -92,29 +92,98 @@ class NotificationService {
     return d;
   }
 
+  // Next time [dayOfMonth] (clamped to the month length) falls at hh:mm.
+  tz.TZDateTime _nextMonthly(int dayOfMonth, int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime make(int year, int month) {
+      final lastDay = DateTime(year, month + 1, 0).day; // 0th of next month
+      final day = dayOfMonth.clamp(1, lastDay);
+      return tz.TZDateTime(tz.local, year, month, day, hour, minute);
+    }
+
+    var dt = make(now.year, now.month);
+    if (!dt.isAfter(now)) {
+      var y = now.year, m = now.month + 1;
+      if (m > 12) {
+        m = 1;
+        y += 1;
+      }
+      dt = make(y, m);
+    }
+    return dt;
+  }
+
+  // Per-occurrence OS id: occurrence 0 keeps the base id (back-compat); the rest
+  // derive a stable id from "<reminderId>#<index>".
+  int _occId(Reminder r, int index) =>
+      index == 0 ? r.notificationId : ('${r.id}#$index').hashCode & 0x7fffffff;
+
+  // The individual firing instances of a reminder (one reminder can fire at
+  // several times of day, or on several weekdays).
+  List<_Occ> _occurrences(Reminder r) {
+    switch (r.repeat) {
+      case ReminderRepeat.once:
+        return [_Occ(0, r.hour, r.minute)];
+      case ReminderRepeat.daily:
+        final ts = r.effectiveTimes;
+        return [
+          for (var i = 0; i < ts.length; i++)
+            _Occ(i, ts[i] ~/ 60, ts[i] % 60, match: DateTimeComponents.time),
+        ];
+      case ReminderRepeat.weekly:
+        return [
+          _Occ(0, r.hour, r.minute,
+              weekday: r.weekday, match: DateTimeComponents.dayOfWeekAndTime),
+        ];
+      case ReminderRepeat.fortnightly:
+        // No native 14-day match → schedule the next weekday occurrence as a
+        // ONE-SHOT; syncAll (every launch) re-arms it so it behaves ~fortnightly.
+        // Exact 14-day spacing would need a stored anchor (future).
+        return [_Occ(0, r.hour, r.minute, weekday: r.weekday)];
+      case ReminderRepeat.monthly:
+        return [
+          _Occ(0, r.hour, r.minute,
+              dayOfMonth: r.dayOfMonth,
+              match: DateTimeComponents.dayOfMonthAndTime),
+        ];
+      case ReminderRepeat.customDays:
+        final wds = r.effectiveWeekdays;
+        return [
+          for (var i = 0; i < wds.length; i++)
+            _Occ(i, r.hour, r.minute,
+                weekday: wds[i], match: DateTimeComponents.dayOfWeekAndTime),
+        ];
+    }
+  }
+
   Future<void> schedule(Reminder r) async {
     if (!_ready || !r.enabled) return;
-    await cancel(r.notificationId);
+    await cancelReminder(r);
     try {
-      final when = _nextTime(r.hour, r.minute,
-          weekday: r.repeat == ReminderRepeat.weekly ? r.weekday : null);
-      final DateTimeComponents? match = switch (r.repeat) {
-        ReminderRepeat.once => null,
-        ReminderRepeat.daily => DateTimeComponents.time,
-        ReminderRepeat.weekly => DateTimeComponents.dayOfWeekAndTime,
-      };
-      await _plugin.zonedSchedule(
-        r.notificationId,
-        r.title,
-        r.body.isEmpty ? null : r.body,
-        when,
-        _details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: match,
-      );
+      for (final o in _occurrences(r)) {
+        final when = o.dayOfMonth != null
+            ? _nextMonthly(o.dayOfMonth!, o.hour, o.minute)
+            : _nextTime(o.hour, o.minute, weekday: o.weekday);
+        await _plugin.zonedSchedule(
+          _occId(r, o.index),
+          r.title,
+          r.body.isEmpty ? null : r.body,
+          when,
+          _details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: o.match,
+        );
+      }
     } catch (_) {/* best-effort */}
+  }
+
+  /// Cancel every occurrence of a reminder (covers multi-time reminders).
+  Future<void> cancelReminder(Reminder r) async {
+    for (var i = 0; i < 8; i++) {
+      await cancel(_occId(r, i));
+    }
   }
 
   Future<void> cancel(int id) async {
@@ -133,4 +202,17 @@ class NotificationService {
       if (r.enabled) await schedule(r);
     }
   }
+}
+
+/// One firing instance of a reminder (a time-of-day, optionally on a weekday or
+/// day-of-month, with the matching recurrence component).
+class _Occ {
+  const _Occ(this.index, this.hour, this.minute,
+      {this.weekday, this.dayOfMonth, this.match});
+  final int index;
+  final int hour;
+  final int minute;
+  final int? weekday;
+  final int? dayOfMonth;
+  final DateTimeComponents? match;
 }

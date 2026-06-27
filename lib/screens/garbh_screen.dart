@@ -20,6 +20,7 @@ import '../theme/app_theme.dart';
 import '../widgets/cards/raga_player.dart';
 import 'home_detail_screens.dart' show TalkComposerScreen;
 import 'tools/ask_veda_screen.dart';
+import 'tools/garbh_games.dart';
 
 // --- warm palette ---
 const _cream = Color(0xFFFBF6EE);
@@ -36,6 +37,22 @@ const _green = Color(0xFF3FA56A);
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
+
+// Route a Vichara brain-fitness puzzle card to its real game.
+Widget _gameFor(GarbhPuzzle p, PregnancyController c,
+    {bool markComplete = true}) {
+  switch (p.title) {
+    case 'Sudoku':
+      return SudokuGame(controller: c, markComplete: markComplete);
+    case 'Logic Puzzle':
+      return LogicGame(controller: c, markComplete: markComplete);
+    case 'Memory Match':
+      return MemoryMatchGame(controller: c, markComplete: markComplete);
+    case 'Word Search':
+    default:
+      return WordSearchGame(controller: c, markComplete: markComplete);
+  }
+}
 
 ({String emoji, Color accent}) _pillarVisual(String id) {
   switch (id) {
@@ -65,16 +82,15 @@ class GarbhScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final week = controller.currentWeek;
-    final t = garbhTrimester(week);
 
-    // Per-pillar "what to do today" + duration.
-    final pillars = <({String id, String name, String tag, String todo, String duration})>[
-      (id: 'shravan', name: s.gsShravan, tag: s.gsShravanTag, todo: shravanForTrimester(t).title, duration: s.gsMinutes(shravanForTrimester(t).minutes)),
-      (id: 'vichara', name: s.gsVichara, tag: s.gsVicharaTag, todo: 'A reflection, a gentle puzzle, or an uplifting read', duration: '2–5 min'),
-      (id: 'samvad', name: s.gsSamvad, tag: s.gsSamvadTag, todo: promptForDay(controller.currentDay).text, duration: '3 min'),
-      (id: 'kriya', name: s.gsKriya, tag: s.gsKriyaTag, todo: kriyaForTrimester(t).title, duration: s.gsMinutes(kriyaForTrimester(t).minutes)),
-      (id: 'ahara', name: s.gsAhara, tag: s.gsAharaTag, todo: nutritionForTrimester(t).tip, duration: '2 min'),
+    // Tools Garbh Sanskar = a calm LIBRARY (NO "today" framing — that lives only
+    // in the daily Garbh section on Home). Intro → four pillar tiles → each opens
+    // the FULL repository of that pillar (daily == false).
+    final pillars = <({String id, String name, String desc})>[
+      (id: 'shravan', name: s.gsShravan, desc: s.gsShravanDesc),
+      (id: 'vichara', name: s.gsVichara, desc: s.gsVicharaDesc),
+      (id: 'samvad', name: s.gsSamvad, desc: s.gsSamvadDesc),
+      (id: 'kriya', name: s.gsKriya, desc: s.gsKriyaDesc),
     ];
 
     return Scaffold(
@@ -83,63 +99,34 @@ class GarbhScreen extends StatelessWidget {
           backgroundColor: AppTheme.surfaceContainer,
           elevation: 0,
           foregroundColor: AppTheme.primary900),
-      body: AnimatedBuilder(
-        animation: GarbhStore.instance,
-        builder: (context, _) {
-          final store = GarbhStore.instance;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
-            children: [
-              // Header (design: kicker + serif title)
-              Text(s.gsKicker(week).toUpperCase(),
-                  style: GoogleFonts.manrope(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                      color: AppTheme.secondary600)),
-              const SizedBox(height: 6),
-              Text(s.gsFiveRituals,
-                  style: GoogleFonts.fraunces(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.primary900)),
-              const SizedBox(height: 18),
-              // Raga / breathing hero (design)
-              _RagaHero(
-                controller: controller,
-                onTap: () =>
-                    _push(context, ShravanScreen(controller: controller)),
-              ),
-              const SizedBox(height: 18),
-              // Progress + streak
-              _ProgressCard(done: store.doneCount, streak: store.streak, s: s),
-              const SizedBox(height: 22),
-              Text(s.gsTodaysRituals,
-                  style: text.titleMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 12),
-              for (final p in pillars) ...[
-                _PillarCard(
-                  pillar: p,
-                  done: store.isDone(p.id),
-                  onTap: () => _openPillar(context, p.id),
-                ),
-                const SizedBox(height: 12),
-              ],
-              const SizedBox(height: 6),
-              if (store.doneCount >= GarbhStore.dailyGoal)
-                Center(
-                  child: Text(s.gsAllDone,
-                      textAlign: TextAlign.center,
-                      style: text.titleSmall?.copyWith(color: _green, fontWeight: FontWeight.w800)),
-                )
-              else
-                Center(
-                  child: Text(s.gsDailyGoalLine(GarbhStore.dailyGoal),
-                      style: text.labelMedium?.copyWith(color: _muted)),
-                ),
-            ],
-          );
-        },
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
+        children: [
+          // Intro — what Garbh Sanskar is + why it matters (no kicker/title hero,
+          // no raga "video" hero, no progress/streak, no "today's rituals").
+          Text(s.garbhSanskar,
+              style: GoogleFonts.fraunces(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primary900)),
+          const SizedBox(height: 10),
+          Text(s.gsAboutBody,
+              style: text.bodyMedium?.copyWith(color: _ink, height: 1.55)),
+          const SizedBox(height: 8),
+          Text(s.gsAboutMeaning,
+              style: text.bodySmall
+                  ?.copyWith(color: _muted, fontStyle: FontStyle.italic)),
+          const SizedBox(height: 22),
+          for (final p in pillars) ...[
+            _LibraryTile(
+              id: p.id,
+              name: p.name,
+              desc: p.desc,
+              onTap: () => _openPillar(context, p.id),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ],
       ),
     );
   }
@@ -164,8 +151,70 @@ class GarbhScreen extends StatelessWidget {
   }
 }
 
-// The design's calm raga/breathing hero: a purple gradient with soft concentric
-// rings, a play button and the week's session — tap to open Shravan (sound).
+// A plain library tile (name + description) — no done-tick, no "today's todo".
+class _LibraryTile extends StatelessWidget {
+  const _LibraryTile(
+      {required this.id,
+      required this.name,
+      required this.desc,
+      required this.onTap});
+  final String id;
+  final String name;
+  final String desc;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final v = _pillarVisual(id);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [v.accent.withValues(alpha: 0.14), _surface],
+            stops: const [0.0, 0.85],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: v.accent.withValues(alpha: 0.22)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: v.accent.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(v.emoji, style: const TextStyle(fontSize: 24)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(name,
+                  style: text.titleMedium
+                      ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 3),
+              Text(desc,
+                  style: text.bodySmall?.copyWith(color: _muted, height: 1.35)),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.chevron_right_rounded,
+              color: v.accent.withValues(alpha: 0.7)),
+        ]),
+      ),
+    );
+  }
+}
+
+// The design's calm raga/breathing hero — no longer on the Tools hub (kept for
+// revert).
+// ignore: unused_element
 class _RagaHero extends StatelessWidget {
   const _RagaHero({required this.controller, required this.onTap});
   final PregnancyController controller;
@@ -236,6 +285,8 @@ class _RagaHero extends StatelessWidget {
   }
 }
 
+// Today's progress/streak — only on the daily Garbh (Home); kept for revert.
+// ignore: unused_element
 class _ProgressCard extends StatelessWidget {
   const _ProgressCard({required this.done, required this.streak, required this.s});
   final int done;
@@ -296,6 +347,9 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
+// Old "today's ritual" card (done-tick + todo) — replaced by _LibraryTile on the
+// Tools hub; kept for revert.
+// ignore: unused_element
 class _PillarCard extends StatelessWidget {
   const _PillarCard({required this.pillar, required this.done, required this.onTap});
   final ({String id, String name, String tag, String todo, String duration}) pillar;
@@ -486,62 +540,130 @@ class ShravanScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
+
+    // Tools library: ALL ragas in one place, each tappable; no mark-complete.
+    if (!daily) {
+      return _PillarScaffold(
+        title: s.gsShravan,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+          children: [
+            Text(s.gsBrowseAll,
+                style: text.bodyMedium?.copyWith(color: _muted)),
+            const SizedBox(height: 14),
+            for (final a in kShravan)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 46,
+                  height: 46,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: _accShravan.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(13)),
+                  child: Text(a.emoji, style: const TextStyle(fontSize: 24)),
+                ),
+                title: Text(a.title,
+                    style: text.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700, color: _ink)),
+                subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
+                    style: text.labelSmall?.copyWith(color: _muted)),
+                trailing: const Icon(Icons.play_circle_outline_rounded,
+                    color: _accShravan),
+                onTap: () => _push(context,
+                    _ShravanDetailScreen(audio: a, controller: controller)),
+              ),
+          ],
+        ),
+      );
+    }
+
+    // Daily (Home): today's session + mark-complete.
     final t = garbhTrimester(controller.currentWeek);
-    final audio =
-        daily ? shravanForDay(controller.currentDay) : shravanForTrimester(t);
-    final more = kShravan.where((a) => a.id != audio.id).take(4).toList();
+    final audio = shravanForDay(controller.currentDay);
     return _PillarScaffold(
       title: s.gsShravan,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
         children: [
-          Text(s.gsTodaysSession, style: text.labelMedium?.copyWith(color: _muted)),
+          Text(s.gsTodaysSession,
+              style: text.labelMedium?.copyWith(color: _muted)),
           const SizedBox(height: 12),
-          Center(
-            child: Container(
-              width: 150,
-              height: 150,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  _accShravan.withValues(alpha: 0.30),
-                  const Color(0xFFEDE6D6),
-                ]),
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Text(audio.emoji, style: const TextStyle(fontSize: 64)),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(audio.title,
-              textAlign: TextAlign.center,
-              style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-          Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
-              textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: _muted)),
+          _ShravanHero(audio: audio, s: s),
           const SizedBox(height: 16),
           _WhyCard(label: s.gsWhyToday, text: shravanWhy(t), accent: _accShravan),
           const SizedBox(height: 16),
           RagaPlayer(title: audio.title, subtitle: '${audio.minutes} min'),
           const SizedBox(height: 8),
           Text(s.gsSampleAudio,
-              textAlign: TextAlign.center, style: text.labelSmall?.copyWith(color: _muted)),
+              textAlign: TextAlign.center,
+              style: text.labelSmall?.copyWith(color: _muted)),
           const SizedBox(height: 16),
           _MarkComplete(pillarId: 'shravan', accent: _accShravan, lang: lang),
           _LearnMore(controller: controller),
-          const SizedBox(height: 12),
-          // Recommendations — hidden in daily (Home) mode.
-          if (!daily)
-            for (final a in more)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Text(a.emoji, style: const TextStyle(fontSize: 24)),
-                title: Text(a.title, style: text.titleSmall),
-                subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
-                    style: text.labelSmall?.copyWith(color: _muted)),
-                trailing: const Icon(Icons.play_circle_outline_rounded,
-                    color: _accShravan),
-                onTap: () {},
-              ),
+        ],
+      ),
+    );
+  }
+}
+
+// One raga's emoji hero + title (shared by daily Shravan + the library detail).
+class _ShravanHero extends StatelessWidget {
+  const _ShravanHero({required this.audio, required this.s});
+  final GarbhAudio audio;
+  final S s;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Column(children: [
+      Center(
+        child: Container(
+          width: 150,
+          height: 150,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              _accShravan.withValues(alpha: 0.30),
+              const Color(0xFFEDE6D6),
+            ]),
+            borderRadius: BorderRadius.circular(26),
+          ),
+          child: Text(audio.emoji, style: const TextStyle(fontSize: 64)),
+        ),
+      ),
+      const SizedBox(height: 16),
+      Text(audio.title,
+          textAlign: TextAlign.center,
+          style: text.headlineSmall
+              ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+      Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
+          textAlign: TextAlign.center,
+          style: text.bodyMedium?.copyWith(color: _muted)),
+    ]);
+  }
+}
+
+// A single raga's detail in the Tools library (player only — no mark-complete).
+class _ShravanDetailScreen extends StatelessWidget {
+  const _ShravanDetailScreen({required this.audio, required this.controller});
+  final GarbhAudio audio;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(controller.language);
+    final text = Theme.of(context).textTheme;
+    return _PillarScaffold(
+      title: s.gsShravan,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+        children: [
+          _ShravanHero(audio: audio, s: s),
+          const SizedBox(height: 16),
+          RagaPlayer(title: audio.title, subtitle: '${audio.minutes} min'),
+          const SizedBox(height: 8),
+          Text(s.gsSampleAudio,
+              textAlign: TextAlign.center,
+              style: text.labelSmall?.copyWith(color: _muted)),
         ],
       ),
     );
@@ -583,7 +705,7 @@ class VicharaScreen extends StatelessWidget {
         ),
         body: TabBarView(children: [
           _SacredTab(controller: controller, daily: daily),
-          _BrainTab(controller: controller),
+          _BrainTab(controller: controller, daily: daily),
           _UpliftingTab(controller: controller, daily: daily),
         ]),
       ),
@@ -599,34 +721,53 @@ class _SacredTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
-    final text = Theme.of(context).textTheme;
-    final ins = daily
-        ? insightForDay(controller.currentDay)
-        : insightForTrimester(garbhTrimester(controller.currentWeek));
+    // Tools library: ALL Sacred Insights, no mark-complete.
+    if (!daily) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+        children: [
+          for (final ins in garbhAllInsights()) _insightCard(context, s, ins),
+        ],
+      );
+    }
+    // Daily: today's insight + mark-complete.
+    final ins = insightForDay(controller.currentDay);
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [_accVichara.withValues(alpha: 0.14), _surface]),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: _accVichara.withValues(alpha: 0.22)),
-          ),
-          child: Text('"${ins.sloka}"',
-              style: text.headlineSmall?.copyWith(
-                  color: _ink, height: 1.4, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(height: 16),
-        _miniSection(context, s.gsMeaning, ins.meaning),
-        _miniSection(context, s.gsLesson, ins.lesson),
-        const SizedBox(height: 6),
-        _WhyCard(label: s.gsReflectMoment, text: ins.reflection, accent: _accVichara),
-        const SizedBox(height: 18),
+        _insightCard(context, s, ins),
         _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
       ],
     );
+  }
+
+  Widget _insightCard(BuildContext context, S s, GarbhInsight ins) {
+    final text = Theme.of(context).textTheme;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              colors: [_accVichara.withValues(alpha: 0.14), _surface]),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: _accVichara.withValues(alpha: 0.22)),
+        ),
+        child: Text('"${ins.sloka}"',
+            style: text.headlineSmall?.copyWith(
+                color: _ink,
+                height: 1.4,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w600)),
+      ),
+      const SizedBox(height: 16),
+      _miniSection(context, s.gsMeaning, ins.meaning),
+      _miniSection(context, s.gsLesson, ins.lesson),
+      const SizedBox(height: 6),
+      _WhyCard(
+          label: s.gsReflectMoment, text: ins.reflection, accent: _accVichara),
+      const SizedBox(height: 18),
+    ]);
   }
 }
 
@@ -644,8 +785,12 @@ Widget _miniSection(BuildContext context, String label, String body) {
 }
 
 class _BrainTab extends StatelessWidget {
-  const _BrainTab({required this.controller});
+  const _BrainTab({required this.controller, this.daily = false});
   final PregnancyController controller;
+
+  /// In the Tools library (daily == false), finishing a game does NOT mark the
+  /// Vichara ritual done — it's just play.
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
@@ -676,11 +821,11 @@ class _BrainTab extends StatelessWidget {
                 ]),
               ),
               TextButton(
-                onPressed: () {
-                  GarbhStore.instance.markDone('vichara');
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(s.gsPuzzleSoon)));
-                },
+                // Opens the real game; in DAILY mode finishing marks Vichara done
+                // (inside each game). In the Tools library (daily=false) it does
+                // not — it's just play. (gsPuzzleSoon kept for revert.)
+                onPressed: () => _push(
+                    context, _gameFor(p, controller, markComplete: daily)),
                 child: Text(s.gsStart),
               ),
             ]),
@@ -707,7 +852,8 @@ class _UpliftingTab extends StatelessWidget {
       children: [
         for (final story in stories)
           GestureDetector(
-            onTap: () => _push(context, _VicharaReader(story: story, controller: controller)),
+            onTap: () => _push(context,
+                _VicharaReader(story: story, controller: controller, daily: daily)),
             child: Container(
               margin: const EdgeInsets.only(bottom: 14),
               padding: const EdgeInsets.all(18),
@@ -749,9 +895,11 @@ class _UpliftingTab extends StatelessWidget {
 }
 
 class _VicharaReader extends StatelessWidget {
-  const _VicharaReader({required this.story, required this.controller});
+  const _VicharaReader(
+      {required this.story, required this.controller, this.daily = false});
   final GarbhStory story;
   final PregnancyController controller;
+  final bool daily;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
@@ -773,7 +921,9 @@ class _VicharaReader extends StatelessWidget {
           ],
           _WhyCard(label: s.gsReflectMoment, text: story.reflection, accent: _accVichara),
           const SizedBox(height: 18),
-          _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+          // Mark-complete only in DAILY mode (Tools library = no "today's done").
+          if (daily)
+            _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
         ],
       ),
     );
@@ -785,22 +935,33 @@ class _VicharaReader extends StatelessWidget {
 // ===========================================================================
 
 class SamvadScreen extends StatefulWidget {
-  const SamvadScreen({super.key, required this.controller});
+  const SamvadScreen(
+      {super.key, required this.controller, this.daily = false});
   final PregnancyController controller;
+
+  /// Daily (Home): today's speaking card + mark-complete. Tools (daily=false):
+  /// the full library of speaking cards, browsable, no mark-complete.
+  final bool daily;
   @override
   State<SamvadScreen> createState() => _SamvadScreenState();
 }
 
 class _SamvadScreenState extends State<SamvadScreen> {
+  late final List<GarbhPrompt> _prompts;
   late int _index;
   @override
   void initState() {
     super.initState();
-    _index = (widget.controller.currentDay.clamp(1, 280) - 1) % kSamvad.length;
+    // Trimester-specific speaking cards (affirmations / read-aloud / visualize).
+    _prompts =
+        samvadForTrimester(garbhTrimester(widget.controller.currentWeek));
+    _index = (widget.controller.currentDay.clamp(1, 280) - 1) % _prompts.length;
   }
 
-  GarbhPrompt get _prompt => kSamvad[_index];
+  GarbhPrompt get _prompt => _prompts[_index];
 
+  // Record-voice / write-a-message removed per request. Kept (gated) for revert.
+  // ignore: unused_element
   Future<void> _compose(bool voice) async {
     final c = widget.controller;
     final s = S(c.language);
@@ -825,6 +986,26 @@ class _SamvadScreenState extends State<SamvadScreen> {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(widget.controller.currentWeek);
+
+    // Tools library: ALL speaking cards, grouped by trimester. No mark-complete.
+    if (!widget.daily) {
+      return _PillarScaffold(
+        title: s.gsSamvad,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+          children: [
+            Text(s.gsBrowseAll,
+                style: text.bodyMedium?.copyWith(color: _muted)),
+            const SizedBox(height: 14),
+            _samvadGroup(text, s.gsSamvadAffirm, kSamvadT1),
+            _samvadGroup(text, s.gsSamvadScripts, kSamvadT2),
+            _samvadGroup(text, s.gsSamvadVisualize, kSamvadT3),
+          ],
+        ),
+      );
+    }
+
+    // Daily (Home): today's speaking card + cycle + mark-complete.
     return _PillarScaffold(
       title: s.gsSamvad,
       child: ListView(
@@ -832,60 +1013,67 @@ class _SamvadScreenState extends State<SamvadScreen> {
         children: [
           Text(s.gsTodaysConnection,
               style: text.labelMedium?.copyWith(
-                  color: _accSamvad, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  color: _accSamvad,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5)),
           const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [_accSamvad.withValues(alpha: 0.16), _surface]),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: _accSamvad.withValues(alpha: 0.22)),
-            ),
-            child: Text(_prompt.text,
-                style: text.headlineSmall?.copyWith(color: _ink, height: 1.4, fontWeight: FontWeight.w700)),
-          ),
+          _samvadCard(text, _prompt.text),
           const SizedBox(height: 12),
-          _WhyCard(label: s.gsWhyMatters, text: samvadThemeForTrimester(t), accent: _accSamvad),
+          _WhyCard(
+              label: s.gsWhyMatters,
+              text: samvadThemeForTrimester(t),
+              accent: _accSamvad),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: () => setState(() => _index = (_index + 1) % kSamvad.length),
-              icon: const Icon(Icons.refresh_rounded, size: 18, color: _accSamvad),
-              label: Text(s.gsAnotherPrompt, style: text.labelLarge?.copyWith(color: _accSamvad)),
+              onPressed: () =>
+                  setState(() => _index = (_index + 1) % _prompts.length),
+              icon:
+                  const Icon(Icons.refresh_rounded, size: 18, color: _accSamvad),
+              label: Text(s.gsAnotherPrompt,
+                  style: text.labelLarge?.copyWith(color: _accSamvad)),
             ),
           ),
-          Row(children: [
-            Expanded(
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                    backgroundColor: _accSamvad, padding: const EdgeInsets.symmetric(vertical: 13)),
-                onPressed: () => _compose(true),
-                icon: const Icon(Icons.mic_rounded, size: 18, color: Colors.white),
-                label: Text(s.gsRecordVoice, style: text.labelLarge?.copyWith(color: Colors.white)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: _accSamvad,
-                  side: const BorderSide(color: _accSamvad, width: 1.4),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                ),
-                onPressed: () => _compose(false),
-                icon: const Icon(Icons.edit_rounded, size: 18),
-                label: Text(s.gsWriteMessage),
-              ),
-            ),
-          ]),
-          const SizedBox(height: 14),
+          const SizedBox(height: 6),
           _MarkComplete(pillarId: 'samvad', accent: _accSamvad, lang: lang),
         ],
       ),
     );
   }
+
+  // A single rose-tinted speaking card.
+  Widget _samvadCard(TextTheme text, String body, {bool compact = false}) =>
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        margin: compact ? const EdgeInsets.only(bottom: 12) : EdgeInsets.zero,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              colors: [_accSamvad.withValues(alpha: 0.16), _surface]),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: _accSamvad.withValues(alpha: 0.22)),
+        ),
+        child: Text(body,
+            style: (compact ? text.titleMedium : text.headlineSmall)?.copyWith(
+                color: _ink, height: 1.45, fontWeight: FontWeight.w700)),
+      );
+
+  // A library group (heading + all its cards) for the Tools repository.
+  Widget _samvadGroup(
+          TextTheme text, String heading, List<GarbhPrompt> cards) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 10),
+          child: Text(heading.toUpperCase(),
+              style: text.labelMedium?.copyWith(
+                  color: _accSamvad,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5)),
+        ),
+        for (final c in cards) _samvadCard(text, c.text, compact: true),
+        const SizedBox(height: 10),
+      ]);
 }
 
 class _MemorySavedScreen extends StatelessWidget {
@@ -938,47 +1126,130 @@ class KriyaScreen extends StatelessWidget {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(controller.currentWeek);
-    final practice =
-        daily ? kriyaForDay(controller.currentDay) : kriyaForTrimester(t);
+
+    // Tools library: ALL practices; each opens its detail; no mark-complete.
+    if (!daily) {
+      return _PillarScaffold(
+        title: s.gsKriya,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+          children: [
+            Text(s.gsBrowseAll,
+                style: text.bodyMedium?.copyWith(color: _muted)),
+            const SizedBox(height: 14),
+            for (final p in kKriya)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 46,
+                  height: 46,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: _accKriya.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(13)),
+                  child: Text(p.emoji, style: const TextStyle(fontSize: 24)),
+                ),
+                title: Text(p.title,
+                    style: text.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700, color: _ink)),
+                subtitle: Text('${p.blurb} · ${s.gsMinutes(p.minutes)}',
+                    style: text.labelSmall?.copyWith(color: _muted)),
+                trailing:
+                    const Icon(Icons.chevron_right_rounded, color: _accKriya),
+                onTap: () => _push(context,
+                    _KriyaDetailScreen(practice: p, controller: controller)),
+              ),
+          ],
+        ),
+      );
+    }
+
+    // Daily (Home): today's practice + mark-complete.
+    final practice = kriyaForDay(controller.currentDay);
     return _PillarScaffold(
       title: s.gsKriya,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
-        children: [
-          Text(s.gsTodaysPractice, style: text.labelMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 12),
-          Center(child: Text(practice.emoji, style: const TextStyle(fontSize: 52))),
-          const SizedBox(height: 10),
-          Text(practice.title,
-              textAlign: TextAlign.center,
-              style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
-          Text('${practice.blurb} · ${s.gsMinutes(practice.minutes)}',
-              textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 16),
-          _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t), accent: _accKriya),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                  backgroundColor: _accKriya, padding: const EdgeInsets.symmetric(vertical: 14)),
-              onPressed: () => _push(context, _BreathingScreen(practice: practice, lang: lang)),
-              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
-              label: Text(s.gsStart, style: text.labelLarge?.copyWith(color: Colors.white)),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _MarkComplete(pillarId: 'kriya', accent: _accKriya, lang: lang),
-        ],
+        children:
+            _kriyaPracticeBody(context, s, text, t, practice, lang, daily: true),
+      ),
+    );
+  }
+}
+
+// Shared practice view (emoji + title + safety + Start). Mark-complete + the
+// breathing screen's markDone happen ONLY in daily mode.
+List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
+    int t, GarbhPractice practice, AppLanguage lang,
+    {required bool daily}) {
+  return [
+    if (daily) ...[
+      Text(s.gsTodaysPractice,
+          style: text.labelMedium?.copyWith(color: _muted)),
+      const SizedBox(height: 12),
+    ],
+    Center(child: Text(practice.emoji, style: const TextStyle(fontSize: 52))),
+    const SizedBox(height: 10),
+    Text(practice.title,
+        textAlign: TextAlign.center,
+        style: text.headlineSmall
+            ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
+    Text('${practice.blurb} · ${s.gsMinutes(practice.minutes)}',
+        textAlign: TextAlign.center,
+        style: text.bodyMedium?.copyWith(color: _muted)),
+    const SizedBox(height: 16),
+    _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t), accent: _accKriya),
+    const SizedBox(height: 16),
+    SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        style: FilledButton.styleFrom(
+            backgroundColor: _accKriya,
+            padding: const EdgeInsets.symmetric(vertical: 14)),
+        onPressed: () => _push(context,
+            _BreathingScreen(practice: practice, lang: lang, daily: daily)),
+        icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+        label:
+            Text(s.gsStart, style: text.labelLarge?.copyWith(color: Colors.white)),
+      ),
+    ),
+    if (daily) ...[
+      const SizedBox(height: 12),
+      _MarkComplete(pillarId: 'kriya', accent: _accKriya, lang: lang),
+    ],
+  ];
+}
+
+// A single practice's detail in the Tools library (no mark-complete).
+class _KriyaDetailScreen extends StatelessWidget {
+  const _KriyaDetailScreen({required this.practice, required this.controller});
+  final GarbhPractice practice;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final text = Theme.of(context).textTheme;
+    final t = garbhTrimester(controller.currentWeek);
+    return _PillarScaffold(
+      title: practice.title,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+        children: _kriyaPracticeBody(context, s, text, t, practice, lang,
+            daily: false),
       ),
     );
   }
 }
 
 class _BreathingScreen extends StatefulWidget {
-  const _BreathingScreen({required this.practice, required this.lang});
+  const _BreathingScreen(
+      {required this.practice, required this.lang, this.daily = true});
   final GarbhPractice practice;
   final AppLanguage lang;
+
+  /// Marks Kriya done on finish only in daily mode (Tools library = no "today").
+  final bool daily;
   @override
   State<_BreathingScreen> createState() => _BreathingScreenState();
 }
@@ -1074,7 +1345,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 13),
             ),
             onPressed: () {
-              GarbhStore.instance.markDone('kriya');
+              if (widget.daily) GarbhStore.instance.markDone('kriya');
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('${s.gsWellDone} — ${s.gsWellDoneBody}')),

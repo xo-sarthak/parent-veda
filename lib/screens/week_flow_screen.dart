@@ -24,6 +24,7 @@ import '../localization/app_language.dart';
 import '../models/journey_node.dart';
 import '../models/symptom.dart';
 import '../models/week_content.dart';
+import '../services/app_nav.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/week_cards/week_overview_card.dart';
@@ -550,7 +551,13 @@ class _DailyMomentBridge extends StatelessWidget {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => Navigator.of(context).popUntil((r) => r.isFirst),
+      // Go to Today: switch to the Today tab, then pop back to the main scaffold.
+      // The Today screen lives in an IndexedStack, so its scroll position is
+      // preserved — she lands right where she left off.
+      onTap: () {
+        AppNav.instance.goToday();
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -911,8 +918,52 @@ class _TrimesterTips extends StatelessWidget {
         ]),
       ),
       for (final t in tips) _tipCard(context, s, t),
+      // Action to-dos, merged in from the (removed) mother "Actions" tab — shown
+      // here without a separate heading, as part of this week's guidance.
+      for (final a in _toDos) _todoCard(a),
     ]);
   }
+
+  Widget _todoCard(_ToDo t) => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 4)),
+          ],
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: _accent.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(12)),
+            child: Text(t.emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.title.of(lang),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 4),
+              Text(t.detail.of(lang),
+                  style: GoogleFonts.manrope(
+                      fontSize: 12.5,
+                      height: 1.45,
+                      color: const Color(0xFF5B5070))),
+            ]),
+          ),
+        ]),
+      );
 
   Widget _tipCard(BuildContext context, S s, TrimesterTip t) => GestureDetector(
         onTap: () => _showTip(context, s, t),
@@ -1432,10 +1483,8 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         const SizedBox(height: 16),
         if (_tab == 0)
           ..._symptomsContent(s, lang)
-        else if (_tab == 1)
-          ..._dietContent(s, lang)
         else
-          ..._actionsContent(s, lang),
+          ..._dietContent(s, lang),
       ],
     );
   }
@@ -1480,7 +1529,8 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       child: Row(children: [
         seg(0, Icons.healing_rounded, s.wfTabSymptoms),
         seg(1, Icons.restaurant_rounded, s.wfTabDiet),
-        seg(2, Icons.checklist_rounded, s.wfTabActions),
+        // "Actions" tab removed — its to-dos now live in the Trimester Tips
+        // section below (per request). seg(2, …, s.wfTabActions) kept commented.
       ]),
     );
   }
@@ -1780,10 +1830,16 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // Toggle: Diet — foods to favour + foods to limit this week.
+  // Toggle: Diet — Indian superfood of the week + foods to favour / to limit.
   List<Widget> _dietContent(S s, AppLanguage lang) {
     final n = widget.w.nutrition;
     return [
+      // Indian superfood of the week — restored into the V2 diet section (it had
+      // only survived in the classic layout when the Classic/New toggle was added).
+      if (n.superfood != null) ...[
+        _superfoodCard(n.superfood!, s, lang),
+        const SizedBox(height: 16),
+      ],
       Text(n.whyNow.of(lang),
           style: GoogleFonts.manrope(
               fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
@@ -1837,11 +1893,63 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // Toggle: Actions — what to do this week.
+  // "Indian superfood of the week" — a highlighted hero card (food + benefit +
+  // how to eat it), gold-tinted to set it apart from the favour/avoid lists.
+  Widget _superfoodCard(Superfood sf, S s, AppLanguage lang) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppTheme.tertiary50, AppTheme.surfaceContainer]),
+          borderRadius: BorderRadius.circular(18),
+          border: Border(left: BorderSide(color: AppTheme.tertiary500, width: 3)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.star_rounded, size: 16, color: AppTheme.tertiary500),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(s.superfoodOfWeek.toUpperCase(),
+                  style: GoogleFonts.manrope(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                      color: AppTheme.tertiary600)),
+            ),
+          ]),
+          const SizedBox(height: 8),
+          Text(sf.food.of(lang),
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.tertiary700)),
+          const SizedBox(height: 5),
+          Text(sf.benefit.of(lang),
+              style: GoogleFonts.manrope(
+                  fontSize: 13.5, height: 1.5, color: const Color(0xFF5B5070))),
+          const SizedBox(height: 8),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.restaurant_menu_rounded,
+                size: 15, color: AppTheme.neutral500),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(sf.howToConsume.of(lang),
+                  style: GoogleFonts.manrope(
+                      fontSize: 12.5, height: 1.45, color: const Color(0xFF6B5F7E))),
+            ),
+          ]),
+        ]),
+      );
+
+  // Toggle: Actions — moved into the Trimester Tips section; kept for revert.
+  // ignore: unused_element
   List<Widget> _actionsContent(S s, AppLanguage lang) => [
         for (final t in _toDos) _toDoCard(t, lang),
       ];
 
+  // ignore: unused_element
   Widget _toDoCard(_ToDo t, AppLanguage lang) => Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -1921,8 +2029,9 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  /// The journey-progress card (trimester · weeks to go · % there). Folded into
-  /// the Scans page; also used by the (now-unused) overview page.
+  /// The journey-progress card (trimester · weeks to go · % there). Currently
+  /// not shown (removed from the Scans page) — kept for revert / reuse.
+  // ignore: unused_element
   Widget _progressCard(S s) {
     final wk = widget.controller.selectedWeek;
     final weeksToGo = (40 - wk).clamp(0, 40);
@@ -2188,9 +2297,10 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
       children: [
         Center(child: _popupTitle(s.jrWeekLabel(cw), s.wfScansTitle)),
         const SizedBox(height: 12),
-        // Journey-progress context, folded in from the old overview page.
-        _progressCard(s),
-        const SizedBox(height: 18),
+        // Journey-progress card removed from the top per request — this page is
+        // now scans & appointments only. (Commented, kept for an easy revert.)
+        // _progressCard(s),
+        // const SizedBox(height: 18),
         for (final m in scans) _scanCard(s, m, lang),
         if (scans.isEmpty)
           Padding(

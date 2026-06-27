@@ -79,7 +79,9 @@ class _SplashScreenState extends State<SplashScreen>
               .setBool(kAuthCompletedKey, true);
         } catch (_) {/* best-effort */}
         // Wire the auth Profile due date into the app's real due date.
-        if (due != null) await widget.pregnancy.setDueDate(due);
+        // PINNED TO WEEK 20 (testing): disabled so login can't move the week.
+        // Re-enable with the load() restore block in pregnancy_controller.dart.
+        // if (due != null) await widget.pregnancy.setDueDate(due);
         nav.pushReplacement(_mainRoute());
       }),
     ));

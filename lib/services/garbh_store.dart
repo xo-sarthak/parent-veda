@@ -13,7 +13,9 @@ class GarbhStore extends ChangeNotifier {
   GarbhStore._();
   static final GarbhStore instance = GarbhStore._();
 
-  static const int dailyGoal = 5;
+  // 4 pillars now that Ahara is commented out (was 5). Restore to 5 if Ahara
+  // comes back in garbh_screen.dart / home_screen_b.dart.
+  static const int dailyGoal = 4;
 
   static const _favsKey = 'garbh_favs';
   static const _doneKey = 'garbh_done';

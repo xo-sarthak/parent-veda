@@ -31,6 +31,20 @@ import 'community_profile_screen.dart';
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
 
+/// `endFloat`, lifted up by [lift] logical px — used to clear the floating
+/// bottom nav pill that MainScaffold paints over the Community screen. Measuring
+/// from the standard (safe-area-aware) endFloat base keeps it correct on every
+/// device, unlike a fixed Padding lift.
+class _EndFloatLifted extends StandardFabLocation
+    with FabEndOffsetX, FabFloatOffsetY {
+  const _EndFloatLifted(this.lift);
+  final double lift;
+  @override
+  double getOffsetY(
+          ScaffoldPrelayoutGeometry scaffoldGeometry, double adjustment) =>
+      super.getOffsetY(scaffoldGeometry, adjustment) - lift;
+}
+
 // Warm tints from the old story-circle row — kept for reference; the Community
 // Pro layout uses gradient mono badges (_commGradients) instead.
 // const List<Color> _storyTints = [
@@ -812,6 +826,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
     final s = S(lang);
     return Scaffold(
       backgroundColor: const Color(0xFFFBEAF2),
+      // Lift the compose button clear of the floating bottom nav pill (painted
+      // over this screen by MainScaffold). A custom location measures the lift
+      // from the safe-area-aware endFloat base, so it clears the pill on every
+      // device (a plain Padding lift was unreliable across gesture-bar sizes).
+      floatingActionButtonLocation: const _EndFloatLifted(78),
       floatingActionButton: AnimatedBuilder(
         animation: CommunityStore.instance,
         builder: (context, _) {
@@ -819,6 +838,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
           // verified doctor (see CreatePostScreen).
           final doc = CommunityStore.instance.doctorMode;
           return FloatingActionButton(
+            heroTag: 'communityComposeFab',
             backgroundColor: doc ? _proPurpleDeep : _proPurple,
             foregroundColor: Colors.white,
             tooltip: doc ? s.cmPostAsDoctor : s.cmCreatePost,
@@ -2380,8 +2400,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   @override
   void initState() {
     super.initState();
-    // Default to "Your feed" (the general timeline = empty communityId).
-    _communityId = widget.initialCommunityId ?? '';
+    // Default to "Your feed" (general timeline). Only pre-select a community the
+    // user has actually joined — you can't post into one you're not part of.
+    final init = widget.initialCommunityId ?? '';
+    _communityId = CommunityStore.instance.isJoined(init) ? init : '';
   }
 
   @override
@@ -2491,45 +2513,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ]),
             ),
           ],
-          Text(s.cmPostTo, style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              // Post to your own feed (general timeline) or into a community.
-              ChoiceChip(
-                label: Text('🏠 ${s.cmYourFeed}'),
-                selected: _communityId == '',
-                onSelected: (_) => setState(() => _communityId = ''),
-              ),
-              for (final c in joined)
-                ChoiceChip(
-                  label: Text('${c.emoji} ${c.name}'),
-                  selected: _communityId == c.id,
-                  onSelected: (_) => setState(() => _communityId = c.id),
-                ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          Text(s.cmTypeLabel,
-              style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final t in types)
-                ChoiceChip(
-                  label: Text(s.cmPostType(_typeVisual(t).key)),
-                  selected: _type == t,
-                  onSelected: (_) => setState(() => _type = t),
-                ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          // Ask an expert to verify (members only — a doctor's own post is
-          // already authoritative). Marks the post so experts see a "Verify this"
+          // ── Ask an expert to verify (members only) ───────────────────────
+          // A doctor's own post is already authoritative; a member can request a
+          // verification — it marks the post so experts see a "Verify this"
           // button and can find it via their "Needs verification" filter.
           if (!CommunityStore.instance.doctorMode) ...[
             Container(
@@ -2571,6 +2557,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
             const SizedBox(height: 18),
           ],
+          // ── What would you like to share? (text + send, at the top) ──────
           // Chat-composer style: the mic + a circular Share/send button live at
           // the bottom-right INSIDE the text field, so posting happens right
           // where the user is typing.
@@ -2621,7 +2608,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Add photos (gallery + camera) — makes posting functional.
+          // ── Add photos (gallery + camera) ────────────────────────────────
           Row(children: [
             OutlinedButton.icon(
               onPressed: _addFromGallery,
@@ -2678,6 +2665,46 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ],
             ),
           ],
+          const SizedBox(height: 18),
+          // ── Where to post (your feed, or a community you've joined) ──────
+          Text(s.cmPostTo,
+              style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              // Post to your own feed (general timeline) or into a community.
+              ChoiceChip(
+                label: Text('🏠 ${s.cmYourFeed}'),
+                selected: _communityId == '',
+                onSelected: (_) => setState(() => _communityId = ''),
+              ),
+              for (final c in joined)
+                ChoiceChip(
+                  label: Text('${c.emoji} ${c.name}'),
+                  selected: _communityId == c.id,
+                  onSelected: (_) => setState(() => _communityId = c.id),
+                ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          // ── Post type ────────────────────────────────────────────────────
+          Text(s.cmTypeLabel,
+              style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final t in types)
+                ChoiceChip(
+                  label: Text(s.cmPostType(_typeVisual(t).key)),
+                  selected: _type == t,
+                  onSelected: (_) => setState(() => _type = t),
+                ),
+            ],
+          ),
           if (_autoTags.isNotEmpty) ...[
             const SizedBox(height: 18),
             Row(children: [

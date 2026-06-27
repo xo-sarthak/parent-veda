@@ -106,6 +106,20 @@ class ScansStore extends ChangeNotifier {
     await _persistAppts();
   }
 
+  /// Testing: clear all completed scans + appointments (empties the map's scan
+  /// state) and remove their linked Journal scan entries.
+  Future<void> clearAllForTesting() async {
+    final ids = _completed.map((c) => c.scanId).toList();
+    _completed.clear();
+    _appts.clear();
+    notifyListeners();
+    await _persistCompleted();
+    await _persistAppts();
+    for (final id in ids) {
+      await JournalStore.instance.deleteEntry('scan_$id');
+    }
+  }
+
   Future<void> _persistCompleted() async {
     try {
       final prefs = await SharedPreferences.getInstance();

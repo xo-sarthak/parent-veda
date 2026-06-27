@@ -1,9 +1,13 @@
 // =============================================================================
-//  TrimesterChartCard — the "Trimester · Month · Week" overview grid
+//  TrimesterChartCard — the "Trimester · Month · Week" overview
 // -----------------------------------------------------------------------------
-//  A calm reference chart (matching the provided design): three colour-coded
-//  trimester blocks, each split into its months and the gestational weeks they
-//  cover, with the mother's CURRENT week circled and her due date below.
+//  A calm reference card: three colour-coded trimester blocks, each split into
+//  its months and the gestational weeks they cover, with the mother's CURRENT
+//  week highlighted and her due date below.
+//
+//  Layout note: built from plain Containers + Wrap (no IntrinsicHeight / cross-
+//  axis stretch). The earlier grid used IntrinsicHeight around an Expanded+Wrap,
+//  which can't resolve its constraints and crashed layout — keep it simple here.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -23,7 +27,7 @@ const List<_Tri> _kChart = [
     month: Color(0xFFFBE4CB),
     week: Color(0xFFFCEEDD),
     months: [
-      (m: 1, weeks: [0, 1, 2, 3, 4]),
+      (m: 1, weeks: [1, 2, 3, 4]),
       (m: 2, weeks: [5, 6, 7, 8]),
       (m: 3, weeks: [9, 10, 11, 12, 13]),
     ],
@@ -52,10 +56,6 @@ const List<_Tri> _kChart = [
   ),
 ];
 
-const double _triW = 78;
-const double _monthW = 58;
-const Color _gridLine = Color(0xFFEAE6DF);
-
 class TrimesterChartCard extends StatelessWidget {
   const TrimesterChartCard({super.key, required this.controller});
   final PregnancyController controller;
@@ -81,17 +81,11 @@ class TrimesterChartCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: AppTheme.primary900)),
         const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(border: Border.all(color: _gridLine)),
-            child: Column(children: [
-              _headerRow(s),
-              for (final tri in _kChart) _trimesterBlock(tri, cw),
-            ]),
-          ),
-        ),
-        const SizedBox(height: 12),
+        for (final tri in _kChart) ...[
+          _trimesterCard(s, tri, cw),
+          const SizedBox(height: 10),
+        ],
+        const SizedBox(height: 2),
         Text(s.tcDueDate(s.formatLongDate(controller.dueDate)),
             style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
@@ -101,118 +95,78 @@ class TrimesterChartCard extends StatelessWidget {
     );
   }
 
-  Widget _headerRow(S s) {
-    Widget cell(String t, double? w) => Container(
-          width: w,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Color(0xFFF1EDE6),
-            border: Border(right: BorderSide(color: _gridLine)),
-          ),
-          child: Text(t,
+  Widget _trimesterCard(S s, _Tri tri, int cw) {
+    final active = tri.months.any((mo) => mo.weeks.contains(cw));
+    return Container(
+      decoration: BoxDecoration(
+        color: tri.week,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: active ? tri.block : tri.block.withValues(alpha: 0.25),
+            width: active ? 1.6 : 1),
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+              width: 10,
+              height: 10,
+              decoration:
+                  BoxDecoration(color: tri.block, shape: BoxShape.circle)),
+          const SizedBox(width: 8),
+          Text('${s.tcTrimester} ${tri.t}',
               style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12.5,
+                  fontSize: 14,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.neutral600)),
-        );
-    return Row(children: [
-      cell(s.tcTrimester, _triW),
-      cell(s.tcMonth, _monthW),
-      Expanded(
-          child: Container(
-        height: 40,
-        alignment: Alignment.center,
-        color: const Color(0xFFF1EDE6),
-        child: Text(s.tcWeek,
-            style: GoogleFonts.plusJakartaSans(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.neutral600)),
-      )),
-    ]);
-  }
-
-  Widget _trimesterBlock(_Tri tri, int cw) {
-    return IntrinsicHeight(
-      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Container(
-          width: _triW,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: tri.block,
-            border: const Border(
-                right: BorderSide(color: _gridLine),
-                top: BorderSide(color: _gridLine)),
+                  color: AppTheme.primary900)),
+        ]),
+        const SizedBox(height: 8),
+        for (final mo in tri.months)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                width: 62,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Text('${s.tcMonth} ${mo.m}',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.neutral700)),
+                ),
+              ),
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [for (final w in mo.weeks) _weekChip(w, cw, tri)],
+                ),
+              ),
+            ]),
           ),
-          child: Text('${tri.t}',
-              style: GoogleFonts.plusJakartaSans(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white)),
-        ),
-        Expanded(
-          child: Column(children: [
-            for (final mo in tri.months) _monthRow(tri, mo, cw),
-          ]),
-        ),
       ]),
     );
   }
 
-  Widget _monthRow(_Tri tri, _Month mo, int cw) {
-    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Container(
-        width: _monthW,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: tri.month,
-          border: const Border(
-              right: BorderSide(color: _gridLine),
-              top: BorderSide(color: _gridLine)),
-        ),
-        child: Text('${mo.m}',
-            style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.neutral700)),
-      ),
-      Expanded(
-        child: Container(
-          color: tri.week,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          decoration: BoxDecoration(
-            color: tri.week,
-            border: const Border(top: BorderSide(color: _gridLine)),
-          ),
-          child: Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [for (final w in mo.weeks) _weekCell(w, cw)],
-          ),
-        ),
-      ),
-    ]);
-  }
-
-  Widget _weekCell(int w, int cw) {
+  Widget _weekChip(int w, int cw, _Tri tri) {
     final here = w == cw;
     return Container(
       width: 30,
       height: 28,
       alignment: Alignment.center,
-      decoration: here
-          ? BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.secondary500, width: 2),
-            )
-          : null,
+      decoration: BoxDecoration(
+        color: here ? AppTheme.secondary500 : Colors.white,
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(
+            color: here ? AppTheme.secondary500 : tri.block.withValues(alpha: 0.30),
+            width: here ? 0 : 1),
+      ),
       child: Text('$w',
           style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
+              fontSize: 12.5,
               fontWeight: here ? FontWeight.w800 : FontWeight.w600,
-              color: here ? AppTheme.secondary600 : AppTheme.neutral700)),
+              color: here ? Colors.white : AppTheme.neutral700)),
     );
   }
 }

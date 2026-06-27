@@ -681,9 +681,31 @@ class WeekVideoCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
-            // "Watch this week" → "Pregnancy Week N": the video is this week's.
-            child: _cardHeader(Icons.play_circle_rounded, AppTheme.primary500,
-                s.wkPregnancyWeek(w.week), v.title.of(lang)),
+            // One heading for the whole week's video — just "Pregnancy Week N".
+            // The specific video title was removed: this video covers the entire
+            // week, not a single event.
+            child: Row(children: [
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: AppTheme.primary500.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14)),
+                child: const Icon(Icons.play_circle_rounded,
+                    size: 22, color: AppTheme.primary500),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(s.wkPregnancyWeek(w.week),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.primary900)),
+              ),
+            ]),
           ),
           AnimatedBuilder(
             animation: VideoStore.instance,

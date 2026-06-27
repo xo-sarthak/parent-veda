@@ -188,20 +188,20 @@ class PregnancyController extends ChangeNotifier {
       }
       parsed.sort((a, b) => a.week.compareTo(b.week));
       _weeks = parsed;
-      // Restore the mother's REAL due date if she set one via the Due Date
-      // Calculator — it persists across restarts, so she SEES her saved date on
-      // reopen instead of it being recomputed. If she hasn't set one, _dueDate
-      // stays at the week-20 placeholder (so a fresh / testing install still
-      // opens on the week-20 V2 flow).
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final saved = prefs.getString(_dueDateKey);
-        final d = saved == null ? null : DateTime.tryParse(saved);
-        if (d != null) {
-          _dueDate = _dateOnly(d);
-          _dueDateIsSet = true;
-        }
-      } catch (_) {/* keep the placeholder */}
+      // PINNED TO WEEK 20 (testing): ignore any saved/auth due date so the app
+      // ALWAYS opens on the week-20 flow, whether or not you log in. _dueDate
+      // stays at the week-20 placeholder. RE-ENABLE this block (and the auth
+      // setDueDate calls in splash_screen.dart / profile_screen.dart) to restore
+      // the mother's real saved due date.
+      // try {
+      //   final prefs = await SharedPreferences.getInstance();
+      //   final saved = prefs.getString(_dueDateKey);
+      //   final d = saved == null ? null : DateTime.tryParse(saved);
+      //   if (d != null) {
+      //     _dueDate = _dateOnly(d);
+      //     _dueDateIsSet = true;
+      //   }
+      // } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
     } catch (e) {
       _error = e;
@@ -250,6 +250,19 @@ class PregnancyController extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
+    } catch (_) {/* best-effort */}
+  }
+
+  /// Testing helper — clear any saved due date and snap back to the week-20
+  /// placeholder, so the app + pregnancy map present a fresh "halfway" state.
+  Future<void> resetForTesting() async {
+    _dueDate = _placeholderDueDate(_now);
+    _dueDateIsSet = false;
+    _selectedWeek = currentWeek;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_dueDateKey);
     } catch (_) {/* best-effort */}
   }
 

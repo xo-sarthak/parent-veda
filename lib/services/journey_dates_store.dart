@@ -55,6 +55,13 @@ class JourneyDatesStore extends ChangeNotifier {
     if (_dates.remove(id) != null) _persistNotify();
   }
 
+  /// Testing: wipe ALL edited milestone dates (resets the map to its defaults).
+  void clearAll() {
+    if (_dates.isEmpty) return;
+    _dates.clear();
+    _persistNotify();
+  }
+
   void _persistNotify() {
     notifyListeners();
     _persist();

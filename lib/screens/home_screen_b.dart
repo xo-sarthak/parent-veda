@@ -32,6 +32,7 @@ import '../services/garbh_store.dart';
 import '../services/home_content_controller.dart';
 import '../services/medicine_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home/home_modules.dart';
 import '../widgets/home/trimester_chart_card.dart';
@@ -43,6 +44,7 @@ import 'products_screen.dart';
 import 'global_search.dart';
 import 'read_next_screen.dart';
 import 'saved_hub_screen.dart';
+import 'reminders_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
@@ -1275,7 +1277,8 @@ class HomeScreenB extends StatelessWidget {
     void openTracker() => Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => MedicineTrackerScreen(controller: pregnancy)));
     return AnimatedBuilder(
-      animation: MedicineStore.instance,
+      animation:
+          Listenable.merge([MedicineStore.instance, ReminderStore.instance]),
       builder: (context, _) {
         final store = MedicineStore.instance;
         final meds = store.activeMeds;
@@ -1283,38 +1286,113 @@ class HomeScreenB extends StatelessWidget {
           eyebrow: s.medDailyTitle,
           icon: Icons.medication_rounded,
           accent: green,
-          child: meds.isEmpty
-              ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(s.medHomeSubtitle,
+          // Top-right: add a reminder for herself (NOT tied to any medicine).
+          trailing: IconButton(
+            tooltip: s.mrAdd,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.notification_add_rounded, color: green),
+            onPressed: () => showMedReminderEditor(context, pregnancy),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (meds.isEmpty)
+              Text(s.medHomeSubtitle,
+                  style: GoogleFonts.manrope(
+                      fontSize: 14.5,
+                      height: 1.5,
+                      color: const Color(0xFF5B5070)))
+            else
+              for (final m in meds) _medRow(store, m, green),
+            if (meds.isEmpty) const SizedBox(height: 16),
+            if (meds.isEmpty)
+              HomePrimaryButton(
+                label: s.medTrackCta,
+                trailingArrow: true,
+                color: green,
+                onTap: openTracker,
+              )
+            else
+              Center(
+                child: TextButton(
+                  onPressed: openTracker,
+                  child: Text(s.medManageCta,
                       style: GoogleFonts.manrope(
-                          fontSize: 14.5,
-                          height: 1.5,
-                          color: const Color(0xFF5B5070))),
-                  const SizedBox(height: 16),
-                  HomePrimaryButton(
-                    label: s.medTrackCta,
-                    trailingArrow: true,
-                    color: green,
-                    onTap: openTracker,
-                  ),
-                ])
-              : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  for (final m in meds) _medRow(store, m, green),
-                  const SizedBox(height: 2),
-                  Center(
-                    child: TextButton(
-                      onPressed: openTracker,
-                      child: Text(s.medManageCta,
-                          style: GoogleFonts.manrope(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: green)),
-                    ),
-                  ),
-                ]),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: green)),
+                ),
+              ),
+            _medRemindersList(context, lang, green),
+          ]),
         );
       },
     );
+  }
+
+  // Her self-set medication reminders (frequency + times + note), shown right on
+  // the card. Tap to edit, ✕ to delete. Empty → nothing (the 🔔 invites adding).
+  Widget _medRemindersList(BuildContext context, AppLanguage lang, Color green) {
+    final s = S(lang);
+    final rems = ReminderStore.instance.medication;
+    if (rems.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 8),
+      const Divider(height: 1, color: AppTheme.outlineVariant),
+      const SizedBox(height: 8),
+      Row(children: [
+        Icon(Icons.notifications_active_rounded, size: 15, color: green),
+        const SizedBox(width: 6),
+        Text(s.mrTitle,
+            style: GoogleFonts.manrope(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
+                color: green)),
+      ]),
+      const SizedBox(height: 4),
+      for (final r in rems)
+        InkWell(
+          onTap: () => showMedReminderEditor(context, pregnancy, existing: r),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: green.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(9)),
+                child: Icon(Icons.alarm_rounded, size: 16, color: green),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(r.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.primary900)),
+                      Text(reminderSummary(s, r, context),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.manrope(
+                              fontSize: 11.5, color: AppTheme.neutral500)),
+                    ]),
+              ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.close_rounded,
+                    size: 18, color: AppTheme.neutral400),
+                onPressed: () => ReminderStore.instance.remove(r.id),
+              ),
+            ]),
+          ),
+        ),
+    ]);
   }
 
   Widget _medRow(MedicineStore store, Medication m, Color green) {
@@ -1443,17 +1521,19 @@ class HomeScreenB extends StatelessWidget {
                 store.isDone('vichara'),
                 () => VicharaScreen(controller: pregnancy, daily: true)),
             _garbhPillarRow(context, s.gsSamvad, s.gsSamvadTag,
-                promptForDay(cd).text, '🎙️', const Color(0xFFB98A7E),
+                promptForDay(cd, garbhTrimester(pregnancy.currentWeek)).text,
+                '🎙️', const Color(0xFFB98A7E),
                 store.isDone('samvad'),
-                () => SamvadScreen(controller: pregnancy)),
+                () => SamvadScreen(controller: pregnancy, daily: true)),
             _garbhPillarRow(context, s.gsKriya, s.gsKriyaTag,
                 kriyaForDay(cd).title, '🌿', const Color(0xFF5E8B7E),
                 store.isDone('kriya'),
                 () => KriyaScreen(controller: pregnancy, daily: true)),
-            _garbhPillarRow(context, s.gsAhara, s.gsAharaTag,
-                nutritionForDay(cd).tip, '🍲', const Color(0xFFC97B4A),
-                store.isDone('ahara'),
-                () => AharaScreen(controller: pregnancy, daily: true)),
+            // Ahara (nourishment) commented out per request — kept for revert.
+            // _garbhPillarRow(context, s.gsAhara, s.gsAharaTag,
+            //     nutritionForDay(cd).tip, '🍲', const Color(0xFFC97B4A),
+            //     store.isDone('ahara'),
+            //     () => AharaScreen(controller: pregnancy, daily: true)),
           ]),
         );
       },

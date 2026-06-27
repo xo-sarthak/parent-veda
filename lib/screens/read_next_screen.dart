@@ -896,13 +896,10 @@ class DailyReadsHomeCard extends StatelessWidget {
                             r.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                            // "Read" is now shown by a small tick on the right
+                            // (below) — no strike-through / dimming.
                             style: text.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                height: 1.25,
-                                color: done ? AppTheme.neutral400 : null,
-                                decoration: done
-                                    ? TextDecoration.lineThrough
-                                    : null),
+                                fontWeight: FontWeight.w700, height: 1.25),
                           ),
                           const SizedBox(height: 3),
                           if (isBook)
@@ -933,6 +930,12 @@ class DailyReadsHomeCard extends StatelessWidget {
                   ]),
             ),
           ),
+          // A small tick marks this read as done (replaces the old strike-through).
+          if (done) ...[
+            const Icon(Icons.check_circle_rounded,
+                size: 18, color: Color(0xFF4F7A52)),
+            const SizedBox(width: 8),
+          ],
           // Bookmark this read — saved reads surface in the Profile › Saved hub.
           _SaveHeart(id: r.id),
         ]),

@@ -10,12 +10,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../services/app_nav.dart';
 import '../services/bump_store.dart';
 import '../services/daily_store.dart';
 import '../services/journal_store.dart';
+import '../services/journey_dates_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/read_next_store.dart';
 import '../services/read_to_baby_saved_store.dart';
+import '../services/scans_store.dart';
 import '../services/video_store.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
@@ -173,6 +176,23 @@ class ProfileScreen extends StatelessWidget {
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
           const SizedBox(height: 16),
+          // --- Reset to Week 20 (testing) ---------------------------------
+          // Clears any saved due date + the pregnancy-map data and snaps the app
+          // back to the week-20 placeholder, so features can be re-tested from a
+          // clean "halfway" state. (Testing aid — remove/gate before release.)
+          OutlinedButton.icon(
+            onPressed: () => _resetForTesting(context),
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: const Text('Reset to Week 20 · testing'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.neutral700,
+              side: const BorderSide(color: AppTheme.outlineVariant),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+          const SizedBox(height: 10),
           // --- Sign out (replays the auth flow) ---------------------------
           OutlinedButton.icon(
             onPressed: () => _signOut(context),
@@ -197,6 +217,20 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  /// Testing reset — clear the due date + pregnancy-map data, snap back to the
+  /// week-20 placeholder, and drop the user on a fresh Today screen.
+  Future<void> _resetForTesting(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    await controller.resetForTesting();
+    JourneyDatesStore.instance.clearAll();
+    await ScansStore.instance.clearAllForTesting();
+    AppNav.instance.goToday();
+    nav.popUntil((r) => r.isFirst); // back to the main scaffold (Today)
+    messenger.showSnackBar(const SnackBar(
+        content: Text('Reset to Week 20 — due date & pregnancy map cleared')));
+  }
+
   /// "Sign out" — clears the local auth flag and replays the auth flow over the
   /// app; completing it re-sets the flag (and feeds any picked due date in).
   Future<void> _signOut(BuildContext context) async {
@@ -211,7 +245,9 @@ class ProfileScreen extends StatelessWidget {
           await (await SharedPreferences.getInstance())
               .setBool(kAuthCompletedKey, true);
         } catch (_) {/* best-effort */}
-        if (due != null) await controller.setDueDate(due);
+        // PINNED TO WEEK 20 (testing): disabled so re-login can't move the week.
+        // Re-enable with the load() restore block in pregnancy_controller.dart.
+        // if (due != null) await controller.setDueDate(due);
         nav.pop();
       }),
     ));

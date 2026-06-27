@@ -411,7 +411,8 @@ class VedaIndex {
 /// Rank the whole-app corpus against [query]. Best-first hits above a relevance
 /// threshold; empty for junk / no real match (so we can say "I don't have that"
 /// honestly instead of surfacing noise).
-List<VedaHit> vedaSearch(String query, PregnancyController p, {int limit = 6}) {
+List<VedaHit> vedaSearch(String query, PregnancyController p,
+    {int limit = 6, bool includeCommunity = true}) {
   final qTokens = _tokens(query);
   if (qTokens.isEmpty) return const [];
   final qLower = query.toLowerCase().trim();
@@ -421,7 +422,27 @@ List<VedaHit> vedaSearch(String query, PregnancyController p, {int limit = 6}) {
   final religions = ReadToBabyStore.instance.religions;
   final hits = <VedaHit>[];
   for (final d in VedaIndex.corpus(p)) {
+    // Community posts are opinions — never a source for the actual answer.
+    if (!includeCommunity && d.kind == VedaKind.community) continue;
     if (!_religionAllowed(d, religions)) continue;
+    final sc = d.score(qTokens, qLower);
+    if (sc >= 4.0) hits.add(VedaHit(d, sc));
+  }
+  hits.sort((a, b) => b.score.compareTo(a.score));
+  return hits.length <= limit ? hits : hits.sublist(0, limit);
+}
+
+/// Top COMMUNITY matches for [query] — used ONLY for the social-proof
+/// "Community insights" section (Section 5). These are never used to form the
+/// actual answer (Sections 1–4); they're someone's opinion, not guidance.
+List<VedaHit> vedaCommunityMatches(String query, PregnancyController p,
+    {int limit = 3}) {
+  final qTokens = _tokens(query);
+  if (qTokens.isEmpty) return const [];
+  final qLower = query.toLowerCase().trim();
+  final hits = <VedaHit>[];
+  for (final d in VedaIndex.corpus(p)) {
+    if (d.kind != VedaKind.community) continue;
     final sc = d.score(qTokens, qLower);
     if (sc >= 4.0) hits.add(VedaHit(d, sc));
   }

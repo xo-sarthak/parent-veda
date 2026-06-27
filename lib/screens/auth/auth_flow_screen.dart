@@ -12,6 +12,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
@@ -29,6 +30,20 @@ const _fieldBg = Color(0xFFF7F2FD);
 const _fieldBorder = Color(0x297C3FC4);
 const _hint = Color(0xFFB6A9C6);
 const _logoAsset = 'assets/brand/pv-mark.png';
+
+// ---- Brand logos (official multi-colour marks, rendered as inline SVG) -----
+const _googleSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">'
+    '<path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>'
+    '<path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>'
+    '<path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>'
+    '<path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>';
+const _appleSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">'
+    '<path fill="#1A1A1A" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>';
+const _facebookSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    '<path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
 
 /// Shared-prefs key set true once the auth flow completes (local "remember me",
 /// no backend). Splash reads it to skip auth on later launches; Profile's
@@ -766,14 +781,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       );
 
   Widget _socialRow() => Row(children: [
-        Expanded(child: _socialBtn('Google', const Color(0xFFEA4335))),
+        Expanded(child: _socialBtn('Google', _googleSvg)),
         const SizedBox(width: 10),
-        Expanded(child: _socialBtn('Apple', const Color(0xFF1A1A1A))),
+        Expanded(child: _socialBtn('Apple', _appleSvg)),
         const SizedBox(width: 10),
-        Expanded(child: _socialBtn('Facebook', const Color(0xFF1877F2))),
+        Expanded(child: _socialBtn('Facebook', _facebookSvg)),
       ]);
 
-  Widget _socialBtn(String label, Color color) => Material(
+  Widget _socialBtn(String label, String svg) => Material(
         color: const Color(0xBFFFFFFF),
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
@@ -786,20 +801,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               border: Border.all(color: const Color(0x247C3FC4), width: 1.5),
             ),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                width: 22,
-                height: 22,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(7)),
-                child: Text(label[0],
-                    style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: color)),
-              ),
-              const SizedBox(height: 5),
+              SvgPicture.string(svg, height: 20),
+              const SizedBox(height: 6),
               Text(label,
                   style: GoogleFonts.plusJakartaSans(
                       fontSize: 11.5,
