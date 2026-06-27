@@ -19,6 +19,7 @@ import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
+import 'father/father_daily_screen.dart';
 import 'main_scaffold.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -62,27 +63,29 @@ class _SplashScreenState extends State<SplashScreen>
     // First run shows the auth flow; once completed (local flag, no backend) we
     // skip straight to the app on later launches.
     var authed = false;
+    var role = 'mother';
     try {
-      authed = (await SharedPreferences.getInstance())
-              .getBool(kAuthCompletedKey) ??
-          false;
+      final prefs = await SharedPreferences.getInstance();
+      authed = prefs.getBool(kAuthCompletedKey) ?? false;
+      role = prefs.getString(kUserRoleKey) ?? 'mother';
     } catch (_) {/* default to showing auth */}
     if (!mounted) return;
     if (authed) {
-      nav.pushReplacement(_mainRoute());
+      nav.pushReplacement(role == 'father' ? _fatherRoute() : _mainRoute());
       return;
     }
     nav.pushReplacement(MaterialPageRoute(
-      builder: (_) => AuthFlowScreen(onDone: (due) async {
+      builder: (_) => AuthFlowScreen(onDone: (due, isFather) async {
         try {
-          await (await SharedPreferences.getInstance())
-              .setBool(kAuthCompletedKey, true);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(kAuthCompletedKey, true);
+          await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
         } catch (_) {/* best-effort */}
         // Wire the auth Profile due date into the app's real due date.
         // PINNED TO WEEK 20 (testing): disabled so login can't move the week.
         // Re-enable with the load() restore block in pregnancy_controller.dart.
-        // if (due != null) await widget.pregnancy.setDueDate(due);
-        nav.pushReplacement(_mainRoute());
+        // if (!isFather && due != null) await widget.pregnancy.setDueDate(due);
+        nav.pushReplacement(isFather ? _fatherRoute() : _mainRoute());
       }),
     ));
   }
@@ -94,6 +97,15 @@ class _SplashScreenState extends State<SplashScreen>
           home: widget.home,
           father: widget.father,
         ),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
+      );
+
+  // Father (paired partner) lands on the standalone Father Daily screen.
+  Route<void> _fatherRoute() => PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 450),
+        pageBuilder: (_, _, _) =>
+            FatherDailyScreen(controller: widget.pregnancy),
         transitionsBuilder: (_, anim, _, child) =>
             FadeTransition(opacity: anim, child: child),
       );

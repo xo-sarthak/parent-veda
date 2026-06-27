@@ -11,6 +11,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../data/father/father_read_data.dart';
+import '../../data/father/father_tales.dart';
+import '../../data/garbh_data.dart';
+import '../../models/garbh_content.dart';
+import '../../models/journal_entry.dart';
+import '../../models/read_item.dart';
+import '../../services/father_journal_store.dart';
+import '../../services/pregnancy_controller.dart';
+import '../../widgets/journal/journal_create.dart';
+import '../week_flow_screen.dart';
+import 'father_journal_screen.dart';
+import 'father_stories_screen.dart';
 
 // ---- palettes ---------------------------------------------------------------
 class _Pal {
@@ -62,13 +76,13 @@ class _Detail {
     required this.eyebrow,
     required this.title,
     this.meta = '',
-    this.script = '',
+    // this.script = '',  // read-aloud text now comes from Samvad (_readAloudToday)
     this.paras = const [],
     this.list = const [],
     this.cta = '',
     this.confirm = '',
   });
-  final String id, eyebrow, title, meta, script, cta, confirm;
+  final String id, eyebrow, title, meta, cta, confirm;
   final List<String> paras, list;
 }
 
@@ -96,7 +110,19 @@ const Map<String, _Detail> _kDetails = {
     title: "Week 20 — what she's carrying",
     paras: [
       'Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.',
-      'Small, specific help lands bigger than grand gestures right now.',
+      'Small, specific help lands bigger than grand gestures right now. You do not have to be asked — noticing first is the whole gift.',
+    ],
+    list: [
+      'Take dinner off her plate — cook her favourite, or order it before she has to ask.',
+      'Rub her lower back for five minutes — no phone, no agenda.',
+      'Quietly handle a chore she usually does, without announcing it.',
+      'Keep water and a small snack by her side of the bed.',
+      'Ask "how are you feeling today?" and just listen — resist fixing it.',
+      'Take over the heavy lifting: groceries, laundry baskets, anything that strains her back.',
+      'Come to the next scan, and write down the questions together beforehand.',
+      'Let her nap without guilt — take the evening shift on the house.',
+      'Help her settle on her side with a pillow tucked behind her back.',
+      'Say the small things out loud — "you are doing something incredible."',
     ],
     cta: "I'll handle dinner",
     confirm: "Dinner's handled tonight. She'll feel it.",
@@ -110,20 +136,22 @@ const Map<String, _Detail> _kDetails = {
       'Around now the tiny bones of the inner ear finish forming — and your voice, lower and slower than hers, carries especially well through the body.',
       "Reading a few lines a day isn't sentimental. It's how your baby starts to know you before they ever see you.",
     ],
-    cta: 'Read the full article',
-    confirm: 'Opening the full read…',
+    cta: 'Done reading',
+    confirm: 'Nice — a few minutes well spent.',
   ),
   'talk': _Detail(
     id: 'talk',
-    eyebrow: 'Talk to your baby',
-    title: 'Say hello tonight',
-    script:
-        '"Hey little one, it\'s Dad. I don\'t know much yet, but I already know I\'m on your side. I can\'t wait to meet you."',
+    eyebrow: 'Read to your baby',
+    title: 'Read to your baby tonight',
+    meta: 'Read aloud · 1 min',
+    // [script] is injected at render time from the mother's Samvad read-aloud
+    // set (see _readAloudToday) so Mom and Dad share the same words.
     paras: [
-      'Baby can recognise your voice now. A minute is plenty — it\'s the rhythm that reaches them, not the words.',
+      'Baby can recognise your voice now — lower and slower than hers, it carries especially well. Read it aloud, let your voice rise and fall, and play with the words.',
+      "A minute is plenty. It's the rhythm that reaches them, not the meaning.",
     ],
-    cta: 'Done for tonight',
-    confirm: "That's a minute well spent.",
+    cta: 'Done reading tonight',
+    confirm: 'Beautiful — your voice is a gift they already know.',
   ),
   'story': _Detail(
     id: 'story',
@@ -154,7 +182,18 @@ class _Entry {
 //  Screen
 // ===========================================================================
 class FatherDailyScreen extends StatefulWidget {
-  const FatherDailyScreen({super.key});
+  const FatherDailyScreen(
+      {super.key, required this.controller, this.embedded = false});
+
+  /// Pregnancy controller — used by the Baby / Mother / What's-next quick
+  /// circles to open the (father-skinned) weekly detail screens for week 20.
+  final PregnancyController controller;
+
+  /// When embedded inside MainScaffold's Today tab (the testing mode switch),
+  /// the screen hides its own bottom tab bar and leaves room for the app's
+  /// floating tab bar instead. Standalone (pairing-flow) use keeps both.
+  final bool embedded;
+
   @override
   State<FatherDailyScreen> createState() => _FatherDailyScreenState();
 }
@@ -163,6 +202,30 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   int _palIdx = 0; // 0 = Slate (default), 1 = Teal
   static const int _week = 20;
   static const String _dadName = 'Arjun';
+
+  // "Read to your baby" reuses the mother's Samvad read-aloud scripts. Week 20 is
+  // trimester 2 (kSamvadT2 — the expressive read-aloud set). Picked by week so
+  // it's stable and rolls forward if other weeks are added later.
+  List<GarbhPrompt> get _readAloudSet =>
+      samvadForTrimester(garbhTrimester(_week));
+  GarbhPrompt get _readAloudToday =>
+      _readAloudSet[_week % _readAloudSet.length];
+
+  // Days-since-epoch — a stable index that ticks over once per day, used to
+  // refresh the daily read + the daily tale.
+  int get _dayIndex =>
+      DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+
+  // "Daily read" is sourced from the father Read-recommendations slots, week-
+  // aware (see father_read_data.dart). Rotates day to day so it refreshes every
+  // day rather than staying fixed all week.
+  ReadItem get _todayRead => fatherDailyReads(_week, _dayIndex).first;
+
+  // Stories/Fables/Mythology: one piece a day, alternating across the kinds the
+  // user enabled (empty = a mix of all three). Persisted in shared_preferences.
+  static const _kTaleKindsKey = 'father_tale_kinds';
+  final Set<FatherTaleKind> _taleKinds = {};
+  FatherTale get _todayTale => fatherTaleForDay(_dayIndex, _taleKinds);
 
   String? _shownCard;
   bool _open = false;
@@ -183,6 +246,32 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Timer? _closeTimer;
 
   _Pal get _p => _palIdx == 0 ? _slate : _teal;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTaleKinds();
+  }
+
+  Future<void> _loadTaleKinds() async {
+    try {
+      final saved =
+          (await SharedPreferences.getInstance()).getStringList(_kTaleKindsKey);
+      if (saved == null || !mounted) return;
+      setState(() {
+        _taleKinds
+          ..clear()
+          ..addAll(FatherTaleKind.values.where((k) => saved.contains(k.name)));
+      });
+    } catch (_) {/* default = a mix of all three */}
+  }
+
+  Future<void> _saveTaleKinds() async {
+    try {
+      await (await SharedPreferences.getInstance()).setStringList(
+          _kTaleKindsKey, _taleKinds.map((k) => k.name).toList());
+    } catch (_) {/* best-effort */}
+  }
 
   @override
   void dispose() {
@@ -251,9 +340,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             _topBar(p),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(0, 2, 0, 24),
+                padding: EdgeInsets.fromLTRB(0, 2, 0, widget.embedded ? 120 : 24),
                 children: [
                   _greeting(p),
+                  _quickCircles(p),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                     child: Text('TODAY FOR YOU',
@@ -278,7 +368,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 ],
               ),
             ),
-            _tabBar(p),
+            if (!widget.embedded) _tabBar(p),
           ]),
           // ---- detail overlay ----
           _detailOverlay(p),
@@ -302,6 +392,63 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   TextStyle _eyebrow(Color c, double spacing) => GoogleFonts.plusJakartaSans(
       fontSize: 11, fontWeight: FontWeight.w700, color: c, letterSpacing: spacing);
 
+  // ---- Baby / Mother / What's-next quick circles ----
+  // Same shortcuts as the mother's weekly; they open the (father-skinned when
+  // FatherPreview is on) week-20 detail screens.
+  Widget _quickCircles(_Pal p) {
+    Widget circle(IconData icon, String label, VoidCallback onTap) => Expanded(
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Column(children: [
+              Container(
+                width: 58,
+                height: 58,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.card,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: p.line),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x141C2830),
+                        blurRadius: 12,
+                        offset: Offset(0, 5)),
+                  ],
+                ),
+                child: Icon(icon, color: p.accent, size: 24),
+              ),
+              const SizedBox(height: 7),
+              Text(label, style: _body(12, p.muted, w: FontWeight.w600)),
+            ]),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(26, 10, 26, 2),
+      child: Row(children: [
+        circle(Icons.child_care_rounded, 'Baby', () => _openWeek('baby')),
+        circle(Icons.favorite_rounded, 'Mother', () => _openWeek('mother')),
+        circle(Icons.event_note_rounded, "What's next", () => _openWeek('next')),
+      ]),
+    );
+  }
+
+  void _openWeek(String which) {
+    final c = widget.controller;
+    final lang = c.language;
+    switch (which) {
+      case 'baby':
+        openWeekBabyDetail(context, c, _week, lang);
+        break;
+      case 'mother':
+        openWeekMotherDetail(context, c, _week, lang);
+        break;
+      case 'next':
+        openWeekWhatsNext(context, c, lang);
+        break;
+    }
+  }
+
   // ---- top bar ----
   Widget _topBar(_Pal p) => Padding(
         padding: const EdgeInsets.fromLTRB(18, 4, 18, 10),
@@ -317,50 +464,8 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           const SizedBox(width: 9),
           Text('ParentVeda', style: _serif(18, p.ink)),
           const Spacer(),
-          // Dad | Mom pill
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-                color: p.accentSoft, borderRadius: BorderRadius.circular(999)),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-                decoration: BoxDecoration(
-                  color: p.card,
-                  borderRadius: BorderRadius.circular(999),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color(0x1F1C2830),
-                        blurRadius: 3,
-                        offset: Offset(0, 1)),
-                  ],
-                ),
-                child: Text('Dad',
-                    style: _body(12, p.accent, w: FontWeight.w700)),
-              ),
-              GestureDetector(
-                onTap: () => setState(() => _momOpen = true),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-                  child: Text('Mom',
-                      style: _body(12, p.muted, w: FontWeight.w600)),
-                ),
-              ),
-            ]),
-          ),
-          const SizedBox(width: 9),
-          GestureDetector(
-            onTap: () => setState(() => _momOpen = true),
-            child: Container(
-              width: 30,
-              height: 30,
-              alignment: Alignment.center,
-              decoration:
-                  BoxDecoration(color: p.warmSoft, shape: BoxShape.circle),
-              child: Text('A', style: _serif(14, p.accent2)),
-            ),
-          ),
+          // The decorative "Dad | Mom" pill + avatar were removed — the real
+          // mode switch lives top-right (MainScaffold). _momSheet kept for revert.
         ]),
       );
 
@@ -466,12 +571,15 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 child: _softCircle(90, Colors.white.withValues(alpha: 0.05))),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: Text('DAILY TIP FOR DAD',
-                          style: _eyebrow(
-                              p.cream.withValues(alpha: 0.72), 0.14)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('DAILY TIP FOR DAD',
+                            style: _eyebrow(
+                                p.cream.withValues(alpha: 0.72), 0.14)),
+                      ),
                     ),
                     Container(
                       width: 40,
@@ -484,7 +592,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                           color: p.cream, size: 22),
                     ),
                   ]),
-              const SizedBox(height: 14),
+              const SizedBox(height: 10),
               Text("Tonight, don't fix it. Just sit with her.",
                   style: _serif(24, p.cream)),
               const SizedBox(height: 9),
@@ -572,10 +680,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       Text('DAILY READ', style: _eyebrow(p.accent, 0.12)),
                     ]),
                     const SizedBox(height: 9),
-                    Text('What your baby can hear at 20 weeks',
+                    Text(_todayRead.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: _serif(18, p.ink, w: FontWeight.w600)),
                     const SizedBox(height: 9),
-                    Text('4 min read · ParentVeda Reads',
+                    Text('${_todayRead.readingTime} · ${_todayRead.category}',
                         style: _body(12.5, p.muted)),
                   ]),
             ),
@@ -597,15 +707,15 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           p,
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _iconTile(p, Icons.mic_none_rounded, p.accentSoft, p.accent),
+              _iconTile(p, Icons.auto_stories_rounded, p.accentSoft, p.accent),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('TALK TO YOUR BABY', style: _eyebrow(p.accent, 0.12)),
+                      Text('READ TO YOUR BABY', style: _eyebrow(p.accent, 0.12)),
                       const SizedBox(height: 3),
-                      Text('Say hello tonight',
+                      Text('Read to your baby tonight',
                           style: _serif(19, p.ink, w: FontWeight.w600)),
                     ]),
               ),
@@ -616,13 +726,20 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
               decoration: BoxDecoration(
                   color: p.accentSoft, borderRadius: BorderRadius.circular(15)),
-              child: Text("“Hey little one, it's Dad. I can't wait to meet you.”",
+              child: Text('“${_readAloudToday.text}”',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.fraunces(
                       fontSize: 15,
                       fontStyle: FontStyle.italic,
                       height: 1.45,
                       color: p.accent)),
             ),
+            const SizedBox(height: 12),
+            _arrowLink(p, 'Read it aloud'),
+            // PURE READ-ALOUD: the record/play control was removed from this card
+            // per spec. Kept commented for easy revert.
+            /*
             const SizedBox(height: 14),
             Row(children: [
               GestureDetector(
@@ -663,108 +780,293 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 ),
               ),
             ]),
+            */
           ]),
         ),
       );
 
-  // ---- card 5: stories & myth ----
-  Widget _storiesMyth(_Pal p) => _tap(
-        () => _openCard('story'),
-        _whiteCard(
-          p,
-          Row(children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(width: 86, height: 86, child: _OceanArt(pal: p)),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      _iconTileSm(p, Icons.history_edu_rounded, p.warmSoft, p.accent2),
-                      const SizedBox(width: 8),
-                      Text('STORIES & MYTH', style: _eyebrow(p.accent2, 0.1)),
-                    ]),
-                    const SizedBox(height: 9),
-                    Text('The Churning of the Ocean',
-                        style: _serif(18, p.ink, w: FontWeight.w600)),
-                    const SizedBox(height: 9),
-                    Row(children: [
-                      Text('Read aloud · 3 min',
-                          style: _body(13, p.accent, w: FontWeight.w600)),
-                      const SizedBox(width: 6),
-                      Text('→', style: _body(15, p.accent)),
-                    ]),
-                  ]),
-            ),
-          ]),
-          pad: 16,
-        ),
-      );
-
-  // ---- card 6: journal ----
-  Widget _journalCard(_Pal p) {
-    final recent = _entries.first;
-    return _whiteCard(
-      p,
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _iconTile(p, Icons.edit_outlined, p.accentSoft, p.accent),
-          const SizedBox(width: 13),
+  // ---- card 5: stories & myth — ONE piece a day (the full 20-of-each
+  //      collection now lives in Tools → Stories, Fables & Mythology). The
+  //      tune icon customizes which kinds appear; tap reads today's piece.
+  Widget _storiesMyth(_Pal p) {
+    final tale = _todayTale;
+    return _tap(
+      () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => FatherTaleReadScreen(tale: tale))),
+      _whiteCard(
+        p,
+        Row(children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(width: 86, height: 86, child: _OceanArt(pal: p)),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('YOUR JOURNAL', style: _eyebrow(p.accent, 0.12)),
-                  const SizedBox(height: 3),
-                  Text('A note to your baby',
-                      style: _serif(19, p.ink, w: FontWeight.w600)),
+                  Row(children: [
+                    _iconTileSm(
+                        p, Icons.history_edu_rounded, p.warmSoft, p.accent2),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('STORIES, FABLES & MYTH',
+                          style: _eyebrow(p.accent2, 0.1)),
+                    ),
+                    GestureDetector(
+                      onTap: _showTaleCustomize,
+                      behavior: HitTestBehavior.opaque,
+                      child:
+                          Icon(Icons.tune_rounded, size: 18, color: p.muted),
+                    ),
+                  ]),
+                  const SizedBox(height: 9),
+                  Text(tale.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _serif(18, p.ink, w: FontWeight.w600)),
+                  const SizedBox(height: 9),
+                  Row(children: [
+                    Text('${fatherTaleKindTag(tale.kind)} · read aloud',
+                        style: _body(13, p.accent, w: FontWeight.w600)),
+                    const SizedBox(width: 6),
+                    Text('→', style: _body(15, p.accent)),
+                  ]),
                 ]),
           ),
         ]),
-        const SizedBox(height: 14),
-        _tap(
-          () => _openCard('journal'),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                color: p.accent, borderRadius: BorderRadius.circular(14)),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.add_rounded, color: p.cream, size: 18),
-              const SizedBox(width: 8),
-              Text('New entry', style: _body(14, p.cream, w: FontWeight.w600)),
-            ]),
-          ),
-        ),
-        const SizedBox(height: 13),
-        _tap(
-          () => _openCard('journal'),
+        pad: 16,
+      ),
+    );
+  }
+
+  // Customize which kinds the daily tale draws from (off = a mix of all three).
+  void _showTaleCustomize() {
+    final p = _p;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: p.bg,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          Widget tile(FatherTaleKind k) {
+            final on = _taleKinds.contains(k);
+            return GestureDetector(
+              onTap: () {
+                setSheet(() => on ? _taleKinds.remove(k) : _taleKinds.add(k));
+                setState(() {});
+                _saveTaleKinds();
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: p.card,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: on ? p.accent : p.line, width: on ? 1.5 : 1),
+                ),
+                child: Row(children: [
+                  Expanded(
+                      child: Text(fatherTaleKindLabel(k),
+                          style: _body(15, p.ink, w: FontWeight.w600))),
+                  Icon(
+                      on
+                          ? Icons.check_circle_rounded
+                          : Icons.circle_outlined,
+                      color: on ? p.accent : p.muted,
+                      size: 22),
+                ]),
+              ),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('What would you like to read?', style: _serif(20, p.ink)),
+                  const SizedBox(height: 6),
+                  Text(
+                      'Pick the kinds you want. Leave all off for a mix of everything.',
+                      style: _body(13, p.muted)),
+                  const SizedBox(height: 16),
+                  for (final k in FatherTaleKind.values) tile(k),
+                ]),
+          );
+        },
+      ),
+    );
+  }
+
+  // ---- card 6: journal ----
+  // Father journal card — the four quick-add circles (memory / note / photo /
+  // voice) into the separate FatherJournalStore, plus a live recent preview.
+  // (The old local-only journal overlay '_journalBody' is kept for revert.)
+  Widget _journalCard(_Pal p) => _whiteCard(
+        p,
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              margin: const EdgeInsets.only(top: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                  color: p.warmSoft, borderRadius: BorderRadius.circular(7)),
-              child: Text(recent.date.toUpperCase(),
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
-                      color: p.accent2)),
-            ),
-            const SizedBox(width: 11),
+            _iconTile(p, Icons.edit_outlined, p.accentSoft, p.accent),
+            const SizedBox(width: 13),
             Expanded(
-                child: Text('"${recent.text}"',
-                    style: _body(13.5, p.ink, h: 1.45))),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('YOUR JOURNAL', style: _eyebrow(p.accent, 0.12)),
+                    const SizedBox(height: 3),
+                    Text('A note to your baby',
+                        style: _serif(19, p.ink, w: FontWeight.w600)),
+                  ]),
+            ),
+            GestureDetector(
+              onTap: _showJournalInfo,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, top: 2),
+                child:
+                    Icon(Icons.info_outline_rounded, size: 19, color: p.muted),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 16),
+          Row(children: [
+            _journalCircle(
+                p, Icons.edit_note_rounded, 'Memory', () => _addJournal('memory')),
+            _journalCircle(
+                p, Icons.favorite_rounded, 'For baby', () => _addJournal('baby')),
+            _journalCircle(
+                p, Icons.add_a_photo_rounded, 'Photo', () => _addJournal('photo')),
+            _journalCircle(
+                p, Icons.mic_none_rounded, 'Voice', () => _addJournal('voice')),
+          ]),
+          AnimatedBuilder(
+            animation: FatherJournalStore.instance,
+            builder: (_, _) {
+              final entries = FatherJournalStore.instance.entries;
+              if (entries.isEmpty) return const SizedBox.shrink();
+              final recent = entries.first;
+              return Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: _tap(
+                  _openFatherJournal,
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: p.warmSoft,
+                          borderRadius: BorderRadius.circular(7)),
+                      child: Text(_journalKindLabel(recent).toUpperCase(),
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: p.accent2)),
+                    ),
+                    const SizedBox(width: 11),
+                    Expanded(
+                        child: Text('"${_journalPreview(recent)}"',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: _body(13.5, p.ink, h: 1.45))),
+                  ]),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _tap(_openFatherJournal, _arrowLink(p, 'See all entries')),
+        ]),
+      );
+
+  Widget _journalCircle(
+          _Pal p, IconData icon, String label, VoidCallback onTap) =>
+      Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Column(children: [
+            Container(
+              width: 46,
+              height: 46,
+              alignment: Alignment.center,
+              decoration:
+                  BoxDecoration(color: p.accentSoft, shape: BoxShape.circle),
+              child: Icon(icon, color: p.accent, size: 21),
+            ),
+            const SizedBox(height: 6),
+            Text(label, style: _body(11, p.muted, w: FontWeight.w600)),
           ]),
         ),
-        const SizedBox(height: 12),
-        _tap(() => _openCard('journal'), _arrowLink(p, 'See all entries')),
-      ]),
+      );
+
+  void _openFatherJournal() => Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => FatherJournalScreen(controller: widget.controller)));
+
+  // The "what is this" note, moved off the card into an (i) tap to save space.
+  void _showJournalInfo() {
+    final p = _p;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: p.bg,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Your journal', style: _serif(20, p.ink)),
+              const SizedBox(height: 8),
+              Text(
+                  'Your memories, photos and voice notes will live here. Tap a circle above to add one — a memory, a note to your baby, a photo or a voice note.',
+                  style: _body(14, p.muted, h: 1.5)),
+            ]),
+      ),
     );
+  }
+
+  void _addJournal(String kind) {
+    final c = widget.controller;
+    final add = FatherJournalStore.instance.addEntry;
+    switch (kind) {
+      case 'memory':
+        openJournalText(context, c, JournalEntryType.memory,
+            onAdd: add, father: true);
+        break;
+      case 'baby':
+        openJournalText(context, c, JournalEntryType.noteForBaby,
+            onAdd: add, father: true);
+        break;
+      case 'photo':
+        openJournalAddPhoto(context, c, onAdd: add, father: true);
+        break;
+      case 'voice':
+        openJournalRecordVoice(context, c, onAdd: add, father: true);
+        break;
+    }
+  }
+
+  String _journalKindLabel(JournalEntry e) {
+    if (e.images.isNotEmpty) return 'Photo';
+    if (e.audios.isNotEmpty) return 'Voice';
+    return e.type == JournalEntryType.noteForBaby ? 'For baby' : 'Memory';
+  }
+
+  String _journalPreview(JournalEntry e) {
+    if (e.title.trim().isNotEmpty) return e.title;
+    if (e.description.trim().isNotEmpty) return e.description;
+    if (e.images.isNotEmpty) return 'Added a photo';
+    if (e.audios.isNotEmpty) return 'Recorded a voice note';
+    return 'A memory';
   }
 
   // ---- bottom tab bar ----
@@ -781,9 +1083,8 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           children: [
             _tab(p, Icons.wb_sunny_outlined, 'Today', active: true),
             _tab(p, Icons.menu_book_rounded, 'Reads', onTap: () => _openCard('read')),
-            _tab(p, Icons.mic_none_rounded, 'Talk', onTap: () => _openCard('talk')),
-            _tab(p, Icons.edit_outlined, 'Journal',
-                onTap: () => _openCard('journal')),
+            _tab(p, Icons.auto_stories_rounded, 'Read', onTap: () => _openCard('talk')),
+            _tab(p, Icons.edit_outlined, 'Journal', onTap: _openFatherJournal),
             _tab(p, Icons.person_outline_rounded, 'You',
                 onTap: () => _flash('That space is coming soon')),
           ],
@@ -882,18 +1183,27 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   }
 
   List<Widget> _detailBody(_Pal p, _Detail d) {
+    final isRead = d.id == 'read';
+    final r = isRead ? _todayRead : null;
     final out = <Widget>[
-      Text(d.title, style: _serif(27, p.ink)),
+      Text(isRead ? r!.title : d.title, style: _serif(27, p.ink)),
     ];
-    if (d.meta.isNotEmpty) {
+    final metaStr = isRead ? '${r!.readingTime} · ${r.category}' : d.meta;
+    if (metaStr.isNotEmpty) {
       out.add(const SizedBox(height: 9));
-      out.add(Text(d.meta, style: _body(13, p.muted, w: FontWeight.w500)));
+      out.add(Text(metaStr, style: _body(13, p.muted, w: FontWeight.w500)));
     }
-    if (d.id == 'read') {
+    if (isRead) {
+      final rr = r!;
       out.add(const SizedBox(height: 18));
       out.add(ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(height: 170, child: _SoundRippleArt(pal: p))));
+      for (final para in rr.body.split('\n\n')) {
+        out.add(const SizedBox(height: 16));
+        out.add(Text(para,
+            style: _body(15.5, p.ink.withValues(alpha: 0.9), h: 1.62)));
+      }
     }
     if (d.id == 'story') {
       out.add(const SizedBox(height: 18));
@@ -901,13 +1211,13 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(height: 170, child: _OceanArt(pal: p))));
     }
-    if (d.id == 'talk' && d.script.isNotEmpty) {
+    if (d.id == 'talk') {
       out.add(const SizedBox(height: 18));
       out.add(Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
             color: p.accentSoft, borderRadius: BorderRadius.circular(18)),
-        child: Text(d.script,
+        child: Text('“${_readAloudToday.text}”',
             style: GoogleFonts.fraunces(
                 fontSize: 18,
                 fontStyle: FontStyle.italic,
@@ -930,7 +1240,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ]),
       ));
     }
-    if (d.paras.isNotEmpty) {
+    if (d.paras.isNotEmpty && !isRead) {
       out.add(const SizedBox(height: 18));
       for (final para in d.paras) {
         out.add(Padding(
@@ -939,6 +1249,37 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               style: _body(15.5, p.ink.withValues(alpha: 0.9), h: 1.62)),
         ));
       }
+    }
+    // Support-your-partner: a longer list of concrete ways to help this week.
+    if (d.id == 'partner' && d.list.isNotEmpty) {
+      out.add(const SizedBox(height: 6));
+      out.add(Text('MORE WAYS TO HELP THIS WEEK', style: _eyebrow(p.muted, 0.12)));
+      out.add(const SizedBox(height: 12));
+      out.add(Container(
+        decoration: BoxDecoration(
+          color: p.card,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: p.line),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(children: [
+          for (var i = 0; i < d.list.length; i++)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                border: i < d.list.length - 1
+                    ? Border(bottom: BorderSide(color: p.line))
+                    : null,
+              ),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Icon(Icons.favorite_rounded, size: 14, color: p.accent2),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Text(d.list[i], style: _body(14.5, p.ink, h: 1.4))),
+              ]),
+            ),
+        ]),
+      ));
     }
     if (d.id == 'tip' && d.list.isNotEmpty) {
       out.add(const SizedBox(height: 4));
@@ -974,8 +1315,33 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
       ));
     }
     if (d.id == 'talk') {
-      out.add(const SizedBox(height: 22));
-      out.add(_recordBlock(p));
+      // PURE READ-ALOUD: the record block was removed here (kept for revert):
+      //   out.add(const SizedBox(height: 22));
+      //   out.add(_recordBlock(p));
+      final more =
+          _readAloudSet.where((g) => g.id != _readAloudToday.id).toList();
+      if (more.isNotEmpty) {
+        out.add(const SizedBox(height: 8));
+        out.add(Text('MORE TO READ ALOUD', style: _eyebrow(p.muted, 0.12)));
+        out.add(const SizedBox(height: 12));
+        for (final g in more) {
+          out.add(Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: p.card,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: p.line),
+            ),
+            child: Text('“${g.text}”',
+                style: GoogleFonts.fraunces(
+                    fontSize: 14.5,
+                    fontStyle: FontStyle.italic,
+                    height: 1.5,
+                    color: p.ink)),
+          ));
+        }
+      }
     }
     if (d.id == 'journal') {
       out.addAll(_journalBody(p));
@@ -983,6 +1349,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     return out;
   }
 
+  // ignore: unused_element  (kept for revert — see PURE READ-ALOUD note above)
   Widget _recordBlock(_Pal p) => Column(children: [
         GestureDetector(
           onTap: () => setState(() => _recording
@@ -1268,6 +1635,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
       ]);
 }
 
+// ignore: unused_element  (used only by the commented-out read-aloud record row)
 const List<double> _kWaveSmall = [
   10, 18, 26, 14, 22, 12, 20, 28, 16, 22, 12, 18, 24, 14
 ];

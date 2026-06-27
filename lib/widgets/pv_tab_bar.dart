@@ -23,11 +23,19 @@ class PvTabBar extends StatelessWidget {
     required this.tabs,
     required this.activeIndex,
     required this.onChanged,
+    this.father = false,
   });
 
   final List<PvTab> tabs;
   final int activeIndex;
   final ValueChanged<int> onChanged;
+
+  /// In Dad (father-preview) mode the bar takes the father Slate palette.
+  final bool father;
+
+  // Father (Slate) accents — mirror the Father Daily / father_skin palette.
+  static const Color _fAccent = Color(0xFF2E5266);
+  static const Color _fMuted = Color(0xFF6A7B82);
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +70,8 @@ class PvTabBar extends StatelessWidget {
   Widget _item(int i) {
     final active = i == activeIndex;
     final t = tabs[i];
+    final activeBg = father ? _fAccent : AppTheme.primary500;
+    final idle = father ? _fMuted : AppTheme.neutral400;
     return GestureDetector(
       onTap: () => onChanged(i),
       behavior: HitTestBehavior.opaque,
@@ -71,7 +81,7 @@ class PvTabBar extends StatelessWidget {
         padding: EdgeInsets.symmetric(
             horizontal: active ? 12 : 6, vertical: active ? 9 : 4),
         decoration: BoxDecoration(
-          color: active ? AppTheme.primary500 : Colors.transparent,
+          color: active ? activeBg : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         // Active = horizontal pill (icon + label). Inactive = icon with a small
@@ -95,7 +105,7 @@ class PvTabBar extends StatelessWidget {
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(t.icon, size: 20, color: AppTheme.neutral400),
+                  Icon(t.icon, size: 20, color: idle),
                   const SizedBox(height: 2),
                   Text(
                     t.label,
@@ -104,7 +114,7 @@ class PvTabBar extends StatelessWidget {
                     style: GoogleFonts.manrope(
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.neutral400,
+                      color: idle,
                     ),
                   ),
                 ],

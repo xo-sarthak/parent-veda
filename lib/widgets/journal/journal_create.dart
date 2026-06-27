@@ -53,6 +53,10 @@ Future<void> openJournalText(
   PregnancyController p,
   JournalEntryType type, {
   JournalEntry? edit,
+  // When provided, new entries are added via this hook instead of the mother
+  // JournalStore (lets the Father's Journal reuse this sheet with its own store).
+  Future<void> Function(JournalEntry entry)? onAdd,
+  bool father = false, // Slate-tint the sheet (father compose)
 }) {
   final s = S(p.language);
   final messenger = ScaffoldMessenger.of(context);
@@ -88,7 +92,7 @@ Future<void> openJournalText(
             TextField(
               controller: tagCtrl,
               autofocus: true,
-              decoration: _fieldDeco(s.jcCustomTagHint),
+              decoration: _fieldDeco(s.jcCustomTagHint, father: father),
             ),
             const SizedBox(height: 12),
           ],
@@ -97,8 +101,12 @@ Future<void> openJournalText(
             autofocus: !isCustom,
             minLines: 3,
             maxLines: 6,
-            decoration:
-                _fieldDeco(hint, suffix: MicDictateButton(controller: bodyCtrl, s: s)),
+            decoration: _fieldDeco(hint,
+                suffix: MicDictateButton(
+                    controller: bodyCtrl,
+                    s: s,
+                    color: father ? _fatherAccent : null),
+                father: father),
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -120,7 +128,7 @@ Future<void> openJournalText(
                           customTag: tag)
                       : edit.copyWith(title: body));
                 } else {
-                  await store.addEntry(JournalEntry(
+                  await (onAdd ?? JournalStore.instance.addEntry)(JournalEntry(
                     id: 'm_${DateTime.now().microsecondsSinceEpoch}',
                     type: type,
                     title: isCustom ? (tag.isEmpty ? s.jcCustom : tag) : body,
@@ -142,12 +150,15 @@ Future<void> openJournalText(
           ),
         ],
       ),
+      father: father,
     ),
   );
 }
 
 Future<void> openJournalAddPhoto(
-    BuildContext context, PregnancyController p) async {
+    BuildContext context, PregnancyController p,
+    {Future<void> Function(JournalEntry entry)? onAdd,
+    bool father = false}) async {
   final s = S(p.language);
   final messenger = ScaffoldMessenger.of(context);
   // Let the user choose: take a new photo (camera) or pick from the gallery.
@@ -171,10 +182,10 @@ Future<void> openJournalAddPhoto(
                 borderRadius: BorderRadius.circular(99)),
           ),
           const SizedBox(height: 16),
-          _photoSourceTile(
-              ctx, Icons.photo_camera_rounded, s.jrTakePhoto, ImageSource.camera),
+          _photoSourceTile(ctx, Icons.photo_camera_rounded, s.jrTakePhoto,
+              ImageSource.camera, father),
           _photoSourceTile(ctx, Icons.photo_library_rounded, s.jrChooseGallery,
-              ImageSource.gallery),
+              ImageSource.gallery, father),
         ]),
       ),
     ),
@@ -196,7 +207,7 @@ Future<void> openJournalAddPhoto(
       }
     }
     if (saved.isEmpty) return;
-    await JournalStore.instance.addEntry(JournalEntry(
+    await (onAdd ?? JournalStore.instance.addEntry)(JournalEntry(
       id: 'p_${DateTime.now().microsecondsSinceEpoch}',
       type: JournalEntryType.photo,
       title: s.jrFilterPhotos,
@@ -213,8 +224,8 @@ Future<void> openJournalAddPhoto(
   }
 }
 
-Widget _photoSourceTile(
-    BuildContext ctx, IconData icon, String label, ImageSource source) {
+Widget _photoSourceTile(BuildContext ctx, IconData icon, String label,
+    ImageSource source, bool father) {
   return InkWell(
     borderRadius: BorderRadius.circular(14),
     onTap: () => Navigator.of(ctx).pop(source),
@@ -226,9 +237,11 @@ Widget _photoSourceTile(
           height: 42,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: AppTheme.primary500.withValues(alpha: 0.12),
+              color: (father ? _fatherAccent : AppTheme.primary500)
+                  .withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(13)),
-          child: Icon(icon, color: AppTheme.primary600, size: 21),
+          child: Icon(icon,
+              color: father ? _fatherAccent : AppTheme.primary600, size: 21),
         ),
         const SizedBox(width: 14),
         Text(label,
@@ -242,13 +255,15 @@ Widget _photoSourceTile(
 }
 
 Future<void> openJournalRecordVoice(
-    BuildContext context, PregnancyController p) async {
+    BuildContext context, PregnancyController p,
+    {Future<void> Function(JournalEntry entry)? onAdd,
+    bool father = false}) async {
   final messenger = ScaffoldMessenger.of(context);
   final saved = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _VoiceRecordSheet(p: p),
+    builder: (ctx) => _VoiceRecordSheet(p: p, onAdd: onAdd, father: father),
   );
   if (saved == true) _savedSnack(messenger, S(p.language).jcSavedVoice);
 }
@@ -310,8 +325,10 @@ Future<void> _editCaption(
 //  Voice recording sheet (real recording via the `record` package)
 // ---------------------------------------------------------------------------
 class _VoiceRecordSheet extends StatefulWidget {
-  const _VoiceRecordSheet({required this.p});
+  const _VoiceRecordSheet({required this.p, this.onAdd, this.father = false});
   final PregnancyController p;
+  final Future<void> Function(JournalEntry entry)? onAdd;
+  final bool father;
   @override
   State<_VoiceRecordSheet> createState() => _VoiceRecordSheetState();
 }
@@ -396,12 +413,15 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
             decoration: BoxDecoration(
               color: _recording
                   ? AppTheme.secondary500
-                  : AppTheme.primary500.withValues(alpha: 0.12),
+                  : (widget.father ? _fatherAccent : AppTheme.primary500)
+                      .withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(_recording ? Icons.stop_rounded : Icons.mic_rounded,
                 size: 40,
-                color: _recording ? Colors.white : AppTheme.primary500),
+                color: _recording
+                    ? Colors.white
+                    : (widget.father ? _fatherAccent : AppTheme.primary500)),
           ),
         ),
         const SizedBox(height: 12),
@@ -425,7 +445,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
                     _playing == _clips[i]
                         ? Icons.stop_circle_rounded
                         : Icons.play_circle_rounded,
-                    color: AppTheme.primary500),
+                    color: widget.father ? _fatherAccent : AppTheme.primary500),
                 onPressed: () => _play(_clips[i]),
               ),
               Expanded(
@@ -456,7 +476,8 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
                 ? null
                 : () async {
                     final nav = Navigator.of(context);
-                    await JournalStore.instance.addEntry(JournalEntry(
+                    await (widget.onAdd ?? JournalStore.instance.addEntry)(
+                        JournalEntry(
                       id: 'v_${DateTime.now().microsecondsSinceEpoch}',
                       type: JournalEntryType.voice,
                       title: s.jcVoiceNote,
@@ -470,6 +491,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
           ),
         ),
       ]),
+      father: widget.father,
     );
   }
 }
@@ -477,17 +499,40 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
 // ---------------------------------------------------------------------------
 //  Small shared sheet helpers
 // ---------------------------------------------------------------------------
-Widget _sheetWrap(BuildContext ctx, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-        child: SafeArea(top: false, child: child),
+// Slate accent for the father compose sheets (matches father_skin / Father
+// Daily). When [father] is set, the sheet re-tints the theme so the cursor,
+// text selection and the Save button follow Slate instead of the app's purple.
+const Color _fatherAccent = Color(0xFF2E5266);
+
+Widget _sheetWrap(BuildContext ctx, Widget child, {bool father = false}) {
+  final base = Padding(
+    padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+    child: Container(
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-    );
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+      child: SafeArea(top: false, child: child),
+    ),
+  );
+  if (!father) return base;
+  final t = Theme.of(ctx);
+  return Theme(
+    data: t.copyWith(
+      colorScheme: t.colorScheme.copyWith(primary: _fatherAccent),
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: _fatherAccent,
+        selectionColor: Color(0x332E5266),
+        selectionHandleColor: _fatherAccent,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(backgroundColor: _fatherAccent),
+      ),
+    ),
+    child: base,
+  );
+}
 
 Widget _grip() => Center(
       child: Container(
@@ -498,11 +543,23 @@ Widget _grip() => Center(
       ),
     );
 
-InputDecoration _fieldDeco(String hint, {Widget? suffix}) => InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: AppTheme.surfaceContainer,
-      suffixIcon: suffix,
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-    );
+InputDecoration _fieldDeco(String hint, {Widget? suffix, bool father = false}) {
+  final base = InputDecoration(
+    hintText: hint,
+    filled: true,
+    fillColor: AppTheme.surfaceContainer,
+    suffixIcon: suffix,
+    border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+  );
+  if (!father) return base;
+  // Father: pin the borders to Slate so the focus ring doesn't fall back to
+  // the app's purple input theme.
+  return base.copyWith(
+    enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+    focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: _fatherAccent, width: 2)),
+  );
+}

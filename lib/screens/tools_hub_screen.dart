@@ -15,6 +15,8 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'bump_journey_screen.dart';
 import 'can_i_screen.dart';
+import 'father/father_journal_screen.dart';
+import 'father/father_stories_screen.dart';
 import 'garbh_screen.dart';
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
@@ -100,6 +102,13 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => DueDateCalculatorScreen(controller: controller))),
       _Tool(s.vedaToolTitle, Icons.auto_awesome_rounded, AppTheme.primary600,
           () => open(() => AskVedaScreen(controller: controller))),
+      // Father's "Stories, Fables & Mythology" collection — parked here for now
+      // (accessible while we decide its final home for the father product).
+      _Tool('Stories, Fables & Mythology', Icons.history_edu_rounded,
+          const Color(0xFFE0915B), () => open(() => const FatherStoriesScreen())),
+      // Father's simple journal (memory / note / photo / voice) — separate store.
+      _Tool("Father's Journal", Icons.menu_book_rounded, const Color(0xFF2E5266),
+          () => open(() => FatherJournalScreen(controller: controller))),
     ];
 
     return Container(

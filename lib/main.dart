@@ -16,6 +16,7 @@ import 'services/read_next_store.dart';
 import 'services/father_content_controller.dart';
 import 'services/home_content_controller.dart';
 import 'services/hospital_bag_store.dart';
+import 'services/father_journal_store.dart';
 import 'services/journal_store.dart';
 import 'services/medicine_store.dart';
 import 'services/memory_store.dart';
@@ -96,6 +97,8 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     ReadNextStore.instance.init();
     // Load My Journal entries.
     JournalStore.instance.init();
+    // Load the father's separate journal entries.
+    FatherJournalStore.instance.init();
     // Load My Calendar personal events.
     CalendarStore.instance.init();
     // Load My Bump Journey photos.

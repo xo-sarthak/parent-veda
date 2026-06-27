@@ -23,6 +23,7 @@ import '../services/video_store.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
 import 'bump_journey_screen.dart';
+import 'father/father_daily_screen.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 import 'saved_hub_screen.dart';
@@ -240,15 +241,23 @@ class ProfileScreen extends StatelessWidget {
           .setBool(kAuthCompletedKey, false);
     } catch (_) {/* best-effort */}
     nav.push(MaterialPageRoute(
-      builder: (_) => AuthFlowScreen(onDone: (due) async {
+      builder: (_) => AuthFlowScreen(onDone: (due, isFather) async {
         try {
-          await (await SharedPreferences.getInstance())
-              .setBool(kAuthCompletedKey, true);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(kAuthCompletedKey, true);
+          await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
         } catch (_) {/* best-effort */}
         // PINNED TO WEEK 20 (testing): disabled so re-login can't move the week.
         // Re-enable with the load() restore block in pregnancy_controller.dart.
-        // if (due != null) await controller.setDueDate(due);
-        nav.pop();
+        // if (!isFather && due != null) await controller.setDueDate(due);
+        if (isFather) {
+          // Paired as the father → swap the app for the Father Daily screen.
+          nav.pushReplacement(
+              MaterialPageRoute(
+                  builder: (_) => FatherDailyScreen(controller: controller)));
+        } else {
+          nav.pop(); // back to the mother app
+        }
       }),
     ));
   }

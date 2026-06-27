@@ -9,6 +9,8 @@
 //  (Success → "Get started"), so the caller can enter the app.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +28,9 @@ const _muted = Color(0xFF7B6B8E);
 const _muted2 = Color(0xFF857591);
 const _label = Color(0xFF8B7AA0);
 const _pink = Color(0xFFC2407A);
+// Partner (father) accent — teal, from the Partner Pairing design.
+const _teal = Color(0xFF1F9E86);
+const _tealDeep = Color(0xFF1B9079);
 const _fieldBg = Color(0xFFF7F2FD);
 const _fieldBorder = Color(0x297C3FC4);
 const _hint = Color(0xFFB6A9C6);
@@ -50,12 +55,17 @@ const _facebookSvg =
 /// sign-out clears it to replay the flow.
 const String kAuthCompletedKey = 'auth_completed';
 
+/// Shared-prefs key storing the chosen role: 'mother' (default) or 'father'.
+/// Set when the auth flow completes; Splash reads it to route the right home.
+const String kUserRoleKey = 'user_role';
+
 class AuthFlowScreen extends StatefulWidget {
   const AuthFlowScreen({super.key, required this.onDone});
 
-  /// Fired when auth completes (Success → "Get started"), with the due date the
-  /// mother optionally picked on the Profile step (null if she skipped it).
-  final void Function(DateTime? dueDate) onDone;
+  /// Fired when auth completes, with the due date the mother optionally picked
+  /// on the Profile step (null if skipped / father), and [isFather] = true when
+  /// the user paired in via a partner code. The caller routes the right home.
+  final void Function(DateTime? dueDate, bool isFather) onDone;
 
   @override
   State<AuthFlowScreen> createState() => _AuthFlowScreenState();
@@ -70,13 +80,17 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   final _password = TextEditingController();
   final _name = TextEditingController();
   final _confirm = TextEditingController();
+  final _code = TextEditingController(); // partner pairing code (father path)
   final _otp = List.generate(5, (_) => TextEditingController());
   final _otpNodes = List.generate(5, (_) => FocusNode());
+  Timer? _pairTimer; // drives the "Pairing…" → "Paired!" auto-advance
 
   static const _backMap = {
     'login': 'welcome',
     'signup': 'welcome',
-    'profile': 'signup',
+    'role': 'welcome',
+    'profile': 'role',
+    'pairCode': 'role',
     'forgot': 'login',
     'otp': 'forgot',
     'reset': 'otp',
@@ -85,7 +99,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
   @override
   void dispose() {
-    for (final c in [_email, _password, _name, _confirm, ..._otp]) {
+    _pairTimer?.cancel();
+    for (final c in [_email, _password, _name, _confirm, _code, ..._otp]) {
       c.dispose();
     }
     for (final n in _otpNodes) {
@@ -107,7 +122,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canBack = _screen != 'welcome';
+    final canBack =
+        _screen != 'welcome' && _screen != 'pairing' && _screen != 'paired';
     return Scaffold(
       backgroundColor: _bg,
       body: Stack(children: [
@@ -166,8 +182,16 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         return _login();
       case 'signup':
         return _signup();
+      case 'role':
+        return _role();
       case 'profile':
         return _profile();
+      case 'pairCode':
+        return _pairCode();
+      case 'pairing':
+        return _pairing();
+      case 'paired':
+        return _paired();
       case 'forgot':
         return _forgot();
       case 'otp':
@@ -289,7 +313,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   color: _pink),
             ),
             const SizedBox(height: 8),
-            _primaryBtn('Log in', () => _go('success')),
+            _primaryBtn('Log in', () => _go('role')),
             _orDivider('OR'),
             _socialRow(),
           ]),
@@ -314,7 +338,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const SizedBox(height: 14),
             _field(_password, 'Password', 'Create a password', obscure: true),
             const SizedBox(height: 6),
-            _primaryBtn('Continue', () => _go('profile')),
+            _primaryBtn('Continue', () => _go('role')),
             const SizedBox(height: 12),
             RichText(
               textAlign: TextAlign.center,
@@ -415,6 +439,337 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       ),
     );
   }
+
+  // ===========================================================================
+  //  ROLE — mother vs father (shown after login/signup; the father branch
+  //  diverges into partner pairing, the mother continues to Profile).
+  // ===========================================================================
+  Widget _role() => _formScroll([
+        const SizedBox(height: 8),
+        _centeredHeader('Who are you here as?',
+            "We'll set up the right experience for you.",
+            showLogo: false),
+        const SizedBox(height: 26),
+        _roleCard(
+          title: "I'm the mother",
+          subtitle: 'Track your pregnancy & journey',
+          icon: Icons.pregnant_woman_rounded,
+          accent: _purple,
+          accentBg: const Color(0x1A7C3FC4),
+          onTap: () => _go('profile'),
+        ),
+        const SizedBox(height: 13),
+        _roleCard(
+          title: "I'm the father",
+          subtitle: 'I have a partner code',
+          icon: Icons.favorite_rounded,
+          accent: _teal,
+          accentBg: const Color(0x1A1F9E86),
+          onTap: () => _go('pairCode'),
+        ),
+      ]);
+
+  Widget _roleCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color accent,
+    required Color accentBg,
+    required VoidCallback onTap,
+  }) =>
+      Material(
+        color: const Color(0xC7FFFFFF),
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                  color: accent.withValues(alpha: 0.22), width: 1.5),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0x144C1D78),
+                    blurRadius: 26,
+                    offset: Offset(0, 10)),
+              ],
+            ),
+            child: Row(children: [
+              Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: accentBg, borderRadius: BorderRadius.circular(14)),
+                child: Icon(icon, color: accent, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.w800,
+                              color: _ink)),
+                      const SizedBox(height: 3),
+                      Text(subtitle,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: _muted2)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded,
+                  color: accent.withValues(alpha: 0.6)),
+            ]),
+          ),
+        ),
+      );
+
+  // ===========================================================================
+  //  PAIR CODE — father enters the code the mother shared (front-end stub:
+  //  any code of 4+ chars proceeds; no backend yet).
+  // ===========================================================================
+  Widget _pairCode() => _formScroll([
+        const SizedBox(height: 8),
+        _centeredHeader('Enter your pairing code',
+            'You can find the pairing code in the message your partner sent you.',
+            showLogo: false),
+        const SizedBox(height: 18),
+        _glass(
+          child: Column(children: [
+            _codeField(),
+            const SizedBox(height: 14),
+            _gatedBtn(
+                'Continue', _code.text.trim().length >= 4, _startPairing),
+            const SizedBox(height: 8),
+            Center(
+                child: _link('Contact support', () => _soon('Support'),
+                    color: _pink)),
+          ]),
+        ),
+      ]);
+
+  Widget _codeField() =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Pairing code',
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 12.5, fontWeight: FontWeight.w700, color: _label)),
+        const SizedBox(height: 7),
+        TextField(
+          controller: _code,
+          onChanged: (_) => setState(() {}),
+          autocorrect: false,
+          textCapitalization: TextCapitalization.characters,
+          inputFormatters: [_UpperCaseFormatter()],
+          style: GoogleFonts.plusJakartaSans(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2.2,
+              color: _ink),
+          decoration: InputDecoration(
+            hintText: 'e.g. 0XOS1U',
+            hintStyle: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.4,
+                color: _hint),
+            filled: true,
+            fillColor: _fieldBg,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: _fieldBorder, width: 2)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: _purple, width: 2)),
+          ),
+        ),
+      ]);
+
+  void _startPairing() {
+    if (_code.text.trim().length < 4) return;
+    _go('pairing');
+    _pairTimer?.cancel();
+    _pairTimer = Timer(const Duration(milliseconds: 2200), () {
+      if (mounted) _go('paired');
+    });
+  }
+
+  // ===========================================================================
+  //  PAIRING — loading beat while we "connect" the two accounts.
+  // ===========================================================================
+  Widget _pairing() => SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height - 140),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 58,
+                height: 58,
+                child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    valueColor: AlwaysStoppedAnimation(_purple)),
+              ),
+              const SizedBox(height: 26),
+              Text('Pairing you with your partner…',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 17, fontWeight: FontWeight.w800, color: _ink)),
+              const SizedBox(height: 10),
+              Text(_code.text.trim().toUpperCase(),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.4,
+                      color: _muted)),
+            ],
+          ),
+        ),
+      );
+
+  // ===========================================================================
+  //  PAIRED — success; "Continue" enters the app as the father.
+  // ===========================================================================
+  Widget _paired() => SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height - 120),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _pairedBadge(),
+              const SizedBox(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _legendDot(_teal, 'Your partner'),
+                const SizedBox(width: 20),
+                _legendDot(_purple, 'You'),
+              ]),
+              const SizedBox(height: 26),
+              Text("You're now paired with\nyour partner.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 25,
+                      height: 1.25,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                      color: _ink)),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 280,
+                child: Text(
+                  "We're here to help you support her and understand her journey better.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      height: 1.55,
+                      fontWeight: FontWeight.w500,
+                      color: _muted),
+                ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: 220,
+                child: _primaryBtn(
+                    'Continue', () => widget.onDone(null, true)),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _pairedBadge() => SizedBox(
+        width: 150,
+        height: 150,
+        child: Stack(alignment: Alignment.center, children: [
+          Container(
+            width: 150,
+            height: 150,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                  colors: [Color(0x33A24DD6), Color(0x00A24DD6)]),
+            ),
+          ),
+          ShaderMask(
+            shaderCallback: (r) => const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [_teal, _purple],
+            ).createShader(r),
+            child: const Icon(Icons.favorite_rounded,
+                size: 96, color: Colors.white),
+          ),
+        ]),
+      );
+
+  Widget _legendDot(Color c, String label) =>
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+            width: 9,
+            height: 9,
+            decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+        const SizedBox(width: 7),
+        Text(label,
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: c == _teal ? _tealDeep : _purpleDeep)),
+      ]);
+
+  // A primary button that fades out + ignores taps until [enabled].
+  Widget _gatedBtn(String label, bool enabled, VoidCallback onTap) => SizedBox(
+        width: double.infinity,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: enabled
+                ? const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [_purple, _purpleDeep])
+                : null,
+            color: enabled ? null : const Color(0x2E7C3FC4),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: enabled
+                ? const [
+                    BoxShadow(
+                        color: Color(0x4D5E2AA3),
+                        blurRadius: 26,
+                        offset: Offset(0, 12)),
+                  ]
+                : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: enabled ? onTap : null,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Text(label,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: enabled
+                              ? Colors.white
+                              : Colors.white.withValues(alpha: 0.85))),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 
   // ===========================================================================
   //  FORGOT
@@ -562,8 +917,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const SizedBox(height: 30),
               SizedBox(
                 width: 200,
-                child:
-                    _primaryBtn('Get started', () => widget.onDone(_pickedDue)),
+                child: _primaryBtn(
+                    'Get started', () => widget.onDone(_pickedDue, false)),
               ),
             ],
           ),
@@ -846,6 +1201,17 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 }
 
 // ---- small visual pieces ---------------------------------------------------
+
+// Forces the pairing-code field to upper case as the user types.
+class _UpperCaseFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+          TextEditingValue oldValue, TextEditingValue newValue) =>
+      TextEditingValue(
+        text: newValue.text.toUpperCase(),
+        selection: newValue.selection,
+      );
+}
 
 class _Dot extends StatelessWidget {
   const _Dot(

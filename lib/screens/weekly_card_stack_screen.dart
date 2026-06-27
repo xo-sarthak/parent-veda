@@ -13,8 +13,10 @@ import '../app_constants.dart';
 import '../localization/app_language.dart';
 import '../services/app_nav.dart';
 import '../services/baby_voice_service.dart';
+import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../theme/father_skin.dart';
 import '../widgets/cards/card_shell.dart';
 import '../widgets/locked_week_view.dart';
 import '../widgets/week_cards/celebration_card.dart';
@@ -54,11 +56,14 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   void initState() {
     super.initState();
     _c.addListener(_onControllerChanged);
+    // Re-skin live when the testing Mom|Dad switch flips.
+    FatherPreview.instance.addListener(_onControllerChanged);
   }
 
   @override
   void dispose() {
     _c.removeListener(_onControllerChanged);
+    FatherPreview.instance.removeListener(_onControllerChanged);
     // Stop any baby voice when this screen goes away (tab switch, pop, etc.) so
     // narration never keeps playing after you leave.
     BabyVoiceService.instance.stop();
@@ -83,6 +88,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   /// Classic ⟷ New (V2) toggle for the week-20 flow preview.
   Widget _v2Toggle() {
     final s = S(_c.language);
+    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
     Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -90,14 +96,18 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
             duration: const Duration(milliseconds: 180),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: on ? AppTheme.primary500 : Colors.transparent,
+              color: on
+                  ? (father ? kFAccent : AppTheme.primary500)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(99),
             ),
             child: Text(label,
                 style: GoogleFonts.manrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: on ? Colors.white : AppTheme.neutral500)),
+                    color: on
+                        ? Colors.white
+                        : (father ? kFMuted : AppTheme.neutral500))),
           ),
         );
     return Center(
@@ -105,7 +115,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
         margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer,
+          color: father ? kFAccentSoft : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(99),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -120,6 +130,8 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   /// the mirror of the Home → weekly hop, so the loop feels two-way.
   Widget _backToDaily() {
     final s = S(_c.language);
+    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
+    final tint = father ? kFAccent : AppTheme.primary600;
     return Center(
       child: GestureDetector(
         onTap: AppNav.instance.goToday,
@@ -128,18 +140,15 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           margin: const EdgeInsets.only(left: 4, right: 2),
           padding: const EdgeInsets.fromLTRB(7, 6, 11, 6),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceContainer,
+            color: father ? kFAccentSoft : AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(99),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.chevron_left_rounded,
-                size: 16, color: AppTheme.primary600),
+            Icon(Icons.chevron_left_rounded, size: 16, color: tint),
             const SizedBox(width: 1),
             Text(s.weeklyBackToDaily,
                 style: GoogleFonts.manrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary600)),
+                    fontSize: 11.5, fontWeight: FontWeight.w700, color: tint)),
           ]),
         ),
       ),
@@ -148,8 +157,12 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Father weekly re-skin (Slate) — colours/fonts only, week-20 + Dad switch.
+    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
     return Scaffold(
+      backgroundColor: father ? kFBg : null,
       appBar: AppBar(
+        backgroundColor: father ? kFBg : null,
         titleSpacing: 16,
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -163,12 +176,14 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                 'ParentVeda',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.primary600,
-                  letterSpacing: -0.5,
-                ),
+                style: father
+                    ? fatherSerif(18, weight: FontWeight.w700)
+                    : GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.primary600,
+                        letterSpacing: -0.5,
+                      ),
               ),
             ),
           ],
@@ -195,13 +210,16 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                     height: 42,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppTheme.primary500.withValues(alpha: 0.08),
+                      color: (father ? kFAccent : AppTheme.primary500)
+                          .withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
                       size: 20,
-                      color: muted ? AppTheme.neutral400 : AppTheme.primary600,
+                      color: muted
+                          ? AppTheme.neutral400
+                          : (father ? kFAccent : AppTheme.primary600),
                     ),
                   ),
                 ),
@@ -236,12 +254,13 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
     final selectedWeek = _c.selectedWeek;
     _builtForWeek ??= selectedWeek;
+    final father = FatherPreview.instance.on && selectedWeek == 20;
 
     final selRange = _c.weekDates(selectedWeek);
     final dateText = _fmtRange(selRange.start, selRange.end);
 
     // The compact week bar (design): current week ±2 on one row, dots between.
-    final strip = _WeekBar(controller: _c);
+    final strip = _WeekBar(controller: _c, father: father);
 
     return NestedScrollView(
       headerSliverBuilder: (context, innerScrolled) => [
@@ -256,6 +275,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
               controller: _c,
               strip: strip,
               dateText: dateText,
+              father: father,
               compactHeight: _compactHeaderHeight,
               stripHeight: _stripHeaderHeight,
             ),
@@ -510,6 +530,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.controller,
     required this.strip,
     required this.dateText,
+    required this.father,
     required this.compactHeight,
     required this.stripHeight,
   });
@@ -517,6 +538,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
   final PregnancyController controller;
   final Widget strip;
   final String dateText;
+  final bool father;
   final double compactHeight;
   final double stripHeight;
 
@@ -540,7 +562,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
         (week / PregnancyController.lastContentWeek).clamp(0.0, 1.0);
 
     return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: father ? kFBg : Theme.of(context).scaffoldBackgroundColor,
       // A hairline that fades in as the strip collapses, separating the pinned
       // header from the scrolling cards beneath.
       child: Column(
@@ -564,11 +586,13 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                           s.trimesterName(week),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.primary900,
-                          ),
+                          style: father
+                              ? fatherSerif(20, weight: FontWeight.w700)
+                              : GoogleFonts.plusJakartaSans(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.primary900,
+                                ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -577,7 +601,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         style: GoogleFonts.manrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.secondary500,
+                          color: father ? kFAccent2 : AppTheme.secondary500,
                         ),
                       ),
                     ],
@@ -590,7 +614,18 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Container(
                           height: 9,
                           decoration: BoxDecoration(
-                            color: AppTheme.primary500.withValues(alpha: 0.14),
+                            // Father: a translucent slate→amber "ghost" of the
+                            // full bar, so you can see where it ends — a touch of
+                            // depth. Mother keeps its flat faint track.
+                            gradient: father
+                                ? LinearGradient(colors: [
+                                    kFAccent.withValues(alpha: 0.34),
+                                    kFAccent2.withValues(alpha: 0.34),
+                                  ])
+                                : null,
+                            color: father
+                                ? null
+                                : AppTheme.primary500.withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: FractionallySizedBox(
@@ -598,11 +633,13 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                             widthFactor: progress,
                             child: Container(
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    AppTheme.primary500,
-                                    AppTheme.primary400
-                                  ],
+                                gradient: LinearGradient(
+                                  colors: father
+                                      ? const [kFAccent, kFAccent2]
+                                      : const [
+                                          AppTheme.primary500,
+                                          AppTheme.primary400
+                                        ],
                                 ),
                                 borderRadius: BorderRadius.circular(999),
                               ),
@@ -616,7 +653,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         style: GoogleFonts.manrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary600,
+                          color: father ? kFAccent : AppTheme.primary600,
                         ),
                       ),
                     ],
@@ -651,6 +688,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
       old.dateText != dateText ||
       old.controller.selectedWeek != controller.selectedWeek ||
       old.controller.language != controller.language ||
+      old.father != father ||
       old.compactHeight != compactHeight ||
       old.stripHeight != stripHeight;
 }
@@ -826,8 +864,9 @@ class _WeekStripState extends State<_WeekStrip> {
 /// week a filled purple disc. Scrolls left/right to browse; tap to switch; the
 /// selected week auto-centres.
 class _WeekBar extends StatefulWidget {
-  const _WeekBar({required this.controller});
+  const _WeekBar({required this.controller, this.father = false});
   final PregnancyController controller;
+  final bool father;
   @override
   State<_WeekBar> createState() => _WeekBarState();
 }
@@ -875,6 +914,9 @@ class _WeekBarState extends State<_WeekBar> {
     final c = widget.controller;
     final weeks = c.availableWeeks;
     if (weeks.isEmpty) return const SizedBox.shrink();
+    final father = widget.father;
+    final connector =
+        father ? const Color(0xFFCBD6DA) : const Color(0xFFD8CAEC);
     return SingleChildScrollView(
       controller: _sc,
       scrollDirection: Axis.horizontal,
@@ -888,11 +930,12 @@ class _WeekBarState extends State<_WeekBar> {
               locked: c.isLocked(weeks[i]),
               isCurrent: weeks[i] == c.currentWeek,
               isSelected: weeks[i] == c.selectedWeek,
+              father: father,
               onTap: () => c.selectWeek(weeks[i]),
             ),
           ),
           if (i < weeks.length - 1)
-            const SizedBox(
+            SizedBox(
               width: 16,
               child: Center(
                 child: SizedBox(
@@ -900,7 +943,7 @@ class _WeekBarState extends State<_WeekBar> {
                   height: 4,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                        color: Color(0xFFD8CAEC), shape: BoxShape.circle),
+                        color: connector, shape: BoxShape.circle),
                   ),
                 ),
               ),
@@ -936,6 +979,7 @@ class _WeekDot extends StatelessWidget {
     required this.isCurrent,
     required this.isSelected,
     required this.onTap,
+    this.father = false,
   });
 
   final int week;
@@ -943,10 +987,12 @@ class _WeekDot extends StatelessWidget {
   final bool isCurrent;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool father;
 
   @override
   Widget build(BuildContext context) {
-    // Selected week — a filled purple disc with a soft glow (design).
+    final accent = father ? kFAccent : AppTheme.primary500;
+    // Selected week — a filled disc with a soft glow (design).
     if (isSelected) {
       return GestureDetector(
         onTap: onTap,
@@ -959,11 +1005,11 @@ class _WeekDot extends StatelessWidget {
             height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppTheme.primary500,
+              color: accent,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primary500.withValues(alpha: 0.30),
+                  color: accent.withValues(alpha: 0.30),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -981,10 +1027,10 @@ class _WeekDot extends StatelessWidget {
         ),
       );
     }
-    // Other weeks — a soft number; the current week gets a small purple dot.
+    // Other weeks — a soft number; the current week gets a small accent dot.
     final color = locked
         ? AppTheme.neutral300
-        : (isCurrent ? AppTheme.primary500 : AppTheme.neutral400);
+        : (isCurrent ? accent : (father ? kFMuted : AppTheme.neutral400));
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -1005,8 +1051,8 @@ class _WeekDot extends StatelessWidget {
               Container(
                 width: 5,
                 height: 5,
-                decoration: const BoxDecoration(
-                    color: AppTheme.primary500, shape: BoxShape.circle),
+                decoration:
+                    BoxDecoration(color: accent, shape: BoxShape.circle),
               ),
             ],
           ],

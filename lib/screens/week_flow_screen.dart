@@ -25,9 +25,29 @@ import '../models/journey_node.dart';
 import '../models/symptom.dart';
 import '../models/week_content.dart';
 import '../services/app_nav.dart';
+import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/week_cards/week_overview_card.dart';
+
+// TESTING-ONLY: when the Dad mode switch is on AND we're on week 20, the weekly
+// flow re-voices its copy for the father (same content, read for/about her).
+// Mother flow + every other week are unchanged. Strip with FatherPreview.
+bool _fatherWeek(int week) => FatherPreview.instance.on && week == 20;
+
+// Slate palette for the father re-skin (mirrors the Father Daily screen). Only
+// used where `_fatherWeek(...)` is true; the mother path never sees these.
+const Color _fBg = Color(0xFFF4EFE8); // warm cream background
+const Color _fLine = Color(0xFFECE5DA);
+const Color _fInk = Color(0xFF22333B); // header ink
+const Color _fMuted = Color(0xFF6A7B82);
+const Color _fAccent = Color(0xFF2E5266); // deep slate (was purple/coral)
+const Color _fAccent2 = Color(0xFFE0915B); // amber highlight
+
+// Father serif header (Fraunces), matching the Father Daily titles.
+TextStyle _fSerif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
+    GoogleFonts.fraunces(
+        fontSize: size, fontWeight: w, color: c, height: 1.18, letterSpacing: -0.2);
 
 // ---------------------------------------------------------------------------
 //  Curated week-20 content (bilingual). Other weeks fall back gracefully.
@@ -462,6 +482,245 @@ const List<LocalizedText> _partnerHelp = [
 ];
 
 // ===========================================================================
+//  FATHER (Dad-preview) WEEK-20 COPY — same content, re-voiced for the partner
+//  reading it for/about her. Used only when _fatherWeek(week) is true; the
+//  mother data above is never touched. Strip with FatherPreview before launch.
+// ===========================================================================
+const LocalizedText _fBabyTitle =
+    LocalizedText(en: 'About your baby', hi: 'Aapke baby ke baare mein');
+const LocalizedText _fBabyBrief = LocalizedText(
+    en: "Your baby is about the size of a banana now, can hear your voice, and is starting to move. Here's what's happening this week.",
+    hi: 'Aapka baby ab lagbhag ek kele jitna hai, aapki awaaz sun sakta hai, aur hilna shuru kar raha hai. Is hafte kya ho raha hai, yahan dekhein.');
+const LocalizedText _fMotherTitle =
+    LocalizedText(en: "How she's doing", hi: 'Woh kaisi hai');
+const LocalizedText _fMotherBrief = LocalizedText(
+    en: "She's in the gentlest stretch of pregnancy — steadier energy, a visible bump, big feelings. Here's how to show up for her this week.",
+    hi: 'Woh pregnancy ke sabse aaramdeh daur mein hai — sthir energy, dikhta hua bump, gehre jazbaat. Is hafte uske liye kaise saath dein, yahan dekhein.');
+const LocalizedText _fNextBrief = LocalizedText(
+    en: "Her 20-week anomaly scan is around now — go together if you can. Here's what's coming up.",
+    hi: 'Uska 20-hafte ka anomaly scan is samay hai — ho sake to saath jaayein. Aage kya aana hai, yahan dekhein.');
+const LocalizedText _fYouThisWeek =
+    LocalizedText(en: 'Her this week', hi: 'Is hafte woh');
+
+// Father trimester section — same topics as the mother's tips, re-voiced as
+// "what she's going through + how you can help" (he isn't in the trimester, so
+// the heading avoids "your trimester tips").
+const LocalizedText _fTipsTitle = LocalizedText(
+    en: 'Supporting her this trimester', hi: 'Is trimester mein uska saath');
+const LocalizedText _fTipsSubtitle = LocalizedText(
+    en: "What she's going through — and how to help",
+    hi: 'Woh kya mehsoos kar rahi hai, aur kaise madad karein');
+
+const List<TrimesterTip> _fTrimesterTips = [
+  TrimesterTip(
+    emoji: '🔍',
+    title: LocalizedText(
+        en: 'Be there for her anomaly scan',
+        hi: 'Uske anomaly scan mein saath rahein'),
+    body: LocalizedText(
+        en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs. Go with her if you can — your presence steadies the nerves these visits can stir. Write the questions down together beforehand. Most findings are reassuring.",
+        hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai. Ho sake to uske saath jaayein — aapki maujoodgi in visits ki ghabraahat sambhaal deti hai. Sawaal pehle se saath likh lein. Zyaadatar findings rahat dene wale hote hain.'),
+  ),
+  TrimesterTip(
+    emoji: '🛌',
+    title: LocalizedText(
+        en: 'Help her sleep on her side',
+        hi: 'Use karwat par sone mein madad karein'),
+    body: LocalizedText(
+        en: "As her bump grows, sleeping on her side — the left is ideal — helps blood and nutrients reach the baby. Slip a pillow between her knees or under the bump. If she wakes up on her back, gently help her settle back onto her side.",
+        hi: 'Jaise-jaise bump badhta hai, karwat (khaaskar baayein) par sona blood aur nutrients ko baby tak pahunchne mein madad karta hai. Ghutno ke beech ya bump ke neeche takiya laga dein. Agar woh peeth ke bal jaag jaaye to pyaar se use wapas karwat par le aayein.'),
+  ),
+  TrimesterTip(
+    emoji: '🥗',
+    title: LocalizedText(
+        en: 'Keep iron & calcium easy for her',
+        hi: 'Iron aur calcium use aasaani se dein'),
+    body: LocalizedText(
+        en: "Her body is building the baby's bones and blood right now. Keep iron (leafy greens, dal, jaggery) and calcium (milk, curd, paneer) within easy reach, and pair iron-rich foods with a little vitamin C. Remind her gently about any supplements the doctor prescribed.",
+        hi: 'Abhi uska shareer baby ki haddiyaan aur khoon bana raha hai. Iron (hari sabziyaan, dal, gud) aur calcium (doodh, dahi, paneer) aaram se haath mein rakhein, aur iron wale khaane ke saath thoda vitamin C dein. Doctor ke diye supplements ke liye use pyaar se yaad dilaate rahein.'),
+  ),
+];
+
+// Father "don't miss" body — points to what's actually on HIS home (daily read,
+// a story to read aloud, a journal prompt — NOT Garbh Sanskar).
+const LocalizedText _fDailyBridgeBody = LocalizedText(
+    en: 'Your daily read, a story to read aloud and a journal prompt are waiting for you on Home.',
+    hi: 'Aapka daily read, baby ko sunane ke liye ek kahaani, aur ek journal prompt aapke Home par taiyaar hain.');
+
+const List<_Article> _babyArticleFather = [
+  _Article(
+      LocalizedText(en: "You're halfway there! 🎉", hi: 'Aap aadhe raaste par hain! 🎉'),
+      LocalizedText(
+          en: "You've reached the middle of the journey together! Baby is growing quickly now, her bump is showing, and any day now she might feel baby move for the very first time.",
+          hi: 'Aap apne safar ke aadhe raaste par pahunch gaye hain! Baby ab tezi se badh raha hai, uska bump dikhne laga hai, aur kisi bhi din woh baby ko pehli baar mehsoos kar sakti hai.')),
+  _Article(
+      LocalizedText(en: 'How big is baby?', hi: 'Baby kitna bada hai?'),
+      LocalizedText(
+          en: "Baby is about the size of a banana now — roughly 25 cm from head to heel and around 300 g. From this week, length is measured head-to-heel instead of head-to-bottom.",
+          hi: 'Baby ab lagbhag ek kele jitna hai — sir se edi tak takreeban 25 cm aur ~300 g. Is hafte se lambai sir-se-edi naapi jaati hai.')),
+  _Article(
+      LocalizedText(en: "She'll feel baby move", hi: 'Woh baby ko mehsoos karegi'),
+      LocalizedText(
+          en: "Baby's first little flutters — called \"quickening\" — often start around now. They feel like bubbles or a gentle tap, and over the next few weeks they'll grow into clear kicks. With a first baby she might feel them a little later — that's completely normal.",
+          hi: 'Baby ki pehli halki harkatein — "quickening" — aksar is samay shuru hoti hain. Yeh bulbule ya halke tap jaisi lagti hain, aur agle kuch hafton mein saaf kicks ban jaayengi. Pehle baby mein woh thodi der se mehsoos kar sakti hai — yeh bilkul normal hai.')),
+  _Article(
+      LocalizedText(en: 'Baby can hear you both now', hi: 'Baby ab aap dono ko sun sakta hai'),
+      LocalizedText(
+          en: "The tiny bones in baby's ears are in place, so baby can hear her voice, yours, the heartbeat and the world around. When you talk, hum or sing, it helps you bond — and baby will often recognise a favourite tune after birth.",
+          hi: 'Baby ke kaano ki nanhi haddiyan ban gayi hain, isliye baby uski awaaz, aapki awaaz, dhadkan aur aas-paas ki duniya sun sakta hai. Jab aap baat karte, gungunaate ya gaate hain, to bonding hoti hai — aur janm ke baad baby aksar pasandeeda dhun pehchaan leta hai.')),
+  _Article(
+      LocalizedText(en: "Baby's tasting her meals", hi: 'Baby uske khaane ka swaad leta hai'),
+      LocalizedText(
+          en: "Baby swallows a little amniotic fluid through the day, and new taste buds pick up the flavours of whatever she eats. A varied, balanced diet now might even shape what baby loves to eat later!",
+          hi: 'Baby din bhar thoda amniotic fluid nigalta hai, aur uski nayi swaad-kaliyan uske khaane ke flavours mehsoos karti hain. Abhi variety wali santulit diet aage baby ke swaad ko bhi bana sakti hai!')),
+  _Article(
+      LocalizedText(en: "Baby's skin, hair and vernix", hi: 'Baby ki tvacha, baal aur vernix'),
+      LocalizedText(
+          en: "A soft creamy coating called vernix and a layer of fine hair (lanugo) are protecting baby's delicate skin. Underneath, baby is building up the fat that will keep them warm and cosy after birth.",
+          hi: 'Vernix naam ki narm creamy parat aur mahin baal (lanugo) baby ki naazuk tvacha ko bacha rahe hain. Iske neeche baby woh fat bana raha hai jo janm ke baad use garm aur aaramdeh rakhega.')),
+  _Article(
+      LocalizedText(en: 'Baby sleeps and wakes', hi: 'Baby sota aur jaagta hai'),
+      LocalizedText(
+          en: "Baby is settling into their own sleep-and-wake cycles, and is often most active just when she lies down to rest! Noticing those patterns is the start of getting to know your little one.",
+          hi: 'Baby apne sone-jaagne ke cycle mein aa raha hai, aur aksar tab sabse zyada active hota hai jab woh aaram karne letti hai! Uske patterns pehchaanna apne nanhe ko jaan-ne ki shuruaat hai.')),
+];
+
+const List<_Fact> _babyScienceFather = [
+  _Fact(
+      '🧠',
+      Color(0xFFF2E9FB),
+      LocalizedText(en: 'A busy little brain', hi: 'Ek vyast nanha dimaag'),
+      LocalizedText(
+          en: "Your baby is forming millions of new nerve connections every single day — that little brain is working at an astonishing pace!",
+          hi: 'Aapka baby har din laakhon naye nerve connections bana raha hai — woh nanha dimaag gajab raftaar se kaam kar raha hai!')),
+  _Fact(
+      '🤏',
+      Color(0xFFFCE3E6),
+      LocalizedText(en: 'A tiny grip', hi: 'Ek nanhi pakad'),
+      LocalizedText(
+          en: "Baby can curl those little fingers and sometimes grabs the umbilical cord — practising for your very first cuddles.",
+          hi: 'Baby apni nanhi ungliyan mod sakta hai aur kabhi gard-naal pakad leta hai — aapki pehli cuddles ki practice kar raha hai.')),
+  _Fact(
+      '🫧',
+      Color(0xFFE6F0FA),
+      LocalizedText(en: 'Baby gets hiccups!', hi: 'Baby ko hichki aati hai!'),
+      LocalizedText(
+          en: "Sometimes she'll feel tiny rhythmic taps — that's just baby having hiccups, and it's completely normal.",
+          hi: 'Kabhi woh chhoti taal-baddh thaap mehsoos karegi — yeh bas baby ki hichki hai, aur bilkul normal hai.')),
+  _Fact(
+      '🦶',
+      Color(0xFFFDF0C4),
+      LocalizedText(en: "Baby's own prints", hi: 'Baby ke apne nishaan'),
+      LocalizedText(
+          en: "Baby's very own fingerprints — and footprints — are forming right now, patterns that will be theirs alone for life.",
+          hi: 'Baby ke apne fingerprints — aur footprints — abhi ban rahe hain, jo zindagi bhar sirf uske honge.')),
+  _Fact(
+      '💗',
+      Color(0xFFEAF1EA),
+      LocalizedText(en: 'A strong heartbeat', hi: 'Ek mazboot dhadkan'),
+      LocalizedText(
+          en: "Baby's heart is pumping hard, moving several litres of blood around that tiny body every single day.",
+          hi: 'Baby ka dil zor se pump kar raha hai, har din kai litre khoon uske nanhe sharir mein ghumata hai.')),
+  _Fact(
+      '🌗',
+      Color(0xFFEDEAF6),
+      LocalizedText(en: 'Baby senses light', hi: 'Baby roshni mehsoos karta hai'),
+      LocalizedText(
+          en: 'Shine a soft light on her bump and baby might turn towards it — those eyes are getting ready to see you both.',
+          hi: 'Uske bump par halki roshni daalein to baby uski taraf mud sakta hai — woh aankhein aap dono ko dekhne ko taiyar ho rahi hain.')),
+];
+
+const List<_Article> _motherArticleFather = [
+  _Article(
+      LocalizedText(en: 'How she might be feeling', hi: 'Woh kaisa mehsoos kar sakti hai'),
+      LocalizedText(
+          en: "The second trimester is often the gentlest stretch of pregnancy — the early nausea has usually eased, her energy is back, and her bump is becoming a lovely, visible reminder of the little one growing inside. Emotionally, though, it can still be a rollercoaster: moments of pure joy, then a wave of worry or tears from nowhere. That's completely normal. Her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
+          hi: "Doosra trimester aksar pregnancy ka sabse aaramdeh hissa hota hai — shuruaati matli kam ho jaati hai, uski energy lautti hai, aur uska bump andar pal rahe nanhe se jeev ki pyaari nishaani ban jaata hai. Lekin emotionally yeh abhi bhi ek rollercoaster ho sakta hai: kabhi khushi ke pal, to kabhi bina baat ke chinta ya aansoo. Yeh bilkul normal hai. Uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
+  _Article(
+      LocalizedText(en: 'Her changing body', hi: 'Uska badalta shareer'),
+      LocalizedText(
+          en: "Around now her womb has risen to about her belly button, and many mothers notice their bump 'pop' this month. A few new aches can come with it — a stretching feeling low in the belly, a little backache, or the odd dizzy moment. None of it means something is wrong; her body is simply making room. Moving gently, standing up slowly, and resting all help — and so does your hand to lean on.",
+          hi: "Is samay tak uski kokh lagbhag naabhi tak aa jaati hai, aur kai maaein is mahine apna bump 'pop' hote dekhti hain. Iske saath kuch nayi takleefein aa sakti hain — pet ke nichle hisse mein khinchaav, halka kamar dard, ya kabhi chakkar. In mein se kuch bhi galat nahi hai; uska shareer bas jagah bana raha hai. Halki harkat, dheere uthna, aur aaram — sab madad karte hain, aur aapka sahara bhi.")),
+  _Article(
+      LocalizedText(en: 'The first flutters', hi: 'Pehli halki harkatein'),
+      LocalizedText(
+          en: "Week 20 is famous for one magical milestone — the first movements, often called 'quickening'. They can feel like bubbles, a gentle tap, or a tiny flutter, and are easy to miss at first. Over the coming weeks they grow into unmistakable kicks. If she hasn't felt anything yet, there's no need to worry — a first pregnancy or the position of the placenta can both delay it, and it will come.",
+          hi: "Hafta 20 ek jaadui padaav ke liye mashhoor hai — pehli harkatein, jise aksar 'quickening' kehte hain. Yeh bulbule, halke tap, ya chhoti si phurphuri jaisi lag sakti hain, aur pehle inhe pakadna mushkil hota hai. Aane wale hafton mein yeh saaf kicks ban jaati hain. Agar abhi tak use kuch mehsoos nahi hua to chinta ki baat nahi — pehli pregnancy ya placenta ki position dono isse thoda der kar sakti hain, aur yeh zaroor aayegi.")),
+  _Article(
+      LocalizedText(en: 'How to be there for her', hi: 'Uske liye kaise saath dein'),
+      LocalizedText(
+          en: "This is a beautiful time to help her slow down and connect — a few quiet minutes with a hand on the bump, a short walk together, a proper night's sleep. Ask how she's feeling and really listen. Looking after her calm is one of the very best things you can do for your baby right now.",
+          hi: 'Yeh use dheere hone aur judne mein madad karne ka khoobsurat samay hai — bump par haath rakhe kuch shaant pal, saath mein ek chhoti si sair, ya bharpoor neend. Poochein woh kaisa mehsoos kar rahi hai aur dhyaan se sunein. Uske sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakte hain unmein se ek hai.')),
+];
+
+const List<_MotherTopic> _motherTopicsFather = [
+  _MotherTopic(
+      '🌀',
+      LocalizedText(en: 'Hormones', hi: 'Hormones'),
+      LocalizedText(
+          en: 'Levels are steadier now — she may have more energy.',
+          hi: 'Ab levels sthir hain — use zyada urja ho sakti hai.'),
+      LocalizedText(
+          en: "After the ups and downs of the first trimester, her hormones settle into a steadier rhythm. Many women feel a welcome lift in energy and mood — the 'pregnancy glow' often shows up around now.",
+          hi: 'Pehli trimester ke utaar-chadhaav ke baad uske hormones sthir ho jaate hain. Kai mahilaon ko urja aur mood mein sudhaar mehsoos hota hai — "pregnancy glow" aksar abhi dikhta hai.')),
+  _MotherTopic(
+      '🤰',
+      LocalizedText(en: 'Her bump', hi: 'Uska bump'),
+      LocalizedText(
+          en: 'The top of her uterus reaches her belly button.',
+          hi: 'Uske uterus ka upri hissa naabhi tak pahunchta hai.'),
+      LocalizedText(
+          en: "Her uterus has grown to about the level of her navel, so the bump is clearly showing now. Roomier clothes and a supportive bra help, and sleeping on her side becomes the comfiest position from here on — keep a pillow handy for between the knees.",
+          hi: 'Uska uterus lagbhag naabhi tak badh gaya hai, isliye bump ab saaf dikhta hai. Khule kapde aur supportive bra aaram dete hain, aur ab karwat par sona sabse aaramdayak hota hai — ghutno ke beech takiya paas rakhein.')),
+  _MotherTopic(
+      '🦋',
+      LocalizedText(en: 'First movements', hi: 'Pehli harkatein'),
+      LocalizedText(
+          en: 'She may feel the first gentle flutters (quickening).',
+          hi: 'Woh pehli halki harkatein (quickening) mehsoos kar sakti hai.'),
+      LocalizedText(
+          en: "Those first movements — called 'quickening' — often arrive around week 20. They can feel like bubbles, a light tap or butterflies, and will be irregular at first. Over the coming weeks they grow stronger and more regular. First-time mums sometimes feel them a little later — perfectly normal.",
+          hi: 'Pehli harkatein — "quickening" — aksar hafta 20 ke aas-paas aati hain. Yeh bulbule, halki thaap ya titli jaisi lag sakti hain, aur pehle anyamit hoti hain. Aage chal kar yeh mazboot aur niyamit ho jaati hain.')),
+  _MotherTopic(
+      '✨',
+      LocalizedText(en: 'Skin & body', hi: 'Tvacha & sharir'),
+      LocalizedText(
+          en: 'More blood flow brings a warm glow and fuller hair.',
+          hi: 'Zyada blood flow se glow aur ghane baal.'),
+      LocalizedText(
+          en: 'The extra blood her body is making can give her skin a warm glow and her hair a fuller look. Some women notice a dark line down the belly (linea nigra) or slight skin changes — these are normal and usually fade after birth.',
+          hi: 'Uska sharir jo zyada khoon bana raha hai usse tvacha mein glow aur baal ghane lagte hain. Kuch mahilaon ko pet par gehri rekha (linea nigra) dikhti hai — yeh normal hai aur janm ke baad aksar mit jaati hai.')),
+  _MotherTopic(
+      '💗',
+      LocalizedText(en: 'Heart & breath', hi: 'Dil & saans'),
+      LocalizedText(
+          en: 'Her heart works harder — she may feel breathless.',
+          hi: 'Uska dil zyada kaam karta hai — saans phool sakti hai.'),
+      LocalizedText(
+          en: 'Her heart is now pumping much more blood than usual, so she may feel a little breathless on the stairs or notice her heart racing at times. Let her move at her own pace, rest when she needs to, and keep water close by.',
+          hi: 'Uska dil ab pehle se kahin zyada khoon pump kar raha hai, isliye seedhi chadhte hue saans phool sakti hai ya dil tez dhadak sakta hai. Use apni raftaar se chalne dein, zaroorat par aaram, aur paani paas rakhein.')),
+  _MotherTopic(
+      '🤕',
+      LocalizedText(en: 'Aches & twinges', hi: 'Dard & khinchaav'),
+      LocalizedText(
+          en: 'Round-ligament twinges as her bump stretches.',
+          hi: 'Bump khinchne se round-ligament khinchaav.'),
+      LocalizedText(
+          en: "She may feel occasional sharp twinges low on the sides of the bump — round-ligament pain — as the ligaments supporting her growing uterus stretch. It's usually brief and harmless; moving slowly helps. Anything severe or persistent is worth a mention to her doctor.",
+          hi: 'Bump ke nichle hisson mein kabhi-kabhi tez khinchaav mehsoos ho sakta hai — round-ligament pain — jab badhte uterus ko sambhalne wale ligaments khinchte hain. Yeh aksar thodi der ka aur harmless hota hai; dheere position badalna madad karta hai. Kuch tez ya lagataar ho to doctor ko batayein.')),
+];
+
+// Father versions of the two tint cards on the mother read (self-care/reassurance).
+const LocalizedText _fHelpTitle =
+    LocalizedText(en: 'How to help', hi: 'Kaise madad karein');
+const LocalizedText _fHelpBody = LocalizedText(
+    en: "Run her a bath, take a chore off her plate, and make sure she's resting on her side. Small, specific help lands bigger than grand gestures right now.",
+    hi: 'Uske liye bath chalayein, koi ek kaam apne zimme lein, aur dhyaan rakhein ki woh karwat par aaram kare. Abhi chhoti, theek madad badi baaton se zyada maayne rakhti hai.');
+const LocalizedText _fReassureBody = LocalizedText(
+    en: "These ups and downs are normal — your steady, calm presence is exactly what she needs most this week.",
+    hi: 'Yeh utaar-chadhaav normal hain — aapka sthir, shaant saath hi is hafte use sabse zyada chahiye.');
+
+// ===========================================================================
 //  The vertical flow
 // ===========================================================================
 class WeekFlowView extends StatelessWidget {
@@ -471,47 +730,56 @@ class WeekFlowView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      // Also listen to FatherPreview so flipping the Dad switch re-flows week 20.
+      animation: Listenable.merge([controller, FatherPreview.instance]),
       builder: (context, _) {
         final w = controller.weekData(controller.selectedWeek);
         if (w == null) return const SizedBox.shrink();
         final lang = controller.language;
         final s = S(lang);
-        return ListView(
+        final father = _fatherWeek(w.week);
+        final list = ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
           children: [
-            WeekSizeHero(w: w, lang: lang),
+            WeekSizeHero(w: w, lang: lang, father: father),
             const SizedBox(height: 18),
             // S2 — Weekly video.
-            WeekVideoCard(w: w, lang: lang),
+            WeekVideoCard(w: w, lang: lang, father: father),
             const SizedBox(height: 14),
             // S3 — About baby → Baby Science pop-up.
             _SectionBrief(
               icon: Icons.child_care_rounded,
-              color: AppTheme.primary500,
-              title: s.wfBabySection,
-              brief: w.development.whatImDoing.of(lang),
+              color: father ? _fAccent : AppTheme.primary500,
+              title: father ? _fBabyTitle.of(lang) : s.wfBabySection,
+              brief: father
+                  ? _fBabyBrief.of(lang)
+                  : w.development.whatImDoing.of(lang),
               cta: s.wfTapExplore,
+              father: father,
               onTap: () => _push(context, _BabyDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
-            // S4 — For you, mum.
+            // S4 — For you, mum (→ "How she's doing" in father preview).
             _SectionBrief(
               icon: Icons.favorite_rounded,
-              color: AppTheme.secondary500,
-              title: s.wfMotherSection,
-              brief: w.mom.emotionalState.of(lang),
+              color: father ? _fAccent2 : AppTheme.secondary500,
+              title: father ? _fMotherTitle.of(lang) : s.wfMotherSection,
+              brief: father
+                  ? _fMotherBrief.of(lang)
+                  : w.mom.emotionalState.of(lang),
               cta: s.wfTapExplore,
+              father: father,
               onTap: () => _push(context, _MotherDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
             // S5 — What's next.
             _SectionBrief(
               icon: Icons.event_note_rounded,
-              color: const Color(0xFF2E9C8E),
+              color: father ? _fAccent : const Color(0xFF2E9C8E),
               title: s.wfNextSection,
-              brief: s.wfNextBrief,
+              brief: father ? _fNextBrief.of(lang) : s.wfNextBrief,
               cta: s.wfTapExplore,
+              father: father,
               onTap: () => _push(
                   context, _WhatsNextScreen(controller: controller, lang: lang)),
             ),
@@ -519,18 +787,24 @@ class WeekFlowView extends StatelessWidget {
             // Organic nudge — a clean, warm reminder, woven mid-flow (NOT at the
             // top), that the daily section is waiting — without pulling her out
             // of the week.
-            _DailyMomentBridge(controller: controller),
+            _DailyMomentBridge(controller: controller, father: father),
             const SizedBox(height: 18),
             // S6 — This week's videos feed.
             _VideoFeed(lang: lang),
             const SizedBox(height: 18),
             // S6.5 — Trimester tips (3 tips for this trimester; tap → pop-up).
-            _TrimesterTips(week: controller.selectedWeek, lang: lang),
+            _TrimesterTips(
+                week: controller.selectedWeek, lang: lang, father: father),
             const SizedBox(height: 16),
-            // S7 — Share with partner.
-            _PartnerSection(w: w, lang: lang),
+            // S7 — Share with partner. Hidden in father mode: that section is
+            // for the mother to share her week WITH the father, so it's pointless
+            // when you already are the father.
+            if (!father) _PartnerSection(w: w, lang: lang),
           ],
         );
+        // Warm-cream backdrop for the father re-skin; mother stays on the
+        // default scaffold background.
+        return father ? ColoredBox(color: _fBg, child: list) : list;
       },
     );
   }
@@ -543,8 +817,9 @@ void _push(BuildContext c, Widget w) =>
 /// weekly flow — a soft reminder that the daily Home has more for her today,
 /// without nagging or pulling her away from the week. Tapping returns to Home.
 class _DailyMomentBridge extends StatelessWidget {
-  const _DailyMomentBridge({required this.controller});
+  const _DailyMomentBridge({required this.controller, this.father = false});
   final PregnancyController controller;
+  final bool father; // father body points to his home, not Garbh Sanskar
 
   @override
   Widget build(BuildContext context) {
@@ -603,7 +878,10 @@ class _DailyMomentBridge extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
                   const SizedBox(height: 3),
-                  Text(s.wfDailyBridgeBody,
+                  Text(
+                      father
+                          ? _fDailyBridgeBody.of(controller.language)
+                          : s.wfDailyBridgeBody,
                       style: GoogleFonts.manrope(
                           fontSize: 12.5,
                           height: 1.4,
@@ -812,6 +1090,7 @@ class _SectionBrief extends StatelessWidget {
     required this.brief,
     required this.cta,
     required this.onTap,
+    this.father = false,
   });
   final IconData icon;
   final Color color;
@@ -819,6 +1098,7 @@ class _SectionBrief extends StatelessWidget {
   final String brief;
   final String cta;
   final VoidCallback onTap;
+  final bool father; // Slate re-skin (week-20 Dad preview only)
 
   @override
   Widget build(BuildContext context) {
@@ -829,6 +1109,7 @@ class _SectionBrief extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(22),
+          border: father ? Border.all(color: _fLine) : null,
           boxShadow: const [
             BoxShadow(
                 color: Color(0x14704090), blurRadius: 18, offset: Offset(0, 8)),
@@ -848,12 +1129,15 @@ class _SectionBrief extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(title,
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                  style: father
+                      ? _fSerif(18, _fInk, w: FontWeight.w600)
+                      : GoogleFonts.plusJakartaSans(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary900)),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
+            Icon(Icons.chevron_right_rounded,
+                color: father ? _fMuted : AppTheme.neutral400),
           ]),
           const SizedBox(height: 10),
           Text(brief,
@@ -862,7 +1146,7 @@ class _SectionBrief extends StatelessWidget {
               style: GoogleFonts.manrope(
                   fontSize: 13.5,
                   height: 1.5,
-                  color: const Color(0xFF5B5070))),
+                  color: father ? _fMuted : const Color(0xFF5B5070))),
           const SizedBox(height: 8),
           Text(cta,
               style: GoogleFonts.manrope(
@@ -880,47 +1164,54 @@ class _SectionBrief extends StatelessWidget {
 //  small pop-up that explains it, without leaving the weekly screen.
 // ---------------------------------------------------------------------------
 class _TrimesterTips extends StatelessWidget {
-  const _TrimesterTips({required this.week, required this.lang});
+  const _TrimesterTips(
+      {required this.week, required this.lang, this.father = false});
   final int week;
   final AppLanguage lang;
+  final bool father; // Slate + father-voiced tips (week-20 Dad preview)
 
   static const Color _accent = Color(0xFFD98A2B); // warm amber for "tips"
+  Color get _accentColor => father ? _fAccent : _accent;
 
   int get _tri => week <= 13 ? 1 : (week <= 27 ? 2 : 3);
 
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
-    final tips =
-        (kTrimesterTipsV2[_tri] ?? const <TrimesterTip>[]).take(3).toList();
+    final tips = father
+        ? _fTrimesterTips.take(3).toList()
+        : (kTrimesterTipsV2[_tri] ?? const <TrimesterTip>[]).take(3).toList();
     if (tips.isEmpty) return const SizedBox.shrink();
+    final title = father ? _fTipsTitle.of(lang) : s.wfTipsTitle;
+    final subtitle =
+        father ? _fTipsSubtitle.of(lang) : s.wfTrimesterLabel(_tri);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(2, 0, 2, 12),
         child: Row(children: [
-          const Icon(Icons.tips_and_updates_rounded, size: 26, color: _accent),
+          Icon(Icons.tips_and_updates_rounded, size: 26, color: _accentColor),
           const SizedBox(width: 12),
           Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.wfTipsTitle,
+              Text(title,
                   style: GoogleFonts.plusJakartaSans(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
-              Text(s.wfTrimesterLabel(_tri),
+                      color: father ? _fInk : AppTheme.primary900)),
+              Text(subtitle,
                   style: GoogleFonts.manrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.neutral500)),
+                      color: father ? _fMuted : AppTheme.neutral500)),
             ]),
           ),
         ]),
       ),
       for (final t in tips) _tipCard(context, s, t),
-      // Action to-dos, merged in from the (removed) mother "Actions" tab — shown
-      // here without a separate heading, as part of this week's guidance.
-      for (final a in _toDos) _todoCard(a),
+      // Action to-dos, merged in from the (removed) mother "Actions" tab.
+      // Hidden in father mode (they're mother-voiced) to keep it focused.
+      if (!father) for (final a in _toDos) _todoCard(a),
     ]);
   }
 
@@ -941,7 +1232,7 @@ class _TrimesterTips extends StatelessWidget {
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: _accent.withValues(alpha: 0.10),
+                color: _accentColor.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(12)),
             child: Text(t.emoji, style: const TextStyle(fontSize: 20)),
           ),
@@ -984,7 +1275,7 @@ class _TrimesterTips extends StatelessWidget {
               height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: _accent.withValues(alpha: 0.10),
+                  color: _accentColor.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(12)),
               child: Text(t.emoji, style: const TextStyle(fontSize: 20)),
             ),
@@ -1030,7 +1321,7 @@ class _TrimesterTips extends StatelessWidget {
               height: 72,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: _accent.withValues(alpha: 0.12),
+                  color: _accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle),
               child: Text(t.emoji, style: const TextStyle(fontSize: 34)),
             ),
@@ -1053,7 +1344,7 @@ class _TrimesterTips extends StatelessWidget {
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                    backgroundColor: _accent,
+                    backgroundColor: _accentColor,
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(s.wfGotIt,
@@ -1072,14 +1363,15 @@ class _TrimesterTips extends StatelessWidget {
 //  Shared full-screen pop-up scaffold (purple header + close)
 // ---------------------------------------------------------------------------
 class _PopupScaffold extends StatelessWidget {
-  const _PopupScaffold({required this.body});
+  const _PopupScaffold({required this.body, this.father = false});
   final Widget body;
+  final bool father; // Slate re-skin (week-20 Dad preview only)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: father ? _fBg : AppTheme.surfaceContainer,
       appBar: AppBar(
-        backgroundColor: AppTheme.primary500,
+        backgroundColor: father ? _fAccent : AppTheme.primary500,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -1092,18 +1384,20 @@ class _PopupScaffold extends StatelessWidget {
   }
 }
 
-Widget _popupTitle(String week, String title) => Padding(
+Widget _popupTitle(String week, String title, {bool father = false}) => Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Column(children: [
         Text(week,
             style: GoogleFonts.manrope(
-                fontSize: 14, color: AppTheme.neutral500)),
+                fontSize: 14, color: father ? _fMuted : AppTheme.neutral500)),
         const SizedBox(height: 2),
         Text(title,
-            style: GoogleFonts.plusJakartaSans(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.primary600)),
+            style: father
+                ? _fSerif(24, _fInk, w: FontWeight.w700)
+                : GoogleFonts.plusJakartaSans(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.primary600)),
       ]),
     );
 
@@ -1111,15 +1405,17 @@ Widget _popupTitle(String week, String title) => Padding(
 //  Inline media + article helpers (shared by the Baby & Mother reads)
 // ---------------------------------------------------------------------------
 
-/// A single article section: bold heading + body paragraph.
-Widget _articleSection(_Article a, AppLanguage lang) => Padding(
+/// A single article section: bold heading + body paragraph. [headingColor] lets
+/// the father re-skin tint the heading (defaults to the mother purple-ink).
+Widget _articleSection(_Article a, AppLanguage lang, {Color? headingColor}) =>
+    Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(a.heading.of(lang),
             style: GoogleFonts.plusJakartaSans(
                 fontSize: 16.5,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.primary900)),
+                color: headingColor ?? AppTheme.primary900)),
         const SizedBox(height: 6),
         Text(a.body.of(lang),
             style: GoogleFonts.manrope(
@@ -1201,10 +1497,10 @@ Widget _mediaPlaceholder(BuildContext context, S s,
 /// alternating photo / video, so the read reads as a mix of text + media.
 List<Widget> _articleWithMedia(
     BuildContext context, S s, List<_Article> arts, AppLanguage lang,
-    Color accent) {
+    Color accent, {Color? headingColor}) {
   final out = <Widget>[];
   for (var i = 0; i < arts.length; i++) {
-    out.add(_articleSection(arts[i], lang));
+    out.add(_articleSection(arts[i], lang, headingColor: headingColor));
     if (i.isEven && i + 1 < arts.length) {
       out.add(_mediaPlaceholder(context, s,
           video: (i ~/ 2).isOdd, accent: accent));
@@ -1229,22 +1525,32 @@ class _BabyDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
+    final father = _fatherWeek(w.week);
+    final article = father ? _babyArticleFather : _babyArticle;
+    final science = father ? _babyScienceFather : _babyScience;
     return _PopupScaffold(
+      father: father,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
         children: [
-          Center(child: _popupTitle(s.jrWeekLabel(w.week), s.wfBabySection)),
+          Center(
+              child: _popupTitle(s.jrWeekLabel(w.week),
+                  father ? _fBabyTitle.of(lang) : s.wfBabySection,
+                  father: father)),
           const SizedBox(height: 8),
-          ..._articleWithMedia(
-              context, s, _babyArticle, lang, AppTheme.primary500),
+          ..._articleWithMedia(context, s, article, lang,
+              father ? _fAccent : AppTheme.primary500,
+              headingColor: father ? _fInk : null),
           const SizedBox(height: 2),
           Text(s.wfBabyScience,
-              style: GoogleFonts.plusJakartaSans(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.primary600)),
+              style: father
+                  ? _fSerif(19, _fInk, w: FontWeight.w700)
+                  : GoogleFonts.plusJakartaSans(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary600)),
           const SizedBox(height: 12),
-          for (final f in _babyScience) _scienceRow(context, s, f, lang),
+          for (final f in science) _scienceRow(context, s, f, lang, father),
           const SizedBox(height: 14),
           Text(s.wfDisclaimer,
               style: GoogleFonts.manrope(
@@ -1255,7 +1561,8 @@ class _BabyDetailScreen extends StatelessWidget {
   }
 
   // A Baby Science fact as a tappable row → opens a small pop-up with the fact.
-  Widget _scienceRow(BuildContext context, S s, _Fact f, AppLanguage lang) =>
+  Widget _scienceRow(BuildContext context, S s, _Fact f, AppLanguage lang,
+          [bool father = false]) =>
       GestureDetector(
         onTap: () => _showFact(context, s, f, lang),
         child: Container(
@@ -1288,7 +1595,7 @@ class _BabyDetailScreen extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.primary900)),
+                            color: father ? _fInk : AppTheme.primary900)),
                     const SizedBox(height: 3),
                     Text(f.desc.of(lang),
                         maxLines: 2,
@@ -1296,16 +1603,17 @@ class _BabyDetailScreen extends StatelessWidget {
                         style: GoogleFonts.manrope(
                             fontSize: 13,
                             height: 1.4,
-                            color: AppTheme.neutral600)),
+                            color: father ? _fMuted : AppTheme.neutral600)),
                     const SizedBox(height: 6),
                     Row(children: [
                       Text(s.wfTapToRead,
                           style: GoogleFonts.manrope(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.primary500)),
-                      const Icon(Icons.chevron_right_rounded,
-                          size: 15, color: AppTheme.primary500),
+                              color: father ? _fAccent : AppTheme.primary500)),
+                      Icon(Icons.chevron_right_rounded,
+                          size: 15,
+                          color: father ? _fAccent : AppTheme.primary500),
                     ]),
                   ]),
             ),
@@ -1424,7 +1732,9 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     final lang = widget.lang;
     final s = S(lang);
     const total = 2;
+    final father = _fatherWeek(widget.w.week);
     return _PopupScaffold(
+      father: father,
       body: Stack(children: [
         PageView(
           controller: _pc,
@@ -1449,20 +1759,35 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
   Widget _combinedPage(BuildContext context, S s, AppLanguage lang) {
     final w = widget.w;
     final m = w.mom;
+    final father = _fatherWeek(w.week);
+    final article = father ? _motherArticleFather : _motherArticle;
+    final topics = father ? _motherTopicsFather : _motherTopics;
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
       children: [
-        Center(child: _popupTitle(s.jrWeekLabel(w.week), s.wfYouThisWeek)),
+        Center(
+            child: _popupTitle(s.jrWeekLabel(w.week),
+                father ? _fYouThisWeek.of(lang) : s.wfYouThisWeek,
+                father: father)),
         const SizedBox(height: 8),
-        ..._articleWithMedia(
-            context, s, _motherArticle, lang, AppTheme.secondary500),
-        for (final t in _motherTopics) _topicCard(t, lang, s),
+        ..._articleWithMedia(context, s, article, lang,
+            father ? _fAccent : AppTheme.secondary500,
+            headingColor: father ? _fInk : null),
+        for (final t in topics) _topicCard(t, lang, s, father: father),
         const SizedBox(height: 4),
-        _tintCard(s.selfCare, m.selfCareTip.of(lang), const Color(0xFF4F7A52),
-            Icons.spa_rounded),
+        _tintCard(
+            father ? _fHelpTitle.of(lang) : s.selfCare,
+            father ? _fHelpBody.of(lang) : m.selfCareTip.of(lang),
+            father ? _fAccent : const Color(0xFF4F7A52),
+            Icons.spa_rounded,
+            father: father),
         const SizedBox(height: 12),
-        _tintCard(s.reassuranceLabel, m.reassurance.of(lang),
-            AppTheme.secondary500, Icons.favorite_rounded),
+        _tintCard(
+            s.reassuranceLabel,
+            father ? _fReassureBody.of(lang) : m.reassurance.of(lang),
+            father ? _fAccent2 : AppTheme.secondary500,
+            Icons.favorite_rounded,
+            father: father),
         const SizedBox(height: 16),
         Text(s.wfDisclaimer,
             style: GoogleFonts.manrope(
@@ -1473,13 +1798,15 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   // Page 2 — Symptoms / Diet / Actions on ONE page, switched by a 3-way toggle.
   Widget _togglePage(BuildContext context, S s, AppLanguage lang) {
+    final father = _fatherWeek(widget.w.week);
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
       children: [
         Center(child:
-            _popupTitle(s.jrWeekLabel(widget.w.week), s.wfHealthThisWeek)),
+            _popupTitle(s.jrWeekLabel(widget.w.week), s.wfHealthThisWeek,
+                father: father)),
         const SizedBox(height: 10),
-        _toggleBar(s),
+        _toggleBar(s, father),
         const SizedBox(height: 16),
         if (_tab == 0)
           ..._symptomsContent(s, lang)
@@ -1489,7 +1816,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  Widget _toggleBar(S s) {
+  Widget _toggleBar(S s, [bool father = false]) {
     Widget seg(int i, IconData icon, String label) {
       final on = _tab == i;
       return Expanded(
@@ -1501,7 +1828,9 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: on ? AppTheme.secondary500 : Colors.transparent,
+              color: on
+                  ? (father ? _fAccent : AppTheme.secondary500)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(22),
             ),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1536,7 +1865,9 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
   }
 
   // Each topic shows a teaser; tap opens the fuller read.
-  Widget _topicCard(_MotherTopic t, AppLanguage lang, S s) => GestureDetector(
+  Widget _topicCard(_MotherTopic t, AppLanguage lang, S s,
+          {bool father = false}) =>
+      GestureDetector(
         onTap: () => _showTopicDialog(t, lang),
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -1549,7 +1880,8 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               height: 46,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: AppTheme.secondary500.withValues(alpha: 0.10),
+                  color: (father ? _fAccent : AppTheme.secondary500)
+                      .withValues(alpha: 0.10),
                   shape: BoxShape.circle),
               child: Text(t.emoji, style: const TextStyle(fontSize: 22)),
             ),
@@ -1562,22 +1894,24 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                         style: GoogleFonts.plusJakartaSans(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.primary900)),
+                            color: father ? _fInk : AppTheme.primary900)),
                     const SizedBox(height: 3),
                     Text(t.short.of(lang),
                         style: GoogleFonts.manrope(
                             fontSize: 13.5,
                             height: 1.45,
-                            color: AppTheme.neutral600)),
+                            color: father ? _fMuted : AppTheme.neutral600)),
                     const SizedBox(height: 6),
                     Row(children: [
                       Text(s.wfTapToRead,
                           style: GoogleFonts.manrope(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.secondary500)),
-                      const Icon(Icons.chevron_right_rounded,
-                          size: 15, color: AppTheme.secondary500),
+                              color:
+                                  father ? _fAccent : AppTheme.secondary500)),
+                      Icon(Icons.chevron_right_rounded,
+                          size: 15,
+                          color: father ? _fAccent : AppTheme.secondary500),
                     ]),
                   ]),
             ),
@@ -1637,7 +1971,8 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  Widget _tintCard(String title, String body, Color c, IconData icon) =>
+  Widget _tintCard(String title, String body, Color c, IconData icon,
+          {bool father = false}) =>
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -1654,7 +1989,9 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           const SizedBox(height: 8),
           Text(body,
               style: GoogleFonts.manrope(
-                  fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
+                  fontSize: 14.5,
+                  height: 1.55,
+                  color: father ? _fMuted : const Color(0xFF5B5070))),
         ]),
       );
 
@@ -2007,7 +2344,9 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     final lang = widget.lang;
     final s = S(lang);
     const total = 2;
+    final father = _fatherWeek(widget.controller.selectedWeek);
     return _PopupScaffold(
+      father: father,
       body: Stack(children: [
         PageView(
           controller: _pc,
@@ -2137,6 +2476,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   // Page 1 — Upcoming milestones (current week onward, tappable).
   Widget _milestones(S s, AppLanguage lang) {
     final cw = widget.controller.selectedWeek;
+    final father = _fatherWeek(cw);
     // A focused window — the current week's milestones plus a few weeks ahead.
     final list = _weekMilestones
         .where((m) => m.week >= cw && m.week <= cw + 6)
@@ -2145,7 +2485,9 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
       children: [
-        Center(child: _popupTitle(s.jrWeekLabel(cw), s.wfMilestonesTitle)),
+        Center(
+            child: _popupTitle(s.jrWeekLabel(cw), s.wfMilestonesTitle,
+                father: father)),
         const SizedBox(height: 8),
         for (final m in list) _milestoneCard(s, m, lang, m.week == cw),
       ],
@@ -2285,6 +2627,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   // Page 2 — Scans & appointments (tappable).
   Widget _scans(S s, AppLanguage lang) {
     final cw = widget.controller.selectedWeek;
+    final father = _fatherWeek(cw);
     final scans = kJourneyMilestones
         .where((m) =>
             m.type == JourneyNodeType.medical &&
@@ -2295,7 +2638,9 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
       children: [
-        Center(child: _popupTitle(s.jrWeekLabel(cw), s.wfScansTitle)),
+        Center(
+            child:
+                _popupTitle(s.jrWeekLabel(cw), s.wfScansTitle, father: father)),
         const SizedBox(height: 12),
         // Journey-progress card removed from the top per request — this page is
         // now scans & appointments only. (Commented, kept for an easy revert.)

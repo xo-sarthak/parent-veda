@@ -27,6 +27,7 @@ import '../../models/week_content.dart';
 import '../../services/size_view_pref.dart';
 import '../../services/video_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/father_skin.dart';
 import '../cards/food_emoji.dart';
 
 const LinearGradient _pageGradient = LinearGradient(
@@ -109,15 +110,23 @@ class WeekOverviewCard extends StatelessWidget {
 //  Hero — progress ring around baby/fruit + size/length/weight
 // ---------------------------------------------------------------------------
 class WeekSizeHero extends StatelessWidget {
-  const WeekSizeHero({super.key, required this.w, required this.lang});
+  const WeekSizeHero(
+      {super.key, required this.w, required this.lang, this.father = false});
   final WeekContent w;
   final AppLanguage lang;
+
+  /// Father re-skin (Slate) — colours/fonts only; the real baby/fruit images
+  /// are never touched.
+  final bool father;
 
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
     final snap = w.snapshot;
     final progress = (w.week / 40).clamp(0.0, 1.0);
+    // Slate-vs-mother resolved tints (chrome only).
+    final accent = father ? kFAccent : AppTheme.primary500;
+    final accent2 = father ? kFAccent2 : AppTheme.secondary500;
     return ValueListenableBuilder<bool>(
       valueListenable: SizeViewPref.babyMode,
       builder: (context, baby, _) {
@@ -128,7 +137,7 @@ class WeekSizeHero extends StatelessWidget {
               SizedBox(
                 width: 238,
                 height: 238,
-                child: CustomPaint(painter: _RingPainter(progress)),
+                child: CustomPaint(painter: _RingPainter(progress, father: father)),
               ),
               // Inner figure circle (real baby image or fruit).
               Container(
@@ -157,11 +166,11 @@ class WeekSizeHero extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                   decoration: BoxDecoration(
-                    color: AppTheme.surface,
+                    color: father ? kFCard : AppTheme.surface,
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: [
                       BoxShadow(
-                          color: AppTheme.primary500.withValues(alpha: 0.16),
+                          color: accent.withValues(alpha: 0.16),
                           blurRadius: 14,
                           offset: const Offset(0, 6)),
                     ],
@@ -170,37 +179,40 @@ class WeekSizeHero extends StatelessWidget {
                     Container(
                         width: 7,
                         height: 7,
-                        decoration: const BoxDecoration(
-                            color: AppTheme.secondary500,
-                            shape: BoxShape.circle)),
+                        decoration: BoxDecoration(
+                            color: accent2, shape: BoxShape.circle)),
                     const SizedBox(width: 7),
                     Text(snap.milestone.of(lang),
                         style: GoogleFonts.manrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primary600)),
+                            color: father ? kFAccent : AppTheme.primary600)),
                   ]),
                 ),
               ),
             ]),
           ),
           const SizedBox(height: 14),
-          _BabyFruitToggle(baby: baby),
+          _BabyFruitToggle(baby: baby, father: father),
           const SizedBox(height: 16),
           Row(children: [
             Expanded(
                 child: _StatCard(
-                    label: s.sizeWord, value: _statValue(snap.fruit.of(lang)))),
+                    label: s.sizeWord,
+                    value: _statValue(snap.fruit.of(lang)),
+                    father: father)),
             const SizedBox(width: 10),
             Expanded(
                 child: _StatCard(
                     label: s.lengthLabel,
-                    value: _statValue(snap.length.of(lang)))),
+                    value: _statValue(snap.length.of(lang)),
+                    father: father)),
             const SizedBox(width: 10),
             Expanded(
                 child: _StatCard(
                     label: s.weightLabel,
-                    value: _statValue(snap.weight.of(lang)))),
+                    value: _statValue(snap.weight.of(lang)),
+                    father: father)),
           ]),
         ]);
       },
@@ -222,20 +234,25 @@ class WeekSizeHero extends StatelessWidget {
 }
 
 class _RingPainter extends CustomPainter {
-  _RingPainter(this.progress);
+  _RingPainter(this.progress, {this.father = false});
   final double progress;
+  final bool father;
   @override
   void paint(Canvas canvas, Size size) {
     const stroke = 15.0;
     final c = size.center(Offset.zero);
     final r = (size.width - stroke) / 2;
+    final track = father ? kFAccent : AppTheme.primary500;
+    final arc = father
+        ? const [kFAccent, kFAccent2]
+        : const [AppTheme.primary500, AppTheme.primary400];
     canvas.drawCircle(
       c,
       r,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
-        ..color = AppTheme.primary500.withValues(alpha: 0.14),
+        ..color = track.withValues(alpha: 0.14),
     );
     canvas.drawArc(
       Rect.fromCircle(center: c, radius: r),
@@ -246,21 +263,23 @@ class _RingPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
         ..strokeCap = StrokeCap.round
-        ..shader = const LinearGradient(
-          colors: [AppTheme.primary500, AppTheme.primary400],
-        ).createShader(Rect.fromCircle(center: c, radius: r)),
+        ..shader = LinearGradient(colors: arc)
+            .createShader(Rect.fromCircle(center: c, radius: r)),
     );
   }
 
   @override
-  bool shouldRepaint(_RingPainter old) => old.progress != progress;
+  bool shouldRepaint(_RingPainter old) =>
+      old.progress != progress || old.father != father;
 }
 
 class _BabyFruitToggle extends StatelessWidget {
-  const _BabyFruitToggle({required this.baby});
+  const _BabyFruitToggle({required this.baby, this.father = false});
   final bool baby;
+  final bool father;
   @override
   Widget build(BuildContext context) {
+    final accent = father ? kFAccent : AppTheme.primary500;
     Widget seg(String label, bool on, VoidCallback onTap) => Expanded(
           child: GestureDetector(
             onTap: onTap,
@@ -270,12 +289,12 @@ class _BabyFruitToggle extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: on ? AppTheme.primary500 : Colors.transparent,
+                color: on ? accent : Colors.transparent,
                 borderRadius: BorderRadius.circular(999),
                 boxShadow: on
                     ? [
                         BoxShadow(
-                            color: AppTheme.primary500.withValues(alpha: 0.32),
+                            color: accent.withValues(alpha: 0.32),
                             blurRadius: 10,
                             offset: const Offset(0, 4))
                       ]
@@ -285,14 +304,16 @@ class _BabyFruitToggle extends StatelessWidget {
                   style: GoogleFonts.manrope(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: on ? Colors.white : AppTheme.neutral600)),
+                      color: on
+                          ? Colors.white
+                          : (father ? kFMuted : AppTheme.neutral600))),
             ),
           ),
         );
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppTheme.primary500.withValues(alpha: 0.08),
+        color: accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(children: [
@@ -304,16 +325,19 @@ class _BabyFruitToggle extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.label, required this.value});
+  const _StatCard(
+      {required this.label, required this.value, this.father = false});
   final String label;
   final String value;
+  final bool father;
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: father ? kFCard : AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: father ? Border.all(color: kFLine) : null,
         boxShadow: const [
           BoxShadow(
               color: Color(0x14704090), blurRadius: 18, offset: Offset(0, 8)),
@@ -326,7 +350,7 @@ class _StatCard extends StatelessWidget {
                 fontSize: 9.5,
                 letterSpacing: 1.0,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.neutral400)),
+                color: father ? kFMuted : AppTheme.neutral400)),
         const SizedBox(height: 5),
         Text(value,
             textAlign: TextAlign.center,
@@ -335,7 +359,7 @@ class _StatCard extends StatelessWidget {
             style: GoogleFonts.plusJakartaSans(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900)),
+                color: father ? kFInk : AppTheme.primary900)),
       ]),
     );
   }
@@ -597,14 +621,21 @@ class _Tinted extends StatelessWidget {
 
 /// The soft gradient panel that every week-20 design card sits on.
 class _DesignPanel extends StatelessWidget {
-  const _DesignPanel({required this.child});
+  const _DesignPanel({required this.child, this.father = false});
   final Widget child;
+  final bool father;
   @override
   Widget build(BuildContext context) => Container(
-        decoration: const BoxDecoration(
-          gradient: _pageGradient,
-          borderRadius: BorderRadius.all(Radius.circular(28)),
-        ),
+        decoration: father
+            ? BoxDecoration(
+                color: kFCard,
+                border: Border.all(color: kFLine),
+                borderRadius: const BorderRadius.all(Radius.circular(28)),
+              )
+            : const BoxDecoration(
+                gradient: _pageGradient,
+                borderRadius: BorderRadius.all(Radius.circular(28)),
+              ),
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
         child: child,
       );
@@ -668,16 +699,20 @@ PvVideo? _pickWeekVideo(int week) {
 }
 
 class WeekVideoCard extends StatelessWidget {
-  const WeekVideoCard({super.key, required this.w, required this.lang});
+  const WeekVideoCard(
+      {super.key, required this.w, required this.lang, this.father = false});
   final WeekContent w;
   final AppLanguage lang;
+  final bool father;
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
     final v = _pickWeekVideo(w.week);
     if (v == null) return const SizedBox.shrink();
     final meta = videoMeta(v.category);
+    final accent = father ? kFAccent : AppTheme.primary500;
     return _DesignPanel(
+      father: father,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
@@ -690,20 +725,22 @@ class WeekVideoCard extends StatelessWidget {
                 height: 44,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                    color: AppTheme.primary500.withValues(alpha: 0.12),
+                    color: accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(14)),
-                child: const Icon(Icons.play_circle_rounded,
-                    size: 22, color: AppTheme.primary500),
+                child: Icon(Icons.play_circle_rounded,
+                    size: 22, color: accent),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(s.wkPregnancyWeek(w.week),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                    style: father
+                        ? fatherSerif(18, weight: FontWeight.w700)
+                        : GoogleFonts.plusJakartaSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primary900)),
               ),
             ]),
           ),
@@ -720,7 +757,7 @@ class WeekVideoCard extends StatelessWidget {
                       saved
                           ? Icons.bookmark_rounded
                           : Icons.bookmark_border_rounded,
-                      color: AppTheme.primary500,
+                      color: accent,
                       size: 22),
                 ),
               );
@@ -738,7 +775,9 @@ class WeekVideoCard extends StatelessWidget {
                 gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [meta.color, AppTheme.primary700]),
+                    colors: father
+                        ? const [kFAccent, Color(0xFF1A2A33)]
+                        : [meta.color, AppTheme.primary700]),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Stack(children: [
@@ -750,8 +789,8 @@ class WeekVideoCard extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.92),
                         shape: BoxShape.circle),
-                    child: const Icon(Icons.play_arrow_rounded,
-                        size: 32, color: AppTheme.primary600),
+                    child: Icon(Icons.play_arrow_rounded,
+                        size: 32, color: father ? kFAccent : AppTheme.primary600),
                   ),
                 ),
                 Positioned(
