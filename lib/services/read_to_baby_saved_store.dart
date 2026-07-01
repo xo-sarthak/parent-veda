@@ -10,6 +10,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/cloud_synced_store.dart';
+
 class SavedRtbPiece {
   const SavedRtbPiece({
     required this.title,
@@ -32,7 +34,7 @@ class SavedRtbPiece {
       );
 }
 
-class ReadToBabySavedStore extends ChangeNotifier {
+class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
   ReadToBabySavedStore._();
   static final ReadToBabySavedStore instance = ReadToBabySavedStore._();
 
@@ -53,7 +55,21 @@ class ReadToBabySavedStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'rtb_saved';
+  @override
+  Object cloudData() => _items.map((e) => e.toJson()).toList();
+  @override
+  void applyCloudData(Object data) => _items
+    ..clear()
+    ..addAll((data as List)
+        .map((e) => SavedRtbPiece.fromJson(Map<String, dynamic>.from(e))));
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   bool isSaved(String title) => _items.any((p) => p.title == title);
   bool get isEmpty => _items.isEmpty;

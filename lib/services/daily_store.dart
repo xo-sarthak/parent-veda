@@ -152,8 +152,8 @@ class DailyStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
-  // === Cloud sync (Supabase) — two day-maps, a list, and a string-list. =======
-  // (Father missions are deferred — they belong to the father side.)
+  // === Cloud sync (Supabase) — two day-maps, a list, a string-list, and the
+  //     father's mission-done day set. ==========================================
   Future<void> _syncFromCloud() async {
     if (!SupabaseRepo.isLoggedIn) return;
     try {
@@ -231,6 +231,26 @@ class DailyStore extends ChangeNotifier {
       }
       await _persist(_movementKey,
           jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
+
+      // father_missions — done days, keyed by (user_id, day)
+      final missionRows = await SupabaseRepo.fetch('father_missions',
+          orderBy: 'day', ascending: true);
+      final cloudMissionDays = <int>{};
+      for (final r in missionRows) {
+        final day = (r['day'] as num?)?.toInt();
+        if (day != null) cloudMissionDays.add(day);
+      }
+      final localMissions = _missionsDone.toSet();
+      for (final day in localMissions) {
+        if (!cloudMissionDays.contains(day)) {
+          await SupabaseRepo.insert('father_missions', {'day': day});
+        }
+      }
+      _missionsDone
+        ..clear()
+        ..addAll(cloudMissionDays)
+        ..addAll(localMissions);
+      await _persist(_missionKey, jsonEncode(_missionsDone.toList()));
 
       notifyListeners();
     } catch (_) {/* offline — keep local */}
@@ -390,9 +410,19 @@ class DailyStore extends ChangeNotifier {
 
   /// Toggles the Father Mode mission-done flag for [day].
   Future<void> toggleMissionDone(int day) async {
-    if (!_missionsDone.remove(day)) _missionsDone.add(day);
+    final nowDone = !_missionsDone.remove(day);
+    if (nowDone) _missionsDone.add(day);
     notifyListeners();
     await _persist(_missionKey, jsonEncode(_missionsDone.toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        if (nowDone) {
+          await SupabaseRepo.insert('father_missions', {'day': day});
+        } else {
+          await SupabaseRepo.deleteBy('father_missions', 'day', day);
+        }
+      } catch (_) {}
+    }
   }
 
   Future<void> _persist(String key, String value) async {

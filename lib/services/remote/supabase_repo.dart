@@ -48,6 +48,37 @@ class SupabaseRepo {
     return List<Map<String, dynamic>>.from(rows);
   }
 
+  /// Fetch rows belonging to ANOTHER user (e.g. your paired partner) from
+  /// [table]. RLS still applies — you only get rows the policies allow (own or
+  /// partner). Used for the mother's merged journal view. [] if logged out.
+  static Future<List<Map<String, dynamic>>> fetchByUser(
+    String table,
+    String otherUserId, {
+    String orderBy = 'created_at',
+    bool ascending = false,
+  }) async {
+    if (userId == null) return [];
+    final rows = await _client
+        .from(table)
+        .select()
+        .eq('user_id', otherUserId)
+        .order(orderBy, ascending: ascending);
+    return List<Map<String, dynamic>>.from(rows);
+  }
+
+  /// The current user's paired partner id, or null (unpaired / logged out).
+  /// Reads own profile row (allowed by RLS). Used to fetch the partner's data.
+  static Future<String?> myPartnerId() async {
+    final uid = userId;
+    if (uid == null) return null;
+    final row = await _client
+        .from('profiles')
+        .select('partner_id')
+        .eq('id', uid)
+        .maybeSingle();
+    return row?['partner_id'] as String?;
+  }
+
   /// Fetch the current user's SINGLE row from [table] (for one-row-per-user
   /// tables like weight_profile / kegel_state). Returns null if none / logged out.
   static Future<Map<String, dynamic>?> fetchOne(String table) async {
@@ -106,6 +137,39 @@ class SupabaseRepo {
     final uid = userId;
     if (uid == null) return;
     await _client.from(table).delete().eq('user_id', uid);
+  }
+
+  // === Generic per-user key/value store (user_state table) ===================
+  // Used by the lightweight "saved / liked / preference" stores via the
+  // CloudSyncedStore mixin. Each store syncs one JSON blob under its store_key.
+
+  /// Load this user's saved blob for [storeKey], or null if none / logged out.
+  /// The value is whatever was saved (a Map or List), decoded from jsonb.
+  static Future<dynamic> loadState(String storeKey) async {
+    final uid = userId;
+    if (uid == null) return null;
+    final row = await _client
+        .from('user_state')
+        .select('data')
+        .eq('user_id', uid)
+        .eq('store_key', storeKey)
+        .maybeSingle();
+    return row?['data'];
+  }
+
+  /// Save this user's blob for [storeKey] (upsert on user_id+store_key).
+  /// No-op if logged out. [data] is any json-encodable structure (Map/List).
+  static Future<void> saveState(String storeKey, Object data) async {
+    final uid = userId;
+    if (uid == null) return;
+    await _client.from('user_state').upsert(
+      {
+        'user_id': uid,
+        'store_key': storeKey,
+        'data': data,
+      },
+      onConflict: 'user_id,store_key',
+    );
   }
 
   /// Insert-or-update a SINGLE-row-per-user record (e.g. a settings/profile-like

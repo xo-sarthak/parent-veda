@@ -8,7 +8,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ReadDoneStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class ReadDoneStore extends ChangeNotifier with CloudSyncedStore {
   ReadDoneStore._();
   static final ReadDoneStore instance = ReadDoneStore._();
 
@@ -29,7 +31,20 @@ class ReadDoneStore extends ChangeNotifier {
       _done.addAll(prefs.getStringList(_key) ?? const []);
       notifyListeners();
     } catch (_) {/* start empty */}
+    await syncStateFromCloud();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'reads_done';
+  @override
+  Object cloudData() => _done.toList();
+  @override
+  void applyCloudData(Object data) => _done
+    ..clear()
+    ..addAll((data as List).map((e) => e.toString()));
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   bool isDone(String id) => _done.contains(id);
 

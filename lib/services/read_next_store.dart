@@ -11,7 +11,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ReadNextStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class ReadNextStore extends ChangeNotifier with CloudSyncedStore {
   ReadNextStore._();
   static final ReadNextStore instance = ReadNextStore._();
 
@@ -50,6 +52,7 @@ class ReadNextStore extends ChangeNotifier {
       } catch (_) {/* ignore */}
     }
     notifyListeners();
+    await syncStateFromCloud();
   }
 
   // --- status (reading / completed) -----------------------------------------
@@ -87,6 +90,25 @@ class ReadNextStore extends ChangeNotifier {
     _persist();
     notifyListeners();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'readnext';
+  @override
+  Object cloudData() => {'status': _status, 'saved': _saved};
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _status.clear();
+    ((m['status'] as Map?) ?? const {})
+        .forEach((k, v) => _status[k.toString()] = v.toString());
+    _saved.clear();
+    ((m['saved'] as Map?) ?? const {})
+        .forEach((k, v) => _saved[k.toString()] = (v as num).toInt());
+  }
+
+  @override
+  Future<void> persistLocalCache() async => _persist();
 
   void _persist() {
     _prefs?.setString(_key, jsonEncode(_status));

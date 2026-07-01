@@ -30,7 +30,23 @@ class JournalStore extends ChangeNotifier {
   static const _key = 'journal_entries';
 
   final List<JournalEntry> _manual = [];
+
+  /// The paired partner's (father's) entries, pulled read-only for the merged
+  /// view. Never persisted locally; refreshed from the cloud on each sync.
+  final List<JournalEntry> _partner = [];
+
+  /// Whether the merged timeline includes the partner's entries (the mother can
+  /// toggle this in the journal screen). Defaults on when a partner is paired.
+  bool showPartnerEntries = true;
+
   bool _loaded = false;
+
+  bool get hasPartnerEntries => _partner.isNotEmpty;
+
+  void setShowPartnerEntries(bool v) {
+    showPartnerEntries = v;
+    notifyListeners();
+  }
 
   Future<void> init() async {
     if (_loaded) return;
@@ -67,6 +83,17 @@ class JournalStore extends ChangeNotifier {
       _manual
         ..clear()
         ..addAll(byId.values);
+
+      // Merged view: also pull the paired partner's (father's) journal, marked
+      // read-only. RLS on father_journal_entries allows the partner to read.
+      _partner.clear();
+      final partnerId = await SupabaseRepo.myPartnerId();
+      if (partnerId != null) {
+        final prows =
+            await SupabaseRepo.fetchByUser('father_journal_entries', partnerId);
+        _partner.addAll(prows.map((r) => _fromRow(r, isPartner: true)));
+      }
+
       await _persist();
       notifyListeners();
     } catch (_) {/* offline — keep local */}
@@ -91,7 +118,7 @@ class JournalStore extends ChangeNotifier {
         'updated_at': e.updatedAt.toIso8601String(),
       };
 
-  JournalEntry _fromRow(Map<String, dynamic> r) {
+  JournalEntry _fromRow(Map<String, dynamic> r, {bool isPartner = false}) {
     var t = JournalEntryType.memory;
     for (final e in JournalEntryType.values) {
       if (e.name == r['type']) {
@@ -117,6 +144,7 @@ class JournalStore extends ChangeNotifier {
       customTag: (r['custom_tag'] ?? '').toString(),
       tags: strList(r['tags']),
       isAutomatic: r['is_automatic'] == true,
+      isPartner: isPartner,
       createdAt: parse(r['created_at']),
       updatedAt: parse(r['updated_at']),
     );
@@ -218,6 +246,7 @@ class JournalStore extends ChangeNotifier {
   List<JournalEntry> timeline(PregnancyController p) {
     final s = S(p.language);
     final list = <JournalEntry>[..._manual];
+    if (showPartnerEntries) list.addAll(_partner);
     list.addAll(_autoMilestones(p));
     list.addAll(_autoHealth(p, s));
     list.sort((a, b) => b.date.compareTo(a.date));

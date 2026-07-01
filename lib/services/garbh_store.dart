@@ -9,7 +9,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GarbhStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class GarbhStore extends ChangeNotifier with CloudSyncedStore {
   GarbhStore._();
   static final GarbhStore instance = GarbhStore._();
 
@@ -61,6 +63,35 @@ class GarbhStore extends ChangeNotifier {
       _streak = 0;
     }
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync (favourites + streak; today's done-state stays local) ------
+  @override
+  String get cloudKey => 'garbh';
+  @override
+  Object cloudData() => {
+        'favs': _favs.toList(),
+        'streak': _streak,
+        'streakDate': _streakDate,
+      };
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _favs
+      ..clear()
+      ..addAll(((m['favs'] as List?) ?? const []).map((e) => e.toString()));
+    _streak = (m['streak'] as num?)?.toInt() ?? _streak;
+    _streakDate = (m['streakDate'] ?? _streakDate).toString();
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final p = _prefs;
+    if (p == null) return;
+    await p.setStringList(_favsKey, _favs.toList());
+    await p.setInt(_streakKey, _streak);
+    await p.setString(_streakDateKey, _streakDate);
   }
 
   // --- favorites ---

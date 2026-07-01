@@ -13,6 +13,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/cloud_synced_store.dart';
+
 /// The two carts we keep separate for now.
 const String kProductsCartId = 'products';
 const String kHospitalCartId = 'hospitalBag';
@@ -64,7 +66,7 @@ class CartItem {
       );
 }
 
-class CartStore extends ChangeNotifier {
+class CartStore extends ChangeNotifier with CloudSyncedStore {
   CartStore._();
   static final CartStore instance = CartStore._();
 
@@ -90,6 +92,7 @@ class CartStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
 
   // --- queries ---
@@ -162,6 +165,25 @@ class CartStore extends ChangeNotifier {
     _carts[cartId]?.clear();
     _persistNotify();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'cart_v1';
+  @override
+  Object cloudData() =>
+      _carts.map((k, v) => MapEntry(k, v.map((i) => i.toJson()).toList()));
+  @override
+  void applyCloudData(Object data) {
+    _carts.clear();
+    (data as Map).forEach((cartId, list) {
+      _carts[cartId.toString()] = (list as List)
+          .map((e) => CartItem.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    });
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   void _persistNotify() {
     notifyListeners();

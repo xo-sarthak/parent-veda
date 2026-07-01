@@ -9,7 +9,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class BoughtStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class BoughtStore extends ChangeNotifier with CloudSyncedStore {
   BoughtStore._();
   static final BoughtStore instance = BoughtStore._();
 
@@ -25,7 +27,20 @@ class BoughtStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'bought_products';
+  @override
+  Object cloudData() => _bought.toList();
+  @override
+  void applyCloudData(Object data) => _bought
+    ..clear()
+    ..addAll((data as List).map((e) => e.toString()));
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   // --- queries ---
   bool isBought(String productId) => _bought.contains(productId);

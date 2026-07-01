@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../localization/app_language.dart'; // LocalizedText
 import 'bought_store.dart';
 import 'hospital_bag_store.dart'; // BagItem / BagCategory / BagItemStatus / DeliveryType
+import 'remote/cloud_synced_store.dart';
 
 /// The single, plain-language journey stage for an item (computed, not stored).
 enum BagStage { needsDecision, planningToBuy, readyAtHome, packed, maybeLater }
@@ -38,7 +39,7 @@ BagStage bagStageOf(BagItem i) {
   return BagStage.needsDecision; // needed (or chosen but not yet sorted)
 }
 
-class HospitalBagV2Store extends ChangeNotifier {
+class HospitalBagV2Store extends ChangeNotifier with CloudSyncedStore {
   HospitalBagV2Store._();
   static final HospitalBagV2Store instance = HospitalBagV2Store._();
 
@@ -148,6 +149,45 @@ class HospitalBagV2Store extends ChangeNotifier {
     _loaded = true;
     markBoughtFromBought();
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'hb2';
+  @override
+  Object cloudData() => {
+        'items': _items.map((i) => i.toJson()).toList(),
+        'onboarded': _onboarded,
+        'delivery': _delivery.name,
+        'updatedIso': _updatedIso,
+      };
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _items
+      ..clear()
+      ..addAll(((m['items'] as List?) ?? const [])
+          .map((e) => BagItem.fromJson(Map<String, dynamic>.from(e))));
+    _onboarded = m['onboarded'] == true;
+    _updatedIso = m['updatedIso']?.toString();
+    _delivery = DeliveryType.values.firstWhere(
+        (d) => d.name == (m['delivery'] ?? 'unsure'),
+        orElse: () => DeliveryType.unsure);
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _itemsKey, jsonEncode(_items.map((i) => i.toJson()).toList()));
+    await prefs.setString(
+        _metaKey,
+        jsonEncode({
+          'onboarded': _onboarded,
+          'delivery': _delivery.name,
+          'updatedIso': _updatedIso,
+        }));
   }
 
   // ---- mutations ------------------------------------------------------------

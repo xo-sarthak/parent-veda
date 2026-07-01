@@ -12,7 +12,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class VideoStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class VideoStore extends ChangeNotifier with CloudSyncedStore {
   VideoStore._();
   static final VideoStore instance = VideoStore._();
 
@@ -44,6 +46,30 @@ class VideoStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'video_saved';
+  @override
+  Object cloudData() => {'saved': _saved.toList(), 'savedAt': _savedAt};
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _saved
+      ..clear()
+      ..addAll(((m['saved'] as List?) ?? const []).map((e) => e.toString()));
+    _savedAt.clear();
+    ((m['savedAt'] as Map?) ?? const {})
+        .forEach((k, v) => _savedAt[k.toString()] = (v as num).toInt());
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, jsonEncode(_saved.toList()));
+    await prefs.setString(_atKey, jsonEncode(_savedAt));
   }
 
   bool isSaved(String id) => _saved.contains(id);

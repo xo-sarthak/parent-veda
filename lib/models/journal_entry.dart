@@ -44,6 +44,7 @@ class JournalEntry {
     this.customTag = '',
     this.tags = const [],
     this.isAutomatic = false,
+    this.isPartner = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : imageUrl = imageUrl,
@@ -68,6 +69,10 @@ class JournalEntry {
   final String customTag; // user-named tag for `custom` entries
   final List<String> tags;
   final bool isAutomatic;
+
+  /// TRANSIENT (never serialized): true when this entry belongs to the paired
+  /// partner (the father), surfaced read-only in the mother's merged timeline.
+  final bool isPartner;
   final DateTime createdAt;
   final DateTime updatedAt;
 

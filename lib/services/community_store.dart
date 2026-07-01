@@ -14,13 +14,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/community_data.dart';
 import '../models/community_models.dart';
+import 'remote/cloud_synced_store.dart';
 
 /// The identity used while testing "Doctor mode" (until real doctor logins
 /// exist). When the test doctor verifies a post, it counts as one expert.
 const String kTestDoctorName = 'Dr. (You)';
 const String kTestDoctorCred = 'OB-GYN';
 
-class CommunityStore extends ChangeNotifier {
+class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   CommunityStore._();
   static final CommunityStore instance = CommunityStore._();
 
@@ -96,6 +97,71 @@ class CommunityStore extends ChangeNotifier {
       ..clear()
       ..addAll(p.getStringList(_repostedKey) ?? const []);
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync (all persistent state; "not interested" stays session-only) -
+  @override
+  String get cloudKey => 'community';
+  @override
+  Object cloudData() => {
+        'joined': _joined.toList(),
+        'muted': _muted.toList(),
+        'liked': _liked.toList(),
+        'saved': _saved.toList(),
+        'upvoted': _upvoted.toList(),
+        'votes': _votes,
+        'posts': _created.map((p) => p.toJson()).toList(),
+        'comments': _userComments,
+        'doctorMode': _doctorMode,
+        'docEndorsed': _doctorEndorsed.toList(),
+        'reposted': _reposted.toList(),
+      };
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    void fillSet(Set<String> s, Object? v) => s
+      ..clear()
+      ..addAll(((v as List?) ?? const []).map((e) => e.toString()));
+    fillSet(_joined, m['joined']);
+    fillSet(_muted, m['muted']);
+    fillSet(_liked, m['liked']);
+    fillSet(_saved, m['saved']);
+    fillSet(_upvoted, m['upvoted']);
+    _votes
+      ..clear()
+      ..addAll(((m['votes'] as Map?) ?? const {})
+          .map((k, v) => MapEntry(k.toString(), v.toString())));
+    _created
+      ..clear()
+      ..addAll(((m['posts'] as List?) ?? const [])
+          .map((e) => CommunityPost.fromJson(Map<String, dynamic>.from(e))));
+    _userComments
+      ..clear()
+      ..addAll(((m['comments'] as Map?) ?? const {}).map((k, v) => MapEntry(
+          k.toString(),
+          ((v as List?) ?? const []).map((e) => e.toString()).toList())));
+    _doctorMode = m['doctorMode'] == true;
+    fillSet(_doctorEndorsed, m['docEndorsed']);
+    fillSet(_reposted, m['reposted']);
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final p = _prefs;
+    if (p == null) return;
+    await p.setStringList(_joinedKey, _joined.toList());
+    await p.setStringList(_mutedKey, _muted.toList());
+    await p.setStringList(_likedKey, _liked.toList());
+    await p.setStringList(_savedKey, _saved.toList());
+    await p.setStringList(_upvotedKey, _upvoted.toList());
+    await p.setString(_votesKey, jsonEncode(_votes));
+    await p.setString(
+        _postsKey, jsonEncode(_created.map((e) => e.toJson()).toList()));
+    await p.setString(_commentsKey, jsonEncode(_userComments));
+    await p.setBool(_doctorModeKey, _doctorMode);
+    await p.setStringList(_docEndorsedKey, _doctorEndorsed.toList());
+    await p.setStringList(_repostedKey, _reposted.toList());
   }
 
   // --- queries ---

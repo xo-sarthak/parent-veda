@@ -553,9 +553,13 @@ class _JournalScreenState extends State<JournalScreen> {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        // Manual entries: tap to edit, long-press to delete.
-        onTap: e.isAutomatic ? null : () => editJournalEntry(context, p, e),
-        onLongPress: e.isAutomatic ? null : () => _confirmDelete(s, e),
+        // Manual entries: tap to edit, long-press to delete. Auto entries and
+        // the partner's entries (read-only in the merged view) aren't editable.
+        onTap: (e.isAutomatic || e.isPartner)
+            ? null
+            : () => editJournalEntry(context, p, e),
+        onLongPress:
+            (e.isAutomatic || e.isPartner) ? null : () => _confirmDelete(s, e),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -591,6 +595,30 @@ class _JournalScreenState extends State<JournalScreen> {
                                   fontSize: 13,
                                   height: 1.4,
                                   color: AppTheme.neutral600)),
+                        ],
+                        if (e.isPartner) ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: m.color.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.favorite_rounded,
+                                    size: 11, color: m.color),
+                                const SizedBox(width: 4),
+                                Text('From ${p.fatherName}',
+                                    style: GoogleFonts.manrope(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: m.color)),
+                              ],
+                            ),
+                          ),
                         ],
                       ],
                     ),

@@ -12,6 +12,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/cloud_synced_store.dart';
+
 /// One item on a checklist. Either a CATALOG product (non-empty [productId],
 /// resolved via productById) OR a mother's OWN custom product (empty productId
 /// + its own [name]/[link]/[price]). [id] is unique within the list (the
@@ -110,7 +112,7 @@ const List<CuratedList> kCuratedChecklists = [
   ]),
 ];
 
-class ProductChecklistStore extends ChangeNotifier {
+class ProductChecklistStore extends ChangeNotifier with CloudSyncedStore {
   ProductChecklistStore._();
   static final ProductChecklistStore instance = ProductChecklistStore._();
 
@@ -133,6 +135,7 @@ class ProductChecklistStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
 
   // --- queries ---
@@ -249,6 +252,22 @@ class ProductChecklistStore extends ChangeNotifier {
     _seq++;
     return 'cl_${DateTime.now().microsecondsSinceEpoch}_$_seq';
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'product_checklists';
+  @override
+  Object cloudData() => _lists.map((l) => l.toJson()).toList();
+  @override
+  void applyCloudData(Object data) {
+    _lists
+      ..clear()
+      ..addAll((data as List)
+          .map((e) => ProductChecklist.fromJson(Map<String, dynamic>.from(e))));
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   void _persistNotify() {
     notifyListeners();

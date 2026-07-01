@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import 'bought_store.dart';
+import 'remote/cloud_synced_store.dart';
 
 /// The six default sections, plus a "custom" bucket for the mother's own items.
 enum BagCategory { labour, afterDelivery, baby, partner, documents, comfort, custom }
@@ -172,7 +173,7 @@ class BagItem {
   }
 }
 
-class HospitalBagStore extends ChangeNotifier {
+class HospitalBagStore extends ChangeNotifier with CloudSyncedStore {
   HospitalBagStore._();
   static final HospitalBagStore instance = HospitalBagStore._();
 
@@ -317,6 +318,45 @@ class HospitalBagStore extends ChangeNotifier {
     BoughtStore.instance.addListener(markBoughtFromBought);
     markBoughtFromBought();
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'hb';
+  @override
+  Object cloudData() => {
+        'items': _items.map((i) => i.toJson()).toList(),
+        'onboarded': _onboarded,
+        'updatedIso': _updatedIso,
+        'delivery': _delivery.name,
+      };
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _items
+      ..clear()
+      ..addAll(((m['items'] as List?) ?? const [])
+          .map((e) => BagItem.fromJson(Map<String, dynamic>.from(e))));
+    _onboarded = m['onboarded'] == true;
+    _updatedIso = m['updatedIso']?.toString();
+    _delivery = DeliveryType.values.firstWhere(
+        (d) => d.name == (m['delivery'] ?? 'unsure'),
+        orElse: () => DeliveryType.unsure);
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _itemsKey, jsonEncode(_items.map((i) => i.toJson()).toList()));
+    await prefs.setString(
+        _metaKey,
+        jsonEncode({
+          'onboarded': _onboarded,
+          'updatedIso': _updatedIso,
+          'delivery': _delivery.name,
+        }));
   }
 
   // ---- Mutations ------------------------------------------------------------

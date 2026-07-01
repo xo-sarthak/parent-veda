@@ -9,7 +9,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ExpertFollowStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class ExpertFollowStore extends ChangeNotifier with CloudSyncedStore {
   ExpertFollowStore._();
   static final ExpertFollowStore instance = ExpertFollowStore._();
 
@@ -24,6 +26,21 @@ class ExpertFollowStore extends ChangeNotifier {
       ..clear()
       ..addAll(_prefs!.getStringList(_key) ?? const []);
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'followed_experts';
+  @override
+  Object cloudData() => _followed.toList();
+  @override
+  void applyCloudData(Object data) => _followed
+    ..clear()
+    ..addAll((data as List).map((e) => e.toString()));
+  @override
+  Future<void> persistLocalCache() async {
+    await _prefs?.setStringList(_key, _followed.toList());
   }
 
   /// Follow keys are the expert's display name (stable for the seed data).

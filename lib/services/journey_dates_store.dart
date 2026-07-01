@@ -16,7 +16,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class JourneyDatesStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class JourneyDatesStore extends ChangeNotifier with CloudSyncedStore {
   JourneyDatesStore._();
   static final JourneyDatesStore instance = JourneyDatesStore._();
 
@@ -38,7 +40,25 @@ class JourneyDatesStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'journey_dates';
+  @override
+  Object cloudData() => _dates.map((k, v) => MapEntry(k, v.toIso8601String()));
+  @override
+  void applyCloudData(Object data) {
+    _dates.clear();
+    (data as Map).forEach((id, v) {
+      final d = DateTime.tryParse(v.toString());
+      if (d != null) _dates[id.toString()] = d;
+    });
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   /// The mother's override date for [id], or null if she hasn't set one.
   DateTime? dateFor(String id) => _dates[id];

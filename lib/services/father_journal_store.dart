@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/journal_entry.dart';
+import 'remote/supabase_repo.dart';
 
 class FatherJournalStore extends ChangeNotifier {
   FatherJournalStore._();
@@ -39,6 +40,78 @@ class FatherJournalStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Then sync with the cloud (no-op if logged out). Files → Phase 3.
+    await _syncFromCloud();
+  }
+
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows = await SupabaseRepo.fetch('father_journal_entries');
+      final byId = {for (final r in rows) r['id'].toString(): _fromRow(r)};
+      for (final e in _manual) {
+        if (!byId.containsKey(e.id)) {
+          byId[e.id] = e;
+          await SupabaseRepo.insert('father_journal_entries', _toRow(e));
+        }
+      }
+      _manual
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
+  }
+
+  // camelCase model <-> snake_case columns (same shape as journal_entries).
+  Map<String, dynamic> _toRow(JournalEntry e) => {
+        'id': e.id,
+        'type': e.type.name,
+        'title': e.title,
+        'description': e.description,
+        'date': e.date.toIso8601String(),
+        'week_number': e.weekNumber,
+        'image_url': e.imageUrl,
+        'audio_url': e.audioUrl,
+        'image_urls': e.imageUrls,
+        'audio_urls': e.audioUrls,
+        'custom_tag': e.customTag,
+        'tags': e.tags,
+        'is_automatic': e.isAutomatic,
+        'created_at': e.createdAt.toIso8601String(),
+        'updated_at': e.updatedAt.toIso8601String(),
+      };
+
+  JournalEntry _fromRow(Map<String, dynamic> r) {
+    var t = JournalEntryType.memory;
+    for (final e in JournalEntryType.values) {
+      if (e.name == r['type']) {
+        t = e;
+        break;
+      }
+    }
+    DateTime parse(Object? v) =>
+        DateTime.tryParse(v?.toString() ?? '') ?? DateTime.now();
+    List<String> strList(Object? v) =>
+        (v as List?)?.map((e) => e.toString()).toList() ?? const [];
+    return JournalEntry(
+      id: (r['id'] ?? '').toString(),
+      type: t,
+      title: (r['title'] ?? '').toString(),
+      description: (r['description'] ?? '').toString(),
+      date: parse(r['date']),
+      weekNumber: (r['week_number'] as num?)?.toInt() ?? 0,
+      imageUrl: r['image_url']?.toString(),
+      audioUrl: r['audio_url']?.toString(),
+      imageUrls: r['image_urls'] == null ? null : strList(r['image_urls']),
+      audioUrls: r['audio_urls'] == null ? null : strList(r['audio_urls']),
+      customTag: (r['custom_tag'] ?? '').toString(),
+      tags: strList(r['tags']),
+      isAutomatic: r['is_automatic'] == true,
+      createdAt: parse(r['created_at']),
+      updatedAt: parse(r['updated_at']),
+    );
   }
 
   bool get hasEntries => _manual.isNotEmpty;
@@ -54,6 +127,11 @@ class FatherJournalStore extends ChangeNotifier {
     _manual.add(e);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('father_journal_entries', _toRow(e));
+      } catch (_) {}
+    }
   }
 
   Future<void> deleteEntry(String id) async {
@@ -69,6 +147,11 @@ class FatherJournalStore extends ChangeNotifier {
     _manual.removeWhere((x) => x.id == id);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.delete('father_journal_entries', id);
+      } catch (_) {}
+    }
   }
 
   Future<void> _persist() async {

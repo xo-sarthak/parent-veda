@@ -7,7 +7,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProductStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class ProductStore extends ChangeNotifier with CloudSyncedStore {
   ProductStore._();
   static final ProductStore instance = ProductStore._();
 
@@ -21,6 +23,21 @@ class ProductStore extends ChangeNotifier {
       ..clear()
       ..addAll(_prefs?.getStringList(_savedKey) ?? const []);
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'prod_saved';
+  @override
+  Object cloudData() => List<String>.from(_saved);
+  @override
+  void applyCloudData(Object data) => _saved
+    ..clear()
+    ..addAll((data as List).map((e) => e.toString()));
+  @override
+  Future<void> persistLocalCache() async {
+    await _prefs?.setStringList(_savedKey, _saved);
   }
 
   List<String> get savedIds => List.unmodifiable(_saved);

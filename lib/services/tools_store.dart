@@ -589,6 +589,26 @@ class ToolsStore extends ChangeNotifier {
       await _persist(_contractionKey,
           jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
 
+      // kegel_history — append-only; synced as a whole blob in user_state,
+      // merged with the cloud by dateIso (its natural key), then pushed back.
+      final khCloud = await SupabaseRepo.loadState('tool_kegel_history');
+      if (khCloud is List) {
+        final byIso = <String, KegelRecord>{
+          for (final e in _kegelHistory) e.dateIso: e,
+        };
+        for (final e in khCloud) {
+          final r = KegelRecord.fromJson(Map<String, dynamic>.from(e));
+          byIso[r.dateIso] = r;
+        }
+        _kegelHistory
+          ..clear()
+          ..addAll(byIso.values);
+      }
+      await SupabaseRepo.saveState('tool_kegel_history',
+          _kegelHistory.map((e) => e.toJson()).toList());
+      await _persist(_kegelHistKey,
+          jsonEncode(_kegelHistory.map((e) => e.toJson()).toList()));
+
       notifyListeners();
     } catch (_) {/* offline — keep local */}
   }
@@ -823,6 +843,12 @@ class ToolsStore extends ChangeNotifier {
     await _persistKegel();
     await _persist(_kegelHistKey,
         jsonEncode(_kegelHistory.map((e) => e.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.saveState('tool_kegel_history',
+            _kegelHistory.map((e) => e.toJson()).toList());
+      } catch (_) {}
+    }
   }
 
   /// Set a custom routine override (used until cleared).
