@@ -16,6 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../tools/due_date_calculator_screen.dart'
+    show DdcMethod, ddcComputeEdd;
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -75,6 +79,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   String _screen = 'welcome';
   String _stage = ''; // pregnant | new | trying
   DateTime? _pickedDue; // chosen on the Profile step → fed into the app
+  bool _busy = false; // true while a Supabase auth request is in flight
 
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -119,6 +124,101 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     ..showSnackBar(SnackBar(
         content: Text('$label — coming soon'),
         duration: const Duration(milliseconds: 1100)));
+
+  // Shows a message at the bottom of the screen (errors, hints). Pass a larger
+  // [ms] to keep long messages on screen long enough to read.
+  void _toast(String msg, {int ms = 1800}) => ScaffoldMessenger.of(context)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+        content: Text(msg), duration: Duration(milliseconds: ms)));
+
+  // Creates the account in Supabase, then continues the flow.
+  //
+  // auth.signUp inserts a row into auth.users, which fires our SQL trigger
+  // (handle_new_user) → a matching row appears in the `profiles` table.
+  Future<void> _submitSignup() async {
+    final email = _email.text.trim();
+    final password = _password.text;
+
+    // Basic guard so we never send empty / too-short values.
+    if (email.isEmpty || password.length < 6) {
+      _toast('Enter an email and a password of at least 6 characters.');
+      return;
+    }
+    if (_busy) return; // ignore double-taps while a request is running
+    setState(() => _busy = true);
+    _toast('Creating your account…');
+
+    try {
+      await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      if (!mounted) return; // the screen could be gone after the await
+      _go('role'); // success → continue to the role step
+    } on AuthException catch (e) {
+      // Supabase's own message, e.g. "User already registered".
+      if (mounted) _toast(e.message);
+    } catch (_) {
+      if (mounted) _toast('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  // Saves the collected profile details (name, role, due date) into the
+  // user's row in the `profiles` table, then continues to success.
+  //
+  // This is the .update() WRITE pattern — the same shape we'll reuse to save
+  // data into every other table later. `.eq('id', userId)` targets only the
+  // current user's row (RLS enforces that too).
+  Future<void> _saveProfile() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+
+    final client = Supabase.instance.client;
+    final userId = client.auth.currentUser?.id;
+
+    try {
+      if (userId == null) {
+        // No logged-in session → the security rules (RLS) won't let us write.
+        // This happens when "Confirm email" is ON (sign-up doesn't start a
+        // session until the emailed link is clicked).
+        if (mounted) {
+          _toast('Not logged in — turn OFF "Confirm email" & sign up fresh.',
+              ms: 9000);
+        }
+      } else {
+        // .select() makes the update RETURN the rows it changed, so we can
+        // confirm the write actually landed (0 rows = something blocked it).
+        final rows = await client
+            .from('profiles')
+            .update({
+              'name': _name.text.trim(),
+              'role': 'mother',
+              'due_date': _pickedDue?.toIso8601String().split('T').first,
+            })
+            .eq('id', userId)
+            .select();
+        if (mounted) {
+          _toast(
+            rows.isEmpty
+                ? 'Save hit 0 rows (RLS or id mismatch).'
+                : 'Profile saved ✓',
+            ms: rows.isEmpty ? 9000 : 2500,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('saveProfile error: $e'); // full error in the flutter terminal
+      if (mounted) _toast('Save failed: $e', ms: 15000);
+    } finally {
+      if (mounted) {
+        setState(() => _busy = false);
+        _go('success'); // continue regardless; the account already exists
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +438,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const SizedBox(height: 14),
             _field(_password, 'Password', 'Create a password', obscure: true),
             const SizedBox(height: 6),
-            _primaryBtn('Continue', () => _go('role')),
+            _primaryBtn('Continue', _submitSignup),
             const SizedBox(height: 12),
             RichText(
               textAlign: TextAlign.center,
@@ -387,18 +487,20 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     color: _label)),
             const SizedBox(height: 9),
             Row(children: [
+              _stageBtn('Trying', 'to conceive', 'trying'),
+              const SizedBox(width: 9),
               _stageBtn('Pregnant', 'expecting', 'pregnant'),
               const SizedBox(width: 9),
               _stageBtn('New parent', '0–2 yrs', 'new'),
-              const SizedBox(width: 9),
-              _stageBtn('Trying', 'to conceive', 'trying'),
             ]),
             const SizedBox(height: 18),
             _dateField("Due date / baby's birthday"),
-            const SizedBox(height: 6),
-            _primaryBtn('Finish setup', () => _go('success')),
+            const SizedBox(height: 9),
+            _calcDueLink(),
+            const SizedBox(height: 8),
+            _primaryBtn('Finish setup', _saveProfile),
             const SizedBox(height: 12),
-            Center(child: _link('Skip for now', () => _go('success'), color: _label)),
+            Center(child: _link('Skip for now', _saveProfile, color: _label)),
           ]),
         ),
       ]);
@@ -1116,6 +1218,363 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return '${d.day} ${m[d.month - 1]} ${d.year}';
+  }
+
+  // "Don't know your due date?" link under the date field → opens the sheet.
+  Widget _calcDueLink() => Align(
+        alignment: Alignment.centerLeft,
+        child: GestureDetector(
+          onTap: _openDueDateCalc,
+          behavior: HitTestBehavior.opaque,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.auto_awesome_rounded, size: 15, color: _purple),
+            const SizedBox(width: 6),
+            Text("Don't know it? Calculate your due date",
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: _purple)),
+          ]),
+        ),
+      );
+
+  // A sleek bottom sheet that reuses the Due Date Calculator's math (no roadmap,
+  // no app commit) and drops the result straight into the Profile date field.
+  Future<void> _openDueDateCalc() async {
+    FocusScope.of(context).unfocus();
+    var method = DdcMethod.lmp;
+    DateTime? lmp, conception, transfer, scan, known;
+    var cycle = 28, embryoDay = 5, gaWeeks = 8, gaDays = 0;
+
+    DateTime? compute() => ddcComputeEdd(
+          method: method,
+          lmp: lmp,
+          conception: conception,
+          transfer: transfer,
+          scan: scan,
+          known: known,
+          cycle: cycle,
+          embryoDay: embryoDay,
+          gaWeeks: gaWeeks,
+          gaDays: gaDays,
+        );
+
+    final result = await showModalBottomSheet<DateTime>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
+        final lbl = GoogleFonts.plusJakartaSans(
+            fontSize: 12.5, fontWeight: FontWeight.w700, color: _label);
+
+        Widget dateRow(String label, DateTime? value,
+            ValueChanged<DateTime> onPick,
+            {bool future = false}) {
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: lbl),
+            const SizedBox(height: 7),
+            Material(
+              color: _fieldBg,
+              borderRadius: BorderRadius.circular(13),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(13),
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: ctx,
+                    initialDate: value ?? now,
+                    firstDate: future ? now : DateTime(now.year - 1),
+                    lastDate:
+                        future ? DateTime(now.year + 1, now.month + 1) : now,
+                  );
+                  if (picked != null) {
+                    setSheet(() => onPick(
+                        DateTime(picked.year, picked.month, picked.day)));
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(13),
+                    border: Border.all(color: _fieldBorder, width: 1.5),
+                  ),
+                  child: Row(children: [
+                    const Icon(Icons.calendar_today_rounded,
+                        size: 16, color: _purple),
+                    const SizedBox(width: 11),
+                    Text(value == null ? 'Select a date' : _fmtDate(value),
+                        style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            color: value == null ? _hint : _ink)),
+                  ]),
+                ),
+              ),
+            ),
+          ]);
+        }
+
+        Widget methodChip(DdcMethod m, String label) {
+          final on = method == m;
+          return GestureDetector(
+            onTap: () => setSheet(() => method = m),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+              decoration: BoxDecoration(
+                color: on ? const Color(0x1F7C3FC4) : const Color(0x99FFFFFF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: on ? _purple : _fieldBorder, width: on ? 2 : 1),
+              ),
+              child: Text(label,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: on ? const Color(0xFF5B2596) : _muted)),
+            ),
+          );
+        }
+
+        Widget pill(int v, String label, int selected, ValueChanged<int> onTap) {
+          final on = selected == v;
+          return GestureDetector(
+            onTap: () => setSheet(() => onTap(v)),
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              decoration: BoxDecoration(
+                color: on ? _purple : const Color(0x99FFFFFF),
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                    color: on ? _purple : _fieldBorder, width: on ? 2 : 1),
+              ),
+              child: Text(label,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: on ? Colors.white : _muted)),
+            ),
+          );
+        }
+
+        Widget rnd(IconData icon, VoidCallback onTap) => GestureDetector(
+              onTap: () => setSheet(onTap),
+              child: Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: _fieldBg, borderRadius: BorderRadius.circular(10)),
+                child: Icon(icon, size: 18, color: _purple),
+              ),
+            );
+
+        Widget stepRow(String l, int v, VoidCallback dec, VoidCallback inc) =>
+            Row(children: [
+              Text(l, style: lbl),
+              const Spacer(),
+              rnd(Icons.remove_rounded, dec),
+              SizedBox(
+                  width: 36,
+                  child: Text('$v',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: _ink))),
+              rnd(Icons.add_rounded, inc),
+            ]);
+
+        Widget inputs() {
+          switch (method) {
+            case DdcMethod.lmp:
+              return Column(children: [
+                dateRow('First day of last period', lmp, (d) => lmp = d),
+                const SizedBox(height: 14),
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Cycle length: $cycle days', style: lbl),
+                      SliderTheme(
+                        data: SliderTheme.of(ctx).copyWith(
+                            activeTrackColor: _purple, thumbColor: _purple),
+                        child: Slider(
+                          value: cycle.toDouble(),
+                          min: 21,
+                          max: 35,
+                          divisions: 14,
+                          label: '$cycle',
+                          onChanged: (v) =>
+                              setSheet(() => cycle = v.round()),
+                        ),
+                      ),
+                    ]),
+              ]);
+            case DdcMethod.conception:
+              return dateRow(
+                  'Conception date', conception, (d) => conception = d);
+            case DdcMethod.ivf:
+              return Column(children: [
+                dateRow('Embryo transfer date', transfer, (d) => transfer = d),
+                const SizedBox(height: 14),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Embryo age at transfer', style: lbl),
+                          const SizedBox(height: 8),
+                          Row(children: [
+                            pill(3, 'Day 3', embryoDay,
+                                (v) => embryoDay = v),
+                            pill(5, 'Day 5', embryoDay,
+                                (v) => embryoDay = v),
+                          ]),
+                        ]),
+                  ),
+                ]),
+              ]);
+            case DdcMethod.ultrasound:
+              return Column(children: [
+                dateRow('Ultrasound date', scan, (d) => scan = d),
+                const SizedBox(height: 14),
+                Text('Gestational age at scan', style: lbl),
+                const SizedBox(height: 8),
+                stepRow('Weeks', gaWeeks,
+                    () => gaWeeks = (gaWeeks - 1).clamp(4, 40),
+                    () => gaWeeks = (gaWeeks + 1).clamp(4, 40)),
+                const SizedBox(height: 6),
+                stepRow('Days', gaDays,
+                    () => gaDays = (gaDays - 1).clamp(0, 6),
+                    () => gaDays = (gaDays + 1).clamp(0, 6)),
+              ]);
+            case DdcMethod.known:
+              return dateRow('Your due date', known, (d) => known = d,
+                  future: true);
+          }
+        }
+
+        final edd = compute();
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: EdgeInsets.fromLTRB(
+              20, 12, 20, 16 + MediaQuery.of(ctx).viewInsets.bottom),
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: _fieldBorder,
+                        borderRadius: BorderRadius.circular(99))),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Calculate your due date',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: _ink)),
+                ),
+                const SizedBox(height: 3),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Tell us what you know — we'll do the math.",
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12.5, color: _muted)),
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('WHAT DO YOU KNOW?',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          color: _label)),
+                ),
+                const SizedBox(height: 10),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  methodChip(DdcMethod.lmp, 'Last period'),
+                  methodChip(DdcMethod.conception, 'Conception'),
+                  methodChip(DdcMethod.ivf, 'IVF transfer'),
+                  methodChip(DdcMethod.ultrasound, 'Ultrasound'),
+                  methodChip(DdcMethod.known, 'Known date'),
+                ]),
+                const SizedBox(height: 18),
+                inputs(),
+                const SizedBox(height: 18),
+                if (edd != null)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 13),
+                    decoration: BoxDecoration(
+                        color: const Color(0x147C3FC4),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: _fieldBorder, width: 1.5)),
+                    child: Row(children: [
+                      const Icon(Icons.celebration_rounded,
+                          size: 20, color: _purple),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ESTIMATED DUE DATE',
+                                  style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                      color: _label)),
+                              const SizedBox(height: 2),
+                              Text(_fmtDate(edd),
+                                  style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: _ink)),
+                            ]),
+                      ),
+                    ]),
+                  ),
+                SizedBox(
+                  width: double.infinity,
+                  child: GestureDetector(
+                    onTap: edd == null
+                        ? null
+                        : () => Navigator.of(ctx).pop(edd),
+                    child: Opacity(
+                      opacity: edd == null ? 0.45 : 1,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: _purple,
+                            borderRadius: BorderRadius.circular(14)),
+                        child: Text('Use this date',
+                            style: GoogleFonts.plusJakartaSans(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white)),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        );
+      }),
+    );
+
+    if (result != null && mounted) setState(() => _pickedDue = result);
   }
 
   Widget _orDivider(String text) => Padding(

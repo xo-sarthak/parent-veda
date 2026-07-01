@@ -17,6 +17,35 @@ import '../../theme/app_theme.dart';
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
 
+/// Pure estimated-due-date math, shared by the Tools calculator and the sign-up
+/// "calculate your due date" sheet. Keeping the formulas in one place means both
+/// stay in sync. Returns null until the method's required date is provided.
+DateTime? ddcComputeEdd({
+  required DdcMethod method,
+  DateTime? lmp,
+  DateTime? conception,
+  DateTime? transfer,
+  DateTime? scan,
+  DateTime? known,
+  int cycle = 28,
+  int embryoDay = 5,
+  int gaWeeks = 8,
+  int gaDays = 0,
+}) {
+  switch (method) {
+    case DdcMethod.lmp:
+      return lmp?.add(Duration(days: 280 + (cycle - 28)));
+    case DdcMethod.conception:
+      return conception?.add(const Duration(days: 266));
+    case DdcMethod.ivf:
+      return transfer?.add(Duration(days: 266 - embryoDay));
+    case DdcMethod.ultrasound:
+      return scan?.add(Duration(days: 280 - (gaWeeks * 7 + gaDays)));
+    case DdcMethod.known:
+      return known;
+  }
+}
+
 class DueDateCalculatorScreen extends StatefulWidget {
   const DueDateCalculatorScreen({super.key, required this.controller});
   final PregnancyController controller;
@@ -51,20 +80,18 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
 
   DateTime _dOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  DateTime? _compute() {
-    switch (_method) {
-      case DdcMethod.lmp:
-        return _lmp?.add(Duration(days: 280 + (_cycle - 28)));
-      case DdcMethod.conception:
-        return _conception?.add(const Duration(days: 266));
-      case DdcMethod.ivf:
-        return _transfer?.add(Duration(days: 266 - _embryoDay));
-      case DdcMethod.ultrasound:
-        return _scan?.add(Duration(days: 280 - (_gaWeeks * 7 + _gaDays)));
-      case DdcMethod.known:
-        return _known;
-    }
-  }
+  DateTime? _compute() => ddcComputeEdd(
+        method: _method,
+        lmp: _lmp,
+        conception: _conception,
+        transfer: _transfer,
+        scan: _scan,
+        known: _known,
+        cycle: _cycle,
+        embryoDay: _embryoDay,
+        gaWeeks: _gaWeeks,
+        gaDays: _gaDays,
+      );
 
   @override
   Widget build(BuildContext context) {

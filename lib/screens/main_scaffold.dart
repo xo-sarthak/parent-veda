@@ -22,6 +22,9 @@ import '../widgets/pv_tab_bar.dart';
 import 'calendar_screen.dart';
 import 'community_screen.dart';
 import 'father/father_daily_screen.dart';
+import 'father/father_journal_screen.dart';
+import 'father/father_read_aloud_screen.dart';
+import 'father/father_reads_screen.dart';
 import 'home_screen_b.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
@@ -32,6 +35,7 @@ class MainScaffold extends StatefulWidget {
     required this.pregnancy,
     required this.home,
     required this.father,
+    this.isFather = false,
   });
 
   final PregnancyController pregnancy;
@@ -39,6 +43,11 @@ class MainScaffold extends StatefulWidget {
 
   /// Kept threaded through for when Father Mode is un-parked (currently unused).
   final FatherContentController father;
+
+  /// True when this user is the (paired) FATHER — the whole shell runs in the
+  /// father (Slate) structure. The testing Mom|Dad toggle (FatherPreview) also
+  /// flips this at runtime for previewing on a mother account.
+  final bool isFather;
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
@@ -48,6 +57,10 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   void initState() {
     super.initState();
+    // A paired father turns on FatherPreview so every existing father (Slate)
+    // skin — the nav pill, the weekly stack, the week pop-ups — fires too. Set
+    // before wiring the listener so it doesn't bounce a setState during init.
+    if (widget.isFather) FatherPreview.instance.on = true;
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
   }
@@ -75,32 +88,44 @@ class _MainScaffoldState extends State<MainScaffold> {
       animation: widget.pregnancy,
       builder: (context, _) {
         final s = S(widget.pregnancy.language);
-        final fatherPreview = FatherPreview.instance.on;
-        final pages = [
-          // Today — the Daily Moment (Warm Nest), or the Father Daily screen
-          // when the testing mode switch is flipped to Dad.
-          fatherPreview
-              ? FatherDailyScreen(
-                  controller: widget.pregnancy, embedded: true)
-              : HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
-          // Journey — the week-on-week stack (same UI for mother & father; the
-          // father skin/copy is applied inside it when FatherPreview is on).
-          WeeklyCardStackScreen(controller: widget.pregnancy),
-          // Tools — the calm tools hub (Garbh Sanskar moved onto Home).
-          ToolsHubScreen(controller: widget.pregnancy),
-          // Calendar — the pregnancy command center. (Read Next stays reachable
-          // from its Home section, so the pill slot goes to Calendar.)
-          CalendarScreen(controller: widget.pregnancy),
-          // Community.
-          CommunityScreen(controller: widget.pregnancy),
-        ];
-        final tabs = [
-          PvTab(Icons.home_rounded, s.tabToday),
-          PvTab(Icons.explore_rounded, s.tabJourney),
-          PvTab(Icons.widgets_rounded, s.toolsTab),
-          PvTab(Icons.calendar_today_rounded, s.tabCalendar),
-          PvTab(Icons.groups_rounded, s.tabCommunity),
-        ];
+        // Father mode is driven by FatherPreview — set true in initState for a
+        // paired father, and flipped by the testing Mom|Dad toggle otherwise.
+        final fatherMode = FatherPreview.instance.on;
+
+        // The SAME nav-pill structure for both, just father (Slate) content +
+        // colours in father mode. Today + Journey are shared; the other three
+        // become the father's own sections (Reads · Read · Journal).
+        final pages = fatherMode
+            ? [
+                FatherDailyScreen(controller: widget.pregnancy, embedded: true),
+                WeeklyCardStackScreen(controller: widget.pregnancy),
+                const FatherReadsScreen(),
+                FatherReadAloudScreen(controller: widget.pregnancy),
+                FatherJournalScreen(
+                    controller: widget.pregnancy, embedded: true),
+              ]
+            : [
+                HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
+                WeeklyCardStackScreen(controller: widget.pregnancy),
+                ToolsHubScreen(controller: widget.pregnancy),
+                CalendarScreen(controller: widget.pregnancy),
+                CommunityScreen(controller: widget.pregnancy),
+              ];
+        final tabs = fatherMode
+            ? const [
+                PvTab(Icons.home_rounded, 'Today'),
+                PvTab(Icons.explore_rounded, 'Journey'),
+                PvTab(Icons.menu_book_rounded, 'Reads'),
+                PvTab(Icons.auto_stories_rounded, 'Read'),
+                PvTab(Icons.edit_outlined, 'Journal'),
+              ]
+            : [
+                PvTab(Icons.home_rounded, s.tabToday),
+                PvTab(Icons.explore_rounded, s.tabJourney),
+                PvTab(Icons.widgets_rounded, s.toolsTab),
+                PvTab(Icons.calendar_today_rounded, s.tabCalendar),
+                PvTab(Icons.groups_rounded, s.tabCommunity),
+              ];
         return Scaffold(
           backgroundColor: AppTheme.scaffoldBackground,
           body: Stack(
@@ -116,16 +141,18 @@ class _MainScaffoldState extends State<MainScaffold> {
                   activeIndex: AppNav.instance.index,
                   onChanged: (i) => AppNav.instance.go(i),
                   // In Dad mode the nav pill takes the father (Slate) colours.
-                  father: fatherPreview,
+                  father: fatherMode,
                 ),
               ),
-              // TESTING-ONLY Mom | Dad switch, top-right on the Today tab so we
-              // can preview the Father experience. Remove before launch.
+              // TESTING-ONLY Mom | Dad switch — moved to the BOTTOM-RIGHT (floats
+              // above the pill tab bar) so the top-right is free for the profile
+              // avatar on both Mom and Dad. On the Today tab only. Remove before
+              // launch.
               if (AppNav.instance.index == 0)
                 Positioned(
                   right: 14,
-                  top: MediaQuery.of(context).padding.top + 8,
-                  child: _modePill(fatherPreview),
+                  bottom: 96,
+                  child: _modePill(fatherMode),
                 ),
             ],
           ),

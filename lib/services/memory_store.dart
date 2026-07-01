@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/memory_models.dart';
+import 'remote/supabase_repo.dart';
 
 class MemoryStore extends ChangeNotifier {
   MemoryStore._();
@@ -74,7 +75,52 @@ class MemoryStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Sync the weekly notes with the cloud (no-op if logged out). photo_memories
+    // are deferred — a pure-file store (no text), so metadata-only sync isn't
+    // useful until files move to Supabase Storage in Phase 3.
+    await _syncFromCloud();
   }
+
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows = await SupabaseRepo.fetch('weekly_journal_notes');
+      final byId = {for (final r in rows) r['id'].toString(): _noteFromRow(r)};
+      for (final e in _journal) {
+        if (!byId.containsKey(e.id)) {
+          byId[e.id] = e;
+          await SupabaseRepo.insert('weekly_journal_notes', _noteToRow(e));
+        }
+      }
+      _journal
+        ..clear()
+        ..addAll(byId.values);
+      await _persistJournal();
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
+  }
+
+  Map<String, dynamic> _noteToRow(JournalEntry e) => {
+        'id': e.id,
+        'week': e.week,
+        'date_iso': e.dateIso.isEmpty ? null : e.dateIso,
+        'source': e.source,
+        'prompt': e.prompt,
+        'text': e.text,
+        'photos': e.photoPaths,
+      };
+
+  JournalEntry _noteFromRow(Map<String, dynamic> r) => JournalEntry(
+        id: (r['id'] ?? '').toString(),
+        week: (r['week'] as num?)?.toInt() ?? 0,
+        dateIso: (r['date_iso'] ?? '').toString(),
+        source: (r['source'] ?? '').toString(),
+        prompt: (r['prompt'] ?? '').toString(),
+        text: (r['text'] ?? '').toString(),
+        photoPaths:
+            (r['photos'] as List?)?.map((e) => e.toString()).toList() ?? <String>[],
+      );
 
   /// Upgrade-safe migration: older builds allowed several notes per week. We now
   /// keep exactly one entry per week. Collapse any duplicates into a single
@@ -155,6 +201,12 @@ class MemoryStore extends ChangeNotifier {
       await _deleteFiles(removed);
       await _persistJournal();
       notifyListeners();
+      if (SupabaseRepo.isLoggedIn) {
+        try {
+          await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(existing),
+              onConflict: 'id');
+        } catch (_) {}
+      }
       return existing;
     }
     final entry = JournalEntry(
@@ -169,6 +221,11 @@ class MemoryStore extends ChangeNotifier {
     _journal.add(entry);
     await _persistJournal();
     notifyListeners();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('weekly_journal_notes', _noteToRow(entry));
+      } catch (_) {}
+    }
     return entry;
   }
 
@@ -185,6 +242,12 @@ class MemoryStore extends ChangeNotifier {
     }
     await _persistJournal();
     notifyListeners();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
+            onConflict: 'id');
+      } catch (_) {}
+    }
   }
 
   Future<void> deleteJournal(String id) async {
@@ -194,6 +257,11 @@ class MemoryStore extends ChangeNotifier {
     await _deleteFiles(e.photoPaths);
     await _persistJournal();
     notifyListeners();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.delete('weekly_journal_notes', id);
+      } catch (_) {}
+    }
   }
 
   Future<void> _deleteFiles(List<String> paths) async {

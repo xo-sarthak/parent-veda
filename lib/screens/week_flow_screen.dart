@@ -35,6 +35,12 @@ import '../widgets/week_cards/week_overview_card.dart';
 // Mother flow + every other week are unchanged. Strip with FatherPreview.
 bool _fatherWeek(int week) => FatherPreview.instance.on && week == 20;
 
+// Father (Slate) SKIN gate — now ALL weeks (the colour scheme rolled out to
+// every week). CONTENT/copy stays week-20 via [_fatherWeek] until each week is
+// re-voiced, so a non-week-20 father week shows the mother's per-week content in
+// the Slate skin.
+bool _fatherSkin(int week) => FatherPreview.instance.on;
+
 // Slate palette for the father re-skin (mirrors the Father Daily screen). Only
 // used where `_fatherWeek(...)` is true; the mother path never sees these.
 const Color _fBg = Color(0xFFF4EFE8); // warm cream background
@@ -44,7 +50,9 @@ const Color _fMuted = Color(0xFF6A7B82);
 const Color _fAccent = Color(0xFF2E5266); // deep slate (was purple/coral)
 const Color _fAccent2 = Color(0xFFE0915B); // amber highlight
 
-// Father serif header (Fraunces), matching the Father Daily titles.
+// Father serif header (Fraunces) — parked: the father weekly headings moved to
+// the mother's sans font (plusJakartaSans). Kept for revert.
+// ignore: unused_element
 TextStyle _fSerif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
     GoogleFonts.fraunces(
         fontSize: size, fontWeight: w, color: c, height: 1.18, letterSpacing: -0.2);
@@ -497,10 +505,346 @@ const LocalizedText _fMotherBrief = LocalizedText(
     en: "She's in the gentlest stretch of pregnancy — steadier energy, a visible bump, big feelings. Here's how to show up for her this week.",
     hi: 'Woh pregnancy ke sabse aaramdeh daur mein hai — sthir energy, dikhta hua bump, gehre jazbaat. Is hafte uske liye kaise saath dein, yahan dekhein.');
 const LocalizedText _fNextBrief = LocalizedText(
-    en: "Her 20-week anomaly scan is around now — go together if you can. Here's what's coming up.",
-    hi: 'Uska 20-hafte ka anomaly scan is samay hai — ho sake to saath jaayein. Aage kya aana hai, yahan dekhein.');
+    en: "See the scans and check-ups coming up for her — and how to be there for each.",
+    hi: 'Uske aane wale scans aur check-ups dekhein — aur har ek mein kaise saath dein.');
 const LocalizedText _fYouThisWeek =
     LocalizedText(en: 'Her this week', hi: 'Is hafte woh');
+
+// ===========================================================================
+//  PER-WEEK father section briefs (the re-voicing pass). 3rd-person, warm,
+//  partner-facing. Authored trimester by trimester — TRIMESTER 1 (weeks 4–13)
+//  + week 20 below; weeks not yet revoiced fall back to the mother's per-week
+//  content via [_fBabyBriefFor] / [_fMotherBriefFor].
+// ===========================================================================
+const Map<int, LocalizedText> _fBabyBriefs = {
+  4: LocalizedText(
+      en: "Your baby's brain, spinal cord and nervous system are just starting to form, and the cells are multiplying fast. It's all invisible for now, but every day is a big step.",
+      hi: "Aapke baby ke brain, spinal cord aur nervous system ki neenv abhi banna shuru hui hai, aur cells tezi se badh rahe hain. Abhi sab chhupa hua hai, par har din ek bada kadam hai."),
+  5: LocalizedText(
+      en: "Your baby's heart is beginning to beat this week, while the brain, spinal cord and major organs keep developing fast. Tiny as they are, they're working hard every day.",
+      hi: "Is hafte aapke baby ka dil dhadakna shuru ho raha hai, aur brain, spinal cord aur major organs tezi se ban rahe hain. Itne chhote hone par bhi, woh har din mehnat kar rahe hain."),
+  6: LocalizedText(
+      en: "Your baby's heart is now beating regularly, the brain is developing fast, and the first hints of eyes, ears and limbs are forming. So many systems are already under construction.",
+      hi: "Aapke baby ka dil ab regularly dhadak raha hai, brain tezi se ban raha hai, aur aankhein, kaan aur haath-pair ki pehli jhalak ban rahi hai. Itne saare systems pehle se ban rahe hain."),
+  7: LocalizedText(
+      en: "Your baby's brain is growing rapidly, tiny arm and leg buds are appearing, and the eyes, ears and nose are becoming more defined. That little heart is still beating strongly.",
+      hi: "Aapke baby ka brain tezi se badh raha hai, chhote haath aur pair ke buds ban rahe hain, aur aankhein, kaan aur naak saaf hoti ja rahi hain. Woh nanha dil ab bhi mazbooti se dhadak raha hai."),
+  8: LocalizedText(
+      en: "Your baby's fingers and toes are starting to form, the little face is becoming more recognisable, and all the major organs have begun developing. The groundwork for the next stage is in place.",
+      hi: "Aapke baby ke haath-pair ki ungliyaan banna shuru ho rahi hain, nanha chehra zyada saaf dikhne laga hai, aur saare major organs develop hone lage hain. Agle stage ki neev ab taiyar hai."),
+  9: LocalizedText(
+      en: "Your baby's arms and legs are getting longer, the joints are forming, and the first small movements are beginning. The heart now has all four chambers and is working hard.",
+      hi: "Aapke baby ke haath-pair lambe ho rahe hain, joints ban rahe hain, aur pehli chhoti harkatein shuru ho rahi hain. Dil ab chaaron chambers ke saath ban chuka hai aur mehnat kar raha hai."),
+  10: LocalizedText(
+      en: "Your baby's fingers and toes are separating, the jaw and face are taking shape, and the brain is building millions of new connections. There are tiny movements now — still far too small for her to feel.",
+      hi: "Aapke baby ki ungliyaan aur pair alag ho rahe hain, jaw aur chehra ban raha hai, aur brain laakhon nayi connections bana raha hai. Ab nanhi harkatein bhi hoti hain — abhi itni chhoti ki use mehsoos nahi hotin."),
+  11: LocalizedText(
+      en: "Your baby's fingers and toes are fully separated now, the bones are starting to harden, and there's stretching, kicking and moving inside that tiny world. The little face grows clearer by the day.",
+      hi: "Aapke baby ki ungliyaan ab poori tarah alag ho gayi hain, haddiyan mazboot honi shuru ho rahi hain, aur woh apni chhoti duniya mein stretch, kick aur move kar raha hai. Nanha chehra din-ba-din saaf hota ja raha hai."),
+  12: LocalizedText(
+      en: "Most of your baby's major organs have formed and are starting to work. There's arm and leg movement, tiny fingers opening and closing, and reflexes developing every day.",
+      hi: "Aapke baby ke zyadatar major organs ban chuke hain aur kaam karne lage hain. Haath-pair hilte hain, nanhi ungliyaan khulti-bandh hoti hain, aur reflexes har din develop ho rahe hain."),
+  13: LocalizedText(
+      en: "Your baby's vocal cords are forming, fingerprints are starting to develop, and the bones keep getting stronger. There's plenty of free movement inside that tiny world now.",
+      hi: "Aapke baby ke vocal cords ban rahe hain, fingerprints develop hone lage hain, aur haddiyan aur mazboot ho rahi hain. Ab us chhoti duniya mein khoob aazaadi se harkat hoti hai."),
+  14: LocalizedText(
+      en: "Your baby's facial muscles are developing enough for tiny expressions, the neck is getting stronger, and for the first time the body is growing faster than the head.",
+      hi: "Aapke baby ki chehre ki muscles itni develop ho gayi hain ki nanhe expressions ban-ne lage hain, gardan mazboot ho rahi hai, aur pehli baar body sar se zyada tezi se badh raha hai."),
+  15: LocalizedText(
+      en: "Your baby's muscles and bones are getting stronger, with smoother movements of the arms, legs and joints. The ears are developing too, getting ready to hear the world in the weeks ahead.",
+      hi: "Aapke baby ki muscles aur haddiyan mazboot ho rahi hain, aur haath, pair aur joints ki harkatein zyada smooth ho gayi hain. Kaan bhi develop ho rahe hain, aane wale hafton mein duniya sunne ki taiyaari mein."),
+  16: LocalizedText(
+      en: "Your baby's bones are hardening, the muscles are getting stronger, and the ears are developing fast — soon there'll be the first responses to sounds from the outside world.",
+      hi: "Aapke baby ki haddiyan mazboot ho rahi hain, muscles strong ho rahe hain, aur kaan tezi se develop ho rahe hain — jald hi bahar ki duniya ki aawaazon par pehli react dikhegi."),
+  17: LocalizedText(
+      en: "Your baby's skeleton is turning from soft cartilage into stronger bone, the muscles are growing more powerful, and there's lots of practising of the movements that help growth.",
+      hi: "Aapke baby ka skeleton naram cartilage se mazboot haddi mein badal raha hai, muscles aur powerful ho rahi hain, aur woh aisi movements practice kar raha hai jo growth mein madad karti hain."),
+  18: LocalizedText(
+      en: "Your baby's ears are developing fast and the brain is making millions of new connections. Arm and leg movements are more controlled now, and the nervous system is getting more sophisticated.",
+      hi: "Aapke baby ke kaan tezi se develop ho rahe hain aur brain laakhon naye connections bana raha hai. Haath-pair ab zyada control ke saath hilte hain, aur nervous system aur advanced ho raha hai."),
+  19: LocalizedText(
+      en: "Your baby's brain keeps developing fast, the senses are sharpening, and a protective coating called vernix is forming on the skin. The arms and legs are stronger, and there's more activity than ever.",
+      hi: "Aapke baby ka brain tezi se develop ho raha hai, senses aur sharp ho rahe hain, aur skin par vernix naam ki protective coating ban rahi hai. Haath-pair mazboot hain, aur pehle se zyada activity hai."),
+  20: _fBabyBrief,
+  21: LocalizedText(
+      en: "Your baby's taste buds are developing, more amniotic fluid is being swallowed, and the movements are getting stronger and better coordinated. The brain keeps making millions of new connections.",
+      hi: "Aapke baby ke taste buds develop ho rahe hain, woh zyada amniotic fluid nigal raha hai, aur harkatein mazboot aur zyada coordinated ho rahi hain. Brain laakhon naye connections banata ja raha hai."),
+  22: LocalizedText(
+      en: "Your baby's hearing is developing fast — picking up her heartbeat, voices (yours included) and even some sounds from outside the womb. That little brain is busy learning from all of it.",
+      hi: "Aapke baby ki hearing tezi se develop ho rahi hai — uski dil ki dhadkan, awaazein (aapki bhi) aur womb ke bahar ki kuch aawaazein bhi sun raha hai. Woh nanha brain in sab se seekhta ja raha hai."),
+  23: LocalizedText(
+      en: "Your baby's brain is developing at an incredible pace — new connections forming every second, laying the groundwork for learning, memory and movement. The hearing keeps improving, and familiar sounds are being recognised.",
+      hi: "Aapke baby ka brain zabardast raftaar se develop ho raha hai — har second naye connections ban rahe hain, jo seekhne, yaad rakhne aur movement ki neenv banate hain. Hearing behtar ho rahi hai, aur jaani-pehchaani aawazein pehchaani jaane lagi hain."),
+  24: LocalizedText(
+      en: "Your baby's hearing is getting sharper, the brain keeps building new pathways, and regular periods of sleep and activity are starting to form. The lungs are continuing their important development too.",
+      hi: "Aapke baby ki hearing aur sharp ho rahi hai, brain naye rastey banata ja raha hai, aur sone-jaagne ke regular periods ban-ne lage hain. Lungs bhi apna important development safar jaari rakhe hue hain."),
+  25: LocalizedText(
+      en: "Your baby's hearing is getting more refined and there are responses to the sounds around now. The brain keeps developing fast, and the movements are stronger and better coordinated.",
+      hi: "Aapke baby ki hearing aur refined ho rahi hai aur ab aas-paas ki aawaazon par react hota hai. Brain tezi se develop ho raha hai, aur harkatein aur mazboot aur coordinated ho rahi hain."),
+  26: LocalizedText(
+      en: "Your baby's eyes are starting to open, the hearing keeps improving, and the brain is developing rapidly. There are responses now to sounds, movement and changes in the surroundings.",
+      hi: "Aapke baby ki aankhein khulna shuru ho rahi hain, hearing behtar ho rahi hai, aur brain tezi se develop ho raha hai. Ab aawazon, movement aur maahaul ke badlaav par react hota hai."),
+  27: LocalizedText(
+      en: "Your baby's brain, lungs and nervous system keep maturing fast. There's practising of breathing movements, eyes opening and closing, and a little more strength every day.",
+      hi: "Aapke baby ka brain, lungs aur nervous system tezi se mature ho rahe hain. Breathing movements ki practice ho rahi hai, aankhein khulti-bandh hoti hain, aur har din thodi aur mazbooti aati hai."),
+  28: LocalizedText(
+      en: "Your baby can open and close those eyes now, blink and respond to light. The brain is developing fast, and the lungs keep preparing for life outside the womb.",
+      hi: "Aapka baby ab aankhein khol-band kar sakta hai, blink kar sakta hai aur roshni par react karta hai. Brain tezi se develop ho raha hai, aur lungs womb ke bahar ki zindagi ke liye taiyaari karte ja rahe hain."),
+  29: LocalizedText(
+      en: "Your baby is building fat under the skin, strengthening those muscles, and maturing the lungs and brain. The movements are getting more powerful with every passing week.",
+      hi: "Aapka baby skin ke neeche fat bana raha hai, muscles mazboot kar raha hai, aur lungs aur brain ko mature kar raha hai. Har hafte ke saath harkatein aur powerful hoti ja rahi hain."),
+  30: LocalizedText(
+      en: "Your baby's brain is developing new folds and connections, the lungs keep maturing, and body fat is building up — the kind that helps keep warm after birth.",
+      hi: "Aapke baby ke brain mein naye folds aur connections ban rahe hain, lungs mature hote ja rahe hain, aur body fat badh raha hai — wahi jo birth ke baad garam rakhne mein madad karta hai."),
+  31: LocalizedText(
+      en: "Your baby is gaining body fat, building muscle, and maturing the lungs and brain. The movements are stronger than ever, even as space inside starts to feel a little tighter.",
+      hi: "Aapka baby body fat badha raha hai, muscles bana raha hai, aur lungs aur brain ko mature kar raha hai. Andar jagah thodi tang hone lagi hai, phir bhi harkatein pehle se zyada mazboot hain."),
+  32: LocalizedText(
+      en: "Your baby is practising breathing movements, sleeping in cycles, and maturing the lungs and nervous system. The body is storing up the nutrients and energy needed for life after birth.",
+      hi: "Aapka baby saans lene ki movements practice kar raha hai, cycles mein so raha hai, aur lungs aur nervous system ko mature kar raha hai. Body janam ke baad ki zindagi ke liye zaroori nutrients aur energy store kar raha hai."),
+  33: LocalizedText(
+      en: "Your baby's brain and lungs keep maturing, and antibodies are passing across from her — protection that will help after birth. There's more fat and a little more strength every day.",
+      hi: "Aapke baby ke brain aur lungs mature hote ja rahe hain, aur uss se antibodies baby tak pahunch rahi hain — jo birth ke baad raksha mein madad karengi. Har din thoda aur fat aur thodi aur mazbooti aati hai."),
+  34: LocalizedText(
+      en: "Your baby's lungs keep maturing, the brain is developing fast, and body fat is building to help with temperature after birth. Most of the systems are now getting ready for life outside the womb.",
+      hi: "Aapke baby ke lungs mature hote ja rahe hain, brain tezi se develop ho raha hai, aur body fat badh raha hai jo birth ke baad temperature mein madad karega. Zyadatar systems ab womb ke bahar ki zindagi ke liye taiyaar ho rahe hain."),
+  35: LocalizedText(
+      en: "Your baby's lungs are nearly mature, the brain keeps developing fast, and body fat is building every day. Around this stage many babies begin settling into a head-down position, ready for the way out.",
+      hi: "Aapke baby ke lungs lagbhag mature ho chuke hain, brain tezi se develop hota ja raha hai, aur har din body fat badh raha hai. Is stage ke aas-paas kai babies head-down position mein settle hone lagte hain, bahar aane ke liye taiyaar."),
+  36: LocalizedText(
+      en: "Your baby's lungs are almost fully mature, the brain keeps developing fast, and the reflexes for after birth — sucking, grasping — are being practised. Nearly ready to meet you both.",
+      hi: "Aapke baby ke lungs lagbhag poori tarah mature ho chuke hain, brain tezi se develop hota ja raha hai, aur birth ke baad ke reflexes — chusna, pakadna — practice ho rahe hain. Aap dono se milne ke lagbhag taiyaar."),
+  37: LocalizedText(
+      en: "Your baby's lungs are ready for life outside the womb, the brain keeps developing, and the reflexes for after birth are being practised. Most of the growth now is about gaining strength and storing energy — full-term is here.",
+      hi: "Aapke baby ke lungs womb ke bahar ki zindagi ke liye taiyaar hain, brain develop hota rehta hai, aur birth ke baad ke reflexes practice ho rahe hain. Ab zyadatar growth taakat banane aur energy store karne par hai — full-term aa gaya hai."),
+  38: LocalizedText(
+      en: "Your baby's lungs are ready, the brain is still developing fast, and strength and energy reserves keep building. Most of the work now is simply getting ready for birth and the world outside.",
+      hi: "Aapke baby ke lungs taiyaar hain, brain abhi bhi tezi se develop ho raha hai, aur taakat aur energy reserves banti ja rahi hain. Ab zyadatar kaam bas janam aur bahar ki duniya ke liye taiyaari karna hai."),
+  39: LocalizedText(
+      en: "Your baby's lungs are ready for that first breath, the reflexes are developed, and small reserves of fat and energy keep building. Most of the work now is simply waiting for labour to begin.",
+      hi: "Aapke baby ke lungs pehli saans ke liye taiyaar hain, reflexes develop ho chuke hain, aur fat aur energy ke chote reserves banti ja rahi hain. Ab zyadatar kaam bas labour shuru hone ka intezaar karna hai."),
+  40: LocalizedText(
+      en: "Your baby's lungs are ready for that first breath, and the heart, brain and body are all prepared for life outside the womb. Right now, your baby is just waiting for the perfect moment to begin the journey into your arms.",
+      hi: "Aapke baby ke lungs pehli saans ke liye taiyaar hain, aur dil, brain aur body sab womb ke bahar ki zindagi ke liye taiyaar hain. Abhi, aapka baby bas us perfect pal ka intezaar kar raha hai jab woh aapki baahon mein apna safar shuru karega."),
+};
+
+const Map<int, LocalizedText> _fMotherBriefs = {
+  4: LocalizedText(
+      en: "Excitement, disbelief and a little anxiety are probably arriving all at once as she takes in the news. A calm, steady you helps more than you'd think.",
+      hi: "News ko samajhte hue excitement, yakeen na hona aur thodi anxiety shayad ek saath aa rahe hain. Aapka shaant aur sthir hona socha se zyada madad karta hai."),
+  5: LocalizedText(
+      en: "She may swing between excitement, joy, disbelief and worry through the day. None of it needs fixing — just let her know you're in it together.",
+      hi: "Din bhar woh excitement, khushi, yakeen na hona aur fikr ke beech jhool sakti hai. Inhe theek karne ki zaroorat nahi — bas use ehsaas dilayein ki aap saath hain."),
+  6: LocalizedText(
+      en: "She might feel excited one moment and wiped out the next — the ups and downs are normal this week. Picking up a few chores quietly goes a long way.",
+      hi: "Kabhi woh excited feel karegi, agle hi pal thaki hui — is hafte yeh utaar-chadhaav normal hai. Chupchaap kuch kaam sambhaal lena bahut madad karta hai."),
+  7: LocalizedText(
+      en: "She may feel excited one moment and worried the next — those swings are a normal part of early pregnancy. Patience and a listening ear are the best things you can offer.",
+      hi: "Kabhi woh excited, to agle pal pareshaan — early pregnancy mein yeh utaar-chadhaav normal hai. Sabra aur dhyaan se sunna sabse achhi cheez hai jo aap de sakte hain."),
+  8: LocalizedText(
+      en: "With her first big scan coming up, she's probably feeling a mix of excitement and uncertainty. Offer to go with her — it helps to have you there.",
+      hi: "Pehla bada scan paas aate hue, woh shayad excitement aur uncertainty dono mehsoos kar rahi hai. Saath jaane ki peshkash karein — aapka wahan hona madad karta hai."),
+  9: LocalizedText(
+      en: "She may feel more connected to the pregnancy now, even while wondering what's ahead. Small check-ins — 'how are you feeling today?' — mean a lot.",
+      hi: "Ab woh pregnancy se zyada juda mehsoos kar sakti hai, bhale hi aage kya hoga yeh soch rahi ho. Chhote sawaal — 'aaj kaisa lag raha hai?' — bahut maayne rakhte hain."),
+  10: LocalizedText(
+      en: "She may feel closer to the pregnancy while still carrying some uncertainty about the future. Just being someone she can talk it through with helps settle the nerves.",
+      hi: "Woh pregnancy se zyada juda mehsoos kar sakti hai, par future ko le kar thodi uncertainty bhi reh sakti hai. Bas aisa koi hona jisse woh baat kar sake, ghabraahat ko shaant karta hai."),
+  11: LocalizedText(
+      en: "She may feel more confident than a few weeks ago, though the odd worry is still completely normal. Keep reassuring her — and keep showing up at the appointments.",
+      hi: "Kuch hafte pehle ke mukable woh zyada confident mehsoos kar sakti hai, par kabhi-kabhi fikr hona bilkul normal hai. Use bharosa dilaate rahein — aur appointments mein saath aate rahein."),
+  12: LocalizedText(
+      en: "Reaching the end of the first trimester, she may feel relief, gratitude and fresh confidence. A lovely moment to celebrate together — you've come through the hardest early stretch.",
+      hi: "Pehle trimester ke ant tak pahunchte hue, woh rahat, kritagyata aur naya confidence mehsoos kar sakti hai. Yeh saath jashn manane ka pyaara pal hai — aap sabse mushkil shuruaati daur paar kar aaye hain."),
+  13: LocalizedText(
+      en: "As the first trimester closes, relief and excitement often take the place of the early uncertainty. A good time to start dreaming and planning the next stretch together.",
+      hi: "Pehla trimester khatam hote hue, shuruaati uncertainty ki jagah aksar rahat aur excitement le leti hai. Agle daur ke sapne dekhne aur saath planning shuru karne ka achha samay."),
+  14: LocalizedText(
+      en: "She may feel more connected to the baby now that the pregnancy is starting to show to the world. Noticing the bump with her — without making her self-conscious — is a sweet way to share it.",
+      hi: "Ab jab pregnancy bahar dikhne lagi hai, woh baby se aur juda mehsoos kar sakti hai. Bump ko uske saath notice karna — bina use self-conscious banaaye — ise baantne ka pyaara tareeka hai."),
+  15: LocalizedText(
+      en: "She may feel more settled and optimistic now, and might be starting to picture life after the birth. It's a lovely time to dream about it together.",
+      hi: "Ab woh zyada settled aur umeed se bhari mehsoos kar sakti hai, aur janm ke baad ki zindagi ki kalpana karne lag sakti hai. Ise saath sapna dekhne ka pyaara samay hai."),
+  16: LocalizedText(
+      en: "She's likely feeling more confident and emotionally settled in this phase. A good stretch to enjoy together before the busier weeks ahead.",
+      hi: "Is phase mein woh shayad zyada confident aur emotionally settled mehsoos kar rahi hai. Aage ke vyast hafton se pehle ise saath enjoy karne ka achha daur hai."),
+  17: LocalizedText(
+      en: "Excitement often grows around now as she starts anticipating the first movements she'll actually feel. Ask her about them — sharing that wait builds the bond.",
+      hi: "Is samay aksar excitement badh jaati hai kyunki woh pehli mehsoos hone wali harkaton ka intezaar karne lagti hai. Unke baare mein uss se poochein — woh intezaar baantna bond banata hai."),
+  18: LocalizedText(
+      en: "With the anomaly scan approaching, excitement is building and the baby feels more real than ever for her. Plan to be at that scan with her if you can.",
+      hi: "Anomaly scan paas aate hue excitement badh rahi hai aur baby uske liye pehle se kahin zyada real lag raha hai. Ho sake to us scan mein uske saath rehne ka plan banayein."),
+  19: LocalizedText(
+      en: "She may feel excited about the anomaly scan while also wondering what the second half of pregnancy holds. Being curious alongside her — not rushing to reassure — helps most.",
+      hi: "Woh anomaly scan ko lekar excited mehsoos kar sakti hai, saath hi soch sakti hai ki pregnancy ka agla aadha hissa kya laayega. Uske saath jigyasu rehna — jaldi bharosa dene ke bajaye — sabse zyada madad karta hai."),
+  20: _fMotherBrief,
+  21: LocalizedText(
+      en: "As the movements get more frequent and noticeable, she's likely feeling more and more connected to the baby. Put a hand on the bump with her when there's a kick — it's a moment you can share.",
+      hi: "Jaise-jaise harkatein zyada frequent aur noticeable hoti hain, woh baby se aur juda mehsoos kar rahi hai. Jab kick ho to uske saath bump par haath rakhein — yeh pal aap dono baant sakte hain."),
+  22: LocalizedText(
+      en: "Many mothers feel a stronger bond once they realise the baby can hear their voice — she may too. A good reason for you both to talk and sing to the bump now.",
+      hi: "Bahut si mothers ko gehra bond mehsoos hota hai jab pata chalta hai ki baby unki awaaz sun sakta hai — woh bhi aisa feel kar sakti hai. Ab bump se baat karne aur gungunaane ka achha bahaana."),
+  23: LocalizedText(
+      en: "She's likely feeling deeply connected now as the baby's movement patterns become familiar. She may start noticing when the baby is awake or resting — ask her about it.",
+      hi: "Ab jab baby ke movement patterns familiar ho rahe hain, woh gehraai se juda mehsoos kar rahi hai. Woh notice karne lag sakti hai ki baby kab jaag raha hai ya aaram kar raha hai — uss se poochein."),
+  24: LocalizedText(
+      en: "As the baby's movement patterns become familiar, she may be feeling a deeper connection. Around now there may be a glucose test too — offer to go along and keep her company.",
+      hi: "Jaise-jaise baby ke movement patterns familiar hote hain, woh gehra connection mehsoos kar sakti hai. Is samay glucose test bhi ho sakta hai — saath jaane aur uska saath dene ki peshkash karein."),
+  25: LocalizedText(
+      en: "She may feel a deeper connection as she starts recognising the baby's own unique movement patterns. When she points one out, lean in — those shared moments matter.",
+      hi: "Jab woh baby ke apne khaas movement patterns pehchaanne lagti hai, woh gehra connection mehsoos kar sakti hai. Jab woh koi harkat bataye, dhyaan dein — woh saanjhe pal maayne rakhte hain."),
+  26: LocalizedText(
+      en: "She may feel grateful and connected, and increasingly aware that the third trimester is near. A good moment to start thinking together about the months ahead.",
+      hi: "Woh grateful aur juda mehsoos kar sakti hai, aur yeh ehsaas badh raha hai ki teesra trimester kareeb hai. Aane wale mahinon ke baare mein saath sochna shuru karne ka achha pal."),
+  27: LocalizedText(
+      en: "Entering the final trimester, she may feel proud, excited and a little overwhelmed all at once. Taking a few things off her plate now goes a long way.",
+      hi: "Final trimester mein aate hue, woh proud, excited aur thoda overwhelmed ek saath mehsoos kar sakti hai. Ab uske kuch kaam sambhaal lena bahut madad karta hai."),
+  28: LocalizedText(
+      en: "She may be balancing excitement about meeting the baby with the first real thoughts about labour and birth. A good time to start learning the plan together.",
+      hi: "Woh baby se milne ki excitement ke saath labour aur birth ke pehle asli khayaalon ko balance kar rahi ho sakti hai. Plan saath seekhna shuru karne ka achha samay."),
+  29: LocalizedText(
+      en: "She may be thinking more and more about labour, delivery and life with the newborn. Listening as she talks it through — and helping where you can — eases the load.",
+      hi: "Woh labour, delivery aur newborn ke saath zindagi ke baare mein zyada sochne lag sakti hai. Jab woh ise baat karke samjhe to sunna — aur jahan ho sake madad karna — bojh halka karta hai."),
+  30: LocalizedText(
+      en: "She may be thinking seriously now about labour, delivery and the recovery afterwards. Reading up on postpartum support with her shows you're in this for the long haul.",
+      hi: "Woh ab labour, delivery aur uske baad ki recovery ke baare mein gambhirta se soch sakti hai. Postpartum support ke baare mein uske saath padhna dikhaata hai ki aap lambe safar ke liye saath hain."),
+  31: LocalizedText(
+      en: "She may swing between excitement about meeting the baby and feeling overwhelmed by all there still is to prepare. Taking a few prep tasks off her list is a real gift right now.",
+      hi: "Woh kabhi baby se milne ke excitement aur kabhi abhi tak taiyaar karne wali har cheez se overwhelmed mehsoos kar sakti hai. Kuch prep ke kaam uski list se hata lena abhi sacha tohfa hai."),
+  32: LocalizedText(
+      en: "She may be mentally preparing for labour while picturing life with the newborn. Around now there's often a growth scan — go along if you can, it's reassuring for you both.",
+      hi: "Woh newborn ke saath zindagi ki kalpana karte hue labour ke liye mansik taiyaari kar rahi ho sakti hai. Is samay aksar growth scan hota hai — ho sake to saath jaayein, aap dono ke liye rahat-bhara hota hai."),
+  33: LocalizedText(
+      en: "She may feel excited, protective and increasingly focused on getting ready for the baby's arrival. Sorting the nursery or the hospital bag together channels that energy well.",
+      hi: "Woh excited, protective aur baby ke aane ki taiyaari par zyada focused mehsoos kar sakti hai. Nursery ya hospital bag saath taiyaar karna us energy ko achhe se istemaal karta hai."),
+  34: LocalizedText(
+      en: "She may feel a mix of excitement, anticipation and the odd flash of nerves about labour and delivery. Steady reassurance — and having the plan ready — settles a lot of that.",
+      hi: "Woh labour aur delivery ko le kar excitement, intezaar aur kabhi-kabhi nervousness ka mishran mehsoos kar sakti hai. Sthir bharosa — aur plan taiyaar rakhna — usmein se bahut kuch shaant kar deta hai."),
+  35: LocalizedText(
+      en: "Excitement and anticipation are often mixed with a real curiosity about when labour will start. The 'any day now' feeling is exciting — and a little nerve-wracking for her.",
+      hi: "Excitement aur intezaar ke saath aksar yeh curiosity bhi hoti hai ki labour kab shuru hoga. 'Kisi bhi din' wala ehsaas exciting hai — aur uske liye thoda nerve-wracking bhi."),
+  36: LocalizedText(
+      en: "Excitement, impatience and anticipation often grow stronger as the due date nears. This is the week to have the hospital bag packed and the plan locked in together.",
+      hi: "Jaise-jaise due date paas aati hai, excitement, besabri aur intezaar aksar aur badh jaate hain. Yeh woh hafta hai jab hospital bag pack aur plan saath taiyaar hona chahiye."),
+  37: LocalizedText(
+      en: "Excitement, impatience and anticipation are very common now — she may be wondering every single day whether today's the day. Keep your phone on and stay close by.",
+      hi: "Ab excitement, besabri aur intezaar bahut aam hain — woh har din soch sakti hai ki kya aaj woh din hai. Apna phone on rakhein aur paas rahein."),
+  38: LocalizedText(
+      en: "As the end of pregnancy nears, she may feel excited, impatient, emotional or deeply reflective — sometimes all at once. Just being present and unhurried with her means a lot now.",
+      hi: "Pregnancy ke ant ke kareeb aate hue, woh excited, beqaraar, emotional ya gehraai se vichaarsheel mehsoos kar sakti hai — kabhi sab ek saath. Abhi uske saath maujood aur bina jaldbaazi ke rehna bahut maayne rakhta hai."),
+  39: LocalizedText(
+      en: "She may feel excited, impatient, emotional, nervous — or all of them in the same day. Every one of those feelings is normal; your calm, steady presence is the anchor.",
+      hi: "Woh excited, beqaraar, emotional, nervous — ya ek hi din mein yeh sab mehsoos kar sakti hai. In sab feelings ka aana normal hai; aapki shaant, sthir maujoodgi hi sahara hai."),
+  40: LocalizedText(
+      en: "She may feel excited, impatient, emotional, nervous, peaceful — or all of these in a single day. Every feeling is valid; you've reached the finish line together, and your steadiness matters most now.",
+      hi: "Woh excited, beqaraar, emotional, nervous, peaceful — ya ek hi din mein yeh sab mehsoos kar sakti hai. Har feeling valid hai; aap saath finish line tak pahunch gaye hain, aur abhi aapki sthirta sabse zyada maayne rakhti hai."),
+};
+
+// The father section brief for a week: the re-voiced copy where authored, else
+// the mother's per-week content (until that week is revoiced).
+LocalizedText _fBabyBriefFor(WeekContent w) =>
+    _fBabyBriefs[w.week] ?? w.development.whatImDoing;
+LocalizedText _fMotherBriefFor(WeekContent w) =>
+    _fMotherBriefs[w.week] ?? w.mom.emotionalState;
+
+// Father "What's next" — Scans & appointments only, re-voiced for the partner:
+// what's coming up for her, and how he can show up for each.
+const LocalizedText _fNextLabel =
+    LocalizedText(en: "What's coming up", hi: 'Aage kya aana hai');
+
+class _FScan {
+  const _FScan(this.week, this.emoji, this.title, this.when, this.body, this.help);
+  final int week; // the anchor week, so the father's What's-next filters by week
+  final String emoji;
+  final LocalizedText title;
+  final LocalizedText when;
+  final LocalizedText body; // what the appointment is
+  final LocalizedText help; // how he can show up for it
+}
+
+const LocalizedText _fScansIntro = LocalizedText(
+    en: "These are the same scans and check-ups she'll have — here's what each one is, and how to be there for it.",
+    hi: "Yeh wahi scans aur check-ups hain jo use honge — har ek kya hai, aur usmein kaise saath dein, yahan dekhein.");
+
+// The MOTHER's scans (same data as kJourneyMilestones medical), re-voiced for the
+// partner: what each is + how to show up. One per scan type, filtered by week, so
+// the father's What's-next works on EVERY week (not just 20). NOT father-only
+// scans — the same appointments, his lens.
+const List<_FScan> _fScans = [
+  _FScan(
+    7,
+    '🔎',
+    LocalizedText(en: 'Dating / early scan', hi: 'Dating / early scan'),
+    LocalizedText(en: 'Weeks 6–9', hi: 'Hafte 6–9'),
+    LocalizedText(
+        en: "The first proper look at the baby — it confirms the due date and the heartbeat. For many couples this is the moment it all feels real.",
+        hi: "Baby ki pehli theek-thaak jhalak — yeh due date aur dhadkan confirm karta hai. Kai couples ke liye yahi woh pal hota hai jab sab kuch asli lagne lagta hai."),
+    LocalizedText(
+        en: "Go with her if you can — it's a lovely first memory to share. A full bladder is often needed, so plan the timing together.",
+        hi: "Ho sake to uske saath jaayein — yeh saath baantne wali pehli pyaari yaad hai. Aksar bhara hua bladder chahiye hota hai, isliye timing saath plan karein."),
+  ),
+  _FScan(
+    12,
+    '🧬',
+    LocalizedText(en: 'NT scan & first screening', hi: 'NT scan aur pehli screening'),
+    LocalizedText(en: 'Weeks 11–14', hi: 'Hafte 11–14'),
+    LocalizedText(
+        en: "A scan (often with a blood test) that checks the baby's growth and screens for some conditions. Waiting for the results can stir a little anxiety.",
+        hi: "Ek scan (aksar blood test ke saath) jo baby ki growth dekhta hai aur kuch conditions ki screening karta hai. Results ka intezaar thodi ghabraahat la sakta hai."),
+    LocalizedText(
+        en: "Be there for the appointment, and be the steady one while you wait for results. Most come back reassuring.",
+        hi: "Appointment mein saath rahein, aur results ke intezaar mein shaant sahara banein. Zyaadatar rahat dene wale aate hain."),
+  ),
+  _FScan(
+    20,
+    '🔍',
+    LocalizedText(
+        en: 'Her 20-week anomaly scan', hi: 'Uska 20-hafte ka anomaly scan'),
+    LocalizedText(en: 'Weeks 18–22', hi: 'Hafte 18–22'),
+    LocalizedText(
+        en: "This detailed scan checks the baby's heart, brain, spine and organs — and often shows the sex, if you both want to know. A big, emotional moment, and most findings are reassuring.",
+        hi: "Yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai — aur agar aap dono jaanna chaahein to aksar sex bhi dikha deta hai. Ek bada, bhaavuk pal, aur zyaadatar findings rahat dene wale hote hain."),
+    LocalizedText(
+        en: "Go with her if you possibly can. Write your questions down together beforehand, and just be the calm beside her in the room.",
+        hi: "Ho sake to zaroor uske saath jaayein. Sawaal pehle se saath likh lein, aur room mein uske paas bas shaant maujoodgi banein."),
+  ),
+  _FScan(
+    26,
+    '🩸',
+    LocalizedText(en: 'Glucose screening', hi: 'Glucose screening'),
+    LocalizedText(en: 'Weeks 24–28', hi: 'Hafte 24–28'),
+    LocalizedText(
+        en: "A routine test for gestational diabetes. She may have to fast and then wait a while after a sugary drink, so it can be a long, tiring morning for her.",
+        hi: "Gestational diabetes ke liye ek routine test. Use fast karna pad sakta hai aur sugary drink ke baad thoda intezaar karna hota hai, isliye uske liye subah lambi aur thakaane wali ho sakti hai."),
+    LocalizedText(
+        en: "Offer to drive and keep her company through the waiting. Have a proper snack ready for the minute it's done.",
+        hi: "Use le jaane aur intezaar mein saath dene ki peshkash karein. Test khatam hote hi ek achha snack taiyar rakhein."),
+  ),
+  _FScan(
+    32,
+    '📏',
+    LocalizedText(en: 'Growth scan', hi: 'Growth scan'),
+    LocalizedText(en: 'Weeks 30–34', hi: 'Hafte 30–34'),
+    LocalizedText(
+        en: "A check on the baby's size, position and the fluid around them, making sure everything is on track for the weeks ahead.",
+        hi: "Baby ke size, position aur uske aas-paas ke fluid ki jaanch, taaki aane wale hafton ke liye sab theek raste par ho."),
+    LocalizedText(
+        en: "Another lovely one to attend together. If the baby isn't head-down yet, don't worry — there's still plenty of time to turn.",
+        hi: "Saath jaane wala ek aur pyaara moka. Agar baby abhi sir-neeche nahi hai to chinta na karein — palatne ke liye abhi kaafi samay hai."),
+  ),
+  _FScan(
+    36,
+    '📝',
+    LocalizedText(en: 'Birth plan & final checks', hi: 'Birth plan aur aakhri checks'),
+    LocalizedText(en: 'Weeks 36–38', hi: 'Hafte 36–38'),
+    LocalizedText(
+        en: "Around now you'll talk through the birth plan, and she may have a GBS swab and more frequent check-ups as the due date nears.",
+        hi: "Is samay aap birth plan par baat karenge, aur due date paas aate hi use GBS swab aur zyada baar check-ups ho sakte hain."),
+    LocalizedText(
+        en: "Learn the plan with her so you can speak up for her on the day. Pack the hospital bag together and keep the car ready.",
+        hi: "Plan use ke saath seekhein taaki us din aap uski awaaz ban sakein. Hospital bag saath pack karein aur gaadi taiyar rakhein."),
+  ),
+];
 
 // Father trimester section — same topics as the mother's tips, re-voiced as
 // "what she's going through + how you can help" (he isn't in the trimester, so
@@ -511,35 +855,101 @@ const LocalizedText _fTipsSubtitle = LocalizedText(
     en: "What she's going through — and how to help",
     hi: 'Woh kya mehsoos kar rahi hai, aur kaise madad karein');
 
-const List<TrimesterTip> _fTrimesterTips = [
-  TrimesterTip(
-    emoji: '🔍',
-    title: LocalizedText(
-        en: 'Be there for her anomaly scan',
-        hi: 'Uske anomaly scan mein saath rahein'),
-    body: LocalizedText(
-        en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs. Go with her if you can — your presence steadies the nerves these visits can stir. Write the questions down together beforehand. Most findings are reassuring.",
-        hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai. Ho sake to uske saath jaayein — aapki maujoodgi in visits ki ghabraahat sambhaal deti hai. Sawaal pehle se saath likh lein. Zyaadatar findings rahat dene wale hote hain.'),
-  ),
-  TrimesterTip(
-    emoji: '🛌',
-    title: LocalizedText(
-        en: 'Help her sleep on her side',
-        hi: 'Use karwat par sone mein madad karein'),
-    body: LocalizedText(
-        en: "As her bump grows, sleeping on her side — the left is ideal — helps blood and nutrients reach the baby. Slip a pillow between her knees or under the bump. If she wakes up on her back, gently help her settle back onto her side.",
-        hi: 'Jaise-jaise bump badhta hai, karwat (khaaskar baayein) par sona blood aur nutrients ko baby tak pahunchne mein madad karta hai. Ghutno ke beech ya bump ke neeche takiya laga dein. Agar woh peeth ke bal jaag jaaye to pyaar se use wapas karwat par le aayein.'),
-  ),
-  TrimesterTip(
-    emoji: '🥗',
-    title: LocalizedText(
-        en: 'Keep iron & calcium easy for her',
-        hi: 'Iron aur calcium use aasaani se dein'),
-    body: LocalizedText(
-        en: "Her body is building the baby's bones and blood right now. Keep iron (leafy greens, dal, jaggery) and calcium (milk, curd, paneer) within easy reach, and pair iron-rich foods with a little vitamin C. Remind her gently about any supplements the doctor prescribed.",
-        hi: 'Abhi uska shareer baby ki haddiyaan aur khoon bana raha hai. Iron (hari sabziyaan, dal, gud) aur calcium (doodh, dahi, paneer) aaram se haath mein rakhein, aur iron wale khaane ke saath thoda vitamin C dein. Doctor ke diye supplements ke liye use pyaar se yaad dilaate rahein.'),
-  ),
-];
+// Father "supporting her this trimester" tips, now PER-TRIMESTER so every week
+// has them (T1/T3 added; T2 kept). Re-voiced as "what she's going through + how
+// you can help."
+const Map<int, List<TrimesterTip>> _fTrimesterTips = {
+  // First trimester — early days, mostly invisible but hard for her.
+  1: [
+    TrimesterTip(
+      emoji: '🤢',
+      title: LocalizedText(
+          en: 'Ride out the nausea with her',
+          hi: 'Matli mein uska saath dein'),
+      body: LocalizedText(
+          en: "Morning sickness and bone-deep tiredness are at their worst now, even though nothing shows yet. Keep plain crackers by the bed, offer ginger or lemon water, and never take the mood swings personally — it's the hormones, not you.",
+          hi: "Subah ki matli aur gehri thakaan abhi sabse zyada hoti hai, bhale hi bahar kuch na dikhe. Bistar ke paas saade crackers rakhein, adrak ya nimbu paani dein, aur mood swings ko kabhi dil par na lein — yeh hormones hain, aap nahi."),
+    ),
+    TrimesterTip(
+      emoji: '🩺',
+      title: LocalizedText(
+          en: 'Come to the first scan',
+          hi: 'Pehle scan mein saath aayein'),
+      body: LocalizedText(
+          en: "The early dating scan and booking appointment usually happen now — the first glimpse of the baby and the heartbeat. Go with her if you can; it's a big, emotional first, and there's a lot to take in together.",
+          hi: "Shuruaati dating scan aur booking appointment aksar abhi hote hain — baby aur dhadkan ki pehli jhalak. Ho sake to uske saath jaayein; yeh ek bada, bhaavuk pehla pal hai, aur saath samajhne layak kaafi kuch hota hai."),
+    ),
+    TrimesterTip(
+      emoji: '🍲',
+      title: LocalizedText(
+          en: 'Take the cooking off her plate',
+          hi: 'Cooking uske zimme se hata dein'),
+      body: LocalizedText(
+          en: "Smells and food aversions can make cooking unbearable for her right now. Step in — cook, order, or keep strong smells out of the kitchen — and keep simple snacks and water within her reach all day.",
+          hi: "Abhi smells aur food aversions ki wajah se cooking uske liye mushkil ho sakti hai. Aage aayein — khaana banayein, order karein, ya tez smells kitchen se door rakhein — aur din bhar saade snacks aur paani uske paas rakhein."),
+    ),
+  ],
+  // Second trimester — the gentlest stretch.
+  2: [
+    TrimesterTip(
+      emoji: '🔍',
+      title: LocalizedText(
+          en: 'Be there for her anomaly scan',
+          hi: 'Uske anomaly scan mein saath rahein'),
+      body: LocalizedText(
+          en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs. Go with her if you can — your presence steadies the nerves these visits can stir. Write the questions down together beforehand. Most findings are reassuring.",
+          hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai. Ho sake to uske saath jaayein — aapki maujoodgi in visits ki ghabraahat sambhaal deti hai. Sawaal pehle se saath likh lein. Zyaadatar findings rahat dene wale hote hain.'),
+    ),
+    TrimesterTip(
+      emoji: '🛌',
+      title: LocalizedText(
+          en: 'Help her sleep on her side',
+          hi: 'Use karwat par sone mein madad karein'),
+      body: LocalizedText(
+          en: "As her bump grows, sleeping on her side — the left is ideal — helps blood and nutrients reach the baby. Slip a pillow between her knees or under the bump. If she wakes up on her back, gently help her settle back onto her side.",
+          hi: 'Jaise-jaise bump badhta hai, karwat (khaaskar baayein) par sona blood aur nutrients ko baby tak pahunchne mein madad karta hai. Ghutno ke beech ya bump ke neeche takiya laga dein. Agar woh peeth ke bal jaag jaaye to pyaar se use wapas karwat par le aayein.'),
+    ),
+    TrimesterTip(
+      emoji: '🥗',
+      title: LocalizedText(
+          en: 'Keep iron & calcium easy for her',
+          hi: 'Iron aur calcium use aasaani se dein'),
+      body: LocalizedText(
+          en: "Her body is building the baby's bones and blood right now. Keep iron (leafy greens, dal, jaggery) and calcium (milk, curd, paneer) within easy reach, and pair iron-rich foods with a little vitamin C. Remind her gently about any supplements the doctor prescribed.",
+          hi: 'Abhi uska shareer baby ki haddiyaan aur khoon bana raha hai. Iron (hari sabziyaan, dal, gud) aur calcium (doodh, dahi, paneer) aaram se haath mein rakhein, aur iron wale khaane ke saath thoda vitamin C dein. Doctor ke diye supplements ke liye use pyaar se yaad dilaate rahein.'),
+    ),
+  ],
+  // Third trimester — getting ready, getting heavier.
+  3: [
+    TrimesterTip(
+      emoji: '🎒',
+      title: LocalizedText(
+          en: 'Get the hospital bag ready',
+          hi: 'Hospital bag taiyar rakhein'),
+      body: LocalizedText(
+          en: "Baby could come a little early, so it pays to be ready. Pack the hospital bag together, know the route to the hospital, keep the car fuelled, and save the important numbers where you can find them fast.",
+          hi: "Baby thoda jaldi aa sakta hai, isliye taiyar rehna achha hai. Hospital bag saath pack karein, hospital ka raasta jaanein, gaadi mein fuel rakhein, aur zaroori numbers aise jagah save karein jahan jaldi mil jaayein."),
+    ),
+    TrimesterTip(
+      emoji: '😴',
+      title: LocalizedText(
+          en: 'Help her rest through the discomfort',
+          hi: 'Takleef mein use aaram dilayein'),
+      body: LocalizedText(
+          en: "Heartburn, a heavy bump and broken sleep make these weeks tiring. Pile up the pillows, take the late-night and early-morning chores, and protect her naps without making her feel guilty about them.",
+          hi: "Heartburn, bhaari bump aur tooti-phooti neend in hafton ko thakaane wala bana dete hain. Takiye lagayein, raat-deri aur subah-jaldi ke kaam khud sambhalein, aur uski neend ki raksha karein bina use guilty feel karaaye."),
+    ),
+    TrimesterTip(
+      emoji: '📞',
+      title: LocalizedText(
+          en: 'Learn the signs of labour',
+          hi: 'Labour ke sanket seekhein'),
+      body: LocalizedText(
+          en: "Know the difference between real contractions and practice (Braxton-Hicks) ones, what 'waters breaking' looks like, and when the hospital wants a call. Keep your phone on and charged — being reachable is half the job.",
+          hi: "Asli contractions aur practice (Braxton-Hicks) ke beech farak jaanein, 'paani toot-na' kaisa hota hai, aur hospital ko kab call karna hai. Apna phone on aur charged rakhein — reachable rehna aadha kaam hai."),
+    ),
+  ],
+};
 
 // Father "don't miss" body — points to what's actually on HIS home (daily read,
 // a story to read aloud, a journal prompt — NOT Garbh Sanskar).
@@ -721,11 +1131,100 @@ const LocalizedText _fReassureBody = LocalizedText(
     hi: 'Yeh utaar-chadhaav normal hain — aapka sthir, shaant saath hi is hafte use sabse zyada chahiye.');
 
 // ===========================================================================
+//  GENERIC (week-agnostic) father DEEP READS — used on every father week EXCEPT
+//  week 20 (which keeps its richer, week-specific father read). Everything here
+//  is always-true and in 3rd-person partner voice, so the father never reads the
+//  mother's voice (baby-to-mum / "you" = mum) on any week. See [_BabyDetailScreen]
+//  / [_combinedBody].
+// ===========================================================================
+const List<_Article> _babyArticleGen = [
+  _Article(
+      LocalizedText(
+          en: 'Growing a little more every day',
+          hi: 'Har din thoda aur badhta hua'),
+      LocalizedText(
+          en: "Week by week your baby is forming and strengthening — organs, senses, muscles and brain, each on its own remarkable schedule. The note at the top of this week tells you what's developing right now.",
+          hi: "Hafte-dar-hafte aapka baby ban aur mazboot ho raha hai — organs, senses, muscles aur brain, har ek apne khaas schedule par. Is hafte ke upar ka note batata hai ki abhi kya develop ho raha hai.")),
+  _Article(
+      LocalizedText(en: 'Your voice matters', hi: 'Aapki awaaz maayne rakhti hai'),
+      LocalizedText(
+          en: "From around the middle of pregnancy your baby can hear, and your voice slowly becomes familiar. Talking, humming or singing to the bump is a simple, lovely way to start bonding long before birth.",
+          hi: "Pregnancy ke lagbhag beech se aapka baby sun sakta hai, aur aapki awaaz dheere-dheere jaani-pehchaani ban jaati hai. Bump se baat karna, gungunaana ya gaana janm se bahut pehle bonding shuru karne ka saral, pyaara tareeka hai.")),
+  _Article(
+      LocalizedText(
+          en: 'Every baby is on their own clock',
+          hi: 'Har baby apne samay par'),
+      LocalizedText(
+          en: "Sizes and milestones are averages, not rules. Whether something happens a little earlier or later, it's almost always perfectly normal — and the scans are there to reassure you both along the way.",
+          hi: "Size aur milestones average hain, niyam nahi. Kuch thoda jaldi ya der se ho, yeh lagbhag hamesha bilkul normal hota hai — aur scans aap dono ko raaste mein bharosa dene ke liye hain.")),
+  _Article(
+      LocalizedText(en: "You're part of this too", hi: 'Aap bhi iska hissa hain'),
+      LocalizedText(
+          en: "Your baby will come to know your voice, your touch through the bump and the calm you bring. Being present now — for her and for your little one — is the start of a bond that lasts a lifetime.",
+          hi: "Aapka baby aapki awaaz, bump ke zariye aapka sparsh aur aapka laaya sukoon pehchaanne lagega. Abhi maujood rehna — uske aur aapke nanhe ke liye — zindagi bhar chalne wale bond ki shuruaat hai.")),
+];
+
+const List<_Article> _motherArticleGen = [
+  _Article(
+      LocalizedText(
+          en: 'How she might be feeling',
+          hi: 'Woh kaisa mehsoos kar sakti hai'),
+      LocalizedText(
+          en: "Pregnancy moves through very different stages, and how she feels shifts with them — energy, appetite, mood and sleep can all change from week to week. Whatever this week brings, her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
+          hi: "Pregnancy bahut alag-alag stages se guzarti hai, aur uske saath uska mehsoos karna badalta hai — energy, bhookh, mood aur neend sab hafte-dar-hafte badal sakte hain. Yeh hafta jo bhi laaye, uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
+  _Article(
+      LocalizedText(en: 'Her changing body', hi: 'Uska badalta shareer'),
+      LocalizedText(
+          en: "Her body is doing extraordinary work, and that brings visible changes and the odd ache along the way. Most are completely normal and pass on their own — but anything sharp, severe or that won't settle is always worth a word with her doctor.",
+          hi: "Uska shareer asaadharan kaam kar raha hai, aur uske saath dikhne wale badlaav aur kabhi-kabhi takleef aati hai. Zyadatar bilkul normal hain aur khud chale jaate hain — lekin kuch tez, gambhir ya jo theek na ho, use hamesha doctor se kehna chahiye.")),
+  _Article(
+      LocalizedText(en: 'How to be there for her', hi: 'Uske liye kaise saath dein'),
+      LocalizedText(
+          en: "The basics matter most: ask how she's really feeling and listen, take a chore off her plate, help her rest, and turn up at the appointments. Looking after her calm is one of the very best things you can do for your baby right now.",
+          hi: "Buniyaadi cheezein sabse zyada maayne rakhti hain: poochein woh sach mein kaisa mehsoos kar rahi hai aur sunein, koi ek kaam apne zimme lein, use aaram dilayein, aur appointments mein pahunchein. Uske sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakte hain unmein se ek hai.")),
+];
+
+const List<_MotherTopic> _motherTopicsGen = [
+  _MotherTopic(
+      '🌀',
+      LocalizedText(en: 'Hormones', hi: 'Hormones'),
+      LocalizedText(
+          en: 'They shape a lot of how she feels.',
+          hi: 'Yeh uske mehsoos karne ko kaafi banate hain.'),
+      LocalizedText(
+          en: "Pregnancy hormones drive a lot of how she feels — energy, mood and appetite can all swing, sometimes within a single day. None of it is her 'being difficult'; it's her body doing its work.",
+          hi: "Pregnancy hormones uske mehsoos karne ko kaafi chalate hain — energy, mood aur bhookh sab badal sakte hain, kabhi ek hi din mein. Yeh uska 'mushkil karna' nahi hai; yeh uska shareer apna kaam kar raha hai.")),
+  _MotherTopic(
+      '😴',
+      LocalizedText(en: 'Rest & sleep', hi: 'Aaram & neend'),
+      LocalizedText(
+          en: 'Good sleep gets harder as time goes on.',
+          hi: 'Samay ke saath achhi neend mushkil hoti hai.'),
+      LocalizedText(
+          en: "Comfortable sleep gets harder as pregnancy goes on. Help her wind down in the evening, take the late-night and early-morning jobs, and protect her naps without making her feel guilty.",
+          hi: "Pregnancy aage badhne ke saath aaramdayak neend mushkil hoti jaati hai. Shaam ko use relax karne mein madad karein, raat-deri aur subah-jaldi ke kaam khud lein, aur uski neend ki raksha karein bina use guilty banaaye.")),
+  _MotherTopic(
+      '💗',
+      LocalizedText(en: 'Her wellbeing', hi: 'Uski sehat'),
+      LocalizedText(
+          en: 'Small steady habits help most.',
+          hi: 'Chhoti sthir aadtein sabse zyada madad karti hain.'),
+      LocalizedText(
+          en: "Gentle movement, plenty of water, decent food and a calm home all help her feel better. The single biggest thing you bring, though, is a steady, reassuring presence she can lean on.",
+          hi: "Halki harkat, khoob paani, achha khaana aur ek shaant ghar — sab use behtar mehsoos karaate hain. Lekin sabse badi cheez jo aap dete hain woh hai ek sthir, bharosa dene wali maujoodgi jiska woh sahara le sake.")),
+];
+
+// ===========================================================================
 //  The vertical flow
 // ===========================================================================
 class WeekFlowView extends StatelessWidget {
-  const WeekFlowView({super.key, required this.controller});
+  const WeekFlowView(
+      {super.key, required this.controller, this.trailing});
   final PregnancyController controller;
+
+  /// Optional widget appended to the bottom of the flow — used for the week-40
+  /// celebration finale, so the new flow keeps the keepsake-booklet moment.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -737,49 +1236,51 @@ class WeekFlowView extends StatelessWidget {
         if (w == null) return const SizedBox.shrink();
         final lang = controller.language;
         final s = S(lang);
-        final father = _fatherWeek(w.week);
+        // Father weekly = Slate colours on every week (skin); the per-week briefs
+        // are re-voiced where authored, else the mother's content.
+        final fatherSkin = _fatherSkin(w.week);
         final list = ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
           children: [
-            WeekSizeHero(w: w, lang: lang, father: father),
+            WeekSizeHero(w: w, lang: lang, father: fatherSkin),
             const SizedBox(height: 18),
             // S2 — Weekly video.
-            WeekVideoCard(w: w, lang: lang, father: father),
+            WeekVideoCard(w: w, lang: lang, father: fatherSkin),
             const SizedBox(height: 14),
-            // S3 — About baby → Baby Science pop-up.
+            // S3 — About baby → Baby Science pop-up. (colour = skin, copy = week-20)
             _SectionBrief(
               icon: Icons.child_care_rounded,
-              color: father ? _fAccent : AppTheme.primary500,
-              title: father ? _fBabyTitle.of(lang) : s.wfBabySection,
-              brief: father
-                  ? _fBabyBrief.of(lang)
-                  : w.development.whatImDoing.of(lang),
+              color: fatherSkin ? _fAccent : AppTheme.primary500,
+              // Father FRAMING (title) on all weeks; the brief WORDING is the
+              // week-20 re-voiced copy or the mother's per-week content.
+              title: fatherSkin ? _fBabyTitle.of(lang) : s.wfBabySection,
+              brief: (fatherSkin ? _fBabyBriefFor(w) : w.development.whatImDoing)
+                  .of(lang),
               cta: s.wfTapExplore,
-              father: father,
+              father: fatherSkin,
               onTap: () => _push(context, _BabyDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
             // S4 — For you, mum (→ "How she's doing" in father preview).
             _SectionBrief(
               icon: Icons.favorite_rounded,
-              color: father ? _fAccent2 : AppTheme.secondary500,
-              title: father ? _fMotherTitle.of(lang) : s.wfMotherSection,
-              brief: father
-                  ? _fMotherBrief.of(lang)
-                  : w.mom.emotionalState.of(lang),
+              color: fatherSkin ? _fAccent2 : AppTheme.secondary500,
+              title: fatherSkin ? _fMotherTitle.of(lang) : s.wfMotherSection,
+              brief: (fatherSkin ? _fMotherBriefFor(w) : w.mom.emotionalState)
+                  .of(lang),
               cta: s.wfTapExplore,
-              father: father,
+              father: fatherSkin,
               onTap: () => _push(context, _MotherDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
             // S5 — What's next.
             _SectionBrief(
               icon: Icons.event_note_rounded,
-              color: father ? _fAccent : const Color(0xFF2E9C8E),
+              color: fatherSkin ? _fAccent : const Color(0xFF2E9C8E),
               title: s.wfNextSection,
-              brief: father ? _fNextBrief.of(lang) : s.wfNextBrief,
+              brief: fatherSkin ? _fNextBrief.of(lang) : s.wfNextBrief,
               cta: s.wfTapExplore,
-              father: father,
+              father: fatherSkin,
               onTap: () => _push(
                   context, _WhatsNextScreen(controller: controller, lang: lang)),
             ),
@@ -787,24 +1288,28 @@ class WeekFlowView extends StatelessWidget {
             // Organic nudge — a clean, warm reminder, woven mid-flow (NOT at the
             // top), that the daily section is waiting — without pulling her out
             // of the week.
-            _DailyMomentBridge(controller: controller, father: father),
+            _DailyMomentBridge(controller: controller, father: fatherSkin),
             const SizedBox(height: 18),
             // S6 — This week's videos feed.
             _VideoFeed(lang: lang),
             const SizedBox(height: 18),
             // S6.5 — Trimester tips (3 tips for this trimester; tap → pop-up).
             _TrimesterTips(
-                week: controller.selectedWeek, lang: lang, father: father),
+                week: controller.selectedWeek, lang: lang, father: fatherSkin),
             const SizedBox(height: 16),
             // S7 — Share with partner. Hidden in father mode: that section is
             // for the mother to share her week WITH the father, so it's pointless
             // when you already are the father.
-            if (!father) _PartnerSection(w: w, lang: lang),
+            if (!fatherSkin) _PartnerSection(w: w, lang: lang),
+            if (trailing != null) ...[
+              const SizedBox(height: 18),
+              trailing!,
+            ],
           ],
         );
-        // Warm-cream backdrop for the father re-skin; mother stays on the
-        // default scaffold background.
-        return father ? ColoredBox(color: _fBg, child: list) : list;
+        // Warm-cream backdrop for the father re-skin (all weeks); mother stays
+        // on the default scaffold background.
+        return fatherSkin ? ColoredBox(color: _fBg, child: list) : list;
       },
     );
   }
@@ -923,12 +1428,16 @@ void openWeekMotherDetail(BuildContext context, PregnancyController controller,
 /// Opens the "What's next" pop-up directly (the Home hero shortcut deep-links
 /// here instead of just jumping to the weekly tab).
 void openWeekWhatsNext(
-    BuildContext context, PregnancyController controller, AppLanguage lang) {
-  _push(context, _WhatsNextScreen(controller: controller, lang: lang));
+    BuildContext context, PregnancyController controller, AppLanguage lang,
+    {bool father = false}) {
+  _push(context,
+      _WhatsNextScreen(controller: controller, lang: lang, father: father));
 }
 
 /// Shared bottom overlay for swipeable pop-ups: a "swipe" hint pill (page 0
-/// only) above animated page dots.
+/// only) above animated page dots. Parked — the weekly pop-ups moved from swipe
+/// to top toggles; kept for revert / reuse.
+// ignore: unused_element
 Widget _swipeOverlay({
   required int page,
   required int count,
@@ -963,6 +1472,7 @@ Widget _swipeOverlay({
 }
 
 // Minimal "n / N" page indicator, top-right of a pop-up carousel.
+// ignore: unused_element
 Widget _pageCounter(int current, int total) {
   return Positioned(
     top: 14,
@@ -986,6 +1496,7 @@ Widget _pageCounter(int current, int total) {
 
 // Minimal, semi-transparent prev/next arrows for a pop-up carousel. A null
 // handler hides that side (e.g. the first/last page of a non-looping flow).
+// ignore: unused_element
 Widget _carouselArrows({VoidCallback? onPrev, VoidCallback? onNext}) {
   Widget side(IconData icon, VoidCallback? onTap) {
     if (onTap == null) return const SizedBox(width: 46);
@@ -1129,8 +1640,13 @@ class _SectionBrief extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(title,
+                  // Father headings use the MOTHER's font (plusJakartaSans), a
+                  // bit bolder (w800), in Slate ink — the serif read poorly.
                   style: father
-                      ? _fSerif(18, _fInk, w: FontWeight.w600)
+                      ? GoogleFonts.plusJakartaSans(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: _fInk)
                       : GoogleFonts.plusJakartaSans(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
@@ -1179,7 +1695,7 @@ class _TrimesterTips extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(lang);
     final tips = father
-        ? _fTrimesterTips.take(3).toList()
+        ? (_fTrimesterTips[_tri] ?? const <TrimesterTip>[]).take(3).toList()
         : (kTrimesterTipsV2[_tri] ?? const <TrimesterTip>[]).take(3).toList();
     if (tips.isEmpty) return const SizedBox.shrink();
     final title = father ? _fTipsTitle.of(lang) : s.wfTipsTitle;
@@ -1392,8 +1908,11 @@ Widget _popupTitle(String week, String title, {bool father = false}) => Padding(
                 fontSize: 14, color: father ? _fMuted : AppTheme.neutral500)),
         const SizedBox(height: 2),
         Text(title,
+            // Father pop-up headers use the MOTHER's font (plusJakartaSans),
+            // bolder, Slate ink — consistent with the weekly headings.
             style: father
-                ? _fSerif(24, _fInk, w: FontWeight.w700)
+                ? GoogleFonts.plusJakartaSans(
+                    fontSize: 24, fontWeight: FontWeight.w800, color: _fInk)
                 : GoogleFonts.plusJakartaSans(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -1525,32 +2044,40 @@ class _BabyDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
+    // SKIN/framing (colours + titles) = all weeks; the article/science WORDING
+    // = the week-20 re-voiced copy, else the mother's (per-week revoice later).
     final father = _fatherWeek(w.week);
-    final article = father ? _babyArticleFather : _babyArticle;
-    final science = father ? _babyScienceFather : _babyScience;
+    final fatherSkin = _fatherSkin(w.week);
+    // Father: week-20 keeps its richer read; other weeks use the generic father
+    // read; the mother keeps hers. Science is generic father-voiced on all weeks.
+    final article = father
+        ? _babyArticleFather
+        : (fatherSkin ? _babyArticleGen : _babyArticle);
+    final science = fatherSkin ? _babyScienceFather : _babyScience;
     return _PopupScaffold(
-      father: father,
+      father: fatherSkin,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
         children: [
           Center(
               child: _popupTitle(s.jrWeekLabel(w.week),
-                  father ? _fBabyTitle.of(lang) : s.wfBabySection,
-                  father: father)),
+                  fatherSkin ? _fBabyTitle.of(lang) : s.wfBabySection,
+                  father: fatherSkin)),
           const SizedBox(height: 8),
           ..._articleWithMedia(context, s, article, lang,
-              father ? _fAccent : AppTheme.primary500,
-              headingColor: father ? _fInk : null),
+              fatherSkin ? _fAccent : AppTheme.primary500,
+              headingColor: fatherSkin ? _fInk : null),
           const SizedBox(height: 2),
           Text(s.wfBabyScience,
-              style: father
-                  ? _fSerif(19, _fInk, w: FontWeight.w700)
+              style: fatherSkin
+                  ? GoogleFonts.plusJakartaSans(
+                      fontSize: 19, fontWeight: FontWeight.w800, color: _fInk)
                   : GoogleFonts.plusJakartaSans(
                       fontSize: 19,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary600)),
           const SizedBox(height: 12),
-          for (final f in science) _scienceRow(context, s, f, lang, father),
+          for (final f in science) _scienceRow(context, s, f, lang, fatherSkin),
           const SizedBox(height: 14),
           Text(s.wfDisclaimer,
               style: GoogleFonts.manrope(
@@ -1712,82 +2239,133 @@ class _MotherDetailScreen extends StatefulWidget {
 }
 
 class _MotherDetailScreenState extends State<_MotherDetailScreen> {
-  final PageController _pc = PageController();
-  int _page = 0;
-  int _tab = 0; // health page toggle: 0 = Symptoms · 1 = Diet · 2 = Actions
+  // Single page, top toggles (no swipe): 0 = You this week · 1 = Health.
+  int _section = 0;
+  int _tab = 0; // health sub-toggle: 0 = Symptoms · 1 = Diet
 
-  @override
-  void dispose() {
-    _pc.dispose();
-    super.dispose();
-  }
-
-  void _hop(int delta) => _pc.animateToPage(_page + delta,
-      duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
-
-  // Now just TWO pages: (1) "You this week" — the read + this-week topics merged
-  // — and (2) a single Health page with a Symptoms / Diet / Actions toggle.
   @override
   Widget build(BuildContext context) {
     final lang = widget.lang;
     final s = S(lang);
-    const total = 2;
-    final father = _fatherWeek(widget.w.week);
+    // Skin/framing = all weeks; "You this week" content is split inside
+    // _combinedBody (week-20 father copy vs the mother's per-week data).
+    final fatherSkin = _fatherSkin(widget.w.week);
     return _PopupScaffold(
-      father: father,
-      body: Stack(children: [
-        PageView(
-          controller: _pc,
-          onPageChanged: (i) => setState(() => _page = i),
-          children: [
-            _combinedPage(context, s, lang),
-            _togglePage(context, s, lang),
-          ],
+      father: fatherSkin,
+      body: Column(children: [
+        const SizedBox(height: 8),
+        Center(
+            child: _popupTitle(
+                s.jrWeekLabel(widget.w.week),
+                _section == 0
+                    ? (fatherSkin ? _fYouThisWeek.of(lang) : s.wfYouThisWeek)
+                    : s.wfHealthThisWeek,
+                father: fatherSkin)),
+        const SizedBox(height: 6),
+        // Father: no Health tab — that's her symptoms & diet in her own voice,
+        // which doesn't belong in the partner view. Just the "Her this week" read.
+        if (!fatherSkin) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _motherTabs(s, lang, fatherSkin),
+          ),
+          const SizedBox(height: 6),
+        ],
+        Expanded(
+          child: (fatherSkin || _section == 0)
+              ? _combinedBody(context, s, lang)
+              : _healthBody(context, s, lang, fatherSkin),
         ),
-        _carouselArrows(
-          onPrev: _page > 0 ? () => _hop(-1) : null,
-          onNext: _page < total - 1 ? () => _hop(1) : null,
-        ),
-        _pageCounter(_page + 1, total),
-        _swipeOverlay(page: _page, count: total, hint: s.wfSwipeMore),
       ]),
     );
   }
 
-  // Page 1 — "You this week": the "for you, mum" read (woven with image/video
-  // frames), then this week's topics + self-care + reassurance, all on one page.
-  Widget _combinedPage(BuildContext context, S s, AppLanguage lang) {
+  // The top toggle row — click a section, the whole page is about it (no swipe).
+  Widget _motherTabs(S s, AppLanguage lang, bool father) {
+    final accent = father ? _fAccent : AppTheme.secondary500;
+    Widget seg(int i, IconData icon, String label) {
+      final on = _section == i;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => setState(() => _section = i),
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: on ? accent : Colors.transparent,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(icon,
+                  size: 15, color: on ? Colors.white : AppTheme.neutral500),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: on ? Colors.white : AppTheme.neutral600)),
+              ),
+            ]),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Row(children: [
+        seg(0, Icons.favorite_rounded,
+            father ? _fYouThisWeek.of(lang) : s.wfYouThisWeek),
+        seg(1, Icons.healing_rounded, s.wfHealthThisWeek),
+      ]),
+    );
+  }
+
+  // "You this week" — the "for you, mum" read (woven with image/video frames),
+  // then this week's topics + self-care + reassurance. (Title now sits above the
+  // toggle row, so this body no longer repeats it.)
+  Widget _combinedBody(BuildContext context, S s, AppLanguage lang) {
     final w = widget.w;
     final m = w.mom;
-    final father = _fatherWeek(w.week);
-    final article = father ? _motherArticleFather : _motherArticle;
-    final topics = father ? _motherTopicsFather : _motherTopics;
+    final father = _fatherWeek(w.week); // copy/wording (week 20)
+    final fatherSkin = _fatherSkin(w.week); // colours/skin (all weeks)
+    final article = father
+        ? _motherArticleFather
+        : (fatherSkin ? _motherArticleGen : _motherArticle);
+    final topics = father
+        ? _motherTopicsFather
+        : (fatherSkin ? _motherTopicsGen : _motherTopics);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
-        Center(
-            child: _popupTitle(s.jrWeekLabel(w.week),
-                father ? _fYouThisWeek.of(lang) : s.wfYouThisWeek,
-                father: father)),
-        const SizedBox(height: 8),
         ..._articleWithMedia(context, s, article, lang,
-            father ? _fAccent : AppTheme.secondary500,
-            headingColor: father ? _fInk : null),
-        for (final t in topics) _topicCard(t, lang, s, father: father),
+            fatherSkin ? _fAccent : AppTheme.secondary500,
+            headingColor: fatherSkin ? _fInk : null),
+        for (final t in topics) _topicCard(t, lang, s, father: fatherSkin),
         const SizedBox(height: 4),
         _tintCard(
-            father ? _fHelpTitle.of(lang) : s.selfCare,
-            father ? _fHelpBody.of(lang) : m.selfCareTip.of(lang),
-            father ? _fAccent : const Color(0xFF4F7A52),
+            fatherSkin ? _fHelpTitle.of(lang) : s.selfCare,
+            fatherSkin ? _fHelpBody.of(lang) : m.selfCareTip.of(lang),
+            fatherSkin ? _fAccent : const Color(0xFF4F7A52),
             Icons.spa_rounded,
-            father: father),
+            father: fatherSkin),
         const SizedBox(height: 12),
         _tintCard(
             s.reassuranceLabel,
-            father ? _fReassureBody.of(lang) : m.reassurance.of(lang),
-            father ? _fAccent2 : AppTheme.secondary500,
+            fatherSkin ? _fReassureBody.of(lang) : m.reassurance.of(lang),
+            fatherSkin ? _fAccent2 : AppTheme.secondary500,
             Icons.favorite_rounded,
-            father: father),
+            father: fatherSkin),
         const SizedBox(height: 16),
         Text(s.wfDisclaimer,
             style: GoogleFonts.manrope(
@@ -1796,16 +2374,11 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  // Page 2 — Symptoms / Diet / Actions on ONE page, switched by a 3-way toggle.
-  Widget _togglePage(BuildContext context, S s, AppLanguage lang) {
-    final father = _fatherWeek(widget.w.week);
+  // Health — Symptoms / Diet on one body, switched by the sub-toggle.
+  Widget _healthBody(BuildContext context, S s, AppLanguage lang, bool father) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
-        Center(child:
-            _popupTitle(s.jrWeekLabel(widget.w.week), s.wfHealthThisWeek,
-                father: father)),
-        const SizedBox(height: 10),
         _toggleBar(s, father),
         const SizedBox(height: 16),
         if (_tab == 0)
@@ -2319,51 +2892,105 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 // Opens on a "what's next" read, then swipes to Upcoming milestones, then
 // Scans & appointments. Milestones and scans open a centered detail pop-up.
 class _WhatsNextScreen extends StatefulWidget {
-  const _WhatsNextScreen({required this.controller, required this.lang});
+  const _WhatsNextScreen(
+      {required this.controller, required this.lang, this.father = false});
   final PregnancyController controller;
   final AppLanguage lang;
+
+  /// When true (the father's "What's next"), show Scans & appointments only,
+  /// re-voiced for the partner — no milestones, no "for you" body section.
+  final bool father;
   @override
   State<_WhatsNextScreen> createState() => _WhatsNextScreenState();
 }
 
 class _WhatsNextScreenState extends State<_WhatsNextScreen> {
-  final PageController _pc = PageController();
-  int _page = 0;
-
-  @override
-  void dispose() {
-    _pc.dispose();
-    super.dispose();
-  }
-
-  void _hop(int delta) => _pc.animateToPage(_page + delta,
-      duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
+  // One page, three tabs (no swipe). Scans & appointments first (default).
+  int _tab = 0;
 
   @override
   Widget build(BuildContext context) {
     final lang = widget.lang;
     final s = S(lang);
-    const total = 2;
-    final father = _fatherWeek(widget.controller.selectedWeek);
+    final cw = widget.controller.selectedWeek;
+    // Father's What's Next = scans-only, for EVERY week now (skin gate), showing
+    // the week-relevant scans re-voiced for the partner.
+    final father = widget.father || _fatherSkin(cw);
+
+    // Father's What's Next = Scans & appointments only, re-voiced for the partner.
+    if (father) {
+      return _PopupScaffold(father: true, body: _fatherScansBody(s, lang, cw));
+    }
+
+    // Mother: a single page with a 3-way top tab row, switched in place.
     return _PopupScaffold(
-      father: father,
-      body: Stack(children: [
-        PageView(
-          controller: _pc,
-          onPageChanged: (i) => setState(() => _page = i),
-          children: [
-            // Merged from 3 → 2: milestones first, then scans (with the useful
-            // journey-progress context from the old overview folded in).
-            _milestones(s, lang),
-            _scans(s, lang),
-          ],
+      father: false,
+      body: Column(children: [
+        const SizedBox(height: 8),
+        Center(child: _popupTitle(s.jrWeekLabel(cw), s.wfNextSection)),
+        const SizedBox(height: 6),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: _whatsNextTabs(s),
         ),
-        _carouselArrows(
-          onPrev: _page > 0 ? () => _hop(-1) : null,
-          onNext: _page < total - 1 ? () => _hop(1) : null,
+        const SizedBox(height: 6),
+        Expanded(
+          child: _tab == 0
+              ? _scansList(s, lang, cw)
+              : (_tab == 1
+                  ? _motherNextList(s, lang, cw)
+                  : _milestonesList(s, lang, cw)),
         ),
-        _pageCounter(_page + 1, total),
-        _swipeOverlay(page: _page, count: total, hint: s.wfSwipeMore),
+      ]),
+    );
+  }
+
+  // The three-way tab row (Scans · For you · Milestones).
+  Widget _whatsNextTabs(S s) {
+    Widget seg(int i, IconData icon, String label) {
+      final on = _tab == i;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => setState(() => _tab = i),
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: on ? AppTheme.primary500 : Colors.transparent,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(icon,
+                  size: 15, color: on ? Colors.white : AppTheme.neutral500),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: on ? Colors.white : AppTheme.neutral600)),
+              ),
+            ]),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Row(children: [
+        seg(0, Icons.event_note_rounded, s.wfNextTabScans),
+        seg(1, Icons.favorite_rounded, s.wfNextTabYou),
+        seg(2, Icons.emoji_events_rounded, s.wfNextTabMilestones),
       ]),
     );
   }
@@ -2473,22 +3100,24 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Page 1 — Upcoming milestones (current week onward, tappable).
-  Widget _milestones(S s, AppLanguage lang) {
-    final cw = widget.controller.selectedWeek;
-    final father = _fatherWeek(cw);
+  // Tab 3 — Upcoming milestones (current week onward, tappable).
+  Widget _milestonesList(S s, AppLanguage lang, int cw) {
     // A focused window — the current week's milestones plus a few weeks ahead.
     final list = _weekMilestones
         .where((m) => m.week >= cw && m.week <= cw + 6)
         .take(8)
         .toList();
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
-        Center(
-            child: _popupTitle(s.jrWeekLabel(cw), s.wfMilestonesTitle,
-                father: father)),
-        const SizedBox(height: 8),
+        if (list.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+                child: Text(s.scnUpToDate,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(color: AppTheme.neutral500))),
+          ),
         for (final m in list) _milestoneCard(s, m, lang, m.week == cw),
       ],
     );
@@ -2624,10 +3253,8 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Page 2 — Scans & appointments (tappable).
-  Widget _scans(S s, AppLanguage lang) {
-    final cw = widget.controller.selectedWeek;
-    final father = _fatherWeek(cw);
+  // Tab 1 — Scans & appointments (tappable). The default tab.
+  Widget _scansList(S s, AppLanguage lang, int cw) {
     final scans = kJourneyMilestones
         .where((m) =>
             m.type == JourneyNodeType.medical &&
@@ -2636,16 +3263,8 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
         .toList()
       ..sort((a, b) => a.anchorWeek.compareTo(b.anchorWeek));
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
-        Center(
-            child:
-                _popupTitle(s.jrWeekLabel(cw), s.wfScansTitle, father: father)),
-        const SizedBox(height: 12),
-        // Journey-progress card removed from the top per request — this page is
-        // now scans & appointments only. (Commented, kept for an easy revert.)
-        // _progressCard(s),
-        // const SizedBox(height: 18),
         for (final m in scans) _scanCard(s, m, lang),
         if (scans.isEmpty)
           Padding(
@@ -2656,6 +3275,305 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                     style: GoogleFonts.manrope(color: AppTheme.neutral500))),
           ),
       ],
+    );
+  }
+
+  // Tab 2 — "What's next for you": a forward look at how she may feel in the
+  // coming weeks (per-week body + emotional changes), tappable for the full read.
+  Widget _motherNextList(S s, AppLanguage lang, int cw) {
+    final last = (cw + 4) > 40 ? 40 : (cw + 4);
+    final cards = <Widget>[];
+    for (int w = cw; w <= last; w++) {
+      final mom = widget.controller.weekData(w)?.mom;
+      if (mom == null || mom.physicalChanges.of(lang).trim().isEmpty) continue;
+      cards.add(_motherWeekCard(s, lang, w, mom, w == cw));
+    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
+      children: [
+        Text(s.wfNextMotherIntro,
+            style: GoogleFonts.manrope(
+                fontSize: 14, height: 1.55, color: const Color(0xFF5B5070))),
+        const SizedBox(height: 16),
+        if (cards.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+                child: Text(s.scnUpToDate,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(color: AppTheme.neutral500))),
+          ),
+        ...cards,
+      ],
+    );
+  }
+
+  Widget _motherWeekCard(
+      S s, AppLanguage lang, int week, MomJourney mom, bool current) {
+    return GestureDetector(
+      onTap: () => _showMotherWeekDialog(s, lang, week, mom),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: current
+              ? AppTheme.secondary500.withValues(alpha: 0.08)
+              : AppTheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: current
+              ? Border.all(color: AppTheme.secondary500.withValues(alpha: 0.4))
+              : null,
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text(s.jrWeekLabel(week),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary900)),
+            ),
+            if (current) _tag(s.msThisWeek),
+          ]),
+          const SizedBox(height: 6),
+          Text(mom.physicalChanges.of(lang),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.manrope(
+                  fontSize: 13.5, height: 1.5, color: const Color(0xFF5B5070))),
+          const SizedBox(height: 8),
+          Row(children: [
+            Text(s.wfTapToRead,
+                style: GoogleFonts.manrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.secondary600)),
+            const Icon(Icons.chevron_right_rounded,
+                size: 15, color: AppTheme.secondary500),
+          ]),
+        ]),
+      ),
+    );
+  }
+
+  void _showMotherWeekDialog(S s, AppLanguage lang, int week, MomJourney mom) {
+    Widget section(String label, String body) => body.trim().isEmpty
+        ? const SizedBox.shrink()
+        : Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label.toUpperCase(),
+                      style: GoogleFonts.manrope(
+                          fontSize: 11,
+                          letterSpacing: 0.4,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.secondary600)),
+                  const SizedBox(height: 4),
+                  Text(body,
+                      style: GoogleFonts.manrope(
+                          fontSize: 14.5,
+                          height: 1.55,
+                          color: const Color(0xFF5B5070))),
+                ]),
+          );
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(s.jrWeekLabel(week),
+                      style: GoogleFonts.manrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary600)),
+                  const SizedBox(height: 4),
+                  Text(s.wfYouThisWeek,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primary900)),
+                  const SizedBox(height: 14),
+                  section(s.wfBodyLabel, mom.physicalChanges.of(lang)),
+                  section(s.wfFeelLabel, mom.emotionalState.of(lang)),
+                  section(s.selfCare, mom.selfCareTip.of(lang)),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                          backgroundColor: AppTheme.primary500,
+                          padding: const EdgeInsets.symmetric(vertical: 12)),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: Text(s.wfGotIt,
+                          style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w700, color: Colors.white)),
+                    ),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---- Father (week-20) Scans & appointments — re-voiced for the partner -----
+  Widget _fatherScansBody(S s, AppLanguage lang, int cw) {
+    // The week-relevant scans (same ±window as the mother's Scans tab), so this
+    // works on EVERY week, not just 20.
+    final scans = _fScans
+        .where((f) => f.week >= cw - 6 && f.week <= cw + 10)
+        .toList()
+      ..sort((a, b) => a.week.compareTo(b.week));
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+      children: [
+        Center(
+            child: _popupTitle(s.jrWeekLabel(cw), _fNextLabel.of(lang),
+                father: true)),
+        const SizedBox(height: 8),
+        Text(_fScansIntro.of(lang),
+            style: GoogleFonts.manrope(fontSize: 15, height: 1.6, color: _fInk)),
+        const SizedBox(height: 16),
+        if (scans.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+                child: Text(s.scnUpToDate,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(color: _fMuted))),
+          )
+        else
+          for (final f in scans) _fScanCard(s, lang, f),
+      ],
+    );
+  }
+
+  Widget _fScanCard(S s, AppLanguage lang, _FScan f) {
+    return GestureDetector(
+      onTap: () => _fScanDialog(s, lang, f),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _fLine)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Text(f.emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(f.title.of(lang),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16, fontWeight: FontWeight.w800, color: _fInk)),
+            ),
+            Text(f.when.of(lang),
+                style: GoogleFonts.manrope(fontSize: 11.5, color: _fMuted)),
+          ]),
+          const SizedBox(height: 8),
+          Text(f.body.of(lang),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style:
+                  GoogleFonts.manrope(fontSize: 13.5, height: 1.5, color: _fInk)),
+          const SizedBox(height: 8),
+          Row(children: [
+            Text(s.wfTapToRead,
+                style: GoogleFonts.manrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    color: _fAccent)),
+            const Icon(Icons.chevron_right_rounded, size: 15, color: _fAccent),
+          ]),
+        ]),
+      ),
+    );
+  }
+
+  void _fScanDialog(S s, AppLanguage lang, _FScan f) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Text(f.emoji, style: const TextStyle(fontSize: 26)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(f.title.of(lang),
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: _fInk)),
+                    ),
+                  ]),
+                  const SizedBox(height: 4),
+                  Text(f.when.of(lang),
+                      style: GoogleFonts.manrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: _fAccent)),
+                  const SizedBox(height: 14),
+                  Text(f.body.of(lang),
+                      style: GoogleFonts.manrope(
+                          fontSize: 14.5, height: 1.55, color: _fInk)),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                        color: _fAccent.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(14)),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('HOW TO SHOW UP',
+                              style: GoogleFonts.manrope(
+                                  fontSize: 11,
+                                  letterSpacing: 0.4,
+                                  fontWeight: FontWeight.w800,
+                                  color: _fAccent)),
+                          const SizedBox(height: 4),
+                          Text(f.help.of(lang),
+                              style: GoogleFonts.manrope(
+                                  fontSize: 14, height: 1.55, color: _fInk)),
+                        ]),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                          backgroundColor: _fAccent,
+                          padding: const EdgeInsets.symmetric(vertical: 12)),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: Text(s.wfGotIt,
+                          style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w700, color: Colors.white)),
+                    ),
+                  ),
+                ]),
+          ),
+        ),
+      ),
     );
   }
 

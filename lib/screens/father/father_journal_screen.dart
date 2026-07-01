@@ -21,8 +21,13 @@ import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
 
 class FatherJournalScreen extends StatefulWidget {
-  const FatherJournalScreen({super.key, required this.controller});
+  const FatherJournalScreen(
+      {super.key, required this.controller, this.embedded = false});
   final PregnancyController controller;
+
+  /// When shown as a tab in the father shell, hide the back button (there's
+  /// nothing to pop back to). Standalone (pushed) keeps it.
+  final bool embedded;
 
   @override
   State<FatherJournalScreen> createState() => _FatherJournalScreenState();
@@ -81,23 +86,25 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 18, 6),
             child: Row(children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).maybePop(),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: kFCard,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: kFLine),
+              if (!widget.embedded) ...[
+                GestureDetector(
+                  onTap: () => Navigator.of(context).maybePop(),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: kFCard,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: kFLine),
+                    ),
+                    child: const Icon(Icons.arrow_back_rounded,
+                        color: kFInk, size: 20),
                   ),
-                  child: const Icon(Icons.arrow_back_rounded,
-                      color: kFInk, size: 20),
                 ),
-              ),
-              const SizedBox(width: 13),
+                const SizedBox(width: 13),
+              ],
               Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,11 +148,24 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
               builder: (context, _) {
                 final entries = FatherJournalStore.instance.entries;
                 if (entries.isEmpty) return _empty();
-                return ListView.separated(
+                // Group by pregnancy week (newest week first, since `entries` is
+                // newest-first) so a week's memories sit together under a header.
+                final groups = <int, List<JournalEntry>>{};
+                for (final e in entries) {
+                  groups.putIfAbsent(e.weekNumber, () => []).add(e);
+                }
+                return ListView(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-                  itemCount: entries.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (_, i) => _entryCard(entries[i]),
+                  children: [
+                    for (final wk in groups.keys) ...[
+                      _weekHeader(wk, groups[wk]!),
+                      for (final e in groups[wk]!)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _entryCard(e),
+                        ),
+                    ],
+                  ],
                 );
               },
             ),
@@ -153,6 +173,42 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
         ]),
       ),
     );
+  }
+
+  // A Slate week divider — "Week N" highlight + the week's date range, so the
+  // entries beneath it visibly belong together.
+  Widget _weekHeader(int wk, List<JournalEntry> es) {
+    final dates = es.map((e) => e.date).toList()..sort();
+    final range = _rangeLabel(dates.first, dates.last);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text(wk > 0 ? 'Week $wk' : 'Memories',
+              style: _serif(16, w: FontWeight.w700)),
+          if (range.isNotEmpty) ...[
+            const SizedBox(width: 10),
+            Text(range, style: _body(11.5, w: FontWeight.w600, c: kFMuted)),
+          ],
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(
+                color: kFAccentSoft, borderRadius: BorderRadius.circular(99)),
+            child: Text('${es.length}',
+                style: _body(11.5, w: FontWeight.w800, c: kFAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _rangeLabel(DateTime a, DateTime b) {
+    String md(DateTime d) => '${d.day} ${_months[d.month - 1]}';
+    if (a.year == b.year && a.month == b.month && a.day == b.day) return md(a);
+    return '${md(a)} – ${md(b)}';
   }
 
   Widget _circle(IconData icon, String label, VoidCallback onTap) => Expanded(
@@ -231,19 +287,18 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
         ]),
         if (images.isNotEmpty) ...[
           const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.file(File(images.first),
-                width: double.infinity,
-                height: 190,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                    height: 190,
-                    color: kFAccentSoft,
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.broken_image_rounded,
-                        color: kFMuted))),
-          ),
+          // One photo → a single banner; multiple → an Instagram-style swipeable
+          // carousel (dots + counter) so a multi-photo day stays compact.
+          images.length == 1
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.file(File(images.first),
+                      width: double.infinity,
+                      height: 190,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _fPhotoError()),
+                )
+              : _FatherPhotoCarousel(paths: images),
         ],
         if (e.title.trim().isNotEmpty) ...[
           const SizedBox(height: 11),
@@ -301,5 +356,90 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
     final m = d.minute.toString().padLeft(2, '0');
     final ap = d.hour < 12 ? 'AM' : 'PM';
     return '${d.day} ${_months[d.month - 1]} ${d.year} · $h:$m $ap';
+  }
+}
+
+// Shared broken-image placeholder (single banner + carousel).
+Widget _fPhotoError() => Container(
+      height: 190,
+      color: kFAccentSoft,
+      alignment: Alignment.center,
+      child: const Icon(Icons.broken_image_rounded, color: kFMuted),
+    );
+
+// ---------------------------------------------------------------------------
+//  Instagram-style swipeable photo carousel for a multi-photo entry.
+// ---------------------------------------------------------------------------
+class _FatherPhotoCarousel extends StatefulWidget {
+  const _FatherPhotoCarousel({required this.paths});
+  final List<String> paths;
+
+  @override
+  State<_FatherPhotoCarousel> createState() => _FatherPhotoCarouselState();
+}
+
+class _FatherPhotoCarouselState extends State<_FatherPhotoCarousel> {
+  final _ctrl = PageController();
+  int _i = 0;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.paths.length;
+    return Column(children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: SizedBox(
+          height: 190,
+          width: double.infinity,
+          child: Stack(children: [
+            PageView.builder(
+              controller: _ctrl,
+              itemCount: n,
+              onPageChanged: (i) => setState(() => _i = i),
+              itemBuilder: (_, i) => Image.file(File(widget.paths[i]),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => _fPhotoError()),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(99)),
+                child: Text('${_i + 1}/$n',
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+              ),
+            ),
+          ]),
+        ),
+      ),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (int i = 0; i < n; i++)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: i == _i ? 18 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                  color: i == _i ? kFAccent : kFLine,
+                  borderRadius: BorderRadius.circular(99)),
+            ),
+        ],
+      ),
+    ]);
   }
 }

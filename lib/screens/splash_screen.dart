@@ -19,7 +19,9 @@ import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
-import 'father/father_daily_screen.dart';
+// father_daily_screen import parked — the paired father now lands on the unified
+// MainScaffold (father mode), not the standalone Father Daily screen.
+// import 'father/father_daily_screen.dart';
 import 'main_scaffold.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -101,11 +103,16 @@ class _SplashScreenState extends State<SplashScreen>
             FadeTransition(opacity: anim, child: child),
       );
 
-  // Father (paired partner) lands on the standalone Father Daily screen.
+  // Father (paired partner) lands on the SAME shell as the mother — the unified
+  // father (Slate) MainScaffold, so both entry points share one structure.
   Route<void> _fatherRoute() => PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 450),
-        pageBuilder: (_, _, _) =>
-            FatherDailyScreen(controller: widget.pregnancy),
+        pageBuilder: (_, _, _) => MainScaffold(
+          pregnancy: widget.pregnancy,
+          home: widget.home,
+          father: widget.father,
+          isFather: true,
+        ),
         transitionsBuilder: (_, anim, _, child) =>
             FadeTransition(opacity: anim, child: child),
       );

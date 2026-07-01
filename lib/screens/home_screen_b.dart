@@ -22,17 +22,21 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
 import '../data/product_data.dart';
+import '../data/scan_schedule.dart';
 import '../localization/app_language.dart';
 import '../models/home_day.dart';
 import '../models/journal_entry.dart';
+import '../models/journey_node.dart';
 import '../models/medication.dart';
 import '../models/product_models.dart';
+import '../models/scan_appointment.dart';
 import '../services/app_nav.dart';
 import '../services/garbh_store.dart';
 import '../services/home_content_controller.dart';
 import '../services/medicine_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
+import '../services/scans_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home/home_modules.dart';
 import '../widgets/home/trimester_chart_card.dart';
@@ -46,6 +50,7 @@ import 'read_next_screen.dart';
 import 'saved_hub_screen.dart';
 import 'reminders_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
+import 'tools/scans_appointments_screen.dart';
 import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
 
@@ -135,11 +140,15 @@ class HomeScreenB extends StatelessWidget {
             // Daily parenting tip.
             GrowModule(day: day, lang: lang, home: home),
             const SizedBox(height: 16),
-            // Read to your baby.
-            ReadModule(day: day, lang: lang, home: home),
-            const SizedBox(height: 16),
+            // "Read to your baby" folded into Garbh Sanskar › Samvad (its content
+            // + customization now live there). Card removed; kept for revert.
+            // ReadModule(day: day, lang: lang, home: home),
+            // const SizedBox(height: 16),
             // Daily Garbh Sanskar.
             _garbhDailySection(context, lang),
+            const SizedBox(height: 16),
+            // Scans & appointments due around now (above the Trimester chart).
+            _scansDailySection(context, lang),
             const SizedBox(height: 16),
             // Trimester chart — quick "where am I" reference (above My Journal).
             TrimesterChartCard(controller: pregnancy),
@@ -1271,6 +1280,140 @@ class HomeScreenB extends StatelessWidget {
 
   // Daily medication & supplements — shown INLINE on Home (today's items with a
   // tick-off), so it's usable with least clicks rather than hidden behind a CTA.
+  // Scans & appointments due AROUND NOW (anchor week ± 2) + any upcoming
+  // appointments, each scan with an "Already done" tick. Future scans surface
+  // when their week arrives; past/not-done ones live behind "view all scans".
+  Widget _scansDailySection(BuildContext context, AppLanguage lang) {
+    final s = S(lang);
+    const teal = Color(0xFF2E9C8E);
+    void openAll() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => ScansAppointmentsScreen(controller: pregnancy)));
+    return AnimatedBuilder(
+      animation: Listenable.merge([ScansStore.instance, pregnancy]),
+      builder: (context, _) {
+        final cw = pregnancy.currentWeek;
+        final due = scansDueAt(cw)
+            .where((m) => !ScansStore.instance.isCompleted(m.id))
+            .toList();
+        final today = DateTime.now();
+        final appts = ScansStore.instance.appointments
+            .where((a) => !a.date
+                .isBefore(DateTime(today.year, today.month, today.day)))
+            .toList();
+        return HomeCard(
+          eyebrow: s.scnDailyTitle,
+          icon: Icons.event_available_rounded,
+          accent: teal,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (due.isEmpty && appts.isEmpty)
+              Text(s.scnUpToDate,
+                  style: GoogleFonts.manrope(
+                      fontSize: 14.5,
+                      height: 1.5,
+                      color: const Color(0xFF5B5070)))
+            else ...[
+              for (final m in due) _scanDueRow(lang, s, m, teal),
+              for (final a in appts) _apptDueRow(s, a, teal),
+            ],
+            const SizedBox(height: 4),
+            Center(
+              child: TextButton(
+                onPressed: openAll,
+                child: Text(s.scnViewAll,
+                    style: GoogleFonts.manrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: teal)),
+              ),
+            ),
+          ]),
+        );
+      },
+    );
+  }
+
+  Widget _scanDueRow(AppLanguage lang, S s, JourneyMilestone m, Color teal) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(children: [
+        Container(
+          width: 38,
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: teal.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12)),
+          child: Text(m.emoji, style: const TextStyle(fontSize: 18)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(m.title.of(lang),
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary900)),
+            Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
+                style: GoogleFonts.manrope(
+                    fontSize: 12, color: AppTheme.neutral500)),
+          ]),
+        ),
+        const SizedBox(width: 8),
+        OutlinedButton(
+          onPressed: () => ScansStore.instance.markCompleted(
+              scanId: m.id,
+              journalTitle: m.title.of(lang),
+              week: m.anchorWeek),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: teal,
+            side: BorderSide(color: teal.withValues(alpha: 0.5)),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            visualDensity: VisualDensity.compact,
+          ),
+          child: Text(s.scnAlreadyDone,
+              style: GoogleFonts.manrope(
+                  fontSize: 12, fontWeight: FontWeight.w700)),
+        ),
+      ]),
+    );
+  }
+
+  Widget _apptDueRow(S s, Appointment a, Color teal) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(children: [
+        Container(
+          width: 38,
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: teal.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12)),
+          child: const Icon(Icons.event_rounded,
+              size: 18, color: Color(0xFF2E9C8E)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(a.title,
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary900)),
+            Text(
+                s.formatShortDate(a.date) +
+                    (a.time.isNotEmpty ? ' · ${a.time}' : ''),
+                style: GoogleFonts.manrope(
+                    fontSize: 12, color: AppTheme.neutral500)),
+          ]),
+        ),
+      ]),
+    );
+  }
+
   Widget _medicationSection(BuildContext context, AppLanguage lang) {
     final s = S(lang);
     const green = Color(0xFF4F7A52);

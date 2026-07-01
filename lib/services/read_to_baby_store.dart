@@ -21,11 +21,18 @@ class ReadToBabyStore extends ChangeNotifier {
   static const _catKey = 'rtb_categories';
   static const _relKey = 'rtb_religions';
   static const _secKey = 'rtb_sections';
+  static const _offsetKey = 'rtb_prompt_offset';
 
-  final Set<String> _categories = {kRtbStories};
+  // Default: the Samvad speaking cards + children's stories ON (everything else
+  // off until the mother chooses it). Speaking-on preserves the original Samvad
+  // experience now that it lives behind the unified Customize sheet.
+  final Set<String> _categories = {kRtbSpeaking, kRtbStories};
   final Set<String> _religions = {};
   // Enabled sub-sections, keyed "<traditionId>|<sectionIndex>".
   final Set<String> _sections = {};
+  // "Another prompt" offset for the daily Samvad piece — SHARED so when the
+  // mother cycles, the father's "Read to your baby" advances to the same piece.
+  int _promptOffset = 0;
   bool _loaded = false;
 
   Future<void> init() async {
@@ -50,6 +57,7 @@ class ReadToBabyStore extends ChangeNotifier {
           ..clear()
           ..addAll(secs);
       }
+      _promptOffset = p.getInt(_offsetKey) ?? 0;
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -57,6 +65,15 @@ class ReadToBabyStore extends ChangeNotifier {
 
   Set<String> get categories => Set.unmodifiable(_categories);
   Set<String> get religions => Set.unmodifiable(_religions);
+  int get promptOffset => _promptOffset;
+
+  /// Advance the daily Samvad "another prompt" — shared by mother + father.
+  void nextPrompt() {
+    _promptOffset++;
+    _persist();
+    notifyListeners();
+  }
+
   bool isCategoryOn(String c) => _categories.contains(c);
   bool isReligionOn(String id) => _religions.contains(id);
   bool isSectionOn(String tradId, int idx) =>
@@ -99,6 +116,7 @@ class ReadToBabyStore extends ChangeNotifier {
       await p.setStringList(_catKey, _categories.toList());
       await p.setStringList(_relKey, _religions.toList());
       await p.setStringList(_secKey, _sections.toList());
+      await p.setInt(_offsetKey, _promptOffset);
     } catch (_) {/* best-effort */}
   }
 }

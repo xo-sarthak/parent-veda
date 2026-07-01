@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
@@ -31,9 +32,21 @@ import 'services/scans_store.dart';
 import 'services/symptom_store.dart';
 import 'services/tools_store.dart';
 import 'services/video_store.dart';
+import 'supabase_config.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  // Flutter must be ready before we do async work like connecting to Supabase.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Connect to the Supabase backend BEFORE the app starts, using the values
+  // from lib/supabase_config.dart. By the time any screen loads, the backend
+  // is ready.
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+  );
+
   runApp(const ParentVedaApp());
 }
 

@@ -243,9 +243,8 @@ class _RingPainter extends CustomPainter {
     final c = size.center(Offset.zero);
     final r = (size.width - stroke) / 2;
     final track = father ? kFAccent : AppTheme.primary500;
-    final arc = father
-        ? const [kFAccent, kFAccent2]
-        : const [AppTheme.primary500, AppTheme.primary400];
+    // Single arc colour (was a 2-colour gradient) — matches the progress bar.
+    final arc = father ? kFAccent : AppTheme.primary500;
     canvas.drawCircle(
       c,
       r,
@@ -263,8 +262,7 @@ class _RingPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
         ..strokeCap = StrokeCap.round
-        ..shader = LinearGradient(colors: arc)
-            .createShader(Rect.fromCircle(center: c, radius: r)),
+        ..color = arc,
     );
   }
 
@@ -735,8 +733,13 @@ class WeekVideoCard extends StatelessWidget {
                 child: Text(s.wkPregnancyWeek(w.week),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    // Father uses the MOTHER's heading font (plusJakartaSans),
+                    // a bit bolder (w800), in Slate ink — the serif read poorly.
                     style: father
-                        ? fatherSerif(18, weight: FontWeight.w700)
+                        ? GoogleFonts.plusJakartaSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: kFInk)
                         : GoogleFonts.plusJakartaSans(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,

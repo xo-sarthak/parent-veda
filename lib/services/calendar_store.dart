@@ -20,6 +20,7 @@ import '../models/calendar_event.dart';
 import '../models/journey_node.dart';
 import 'journal_store.dart';
 import 'pregnancy_controller.dart';
+import 'remote/supabase_repo.dart';
 import 'scans_store.dart';
 import 'tools_store.dart';
 
@@ -34,6 +35,7 @@ class CalendarStore extends ChangeNotifier {
 
   Future<void> init() async {
     if (_loaded) return;
+    // 1) Local cache first.
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
@@ -46,26 +48,67 @@ class CalendarStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // 2) Then sync with the cloud (no-op if logged out).
+    await _syncFromCloud();
+  }
+
+  // Same recipe as symptom_store — but no translator needed here, since the
+  // field names already match the column names. We reuse the model's toJson /
+  // personalFromJson directly.
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows = await SupabaseRepo.fetch('calendar_personal_events',
+          orderBy: 'date');
+      final byId = {
+        for (final r in rows) r['id'].toString(): CalendarEvent.personalFromJson(r)
+      };
+      for (final e in _personal) {
+        if (!byId.containsKey(e.id)) {
+          byId[e.id] = e; // keep local-only...
+          await SupabaseRepo.insert('calendar_personal_events', e.toJson()); // ...and push up
+        }
+      }
+      _personal
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
   }
 
   Future<void> addPersonal(
       {required String title, String description = '', required DateTime date}) async {
-    _personal.add(CalendarEvent(
+    final ev = CalendarEvent(
       id: 'pe_${DateTime.now().microsecondsSinceEpoch}',
       title: title,
       description: description,
       category: CalEventCategory.personal,
       date: date,
       isSystemGenerated: false,
-    ));
+    );
+    _personal.add(ev);
     notifyListeners();
     await _persist();
+    // Push to the cloud (best-effort).
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('calendar_personal_events', ev.toJson());
+      } catch (_) {/* offline — syncs up on next init */}
+    }
   }
 
   Future<void> deletePersonal(String id) async {
     _personal.removeWhere((e) => e.id == id);
     notifyListeners();
     await _persist();
+    // Delete from the cloud too (NEW vs symptom).
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.delete('calendar_personal_events', id);
+      } catch (_) {/* offline — best-effort */}
+    }
   }
 
   Future<void> _persist() async {

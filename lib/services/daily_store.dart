@@ -16,6 +16,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/supabase_repo.dart';
+
 /// A single Talk-To-Baby message saved into Dear Baby. Text-based for now
 /// (spoken notes are transcribed via speech-to-text before saving).
 @immutable
@@ -145,7 +147,114 @@ class DailyStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Then sync with the cloud (no-op if logged out).
+    await _syncFromCloud();
   }
+
+  // === Cloud sync (Supabase) — two day-maps, a list, and a string-list. =======
+  // (Father missions are deferred — they belong to the father side.)
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // daily_moods — one mood per day, keyed by (user_id, day)
+      final moodRows = await SupabaseRepo.fetch('daily_moods',
+          orderBy: 'day', ascending: true);
+      final cloudMoodDays = <int>{};
+      for (final r in moodRows) {
+        final day = (r['day'] as num?)?.toInt();
+        if (day != null) {
+          cloudMoodDays.add(day);
+          _moods[day] = (r['mood_id'] ?? '').toString();
+        }
+      }
+      for (final e in _moods.entries) {
+        if (!cloudMoodDays.contains(e.key)) {
+          await SupabaseRepo.upsert('daily_moods',
+              {'day': e.key, 'mood_id': e.value},
+              onConflict: 'user_id,day');
+        }
+      }
+      await _persist(_moodKey,
+          jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
+
+      // baby_talk — list, by id
+      final talkRows = await SupabaseRepo.fetch('baby_talk');
+      final talkById = {
+        for (final r in talkRows) r['id'].toString(): _talkFromRow(r)
+      };
+      for (final e in _talk) {
+        if (!talkById.containsKey(e.id)) {
+          talkById[e.id] = e;
+          await SupabaseRepo.insert('baby_talk', _talkToRow(e));
+        }
+      }
+      _talk
+        ..clear()
+        ..addAll(talkById.values);
+      await _persist(
+          _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+
+      // kept_affirmations — plain strings, keyed by the text itself
+      final keptRows = await SupabaseRepo.fetch('kept_affirmations');
+      final cloudKept =
+          keptRows.map((r) => (r['text'] ?? '').toString()).toSet();
+      for (final t in _kept) {
+        if (!cloudKept.contains(t)) {
+          await SupabaseRepo.upsert('kept_affirmations', {'text': t},
+              onConflict: 'user_id,text');
+        }
+      }
+      final mergedKept = {...cloudKept, ..._kept};
+      _kept
+        ..clear()
+        ..addAll(mergedKept);
+      await _persist(_keptKey, jsonEncode(_kept));
+
+      // daily_movement_responses — one response per day, keyed by (user_id, day)
+      final mvRows = await SupabaseRepo.fetch('daily_movement_responses',
+          orderBy: 'day', ascending: true);
+      final cloudMvDays = <int>{};
+      for (final r in mvRows) {
+        final day = (r['day'] as num?)?.toInt();
+        if (day != null) {
+          cloudMvDays.add(day);
+          _movement[day] = (r['response'] ?? '').toString();
+        }
+      }
+      for (final e in _movement.entries) {
+        if (!cloudMvDays.contains(e.key)) {
+          await SupabaseRepo.upsert('daily_movement_responses',
+              {'day': e.key, 'response': e.value},
+              onConflict: 'user_id,day');
+        }
+      }
+      await _persist(_movementKey,
+          jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
+
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
+  }
+
+  Map<String, dynamic> _talkToRow(TalkEntry e) => {
+        'id': e.id,
+        'day': e.day,
+        'week': e.week,
+        'prompt': e.prompt,
+        'text': e.text,
+        'date_iso': e.dateIso.isEmpty ? null : e.dateIso,
+        'spoken': e.spoken,
+      };
+
+  TalkEntry _talkFromRow(Map<String, dynamic> r) => TalkEntry(
+        id: (r['id'] ?? '').toString(),
+        day: (r['day'] as num?)?.toInt() ?? 0,
+        week: (r['week'] as num?)?.toInt() ?? 0,
+        prompt: (r['prompt'] ?? '').toString(),
+        text: (r['text'] ?? '').toString(),
+        dateIso: (r['date_iso'] ?? '').toString(),
+        spoken: r['spoken'] == true,
+      );
 
   // --- mutations -------------------------------------------------------------
 
@@ -161,6 +270,12 @@ class DailyStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_moodKey,
         jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('daily_moods', {'day': day, 'mood_id': moodId},
+            onConflict: 'user_id,day');
+      } catch (_) {}
+    }
   }
 
   Future<void> clearMood(int day) async {
@@ -168,6 +283,11 @@ class DailyStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_moodKey,
         jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.deleteBy('daily_moods', 'day', day);
+      } catch (_) {}
+    }
   }
 
   /// Saves (or replaces) the Talk-To-Baby entry for [day] into Dear Baby.
@@ -192,6 +312,12 @@ class DailyStore extends ChangeNotifier {
     notifyListeners();
     await _persist(
         _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.deleteBy('baby_talk', 'day', day); // replace this day's entry
+        await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
+      } catch (_) {}
+    }
     return entry;
   }
 
@@ -222,14 +348,30 @@ class DailyStore extends ChangeNotifier {
     notifyListeners();
     await _persist(
         _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
+      } catch (_) {}
+    }
     return entry;
   }
 
   Future<void> toggleKept(String text) async {
     final t = text.trim();
-    if (!_kept.remove(t)) _kept.add(t);
+    final wasPresent = _kept.remove(t);
+    if (!wasPresent) _kept.add(t);
     notifyListeners();
     await _persist(_keptKey, jsonEncode(_kept));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        if (wasPresent) {
+          await SupabaseRepo.deleteBy('kept_affirmations', 'text', t);
+        } else {
+          await SupabaseRepo.upsert('kept_affirmations', {'text': t},
+              onConflict: 'user_id,text');
+        }
+      } catch (_) {}
+    }
   }
 
   Future<void> setMovement(int day, String response) async {
@@ -237,6 +379,13 @@ class DailyStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_movementKey,
         jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('daily_movement_responses',
+            {'day': day, 'response': response},
+            onConflict: 'user_id,day');
+      } catch (_) {}
+    }
   }
 
   /// Toggles the Father Mode mission-done flag for [day].

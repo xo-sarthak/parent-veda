@@ -12,13 +12,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
+import '../data/read_to_baby_data.dart';
+import '../data/spiritual_reading_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/read_to_baby_saved_store.dart';
+import '../services/read_to_baby_store.dart';
+import '../services/samvad_pool.dart';
 import '../theme/app_theme.dart';
 import '../widgets/cards/raga_player.dart';
-import 'home_detail_screens.dart' show TalkComposerScreen;
+// TalkComposerScreen parked — the Samvad record/write composer was removed when
+// "Read to your baby" folded into Samvad. Kept commented for revert.
+// import 'home_detail_screens.dart' show TalkComposerScreen;
 import 'tools/ask_veda_screen.dart';
 import 'tools/garbh_games.dart';
 
@@ -947,94 +954,115 @@ class SamvadScreen extends StatefulWidget {
 }
 
 class _SamvadScreenState extends State<SamvadScreen> {
-  late final List<GarbhPrompt> _prompts;
-  late int _index;
-  @override
-  void initState() {
-    super.initState();
-    // Trimester-specific speaking cards (affirmations / read-aloud / visualize).
-    _prompts =
-        samvadForTrimester(garbhTrimester(widget.controller.currentWeek));
-    _index = (widget.controller.currentDay.clamp(1, 280) - 1) % _prompts.length;
-  }
-
-  GarbhPrompt get _prompt => _prompts[_index];
-
-  // Record-voice / write-a-message removed per request. Kept (gated) for revert.
-  // ignore: unused_element
-  Future<void> _compose(bool voice) async {
-    final c = widget.controller;
-    final s = S(c.language);
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => TalkComposerScreen(
-        day: c.currentDay,
-        week: c.currentWeek,
-        prompt: _prompt.text,
-        motivation: s.gsSamvadTag,
-        lang: c.language,
-        startWithVoice: voice,
-      ),
-    ));
-    if (!mounted) return;
-    GarbhStore.instance.markDone('samvad');
-    _push(context, _MemorySavedScreen(controller: c));
-  }
+  ReadToBabyStore get _store => ReadToBabyStore.instance;
+  int get _trimester => garbhTrimester(widget.controller.currentWeek);
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, ReadToBabySavedStore.instance]),
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
     final lang = widget.controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final t = garbhTrimester(widget.controller.currentWeek);
+    final t = _trimester;
 
-    // Tools library: ALL speaking cards, grouped by trimester. No mark-complete.
+    // Tools library: every enabled category as its own segregated group.
     if (!widget.daily) {
+      final groups = samvadLibraryGroups(_store, t);
       return _PillarScaffold(
         title: s.gsSamvad,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
           children: [
-            Text(s.gsBrowseAll,
-                style: text.bodyMedium?.copyWith(color: _muted)),
-            const SizedBox(height: 14),
-            _samvadGroup(text, s.gsSamvadAffirm, kSamvadT1),
-            _samvadGroup(text, s.gsSamvadScripts, kSamvadT2),
-            _samvadGroup(text, s.gsSamvadVisualize, kSamvadT3),
+            Row(children: [
+              Expanded(
+                child: Text(s.gsBrowseAll,
+                    style: text.bodyMedium?.copyWith(color: _muted)),
+              ),
+              _customizeButton(s, text),
+            ]),
+            const SizedBox(height: 12),
+            if (groups.isEmpty)
+              _emptyHint(text)
+            else
+              for (final g in groups) _samvadGroup(text, g.heading, g.pieces),
           ],
         ),
       );
     }
 
-    // Daily (Home): today's speaking card + cycle + mark-complete.
+    // Daily (Home): today's piece, drawn from the mother's enabled categories.
+    final pool = samvadDailyPool(_store, t);
+    if (pool.isEmpty) {
+      return _PillarScaffold(
+        title: s.gsSamvad,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+          children: [
+            Align(
+                alignment: Alignment.centerRight,
+                child: _customizeButton(s, text)),
+            const SizedBox(height: 8),
+            _emptyHint(text),
+          ],
+        ),
+      );
+    }
+    final day = widget.controller.currentDay.clamp(1, 280);
+    final piece = pool[((day - 1) + _store.promptOffset) % pool.length];
+    final saved = ReadToBabySavedStore.instance.isSaved(piece.saveKey);
+
     return _PillarScaffold(
       title: s.gsSamvad,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
         children: [
-          Text(s.gsTodaysConnection,
-              style: text.labelMedium?.copyWith(
-                  color: _accSamvad,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5)),
+          Row(children: [
+            Expanded(
+              child: Text(s.gsTodaysConnection,
+                  style: text.labelMedium?.copyWith(
+                      color: _accSamvad,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5)),
+            ),
+            _customizeButton(s, text),
+          ]),
           const SizedBox(height: 12),
-          _samvadCard(text, _prompt.text),
+          _samvadCard(text, piece.body, title: piece.title),
           const SizedBox(height: 12),
           _WhyCard(
               label: s.gsWhyMatters,
               text: samvadThemeForTrimester(t),
               accent: _accSamvad),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: () =>
-                  setState(() => _index = (_index + 1) % _prompts.length),
-              icon:
-                  const Icon(Icons.refresh_rounded, size: 18, color: _accSamvad),
+          Row(children: [
+            TextButton.icon(
+              onPressed: () => ReadToBabySavedStore.instance
+                  .toggleSave(piece.saveKey, piece.body, piece.group),
+              icon: Icon(
+                  saved
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  size: 18,
+                  color: _accSamvad),
+              label: Text(s.rtbSave,
+                  style: text.labelLarge?.copyWith(color: _accSamvad)),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              // Shared offset → the father's "Read to your baby" advances too.
+              onPressed: () => _store.nextPrompt(),
+              icon: const Icon(Icons.refresh_rounded,
+                  size: 18, color: _accSamvad),
               label: Text(s.gsAnotherPrompt,
                   style: text.labelLarge?.copyWith(color: _accSamvad)),
             ),
-          ),
+          ]),
           const SizedBox(height: 6),
           _MarkComplete(pillarId: 'samvad', accent: _accSamvad, lang: lang),
         ],
@@ -1042,8 +1070,29 @@ class _SamvadScreenState extends State<SamvadScreen> {
     );
   }
 
-  // A single rose-tinted speaking card.
-  Widget _samvadCard(TextTheme text, String body, {bool compact = false}) =>
+  Widget _customizeButton(S s, TextTheme text) => TextButton.icon(
+        onPressed: () => _openCustomize(context, s),
+        icon: const Icon(Icons.tune_rounded, size: 18, color: _accSamvad),
+        label: Text(s.rtbCustomize,
+            style: text.labelLarge?.copyWith(color: _accSamvad)),
+      );
+
+  Widget _emptyHint(TextTheme text) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: _accSamvad.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _accSamvad.withValues(alpha: 0.2)),
+        ),
+        child: Text(
+            'Nothing selected yet. Tap Customize to choose what to read to your baby.',
+            style: text.bodyMedium?.copyWith(color: _ink, height: 1.5)),
+      );
+
+  // A single rose-tinted speaking card (optional title + body).
+  Widget _samvadCard(TextTheme text, String body,
+          {String? title, bool compact = false}) =>
       Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
@@ -1054,14 +1103,23 @@ class _SamvadScreenState extends State<SamvadScreen> {
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: _accSamvad.withValues(alpha: 0.22)),
         ),
-        child: Text(body,
-            style: (compact ? text.titleMedium : text.headlineSmall)?.copyWith(
-                color: _ink, height: 1.45, fontWeight: FontWeight.w700)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (title != null && title.trim().isNotEmpty) ...[
+            Text(title,
+                style: text.titleMedium
+                    ?.copyWith(color: _accSamvad, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+          ],
+          Text(body,
+              style:
+                  (compact ? text.titleMedium : text.headlineSmall)?.copyWith(
+                      color: _ink, height: 1.45, fontWeight: FontWeight.w700)),
+        ]),
       );
 
   // A library group (heading + all its cards) for the Tools repository.
   Widget _samvadGroup(
-          TextTheme text, String heading, List<GarbhPrompt> cards) =>
+          TextTheme text, String heading, List<SamvadPiece> cards) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.only(top: 4, bottom: 10),
@@ -1071,11 +1129,192 @@ class _SamvadScreenState extends State<SamvadScreen> {
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5)),
         ),
-        for (final c in cards) _samvadCard(text, c.text, compact: true),
+        for (final c in cards)
+          _samvadCard(text, c.body, title: c.title, compact: true),
         const SizedBox(height: 10),
       ]);
+
+  // -------------------------------------------------------------------------
+  //  Customize sheet — the single owner of "read to your baby" preferences.
+  //  Ported from the old mother ReadModule; this is now the mother's ONLY
+  //  control, and the source the father's daily card mirrors (he has none).
+  // -------------------------------------------------------------------------
+  void _openCustomize(BuildContext context, S s) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => AnimatedBuilder(
+        animation: _store,
+        builder: (ctx, _) {
+          final store = _store;
+          return Container(
+            decoration: const BoxDecoration(
+              color: _surface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: _line,
+                          borderRadius: BorderRadius.circular(99))),
+                  const SizedBox(height: 14),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(s.rtbCustomizeTitle,
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: _ink)),
+                  ),
+                  const SizedBox(height: 2),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(s.rtbCustomizeSub,
+                        style: const TextStyle(fontSize: 13, color: _muted)),
+                  ),
+                  const SizedBox(height: 10),
+                  _catTile(store, kRtbSpeaking, s.rtbSpeaking,
+                      Icons.record_voice_over_rounded),
+                  _catTile(store, kRtbStories, s.rtbStories,
+                      Icons.auto_stories_rounded),
+                  _catTile(store, kRtbRhymes, s.rtbRhymes,
+                      Icons.music_note_rounded),
+                  _catTile(store, kRtbAffirmations, s.rtbAffirmations,
+                      Icons.favorite_rounded),
+                  _catTile(store, kRtbSpiritual, s.rtbSpiritual,
+                      Icons.self_improvement_rounded),
+                  if (store.isCategoryOn(kRtbSpiritual)) ...[
+                    const Divider(height: 18),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(s.rtbPickReligions,
+                          style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: _ink)),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final tr in kSpiritualTraditions)
+                          FilterChip(
+                            label: Text('${tr.symbol} ${tr.name}',
+                                style: TextStyle(
+                                    fontWeight: store.isReligionOn(tr.id)
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: _ink)),
+                            selected: store.isReligionOn(tr.id),
+                            onSelected: (_) => store.toggleReligion(tr.id),
+                            backgroundColor: _surface,
+                            selectedColor: _accSamvad.withValues(alpha: 0.14),
+                            showCheckmark: true,
+                            checkmarkColor: _accSamvad,
+                            side: store.isReligionOn(tr.id)
+                                ? const BorderSide(color: _accSamvad, width: 2)
+                                : const BorderSide(color: _line, width: 1),
+                          ),
+                      ],
+                    ),
+                    // For each chosen tradition, pick which sub-sections to read.
+                    for (final tr in kSpiritualTraditions)
+                      if (store.isReligionOn(tr.id)) ...[
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('${tr.symbol} ${tr.name}',
+                              style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: _ink)),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (var i = 0; i < tr.sections.length; i++)
+                              FilterChip(
+                                label: Text(tr.sections[i].title,
+                                    style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: store.isSectionOn(tr.id, i)
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                        color: _ink)),
+                                selected: store.isSectionOn(tr.id, i),
+                                onSelected: (_) =>
+                                    store.toggleSection(tr.id, i),
+                                backgroundColor: _surface,
+                                selectedColor:
+                                    _accSamvad.withValues(alpha: 0.14),
+                                showCheckmark: true,
+                                checkmarkColor: _accSamvad,
+                                side: store.isSectionOn(tr.id, i)
+                                    ? const BorderSide(
+                                        color: _accSamvad, width: 2)
+                                    : const BorderSide(color: _line, width: 1),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                          ],
+                        ),
+                      ],
+                  ],
+                ]),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _catTile(
+      ReadToBabyStore store, String key, String label, IconData icon) {
+    final on = store.isCategoryOn(key);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.fromLTRB(12, 2, 6, 2),
+      decoration: BoxDecoration(
+        color: on ? _accSamvad.withValues(alpha: 0.08) : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: on ? _accSamvad.withValues(alpha: 0.55) : _line,
+          width: on ? 1.6 : 1,
+        ),
+      ),
+      child: Row(children: [
+        Icon(icon, size: 20, color: on ? _accSamvad : _muted),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                  color: _ink)),
+        ),
+        Switch(
+          value: on,
+          onChanged: (_) => store.toggleCategory(key),
+          activeThumbColor: _accSamvad,
+        ),
+      ]),
+    );
+  }
 }
 
+// Parked — only used by the removed Samvad record/write composer. Kept for revert.
+// ignore: unused_element
 class _MemorySavedScreen extends StatelessWidget {
   const _MemorySavedScreen({required this.controller});
   final PregnancyController controller;

@@ -876,6 +876,10 @@ class S {
   String get calLegendTrimester => _p('Trimester start', 'Trimester shuru');
   String get calLegendBirth => _p('Due date', 'Due date');
   String get scnTitle => _p('Scans & Appointments ❤', 'Scans & Appointments ❤');
+  // Daily-home "Scans & appointments" card (the due-now list + view-all).
+  String get scnDailyTitle => _p('Scans & appointments', 'Scans & appointments');
+  String get scnAlreadyDone => _p('Already done', 'Pehle se ho gaya');
+  String get scnViewAll => _p('View all scans', 'Sabhi scans dekhein');
   String get scnToolTitle => _p('Scans & Care', 'Scans & Care');
   String get scnTabUpcoming => _p('Upcoming', 'Aage');
   String get scnTabCompleted => _p('Completed', 'Poore');
@@ -1221,6 +1225,15 @@ class S {
       "Here's what's coming up in your journey — the milestones your baby will reach, and the scans worth keeping on your radar. A little glimpse ahead helps you feel prepared and calm.",
       'Aage aapke safar mein kya aane wala hai — baby ke padaav aur dhyaan rakhne layak scans. Thodi jhalak aage ki, taaki aap taiyar aur shaant mehsoos karein.');
   String get wfNextRadar => _p('On your radar', 'Aapke radar par');
+  // What's-next tab labels (single page, no swipe) + the "for you" forward look.
+  String get wfNextTabScans => _p('Scans', 'Scans');
+  String get wfNextTabYou => _p('For you', 'Aapke liye');
+  String get wfNextTabMilestones => _p('Milestones', 'Padaav');
+  String get wfNextMotherIntro => _p(
+      'A gentle look at how you may feel in the weeks just ahead — your body changing, step by step.',
+      'Aane wale hafton mein aap kaisa mehsoos kar sakti hain — aapka shareer dheere-dheere badalta hua, ek halki jhalak.');
+  String get wfBodyLabel => _p('Your body', 'Aapka shareer');
+  String get wfFeelLabel => _p('How you may feel', 'Kaisa lag sakta hai');
   String get wfGotIt => _p('Got it', 'Samajh gaya');
   String get wfTipsTitle => _p('Trimester tips', 'Trimester tips');
   String wfTrimesterLabel(int t) => _p('Trimester $t', 'Trimester $t');
@@ -1300,6 +1313,7 @@ class S {
       _p('Customize this feed', 'Yeh feed customize karein');
   String get rtbCustomizeSub => _p('Choose what your daily read draws from.',
       'Chunein ki aapki rozaana read kahan se aaye.');
+  String get rtbSpeaking => _p('Speaking cards', 'Speaking cards');
   String get rtbStories => _p("Children's stories", 'Bachchon ki kahaniyan');
   String get rtbSpiritual => _p('Spiritual reading', 'Spiritual reading');
   String get rtbRhymes => _p('Rhymes & lullabies', 'Rhymes & lullabies');

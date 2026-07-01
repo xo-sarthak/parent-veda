@@ -85,10 +85,11 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (mounted) setState(() {});
   }
 
-  /// Classic ⟷ New (V2) toggle for the week-20 flow preview.
+  /// Classic ⟷ New (V2) toggle — parked (V2 is now the only view). Kept for revert.
+  // ignore: unused_element
   Widget _v2Toggle() {
     final s = S(_c.language);
-    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
+    final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
     Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -130,7 +131,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   /// the mirror of the Home → weekly hop, so the loop feels two-way.
   Widget _backToDaily() {
     final s = S(_c.language);
-    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
+    final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
     final tint = father ? kFAccent : AppTheme.primary600;
     return Center(
       child: GestureDetector(
@@ -158,7 +159,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   @override
   Widget build(BuildContext context) {
     // Father weekly re-skin (Slate) — colours/fonts only, week-20 + Dad switch.
-    final father = FatherPreview.instance.on && _c.selectedWeek == 20;
+    final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
     return Scaffold(
       backgroundColor: father ? kFBg : null,
       appBar: AppBar(
@@ -176,8 +177,15 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                 'ParentVeda',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                // Father uses the SAME font as the mother (the serif read poorly
+                // here), just in the Slate ink colour.
                 style: father
-                    ? fatherSerif(18, weight: FontWeight.w700)
+                    ? GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: kFAccent,
+                        letterSpacing: -0.5,
+                      )
                     : GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -191,8 +199,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
         actions: [
           // Mirror of Home → weekly: hop back to the Daily tab.
           _backToDaily(),
-          // Week-20 only: compare the classic cards vs the new vertical flow.
-          if (_c.selectedWeek == 20) _v2Toggle(),
+          // Classic/New toggle removed — the New (V2) flow is the only weekly
+          // view now (all weeks). Kept (commented) for revert.
+          // if (_c.selectedWeek == 20) _v2Toggle(),
           // Mute / unmute baby voice — design's soft round speaker button.
           AnimatedBuilder(
             animation: BabyVoiceService.instance,
@@ -254,7 +263,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
     final selectedWeek = _c.selectedWeek;
     _builtForWeek ??= selectedWeek;
-    final father = FatherPreview.instance.on && selectedWeek == 20;
+    final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
 
     final selRange = _c.weekDates(selectedWeek);
     final dateText = _fmtRange(selRange.start, selRange.end);
@@ -282,13 +291,21 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           ),
         ),
       ],
-      // Week-20 "New" flow (V2) keeps this scrolling trimester/week header and
-      // swaps the swipe-carousel body for the vertical section flow.
+      // The "New" (V2) vertical section flow is now the ONLY weekly view, for
+      // EVERY week (4–40). The classic swipe carousel (_pagerBody) is parked for
+      // revert. Week 40 appends the celebration finale at the bottom of the flow.
       body: _c.isLocked(selectedWeek)
           ? _lockedBody(selectedWeek)
-          : (selectedWeek == 20 && _v2
-              ? WeekFlowView(controller: _c)
-              : _pagerBody(selectedWeek)),
+          : WeekFlowView(
+              controller: _c,
+              trailing:
+                  selectedWeek == PregnancyController.lastContentWeek
+                      ? SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.8,
+                          child: _celebrationCard(),
+                        )
+                      : null,
+            ),
     );
   }
 
@@ -316,8 +333,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     );
   }
 
-  /// The swipeable card carousel. Each card is its own vertical scroll view so
-  /// scrolling a card collapses the shared header; page dots float at the foot.
+  /// The swipeable card carousel — parked (the V2 flow replaced it for all
+  /// weeks). Kept for revert.
+  // ignore: unused_element
   Widget _pagerBody(int week) {
     final cards = _cardsFor(week);
     if (cards.isEmpty) {
@@ -419,6 +437,23 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (key == _lastAutoKey) return;
     _lastAutoKey = key;
     BabyVoiceService.instance.autoPlay(text, cardKey: key, lang: lang);
+  }
+
+  /// The week-40 celebration finale (the keepsake-booklet entry), built so the
+  /// V2 flow can append it at the bottom — same construction the classic
+  /// carousel used.
+  Widget _celebrationCard() {
+    final lang = _c.language;
+    final ranges = <int, String>{};
+    for (final wk in _c.availableWeeks) {
+      final r = _c.weekDates(wk);
+      ranges[wk] = _fmtRange(r.start, r.end);
+    }
+    return CelebrationCard(
+      language: lang,
+      dateRanges: ranges,
+      completionDate: _fmtFull(DateTime.now()),
+    );
   }
 
   /// The ordered card list for a week. Reflect & Remember is second-last and
@@ -586,11 +621,17 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                           s.trimesterName(week),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          // Same font as the mother (serif read poorly), Slate
+                          // ink, a touch bolder (w800) per request.
                           style: father
-                              ? fatherSerif(20, weight: FontWeight.w700)
+                              ? GoogleFonts.plusJakartaSans(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: kFInk,
+                                )
                               : GoogleFonts.plusJakartaSans(
                                   fontSize: 20,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w800,
                                   color: AppTheme.primary900,
                                 ),
                         ),
@@ -614,18 +655,10 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Container(
                           height: 9,
                           decoration: BoxDecoration(
-                            // Father: a translucent slate→amber "ghost" of the
-                            // full bar, so you can see where it ends — a touch of
-                            // depth. Mother keeps its flat faint track.
-                            gradient: father
-                                ? LinearGradient(colors: [
-                                    kFAccent.withValues(alpha: 0.34),
-                                    kFAccent2.withValues(alpha: 0.34),
-                                  ])
-                                : null,
-                            color: father
-                                ? null
-                                : AppTheme.primary500.withValues(alpha: 0.14),
+                            // Flat single-colour track — no two-colour gradient
+                            // (the slate→amber "ghost" was removed per request).
+                            color: (father ? kFAccent : AppTheme.primary500)
+                                .withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: FractionallySizedBox(
@@ -633,14 +666,8 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                             widthFactor: progress,
                             child: Container(
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: father
-                                      ? const [kFAccent, kFAccent2]
-                                      : const [
-                                          AppTheme.primary500,
-                                          AppTheme.primary400
-                                        ],
-                                ),
+                                // Single fill colour (was a 2-colour gradient).
+                                color: father ? kFAccent : AppTheme.primary500,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),

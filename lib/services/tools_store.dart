@@ -15,6 +15,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/supabase_repo.dart';
+
 // ---------------------------------------------------------------------------
 //  Models
 // ---------------------------------------------------------------------------
@@ -492,7 +494,186 @@ class ToolsStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Then sync with the cloud (no-op if logged out).
+    await _syncFromCloud();
   }
+
+  // ===========================================================================
+  //  Cloud sync (Supabase) — local-first. Five data kinds sync here; kegel
+  //  *history* is deferred (no-id append-only log). camelCase <-> snake_case.
+  // ===========================================================================
+
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // weight_profile (single row per user)
+      final wp = await SupabaseRepo.fetchOne('weight_profile');
+      if (wp != null) {
+        _prePregnancyWeight =
+            (wp['pre'] as num?)?.toDouble() ?? _prePregnancyWeight;
+        _heightCm = (wp['height'] as num?)?.toDouble() ?? _heightCm;
+      } else if (_prePregnancyWeight != null) {
+        await _cloudUpsertWeightProfile(); // push local profile up
+      }
+
+      // weight_entries (list, by id)
+      final weRows = await SupabaseRepo.fetch('weight_entries');
+      final weById = {
+        for (final r in weRows) r['id'].toString(): _weightEntryFromRow(r)
+      };
+      for (final e in _weightEntries) {
+        if (!weById.containsKey(e.id)) {
+          weById[e.id] = e;
+          await SupabaseRepo.insert('weight_entries', _weightEntryToRow(e));
+        }
+      }
+      _weightEntries
+        ..clear()
+        ..addAll(weById.values);
+      await _persist(_weightEntriesKey,
+          jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
+
+      // movement_sessions (list, by id — only ended sessions are pushed)
+      final msRows = await SupabaseRepo.fetch('movement_sessions');
+      final msById = {
+        for (final r in msRows) r['id'].toString(): _movementFromRow(r)
+      };
+      final activeLocal = _movementSessions.where((s) => s.isActive).toList();
+      for (final s in _movementSessions) {
+        if (!s.isActive && s.times.isNotEmpty && !msById.containsKey(s.id)) {
+          msById[s.id] = s;
+          await SupabaseRepo.upsert('movement_sessions', _movementToRow(s),
+              onConflict: 'id');
+        }
+      }
+      _movementSessions
+        ..clear()
+        ..addAll(msById.values)
+        ..addAll(activeLocal);
+      await _persistMovementSessions();
+
+      // kegel_state (single row per user)
+      final ks = await SupabaseRepo.fetchOne('kegel_state');
+      if (ks != null) {
+        _kegelSessions = (ks['sessions'] as num?)?.toInt() ?? _kegelSessions;
+        _kegelLast = ks['last']?.toString() ?? _kegelLast;
+        _kegelHoldAdjust = (ks['hold_adjust'] as num?)?.toInt() ?? _kegelHoldAdjust;
+        _kegelRepAdjust = (ks['rep_adjust'] as num?)?.toInt() ?? _kegelRepAdjust;
+        _kegelCustomHold = (ks['custom_hold'] as num?)?.toInt();
+        _kegelCustomRelax = (ks['custom_relax'] as num?)?.toInt();
+        _kegelCustomReps = (ks['custom_reps'] as num?)?.toInt();
+        _kegelVoiceOn = (ks['voice_on'] as bool?) ?? _kegelVoiceOn;
+        _kegelThisWeek
+          ..clear()
+          ..addAll(((ks['this_week'] as List?) ?? []).map((e) => e.toString()));
+      } else if (_kegelSessions > 0 || _kegelThisWeek.isNotEmpty) {
+        await _cloudPushKegelState(); // push local state up
+      }
+
+      // contraction_sessions (list, by id)
+      final ctRows = await SupabaseRepo.fetch('contraction_sessions');
+      final ctById = {
+        for (final r in ctRows) r['id'].toString(): _contractionFromRow(r)
+      };
+      for (final s in _contractionSessions) {
+        if (!ctById.containsKey(s.id)) {
+          ctById[s.id] = s;
+          await SupabaseRepo.upsert('contraction_sessions', _contractionToRow(s),
+              onConflict: 'id');
+        }
+      }
+      _contractionSessions
+        ..clear()
+        ..addAll(ctById.values);
+      await _persist(_contractionKey,
+          jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
+
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
+  }
+
+  Future<void> _cloudUpsertWeightProfile() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      await SupabaseRepo.upsert('weight_profile',
+          {'pre': _prePregnancyWeight, 'height': _heightCm},
+          onConflict: 'user_id');
+    } catch (_) {}
+  }
+
+  Future<void> _cloudPushKegelState() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      await SupabaseRepo.upsert(
+          'kegel_state',
+          {
+            'sessions': _kegelSessions,
+            'last': _kegelLast,
+            'hold_adjust': _kegelHoldAdjust,
+            'rep_adjust': _kegelRepAdjust,
+            'custom_hold': _kegelCustomHold,
+            'custom_relax': _kegelCustomRelax,
+            'custom_reps': _kegelCustomReps,
+            'voice_on': _kegelVoiceOn,
+            'this_week': _kegelThisWeek,
+          },
+          onConflict: 'user_id');
+    } catch (_) {}
+  }
+
+  // ---- row mappings ---------------------------------------------------------
+  Map<String, dynamic> _weightEntryToRow(WeightEntry e) => {
+        'id': e.id,
+        'date_iso': e.dateIso.isEmpty ? null : e.dateIso,
+        'time_iso': e.timeIso.isEmpty ? null : e.timeIso,
+        'week': e.week,
+        'weight': e.weight,
+        'notes': e.notes,
+      };
+
+  WeightEntry _weightEntryFromRow(Map<String, dynamic> r) => WeightEntry(
+        id: (r['id'] ?? '').toString(),
+        dateIso: (r['date_iso'] ?? '').toString(),
+        timeIso: (r['time_iso'] ?? '').toString(),
+        week: (r['week'] as num?)?.toInt() ?? 0,
+        weight: (r['weight'] as num?)?.toDouble() ?? 0,
+        notes: (r['notes'] ?? '').toString(),
+      );
+
+  Map<String, dynamic> _movementToRow(MovementSession s) => {
+        'id': s.id,
+        'start_iso': s.startIso.isEmpty ? null : s.startIso,
+        'end_iso': (s.endIso == null || s.endIso!.isEmpty) ? null : s.endIso,
+        'times': s.times.map((d) => d.toIso8601String()).toList(),
+      };
+
+  MovementSession _movementFromRow(Map<String, dynamic> r) => MovementSession(
+        id: (r['id'] ?? '').toString(),
+        startIso: (r['start_iso'] ?? '').toString(),
+        endIso: r['end_iso']?.toString(),
+        times: ((r['times'] as List?) ?? [])
+            .map((e) => DateTime.tryParse(e.toString()))
+            .whereType<DateTime>()
+            .toList(),
+      );
+
+  Map<String, dynamic> _contractionToRow(ContractionSession s) => {
+        'id': s.id,
+        'date_iso': s.dateIso.isEmpty ? null : s.dateIso,
+        'contractions': s.contractions.map((c) => c.toJson()).toList(),
+        'labor_response': s.laborResponse,
+      };
+
+  ContractionSession _contractionFromRow(Map<String, dynamic> r) =>
+      ContractionSession(
+        id: (r['id'] ?? '').toString(),
+        dateIso: (r['date_iso'] ?? '').toString(),
+        contractions: ((r['contractions'] as List?) ?? [])
+            .map((e) => Contraction.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        laborResponse: r['labor_response']?.toString(),
+      );
 
   // ---- Movement mutations ---------------------------------------------------
 
@@ -525,13 +706,21 @@ class ToolsStore extends ChangeNotifier {
   Future<void> endMovementSession() async {
     final s = activeMovementSession;
     if (s == null) return;
-    if (s.times.isEmpty) {
-      _movementSessions.remove(s);
-    } else {
+    final keep = s.times.isNotEmpty;
+    if (keep) {
       s.endIso = DateTime.now().toIso8601String();
+    } else {
+      _movementSessions.remove(s);
     }
     notifyListeners();
     await _persistMovementSessions();
+    // Only ended sessions (with movements) go to the cloud.
+    if (keep && SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('movement_sessions', _movementToRow(s),
+            onConflict: 'id');
+      } catch (_) {}
+    }
   }
 
   /// Close any session left active from a previous launch (no persistence note
@@ -565,6 +754,7 @@ class ToolsStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_weightProfileKey,
         jsonEncode({'pre': preWeight, 'height': heightCm}));
+    await _cloudUpsertWeightProfile();
   }
 
   /// Add a weight entry. Multiple entries per day are allowed (and kept) — they
@@ -574,6 +764,11 @@ class ToolsStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_weightEntriesKey,
         jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('weight_entries', _weightEntryToRow(entry));
+      } catch (_) {}
+    }
   }
 
   /// Remove a single weight entry by id.
@@ -582,6 +777,11 @@ class ToolsStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_weightEntriesKey,
         jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.delete('weight_entries', id);
+      } catch (_) {}
+    }
   }
 
   // ---- Kegel mutations ------------------------------------------------------
@@ -667,6 +867,7 @@ class ToolsStore extends ChangeNotifier {
           'voiceOn': _kegelVoiceOn,
           'thisWeek': _kegelThisWeek,
         }));
+    await _cloudPushKegelState();
   }
 
   // ---- Contraction mutations ------------------------------------------------
@@ -677,6 +878,12 @@ class ToolsStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_contractionKey,
         jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('contraction_sessions', _contractionToRow(session),
+            onConflict: 'id');
+      } catch (_) {}
+    }
   }
 
   // ---- Helpers --------------------------------------------------------------

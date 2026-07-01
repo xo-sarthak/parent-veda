@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/journal_entry.dart';
 import '../models/symptom.dart';
 import 'journal_store.dart';
+import 'remote/supabase_repo.dart';
 
 class SymptomStore extends ChangeNotifier {
   SymptomStore._();
@@ -26,6 +27,7 @@ class SymptomStore extends ChangeNotifier {
 
   Future<void> init() async {
     if (_loaded) return;
+    // 1) Local cache first — instant, works offline.
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
@@ -37,7 +39,52 @@ class SymptomStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // 2) Then sync with the cloud (no-op if logged out).
+    await _syncFromCloud();
   }
+
+  // Pull the user's rows from Supabase and merge with what we have locally:
+  // cloud wins, but local-only rows (e.g. logged offline) are kept AND pushed
+  // up. Best-effort — on any error we just keep the local cache.
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows =
+          await SupabaseRepo.fetch('symptom_logs', orderBy: 'created_at_iso');
+      final byId = {for (final r in rows) r['id'].toString(): _fromRow(r)};
+      for (final l in _logs) {
+        if (!byId.containsKey(l.id)) {
+          byId[l.id] = l; // keep local-only entry...
+          await SupabaseRepo.insert('symptom_logs', _toRow(l)); // ...and push it up
+        }
+      }
+      _logs
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline / transient — keep local */}
+  }
+
+  // camelCase model  <->  snake_case table columns
+  Map<String, dynamic> _toRow(SymptomLog l) => {
+        'id': l.id,
+        'symptom_id': l.symptomId,
+        'date_key': l.dateKey,
+        'severity': l.severity,
+        'notes': l.notes,
+        'created_at_iso': l.createdAtIso,
+      };
+
+  SymptomLog _fromRow(Map<String, dynamic> r) => SymptomLog(
+        id: (r['id'] ?? '').toString(),
+        symptomId: (r['symptom_id'] ?? '').toString(),
+        dateKey: (r['date_key'] ?? '').toString(),
+        severity: (r['severity'] ?? 'mild').toString(),
+        notes: (r['notes'] ?? '').toString(),
+        createdAtIso: (r['created_at_iso'] ?? '').toString(),
+      );
 
   static String dateKey(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-'
@@ -68,16 +115,24 @@ class SymptomStore extends ChangeNotifier {
   }) async {
     final now = DateTime.now();
     final id = 'sl_${now.microsecondsSinceEpoch}';
-    _logs.add(SymptomLog(
+    final entry = SymptomLog(
       id: id,
       symptomId: symptomId,
       dateKey: dateKey(now),
       severity: severity,
       notes: notes,
       createdAtIso: now.toIso8601String(),
-    ));
+    );
+    _logs.add(entry);
     notifyListeners();
     await _persist();
+
+    // Push to the cloud (best-effort; it's already saved in the local cache).
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('symptom_logs', _toRow(entry));
+      } catch (_) {/* offline — will sync up on next init */}
+    }
 
     if (addToJournal) {
       await JournalStore.instance.addEntry(JournalEntry(

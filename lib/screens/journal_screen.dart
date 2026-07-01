@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
+import '../services/father_journal_store.dart';
 import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/tools_store.dart';
@@ -26,6 +27,10 @@ enum _JournalView { list, booklet }
 
 /// How the list view buckets entries.
 enum _GroupBy { month, week }
+
+/// A journal entry tagged with its author, for the Combined (you + Dad) booklet.
+/// `father == false` covers the mother's own entries (manual + auto).
+typedef _AE = ({JournalEntry e, bool father});
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key, required this.controller});
@@ -50,6 +55,11 @@ class _JournalScreenState extends State<JournalScreen> {
   bool _groupsTouched = false; // false → default (only most-recent group open)
   final PageController _bookCtrl = PageController();
 
+  // Combined (you + Dad) booklet — a separate mode, reached via its own app-bar
+  // icon. Father entries surface ONLY here; her List/Booklet stay her own.
+  bool _combined = false;
+  final PageController _combinedBookCtrl = PageController();
+
   PregnancyController get p => widget.controller;
 
   static const List<BoxShadow> _soft = [
@@ -66,6 +76,8 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   void initState() {
     super.initState();
+    // Load the father's journal so the Combined view has his entries available.
+    FatherJournalStore.instance.init();
     _voicePlayer.onPlayerComplete.listen((_) {
       if (mounted) setState(() => _playingPath = null);
     });
@@ -76,6 +88,7 @@ class _JournalScreenState extends State<JournalScreen> {
     _searchCtrl.dispose();
     _voicePlayer.dispose();
     _bookCtrl.dispose();
+    _combinedBookCtrl.dispose();
     super.dispose();
   }
 
@@ -99,8 +112,12 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([JournalStore.instance, ToolsStore.instance, p]),
+      animation: Listenable.merge([
+        JournalStore.instance,
+        FatherJournalStore.instance,
+        ToolsStore.instance,
+        p
+      ]),
       builder: (context, _) => _build(context),
     );
   }
@@ -137,7 +154,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w700, color: AppTheme.primary900)),
         actions: [
-          if (!_searching)
+          if (!_searching && !_combined)
             IconButton(
               tooltip: _view == _JournalView.list
                   ? s.jrBookletView
@@ -148,6 +165,15 @@ class _JournalScreenState extends State<JournalScreen> {
               onPressed: () => setState(() => _view = _view == _JournalView.list
                   ? _JournalView.booklet
                   : _JournalView.list),
+            ),
+          // Combined (you + Dad) booklet — its own toggle.
+          if (!_searching)
+            IconButton(
+              tooltip: _combined ? 'My journal' : 'Combined · you + Dad',
+              icon: Icon(_combined
+                  ? Icons.people_alt_rounded
+                  : Icons.people_alt_outlined),
+              onPressed: () => setState(() => _combined = !_combined),
             ),
           IconButton(
             icon: Icon(_searching ? Icons.close_rounded : Icons.search_rounded),
@@ -173,22 +199,27 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
         ],
       ),
-      body: _view == _JournalView.booklet
-          ? Column(children: [
-              _filters(s),
-              Expanded(child: _booklet(s, list)),
-            ])
-          : Column(children: [
-              _filters(s),
-              if (_filter != JournalFilter.photos) _groupByBar(s),
-              Expanded(
-                child: list.isEmpty
-                    ? _empty(s)
-                    : (_filter == JournalFilter.photos
-                        ? _photoGrid(s, list)
-                        : _groupedList(s, list)),
-              ),
-            ]),
+      body: _combined
+          ? _booklet(s, _combinedItems(), ctrl: _combinedBookCtrl, combined: true)
+          : (_view == _JournalView.booklet
+              ? Column(children: [
+                  _filters(s),
+                  Expanded(
+                      child: _booklet(
+                          s, [for (final e in list) (e: e, father: false)],
+                          ctrl: _bookCtrl)),
+                ])
+              : Column(children: [
+                  _filters(s),
+                  if (_filter != JournalFilter.photos) _groupByBar(s),
+                  Expanded(
+                    child: list.isEmpty
+                        ? _empty(s)
+                        : (_filter == JournalFilter.photos
+                            ? _photoGrid(s, list)
+                            : _groupedList(s, list)),
+                  ),
+                ])),
       // Just a "+" — the create options open on tap (the long label was
       // spilling out of the button).
       floatingActionButton: FloatingActionButton(
@@ -736,14 +767,52 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
+  // --- combined (you + Dad) data ---------------------------------------------
+  // Her full timeline (memories + auto milestones/health/scans) merged with the
+  // father's manual entries, each tagged with its author, newest first.
+  List<_AE> _combinedItems() {
+    final out = <_AE>[
+      for (final e in JournalStore.instance.timeline(p)) (e: e, father: false),
+      for (final e in FatherJournalStore.instance.entries) (e: e, father: true),
+    ];
+    final q = _query.trim().toLowerCase();
+    final filtered = q.isEmpty
+        ? out
+        : out
+            .where((ae) =>
+                ae.e.title.toLowerCase().contains(q) ||
+                ae.e.description.toLowerCase().contains(q))
+            .toList();
+    filtered.sort((a, b) => b.e.date.compareTo(a.e.date));
+    return filtered;
+  }
+
+  // A small "You" / "Dad" pill shown on each entry in the Combined booklet.
+  Widget _authorChip(bool father) {
+    final c = father ? const Color(0xFF2E5266) : AppTheme.primary500;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+          color: c.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(99)),
+      child: Text(father ? 'Dad' : 'You',
+          style: GoogleFonts.manrope(
+              fontSize: 10, fontWeight: FontWeight.w800, color: c)),
+    );
+  }
+
   // --- booklet view (flip through, like a real diary) ------------------------
-  Widget _booklet(S s, List<JournalEntry> list) {
+  // Drives both the mother-only booklet and the Combined (you + Dad) booklet:
+  // entries are wrapped as ({e, father}) so a Combined page can chip each one.
+  Widget _booklet(S s, List<_AE> list,
+      {required PageController ctrl, bool combined = false}) {
     final chrono = list.reversed.toList(); // earliest → latest
-    final byDay = <String, List<JournalEntry>>{};
-    for (final e in chrono) {
+    final byDay = <String, List<_AE>>{};
+    for (final ae in chrono) {
+      final e = ae.e;
       byDay
           .putIfAbsent('${e.date.year}-${e.date.month}-${e.date.day}', () => [])
-          .add(e);
+          .add(ae);
     }
     final days = byDay.keys.toList();
     if (days.isEmpty) return _empty(s);
@@ -753,12 +822,12 @@ class _JournalScreenState extends State<JournalScreen> {
       // never feel like they're floating on a bare canvas (esp. when sparse).
       const Positioned.fill(child: _BookletBackdrop()),
       PageView.builder(
-        controller: _bookCtrl,
+        controller: ctrl,
         itemCount: pages,
         itemBuilder: (context, i) => AnimatedBuilder(
-          animation: _bookCtrl,
+          animation: ctrl,
           builder: (context, child) {
-            final t = (i - _bookPage()).clamp(-1.0, 1.0);
+            final t = (i - _pageOf(ctrl)).clamp(-1.0, 1.0);
             return Opacity(
               opacity: (1 - t.abs() * 0.55).clamp(0.0, 1.0),
               child: Transform(
@@ -772,8 +841,8 @@ class _JournalScreenState extends State<JournalScreen> {
             );
           },
           child: i == 0
-              ? _bookletCover(s, chrono)
-              : _bookletPage(s, byDay[days[i - 1]]!),
+              ? _bookletCover(s, chrono, combined: combined)
+              : _bookletPage(s, byDay[days[i - 1]]!, combined: combined),
         ),
       ),
       Positioned(
@@ -781,12 +850,12 @@ class _JournalScreenState extends State<JournalScreen> {
         right: 0,
         bottom: 14,
         child: AnimatedBuilder(
-          animation: _bookCtrl,
+          animation: ctrl,
           builder: (context, _) {
-            final cur = _bookPage().round();
+            final cur = _pageOf(ctrl).round();
             return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               _bookArrow(Icons.chevron_left_rounded, cur > 0,
-                  () => _bookCtrl.previousPage(
+                  () => ctrl.previousPage(
                       duration: const Duration(milliseconds: 340),
                       curve: Curves.easeInOut)),
               const SizedBox(width: 14),
@@ -805,7 +874,7 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
               const SizedBox(width: 14),
               _bookArrow(Icons.chevron_right_rounded, cur < pages - 1,
-                  () => _bookCtrl.nextPage(
+                  () => ctrl.nextPage(
                       duration: const Duration(milliseconds: 340),
                       curve: Curves.easeInOut)),
             ]);
@@ -815,9 +884,9 @@ class _JournalScreenState extends State<JournalScreen> {
     ]);
   }
 
-  double _bookPage() {
-    if (!_bookCtrl.hasClients) return 0;
-    return _bookCtrl.page ?? 0;
+  double _pageOf(PageController c) {
+    if (!c.hasClients) return 0;
+    return c.page ?? 0;
   }
 
   Widget _bookArrow(IconData icon, bool enabled, VoidCallback onTap) =>
@@ -841,8 +910,8 @@ class _JournalScreenState extends State<JournalScreen> {
       height: d,
       decoration: BoxDecoration(color: c, shape: BoxShape.circle));
 
-  Widget _bookletCover(S s, List<JournalEntry> entries) {
-    final weeks = entries.map((e) => e.weekNumber).where((w) => w > 0).toList()
+  Widget _bookletCover(S s, List<_AE> entries, {bool combined = false}) {
+    final weeks = entries.map((x) => x.e.weekNumber).where((w) => w > 0).toList()
       ..sort();
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 10, 18, 60),
@@ -905,6 +974,14 @@ class _JournalScreenState extends State<JournalScreen> {
                           color: Colors.white.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(2)),
                     ),
+                    if (combined) ...[
+                      const SizedBox(height: 10),
+                      Text('You + Dad',
+                          style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white.withValues(alpha: 0.9))),
+                    ],
                     if (weeks.isNotEmpty) ...[
                       const SizedBox(height: 10),
                       Text(s.jrCoverWeeks(weeks.first, weeks.last),
@@ -933,9 +1010,9 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _bookletPage(S s, List<JournalEntry> es) {
-    final date = es.first.date;
-    final wk = es.fold(0, (a, e) => e.weekNumber > a ? e.weekNumber : a);
+  Widget _bookletPage(S s, List<_AE> es, {bool combined = false}) {
+    final date = es.first.e.date;
+    final wk = es.fold(0, (a, ae) => ae.e.weekNumber > a ? ae.e.weekNumber : a);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 60),
       child: Container(
@@ -983,7 +1060,7 @@ class _JournalScreenState extends State<JournalScreen> {
               const SizedBox(height: 6),
               Container(height: 1, color: const Color(0xFFEADFCB)),
               const SizedBox(height: 14),
-              for (final e in es) _bookletEntry(s, e),
+              for (final ae in es) _bookletEntry(s, ae, combined: combined),
             ]),
           ),
         ]),
@@ -991,7 +1068,8 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _bookletEntry(S s, JournalEntry e) {
+  Widget _bookletEntry(S s, _AE ae, {bool combined = false}) {
+    final e = ae.e;
     final m = metaFor(e.type);
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
@@ -1006,6 +1084,10 @@ class _JournalScreenState extends State<JournalScreen> {
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
           ),
+          if (combined) ...[
+            _authorChip(ae.father),
+            const SizedBox(width: 8),
+          ],
           Text(_fmtTime(e.createdAt),
               style: GoogleFonts.manrope(
                   fontSize: 10.5,

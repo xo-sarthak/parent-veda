@@ -16,12 +16,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/father/father_read_data.dart';
 import '../../data/father/father_tales.dart';
 import '../../data/garbh_data.dart';
-import '../../models/garbh_content.dart';
+import '../../data/scan_schedule.dart';
+// garbh_content (GarbhPrompt) parked — the father read-aloud now uses the shared
+// SamvadPiece pool. Kept commented for revert.
+// import '../../models/garbh_content.dart';
 import '../../models/journal_entry.dart';
+import '../../models/journey_node.dart';
 import '../../models/read_item.dart';
+import '../../models/scan_appointment.dart';
+import '../../services/app_nav.dart';
 import '../../services/father_journal_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/read_to_baby_store.dart';
+import '../../services/samvad_pool.dart';
+import '../../services/scans_store.dart';
 import '../../widgets/journal/journal_create.dart';
+import '../profile_screen.dart';
 import '../week_flow_screen.dart';
 import 'father_journal_screen.dart';
 import 'father_stories_screen.dart';
@@ -203,13 +213,23 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   static const int _week = 20;
   static const String _dadName = 'Arjun';
 
-  // "Read to your baby" reuses the mother's Samvad read-aloud scripts. Week 20 is
-  // trimester 2 (kSamvadT2 — the expressive read-aloud set). Picked by week so
-  // it's stable and rolls forward if other weeks are added later.
-  List<GarbhPrompt> get _readAloudSet =>
-      samvadForTrimester(garbhTrimester(_week));
-  GarbhPrompt get _readAloudToday =>
-      _readAloudSet[_week % _readAloudSet.length];
+  // "Read to your baby" mirrors the mother's daily Samvad EXACTLY: same shared
+  // pool, same customization (ReadToBabyStore, mother-owned), same day pick. The
+  // father has NO controls of his own — whatever the mother enables is what he
+  // sees here. Uses her live stage (not the fixed week-20 framing) so the daily
+  // piece is identical to the one on her side.
+  List<SamvadPiece> get _readAloudPool => samvadDailyPool(
+      ReadToBabyStore.instance,
+      garbhTrimester(widget.controller.currentWeek));
+  SamvadPiece? get _readAloudToday {
+    final pool = _readAloudPool;
+    if (pool.isEmpty) return null;
+    final day = widget.controller.currentDay.clamp(1, 280);
+    // Same shared "another prompt" offset the mother cycles on her Samvad, so
+    // tapping it on her side advances the father's piece to match.
+    final off = ReadToBabyStore.instance.promptOffset;
+    return pool[((day - 1) + off) % pool.length];
+  }
 
   // Days-since-epoch — a stable index that ticks over once per day, used to
   // refresh the daily read + the daily tale.
@@ -218,8 +238,14 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // "Daily read" is sourced from the father Read-recommendations slots, week-
   // aware (see father_read_data.dart). Rotates day to day so it refreshes every
-  // day rather than staying fixed all week.
-  ReadItem get _todayRead => fatherDailyReads(_week, _dayIndex).first;
+  // day rather than staying fixed all week. Now a small LOOPING swipe carousel
+  // of the day's reads; `_readIdx` tracks the slide currently showing.
+  late final List<ReadItem> _reads;
+  int _readIdx = 0;
+  late final PageController _readPc;
+  ReadItem get _todayRead => _reads.isEmpty
+      ? fatherReadForWeek(_week)
+      : _reads[_readIdx % _reads.length];
 
   // Stories/Fables/Mythology: one piece a day, alternating across the kinds the
   // user enabled (empty = a mix of all three). Persisted in shared_preferences.
@@ -251,6 +277,18 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   void initState() {
     super.initState();
     _loadTaleKinds();
+    // The day's reads + a controller parked mid-range so the carousel loops both
+    // ways without ever feeling stuck at the first slide.
+    _reads = fatherDailyReads(_week, _dayIndex);
+    _readPc = PageController(
+        initialPage: _reads.length > 1 ? _reads.length * 1000 : 0);
+    // Mirror the mother's customization live: when she changes what to read,
+    // the father's "Read to your baby" card refreshes too.
+    ReadToBabyStore.instance.addListener(_onReadStore);
+  }
+
+  void _onReadStore() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadTaleKinds() async {
@@ -275,6 +313,8 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   @override
   void dispose() {
+    ReadToBabyStore.instance.removeListener(_onReadStore);
+    _readPc.dispose();
     _toastTimer?.cancel();
     _closeTimer?.cancel();
     _draft.dispose();
@@ -342,10 +382,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(0, 2, 0, widget.embedded ? 120 : 24),
                 children: [
-                  _greeting(p),
-                  _quickCircles(p),
+                  // Weekly snapshot — mirrors the mother's home hero, in Slate.
+                  _weeklySnapshot(p),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                     child: Text('TODAY FOR YOU',
                         style: _eyebrow(p.muted, 0.14)),
                   ),
@@ -360,8 +400,13 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       const SizedBox(height: 14),
                       _talkBaby(p),
                       const SizedBox(height: 14),
-                      _storiesMyth(p),
+                      // Scans & appointments due around now (below Read to baby).
+                      _scansCard(p),
                       const SizedBox(height: 14),
+                      // "Stories, Fables & Myth" removed from the father's daily
+                      // home. Kept for revert.
+                      // _storiesMyth(p),
+                      // const SizedBox(height: 14),
                       _journalCard(p),
                     ]),
                   ),
@@ -394,7 +439,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // ---- Baby / Mother / What's-next quick circles ----
   // Same shortcuts as the mother's weekly; they open the (father-skinned when
-  // FatherPreview is on) week-20 detail screens.
+  // FatherPreview is on) week-20 detail screens. Parked — the snapshot hero now
+  // carries these shortcuts. Kept for revert.
+  // ignore: unused_element
   Widget _quickCircles(_Pal p) {
     Widget circle(IconData icon, String label, VoidCallback onTap) => Expanded(
           child: GestureDetector(
@@ -444,7 +491,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         openWeekMotherDetail(context, c, _week, lang);
         break;
       case 'next':
-        openWeekWhatsNext(context, c, lang);
+        openWeekWhatsNext(context, c, lang, father: true);
         break;
     }
   }
@@ -464,12 +511,224 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           const SizedBox(width: 9),
           Text('ParentVeda', style: _serif(18, p.ink)),
           const Spacer(),
-          // The decorative "Dad | Mom" pill + avatar were removed — the real
-          // mode switch lives top-right (MainScaffold). _momSheet kept for revert.
+          // Dev Slate/Teal palette toggle (moved here from the snapshot hero).
+          GestureDetector(
+            onTap: () => setState(() => _palIdx = _palIdx == 0 ? 1 : 0),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+              decoration: BoxDecoration(
+                color: p.card,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: p.line),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                    width: 11,
+                    height: 11,
+                    decoration:
+                        BoxDecoration(color: p.accent, shape: BoxShape.circle)),
+                const SizedBox(width: 5),
+                Container(
+                    width: 11,
+                    height: 11,
+                    decoration: BoxDecoration(
+                        color: p.accent2, shape: BoxShape.circle)),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Profile avatar (top-right, like the mother) → ProfileScreen.
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) =>
+                    ProfileScreen(controller: widget.controller, father: true))),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration:
+                  BoxDecoration(color: p.accent, shape: BoxShape.circle),
+              child: Text(
+                  _dadName.isNotEmpty ? _dadName[0].toUpperCase() : 'P',
+                  style: _serif(16, p.cream)),
+            ),
+          ),
         ]),
       );
 
   // ---- greeting + progress ----
+  // ---- Weekly snapshot (full mirror of the mother's home hero, in Slate) ----
+  Widget _weeklySnapshot(_Pal p) {
+    final hour = DateTime.now().hour;
+    final part = hour < 12 ? 'morning' : (hour < 18 ? 'afternoon' : 'evening');
+    final pct = (_week / 40).clamp(0.04, 1.0);
+    final lang = widget.controller.language;
+    final summary = widget.controller
+            .weekData(_week)
+            ?.snapshot
+            .weekHeadline
+            .of(lang)
+            .trim() ??
+        '';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+          child: Text('WEEKLY SNAPSHOT', style: _eyebrow(p.muted, 0.14)),
+        ),
+        GestureDetector(
+          onTap: () => AppNav.instance.goWeekly(),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(26),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [p.accent, const Color(0xFF1E3A47)],
+                ),
+              ),
+              child: Stack(children: [
+                Positioned(
+                    right: -34,
+                    top: -40,
+                    child: _softCircle(150, Colors.white.withValues(alpha: 0.06))),
+                Positioned(
+                    right: 26,
+                    bottom: -42,
+                    child: _softCircle(96, p.accent2.withValues(alpha: 0.20))),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Good $part, $_dadName',
+                                          style: _body(12.5,
+                                              p.cream.withValues(alpha: 0.85))),
+                                      const SizedBox(height: 6),
+                                      Text('Week $_week',
+                                          style: _serif(26, p.cream,
+                                              w: FontWeight.w600)),
+                                      if (summary.isNotEmpty) ...[
+                                        const SizedBox(height: 6),
+                                        Text(summary,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: _body(
+                                                13,
+                                                p.cream
+                                                    .withValues(alpha: 0.88))),
+                                      ],
+                                      const SizedBox(height: 12),
+                                      Row(mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text('Open her week',
+                                                style: _body(12.5, p.cream,
+                                                    w: FontWeight.w700)),
+                                            Icon(Icons.chevron_right_rounded,
+                                                size: 17, color: p.cream),
+                                          ]),
+                                    ]),
+                              ),
+                              const SizedBox(width: 12),
+                              // Circular progress ring (mirrors the mother hero).
+                              _snapRing(p, pct, (40 - _week).clamp(0, 40)),
+                            ]),
+                        const SizedBox(height: 16),
+                        Container(
+                            height: 1,
+                            color: Colors.white.withValues(alpha: 0.16)),
+                        const SizedBox(height: 14),
+                        Row(children: [
+                          _snapShortcut(p, Icons.child_care_rounded, 'Baby',
+                              () => _openWeek('baby')),
+                          _snapShortcut(p, Icons.favorite_rounded, 'Mother',
+                              () => _openWeek('mother')),
+                          _snapShortcut(p, Icons.explore_rounded, "What's next",
+                              () => _openWeek('next')),
+                        ]),
+                      ]),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  // Circular percentage ring — the father-skin twin of the mother hero's ring.
+  Widget _snapRing(_Pal p, double pct, int weeksToGo) => SizedBox(
+        width: 74,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SizedBox(
+            width: 62,
+            height: 62,
+            child: Stack(alignment: Alignment.center, children: [
+              SizedBox(
+                width: 62,
+                height: 62,
+                child: CircularProgressIndicator(
+                  value: pct.toDouble(),
+                  strokeWidth: 6,
+                  strokeCap: StrokeCap.round,
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
+                  valueColor: const AlwaysStoppedAnimation(Colors.white),
+                ),
+              ),
+              Text('${(pct * 100).round()}%',
+                  style: _body(13, p.cream, w: FontWeight.w700)),
+            ]),
+          ),
+          const SizedBox(height: 5),
+          Text('$weeksToGo weeks to go',
+              textAlign: TextAlign.center,
+              style: _body(10.5, p.cream.withValues(alpha: 0.92),
+                  w: FontWeight.w700, h: 1.15)),
+        ]),
+      );
+
+  Widget _snapShortcut(
+          _Pal p, IconData icon, String label, VoidCallback onTap) =>
+      Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Column(children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+              ),
+              child: Icon(icon, size: 21, color: p.cream),
+            ),
+            const SizedBox(height: 6),
+            Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: _body(11, p.cream.withValues(alpha: 0.95),
+                    w: FontWeight.w700)),
+          ]),
+        ),
+      );
+
+  // Parked — replaced by _weeklySnapshot above. Kept for revert.
+  // ignore: unused_element
   Widget _greeting(_Pal p) {
     final hour = DateTime.now().hour;
     final part = hour < 12 ? 'morning' : (hour < 18 ? 'afternoon' : 'evening');
@@ -664,40 +923,91 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       );
 
-  // ---- card 3: daily read ----
-  Widget _dailyRead(_Pal p) => _tap(
-        () => _openCard('read'),
-        _whiteCard(
-          p,
-          Row(children: [
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      _iconTileSm(p, Icons.menu_book_rounded, p.accentSoft, p.accent),
-                      const SizedBox(width: 8),
-                      Text('DAILY READ', style: _eyebrow(p.accent, 0.12)),
-                    ]),
-                    const SizedBox(height: 9),
-                    Text(_todayRead.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: _serif(18, p.ink, w: FontWeight.w600)),
-                    const SizedBox(height: 9),
-                    Text('${_todayRead.readingTime} · ${_todayRead.category}',
-                        style: _body(12.5, p.muted)),
-                  ]),
-            ),
-            const SizedBox(width: 14),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                  width: 86, height: 86, child: _SoundRippleArt(pal: p)),
-            ),
-          ]),
-          pad: 16,
+  // ---- card 3: daily read — a looping swipe carousel of the day's reads, with
+  //      a subtle Instagram-style "more slides" indicator. Card layout per slide
+  //      is unchanged; tapping the visible slide opens that read.
+  Widget _dailyRead(_Pal p) {
+    final n = _reads.length;
+    if (n <= 1) {
+      return _tap(() => _openCard('read'),
+          _whiteCard(p, _readRow(p, _todayRead), pad: 16));
+    }
+    return _whiteCard(
+      p,
+      Stack(children: [
+        SizedBox(
+          height: 112,
+          child: PageView.builder(
+            controller: _readPc,
+            // A big virtual range so it loops endlessly in both directions.
+            itemCount: n * 2000,
+            onPageChanged: (i) => setState(() => _readIdx = i % n),
+            itemBuilder: (_, i) =>
+                _tap(() => _openCard('read'), _readRow(p, _reads[i % n])),
+          ),
         ),
+        // Floating dots, centred at the bottom — quiet, just "there's more".
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Center(child: _readDots(p, n, _readIdx)),
+        ),
+      ]),
+      pad: 16,
+    );
+  }
+
+  // One read slide — identical to the original Daily Read card content.
+  Widget _readRow(_Pal p, ReadItem r) => Row(children: [
+        Expanded(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  _iconTileSm(
+                      p, Icons.menu_book_rounded, p.accentSoft, p.accent),
+                  const SizedBox(width: 8),
+                  Text('DAILY READ', style: _eyebrow(p.accent, 0.12)),
+                ]),
+                const SizedBox(height: 9),
+                Text(r.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: _serif(18, p.ink, w: FontWeight.w600)),
+                const SizedBox(height: 9),
+                Text('${r.readingTime} · ${r.category}',
+                    style: _body(12.5, p.muted)),
+              ]),
+        ),
+        const SizedBox(width: 14),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child:
+              SizedBox(width: 86, height: 86, child: _SoundRippleArt(pal: p)),
+        ),
+      ]);
+
+  // Subtle "more slides ahead" dots (the active one stretches a little).
+  Widget _readDots(_Pal p, int n, int active) => Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (int i = 0; i < n; i++)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: i == active ? 16 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: i == active
+                    ? p.accent
+                    : p.muted.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+        ],
       );
 
   // ---- card 4: talk to baby ----
@@ -726,7 +1036,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
               decoration: BoxDecoration(
                   color: p.accentSoft, borderRadius: BorderRadius.circular(15)),
-              child: Text('“${_readAloudToday.text}”',
+              child: Text(
+                  _readAloudToday == null
+                      ? 'Choose a few lines to read together.'
+                      : '“${_readAloudToday!.body}”',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.fraunces(
@@ -785,9 +1098,211 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       );
 
-  // ---- card 5: stories & myth — ONE piece a day (the full 20-of-each
-  //      collection now lives in Tools → Stories, Fables & Mythology). The
-  //      tune icon customizes which kinds appear; tap reads today's piece.
+  // ---- card: scans & appointments (due around now), re-voiced for the partner.
+  //      Future scans appear when their week arrives; past / not-done ones live
+  //      behind "View all scans". "Already done" ticks one off (shared with her).
+  Widget _scansCard(_Pal p) => AnimatedBuilder(
+        animation: ScansStore.instance,
+        builder: (context, _) {
+          final cw = widget.controller.currentWeek;
+          final due = scansDueAt(cw)
+              .where((m) => !ScansStore.instance.isCompleted(m.id))
+              .toList();
+          final today = DateTime.now();
+          final appts = ScansStore.instance.appointments
+              .where((a) => !a.date
+                  .isBefore(DateTime(today.year, today.month, today.day)))
+              .toList();
+          return _whiteCard(
+            p,
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                _iconTile(
+                    p, Icons.event_available_rounded, p.accentSoft, p.accent),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('SCANS & APPOINTMENTS',
+                            style: _eyebrow(p.accent, 0.12)),
+                        const SizedBox(height: 3),
+                        Text('Coming up for her',
+                            style: _serif(19, p.ink, w: FontWeight.w600)),
+                      ]),
+                ),
+              ]),
+              const SizedBox(height: 13),
+              if (due.isEmpty && appts.isEmpty)
+                Text("Nothing due right now — you're both up to date.",
+                    style: _body(14, p.muted))
+              else ...[
+                for (final m in due) _fScanRow(p, m),
+                for (final a in appts) _fApptRow(p, a),
+              ],
+              const SizedBox(height: 6),
+              _tap(_openAllScans, _arrowLink(p, 'View all scans')),
+            ]),
+          );
+        },
+      );
+
+  Widget _fScanRow(_Pal p, JourneyMilestone m) {
+    final lang = widget.controller.language;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(children: [
+        Text(m.emoji, style: const TextStyle(fontSize: 18)),
+        const SizedBox(width: 11),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(m.title.of(lang), style: _body(14.5, p.ink, w: FontWeight.w700)),
+            Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+                style: _body(12, p.muted)),
+          ]),
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: () => ScansStore.instance.markCompleted(
+              scanId: m.id,
+              journalTitle: m.title.of(lang),
+              week: m.anchorWeek),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: p.accent, width: 1.4),
+            ),
+            child:
+                Text('Already done', style: _body(12, p.accent, w: FontWeight.w700)),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _fApptRow(_Pal p, Appointment a) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(children: [
+          Icon(Icons.event_rounded, size: 18, color: p.accent2),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(a.title, style: _body(14.5, p.ink, w: FontWeight.w700)),
+                  Text(
+                      _fmtApptDate(a.date) +
+                          (a.time.isNotEmpty ? ' · ${a.time}' : ''),
+                      style: _body(12, p.muted)),
+                ]),
+          ),
+        ]),
+      );
+
+  static const _scanMonths = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  String _fmtApptDate(DateTime d) =>
+      '${d.day} ${_scanMonths[d.month - 1]} ${d.year}';
+
+  // "View all scans" — a Slate sheet of every scan with a done tick, so he can
+  // also clear older ones (handy if they joined the app late).
+  void _openAllScans() {
+    final p = _p;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: p.bg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => AnimatedBuilder(
+        animation: ScansStore.instance,
+        builder: (ctx, _) => DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.7,
+          maxChildSize: 0.92,
+          builder: (ctx, scroll) => Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                      child: Container(
+                          width: 42,
+                          height: 5,
+                          decoration: BoxDecoration(
+                              color: p.line,
+                              borderRadius: BorderRadius.circular(999)))),
+                  const SizedBox(height: 16),
+                  Text('All scans', style: _serif(20, p.ink)),
+                  const SizedBox(height: 4),
+                  Text(
+                      'Tick off the ones already done — even older ones, if you joined late.',
+                      style: _body(13, p.muted)),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: ListView(
+                      controller: scroll,
+                      children: [
+                        for (final m in allMedicalScans()) _fAllScanTile(p, m),
+                      ],
+                    ),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _fAllScanTile(_Pal p, JourneyMilestone m) {
+    final lang = widget.controller.language;
+    final done = ScansStore.instance.isCompleted(m.id);
+    return GestureDetector(
+      onTap: () => done
+          ? ScansStore.instance.unmarkCompleted(m.id)
+          : ScansStore.instance.markCompleted(
+              scanId: m.id,
+              journalTitle: m.title.of(lang),
+              week: m.anchorWeek),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: p.card,
+          borderRadius: BorderRadius.circular(16),
+          border:
+              Border.all(color: done ? p.accent : p.line, width: done ? 1.5 : 1),
+        ),
+        child: Row(children: [
+          Text(m.emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(m.title.of(lang),
+                      style: _body(14.5, p.ink, w: FontWeight.w700)),
+                  Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+                      style: _body(12, p.muted)),
+                ]),
+          ),
+          Icon(done ? Icons.check_circle_rounded : Icons.circle_outlined,
+              color: done ? p.accent : p.muted, size: 24),
+        ]),
+      ),
+    );
+  }
+
+  // ---- card 5: stories & myth — REMOVED from the father's daily home (kept
+  //      here, unused, for an easy revert). The full collection in Tools was
+  //      removed too.
+  // ignore: unused_element
   Widget _storiesMyth(_Pal p) {
     final tale = _todayTale;
     return _tap(
@@ -1212,17 +1727,27 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           child: SizedBox(height: 170, child: _OceanArt(pal: p))));
     }
     if (d.id == 'talk') {
+      final today = _readAloudToday;
       out.add(const SizedBox(height: 18));
       out.add(Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
             color: p.accentSoft, borderRadius: BorderRadius.circular(18)),
-        child: Text('“${_readAloudToday.text}”',
-            style: GoogleFonts.fraunces(
-                fontSize: 18,
-                fontStyle: FontStyle.italic,
-                height: 1.5,
-                color: p.accent)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (today?.title != null && today!.title!.trim().isNotEmpty) ...[
+            Text(today.title!, style: _serif(18, p.accent, w: FontWeight.w700)),
+            const SizedBox(height: 8),
+          ],
+          Text(
+              today == null
+                  ? 'Choose a few lines to read together.'
+                  : '“${today.body}”',
+              style: GoogleFonts.fraunces(
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                  height: 1.5,
+                  color: p.accent)),
+        ]),
       ));
     }
     if (d.id == 'partner') {
@@ -1314,35 +1839,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       ));
     }
-    if (d.id == 'talk') {
-      // PURE READ-ALOUD: the record block was removed here (kept for revert):
-      //   out.add(const SizedBox(height: 22));
-      //   out.add(_recordBlock(p));
-      final more =
-          _readAloudSet.where((g) => g.id != _readAloudToday.id).toList();
-      if (more.isNotEmpty) {
-        out.add(const SizedBox(height: 8));
-        out.add(Text('MORE TO READ ALOUD', style: _eyebrow(p.muted, 0.12)));
-        out.add(const SizedBox(height: 12));
-        for (final g in more) {
-          out.add(Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: p.card,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: p.line),
-            ),
-            child: Text('“${g.text}”',
-                style: GoogleFonts.fraunces(
-                    fontSize: 14.5,
-                    fontStyle: FontStyle.italic,
-                    height: 1.5,
-                    color: p.ink)),
-          ));
-        }
-      }
-    }
+    // "MORE TO READ ALOUD" list removed — this is a daily section, so just the
+    // one piece (matching the mother's daily Samvad). Kept commented for revert.
+    // PURE READ-ALOUD: the record block was also removed here (see _recordBlock).
     if (d.id == 'journal') {
       out.addAll(_journalBody(p));
     }

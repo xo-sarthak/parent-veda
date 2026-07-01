@@ -23,21 +23,26 @@ import '../services/video_store.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
 import 'bump_journey_screen.dart';
-import 'father/father_daily_screen.dart';
+import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 import 'saved_hub_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key, required this.controller});
+  const ProfileScreen(
+      {super.key, required this.controller, this.father = false});
 
   final PregnancyController controller;
+
+  /// When true, this is the PARTNER (father) account: the mother-only memory
+  /// vaults are hidden and a partner-account note is shown instead.
+  final bool father;
 
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    final name = controller.motherName;
+    final name = father ? controller.fatherName : controller.motherName;
     final initial = name.isNotEmpty ? name.characters.first : '🌸';
 
     return Scaffold(
@@ -78,7 +83,9 @@ class ProfileScreen extends StatelessWidget {
                   Text(name, style: text.titleLarge),
                   const SizedBox(height: 2),
                   Text(
-                    '${s.weekOf(controller.currentWeek, PregnancyController.lastContentWeek)} · ${s.trimesterName(controller.currentWeek)}',
+                    father
+                        ? 'Partner account'
+                        : '${s.weekOf(controller.currentWeek, PregnancyController.lastContentWeek)} · ${s.trimesterName(controller.currentWeek)}',
                     style: text.bodyMedium,
                   ),
                 ],
@@ -86,6 +93,49 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          // Mother-only memory vaults (Journal / Bump / Dear Baby / Saved) are
+          // hidden for the father — they belong to her account; he sees a
+          // partner-account note instead.
+          if (father) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppTheme.outlineVariant),
+              ),
+              child: Row(children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: const Color(0xFF2E5266).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14)),
+                  child: const Icon(Icons.favorite_rounded,
+                      color: Color(0xFF2E5266)),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Partner account',
+                            style: text.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 3),
+                        Text(
+                            controller.motherName.isNotEmpty
+                                ? "You're paired with ${controller.motherName}. Her journal, bump journey and memories live in her account."
+                                : "You're paired as a partner. The journal, bump journey and memories live in the mother's account.",
+                            style: text.bodySmall?.copyWith(
+                                color: AppTheme.neutral600, height: 1.45)),
+                      ]),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 14),
+          ] else ...[
           // --- My Journal -------------------------------------------------
           AnimatedBuilder(
             animation: JournalStore.instance,
@@ -174,6 +224,7 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 14),
+          ],
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
           const SizedBox(height: 16),
@@ -251,11 +302,13 @@ class ProfileScreen extends StatelessWidget {
         // Re-enable with the load() restore block in pregnancy_controller.dart.
         // if (!isFather && due != null) await controller.setDueDate(due);
         if (isFather) {
-          // Paired as the father → swap the app for the Father Daily screen.
-          nav.pushReplacement(
-              MaterialPageRoute(
-                  builder: (_) => FatherDailyScreen(controller: controller)));
+          // Paired as the father → switch the app into the unified father shell
+          // (the same MainScaffold, Slate structure) via the preview flag, then
+          // drop back to the root so it re-renders in father mode.
+          FatherPreview.instance.on = true;
+          nav.popUntil((r) => r.isFirst);
         } else {
+          FatherPreview.instance.on = false;
           nav.pop(); // back to the mother app
         }
       }),

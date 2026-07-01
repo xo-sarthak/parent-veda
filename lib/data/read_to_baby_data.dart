@@ -15,6 +15,9 @@
 // =============================================================================
 
 /// Category keys (must match ReadToBabyStore + the customize sheet).
+/// [kRtbSpeaking] = the Garbh Samvad trimester speaking cards, folded in as a
+/// toggleable category when "Read to your baby" merged into Samvad.
+const String kRtbSpeaking = 'speaking';
 const String kRtbStories = 'stories';
 const String kRtbSpiritual = 'spiritual';
 const String kRtbRhymes = 'rhymes';

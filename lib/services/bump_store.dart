@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/bump_photo.dart';
 import '../models/journal_entry.dart';
 import 'journal_store.dart';
+import 'remote/supabase_repo.dart';
 
 class BumpStore extends ChangeNotifier {
   BumpStore._();
@@ -40,7 +41,48 @@ class BumpStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Sync with the cloud (no-op if logged out). Metadata (caption/week/favorite)
+    // syncs now; the image file itself moves to Supabase Storage in Phase 3.
+    await _syncFromCloud();
   }
+
+  Future<void> _syncFromCloud() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows = await SupabaseRepo.fetch('bump_photos');
+      final byId = {for (final r in rows) r['id'].toString(): _fromRow(r)};
+      for (final p in _photos) {
+        if (!byId.containsKey(p.id)) {
+          byId[p.id] = p;
+          await SupabaseRepo.insert('bump_photos', _toRow(p));
+        }
+      }
+      _photos
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline — keep local */}
+  }
+
+  Map<String, dynamic> _toRow(BumpPhoto p) => {
+        'id': p.id,
+        'image_url': p.imageUrl,
+        'week_number': p.weekNumber,
+        'date': p.date.toIso8601String(),
+        'caption': p.caption,
+        'is_favorite': p.isFavorite,
+      };
+
+  BumpPhoto _fromRow(Map<String, dynamic> r) => BumpPhoto(
+        id: (r['id'] ?? '').toString(),
+        imageUrl: (r['image_url'] ?? '').toString(),
+        weekNumber: (r['week_number'] as num?)?.toInt() ?? 0,
+        date: DateTime.tryParse(r['date']?.toString() ?? '') ?? DateTime.now(),
+        caption: (r['caption'] ?? '').toString(),
+        isFavorite: r['is_favorite'] == true,
+      );
 
   /// Photos in chronological order (by week, then date).
   List<BumpPhoto> get photos {
@@ -66,15 +108,21 @@ class BumpStore extends ChangeNotifier {
   }) async {
     final bumpPath = await JournalStore.saveImage(sourcePath);
     final id = 'bp_${DateTime.now().microsecondsSinceEpoch}';
-    _photos.add(BumpPhoto(
+    final photo = BumpPhoto(
       id: id,
       imageUrl: bumpPath,
       weekNumber: week,
       date: DateTime.now(),
       caption: caption,
-    ));
+    );
+    _photos.add(photo);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.insert('bump_photos', _toRow(photo));
+      } catch (_) {}
+    }
 
     // Mirror into the Journal (its own file copy) → also shows in the Calendar.
     final journalPath = await JournalStore.saveImage(sourcePath);
@@ -94,6 +142,12 @@ class BumpStore extends ChangeNotifier {
     _photos[i] = _photos[i].copyWith(isFavorite: !_photos[i].isFavorite);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+            onConflict: 'id');
+      } catch (_) {}
+    }
   }
 
   Future<void> updateCaption(String id, String caption) async {
@@ -102,6 +156,12 @@ class BumpStore extends ChangeNotifier {
     _photos[i] = _photos[i].copyWith(caption: caption);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+            onConflict: 'id');
+      } catch (_) {}
+    }
   }
 
   Future<void> delete(String id) async {
@@ -114,6 +174,11 @@ class BumpStore extends ChangeNotifier {
     _photos.removeWhere((p) => p.id == id);
     notifyListeners();
     await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.delete('bump_photos', id);
+      } catch (_) {}
+    }
     // Remove the mirrored journal entry (and its file copy).
     await JournalStore.instance.deleteEntry('bump_$id');
   }
