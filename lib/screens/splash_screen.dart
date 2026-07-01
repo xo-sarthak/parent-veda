@@ -87,6 +87,8 @@ class _SplashScreenState extends State<SplashScreen>
         // PINNED TO WEEK 20 (testing): disabled so login can't move the week.
         // Re-enable with the load() restore block in pregnancy_controller.dart.
         // if (!isFather && due != null) await widget.pregnancy.setDueDate(due);
+        // Load the real profile name(s) so the app shows them (not placeholders).
+        await widget.pregnancy.loadProfileFromCloud();
         nav.pushReplacement(isFather ? _fatherRoute() : _mainRoute());
       }),
     ));

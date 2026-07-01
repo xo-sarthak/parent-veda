@@ -7,7 +7,10 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../localization/app_language.dart';
 import '../services/app_nav.dart';
@@ -136,6 +139,9 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 14),
           ] else ...[
+          // --- Invite your partner (pairing code) -------------------------
+          const _InvitePartnerCard(),
+          const SizedBox(height: 14),
           // --- My Journal -------------------------------------------------
           AnimatedBuilder(
             animation: JournalStore.instance,
@@ -288,6 +294,7 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     final nav = Navigator.of(context);
     try {
+      await Supabase.instance.client.auth.signOut(); // clear the real session
       await (await SharedPreferences.getInstance())
           .setBool(kAuthCompletedKey, false);
     } catch (_) {/* best-effort */}
@@ -301,6 +308,8 @@ class ProfileScreen extends StatelessWidget {
         // PINNED TO WEEK 20 (testing): disabled so re-login can't move the week.
         // Re-enable with the load() restore block in pregnancy_controller.dart.
         // if (!isFather && due != null) await controller.setDueDate(due);
+        // Load the real profile name(s) so the app shows them (not placeholders).
+        await controller.loadProfileFromCloud();
         if (isFather) {
           // Paired as the father → switch the app into the unified father shell
           // (the same MainScaffold, Slate structure) via the preview flag, then
@@ -313,6 +322,123 @@ class ProfileScreen extends StatelessWidget {
         }
       }),
     ));
+  }
+}
+
+/// The mother's "Invite your partner" card — shows her persistent pairing code
+/// with Share + Copy. The father enters this code to link the two accounts.
+class _InvitePartnerCard extends StatefulWidget {
+  const _InvitePartnerCard();
+
+  @override
+  State<_InvitePartnerCard> createState() => _InvitePartnerCardState();
+}
+
+class _InvitePartnerCardState extends State<_InvitePartnerCard> {
+  String? _code;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      if (uid != null) {
+        final row = await Supabase.instance.client
+            .from('profiles')
+            .select('pairing_code')
+            .eq('id', uid)
+            .maybeSingle();
+        if (mounted) {
+          setState(() {
+            _code = row?['pairing_code'] as String?;
+            _loading = false;
+          });
+          return;
+        }
+      }
+    } catch (_) {/* leave code null */}
+    if (mounted) setState(() => _loading = false);
+  }
+
+  void _share() {
+    final code = _code;
+    if (code == null) return;
+    Share.share(
+      'Join me on ParentVeda 💜  Download the app, choose "I\'m the father", '
+      'and enter my pairing code: $code',
+      subject: 'Your ParentVeda pairing code',
+    );
+  }
+
+  void _copy() {
+    final code = _code;
+    if (code == null) return;
+    Clipboard.setData(ClipboardData(text: code));
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pairing code copied')));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading || _code == null) return const SizedBox.shrink();
+    final text = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.primary50,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.primary100),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.favorite_rounded,
+              color: AppTheme.primary500, size: 20),
+          const SizedBox(width: 8),
+          Text('Invite your partner',
+              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 6),
+        Text('Share this code so your partner can pair with your journey.',
+            style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.outlineVariant),
+          ),
+          child: Text(_code!,
+              style: text.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 4,
+                  color: AppTheme.primary600)),
+        ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: _share,
+              icon: const Icon(Icons.share_rounded, size: 18),
+              label: const Text('Share'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: _copy,
+            icon: const Icon(Icons.copy_rounded, size: 18),
+            label: const Text('Copy'),
+          ),
+        ]),
+      ]),
+    );
   }
 }
 

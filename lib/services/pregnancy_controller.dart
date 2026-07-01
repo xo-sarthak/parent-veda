@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../localization/app_language.dart';
 import '../models/week_content.dart';
@@ -53,6 +54,11 @@ class PregnancyController extends ChangeNotifier {
   bool _isLoading = true;
   Object? _error;
 
+  // Real profile names loaded from Supabase (fall back to placeholders).
+  String? _myName; // the logged-in user's own name
+  String? _myRole; // 'mother' | 'father'
+  String? _partnerName; // the paired partner's name (if paired)
+
   /// When true, every week is viewable (used so the full journey — including
   /// the week-40 celebration — can be reached and reviewed).
   bool unlockAllWeeks = true;
@@ -71,13 +77,15 @@ class PregnancyController extends ChangeNotifier {
   /// Whether the mother has set her real due date (vs the week-20 placeholder).
   bool get isDueDateSet => _dueDateIsSet;
 
-  /// Placeholder mother's name for the Home greeting until a real profile /
-  /// onboarding name exists (mirrors the placeholder due date).
-  String get motherName => 'Priya';
+  /// The mother's name — the logged-in user's own name in mother mode, or the
+  /// paired mother's name in father mode. Falls back to a placeholder.
+  String get motherName =>
+      (_myRole == 'mother' ? _myName : _partnerName) ?? 'Priya';
 
-  /// Placeholder father's name for the Father Mode greeting (same placeholder
-  /// pattern as [motherName], until onboarding captures a real name).
-  String get fatherName => 'Dad';
+  /// The father's name — the logged-in user's own name in father mode, or the
+  /// paired father's name in mother mode. Falls back to a placeholder.
+  String get fatherName =>
+      (_myRole == 'father' ? _myName : _partnerName) ?? 'Dad';
 
   List<WeekContent> get weeks => List.unmodifiable(_weeks);
 
@@ -203,6 +211,8 @@ class PregnancyController extends ChangeNotifier {
       //   }
       // } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
+      // Load the real profile name(s) from Supabase (if signed in).
+      await loadProfileFromCloud();
     } catch (e) {
       _error = e;
       _weeks = const [];
@@ -210,6 +220,37 @@ class PregnancyController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Fetches the logged-in user's profile name + role (and the paired partner's
+  /// name, readable via the pairing RLS) so the UI shows real names instead of
+  /// the placeholders. No-op if signed out; keeps placeholders on any error.
+  Future<void> loadProfileFromCloud() async {
+    try {
+      final client = Supabase.instance.client;
+      final uid = client.auth.currentUser?.id;
+      if (uid == null) return;
+      final me = await client
+          .from('profiles')
+          .select('name, role, partner_id')
+          .eq('id', uid)
+          .maybeSingle();
+      if (me == null) return;
+      final myName = (me['name'] as String?)?.trim();
+      _myName = (myName != null && myName.isNotEmpty) ? myName : null;
+      _myRole = me['role'] as String?;
+      final partnerId = me['partner_id'] as String?;
+      if (partnerId != null) {
+        final partner = await client
+            .from('profiles')
+            .select('name')
+            .eq('id', partnerId)
+            .maybeSingle();
+        final pn = (partner?['name'] as String?)?.trim();
+        _partnerName = (pn != null && pn.isNotEmpty) ? pn : null;
+      }
+      notifyListeners();
+    } catch (_) {/* keep placeholders */}
   }
 
   void toggleLanguage() {

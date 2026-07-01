@@ -137,10 +137,15 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // auth.signUp inserts a row into auth.users, which fires our SQL trigger
   // (handle_new_user) → a matching row appears in the `profiles` table.
   Future<void> _submitSignup() async {
+    final name = _name.text.trim();
     final email = _email.text.trim();
     final password = _password.text;
 
-    // Basic guard so we never send empty / too-short values.
+    // Name, email, and password are all required.
+    if (name.isEmpty) {
+      _toast('Please enter your name.');
+      return;
+    }
     if (email.isEmpty || password.length < 6) {
       _toast('Enter an email and a password of at least 6 characters.');
       return;
@@ -218,6 +223,68 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         _go('success'); // continue regardless; the account already exists
       }
     }
+  }
+
+  // Logs an EXISTING user in, then routes straight into the app based on their
+  // saved profile (role + due date) — no need to re-pick role/due-date.
+  Future<void> _submitLogin() async {
+    final email = _email.text.trim();
+    final password = _password.text;
+    if (email.isEmpty || password.isEmpty) {
+      _toast('Enter your email and password.');
+      return;
+    }
+    if (_busy) return;
+    setState(() => _busy = true);
+    _toast('Logging in…');
+
+    try {
+      await Supabase.instance.client.auth
+          .signInWithPassword(email: email, password: password);
+
+      // Read the profile so we route to the correct home.
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      DateTime? due;
+      var isFather = false;
+      if (uid != null) {
+        final row = await Supabase.instance.client
+            .from('profiles')
+            .select()
+            .eq('id', uid)
+            .maybeSingle();
+        if (row != null) {
+          isFather = row['role'] == 'father';
+          final d = row['due_date'];
+          if (d != null) due = DateTime.tryParse(d.toString());
+        }
+      }
+      if (!mounted) return;
+      widget.onDone(due, isFather);
+    } on AuthException catch (e) {
+      if (mounted) _toast(e.message); // e.g. "Invalid login credentials"
+    } catch (_) {
+      if (mounted) _toast('Login failed. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  // Marks the current account as the father, then enters the app. (The real
+  // partner link — pairing code → mother — is a separate step; for now this
+  // records the role so routing + father content work.)
+  Future<void> _finishFather() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid != null) {
+      final name = _name.text.trim();
+      try {
+        await Supabase.instance.client.from('profiles').update({
+          'role': 'father',
+          'pairing_code': null, // the father shares no code — clear his unused one
+          if (name.isNotEmpty) 'name': name,
+        }).eq('id', uid);
+      } catch (_) {/* best-effort */}
+    }
+    if (mounted) widget.onDone(null, true);
   }
 
   @override
@@ -413,7 +480,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   color: _pink),
             ),
             const SizedBox(height: 8),
-            _primaryBtn('Log in', () => _go('role')),
+            _primaryBtn('Log in', _submitLogin),
             _orDivider('OR'),
             _socialRow(),
           ]),
@@ -694,13 +761,26 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
       ]);
 
-  void _startPairing() {
-    if (_code.text.trim().length < 4) return;
+  Future<void> _startPairing() async {
+    final code = _code.text.trim();
+    if (code.length < 4) return;
     _go('pairing');
-    _pairTimer?.cancel();
-    _pairTimer = Timer(const Duration(milliseconds: 2200), () {
-      if (mounted) _go('paired');
-    });
+    try {
+      // Securely link this father to the mother whose code this is
+      // (the link_as_partner SQL function sets both profiles' partner_id).
+      await Supabase.instance.client
+          .rpc('link_as_partner', params: {'code': code});
+      if (!mounted) return;
+      _go('paired');
+    } on PostgrestException catch (e) {
+      if (!mounted) return;
+      _go('pairCode');
+      _toast(e.message); // e.g. "Invalid pairing code"
+    } catch (_) {
+      if (!mounted) return;
+      _go('pairCode');
+      _toast('Pairing failed. Check the code and try again.');
+    }
   }
 
   // ===========================================================================
@@ -782,8 +862,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const SizedBox(height: 30),
               SizedBox(
                 width: 220,
-                child: _primaryBtn(
-                    'Continue', () => widget.onDone(null, true)),
+                child: _primaryBtn('Continue', _finishFather),
               ),
             ],
           ),
