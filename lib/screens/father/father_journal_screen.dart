@@ -8,8 +8,6 @@
 //  reuses the mother's compose sheets via their `onAdd` hook.
 // =============================================================================
 
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,8 +15,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/journal_entry.dart';
 import '../../services/father_journal_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/remote/storage_service.dart';
 import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
+import '../../widgets/storage_image.dart';
 
 class FatherJournalScreen extends StatefulWidget {
   const FatherJournalScreen(
@@ -69,7 +69,9 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
       return;
     }
     await _player.stop();
-    await _player.play(DeviceFileSource(path));
+    final file = await StorageService.resolve(path);
+    if (file == null) return;
+    await _player.play(DeviceFileSource(file.path));
     if (mounted) setState(() => _playing = path);
   }
 
@@ -292,11 +294,10 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
           images.length == 1
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: Image.file(File(images.first),
+                  child: StorageImage(images.first,
                       width: double.infinity,
                       height: 190,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => _fPhotoError()),
+                      fit: BoxFit.cover),
                 )
               : _FatherPhotoCarousel(paths: images),
         ],
@@ -359,14 +360,6 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
   }
 }
 
-// Shared broken-image placeholder (single banner + carousel).
-Widget _fPhotoError() => Container(
-      height: 190,
-      color: kFAccentSoft,
-      alignment: Alignment.center,
-      child: const Icon(Icons.broken_image_rounded, color: kFMuted),
-    );
-
 // ---------------------------------------------------------------------------
 //  Instagram-style swipeable photo carousel for a multi-photo entry.
 // ---------------------------------------------------------------------------
@@ -402,9 +395,8 @@ class _FatherPhotoCarouselState extends State<_FatherPhotoCarousel> {
               controller: _ctrl,
               itemCount: n,
               onPageChanged: (i) => setState(() => _i = i),
-              itemBuilder: (_, i) => Image.file(File(widget.paths[i]),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _fPhotoError()),
+              itemBuilder: (_, i) => StorageImage(widget.paths[i],
+                  fit: BoxFit.cover),
             ),
             Positioned(
               top: 8,

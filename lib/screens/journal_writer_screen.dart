@@ -7,13 +7,12 @@
 //  Creates a new entry or edits an existing one.
 // =============================================================================
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../localization/app_language.dart';
 import '../models/memory_models.dart';
+import '../widgets/storage_image.dart';
 import '../services/memory_store.dart';
 import '../theme/app_theme.dart';
 
@@ -278,7 +277,7 @@ class _PhotoStrip extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: Image.file(File(p),
+                    child: StorageImage(p,
                         width: 88, height: 88, fit: BoxFit.cover),
                   ),
                   Positioned(

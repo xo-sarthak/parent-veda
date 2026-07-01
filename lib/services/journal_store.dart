@@ -20,6 +20,7 @@ import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
 import '../models/journey_node.dart';
 import 'pregnancy_controller.dart';
+import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 import 'tools_store.dart';
 
@@ -172,6 +173,7 @@ class JournalStore extends ChangeNotifier {
           final f = File(p);
           if (f.existsSync()) f.deleteSync();
         } catch (_) {}
+        await StorageService.remove(p);
       }
     }
     _manual.removeWhere((x) => x.id == id);
@@ -217,7 +219,9 @@ class JournalStore extends ChangeNotifier {
       final dest =
           '${jdir.path}/jr_${DateTime.now().microsecondsSinceEpoch}.$ext';
       await File(sourcePath).copy(dest);
-      return dest;
+      // Upload the bytes to Storage; returns the storage path (or the local
+      // path as an offline fallback) to persist on the entry.
+      return StorageService.upload(dest, 'journal');
     } catch (_) {
       return sourcePath;
     }
@@ -234,7 +238,7 @@ class JournalStore extends ChangeNotifier {
       final dest =
           '${jdir.path}/jr_${DateTime.now().microsecondsSinceEpoch}.$ext';
       await File(sourcePath).copy(dest);
-      return dest;
+      return StorageService.upload(dest, 'voice');
     } catch (_) {
       return sourcePath;
     }

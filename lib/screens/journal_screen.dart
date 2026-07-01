@@ -7,8 +7,6 @@
 //  state. Voice memories + printable export are placeholders (coming soon).
 // =============================================================================
 
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,9 +16,11 @@ import '../models/journal_entry.dart';
 import '../services/father_journal_store.dart';
 import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/remote/storage_service.dart';
 import '../services/tools_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/journal/journal_create.dart';
+import '../widgets/storage_image.dart';
 
 /// Two ways to read the journal: a tidy grouped LIST, or a flip-through BOOKLET.
 enum _JournalView { list, booklet }
@@ -92,15 +92,18 @@ class _JournalScreenState extends State<JournalScreen> {
     super.dispose();
   }
 
-  Future<void> _playVoice(String path) async {
-    if (_playingPath == path) {
+  Future<void> _playVoice(String ref) async {
+    if (_playingPath == ref) {
       await _voicePlayer.stop();
       if (mounted) setState(() => _playingPath = null);
       return;
     }
     await _voicePlayer.stop();
-    await _voicePlayer.play(DeviceFileSource(path));
-    if (mounted) setState(() => _playingPath = path);
+    // Resolve the reference to a local file (downloads from Storage if needed).
+    final file = await StorageService.resolve(ref);
+    if (file == null) return;
+    await _voicePlayer.play(DeviceFileSource(file.path));
+    if (mounted) setState(() => _playingPath = ref);
   }
 
   String _fmtTime(DateTime d) {
@@ -678,24 +681,15 @@ class _JournalScreenState extends State<JournalScreen> {
                 fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
       );
 
-  Widget _imgError() => Container(
-        height: 80,
-        color: AppTheme.surfaceContainerHigh,
-        alignment: Alignment.center,
-        child: const Icon(Icons.image_not_supported_rounded,
-            color: AppTheme.neutral300),
-      );
-
   // One photo → a single banner; multiple → a horizontal carousel.
   Widget _imageCarousel(List<String> paths) {
     if (paths.length == 1) {
-      return ClipRRect(
+      return StorageImage(
+        paths.first,
+        height: 170,
+        width: double.infinity,
+        fit: BoxFit.cover,
         borderRadius: BorderRadius.circular(14),
-        child: Image.file(File(paths.first),
-            height: 170,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => _imgError()),
       );
     }
     return SizedBox(
@@ -704,13 +698,12 @@ class _JournalScreenState extends State<JournalScreen> {
         scrollDirection: Axis.horizontal,
         itemCount: paths.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, i) => ClipRRect(
+        itemBuilder: (_, i) => StorageImage(
+          paths[i],
+          width: 132,
+          height: 132,
+          fit: BoxFit.cover,
           borderRadius: BorderRadius.circular(12),
-          child: Image.file(File(paths[i]),
-              width: 132,
-              height: 132,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _imgError()),
         ),
       ),
     );
@@ -782,14 +775,10 @@ class _JournalScreenState extends State<JournalScreen> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
       children: [
         for (final path in photos)
-          ClipRRect(
+          StorageImage(
+            path,
+            fit: BoxFit.cover,
             borderRadius: BorderRadius.circular(14),
-            child: Image.file(
-              File(path),
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) =>
-                  Container(color: AppTheme.surfaceContainerHigh),
-            ),
           ),
       ],
     );

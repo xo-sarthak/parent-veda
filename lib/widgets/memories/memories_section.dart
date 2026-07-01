@@ -7,13 +7,12 @@
 //  week-40 finale.
 // =============================================================================
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/memory_models.dart';
 import '../../screens/journal_writer_screen.dart';
+import '../storage_image.dart';
 import '../../screens/photo_viewer_screen.dart';
 import '../../services/memory_store.dart';
 import '../../theme/app_theme.dart';
@@ -188,7 +187,7 @@ class _EntryCard extends StatelessWidget {
                       )),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.file(File(p),
+                        child: StorageImage(p,
                             width: 74, height: 74, fit: BoxFit.cover),
                       ),
                     ),
@@ -397,7 +396,7 @@ class _WeekEntryCard extends StatelessWidget {
                       )),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(14),
-                        child: Image.file(File(p),
+                        child: StorageImage(p,
                             width: 96, height: 96, fit: BoxFit.cover),
                       ),
                     ),
@@ -513,7 +512,7 @@ class _PhotoGrid extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             child: Stack(
               children: [
-                Image.file(File(shown[i]), width: 96, height: 96, fit: BoxFit.cover),
+                StorageImage(shown[i], width: 96, height: 96, fit: BoxFit.cover),
                 if (i == shown.length - 1 && extra > 0)
                   Positioned.fill(
                     child: Container(

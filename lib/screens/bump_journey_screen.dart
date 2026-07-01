@@ -20,6 +20,7 @@ import '../models/bump_photo.dart';
 import '../services/bump_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/storage_image.dart';
 
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
@@ -346,18 +347,11 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(0),
-            child: Image.file(
-              File(b.imageUrl),
+            child: StorageImage(
+              b.imageUrl,
               width: double.infinity,
               height: 320,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                height: 200,
-                color: AppTheme.surfaceContainerHigh,
-                alignment: Alignment.center,
-                child: const Icon(Icons.image_not_supported_rounded,
-                    color: AppTheme.neutral300),
-              ),
             ),
           ),
           Padding(
@@ -760,12 +754,8 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.file(File(b.imageUrl),
-                height: 230,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (_, _, _) =>
-                    Container(height: 230, color: AppTheme.surfaceContainerHigh)),
+            child: StorageImage(b.imageUrl,
+                height: 230, fit: BoxFit.cover, width: double.infinity),
           ),
           const SizedBox(height: 6),
           Text(s.jrWeekLabel(b.weekNumber),

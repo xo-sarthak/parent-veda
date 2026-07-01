@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/memory_models.dart';
+import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 
 class MemoryStore extends ChangeNotifier {
@@ -270,6 +271,7 @@ class MemoryStore extends ChangeNotifier {
         final f = File(p);
         if (f.existsSync()) await f.delete();
       } catch (_) {}
+      await StorageService.remove(p);
     }
   }
 
@@ -297,8 +299,9 @@ class MemoryStore extends ChangeNotifier {
       final id = _newId();
       final dest = File('${dir.path}/memory_$id.jpg');
       await dest.writeAsBytes(await shot.readAsBytes());
+      final stored = await StorageService.upload(dest.path, 'memory');
       final pm = PhotoMemory(
-          id: id, week: week, dateIso: _todayIso(), path: dest.path);
+          id: id, week: week, dateIso: _todayIso(), path: stored);
       _photos.add(pm);
       await _persistPhotos();
       notifyListeners();
@@ -323,7 +326,7 @@ class MemoryStore extends ChangeNotifier {
       final dir = await getApplicationDocumentsDirectory();
       final dest = File('${dir.path}/note_${_newId()}.jpg');
       await dest.writeAsBytes(await shot.readAsBytes());
-      return dest.path;
+      return StorageService.upload(dest.path, 'memory');
     } catch (_) {
       return null;
     }
@@ -337,6 +340,7 @@ class MemoryStore extends ChangeNotifier {
       final f = File(pm.path);
       if (f.existsSync()) await f.delete();
     } catch (_) {}
+    await StorageService.remove(pm.path);
     await _persistPhotos();
     notifyListeners();
   }
