@@ -105,7 +105,7 @@ class JournalStore extends ChangeNotifier {
         'type': e.type.name,
         'title': e.title,
         'description': e.description,
-        'date': e.date.toIso8601String(),
+        'date': SupabaseRepo.dbTime(e.date),
         'week_number': e.weekNumber,
         'image_url': e.imageUrl,
         'audio_url': e.audioUrl,
@@ -114,8 +114,8 @@ class JournalStore extends ChangeNotifier {
         'custom_tag': e.customTag,
         'tags': e.tags,
         'is_automatic': e.isAutomatic,
-        'created_at': e.createdAt.toIso8601String(),
-        'updated_at': e.updatedAt.toIso8601String(),
+        'created_at': SupabaseRepo.dbTime(e.createdAt),
+        'updated_at': SupabaseRepo.dbTime(e.updatedAt),
       };
 
   JournalEntry _fromRow(Map<String, dynamic> r, {bool isPartner = false}) {
@@ -126,8 +126,7 @@ class JournalStore extends ChangeNotifier {
         break;
       }
     }
-    DateTime parse(Object? v) =>
-        DateTime.tryParse(v?.toString() ?? '') ?? DateTime.now();
+    DateTime parse(Object? v) => SupabaseRepo.parseDbTime(v);
     List<String> strList(Object? v) =>
         (v as List?)?.map((e) => e.toString()).toList() ?? const [];
     return JournalEntry(

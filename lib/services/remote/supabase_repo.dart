@@ -172,6 +172,14 @@ class SupabaseRepo {
     );
   }
 
+  // === Timestamp helpers (for timestamptz columns) ==========================
+  // Store the true UTC instant and read it back in LOCAL time, so a timestamp
+  // written on one device doesn't drift by the timezone offset when another
+  // device (or Postgres) reads it back. Use for real DateTime <-> timestamptz.
+  static String dbTime(DateTime d) => d.toUtc().toIso8601String();
+  static DateTime parseDbTime(Object? v) =>
+      DateTime.tryParse(v?.toString() ?? '')?.toLocal() ?? DateTime.now();
+
   /// Insert-or-update a SINGLE-row-per-user record (e.g. a settings/profile-like
   /// row), keyed by [onConflict] (defaults to user_id). Returns the saved row.
   static Future<Map<String, dynamic>?> upsert(

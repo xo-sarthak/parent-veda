@@ -70,7 +70,7 @@ class BumpStore extends ChangeNotifier {
         'id': p.id,
         'image_url': p.imageUrl,
         'week_number': p.weekNumber,
-        'date': p.date.toIso8601String(),
+        'date': SupabaseRepo.dbTime(p.date),
         'caption': p.caption,
         'is_favorite': p.isFavorite,
       };
@@ -79,7 +79,7 @@ class BumpStore extends ChangeNotifier {
         id: (r['id'] ?? '').toString(),
         imageUrl: (r['image_url'] ?? '').toString(),
         weekNumber: (r['week_number'] as num?)?.toInt() ?? 0,
-        date: DateTime.tryParse(r['date']?.toString() ?? '') ?? DateTime.now(),
+        date: SupabaseRepo.parseDbTime(r['date']),
         caption: (r['caption'] ?? '').toString(),
         isFavorite: r['is_favorite'] == true,
       );
