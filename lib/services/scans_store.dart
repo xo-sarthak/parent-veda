@@ -26,6 +26,13 @@ class ScansStore extends ChangeNotifier {
 
   final List<CompletedScan> _completed = [];
   final List<Appointment> _appts = [];
+
+  // The paired partner's scan-done state + appointments (read-only): a scan
+  // shows done if EITHER partner marked it, and both partners see all
+  // appointments. Refreshed from the cloud on each sync.
+  final List<CompletedScan> _partnerCompleted = [];
+  final List<Appointment> _partnerAppts = [];
+
   bool _loaded = false;
 
   Future<void> init() async {
@@ -87,6 +94,21 @@ class ScansStore extends ChangeNotifier {
         ..clear()
         ..addAll(byId.values);
       await _persistAppts();
+
+      // Partner share: also pull the paired partner's done-scans + appointments
+      // (read-only — RLS allows reading the partner's rows).
+      _partnerCompleted.clear();
+      _partnerAppts.clear();
+      final partnerId = await SupabaseRepo.myPartnerId();
+      if (partnerId != null) {
+        final pScans =
+            await SupabaseRepo.fetchByUser('completed_scans', partnerId);
+        _partnerCompleted.addAll(pScans.map(_fromScanRow));
+        final pAppts = await SupabaseRepo.fetchByUser('appointments', partnerId,
+            orderBy: 'date_iso');
+        _partnerAppts.addAll(pAppts.map(_fromApptRow));
+      }
+
       notifyListeners();
     } catch (_) {/* offline — keep local */}
   }
@@ -138,11 +160,16 @@ class ScansStore extends ChangeNotifier {
   }
 
   // ---- completed scans ------------------------------------------------------
+  // Done if EITHER partner marked it (own rows OR the partner's, read-only).
   bool isCompleted(String scanId) =>
-      _completed.any((c) => c.scanId == scanId);
+      _completed.any((c) => c.scanId == scanId) ||
+      _partnerCompleted.any((c) => c.scanId == scanId);
 
   CompletedScan? completedOf(String scanId) {
     for (final c in _completed) {
+      if (c.scanId == scanId) return c;
+    }
+    for (final c in _partnerCompleted) {
       if (c.scanId == scanId) return c;
     }
     return null;
@@ -190,7 +217,12 @@ class ScansStore extends ChangeNotifier {
 
   // ---- appointments ---------------------------------------------------------
   List<Appointment> get appointments {
-    final list = [..._appts];
+    // Union of own + the partner's appointments (keyed by id), soonest first.
+    final byId = {for (final a in _appts) a.id: a};
+    for (final a in _partnerAppts) {
+      byId.putIfAbsent(a.id, () => a);
+    }
+    final list = byId.values.toList();
     list.sort((a, b) => a.date.compareTo(b.date));
     return list;
   }
@@ -223,6 +255,8 @@ class ScansStore extends ChangeNotifier {
     final ids = _completed.map((c) => c.scanId).toList();
     _completed.clear();
     _appts.clear();
+    _partnerCompleted.clear();
+    _partnerAppts.clear();
     notifyListeners();
     await _persistCompleted();
     await _persistAppts();
