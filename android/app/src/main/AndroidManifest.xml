@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Exact-time reminders (Android 12+). USE_EXACT_ALARM auto-grants for
+         testing now; before a Play Store launch, drop USE_EXACT_ALARM and rely
+         on SCHEDULE_EXACT_ALARM + the runtime request (Play flags USE_EXACT). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <application
         android:label="parentveda"
         android:name="${applicationName}"

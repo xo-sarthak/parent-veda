@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/medication.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class MedicineStore extends ChangeNotifier {
   MedicineStore._();
@@ -52,6 +53,7 @@ class MedicineStore extends ChangeNotifier {
 
   // Two tables in one store → merge each. Same recipe as symptom, twice.
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // medications

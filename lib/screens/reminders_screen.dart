@@ -67,11 +67,52 @@ class RemindersScreen extends StatelessWidget {
     store.init();
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(s.rmdTitle)),
+      appBar: AppBar(
+        title: Text(s.rmdTitle),
+        actions: [
+          IconButton(
+            tooltip: 'Send a test notification now',
+            icon: const Icon(Icons.notifications_active_outlined),
+            onPressed: () async {
+              await NotificationService.instance.requestPermission();
+              await NotificationService.instance.showNow();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                  ..clearSnackBars()
+                  ..showSnackBar(const SnackBar(
+                      content: Text(
+                          'Test notification sent — check your tray')));
+              }
+            },
+          ),
+          IconButton(
+            tooltip: 'Schedule a test for 1 min from now',
+            icon: const Icon(Icons.alarm_add_outlined),
+            onPressed: () async {
+              await NotificationService.instance.requestPermission();
+              await NotificationService.instance.scheduleTestIn1Min();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                  ..clearSnackBars()
+                  ..showSnackBar(const SnackBar(
+                      content: Text(
+                          'Scheduled a test for ~1 min — lock the phone and wait')));
+              }
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showReminderEditor(context, controller),
+        backgroundColor: AppTheme.primary500,
+        foregroundColor: Colors.white,
+        elevation: 2,
+        highlightElevation: 5,
+        shape: const StadiumBorder(),
         icon: const Icon(Icons.add_rounded),
-        label: Text(s.rmdAdd),
+        label: Text(s.rmdAdd,
+            style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700, fontSize: 14.5)),
       ),
       body: AnimatedBuilder(
         animation: store,
@@ -86,6 +127,8 @@ class RemindersScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.primary50,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: AppTheme.primary500.withValues(alpha: 0.12)),
                 ),
                 child: Row(children: [
                   const Icon(Icons.notifications_active_rounded,
@@ -151,7 +194,17 @@ class RemindersScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
+        border: Border.all(
+            color: r.enabled
+                ? AppTheme.primary500.withValues(alpha: 0.20)
+                : AppTheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary900.withValues(alpha: 0.05),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.fromLTRB(14, 6, 8, 6),
@@ -181,10 +234,14 @@ class RemindersScreen extends StatelessWidget {
                 color: r.enabled ? AppTheme.primary900 : AppTheme.neutral500)),
         subtitle: Text(reminderSummary(s, r, context),
             style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
-        trailing: Switch.adaptive(
+        trailing: Switch(
           value: r.enabled,
-          activeThumbColor: AppTheme.primary500,
           onChanged: (_) => store.toggle(r.id),
+          activeThumbColor: Colors.white,
+          activeTrackColor: AppTheme.primary500,
+          inactiveThumbColor: Colors.white,
+          inactiveTrackColor: AppTheme.neutral300,
+          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
         ),
       ),
     );

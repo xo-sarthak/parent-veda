@@ -44,7 +44,7 @@ Future<void> main() async {
   // is ready.
   await Supabase.initialize(
     url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.anonKey,
+    publishableKey: SupabaseConfig.publishableKey,
   );
 
   runApp(const ParentVedaApp());

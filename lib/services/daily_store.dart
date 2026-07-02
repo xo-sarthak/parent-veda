@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 /// A single Talk-To-Baby message saved into Dear Baby. Text-based for now
 /// (spoken notes are transcribed via speech-to-text before saving).
@@ -155,6 +156,7 @@ class DailyStore extends ChangeNotifier {
   // === Cloud sync (Supabase) — two day-maps, a list, a string-list, and the
   //     father's mission-done day set. ==========================================
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // daily_moods — one mood per day, keyed by (user_id, day)

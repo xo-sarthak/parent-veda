@@ -21,6 +21,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'supabase_repo.dart';
+import 'sync_registry.dart';
 
 mixin CloudSyncedStore on ChangeNotifier {
   // Guards the auto-push: stays false until the first cloud sync finishes, so
@@ -53,6 +54,7 @@ mixin CloudSyncedStore on ChangeNotifier {
 
   /// Run once at startup, after the local cache has been loaded.
   Future<void> syncStateFromCloud() async {
+    SyncRegistry.register(syncStateFromCloud);
     if (SupabaseRepo.isLoggedIn) {
       try {
         final data = await SupabaseRepo.loadState(cloudKey);

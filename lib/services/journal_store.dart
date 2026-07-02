@@ -22,6 +22,7 @@ import '../models/journey_node.dart';
 import 'pregnancy_controller.dart';
 import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 import 'tools_store.dart';
 
 class JournalStore extends ChangeNotifier {
@@ -71,6 +72,7 @@ class JournalStore extends ChangeNotifier {
   }
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('journal_entries');
@@ -96,8 +98,30 @@ class JournalStore extends ChangeNotifier {
       }
 
       await _persist();
+      await _backfillMedia();
       notifyListeners();
     } catch (_) {/* offline — keep local */}
+  }
+
+  // Upload any media still stored as local paths (captured offline/logged-out,
+  // or from before Storage existed) and rewrite the entry to the cloud path.
+  Future<void> _backfillMedia() async {
+    var changed = false;
+    for (var i = 0; i < _manual.length; i++) {
+      final e = _manual[i];
+      final imgs = await StorageService.backfillAll(e.imageUrls, 'journal');
+      final auds = await StorageService.backfillAll(e.audioUrls, 'voice');
+      if (!listEquals(imgs, e.imageUrls) || !listEquals(auds, e.audioUrls)) {
+        final ne = e.copyWith(imageUrls: imgs, audioUrls: auds);
+        _manual[i] = ne;
+        changed = true;
+        try {
+          await SupabaseRepo.upsert('journal_entries', _toRow(ne),
+              onConflict: 'id');
+        } catch (_) {}
+      }
+    }
+    if (changed) await _persist();
   }
 
   // camelCase model <-> snake_case columns.

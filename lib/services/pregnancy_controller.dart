@@ -196,20 +196,19 @@ class PregnancyController extends ChangeNotifier {
       }
       parsed.sort((a, b) => a.week.compareTo(b.week));
       _weeks = parsed;
-      // PINNED TO WEEK 20 (testing): ignore any saved/auth due date so the app
-      // ALWAYS opens on the week-20 flow, whether or not you log in. _dueDate
-      // stays at the week-20 placeholder. RE-ENABLE this block (and the auth
-      // setDueDate calls in splash_screen.dart / profile_screen.dart) to restore
-      // the mother's real saved due date.
-      // try {
-      //   final prefs = await SharedPreferences.getInstance();
-      //   final saved = prefs.getString(_dueDateKey);
-      //   final d = saved == null ? null : DateTime.tryParse(saved);
-      //   if (d != null) {
-      //     _dueDate = _dateOnly(d);
-      //     _dueDateIsSet = true;
-      //   }
-      // } catch (_) {/* keep the placeholder */}
+      // Restore the mother's saved due date (local cache) so the app opens on
+      // her real current week; falls back to the week-20 placeholder if none.
+      // The cloud profile's due_date (loaded below) is the cross-device source
+      // of truth and overrides this when present.
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final saved = prefs.getString(_dueDateKey);
+        final d = saved == null ? null : DateTime.tryParse(saved);
+        if (d != null) {
+          _dueDate = _dateOnly(d);
+          _dueDateIsSet = true;
+        }
+      } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
       // Load the real profile name(s) from Supabase (if signed in).
       await loadProfileFromCloud();
@@ -232,22 +231,42 @@ class PregnancyController extends ChangeNotifier {
       if (uid == null) return;
       final me = await client
           .from('profiles')
-          .select('name, role, partner_id')
+          .select('name, role, partner_id, due_date')
           .eq('id', uid)
           .maybeSingle();
       if (me == null) return;
       final myName = (me['name'] as String?)?.trim();
       _myName = (myName != null && myName.isNotEmpty) ? myName : null;
       _myRole = me['role'] as String?;
+      String? dueStr = me['due_date'] as String?;
       final partnerId = me['partner_id'] as String?;
       if (partnerId != null) {
         final partner = await client
             .from('profiles')
-            .select('name')
+            .select('name, due_date')
             .eq('id', partnerId)
             .maybeSingle();
         final pn = (partner?['name'] as String?)?.trim();
         _partnerName = (pn != null && pn.isNotEmpty) ? pn : null;
+        // The pregnancy due date lives on the mother's profile; if mine is
+        // empty (e.g. I'm the father), use my partner's.
+        if (dueStr == null || dueStr.isEmpty) {
+          dueStr = partner?['due_date'] as String?;
+        }
+      }
+      // Cloud due date = the cross-device source of truth. Apply it + refresh
+      // the local cache so a fresh login shows the real current week.
+      if (dueStr != null && dueStr.isNotEmpty) {
+        final d = DateTime.tryParse(dueStr);
+        if (d != null) {
+          _dueDate = _dateOnly(d);
+          _dueDateIsSet = true;
+          _selectedWeek = currentWeek;
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
+          } catch (_) {/* best-effort */}
+        }
       }
       notifyListeners();
     } catch (_) {/* keep placeholders */}
@@ -292,6 +311,16 @@ class PregnancyController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
     } catch (_) {/* best-effort */}
+    // Keep the cloud profile in sync (source of truth across devices).
+    try {
+      final client = Supabase.instance.client;
+      final uid = client.auth.currentUser?.id;
+      if (uid != null) {
+        await client.from('profiles').update(
+            {'due_date': _dueDate.toIso8601String().split('T').first}).eq(
+            'id', uid);
+      }
+    } catch (_) {/* offline — local only */}
   }
 
   /// Testing helper — clear any saved due date and snap back to the week-20
@@ -305,6 +334,16 @@ class PregnancyController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_dueDateKey);
     } catch (_) {/* best-effort */}
+    // Also clear it in the cloud so the reset isn't undone on the next sync.
+    try {
+      final client = Supabase.instance.client;
+      final uid = client.auth.currentUser?.id;
+      if (uid != null) {
+        await client
+            .from('profiles')
+            .update({'due_date': null}).eq('id', uid);
+      }
+    } catch (_) {/* offline — local only */}
   }
 
   // --- helpers ---------------------------------------------------------------

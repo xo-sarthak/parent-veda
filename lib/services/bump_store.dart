@@ -17,7 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/bump_photo.dart';
 import '../models/journal_entry.dart';
 import 'journal_store.dart';
+import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class BumpStore extends ChangeNotifier {
   BumpStore._();
@@ -48,6 +50,7 @@ class BumpStore extends ChangeNotifier {
   }
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('bump_photos');
@@ -62,8 +65,34 @@ class BumpStore extends ChangeNotifier {
         ..clear()
         ..addAll(byId.values);
       await _persist();
+      await _backfillMedia();
       notifyListeners();
     } catch (_) {/* offline — keep local */}
+  }
+
+  // Upload any bump photo still stored as a local path; rewrite to cloud path.
+  Future<void> _backfillMedia() async {
+    var changed = false;
+    for (var i = 0; i < _photos.length; i++) {
+      final p = _photos[i];
+      final url = await StorageService.backfill(p.imageUrl, 'bump');
+      if (url != p.imageUrl) {
+        _photos[i] = BumpPhoto(
+          id: p.id,
+          imageUrl: url,
+          weekNumber: p.weekNumber,
+          date: p.date,
+          caption: p.caption,
+          isFavorite: p.isFavorite,
+        );
+        changed = true;
+        try {
+          await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+              onConflict: 'id');
+        } catch (_) {}
+      }
+    }
+    if (changed) await _persist();
   }
 
   Map<String, dynamic> _toRow(BumpPhoto p) => {

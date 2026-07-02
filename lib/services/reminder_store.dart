@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/reminder.dart';
 import 'notification_service.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class ReminderStore extends ChangeNotifier {
   ReminderStore._();
@@ -49,6 +50,7 @@ class ReminderStore extends ChangeNotifier {
   }
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('reminders', orderBy: 'created_at');

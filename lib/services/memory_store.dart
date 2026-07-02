@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/memory_models.dart';
 import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class MemoryStore extends ChangeNotifier {
   MemoryStore._();
@@ -84,6 +85,7 @@ class MemoryStore extends ChangeNotifier {
   }
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('weekly_journal_notes');
@@ -98,8 +100,26 @@ class MemoryStore extends ChangeNotifier {
         ..clear()
         ..addAll(byId.values);
       await _persistJournal();
+      await _backfillMedia();
       notifyListeners();
     } catch (_) {/* offline — keep local */}
+  }
+
+  // Upload any note photos still stored as local paths; rewrite to cloud paths.
+  Future<void> _backfillMedia() async {
+    var changed = false;
+    for (final e in _journal) {
+      final paths = await StorageService.backfillAll(e.photoPaths, 'memory');
+      if (!listEquals(paths, e.photoPaths)) {
+        e.photoPaths = paths;
+        changed = true;
+        try {
+          await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
+              onConflict: 'id');
+        } catch (_) {}
+      }
+    }
+    if (changed) await _persistJournal();
   }
 
   Map<String, dynamic> _noteToRow(JournalEntry e) => {

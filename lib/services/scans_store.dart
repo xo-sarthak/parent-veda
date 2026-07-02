@@ -16,6 +16,7 @@ import '../models/journal_entry.dart';
 import '../models/scan_appointment.dart';
 import 'journal_store.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class ScansStore extends ChangeNotifier {
   ScansStore._();
@@ -61,6 +62,7 @@ class ScansStore extends ChangeNotifier {
   }
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // completed_scans — keyed by scan_id (no `id` column)

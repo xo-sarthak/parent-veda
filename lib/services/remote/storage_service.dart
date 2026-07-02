@@ -114,4 +114,23 @@ class StorageService {
       if (cache.existsSync()) await cache.delete();
     } catch (_) {}
   }
+
+  /// Backfill: if [ref] is still a local file (captured offline / logged-out, or
+  /// from before Storage existed), upload it now and return the Storage path;
+  /// otherwise return [ref] unchanged. No-op when logged out (upload falls back
+  /// to the local path).
+  static Future<String> backfill(String ref, String type) async {
+    if (ref.isEmpty || !File(ref).existsSync()) return ref;
+    return upload(ref, type);
+  }
+
+  /// Backfill every ref in [refs] (see [backfill]).
+  static Future<List<String>> backfillAll(List<String> refs, String type) async {
+    if (refs.isEmpty) return refs;
+    final out = <String>[];
+    for (final r in refs) {
+      out.add(await backfill(r, type));
+    }
+    return out;
+  }
 }

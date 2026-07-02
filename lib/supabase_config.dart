@@ -19,4 +19,5 @@ class SupabaseConfig {
 
   /// Your project's anon / public key (a long string that starts with "eyJ...").
   static const String anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcmFienVoeGJzY2hrZXlvaGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTU3MjQsImV4cCI6MjA5ODIzMTcyNH0.MErbbPMfVrXl8G8mdyjiSKnQS_n0JMfQXb3sN895VK0';
+  static const String publishableKey = 'sb_publishable_28y3hx961bUEYp19UpvIUw_VQZmYkJR';
 }

@@ -16,6 +16,7 @@ import '../models/journal_entry.dart';
 import '../models/symptom.dart';
 import 'journal_store.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 class SymptomStore extends ChangeNotifier {
   SymptomStore._();
@@ -48,6 +49,7 @@ class SymptomStore extends ChangeNotifier {
   // cloud wins, but local-only rows (e.g. logged offline) are kept AND pushed
   // up. Best-effort — on any error we just keep the local cache.
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows =

@@ -7,6 +7,8 @@
 //  means the nudge won't fire until permission is granted.
 // =============================================================================
 
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -34,6 +36,7 @@ class NotificationService {
         tz.setLocalLocation(tz.getLocation('UTC'));
       } catch (_) {/* leave default */}
     }
+    debugPrint('[reminders] tz.local = ${tz.local.name}');
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -55,7 +58,14 @@ class NotificationService {
           _plugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       if (android != null) {
-        return (await android.requestNotificationsPermission()) ?? true;
+        final granted =
+            (await android.requestNotificationsPermission()) ?? true;
+        // Android 12+: also need permission to schedule EXACT alarms, otherwise
+        // the OS batches/delays them (Doze) and a reminder can miss its time.
+        try {
+          await android.requestExactAlarmsPermission();
+        } catch (_) {/* older Android — not needed */}
+        return granted;
       }
       final ios = _plugin.resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin>();
@@ -66,6 +76,41 @@ class NotificationService {
       }
     } catch (_) {/* ignore */}
     return true;
+  }
+
+  /// Fire a notification immediately — a quick way to confirm notifications
+  /// work at all on this device, independent of scheduling/timing.
+  Future<void> showNow({
+    String title = 'ParentVeda',
+    String body = "Test notification — you're all set ✅",
+  }) async {
+    if (!_ready) await init();
+    try {
+      await _plugin.show(999001, title, body, _details);
+    } catch (_) {/* best-effort */}
+  }
+
+  /// Diagnostic: schedule a real EXACT notification ~1 minute out, through the
+  /// same path reminders use, logging where it lands (or the error).
+  Future<void> scheduleTestIn1Min() async {
+    if (!_ready) await init();
+    final when = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 1));
+    try {
+      await _plugin.zonedSchedule(
+        999002,
+        'Scheduled test',
+        'Fired ~1 min after you tapped — scheduling works ✅',
+        when,
+        _details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      debugPrint('[reminders] TEST scheduled for $when '
+          '(now=${tz.TZDateTime.now(tz.local)}, tz=${tz.local.name})');
+    } catch (e) {
+      debugPrint('[reminders] TEST schedule FAILED: $e');
+    }
   }
 
   NotificationDetails get _details => const NotificationDetails(
@@ -157,26 +202,33 @@ class NotificationService {
   }
 
   Future<void> schedule(Reminder r) async {
-    if (!_ready || !r.enabled) return;
+    if (!_ready || !r.enabled) {
+      debugPrint('[reminders] schedule skipped (ready=$_ready enabled=${r.enabled})');
+      return;
+    }
     await cancelReminder(r);
-    try {
-      for (final o in _occurrences(r)) {
-        final when = o.dayOfMonth != null
-            ? _nextMonthly(o.dayOfMonth!, o.hour, o.minute)
-            : _nextTime(o.hour, o.minute, weekday: o.weekday);
+    for (final o in _occurrences(r)) {
+      final when = o.dayOfMonth != null
+          ? _nextMonthly(o.dayOfMonth!, o.hour, o.minute)
+          : _nextTime(o.hour, o.minute, weekday: o.weekday);
+      try {
         await _plugin.zonedSchedule(
           _occId(r, o.index),
           r.title,
           r.body.isEmpty ? null : r.body,
           when,
           _details,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: o.match,
         );
+        debugPrint('[reminders] scheduled "${r.title}" #${o.index} for $when '
+            '(now=${tz.TZDateTime.now(tz.local)}, tz=${tz.local.name})');
+      } catch (e) {
+        debugPrint('[reminders] FAILED "${r.title}" #${o.index}: $e');
       }
-    } catch (_) {/* best-effort */}
+    }
   }
 
   /// Cancel every occurrence of a reminder (covers multi-time reminders).

@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 // ---------------------------------------------------------------------------
 //  Models
@@ -505,6 +506,7 @@ class ToolsStore extends ChangeNotifier {
   // ===========================================================================
 
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // weight_profile (single row per user)

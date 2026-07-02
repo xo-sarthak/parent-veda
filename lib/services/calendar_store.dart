@@ -21,6 +21,7 @@ import '../models/journey_node.dart';
 import 'journal_store.dart';
 import 'pregnancy_controller.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 import 'scans_store.dart';
 import 'tools_store.dart';
 
@@ -57,6 +58,7 @@ class CalendarStore extends ChangeNotifier {
   // field names already match the column names. We reuse the model's toJson /
   // personalFromJson directly.
   Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('calendar_personal_events',

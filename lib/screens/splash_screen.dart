@@ -17,6 +17,7 @@ import '../localization/app_language.dart';
 import '../services/father_content_controller.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/remote/sync_registry.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
 // father_daily_screen import parked — the paired father now lands on the unified
@@ -89,6 +90,9 @@ class _SplashScreenState extends State<SplashScreen>
         // if (!isFather && due != null) await widget.pregnancy.setDueDate(due);
         // Load the real profile name(s) so the app shows them (not placeholders).
         await widget.pregnancy.loadProfileFromCloud();
+        // Re-pull every store's cloud data now that we're logged in, so a fresh
+        // login shows the user's data without needing an app restart.
+        SyncRegistry.resyncAll();
         nav.pushReplacement(isFather ? _fatherRoute() : _mainRoute());
       }),
     ));

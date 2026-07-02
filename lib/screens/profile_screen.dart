@@ -19,6 +19,7 @@ import '../services/daily_store.dart';
 import '../services/journal_store.dart';
 import '../services/journey_dates_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/remote/sync_registry.dart';
 import '../services/read_next_store.dart';
 import '../services/read_to_baby_saved_store.dart';
 import '../services/scans_store.dart';
@@ -310,6 +311,8 @@ class ProfileScreen extends StatelessWidget {
         // if (!isFather && due != null) await controller.setDueDate(due);
         // Load the real profile name(s) so the app shows them (not placeholders).
         await controller.loadProfileFromCloud();
+        // Re-pull every store's cloud data now that we're logged in.
+        SyncRegistry.resyncAll();
         if (isFather) {
           // Paired as the father → switch the app into the unified father shell
           // (the same MainScaffold, Slate structure) via the preview flag, then
