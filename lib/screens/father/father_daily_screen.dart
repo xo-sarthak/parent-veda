@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/father/father_read_data.dart';
 import '../../data/father/father_tales.dart';
 import '../../data/garbh_data.dart';
+import '../../data/scan_guide_data.dart';
 import '../../data/scan_schedule.dart';
 // garbh_content (GarbhPrompt) parked — the father read-aloud now uses the shared
 // SamvadPiece pool. Kept commented for revert.
@@ -30,6 +31,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/read_to_baby_store.dart';
 import '../../services/samvad_pool.dart';
 import '../../services/scans_store.dart';
+import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
 import '../profile_screen.dart';
 import '../week_flow_screen.dart';
@@ -918,7 +920,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   ]),
             ),
             const SizedBox(height: 14),
-            _arrowLink(p, 'See her week'),
+            _arrowLink(p, 'Read more'),
           ]),
         ),
       );
@@ -1151,35 +1153,42 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final lang = widget.controller.language;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Row(children: [
-        Text(m.emoji, style: const TextStyle(fontSize: 18)),
-        const SizedBox(width: 11),
-        Expanded(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(m.title.of(lang), style: _body(14.5, p.ink, w: FontWeight.w700)),
-            Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
-                style: _body(12, p.muted)),
-          ]),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () => ScansStore.instance.markCompleted(
-              scanId: m.id,
-              journalTitle: m.title.of(lang),
-              week: m.anchorWeek),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: p.accent, width: 1.4),
-            ),
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                _FatherScanDetail(milestone: m, controller: widget.controller))),
+        behavior: HitTestBehavior.opaque,
+        child: Row(children: [
+          Text(m.emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 11),
+          Expanded(
             child:
-                Text('Already done', style: _body(12, p.accent, w: FontWeight.w700)),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(m.title.of(lang),
+                  style: _body(14.5, p.ink, w: FontWeight.w700)),
+              Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+                  style: _body(12, p.muted)),
+            ]),
           ),
-        ),
-      ]),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => ScansStore.instance.markCompleted(
+                scanId: m.id,
+                journalTitle: m.title.of(lang),
+                week: m.anchorWeek),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: p.accent, width: 1.4),
+              ),
+              child: Text('Already done',
+                  style: _body(12, p.accent, w: FontWeight.w700)),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -1263,12 +1272,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final lang = widget.controller.language;
     final done = ScansStore.instance.isCompleted(m.id);
     return GestureDetector(
-      onTap: () => done
-          ? ScansStore.instance.unmarkCompleted(m.id)
-          : ScansStore.instance.markCompleted(
-              scanId: m.id,
-              journalTitle: m.title.of(lang),
-              week: m.anchorWeek),
+      // Tap the tile → read the scan in depth; the check icon toggles "done".
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) =>
+              _FatherScanDetail(milestone: m, controller: widget.controller))),
       behavior: HitTestBehavior.opaque,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -1292,8 +1299,19 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       style: _body(12, p.muted)),
                 ]),
           ),
-          Icon(done ? Icons.check_circle_rounded : Icons.circle_outlined,
-              color: done ? p.accent : p.muted, size: 24),
+          GestureDetector(
+            onTap: () => done
+                ? ScansStore.instance.unmarkCompleted(m.id)
+                : ScansStore.instance.markCompleted(
+                    scanId: m.id,
+                    journalTitle: m.title.of(lang),
+                    week: m.anchorWeek),
+            behavior: HitTestBehavior.opaque,
+            child: Icon(
+                done ? Icons.check_circle_rounded : Icons.circle_outlined,
+                color: done ? p.accent : p.muted,
+                size: 24),
+          ),
         ]),
       ),
     );
@@ -1750,6 +1768,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ]),
       ));
     }
+    // Removed the repeated "DO THIS TODAY" box — it already shows on the home
+    // card, so repeating it inside the detail was redundant. Kept for revert:
+    /*
     if (d.id == 'partner') {
       out.add(const SizedBox(height: 18));
       out.add(Container(
@@ -1765,6 +1786,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ]),
       ));
     }
+    */
     if (d.paras.isNotEmpty && !isRead) {
       out.add(const SizedBox(height: 18));
       for (final para in d.paras) {
@@ -2143,6 +2165,179 @@ const List<double> _kWaveBig = [
 ];
 
 // ---- waveform (static bars) ----
+// ===========================================================================
+//  Father scan detail — mirrors the mother's rich scan detail, in the Slate
+//  skin + a father voice. Same content (what-is / sections / bullets / how to
+//  read the report) so the father gets the depth she does. Read-only; the
+//  done-toggle stays on the scan rows/tiles.
+// ===========================================================================
+class _FatherScanDetail extends StatelessWidget {
+  const _FatherScanDetail({required this.milestone, required this.controller});
+  final JourneyMilestone milestone;
+  final PregnancyController controller;
+
+  TextStyle _b(double s,
+          {FontWeight w = FontWeight.w400, Color c = kFInk, double h = 1.5}) =>
+      GoogleFonts.plusJakartaSans(
+          fontSize: s, fontWeight: w, color: c, height: h);
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final m = milestone;
+    final guide = kScanGuides[m.id];
+    return Scaffold(
+      backgroundColor: kFBg,
+      appBar: AppBar(
+        backgroundColor: kFBg,
+        elevation: 0,
+        foregroundColor: kFInk,
+        title: Text(m.title.of(lang),
+            style: fatherSerif(20, weight: FontWeight.w600)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+        children: [
+          Row(children: [
+            Text(m.emoji, style: const TextStyle(fontSize: 30)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(m.title.of(lang),
+                  style: fatherSerif(24, weight: FontWeight.w600)),
+            ),
+          ]),
+          const SizedBox(height: 4),
+          Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+              style: _b(12.5, c: kFMuted)),
+          const SizedBox(height: 16),
+          Text(
+              "Here's what this scan is — so you can be there for it with her, and understand what you're looking at together.",
+              style: _b(13.5, c: kFMuted)),
+          const SizedBox(height: 16),
+          if (guide != null) ...[
+            _whatIs(guide.whatIs.of(lang)),
+            const SizedBox(height: 18),
+          ],
+          for (final sec in m.sections)
+            if (sec.body.of(lang).trim().isNotEmpty)
+              _block(sec.label.of(lang), sec.body.of(lang)),
+          for (final b in m.bullets)
+            _bullets(b.label.of(lang), [for (final it in b.items) it.of(lang)]),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+                color: kFAccentSoft, borderRadius: BorderRadius.circular(14)),
+            child: Text(
+                'General guidance to help you support her — every pregnancy is different, so always follow her doctor.',
+                style: _b(12.5, c: kFInk)),
+          ),
+          if (guide != null && guide.interpret.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            Text('HOW TO READ THE REPORT',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: kFAccent)),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                  color: kFWarmSoft, borderRadius: BorderRadius.circular(14)),
+              child: Text(
+                  "Plain-language explanations, not a diagnosis. Numbers only mean something in full context — read the report with her doctor.",
+                  style: _b(12.5, c: kFInk)),
+            ),
+            const SizedBox(height: 12),
+            for (final row in guide.interpret)
+              _interpretRow(row.term.of(lang), row.meaning.of(lang)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _whatIs(String body) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kFAccentSoft,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: kFLine),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.info_outline_rounded, size: 18, color: kFAccent),
+            const SizedBox(width: 8),
+            Text('What is this scan?',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: kFAccent)),
+          ]),
+          const SizedBox(height: 8),
+          Text(body, style: _b(14, c: kFInk, h: 1.55)),
+        ]),
+      );
+
+  Widget _block(String label, String body) => Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (label.trim().isNotEmpty) ...[
+            Text(label,
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                    color: kFAccent)),
+            const SizedBox(height: 4),
+          ],
+          Text(body, style: _b(14, c: kFInk)),
+        ]),
+      );
+
+  Widget _bullets(String label, List<String> items) => Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.3,
+                  color: kFAccent)),
+          const SizedBox(height: 6),
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 6, right: 8),
+                  child: Icon(Icons.circle, size: 5, color: kFAccent),
+                ),
+                Expanded(child: Text(item, style: _b(14, c: kFInk))),
+              ]),
+            ),
+        ]),
+      );
+
+  Widget _interpretRow(String term, String meaning) => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: kFCard,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: kFLine),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(term,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14.5, fontWeight: FontWeight.w800, color: kFAccent)),
+          const SizedBox(height: 4),
+          Text(meaning, style: _b(14, c: kFInk)),
+        ]),
+      );
+}
+
 class _Waveform extends StatelessWidget {
   const _Waveform({required this.heights, required this.color, this.height = 30});
   final List<double> heights;

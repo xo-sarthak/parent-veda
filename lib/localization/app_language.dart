@@ -1179,6 +1179,7 @@ class S {
       'Scans, appointments and milestones coming up around now.',
       'Aane wale scans, appointments aur padaav.');
   String get wfVideosSection => _p("This week's videos", 'Is hafte ke videos');
+  String get wfArticlesSection => _p("This week's reads", 'Is hafte ke reads');
   String get wfPartnerSection =>
       _p('Share with your partner', 'Partner ke saath share karein');
   String get wfTapExplore =>
@@ -2780,6 +2781,12 @@ class S {
   String get gsTabSacred => _p('Sacred Insights', 'Pavitra Vichar');
   String get gsTabBrain => _p('Brain Fitness', 'Brain Fitness');
   String get gsTabUplifting => _p('Uplifting Vibrations', 'Uplifting Vibrations');
+  String get gsSamvadTabAffirm =>
+      _p('Affirmations & Blessings', 'Affirmations & Aashirwad');
+  String get gsSamvadTabStories => _p('Stories & Fables', 'Kahaniyaan & Fables');
+  String get gsSamvadTabMantras => _p('Mantras & Lullabies', 'Mantra & Lories');
+  String get gsSamvadTabSpiritual =>
+      _p('Spiritual Reading', 'Aadhyaatmik Paath');
   String get gsMeaning => _p('What it means', 'Iska matlab');
   String get gsLesson => _p('Life lesson', 'Jeevan ka sabak');
   String get gsReadAloud => _p('Read aloud', 'Padh kar sunaayein');

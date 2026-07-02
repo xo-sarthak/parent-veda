@@ -953,121 +953,228 @@ class SamvadScreen extends StatefulWidget {
   State<SamvadScreen> createState() => _SamvadScreenState();
 }
 
-class _SamvadScreenState extends State<SamvadScreen> {
+typedef _SP = ({String? title, String body, String saveKey, String group});
+
+class _SamvadScreenState extends State<SamvadScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
   ReadToBabyStore get _store => ReadToBabyStore.instance;
   int get _trimester => garbhTrimester(widget.controller.currentWeek);
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_store, ReadToBabySavedStore.instance]),
-      builder: (context, _) => _build(context),
-    );
+  void initState() {
+    super.initState();
+    _tab = TabController(length: 4, vsync: this);
   }
 
-  Widget _build(BuildContext context) {
-    final lang = widget.controller.language;
-    final s = S(lang);
-    final text = Theme.of(context).textTheme;
-    final t = _trimester;
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
 
-    // Tools library: every enabled category as its own segregated group.
-    if (!widget.daily) {
-      final groups = samvadLibraryGroups(_store, t);
-      return _PillarScaffold(
-        title: s.gsSamvad,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-          children: [
-            Row(children: [
-              Expanded(
-                child: Text(s.gsBrowseAll,
-                    style: text.bodyMedium?.copyWith(color: _muted)),
-              ),
-              _customizeButton(s, text),
-            ]),
-            const SizedBox(height: 12),
-            if (groups.isEmpty)
-              _emptyHint(text)
-            else
-              for (final g in groups) _samvadGroup(text, g.heading, g.pieces),
+  @override
+  Widget build(BuildContext context) {
+    final s = S(widget.controller.language);
+    // Vichara-style: 4 fixed tabs, one section each. Daily = one piece per tab;
+    // Tools = the full library per tab. (The old vertical customize-feed scroll
+    // is replaced; category on/off is gone — only Spiritual keeps a chooser.)
+    return Scaffold(
+      backgroundColor: _cream,
+      appBar: AppBar(
+        backgroundColor: _cream,
+        elevation: 0,
+        foregroundColor: _ink,
+        title: Text(s.gsSamvad),
+        bottom: TabBar(
+          controller: _tab,
+          labelColor: _accSamvad,
+          unselectedLabelColor: _muted,
+          indicatorColor: _accSamvad,
+          isScrollable: true,
+          tabs: [
+            Tab(text: s.gsSamvadTabAffirm),
+            Tab(text: s.gsSamvadTabStories),
+            Tab(text: s.gsSamvadTabMantras),
+            Tab(text: s.gsSamvadTabSpiritual),
           ],
         ),
-      );
-    }
-
-    // Daily (Home): today's piece, drawn from the mother's enabled categories.
-    final pool = samvadDailyPool(_store, t);
-    if (pool.isEmpty) {
-      return _PillarScaffold(
-        title: s.gsSamvad,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
-          children: [
-            Align(
-                alignment: Alignment.centerRight,
-                child: _customizeButton(s, text)),
-            const SizedBox(height: 8),
-            _emptyHint(text),
-          ],
-        ),
-      );
-    }
-    final day = widget.controller.currentDay.clamp(1, 280);
-    final piece = pool[((day - 1) + _store.promptOffset) % pool.length];
-    final saved = ReadToBabySavedStore.instance.isSaved(piece.saveKey);
-
-    return _PillarScaffold(
-      title: s.gsSamvad,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+      ),
+      body: TabBarView(
+        controller: _tab,
         children: [
-          Row(children: [
-            Expanded(
-              child: Text(s.gsTodaysConnection,
-                  style: text.labelMedium?.copyWith(
-                      color: _accSamvad,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5)),
-            ),
-            _customizeButton(s, text),
-          ]),
-          const SizedBox(height: 12),
-          _samvadCard(text, piece.body, title: piece.title),
-          const SizedBox(height: 12),
-          _WhyCard(
-              label: s.gsWhyMatters,
-              text: samvadThemeForTrimester(t),
-              accent: _accSamvad),
-          const SizedBox(height: 8),
-          Row(children: [
-            TextButton.icon(
-              onPressed: () => ReadToBabySavedStore.instance
-                  .toggleSave(piece.saveKey, piece.body, piece.group),
-              icon: Icon(
-                  saved
-                      ? Icons.bookmark_rounded
-                      : Icons.bookmark_border_rounded,
-                  size: 18,
-                  color: _accSamvad),
-              label: Text(s.rtbSave,
-                  style: text.labelLarge?.copyWith(color: _accSamvad)),
-            ),
-            const Spacer(),
-            TextButton.icon(
-              // Shared offset → the father's "Read to your baby" advances too.
-              onPressed: () => _store.nextPrompt(),
-              icon: const Icon(Icons.refresh_rounded,
-                  size: 18, color: _accSamvad),
-              label: Text(s.gsAnotherPrompt,
-                  style: text.labelLarge?.copyWith(color: _accSamvad)),
-            ),
-          ]),
-          const SizedBox(height: 6),
-          _MarkComplete(pillarId: 'samvad', accent: _accSamvad, lang: lang),
+          _listTab(_affirmationPieces()),
+          _listTab(_storyPieces()),
+          _listTab(_mantraLullabyPieces()),
+          _spiritualTab(s),
         ],
       ),
     );
+  }
+
+  // ---- Content per section (record: title?, body, saveKey, group) ----------
+  List<_SP> _affirmationPieces() => [
+        for (final p in readAloudByCategory(kRtbAffirmations))
+          (
+            title: p.title,
+            body: p.body,
+            saveKey: p.title,
+            group: 'Affirmations & Blessings'
+          ),
+      ];
+
+  List<_SP> _storyPieces() => [
+        for (final p in readAloudByCategory(kRtbStories))
+          (
+            title: p.title,
+            body: p.body,
+            saveKey: p.title,
+            group: 'Stories & Fables'
+          ),
+      ];
+
+  // Mantras (this trimester's speaking cards) + lullabies (rhymes).
+  List<_SP> _mantraLullabyPieces() => [
+        for (final p in samvadForTrimester(_trimester))
+          (
+            title: null,
+            body: p.text,
+            saveKey: 'mantra_${p.id}',
+            group: 'Mantras & Lullabies'
+          ),
+        for (final p in readAloudByCategory(kRtbRhymes))
+          (
+            title: p.title,
+            body: p.body,
+            saveKey: p.title,
+            group: 'Mantras & Lullabies'
+          ),
+      ];
+
+  // Spiritual reading — only from the traditions/sections the mother enabled.
+  List<_SP> _spiritualPieces() {
+    final out = <_SP>[];
+    for (final tr in kSpiritualTraditions) {
+      if (!_store.isReligionOn(tr.id)) continue;
+      for (var i = 0; i < tr.sections.length; i++) {
+        if (!_store.isSectionOn(tr.id, i)) continue;
+        for (final r in tr.sections[i].reads) {
+          out.add((
+            title: r.title,
+            body: r.body,
+            saveKey: r.title,
+            group: tr.name
+          ));
+        }
+      }
+    }
+    return out;
+  }
+
+  // ---- Generic tab: daily = today's one piece; tools = the full list -------
+  Widget _listTab(List<_SP> pieces) {
+    final s = S(widget.controller.language);
+    final text = Theme.of(context).textTheme;
+    return AnimatedBuilder(
+      animation: ReadToBabySavedStore.instance,
+      builder: (context, _) {
+        if (pieces.isEmpty) {
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+            children: [_emptyHint(text)],
+          );
+        }
+        if (!widget.daily) {
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+            children: [
+              for (final p in pieces) _pieceCard(text, s, p, compact: true),
+            ],
+          );
+        }
+        final day = widget.controller.currentDay.clamp(1, 280);
+        final p = pieces[(day - 1) % pieces.length];
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+          children: [
+            _pieceCard(text, s, p),
+            const SizedBox(height: 12),
+            _WhyCard(
+                label: s.gsWhyMatters,
+                text: samvadThemeForTrimester(_trimester),
+                accent: _accSamvad),
+            const SizedBox(height: 6),
+            _MarkComplete(
+                pillarId: 'samvad',
+                accent: _accSamvad,
+                lang: widget.controller.language),
+          ],
+        );
+      },
+    );
+  }
+
+  // ---- Spiritual tab: Customize control (mother) + the chosen reading ------
+  Widget _spiritualTab(S s) {
+    final text = Theme.of(context).textTheme;
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, ReadToBabySavedStore.instance]),
+      builder: (context, _) {
+        final pieces = _spiritualPieces();
+        final children = <Widget>[
+          Align(
+              alignment: Alignment.centerRight,
+              child: _customizeButton(s, text)),
+          const SizedBox(height: 4),
+        ];
+        if (pieces.isEmpty) {
+          children.add(_emptyHint(text));
+        } else if (!widget.daily) {
+          for (final p in pieces) {
+            children.add(_pieceCard(text, s, p, compact: true));
+          }
+        } else {
+          final day = widget.controller.currentDay.clamp(1, 280);
+          children.add(_pieceCard(text, s, pieces[(day - 1) % pieces.length]));
+          children.add(const SizedBox(height: 12));
+          children.add(_WhyCard(
+              label: s.gsWhyMatters,
+              text: samvadThemeForTrimester(_trimester),
+              accent: _accSamvad));
+          children.add(const SizedBox(height: 6));
+          children.add(_MarkComplete(
+              pillarId: 'samvad',
+              accent: _accSamvad,
+              lang: widget.controller.language));
+        }
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+          children: children,
+        );
+      },
+    );
+  }
+
+  // ---- A card (optional title + body) with a Save toggle -------------------
+  Widget _pieceCard(TextTheme text, S s, _SP p, {bool compact = false}) {
+    final saved = ReadToBabySavedStore.instance.isSaved(p.saveKey);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _samvadCard(text, p.body, title: p.title, compact: compact),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => ReadToBabySavedStore.instance
+              .toggleSave(p.saveKey, p.body, p.group),
+          icon: Icon(
+              saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              size: 18,
+              color: _accSamvad),
+          label: Text(s.rtbSave,
+              style: text.labelLarge?.copyWith(color: _accSamvad)),
+        ),
+      ),
+      if (compact) const SizedBox(height: 6),
+    ]);
   }
 
   Widget _customizeButton(S s, TextTheme text) => TextButton.icon(
@@ -1118,6 +1225,7 @@ class _SamvadScreenState extends State<SamvadScreen> {
       );
 
   // A library group (heading + all its cards) for the Tools repository.
+  // ignore: unused_element
   Widget _samvadGroup(
           TextTheme text, String heading, List<SamvadPiece> cards) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1180,96 +1288,82 @@ class _SamvadScreenState extends State<SamvadScreen> {
                         style: const TextStyle(fontSize: 13, color: _muted)),
                   ),
                   const SizedBox(height: 10),
-                  _catTile(store, kRtbSpeaking, s.rtbSpeaking,
-                      Icons.record_voice_over_rounded),
-                  _catTile(store, kRtbStories, s.rtbStories,
-                      Icons.auto_stories_rounded),
-                  _catTile(store, kRtbRhymes, s.rtbRhymes,
-                      Icons.music_note_rounded),
-                  _catTile(store, kRtbAffirmations, s.rtbAffirmations,
-                      Icons.favorite_rounded),
-                  _catTile(store, kRtbSpiritual, s.rtbSpiritual,
-                      Icons.self_improvement_rounded),
-                  if (store.isCategoryOn(kRtbSpiritual)) ...[
-                    const Divider(height: 18),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(s.rtbPickReligions,
-                          style: const TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
-                              color: _ink)),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final tr in kSpiritualTraditions)
-                          FilterChip(
-                            label: Text('${tr.symbol} ${tr.name}',
-                                style: TextStyle(
-                                    fontWeight: store.isReligionOn(tr.id)
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
-                                    color: _ink)),
-                            selected: store.isReligionOn(tr.id),
-                            onSelected: (_) => store.toggleReligion(tr.id),
-                            backgroundColor: _surface,
-                            selectedColor: _accSamvad.withValues(alpha: 0.14),
-                            showCheckmark: true,
-                            checkmarkColor: _accSamvad,
-                            side: store.isReligionOn(tr.id)
-                                ? const BorderSide(color: _accSamvad, width: 2)
-                                : const BorderSide(color: _line, width: 1),
-                          ),
-                      ],
-                    ),
-                    // For each chosen tradition, pick which sub-sections to read.
-                    for (final tr in kSpiritualTraditions)
-                      if (store.isReligionOn(tr.id)) ...[
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text('${tr.symbol} ${tr.name}',
-                              style: const TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w800,
+                  // Spiritual-only customization now (category on/off retired —
+                  // the 4 sections are fixed tabs). _catTile kept for revert.
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(s.rtbPickReligions,
+                        style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: _ink)),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final tr in kSpiritualTraditions)
+                        FilterChip(
+                          label: Text('${tr.symbol} ${tr.name}',
+                              style: TextStyle(
+                                  fontWeight: store.isReligionOn(tr.id)
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   color: _ink)),
+                          selected: store.isReligionOn(tr.id),
+                          onSelected: (_) => store.toggleReligion(tr.id),
+                          backgroundColor: _surface,
+                          selectedColor: _accSamvad.withValues(alpha: 0.14),
+                          showCheckmark: true,
+                          checkmarkColor: _accSamvad,
+                          side: store.isReligionOn(tr.id)
+                              ? const BorderSide(color: _accSamvad, width: 2)
+                              : const BorderSide(color: _line, width: 1),
                         ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (var i = 0; i < tr.sections.length; i++)
-                              FilterChip(
-                                label: Text(tr.sections[i].title,
-                                    style: TextStyle(
-                                        fontSize: 11.5,
-                                        fontWeight: store.isSectionOn(tr.id, i)
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
-                                        color: _ink)),
-                                selected: store.isSectionOn(tr.id, i),
-                                onSelected: (_) =>
-                                    store.toggleSection(tr.id, i),
-                                backgroundColor: _surface,
-                                selectedColor:
-                                    _accSamvad.withValues(alpha: 0.14),
-                                showCheckmark: true,
-                                checkmarkColor: _accSamvad,
-                                side: store.isSectionOn(tr.id, i)
-                                    ? const BorderSide(
-                                        color: _accSamvad, width: 2)
-                                    : const BorderSide(color: _line, width: 1),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                          ],
-                        ),
-                      ],
-                  ],
+                    ],
+                  ),
+                  // For each chosen tradition, pick which sub-sections to read.
+                  for (final tr in kSpiritualTraditions)
+                    if (store.isReligionOn(tr.id)) ...[
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('${tr.symbol} ${tr.name}',
+                            style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                color: _ink)),
+                      ),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (var i = 0; i < tr.sections.length; i++)
+                            FilterChip(
+                              label: Text(tr.sections[i].title,
+                                  style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: store.isSectionOn(tr.id, i)
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: _ink)),
+                              selected: store.isSectionOn(tr.id, i),
+                              onSelected: (_) => store.toggleSection(tr.id, i),
+                              backgroundColor: _surface,
+                              selectedColor: _accSamvad.withValues(alpha: 0.14),
+                              showCheckmark: true,
+                              checkmarkColor: _accSamvad,
+                              side: store.isSectionOn(tr.id, i)
+                                  ? const BorderSide(color: _accSamvad, width: 2)
+                                  : const BorderSide(color: _line, width: 1),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                        ],
+                      ),
+                    ],
                 ]),
               ),
             ),
@@ -1279,6 +1373,7 @@ class _SamvadScreenState extends State<SamvadScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _catTile(
       ReadToBabyStore store, String key, String label, IconData icon) {
     final on = store.isCategoryOn(key);

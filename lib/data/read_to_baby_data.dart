@@ -281,3 +281,11 @@ const List<ReadAloudPiece> kReadAloudPieces = [
 
 List<ReadAloudPiece> readAloudByCategory(String category) =>
     kReadAloudPieces.where((p) => p.category == category).toList();
+
+/// The FATHER's affirmations & blessings — a distinct half of the shared pool,
+/// so his "Read to your baby" affirmations differ from the mother's (she keeps
+/// the full set). Same dataset, different slice; refine the selection anytime.
+List<ReadAloudPiece> readAloudFatherAffirmations() {
+  final all = readAloudByCategory(kRtbAffirmations);
+  return all.sublist(all.length ~/ 2);
+}

@@ -20,6 +20,7 @@ import 'package:share_plus/share_plus.dart';
 import '../data/journey_milestones.dart';
 import '../data/symptom_data.dart';
 import '../data/trimester_tips.dart';
+import '../data/week_articles_data.dart';
 import '../localization/app_language.dart';
 import '../models/journey_node.dart';
 import '../models/symptom.dart';
@@ -1293,6 +1294,10 @@ class WeekFlowView extends StatelessWidget {
             // S6 — This week's videos feed.
             _VideoFeed(lang: lang),
             const SizedBox(height: 18),
+            // This week's reads — an articles carousel below the videos
+            // (shared by mother + father; hides itself when the week has none).
+            _ArticleFeed(lang: lang, week: w.week),
+            const SizedBox(height: 18),
             // S6.5 — Trimester tips (3 tips for this trimester; tap → pop-up).
             _TrimesterTips(
                 week: controller.selectedWeek, lang: lang, father: fatherSkin),
@@ -1329,80 +1334,35 @@ class _DailyMomentBridge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      // Go to Today: switch to the Today tab, then pop back to the main scaffold.
-      // The Today screen lives in an IndexedStack, so its scroll position is
-      // preserved — she lands right where she left off.
+    // Minimalistic: a subtle inline link row (not a full card) woven into the
+    // flow — 🌅 + one line + arrow, tapping jumps to the Today (Daily) tab.
+    return InkWell(
       onTap: () {
         AppNav.instance.goToday();
         Navigator.of(context).popUntil((r) => r.isFirst);
       },
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFFFF2E6), Color(0xFFFDE8F0)],
-          ),
-          borderRadius: BorderRadius.circular(22),
-          border:
-              Border.all(color: AppTheme.secondary500.withValues(alpha: 0.16)),
-        ),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(children: [
-          // Soft dawn illustration disc.
-          Container(
-            width: 54,
-            height: 54,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFFFC56B), Color(0xFFFF8FA8)]),
-              shape: BoxShape.circle,
-            ),
-            child: const Text('🌅', style: TextStyle(fontSize: 26)),
-          ),
-          const SizedBox(width: 14),
+          const Text('🌅', style: TextStyle(fontSize: 15)),
+          const SizedBox(width: 9),
           Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(s.wfDailyBridgeKicker,
-                      style: GoogleFonts.manrope(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: AppTheme.secondary600)),
-                  const SizedBox(height: 3),
-                  Text(s.wfDailyBridgeTitle,
-                      style: text.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
-                  const SizedBox(height: 3),
-                  Text(
-                      father
-                          ? _fDailyBridgeBody.of(controller.language)
-                          : s.wfDailyBridgeBody,
-                      style: GoogleFonts.manrope(
-                          fontSize: 12.5,
-                          height: 1.4,
-                          color: AppTheme.neutral700)),
-                  const SizedBox(height: 8),
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(s.wfDailyBridgeCta,
-                        style: GoogleFonts.manrope(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.secondary600)),
-                    const Icon(Icons.arrow_forward_rounded,
-                        size: 15, color: AppTheme.secondary600),
-                  ]),
-                ]),
+            child: Text(
+              father
+                  ? _fDailyBridgeBody.of(controller.language)
+                  : s.wfDailyBridgeBody,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.manrope(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primary900),
+            ),
           ),
+          const SizedBox(width: 8),
+          const Icon(Icons.arrow_forward_rounded,
+              size: 15, color: AppTheme.secondary600),
         ]),
       ),
     );
@@ -3827,6 +3787,142 @@ class _VideoFeed extends StatelessWidget {
             ),
           ]),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Weekly articles — "This week's reads" carousel (mirrors _VideoFeed)
+// ---------------------------------------------------------------------------
+class _ArticleFeed extends StatelessWidget {
+  const _ArticleFeed({required this.lang, required this.week});
+  final AppLanguage lang;
+  final int week;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    final articles = weekArticlesFor(week);
+    if (articles.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        const Icon(Icons.menu_book_rounded,
+            color: AppTheme.primary500, size: 22),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(s.wfArticlesSection,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primary900)),
+        ),
+      ]),
+      const SizedBox(height: 12),
+      SizedBox(
+        height: 176,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          padding: EdgeInsets.zero,
+          itemCount: articles.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (context, i) => _card(context, articles[i]),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _card(BuildContext context, WeekArticle a) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => _ArticleReader(article: a))),
+      child: Container(
+        width: 208,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+                color: AppTheme.primary900.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(a.emoji, style: const TextStyle(fontSize: 28)),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Text(a.title,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    height: 1.3,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.primary900)),
+          ),
+          const SizedBox(height: 8),
+          Row(children: [
+            const Icon(Icons.schedule_rounded,
+                size: 13, color: AppTheme.neutral500),
+            const SizedBox(width: 4),
+            Text('${a.readMins} min read',
+                style: GoogleFonts.manrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.neutral500)),
+          ]),
+        ]),
+      ),
+    );
+  }
+}
+
+class _ArticleReader extends StatelessWidget {
+  const _ArticleReader({required this.article});
+  final WeekArticle article;
+
+  @override
+  Widget build(BuildContext context) {
+    final paras = article.body.split('\n\n');
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(
+        backgroundColor: AppTheme.scaffoldBackground,
+        elevation: 0,
+        foregroundColor: AppTheme.primary900,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+        children: [
+          Text(article.emoji, style: const TextStyle(fontSize: 40)),
+          const SizedBox(height: 12),
+          Text(article.title,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  height: 1.25,
+                  color: AppTheme.primary900)),
+          const SizedBox(height: 8),
+          Row(children: [
+            const Icon(Icons.schedule_rounded,
+                size: 14, color: AppTheme.neutral500),
+            const SizedBox(width: 4),
+            Text('${article.readMins} min read · Week ${article.week}',
+                style: GoogleFonts.manrope(
+                    fontSize: 12.5, color: AppTheme.neutral500)),
+          ]),
+          const SizedBox(height: 18),
+          for (final para in paras) ...[
+            Text(para,
+                style: GoogleFonts.manrope(
+                    fontSize: 15, height: 1.6, color: AppTheme.neutral700)),
+            const SizedBox(height: 14),
+          ],
+        ],
       ),
     );
   }

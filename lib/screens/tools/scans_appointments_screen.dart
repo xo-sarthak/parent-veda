@@ -78,14 +78,16 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         children: [
           _segmented(s),
           const SizedBox(height: 14),
-          if (_tab == 0) ..._upcoming(s) else if (_tab == 1) ..._completed(s) else ..._roadmap(s),
+          if (_tab == 0) ..._upcoming(s) else ..._completed(s),
         ],
       ),
     );
   }
 
   Widget _segmented(S s) {
-    final tabs = [s.scnTabUpcoming, s.scnTabCompleted, s.scnTabRoadmap];
+    // Care roadmap removed — Roadmap tab dropped. _roadmap/_roadmapRow kept
+    // (ignore: unused_element) for revert.
+    final tabs = [s.scnTabUpcoming, s.scnTabCompleted];
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -303,7 +305,8 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
     return out;
   }
 
-  // --- Roadmap ---------------------------------------------------------------
+  // --- Roadmap (removed from the UI; kept for revert) ------------------------
+  // ignore: unused_element
   List<Widget> _roadmap(S s) {
     final lang = p.language;
     final cw = p.currentWeek;
