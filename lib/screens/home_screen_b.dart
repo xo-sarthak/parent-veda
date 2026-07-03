@@ -38,6 +38,8 @@ import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
 import '../services/scans_store.dart';
 import '../theme/app_theme.dart';
+import 'post_pregnancy/post_pregnancy_home.dart';
+import 'weekly_card_stack_screen.dart';
 import '../widgets/home/home_modules.dart';
 import '../widgets/home/trimester_chart_card.dart';
 import '../widgets/journal/journal_create.dart';
@@ -118,6 +120,9 @@ class HomeScreenB extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(18, 8, 18, 110),
           children: [
             _brandHeader(context),
+            const SizedBox(height: 12),
+            // Temporary doorway into the new (isolated) post-pregnancy app.
+            _postPregnancyDoorway(context),
             const SizedBox(height: 14),
             // ===== WEEKLY SNAPSHOT — the hero + quick shortcuts as one unit ====
             _sectionEyebrow(s.snapshotTitle),
@@ -169,6 +174,61 @@ class HomeScreenB extends StatelessWidget {
             _productsCarousel(context, week, lang),
           ],
         ),
+      ),
+    );
+  }
+
+  // --- Post-Pregnancy doorway ------------------------------------------------
+  // Temporary entry into the new (isolated) parenting app. Same for mother and
+  // father. The "40 weeks complete → parenting" hand-off isn't wired yet; this
+  // is a preview doorway only, and the pregnancy app itself is untouched.
+  Widget _postPregnancyDoorway(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const PostPregnancyHome(),
+          settings: const RouteSettings(name: 'pp/my_child'),
+        ),
+      ),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [AppTheme.primary600, AppTheme.secondary500],
+          ),
+          boxShadow: const [
+            BoxShadow(color: Color(0x33FF5A79), blurRadius: 18, offset: Offset(0, 8)),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.child_care_rounded, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Post-Pregnancy',
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+              const SizedBox(height: 2),
+              Text("Baby's arrived? Step into the parenting app",
+                  style: GoogleFonts.manrope(
+                      fontSize: 12, color: Colors.white.withValues(alpha: 0.9))),
+            ]),
+          ),
+          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+        ]),
       ),
     );
   }
@@ -313,9 +373,15 @@ class HomeScreenB extends StatelessWidget {
   }) {
     final pct = pregnancy.progress;
     final lang = pregnancy.language;
-    // Tapping anywhere on the hero opens the weekly view (current week).
+    // Tapping anywhere on the hero opens the weekly view (current week). The
+    // weekly stack is now PUSHED (the Journey tab was replaced by "Prepare",
+    // so the mother reaches the week stack from this snapshot rather than a tab).
     return GestureDetector(
-      onTap: () => AppNav.instance.goWeekly(),
+      onTap: () {
+        pregnancy.selectWeek(pregnancy.currentWeek);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => WeeklyCardStackScreen(controller: pregnancy)));
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
       child: Container(

@@ -26,6 +26,7 @@ import 'father/father_journal_screen.dart';
 import 'father/father_read_aloud_screen.dart';
 import 'father/father_reads_screen.dart';
 import 'home_screen_b.dart';
+import 'prepare/prepare_hub_screen.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
 
@@ -106,7 +107,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               ]
             : [
                 HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
-                WeeklyCardStackScreen(controller: widget.pregnancy),
+                const PrepareHubScreen(),
                 ToolsHubScreen(controller: widget.pregnancy),
                 CalendarScreen(controller: widget.pregnancy),
                 CommunityScreen(controller: widget.pregnancy),
@@ -121,7 +122,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               ]
             : [
                 PvTab(Icons.home_rounded, s.tabToday),
-                PvTab(Icons.explore_rounded, s.tabJourney),
+                PvTab(Icons.school_rounded, s.tabPrepare),
                 PvTab(Icons.widgets_rounded, s.toolsTab),
                 PvTab(Icons.calendar_today_rounded, s.tabCalendar),
                 PvTab(Icons.groups_rounded, s.tabCommunity),

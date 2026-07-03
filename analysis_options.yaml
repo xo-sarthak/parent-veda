@@ -9,6 +9,14 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # Never analyze build output. Asset folders declared in pubspec (e.g.
+  # `lib/data/father/`) copy their .dart files into build/…/flutter_assets/,
+  # where relative imports no longer resolve — producing phantom errors. The
+  # real sources under lib/ are analyzed normally.
+  exclude:
+    - build/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

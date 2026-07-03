@@ -1416,6 +1416,7 @@ class S {
   // Direction B (Warm Nest) floating tab bar:
   String get tabToday => _p('Today', 'Aaj');
   String get tabJourney => _p('Journey', 'Safar');
+  String get tabPrepare => _p('Prepare', 'Taiyari');
   String get tabSanskar => _p('Sanskar', 'Sanskar');
   String get tabRead => _p('Read', 'Padhein');
   String get tabCommunity => _p('Community', 'Community');
