@@ -17,6 +17,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import 'bought_store.dart';
+import 'remote/cloud_synced_store.dart';
 
 /// The six default sections, plus a "custom" bucket for the mother's own items.
 enum BagCategory { labour, afterDelivery, baby, partner, documents, comfort, custom }
@@ -88,6 +90,8 @@ class BagItem {
     this.recommendation,
     this.status = BagItemStatus.needed,
     this.packed = false,
+    this.purchased = false,
+    this.favourite = false,
     this.store = '',
     this.link = '',
     this.price,
@@ -104,6 +108,8 @@ class BagItem {
   // Mutable planning state.
   BagItemStatus status;
   bool packed;
+  bool purchased; // bought (separate from packed). Auto-set for ParentVeda buys.
+  bool favourite; // the mother's own "favourites" list (her must-haves)
   String store; // for buyElse
   String link; // for buyElse
   int? price; // chosen product price (buyVeda) or user-entered (buyElse)
@@ -131,6 +137,8 @@ class BagItem {
         'recommendation': recommendation?.toJson(),
         'status': status.name,
         'packed': packed,
+        'purchased': purchased,
+        'favourite': favourite,
         'store': store,
         'link': link,
         'price': price,
@@ -154,6 +162,8 @@ class BagItem {
               Map<String, dynamic>.from(j['recommendation'])),
       status: _statusFromString((j['status'] ?? 'needed').toString()),
       packed: j['packed'] == true,
+      purchased: j['purchased'] == true,
+      favourite: j['favourite'] == true,
       store: (j['store'] ?? '').toString(),
       link: (j['link'] ?? '').toString(),
       price: (j['price'] as num?)?.toInt(),
@@ -163,7 +173,7 @@ class BagItem {
   }
 }
 
-class HospitalBagStore extends ChangeNotifier {
+class HospitalBagStore extends ChangeNotifier with CloudSyncedStore {
   HospitalBagStore._();
   static final HospitalBagStore instance = HospitalBagStore._();
 
@@ -247,9 +257,11 @@ class HospitalBagStore extends ChangeNotifier {
           !i.packed)
       .toList();
 
-  /// Planner filter. [key] ∈ all|veda|else|owned|packed|pending|skipped.
+  /// Planner filter. [key] ∈ all|fav|veda|else|owned|packed|pending|skipped.
   List<BagItem> filter(String key) {
     switch (key) {
+      case 'fav':
+        return _items.where((i) => i.favourite).toList();
       case 'veda':
         return withStatus(BagItemStatus.buyVeda);
       case 'else':
@@ -302,10 +314,82 @@ class HospitalBagStore extends ChangeNotifier {
       }
     } catch (_) {/* start empty */}
     _loaded = true;
+    // Auto-reflect in-app ParentVeda purchases as "bought" — now and on change.
+    BoughtStore.instance.addListener(markBoughtFromBought);
+    markBoughtFromBought();
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'hb';
+  @override
+  Object cloudData() => {
+        'items': _items.map((i) => i.toJson()).toList(),
+        'onboarded': _onboarded,
+        'updatedIso': _updatedIso,
+        'delivery': _delivery.name,
+      };
+  @override
+  void applyCloudData(Object data) {
+    final m = data as Map;
+    _items
+      ..clear()
+      ..addAll(((m['items'] as List?) ?? const [])
+          .map((e) => BagItem.fromJson(Map<String, dynamic>.from(e))));
+    _onboarded = m['onboarded'] == true;
+    _updatedIso = m['updatedIso']?.toString();
+    _delivery = DeliveryType.values.firstWhere(
+        (d) => d.name == (m['delivery'] ?? 'unsure'),
+        orElse: () => DeliveryType.unsure);
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _itemsKey, jsonEncode(_items.map((i) => i.toJson()).toList()));
+    await prefs.setString(
+        _metaKey,
+        jsonEncode({
+          'onboarded': _onboarded,
+          'updatedIso': _updatedIso,
+          'delivery': _delivery.name,
+        }));
   }
 
   // ---- Mutations ------------------------------------------------------------
+
+  Future<void> togglePurchased(String id) async {
+    final i = byId(id);
+    if (i == null) return;
+    i.purchased = !i.purchased;
+    await _touch();
+  }
+
+  Future<void> setPurchased(String id, bool value) async {
+    final i = byId(id);
+    if (i == null || i.purchased == value) return;
+    i.purchased = value;
+    await _touch();
+  }
+
+  /// Set [purchased] for any "buy from ParentVeda" item whose chosen product has
+  /// been bought through the in-app preview checkout (BoughtStore). Idempotent.
+  void markBoughtFromBought() {
+    var changed = false;
+    for (final i in _items) {
+      if (i.status == BagItemStatus.buyVeda && !i.purchased) {
+        final pid = i.selectedProductId ?? '${i.id}_pv';
+        if (BoughtStore.instance.isBought(pid)) {
+          i.purchased = true;
+          changed = true;
+        }
+      }
+    }
+    if (changed) _touch();
+  }
 
   /// Replace the bag with a freshly generated default set and mark onboarded.
   Future<void> createBag(List<BagItem> defaults, DeliveryType delivery) async {
@@ -347,6 +431,18 @@ class HospitalBagStore extends ChangeNotifier {
     i.packed = !i.packed;
     await _touch();
   }
+
+  /// The mother's own favourites — her must-have items, regardless of category.
+  Future<void> toggleFavourite(String id) async {
+    final i = byId(id);
+    if (i == null) return;
+    i.favourite = !i.favourite;
+    await _touch();
+  }
+
+  List<BagItem> get favourites =>
+      _items.where((i) => i.favourite).toList();
+  int get favouriteCount => favourites.length;
 
   Future<void> setBuyElse(
     String id, {

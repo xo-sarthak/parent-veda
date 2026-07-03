@@ -18,6 +18,7 @@ import '../../screens/tools/baby_movement_screen.dart';
 import '../../screens/tools/contraction_tracker_screen.dart';
 import '../../screens/tools/kegel_care_screen.dart';
 import '../../screens/tools/weight_tracker_screen.dart';
+import '../../services/journey_dates_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import 'journey_palette.dart';
@@ -117,8 +118,13 @@ class _NodeCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Timing line: range label, or "reached on" / "expected in".
-              _timingLine(context, s, lang, reached, weeksAway, color),
+              // Timing + an editable "when did this happen?" date (subjective
+              // events vary per mother). Rebuilds live when the date is edited.
+              AnimatedBuilder(
+                animation: JourneyDatesStore.instance,
+                builder: (context, _) =>
+                    _timingAndEdit(context, s, lang, reached, weeksAway, color),
+              ),
 
               const SizedBox(height: 16),
 
@@ -206,7 +212,7 @@ class _NodeCard extends StatelessWidget {
     );
   }
 
-  Widget _timingLine(
+  Widget _timingAndEdit(
     BuildContext context,
     S s,
     AppLanguage lang,
@@ -215,29 +221,88 @@ class _NodeCard extends StatelessWidget {
     Color color,
   ) {
     final text = Theme.of(context).textTheme;
+    final m = milestone;
+    final override = JourneyDatesStore.instance.dateFor(m.id);
+    // Displayed date = the mother's override if set, else computed from her due
+    // date. (Editing changes only the SHOWN date — the node keeps its trail
+    // position for now.)
+    final date = override ?? controller.dateForDay(m.posDay.round());
+    final dateStr = s.formatLongDate(date);
+    final appt = m.isAppointment;
+
     String label;
     IconData icon;
-    if (!reached) {
+    if (override != null) {
+      icon = Icons.event_available_rounded;
+      label = appt ? s.jmAppointmentOn(dateStr) : s.jmHappenedOn(dateStr);
+    } else if (!reached) {
       icon = Icons.schedule_rounded;
-      label = s.expectedInWeeks(weeksAway);
-    } else if (milestone.type == JourneyNodeType.achievement) {
+      label = '${s.expectedInWeeks(weeksAway)} · $dateStr';
+    } else if (m.type == JourneyNodeType.achievement) {
       icon = Icons.check_circle_rounded;
-      final start = controller.weekDates(milestone.anchorWeek).start;
-      label = s.reachedOn(s.formatLongDate(start));
-    } else if (milestone.rangeLabel != null) {
-      icon = Icons.event_rounded;
-      label = milestone.rangeLabel!.of(lang);
+      label = s.reachedOn(dateStr);
     } else {
       icon = Icons.event_rounded;
-      label = '${s.weekWord} ${milestone.anchorWeek}';
+      label = dateStr;
     }
-    return Row(
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 15, color: AppTheme.neutral500),
-        const SizedBox(width: 6),
-        Text(label, style: text.labelMedium),
+        Row(
+          children: [
+            Icon(icon, size: 15, color: AppTheme.neutral500),
+            const SizedBox(width: 6),
+            Flexible(child: Text(label, style: text.labelMedium)),
+            if (override != null) ...[
+              const SizedBox(width: 6),
+              Text('· ${s.jmEditedHint}',
+                  style: text.labelSmall?.copyWith(color: color)),
+            ],
+          ],
+        ),
+        // Only the two kinds of milestone with a real personal date get an edit
+        // affordance: appointments she books ("Set appointment date") and the
+        // moments she witnesses ("When did this happen?"). Everything else stays
+        // read-only so the map never asks for a date that can't exist.
+        if (m.isDatable) ...[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => _editDate(context, date, appt),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: color,
+                side: BorderSide(color: color.withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                visualDensity: VisualDensity.compact,
+              ),
+              icon: const Icon(Icons.edit_calendar_rounded, size: 16),
+              label: Text(override == null
+                  ? (appt ? s.jmSetAppointment : s.jmWhenHappened)
+                  : (appt ? s.jmEditAppointment : s.jmEditDate)),
+            ),
+          ),
+        ],
       ],
     );
+  }
+
+  Future<void> _editDate(
+      BuildContext context, DateTime current, bool appt) async {
+    final due = controller.dueDate;
+    final s = S(controller.language);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: controller.dateForDay(1).subtract(const Duration(days: 30)),
+      lastDate:
+          DateTime(due.year, due.month, due.day).add(const Duration(days: 45)),
+      helpText: appt ? s.jmSetAppointment : s.jmWhenHappened,
+    );
+    if (picked != null) {
+      JourneyDatesStore.instance.setDate(milestone.id, picked);
+    }
   }
 
   Widget _actions(BuildContext context, S s, Color color, bool reached) {

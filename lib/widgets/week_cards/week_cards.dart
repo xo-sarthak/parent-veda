@@ -11,32 +11,67 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../data/body_changes.dart';
+import '../../data/trimester_tips.dart';
 import '../../localization/app_language.dart';
+import '../../models/pv_video.dart';
 import '../../models/week_content.dart';
 import '../../screens/journal_writer_screen.dart';
 import '../../services/baby_voice_service.dart';
 import '../../services/memory_store.dart';
 import '../../services/size_view_pref.dart';
+import '../../services/video_store.dart';
 import '../../theme/app_theme.dart';
 import '../baby_voice/baby_avatar.dart';
 import '../baby_voice/speaker_button.dart';
 import '../cards/card_shell.dart';
+import '../cards/food_emoji.dart';
 import '../cards/raga_player.dart';
 import '../memories/memories_section.dart';
-import 'living_halo.dart';
+import 'week_overview_card.dart';
+// import 'living_halo.dart'; // ring figure replaced by the striped Size hero
+//   (kept for revert: re-add this import + restore the old SizeRevealCard body).
 
 /// Ordered card list for a week. Reflect & Remember is second-last, Share Your
 /// Journey is always last.
-List<Widget> buildWeekCards(WeekContent w, AppLanguage lang) => [
-      SizeRevealCard(w: w, lang: lang),
-      BabyUpdateCard(w: w, lang: lang),
-      MomJourneyCard(w: w, lang: lang),
-      NourishmentCard(w: w, lang: lang),
-      ActionPlanCard(w: w, lang: lang),
-      BondingRitualCard(w: w, lang: lang),
-      ReflectRememberCard(w: w, lang: lang),
-      ShareJourneyCard(w: w, lang: lang),
+List<Widget> buildWeekCards(WeekContent w, AppLanguage lang) {
+  // ── Week 20 — "ParentVeda Journey" design PREVIEW ────────────────────────
+  // An elevated, de-cluttered overview card (progress-ring hero + Baby / Mother
+  // / Health accordions) folds the Size, Baby Update and Mom's Journey cards
+  // into one. The horizontal carousel stays; each card just reads cleaner.
+  // The original cards are NOT removed — every other week keeps them; once this
+  // look is approved, roll it out to more weeks.
+  if (w.week == 20) {
+    return [
+      WeekOverviewCard(w: w, lang: lang),
+      WeekVideoCard(w: w, lang: lang),
+      WeekMilestoneCard(w: w, lang: lang),
+      WeekNutritionCard(w: w, lang: lang),
+      if (kTrimesterTips.containsKey(w.week))
+        WeekTipsCard(w: w, lang: lang),
+      WeekActionCard(w: w, lang: lang),
+      // Weekly Garbh Sanskar (Bonding) + Journaling (Reflect) removed from the
+      // weekly stack per Excel — both are daily-only. Kept for revert:
+      // BondingRitualCard(w: w, lang: lang),
+      // ReflectRememberCard(w: w, lang: lang),
+      WeekShareCard(w: w, lang: lang),
     ];
+  }
+  return [
+    SizeRevealCard(w: w, lang: lang),
+    WeeklyVideoCard(w: w, lang: lang),
+    BabyUpdateCard(w: w, lang: lang),
+    MomJourneyCard(w: w, lang: lang),
+    if (kTrimesterTips.containsKey(w.week)) TrimesterTipsCard(w: w, lang: lang),
+    NourishmentCard(w: w, lang: lang),
+    ActionPlanCard(w: w, lang: lang),
+    // Weekly Garbh Sanskar (Bonding) + Journaling (Reflect) removed from the
+    // weekly stack per Excel — both are daily-only. Kept for revert:
+    // BondingRitualCard(w: w, lang: lang),
+    // ReflectRememberCard(w: w, lang: lang),
+    ShareJourneyCard(w: w, lang: lang),
+  ];
+}
 
 // ---------------------------------------------------------------------------
 //  Shared small pieces
@@ -188,37 +223,18 @@ class SizeRevealCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(child: SoftPill(label: snap.milestone.of(lang), color: AppTheme.primary500, icon: Icons.flag_rounded)),
-          const SizedBox(height: 14),
-          ValueListenableBuilder<bool>(
-            valueListenable: SizeViewPref.babyMode,
-            builder: (context, baby, _) {
-              // Every week: the figure (fruit emoji or baby illustration),
-              // then a single horizontal segmented Fruit/Baby pill centred
-              // directly below it — one calm, consistent layout.
-              return Column(children: [
-                Center(child: LivingHalo(week: w.week, babyMode: baby, lang: lang)),
-                const SizedBox(height: 14),
-                Center(
-                  child:
-                      _FruitBabyToggle(baby: baby, onChanged: SizeViewPref.set),
-                ),
-              ]);
-            },
+          const SizedBox(height: 16),
+          // Warm-Nest "Your Week" image hero: a soft striped frame holding the
+          // week's figure — the food emoji, or the real in-womb baby image via
+          // the Fruit/Baby toggle — with a "baby · week N" tag and Size /
+          // Length·Weight corner tags.
+          _SizeHero(
+            week: w.week,
+            lang: lang,
+            fruit: snap.fruit.of(lang),
+            length: snap.length.of(lang),
+            weight: snap.weight.of(lang),
           ),
-          const SizedBox(height: 18),
-          Center(child: Text(s.sizeOf, style: text.bodyMedium)),
-          const SizedBox(height: 4),
-          Center(
-            child: Text(snap.fruit.of(lang),
-                textAlign: TextAlign.center,
-                style: text.headlineMedium?.copyWith(color: AppTheme.primary600)),
-          ),
-          const SizedBox(height: 18),
-          Row(children: [
-            Expanded(child: _Metric(s.lengthLabel, snap.length.of(lang), Icons.straighten_rounded)),
-            const SizedBox(width: 12),
-            Expanded(child: _Metric(s.weightLabel, snap.weight.of(lang), Icons.hourglass_empty_rounded)),
-          ]),
           const SizedBox(height: 18),
           Container(
             width: double.infinity,
@@ -334,6 +350,357 @@ class _FruitBabyToggle extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+//  Size hero — striped "image" frame (Warm-Nest "Your Week" design)
+// ---------------------------------------------------------------------------
+
+/// The redesigned Size centrepiece: a soft diagonally-striped "image" frame.
+/// The figure crossfades between the week's food emoji and the real in-womb
+/// baby image (assets/baby/week_NN.jpg) via the Fruit/Baby toggle below. A
+/// "baby · week N" tag sits top-centre; Size (food) bottom-left; Length &
+/// Weight bottom-right — matching the Claude-Design weekly screen.
+class _SizeHero extends StatelessWidget {
+  const _SizeHero({
+    required this.week,
+    required this.lang,
+    required this.fruit,
+    required this.length,
+    required this.weight,
+  });
+  final int week;
+  final AppLanguage lang;
+  final String fruit;
+  final String length;
+  final String weight;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    return ValueListenableBuilder<bool>(
+      valueListenable: SizeViewPref.babyMode,
+      builder: (context, baby, _) {
+        return Column(children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              height: 280,
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  Positioned.fill(child: CustomPaint(painter: _StripePainter())),
+                  Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 280),
+                      child: baby
+                          ? _BabyHeroImage(week: week, key: const ValueKey('baby'))
+                          : Text(
+                              foodEmojiForWeek(week),
+                              key: const ValueKey('food'),
+                              style: const TextStyle(fontSize: 92),
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 14,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: _HeroPill('baby · ${s.weekWord.toLowerCase()} $week'),
+                    ),
+                  ),
+                  Positioned(
+                    left: 12,
+                    bottom: 12,
+                    child: _HeroTag(
+                      label: s.sizeWord,
+                      value: '${foodEmojiForWeek(week)} $fruit',
+                    ),
+                  ),
+                  Positioned(
+                    right: 12,
+                    bottom: 12,
+                    child: _HeroTag(
+                      label: s.lengthLabel,
+                      value: length,
+                      label2: s.weightLabel,
+                      value2: weight,
+                      alignEnd: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(child: _FruitBabyToggle(baby: baby, onChanged: SizeViewPref.set)),
+        ]);
+      },
+    );
+  }
+}
+
+class _HeroPill extends StatelessWidget {
+  const _HeroPill(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    final styles = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      child: Text(
+        text,
+        style: styles.labelMedium?.copyWith(
+          color: AppTheme.primary500,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroTag extends StatelessWidget {
+  const _HeroTag({
+    required this.label,
+    required this.value,
+    this.label2,
+    this.value2,
+    this.alignEnd = false,
+  });
+  final String label;
+  final String value;
+  final String? label2;
+  final String? value2;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final styles = Theme.of(context).textTheme;
+    final cross = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    Widget pair(String l, String v) => Column(
+          crossAxisAlignment: cross,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l.toUpperCase(),
+              style: styles.labelSmall?.copyWith(
+                color: AppTheme.neutral500,
+                letterSpacing: 0.8,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              v,
+              textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+              style: styles.titleMedium?.copyWith(
+                color: AppTheme.primary900,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        );
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 140),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: cross,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          pair(label, value),
+          if (label2 != null && value2 != null) ...[
+            const SizedBox(height: 8),
+            pair(label2!, value2!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StripePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = AppTheme.secondary50);
+    final stripe = Paint()
+      ..color = AppTheme.secondary100.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 16;
+    const gap = 30.0;
+    for (double x = -size.height; x < size.width; x += gap) {
+      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), stripe);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _StripePainter oldDelegate) => false;
+}
+
+/// Real in-womb baby image for the hero (assets/baby/week_NN.jpg), with the
+/// food emoji as a graceful fallback until artwork for a week is provided.
+class _BabyHeroImage extends StatelessWidget {
+  const _BabyHeroImage({super.key, required this.week});
+  final int week;
+  String get _asset =>
+      'assets/baby/week_${week.toString().padLeft(2, '0')}.jpg';
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: Image.asset(
+        _asset,
+        width: 190,
+        height: 190,
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+        errorBuilder: (_, _, _) =>
+            Text(foodEmojiForWeek(week), style: const TextStyle(fontSize: 92)),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Weekly Video — first carousel slot after the Size hero
+// ---------------------------------------------------------------------------
+
+/// The recommended Watch & Learn video for [week] (the nearest one if the week
+/// falls between curated ranges).
+PvVideo? _weekVideo(int week) {
+  final recs =
+      kVideos.where((v) => v.category == VideoCategory.recommended).toList();
+  for (final v in recs) {
+    if (v.matchesWeek(week)) return v;
+  }
+  if (recs.isEmpty) return null;
+  int dist(PvVideo v) => week < v.weekStart
+      ? v.weekStart - week
+      : (week > v.weekEnd ? week - v.weekEnd : 0);
+  recs.sort((a, b) => dist(a).compareTo(dist(b)));
+  return recs.first;
+}
+
+class WeeklyVideoCard extends StatelessWidget {
+  const WeeklyVideoCard({super.key, required this.w, required this.lang});
+  final WeekContent w;
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final s = S(lang);
+    final v = _weekVideo(w.week);
+    if (v == null) return const SizedBox.shrink();
+    final meta = videoMeta(v.category);
+    return CardShell(
+      eyebrow: s.wkVideoEyebrow,
+      title: v.title.of(lang),
+      icon: Icons.play_circle_rounded,
+      accent: AppTheme.primary500,
+      trailing: AnimatedBuilder(
+        animation: VideoStore.instance,
+        builder: (context, _) {
+          final saved = VideoStore.instance.isSaved(v.id);
+          return IconButton(
+            icon: Icon(
+                saved
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_border_rounded,
+                color: AppTheme.primary500),
+            onPressed: () => VideoStore.instance.toggle(v.id),
+          );
+        },
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        GestureDetector(
+          onTap: () => ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [meta.color, AppTheme.primary700],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Stack(children: [
+                Center(
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        shape: BoxShape.circle),
+                    child: const Icon(Icons.play_arrow_rounded,
+                        size: 34, color: AppTheme.primary600),
+                  ),
+                ),
+                Positioned(
+                  left: 10,
+                  top: 10,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(40)),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(meta.icon, size: 13, color: meta.color),
+                      const SizedBox(width: 5),
+                      Text(s.wkVideoEyebrow,
+                          style: text.labelSmall?.copyWith(
+                              color: meta.color, fontWeight: FontWeight.w700)),
+                    ]),
+                  ),
+                ),
+                Positioned(
+                  right: 10,
+                  bottom: 10,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(40)),
+                    child: Text(v.duration,
+                        style: text.labelSmall?.copyWith(color: Colors.white)),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(v.reason.of(lang), style: text.bodyLarge?.copyWith(height: 1.5)),
+        const SizedBox(height: 10),
+        Row(children: [
+          const Icon(Icons.info_outline_rounded,
+              size: 14, color: AppTheme.neutral400),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(s.wkVideoSoon,
+                style: text.bodySmall?.copyWith(color: AppTheme.neutral500)),
+          ),
+        ]),
+      ]),
+    );
+  }
+}
+
+// ignore: unused_element  (superseded by the Size hero corner tags; kept for revert)
 class _Metric extends StatelessWidget {
   const _Metric(this.label, this.value, this.icon);
   final String label;
@@ -423,7 +790,10 @@ class MomJourneyCard extends StatelessWidget {
       icon: Icons.self_improvement_rounded,
       accent: AppTheme.tertiary400,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Block(label: s.physicalChanges, body: m.physicalChanges.of(lang), color: AppTheme.tertiary500, icon: Icons.accessibility_new_rounded),
+        if (kBodyChanges.containsKey(w.week))
+          _BodyChangesBlock(week: w.week, lang: lang, title: s.physicalChanges)
+        else
+          _Block(label: s.physicalChanges, body: m.physicalChanges.of(lang), color: AppTheme.tertiary500, icon: Icons.accessibility_new_rounded),
         _Block(label: s.howYouFeel, body: m.emotionalState.of(lang), color: AppTheme.primary500, icon: Icons.psychology_rounded),
         if (m.commonSymptoms.isNotEmpty) ...[
           Text(s.commonSymptoms, style: text.titleMedium),
@@ -466,6 +836,103 @@ class _RedFlag extends StatelessWidget {
         Text(body, style: styles.bodyMedium?.copyWith(color: AppTheme.secondary900.withValues(alpha: 0.85), height: 1.55)),
         const SizedBox(height: 10),
         Text(footer, style: styles.bodySmall?.copyWith(color: AppTheme.secondary700, fontStyle: FontStyle.italic)),
+      ]),
+    );
+  }
+}
+
+/// Mother's Body Changes — week-by-week biological sections (shown inside the
+/// Mom's Journey card when this week has authored content in kBodyChanges).
+class _BodyChangesBlock extends StatelessWidget {
+  const _BodyChangesBlock(
+      {required this.week, required this.lang, required this.title});
+  final int week;
+  final AppLanguage lang;
+  final String title;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final changes = kBodyChanges[week] ?? const <BodyChange>[];
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.accessibility_new_rounded,
+              size: 15, color: AppTheme.tertiary500),
+          const SizedBox(width: 6),
+          Text(title.toUpperCase(),
+              style: text.labelSmall?.copyWith(
+                  color: AppTheme.tertiary500,
+                  letterSpacing: 1,
+                  fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 12),
+        for (final ch in changes)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(ch.label.of(lang),
+                  style: text.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.tertiary700)),
+              const SizedBox(height: 2),
+              Text(ch.detail.of(lang),
+                  style: text.bodyMedium
+                      ?.copyWith(height: 1.45, color: AppTheme.neutral800)),
+            ]),
+          ),
+      ]),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Trimester Tips — 2-3 gentle tips for the week (kTrimesterTips)
+// ---------------------------------------------------------------------------
+class TrimesterTipsCard extends StatelessWidget {
+  const TrimesterTipsCard({super.key, required this.w, required this.lang});
+  final WeekContent w;
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final s = S(lang);
+    final tips = kTrimesterTips[w.week] ?? const <LocalizedText>[];
+    return CardShell(
+      eyebrow: s.ttEyebrow,
+      title: s.ttTitle(w.week),
+      icon: Icons.tips_and_updates_rounded,
+      accent: AppTheme.tertiary500,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        for (int i = 0; i < tips.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 28,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: AppTheme.tertiary500.withValues(alpha: 0.14),
+                    shape: BoxShape.circle),
+                child: Text('${i + 1}',
+                    style: text.labelMedium?.copyWith(
+                        color: AppTheme.tertiary700,
+                        fontWeight: FontWeight.w800)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(tips[i].of(lang),
+                    style: text.bodyLarge?.copyWith(height: 1.5)),
+              ),
+            ]),
+          ),
       ]),
     );
   }
@@ -575,7 +1042,9 @@ class ActionPlanCard extends StatelessWidget {
       icon: Icons.checklist_rounded,
       accent: AppTheme.primary500,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Block(label: s.doThisWeek, body: a.doThisWeek.of(lang), color: const Color(0xFF3FA37A), icon: Icons.check_circle_rounded),
+        // "What to do this week" removed per Deepti ruling — keep only "what to
+        // skip" + the myth buster. Kept for revert:
+        // _Block(label: s.doThisWeek, body: a.doThisWeek.of(lang), color: const Color(0xFF3FA37A), icon: Icons.check_circle_rounded),
         _Block(label: s.skipThisWeek, body: a.skipThisWeek.of(lang), color: AppTheme.secondary500, icon: Icons.do_not_disturb_on_rounded),
         Container(
           width: double.infinity,

@@ -9,7 +9,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CanIStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class CanIStore extends ChangeNotifier with CloudSyncedStore {
   CanIStore._();
   static final CanIStore instance = CanIStore._();
 
@@ -24,6 +26,21 @@ class CanIStore extends ChangeNotifier {
       ..clear()
       ..addAll(_prefs?.getStringList(_savedKey) ?? const []);
     notifyListeners();
+    await syncStateFromCloud();
+  }
+
+  // --- cloud sync ------------------------------------------------------------
+  @override
+  String get cloudKey => 'cani_saved';
+  @override
+  Object cloudData() => List<String>.from(_saved);
+  @override
+  void applyCloudData(Object data) => _saved
+    ..clear()
+    ..addAll((data as List).map((e) => e.toString()));
+  @override
+  Future<void> persistLocalCache() async {
+    await _prefs?.setStringList(_savedKey, _saved);
   }
 
   List<String> get savedIds => List.unmodifiable(_saved);

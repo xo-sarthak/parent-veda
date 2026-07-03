@@ -8,11 +8,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../data/read_next_data.dart';
 import '../localization/app_language.dart';
 import '../models/read_item.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
 
@@ -524,9 +526,12 @@ class ReadItemScreen extends StatelessWidget {
         actions: [_SaveHeart(id: item.id), const SizedBox(width: 8)],
       ),
       body: AnimatedBuilder(
-        animation: ReadNextStore.instance,
+        animation: Listenable.merge(
+            [ReadNextStore.instance, ReadDoneStore.instance]),
         builder: (context, _) {
+          ReadDoneStore.instance.ensureLoaded();
           final status = ReadNextStore.instance.statusOf(item.id);
+          final done = ReadDoneStore.instance.isDone(item.id);
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
@@ -562,30 +567,43 @@ class ReadItemScreen extends StatelessWidget {
                         style: text.bodyLarge?.copyWith(height: 1.6, fontSize: 16)),
                   ),
               const SizedBox(height: 8),
-              // status actions
+              // status actions — once it's completed we DON'T offer "reading"
+              // any more (completed and reading are mutually exclusive).
               Row(children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: status == 'reading' ? _gold : AppTheme.neutral700,
-                      side: BorderSide(
-                          color: status == 'reading' ? _gold : AppTheme.outlineVariant,
-                          width: 1.4),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                if (!done) ...[
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: status == 'reading' ? _gold : AppTheme.neutral700,
+                        side: BorderSide(
+                            color: status == 'reading' ? _gold : AppTheme.outlineVariant,
+                            width: 1.4),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () => ReadNextStore.instance.setStatus(item.id, 'reading'),
+                      child: Text(status == 'reading' ? s.rnReadingBadge : s.rnMarkReading),
                     ),
-                    onPressed: () => ReadNextStore.instance.setStatus(item.id, 'reading'),
-                    child: Text(status == 'reading' ? s.rnReadingBadge : s.rnMarkReading),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: status == 'completed' ? _green : _accent,
+                      backgroundColor: done ? _green : _accent,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    onPressed: () => ReadNextStore.instance.setStatus(item.id, 'completed'),
-                    child: Text(status == 'completed' ? s.rnCompletedBadge : s.rnMarkDone,
+                    // Marking complete here ticks the Home daily-reads checkbox
+                    // too (same ReadDoneStore) and clears any "reading" status —
+                    // no second tap, no contradictory state.
+                    onPressed: () {
+                      ReadDoneStore.instance.toggle(item.id);
+                      if (ReadDoneStore.instance.isDone(item.id)) {
+                        ReadNextStore.instance.setStatus(item.id, 'completed');
+                      } else {
+                        ReadNextStore.instance.clearStatus(item.id);
+                      }
+                    },
+                    child: Text(done ? s.rnCompletedBadge : s.rnMarkDone,
                         style: text.labelLarge?.copyWith(color: Colors.white)),
                   ),
                 ),
@@ -699,6 +717,231 @@ class ReadNextHomeCard extends StatelessWidget {
         ]),
       ]),
     );
+  }
+}
+
+// ===========================================================================
+//  Daily Reads — home section (above Read Next): 3 rotating articles + a
+//  books column. Vertical list (no carousel): heading on top, content below.
+// ===========================================================================
+
+/// Soft per-category thumbnail tint.
+Color _readTint(String category) {
+  switch (category) {
+    case 'Baby Development':
+      return AppTheme.primary100;
+    case 'Mother Changes':
+      return AppTheme.secondary100;
+    case 'Nutrition':
+      return const Color(0xFFE3F3E8);
+    case 'Preparation':
+      return const Color(0xFFF6ECD8);
+    case 'Emotional Wellbeing':
+      return const Color(0xFFEDE7FA);
+    case 'Partner Support':
+      return const Color(0xFFE4ECF8);
+    default:
+      return AppTheme.primary100;
+  }
+}
+
+class DailyReadsHomeCard extends StatelessWidget {
+  const DailyReadsHomeCard(
+      {super.key, required this.controller, required this.lang});
+  final PregnancyController controller;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) {
+    ReadDoneStore.instance.ensureLoaded();
+    return AnimatedBuilder(
+      animation: Listenable.merge(
+          [ReadDoneStore.instance, ReadNextStore.instance]),
+      builder: (context, _) {
+    final s = S(lang);
+    final week = controller.currentWeek;
+    final day = controller.currentDay;
+    final articles = dailyArticleReads(week, day);
+    final books = dailyBookReads(day);
+    if (articles.isEmpty && books.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppTheme.outlineVariant, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary900.withValues(alpha: 0.05),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Gradient header bar.
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [AppTheme.primary600, AppTheme.primary400],
+            ),
+          ),
+          child: Text(
+            s.drTitle,
+            style: GoogleFonts.fraunces(
+                fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+        ),
+        // Articles.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 4),
+          child: _groupLabel(s.drArticles),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Column(
+            children: [
+              for (var i = 0; i < articles.length; i++)
+                _row(context, articles[i],
+                    divider: i != articles.length - 1),
+            ],
+          ),
+        ),
+        // Books.
+        if (books.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
+            child: _groupLabel(s.drBooks),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Column(
+              children: [
+                for (var i = 0; i < books.length; i++)
+                  _row(context, books[i],
+                      isBook: true, divider: i != books.length - 1),
+              ],
+            ),
+          ),
+        ],
+        // See all.
+        const Divider(height: 1, color: AppTheme.outlineVariant),
+        Center(
+          child: TextButton(
+            onPressed: () =>
+                _push(context, ReadNextScreen(controller: controller)),
+            child: Text(s.drSeeAll,
+                style: TextStyle(
+                    color: _accent,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3)),
+          ),
+        ),
+      ]),
+    );
+      },
+    );
+  }
+
+  Widget _groupLabel(String text) => Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.6,
+          color: AppTheme.neutral500,
+        ),
+      );
+
+  Widget _row(BuildContext context, ReadItem r,
+      {bool isBook = false, bool divider = true}) {
+    final text = Theme.of(context).textTheme;
+    final done = ReadDoneStore.instance.isDone(r.id);
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          // Daily Reads is a clean read row now — no check-off here, just the
+          // read + a bookmark heart (per request). Completion can still be set
+          // from the full article view; that just dims the title below.
+          Expanded(
+            child: InkWell(
+              onTap: () => _openItem(context, r, controller),
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _readTint(r.category),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child:
+                          Text(r.emoji, style: const TextStyle(fontSize: 24)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            r.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            // "Read" is now shown by a small tick on the right
+                            // (below) — no strike-through / dimming.
+                            style: text.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w700, height: 1.25),
+                          ),
+                          const SizedBox(height: 3),
+                          if (isBook)
+                            Row(children: [
+                              const Icon(Icons.star_rounded,
+                                  size: 13, color: _gold),
+                              const SizedBox(width: 3),
+                              Text(r.rating.toStringAsFixed(1),
+                                  style: text.labelSmall?.copyWith(
+                                      color: AppTheme.neutral600,
+                                      fontWeight: FontWeight.w700)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(r.author,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: text.labelSmall?.copyWith(
+                                        color: AppTheme.neutral500)),
+                              ),
+                            ])
+                          else
+                            Text('${r.category} · ${r.readingTime}',
+                                style: text.labelSmall
+                                    ?.copyWith(color: AppTheme.neutral500)),
+                        ],
+                      ),
+                    ),
+                  ]),
+            ),
+          ),
+          // A small tick marks this read as done (replaces the old strike-through).
+          if (done) ...[
+            const Icon(Icons.check_circle_rounded,
+                size: 18, color: Color(0xFF4F7A52)),
+            const SizedBox(width: 8),
+          ],
+          // Bookmark this read — saved reads surface in the Profile › Saved hub.
+          _SaveHeart(id: r.id),
+        ]),
+      ),
+      if (divider) const Divider(height: 1, color: AppTheme.outlineVariant),
+    ]);
   }
 }
 

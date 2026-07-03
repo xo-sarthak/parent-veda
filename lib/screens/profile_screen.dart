@@ -7,31 +7,60 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../localization/app_language.dart';
+import '../services/app_nav.dart';
+import '../services/bump_store.dart';
 import '../services/daily_store.dart';
+import '../services/journal_store.dart';
+import '../services/journey_dates_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/remote/sync_registry.dart';
+import '../services/read_next_store.dart';
+import '../services/read_to_baby_saved_store.dart';
+import '../services/scans_store.dart';
+import '../services/video_store.dart';
 import '../theme/app_theme.dart';
+import 'auth/auth_flow_screen.dart';
+import 'bump_journey_screen.dart';
+import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
+import 'journal_screen.dart';
+import 'saved_hub_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key, required this.controller});
+  const ProfileScreen(
+      {super.key, required this.controller, this.father = false});
 
   final PregnancyController controller;
+
+  /// When true, this is the PARTNER (father) account: the mother-only memory
+  /// vaults are hidden and a partner-account note is shown instead.
+  final bool father;
 
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    final name = controller.motherName;
+    final name = father ? controller.fatherName : controller.motherName;
     final initial = name.isNotEmpty ? name.characters.first : '🌸';
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+    return Scaffold(
+      backgroundColor: AppTheme.surfaceContainer,
+      appBar: AppBar(
+        backgroundColor: AppTheme.surfaceContainer,
+        elevation: 0,
+        title: Text(s.profileTitle, style: text.titleLarge),
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
         children: [
-          Text(s.profileTitle, style: text.headlineMedium),
-          const SizedBox(height: 18),
           // --- Profile header ---------------------------------------------
           Row(
             children: [
@@ -58,7 +87,9 @@ class ProfileScreen extends StatelessWidget {
                   Text(name, style: text.titleLarge),
                   const SizedBox(height: 2),
                   Text(
-                    '${s.weekOf(controller.currentWeek, PregnancyController.lastContentWeek)} · ${s.trimesterName(controller.currentWeek)}',
+                    father
+                        ? 'Partner account'
+                        : '${s.weekOf(controller.currentWeek, PregnancyController.lastContentWeek)} · ${s.trimesterName(controller.currentWeek)}',
                     style: text.bodyMedium,
                   ),
                 ],
@@ -66,6 +97,94 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          // Mother-only memory vaults (Journal / Bump / Dear Baby / Saved) are
+          // hidden for the father — they belong to her account; he sees a
+          // partner-account note instead.
+          if (father) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppTheme.outlineVariant),
+              ),
+              child: Row(children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: const Color(0xFF2E5266).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14)),
+                  child: const Icon(Icons.favorite_rounded,
+                      color: Color(0xFF2E5266)),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Partner account',
+                            style: text.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 3),
+                        Text(
+                            controller.motherName.isNotEmpty
+                                ? "You're paired with ${controller.motherName}. Her journal, bump journey and memories live in her account."
+                                : "You're paired as a partner. The journal, bump journey and memories live in the mother's account.",
+                            style: text.bodySmall?.copyWith(
+                                color: AppTheme.neutral600, height: 1.45)),
+                      ]),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 14),
+          ] else ...[
+          // --- Invite your partner (pairing code) -------------------------
+          const _InvitePartnerCard(),
+          const SizedBox(height: 14),
+          // --- My Journal -------------------------------------------------
+          AnimatedBuilder(
+            animation: JournalStore.instance,
+            builder: (context, _) {
+              final count = JournalStore.instance.manualEntries.length;
+              return _VaultCard(
+                title: s.jrTitle,
+                subtitle: s.jrSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.auto_stories_rounded,
+                accent: AppTheme.primary500,
+                accentBg: AppTheme.primary50,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => JournalScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+          // --- My Bump Journey --------------------------------------------
+          AnimatedBuilder(
+            animation: BumpStore.instance,
+            builder: (context, _) {
+              final count = BumpStore.instance.count;
+              return _VaultCard(
+                title: s.bumpTitle,
+                subtitle: s.bumpSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.pregnant_woman_rounded,
+                accent: AppTheme.secondary500,
+                accentBg: AppTheme.secondary50,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BumpJourneyScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
           // --- Dear Baby memory vault -------------------------------------
           AnimatedBuilder(
             animation: DailyStore.instance,
@@ -85,14 +204,243 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 14),
+          // --- Saved (bookmarked videos) ----------------------------------
+          AnimatedBuilder(
+            animation: Listenable.merge([
+              VideoStore.instance,
+              ReadNextStore.instance,
+              ReadToBabySavedStore.instance,
+            ]),
+            builder: (context, _) {
+              final count = VideoStore.instance.savedIds.length +
+                  ReadNextStore.instance.savedIds.length +
+                  ReadToBabySavedStore.instance.recent().length;
+              return _VaultCard(
+                title: s.savedVaultTitle,
+                subtitle: s.savedHubSubtitle,
+                trailing: count > 0 ? '$count' : '',
+                icon: Icons.bookmark_rounded,
+                accent: const Color(0xFF3FA56A),
+                accentBg: const Color(0xFFEAF3EF),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SavedHubScreen(controller: controller),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+          ],
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
+          const SizedBox(height: 16),
+          // --- Reset to Week 20 (testing) ---------------------------------
+          // Clears any saved due date + the pregnancy-map data and snaps the app
+          // back to the week-20 placeholder, so features can be re-tested from a
+          // clean "halfway" state. (Testing aid — remove/gate before release.)
+          OutlinedButton.icon(
+            onPressed: () => _resetForTesting(context),
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: const Text('Reset to Week 20 · testing'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.neutral700,
+              side: const BorderSide(color: AppTheme.outlineVariant),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // --- Sign out (replays the auth flow) ---------------------------
+          OutlinedButton.icon(
+            onPressed: () => _signOut(context),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: Text(s.profileSignOut),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.secondary600,
+              side: BorderSide(
+                  color: AppTheme.secondary500.withValues(alpha: 0.35)),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
           const SizedBox(height: 24),
           Center(
             child: Text(s.moreComingSoon, style: text.labelMedium),
           ),
         ],
       ),
+      ),
+    );
+  }
+
+  /// Testing reset — clear the due date + pregnancy-map data, snap back to the
+  /// week-20 placeholder, and drop the user on a fresh Today screen.
+  Future<void> _resetForTesting(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    await controller.resetForTesting();
+    JourneyDatesStore.instance.clearAll();
+    await ScansStore.instance.clearAllForTesting();
+    AppNav.instance.goToday();
+    nav.popUntil((r) => r.isFirst); // back to the main scaffold (Today)
+    messenger.showSnackBar(const SnackBar(
+        content: Text('Reset to Week 20 — due date & pregnancy map cleared')));
+  }
+
+  /// "Sign out" — clears the local auth flag and replays the auth flow over the
+  /// app; completing it re-sets the flag (and feeds any picked due date in).
+  Future<void> _signOut(BuildContext context) async {
+    final nav = Navigator.of(context);
+    try {
+      await Supabase.instance.client.auth.signOut(); // clear the real session
+      await (await SharedPreferences.getInstance())
+          .setBool(kAuthCompletedKey, false);
+    } catch (_) {/* best-effort */}
+    nav.push(MaterialPageRoute(
+      builder: (_) => AuthFlowScreen(onDone: (due, isFather) async {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(kAuthCompletedKey, true);
+          await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
+        } catch (_) {/* best-effort */}
+        // PINNED TO WEEK 20 (testing): disabled so re-login can't move the week.
+        // Re-enable with the load() restore block in pregnancy_controller.dart.
+        // if (!isFather && due != null) await controller.setDueDate(due);
+        // Load the real profile name(s) so the app shows them (not placeholders).
+        await controller.loadProfileFromCloud();
+        // Re-pull every store's cloud data now that we're logged in.
+        SyncRegistry.resyncAll();
+        if (isFather) {
+          // Paired as the father → switch the app into the unified father shell
+          // (the same MainScaffold, Slate structure) via the preview flag, then
+          // drop back to the root so it re-renders in father mode.
+          FatherPreview.instance.on = true;
+          nav.popUntil((r) => r.isFirst);
+        } else {
+          FatherPreview.instance.on = false;
+          nav.pop(); // back to the mother app
+        }
+      }),
+    ));
+  }
+}
+
+/// The mother's "Invite your partner" card — shows her persistent pairing code
+/// with Share + Copy. The father enters this code to link the two accounts.
+class _InvitePartnerCard extends StatefulWidget {
+  const _InvitePartnerCard();
+
+  @override
+  State<_InvitePartnerCard> createState() => _InvitePartnerCardState();
+}
+
+class _InvitePartnerCardState extends State<_InvitePartnerCard> {
+  String? _code;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      if (uid != null) {
+        final row = await Supabase.instance.client
+            .from('profiles')
+            .select('pairing_code')
+            .eq('id', uid)
+            .maybeSingle();
+        if (mounted) {
+          setState(() {
+            _code = row?['pairing_code'] as String?;
+            _loading = false;
+          });
+          return;
+        }
+      }
+    } catch (_) {/* leave code null */}
+    if (mounted) setState(() => _loading = false);
+  }
+
+  void _share() {
+    final code = _code;
+    if (code == null) return;
+    Share.share(
+      'Join me on ParentVeda 💜  Download the app, choose "I\'m the father", '
+      'and enter my pairing code: $code',
+      subject: 'Your ParentVeda pairing code',
+    );
+  }
+
+  void _copy() {
+    final code = _code;
+    if (code == null) return;
+    Clipboard.setData(ClipboardData(text: code));
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pairing code copied')));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading || _code == null) return const SizedBox.shrink();
+    final text = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.primary50,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.primary100),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.favorite_rounded,
+              color: AppTheme.primary500, size: 20),
+          const SizedBox(width: 8),
+          Text('Invite your partner',
+              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 6),
+        Text('Share this code so your partner can pair with your journey.',
+            style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.outlineVariant),
+          ),
+          child: Text(_code!,
+              style: text.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 4,
+                  color: AppTheme.primary600)),
+        ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: _share,
+              icon: const Icon(Icons.share_rounded, size: 18),
+              label: const Text('Share'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: _copy,
+            icon: const Icon(Icons.copy_rounded, size: 18),
+            label: const Text('Copy'),
+          ),
+        ]),
+      ]),
     );
   }
 }
@@ -103,12 +451,18 @@ class _VaultCard extends StatelessWidget {
     required this.subtitle,
     required this.trailing,
     required this.onTap,
+    this.icon = Icons.favorite_rounded,
+    this.accent = AppTheme.secondary500,
+    this.accentBg = AppTheme.secondary50,
   });
 
   final String title;
   final String subtitle;
   final String trailing;
   final VoidCallback onTap;
+  final IconData icon;
+  final Color accent;
+  final Color accentBg;
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +486,10 @@ class _VaultCard extends StatelessWidget {
                 height: 50,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppTheme.secondary50,
+                  color: accentBg,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(Icons.favorite_rounded,
-                    color: AppTheme.secondary500, size: 26),
+                child: Icon(icon, color: accent, size: 26),
               ),
               const SizedBox(width: 14),
               Expanded(

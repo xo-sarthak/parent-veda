@@ -9,7 +9,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
 import 'journey_palette.dart';
 
 /// A circular checkpoint sitting on the trail. Week nodes show their number;
@@ -35,63 +34,100 @@ class JourneyNodeMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = JourneyColors.forState(state);
     final completed = state == NodeState.completed;
     final future = state == NodeState.future;
+    final current = state == NodeState.current;
 
-    final fill = future ? AppTheme.surface : color;
-    final textColor = future ? AppTheme.neutral500 : Colors.white;
-    final border = future
-        ? Border.all(color: JourneyColors.future, width: 3)
-        : Border.all(color: Colors.white, width: 3);
-
+    // MapB node styles: current = coral gradient (no border), done = solid
+    // purple + white check, future = plain white with a soft shadow.
     final core = Container(
       width: diameter,
       height: diameter,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: fill,
+        color: completed
+            ? JourneyColors.completed
+            : future
+                ? Colors.white
+                : null,
+        gradient: current
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFFF5A79), Color(0xFFBF435B)],
+              )
+            : null,
         shape: BoxShape.circle,
-        border: border,
         boxShadow: [
-          if (completed)
-            BoxShadow(
-              color: JourneyColors.completed.withValues(alpha: 0.35),
-              blurRadius: 14,
-              spreadRadius: 1,
-            )
-          else if (!future)
-            BoxShadow(
-              color: color.withValues(alpha: 0.30),
-              blurRadius: 12,
+          if (current)
+            const BoxShadow(
+              color: Color(0x66FF5A79),
+              blurRadius: 24,
+              offset: Offset(0, 10),
             )
           else
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 6,
+            const BoxShadow(
+              color: Color(0x1F2D144C),
+              blurRadius: 12,
+              offset: Offset(0, 4),
             ),
         ],
       ),
       child: completed
-          ? const Icon(Icons.check_rounded, color: Colors.white, size: 26)
+          ? const Icon(Icons.check_rounded, color: Colors.white, size: 22)
           : Text(
               label,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: TextStyle(
+                color: future ? const Color(0xFFB2AEB5) : Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: current ? 17 : 14,
+              ),
             ),
     );
 
     Widget child = core;
-    if (pulse != null && state == NodeState.current) {
+    if (pulse != null && current) {
+      // The current week must be unmistakable: two staggered "ping" rings (a
+      // soft filled halo + a crisp expanding ring) radiate outward and fade on
+      // a loop, behind a gently breathing core — clearly alive next to the
+      // static completed/future circles.
       child = AnimatedBuilder(
         animation: pulse!,
-        // A smooth 0→1→0 breath each cycle (sin over the 0→1 pulse value).
-        builder: (context, c) => Transform.scale(
-          scale: 1 + 0.07 * math.sin(pulse!.value * math.pi),
-          child: c,
-        ),
+        builder: (context, c) {
+          const here = Color(0xFFFF5A79); // current coral
+          final v = pulse!.value; // 0 → 1, repeating
+          final v2 = (v + 0.5) % 1.0; // second ping, half a cycle behind
+          Widget ping(double t, {required bool stroke}) => OverflowBox(
+                maxWidth: double.infinity,
+                maxHeight: double.infinity,
+                child: Container(
+                  width: diameter * (1.0 + t * 1.35),
+                  height: diameter * (1.0 + t * 1.35),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        stroke ? null : here.withValues(alpha: 0.26 * (1 - t)),
+                    border: stroke
+                        ? Border.all(
+                            color: here.withValues(alpha: 0.55 * (1 - t)),
+                            width: 2.5)
+                        : null,
+                  ),
+                ),
+              );
+          return Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              ping(v, stroke: false),
+              ping(v2, stroke: true),
+              Transform.scale(
+                scale: 1 + 0.06 * math.sin(v * math.pi),
+                child: c,
+              ),
+            ],
+          );
+        },
         child: core,
       );
     }
@@ -105,20 +141,21 @@ class JourneyNodeMarker extends StatelessWidget {
 }
 
 /// A milestone stop (achievement / medical / baby / mother / journey / feature).
-/// Smaller than a week checkpoint, filled with its TYPE colour and an emoji.
-/// Future milestones fade back so the trail reads "not yet reached".
+/// Emoji-free but with real presence: a circular checkpoint in its TYPE colour
+/// carrying a small Material type-icon. Reached = full colour fill + white ring
+/// + white icon; upcoming = white fill with a colour ring + colour icon.
 class MilestoneMarker extends StatelessWidget {
   const MilestoneMarker({
     super.key,
-    required this.emoji,
     required this.color,
+    required this.icon,
     required this.reached,
     required this.onTap,
-    this.diameter = 40,
+    this.diameter = 36,
   });
 
-  final String emoji;
   final Color color;
+  final IconData icon;
   final bool reached;
   final VoidCallback onTap;
   final double diameter;
@@ -128,74 +165,56 @@ class MilestoneMarker extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Opacity(
-        opacity: reached ? 1.0 : 0.55,
-        child: Container(
-          width: diameter,
-          height: diameter,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: reached ? color : AppTheme.surface,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: reached ? Colors.white : color,
-              width: reached ? 2.5 : 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: reached ? 0.30 : 0.12),
-                blurRadius: 10,
-              ),
-            ],
+      child: Container(
+        width: diameter,
+        height: diameter,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: reached ? color : Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: reached ? Colors.white : color,
+            width: 2,
           ),
-          child: Text(emoji, style: TextStyle(fontSize: diameter * 0.42)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1F2D144C),
+              blurRadius: 9,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          size: diameter * 0.5,
+          color: reached ? Colors.white : color,
         ),
       ),
     );
   }
 }
 
-/// The little caption pill that sits beside a node so its meaning is readable
-/// at a glance (no tap needed): an emoji + short title, tinted by the node's
-/// colour. Reached nodes read in full colour on white; future ones fade back.
-/// [alignEnd] right-aligns the pill (for nodes on the left of the trail, whose
-/// label grows leftwards toward the screen edge).
+/// The small caption pill that sits directly below a node (MapB design): a
+/// single rounded pill — white with deep-purple text for ordinary stops, or a
+/// deep-purple pill with white text for the current "You're here" stop.
 class JourneyNodeLabel extends StatelessWidget {
   const JourneyNodeLabel({
     super.key,
     required this.text,
-    required this.color,
-    required this.reached,
     required this.onTap,
-    required this.maxWidth,
-    this.emoji,
-    this.subtitle,
-    this.alignEnd = false,
+    this.dark = false,
+    this.maxWidth = 150,
   });
 
   final String text;
-  final String? emoji;
-
-  /// Optional muted second line (e.g. "Week 6" / "Week 18–20") so every node
-  /// reads which week it belongs to — kept on its own line for a clean, uniform
-  /// look rather than crammed onto the title row.
-  final String? subtitle;
-  final Color color;
-  final bool reached;
   final VoidCallback onTap;
+
+  /// The current ("you're here") pill uses the dark deep-purple treatment.
+  final bool dark;
   final double maxWidth;
-  final bool alignEnd;
 
   @override
   Widget build(BuildContext context) {
-    final inkColor = reached ? _darken(color) : AppTheme.neutral500;
-    final subColor = reached
-        ? color.withValues(alpha: 0.85)
-        : AppTheme.neutral400;
-    final cross =
-        alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final align = alignEnd ? TextAlign.right : TextAlign.left;
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -204,79 +223,67 @@ class JourneyNodeLabel extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
           decoration: BoxDecoration(
-            color: reached ? Colors.white : AppTheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: reached
-                  ? color.withValues(alpha: 0.45)
-                  : JourneyColors.future.withValues(alpha: 0.8),
-              width: 1.2,
-            ),
-            boxShadow: [
+            color: dark ? const Color(0xFF2D144C) : Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withValues(alpha: reached ? 0.07 : 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: Color(0x142D144C),
+                blurRadius: 10,
+                offset: Offset(0, 2),
               ),
             ],
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            textDirection: alignEnd ? TextDirection.rtl : TextDirection.ltr,
-            children: [
-              if (emoji != null && emoji!.isNotEmpty) ...[
-                Text(emoji!, style: const TextStyle(fontSize: 15)),
-                const SizedBox(width: 7),
-              ],
-              Flexible(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: cross,
-                  children: [
-                    Text(
-                      text,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: align,
-                      textDirection:
-                          alignEnd ? TextDirection.rtl : TextDirection.ltr,
-                      style: TextStyle(
-                        color: inkColor,
-                        fontSize: 11.5,
-                        height: 1.12,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        subtitle!,
-                        textAlign: align,
-                        style: TextStyle(
-                          color: subColor,
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
+          // Wrap to 2 lines + size the pill to its content (no hard truncation).
+          child: Text(
+            text,
+            maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: dark ? Colors.white : const Color(0xFF502489),
+              fontSize: 11,
+              height: 1.2,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.1,
+            ),
           ),
         ),
       ),
     );
   }
+}
 
-  /// A slightly deeper shade of the node colour so small text stays legible.
-  static Color _darken(Color c) {
-    final hsl = HSLColor.fromColor(c);
-    return hsl.withLightness((hsl.lightness - 0.18).clamp(0.0, 1.0)).toColor();
+/// A soft dashed ring (kept for reference; upcoming stops now use plain white
+/// discs / colour-ringed dots to match the reference design).
+// ignore: unused_element
+class _DashedRingPainter extends CustomPainter {
+  const _DashedRingPainter(this.color);
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final radius = size.width / 2 - 1.3;
+    if (radius <= 0) return;
+    final center = Offset(size.width / 2, size.height / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..color = color
+      ..isAntiAlias = true;
+    final circumference = 2 * math.pi * radius;
+    final dashCount = (circumference / 8).floor().clamp(8, 64);
+    final step = (2 * math.pi) / dashCount;
+    final dashSweep = step * 0.5;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    for (int i = 0; i < dashCount; i++) {
+      canvas.drawArc(rect, i * step, dashSweep, false, paint);
+    }
   }
+
+  @override
+  bool shouldRepaint(covariant _DashedRingPainter old) => old.color != color;
 }
 
 /// The pulsing "you are here" marker. [pulse] drives a 0→1 repeating animation;

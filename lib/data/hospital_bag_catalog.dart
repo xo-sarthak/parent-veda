@@ -22,6 +22,9 @@ class BagProduct {
     this.why = const [],
     this.consider = const [],
     this.imageUrl,
+    this.isAffiliate = false,
+    this.store = '',
+    this.link = '',
   });
 
   final String id;
@@ -32,6 +35,13 @@ class BagProduct {
   final List<String> why; // why ParentVeda recommends it
   final List<String> consider; // things to consider
   final String? imageUrl; // optional real photo (network)
+
+  // Affiliate option (sold elsewhere, e.g. Amazon/FirstCry) → "Buy" opens the
+  // external site, NO in-app cart — mirrors Product.isAffiliate in the product
+  // checklist. ParentVeda picks (false) are chosen as her "buy from us" option.
+  final bool isAffiliate;
+  final String store; // 'Amazon' | 'FirstCry' (affiliate only)
+  final String link; // external URL (affiliate only)
 }
 
 /// A best-overall product spec for a sellable item (the value option is derived).
@@ -167,22 +177,23 @@ String _valueName(String brand) => brand.startsWith('ParentVeda ')
 List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) {
   if (!bagIsSellable(itemId, isCustom: isCustom)) return const [];
   final c = _catalog[itemId];
+  final emoji = c?.emoji ?? '🛍️';
+  final base = c?.price ?? 399;
+  final query = c?.brand ?? itemId.replaceAll('_', ' ');
+  final out = <BagProduct>[];
   if (c == null) {
     // Sellable but uncatalogued — a gentle generic recommendation.
-    return [
-      BagProduct(
-        id: '${itemId}_pv',
-        name: 'ParentVeda pick',
-        price: 399,
-        emoji: '🛍️',
-        topPick: true,
-        why: const ['Chosen for quality & comfort', 'Trusted by ParentVeda parents'],
-      ),
-    ];
-  }
-  final valuePrice = ((c.price * 0.8) / 10).round() * 10;
-  return [
-    BagProduct(
+    out.add(BagProduct(
+      id: '${itemId}_pv',
+      name: 'ParentVeda pick',
+      price: 399,
+      emoji: '🛍️',
+      topPick: true,
+      why: const ['Chosen for quality & comfort', 'Trusted by ParentVeda parents'],
+    ));
+  } else {
+    final valuePrice = ((c.price * 0.8) / 10).round() * 10;
+    out.add(BagProduct(
       id: '${itemId}_pv',
       name: c.brand,
       price: c.price,
@@ -190,15 +201,37 @@ List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) {
       topPick: true,
       why: c.why,
       consider: c.consider,
-    ),
-    BagProduct(
+    ));
+    out.add(BagProduct(
       id: '${itemId}_value',
       name: _valueName(c.brand),
       price: valuePrice,
       emoji: c.emoji,
       why: const ['A simpler, budget-friendly option'],
-    ),
-  ];
+    ));
+  }
+  // Affiliate options (sold elsewhere) — the same split as the product checklist.
+  out.add(_affiliate(itemId, 'amazon', 'Amazon', (base * 1.05).round(), emoji, query));
+  out.add(_affiliate(
+      itemId, 'firstcry', 'FirstCry', (base * 0.95).round(), emoji, query));
+  return out;
+}
+
+BagProduct _affiliate(
+    String itemId, String key, String store, int price, String emoji, String query) {
+  final q = Uri.encodeComponent(query);
+  final url = store == 'Amazon'
+      ? 'https://www.amazon.in/s?k=$q'
+      : 'https://www.firstcry.com/search?q=$q';
+  return BagProduct(
+    id: '${itemId}_$key',
+    name: store,
+    price: price,
+    emoji: emoji,
+    isAffiliate: true,
+    store: store,
+    link: url,
+  );
 }
 
 /// The ParentVeda best-overall product for an item (or null if non-sellable).

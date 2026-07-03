@@ -58,3 +58,11 @@ tools/.phone-ip
 
 # Session handoff notes — local working doc, not part of the repo
 HANDOFF.md
+SESSION-*.md
+
+# Design/reference handoff bundles + generated reference docs — local working
+# material, not part of the repo
+/UI revamp for mothers-handoff/
+/parentveda-mobile-screens/
+/week-card-page-design-handoff/
+ParentVeda-Backend-Tables.pdf

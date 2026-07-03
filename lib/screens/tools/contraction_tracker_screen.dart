@@ -241,14 +241,11 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
               _assessBanner(s),
               const SizedBox(height: 16),
             ],
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(s.contractionIntro, style: text.bodyMedium),
-            ),
+            // What contractions are + true vs false (Braxton Hicks) + how to time.
+            _aboutCard(s, text),
+            const SizedBox(height: 14),
+            // Clear "we're a timer, not a medical app" disclaimer.
+            _disclaimerCard(s, text),
             const SizedBox(height: 16),
             _safetyCard(s),
             const SizedBox(height: 30),
@@ -399,9 +396,74 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         const SizedBox(height: 6),
         Text(s.assessSummary(key),
             style: text.bodyMedium?.copyWith(color: AppTheme.neutral800)),
+        // ALWAYS point to the doctor — even on a calm "no pattern" reading, since
+        // timing can't rule labour in or out. (Emergency/preterm already carry
+        // their own urgent contact message, so skip the softer line there.)
+        if (!urgent) ...[
+          const SizedBox(height: 10),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Icon(Icons.local_hospital_outlined,
+                size: 15, color: AppTheme.neutral500),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(s.ctAlwaysConsult,
+                  style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+            ),
+          ]),
+        ],
       ]),
     );
   }
+
+  /// "Understanding contractions" — what they are, true vs false (Braxton
+  /// Hicks), and how to time one. Helps a first-time user know what this is.
+  Widget _aboutCard(S s, TextTheme text) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.info_outline_rounded, size: 18, color: _restColor),
+            const SizedBox(width: 8),
+            Text(s.ctAboutTitle,
+                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          ]),
+          const SizedBox(height: 8),
+          Text(s.ctAboutBody,
+              style: text.bodyMedium?.copyWith(height: 1.5)),
+        ]),
+      );
+
+  /// The "this is a timer, not a diagnosis / not a medical app" disclaimer —
+  /// kept clearly visible so the tool never reads as medical advice.
+  Widget _disclaimerCard(S s, TextTheme text) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF6E9),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x33D9822B)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.health_and_safety_outlined,
+              size: 20, color: Color(0xFFB36B12)),
+          const SizedBox(width: 10),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(s.ctDisclaimerTitle,
+                  style: text.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFB36B12))),
+              const SizedBox(height: 4),
+              Text(s.ctDisclaimerBody,
+                  style: text.bodySmall
+                      ?.copyWith(color: AppTheme.neutral700, height: 1.45)),
+            ]),
+          ),
+        ]),
+      );
 
   /// The Layer-2 symptom "safety check" entry — shows current state + Update.
   Widget _safetyCard(S s) {

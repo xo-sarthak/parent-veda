@@ -358,9 +358,947 @@ class S {
   String get momentSummary => _p('A small moment for you and your baby.',
       'Aap aur aapke baby ke liye ek chhota sa pal.');
 
+  // ---- Direction B "Warm Nest" Home (hero, rituals, quick row, splash) ------
+  String weekDayLine(int week, int day) =>
+      _p('Week $week, Day $day', 'Hafta $week, Din $day');
+  String babyIsSize(String fruit) =>
+      _p('Your baby is $fruit', 'Aapka baby $fruit jitna');
+  String momentDone(int done, int total) =>
+      _p('$done of $total done', '$total mein se $done poore');
+  String get ritualGrow => _p('Grow', 'Grow');
+  String get ritualRead => _p('Read', 'Padhein');
+  String get ritualTalk => _p('Talk', 'Baat');
+  String get ritualSanskar => _p('Sanskar', 'Sanskar');
+  String get ritualForYou => _p('For you', 'Aapke liye');
+  String get quickKicks => _p('Kicks', 'Kicks');
+  String quickKicksValue(int n) => _p('$n today', 'aaj $n');
+  String get quickWater => _p('Water', 'Paani');
+  String quickWaterValue(int n) => _p('$n glasses', '$n glass');
+  String get splashTagline => _p('Nurturing wisdom', 'Nurturing wisdom');
+  String get splashFooter =>
+      _p('Your calm companion 💜', 'Aapka shaant saathi 💜');
+
+  // ===========================================================================
+  //  MY JOURNAL — the mother's pregnancy memory timeline
+  // ===========================================================================
+  String get jrTitle => _p('My Journal', 'My Journal');
+  String get jrSubtitle =>
+      _p('Your pregnancy story, one day at a time',
+          'Aapki pregnancy ki kahani, ek-ek din');
+  String get jrFilterAll => _p('All', 'Sab');
+  String get jrFilterMemories => _p('Memories', 'Yaadein');
+  String get jrFilterPhotos => _p('Photos', 'Photos');
+  String get jrTakePhoto => _p('Take a photo', 'Photo kheenchein');
+  String get jrChooseGallery => _p('Choose from gallery', 'Gallery se chunein');
+  String get jrFilterMilestones => _p('Milestones', 'Padaav');
+  String get jrFilterHealth => _p('Health', 'Sehat');
+  String get jrFilterScans => _p('Scans', 'Scans');
+  String get jrFilterBaby => _p('Baby', 'Baby');
+  String get jrEmptyTitle => _p('Your pregnancy story begins here.',
+      'Aapki pregnancy ki kahani yahin se shuru hoti hai.');
+  String get jrEmptyBody => _p(
+      'Capture a memory, a photo, or a note for your baby — it all gathers here.',
+      'Ek yaad, ek photo, ya baby ke liye ek note save karein — sab yahin jama hoga.');
+  String get jrCreateFirst => _p('Create First Memory', 'Pehli Yaad Banayein');
+  String get jrCreateMemory => _p('Create Memory', 'Yaad Banayein');
+  String get jrWriteMemory => _p('Write Memory', 'Yaad Likhein');
+  String get jrAddPhoto => _p('Add Photo', 'Photo Add Karein');
+  String get jrRecordVoice =>
+      _p('Record Voice Note', 'Voice Note Record Karein');
+  String get jrNoteForBaby => _p('Note for Baby', 'Baby Ke Liye Note');
+  String get jrVoiceSoon =>
+      _p('Voice memories are coming soon 💜', 'Voice memories jaldi aa rahi hain 💜');
+  String get jrSearchHint =>
+      _p('Search your journal', 'Apni journal mein search karein');
+  String get jrExport => _p('Export', 'Export');
+  String get jrExportSoon => _p(
+      'Your printable memory book is coming soon 💜',
+      'Aapki printable memory book jaldi aa rahi hai 💜');
+  String get jrMemoryHint => _p('Write your memory…', 'Apni yaad likhein…');
+  String get jrNoteForBabyHint =>
+      _p('Write to your baby…', 'Apne baby ko likhein…');
+  String get jrCaptionHint =>
+      _p('Add a caption (optional)', 'Caption add karein (optional)');
+  String get jrSaveMemory => _p('Save', 'Save karein');
+  String get jrSavedMemory =>
+      _p('Saved to your journal 💜', 'Aapki journal mein save ho gaya 💜');
+  // Daily "My Journal" section + create flows
+  String get jcMyJournal => _p('My Journal', 'Meri Journal');
+  String get jcViewTimeline =>
+      _p('View My Journal Timeline', 'Meri Journal Timeline dekhein');
+  String get jcCustom => _p('Custom', 'Custom');
+  String get jcCustomTagHint =>
+      _p('Tag (e.g. Cravings, A dream)', 'Tag (jaise Cravings)');
+  String get jcCustomBodyHint => _p(
+      'Write anything you want to remember…', 'Jo yaad rakhna ho likhein…');
+  String get jcRecordTitle =>
+      _p('Record a voice note', 'Voice note record karein');
+  String get jcTapToRecord =>
+      _p('Tap the mic to start', 'Shuru karne ke liye mic tap karein');
+  String get jcRecording =>
+      _p('Recording… tap to stop', 'Record ho raha hai… rokne ke liye tap karein');
+  String get jcRecordAnother =>
+      _p('Tap to record another', 'Ek aur record karne ke liye tap karein');
+  String get jcMicNeeded => _p('Microphone permission is needed to record.',
+      'Record karne ke liye microphone permission chahiye.');
+  // "Entry saved" confirmation snackbars.
+  String get jcSavedMemory => _p('Memory saved 💜', 'Yaad save ho gayi 💜');
+  String get jcSavedNote =>
+      _p('Note for baby saved 💜', 'Baby ke liye note save ho gaya 💜');
+  String get jcSavedPhoto =>
+      _p('Photo added to your journal', 'Photo aapke journal mein add ho gayi');
+  String get jcSavedVoice =>
+      _p('Voice note saved', 'Voice note save ho gaya');
+  String get jcUpdated => _p('Entry updated', 'Entry update ho gayi');
+  // Speech-to-text mic button.
+  String get micTap => _p('Tap to dictate', 'Bolkar likhne ke liye tap karein');
+  String get micListening => _p('Listening…', 'Sun raha hai…');
+  String get micDenied => _p('Microphone/speech permission is needed to dictate.',
+      'Bolkar likhne ke liye microphone/speech permission chahiye.');
+  String get jcVoiceNote => _p('Voice note', 'Voice note');
+  String get jrDeleteEntryQ =>
+      _p('Delete this entry?', 'Yeh entry delete karein?');
+  String get jrNothingHere => _p(
+      'Nothing here yet — add your first one with the button below.',
+      'Abhi yahan kuch nahi — neeche button se apni pehli add karein.');
+  String jrWeekLabel(int w) => _p('Week $w', 'Hafta $w');
+  // Journal views (grouped list + flip-through booklet).
+  String get jrListView => _p('List view', 'List view');
+  String get jrBookletView => _p('Booklet', 'Booklet');
+  String get jrGroupBy => _p('Group by', 'Group by');
+  String get jrByMonth => _p('Month', 'Mahina');
+  String get jrByWeek => _p('Week', 'Hafta');
+  String jrMonthYear(DateTime d) =>
+      '${_months[(d.month - 1).clamp(0, 11)]} ${d.year}';
+  String jrWeekdayDate(DateTime d) =>
+      '${_weekdays[(d.weekday - 1).clamp(0, 6)]}, ${d.day} ${_months[(d.month - 1).clamp(0, 11)]}';
+  String jrDayRange(DateTime a, DateTime b) {
+    final ma = _months[(a.month - 1).clamp(0, 11)];
+    final mb = _months[(b.month - 1).clamp(0, 11)];
+    if (a.month == b.month && a.year == b.year) return '${a.day}–${b.day} $ma';
+    return '${a.day} $ma – ${b.day} $mb';
+  }
+
+  String jrCoverTitle(String name) => name.trim().isEmpty
+      ? _p('My Pregnancy Journal', 'My Pregnancy Journal')
+      : _p("$name's Pregnancy Journal", "$name ka Pregnancy Journal");
+  String jrCoverWeeks(int a, int b) => _p('Weeks $a–$b', 'Hafte $a–$b');
+  String get jrCoverHint =>
+      _p('Swipe to flip through', 'Palatne ke liye swipe karein');
+  // Rotating memory prompts (for mothers unsure what to write).
+  List<String> get jrPrompts => _e
+      ? const [
+          'What made you smile today?',
+          'What are you most excited about right now?',
+          'What do you want your baby to know about today?',
+          'What surprised you this week?',
+          'Write a message for your baby.',
+          'What are you grateful for today?',
+        ]
+      : const [
+          'Aaj kis baat ne aapko muskuraaya?',
+          'Abhi aap sabse zyada kis baat ke liye excited hain?',
+          'Aaj ke baare mein aap apne baby ko kya bataana chahengi?',
+          'Is hafte kis baat ne aapko hairaan kiya?',
+          'Apne baby ke liye ek message likhein.',
+          'Aaj aap kis baat ke liye shukrguzaar hain?',
+        ];
+  // Auto-entry titles.
+  String jrWeekDone(int w) => _p('Week $w completed', 'Hafta $w poora hua');
+  String get jrFirstTriDone =>
+      _p('First trimester complete', 'Pehli trimester poori');
+  String get jrSecondTriDone =>
+      _p('Second trimester complete', 'Doosri trimester poori');
+  String get jrThirdTriStart =>
+      _p('Third trimester started', 'Teesri trimester shuru');
+  String get jrHalfway => _p('Halfway there', 'Aadha safar poora');
+  String get jrViability =>
+      _p('Viability milestone reached', 'Viability padaav tak pahunche');
+  String get jrFullTerm => _p('Full term reached', 'Full term tak pahunche');
+  String get jrWeightLogged => _p('Weight logged', 'Wazan note hua');
+  String get jrKickSession => _p('Kick session logged', 'Kick session note hua');
+  String get jrFirstKick => _p('First kick recorded', 'Pehli kick record hui');
+  String jrMovementsCount(int n) =>
+      _p(n == 1 ? '1 movement' : '$n movements',
+          n == 1 ? '1 movement' : '$n movements');
+  // "Where your journal fills from" info sheet + per-filter empty states.
+  String get jrInfoTitle =>
+      _p('Where your journal fills from', 'Aapki journal kahan se bharti hai');
+  String get jrInfoIntro => _p(
+      'Some entries you add yourself; others appear automatically as you use the app.',
+      'Kuch entries aap khud add karti hain; kuch app use karte hue apne aap aa jaati hain.');
+  String get jrSrcMemories =>
+      _p('Memories — written by you.', 'Yaadein — aap likhti hain.');
+  String get jrSrcBaby => _p(
+      'Notes for baby — written by you, in their own space.',
+      'Baby ke liye notes — aap likhti hain, unki apni jagah.');
+  String get jrSrcPhotos => _p('Photos — added by you from your gallery.',
+      'Photos — aap apni gallery se add karti hain.');
+  String get jrSrcMilestones => _p('Milestones — automatic, from your due date.',
+      'Padaav — apne aap, aapki due date se.');
+  String get jrSrcHealth => _p(
+      'Weight, kicks & symptoms — from your trackers and Symptoms Companion.',
+      'Wazan, kicks aur symptoms — aapke trackers aur Symptoms Companion se.');
+  String get jrSrcScans => _p(
+      'Scans & reports — appear once uploads are available (coming soon).',
+      'Scans aur reports — upload available hone par aayenge (jaldi aa raha hai).');
+  String get jrEmptyMemories => _p(
+      'Your memories will gather here. Tap Create Memory to write your first.',
+      'Aapki yaadein yahan jama hongi. Pehli likhne ke liye Create Memory dabaayein.');
+  String get jrEmptyPhotos => _p(
+      'Your photos will gather here. Add one with Create Memory.',
+      'Aapki photos yahan jama hongi. Create Memory se ek add karein.');
+  String get jrEmptyMilestones => _p(
+      'Milestones appear here automatically as your pregnancy grows 💜',
+      'Padaav yahan apne aap aate hain jaise aapki pregnancy aage badhti hai 💜');
+  String get jrEmptyHealth => _p(
+      'Your weight and kick logs gather here automatically from the trackers.',
+      'Aapke wazan aur kick logs yahan apne aap trackers se aate hain.');
+  String get jrEmptyScans => _p(
+      'Scans & reports will appear here once uploads are available — coming soon 💜',
+      'Scans aur reports yahan upload available hone par aayenge — jaldi aa raha hai 💜');
+  String get jrEmptyBaby => _p(
+      'Your notes for baby will gather here. Write your first with Create Memory.',
+      'Baby ke liye aapke notes yahan jama honge. Pehla Create Memory se likhein.');
+
+  // ===========================================================================
+  //  MY CALENDAR — the pregnancy command center
+  // ===========================================================================
+  String get tabCalendar => _p('Calendar', 'Calendar');
+  String get calTitle => _p('My Calendar', 'My Calendar');
+  String get calTabTimeline => _p('Timeline', 'Timeline');
+  String get calTabCalendar => _p('Calendar', 'Calendar');
+  String get calTabUpcoming => _p('Upcoming', 'Aage');
+  String calDaysTogether(int n) => _p('$n Days Together', '$n Din Saath');
+  String get calFilterAll => _p('All', 'Sab');
+  String get calFilterMilestones => _p('Milestones', 'Padaav');
+  String get calFilterMedical => _p('Medical', 'Medical');
+  String get calFilterJournal => _p('Journal', 'Journal');
+  String get calFilterPersonal => _p('Personal', 'Niji');
+  String get calFilterParentveda => _p('ParentVeda', 'ParentVeda');
+  String get calSearchHint => _p('Search events', 'Events search karein');
+  String get calThisWeek => _p('This week', 'Is hafte');
+  String get calNext2Weeks => _p('Next 2 weeks', 'Agle 2 hafte');
+  String get calThisMonth => _p('This month', 'Is mahine');
+  String get calLater => _p('Later', 'Baad mein');
+  String get calTimelineEmpty => _p(
+      'Your journey will appear here as it unfolds.',
+      'Aapka safar yahan dikhega jaise woh aage badhega.');
+  String get calUpcomingEmpty => _p(
+      'Nothing scheduled ahead right now.', 'Abhi aage kuch tay nahi hai.');
+  String get calNoEventsDay => _p('Nothing on this day.', 'Is din kuch nahi.');
+  String get calAddPersonal =>
+      _p('Add personal event', 'Niji event add karein');
+  String get calEventTitleHint => _p('Event name', 'Event ka naam');
+  String get calEventNoteHint => _p('Note (optional)', 'Note (optional)');
+  String get calStatusCompleted => _p('Completed', 'Poora');
+  String get calStatusUpcoming => _p('Upcoming', 'Aane wala');
+  String calOpenWeek(int n) => _p('Open Week $n', 'Hafta $n kholein');
+  String get calOpenJournal => _p('Open Journal', 'Journal kholein');
+  String calInDays(int n) => n <= 0
+      ? _p('Today', 'Aaj')
+      : (n == 1 ? _p('Tomorrow', 'Kal') : _p('In $n days', '$n din mein'));
+  String calMonthYear(DateTime d) =>
+      '${_months[(d.month - 1).clamp(0, 11)]} ${d.year}';
+  List<String> get calWeekdayLetters =>
+      const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+  // ===========================================================================
+  //  MY BUMP JOURNEY — the visual pregnancy timeline
+  // ===========================================================================
+  String get bumpTitle => _p('My Bump Journey', 'My Bump Journey');
+  String get bumpSubtitle =>
+      _p('Your bump, week by week', 'Aapka bump, hafte-dar-hafte');
+  String get bumpEmptyTitle => _p('Your bump journey begins here.',
+      'Aapka bump safar yahin se shuru hota hai.');
+  String get bumpEmptyBody =>
+      _p('Capture your first memory ❤', 'Apni pehli yaad kaid karein ❤');
+  String get bumpAddFirst => _p('Add First Photo', 'Pehli Photo Add Karein');
+  String get bumpAddPhoto => _p('Add Photo', 'Photo Add Karein');
+  String get bumpTakePhoto => _p('Take Photo', 'Photo Kheechein');
+  String get bumpUpload => _p('Upload Photo', 'Photo Upload Karein');
+  String bumpPhotosAdded(int n) => _p('$n Photos Added', '$n Photos Add Hui');
+  String get bumpThenNow => _p('Then & Now', 'Pehle & Ab');
+  String get bumpThen => _p('Then', 'Pehle');
+  String get bumpNow => _p('Now', 'Ab');
+  String bumpCaptureThisWeek(int w) => _p(
+      'Week $w — would you like to capture this week?',
+      'Hafta $w — is hafte ko kaid karna chahengi?');
+  String get bumpFilterAll => _p('All', 'Sab');
+  String get bumpFilterT1 => _p('Trimester 1', 'Trimester 1');
+  String get bumpFilterT2 => _p('Trimester 2', 'Trimester 2');
+  String get bumpFilterT3 => _p('Trimester 3', 'Trimester 3');
+  String get bumpFilterCaptioned => _p('With captions', 'Caption ke saath');
+  String get bumpFilterFavorites => _p('Favorites', 'Pasandeeda');
+  String get bumpNothingForFilter =>
+      _p('No photos here yet.', 'Yahan abhi koi photo nahi.');
+  String get bumpExportSoon => _p('Your bump memory book is coming soon ❤',
+      'Aapki bump memory book jaldi aa rahi hai ❤');
+  String get bumpSaved => _p('Saved to your bump journey ❤',
+      'Aapke bump safar mein save ho gaya ❤');
+  String bumpJournalTitle(int w) =>
+      _p('Bump photo · Week $w', 'Bump photo · Hafta $w');
+  String get bumpEditCaption => _p('Edit caption', 'Caption edit karein');
+  List<String> get bumpCaptionSuggestions => _e
+      ? const [
+          'Today I felt stronger.',
+          'Halfway there ❤',
+          'Baby is growing beautifully.',
+          'Feeling excited.',
+          'Our journey continues.',
+        ]
+      : const [
+          'Aaj main aur mazboot mehsoos kar rahi hoon.',
+          'Aadha safar poora ❤',
+          'Baby khoobsurati se badh raha hai.',
+          'Bahut excited feel ho raha hai.',
+          'Hamara safar jaari hai.',
+        ];
+
+  // ===========================================================================
+  //  DAILY MEDICATION & SUPPLEMENTS
+  // ===========================================================================
+  String get medTitle =>
+      _p('Medication & Supplements', 'Medication & Supplements');
+  String get medTodayNourishment =>
+      _p("Today's Nourishment ❤", 'Aaj Ka Poshan ❤');
+  String medProgress(int done, int total) =>
+      _p('$done of $total completed today', '$total mein se $done aaj poore');
+  String get medTaken => _p('Taken', 'Le liya');
+  String get medTakenDone => _p('Taken ✓', 'Le liya ✓');
+  String medLogged(String name) => _p('$name logged ❤', '$name log ho gaya ❤');
+  String get medAddNew => _p('Add New', 'Naya Add Karein');
+  String get medSetupTitle => _p(
+      "Let's set up your supplements ❤", 'Aaiye aapke supplements set karein ❤');
+  String get medSetupBody => _p(
+      'Which supplements has your doctor recommended?',
+      'Aapke doctor ne kaunse supplements recommend kiye hain?');
+  String get medAddCustom =>
+      _p('Add custom medication', 'Custom medication add karein');
+  String get medTabDaily => _p('Daily', 'Rozaana');
+  String get medTabWeekly => _p('Weekly', 'Saptaahik');
+  String get medWeekOverview => _p('Week overview', 'Hafte ka overview');
+  String medDaysOf7(int n) => _p('$n/7 days', '$n/7 din');
+  String medConsistency(int n) => _p(
+      'You recorded your supplements on $n of the last 30 days.',
+      'Aapne pichhle 30 dinon mein se $n din apne supplements record kiye.');
+  String get medName => _p('Name', 'Naam');
+  String get medDose => _p('Dose', 'Khuraak');
+  String get medTime => _p(
+      'Time (e.g. 8 PM, after breakfast)', 'Samay (jaise 8 PM, nashte ke baad)');
+  String get medFrequency => _p(
+      'Frequency (e.g. once daily)', 'Kitni baar (jaise rozaana ek baar)');
+  String get medNotes => _p('Notes (optional)', 'Notes (optional)');
+  String get medAddTitle => _p('Add medication', 'Medication add karein');
+  String get medDeleteQ =>
+      _p('Remove this from your list?', 'Ise apni list se hataayein?');
+  String get medDisclaimer => _p('Tracking only — always follow your doctor.',
+      'Sirf tracking — hamesha apne doctor ki salah maanein.');
+  String medPresetName(String k) {
+    switch (k) {
+      case 'iron':
+        return _p('Iron', 'Iron');
+      case 'calcium':
+        return _p('Calcium', 'Calcium');
+      case 'folicAcid':
+        return _p('Folic Acid', 'Folic Acid');
+      case 'vitaminD':
+        return _p('Vitamin D', 'Vitamin D');
+      case 'dha':
+        return _p('DHA', 'DHA');
+      case 'multivitamin':
+        return _p('Prenatal Multivitamin', 'Prenatal Multivitamin');
+      default:
+        return k;
+    }
+  }
+
+  String medPresetInfo(String k) {
+    switch (k) {
+      case 'iron':
+        return _p('Supports healthy blood production during pregnancy.',
+            'Pregnancy mein sehatmand blood banane mein madad karta hai.');
+      case 'calcium':
+        return _p("Supports your baby's bone development.",
+            'Aapke baby ki haddiyon ke vikas mein madad karta hai.');
+      case 'folicAcid':
+        return _p("Supports your baby's early development.",
+            'Aapke baby ke shuruaati vikas mein madad karta hai.');
+      case 'vitaminD':
+        return _p('Supports calcium absorption and immunity.',
+            'Calcium absorption aur immunity mein madad karta hai.');
+      case 'dha':
+        return _p("Supports your baby's brain and eye development.",
+            'Aapke baby ke dimaag aur aankhon ke vikas mein madad karta hai.');
+      case 'multivitamin':
+        return _p('A daily blend of key pregnancy nutrients.',
+            'Pregnancy ke zaroori nutrients ka rozaana mishran.');
+      default:
+        return '';
+    }
+  }
+
+  // ---- Tools hub + Home Garbh ----------------------------------------------
+  String get toolCanI => _p('Can I?', 'Can I?');
+  String get toolsSupportNote => _p(
+      'Supportive, never clinical — always check with your doctor.',
+      'Sahaayak, kabhi clinical nahi — hamesha apne doctor se poochein.');
+  String get homeGarbhSubtitle =>
+      _p('Five gentle daily rituals', 'Paanch pyaari rozaana rituals');
+
+  // ===========================================================================
+  //  WATCH & LEARN — contextual videos
+  // ===========================================================================
+  String get vidTodaysVideo => _p("Today's Video ❤", 'Aaj Ka Video ❤');
+  String get vidWhyNow =>
+      _p('Why this matters now', 'Yeh abhi kyun maayne rakhta hai');
+  String get vidWatch => _p('Watch', 'Dekhein');
+  String get vidSave => _p('Save', 'Save');
+  String get vidSaved => _p('Saved', 'Saved');
+  String get vidMoreVideos => _p('More videos', 'Aur videos');
+  String get vidComingSoon => _p('This video is on its way — coming soon ❤',
+      'Yeh video jald aa raha hai — coming soon ❤');
+  String get vidScreenTitle => _p('Watch & Learn', 'Watch & Learn');
+  String get vidSecRecommended =>
+      _p('Recommended for this week', 'Is hafte ke liye');
+  String get vidSecSkill => _p('Learn a skill', 'Ek skill seekhein');
+  String get vidSecExpert => _p('Expert explains', 'Expert samjhaate hain');
+  String get vidSecBirth => _p('Birth preparation', 'Janm ki taiyaari');
+  String get vidSecNewborn => _p('Newborn preparation', 'Newborn ki taiyaari');
+  String get vidSecSaved => _p('Saved videos', 'Save kiye videos');
+  String get savedVaultTitle => _p('Saved', 'Saved');
+  String get savedVaultSubtitle => _p(
+      'Your bookmarked videos, in one place.',
+      'Aapke bookmark kiye videos, ek jagah.');
+  // Saved hub (Profile › Saved).
+  String get savedHubSubtitle => _p(
+      'Your saved reads, videos & read-to-baby, all here.',
+      'Aapke saved reads, videos & read-to-baby, sab yahan.');
+  String get shTitle => _p('Saved', 'Saved');
+  String get shReadToBaby => _p('Saved read-to-baby', 'Saved read-to-baby');
+  String get shReads => _p('Saved reads', 'Saved reads');
+  String get shWatch => _p('Watch & Learn', 'Watch & Learn');
+  String get shRead => _p('Read more', 'Aur padhein');
+  String get shEmpty => _p(
+      "Nothing saved yet. Tap the bookmark on a read, a video or a read-to-baby piece and it'll show up here.",
+      'Abhi kuch save nahi hua. Kisi read, video ya read-to-baby piece par bookmark dabayein — woh yahan dikhega.');
+  String get rtbSave => _p('Save', 'Save karein');
+
+  // ===========================================================================
+  //  SYMPTOMS COMPANION
+  // ===========================================================================
+  String get symTitle => _p('Symptoms Companion ❤', 'Symptoms Companion ❤');
+  String get symToolTitle => _p('Symptoms', 'Lakshan');
+  String get symSearchHint => _p(
+      'What are you experiencing today?', 'Aaj aap kya mehsoos kar rahi hain?');
+  String symCommonNow(int week) =>
+      _p('Common around Week $week', 'Hafta $week ke aas-paas aam');
+  String get symBrowse => _p('Browse by category', 'Category se dekhein');
+  String get symAll => _p('All symptoms', 'Saare lakshan');
+  String get symHowCommon => _p('How common is it?', 'Yeh kitna aam hai?');
+  String get symWhy => _p('Why it happens', 'Yeh kyun hota hai');
+  String get symWhatHelps => _p('What may help', 'Kya madad kar sakta hai');
+  String get symWhenDoctor =>
+      _p('When to contact your doctor', 'Doctor se kab sampark karein');
+  String get symLog => _p('Log this symptom', 'Yeh symptom log karein');
+  String symLogged(String name) => _p('Logged: $name', '$name log hua');
+  String get symSeverity => _p('How strong is it?', 'Kitna tez hai?');
+  String get symMild => _p('Mild', 'Halka');
+  String get symModerate => _p('Moderate', 'Madhyam');
+  String get symSevere => _p('Severe', 'Tej');
+  String get symAddToJournal =>
+      _p('Add to my journal', 'Meri journal mein add karein');
+  String get symUrgentTitle => _p('When to seek care', 'Kab turant care lein');
+  String get symUrgentBody => _p(
+      'These are signs to contact your doctor or maternity unit.',
+      'Ye sanket hain jab doctor ya maternity unit se sampark karein.');
+  String symInsight(String name, int n) => _p(
+      "You've noted $name $n times this week.",
+      'Aapne is hafte $name $n baar note kiya.');
+  String symJournalText(String name) =>
+      _p('You noted $name today.', 'Aapne aaj $name note kiya.');
+  String get symNoResults =>
+      _p('No matches — try another word.', 'Koi match nahi — doosra shabd try karein.');
+  String get symDisclaimer => _p(
+      'For understanding, not diagnosis — your doctor is always the best guide.',
+      'Samajhne ke liye, nidaan nahi — aapka doctor hamesha sabse achhi salah dete hain.');
+  String get symCatDigestive => _p('Digestive', 'Pachan');
+  String get symCatPhysical => _p('Physical', 'Sharirik');
+  String get symCatSleep => _p('Sleep', 'Neend');
+  String get symCatEmotional => _p('Emotional', 'Bhaavnaayein');
+  String get symCatCirculation => _p('Circulation', 'Circulation');
+  String get symCatMovement => _p('Baby movement', 'Baby movement');
+  String get symCatLabour => _p('Labour signs', 'Labour ke sanket');
+  String get symCatUrgent => _p('Urgent', 'Urgent');
+
+  // ===========================================================================
+  //  SCANS & APPOINTMENTS — care roadmap
+  // ===========================================================================
+  String get calFilterAppointments => _p('Appointments', 'Appointments');
+  String get calChildbirth => _p('Birth', 'Janm');
+  String get calAddNote => _p('Add Note', 'Note jodein');
+  String get calNoNotesDay =>
+      _p('No notes for this day yet.', 'Is din ke liye abhi koi note nahi.');
+  String get calWeeksUpper => _p('WEEKS', 'HAFTE');
+  // Selected-day panel + colour-code legend.
+  String get calOnThisDay => _p('On this day', 'Is din');
+  String get calLegendTitle =>
+      _p('What the dots mean', 'In dots ka matlab');
+  String calTrimesterTag(int t) => switch (t) {
+        1 => _p('1st tri', '1st tri'),
+        2 => _p('2nd tri', '2nd tri'),
+        _ => _p('3rd tri', '3rd tri'),
+      };
+  String calTrimesterStart(int t) => switch (t) {
+        1 => _p('1st trimester begins', '1st trimester shuru'),
+        2 => _p('2nd trimester begins', '2nd trimester shuru'),
+        _ => _p('3rd trimester begins', '3rd trimester shuru'),
+      };
+  String get calMeanMilestone =>
+      _p('A pregnancy milestone', 'Pregnancy ka ek milestone');
+  String get calMeanMedical =>
+      _p('A scan, test or vaccination', 'Scan, test ya vaccination');
+  String get calMeanAppointment =>
+      _p('A doctor appointment', 'Doctor appointment');
+  String get calMeanJournal => _p(
+      'A memory, photo or log you saved', 'Aapki saved memory, photo ya log');
+  String get calMeanPersonal =>
+      _p('A personal note you added', 'Aapka jodaa hua note');
+  String get calMeanParentveda => _p(
+      'A ParentVeda unlock or "days together"',
+      'ParentVeda unlock ya "saath ke din"');
+  String get calMeanWeekStart =>
+      _p('The start of a pregnancy week', 'Pregnancy hafte ki shuruaat');
+  String get calMeanTrimester =>
+      _p('A new trimester begins', 'Naya trimester shuru');
+  String get calMeanBirth => _p('Your due date', 'Aapki due date');
+  String get calLegendWeekStart => _p('Week start', 'Hafte ki shuruaat');
+  String get calLegendTrimester => _p('Trimester start', 'Trimester shuru');
+  String get calLegendBirth => _p('Due date', 'Due date');
+  String get scnTitle => _p('Scans & Appointments ❤', 'Scans & Appointments ❤');
+  // Daily-home "Scans & appointments" card (the due-now list + view-all).
+  String get scnDailyTitle => _p('Scans & appointments', 'Scans & appointments');
+  String get scnAlreadyDone => _p('Already done', 'Pehle se ho gaya');
+  String get scnViewAll => _p('View all scans', 'Sabhi scans dekhein');
+  String get scnToolTitle => _p('Scans & Care', 'Scans & Care');
+  String get scnTabUpcoming => _p('Upcoming', 'Aage');
+  String get scnTabCompleted => _p('Completed', 'Poore');
+  String get scnTabRoadmap => _p('Care roadmap', 'Care roadmap');
+  String get scnNextUp => _p('NEXT UP', 'AGLA');
+  String get scnLearnMore => _p('Learn more', 'Aur jaanein');
+  String get scnMarkDone => _p('Mark completed', 'Poora mark karein');
+  String get scnMarkedDone => _p('Completed ✓', 'Poora ✓');
+  String get scnImportantNote => _p(
+      'Every pregnancy is unique — your doctor will guide you based on your situation.',
+      'Har pregnancy alag hai — aapke doctor aapki situation ke hisaab se salah denge.');
+  // Scan guide — "what is this scan" + "how to interpret the report".
+  String get scnWhatIs => _p('What is this scan?', 'Yeh scan kya hai?');
+  String get scnHowToInterpret =>
+      _p('How to interpret the report', 'Report kaise samjhein');
+  String get scnInterpretSub => _p('Understand the terms on your report',
+      'Apni report ke terms samjhein');
+  String get scnInterpretHeading =>
+      _p('Reading your report', 'Apni report padhna');
+  String get scnInterpretDisclaimerTitle =>
+      _p('Not for medical diagnosis', 'Medical diagnosis ke liye nahi');
+  String get scnInterpretDisclaimer => _p(
+      'This explains common terms to help you understand YOUR report and ask better questions. It is general information — NOT a diagnosis or medical advice, and ParentVeda is not a medical service. Always rely on your doctor or sonographer to interpret your actual results.',
+      'Yeh aam terms samjhata hai taaki aap APNI report samjhein aur behtar sawaal pooch sakein. Yeh saamaanya jaankari hai — koi diagnosis ya medical salah NAHI, aur ParentVeda koi medical service nahi. Apne result samajhne ke liye hamesha apne doctor ya sonographer par bharosa karein.');
+  String get scnUpToDate => _p("You're up to date — nothing due right now ❤",
+      'Aap up to date hain — abhi kuch due nahi ❤');
+  String get scnNoCompleted => _p(
+      'Scans you mark completed will gather here.',
+      'Jo scans aap poore mark karengi woh yahan jama honge.');
+  String get scnDelivery => _p('Delivery', 'Delivery');
+  String get scnAppts => _p('Your appointments', 'Aapke appointments');
+  String get scnAddAppt => _p('Add appointment', 'Appointment add karein');
+  String get scnApptTitle => _p('Title', 'Title');
+  String get scnApptTime => _p('Time (optional)', 'Samay (optional)');
+  String get scnApptLocation => _p('Location (optional)', 'Jagah (optional)');
+  String get scnApptDoctor => _p('Doctor (optional)', 'Doctor (optional)');
+  String get scnTypeDoctor => _p('Doctor visit', 'Doctor visit');
+  String get scnTypeScan => _p('Scan', 'Scan');
+  String get scnTypeTest => _p('Test', 'Test');
+  String get scnTypeVaccination => _p('Vaccination', 'Vaccination');
+  String get scnTypeCustom => _p('Custom', 'Custom');
+  String scnCompletedJournal(String name) =>
+      _p('$name — completed', '$name — poora');
+
+  // ===========================================================================
+  //  DUE DATE CALCULATOR
+  // ===========================================================================
+  String get ddcTitle => _p('Due Date Calculator', 'Due Date Calculator');
+  String get ddcToolTitle => _p('Due Date', 'Due Date');
+  String get ddcHeader => _p('When is my baby due?', 'Mera baby kab due hai?');
+  String get ddcSub => _p(
+      'Calculate your due date, timeline and upcoming milestones.',
+      'Apni due date, timeline aur aane wale padaav nikaalein.');
+  String get ddcMethod =>
+      _p('How would you like to calculate?', 'Aap kaise calculate karna chahengi?');
+  String get ddcLmp => _p('Last period (LMP)', 'Pichhla period (LMP)');
+  String get ddcConception => _p('Conception date', 'Conception ki tareekh');
+  String get ddcIvf => _p('IVF transfer', 'IVF transfer');
+  String get ddcUltrasound => _p('Ultrasound dating', 'Ultrasound dating');
+  String get ddcKnown =>
+      _p('I know my due date', 'Mujhe meri due date pata hai');
+  String get ddcLmpDate => _p('First day of your last period',
+      'Aapke pichhle period ka pehla din');
+  String get ddcCycle => _p('Cycle length', 'Cycle ki lambai');
+  String get ddcDays => _p('days', 'din');
+  String get ddcDaysLabel => _p('Days', 'Din');
+  String get ddcConceptionDate =>
+      _p('Conception date', 'Conception ki tareekh');
+  String get ddcTransferDate =>
+      _p('Embryo transfer date', 'Embryo transfer ki tareekh');
+  String get ddcEmbryoDay => _p('Embryo age', 'Embryo ki umar');
+  String get ddcDay3 => _p('Day 3', 'Day 3');
+  String get ddcDay5 => _p('Day 5', 'Day 5');
+  String get ddcScanDate => _p('Date of ultrasound', 'Ultrasound ki tareekh');
+  String get ddcGa => _p('Gestational age at scan', 'Scan par gestational age');
+  String get ddcKnownDate => _p('Your due date', 'Aapki due date');
+  String get ddcPickDate => _p('Pick a date', 'Tareekh chunein');
+  String get ddcCalculate =>
+      _p('Calculate My Due Date', 'Meri Due Date Nikaalein');
+  String get ddcResultLead => _p(
+      'Your baby is expected around', 'Aapka baby aane waala hai lagbhag');
+  String get ddcTimeline => _p('Your timeline', 'Aapki timeline');
+  String get ddcMilestones =>
+      _p('Key milestones ahead', 'Aage ke khaas padaav');
+  String get ddcTrimesters =>
+      _p('Trimester breakdown', 'Trimester breakdown');
+  String get ddcConceptionTitle =>
+      _p('Conception & months', 'Conception aur mahine');
+  String get ddcConceptionAround =>
+      _p('Estimated conception around', 'Anumaanit conception lagbhag');
+  String get ddcMonths => _p('Month by month', 'Mahine-dar-mahine');
+  String get ddcMsHeartbeat => _p('Heartbeat', 'Dhadkan');
+  String get ddcMsNt => _p('NT Scan', 'NT Scan');
+  String get ddcMsAnomaly => _p('Anomaly Scan', 'Anomaly Scan');
+  String get ddcMsViability => _p('Viability', 'Viability');
+  String get ddcMsThirdTri => _p('Third Trimester', 'Teesri Trimester');
+  String get ddcMsFullTerm => _p('Full Term', 'Full Term');
+  String get ddcMsDue => _p('Due Date', 'Due Date');
+  String get ddcReady => _p('Your pregnancy journey is ready 💜',
+      'Aapki pregnancy journey taiyaar hai 💜');
+  String get ddcBenWeekly => _p('Weekly development', 'Saptaahik vikas');
+  String get ddcBenDaily => _p('Daily guidance', 'Rozaana margdarshan');
+  String get ddcBenScans => _p('Scan reminders', 'Scan reminders');
+  String get ddcBenGarbh => _p('Garbh Sanskar', 'Garbh Sanskar');
+  String get ddcBenSymptoms => _p('Symptom support', 'Symptom support');
+  String get ddcBenBag => _p('Hospital bag', 'Hospital bag');
+  String get ddcStart => _p('Start My Pregnancy Journey',
+      'Meri Pregnancy Journey Shuru Karein');
+  String get ddcStarted =>
+      _p('Your journey is set 💜', 'Aapki journey set ho gayi 💜');
+  String get ddcRecalculate => _p('Recalculate', 'Dobara nikaalein');
+
+  // ===========================================================================
+  //  ASK VEDA — companion (preview)
+  // ===========================================================================
+  String get vedaTitle => _p('Ask Veda', 'Ask Veda');
+  String get vedaToolTitle => _p('Ask Veda', 'Ask Veda');
+  String get vedaTagline => _p('Your pregnancy & parenting companion',
+      'Aapki pregnancy aur parenting saathi');
+  String get vedaComingSoon => _p('Coming soon', 'Jaldi aa raha hai');
+  String get vedaBeta => _p('Beta', 'Beta');
+  String get vedaWelcome => _p(
+      "Hello 💜 I'm Veda. Ask me about a food, a symptom or your week, and I'll share what we know — drawn from ParentVeda's guidance. I'm still learning, and I'll get better as we grow.",
+      'Namaste 💜 Main Veda hoon. Mujhse kisi food, lakshan ya apne hafte ke baare mein poochein — main ParentVeda ki jaankari se jo pata hai woh bataungi. Main abhi seekh rahi hoon, aur aage aur behtar hoti jaungi.');
+  String get vedaHint => _p('Ask AskVeda', 'Ask AskVeda');
+  String get vedaTrySomething => _p('Try asking', 'Yeh poochein');
+  String get vedaReply => _p(
+      "I'm almost ready 💜 Veda is launching soon — I'll answer this with your week, scans and journal in mind. I'll let you know the moment I'm here.",
+      'Main lagbhag taiyaar hoon 💜 Veda jald aa rahi hai — main is sawaal ka jawaab aapke hafte, scans aur journal ke saath doongi. Aate hi aapko bata doongi.');
+  String get vedaVoice => _p('Voice', 'Voice');
+  String get vedaVoiceSoon =>
+      _p('Voice questions are coming soon 💜', 'Voice sawaal jaldi aa rahe hain 💜');
+  String get vedaImage => _p('Photo', 'Photo');
+  String get vedaImageSoon => _p(
+      'Photo questions (rashes, reports, labels) are coming soon 💜',
+      'Photo sawaal (rashes, reports, labels) jaldi aa rahe hain 💜');
+  // Offline "answer from our own content" (Can I? + Symptoms).
+  String get vedaDisclaimer => _p(
+      'This is general guidance from what I know — please confirm anything important with your doctor. 💜',
+      'Yeh meri jaankari se general guidance hai — kuch bhi important ho to apne doctor se zaroor confirm karein. 💜');
+  String get vedaNoMatch => _p(
+      "I don't have a confident answer on that yet — I'm still learning. Try asking about a food (\"Can I eat papaya?\"), a symptom, or use the Can I? tool. I'll answer more as ParentVeda grows. 💜",
+      "Iska pakka jawaab abhi mere paas nahi hai — main abhi seekh rahi hoon. Kisi food (\"Kya main papaya kha sakti hoon?\"), lakshan ke baare mein poochein, ya Can I? tool use karein. ParentVeda badhne ke saath main aur jawaab dungi. 💜");
+  String get vedaFromYourApp =>
+      _p('From your ParentVeda', 'Aapke ParentVeda se');
+  // Structured showcase result-page section headers.
+  String get vedaWhatMeans =>
+      _p('What this means for you', 'Aapke liye iska matlab');
+  String get vedaNextActions =>
+      _p('Recommended next actions', 'Recommended agle kadam');
+  String get vedaPvContent => _p('From ParentVeda', 'ParentVeda se');
+  String get vedaCommunityInsights =>
+      _p('Community insights', 'Community insights');
+  String get vedaProductsHdr => _p('Products', 'Products');
+  String get vedaServices => _p('Services', 'Services');
+  String get vedaUrgentBanner => _p(
+      'Please act now — contact your maternity unit',
+      'Please abhi act karein — apni maternity unit se contact karein');
+  // Stage-wise suggested questions (the Ask Veda home, before you type).
+  String get vedaSuggestHeader =>
+      _p("What's on your mind?", 'Kya poochna chahti hain?');
+  String get vedaSuggestSub => _p(
+      'Tap a question, or type your own below.',
+      'Koi sawaal tap karein, ya neeche apna likhein.');
+  String get vedaStageSoon =>
+      _p('As your journey grows', 'Jaise aapka safar badhega');
+  String get vedaShuffle => _p('Shuffle questions', 'Naye sawaal');
+  // Ask Veda structured result page (the "Ask Veda Results" design).
+  String get vedaAnswerLabel => _p('Veda Answer', 'Veda ka jawab');
+  String get vedaWhenChecked =>
+      _p('When to get checked', 'Kab doctor ko dikhayein');
+  String get vedaMoreInfo => _p('More information', 'Aur jaankari');
+  // Retrieval-path 7-section answer: personalization default, default actions,
+  // community social-proof, and content-TYPE labels for Section 4.
+  String get vedaMeansDefault => _p(
+      "Here's what ParentVeda's guidance suggests for where you are right now.",
+      'ParentVeda ki guidance aapki abhi ki sthiti ke liye yeh sujhaati hai.');
+  String get vedaActionExplore => _p(
+      'Explore the related ParentVeda content below.',
+      'Neeche di gayi ParentVeda content dekhein.');
+  String get vedaActionTrack => _p(
+      'Note how you\'re feeling and track it over the next few days.',
+      'Aap kaisa mehsoos kar rahi hain, note karein aur agle kuch din track karein.');
+  String get vedaActionDoctor => _p(
+      'If it persists or worries you, check with your doctor.',
+      'Agar yeh bana rahe ya chinta ho, to apne doctor se baat karein.');
+  String vedaCommunitySocial(int n) => _p(
+      'Other ParentVeda mothers have asked about this too.',
+      'ParentVeda ki doosri mummies ne bhi iske baare mein poocha hai.');
+  String get vedaTypeCanI => _p('Can-I guide', 'Can-I guide');
+  String get vedaTypeSymptom => _p('Symptom guide', 'Lakshan guide');
+  String get vedaTypeWeekly => _p('Weekly journey', 'Weekly journey');
+  String get vedaTypeRead => _p('Read', 'Read');
+  String get vedaTypeTip => _p('Trimester tip', 'Trimester tip');
+  String get vedaTypeReflection => _p('Reflection', 'Reflection');
+  String get vedaTypeReadBaby => _p('Read to baby', 'Read to baby');
+  String get vedaTypeGarbh => _p('Garbh Sanskar', 'Garbh Sanskar');
+  String get vedaTypeBody => _p('Body changes', 'Body changes');
+  String get vedaTypeTool => _p('Tool', 'Tool');
+  String get vedaTypeProduct => _p('Product', 'Product');
+  String get vedaTypeCommunity => _p('Community', 'Community');
+  String get vedaTalkExpert => _p('Talk to an expert', 'Expert se baat karein');
+  String get vedaProductsHint =>
+      _p('Suggested for your question', 'Aapke sawaal ke hisaab se');
+  String get vedaBook => _p('Book', 'Book');
+  String get vedaCall => _p('Call', 'Call');
+  String get vedaVerdictSafe => _p('Generally safe ✅', 'Aam taur par safe ✅');
+  String get vedaVerdictModeration =>
+      _p('Fine in moderation ⚖️', 'Seemit maatra mein theek ⚖️');
+  String get vedaVerdictDepends => _p('It depends 🤔', 'Yeh nirbhar karta hai 🤔');
+  String get vedaVerdictAvoid => _p('Best avoided 🚫', 'Behtar hai bachein 🚫');
+  String get vedaVerdictAskDoctor =>
+      _p('Ask your doctor 🩺', 'Apne doctor se poochein 🩺');
+  List<String> get vedaExamples => _e
+      ? const [
+          'Can I eat papaya?',
+          'Is coffee safe now?',
+          'Can I eat pineapple?',
+          'Is back pain normal now?',
+          'What helps with heartburn?',
+          'How can I sleep better?',
+        ]
+      : const [
+          'Kya main papaya kha sakti hoon?',
+          'Kya coffee safe hai?',
+          'Kya abhi kamar dard normal hai?',
+          'Acidity kam kaise karein?',
+          'Behtar neend kaise aaye?',
+          'Kya main pineapple kha sakti hoon?',
+        ];
+
+  // ===========================================================================
+  //  WEEK'S TO GO (weekly header)
+  // ===========================================================================
+  String weeksToGo(int n) => _p(n == 1 ? '1 week to go' : '$n weeks to go',
+      n == 1 ? '1 hafta baaki' : '$n hafte baaki');
+  String get weeksToGoNow => _p('Any day now 💜', 'Kabhi bhi 💜');
+  String get flowDaily => _p('Daily', 'Rozaana');
+  String get flowWeekly => _p('Weekly', 'Saptaahik');
+  String get snapThisWeek => _p('This week', 'Is hafte');
+  String get snapOpenWeek => _p('View week', 'Week dekhein');
+  String get sizeWord => _p('Size', 'Size');
+  String get wkVideoEyebrow => _p('Watch this week', 'Is hafte dekhein');
+  // The weekly video is labelled by the week it covers (replaces "Watch this
+  // week"), so it reads as that week's video.
+  String wkPregnancyWeek(int n) =>
+      _p('Pregnancy Week $n', 'Pregnancy Week $n');
+  String get wkVideoSoon =>
+      _p('Playback coming soon 💜', 'Playback jaldi aa raha hai 💜');
+  String get ttEyebrow => _p('Trimester tips', 'Trimester tips');
+  String ttTitle(int week) => _p('Tips for week $week', 'Hafta $week ke tips');
+  String get journeyTrailKicker =>
+      _p('Your trail to birth', 'Janm tak ka safar');
+  String gsKicker(int week) =>
+      _p('Garbh Sanskar · Week $week', 'Garbh Sanskar · Hafta $week');
+  String get gsFiveRituals =>
+      _p('Five gentle rituals', 'Paanch komal rituals');
+
+  // Week 20 "ParentVeda Journey" overview accordions (design preview)
+  String get ovBaby => _p('Baby', 'Baby');
+  String get ovBabySub =>
+      _p("What I'm doing this week", 'Is hafte main kya kar raha hoon');
+  String get ovMother => _p('Mother', 'Maa');
+  String get ovMotherSub =>
+      _p("How you're feeling", 'Aap kaisa mehsoos kar rahi hain');
+  String get ovHealth => _p('Health', 'Sehat');
+  String get ovHealthSub => _p("This week's care", 'Is hafte ki dekhbhaal');
+  String get ovVideoWhy => _p('Why this matters', 'Yeh kyun zaroori hai');
+  String get msEyebrow => _p('Milestones', 'Padaav');
+  String get msTitle => _p("Baby's journey", 'Baby ka safar');
+  String get msThisWeek => _p('This week', 'Is hafte');
+
+  // ===========================================================================
+  //  WEEK FLOW (V2 — week 20 vertical-flow preview)
+  // ===========================================================================
+  String get wfClassic => _p('Classic', 'Classic');
+  String get wfNew => _p('New', 'New');
+  String get weeklyBackToDaily => _p('Daily', 'Daily');
+  // Global search (Home search icon).
+  String get searchHint =>
+      _p('Search ParentVeda…', 'ParentVeda mein search karein…');
+  String get searchEmptyHint => _p(
+      'Search products, reads, foods, symptoms and tools.',
+      'Products, reads, foods, lakshan aur tools search karein.');
+  String get searchNoResults =>
+      _p('No results for', 'Koi result nahi mila');
+  String get searchTools => _p('Tools & sections', 'Tools aur sections');
+  String get searchProducts => _p('Products', 'Products');
+  String get searchReads => _p('Reads', 'Reads');
+  String get searchCanI => _p('Can I?', 'Can I?');
+  String get searchSymptoms => _p('Symptoms', 'Lakshan');
+  String get navProducts => _p('Products', 'Products');
+  String get wfBabySection => _p('About your baby', 'Aapke baby ke baare mein');
+  String get wfMotherSection => _p('For you, mum', 'Aapke liye, maa');
+  String get wfNextSection => _p("What's next", 'Aage kya');
+  String get wfNextBrief => _p(
+      'Scans, appointments and milestones coming up around now.',
+      'Aane wale scans, appointments aur padaav.');
+  String get wfVideosSection => _p("This week's videos", 'Is hafte ke videos');
+  String get wfArticlesSection => _p("This week's reads", 'Is hafte ke reads');
+  String get wfPartnerSection =>
+      _p('Share with your partner', 'Partner ke saath share karein');
+  String get wfTapExplore =>
+      _p('Tap to explore', 'Dekhne ke liye tap karein');
+  String get wfBabyScience => _p('Baby Science', 'Baby Science');
+  String get wfSwipeHint =>
+      _p('Swipe for Baby Science', 'Baby Science ke liye swipe karein');
+  String get wfBabyMilestones =>
+      _p('Milestones around now', 'Abhi ke aas-paas ke padaav');
+  String get wfMotherThisWeek => _p('Mother this week', 'Maa is hafte');
+  // Combined Mother page (the "for you, mum" read + "mother this week" merged).
+  String get wfYouThisWeek => _p('You this week', 'Aap is hafte');
+  // Organic "daily moment" nudge woven into the weekly flow.
+  String get wfDailyBridgeKicker =>
+      _p('DON\'T MISS', 'CHHOOT NA JAAYE');
+  String get wfDailyBridgeTitle =>
+      _p('Your daily moment is waiting', 'Aapka daily moment intezaar mein hai');
+  String get wfDailyBridgeBody => _p(
+      "Today's reads, Garbh Sanskar and a journal prompt are ready for you on Home.",
+      'Aaj ke reads, Garbh Sanskar aur ek journal prompt Home par taiyaar hain.');
+  String get wfDailyBridgeCta => _p('Go to today', 'Aaj par jaayein');
+  // Mother health page — three toggles on one page.
+  String get wfTabSymptoms => _p('Symptoms', 'Symptoms');
+  String get wfTabDiet => _p('Diet', 'Diet');
+  String get wfTabActions => _p('Actions', 'Actions');
+  // Inline media-placeholder tags woven into the reads.
+  String get wfMediaVideo => _p('VIDEO', 'VIDEO');
+  String get wfMediaPhoto => _p('PHOTO', 'PHOTO');
+  String get wfHealthThisWeek => _p('Health this week', 'Sehat is hafte');
+  String get wfEatThisWeek =>
+      _p('What to eat this week', 'Is hafte kya khaayein');
+  String get wfDoThisWeek => _p('What to do this week', 'Is hafte kya karein');
+  String get wfSwipeMore =>
+      _p('Swipe for more', 'Aur dekhne ke liye swipe karein');
+  String get wfHealthIntro => _p(
+      'Common, normal things you may notice now — tap any to understand it and what helps.',
+      'Aam, normal baatein jo aap abhi mehsoos kar sakti hain — kisi ko bhi samajhne ke liye tap karein.');
+  String get wfTapToRead => _p('Read about it', 'Iske baare mein padhein');
+  String get wfMilestonesTitle =>
+      _p('Upcoming milestones', 'Aane wale padaav');
+  String get wfScansTitle =>
+      _p('Scans & appointments', 'Scans & appointments');
+  String get wfNextIntro => _p(
+      "Here's what's coming up in your journey — the milestones your baby will reach, and the scans worth keeping on your radar. A little glimpse ahead helps you feel prepared and calm.",
+      'Aage aapke safar mein kya aane wala hai — baby ke padaav aur dhyaan rakhne layak scans. Thodi jhalak aage ki, taaki aap taiyar aur shaant mehsoos karein.');
+  String get wfNextRadar => _p('On your radar', 'Aapke radar par');
+  // What's-next tab labels (single page, no swipe) + the "for you" forward look.
+  String get wfNextTabScans => _p('Scans', 'Scans');
+  String get wfNextTabYou => _p('For you', 'Aapke liye');
+  String get wfNextTabMilestones => _p('Milestones', 'Padaav');
+  String get wfNextMotherIntro => _p(
+      'A gentle look at how you may feel in the weeks just ahead — your body changing, step by step.',
+      'Aane wale hafton mein aap kaisa mehsoos kar sakti hain — aapka shareer dheere-dheere badalta hua, ek halki jhalak.');
+  String get wfBodyLabel => _p('Your body', 'Aapka shareer');
+  String get wfFeelLabel => _p('How you may feel', 'Kaisa lag sakta hai');
+  String get wfGotIt => _p('Got it', 'Samajh gaya');
+  String get wfTipsTitle => _p('Trimester tips', 'Trimester tips');
+  String wfTrimesterLabel(int t) => _p('Trimester $t', 'Trimester $t');
+  String wfWeeksToGo(int n) => _p('$n weeks to go', '$n hafte baaki');
+  String wfPercentThere(int pct) => _p('$pct% there', '$pct% poora');
+
+  // Garbh tool + Products (daily carousel)
+  String get garbhToolTitle => _p('Garbh Sanskar', 'Garbh Sanskar');
+  // Spiritual Reading (a gentle, neutral, surface-level testing feature).
+  String get sprToolTitle => _p('Spiritual Reading', 'Spiritual Reading');
+  String get sprTitle => _p('Spiritual Reading', 'Spiritual Reading');
+  String get sprDisclaimer => _p(
+      'A gentle, surface-level look at how a few traditions approach pregnancy and motherhood — shared for comfort and curiosity, with respect for all beliefs. Not religious instruction.',
+      'Kuch paramparaayein pregnancy aur maatritva ko kaise dekhti hain, uski ek halki si jhalak — sukoon aur jaankari ke liye, sabhi vishwaason ke sammaan ke saath. Yeh koi dharmik nirdesh nahi hai.');
+  String get sprFootnote => _p(
+      'Shared respectfully for comfort and reflection — not as religious advice. Every family’s beliefs are their own.',
+      'Sukoon aur soch ke liye sammaan ke saath saajha kiya gaya — dharmik salah ke taur par nahi. Har parivaar ke vishwaas unke apne hain.');
+  String sprViewAll(int n) =>
+      _p('View all $n readings', 'Sabhi $n readings dekhein');
+  String get prodSectionTitle => _p(
+      "Today's product recommendation", 'Aaj ki product recommendation');
+  String get prodSeeAll => _p('See all', 'Sab dekhein');
+  // Weekly snapshot + Today's journey (Home segregation).
+  String get snapshotTitle => _p('Weekly snapshot', 'Weekly snapshot');
+  String get todaysJourney => _p("Today's journey", 'Aaj ka safar');
+  String weeksLeftShort(int n) => _p('$n wks to go', '$n hafte baaki');
+  String get medManageCta => _p('Manage', 'Manage karein');
+  String get prodSeeNow => _p('See now', 'Dekhein');
+  String get wfTabThisWeek => _p('This week', 'Is hafte');
+  String get wfTabHealth => _p('Health', 'Sehat');
+  String get wfTabEat => _p('Eat', 'Khaayein');
+  String get wfTabDo => _p('To-do', 'Karein');
+  String get wfTabScans => _p('Scans', 'Scans');
+  String get wfTabMilestones => _p('Milestones', 'Padaav');
+  String get wfAvoid => _p('What to avoid', 'Kya na khaayein');
+  String get wfDisclaimer => _p(
+      'This is for understanding, not diagnosis — your doctor is always the best guide.',
+      'Yeh samajhne ke liye hai, nidaan nahi — aapka doctor hamesha sabse achhi salah dete hain.');
+  String get wfPartnerCta =>
+      _p('Share update on WhatsApp', 'WhatsApp par update share karein');
+  String get wfPartnerBlurb => _p(
+      'Send your partner a crisp summary of this week — baby, you, scans and how they can help.',
+      'Apne partner ko is hafte ka saaf summary bhejein — baby, aap, scans aur woh kaise madad kar sakte hain.');
+  String wfPartnerHeader(int week) =>
+      _p('Our pregnancy · Week $week', 'Hamari pregnancy · Hafta $week');
+  String get wfPartnerScans =>
+      _p('Check upcoming scans together in the app.',
+          'App mein aane wale scans saath dekhein.');
+  String get wfPartnerHelp =>
+      _p('How you can help', 'Aap kaise madad kar sakte hain');
+  String get wfPartnerScansHeader =>
+      _p('Scans & appointments coming up:', 'Aane wale scans & appointments:');
+  String get wfPartnerSignoff => _p(
+      "You're in this together 💜", 'Aap dono is safar mein saath hain 💜');
+
   // ---- Module eyebrows -----------------------------------------------------
-  String get growEyebrow => _p('Grow', 'Grow');
+  String get growEyebrow =>
+      _p('Daily parenting tip', 'Rozaana parenting tip');
   String get readEyebrow => _p('Read To Your Baby', 'Apne Baby Ko Sunaayein');
+  String get medDailyTitle => _p(
+      'Daily medication and supplements', 'Rozaana dawai aur supplements');
+  String get medHomeSubtitle => _p("Track today's medicines & supplements",
+      'Aaj ki dawaiyan & supplements track karein');
+  String get medTrackCta => _p('Track today', 'Aaj track karein');
   String get talkEyebrow => _p('Talk To Your Baby', 'Apne Baby Se Baat Karein');
   String get momentForYouEyebrow => _p('A Moment For You', 'Aapke Liye Ek Pal');
   String get movementEyebrow =>
@@ -370,6 +1308,20 @@ class S {
   String get readMore => _p('Read More', 'Aur Padhein');
   String get readCta => _p('Read', 'Padhein');
   String get listenCta => _p('Listen', 'Sunein');
+  // Read-to-your-baby customizable feed.
+  String get rtbCustomize => _p('Customize', 'Customize karein');
+  String get rtbCustomizeTitle =>
+      _p('Customize this feed', 'Yeh feed customize karein');
+  String get rtbCustomizeSub => _p('Choose what your daily read draws from.',
+      'Chunein ki aapki rozaana read kahan se aaye.');
+  String get rtbSpeaking => _p('Speaking cards', 'Speaking cards');
+  String get rtbStories => _p("Children's stories", 'Bachchon ki kahaniyan');
+  String get rtbSpiritual => _p('Spiritual reading', 'Spiritual reading');
+  String get rtbRhymes => _p('Rhymes & lullabies', 'Rhymes & lullabies');
+  String get rtbAffirmations =>
+      _p('Affirmations & blessings', 'Affirmations & aashirwad');
+  String get rtbPickReligions =>
+      _p('Pick traditions', 'Paramparaayein chunein');
   String get recordCta => _p('Record', 'Record karein');
   String get writeCta => _p('Write', 'Likhein');
   String get maybeLater => _p('Maybe later', 'Baad mein');
@@ -461,6 +1413,14 @@ class S {
       'Phir bhi movement mehsoos nahi ho rahi? Apne doctor se sampark karein.');
 
   // ---- Bottom navigation + tabs --------------------------------------------
+  // Direction B (Warm Nest) floating tab bar:
+  String get tabToday => _p('Today', 'Aaj');
+  String get tabJourney => _p('Journey', 'Safar');
+  String get tabPrepare => _p('Prepare', 'Taiyari');
+  String get tabSanskar => _p('Sanskar', 'Sanskar');
+  String get tabRead => _p('Read', 'Padhein');
+  String get tabCommunity => _p('Community', 'Community');
+
   String get homeTab => _p('Home', 'Home');
   String get myBabyTab => _p('My Baby', 'My Baby');
   String get dearBabyTab => _p('Dear Baby', 'Dear Baby');
@@ -473,6 +1433,7 @@ class S {
   // ===========================================================================
 
   String get profileTitle => _p('Profile', 'Profile');
+  String get profileSignOut => _p('Sign out', 'Sign out');
   String get languageLabel => _p('Language', 'Bhasha');
   String get languageEnglish => 'English';
   String get languageHinglish => 'Hinglish';
@@ -518,6 +1479,10 @@ class S {
   // ---- Journey map chrome --------------------------------------------------
   String get journeyTitle => _p('Your Pregnancy Journey', 'Aapka Pregnancy Safar');
   String get youAreHere => _p('YOU ARE HERE', 'AAP YAHAN HAIN');
+  String get journeyHerePill => _p("You're here", 'Aap yahan');
+  String get journeyWelcome => _p('Welcome', 'Swagat');
+  String get journeyStart => _p('Start', 'Shuruaat');
+  String get journeyBirth => _p('Birth', 'Birth');
   String trimesterBandLabel(int i) => i == 0
       ? _p('First Trimester', 'Pehli Trimester')
       : i == 1
@@ -563,6 +1528,36 @@ class S {
       n == 1 ? 'Lagbhag 1 hafte mein' : 'Lagbhag $n hafton mein');
   String viewWeekN(int n) => _p('View Week $n', 'Hafta $n dekhein');
   String get continueJourney => _p('Continue journey', 'Safar jaari rakhein');
+  // Journey-map milestone dates ("jm*").
+  String jmShortDate(DateTime d) =>
+      '${d.day} ${_months[(d.month - 1).clamp(0, 11)].substring(0, 3)}';
+  String get jmEditDate => _p('Edit date', 'Tareekh badlein');
+  String get jmWhenHappened => _p('When did this happen?', 'Ye kab hua tha?');
+  String jmHappenedOn(String date) => _p('Happened on $date', '$date ko hua');
+  String get jmEditedHint => _p('edited by you', 'aapne set kiya');
+  // Appointment-style milestones (scans/visits the clinic schedules).
+  String get jmSetAppointment =>
+      _p('Set appointment date', 'Appointment ki tareekh set karein');
+  String get jmEditAppointment =>
+      _p('Edit appointment date', 'Appointment ki tareekh badlein');
+  String jmAppointmentOn(String date) =>
+      _p('Appointment · $date', 'Appointment · $date');
+  // Late-joiner "catch up" — set real dates for moments already behind you.
+  String get jmCatchUpTitle => _p('Joined along the way?', 'Beech mein judi?');
+  String get jmCatchUpBody => _p(
+      'Set when these moments actually happened, so this map is truly yours.',
+      'Set karein ki ye pal asal mein kab hue, taaki yeh map sach mein aapka ho.');
+  String get jmCatchUpCta => _p('Catch up', 'Catch up karein');
+  String get jmCatchUpSheet =>
+      _p('When did these happen?', 'Ye kab hue the?');
+  String get jmSetWhen => _p('Set date', 'Tareekh set karein');
+  String get jmAllCaughtUp =>
+      _p("You're all caught up ❤️", 'Aap sab set hain ❤️');
+  // Overdue (past the due date) — calm, reassuring.
+  String get jmOverdueTitle => _p('Past your due date', 'Due date nikal gayi');
+  String jmOverdueBody(int days) => _p(
+      '$days ${days == 1 ? 'day' : 'days'} past your due date — your baby will come when ready 💛',
+      '$days din due date ke baad — aapka baby taiyaar hone par aayega 💛');
   String get launchFeatureCta => _p('Launch', 'Shuru karein');
   String get featureComingSoonTitle =>
       _p('Coming soon 💜', 'Jaldi aa raha hai 💜');
@@ -577,6 +1572,11 @@ class S {
   static const List<String> _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  // Mon..Sun (DateTime.weekday is 1=Monday .. 7=Sunday).
+  static const List<String> _weekdays = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
   ];
 
   String formatLongDate(DateTime d) =>
@@ -790,6 +1790,12 @@ class S {
       'Most mothers at your stage of pregnancy benefit from this gentle level. It is personalized and may change as your pregnancy progresses.',
       'Aapke stage ki zyadatar maayein is halke level se faayda paati hain. Yeh personalized hai aur pregnancy ke saath badal sakti hai.');
   String get startCareSession => _p('Start Care Session', 'Care Session shuru karein');
+  // "What are Kegels & how to do them" — for a first-timer.
+  String get kegelHowTitle =>
+      _p('What is a Kegel & how to do it', 'Kegel kya hai & kaise karein');
+  String get kegelHowBody => _p(
+      'A Kegel is simply squeezing and lifting your pelvic-floor muscles — the same ones you would use to stop yourself passing urine or wind — then fully relaxing them. To find them, imagine gently stopping that flow (just to locate the muscle, not as a habit). Squeeze and hold for a few seconds, then relax for the same time. Keep breathing normally, and try not to tighten your tummy, thighs or buttocks. A Care Session below guides the hold-and-relax timing for you.',
+      'Kegel yaani apni pelvic-floor muscles ko kasna aur upar uthana — wahi jo aap urine ya gas rokne ke liye use karti hain — phir poori tarah dheela chhodna. Inhe dhoondhne ke liye, halke se us flow ko rokne ki kalpana karein (sirf muscle pehchaanne ke liye, aadat ke roop mein nahi). Kuch second kasein aur rokein, phir utni hi der dheela chhodein. Saans normal rakhein, aur pet, jaangh ya kulhe na kasein. Neeche di Care Session aapke liye hold-and-relax ka timing guide karti hai.');
   String get whyAmIDoingThis => _p('Why am I doing this?', 'Main yeh kyun kar rahi hoon?');
   String get whyAmIDoingThisBody => _p(
       'The pelvic floor supports the bladder, bowel and uterus. These muscles work harder throughout pregnancy. Regular exercises may help maintain strength and support recovery after birth.',
@@ -849,6 +1855,100 @@ class S {
   // ===========================================================================
   String get hbName => _p('My Hospital Bag', 'My Hospital Bag');
   String rupees(int n) => '₹$n';
+
+  // --- Simplified hospital bag (v2): the joyful, tap-only experience ---------
+  String get hb2MyBag => _p('My Hospital Bag', 'Mera Hospital Bag');
+  String get hb2FillingUp =>
+      _p('Your bag is filling up 💛', 'Aapka bag bhar raha hai 💛');
+  String get hb2ReadyBanner => _p('Your bag is ready for baby! 🎉',
+      'Aapka bag baby ke liye taiyaar hai! 🎉');
+  String get hb2HeroEmpty =>
+      _p("Let's pack for the big day", 'Bade din ke liye pack karein');
+  String hb2DaysToGo(int n) => _p('$n days to go', '$n din baaki');
+  String hb2ReadyPct(int n) => _p('$n% ready', '$n% taiyaar');
+  String get hb2AddItems => _p('Add items', 'Items add karein');
+  String get hb2EmptyTitle =>
+      _p("Let's start your bag 🎒", 'Apna bag shuru karein 🎒');
+  String get hb2EmptySub => _p(
+      "Add the things you'd love to have for the big day.",
+      'Bade din ke liye jo cheezein chahiye, unhe add karein.');
+  String get hb2GroupVeda =>
+      _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hb2GroupElse =>
+      _p('Buy elsewhere', 'Kahin aur se khareedein');
+  String get hb2GroupHave => _p('Already have', 'Pehle se hai');
+  String get hb2GroupNeeded =>
+      _p('Where will you get these?', 'Ye kahan se laaengi?');
+  String hb2Buy(int price) => _p('Buy ₹$price', '₹$price mein lein');
+  String get hb2ToBuy => _p('To buy', 'Lena hai');
+  String get hb2Bought => _p('Bought', 'Le liya');
+  String get hb2Pack => _p('Pack', 'Pack karein');
+  String get hb2Packed => _p('Packed', 'Pack ho gaya');
+  String get hb2ChooseSource =>
+      _p('Where will you get this?', 'Ye kahan se laaengi?');
+  String get hb2SrcVeda =>
+      _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  String get hb2SrcElse => _p('Buy elsewhere', 'Kahin aur se khareedein');
+  String get hb2SrcHave => _p('I already have it', 'Ye mere paas hai');
+  String get hb2Remove => _p('Remove from bag', 'Bag se hatayein');
+  String get hb2LinkOptional =>
+      _p('Paste a link (optional)', 'Link daalein (optional)');
+  String get hb2Save => _p('Save', 'Save karein');
+  String hb2PackedCheer(int i) {
+    const en = [
+      'One less thing to worry about 💛',
+      'Your bag is getting ready ✨',
+      'Lovely — packed! 🎒',
+      "You're doing so well, mama 💛",
+    ];
+    const hi = [
+      'Ek chinta kam 💛',
+      'Aapka bag taiyaar ho raha hai ✨',
+      'Bahut khoob — pack ho gaya! 🎒',
+      'Aap bahut achha kar rahi hain, mama 💛',
+    ];
+    final n = i % en.length;
+    return _p(en[n], hi[n]);
+  }
+
+  String get hb2AddTitle => _p('Add to my bag', 'Mere bag mein add karein');
+  String get hb2Done => _p('Done', 'Done');
+  String get hb2Search => _p('Search items…', 'Items dhoondein…');
+  String get hb2MumsAlsoPacked => _p(
+      'Mums like you also packed', 'Aap jaisi mummies ne ye bhi packing kiya');
+  String get hb2SocialProof =>
+      _p('9 in 10 mums pack this', '10 mein 9 mummies ye packing karti hain');
+  String get hb2Add => _p('Add', 'Add');
+  String get hb2CatLabour => _p('For labour', 'Labour ke liye');
+  String get hb2CatAfter => _p('After delivery', 'Delivery ke baad');
+  String get hb2CatBaby => _p('For baby', 'Baby ke liye');
+  String get hb2CatPartner => _p('For partner', 'Partner ke liye');
+  String get hb2CatDocs => _p('Documents', 'Documents');
+  String get hb2CatComfort => _p('Comfort', 'Aaram ke liye');
+  String get hb2CatCustom => _p('My own', 'Mere apne');
+  String get hb2ShareTitle => _p('Share my bag', 'Mera bag share karein');
+  String get hb2ShareToBuy => _p('Still to buy', 'Abhi lena hai');
+  String hb2SharePacked(int a, int b) =>
+      _p('Packed: $a of $b 💛', 'Pack hua: $b mein se $a 💛');
+  String get hb2RemindMe => _p('Remind me to prep', 'Mujhe yaad dilayein');
+  String get hb2RemindOff => _p('Turn off reminder', 'Reminder band karein');
+  String get hb2ReminderTitle =>
+      _p('Your hospital bag 💛', 'Aapka hospital bag 💛');
+  String get hb2ReminderBody => _p(
+      'A few minutes to add or pack something today?',
+      'Aaj kuch add ya pack karne ke liye kuch minute?');
+  String get hb2ReminderSet => _p("Reminder set — I'll nudge you daily 💛",
+      'Reminder set — main roz yaad dilaungi 💛');
+  String get hb2ReminderOff =>
+      _p('Reminder turned off', 'Reminder band ho gaya');
+  String get hb2KeepsakeTitle =>
+      _p("Baby's bag is ready! 💛", 'Baby ka bag taiyaar hai! 💛');
+  String hb2KeepsakeSub(String date) =>
+      _p('Packed on $date', '$date ko packed');
+  String get hb2KeepsakeShare => _p('Share the moment', 'Ye pal share karein');
+  String hb2KeepsakeShareText(String date) => _p(
+      'Our hospital bag is all packed and ready for baby 💛 ($date) — ParentVeda',
+      'Hamara hospital bag baby ke liye taiyaar hai 💛 ($date) — ParentVeda');
   // Locked / "time to prepare" state
   String get hbTimeToPrepareTitle =>
       _p('Time to start preparing', 'Taiyaari shuru karne ka samay');
@@ -937,6 +2037,92 @@ class S {
   String get hbStatusLabel => _p('Status', 'Sthiti');
   String get hbMarkPacked => _p('Mark as packed', 'Packed mark karein');
   String get hbPackedLabel => _p('Packed', 'Pack ho gaya');
+
+  // ===== Hospital Bag V2 (toggle-able redesign) =============================
+  String get hb2vClassic => _p('Classic', 'Classic');
+  String get hb2vNew => _p('New', 'Naya');
+  // Onboarding
+  String get hb2v2Title => _p('Build your hospital bag', 'Apna hospital bag taiyaar karein');
+  String get hb2v2Sub => _p(
+      "Let's prepare for one of the most special days of your life. You don't need to finish today — we'll build it together over the coming weeks.",
+      "Aapki zindagi ke sabse khaas din ki taiyaari karein. Aaj poora karna zaroori nahi — hum ise aane wale hafton mein saath milkar banayenge.");
+  String get hb2v2StartCta => _p('Start preparing', 'Taiyaari shuru karein');
+  String get hb2v2DeliveryQ =>
+      _p('How are you planning to deliver?', 'Aap delivery kaise plan kar rahi hain?');
+  // Plain-language stages
+  String get hb2v2StageDecision => _p('Needs your decision', 'Aapka faisla chahiye');
+  String get hb2v2StagePlanning => _p('Planning to buy', 'Khareedne ka plan');
+  String get hb2v2StageHome => _p('Ready at home', 'Ghar par taiyaar');
+  String get hb2v2StagePacked => _p('Packed', 'Pack ho gaya');
+  String get hb2v2StageLater => _p('Maybe later', 'Shaayad baad mein');
+  // Home
+  String get hb2v2Attention => _p('Needs your attention', 'Aapke dhyaan ki zaroorat');
+  String get hb2v2AllSorted => _p("You're all caught up 💛", 'Sab sambhal liya 💛');
+  String get hb2v2Categories => _p('Your bag, by area', 'Aapka bag, hisson mein');
+  String get hb2v2Shopping => _p('Shopping', 'Shopping');
+  String get hb2v2Packing => _p('Packing', 'Packing');
+  String hb2v2DaysToGo(int n) => _p('$n days to go', '$n din baaki');
+  String get hb2v2HeroReady => _p('Your bag is almost ready 💛', 'Aapka bag lagbhag taiyaar 💛');
+  String get hb2v2HeroBuilding => _p('Building your bag, gently', 'Aapka bag, aaraam se ban raha hai');
+  // Action sheet
+  String hb2v2WhatDo(String item) => _p('$item — what would you like to do?',
+      '$item — aap kya karna chahengi?');
+  String get hb2v2ChooseOne => _p('Help me choose one', 'Ek chunne mein madad karein');
+  String get hb2v2HaveOne => _p('I already have one', 'Mere paas pehle se hai');
+  String get hb2v2BuyElse => _p("I'll buy elsewhere", 'Main kahin aur se loongi');
+  String get hb2v2Later => _p("I'll decide later", 'Baad mein decide karoongi');
+  String get hb2v2NotNeed => _p("I don't think I need this", 'Mujhe shaayad iski zaroorat nahi');
+  // Product experience
+  String get hb2v2PvPick => _p('ParentVeda pick', 'ParentVeda ki pasand');
+  String get hb2v2WhyRec => _p('Why ParentVeda recommends this', 'ParentVeda yeh kyun suggest karta hai');
+  String get hb2v2Consider => _p('Things to consider', 'Dhyaan dene ki baatein');
+  String get hb2v2BuyingGuide => _p('Buying guide', 'Khareedne ki guide');
+  String get hb2v2BuyingGuideBody => _p(
+      'Look for soft, breathable fabric and an easy fit. One or two is usually enough to start — you can always add more later.',
+      'Naram, saans lene wala kapda aur aaramdaayak fit dekhein. Shuru mein ek-do kaafi hote hain — baad mein aur le sakti hain.');
+  String get hb2v2Reviews => _p('Real parent reviews', 'Asli parent reviews');
+  String get hb2v2ReviewsSoon => _p('Reviews from ParentVeda parents are coming soon.',
+      'ParentVeda parents ke reviews jaldi aa rahe hain.');
+  String get hb2v2Compare => _p('Compare options', 'Options compare karein');
+  String get hb2v2SeeAll => _p('See all options', 'Sabhi options dekhein');
+  String get hb2v2Selected => _p('Selected', 'Chuna gaya');
+  String get hb2v2ChooseThis => _p('Choose this', 'Yeh chunein');
+  String get hb2v2BuyOnPv => _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  // Buy elsewhere
+  String get hb2v2WhereBuy => _p('Where will you buy it?', 'Aap ise kahaan se lengi?');
+  String get hb2v2SkipForNow => _p('Skip for now', 'Abhi chhod dein');
+  String get hb2v2AddDetails => _p('Add price / link / note (optional)',
+      'Daam / link / note jodein (optional)');
+  // Maybe later
+  String get hb2v2MaybeLaterTitle => _p('Maybe later', 'Shaayad baad mein');
+  String get hb2v2RestoreItem => _p('Add back to bag', 'Bag mein wapas jodein');
+  // Packing
+  String get hb2v2TimeToPack => _p('Time to pack your bag', 'Bag pack karne ka samay');
+  String get hb2v2InBag => _p('In my hospital bag', 'Mere hospital bag mein');
+  String get hb2v2PackThis => _p('Pack this', 'Ise pack karein');
+  // Custom
+  String get hb2v2AddOwn => _p('Add my own item', 'Apni cheez jodein');
+  String get hb2v2ItemName => _p('Item name', 'Cheez ka naam');
+  String get hb2v2NotesOptional => _p('Notes (optional)', 'Note (optional)');
+  String get hb2v2RemoveItem => _p('Remove item', 'Cheez hatayein');
+  // Shopping summary
+  String get hb2v2SummaryTitle => _p('Shopping summary', 'Shopping summary');
+  String get hb2v2SecFromPv => _p('Buying from ParentVeda', 'ParentVeda se khareed rahi hain');
+  String get hb2v2SecElse => _p('Buying elsewhere', 'Kahin aur se');
+  String get hb2v2SecHome => _p('Already at home', 'Ghar par pehle se');
+  String get hb2v2SecWaiting => _p('Waiting to buy', 'Khareedna baaki');
+  String get hb2v2SecPacked => _p('Packed', 'Pack ho gaya');
+  String get hb2v2PvSpend => _p('ParentVeda spend', 'ParentVeda kharcha');
+  String get hb2v2ExtSpend => _p('External spend', 'Baahar ka kharcha');
+  String get hb2v2TotalSpend => _p('Total planned', 'Kul planned');
+  String get hb2v2SummaryCta => _p('Shopping summary', 'Shopping summary');
+  // Mark bought (elsewhere)
+  String get hb2v2MarkBought => _p('Mark as bought', 'Khareeda mark karein');
+  String get hb2v2Bought => _p('Bought', 'Khareed liya');
+  String get hbMarkFavourite =>
+      _p('Add to favourites', 'Favourites mein jodein');
+  String get hbFavourites => _p('Favourites', 'Favourites');
+  String hbTapToExpand(int n) => _p('$n items', '$n cheezein');
   String get hbRestore => _p('Restore', 'Wapas laayein');
   // Recommendation / trust layer
   String get hbRecommendation =>
@@ -947,6 +2133,13 @@ class S {
   String get hbThingsToConsider =>
       _p('Things to consider', 'Dhyaan dene yogya baatein');
   String get hbBuyVedaCta => _p('Buy from ParentVeda', 'ParentVeda se khareedein');
+  // Affiliate split (also-available-elsewhere — mirrors the product checklist).
+  String get hbAlsoElsewhere =>
+      _p('Also available elsewhere', 'Kahin aur bhi uplabdh');
+  String get hbAffiliateNote => _p(
+      'Opens the store in your browser. ParentVeda may earn a small commission.',
+      'Store aapke browser mein khulega. ParentVeda ko chhota commission mil sakta hai.');
+  String hbBuyOn(String store) => _p('Buy on $store', '$store par khareedein');
   String get hbStoreComingSoon => _p(
       'Our store is coming soon. For now it\'s saved to your plan — you can also buy it elsewhere.',
       'Hamaara store jald aa raha hai. Abhi yeh aapke plan mein save hai — aap ise kahin aur se bhi khareed sakti hain.');
@@ -971,6 +2164,8 @@ class S {
   // Planner filters
   String hbFilter(String key) {
     switch (key) {
+      case 'fav':
+        return _p('Favourites', 'Favourites');
       case 'veda':
         return _p('ParentVeda', 'ParentVeda');
       case 'else':
@@ -1037,6 +2232,108 @@ class S {
   String get contractionIntro => _p(
       'Record contraction timing and patterns that may be useful when speaking with your healthcare provider. Always follow your provider\'s advice.',
       'Contraction timing aur patterns record karein jo doctor se baat karte waqt kaam aa sakte hain. Hamesha apne doctor ki salah maanein.');
+  // "What is this" explainer — what a contraction is + true vs false (Braxton
+  // Hicks) + how to time one. So a first-time user understands the tool.
+  String get ctAboutTitle =>
+      _p('Understanding contractions', 'Contractions ko samajhna');
+  String get ctAboutBody => _p(
+      'A contraction is your womb tightening and then relaxing. Not every tightening is labour. "Braxton Hicks" (practice) contractions are common and usually harmless — they tend to be irregular, do not get stronger or closer together, and often ease when you rest, change position or drink water. True labour contractions tend to get longer, stronger and closer together over time, and do not fade. To time one: tap when it starts, and again when it ends.',
+      'Contraction yaani aapki kokh ka kasna aur phir dheela hona. Har kasaav labour nahi hota. "Braxton Hicks" (practice) contractions aam aur aksar harmless hote hain — ye anymit hote hain, na tej hote hain na paas-paas aate hain, aur aaram karne, position badalne ya paani peene par aksar kam ho jaate hain. Asli labour contractions samay ke saath lambe, tej aur paas-paas hote jaate hain, aur kam nahi hote. Time karne ke liye: shuru hone par tap karein, aur khatm hone par phir tap karein.');
+  // The not-a-medical-app disclaimer (kept clearly visible).
+  String get ctDisclaimerTitle =>
+      _p('A timer, not a diagnosis', 'Ek timer, diagnosis nahi');
+  String get ctDisclaimerBody => _p(
+      'ParentVeda is not a medical or diagnostic service. This tool only records your contractions and shows the pattern — it cannot confirm that you are in labour, or rule it out. Only your doctor or midwife can. If anything feels off, contact them, even if the pattern here looks calm.',
+      'ParentVeda koi medical ya diagnostic service nahi hai. Yeh tool sirf aapke contractions record karke pattern dikhata hai — yeh na labour confirm kar sakta hai, na inkaar. Sirf aapki doctor ya midwife hi yeh keh sakti hain. Agar kuch theek na lage, to unse sampark karein — chahe yahan pattern shaant hi kyun na dikhe.');
+  // Universal "always consult" line shown under every (non-urgent) assessment.
+  String get ctAlwaysConsult => _p(
+      'Timing cannot confirm or rule out labour. If you are unsure, or something does not feel right, contact your doctor or midwife — even now.',
+      'Timing se labour na confirm ho sakta hai na inkaar. Agar pakka nahi, ya kuch theek na lage, to abhi apni doctor ya midwife se sampark karein.');
+
+  // ---- Reminders (customizable local notifications) ------------------------
+  String get rmdTitle => _p('Reminders', 'Reminders');
+  String get rmdToolSub =>
+      _p('Gentle nudges, your way', 'Aapke tareeke se halki yaad');
+  String get rmdEmpty => _p('No reminders yet', 'Abhi koi reminder nahi');
+  String get rmdEmptySub => _p(
+      'Add a gentle nudge for anything — a Kegel session, your vitamin, reading to baby, or your own.',
+      'Kisi bhi cheez ke liye halki yaad jodein — Kegel session, vitamin, baby ko padhna, ya apni khud ki.');
+  String get rmdAdd => _p('Add reminder', 'Reminder jodein');
+  String get rmdRemindMe => _p('Remind me', 'Mujhe yaad dilaayein');
+  String get rmdNew => _p('New reminder', 'Naya reminder');
+  String get rmdEditTitle => _p('Edit reminder', 'Reminder badlein');
+  String get rmdWhatLabel => _p('What should we remind you about?',
+      'Hum aapko kis cheez ki yaad dilaayein?');
+  String get rmdWhatHint =>
+      _p('e.g. Time for your Kegels', 'jaise Kegel ka samay');
+  String get rmdSuggestions => _p('Quick ideas', 'Jaldi ideas');
+  String get rmdTime => _p('Time', 'Samay');
+  String get rmdRepeat => _p('Repeat', 'Dohraayein');
+  String get rmdOnce => _p('Once', 'Ek baar');
+  String get rmdDaily => _p('Daily', 'Rozana');
+  String get rmdWeekly => _p('Weekly', 'Saptahik');
+  String get rmdOnDay => _p('On', 'Din');
+  String get rmdSave => _p('Save reminder', 'Reminder save karein');
+  String get rmdDelete => _p('Delete reminder', 'Reminder hataayein');
+  String get rmdSaved => _p('Reminder saved 💜', 'Reminder save ho gaya 💜');
+  String get rmdRemoved => _p('Reminder removed', 'Reminder hata diya');
+  String get rmdScheduleNote => _p('We\'ll nudge you at the time you set.',
+      'Aapke set kiye samay par hum yaad dilaayenge.');
+  // Extended repeat labels (used by medication reminders).
+  String get rmdFortnightly => _p('Fortnightly', 'Har 2 hafte');
+  String get rmdMonthly => _p('Monthly', 'Har maheene');
+  String get rmdCustomDays => _p('Specific days', 'Chuni hui din');
+  // --- Medication reminders (Daily Medication card; never tied to a medicine) -
+  String get mrTitle => _p('My reminders', 'Mere reminder');
+  String get mrAdd => _p('Add reminder', 'Reminder jodein');
+  String get mrNew => _p('Add a reminder', 'Reminder jodein');
+  String get mrEdit => _p('Edit reminder', 'Reminder badlein');
+  String get mrFreq => _p('How often?', 'Kitni baar?');
+  String get mrFreqOnce => _p('Once a day', 'Din mein ek baar');
+  String get mrFreqTwice => _p('Twice a day', 'Din mein do baar');
+  String get mrFreqThrice => _p('Thrice a day', 'Din mein teen baar');
+  String get mrFreqWeekly => _p('Weekly', 'Har hafte');
+  String get mrFreqFortnightly => _p('Fortnightly', 'Har 2 hafte');
+  String get mrFreqMonthly => _p('Monthly', 'Har maheene');
+  String get mrFreqCustom => _p('Custom', 'Custom');
+  String get mrTimes => _p('At these times', 'In samay par');
+  String mrTimeN(int n) => _p('Time $n', 'Samay $n');
+  String get mrDayOfMonth => _p('Day of month', 'Maheene ka din');
+  String get mrOnDays => _p('On these days', 'In dino par');
+  String get mrNote => _p('Note (what should it say?)', 'Note (kya likhein?)');
+  String get mrNoteHint =>
+      _p('e.g. Iron tablet after lunch', 'jaise: lunch ke baad iron tablet');
+  String get mrDefaultTitle =>
+      _p('Medication reminder 💊', 'Dawai reminder 💊');
+  String get mrSave => _p('Save reminder', 'Reminder save karein');
+  String get mrDelete => _p('Delete', 'Hataayein');
+  String get mrEmpty => _p('No reminders yet — tap the bell to add one.',
+      'Abhi koi reminder nahi — bell dabaakar jodein.');
+  String get mrSaved => _p('Reminder set 💜', 'Reminder set ho gaya 💜');
+  String mrTimesPerDay(int n) => _p('$n× daily', 'Rozana $n baar');
+  String rmdWeekdayShort(int wd) {
+    const en = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const hi = ['Som', 'Mang', 'Budh', 'Guru', 'Shukra', 'Shani', 'Ravi'];
+    final i = (wd - 1).clamp(0, 6);
+    return _p(en[i], hi[i]);
+  }
+
+  // Suggested reminder presets.
+  String get rmdSugKegel => _p('Time for your Kegels 🌸', 'Kegel ka samay 🌸');
+  String get rmdSugVitamin =>
+      _p('Take your prenatal vitamin 💊', 'Apna prenatal vitamin lein 💊');
+  String get rmdSugRead =>
+      _p('Read to your baby 📖', 'Apne baby ko padhein 📖');
+  String get rmdSugWater => _p('Sip some water 💧', 'Thoda paani piyein 💧');
+  String get rmdSugCalm =>
+      _p('A calm moment for you 🕊️', 'Aapke liye ek shaant pal 🕊️');
+
+  // ---- Trimester chart (Home) ----------------------------------------------
+  String get tcTitle => _p('Trimester chart', 'Trimester chart');
+  String get tcTrimester => _p('Trimester', 'Trimester');
+  String get tcMonth => _p('Month', 'Mahina');
+  String get tcWeek => _p('Week', 'Hafta');
+  String tcDueDate(String date) => _p('Due Date: $date', 'Due Date: $date');
   String get contractionEmpty => _p(
       'Ready to start tracking? When a contraction begins, tap the button below.',
       'Tracking shuru karein? Jab contraction shuru ho, neeche button dabaayein.');
@@ -1146,12 +2443,12 @@ class S {
             '37 hafte se pehle niyamit contractions ke liye medical jaanch zaroori ho sakti hai. Apne doctor se jaldi sampark karein.');
       case 'active':
         return _p(
-            'Contractions are frequent, lasting longer, and occurring at relatively regular intervals. Contact your healthcare provider or follow your birth plan instructions.',
-            'Contractions baar-baar, lambe aur kaafi niyamit ho rahe hain. Apne doctor se sampark karein ya apne birth plan ke nirdesh follow karein.');
+            'Your contractions are frequent, longer, and fairly regular — a pattern often seen in active labour. Even so, strong contractions can sometimes be a false alarm, so this is NOT a confirmation. Please contact your healthcare provider, or follow your birth plan.',
+            'Aapke contractions baar-baar, lambe aur kaafi niyamit hain — aisa pattern aksar active labour mein dikhta hai. Phir bhi, tej contractions kabhi-kabhi false alarm bhi ho sakte hain, isliye yeh pakka NAHI hai. Kripya apne doctor se sampark karein, ya apne birth plan ko follow karein.');
       case 'likely':
         return _p(
-            'A consistent labor-like contraction pattern appears to be developing. Consider contacting your healthcare provider for guidance.',
-            'Ek niyamit labour-jaisa pattern banta dikh raha hai. Margdarshan ke liye apne doctor se sampark karne par vichaar karein.');
+            'A steady, labour-like pattern seems to be forming. It might be early labour, or it might still settle — timing alone cannot tell for sure. Consider contacting your healthcare provider for guidance.',
+            'Ek niyamit, labour-jaisa pattern banta dikh raha hai. Yeh shuruaati labour ho sakta hai, ya abhi shaant bhi pad sakta hai — sirf timing se pakka nahi kaha ja sakta. Margdarshan ke liye apne doctor se sampark karne par vichaar karein.');
       case 'early':
         return _p(
             'Contractions may be showing an early labor pattern. Continue monitoring frequency and duration.',
@@ -1401,6 +2698,31 @@ class S {
   String get gsVicharaTag => _p('Positive Contemplation', 'Sakaratmak Vichar');
   String get gsKriya => _p('Kriya', 'Kriya');
   String get gsKriyaTag => _p('Breath & Grounding', 'Saans Aur Sthirta');
+  // Tools Garbh Sanskar = a calm LIBRARY (no "today" framing). Intro + tiles.
+  String get gsAboutBody => _p(
+      'Garbh Sanskar is the gentle, age-old practice of nurturing your bond and your baby\'s growth through sound, positive thoughts, loving connection and mindful movement during pregnancy.',
+      'Garbh Sanskar pregnancy ke dauraan dhwani, sakaratmak vichaaron, pyaar bhare judaav aur mindful movement se aapke rishte aur baby ke vikas ko poshit karne ki saumya, praacheen practice hai.');
+  String get gsAboutMeaning => _p(
+      'A calm space to explore — pick whatever feels right for you today.',
+      'Ek shaant jagah jise explore karein — aaj jo aapko theek lage wo chunein.');
+  String get gsShravanDesc => _p(
+      'Calming ragas, tones and sounds for you and your baby.',
+      'Aapke aur baby ke liye shaant ragas, sur aur dhwaniyan.');
+  String get gsVicharaDesc => _p(
+      'Sacred insights, gentle brain games and uplifting reads.',
+      'Pavitra insights, halke brain games aur uplifting reads.');
+  String get gsSamvadDesc => _p(
+      'Speaking cards to read aloud — your voice, for your baby.',
+      'Padhne ke liye speaking cards — aapki awaaz, aapke baby ke liye.');
+  String get gsKriyaDesc => _p(
+      'Gentle, safe prenatal movement and breathing practices.',
+      'Saumya, surakshit prenatal movement aur saans ki practices.');
+  String get gsBrowseAll =>
+      _p('Browse the full collection.', 'Poora sangrah dekhein.');
+  String get gsSamvadAffirm => _p('Affirmations', 'Affirmations');
+  String get gsSamvadScripts =>
+      _p('Read-aloud stories', 'Padhkar sunane wali kahaniyan');
+  String get gsSamvadVisualize => _p('Visualizations', 'Visualizations');
   String get gsYourJourney => _p('Your journey', 'Aapka safar');
   String get gsStatListening => _p('Listening', 'Shravan');
   String get gsStatReflections => _p('Reflections', 'Vichar');
@@ -1443,6 +2765,8 @@ class S {
       _p('$done / $goal rituals completed', '$done / $goal rituals poore');
   String gsDayStreak(int n) => _p('$n day streak', '$n din ki streak');
   String get gsTodaysRituals => _p("Today's rituals", 'Aaj ke rituals');
+  String get gsVicharaTodo => _p('A reflection, a puzzle, or an uplifting read',
+      'Ek vichaar, ek puzzle, ya ek prernadayi read');
   String gsDailyGoalLine(int goal) =>
       _p('Goal: $goal / $goal each day', 'Lakshya: roz $goal / $goal');
   String get gsAllDone =>
@@ -1458,6 +2782,12 @@ class S {
   String get gsTabSacred => _p('Sacred Insights', 'Pavitra Vichar');
   String get gsTabBrain => _p('Brain Fitness', 'Brain Fitness');
   String get gsTabUplifting => _p('Uplifting Vibrations', 'Uplifting Vibrations');
+  String get gsSamvadTabAffirm =>
+      _p('Affirmations & Blessings', 'Affirmations & Aashirwad');
+  String get gsSamvadTabStories => _p('Stories & Fables', 'Kahaniyaan & Fables');
+  String get gsSamvadTabMantras => _p('Mantras & Lullabies', 'Mantra & Lories');
+  String get gsSamvadTabSpiritual =>
+      _p('Spiritual Reading', 'Aadhyaatmik Paath');
   String get gsMeaning => _p('What it means', 'Iska matlab');
   String get gsLesson => _p('Life lesson', 'Jeevan ka sabak');
   String get gsReadAloud => _p('Read aloud', 'Padh kar sunaayein');
@@ -1476,6 +2806,26 @@ class S {
   String get gsPuzzleSoon =>
       _p('This puzzle opens soon — counts as done for today ❤️',
           'Yeh puzzle jald — aaj ke liye poora maana jaayega ❤️');
+  // Vichara brain games — shared chrome.
+  String get gsGameDone =>
+      _p('Well done — a calm few minutes 🌿', 'Shabaash — kuch shaant pal 🌿');
+  String get gsPlayAgain => _p('Play again', 'Phir se khelein');
+  String get gsGameClose => _p('Done', 'Ho gaya');
+  String get gsWordSearchHow => _p(
+      'Tap the first and last letter of a hidden word.',
+      'Chhupe shabd ke pehle aur aakhri akshar par tap karein.');
+  String gsWordsFound(int a, int b) =>
+      _p('$a of $b found', '$b mein se $a mile');
+  String get gsSudokuHow => _p(
+      'Fill 1–4 so every row, column and box has no repeats.',
+      'Aise bharein ki har row, column aur box mein 1–4 dohraayein nahi.');
+  String get gsLogicHow =>
+      _p('Pick the answer that fits.', 'Sahi jawaab chunein.');
+  String get gsLogicNudge =>
+      _p('Not quite — try another 🌸', 'Bilkul nahi — doosra try karein 🌸');
+  String gsLogicProgress(int a, int b) => _p('$a of $b', '$b mein se $a');
+  String get gsMemoryHow => _p('Flip two cards to find the matching pairs.',
+      'Do cards palatein aur jodi milayein.');
 
   // ---- Community (Tools) ---------------------------------------------------
   String get cmTitle => _p('Community', 'Community');
@@ -1483,13 +2833,66 @@ class S {
       'Search communities, topics or posts', 'Communities, topics ya posts search karein');
   String get cmJoinedSection => _p('Your communities', 'Aapki communities');
   String get cmRecommended => _p('Recommended for you', 'Aapke liye recommended');
+  String get cmRecommendedEmpty => _p(
+      "You've joined every community 🎉 — they're all up in 'Your communities'.",
+      "Aapne saari communities join kar li 🎉 — wo sab 'Aapki communities' mein hain.");
   String get cmPulse => _p('Community Pulse', 'Community Pulse');
   String get cmFeed => _p('For you', 'Aapke liye');
+  String get cmWalkingTogether => _p('Walking together', 'Saath chalte hain');
+  String get cmMyActivity => _p('My Activity', 'Meri Activity');
+  String get cmMyBookmarks => _p('My Bookmarks', 'Mere Bookmarks');
+  String get cmActPosts => _p('Your posts', 'Aapki posts');
+  String get cmActLiked => _p('Liked', 'Pasand kiye');
+  String get cmActCommented => _p('Commented', 'Comment kiye');
+  String get cmActUpvoted => _p('Endorsed', 'Endorse kiye');
+  String get cmActEmpty => _p(
+      'Your posts, likes and comments will appear here.',
+      'Aapki posts, likes aur comments yahan dikhenge.');
+  String get cmBookmarksEmpty => _p(
+      'Posts you bookmark will be saved here.',
+      'Jo posts aap bookmark karengi woh yahan save honge.');
   String get cmJoin => _p('Join', 'Join karein');
   String get cmJoinedBadge => _p('Joined', 'Joined');
   String get cmLeave => _p('Leave community', 'Community chhodein');
   String get cmMute => _p('Mute community', 'Community mute karein');
   String get cmUnmute => _p('Unmute community', 'Unmute karein');
+  // Twitter-style post card + ⋯ menu + profiles.
+  String get cmInCommunity => _p('in', 'in');
+  String get cmReposted => _p('Reposted ✓', 'Repost ho gaya ✓');
+  String get cmRepostUndone => _p('Repost removed', 'Repost hata diya');
+  String get cmShared => _p('Sharing… (preview)', 'Share ho raha hai… (preview)');
+  String get cmFollow => _p('Follow', 'Follow');
+  String get cmUnfollow => _p('Unfollow', 'Unfollow');
+  String get cmFollowingState => _p('Following', 'Following');
+  String get cmFollowedToast =>
+      _p('Following — their posts show in Following',
+          'Follow kiya — unke posts Following mein dikhenge');
+  String get cmUnfollowedToast => _p('Unfollowed', 'Unfollow kiya');
+  String get cmNotInterested => _p('Not interested', 'Interested nahi');
+  String get cmNotInterestedDone =>
+      _p("Got it — we'll show fewer like this",
+          'Theek hai — aise posts kam dikhayenge');
+  String get cmMuteUser => _p('Mute', 'Mute');
+  String get cmMutedToast => _p('Muted', 'Mute kiya');
+  String get cmBlock => _p('Block', 'Block');
+  String get cmBlockedToast => _p('Blocked', 'Block kiya');
+  String get cmReport => _p('Report post', 'Post report karein');
+  String get cmReportedToast =>
+      _p('Reported — thank you', 'Report kiya — shukriya');
+  String get cmYourFeed => _p('Your feed', 'Aapka feed');
+  String get cmFollowingEmpty =>
+      _p('Your Following feed is empty', 'Following feed abhi khaali hai');
+  String get cmFollowingEmptySub => _p(
+      'Join communities or follow experts to see their posts here.',
+      'Communities join karein ya experts ko follow karein — unke posts yahan dikhenge.');
+  String get cmExpertBio => _p(
+      'Verified expert on ParentVeda. Here to support mothers through pregnancy, birth and the early days with gentle, evidence-based guidance. 💜',
+      'ParentVeda par verified expert. Pregnancy, birth aur shuruaati dino mein maaon ka saath dene ke liye — gentle, evidence-based guidance ke saath. 💜');
+  String get cmMember => _p('Member', 'Member');
+  String get cmPostsCount => _p('Posts', 'Posts');
+  String get cmFollowers => _p('Followers', 'Followers');
+  String get cmFollowingCount => _p('Following', 'Following');
+  String get cmNoPostsYet => _p('No posts yet', 'Abhi koi post nahi');
   String cmMembers(int n) => _p('$n members', '$n members');
   String get cmCreatePost => _p('Create post', 'Post banayein');
   String get cmVote => _p('Vote', 'Vote');
@@ -1509,6 +2912,121 @@ class S {
       _p('Auto-detected topics', 'Auto-detect kiye gaye topics');
 
   // ---- Products ❤️ (Tools) -------------------------------------------------
+  // ---- Product Checklist (tool) --------------------------------------------
+  String get pclTitle => _p('Product Checklist', 'Product Checklist');
+  String get pclIntro => _p(
+      'Build your own checklists from our products — add what you want, note when you need it, and tick things off as you get them.',
+      'Hamare products se apni khud ki checklist banayein — jo chahiye add karein, kab chahiye likhein, aur milte hi tick karein.');
+  String get pclYourLists => _p('Your checklists', 'Aapki checklists');
+  String get pclNewChecklist => _p('New checklist', 'Nayi checklist');
+  String get pclNamePrompt =>
+      _p('Name your checklist', 'Checklist ko naam dein');
+  String get pclRename => _p('Rename', 'Naam badlein');
+  String get pclDelete => _p('Delete', 'Delete');
+  String get pclDeleteConfirm =>
+      _p('Delete this checklist?', 'Yeh checklist delete karein?');
+  String get pclDeleted => _p('Checklist deleted', 'Checklist delete ho gayi');
+  String get pclCurated => _p('Curated starters', 'Curated starters');
+  String get pclCuratedSub => _p('Ready-made lists you can make your own.',
+      'Banayi-banayi lists, jinhe aap apna bana sakti hain.');
+  String get pclAdopt =>
+      _p('Add to my checklists', 'Meri checklists mein add karein');
+  String get pclAddProducts => _p('Add products', 'Products add karein');
+  String get pclAdd => _p('Add', 'Add');
+  String get pclAdded => _p('Added', 'Added');
+  String pclAddedTo(String name) =>
+      _p('Added to $name', '$name mein add ho gaya');
+  String get pclAddToChecklist =>
+      _p('Add to checklist', 'Checklist mein add karein');
+  String pclGotChip(int got, int total) => _p('$got/$total', '$got/$total');
+  String pclGotOf(int got, int total) =>
+      _p('$got of $total ticked', '$total mein se $got ticked');
+  String get pclSaveList => _p('Save list', 'List save karein');
+  String get pclSavedSnack => _p('Checklist saved ✓', 'Checklist save ho gayi ✓');
+  String get pclAddRemaining =>
+      _p('Add remaining to cart', 'Baaki cart mein daalein');
+  String get pclGotPromptTitle => _p('Already got this?', 'Yeh mil gaya?');
+  String get pclGotPromptBody => _p(
+      "Mark it as something you already have — it won't be added to your cart.",
+      'Ise aapke paas mojood maan lein — yeh cart mein nahi jaayega.');
+  String get pclGotPromptYes => _p('Yes, got it', 'Haan, mil gaya');
+  String get pclGotPromptNo => _p('Not yet', 'Abhi nahi');
+  String get pclAffiliate => _p('Affiliate', 'Affiliate');
+  String get pclCustomTag => _p('Yours', 'Aapka');
+  String get pclBoughtTag => _p('Bought ✓', 'Le liya ✓');
+  String get pclOpenLink => _p('Open link', 'Link kholein');
+  String get pclAddOwn => _p('Add your own product', 'Apna product add karein');
+  String get pclCustomName => _p('Product name', 'Product ka naam');
+  String get pclCustomLink => _p('Link (optional)', 'Link (optional)');
+  String get pclCustomPrice => _p('Price (optional)', 'Daam (optional)');
+  String get pclCustomNote =>
+      _p('When / note (optional)', 'Kab / note (optional)');
+  String pclCustomAdded(String name) =>
+      _p('Added "$name" to your list', '"$name" list mein add ho gaya');
+  String pclItemsCount(int n) => _p('$n items', '$n cheezein');
+  String pclListSummary(int total, int got) => total == 0
+      ? _p('No products yet', 'Abhi koi product nahi')
+      : _p('$total items · $got/$total got', '$total cheezein · $got/$total mila');
+  String get pclNotePrompt =>
+      _p('When do you need it?', 'Yeh kab chahiye?');
+  String get pclAddWhen => _p('Add when', 'Kab chahiye, likhein');
+  String get pclEditNote => _p('Edit note', 'Note edit karein');
+  String get pclRemove => _p('Remove', 'Hatayein');
+  String get pclEmpty => _p(
+      'No checklists yet. Create one and add the products you love.',
+      'Abhi koi checklist nahi. Ek banayein aur apne pasand ke products add karein.');
+  String get pclEmptyItems => _p(
+      'No products yet. Add some from our catalogue.',
+      'Abhi koi product nahi. Hamare catalogue se kuch add karein.');
+  String get pclSearchHint => _p('Search products', 'Products search karein');
+  String get pclNoResults => _p('No products found', 'Koi product nahi mila');
+  String get pclSave => _p('Save', 'Save');
+  String get pclCancel => _p('Cancel', 'Cancel');
+
+  // ---- Shopping cart (preview, no real payment) ----------------------------
+  String get cartProductsTitle => _p('Cart', 'Cart');
+  String get cartHospitalTitle =>
+      _p('Hospital Bag Cart', 'Hospital Bag Cart');
+  String get cartAddToCart => _p('Add to cart', 'Cart mein add karein');
+  String get cartAddAllToCart =>
+      _p('Add all to cart', 'Sab cart mein add karein');
+  String get cartBuyNow => _p('Buy now', 'Abhi khareedein');
+  String get cartCheckout => _p('Checkout', 'Checkout');
+  String get cartPlaceOrder => _p('Place order', 'Order place karein');
+  String get cartSubtotal => _p('Subtotal', 'Subtotal');
+  String get cartDelivery => _p('Delivery', 'Delivery');
+  String get cartFree => _p('Free', 'Free');
+  String get cartTotal => _p('Total', 'Total');
+  String get cartEach => _p('each', 'each');
+  String cartItems(int n) => _p('$n item${n == 1 ? '' : 's'}',
+      '$n cheez${n == 1 ? '' : 'ein'}');
+  String get cartSize => _p('Size', 'Size');
+  String get cartColor => _p('Colour', 'Colour');
+  String get cartChooseSize => _p('Choose a size', 'Size chunein');
+  String get cartEmpty => _p('Your cart is empty', 'Aapka cart khaali hai');
+  String get cartEmptyHint => _p(
+      'Add products and they will show up here.',
+      'Products add karein, woh yahan dikhenge.');
+  String get cartAddedToCart => _p('Added to cart', 'Cart mein add ho gaya');
+  String cartAddedN(int n) => _p('$n added to cart',
+      '$n cart mein add ho gaye');
+  String get cartAllInCart =>
+      _p('Already in your cart', 'Pehle se aapke cart mein hai');
+  String get cartViewCart => _p('View cart', 'Cart dekhein');
+  String get cartOrderSummary => _p('Order summary', 'Order summary');
+  String get cartDeliverTo => _p('Deliver to', 'Yahan bhejein');
+  String get cartDeliverToValue =>
+      _p('Home · Add address', 'Ghar · Address add karein');
+  String get cartChange => _p('Change', 'Badlein');
+  String get cartPaymentMethod => _p('Payment method', 'Payment method');
+  String get cartComingSoonTag => _p('Coming soon', 'Jald aa raha hai');
+  String get cartOrderPlaced => _p('Order placed', 'Order ho gaya');
+  String get cartOrderPlacedSub => _p(
+      'This is a preview — no payment was taken. We will let you know the moment checkout goes live. 💜',
+      'Yeh ek preview hai — koi payment nahi liya gaya. Checkout live hote hi aapko bata denge. 💜');
+  String get cartContinueShopping =>
+      _p('Continue shopping', 'Shopping jaari rakhein');
+
   String get prTitle => _p('Products', 'Products');
   String get prTabRecommended => _p('Recommended', 'Recommended');
   String get prTabBrowse => _p('Browse all', 'Sabhi');
@@ -1559,6 +3077,10 @@ class S {
       'Abhi kuch save nahi hua. Kisi bhi product par heart dabakar yahaan rakhein.');
   String get prComingSoon =>
       _p('Buying opens soon — saving works now ❤️', 'Buying jald — saving abhi chalta hai ❤️');
+  String get prAffiliate => _p('Affiliate', 'Affiliate');
+  String get prBuyOnAmazon => _p('Buy on Amazon', 'Amazon par khareedein');
+  String get prAffiliateNote => _p('Sold on Amazon — opens externally.',
+      'Amazon par milta hai — bahar khulta hai.');
   String get prSearchHint => _p('Search products', 'Products search karein');
   String prBadge(String key) {
     switch (key) {
@@ -1580,9 +3102,110 @@ class S {
       _p('What would you like to share?', 'Aap kya share karna chahengi?');
   String get cmShare => _p('Share', 'Share karein');
   String get cmPosted => _p('Posted to your community ❤️', 'Aapki community mein post ho gaya ❤️');
+  String get cmPostAsDoctor => _p('Post as doctor', 'Doctor ban kar post karein');
+  String get cmPostedAsDoctor => _p('Posted as a verified doctor 🩺', 'Verified doctor ke roop mein post ho gaya 🩺');
+  String get cmPostingAsDoctor => _p('Posting as a verified doctor', 'Verified doctor ke roop mein post');
   String get cmExpertBadge => _p('Expert', 'Expert');
   String get cmComingSoon => _p('Coming soon', 'Jald aa raha hai');
   String get cmRemindMe => _p('Remind me', 'Yaad dilayein');
+  // ---- Community Pro: trust-building expert endorsement layer ---------------
+  String get cmSubtitle => _p(
+      'A circle of mothers, walking the same path as you.',
+      'Maaon ka ek circle, jo aapke saath usi raah par chal rahi hain.');
+  String get cmFollowing => _p('Following', 'Follow kiye');
+  String cmNew(int n) => _p('$n new', '$n naye');
+  String get cmEndorsed => _p('Verified expert backs this experience',
+      'Verified expert is anubhav ko samarthan dete hain');
+  String get cmExpertLiked => _p('Liked', 'Pasand');
+  String get cmVerifiedExpert => _p('Verified expert', 'Verified expert');
+  // Expert-endorsement credibility count + "who verified" sheet.
+  String cmPlusExperts(int n) =>
+      _p('+$n other experts', '+$n aur experts');
+  String get cmExpertsWhoVerified =>
+      _p('Verified by these experts', 'In experts ne verify kiya');
+  String cmAndMoreExperts(int n) =>
+      _p('…and $n more verified experts', '…aur $n verified experts');
+  // Doctor (test) mode + endorse flow.
+  String get cmDoctorMode => _p('Doctor mode', 'Doctor mode');
+  String get cmDoctorBanner => _p(
+      "You're viewing as a verified doctor · test mode",
+      'Aap ek verified doctor ke roop mein dekh rahe hain · test mode');
+  String get cmDoctorOn =>
+      _p('Doctor mode on — test', 'Doctor mode on — test');
+  String get cmDoctorOff => _p('Doctor mode off', 'Doctor mode off');
+  String get cmEndorseThis => _p('Verify this', 'Verify karein');
+  String get cmYouVerified => _p('You verified this', 'Aapne verify kiya');
+  String get cmExit => _p('Exit', 'Exit');
+  // Subtle "verified by an expert" hint (replaces the old full-width banner).
+  String cmVerifiedBy(String name) =>
+      _p('Verified by $name', '$name ne verify kiya');
+  String cmVerifiedByPlus(String name, int n) => _p(
+      'Verified by $name +$n experts', '$name +$n experts ne verify kiya');
+  // Request-an-expert-to-verify flow (composer toggle, pending tag, expert filter).
+  String get cmAskVerifyTitle =>
+      _p('Ask an expert to verify this', 'Expert se verify karne ko kahein');
+  String get cmAskVerifySub => _p(
+      'A verified expert can review and confirm your post.',
+      'Ek verified expert aapke post ko dekh kar confirm kar sakte hain.');
+  String get cmPendingVerify =>
+      _p('Awaiting expert verification', 'Expert verification ka intezaar');
+  String get cmNeedsVerify => _p('Needs verification', 'Verification chahiye');
+  String get cmNoVerifyRequests => _p(
+      'No posts are waiting for verification right now.',
+      'Abhi koi post verification ke liye nahi hai.');
+  // Specialty the mother prefers for verification + the new comment-to-verify flow.
+  String cmSpecialty(String key) {
+    switch (key) {
+      case 'gynae':
+        return _p('Gynaecologist', 'Gynaecologist');
+      case 'pediatric':
+        return _p('Pediatrician', 'Pediatrician');
+      case 'lactation':
+        return _p('Lactation expert', 'Lactation expert');
+      case 'nutrition':
+        return _p('Nutritionist', 'Nutritionist');
+      case 'physio':
+        return _p('Physiotherapist', 'Physiotherapist');
+      case 'mental':
+        return _p('Mental health', 'Mental health');
+      default:
+        return _p('Any doctor', 'Koi bhi doctor');
+    }
+  }
+
+  String get cmChooseSpecialty =>
+      _p('Which expert should we ask?', 'Kis expert se poochein?');
+  String cmAwaitingSpecialty(String specialty) => _p(
+      'Awaiting $specialty verification', '$specialty verification ka intezaar');
+  String get cmCommentToVerify =>
+      _p('Comment to verify this post', 'Verify karne ke liye comment karein');
+  String get cmShareVia => _p('via ParentVeda Community', 'ParentVeda Community se');
+  // Composer — write & add photos to a community.
+  String get cmAddPhotos => _p('Add photos', 'Photos jodein');
+  String get cmCamera => _p('Camera', 'Camera');
+  String get cmWritePrompt => _p('Share something with this group…',
+      'Is group ke saath kuch share karein…');
+  // Community Pulse cards (Community Pro design).
+  String get cmPulse1Tag => _p('YOU ARE NOT ALONE', 'AAP AKELI NAHI HAIN');
+  String get cmPulse1Text => _p('127 mothers are also due in November 2026.',
+      '127 mummies bhi November 2026 mein due hain.');
+  String get cmPulse1Foot =>
+      _p('+124 mamas online right now', '+124 mummies abhi online');
+  String get cmPulse2Tag => _p('TRENDING TODAY', 'AAJ TRENDING');
+  String get cmPulse2Text => _p('34 mamas are sharing their week-18 wins.',
+      '34 mummies apni week-18 ki jeet share kar rahi hain.');
+  String get cmPulse2Foot => _p('#Week18 · updated 2h ago',
+      '#Week18 · 2 ghante pehle update');
+  String get cmPulse3Tag => _p('EXPERT LIVE', 'EXPERT LIVE');
+  String get cmPulse3Text => _p('Dr. Meera is hosting a latch & feeding Q&A.',
+      'Dr. Meera latch & feeding Q&A le rahi hain.');
+  String get cmPulse3Foot => _p('Today · 6:00 PM · Tap to set a reminder',
+      'Aaj · 6:00 PM · Reminder set karne ke liye tap karein');
+  String get cmPulse4Tag => _p('A GENTLE REMINDER', 'EK PYAARA REMINDER');
+  String get cmPulse4Text => _p('You grew a whole heartbeat this month. 💜',
+      'Is mahine aapne ek poori dhadkan badhayi. 💜');
+  String get cmPulse4Foot => _p('Tap to log how you are feeling today',
+      'Aaj kaisa lag raha hai, log karne ke liye tap karein');
   String cmPostType(String key) {
     switch (key) {
       case 'question':
@@ -1604,8 +3227,15 @@ class S {
     }
   }
 
-  // ---- Read Next ❤️ (Home) -------------------------------------------------
-  String get rnTitle => _p('Read Next', 'Read Next');
+  // ---- Daily Reads (Home — above Read Next) --------------------------------
+  String get drTitle => _p('Daily Reads', 'Daily Reads');
+  String get drArticles => _p('Articles', 'Lekh');
+  String get drBooks => _p('Books', 'Kitaabein');
+  String get drSeeAll => _p('See all', 'Sabhi dekhein');
+
+  // ---- Read recommendations ❤️ (formerly "Read Next" / "Library") ----------
+  String get rnTitle =>
+      _p('Read recommendations', 'Read recommendations');
   String get rnSubtitle => _p('Handpicked reading for your stage of pregnancy.',
       'Aapki pregnancy stage ke liye chuni hui reading.');
   String get rnThisWeekPick => _p("This Week's Pick", 'Is Hafte Ki Pick');

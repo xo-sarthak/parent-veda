@@ -2,12 +2,11 @@
 //  PhotoViewerScreen — full-screen memory photo with a week badge + date.
 // =============================================================================
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../localization/app_language.dart';
 import '../models/memory_models.dart';
+import '../widgets/storage_image.dart';
 
 class PhotoViewerScreen extends StatelessWidget {
   const PhotoViewerScreen({super.key, required this.photo, required this.lang});
@@ -33,7 +32,7 @@ class PhotoViewerScreen extends StatelessWidget {
             child: InteractiveViewer(
               minScale: 1,
               maxScale: 4,
-              child: Image.file(File(photo.path), fit: BoxFit.contain),
+              child: StorageImage(photo.path, fit: BoxFit.contain),
             ),
           ),
           Positioned(

@@ -18,7 +18,7 @@ class JourneyGeometry {
     this.lanePhase = math.pi / 2,
     this.topPad = 40,
     this.bottomPad = 70,
-  }) : amplitude = amplitude ?? (size.width * 0.12);
+  }) : amplitude = amplitude ?? (size.width * 0.18);
 
   /// The full canvas the trail is drawn into.
   final Size size;

@@ -1,6 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Voice journaling: capture the mother's spoken note. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Customizable reminders (flutter_local_notifications). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Exact-time reminders (Android 12+). USE_EXACT_ALARM auto-grants for
+         testing now; before a Play Store launch, drop USE_EXACT_ALARM and rely
+         on SCHEDULE_EXACT_ALARM + the runtime request (Play flags USE_EXACT). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <application
         android:label="parentveda"
         android:name="${applicationName}"
@@ -32,6 +41,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Reschedule reminders after a reboot (flutter_local_notifications). -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

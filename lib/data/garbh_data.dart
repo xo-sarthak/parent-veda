@@ -194,22 +194,60 @@ const List<GarbhPractice> kKriya = [
 // ---------------------------------------------------------------------------
 //  Samvad — Womb Connection prompts (one shown as "today's connection")
 // ---------------------------------------------------------------------------
-const List<GarbhPrompt> kSamvad = [
-  GarbhPrompt('s1', 'Tell your baby about your favourite childhood memory.'),
-  GarbhPrompt('s2', 'Tell your baby about the day you found out they were coming.'),
-  GarbhPrompt('s3', 'Describe the people who are so excited to meet them.'),
-  GarbhPrompt('s4', 'Tell your baby what you hope they will love about the world.'),
-  GarbhPrompt('s5', 'Share a song that has always meant a lot to you.'),
-  GarbhPrompt('s6', 'Tell your baby about their grandparents.'),
-  GarbhPrompt('s7', 'Describe your favourite place, and why it is special.'),
-  GarbhPrompt('s8', 'Tell your baby one value you hope to pass on.'),
-  GarbhPrompt('s9', 'Tell your baby why you are excited to meet them.'),
-  GarbhPrompt('s10', 'Share a small dream you have for them.'),
-  GarbhPrompt('s11', 'Tell your baby about a time you felt truly brave.'),
-  GarbhPrompt('s12', 'Describe what home feels like to you.'),
-  GarbhPrompt('s13', 'Tell your baby about a food you cannot wait to share.'),
-  GarbhPrompt('s14', 'Share what made you smile today.'),
+// Three trimester-specific sets of SPEAKING cards (read aloud to the bump), per
+// the Garbh spec (Pillar 3 — Womb Connection):
+//  T1 = affirmations — welcome the baby + grow the mother's own confidence.
+//  T2 = expressive, multi-genre read-aloud scripts for the "peak auditory window";
+//       the punctuation is deliberately dramatic (— … ! CAPS) so her voice
+//       naturally rises, falls and plays, helping baby map sound.
+//  T3 = visualization prompts — welcome + the birth day as a cooperative team.
+// (Old generic kSamvad prompts removed; replaced by these trimester sets.)
+
+const List<GarbhPrompt> kSamvadT1 = [
+  GarbhPrompt('aff1',
+      'Little one, you are so wanted. I am becoming your mother, and my body already knows just what to do.'),
+  GarbhPrompt('aff2',
+      'My darling, every single day my heart makes a little more room for you. I am strong, and I am yours.'),
+  GarbhPrompt('aff3',
+      'Hello, tiny love. You are safe inside me. We are learning this journey together — you and I, side by side.'),
+  GarbhPrompt('aff4',
+      'Sweet baby, I welcome you with my whole heart. I trust my body, and I trust the gentle way you are growing.'),
+  GarbhPrompt('aff5',
+      'I am calm, and I am ready. Every change in me is making a soft, safe home for you, my little one.'),
+  GarbhPrompt('aff6',
+      'You are already loved beyond measure. Today I am kind to myself, so I can be kind to you.'),
 ];
+
+const List<GarbhPrompt> kSamvadT2 = [
+  GarbhPrompt('scr1',
+      "Once upon a time, there was a tiny seed… who dreamed of touching the SKY. 'I'm far too small!' it sighed. But the soft rain whispered, 'Just grow — one little leaf at a time.' And do you know what happened, my love? That tiny seed became a GREAT, tall tree!"),
+  GarbhPrompt('scr2',
+      "Knock, knock! Who's there? It's the morning sun, peeking through the window — 'Good morning, little one!' it calls. And the birds all answer, 'Tweet! Tweet! Wake UP — it's a beautiful day!'"),
+  GarbhPrompt('scr3',
+      "Listen… can you hear me? My voice goes soft and low… and then — bright and HIGH! This is how we'll talk, you and I. One day you'll giggle right back — and oh, how I cannot WAIT to hear it!"),
+  GarbhPrompt('scr4',
+      "Let me tell you about a clever little crow. He was SO thirsty! He found a pot — but the water sat low, low, low. 'What shall I do?' he wondered… Then — plop! plop! PLOP! — in went the pebbles, and the water rose UP. Clever crow! We never give up, do we, my love?"),
+  GarbhPrompt('scr5',
+      "Round and round the garden hums a gentle bee. Buzz, buzz, BUZZ! 'Hello, flowers!' she sings. And every flower nods — 'Hello, busy bee!' What a happy, humming, wonderful day."),
+];
+
+const List<GarbhPrompt> kSamvadT3 = [
+  GarbhPrompt('vis1',
+      'Close your eyes with me, little one. Picture the day we meet — soft light, gentle hands, and the voice you already know so well. We will do this together, as a team.'),
+  GarbhPrompt('vis2',
+      'Soon, my love, you will make your way toward my arms. I am strong, you are strong, and we move as one. I am right here, and I will welcome you.'),
+  GarbhPrompt('vis3',
+      'Imagine it, sweet baby: the very first time I hold you on my chest. Your tiny breath and my steady heartbeat — the two sounds you have always known, finally together.'),
+  GarbhPrompt('vis4',
+      'On your birth day, we are a team. When you are ready, you will show me the way, and I will breathe you gently into the world. I trust you, and I trust us.'),
+  GarbhPrompt('vis5',
+      'Picture us, little one — you nestled close, me holding you near. Whatever the day brings, we meet it together. You are not arriving alone; I am right here with you.'),
+];
+
+/// The speaking-cards for trimester [t]: affirmations (1) → read-aloud scripts
+/// (2) → visualizations (3).
+List<GarbhPrompt> samvadForTrimester(int t) =>
+    t <= 1 ? kSamvadT1 : (t == 2 ? kSamvadT2 : kSamvadT3);
 
 // ---------------------------------------------------------------------------
 //  Lookups
@@ -235,9 +273,12 @@ GarbhPractice? kriyaById(String id) {
   return null;
 }
 
-/// Today's connection prompt, rotating gently by day of pregnancy.
-GarbhPrompt promptForDay(int day) =>
-    kSamvad[(day.clamp(1, 280) - 1) % kSamvad.length];
+/// Today's connection card, rotating gently by day — from the set that matches
+/// the mother's [trimester] (affirmation / read-aloud script / visualization).
+GarbhPrompt promptForDay(int day, int trimester) {
+  final list = samvadForTrimester(trimester);
+  return list[(day.clamp(1, 280) - 1) % list.length];
+}
 
 // ===========================================================================
 //  v2.0 — trimester engine + per-pillar "today" pickers
@@ -290,6 +331,9 @@ const List<GarbhInsight> _insights = [
 ];
 GarbhInsight insightForTrimester(int t) => _insights[(t - 1).clamp(0, 2)];
 
+/// All Sacred-Insight verses (used by the Tools library — the full repository).
+List<GarbhInsight> garbhAllInsights() => _insights;
+
 // --- Vichara: Brain Fitness (gentle puzzles for focused calm) ---
 const List<GarbhPuzzle> kPuzzles = [
   GarbhPuzzle('Word Search', '🔤', 'Find the hidden words — a quiet few minutes.'),
@@ -298,15 +342,15 @@ const List<GarbhPuzzle> kPuzzles = [
   GarbhPuzzle('Memory Match', '🃏', 'A simple memory game to relax into.'),
 ];
 
-// --- Samvad: theme line per trimester (the prompt rotates by day) ---
+// --- Samvad: "why this matters" line per trimester (cards rotate by day) ---
 String samvadThemeForTrimester(int t) {
   switch (t) {
     case 1:
-      return 'Welcome your baby and be kind to yourself as your body changes.';
+      return 'Say these affirmations aloud — welcome your baby, and let your own confidence grow with every word.';
     case 2:
-      return 'Your baby can hear you now — talk, tell stories, share your day.';
+      return "Your baby's hearing is awake now. Read aloud with feeling — let your voice rise, fall and play, so they learn its music.";
     default:
-      return 'Speak words of welcome and calm as you prepare to meet your baby.';
+      return 'Picture the day you meet, and speak it softly — you and your baby, a team getting ready together.';
   }
 }
 
@@ -358,3 +402,32 @@ const List<GarbhNutrition> _nutrition = [
   ),
 ];
 GarbhNutrition nutritionForTrimester(int t) => _nutrition[(t - 1).clamp(0, 2)];
+
+// ===========================================================================
+//  Daily rotation pickers — used ONLY by the Home daily Garbh section, where
+//  each pillar shows a different item each day (no recommendation lists). The
+//  full Tools Garbh keeps the trimester pickers above.
+// ===========================================================================
+int _dayIdx(int day, int n) => (day.clamp(1, 280) - 1) % n;
+
+List<GarbhAudio> get _dailyRagas =>
+    kShravan.where((a) => a.kind == GarbhKind.raga).toList();
+
+/// A different raga each day (cycles through the raga set).
+GarbhAudio shravanForDay(int day) {
+  final r = _dailyRagas;
+  return r[_dayIdx(day, r.length)];
+}
+
+/// A different sacred insight each day.
+GarbhInsight insightForDay(int day) => _insights[_dayIdx(day, _insights.length)];
+
+/// One uplifting read per day (rotates through the library).
+GarbhStory vicharaStoryForDay(int day) => kVichara[_dayIdx(day, kVichara.length)];
+
+/// A different breath practice each day.
+GarbhPractice kriyaForDay(int day) => kKriya[_dayIdx(day, kKriya.length)];
+
+/// A different nourishment focus each day.
+GarbhNutrition nutritionForDay(int day) =>
+    _nutrition[_dayIdx(day, _nutrition.length)];

@@ -11,12 +11,16 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/read_to_baby_data.dart';
+import '../../data/spiritual_reading_data.dart';
 import '../../localization/app_language.dart';
 import '../../models/home_day.dart';
 import '../../models/week_content.dart';
 import '../../services/baby_voice_service.dart';
 import '../../services/daily_store.dart';
 import '../../services/home_content_controller.dart';
+import '../../services/read_to_baby_saved_store.dart';
+import '../../services/read_to_baby_store.dart';
 import '../../screens/home_detail_screens.dart';
 import '../../theme/app_theme.dart';
 import '../cards/card_shell.dart';
@@ -506,69 +510,276 @@ class ReadModule extends StatelessWidget {
   final AppLanguage lang;
   final HomeContentController home;
 
+  // ignore: unused_element
   String get _listenKey => 'home_day_${day.day}_story';
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge(
+          [ReadToBabyStore.instance, ReadToBabySavedStore.instance]),
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    final st = day.story;
+    final piece = _todaysPiece(s);
     return HomeCard(
-      eyebrow: s.readEyebrow,
+      eyebrow:
+          piece.tag.isEmpty ? s.readEyebrow : '${s.readEyebrow} · ${piece.tag}',
       icon: Icons.menu_book_rounded,
       accent: AppTheme.secondary500,
-      title: '“${st.title.of(lang)}”',
+      title: '“${piece.title}”',
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(st.summary.of(lang), style: text.bodyLarge?.copyWith(height: 1.5)),
-        const SizedBox(height: 16),
+        Text(piece.body, style: text.bodyLarge?.copyWith(height: 1.55)),
+        const SizedBox(height: 12),
         Row(children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () {
-                home.markEngaged(DailyModule.read);
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => StoryReaderScreen(story: st, lang: lang),
-                ));
-              },
-              icon: const Icon(Icons.menu_book_rounded, size: 18),
-              label: Text(s.readCta),
+          TextButton.icon(
+            onPressed: () => _openCustomize(context, s),
+            icon: const Icon(Icons.tune_rounded, size: 18),
+            label: Text(s.rtbCustomize),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.secondary600,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             ),
           ),
-          if (st.audioAvailable) ...[
-            const SizedBox(width: 12),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: BabyVoiceService.instance,
-                builder: (context, _) {
-                  final playing = BabyVoiceService.instance.isPlaying(_listenKey);
-                  return FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppTheme.secondary500,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+          const Spacer(),
+          // Save this piece — it surfaces in the Profile › Saved hub.
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            tooltip: s.rtbSave,
+            onPressed: () => ReadToBabySavedStore.instance
+                .toggleSave(piece.title, piece.body, piece.tag),
+            icon: Icon(
+              ReadToBabySavedStore.instance.isSaved(piece.title)
+                  ? Icons.bookmark_rounded
+                  : Icons.bookmark_border_rounded,
+              color: AppTheme.secondary500,
+              size: 22,
+            ),
+          ),
+        ]),
+      ]),
+    );
+    // The read-to-baby "Listen" / play-voice button stays removed (baby voice
+    // off here); revert from git history if it's ever wanted again.
+  }
+
+  // The day's piece, drawn from the mother's chosen categories (stable per day,
+  // changes daily via the day index — no randomness).
+  ({String title, String body, String tag}) _todaysPiece(S s) {
+    final store = ReadToBabyStore.instance;
+    final pool = <({String title, String body, String tag})>[];
+    void addCat(String cat, String tag) {
+      for (final p in readAloudByCategory(cat)) {
+        pool.add((title: p.title, body: p.body, tag: tag));
+      }
+    }
+
+    if (store.isCategoryOn(kRtbStories)) addCat(kRtbStories, s.rtbStories);
+    if (store.isCategoryOn(kRtbRhymes)) addCat(kRtbRhymes, s.rtbRhymes);
+    if (store.isCategoryOn(kRtbAffirmations)) {
+      addCat(kRtbAffirmations, s.rtbAffirmations);
+    }
+    if (store.isCategoryOn(kRtbSpiritual)) {
+      for (final t in kSpiritualTraditions) {
+        if (!store.isReligionOn(t.id)) continue;
+        for (var i = 0; i < t.sections.length; i++) {
+          if (!store.isSectionOn(t.id, i)) continue; // only chosen sub-sections
+          for (final r in t.sections[i].reads) {
+            pool.add((title: r.title, body: r.body, tag: t.name));
+          }
+        }
+      }
+    }
+    if (pool.isEmpty) {
+      final fb = readAloudByCategory(kRtbStories).first;
+      return (title: fb.title, body: fb.body, tag: s.rtbStories);
+    }
+    return pool[day.day % pool.length];
+  }
+
+  void _openCustomize(BuildContext context, S s) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => AnimatedBuilder(
+        animation: ReadToBabyStore.instance,
+        builder: (ctx, _) {
+          final store = ReadToBabyStore.instance;
+          return Container(
+            decoration: const BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: AppTheme.neutral300,
+                          borderRadius: BorderRadius.circular(99))),
+                  const SizedBox(height: 14),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(s.rtbCustomizeTitle,
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.primary900)),
+                  ),
+                  const SizedBox(height: 2),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(s.rtbCustomizeSub,
+                        style: const TextStyle(
+                            fontSize: 13, color: AppTheme.neutral600)),
+                  ),
+                  const SizedBox(height: 10),
+                  _catTile(store, kRtbStories, s.rtbStories,
+                      Icons.auto_stories_rounded),
+                  _catTile(
+                      store, kRtbRhymes, s.rtbRhymes, Icons.music_note_rounded),
+                  _catTile(store, kRtbAffirmations, s.rtbAffirmations,
+                      Icons.favorite_rounded),
+                  _catTile(store, kRtbSpiritual, s.rtbSpiritual,
+                      Icons.self_improvement_rounded),
+                  if (store.isCategoryOn(kRtbSpiritual)) ...[
+                    const Divider(height: 18),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(s.rtbPickReligions,
+                          style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.neutral700)),
                     ),
-                    onPressed: () {
-                      home.markEngaged(DailyModule.read);
-                      // Listen always narrates the ENGLISH story text with an
-                      // English voice. TTS can't synthesise Roman-script
-                      // Hinglish (a Hindi engine expects Devanagari), so we
-                      // force English here regardless of the UI language.
-                      BabyVoiceService.instance.toggleCard(
-                        st.body.en,
-                        cardKey: _listenKey,
-                        lang: AppLanguage.english,
-                        scope: VoiceScope.home,
-                      );
-                    },
-                    icon: Icon(playing ? Icons.stop_rounded : Icons.graphic_eq_rounded,
-                        size: 18, color: Colors.white),
-                    label: Text(playing ? s.listenCta : s.listenCta,
-                        style: text.labelLarge?.copyWith(color: Colors.white)),
-                  );
-                },
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final t in kSpiritualTraditions)
+                          FilterChip(
+                            label: Text('${t.symbol} ${t.name}',
+                                style: TextStyle(
+                                    fontWeight: store.isReligionOn(t.id)
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: store.isReligionOn(t.id)
+                                        ? AppTheme.primary700
+                                        : AppTheme.neutral700)),
+                            selected: store.isReligionOn(t.id),
+                            onSelected: (_) => store.toggleReligion(t.id),
+                            backgroundColor: AppTheme.surface,
+                            selectedColor:
+                                AppTheme.primary500.withValues(alpha: 0.14),
+                            showCheckmark: true,
+                            checkmarkColor: AppTheme.primary600,
+                            side: store.isReligionOn(t.id)
+                                ? const BorderSide(
+                                    color: AppTheme.primary500, width: 2)
+                                : const BorderSide(
+                                    color: AppTheme.outlineVariant, width: 1),
+                          ),
+                      ],
+                    ),
+                    // For each chosen religion, pick which sub-sections to read.
+                    for (final t in kSpiritualTraditions)
+                      if (store.isReligionOn(t.id)) ...[
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('${t.symbol} ${t.name}',
+                              style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.primary900)),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (var i = 0; i < t.sections.length; i++)
+                              FilterChip(
+                                label: Text(t.sections[i].title,
+                                    style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: store.isSectionOn(t.id, i)
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                        color: store.isSectionOn(t.id, i)
+                                            ? AppTheme.primary700
+                                            : AppTheme.neutral700)),
+                                selected: store.isSectionOn(t.id, i),
+                                onSelected: (_) => store.toggleSection(t.id, i),
+                                backgroundColor: AppTheme.surface,
+                                selectedColor: AppTheme.primary500
+                                    .withValues(alpha: 0.14),
+                                showCheckmark: true,
+                                checkmarkColor: AppTheme.primary600,
+                                side: store.isSectionOn(t.id, i)
+                                    ? const BorderSide(
+                                        color: AppTheme.primary500, width: 2)
+                                    : const BorderSide(
+                                        color: AppTheme.outlineVariant,
+                                        width: 1),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                          ],
+                        ),
+                      ],
+                  ],
+                ]),
               ),
             ),
-          ],
-        ]),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _catTile(
+      ReadToBabyStore store, String key, String label, IconData icon) {
+    final on = store.isCategoryOn(key);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.fromLTRB(12, 2, 6, 2),
+      decoration: BoxDecoration(
+        color:
+            on ? AppTheme.primary500.withValues(alpha: 0.06) : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: on
+              ? AppTheme.primary500.withValues(alpha: 0.55)
+              : AppTheme.outlineVariant,
+          width: on ? 1.6 : 1,
+        ),
+      ),
+      child: Row(children: [
+        Icon(icon,
+            size: 20, color: on ? AppTheme.primary500 : AppTheme.secondary500),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                  color: AppTheme.primary900)),
+        ),
+        Switch(
+          value: on,
+          onChanged: (_) => store.toggleCategory(key),
+        ),
       ]),
     );
   }

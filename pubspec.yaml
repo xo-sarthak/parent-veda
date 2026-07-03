@@ -65,6 +65,19 @@ dependencies:
   # in-app preview before saving/sharing.
   pdf: ^3.11.1
   printing: ^5.13.4
+  record: ^7.1.0
+  url_launcher: ^6.3.0
+
+  # Customizable local reminders (Kegel, medication, daily reads, bag tasks…).
+  # The reminder UI + store are wired now; NotificationService (the actual OS
+  # scheduling) plugs into these once `flutter pub get` installs the packages.
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
+
+  # Brand logos (Google/Apple/Facebook) on the auth screens.
+  flutter_svg: ^2.0.10+1
+  supabase_flutter: ^2.15.0
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +108,7 @@ flutter:
     - lib/data/father/
     - assets/audio/raga_drone.wav
     - assets/baby/
+    - assets/brand/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

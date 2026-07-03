@@ -369,6 +369,42 @@ const List<JourneyMilestone> kJourneyMilestones = [
       ),
     ],
   ),
+  JourneyMilestone(
+    id: 'm_gbs',
+    type: JourneyNodeType.medical,
+    anchorWeek: 36,
+    emoji: '🧫',
+    rangeLabel: LocalizedText(en: 'Week 36–37', hi: 'Hafta 36–37'),
+    title: LocalizedText(en: 'Group B Strep Test', hi: 'Group B Strep Test'),
+    sections: [
+      CardSection(
+        LocalizedText(en: 'Why this matters', hi: 'Yeh kyun zaroori hai'),
+        LocalizedText(
+          en: 'A simple swab near term checks whether you carry Group B Strep, so your team can protect your baby during birth if needed. Carrying it is common and harmless to you.',
+          hi: 'Term ke paas ek aasaan swab dekhta hai ki aap Group B Strep carry karti hain ya nahi, taaki zaroorat par team janm ke samay baby ko surakshit rakh sake. Ise carry karna aam hai aur aapke liye harmless hai.',
+        ),
+      ),
+      CardSection(
+        LocalizedText(en: 'Typical timing', hi: 'Aam tor par kab'),
+        LocalizedText(
+            en: 'Usually around weeks 36 to 37.',
+            hi: 'Aam tor par hafta 36 se 37 ke beech.'),
+      ),
+    ],
+    bullets: [
+      BulletBlock(
+        LocalizedText(en: 'Questions to ask', hi: 'Kya poochein'),
+        [
+          LocalizedText(
+              en: 'If I carry GBS, what happens during labour?',
+              hi: 'Agar main GBS carry karti hoon, to labour mein kya hoga?'),
+          LocalizedText(
+              en: 'Do you offer this test routinely here?',
+              hi: 'Kya yahan yeh test routine mein hota hai?'),
+        ],
+      ),
+    ],
+  ),
 
   // ===========================================================================
   //  TYPE 4 · BABY DEVELOPMENT (blue) — wonder & education

@@ -14,16 +14,27 @@
 //  gentle "coming soon".
 // =============================================================================
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// url_launcher + cart_store are used only by the OLD (now-commented) UI below;
+// re-add their imports if that block is restored.
 
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
 import '../../localization/app_language.dart';
+import '../../models/reminder.dart';
+import '../../services/bought_store.dart';
 import '../../services/hospital_bag_store.dart';
+import '../../services/hospital_bag_v2_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/reminder_store.dart';
 import '../../theme/app_theme.dart';
+import '../cart_screen.dart';
+import 'hospital_bag_v2_screen.dart';
 
 class HospitalBagScreen extends StatefulWidget {
   const HospitalBagScreen({super.key, required this.controller});
@@ -35,25 +46,107 @@ class HospitalBagScreen extends StatefulWidget {
 
 class _HospitalBagScreenState extends State<HospitalBagScreen> {
   final _store = HospitalBagStore.instance;
+  static const _verKey = 'hb_use_v2';
+  bool _useV2 = false;
 
   @override
   void initState() {
     super.initState();
     _store.init();
+    HospitalBagV2Store.instance.init();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (mounted) setState(() => _useV2 = p.getBool(_verKey) ?? false);
+    } catch (_) {/* default V1 */}
+  }
+
+  void _setVersion(bool v) {
+    setState(() => _useV2 = v);
+    SharedPreferences.getInstance().then((p) => p.setBool(_verKey, v));
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _store,
-      builder: (context, _) {
-        if (!_store.onboarded) {
-          return _Onboarding(controller: widget.controller);
-        }
-        return _BagHome(controller: widget.controller);
-      },
+    // V1 (untouched) or V2; a small floating "Classic | New" switcher overlays
+    // both so they can be compared. V1's widgets/behaviour are unchanged.
+    final body = _useV2
+        ? HospitalBagV2Screen(controller: widget.controller)
+        : AnimatedBuilder(
+            animation: _store,
+            builder: (context, _) => _store.onboarded
+                ? _MyBagScreen(controller: widget.controller)
+                : _Onboarding(controller: widget.controller),
+          );
+    return Stack(children: [
+      Positioned.fill(child: body),
+      Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: SafeArea(
+          child: Center(
+            child: _VersionPill(
+                useV2: _useV2,
+                onChanged: _setVersion,
+                lang: widget.controller.language),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+
+/// A small floating segmented switcher between V1 ("Classic") and V2 ("New").
+class _VersionPill extends StatelessWidget {
+  const _VersionPill(
+      {required this.useV2, required this.onChanged, required this.lang});
+  final bool useV2;
+  final ValueChanged<bool> onChanged;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(99),
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x292D144C), blurRadius: 20, offset: Offset(0, 6)),
+        ],
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        _seg(context, s.hb2vClassic, !useV2, () => onChanged(false)),
+        _seg(context, s.hb2vNew, useV2, () => onChanged(true)),
+      ]),
     );
   }
+
+  Widget _seg(BuildContext context, String label, bool active, VoidCallback onTap) =>
+      GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          decoration: BoxDecoration(
+            color: active ? AppTheme.primary500 : Colors.transparent,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Text(label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: active ? Colors.white : AppTheme.neutral600)),
+        ),
+      );
 }
 
 // ===========================================================================
@@ -79,6 +172,7 @@ class _HospitalBagScreenState extends State<HospitalBagScreen> {
   }
 }
 
+// ignore: unused_element
 ({String label, Color color}) _statusStyle(S s, BagItemStatus status) {
   switch (status) {
     case BagItemStatus.have:
@@ -99,6 +193,7 @@ class _HospitalBagScreenState extends State<HospitalBagScreen> {
 int? _vedaPrice(BagItem item) =>
     item.price ?? bagBestProduct(item.id, isCustom: item.isCustom)?.price;
 
+// ignore: unused_element
 String _relativeUpdated(S s, DateTime? d) {
   if (d == null) return '';
   final now = DateTime.now();
@@ -224,8 +319,1004 @@ class _OnboardingState extends State<_Onboarding> {
 }
 
 // ===========================================================================
-//  Home (Bag / Planner / Shopping)
+//  SIMPLIFIED "My Hospital Bag" — a warm, tap-only nesting experience.
+//    • _MyBagScreen    — the default: a filling-bag hero + her items grouped by
+//                        WHERE she'll get them, with inline Bought/Packed.
+//    • _AddItemsScreen — the dead-simple catalogue browser (+ "mums like you").
+//    • _KeepsakeScreen — the "bag is ready 💛" celebration.
+//  The OLD 3-view UI (Bag/Planner/Shopping) is preserved, commented, below.
 // ===========================================================================
+
+const String _kBagReminderId = 'bag_prep';
+
+class _MyBagScreen extends StatefulWidget {
+  const _MyBagScreen({required this.controller});
+  final PregnancyController controller;
+  @override
+  State<_MyBagScreen> createState() => _MyBagScreenState();
+}
+
+class _MyBagScreenState extends State<_MyBagScreen> {
+  final _store = HospitalBagStore.instance;
+  int _cheer = 0;
+  bool _celebrated = false;
+
+  PregnancyController get c => widget.controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(c.language);
+    final lang = c.language;
+    final text = Theme.of(context).textTheme;
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, BoughtStore.instance]),
+      builder: (context, _) {
+        final items = _store.items;
+        final veda = _store.withStatus(BagItemStatus.buyVeda);
+        final els = _store.withStatus(BagItemStatus.buyElse);
+        final have = _store.withStatus(BagItemStatus.have);
+        final needed = _store.withStatus(BagItemStatus.needed);
+        final total = items.length;
+        final packed = items.where((i) => i.packed).length;
+        final allReady = total > 0 && packed == total;
+
+        if (allReady && !_celebrated) {
+          _celebrated = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _openKeepsake();
+          });
+        } else if (!allReady) {
+          _celebrated = false;
+        }
+
+        final hasReminder =
+            ReminderStore.instance.byId(_kBagReminderId) != null;
+
+        return Scaffold(
+          backgroundColor: AppTheme.surfaceContainer,
+          appBar: AppBar(
+            title: Text('${s.hb2MyBag} ❤️'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.ios_share_rounded),
+                tooltip: s.hb2ShareTitle,
+                onPressed: () => _share(s, lang),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (v) {
+                  if (v == 'remind') _toggleReminder(s);
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'remind',
+                    child: Text(hasReminder ? s.hb2RemindOff : s.hb2RemindMe),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 40),
+            children: [
+              _hero(s, text, packed, total, allReady),
+              const SizedBox(height: 16),
+              _addButton(s),
+              const SizedBox(height: 18),
+              if (total == 0)
+                _emptyState(s, text)
+              else ...[
+                if (veda.isNotEmpty)
+                  _group(s, text, lang, BagItemStatus.buyVeda, veda),
+                if (els.isNotEmpty)
+                  _group(s, text, lang, BagItemStatus.buyElse, els),
+                if (have.isNotEmpty)
+                  _group(s, text, lang, BagItemStatus.have, have),
+                if (needed.isNotEmpty)
+                  _group(s, text, lang, BagItemStatus.needed, needed),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _hero(S s, TextTheme text, int packed, int total, bool allReady) {
+    final fill = total == 0 ? 0.0 : packed / total;
+    final pct = (fill * 100).round();
+    final days = c.daysToDueDate;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFFF1E6), Color(0xFFFDE8F0)]),
+        borderRadius: BorderRadius.circular(24),
+        border:
+            Border.all(color: AppTheme.secondary500.withValues(alpha: 0.14)),
+      ),
+      child: Row(children: [
+        SizedBox(
+          width: 76,
+          height: 92,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: fill),
+            duration: const Duration(milliseconds: 650),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, _) => CustomPaint(painter: _BagHeroPainter(v)),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(allReady ? s.hb2ReadyBanner : s.hb2FillingUp,
+                style: text.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800, color: AppTheme.primary900)),
+            const SizedBox(height: 6),
+            Text(
+              total == 0
+                  ? s.hb2HeroEmpty
+                  : (days > 0
+                      ? '${s.hb2ReadyPct(pct)}  ·  ${s.hb2DaysToGo(days)}'
+                      : s.hb2ReadyPct(pct)),
+              style: text.bodySmall?.copyWith(color: AppTheme.neutral700),
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                value: total == 0 ? 0 : fill,
+                minHeight: 7,
+                backgroundColor: Colors.white.withValues(alpha: 0.6),
+                valueColor:
+                    const AlwaysStoppedAnimation(AppTheme.secondary500),
+              ),
+            ),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  Widget _addButton(S s) => SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          onPressed: _openAddItems,
+          icon: const Icon(Icons.add_rounded),
+          label: Text(s.hb2AddItems),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppTheme.secondary500,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+        ),
+      );
+
+  Widget _emptyState(S s, TextTheme text) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AppTheme.outlineVariant),
+        ),
+        child: Column(children: [
+          const Text('🎒', style: TextStyle(fontSize: 54)),
+          const SizedBox(height: 12),
+          Text(s.hb2EmptyTitle,
+              textAlign: TextAlign.center,
+              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text(s.hb2EmptySub,
+              textAlign: TextAlign.center,
+              style: text.bodyMedium?.copyWith(color: AppTheme.neutral600)),
+        ]),
+      );
+
+  ({IconData icon, Color color, String label}) _groupMeta(
+      S s, BagItemStatus st) {
+    switch (st) {
+      case BagItemStatus.buyVeda:
+        return (
+          icon: Icons.storefront_rounded,
+          color: AppTheme.primary500,
+          label: s.hb2GroupVeda
+        );
+      case BagItemStatus.buyElse:
+        return (
+          icon: Icons.link_rounded,
+          color: AppTheme.secondary500,
+          label: s.hb2GroupElse
+        );
+      case BagItemStatus.have:
+        return (
+          icon: Icons.check_circle_rounded,
+          color: AppTheme.tertiary500,
+          label: s.hb2GroupHave
+        );
+      default:
+        return (
+          icon: Icons.help_outline_rounded,
+          color: AppTheme.neutral500,
+          label: s.hb2GroupNeeded
+        );
+    }
+  }
+
+  Widget _group(S s, TextTheme text, AppLanguage lang, BagItemStatus st,
+      List<BagItem> items) {
+    final m = _groupMeta(s, st);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Row(children: [
+            Icon(m.icon, size: 18, color: m.color),
+            const SizedBox(width: 8),
+            Text('${m.label}  ·  ${items.length}',
+                style: text.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800, color: m.color)),
+          ]),
+        ),
+        for (final it in items) _itemCard(s, text, lang, it),
+      ]),
+    );
+  }
+
+  Widget _itemCard(S s, TextTheme text, AppLanguage lang, BagItem it) {
+    final sellable = bagIsSellable(it.id, isCustom: it.isCustom);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Column(children: [
+        InkWell(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+          onTap: () => _sourceSheet(s, it),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 8),
+            child: Row(children: [
+              Text(_emojiFor(it), style: const TextStyle(fontSize: 22)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(it.name.of(lang),
+                          style: text.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w700)),
+                      if (it.status == BagItemStatus.buyElse &&
+                          it.store.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                              '${it.store}${it.link.isNotEmpty ? '  🔗' : ''}',
+                              style: text.labelSmall
+                                  ?.copyWith(color: AppTheme.neutral500)),
+                        ),
+                    ]),
+              ),
+              const Icon(Icons.unfold_more_rounded,
+                  size: 18, color: AppTheme.neutral400),
+            ]),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _controls(s, it, sellable),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  List<Widget> _controls(S s, BagItem it, bool sellable) {
+    if (it.status == BagItemStatus.needed) {
+      return [
+        _pill(
+          label: s.hb2ChooseSource,
+          icon: Icons.add_shopping_cart_rounded,
+          on: false,
+          onTap: () => _sourceSheet(s, it),
+        ),
+      ];
+    }
+    final out = <Widget>[];
+    final buyable = it.status == BagItemStatus.buyVeda ||
+        it.status == BagItemStatus.buyElse;
+    if (it.status == BagItemStatus.buyVeda && sellable && !it.purchased) {
+      out.add(_buyPill(s, it));
+    }
+    if (buyable) {
+      out.add(_pill(
+        label: it.purchased ? s.hb2Bought : s.hb2ToBuy,
+        icon: Icons.shopping_bag_rounded,
+        on: it.purchased,
+        onTap: () => _store.togglePurchased(it.id),
+      ));
+    }
+    out.add(_pill(
+      label: it.packed ? s.hb2Packed : s.hb2Pack,
+      icon: Icons.backpack_rounded,
+      on: it.packed,
+      onTap: () => _pack(s, it),
+    ));
+    return out;
+  }
+
+  Widget _pill({
+    required String label,
+    required IconData icon,
+    required bool on,
+    required VoidCallback onTap,
+  }) {
+    final color = on ? AppTheme.tertiary600 : AppTheme.neutral500;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: on ? AppTheme.tertiary50 : AppTheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: on ? AppTheme.tertiary400 : AppTheme.outlineVariant),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(on ? Icons.check_rounded : icon, size: 15, color: color),
+          const SizedBox(width: 5),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: color)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buyPill(S s, BagItem it) {
+    final price = _vedaPrice(it) ?? 0;
+    return GestureDetector(
+      onTap: () => _buyVeda(it),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.primary500,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.shopping_bag_rounded, size: 15, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(s.hb2Buy(price),
+              style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white)),
+        ]),
+      ),
+    );
+  }
+
+  String _emojiFor(BagItem it) {
+    final p = bagBestProduct(it.id, isCustom: it.isCustom);
+    if (p != null) return p.emoji;
+    switch (it.category) {
+      case BagCategory.documents:
+        return '📄';
+      case BagCategory.partner:
+        return '👜';
+      case BagCategory.comfort:
+        return '🌸';
+      default:
+        return '🎒';
+    }
+  }
+
+  void _pack(S s, BagItem it) {
+    final wasPacked = it.packed;
+    _store.togglePacked(it.id);
+    if (!wasPacked) {
+      HapticFeedback.lightImpact();
+      final msg = s.hb2PackedCheer(_cheer % 4);
+      _cheer++;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(
+          content: Text(msg),
+          duration: const Duration(milliseconds: 1300),
+          behavior: SnackBarBehavior.floating,
+        ));
+    }
+  }
+
+  void _buyVeda(BagItem it) {
+    final best = bagBestProduct(it.id, isCustom: it.isCustom);
+    final price = best?.price ?? _vedaPrice(it) ?? 0;
+    final pid = best?.id ?? '${it.id}_pv';
+    _store.chooseVedaProduct(it.id, productId: pid, price: price);
+    showSingleBuyNow(
+      context,
+      c,
+      productId: pid,
+      name: it.name.of(c.language),
+      emoji: _emojiFor(it),
+      unitPrice: price.toDouble(),
+    );
+  }
+
+  void _openAddItems() => Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => _AddItemsScreen(controller: c)));
+
+  void _openKeepsake() => Navigator.of(context).push(MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (_) => _KeepsakeScreen(controller: c)));
+
+  void _toggleReminder(S s) {
+    final store = ReminderStore.instance;
+    if (store.byId(_kBagReminderId) == null) {
+      store.upsert(Reminder(
+        id: _kBagReminderId,
+        title: s.hb2ReminderTitle,
+        body: s.hb2ReminderBody,
+        hour: 18,
+        minute: 0,
+        repeat: ReminderRepeat.daily,
+        category: 'bag',
+      ));
+      _toast(s.hb2ReminderSet);
+    } else {
+      store.remove(_kBagReminderId);
+      _toast(s.hb2ReminderOff);
+    }
+  }
+
+  void _toast(String msg) => ScaffoldMessenger.of(context)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(milliseconds: 1500)));
+
+  void _share(S s, AppLanguage lang) {
+    final b = StringBuffer('${s.hb2MyBag} 💛\n\n');
+    final toBuy = _store.items
+        .where((i) =>
+            (i.status == BagItemStatus.buyVeda ||
+                i.status == BagItemStatus.buyElse) &&
+            !i.purchased)
+        .toList();
+    if (toBuy.isNotEmpty) {
+      b.writeln('${s.hb2ShareToBuy}:');
+      for (final i in toBuy) {
+        final where = i.status == BagItemStatus.buyVeda
+            ? 'ParentVeda'
+            : (i.store.isNotEmpty ? i.store : s.hb2GroupElse);
+        b.writeln('• ${i.name.of(lang)}  ($where)');
+      }
+      b.writeln();
+    }
+    final packed = _store.items.where((i) => i.packed).length;
+    b.writeln(s.hb2SharePacked(packed, _store.items.length));
+    Share.share(b.toString());
+  }
+
+  void _sourceSheet(S s, BagItem it) {
+    final lang = c.language;
+    final sellable = bagIsSellable(it.id, isCustom: it.isCustom);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 10),
+          Container(
+              width: 38,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: AppTheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(99))),
+          const SizedBox(height: 14),
+          Text(it.name.of(lang),
+              style: Theme.of(ctx)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 2),
+          Text(s.hb2ChooseSource,
+              style: Theme.of(ctx)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: AppTheme.neutral500)),
+          const SizedBox(height: 8),
+          if (sellable)
+            _sheetOption(Icons.storefront_rounded, AppTheme.primary500,
+                s.hb2SrcVeda, () {
+              Navigator.pop(ctx);
+              _chooseVeda(it);
+            }),
+          _sheetOption(
+              Icons.link_rounded, AppTheme.secondary500, s.hb2SrcElse, () {
+            Navigator.pop(ctx);
+            _buyElseSheet(s, it);
+          }),
+          _sheetOption(Icons.check_circle_rounded, AppTheme.tertiary500,
+              s.hb2SrcHave, () {
+            Navigator.pop(ctx);
+            _store.setStatus(it.id, BagItemStatus.have);
+          }),
+          _sheetOption(Icons.delete_outline_rounded, AppTheme.neutral500,
+              s.hb2Remove, () {
+            Navigator.pop(ctx);
+            _store.removeItem(it.id);
+          }),
+          const SizedBox(height: 12),
+        ]),
+      ),
+    );
+  }
+
+  Widget _sheetOption(
+          IconData icon, Color color, String label, VoidCallback onTap) =>
+      ListTile(
+        leading: Icon(icon, color: color),
+        title: Text(label),
+        onTap: onTap,
+      );
+
+  void _chooseVeda(BagItem it) {
+    final best = bagBestProduct(it.id, isCustom: it.isCustom);
+    _store.chooseVedaProduct(it.id,
+        productId: best?.id ?? '${it.id}_pv',
+        price: best?.price ?? _vedaPrice(it) ?? 0);
+  }
+
+  void _buyElseSheet(S s, BagItem it) {
+    var shop = it.store.isNotEmpty ? it.store : 'Amazon';
+    final linkCtrl = TextEditingController(text: it.link);
+    const shops = ['Amazon', 'Flipkart', 'FirstCry', 'Other'];
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 18,
+            bottom: 18 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: StatefulBuilder(
+          builder: (ctx, setSheet) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(s.hb2SrcElse,
+                  style: Theme.of(ctx)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final sh in shops)
+                    ChoiceChip(
+                      label: Text(sh),
+                      selected: shop == sh,
+                      onSelected: (_) => setSheet(() => shop = sh),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: linkCtrl,
+                decoration: InputDecoration(
+                  hintText: s.hb2LinkOptional,
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    _store.setBuyElse(it.id,
+                        store: shop, link: linkCtrl.text.trim());
+                    Navigator.pop(ctx);
+                  },
+                  child: Text(s.hb2Save),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Add items — the dead-simple catalogue browser.
+// ---------------------------------------------------------------------------
+class _AddItemsScreen extends StatefulWidget {
+  const _AddItemsScreen({required this.controller});
+  final PregnancyController controller;
+  @override
+  State<_AddItemsScreen> createState() => _AddItemsScreenState();
+}
+
+class _AddItemsScreenState extends State<_AddItemsScreen> {
+  final _store = HospitalBagStore.instance;
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+  final Set<BagCategory> _expanded = {BagCategory.labour};
+
+  PregnancyController get c => widget.controller;
+
+  static const _order = [
+    BagCategory.labour,
+    BagCategory.afterDelivery,
+    BagCategory.baby,
+    BagCategory.partner,
+    BagCategory.documents,
+    BagCategory.comfort,
+  ];
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(c.language);
+    final lang = c.language;
+    final text = Theme.of(context).textTheme;
+    return Scaffold(
+      backgroundColor: AppTheme.surfaceContainer,
+      appBar: AppBar(
+        title: Text(s.hb2AddTitle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(s.hb2Done),
+          ),
+        ],
+      ),
+      body: AnimatedBuilder(
+        animation: _store,
+        builder: (context, _) {
+          final inBag = _store.items.map((i) => i.id).toSet();
+          final byCat = bagCatalogByCategory();
+          final suggestions = suggestedEssentials()
+              .where((i) => !inBag.contains(i.id))
+              .toList();
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 40),
+            children: [
+              TextField(
+                controller: _searchCtrl,
+                onChanged: (v) =>
+                    setState(() => _query = v.trim().toLowerCase()),
+                decoration: InputDecoration(
+                  hintText: s.hb2Search,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (_query.isEmpty && suggestions.isNotEmpty) ...[
+                Row(children: [
+                  const Text('💛', style: TextStyle(fontSize: 16)),
+                  const SizedBox(width: 6),
+                  Text(s.hb2MumsAlsoPacked,
+                      style: text.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w800)),
+                ]),
+                const SizedBox(height: 10),
+                for (final sug in suggestions.take(6))
+                  _suggestionTile(s, text, lang, sug),
+                const SizedBox(height: 18),
+              ],
+              for (final cat in _order)
+                _catSection(
+                    s, text, lang, cat, byCat[cat] ?? const [], inBag),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _suggestionTile(S s, TextTheme text, AppLanguage lang, BagItem item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+            colors: [Color(0xFFFFF6E9), Color(0xFFFDEEF4)]),
+        borderRadius: BorderRadius.circular(16),
+        border:
+            Border.all(color: AppTheme.secondary500.withValues(alpha: 0.16)),
+      ),
+      child: Row(children: [
+        Text(_emojiForTemplate(item), style: const TextStyle(fontSize: 22)),
+        const SizedBox(width: 12),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(item.name.of(lang),
+                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            Text(s.hb2SocialProof,
+                style: text.labelSmall?.copyWith(color: AppTheme.neutral600)),
+          ]),
+        ),
+        FilledButton(
+          onPressed: () {
+            _store.addSuggested(item);
+            HapticFeedback.selectionClick();
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: AppTheme.secondary500,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(s.hb2Add),
+        ),
+      ]),
+    );
+  }
+
+  Widget _catSection(S s, TextTheme text, AppLanguage lang, BagCategory cat,
+      List<BagItem> items, Set<String> inBag) {
+    final filtered = _query.isEmpty
+        ? items
+        : items
+            .where((i) => i.name.en.toLowerCase().contains(_query))
+            .toList();
+    if (filtered.isEmpty) return const SizedBox.shrink();
+    final open = _query.isNotEmpty || _expanded.contains(cat);
+    final style = _catStyle(cat);
+    final addedCount = filtered.where((i) => inBag.contains(i.id)).length;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => setState(() {
+          if (!_expanded.remove(cat)) _expanded.add(cat);
+        }),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(children: [
+            Icon(style.icon, size: 20, color: style.color),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(_catLabel(s, cat),
+                  style:
+                      text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+            ),
+            Text('$addedCount/${filtered.length}',
+                style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+            const SizedBox(width: 6),
+            Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                color: AppTheme.neutral400),
+          ]),
+        ),
+      ),
+      if (open)
+        for (final it in filtered)
+          _addRow(text, lang, it, inBag.contains(it.id)),
+      const Divider(height: 1),
+    ]);
+  }
+
+  Widget _addRow(TextTheme text, AppLanguage lang, BagItem it, bool added) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        if (added) {
+          _store.removeItem(it.id);
+        } else {
+          _store.addSuggested(it);
+        }
+        HapticFeedback.selectionClick();
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+        child: Row(children: [
+          Text(_emojiForTemplate(it), style: const TextStyle(fontSize: 19)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(it.name.of(lang),
+                style: text.bodyLarge?.copyWith(
+                    color: added ? AppTheme.primary700 : null,
+                    fontWeight: added ? FontWeight.w700 : FontWeight.w500)),
+          ),
+          Icon(
+            added
+                ? Icons.check_circle_rounded
+                : Icons.add_circle_outline_rounded,
+            color: added ? AppTheme.secondary500 : AppTheme.neutral400,
+          ),
+        ]),
+      ),
+    );
+  }
+
+  String _emojiForTemplate(BagItem it) {
+    final p = bagBestProduct(it.id, isCustom: it.isCustom);
+    if (p != null) return p.emoji;
+    switch (it.category) {
+      case BagCategory.documents:
+        return '📄';
+      case BagCategory.partner:
+        return '👜';
+      case BagCategory.comfort:
+        return '🌸';
+      default:
+        return '🎒';
+    }
+  }
+
+  String _catLabel(S s, BagCategory cat) {
+    switch (cat) {
+      case BagCategory.labour:
+        return s.hb2CatLabour;
+      case BagCategory.afterDelivery:
+        return s.hb2CatAfter;
+      case BagCategory.baby:
+        return s.hb2CatBaby;
+      case BagCategory.partner:
+        return s.hb2CatPartner;
+      case BagCategory.documents:
+        return s.hb2CatDocs;
+      case BagCategory.comfort:
+        return s.hb2CatComfort;
+      case BagCategory.custom:
+        return s.hb2CatCustom;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Keepsake — "Baby's bag is ready 💛".
+// ---------------------------------------------------------------------------
+class _KeepsakeScreen extends StatelessWidget {
+  const _KeepsakeScreen({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(controller.language);
+    final text = Theme.of(context).textTheme;
+    final date = s.formatLongDate(DateTime.now());
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFFF1E6), Color(0xFFFDE8F0)]),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Text('🎒', style: TextStyle(fontSize: 84)),
+                const SizedBox(height: 6),
+                const Text('💛', style: TextStyle(fontSize: 34)),
+                const SizedBox(height: 18),
+                Text(s.hb2KeepsakeTitle,
+                    textAlign: TextAlign.center,
+                    style: text.headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 8),
+                Text(s.hb2KeepsakeSub(date),
+                    textAlign: TextAlign.center,
+                    style:
+                        text.bodyLarge?.copyWith(color: AppTheme.neutral700)),
+                const SizedBox(height: 30),
+                FilledButton.icon(
+                  onPressed: () => Share.share(s.hb2KeepsakeShareText(date)),
+                  icon: const Icon(Icons.ios_share_rounded),
+                  label: Text(s.hb2KeepsakeShare),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.secondary500,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 26, vertical: 13),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(s.hb2Done),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  The filling-bag hero painter.
+// ---------------------------------------------------------------------------
+class _BagHeroPainter extends CustomPainter {
+  _BagHeroPainter(this.fill);
+  final double fill; // 0..1
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final body = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.10, h * 0.30, w * 0.80, h * 0.66),
+      const Radius.circular(14),
+    );
+    final handle = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round
+      ..color = AppTheme.secondary500.withValues(alpha: 0.85);
+    canvas.drawArc(Rect.fromLTWH(w * 0.30, h * 0.06, w * 0.40, h * 0.42),
+        math.pi, math.pi, false, handle);
+    final f = fill.clamp(0.0, 1.0);
+    if (f > 0) {
+      canvas.save();
+      canvas.clipRRect(body);
+      final fillH = body.height * f;
+      final r = Rect.fromLTWH(body.left, body.bottom - fillH, body.width, fillH);
+      canvas.drawRect(
+          r,
+          Paint()
+            ..shader = const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFFC56B), Color(0xFFFF8FA8)],
+            ).createShader(r));
+      canvas.restore();
+    }
+    canvas.drawRRect(
+        body,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5
+          ..color = AppTheme.secondary500.withValues(alpha: 0.55));
+    final tp = TextPainter(
+      text: const TextSpan(text: '💛', style: TextStyle(fontSize: 18)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(w / 2 - tp.width / 2, h * 0.52));
+  }
+
+  @override
+  bool shouldRepaint(_BagHeroPainter old) => old.fill != fill;
+}
+
+// ===========================================================================
+//  OLD UI (Bag / Planner / Shopping) — replaced by _MyBagScreen above.
+//  Preserved (commented out) for an easy revert, per "comment out, never delete".
+// ===========================================================================
+/* OLD_BAG_UI_DISABLED
 
 class _BagHome extends StatelessWidget {
   const _BagHome({required this.controller});
@@ -254,6 +1345,13 @@ class _BagHome extends StatelessWidget {
               icon: const Icon(Icons.ios_share_rounded),
               onPressed: () => _sharePartner(context, s, store),
             ),
+            IconButton(
+              tooltip: s.cartAddAllToCart,
+              icon: const Icon(Icons.add_shopping_cart_rounded),
+              onPressed: () => _addPlannedToCart(context, controller),
+            ),
+            cartIconButton(context, controller,
+                cartId: kHospitalCartId, title: s.cartHospitalTitle),
           ],
           bottom: TabBar(
             tabs: [
@@ -263,62 +1361,132 @@ class _BagHome extends StatelessWidget {
             ],
           ),
         ),
-        body: AnimatedBuilder(
-          animation: store,
-          builder: (context, _) => TabBarView(
-            children: [
-              _BagView(controller: controller),
-              _PlannerView(controller: controller),
-              _ShoppingView(controller: controller),
-            ],
-          ),
+        // Each tab listens to the store itself (see below). The TabBarView is NOT
+        // wrapped in an AnimatedBuilder anymore — rebuilding it on every store
+        // change, combined with a lazy DefaultTabController.of() in an onTap, left
+        // a stale tab-controller dependent and crashed with "_dependents.isEmpty".
+        body: TabBarView(
+          children: [
+            _BagView(controller: controller),
+            _PlannerView(controller: controller),
+            _ShoppingView(controller: controller),
+          ],
         ),
       ),
     );
   }
 }
 
+/// Add the planned hospital-bag items to the (separate) hospital-bag cart.
+void _addPlannedToCart(BuildContext context, PregnancyController controller) {
+  final s = S(controller.language);
+  final lang = controller.language;
+  final store = HospitalBagStore.instance;
+  var added = 0;
+  for (final item in store.planned) {
+    if (CartStore.instance.contains(kHospitalCartId, item.id)) continue;
+    final price =
+        item.plannedCost > 0 ? item.plannedCost.toDouble() : mockPriceFor(item.id);
+    CartStore.instance.add(
+      kHospitalCartId,
+      productId: item.id,
+      name: item.name.of(lang),
+      emoji: '🧳',
+      unitPrice: price,
+    );
+    added++;
+  }
+  ScaffoldMessenger.of(context)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+      content: Text(added == 0 ? s.cartAllInCart : s.cartAddedN(added)),
+      action: added == 0
+          ? null
+          : SnackBarAction(
+              label: s.cartViewCart,
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => CartScreen(
+                      controller: controller,
+                      cartId: kHospitalCartId,
+                      title: s.cartHospitalTitle))),
+            ),
+    ));
+}
+
 // ---------------------------------------------------------------------------
 //  Bag View
 // ---------------------------------------------------------------------------
 
-class _BagView extends StatelessWidget {
+class _BagView extends StatefulWidget {
   const _BagView({required this.controller});
   final PregnancyController controller;
 
   @override
-  Widget build(BuildContext context) {
-    final s = S(controller.language);
-    final lang = controller.language;
-    final store = HospitalBagStore.instance;
+  State<_BagView> createState() => _BagViewState();
+}
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-      children: [
-        _progressCard(context, s, store),
-        const SizedBox(height: 18),
-        // Category cards
-        for (final c in store.activeCategories) ...[
-          _categoryCard(context, s, lang, store, c),
-          const SizedBox(height: 12),
-        ],
-        const SizedBox(height: 6),
-        // Suggested essentials
-        _suggestedSection(context, s, lang, store),
-        const SizedBox(height: 18),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () => showAddCustomBag(context, s),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(s.hbAddCustom),
+class _BagViewState extends State<_BagView> {
+  // Category cards expanded to show their items inline — so she can pack /
+  // favourite right there, without drilling into a separate screen.
+  final Set<BagCategory> _expanded = {};
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(widget.controller.language);
+    final lang = widget.controller.language;
+    final store = HospitalBagStore.instance;
+    // Capture the TabController during BUILD so its dependency is registered (and
+    // cleaned up) properly — not lazily inside an onTap, which was the crash.
+    final tabs = DefaultTabController.of(context);
+
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        children: [
+          _progressCard(context, s, store, tabs),
+          const SizedBox(height: 18),
+          // Category cards — tap to expand and pack items inline.
+          for (final c in store.activeCategories) ...[
+            _categoryCard(context, s, lang, store, c),
+            if (_expanded.contains(c)) ...[
+              const SizedBox(height: 8),
+              for (final i in store.itemsIn(c))
+                _ItemRow(
+                    controller: widget.controller, item: i, lang: lang, s: s),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => _CategoryScreen(
+                        controller: widget.controller, category: c),
+                  )),
+                  icon: const Icon(Icons.add_rounded, size: 16),
+                  label: Text(s.hbAddCustom),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 6),
+          // Suggested essentials
+          _suggestedSection(context, s, lang, store),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => showAddCustomBag(context, s),
+              icon: const Icon(Icons.add_rounded),
+              label: Text(s.hbAddCustom),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _progressCard(BuildContext context, S s, HospitalBagStore store) {
+  Widget _progressCard(
+      BuildContext context, S s, HospitalBagStore store, TabController tabs) {
     final text = Theme.of(context).textTheme;
     final p = store.percentReady;
     final updated = _relativeUpdated(s, store.lastUpdated);
@@ -326,8 +1494,9 @@ class _BagView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
-        // Tap to jump to the Planner (the full list of items in the bag).
-        onTap: () => DefaultTabController.of(context).animateTo(1),
+        // Tap to jump to the Planner (the full list of items in the bag) — uses
+        // the controller captured during build, not a lazy .of() in the callback.
+        onTap: () => tabs.animateTo(1),
         child: Ink(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -404,9 +1573,9 @@ class _BagView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => _CategoryScreen(controller: controller, category: c),
-        )),
+        onTap: () => setState(() {
+          if (!_expanded.remove(c)) _expanded.add(c);
+        }),
         child: Ink(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -453,7 +1622,11 @@ class _BagView extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
+            Icon(
+                _expanded.contains(c)
+                    ? Icons.expand_less_rounded
+                    : Icons.expand_more_rounded,
+                color: AppTheme.neutral400),
           ]),
         ),
       ),
@@ -607,8 +1780,26 @@ class _ItemRow extends StatelessWidget {
                 _chip('❤️ ${s.hbRecommendation}', AppTheme.primary400),
             ]),
           ),
-          trailing: const Icon(Icons.chevron_right_rounded,
-              color: AppTheme.neutral400),
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            // Favourite heart — builds the mother's own must-have list.
+            IconButton(
+              tooltip: s.hbMarkFavourite,
+              visualDensity: VisualDensity.compact,
+              onPressed: () =>
+                  HospitalBagStore.instance.toggleFavourite(item.id),
+              icon: Icon(
+                item.favourite
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                size: 20,
+                color: item.favourite
+                    ? AppTheme.secondary500
+                    : AppTheme.neutral400,
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppTheme.neutral400),
+          ]),
           onTap: () {
             if (sellable) {
               Navigator.of(context).push(MaterialPageRoute(
@@ -656,10 +1847,22 @@ class _PlannerViewState extends State<_PlannerView> {
     final s = S(widget.controller.language);
     final lang = widget.controller.language;
     final store = HospitalBagStore.instance;
-    final items = store.filter(_filter);
-    const keys = ['all', 'veda', 'else', 'owned', 'packed', 'pending', 'skipped'];
+    const keys = [
+      'all',
+      'fav',
+      'veda',
+      'else',
+      'owned',
+      'packed',
+      'pending',
+      'skipped'
+    ];
 
-    return Column(children: [
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final items = store.filter(_filter);
+        return Column(children: [
       const SizedBox(height: 10),
       SizedBox(
         height: 40,
@@ -695,6 +1898,8 @@ class _PlannerViewState extends State<_PlannerView> {
               ),
       ),
     ]);
+      },
+    );
   }
 }
 
@@ -713,9 +1918,11 @@ class _ShoppingView extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final store = HospitalBagStore.instance;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-      children: [
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        children: [
         // Cost totals — kept strictly separate.
         Container(
           padding: const EdgeInsets.all(18),
@@ -769,6 +1976,7 @@ class _ShoppingView extends StatelessWidget {
           ),
         ),
       ],
+        ),
     );
   }
 
@@ -1034,15 +2242,35 @@ class _ProductScreen extends StatelessWidget {
           if (item == null) return const SizedBox.shrink();
           final text = Theme.of(context).textTheme;
           final products = bagProductsFor(itemId, isCustom: item.isCustom);
+          final pvPicks = products.where((p) => !p.isAffiliate).toList();
+          final affiliate = products.where((p) => p.isAffiliate).toList();
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
             children: [
-              Text(s.hbChooseOption,
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              for (final p in products) ...[
-                _productCard(context, s, item, p),
+              if (pvPicks.isNotEmpty) ...[
+                Text(s.hbChooseOption,
+                    style:
+                        text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
+                for (final p in pvPicks) ...[
+                  _productCard(context, s, item, p),
+                  const SizedBox(height: 12),
+                ],
+              ],
+              // Affiliate split — also available elsewhere (external links).
+              if (affiliate.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(s.hbAlsoElsewhere,
+                    style:
+                        text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(s.hbAffiliateNote,
+                    style: text.bodySmall?.copyWith(color: AppTheme.neutral500)),
+                const SizedBox(height: 12),
+                for (final p in affiliate) ...[
+                  _productCard(context, s, item, p),
+                  const SizedBox(height: 12),
+                ],
               ],
               if (item.status == BagItemStatus.buyVeda) ...[
                 const SizedBox(height: 2),
@@ -1096,14 +2324,32 @@ class _ProductScreen extends StatelessWidget {
 /// it as the mother's "buy from ParentVeda" choice.
 Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
   final text = Theme.of(context).textTheme;
-  final selected =
-      item.status == BagItemStatus.buyVeda && item.selectedProductId == p.id;
+  final affiliate = p.isAffiliate;
+  // ParentVeda picks select as "buy from ParentVeda"; affiliate options select
+  // as "buy elsewhere" + open the external store.
+  final selected = affiliate
+      ? (item.status == BagItemStatus.buyElse && item.store == p.store)
+      : (item.status == BagItemStatus.buyVeda &&
+          item.selectedProductId == p.id);
+
+  void onTap() {
+    if (affiliate) {
+      HospitalBagStore.instance
+          .setBuyElse(item.id, store: p.store, link: p.link, price: p.price);
+      if (p.link.isNotEmpty) {
+        launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
+      }
+    } else {
+      HospitalBagStore.instance
+          .chooseVedaProduct(item.id, productId: p.id, price: p.price);
+    }
+  }
+
   return Material(
     color: Colors.transparent,
     child: InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => HospitalBagStore.instance
-          .chooseVedaProduct(item.id, productId: p.id, price: p.price),
+      onTap: onTap,
       child: Ink(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -1122,12 +2368,17 @@ Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (p.topPick)
+                    if (affiliate)
+                      Text('🔗 ${p.store}',
+                          style: text.labelSmall?.copyWith(
+                              color: AppTheme.secondary600,
+                              fontWeight: FontWeight.w800))
+                    else if (p.topPick)
                       Text('❤️ ${s.hbBestOverall}',
                           style: text.labelSmall?.copyWith(
                               color: AppTheme.primary600,
                               fontWeight: FontWeight.w800)),
-                    Text(p.name,
+                    Text(affiliate ? s.hbBuyOn(p.store) : p.name,
                         style: text.titleSmall
                             ?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
@@ -1137,10 +2388,14 @@ Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
                   ]),
             ),
             Icon(
-              selected
-                  ? Icons.check_circle_rounded
-                  : Icons.radio_button_unchecked_rounded,
-              color: selected ? AppTheme.primary500 : AppTheme.neutral300,
+              affiliate
+                  ? Icons.open_in_new_rounded
+                  : (selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded),
+              color: affiliate
+                  ? AppTheme.secondary500
+                  : (selected ? AppTheme.primary500 : AppTheme.neutral300),
             ),
           ]),
           if (p.why.isNotEmpty) ...[
@@ -1495,3 +2750,6 @@ class _BagFillPainter extends CustomPainter {
   bool shouldRepaint(covariant _BagFillPainter old) =>
       old.progress != progress;
 }
+
+// END OLD_BAG_UI_DISABLED
+*/

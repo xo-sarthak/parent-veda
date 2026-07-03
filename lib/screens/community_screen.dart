@@ -8,20 +8,538 @@
 //  Pregnancy-adapted; no gender communities.
 // =============================================================================
 
+// import 'dart:async'; // only Timer (Community Pulse) used it — Pulse removed
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../data/community_data.dart';
 import '../localization/app_language.dart';
 import '../models/community_models.dart';
 import '../services/community_store.dart';
+import '../services/expert_follow_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/mic_dictation_button.dart';
+import 'community_profile_screen.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
 
+/// `endFloat`, lifted up by [lift] logical px — used to clear the floating
+/// bottom nav pill that MainScaffold paints over the Community screen. Measuring
+/// from the standard (safe-area-aware) endFloat base keeps it correct on every
+/// device, unlike a fixed Padding lift.
+class _EndFloatLifted extends StandardFabLocation
+    with FabEndOffsetX, FabFloatOffsetY {
+  const _EndFloatLifted(this.lift);
+  final double lift;
+  @override
+  double getOffsetY(
+          ScaffoldPrelayoutGeometry scaffoldGeometry, double adjustment) =>
+      super.getOffsetY(scaffoldGeometry, adjustment) - lift;
+}
+
+// Warm tints from the old story-circle row — kept for reference; the Community
+// Pro layout uses gradient mono badges (_commGradients) instead.
+// const List<Color> _storyTints = [
+//   AppTheme.secondary100,
+//   AppTheme.surfaceContainerHigh,
+//   Color(0xFFEAF1EA),
+//   Color(0xFFF1E8DA),
+// ];
+
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
+
+// --- Community Pro palette (purple/pink trust language) --------------------
+const Color _proInk = Color(0xFF2C1A45);
+const Color _proPurple = Color(0xFF7C3AED);
+const Color _proPurpleDeep = Color(0xFF6D28D9);
+const Color _proPink = Color(0xFFD6478A);
+
+/// Soft top-to-bottom wash that sits behind the whole tab (matches the design).
+const LinearGradient _proBackdrop = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [Color(0xFFFBEAF2), Color(0xFFF4EAF8), Color(0xFFEFE4F7), Color(0xFFE9E2F6)],
+);
+
+/// Gradient cycled across the mono community badges.
+const List<List<Color>> _commGradients = [
+  [Color(0xFF7C3AED), Color(0xFFA855F7)],
+  [Color(0xFFEC4899), Color(0xFFF472B6)],
+  [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
+  [Color(0xFFA855F7), Color(0xFF7C3AED)],
+  [Color(0xFFD6478A), Color(0xFFF472B6)],
+];
+
+/// A two-letter monogram from a community name, skipping leading numbers
+/// ("November 2026 Moms" → "NM", "Delhi Moms" → "DM").
+String _mono(String name) {
+  final words = name
+      .split(RegExp(r'\s+'))
+      .where((w) => w.isNotEmpty && !RegExp(r'^[0-9]').hasMatch(w))
+      .toList();
+  if (words.isEmpty) return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  if (words.length == 1) {
+    final w = words.first;
+    return (w.length >= 2 ? w.substring(0, 2) : w).toUpperCase();
+  }
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+/// Avatar that visibly differentiates a verified expert (gradient + seal) from a
+/// member (soft tinted disc). This is the core of the trust language.
+Widget _authorAvatar(CommunityPost post, {double size = 46}) {
+  final isExpert = post.cred.isNotEmpty || post.type == PostType.expert;
+  final initial = post.author.isNotEmpty ? post.author[0].toUpperCase() : '?';
+  if (isExpert) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(clipBehavior: Clip.none, children: [
+        Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [_proPurple, Color(0xFFA855F7)],
+            ),
+          ),
+          child: Text(initial,
+              style: GoogleFonts.fraunces(
+                  fontSize: size * 0.4,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)),
+        ),
+        Positioned(
+          right: -2,
+          bottom: -2,
+          child: Container(
+            padding: const EdgeInsets.all(1.5),
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: const Icon(Icons.verified_rounded, size: 15, color: _proPurple),
+          ),
+        ),
+      ]),
+    );
+  }
+  final c = _typeVisual(post.type).color;
+  return Container(
+    width: size,
+    height: size,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(color: c.withValues(alpha: 0.14), shape: BoxShape.circle),
+    child: Text(initial,
+        style: GoogleFonts.fraunces(
+            fontSize: size * 0.4, fontWeight: FontWeight.w600, color: c)),
+  );
+}
+
+// --- Twitter-style helpers --------------------------------------------------
+/// A handle from an author name ("Dr. Meera" → "meera", "ParentVeda" → "parentveda").
+String _handle(String author) {
+  var h = author.toLowerCase().replaceAll('dr.', '').replaceAll('dr ', '');
+  h = h.replaceAll(RegExp(r'[^a-z0-9]'), '');
+  return h.isEmpty ? 'member' : h;
+}
+
+/// Stable pseudo "time ago" for seed posts (user posts read as "now").
+String _timeAgo(CommunityPost post) {
+  if (post.isUser) return 'now';
+  final h = post.id.hashCode.abs() % 47;
+  if (h == 0) return 'now';
+  if (h < 24) return '${h}h';
+  return '${(h / 24).ceil()}d';
+}
+
+/// Cosmetic "views" count (Twitter shows views) derived from engagement.
+String _viewsLabel(CommunityPost post) {
+  final v = post.likes * 247 + post.comments * 90 + 503;
+  if (v >= 1000) {
+    return '${(v / 1000).toStringAsFixed(v >= 100000 ? 0 : 1)}K';
+  }
+  return '$v';
+}
+
+bool _isExpertAuthor(CommunityPost post) =>
+    post.cred.isNotEmpty || post.type == PostType.expert;
+
+void _toast(BuildContext c, String m) {
+  ScaffoldMessenger.of(c)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+        content: Text(m), duration: const Duration(milliseconds: 1300)));
+}
+
+/// One engagement action (icon + optional count), Twitter-style.
+class _EngageButton extends StatelessWidget {
+  const _EngageButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 18, color: color),
+          if (label.isNotEmpty) ...[
+            const SizedBox(width: 5),
+            Text(label,
+                style: GoogleFonts.manrope(
+                    fontSize: 12.5, color: color, fontWeight: FontWeight.w600)),
+          ],
+        ]),
+      ),
+    );
+  }
+}
+
+/// The ⋯ menu on a post (Follow expert / Not interested / Mute / Block / Report).
+void _showPostMenu(BuildContext context, S s, CommunityPost post) {
+  final ef = ExpertFollowStore.instance;
+  final store = CommunityStore.instance;
+  final expert = _isExpertAuthor(post);
+  final handle = '@${_handle(post.author)}';
+  void done(String m) {
+    Navigator.of(context).pop();
+    _toast(context, m);
+  }
+
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: AppTheme.surface,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+    builder: (ctx) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(height: 8),
+        Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+                color: AppTheme.outlineVariant,
+                borderRadius: BorderRadius.circular(2))),
+        const SizedBox(height: 6),
+        if (expert)
+          AnimatedBuilder(
+            animation: ef,
+            builder: (_, _) {
+              final following = ef.isFollowing(post.author);
+              return ListTile(
+                leading: Icon(
+                    following
+                        ? Icons.person_remove_alt_1_outlined
+                        : Icons.person_add_alt_1_outlined,
+                    color: _proPurple),
+                title: Text('${following ? s.cmUnfollow : s.cmFollow} $handle',
+                    style:
+                        GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+                onTap: () {
+                  ef.toggleFollow(post.author);
+                  done(following ? s.cmUnfollowedToast : s.cmFollowedToast);
+                },
+              );
+            },
+          ),
+        ListTile(
+            leading: const Icon(Icons.do_not_disturb_on_outlined),
+            title: Text(s.cmNotInterested),
+            onTap: () {
+              store.hidePost(post.id);
+              done(s.cmNotInterestedDone);
+            }),
+        ListTile(
+            leading: const Icon(Icons.volume_off_outlined),
+            title: Text('${s.cmMuteUser} $handle'),
+            onTap: () => done(s.cmMutedToast)),
+        ListTile(
+            leading: const Icon(Icons.block_outlined),
+            title: Text('${s.cmBlock} $handle'),
+            onTap: () => done(s.cmBlockedToast)),
+        ListTile(
+            leading: const Icon(Icons.flag_outlined, color: _like),
+            title: Text(s.cmReport, style: const TextStyle(color: _like)),
+            onTap: () => done(s.cmReportedToast)),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+}
+
+/// A small purple-gradient seal avatar (verified-expert language).
+Widget _sealAvatar(String name, {double size = 32}) {
+  final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+  return SizedBox(
+    width: size,
+    height: size,
+    child: Stack(clipBehavior: Clip.none, children: [
+      Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [_proPurple, Color(0xFFA855F7)]),
+            shape: BoxShape.circle),
+        child: Text(initial,
+            style: GoogleFonts.fraunces(
+                fontSize: size * 0.44,
+                fontWeight: FontWeight.w600,
+                color: Colors.white)),
+      ),
+      Positioned(
+        right: -2,
+        bottom: -2,
+        child: Container(
+          padding: const EdgeInsets.all(1),
+          decoration:
+              const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+          child: Icon(Icons.verified_rounded, size: size * 0.4, color: _proPurple),
+        ),
+      ),
+    ]),
+  );
+}
+
+/// Bottom sheet: the verified experts who've backed a post (builds trust).
+void _showExpertsSheet(BuildContext context, S s, int total) {
+  final shown = kCommunityExperts;
+  final more = (total - shown.length).clamp(0, total);
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: AppTheme.surface,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (ctx) {
+      final text = Theme.of(ctx).textTheme;
+      return SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 10),
+          Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: AppTheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+            child: Row(children: [
+              const Icon(Icons.verified_rounded, size: 20, color: _proPurpleDeep),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('${s.cmExpertsWhoVerified} · $total',
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: _proInk)),
+              ),
+            ]),
+          ),
+          Flexible(
+            child: ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(bottom: 8),
+              children: [
+                for (final e in shown)
+                  ListTile(
+                    leading: _sealAvatar(e.name, size: 38),
+                    title: Text(e.name,
+                        style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w700, fontSize: 14)),
+                    subtitle: Text('${e.cred} · ${e.specialty}',
+                        style: GoogleFonts.manrope(
+                            fontSize: 12, color: AppTheme.neutral500)),
+                  ),
+                if (more > 0)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 6, 20, 8),
+                    child: Text(s.cmAndMoreExperts(more),
+                        style: text.bodySmall?.copyWith(
+                            color: AppTheme.neutral500,
+                            fontWeight: FontWeight.w600)),
+                  ),
+              ],
+            ),
+          ),
+        ]),
+      );
+    },
+  );
+}
+
+/// The gradient endorsement strip shown atop a post a verified expert (or the
+/// test doctor) has publicly backed — with a Facebook-style "+ N other experts"
+/// credibility line that opens the "who verified" sheet.
+///
+/// REPLACED by the subtle [_verifiedHint] (the full-width purple bar read like a
+/// heading). Kept for an easy revert.
+// ignore: unused_element
+Widget _endorsementBanner(BuildContext context, S s, CommunityPost post) {
+  final store = CommunityStore.instance;
+  final text = Theme.of(context).textTheme;
+  final byDoctorOnly = post.endorsedBy.isEmpty; // only the test doctor backs it
+  final name = byDoctorOnly ? kTestDoctorName : post.endorsedBy;
+  final cred = byDoctorOnly ? kTestDoctorCred : post.endorsedByCred;
+  // "Other experts" beyond the headline (seed count + the test doctor).
+  final others = byDoctorOnly ? 0 : store.endorseCount(post);
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [_proPurpleDeep, Color(0xFF9333EA)],
+      ),
+    ),
+    child: Row(children: [
+      _sealAvatar(name),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            cred.isEmpty ? name : '$name · $cred',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: text.labelMedium
+                ?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 1),
+          if (others > 0)
+            GestureDetector(
+              onTap: () => _showExpertsSheet(context, s, others),
+              behavior: HitTestBehavior.opaque,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(s.cmPlusExperts(others),
+                    style: text.labelSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white70)),
+                const Icon(Icons.chevron_right_rounded,
+                    size: 15, color: Colors.white),
+              ]),
+            )
+          else
+            Text(s.cmEndorsed,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.labelSmall
+                    ?.copyWith(color: Colors.white.withValues(alpha: 0.92))),
+        ]),
+      ),
+      const SizedBox(width: 8),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(20)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Text('💜', style: TextStyle(fontSize: 11)),
+          const SizedBox(width: 4),
+          Text(s.cmExpertLiked,
+              style: text.labelSmall
+                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+        ]),
+      ),
+    ]),
+  );
+}
+
+/// A small, subtle "verified by an expert" line for an endorsed post — replaces
+/// the old full-width purple banner (which read like a heading). Tapping it (when
+/// other experts also backed the post) opens the "who verified" sheet.
+Widget _verifiedHint(BuildContext context, S s, CommunityPost post) {
+  final store = CommunityStore.instance;
+  final byDoctorOnly = post.endorsedBy.isEmpty; // only the test doctor backs it
+  final name = byDoctorOnly ? kTestDoctorName : post.endorsedBy;
+  final others = byDoctorOnly ? 0 : store.endorseCount(post);
+  final tappable = others > 0;
+  return GestureDetector(
+    onTap: tappable ? () => _showExpertsSheet(context, s, others) : null,
+    behavior: HitTestBehavior.opaque,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: _proPurple.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.verified_rounded, size: 13, color: _proPurple),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            tappable ? s.cmVerifiedByPlus(name, others) : s.cmVerifiedBy(name),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.manrope(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                color: _proPurpleDeep),
+          ),
+        ),
+        if (tappable)
+          const Icon(Icons.chevron_right_rounded, size: 14, color: _proPurple),
+      ]),
+    ),
+  );
+}
+
+/// The verification-requested tag. For a MEMBER it shows "Awaiting [specialty]
+/// verification"; for a DOCTOR it shows "Comment to verify this post" (the new
+/// way a post becomes expert-verified — by a doctor commenting on it).
+Widget _pendingVerifyTag(S s, CommunityPost post, {bool doctor = false}) {
+  final spKey = post.preferredSpecialty;
+  final sp = (spKey.isEmpty || spKey == 'all') ? null : s.cmSpecialty(spKey);
+  final label = doctor
+      ? s.cmCommentToVerify
+      : (sp == null ? s.cmPendingVerify : s.cmAwaitingSpecialty(sp));
+  final icon =
+      doctor ? Icons.rate_review_outlined : Icons.hourglass_bottom_rounded;
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: _proPurple.withValues(alpha: doctor ? 0.08 : 0.05),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: _proPurple.withValues(alpha: 0.22)),
+    ),
+    child: Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(icon, size: 12, color: _proPurple),
+      const SizedBox(width: 5),
+      Text(label,
+          style: GoogleFonts.manrope(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: _proPurpleDeep)),
+    ]),
+  );
+}
+
+/// Share a post via the OS share sheet (share_plus — house style).
+void _sharePost(S s, CommunityPost post) {
+  final body = '"${post.text}"\n\n— ${post.author} · ${s.cmShareVia}';
+  Share.share(body);
+}
 
 ({IconData icon, Color color, String key}) _typeVisual(PostType t) {
   switch (t) {
@@ -42,18 +560,263 @@ void _push(BuildContext c, Widget w) =>
   }
 }
 
+/// Per-type identity for the Community Pulse cards (icon + accent colour) so the
+/// strip reads as distinct, premium cards rather than one flat tile.
+({IconData icon, Color color}) _pulseVisual(PulseType t) {
+  switch (t) {
+    case PulseType.poll:
+      return (icon: Icons.bar_chart_rounded, color: const Color(0xFF18A39B));
+    case PulseType.trending:
+      return (icon: Icons.local_fire_department_rounded, color: _like);
+    case PulseType.expert:
+      return (icon: Icons.verified_rounded, color: const Color(0xFF7A4FC2));
+    case PulseType.cohort:
+      return (icon: Icons.groups_rounded, color: _accent);
+    case PulseType.benchmark:
+      return (icon: Icons.insights_rounded, color: const Color(0xFFE6A817));
+  }
+}
+
 // ===========================================================================
 //  Home
 // ===========================================================================
 
-class CommunityScreen extends StatelessWidget {
+class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key, required this.controller});
   final PregnancyController controller;
+  @override
+  State<CommunityScreen> createState() => _CommunityScreenState();
+}
 
-  Future<void> _search(BuildContext context, AppLanguage lang) async {
+class _CommunityScreenState extends State<CommunityScreen> {
+  // "For you" (ranked feed) vs "Following" (expert + expert-endorsed only).
+  bool _following = false;
+  // Expert (doctor-mode) filter: show only posts that asked to be verified.
+  // Works in BOTH For You and Following so an expert can triage requests fast.
+  bool _needsVerifyOnly = false;
+  // Community Pulse removed per request — fields kept commented for revert.
+  // final PageController _pulseCtrl = PageController(viewportFraction: 0.84);
+  // int _pulsePage = 0;
+  // Timer? _pulseTimer;
+
+  PregnancyController get controller => widget.controller;
+
+  // initState/dispose only drove Community Pulse (removed per request) — kept
+  // commented for an easy revert.
+  /*
+  @override
+  void initState() {
+    super.initState();
+    // Community Pulse auto-advances, like the design.
+    _pulseTimer = Timer.periodic(const Duration(milliseconds: 4500), (_) {
+      if (!_pulseCtrl.hasClients) return;
+      final count = _proPulse(S(controller.language)).length;
+      _pulseCtrl.animateToPage(
+        (_pulsePage + 1) % count,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _pulseTimer?.cancel();
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+  */
+
+  /// Community Pulse cards, matching the Community Pro design (tag + dot, a big
+  /// reassuring line, and a foot note), with soft per-card gradients.
+  /// (Pulse section removed per request — kept for an easy revert.)
+  List<({String tag, String text, String foot, List<Color> bg, Color dot})>
+      // ignore: unused_element
+      _proPulse(S s) => [
+            (
+              tag: s.cmPulse1Tag,
+              text: s.cmPulse1Text,
+              foot: s.cmPulse1Foot,
+              bg: const [Color(0xFFECE2FB), Color(0xFFF7EFFC)],
+              dot: const Color(0xFF7C3AED),
+            ),
+            (
+              tag: s.cmPulse2Tag,
+              text: s.cmPulse2Text,
+              foot: s.cmPulse2Foot,
+              bg: const [Color(0xFFFBE7F1), Color(0xFFF4E9FB)],
+              dot: const Color(0xFFD6478A),
+            ),
+            (
+              tag: s.cmPulse3Tag,
+              text: s.cmPulse3Text,
+              foot: s.cmPulse3Foot,
+              bg: const [Color(0xFFE7E9FB), Color(0xFFF0E8FB)],
+              dot: const Color(0xFF6D28D9),
+            ),
+            (
+              tag: s.cmPulse4Tag,
+              text: s.cmPulse4Text,
+              foot: s.cmPulse4Foot,
+              bg: const [Color(0xFFF1E8FB), Color(0xFFFBF0F6)],
+              dot: const Color(0xFF9333EA),
+            ),
+          ];
+
+  Future<void> _search(AppLanguage lang) async {
     await showSearch<void>(
       context: context,
       delegate: _CommunitySearchDelegate(lang, controller),
+    );
+  }
+
+  // Warm header: eyebrow kicker, serif title, soft subtitle.
+  Widget _header(S s) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 6, 20, 2),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(s.cmTitle.toUpperCase(),
+              style: GoogleFonts.manrope(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: _proPink)),
+          const SizedBox(height: 4),
+          Text(s.cmWalkingTogether,
+              style: GoogleFonts.fraunces(
+                  fontSize: 35,
+                  height: 1.05,
+                  fontWeight: FontWeight.w600,
+                  color: _proInk)),
+          const SizedBox(height: 4),
+          Text(s.cmSubtitle,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.5,
+                  height: 1.4,
+                  color: _proInk.withValues(alpha: 0.62))),
+        ]),
+      );
+
+  Widget _label(String t) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+        child: Text(t,
+            style: GoogleFonts.fraunces(
+                fontSize: 18, fontWeight: FontWeight.w600, color: _proInk)),
+      );
+
+  // Slim banner shown while testing the doctor experience.
+  Widget _doctorModeBanner(S s) => Container(
+        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [_proPurpleDeep, Color(0xFF9333EA)]),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(children: [
+          const Text('🩺', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(s.cmDoctorBanner,
+                style: GoogleFonts.manrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                    color: Colors.white)),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => CommunityStore.instance.setDoctorMode(false),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+              decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.22),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Text(s.cmExit,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
+            ),
+          ),
+        ]),
+      );
+
+  Widget _feedTabs(S s) {
+    Widget chip(String label, bool active, VoidCallback onTap) => Expanded(
+          child: GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active ? _proPurple : Colors.transparent,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: active
+                    ? const [
+                        BoxShadow(
+                            color: Color(0x337C3AED),
+                            blurRadius: 10,
+                            offset: Offset(0, 3))
+                      ]
+                    : null,
+              ),
+              child: Text(label,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: active ? Colors.white : _proInk.withValues(alpha: 0.55))),
+            ),
+          ),
+        );
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 6, 20, 2),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.66),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+      ),
+      child: Row(children: [
+        chip(s.cmFeed, !_following, () => setState(() => _following = false)),
+        chip(s.cmFollowing, _following, () => setState(() => _following = true)),
+      ]),
+    );
+  }
+
+  /// Expert-only "Needs verification" filter chip (doctor mode). Tapping narrows
+  /// the current feed to posts whose authors asked an expert to verify them.
+  Widget _verifyFilterChip(S s) {
+    final on = _needsVerifyOnly;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: GestureDetector(
+          onTap: () => setState(() => _needsVerifyOnly = !_needsVerifyOnly),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+            decoration: BoxDecoration(
+              color: on ? _proPurple : _proPurple.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                  color: _proPurple.withValues(alpha: on ? 0 : 0.3)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(on ? Icons.verified_rounded : Icons.verified_outlined,
+                  size: 15, color: on ? Colors.white : _proPurpleDeep),
+              const SizedBox(width: 6),
+              Text(s.cmNeedsVerify,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: on ? Colors.white : _proPurpleDeep)),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 
@@ -61,105 +824,286 @@ class CommunityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
-    final text = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(
-        backgroundColor: AppTheme.scaffoldBackground,
-        elevation: 0,
-        title: Text(s.cmTitle,
-            style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () => _search(context, lang),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: _accent,
-        foregroundColor: Colors.white,
-        extendedPadding: const EdgeInsets.symmetric(horizontal: 22),
-        isExtended: true,
-        onPressed: () => _push(context, CreatePostScreen(controller: controller)),
-        icon: const Icon(Icons.edit_rounded, size: 20),
-        label: Text(s.cmCreatePost,
-            style: text.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-      ),
-      body: AnimatedBuilder(
+      backgroundColor: const Color(0xFFFBEAF2),
+      // Lift the compose button clear of the floating bottom nav pill (painted
+      // over this screen by MainScaffold). A custom location measures the lift
+      // from the safe-area-aware endFloat base, so it clears the pill on every
+      // device (a plain Padding lift was unreliable across gesture-bar sizes).
+      floatingActionButtonLocation: const _EndFloatLifted(78),
+      floatingActionButton: AnimatedBuilder(
         animation: CommunityStore.instance,
         builder: (context, _) {
-          final store = CommunityStore.instance;
-          final joined = store.joinedCommunities;
-          final recommended = store.recommendedCommunities;
-          final feed = store.feed();
-          return ListView(
-            padding: const EdgeInsets.only(bottom: 96),
-            children: [
-              // Joined communities (stories style)
-              if (joined.isNotEmpty) ...[
-                _sectionTitle(context, s.cmJoinedSection),
-                SizedBox(
-                  height: 104,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    itemCount: joined.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 14),
-                    itemBuilder: (context, i) => _StoryCircle(
-                      community: joined[i],
-                      hasActivity: store.postsForCommunity(joined[i].id).isNotEmpty,
-                      onTap: () => _push(context,
-                          CommunityDetailScreen(community: joined[i], controller: controller)),
-                      onLong: () => _communitySheet(context, joined[i], s, joined: true),
-                    ),
-                  ),
-                ),
-              ],
-              // Recommended
-              if (recommended.isNotEmpty) ...[
-                _sectionTitle(context, s.cmRecommended),
-                SizedBox(
-                  height: 178,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    itemCount: recommended.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (context, i) => _RecommendedCard(
-                      community: recommended[i],
-                      lang: lang,
-                      onTap: () => _push(context,
-                          CommunityDetailScreen(community: recommended[i], controller: controller)),
-                      onJoin: () => store.toggleJoin(recommended[i].id),
-                    ),
-                  ),
-                ),
-              ],
-              // Pulse
-              _sectionTitle(context, s.cmPulse),
-              SizedBox(
-                height: 150,
-                child: PageView.builder(
-                  controller: PageController(viewportFraction: 0.86),
-                  itemCount: kPulse.length,
-                  itemBuilder: (context, i) => Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 0, 6, 0),
-                    child: _PulseCardView(card: kPulse[i], lang: lang, controller: controller),
-                  ),
-                ),
-              ),
-              // Feed
-              _sectionTitle(context, s.cmFeed),
-              for (final p in feed)
-                _PostCard(
-                  post: p,
-                  lang: lang,
-                  onTap: () => _push(context, PostDetailScreen(post: p, controller: controller)),
-                ),
-            ],
+          // A round + FAB (X-style). In doctor (test) mode it authors as the
+          // verified doctor (see CreatePostScreen).
+          final doc = CommunityStore.instance.doctorMode;
+          return FloatingActionButton(
+            heroTag: 'communityComposeFab',
+            backgroundColor: doc ? _proPurpleDeep : _proPurple,
+            foregroundColor: Colors.white,
+            tooltip: doc ? s.cmPostAsDoctor : s.cmCreatePost,
+            onPressed: () =>
+                _push(context, CreatePostScreen(controller: controller)),
+            child: Icon(
+                doc ? Icons.medical_services_rounded : Icons.add_rounded,
+                size: 26),
           );
         },
+      ),
+      body: Container(
+        decoration: const BoxDecoration(gradient: _proBackdrop),
+        child: AnimatedBuilder(
+          animation: Listenable.merge(
+              [CommunityStore.instance, ExpertFollowStore.instance]),
+          builder: (context, _) {
+            final store = CommunityStore.instance;
+            final ef = ExpertFollowStore.instance;
+            final joined = store.joinedCommunities;
+            final recommended = store.recommendedCommunities;
+            // For You = ranked blend; Following = only joined communities +
+            // followed experts. Both drop "not interested" (hidden) posts.
+            final feed = (_following
+                    ? store.feed().where((p) =>
+                        store.isJoined(p.communityId) ||
+                        ef.isFollowing(p.author))
+                    : store.feed())
+                .where((p) => !store.isHidden(p.id))
+                // Expert "needs verification" filter (doctor mode only): keep just
+                // the posts that requested a verification and aren't verified yet.
+                .where((p) => !_needsVerifyOnly ||
+                    (p.wantsVerification && !store.isEndorsed(p)))
+                .toList();
+            final topPad = MediaQuery.of(context).padding.top + 6;
+            return ListView(
+              padding: EdgeInsets.only(top: topPad, bottom: 110),
+              children: [
+                // Top utility icons (in-scroll, like the design) — no wasted bar.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 2, 14, 0),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    // Doctor (test) mode toggle — for trying the doctor flow.
+                    IconButton(
+                      tooltip: s.cmDoctorMode,
+                      visualDensity: VisualDensity.compact,
+                      color: store.doctorMode ? _proPurpleDeep : _proInk,
+                      icon: Icon(
+                          store.doctorMode
+                              ? Icons.medical_services_rounded
+                              : Icons.medical_services_outlined,
+                          size: 22),
+                      onPressed: () {
+                        store.setDoctorMode(!store.doctorMode);
+                        ScaffoldMessenger.of(context)
+                          ..clearSnackBars()
+                          ..showSnackBar(SnackBar(
+                            duration: const Duration(milliseconds: 1100),
+                            content: Text(store.doctorMode
+                                ? s.cmDoctorOn
+                                : s.cmDoctorOff),
+                          ));
+                      },
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      tooltip: s.cmMyBookmarks,
+                      color: _proInk,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.bookmark_border_rounded, size: 23),
+                      onPressed: () =>
+                          _push(context, MyBookmarksScreen(controller: controller)),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      tooltip: s.cmMyActivity,
+                      color: _proInk,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.person_outline_rounded, size: 23),
+                      onPressed: () =>
+                          _push(context, MyActivityScreen(controller: controller)),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      color: _proInk,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.search_rounded, size: 23),
+                      onPressed: () => _search(lang),
+                    ),
+                  ]),
+                ),
+                _header(s),
+                if (store.doctorMode) _doctorModeBanner(s),
+                // Your communities — premium mono-badge cards
+                if (joined.isNotEmpty) ...[
+                  _label(s.cmJoinedSection),
+                  SizedBox(
+                    height: 138,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: joined.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 13),
+                      itemBuilder: (context, i) => _CommunityCard(
+                        community: joined[i],
+                        lang: lang,
+                        gradient: _commGradients[i % _commGradients.length],
+                        unread: store.postsForCommunity(joined[i].id).length,
+                        onTap: () => _push(
+                            context,
+                            CommunityDetailScreen(
+                                community: joined[i], controller: controller)),
+                        onLong: () =>
+                            _communitySheet(context, joined[i], s, joined: true),
+                      ),
+                    ),
+                  ),
+                ],
+                // Recommended for you — communities you haven't joined yet. The
+                // section now ALWAYS renders (header + either the list or a clear
+                // note) so it can never silently disappear when you've joined all.
+                _label(s.cmRecommended),
+                if (recommended.isNotEmpty)
+                  SizedBox(
+                    height: 214,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: recommended.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 13),
+                      itemBuilder: (context, i) => _RecommendedCard(
+                        community: recommended[i],
+                        lang: lang,
+                        joined: store.isJoined(recommended[i].id),
+                        onTap: () => _push(
+                            context,
+                            CommunityDetailScreen(
+                                community: recommended[i], controller: controller)),
+                        onJoin: () => store.toggleJoin(recommended[i].id),
+                      ),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                            color: _proPurple.withValues(alpha: 0.16)),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.celebration_rounded,
+                            size: 20, color: _proPurple),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(s.cmRecommendedEmpty,
+                              style: GoogleFonts.manrope(
+                                  fontSize: 13,
+                                  height: 1.4,
+                                  fontWeight: FontWeight.w600,
+                                  color: _proInk)),
+                        ),
+                      ]),
+                    ),
+                  ),
+                // Community Pulse REMOVED per request — kept commented for revert.
+                /*
+                _label(s.cmPulse),
+                SizedBox(
+                  height: 170,
+                  child: PageView.builder(
+                    controller: _pulseCtrl,
+                    onPageChanged: (i) => setState(() => _pulsePage = i),
+                    itemCount: _proPulse(s).length,
+                    itemBuilder: (context, i) {
+                      final p = _proPulse(s)[i];
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 2, 8, 6),
+                        child: _ProPulseCard(
+                            tag: p.tag,
+                            text: p.text,
+                            foot: p.foot,
+                            bg: p.bg,
+                            dot: p.dot),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  for (int i = 0; i < _proPulse(s).length; i++)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: i == _pulsePage ? 18 : 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: i == _pulsePage
+                            ? _proPurple
+                            : _proPurple.withValues(alpha: 0.24),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                ]),
+                */
+                const SizedBox(height: 8),
+                // Feed tabs + feed
+                _feedTabs(s),
+                // Expert triage filter — only while viewing as a doctor.
+                if (store.doctorMode) _verifyFilterChip(s),
+                const SizedBox(height: 8),
+                if (feed.isEmpty && _needsVerifyOnly)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(28, 40, 28, 40),
+                    child: Column(children: [
+                      const Icon(Icons.verified_outlined,
+                          size: 40, color: _proPurple),
+                      const SizedBox(height: 12),
+                      Text(s.cmNoVerifyRequests,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w700,
+                              color: _proInk)),
+                    ]),
+                  )
+                else if (_following && feed.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(28, 40, 28, 40),
+                    child: Column(children: [
+                      const Icon(Icons.group_outlined,
+                          size: 40, color: _proPurple),
+                      const SizedBox(height: 12),
+                      Text(s.cmFollowingEmpty,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w700,
+                              color: _proInk)),
+                      const SizedBox(height: 6),
+                      Text(s.cmFollowingEmptySub,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.manrope(
+                              fontSize: 12.5, color: AppTheme.neutral500)),
+                    ]),
+                  )
+                else
+                  for (final p in feed)
+                    CommunityPostCard(
+                      key: ValueKey(p.id),
+                      post: p,
+                      lang: lang,
+                      controller: controller,
+                      onTap: () => _push(context,
+                          PostDetailScreen(post: p, controller: controller)),
+                    ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -173,6 +1117,76 @@ Widget _sectionTitle(BuildContext context, String title) => Padding(
               .titleMedium
               ?.copyWith(fontWeight: FontWeight.w800)),
     );
+
+/// Community Pulse card — soft gradient, a coloured tag dot, a big reassuring
+/// line and a foot note (Community Pro design).
+// Pulse card — kept for revert (Community Pulse section removed per request).
+// ignore: unused_element
+class _ProPulseCard extends StatelessWidget {
+  const _ProPulseCard({
+    required this.tag,
+    required this.text,
+    required this.foot,
+    required this.bg,
+    required this.dot,
+  });
+  final String tag;
+  final String text;
+  final String foot;
+  final List<Color> bg;
+  final Color dot;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topLeft, end: Alignment.bottomRight, colors: bg),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0x127C3AED)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration:
+                BoxDecoration(color: dot, borderRadius: BorderRadius.circular(3)),
+          ),
+          const SizedBox(width: 9),
+          Flexible(
+            child: Text(tag,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: dot)),
+          ),
+        ]),
+        const SizedBox(height: 12),
+        Expanded(
+          child: Text(text,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 17.5,
+                  height: 1.32,
+                  fontWeight: FontWeight.w500,
+                  color: _proInk)),
+        ),
+        const SizedBox(height: 10),
+        Text(foot,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: _proInk.withValues(alpha: 0.55))),
+      ]),
+    );
+  }
+}
 
 void _communitySheet(BuildContext context, Community c, S s, {required bool joined}) {
   showModalBottomSheet<void>(
@@ -205,86 +1219,117 @@ void _communitySheet(BuildContext context, Community c, S s, {required bool join
   );
 }
 
-// --- story circle ---
-class _StoryCircle extends StatelessWidget {
-  const _StoryCircle({
+// --- Your communities card (premium mono badge) ---
+class _CommunityCard extends StatelessWidget {
+  const _CommunityCard({
     required this.community,
-    required this.hasActivity,
+    required this.lang,
+    required this.gradient,
+    required this.unread,
     required this.onTap,
     required this.onLong,
   });
   final Community community;
-  final bool hasActivity;
+  final AppLanguage lang;
+  final List<Color> gradient;
+  final int unread;
   final VoidCallback onTap;
   final VoidCallback onLong;
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final s = S(lang);
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLong,
-      child: SizedBox(
-        width: 70,
-        child: Column(children: [
-          Stack(children: [
-            Container(
-              width: 64,
-              height: 64,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: hasActivity
-                      ? [_accent, _like]
-                      : [AppTheme.outlineVariant, AppTheme.outlineVariant],
-                ),
-              ),
-              child: Container(
+      child: Container(
+        width: 172,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x14512D77), blurRadius: 16, offset: Offset(0, 6)),
+          ],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Stack(clipBehavior: Clip.none, children: [
+              Container(
+                width: 46,
+                height: 46,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: AppTheme.surface,
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradient),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Text(community.emoji, style: const TextStyle(fontSize: 26)),
+                child: Text(_mono(community.name),
+                    style: GoogleFonts.fraunces(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
               ),
-            ),
-            if (hasActivity)
               Positioned(
-                right: 2,
-                top: 2,
+                right: -3,
+                top: -3,
                 child: Container(
                   width: 13,
                   height: 13,
                   decoration: BoxDecoration(
-                    color: _like,
+                    color: const Color(0xFF34C759),
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppTheme.scaffoldBackground, width: 2),
+                    border: Border.all(color: Colors.white, width: 2),
                   ),
                 ),
               ),
+            ]),
+            const Spacer(),
+            if (unread > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _proPurple.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(s.cmNew(unread),
+                    style: text.labelSmall?.copyWith(
+                        color: _proPurpleDeep, fontWeight: FontWeight.w800)),
+              ),
           ]),
-          const SizedBox(height: 6),
+          const SizedBox(height: 14),
           Text(community.name,
-              maxLines: 2,
-              textAlign: TextAlign.center,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: text.labelSmall?.copyWith(height: 1.1)),
+              style: text.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w800, color: _proInk)),
+          const SizedBox(height: 2),
+          Text(s.cmMembers(community.members),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
         ]),
       ),
     );
   }
 }
 
-// --- recommended card ---
+// --- recommended card (Join + celebrate) ---
 class _RecommendedCard extends StatelessWidget {
   const _RecommendedCard({
     required this.community,
     required this.lang,
+    required this.joined,
     required this.onTap,
     required this.onJoin,
   });
   final Community community;
   final AppLanguage lang;
+  final bool joined;
   final VoidCallback onTap;
   final VoidCallback onJoin;
   @override
@@ -294,38 +1339,77 @@ class _RecommendedCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 160,
-        padding: const EdgeInsets.all(13),
+        width: 210,
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x14512D77), blurRadius: 16, offset: Offset(0, 6)),
+          ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(community.emoji, style: const TextStyle(fontSize: 26)),
-          const SizedBox(height: 6),
+          Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _proPurple.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(community.emoji, style: const TextStyle(fontSize: 22)),
+          ),
+          const SizedBox(height: 10),
           Text(community.name,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.15)),
+              style: text.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w800, color: _proInk)),
           const SizedBox(height: 2),
           Text(s.cmMembers(community.members),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-          const Spacer(),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Text(community.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: text.bodySmall
+                    ?.copyWith(color: AppTheme.neutral600, height: 1.35)),
+          ),
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: _accent,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                minimumSize: const Size(0, 36),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              onPressed: onJoin,
-              child: Text(s.cmJoin, style: text.labelMedium?.copyWith(color: Colors.white)),
-            ),
+            child: joined
+                ? OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _proPurpleDeep,
+                      side: BorderSide(color: _proPurple.withValues(alpha: 0.4)),
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      minimumSize: const Size(0, 38),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: onJoin,
+                    icon: const Icon(Icons.check_rounded, size: 17),
+                    label: Text(s.cmJoinedBadge,
+                        style: text.labelMedium
+                            ?.copyWith(fontWeight: FontWeight.w800)),
+                  )
+                : FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _proPurple,
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      minimumSize: const Size(0, 38),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: onJoin,
+                    child: Text(s.cmJoin,
+                        style: text.labelMedium?.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.w800)),
+                  ),
           ),
         ]),
       ),
@@ -333,7 +1417,9 @@ class _RecommendedCard extends StatelessWidget {
   }
 }
 
-// --- pulse card ---
+// --- pulse card (old kPulse renderer; replaced by _ProPulseCard, kept for
+// reference per the comment-out-never-delete rule) ---
+// ignore: unused_element
 class _PulseCardView extends StatelessWidget {
   const _PulseCardView({required this.card, required this.lang, required this.controller});
   final PulseCard card;
@@ -343,57 +1429,98 @@ class _PulseCardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
+    final v = _pulseVisual(card.type);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_accent.withValues(alpha: 0.12), AppTheme.surface],
+          colors: [v.color.withValues(alpha: 0.09), AppTheme.surface],
+          stops: const [0.0, 0.7],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _accent.withValues(alpha: 0.18)),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x142D144C), blurRadius: 16, offset: Offset(0, 5)),
+        ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(card.title.toUpperCase(),
-            style: text.labelSmall?.copyWith(
-                color: _accent, letterSpacing: 0.8, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 8),
+        Row(children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: v.color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(v.icon, size: 18, color: v.color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              card.title.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: text.labelSmall?.copyWith(
+                  color: v.color,
+                  letterSpacing: 0.6,
+                  fontWeight: FontWeight.w800),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 11),
         Expanded(
-          child: Text(card.body,
-              style: text.titleMedium?.copyWith(height: 1.3, fontWeight: FontWeight.w600)),
+          child: Text(
+            card.body,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: text.titleSmall?.copyWith(
+                height: 1.35,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primary900),
+          ),
         ),
-        const SizedBox(height: 8),
-        _pulseAction(context, s),
+        const SizedBox(height: 10),
+        _pulseAction(context, s, v.color),
       ]),
     );
   }
 
-  Widget _pulseAction(BuildContext context, S s) {
+  Widget _pulseAction(BuildContext context, S s, Color color) {
     final store = CommunityStore.instance;
     final text = Theme.of(context).textTheme;
     switch (card.type) {
       case PulseType.poll:
         final voted = store.votedOption(kPulseKicksPollId);
         if (voted != null) {
-          return Text('${s.cmVoted} · $voted',
-              style: text.labelMedium?.copyWith(color: AppTheme.neutral600));
+          return Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.check_circle_rounded, size: 16, color: color),
+            const SizedBox(width: 6),
+            Text('${s.cmVoted} · $voted',
+                style: text.labelMedium?.copyWith(
+                    color: AppTheme.neutral700, fontWeight: FontWeight.w700)),
+          ]);
         }
         return Wrap(
           spacing: 8,
+          runSpacing: 8,
           children: [
             for (final o in card.options)
               GestureDetector(
                 onTap: () => store.vote(kPulseKicksPollId, o),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                    color: _accent.withValues(alpha: 0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: color.withValues(alpha: 0.28)),
                   ),
                   child: Text(o,
-                      style: text.labelMedium?.copyWith(
-                          color: _accent, fontWeight: FontWeight.w700)),
+                      style: text.labelMedium
+                          ?.copyWith(color: color, fontWeight: FontWeight.w700)),
                 ),
               ),
           ],
@@ -402,12 +1529,15 @@ class _PulseCardView extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             final p = store.postById(card.linkPostId ?? '');
-            if (p != null) _push(context, PostDetailScreen(post: p, controller: controller));
+            if (p != null) {
+              _push(context, PostDetailScreen(post: p, controller: controller));
+            }
           },
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Text(s.cmViewDiscussion,
-                style: text.labelMedium?.copyWith(color: _accent, fontWeight: FontWeight.w800)),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: _accent),
+                style: text.labelMedium
+                    ?.copyWith(color: color, fontWeight: FontWeight.w800)),
+            Icon(Icons.chevron_right_rounded, size: 18, color: color),
           ]),
         );
       case PulseType.expert:
@@ -415,10 +1545,11 @@ class _PulseCardView extends StatelessWidget {
           onTap: () => ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(s.cmComingSoon))),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.notifications_active_rounded, size: 16, color: _accent),
+            Icon(Icons.notifications_active_rounded, size: 16, color: color),
             const SizedBox(width: 6),
             Text(s.cmRemindMe,
-                style: text.labelMedium?.copyWith(color: _accent, fontWeight: FontWeight.w800)),
+                style: text.labelMedium
+                    ?.copyWith(color: color, fontWeight: FontWeight.w800)),
           ]),
         );
       case PulseType.cohort:
@@ -432,17 +1563,23 @@ class _PulseCardView extends StatelessWidget {
 //  Post card (feed + detail)
 // ===========================================================================
 
-class _PostCard extends StatelessWidget {
-  const _PostCard({
+class CommunityPostCard extends StatelessWidget {
+  const CommunityPostCard({
+    super.key,
     required this.post,
     required this.lang,
+    required this.controller,
     this.onTap,
     this.detailed = false,
   });
   final CommunityPost post;
   final AppLanguage lang;
+  final PregnancyController controller;
   final VoidCallback? onTap;
   final bool detailed;
+
+  void _openProfile(BuildContext context) => _push(
+      context, CommunityProfileScreen(post: post, controller: controller));
 
   @override
   Widget build(BuildContext context) {
@@ -450,142 +1587,218 @@ class _PostCard extends StatelessWidget {
     final s = S(lang);
     final store = CommunityStore.instance;
     final community = communityById(post.communityId);
-    final tv = _typeVisual(post.type);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.outlineVariant),
+    final endorsed = store.isEndorsed(post);
+    final liked = store.isLiked(post.id);
+    final saved = store.isSaved(post.id);
+    final reposted = store.isReposted(post.id);
+    return Container(
+      // Flat Twitter-style row (no card chrome). Verified posts no longer get a
+      // purple wash or full-width banner — just a small inline "Verified by …"
+      // hint on its own line below (see the verification line near the actions).
+      color: AppTheme.surface,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              GestureDetector(
+                onTap: () => _openProfile(context),
+                child: _authorAvatar(post, size: 44),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // header: [name + seal + @handle · time] ……… ⋯
+                      // The name/handle group is Expanded so it truncates and the
+                      // ⋯ menu always pins to the FAR top-right corner (it used to
+                      // float mid-row whenever the name/handle ran long).
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Row(children: [
+                              Flexible(
+                                child: GestureDetector(
+                                  onTap: () => _openProfile(context),
+                                  child: Text(post.author,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: text.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: _proInk)),
+                                ),
+                              ),
+                              if (_isExpertAuthor(post)) ...[
+                                const SizedBox(width: 3),
+                                const Icon(Icons.verified_rounded,
+                                    size: 15, color: _proPurple),
+                              ],
+                              const SizedBox(width: 5),
+                              Flexible(
+                                child: Text(
+                                    '@${_handle(post.author)} · ${_timeAgo(post)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.manrope(
+                                        fontSize: 12.5,
+                                        color: AppTheme.neutral500)),
+                              ),
+                            ]),
+                          ),
+                          InkWell(
+                            onTap: () => _showPostMenu(context, s, post),
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.only(left: 6, bottom: 4),
+                              child: Icon(Icons.more_horiz_rounded,
+                                  size: 19, color: AppTheme.neutral500),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (community != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 1),
+                          child: Text(
+                              '${s.cmInCommunity} ${community.emoji} ${community.name}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.manrope(
+                                  fontSize: 11.5, color: AppTheme.neutral400)),
+                        ),
+                      const SizedBox(height: 6),
+                      // body
+                      Text(post.text,
+                          maxLines: detailed ? null : 6,
+                          overflow: detailed
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          style: text.bodyMedium?.copyWith(
+                              height: 1.45, fontSize: 14.5, color: _proInk)),
+                      if (post.imageUrls.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        _PostPhotos(paths: post.imageUrls),
+                      ] else if (post.image.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          height: 150,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceContainer,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child:
+                              Text(post.image, style: const TextStyle(fontSize: 56)),
+                        ),
+                      ],
+                      if (post.pollOptions.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        _PollBlock(post: post, lang: lang),
+                      ],
+                      if (post.topics.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Wrap(spacing: 8, runSpacing: 4, children: [
+                          for (final t in post.topics)
+                            Text('#${t.replaceAll(' ', '')}',
+                                style: GoogleFonts.manrope(
+                                    fontSize: 12.5,
+                                    color: _proPurpleDeep,
+                                    fontWeight: FontWeight.w600)),
+                        ]),
+                      ],
+                      const SizedBox(height: 10),
+                      // engagement row — reply · repost · like · views · save · share
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _EngageButton(
+                                icon: Icons.mode_comment_outlined,
+                                label: '${store.commentCount(post)}',
+                                color: AppTheme.neutral500,
+                                onTap: onTap ?? () {}),
+                            _EngageButton(
+                                icon: Icons.repeat_rounded,
+                                label: '${store.repostCount(post)}',
+                                color: reposted
+                                    ? const Color(0xFF17A673)
+                                    : AppTheme.neutral500,
+                                onTap: () {
+                                  store.toggleRepost(post.id);
+                                  _toast(
+                                      context,
+                                      store.isReposted(post.id)
+                                          ? s.cmReposted
+                                          : s.cmRepostUndone);
+                                }),
+                            _EngageButton(
+                                icon: liked
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                label: '${store.likeCount(post)}',
+                                color: liked ? _like : AppTheme.neutral500,
+                                onTap: () => store.toggleLike(post.id)),
+                            _EngageButton(
+                                icon: Icons.bar_chart_rounded,
+                                label: _viewsLabel(post),
+                                color: AppTheme.neutral500,
+                                onTap: onTap ?? () {}),
+                            _EngageButton(
+                                icon: saved
+                                    ? Icons.bookmark_rounded
+                                    : Icons.bookmark_border_rounded,
+                                label: '',
+                                color: saved ? _accent : AppTheme.neutral500,
+                                onTap: () => store.toggleSave(post.id)),
+                            _EngageButton(
+                                icon: Icons.ios_share_rounded,
+                                label: '',
+                                color: AppTheme.neutral500,
+                                onTap: () => _sharePost(s, post)),
+                          ]),
+                      // Verification line (subtle, single line):
+                      //   • endorsed → small "Verified by …" hint (all viewers)
+                      //   • asked but not yet verified → for a member, an
+                      //     "Awaiting [specialty] verification" tag; for a doctor,
+                      //     a "Comment to verify this post" prompt.
+                      // A post is verified when a DOCTOR COMMENTS on it (see
+                      // CommunityStore.addComment) — the old explicit "Verify
+                      // this" button is removed (kept commented just below).
+                      if (endorsed) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: _verifiedHint(context, s, post),
+                        ),
+                      ] else if (post.wantsVerification) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child:
+                              _pendingVerifyTag(s, post, doctor: store.doctorMode),
+                        ),
+                      ],
+                      // Verification is now comment-driven; the explicit button is
+                      // removed but kept here for an easy revert if ever needed:
+                      // if (store.doctorMode && post.wantsVerification)
+                      //   _DoctorEndorseButton(post: post, lang: lang),
+                    ]),
+              ),
+            ]),
+          ),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // author row
-          Row(children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: _accent.withValues(alpha: 0.12),
-              child: Text(post.authorEmoji, style: const TextStyle(fontSize: 18)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Flexible(
-                    child: Text(post.author,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                  ),
-                  if (post.type == PostType.expert || post.type == PostType.parentVeda) ...[
-                    const SizedBox(width: 6),
-                    Icon(tv.icon, size: 15, color: tv.color),
-                  ],
-                ]),
-                if (community != null)
-                  Text('${community.emoji} ${community.name}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-              ]),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: tv.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(s.cmPostType(tv.key),
-                  style: text.labelSmall?.copyWith(color: tv.color, fontWeight: FontWeight.w700)),
-            ),
-          ]),
-          const SizedBox(height: 12),
-          // body
-          Text(post.text,
-              maxLines: detailed ? null : 4,
-              overflow: detailed ? TextOverflow.visible : TextOverflow.ellipsis,
-              style: text.bodyLarge?.copyWith(height: 1.45)),
-          if (post.image.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Container(
-              height: 140,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(post.image, style: const TextStyle(fontSize: 56)),
-            ),
-          ],
-          if (post.pollOptions.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            _PollBlock(post: post, lang: lang),
-          ],
-          if (post.topics.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (final t in post.topics)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text('#$t',
-                        style: text.labelSmall?.copyWith(color: AppTheme.neutral600)),
-                  ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 4),
-          // actions
-          Row(children: [
-            _ActionButton(
-              icon: store.isLiked(post.id)
-                  ? Icons.favorite_rounded
-                  : Icons.favorite_border_rounded,
-              color: store.isLiked(post.id) ? _like : AppTheme.neutral500,
-              label: '${store.likeCount(post)}',
-              onTap: () => store.toggleLike(post.id),
-            ),
-            // Upvote — endorsing an expert's answer (expert posts only).
-            if (post.type == PostType.expert)
-              _ActionButton(
-                icon: store.isUpvoted(post.id)
-                    ? Icons.thumb_up_rounded
-                    : Icons.thumb_up_outlined,
-                color: store.isUpvoted(post.id)
-                    ? const Color(0xFF7A4FC2)
-                    : AppTheme.neutral500,
-                label: '${store.upvoteCount(post)}',
-                onTap: () => store.toggleUpvote(post.id),
-              ),
-            _ActionButton(
-              icon: Icons.mode_comment_outlined,
-              color: AppTheme.neutral500,
-              label: '${store.commentCount(post)}',
-              onTap: onTap ?? () {},
-            ),
-            _ActionButton(
-              icon: store.isSaved(post.id)
-                  ? Icons.bookmark_rounded
-                  : Icons.bookmark_border_rounded,
-              color: store.isSaved(post.id) ? _accent : AppTheme.neutral500,
-              label: '${store.saveCount(post)}',
-              onTap: () => store.toggleSave(post.id),
-            ),
-          ]),
-        ]),
-      ),
+        const Divider(height: 1, thickness: 1, color: Color(0x12512D77)),
+      ]),
     );
   }
 }
 
+// Old engagement chip — replaced by the Twitter-style `_EngageButton` row.
+// Kept for an easy revert.
+// ignore: unused_element
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
@@ -610,6 +1823,196 @@ class _ActionButton extends StatelessWidget {
           const SizedBox(width: 6),
           Text(label, style: text.labelMedium?.copyWith(color: AppTheme.neutral600)),
         ]),
+      ),
+    );
+  }
+}
+
+// ===========================================================================
+//  Doctor (test) mode — verify/endorse a post with a celebratory flourish
+//  No longer shown (verification is comment-driven now) — kept for an easy
+//  revert if we ever want the explicit button back.
+// ===========================================================================
+// ignore: unused_element
+class _DoctorEndorseButton extends StatefulWidget {
+  const _DoctorEndorseButton({required this.post, required this.lang});
+  final CommunityPost post;
+  final AppLanguage lang;
+  @override
+  State<_DoctorEndorseButton> createState() => _DoctorEndorseButtonState();
+}
+
+class _DoctorEndorseButtonState extends State<_DoctorEndorseButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 760));
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  void _onTap() {
+    final store = CommunityStore.instance;
+    final was = store.isDoctorEndorsed(widget.post.id);
+    store.toggleDoctorEndorse(widget.post.id);
+    if (!was) {
+      HapticFeedback.mediumImpact();
+      _c.forward(from: 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(widget.lang);
+    final store = CommunityStore.instance;
+    final endorsed = store.isDoctorEndorsed(widget.post.id);
+    return GestureDetector(
+      onTap: _onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) {
+          final t = _c.value;
+          final popping = endorsed && t > 0 && t < 1;
+          final seal = Transform.rotate(
+            angle: popping ? 0.45 * math.sin(t * math.pi) : 0,
+            child: Transform.scale(
+              scale: popping ? 1 + 0.55 * math.sin(t * math.pi) : 1,
+              child: Icon(Icons.verified_rounded,
+                  size: 16, color: endorsed ? Colors.white : _proPurpleDeep),
+            ),
+          );
+          return Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              if (popping)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _EndorseBurstPainter(t)),
+                  ),
+                ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                decoration: BoxDecoration(
+                  gradient: endorsed
+                      ? const LinearGradient(
+                          colors: [_proPurpleDeep, Color(0xFF9333EA)])
+                      : null,
+                  color: endorsed ? null : _proPurple.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: endorsed
+                      ? null
+                      : Border.all(color: _proPurple.withValues(alpha: 0.4)),
+                  boxShadow: endorsed
+                      ? [
+                          BoxShadow(
+                              color: _proPurple.withValues(alpha: 0.35),
+                              blurRadius: 12,
+                              offset: const Offset(0, 3))
+                        ]
+                      : null,
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  seal,
+                  const SizedBox(width: 6),
+                  Text(endorsed ? s.cmYouVerified : s.cmEndorseThis,
+                      style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: endorsed ? Colors.white : _proPurpleDeep)),
+                ]),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// An expanding ring + gold/purple sparkle burst when a doctor verifies a post.
+class _EndorseBurstPainter extends CustomPainter {
+  _EndorseBurstPainter(this.t);
+  final double t;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final e = Curves.easeOut.transform(t.clamp(0.0, 1.0));
+    final fade = 1 - t;
+    canvas.drawCircle(
+      center,
+      6 + 26 * e,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.6 * fade
+        ..color = const Color(0xFF9333EA).withValues(alpha: fade * 0.75),
+    );
+    const n = 8;
+    for (var i = 0; i < n; i++) {
+      final ang = (i / n) * 2 * math.pi + t;
+      final p = center + Offset(math.cos(ang), math.sin(ang)) * (8 + 24 * e);
+      canvas.drawCircle(
+        p,
+        2.6 * fade,
+        Paint()
+          ..color = (i.isEven ? const Color(0xFFE6A817) : _proPurple)
+              .withValues(alpha: fade),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_EndorseBurstPainter old) => old.t != t;
+}
+
+/// Renders the real photos attached to a user post: one fills the width, more
+/// scroll horizontally as rounded tiles.
+class _PostPhotos extends StatelessWidget {
+  const _PostPhotos({required this.paths});
+  final List<String> paths;
+
+  Widget _broken(double w, double h) => Container(
+        width: w == double.infinity ? null : w,
+        height: h,
+        color: AppTheme.surfaceContainer,
+        alignment: Alignment.center,
+        child: const Icon(Icons.broken_image_outlined, color: AppTheme.neutral400),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    if (paths.length == 1) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.file(
+          File(paths.first),
+          height: 210,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _broken(double.infinity, 210),
+        ),
+      );
+    }
+    return SizedBox(
+      height: 150,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: paths.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, i) => ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.file(
+            File(paths[i]),
+            width: 150,
+            height: 150,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _broken(150, 150),
+          ),
+        ),
       ),
     );
   }
@@ -723,6 +2126,48 @@ class CommunityDetailScreen extends StatelessWidget {
                   ),
                 ]),
               ),
+              // Composer entry — write a post (with photos) to this group.
+              if (joined)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 2),
+                  child: GestureDetector(
+                    onTap: () => _push(
+                        context,
+                        CreatePostScreen(
+                            controller: controller,
+                            initialCommunityId: community.id)),
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: AppTheme.outlineVariant),
+                      ),
+                      child: Row(children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: _accent.withValues(alpha: 0.12),
+                          child: Text(
+                            controller.motherName.isNotEmpty
+                                ? controller.motherName[0].toUpperCase()
+                                : '🙂',
+                            style: text.labelLarge
+                                ?.copyWith(color: _accent, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(s.cmWritePrompt,
+                              style: text.bodyMedium
+                                  ?.copyWith(color: AppTheme.neutral500)),
+                        ),
+                        const Icon(Icons.photo_camera_outlined,
+                            size: 22, color: _accent),
+                      ]),
+                    ),
+                  ),
+                ),
               _sectionTitle(context, s.cmPosts),
               if (posts.isEmpty)
                 Padding(
@@ -733,9 +2178,10 @@ class CommunityDetailScreen extends StatelessWidget {
                 )
               else
                 for (final p in posts)
-                  _PostCard(
+                  CommunityPostCard(
                     post: p,
                     lang: lang,
+                    controller: controller,
                     onTap: () => _push(context, PostDetailScreen(post: p, controller: controller)),
                   ),
             ],
@@ -804,7 +2250,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           return ListView(
             padding: const EdgeInsets.only(top: 8, bottom: 28),
             children: [
-              _PostCard(post: post, lang: lang, detailed: true),
+              CommunityPostCard(
+                  post: post,
+                  lang: lang,
+                  controller: widget.controller,
+                  detailed: true),
               _sectionTitle(context, s.cmComments),
               if (seed.isEmpty && mine.isEmpty)
                 Padding(
@@ -813,8 +2263,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       style: text.bodyMedium?.copyWith(color: AppTheme.neutral500)),
                 ),
               for (final c in seed) _commentTile(context, c.emoji, c.author, c.text),
+              // In doctor (test) mode your comments post AS the verified doctor.
               for (final c in mine)
-                _commentTile(context, '🙂', widget.controller.motherName, c),
+                _commentTile(
+                    context,
+                    store.doctorMode ? '🩺' : '🙂',
+                    store.doctorMode
+                        ? kTestDoctorName
+                        : widget.controller.motherName,
+                    c),
               // add comment
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -922,23 +2379,31 @@ Widget _commentTile(BuildContext context, String emoji, String author, String te
 // ===========================================================================
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key, required this.controller});
+  const CreatePostScreen(
+      {super.key, required this.controller, this.initialCommunityId});
   final PregnancyController controller;
+  final String? initialCommunityId;
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final _textCtrl = TextEditingController();
+  final _picker = ImagePicker();
+  final List<String> _photos = [];
   String? _communityId;
   PostType _type = PostType.question;
   List<String> _autoTags = const [];
+  bool _wantVerify = false; // "ask an expert to verify this"
+  String _specialty = 'all'; // preferred expert specialty for verification
 
   @override
   void initState() {
     super.initState();
-    final joined = CommunityStore.instance.joinedCommunities;
-    if (joined.isNotEmpty) _communityId = joined.first.id;
+    // Default to "Your feed" (general timeline). Only pre-select a community the
+    // user has actually joined — you can't post into one you're not part of.
+    final init = widget.initialCommunityId ?? '';
+    _communityId = CommunityStore.instance.isJoined(init) ? init : '';
   }
 
   @override
@@ -947,22 +2412,51 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     super.dispose();
   }
 
+  Future<void> _addFromGallery() async {
+    final imgs = await _picker.pickMultiImage();
+    if (imgs.isEmpty) return;
+    setState(() {
+      _photos.addAll(imgs.map((x) => x.path));
+      if (_type == PostType.question) _type = PostType.photo;
+    });
+  }
+
+  Future<void> _addFromCamera() async {
+    final img = await _picker.pickImage(source: ImageSource.camera);
+    if (img == null) return;
+    setState(() {
+      _photos.add(img.path);
+      if (_type == PostType.question) _type = PostType.photo;
+    });
+  }
+
   void _share(S s) {
     final t = _textCtrl.text.trim();
-    if (t.isEmpty || _communityId == null) return;
+    if ((t.isEmpty && _photos.isEmpty) || _communityId == null) return;
+    // In doctor (test) mode the post is authored AS the verified doctor — name +
+    // credential, so it renders with the gradient expert seal, not a plain user.
+    final asDoctor = CommunityStore.instance.doctorMode;
     final post = CommunityPost(
       id: 'user_${DateTime.now().millisecondsSinceEpoch}',
       communityId: _communityId!,
-      author: widget.controller.motherName,
-      authorEmoji: '🙂',
+      author: asDoctor ? kTestDoctorName : widget.controller.motherName,
+      authorEmoji: asDoctor ? '🩺' : '🙂',
       text: t,
       type: _type,
       topics: inferTopics(t), // auto-tag from the text
+      imageUrls: List.of(_photos),
       isUser: true,
+      cred: asDoctor ? kTestDoctorCred : '',
+      // A doctor's own post doesn't request verification; a member's can.
+      wantsVerification: !asDoctor && _wantVerify,
+      preferredSpecialty: (!asDoctor && _wantVerify) ? _specialty : '',
+      // Stamp creation time so the new post floats to the top of the feed.
+      createdAt: DateTime.now().millisecondsSinceEpoch,
     );
     CommunityStore.instance.addPost(post);
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.cmPosted)));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(asDoctor ? s.cmPostedAsDoctor : s.cmPosted)));
   }
 
   @override
@@ -977,27 +2471,215 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       PostType.milestone,
       PostType.photo,
     ];
+    final canPost = _textCtrl.text.trim().isNotEmpty || _photos.isNotEmpty;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
         title: Text(s.cmCreatePost),
-        actions: [
-          TextButton(
-            onPressed: () => _share(s),
-            child: Text(s.cmShare,
-                style: text.labelLarge?.copyWith(color: _accent, fontWeight: FontWeight.w800)),
-          ),
-        ],
+        // Share/Post moved INTO the composer (bottom-right of the text field) so
+        // the user posts right where they type. Old top-right button kept here,
+        // commented, for an easy revert.
+        // actions: [
+        //   TextButton(
+        //     onPressed: () => _share(s),
+        //     child: Text(s.cmShare,
+        //         style: text.labelLarge
+        //             ?.copyWith(color: _accent, fontWeight: FontWeight.w800)),
+        //   ),
+        // ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: [
-          Text(s.cmPostTo, style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+          // Doctor (test) mode: make it obvious this post goes out as a doctor.
+          if (CommunityStore.instance.doctorMode) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                    colors: [_proPurple, Color(0xFFA855F7)]),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(children: [
+                const Icon(Icons.verified_rounded,
+                    color: Colors.white, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('${s.cmPostingAsDoctor}  ·  $kTestDoctorName',
+                      style: text.labelLarge?.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.w700)),
+                ),
+              ]),
+            ),
+          ],
+          // ── Ask an expert to verify (members only) ───────────────────────
+          // A doctor's own post is already authoritative; a member can request a
+          // verification — it marks the post so experts see a "Verify this"
+          // button and can find it via their "Needs verification" filter.
+          if (!CommunityStore.instance.doctorMode) ...[
+            Container(
+              decoration: BoxDecoration(
+                color: _proPurple.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _proPurple.withValues(alpha: 0.18)),
+              ),
+              child: SwitchListTile.adaptive(
+                value: _wantVerify,
+                onChanged: (v) => setState(() => _wantVerify = v),
+                activeThumbColor: _proPurple,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                secondary:
+                    const Icon(Icons.verified_outlined, color: _proPurpleDeep),
+                title: Text(s.cmAskVerifyTitle,
+                    style: text.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w800, color: _proInk)),
+                subtitle: Text(s.cmAskVerifySub,
+                    style:
+                        text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+              ),
+            ),
+            // When she asks, let her choose which kind of expert to reach.
+            if (_wantVerify) ...[
+              const SizedBox(height: 12),
+              Text(s.cmChooseSpecialty,
+                  style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final sp in kVerifySpecialties)
+                  ChoiceChip(
+                    label: Text(s.cmSpecialty(sp)),
+                    selected: _specialty == sp,
+                    onSelected: (_) => setState(() => _specialty = sp),
+                  ),
+              ]),
+            ],
+            const SizedBox(height: 18),
+          ],
+          // ── What would you like to share? (text + send, at the top) ──────
+          // Chat-composer style: the mic + a circular Share/send button live at
+          // the bottom-right INSIDE the text field, so posting happens right
+          // where the user is typing.
+          Stack(
+            children: [
+              TextField(
+                controller: _textCtrl,
+                minLines: 5,
+                maxLines: 12,
+                autofocus: true,
+                onChanged: (v) => setState(() => _autoTags = inferTopics(v)),
+                decoration: InputDecoration(
+                  hintText: s.cmShareSomething,
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  contentPadding: const EdgeInsets.fromLTRB(16, 14, 16, 54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: const BorderSide(color: AppTheme.outlineVariant),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: const BorderSide(color: AppTheme.outlineVariant),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  MicDictateButton(controller: _textCtrl, s: s),
+                  const SizedBox(width: 4),
+                  Material(
+                    color: canPost ? _accent : AppTheme.neutral300,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: canPost ? () => _share(s) : null,
+                      child: const Padding(
+                        padding: EdgeInsets.all(9),
+                        child: Icon(Icons.send_rounded,
+                            color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // ── Add photos (gallery + camera) ────────────────────────────────
+          Row(children: [
+            OutlinedButton.icon(
+              onPressed: _addFromGallery,
+              icon: const Icon(Icons.photo_library_outlined, size: 18),
+              label: Text(s.cmAddPhotos),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _proPurpleDeep,
+                side: BorderSide(color: _proPurple.withValues(alpha: 0.4)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+            const SizedBox(width: 10),
+            OutlinedButton.icon(
+              onPressed: _addFromCamera,
+              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+              label: Text(s.cmCamera),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _proPurpleDeep,
+                side: BorderSide(color: _proPurple.withValues(alpha: 0.4)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          ]),
+          if (_photos.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (var i = 0; i < _photos.length; i++)
+                  Stack(clipBehavior: Clip.none, children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.file(File(_photos[i]),
+                          width: 92, height: 92, fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      top: -7,
+                      right: -7,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _photos.removeAt(i)),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              color: _proInk, shape: BoxShape.circle),
+                          padding: const EdgeInsets.all(3),
+                          child: const Icon(Icons.close_rounded,
+                              size: 15, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ]),
+              ],
+            ),
+          ],
+          const SizedBox(height: 18),
+          // ── Where to post (your feed, or a community you've joined) ──────
+          Text(s.cmPostTo,
+              style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
+              // Post to your own feed (general timeline) or into a community.
+              ChoiceChip(
+                label: Text('🏠 ${s.cmYourFeed}'),
+                selected: _communityId == '',
+                onSelected: (_) => setState(() => _communityId = ''),
+              ),
               for (final c in joined)
                 ChoiceChip(
                   label: Text('${c.emoji} ${c.name}'),
@@ -1007,6 +2689,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
           ),
           const SizedBox(height: 18),
+          // ── Post type ────────────────────────────────────────────────────
           Text(s.cmTypeLabel,
               style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
@@ -1021,27 +2704,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   onSelected: (_) => setState(() => _type = t),
                 ),
             ],
-          ),
-          const SizedBox(height: 18),
-          TextField(
-            controller: _textCtrl,
-            minLines: 5,
-            maxLines: 12,
-            autofocus: true,
-            onChanged: (v) => setState(() => _autoTags = inferTopics(v)),
-            decoration: InputDecoration(
-              hintText: s.cmShareSomething,
-              filled: true,
-              fillColor: AppTheme.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: const BorderSide(color: AppTheme.outlineVariant),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: const BorderSide(color: AppTheme.outlineVariant),
-              ),
-            ),
           ),
           if (_autoTags.isNotEmpty) ...[
             const SizedBox(height: 18),
@@ -1074,6 +2736,120 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       ),
     );
   }
+}
+
+// ===========================================================================
+//  My Activity & My Bookmarks
+// ===========================================================================
+
+class MyActivityScreen extends StatelessWidget {
+  const MyActivityScreen({super.key, required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(title: Text(s.cmMyActivity)),
+      body: AnimatedBuilder(
+        animation: CommunityStore.instance,
+        builder: (context, _) {
+          final store = CommunityStore.instance;
+          final posts = store.createdPosts;
+          final commented = store.commentedPosts;
+          final liked = store.likedPosts;
+          final upvoted = store.upvotedPosts;
+          if (posts.isEmpty &&
+              commented.isEmpty &&
+              liked.isEmpty &&
+              upvoted.isEmpty) {
+            return _emptyState(context, Icons.forum_outlined, s.cmActEmpty);
+          }
+          Widget section(String title, List<CommunityPost> list) {
+            if (list.isEmpty) return const SizedBox.shrink();
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle(context, title),
+                  for (final p in list)
+                    CommunityPostCard(
+                      post: p,
+                      lang: lang,
+                      controller: controller,
+                      onTap: () => _push(context,
+                          PostDetailScreen(post: p, controller: controller)),
+                    ),
+                ]);
+          }
+
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 28),
+            children: [
+              section(s.cmActPosts, posts),
+              section(s.cmActCommented, commented),
+              section(s.cmActLiked, liked),
+              section(s.cmActUpvoted, upvoted),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class MyBookmarksScreen extends StatelessWidget {
+  const MyBookmarksScreen({super.key, required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(title: Text(s.cmMyBookmarks)),
+      body: AnimatedBuilder(
+        animation: CommunityStore.instance,
+        builder: (context, _) {
+          final saved = CommunityStore.instance.savedPosts;
+          if (saved.isEmpty) {
+            return _emptyState(
+                context, Icons.bookmark_border_rounded, s.cmBookmarksEmpty);
+          }
+          return ListView(
+            padding: const EdgeInsets.only(top: 8, bottom: 28),
+            children: [
+              for (final p in saved)
+                CommunityPostCard(
+                  post: p,
+                  lang: lang,
+                  controller: controller,
+                  onTap: () => _push(
+                      context, PostDetailScreen(post: p, controller: controller)),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+Widget _emptyState(BuildContext context, IconData icon, String msg) {
+  final text = Theme.of(context).textTheme;
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 52, color: AppTheme.neutral300),
+        const SizedBox(height: 16),
+        Text(msg,
+            textAlign: TextAlign.center,
+            style: text.bodyMedium
+                ?.copyWith(color: AppTheme.neutral500, height: 1.4)),
+      ]),
+    ),
+  );
 }
 
 // ===========================================================================
