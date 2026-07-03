@@ -192,7 +192,7 @@ class BirthingClassesScreen extends StatelessWidget {
               child: const Text('▸', style: TextStyle(color: kPurple, fontSize: 14)),
             )
           else
-            const Text('🔒', style: TextStyle(color: Color(0xFFC7BBD6))),
+            const Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFFC7BBD6)),
         ]),
       ),
     );

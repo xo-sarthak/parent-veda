@@ -37,7 +37,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             Text('Prenatal Yoga', style: pvHeroStyle()),
             const SizedBox(height: 12),
             Text('Trimester-safe movement to feel strong, calm, and ready.', style: pvSubStyle()),
-            pvBanner(emoji: '🛡️', spans: [
+            pvBanner(icon: Icons.shield_outlined, spans: [
               pvText("You're in your "),
               pvBold('third trimester'),
               pvText(" — here's your safe track. We hide anything that isn't right for 30 weeks."),
@@ -81,9 +81,9 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             // trimester tabs
             const SizedBox(height: 22),
             Row(children: [
-              Expanded(flex: 10, child: _tab('Trimester 1 🔒', 0)),
+              Expanded(flex: 10, child: _tab('Trimester 1', 0, locked: true)),
               const SizedBox(width: 8),
-              Expanded(flex: 10, child: _tab('Trimester 2 🔒', 1)),
+              Expanded(flex: 10, child: _tab('Trimester 2', 1, locked: true)),
               const SizedBox(width: 8),
               Expanded(flex: 13, child: _tab(_tri == 2 ? 'Trimester 3 · here' : 'Trimester 3', 2)),
             ]),
@@ -102,7 +102,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
     );
   }
 
-  Widget _tab(String label, int index) {
+  Widget _tab(String label, int index, {bool locked = false}) {
     final active = index == _tri;
     return GestureDetector(
       onTap: () => setState(() => _tri = index),
@@ -113,11 +113,23 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           color: active ? kPurple : kLockBg,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: pvBody(active ? Colors.white : kMuted, 12)
-                .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (locked) ...[
+              Icon(Icons.lock_outline_rounded, size: 11, color: active ? Colors.white : kMuted),
+              const SizedBox(width: 4),
+            ],
+            Flexible(
+              child: Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvBody(active ? Colors.white : kMuted, 12)
+                      .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -135,7 +147,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
       decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Text('🔒', style: TextStyle(fontSize: 18)),
+          const Icon(Icons.lock_outline_rounded, size: 18, color: kMuted),
           const SizedBox(width: 10),
           Text('Trimester ${_tri + 1} track', style: pvTitleStyle(16)),
         ]),

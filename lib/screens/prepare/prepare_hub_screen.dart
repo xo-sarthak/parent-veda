@@ -86,16 +86,16 @@ class PrepareHubScreen extends StatelessWidget {
 
             // category tiles
             pad(Column(children: [
-              _tile(context, '🎓', 'Masterclasses', 'Deep-dive live sessions with experts.',
+              _tile(context, Icons.school_outlined, 'Masterclasses', 'Deep-dive live sessions with experts.',
                   '4 sessions', top: true, onTap: () => openSection(const MasterclassesScreen())),
-              _tile(context, '💬', '1:1 Consultations', 'A private call with the right expert.',
+              _tile(context, Icons.chat_bubble_outline_rounded, '1:1 Consultations', 'A private call with the right expert.',
                   '5 specialists', onTap: () => openSection(const ConsultationsScreen())),
-              _tile(context, '👭', 'Cohort Programs',
+              _tile(context, Icons.groups_outlined, 'Cohort Programs',
                   'Small groups, a real coach, mums due when you are.', '4 programs',
                   onTap: () => openSection(const CohortsScreen())),
-              _tile(context, '🧘', 'Prenatal Yoga', 'Trimester-safe movement.', '6-week program',
+              _tile(context, Icons.self_improvement_rounded, 'Prenatal Yoga', 'Trimester-safe movement.', '6-week program',
                   onTap: () => openSection(const PrenatalYogaScreen())),
-              _tile(context, '👶', 'Birthing Classes', 'Everything for the big day.', '6-class course',
+              _tile(context, Icons.child_friendly_outlined, 'Birthing Classes', 'Everything for the big day.', '6-class course',
                   bottom: true, onTap: () => openSection(const BirthingClassesScreen())),
             ])),
 
@@ -104,7 +104,7 @@ class PrepareHubScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
               decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
               child: Row(children: [
-                const Text('✨', style: TextStyle(fontSize: 16)),
+                const Icon(Icons.auto_awesome_outlined, size: 16, color: kPurple),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text.rich(
@@ -164,7 +164,7 @@ class PrepareHubScreen extends StatelessWidget {
     );
   }
 
-  Widget _tile(BuildContext context, String emoji, String title, String sub, String count,
+  Widget _tile(BuildContext context, IconData icon, String title, String sub, String count,
       {bool top = false, bool bottom = false, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -183,7 +183,7 @@ class PrepareHubScreen extends StatelessWidget {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(14)),
-            child: Text(emoji, style: const TextStyle(fontSize: 19)),
+            child: Icon(icon, size: 22, color: kPurple),
           ),
           const SizedBox(width: 15),
           Expanded(

@@ -1,16 +1,17 @@
 // =============================================================================
-//  ProductsDiscoveryScreen — Products · home / discovery (parenting app)
+//  ProductsDiscoveryScreen — Products · home / categories (parenting app · S3)
 // -----------------------------------------------------------------------------
-//  The Products tab landing: AskVeda-in-products, discovery entry points,
-//  problem chips, a ParentVeda-ranked list, and a labelled sponsored slot.
-//  Faithful build of Claude Design "post pregnancy app.dc.html" · S3. Tapping a
-//  product opens the product detail. Isolated — no pregnancy imports.
+//  The Products tab landing: AskVeda-in-products, a curated category list, and a
+//  compare shortcut. Faithful build of Claude Design "post pregnancy
+//  app.dc.html" · S3. Flow: home → category (S3cat) → subcategory (S3sub) →
+//  detail (S3d); Compare (S3c) is reachable throughout. Isolated module.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
-import 'product_detail_screen.dart';
+import 'products_category_screen.dart';
+import 'products_compare_screen.dart';
 
 class ProductsDiscoveryScreen extends StatelessWidget {
   const ProductsDiscoveryScreen({super.key});
@@ -21,8 +22,11 @@ class ProductsDiscoveryScreen extends StatelessWidget {
         const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
       );
 
-  void _openDetail(BuildContext context) => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => const ProductDetailScreen()));
+  void _openCategory(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProductsCategoryScreen()));
+
+  void _openCompare(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProductsCompareScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,6 @@ class ProductsDiscoveryScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.only(top: 12, bottom: 116),
             children: [
-              // header
               _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -61,7 +64,7 @@ class ProductsDiscoveryScreen extends StatelessWidget {
                     ],
                   ),
                   child: Row(children: [
-                    const Text('✨', style: TextStyle(color: ppPurple, fontSize: 15)),
+                    const Icon(Icons.auto_awesome_outlined, color: ppPurple, size: 16),
                     const SizedBox(width: 11),
                     Expanded(
                       child: Text('"My 2-year-old has red rashes — what should I buy?"',
@@ -74,51 +77,47 @@ class ProductsDiscoveryScreen extends StatelessWidget {
               _pad(Text('Ask in plain words — AskVeda ranks products with reasons.',
                   style: ppBody(11, color: ppMuted))),
 
-              // discovery entry points (2x2)
-              const SizedBox(height: 22),
+              // categories
+              const SizedBox(height: 26),
+              _pad(Text('Shop by category', style: ppJakarta(18))),
+              const SizedBox(height: 4),
+              _pad(Text('Every category is curated and reviewed by ParentVeda.', style: ppBody(12))),
+              const SizedBox(height: 16),
               _pad(Column(children: [
-                Row(children: [
-                  Expanded(child: _entry(context, '🎯', 'By problem', 'Rashes, colic, sleep, teething.')),
-                  const SizedBox(width: 12),
-                  Expanded(child: _entry(context, '🌱', 'By life-stage', 'Right for Aarav at 4 months.')),
-                ]),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Expanded(child: _entry(context, '🗂', 'Categories', 'Skincare, food, sleep, toys.')),
-                  const SizedBox(width: 12),
-                  Expanded(child: _entry(context, '⚖️', 'Compare', 'Any two, side by side.')),
-                ]),
+                _cat(context, Icons.bedtime_outlined, 'Sleep', 'Soothers · Sleepwear · Bedding', first: true),
+                _catDivider(),
+                _cat(context, Icons.spa_outlined, 'Skincare', 'Lotions · Rash creams · Bath'),
+                _catDivider(),
+                _cat(context, Icons.local_drink_outlined, 'Feeding', 'Bottles · Weaning · Sterilisers'),
+                _catDivider(),
+                _cat(context, Icons.toys_outlined, 'Play & Development', 'Toys · Books · Sensory'),
+                _catDivider(),
+                _cat(context, Icons.health_and_safety_outlined, 'Health & Safety', 'Thermometers · Baby-proofing'),
+                _catDivider(),
+                _cat(context, Icons.child_friendly_outlined, 'On the move', 'Strollers · Carriers · Travel'),
               ])),
 
-              // problem chips
-              const SizedBox(height: 20),
-              _chips(),
-
-              // ranked list
-              const SizedBox(height: 28),
-              _pad(Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Flexible(child: Text('For poor sleep', style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                  const SizedBox(width: 10),
-                  Text('Ranked by ParentVeda', style: ppBody(12, color: ppMuted)),
-                ],
+              // compare shortcut
+              const SizedBox(height: 24),
+              _pad(GestureDetector(
+                onTap: () => _openCompare(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+                  decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(18)),
+                  child: Row(children: [
+                    const Icon(Icons.compare_arrows_rounded, color: ppPurple, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Compare any two', style: ppJakarta(14)),
+                        const SizedBox(height: 1),
+                        Text("Side by side, ParentVeda's honest read.", style: ppBody(12)),
+                      ]),
+                    ),
+                    const Text('→', style: TextStyle(color: ppPurple)),
+                  ]),
+                ),
               )),
-              const SizedBox(height: 6),
-              _pad(Text('Every pick has an expert summary and named-mother reviews.', style: ppBody(12))),
-              const SizedBox(height: 14),
-              _pad(_productRow(context, '1', 'Dozy White-Noise Soother', '✓ Verified', ppPurple,
-                  '★ 4.8 · 214', '₹1,499', 'on Amazon', ppMuted, top: true)),
-              _pad(_productRow(context, '2', 'Hush Blackout Curtains', 'ParentVeda', ppBrown,
-                  '★ 4.7 · 96', '₹1,299', 'In-app', ppPurple)),
-              _pad(_productRow(context, '3', 'SnuggleSack Sleep Bag', '✓ Verified', ppPurple,
-                  '★ 4.6 · 143', '₹899', 'on FirstCry', ppMuted, bottom: true)),
-
-              // sponsored
-              const SizedBox(height: 22),
-              _pad(_sponsored()),
 
               const SizedBox(height: 22),
               _pad(Text(
@@ -149,120 +148,35 @@ class ProductsDiscoveryScreen extends StatelessWidget {
     );
   }
 
-  Widget _entry(BuildContext context, String emoji, String title, String desc) => GestureDetector(
-        onTap: () => _soon(context),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppLine)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 36,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
-              child: Text(emoji, style: const TextStyle(fontSize: 17)),
-            ),
-            const SizedBox(height: 12),
-            Text(title, style: ppJakarta(15)),
-            const SizedBox(height: 3),
-            Text(desc, style: ppBody(12, h: 1.4)),
-          ]),
-        ),
-      );
+  Widget _catDivider() =>
+      const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: SizedBox(height: 1, child: ColoredBox(color: ppHair)));
 
-  Widget _chips() {
-    Widget chip(String label, {bool active = false}) => Container(
-          margin: const EdgeInsets.only(right: 9),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-              color: active ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
-          child: Text(label,
-              style: ppBody(12, color: active ? Colors.white : ppSoft, w: active ? FontWeight.w700 : FontWeight.w600)),
-        );
-    return SizedBox(
-      height: 34,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        children: [
-          chip('Poor sleep', active: true),
-          chip('Rashes'),
-          chip('Colic'),
-          chip('Teething'),
-          chip('Dry skin'),
-        ],
-      ),
-    );
-  }
-
-  Widget _productRow(BuildContext context, String rank, String title, String badge, Color badgeColor,
-      String rating, String price, String source, Color sourceColor,
-      {bool top = false, bool bottom = false}) {
+  Widget _cat(BuildContext context, IconData icon, String name, String subs, {bool first = false}) {
     return GestureDetector(
-      onTap: () => _openDetail(context),
+      onTap: () => _openCategory(context),
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          border: Border(
-            top: top ? const BorderSide(color: ppHair) : BorderSide.none,
-            bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
-          ),
-        ),
+      child: Padding(
+        padding: EdgeInsets.only(top: first ? 4 : 0),
         child: Row(children: [
-          SizedBox(width: 16, child: Text(rank, style: ppJakarta(14, color: ppPurple))),
-          const SizedBox(width: 14),
-          const PpStriped(height: 56, width: 56, radius: 16, border: true),
+          Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
+            child: Icon(icon, size: 22, color: ppPurple),
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: ppJakarta(15, w: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 5),
-              Row(children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
-                  child: Text(badge, style: ppBody(11, color: badgeColor, w: FontWeight.w700)),
-                ),
-                const SizedBox(width: 8),
-                Flexible(child: Text(rating, style: ppBody(12, color: ppMuted), overflow: TextOverflow.ellipsis)),
-              ]),
+              Text(name, style: ppJakarta(16)),
+              const SizedBox(height: 2),
+              Text(subs, style: ppBody(12)),
             ]),
           ),
           const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text(price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
-            const SizedBox(height: 2),
-            Text(source, style: ppBody(10, color: sourceColor, w: sourceColor == ppMuted ? FontWeight.w400 : FontWeight.w600)),
-          ]),
+          const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
-  }
-
-  Widget _sponsored() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFECE5F2))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ppEyebrow('Sponsored', color: ppMuted, spacing: 0.8),
-        const SizedBox(height: 12),
-        Row(children: [
-          const PpStriped(height: 56, width: 56, radius: 16, border: true),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Mamaearth Mineral Baby Lotion', style: ppJakarta(15)),
-              const SizedBox(height: 3),
-              Text('Still gets a ParentVeda summary & real reviews.', style: ppBody(12)),
-            ]),
-          ),
-        ]),
-      ]),
     );
   }
 }

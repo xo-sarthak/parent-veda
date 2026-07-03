@@ -97,13 +97,13 @@ Widget pvPill(String text, {Color bg = kPanel, Color fg = kPurple}) => Container
     );
 
 // Rounded lavender info/context banner.
-Widget pvBanner({String? emoji, required List<InlineSpan> spans}) => Container(
+Widget pvBanner({IconData? icon, required List<InlineSpan> spans}) => Container(
       margin: const EdgeInsets.only(top: 20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(16)),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (emoji != null) ...[
-          Text(emoji, style: const TextStyle(fontSize: 16)),
+        if (icon != null) ...[
+          Icon(icon, size: 18, color: kPurple),
           const SizedBox(width: 11),
         ],
         Expanded(

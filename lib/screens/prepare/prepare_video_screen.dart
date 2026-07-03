@@ -95,7 +95,7 @@ class PrepareVideoScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(16)),
                 child: Row(children: [
-                  const Text('🎬', style: TextStyle(fontSize: 16)),
+                  const Icon(Icons.movie_outlined, size: 18, color: kPurple),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text('The full video lands here soon. We\'ll notify you when it\'s ready to watch.',

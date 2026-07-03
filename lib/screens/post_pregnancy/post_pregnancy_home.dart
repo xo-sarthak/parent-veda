@@ -16,8 +16,16 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'explore_drawer.dart';
+import 'growth_activity_screen.dart';
+import 'health_guide_screen.dart';
+import 'journal_screen.dart';
+import 'multichild_sheet.dart';
 import 'pp_common.dart';
 import 'products_discovery_screen.dart';
+import 'sleep_better_screen.dart';
+import 'snapshot_expanded_screen.dart';
+import 'solve_problem_screen.dart';
 
 class PostPregnancyHome extends StatefulWidget {
   const PostPregnancyHome({super.key});
@@ -27,6 +35,7 @@ class PostPregnancyHome extends StatefulWidget {
 }
 
 class _PostPregnancyHomeState extends State<PostPregnancyHome> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _playDone = false;
   bool _playLiked = false;
 
@@ -36,10 +45,25 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
         const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
       );
 
+  void _openProducts() => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => const ProductsDiscoveryScreen()));
+  void _openSnapshot() =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SnapshotExpandedScreen()));
+  void _openSolve() =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SolveProblemScreen()));
+  void _openGrowth() =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GrowthActivityScreen()));
+  void _openJournal() =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MyChildJournalScreen()));
+  void _openSleepBetter() =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SleepBetterScreen()));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: ppBg,
+      drawer: const ExploreDrawer(),
       body: Stack(children: [
         SafeArea(
           bottom: false,
@@ -65,17 +89,17 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
               _morePlaysRail(),
               _pad(_gap(26, ppDivider(), 20)),
 
-              _pad(_railHeader('Reads for this week')),
+              _pad(_railHeader('Reads for this week', onSeeAll: () => openPpTab(context, 1))),
               const SizedBox(height: 14),
               _readsRail(),
               _pad(_gap(26, ppDivider(), 20)),
 
-              _pad(_railHeader('Videos for this week')),
+              _pad(_railHeader('Videos for this week', onSeeAll: () => openPpTab(context, 1))),
               const SizedBox(height: 14),
               _videosRail(),
               _pad(_gap(26, ppDivider(), 20)),
 
-              _pad(_railHeader('Products for this week')),
+              _pad(_railHeader('Products for this week', onSeeAll: _openProducts)),
               const SizedBox(height: 14),
               _productsRail(),
               _pad(_gap(26, ppDivider(), 20)),
@@ -120,19 +144,24 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
 
   // --- greeting --------------------------------------------------------------
   Widget _greeting() {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Expanded(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ppEyebrow('Tuesday, 8 July', color: ppSoft, spacing: 0.7),
-          const SizedBox(height: 4),
-          Text('Good morning, Priya', style: ppJakarta(23)),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Chrome row: hamburger (→ Explore) · language · avatar.
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        GestureDetector(
+          onTap: () => _scaffoldKey.currentState?.openDrawer(),
+          behavior: HitTestBehavior.opaque,
+          child: const Icon(Icons.menu_rounded, size: 24, color: ppInk),
+        ),
+        Row(children: [
+          ppLangToggle(),
+          const SizedBox(width: 11),
+          const PpStriped(height: 36, width: 36, radius: 999, border: true),
         ]),
-      ),
-      Row(children: [
-        ppLangToggle(),
-        const SizedBox(width: 11),
-        const PpStriped(height: 36, width: 36, radius: 999, border: true),
       ]),
+      const SizedBox(height: 18),
+      ppEyebrow('Tuesday, 8 July', color: ppSoft, spacing: 0.7),
+      const SizedBox(height: 4),
+      Text('Good morning, Priya', style: ppJakarta(23)),
     ]);
   }
 
@@ -144,7 +173,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           GestureDetector(
-            onTap: _soon, // multi-child switcher (S10) — later
+            onTap: () => showMultiChildSheet(context),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Text('Aarav', style: ppJakarta(21)),
@@ -161,6 +190,22 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
           const SizedBox(height: 1),
           Text('4 months 1 week · Born 8 Mar', style: ppBody(13)),
         ]),
+      ),
+      const SizedBox(width: 10),
+      // Health pill → Customised Health Guide (S17).
+      GestureDetector(
+        onTap: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const HealthGuideScreen())),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+          decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(999)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.monitor_heart_outlined, size: 15, color: Colors.white),
+            const SizedBox(width: 6),
+            Text('Health', style: ppBody(12, color: Colors.white, w: FontWeight.w700)),
+          ]),
+        ),
       ),
     ]);
   }
@@ -188,7 +233,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
 
   Widget _leapProgress() {
     return Row(children: [
-      const Text('☁', style: TextStyle(fontSize: 13)),
+      const Icon(Icons.cloud_rounded, size: 15, color: ppMuted),
       const SizedBox(width: 10),
       Expanded(
         child: SizedBox(
@@ -212,7 +257,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
         ),
       ),
       const SizedBox(width: 10),
-      const Text('☀', style: TextStyle(fontSize: 13)),
+      const Icon(Icons.wb_sunny_rounded, size: 15, color: ppCoral),
       const SizedBox(width: 6),
       Text('Day 12', style: ppBody(11, color: ppPurple, w: FontWeight.w700)),
     ]);
@@ -255,7 +300,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
       Text("Aarav's world is getting bigger.", style: ppFraunces(38, h: 1.12)),
       const SizedBox(height: 20),
       GestureDetector(
-        onTap: _soon,
+        onTap: _openSnapshot,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
           child: Stack(children: [
@@ -310,7 +355,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Flexible(child: ppEyebrow('Where he is right now', color: ppSoft, spacing: 1.2)),
         const SizedBox(width: 10),
-        GestureDetector(onTap: _soon, child: ppSeeAll()),
+        GestureDetector(onTap: _openSnapshot, child: ppSeeAll()),
       ]),
       const SizedBox(height: 4),
       _milestone('Motor', 'Swiping at toys, pushing up — a first roll is close.', top: true),
@@ -368,7 +413,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
 
   Widget _challenge(String title, String desc, {bool now = false, bool top = false, bool bottom = false}) =>
       GestureDetector(
-        onTap: _soon,
+        onTap: _openSolve,
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15),
@@ -418,7 +463,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
           style: ppBody(14)),
       const SizedBox(height: 14),
       GestureDetector(
-        onTap: _soon,
+        onTap: _openGrowth,
         child: Text('How to play & why it works →',
             style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
       ),
@@ -461,7 +506,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
   }
 
   // --- rails -----------------------------------------------------------------
-  Widget _railHeader(String title, {bool big = true}) => Row(
+  Widget _railHeader(String title, {bool big = true, VoidCallback? onSeeAll}) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
@@ -470,7 +515,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
               child: Text(title,
                   maxLines: 1, overflow: TextOverflow.ellipsis, style: ppJakarta(big ? 18 : 15))),
           const SizedBox(width: 10),
-          GestureDetector(onTap: _soon, child: ppSeeAll()),
+          GestureDetector(onTap: onSeeAll ?? _soon, child: ppSeeAll()),
         ],
       );
 
@@ -486,17 +531,12 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
       );
 
   Widget _morePlaysRail() {
-    Widget card(String emoji, String title, String meta) => GestureDetector(
-          onTap: _soon,
+    Widget card(String title, String meta) => GestureDetector(
+          onTap: _openGrowth,
           child: SizedBox(
             width: 150,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              PpStriped(
-                height: 100,
-                radius: 16,
-                border: true,
-                child: Center(child: Text(emoji, style: const TextStyle(fontSize: 26))),
-              ),
+              const PpStriped(height: 100, radius: 16, border: true),
               const SizedBox(height: 10),
               Text(title, style: ppJakarta(14, w: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 4),
@@ -505,10 +545,10 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
           ),
         );
     return _rail(178, [
-      card('🙈', 'Peekaboo, slow and silly', '5 min · Object permanence'),
-      card('🤚', 'Reach for the ring', '4 min · Grasp & intent'),
-      card('🪞', 'Mirror, mirror on the mat', '3 min · Self & faces'),
-      card('🌀', 'Roll-toward-the-toy', '5 min · Rolling practice'),
+      card('Peekaboo, slow and silly', '5 min · Object permanence'),
+      card('Reach for the ring', '4 min · Grasp & intent'),
+      card('Mirror, mirror on the mat', '3 min · Self & faces'),
+      card('Roll-toward-the-toy', '5 min · Rolling practice'),
     ]);
   }
 
@@ -573,7 +613,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
 
   Widget _productsRail() {
     Widget card(String title, String price, {bool verified = false}) => GestureDetector(
-          onTap: _soon,
+          onTap: _openProducts,
           child: SizedBox(
             width: 160,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -632,7 +672,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: _soon,
+              onTap: _openSleepBetter,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
                 decoration: BoxDecoration(
@@ -652,9 +692,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
 
   // --- journal ---------------------------------------------------------------
   Widget _journalNudge() {
-    Widget btn(String label) => Expanded(
+    Widget btn(IconData icon, String label) => Expanded(
           child: GestureDetector(
-            onTap: _soon,
+            onTap: _openJournal,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               alignment: Alignment.center,
@@ -662,7 +702,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: ppLine)),
-              child: Text(label, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(icon, size: 16, color: ppPurple),
+                const SizedBox(width: 7),
+                Text(label, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+              ]),
             ),
           ),
         );
@@ -672,13 +716,19 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
             child: Text('Capture today',
                 maxLines: 1, overflow: TextOverflow.ellipsis, style: ppJakarta(18))),
         const SizedBox(width: 10),
-        GestureDetector(onTap: _soon, child: ppSeeAll('Journal →')),
+        GestureDetector(onTap: _openJournal, child: ppSeeAll('Journal →')),
       ]),
       const SizedBox(height: 12),
       Text('Aarav rolled halfway across the mat today? Save the moment before it blurs into the next.',
           style: ppBody(14, h: 1.55)),
       const SizedBox(height: 14),
-      Row(children: [btn('🎙 Voice'), const SizedBox(width: 10), btn('📷 Photo'), const SizedBox(width: 10), btn('✍ Note')]),
+      Row(children: [
+        btn(Icons.mic_none_rounded, 'Voice'),
+        const SizedBox(width: 10),
+        btn(Icons.photo_camera_outlined, 'Photo'),
+        const SizedBox(width: 10),
+        btn(Icons.edit_outlined, 'Note'),
+      ]),
     ]);
   }
 
@@ -756,12 +806,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(children: [
             Expanded(child: tab('My Child', true)),
-            Expanded(child: tab('AskVeda', false)),
-            Expanded(child: tab('Community', false)),
-            Expanded(
-                child: tab('Products', false,
-                    onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ProductsDiscoveryScreen())))),
+            Expanded(child: tab('AskVeda', false, onTap: () => openPpTab(context, 1))),
+            Expanded(child: tab('Community', false, onTap: () => openPpTab(context, 2))),
+            Expanded(child: tab('Products', false, onTap: () => openPpTab(context, 3))),
           ]),
         ),
       ),
@@ -780,10 +827,7 @@ class _PlayCircle extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 3),
-        child: Text('▶', style: TextStyle(color: ppPurple, fontSize: size * 0.34)),
-      ),
+      child: Icon(Icons.play_arrow_rounded, color: ppPurple, size: size * 0.5),
     );
   }
 }

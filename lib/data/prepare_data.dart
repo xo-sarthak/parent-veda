@@ -215,7 +215,7 @@ Masterclass? masterclassById(String id) {
 class Specialist {
   const Specialist({
     required this.id,
-    required this.emoji,
+    required this.icon,
     required this.role,
     required this.name,
     required this.cred,
@@ -231,7 +231,7 @@ class Specialist {
   });
 
   final String id;
-  final String emoji;
+  final IconData icon;
   final String role; // "Obstetrician"
   final String name; // "Dr. Ananya Rao"
   final String cred; // "MBBS, MD (OB-GYN)" / "RD"
@@ -249,7 +249,7 @@ class Specialist {
 const List<Specialist> kSpecialists = [
   Specialist(
     id: 'sp_ob',
-    emoji: '🩺',
+    icon: Icons.medical_services_outlined,
     role: 'Obstetrician',
     name: 'Dr. Ananya Rao',
     cred: 'MBBS, MD (OB-GYN) · 15 yrs',
@@ -272,7 +272,7 @@ const List<Specialist> kSpecialists = [
   ),
   Specialist(
     id: 'sp_nutrition',
-    emoji: '🥗',
+    icon: Icons.restaurant_outlined,
     role: 'Prenatal Nutritionist',
     name: 'Ritu Malhotra',
     cred: 'RD · 10 yrs',
@@ -294,7 +294,7 @@ const List<Specialist> kSpecialists = [
   ),
   Specialist(
     id: 'sp_lactation',
-    emoji: '🤱',
+    icon: Icons.child_care_outlined,
     role: 'Lactation Consultant',
     name: 'Sana Khan',
     cred: 'IBCLC · 8 yrs',
@@ -316,7 +316,7 @@ const List<Specialist> kSpecialists = [
   ),
   Specialist(
     id: 'sp_counsellor',
-    emoji: '🧠',
+    icon: Icons.psychology_outlined,
     role: 'Prenatal Counsellor',
     name: 'Dr. Neha Verma',
     cred: 'Clinical Psychologist · 11 yrs',
@@ -338,7 +338,7 @@ const List<Specialist> kSpecialists = [
   ),
   Specialist(
     id: 'sp_physio',
-    emoji: '🌿',
+    icon: Icons.accessibility_new_rounded,
     role: 'Physiotherapist',
     name: 'Kavya Menon',
     cred: "Women's-health PT · 9 yrs",

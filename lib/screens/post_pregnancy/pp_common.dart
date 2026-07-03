@@ -13,6 +13,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'askveda_screen.dart';
+import 'community_screen.dart';
+import 'products_discovery_screen.dart';
+
 // ---- palette ----------------------------------------------------------------
 const Color ppBg = Color(0xFFFBF9FE);
 const Color ppInk = Color(0xFF2F2C30);
@@ -127,26 +131,36 @@ class _StripePainter extends CustomPainter {
 //  others show a gentle "coming soon". "My Child" pops back to the home route
 //  (named 'pp/my_child' by the doorway) from any depth. Pass onProducts to push
 //  the Products discovery screen from a non-products tab.
+/// Central tab navigation for the parenting app: pop back to the My Child home
+/// (route 'pp/my_child') so the stack stays shallow, then push the target tab.
+void openPpTab(BuildContext context, int index) {
+  final nav = Navigator.of(context);
+  nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
+  switch (index) {
+    case 1:
+      nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
+      break;
+    case 2:
+      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+      break;
+    case 3:
+      nav.push(MaterialPageRoute<void>(builder: (_) => const ProductsDiscoveryScreen()));
+      break;
+    // 0 = My Child: the popUntil above already returned to it.
+  }
+}
+
 class PpBottomNav extends StatelessWidget {
-  const PpBottomNav({super.key, required this.active, this.onProducts});
+  const PpBottomNav({super.key, required this.active});
 
   /// 0 = My Child · 1 = AskVeda · 2 = Community · 3 = Products
   final int active;
-  final VoidCallback? onProducts;
 
   static const List<String> _labels = ['My Child', 'AskVeda', 'Community', 'Products'];
 
   void _tap(BuildContext context, int i) {
     if (i == active) return;
-    if (i == 0) {
-      Navigator.of(context).popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
-    } else if (i == 3 && onProducts != null) {
-      onProducts!();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
-    }
+    openPpTab(context, i);
   }
 
   @override
@@ -193,3 +207,98 @@ class PpBottomNav extends StatelessWidget {
     );
   }
 }
+
+// ---- shared deep-dive pieces (back bar, section divider, rows) --------------
+void _ppSoon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+    );
+
+Widget ppBack(BuildContext context, String label) => GestureDetector(
+      onTap: () => Navigator.of(context).maybePop(),
+      behavior: HitTestBehavior.opaque,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.arrow_back, size: 20, color: ppSoft),
+        const SizedBox(width: 12),
+        Flexible(child: Text(label, style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+      ]),
+    );
+
+Widget ppSectionDivider() => const Padding(
+      padding: EdgeInsets.symmetric(vertical: 26),
+      child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
+    );
+
+// An explained product row (image · title + why · price). Tap = coming soon.
+Widget ppProductRow(BuildContext context, String title, String desc, String price,
+        {bool top = false, bool bottom = false}) =>
+    GestureDetector(
+      onTap: () => _ppSoon(context),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+            border: Border(
+          top: top ? const BorderSide(color: ppHair) : BorderSide.none,
+          bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
+        )),
+        child: Row(children: [
+          const PpStriped(height: 48, width: 48, radius: 14, border: true),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: ppBody(14, color: ppInk, w: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(desc, style: ppBody(12)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          Text(price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+        ]),
+      ),
+    );
+
+// A "go deeper" row (pill · text · →). Tap = coming soon.
+Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = false, bool bottom = false}) =>
+    GestureDetector(
+      onTap: () => _ppSoon(context),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 13),
+        decoration: BoxDecoration(
+            border: Border(
+          top: top ? const BorderSide(color: ppHair) : BorderSide.none,
+          bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
+        )),
+        child: Row(children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
+            child: Text(pill, style: ppBody(10, color: ppPurple, w: FontWeight.w700)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(text, style: ppBody(14, color: ppInk, h: 1.4))),
+          const SizedBox(width: 10),
+          const Text('→', style: TextStyle(color: ppMuted)),
+        ]),
+      ),
+    );
+
+// Soft purple card shadow.
+const List<BoxShadow> ppCardShadow = [
+  BoxShadow(color: Color(0x266A30B6), blurRadius: 26, spreadRadius: -12, offset: Offset(0, 14)),
+];
+
+// A pill toggle switch (visual state). on = purple, knob right.
+Widget ppSwitch(bool on) => Container(
+      width: 44,
+      height: 26,
+      decoration: BoxDecoration(color: on ? ppPurple : ppLine, borderRadius: BorderRadius.circular(999)),
+      child: AnimatedAlign(
+        duration: const Duration(milliseconds: 150),
+        alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.all(3),
+          child: Container(width: 20, height: 20, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+        ),
+      ),
+    );

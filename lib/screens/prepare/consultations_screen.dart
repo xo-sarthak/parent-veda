@@ -77,7 +77,7 @@ class ConsultationsScreen extends StatelessWidget {
             height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(16)),
-            child: Text(s.emoji, style: const TextStyle(fontSize: 19)),
+            child: Icon(s.icon, size: 24, color: kPurple),
           ),
           const SizedBox(width: 14),
           Expanded(
