@@ -68,6 +68,20 @@ Widget ppLangToggle() => Text.rich(
 Widget ppSeeAll([String label = 'See all →']) => Text(label,
     style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppPurple));
 
+// A location chip (📍 label ▾) used across the Problem Solver / local-services
+// screens. Visual only — the city is fixed to the mock's Delhi NCR for now.
+Widget ppLocationPill(String city) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.place_outlined, size: 13, color: ppPurple),
+        const SizedBox(width: 5),
+        Text(city, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppInk)),
+        const SizedBox(width: 3),
+        const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: ppMuted),
+      ]),
+    );
+
 // Diagonal-striped placeholder (stands in for imagery/video, as in the mock).
 class PpStriped extends StatelessWidget {
   const PpStriped({

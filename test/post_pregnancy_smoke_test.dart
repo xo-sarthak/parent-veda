@@ -4,20 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:parentveda/screens/post_pregnancy/askveda_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/book_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/cohort_courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/community_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/explore_drawer.dart';
 import 'package:parentveda/screens/post_pregnancy/growth_activity_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/guides_tools_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_guide_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/masterclass_funnel_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/masterclasses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/multichild_sheet.dart';
 import 'package:parentveda/screens/post_pregnancy/post_pregnancy_home.dart';
+import 'package:parentveda/screens/post_pregnancy/problem_solver_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/product_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_category_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_compare_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_discovery_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_subcategory_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/provider_profile_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/provider_results_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipe_page_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipes_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/recommendations_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_better_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/snapshot_expanded_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/solve_problem_screen.dart';
@@ -41,6 +51,16 @@ void main() {
     'Multi-child sheet': const MultiChildSheet(),
     'Recipes': const RecipesScreen(),
     'Recipe page': const RecipePageScreen(),
+    'Masterclasses': const MasterclassesScreen(),
+    'Masterclass funnel': const MasterclassFunnelScreen(),
+    'Cohort Courses': const CohortCoursesScreen(),
+    'Guides & Tools': const GuidesToolsScreen(),
+    'Courses': const CoursesScreen(),
+    'Recommendations': const RecommendationsScreen(),
+    'Book detail': const BookDetailScreen(),
+    'Problem Solver': const ProblemSolverScreen(),
+    'Provider results': const ProviderResultsScreen(),
+    'Provider profile': const ProviderProfileScreen(),
     'Explore drawer': const ExploreDrawer(),
   };
 

@@ -1,16 +1,23 @@
 // =============================================================================
 //  ExploreDrawer — the "Explore" left drawer (parenting app)
 // -----------------------------------------------------------------------------
-//  Opened from the hamburger on the My Child home. A home for sections that
-//  don't sit in the bottom-nav's four hero tabs — starting with Recipes (→
-//  Recipe page). More sections (Recommendations, Nuskhe, Courses, …) slot in
-//  here as they're greenlit. Warm-Nest styled to match the app.
+//  Opened from the hamburger on the My Child home. Home for the section pages
+//  that don't sit in the bottom-nav's four hero tabs: Recipes, Recommendations,
+//  the Learn family (Masterclasses · Cohort Courses · Guides & Tools · Courses),
+//  and local-services help. Each row pushes a faithfully-built Claude Design
+//  screen. Warm-Nest / Editorial-Calm styled to match the app.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import 'cohort_courses_screen.dart';
+import 'courses_screen.dart';
+import 'guides_tools_screen.dart';
+import 'masterclasses_screen.dart';
 import 'pp_common.dart';
+import 'problem_solver_screen.dart';
 import 'recipes_screen.dart';
+import 'recommendations_screen.dart';
 
 class ExploreDrawer extends StatelessWidget {
   const ExploreDrawer({super.key});
@@ -24,40 +31,51 @@ class ExploreDrawer extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 20, 24),
+          padding: const EdgeInsets.fromLTRB(24, 24, 20, 12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             ppEyebrow('ParentVeda'),
             const SizedBox(height: 10),
             Text('Explore', style: ppFraunces(32, h: 1.1)),
             const SizedBox(height: 6),
             Text('Everything else, one tap away.', style: ppBody(14)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            _section(
-              context,
-              Icons.restaurant_menu_outlined,
-              'Recipes',
-              'Age-tagged, healthier Indian food.',
-              () {
-                final nav = Navigator.of(context);
-                nav.pop(); // close the drawer
-                nav.push(MaterialPageRoute(builder: (_) => const RecipesScreen()));
-              },
-              top: true,
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: 16),
+                children: [
+                  _section(context, Icons.restaurant_menu_outlined, 'Recipes',
+                      'Age-tagged, healthier Indian food.', const RecipesScreen(),
+                      top: true),
+                  _section(context, Icons.recommend_outlined, 'Recommendations',
+                      'What to read, watch, play & do.', const RecommendationsScreen()),
+                  _section(context, Icons.school_outlined, 'Masterclasses',
+                      'One evening with an expert.', const MasterclassesScreen()),
+                  _section(context, Icons.groups_outlined, 'Cohort Courses',
+                      'Guided, together — small groups.', const CohortCoursesScreen()),
+                  _section(context, Icons.article_outlined, 'Guides & Tools',
+                      'Downloads you keep forever.', const GuidesToolsScreen()),
+                  _section(context, Icons.video_library_outlined, 'Courses',
+                      'Documentary guides, stage by stage.', const CoursesScreen()),
+                  _section(context, Icons.handshake_outlined, 'Find help',
+                      'Vetted local services near you.', const ProblemSolverScreen()),
+                ],
+              ),
             ),
-
-            const Spacer(),
-            Text('More sections coming soon.', style: ppBody(12, color: ppMuted)),
           ]),
         ),
       ),
     );
   }
 
-  Widget _section(BuildContext context, IconData icon, String title, String desc, VoidCallback onTap,
+  Widget _section(BuildContext context, IconData icon, String title, String desc, Widget screen,
           {bool top = false}) =>
       GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          final nav = Navigator.of(context);
+          nav.pop(); // close the drawer
+          nav.push(MaterialPageRoute<void>(builder: (_) => screen));
+        },
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
