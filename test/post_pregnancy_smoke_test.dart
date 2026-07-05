@@ -16,6 +16,7 @@ import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclass_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclasses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/multichild_sheet.dart';
+import 'package:parentveda/screens/post_pregnancy/nuskhe_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/post_pregnancy_home.dart';
 import 'package:parentveda/screens/post_pregnancy/problem_solver_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/product_detail_screen.dart';
@@ -28,6 +29,7 @@ import 'package:parentveda/screens/post_pregnancy/provider_results_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipe_page_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipes_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recommendations_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/sick_days_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_better_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/snapshot_expanded_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/solve_problem_screen.dart';
@@ -51,6 +53,7 @@ void main() {
     'Multi-child sheet': const MultiChildSheet(),
     'Recipes': const RecipesScreen(),
     'Recipe page': const RecipePageScreen(),
+    'Sick Days': const SickDaysScreen(),
     'Masterclasses': const MasterclassesScreen(),
     'Masterclass funnel': const MasterclassFunnelScreen(),
     'Cohort Courses': const CohortCoursesScreen(),
@@ -61,6 +64,7 @@ void main() {
     'Problem Solver': const ProblemSolverScreen(),
     'Provider results': const ProviderResultsScreen(),
     'Provider profile': const ProviderProfileScreen(),
+    'Dadi/Nani Nuskhe': const NuskheScreen(),
     'Explore drawer': const ExploreDrawer(),
   };
 

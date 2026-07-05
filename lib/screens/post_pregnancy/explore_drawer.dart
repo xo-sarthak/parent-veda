@@ -14,6 +14,7 @@ import 'cohort_courses_screen.dart';
 import 'courses_screen.dart';
 import 'guides_tools_screen.dart';
 import 'masterclasses_screen.dart';
+import 'nuskhe_screen.dart';
 import 'pp_common.dart';
 import 'problem_solver_screen.dart';
 import 'recipes_screen.dart';
@@ -59,6 +60,8 @@ class ExploreDrawer extends StatelessWidget {
                       'Documentary guides, stage by stage.', const CoursesScreen()),
                   _section(context, Icons.handshake_outlined, 'Find help',
                       'Vetted local services near you.', const ProblemSolverScreen()),
+                  _section(context, Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',
+                      'Home remedies, safely.', const NuskheScreen()),
                 ],
               ),
             ),
