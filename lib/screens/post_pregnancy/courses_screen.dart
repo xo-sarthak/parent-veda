@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'course_funnel_screen.dart';
 import 'pp_common.dart';
 
 class CoursesScreen extends StatelessWidget {
@@ -16,9 +17,8 @@ class CoursesScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _openFunnel(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CourseFunnelScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class CoursesScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       GestureDetector(
-                        onTap: () => _soon(context),
+                        onTap: () => _openFunnel(context),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
                           decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
@@ -225,7 +225,7 @@ class CoursesScreen extends StatelessWidget {
   Widget _module(BuildContext context, IconData icon, String title, String meta,
       {bool locked = false, bool top = false}) {
     return GestureDetector(
-      onTap: () => _soon(context),
+      onTap: () => _openFunnel(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),

@@ -143,9 +143,9 @@ class ProductDetailScreen extends StatelessWidget {
                     : 'A ParentVeda-reviewed pick for its category — chosen for everyday usefulness, safety, and value. Named, verified-mother ratings back it up.',
                 style: ppBody(15, color: ppInk, h: 1.65))),
 
-            // good / consider (soothers only)
+            // good / consider + "choose this if" — all still under "The ParentVeda take"
             if (_isSoother) ...[
-              _div(),
+              const SizedBox(height: 20),
               _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -166,17 +166,13 @@ class ProductDetailScreen extends StatelessWidget {
                   ]),
                 ),
               ])),
-              const SizedBox(height: 22),
-              _pad(Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(18)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  ppEyebrow('Choose this if…', color: ppBrown, spacing: 0.8),
-                  const SizedBox(height: 7),
-                  Text('you’re in a noisy joint-family home and want the simplest thing that works.',
-                      style: ppBody(14, color: ppInk, h: 1.55)),
-                ]),
-              )),
+              const SizedBox(height: 18),
+              _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ppEyebrow('Choose this if…', color: ppBrown, spacing: 0.8),
+                const SizedBox(height: 7),
+                Text("you're in a noisy joint-family home and want the simplest thing that works.",
+                    style: ppBody(14, color: ppInk, h: 1.55)),
+              ])),
 
               // research
               _div(),

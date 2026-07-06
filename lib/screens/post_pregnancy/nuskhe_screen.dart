@@ -125,7 +125,7 @@ class NuskheScreen extends StatelessWidget {
                 'Vaidya-approved', ppBrown, ppPanel, '0+ months',
                 top: true)),
             _pad(_remedy(context, Icons.local_florist_outlined, 'Nutmeg (jaiphal) for restful sleep',
-                '⚠ 8+ months only', ppCoral, ppCoralTint, 'read cautions',
+                '8+ months only', ppCoral, ppCoralTint, 'read cautions',
                 top: true, bottom: true)),
 
             const SizedBox(height: 22),
@@ -193,7 +193,11 @@ class NuskheScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: pillBg, borderRadius: BorderRadius.circular(999)),
-                  child: Text(pill.startsWith('⚠') ? pill : '✓ $pill', style: ppBody(10, color: pillFg, w: FontWeight.w700)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(pillFg == ppCoral ? Icons.warning_amber_rounded : Icons.check_rounded, size: 11, color: pillFg),
+                    const SizedBox(width: 4),
+                    Text(pill, style: ppBody(10, color: pillFg, w: FontWeight.w700)),
+                  ]),
                 ),
                 Text(meta, style: ppBody(12, color: ppMuted)),
               ]),

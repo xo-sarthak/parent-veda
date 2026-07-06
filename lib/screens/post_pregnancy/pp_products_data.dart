@@ -43,6 +43,10 @@ class PpProduct {
     this.autoOff,
     this.volumeLock,
     this.power,
+    this.summary = '',
+    this.specs = const {},
+    this.pros = const [],
+    this.cons = const [],
   });
 
   final String id;
@@ -63,6 +67,14 @@ class PpProduct {
   final bool? autoOff;
   final bool? volumeLock;
   final String? power;
+
+  // Per-product compare content — every section is differentiated (no generic
+  // shared text): a one-line summary, a category spec sheet, and this product's
+  // own "what's right" / "worth knowing".
+  final String summary;
+  final Map<String, String> specs;
+  final List<String> pros;
+  final List<String> cons;
 
   String get priceLabel => '₹${_grouped(price)}';
   String get ratingLabel => '★ ${rating.toStringAsFixed(1)}';
@@ -127,7 +139,24 @@ const List<PpProduct> kPpProducts = [
       sound: 'True continuous white noise',
       autoOff: true,
       volumeLock: false,
-      power: 'USB + power bank'),
+      power: 'USB + power bank',
+      summary: 'Our top soother — true continuous white noise that never loops.',
+      specs: {
+        'Sound': 'True continuous white noise',
+        'Auto-off timer': 'Yes',
+        'Volume lock': 'No',
+        'Power': 'USB + power bank',
+        'Warranty': '1 year',
+      },
+      pros: [
+        'True non-looping white noise that stays steady all night',
+        'Runs off a power bank — great for travel and power cuts',
+        'ParentVeda-verified purchase reviews',
+      ],
+      cons: [
+        'The priciest of the four',
+        'No volume lock, so an older baby could nudge the level',
+      ]),
   PpProduct(
       id: 'lull',
       name: 'Lull Portable Soother',
@@ -142,7 +171,24 @@ const List<PpProduct> kPpProducts = [
       sound: 'Looping tracks (short loop)',
       autoOff: true,
       volumeLock: true,
-      power: 'Rechargeable battery'),
+      power: 'Rechargeable battery',
+      summary: 'Compact and pocketable, with a handy volume lock.',
+      specs: {
+        'Sound': 'Looping tracks (short loop)',
+        'Auto-off timer': 'Yes',
+        'Volume lock': 'Yes',
+        'Power': 'Rechargeable battery',
+        'Warranty': '6 months',
+      },
+      pros: [
+        'Volume lock stops little hands changing it',
+        'Genuinely pocket-sized for the diaper bag',
+        'Good value at under ₹1,000',
+      ],
+      cons: [
+        'Tracks loop on a short cycle — some babies notice the repeat',
+        'Battery-only; nothing to plug in overnight',
+      ]),
   PpProduct(
       id: 'hush',
       name: 'Hush Mini Sound Machine',
@@ -157,7 +203,24 @@ const List<PpProduct> kPpProducts = [
       sound: 'Continuous white noise',
       autoOff: false,
       volumeLock: true,
-      power: 'USB'),
+      power: 'USB',
+      summary: 'The budget pick — continuous noise, volume-locked.',
+      specs: {
+        'Sound': 'Continuous white noise',
+        'Auto-off timer': 'No',
+        'Volume lock': 'Yes',
+        'Power': 'USB',
+        'Warranty': '6 months',
+      },
+      pros: [
+        'Continuous (non-looping) sound at the lowest price',
+        'Volume lock included',
+        'Simple, one-button operation',
+      ],
+      cons: [
+        'No auto-off timer — it runs until you switch it off',
+        'USB-only, so it needs a plug nearby',
+      ]),
   PpProduct(
       id: 'cloudtunes',
       name: 'CloudTunes Soother',
@@ -171,7 +234,24 @@ const List<PpProduct> kPpProducts = [
       sound: 'Melodies + white noise',
       autoOff: true,
       volumeLock: false,
-      power: 'Battery'),
+      power: 'Battery',
+      summary: 'Melodies plus white noise, cheapest of the four.',
+      specs: {
+        'Sound': 'Melodies + white noise',
+        'Auto-off timer': 'Yes',
+        'Volume lock': 'No',
+        'Power': 'Battery (replaceable)',
+        'Warranty': '—',
+      },
+      pros: [
+        'Melodies and white noise in one device',
+        'Cheapest option here',
+        'Auto-off timer to save battery',
+      ],
+      cons: [
+        'Lowest rating and review count of the four so far',
+        'No volume lock; batteries are not rechargeable',
+      ]),
 
   // -- Sleep · Sleepwear & sacks --
   PpProduct(
@@ -221,9 +301,89 @@ const List<PpProduct> kPpProducts = [
       verified: true),
 
   // -- Skincare (light catalog) --
-  PpProduct(id: 'lotion', name: 'Soothe Baby Lotion', brand: 'ParentVeda', category: 'Skincare', sub: 'Lotions', rating: 4.7, reviews: 128, price: 399, retailer: 'In-app', parentVeda: true, verified: true),
-  PpProduct(id: 'rashcream', name: 'Calm Zinc Rash Cream', brand: 'Sebamed', category: 'Skincare', sub: 'Rash creams', rating: 4.6, reviews: 84, price: 299, retailer: 'Amazon', verified: true),
-  PpProduct(id: 'babywash', name: 'Gentle Top-to-Toe Wash', brand: 'Mustela', category: 'Skincare', sub: 'Bath', rating: 4.5, reviews: 61, price: 349, retailer: 'FirstCry'),
+  PpProduct(
+      id: 'lotion',
+      name: 'Soothe Baby Lotion',
+      brand: 'ParentVeda',
+      category: 'Skincare',
+      sub: 'Lotions',
+      rating: 4.7,
+      reviews: 128,
+      price: 399,
+      retailer: 'In-app',
+      parentVeda: true,
+      verified: true,
+      summary: 'A light, fragrance-free daily moisturiser for normal-to-dry skin.',
+      specs: {
+        'Suitable age': '0+ months',
+        'Key ingredients': 'Glycerin, panthenol',
+        'Free from': 'Fragrance, parabens',
+        'Skin type': 'Normal to dry',
+        'Size': '200 ml',
+      },
+      pros: [
+        'Fragrance- and paraben-free',
+        'Absorbs fast without a greasy film',
+        'ParentVeda-made with verified reviews',
+      ],
+      cons: [
+        'May feel light for very dry or eczema-prone skin',
+      ]),
+  PpProduct(
+      id: 'rashcream',
+      name: 'Calm Zinc Rash Cream',
+      brand: 'Sebamed',
+      category: 'Skincare',
+      sub: 'Rash creams',
+      rating: 4.6,
+      reviews: 84,
+      price: 299,
+      retailer: 'Amazon',
+      verified: true,
+      summary: 'A zinc barrier cream for nappy rash and red patches.',
+      specs: {
+        'Suitable age': '0+ months',
+        'Key ingredients': 'Zinc oxide, panthenol',
+        'Free from': 'Fragrance, alkali',
+        'Skin type': 'Sensitive, rash-prone',
+        'Size': '100 g',
+      },
+      pros: [
+        'Thick zinc barrier that calms nappy rash fast',
+        'pH-balanced for sensitive skin',
+        'A little goes a long way',
+      ],
+      cons: [
+        'Thick texture takes a moment to spread',
+        'Not a daily all-over moisturiser',
+      ]),
+  PpProduct(
+      id: 'babywash',
+      name: 'Gentle Top-to-Toe Wash',
+      brand: 'Mustela',
+      category: 'Skincare',
+      sub: 'Bath',
+      rating: 4.5,
+      reviews: 61,
+      price: 349,
+      retailer: 'FirstCry',
+      summary: 'A tear-free wash for hair and body in one bottle.',
+      specs: {
+        'Suitable age': '0+ months',
+        'Key ingredients': 'Mild surfactants, avocado',
+        'Free from': 'Soap, parabens',
+        'Skin type': 'Normal',
+        'Size': '400 ml',
+      },
+      pros: [
+        'Tear-free — hair and body in one bottle',
+        'Big 400 ml pump lasts months',
+        'Soap-free formula',
+      ],
+      cons: [
+        'Lightly fragranced — not fully fragrance-free',
+        'Pricier per wash than a plain cleanser',
+      ]),
 
   // -- Feeding (light catalog) --
   PpProduct(id: 'bottle', name: 'Anti-Colic Feeding Bottle', brand: 'Philips', category: 'Feeding', sub: 'Bottles', rating: 4.6, reviews: 210, price: 599, retailer: 'Amazon', verified: true),
@@ -249,6 +409,33 @@ const List<PpProduct> kPpProducts = [
 // ---- queries ----------------------------------------------------------------
 PpCategory categoryByName(String name) =>
     kPpCategories.firstWhere((c) => c.name == name, orElse: () => kPpCategories.first);
+
+PpProduct productById(String id) => kPpProducts.firstWhere((p) => p.id == id, orElse: () => kPpProducts.first);
+
+// ---- discovery filters (per the Products brief) ------------------------------
+// Problem / concern-based entry points → the categories that address them.
+const List<(String, IconData, Set<String>)> kPpConcerns = [
+  ('Rashes', Icons.healing_outlined, {'Skincare'}),
+  ('Poor sleep', Icons.bedtime_outlined, {'Sleep'}),
+  ('Colic & gas', Icons.child_care_outlined, {'Feeding', 'Sleep'}),
+  ('Teething', Icons.emoji_emotions_outlined, {'Play & Development', 'Health & Safety'}),
+  ('Dry skin', Icons.spa_outlined, {'Skincare'}),
+  ('Fever', Icons.thermostat_outlined, {'Health & Safety'}),
+  ('Feeding', Icons.local_drink_outlined, {'Feeding'}),
+  ('Travel', Icons.directions_car_outlined, {'On the move'}),
+];
+
+// Life-stage entry points → the categories most relevant at that age.
+const List<(String, Set<String>)> kPpStages = [
+  ('Newborn · 0–3m', {'Sleep', 'Skincare', 'Feeding', 'Health & Safety'}),
+  ('3–6 months', {'Sleep', 'Play & Development', 'Feeding'}),
+  ('6–12 months', {'Feeding', 'Play & Development', 'On the move'}),
+  ('1–2 years', {'Play & Development', 'On the move', 'Health & Safety'}),
+  ('2 years +', {'Play & Development'}),
+];
+
+/// Distinct brands across the catalog, sorted — for the brand filter.
+List<String> ppBrands() => kPpProducts.map((p) => p.brand).toSet().toList()..sort();
 
 List<PpProduct> productsInSub(String category, String subName) =>
     kPpProducts.where((p) => p.category == category && p.sub == subName).toList();

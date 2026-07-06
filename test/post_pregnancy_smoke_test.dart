@@ -19,6 +19,11 @@ import 'package:parentveda/screens/post_pregnancy/guides_tools_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_guide_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/investments_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_capture_screens.dart';
+import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_home_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_moments_screens.dart';
+import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_settings_screens.dart';
+import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_storybook_screens.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclass_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclasses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/multichild_sheet.dart';
@@ -103,6 +108,24 @@ void main() {
     'Investments & Savings': const InvestmentsScreen(),
     'Astrology & Numerology': const AstrologyScreen(),
     'Explore drawer': const ExploreDrawer(),
+    // My Journal V2
+    'Journal · Welcome': const JournalWelcomeScreen(),
+    'Journal · Empty': const JournalEmptyScreen(),
+    'Journal · Home': const JournalV2Home(),
+    'Journal · Guided': const GuidedMemoryScreen(),
+    'Journal · Quick Capture': const QuickCaptureScreen(),
+    'Journal · Write Story': const WriteStoryScreen(),
+    'Journal · Letter': const LetterScreen(),
+    'Journal · Memory Detail': const MemoryDetailScreen(),
+    'Journal · Timeline': const TimelineScreen(),
+    'Journal · Search': const SearchScreen(),
+    'Journal · Letters': const LettersScreen(),
+    'Journal · Storybook Library': const StorybookLibraryScreen(),
+    'Journal · Storybook': const StorybookScreen(),
+    'Journal · Reader': const StorybookReaderScreen(),
+    'Journal · Customize': const HardcoverCustomizationScreen(),
+    'Journal · Print': const PrintStorybookScreen(),
+    'Journal · Settings': const JournalSettingsScreen(),
   };
 
   screens.forEach((name, screen) {
@@ -137,6 +160,45 @@ void main() {
     await tester.tap(find.text('Grow'));
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('Baby development opportunities'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // The "Deals for the day" commerce shelf sits at the very bottom of the home
+  // (below the fold, lazily built) — scroll to it and confirm it renders clean.
+  testWidgets('My Child home: deals-for-the-day renders at the bottom', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: PostPregnancyHome()));
+    await tester.pump();
+
+    await tester.scrollUntilVisible(
+      find.text('Deals for the day'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 40,
+    );
+    expect(find.text('Deals for the day'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Tapping the child's photo opens the details bottom sheet (not the Snapshot
+  // screen) — faithful to S1 v2's data-detailsmodal.
+  testWidgets('My Child home: photo opens the child-details sheet', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: PostPregnancyHome()));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('child-photo')));
+    await tester.pumpAndSettle();
+
+    expect(find.text("Aarav's details"), findsOneWidget);
+    expect(find.text('Date of birth'), findsOneWidget);
+    expect(find.text('8 March 2026'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

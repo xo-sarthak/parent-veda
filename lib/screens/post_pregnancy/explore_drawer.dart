@@ -10,9 +10,14 @@
 
 import 'package:flutter/material.dart';
 
+import 'article_archive_screen.dart';
+import 'astrology_screen.dart';
 import 'cohort_courses_screen.dart';
 import 'courses_screen.dart';
 import 'guides_tools_screen.dart';
+import 'health_guide_screen.dart';
+import 'investments_screen.dart';
+import 'journal_v2/journal_home_screen.dart';
 import 'masterclasses_screen.dart';
 import 'nuskhe_screen.dart';
 import 'pp_common.dart';
@@ -45,11 +50,15 @@ class ExploreDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 16),
                 children: [
-                  _section(context, Icons.restaurant_menu_outlined, 'Recipes',
-                      'Age-tagged, healthier Indian food.', const RecipesScreen(),
+                  _section(context, Icons.monitor_heart_outlined, 'Health Guide',
+                      "Aarav's health record & guidance.", const HealthGuideScreen(),
                       top: true),
+                  _section(context, Icons.restaurant_menu_outlined, 'Recipes',
+                      'Age-tagged, healthier Indian food.', const RecipesScreen()),
                   _section(context, Icons.recommend_outlined, 'Recommendations',
                       'What to read, watch, play & do.', const RecommendationsScreen()),
+                  _section(context, Icons.feed_outlined, 'Articles',
+                      "Everything we've written, to browse.", const ArticleArchiveScreen()),
                   _section(context, Icons.school_outlined, 'Masterclasses',
                       'One evening with an expert.', const MasterclassesScreen()),
                   _section(context, Icons.groups_outlined, 'Cohort Courses',
@@ -62,6 +71,12 @@ class ExploreDrawer extends StatelessWidget {
                       'Vetted local services near you.', const ProblemSolverScreen()),
                   _section(context, Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',
                       'Home remedies, safely.', const NuskheScreen()),
+                  _section(context, Icons.savings_outlined, 'Investments & Savings',
+                      'Plan ahead for their future.', const InvestmentsScreen()),
+                  _section(context, Icons.auto_awesome_outlined, 'Astrology & Numerology',
+                      'Optional cosmic notes.', const AstrologyScreen()),
+                  _section(context, Icons.menu_book_outlined, 'My Journal V2',
+                      'A keepsake storybook of their life.', const JournalWelcomeScreen()),
                 ],
               ),
             ),

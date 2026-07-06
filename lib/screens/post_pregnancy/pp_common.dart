@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'askveda_screen.dart';
 import 'community_screen.dart';
 import 'products_discovery_screen.dart';
+import 'tools_hub_screen.dart';
 
 // ---- palette ----------------------------------------------------------------
 const Color ppBg = Color(0xFFFBF9FE);
@@ -68,7 +69,7 @@ Widget ppLangToggle() => Text.rich(
 Widget ppSeeAll([String label = 'See all →']) => Text(label,
     style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppPurple));
 
-// A location chip (📍 label ▾) used across the Problem Solver / local-services
+// A location chip (pin · label · caret) used across the Problem Solver / local-services
 // screens. Visual only — the city is fixed to the mock's Delhi NCR for now.
 Widget ppLocationPill(String city) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -155,9 +156,12 @@ void openPpTab(BuildContext context, int index) {
       nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
       break;
     case 2:
-      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+      nav.push(MaterialPageRoute<void>(builder: (_) => const ToolsHubScreen()));
       break;
     case 3:
+      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+      break;
+    case 4:
       nav.push(MaterialPageRoute<void>(builder: (_) => const ProductsDiscoveryScreen()));
       break;
     // 0 = My Child: the popUntil above already returned to it.
@@ -167,10 +171,10 @@ void openPpTab(BuildContext context, int index) {
 class PpBottomNav extends StatelessWidget {
   const PpBottomNav({super.key, required this.active});
 
-  /// 0 = My Child · 1 = AskVeda · 2 = Community · 3 = Products
+  /// 0 = My Child · 1 = AskVeda · 2 = Tools · 3 = Community · 4 = Products
   final int active;
 
-  static const List<String> _labels = ['My Child', 'AskVeda', 'Community', 'Products'];
+  static const List<String> _labels = ['My Child', 'AskVeda', 'Tools', 'Community', 'Products'];
 
   void _tap(BuildContext context, int i) {
     if (i == active) return;
@@ -196,7 +200,7 @@ class PpBottomNav extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: ppBody(11, color: on ? ppPurple : ppMuted, w: on ? FontWeight.w700 : FontWeight.w600)),
+                style: ppBody(10.5, color: on ? ppPurple : ppMuted, w: on ? FontWeight.w700 : FontWeight.w600)),
           ]),
         ),
       );
@@ -214,8 +218,8 @@ class PpBottomNav extends StatelessWidget {
             border: Border.all(color: const Color(0xFFEFEAF4)),
             boxShadow: const [BoxShadow(color: Color(0x1E6A30B6), blurRadius: 26, offset: Offset(0, 10))],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(children: [tab(0), tab(1), tab(2), tab(3)]),
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Row(children: [tab(0), tab(1), tab(2), tab(3), tab(4)]),
         ),
       ),
     );
@@ -240,6 +244,31 @@ Widget ppBack(BuildContext context, String label) => GestureDetector(
 Widget ppSectionDivider() => const Padding(
       padding: EdgeInsets.symmetric(vertical: 26),
       child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
+    );
+
+// A round back button (34px lavender circle with ←) as used on the newer
+// tracker/finder frames — with an optional uppercase eyebrow and/or trailing
+// widget on the right. Tapping pops the current route.
+Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) => Row(
+      children: [
+        GestureDetector(
+          onTap: () => Navigator.of(context).maybePop(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+            child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
+          ),
+        ),
+        if (eyebrow != null) ...[
+          const SizedBox(width: 12),
+          Expanded(child: ppEyebrow(eyebrow, color: ppMuted, spacing: 1.4)),
+        ] else
+          const Spacer(),
+        ?trailing,
+      ],
     );
 
 // An explained product row (image · title + why · price). Tap = coming soon.
@@ -301,6 +330,34 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
 const List<BoxShadow> ppCardShadow = [
   BoxShadow(color: Color(0x266A30B6), blurRadius: 26, spreadRadius: -12, offset: Offset(0, 14)),
 ];
+
+// Commerce trust row (iMumz-style): money-back · pay-later · pause · EMI.
+// Used on the paid funnel pages to make the offer feel real.
+Widget ppGuaranteeRow() {
+  Widget item(IconData icon, String label) => Expanded(
+        child: Column(children: [
+          Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppPanelDiv)),
+            child: Icon(icon, size: 20, color: ppPurple),
+          ),
+          const SizedBox(height: 9),
+          Text(label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: ppBody(10.5, color: ppSoft, h: 1.3, w: FontWeight.w600)),
+        ]),
+      );
+  return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    item(Icons.replay_rounded, '7-day money-back'),
+    item(Icons.event_available_outlined, 'Pay now,\njoin anytime'),
+    item(Icons.pause_circle_outline, '90-day\npause plan'),
+    item(Icons.credit_card_outlined, 'EMI options\navailable'),
+  ]);
+}
 
 // A pill toggle switch (visual state). on = purple, knob right.
 Widget ppSwitch(bool on) => Container(
