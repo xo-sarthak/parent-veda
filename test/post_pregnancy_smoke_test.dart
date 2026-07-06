@@ -29,6 +29,7 @@ import 'package:parentveda/screens/post_pregnancy/provider_results_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipe_page_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recipes_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/recommendations_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/remedy_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sick_days_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_better_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/snapshot_expanded_screen.dart';
@@ -65,6 +66,7 @@ void main() {
     'Provider results': const ProviderResultsScreen(),
     'Provider profile': const ProviderProfileScreen(),
     'Dadi/Nani Nuskhe': const NuskheScreen(),
+    'Remedy detail': const RemedyDetailScreen(),
     'Explore drawer': const ExploreDrawer(),
   };
 
