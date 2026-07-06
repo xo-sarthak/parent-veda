@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 
 import 'masterclass_funnel_screen.dart';
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'provider_profile_screen.dart';
 
 class MasterclassesScreen extends StatelessWidget {
   const MasterclassesScreen({super.key});
@@ -20,6 +22,9 @@ class MasterclassesScreen extends StatelessWidget {
   void _openFunnel(BuildContext context) => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => const MasterclassFunnelScreen()),
       );
+
+  void _openExpert(BuildContext context, String id) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: expertById(id))));
 
   @override
   Widget build(BuildContext context) {
@@ -80,25 +85,29 @@ class MasterclassesScreen extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('The 4-Month Sleep Regression, Solved', style: ppJakarta(19)),
                       const SizedBox(height: 14),
-                      Row(children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
-                          clipBehavior: Clip.antiAlias,
-                          child: const PpStriped(height: 44, colorA: ppBorder, colorB: ppStripeB),
-                        ),
-                        const SizedBox(width: 11),
-                        Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('Dr. Ananya Rao', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
-                            const SizedBox(height: 1),
-                            Text('Paediatrician · 15 yrs', style: ppBody(12)),
-                          ]),
-                        ),
-                        const SizedBox(width: 10),
-                        Text('90 min', style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
-                      ]),
+                      GestureDetector(
+                        onTap: () => _openExpert(context, 'ananya'),
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
+                            clipBehavior: Clip.antiAlias,
+                            child: const PpStriped(height: 44, colorA: ppBorder, colorB: ppStripeB),
+                          ),
+                          const SizedBox(width: 11),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('Dr. Ananya Rao', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
+                              const SizedBox(height: 1),
+                              Text('Paediatrician · 15 yrs', style: ppBody(12)),
+                            ]),
+                          ),
+                          const SizedBox(width: 10),
+                          Text('90 min', style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
+                        ]),
+                      ),
                       const SizedBox(height: 16),
                       Row(children: [
                         Expanded(
@@ -130,12 +139,12 @@ class MasterclassesScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _pad(_row(context, 'Starting solids without the stress',
                 'Ritu Malhotra, Nutritionist · 75 min', '₹999',
-                top: true)),
+                expertId: 'ritu', top: true)),
             _pad(_row(context, 'Understanding the Wonder Weeks',
-                'Dr. Kabir Sen, Child Psychologist · 2 hr', '₹2,499')),
+                'Dr. Kabir Sen, Child Psychologist · 2 hr', '₹2,499', expertId: 'kabir')),
             _pad(_row(context, 'Baby-proofing for joint families',
                 'Meera Iyer, Safety Educator · 60 min', '₹1,299',
-                bottom: true)),
+                expertId: 'meera', bottom: true)),
 
             const SizedBox(height: 22),
             _pad(Text(
@@ -148,9 +157,9 @@ class MasterclassesScreen extends StatelessWidget {
   }
 
   Widget _row(BuildContext context, String title, String meta, String price,
-      {bool top = false, bool bottom = false}) {
+      {required String expertId, bool top = false, bool bottom = false}) {
     return GestureDetector(
-      onTap: () => _openFunnel(context),
+      onTap: () => _openExpert(context, expertId),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),

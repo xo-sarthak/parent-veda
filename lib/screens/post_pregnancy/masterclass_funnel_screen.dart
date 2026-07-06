@@ -10,6 +10,8 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'provider_profile_screen.dart';
 
 class MasterclassFunnelScreen extends StatefulWidget {
   const MasterclassFunnelScreen({super.key});
@@ -22,6 +24,9 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
   int _openFaq = 0;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+
+  void _openExpert(BuildContext context, String id) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: expertById(id))));
 
   void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Booking opens soon'), behavior: SnackBarBehavior.floating),
@@ -139,29 +144,40 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
 
               // coach
               const SizedBox(height: 28),
-              _pad(Text('Your expert', style: ppJakarta(18))),
-              const SizedBox(height: 14),
-              _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
-                  clipBehavior: Clip.antiAlias,
-                  child: const PpStriped(height: 70, colorA: ppBorder, colorB: ppStripeB),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Dr. Ananya Rao', style: ppJakarta(16)),
-                    const SizedBox(height: 2),
-                    Text('Paediatrician · 15 years', style: ppBody(12)),
-                    const SizedBox(height: 8),
-                    Text(
-                        'Has guided thousands of Indian families through the fourth-month wobble. Calm, practical, no cry-it-out.',
-                        style: ppBody(13, h: 1.55)),
-                  ]),
+              _pad(Row(children: [
+                Expanded(child: Text('Your expert', style: ppJakarta(18))),
+                GestureDetector(
+                  onTap: () => _openExpert(context, 'ananya'),
+                  behavior: HitTestBehavior.opaque,
+                  child: Text('View profile →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
                 ),
               ])),
+              const SizedBox(height: 14),
+              _pad(GestureDetector(
+                onTap: () => _openExpert(context, 'ananya'),
+                behavior: HitTestBehavior.opaque,
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
+                    clipBehavior: Clip.antiAlias,
+                    child: const PpStriped(height: 70, colorA: ppBorder, colorB: ppStripeB),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('Dr. Ananya Rao', style: ppJakarta(16)),
+                      const SizedBox(height: 2),
+                      Text('Paediatrician · 15 years', style: ppBody(12)),
+                      const SizedBox(height: 8),
+                      Text(
+                          'Has guided thousands of Indian families through the fourth-month wobble. Calm, practical, no cry-it-out.',
+                          style: ppBody(13, h: 1.55)),
+                    ]),
+                  ),
+                ]),
+              )),
 
               // testimonial
               const SizedBox(height: 26),

@@ -3,20 +3,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:parentveda/screens/post_pregnancy/article_archive_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/article_reader_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/askveda_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/astrology_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/book_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_courses_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/cohort_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/community_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/course_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/explore_drawer.dart';
 import 'package:parentveda/screens/post_pregnancy/growth_activity_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/guides_tools_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_guide_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/investments_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclass_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/masterclasses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/multichild_sheet.dart';
+import 'package:parentveda/screens/post_pregnancy/name_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_finder_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_matches_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_swipe_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/nuskhe_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_experts_data.dart';
 import 'package:parentveda/screens/post_pregnancy/post_pregnancy_home.dart';
 import 'package:parentveda/screens/post_pregnancy/problem_solver_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/product_detail_screen.dart';
@@ -34,6 +45,12 @@ import 'package:parentveda/screens/post_pregnancy/sick_days_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_better_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/snapshot_expanded_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/solve_problem_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/tools_hub_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vaccination_compare_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vaccination_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vaccine_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/what_changed_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/wonder_week_screen.dart';
 
 void main() {
   final screens = <String, Widget>{
@@ -65,8 +82,26 @@ void main() {
     'Problem Solver': const ProblemSolverScreen(),
     'Provider results': const ProviderResultsScreen(),
     'Provider profile': const ProviderProfileScreen(),
+    'Expert profile (Ananya)': ProviderProfileScreen(expert: expertById('ananya')),
+    'Expert profile (Meera)': ProviderProfileScreen(expert: expertById('meera')),
     'Dadi/Nani Nuskhe': const NuskheScreen(),
     'Remedy detail': const RemedyDetailScreen(),
+    'Article archive': const ArticleArchiveScreen(),
+    'Article reader': const ArticleReaderScreen(),
+    'Cohort funnel': const CohortFunnelScreen(),
+    'Course funnel': const CourseFunnelScreen(),
+    'Tools hub': const ToolsHubScreen(),
+    'What Changed': const WhatChangedScreen(),
+    'Wonder Week': const WonderWeekScreen(),
+    'Vaccination home': const VaccinationScreen(),
+    'Vaccination compare': const VaccinationCompareScreen(),
+    'Vaccine detail': const VaccineDetailScreen(),
+    'Name finder quiz': const NameFinderScreen(),
+    'Name swipe deck': const NameSwipeScreen(),
+    'Name detail': const NameDetailScreen(),
+    'Name matches': const NameMatchesScreen(),
+    'Investments & Savings': const InvestmentsScreen(),
+    'Astrology & Numerology': const AstrologyScreen(),
     'Explore drawer': const ExploreDrawer(),
   };
 
@@ -81,5 +116,42 @@ void main() {
       await tester.pump();
       expect(tester.takeException(), isNull);
     });
+  });
+
+  // The home's Solve/Grow panels aren't rendered on the default (Snapshot) tab,
+  // so tap through all three tabs and confirm each renders without overflow.
+  testWidgets('My Child home: all three tabs render', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: PostPregnancyHome()));
+    await tester.pump();
+    expect(find.text('Snapshot'), findsOneWidget);
+
+    await tester.tap(find.text('Solve'));
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Challenges to solve'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('Grow'));
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Baby development opportunities'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // The Astrology reading is behind an opt-in toggle (off by default), so pump
+  // the ON state too and confirm the readings render cleanly.
+  testWidgets('Astrology readings render when toggled on', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: AstrologyScreen()));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('astro-toggle')));
+    await tester.pump();
+    expect(find.text("Aarav's cosmic notes"), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

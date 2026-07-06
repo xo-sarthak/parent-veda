@@ -1,18 +1,25 @@
 // =============================================================================
-//  ProviderProfileScreen — Problem Solver · provider profile (parenting · S18·detail)
+//  ProviderProfileScreen — reusable expert / provider profile (parenting · S18·detail)
 // -----------------------------------------------------------------------------
-//  A single provider: why ParentVeda picks her, languages & specialties,
-//  verified-mother reviews, a referral disclosure, and a sticky "Book on Practo"
-//  bar. Reached from Provider results → a provider. Faithful build of Claude
-//  Design · S18·detail.
+//  A single expert or provider: why ParentVeda picks them, languages &
+//  specialties, verified-mother reviews, a disclosure, and a sticky book bar.
+//  Data-driven — pass any `Expert` (from pp_experts_data) and it renders that
+//  person; with no expert it defaults to Dr. Neha Sharma (the Problem Solver
+//  provider), so the S18·detail flow is unchanged. Reused everywhere an expert
+//  is named: masterclasses, cohorts, courses, and local services. Faithful build
+//  of Claude Design · S18·detail.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
 
 class ProviderProfileScreen extends StatelessWidget {
-  const ProviderProfileScreen({super.key});
+  const ProviderProfileScreen({super.key, this.expert});
+
+  /// The person to render. Defaults to Dr. Neha Sharma when null.
+  final Expert? expert;
 
   static const Color _green = Color(0xFF1F8A5B);
 
@@ -24,6 +31,7 @@ class ProviderProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final e = expert ?? expertById('neha');
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -32,7 +40,7 @@ class ProviderProfileScreen extends StatelessWidget {
           ListView(
             padding: const EdgeInsets.only(top: 12, bottom: 120),
             children: [
-              _pad(ppBack(context, 'Paediatricians')),
+              _pad(ppBack(context, e.backLabel)),
 
               // header
               const SizedBox(height: 20),
@@ -47,23 +55,24 @@ class ProviderProfileScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(color: const Color(0xFFEAF6EF), borderRadius: BorderRadius.circular(999)),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        const Icon(Icons.check_rounded, size: 12, color: _green),
-                        const SizedBox(width: 5),
-                        Flexible(
-                            child: Text('ParentVeda top pick',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: ppBody(11, color: _green, w: FontWeight.w700))),
-                      ]),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Dr. Neha Sharma', style: ppFraunces(24, h: 1.1)),
+                    if (e.topPick)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(color: const Color(0xFFEAF6EF), borderRadius: BorderRadius.circular(999)),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.check_rounded, size: 12, color: _green),
+                          const SizedBox(width: 5),
+                          Flexible(
+                              child: Text(e.topPickLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: ppBody(11, color: _green, w: FontWeight.w700))),
+                        ]),
+                      ),
+                    if (e.topPick) const SizedBox(height: 8),
+                    Text(e.name, style: ppFraunces(24, h: 1.1)),
                     const SizedBox(height: 2),
-                    Text('Paediatrician · 12 years', style: ppBody(13)),
+                    Text(e.credential, style: ppBody(13)),
                   ]),
                 ),
               ])),
@@ -71,29 +80,22 @@ class ProviderProfileScreen extends StatelessWidget {
               // stats
               const SizedBox(height: 20),
               _pad(Row(children: [
-                _stat('★ 4.9', '312 reviews'),
+                _stat('★ ${e.rating}', e.reviewsCount),
                 _statDivider(),
-                _stat('2.4 km', 'Greater Kailash'),
+                _stat(e.mid.$1, e.mid.$2),
                 _statDivider(),
-                _stat('₹800', 'consult'),
+                _stat(e.fee.$1, e.fee.$2),
               ])),
 
               // why
               const SizedBox(height: 26),
-              _pad(Text('Why ParentVeda picks her', style: ppJakarta(18))),
+              _pad(Text(e.whyHeading, style: ppJakarta(18))),
               const SizedBox(height: 8),
-              _pad(Text(
-                  'Gentle with anxious first-time parents, generous with time, and quick to reassure without over-prescribing. Consistently top-rated by mothers for the 4-month vaccine visit.',
-                  style: ppBody(15, h: 1.6))),
+              _pad(Text(e.why, style: ppBody(15, h: 1.6))),
 
               // languages & specialties
               const SizedBox(height: 22),
-              _pad(Wrap(spacing: 9, runSpacing: 9, children: [
-                _tag('Hindi'),
-                _tag('English'),
-                _tag('Vaccinations'),
-                _tag('Newborn care'),
-              ])),
+              _pad(Wrap(spacing: 9, runSpacing: 9, children: [for (final t in e.tags) _tag(t)])),
 
               // reviews
               const SizedBox(height: 28),
@@ -101,17 +103,12 @@ class ProviderProfileScreen extends StatelessWidget {
               const SizedBox(height: 4),
               _pad(Text('Same review system as Products — named, never anonymous.', style: ppBody(12))),
               const SizedBox(height: 14),
-              _pad(_review('Priya', 'mother of Aarav (4 mo)', '★★★★★',
-                  "“She talked me through Aarav's vaccine day calmly. Never rushed.”",
-                  top: true)),
-              _pad(_review('Ritika', 'mother of Vivaan (9 mo)', '★★★★★',
-                  '“Our go-to for every fever since birth.”',
-                  bottom: true)),
+              for (var i = 0; i < e.reviews.length; i++)
+                _pad(_review(e.reviews[i].$1, e.reviews[i].$2, '★★★★★', e.reviews[i].$3,
+                    top: i == 0, bottom: i == e.reviews.length - 1)),
 
               const SizedBox(height: 22),
-              _pad(Text(
-                  'Booking is handled by Practo. ParentVeda earns a small referral fee — it never changes your price.',
-                  textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+              _pad(Text(e.disclaimer, textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
             ],
           ),
 
@@ -132,8 +129,8 @@ class ProviderProfileScreen extends StatelessWidget {
               ),
               child: Row(children: [
                 Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('₹800', style: ppBody(16, color: ppInk, w: FontWeight.w700)),
-                  Text('via Practo', style: ppBody(11, color: ppMuted, w: FontWeight.w600)),
+                  Text(e.ctaPrice, style: ppBody(16, color: ppInk, w: FontWeight.w700)),
+                  Text(e.ctaSub, style: ppBody(11, color: ppMuted, w: FontWeight.w600)),
                 ]),
                 const SizedBox(width: 14),
                 Expanded(
@@ -143,7 +140,7 @@ class ProviderProfileScreen extends StatelessWidget {
                       height: 52,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
-                      child: Text('Book on Practo', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                      child: Text(e.ctaLabel, style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                     ),
                   ),
                 ),
