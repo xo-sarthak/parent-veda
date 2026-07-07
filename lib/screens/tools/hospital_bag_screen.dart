@@ -4,13 +4,13 @@
 //  A personalized preparation experience (NOT a checklist) for Week 30+. A
 //  welcoming onboarding generates a smart default bag; the mother then prepares
 //  it over time. Three views of the same data:
-//    • Bag      — emotional: a filling bag visual, progress, category cards
-//    • Planner  — a flat, filterable "single source of truth" list
-//    • Shopping — three separate cost totals + grouped purchases + partner share
+//    • Bag      - emotional: a filling bag visual, progress, category cards
+//    • Planner  - a flat, filterable "single source of truth" list
+//    • Shopping - three separate cost totals + grouped purchases + partner share
 //  Every item supports states (already-have / buy-from-ParentVeda / buy-elsewhere
 //  / skip) plus a "packed" flag. Custom items, search, suggested essentials and
 //  gentle "ready" moments are all included. Nothing is mandatory; everything
-//  autosaves. Commerce is intentionally non-pushy — the ParentVeda store is a
+//  autosaves. Commerce is intentionally non-pushy - the ParentVeda store is a
 //  gentle "coming soon".
 // =============================================================================
 
@@ -319,11 +319,11 @@ class _OnboardingState extends State<_Onboarding> {
 }
 
 // ===========================================================================
-//  SIMPLIFIED "My Hospital Bag" — a warm, tap-only nesting experience.
-//    • _MyBagScreen    — the default: a filling-bag hero + her items grouped by
+//  SIMPLIFIED "My Hospital Bag" - a warm, tap-only nesting experience.
+//    • _MyBagScreen    - the default: a filling-bag hero + her items grouped by
 //                        WHERE she'll get them, with inline Bought/Packed.
-//    • _AddItemsScreen — the dead-simple catalogue browser (+ "mums like you").
-//    • _KeepsakeScreen — the "bag is ready 💛" celebration.
+//    • _AddItemsScreen - the dead-simple catalogue browser (+ "mums like you").
+//    • _KeepsakeScreen - the "bag is ready 💛" celebration.
 //  The OLD 3-view UI (Bag/Planner/Shopping) is preserved, commented, below.
 // ===========================================================================
 
@@ -947,7 +947,7 @@ class _MyBagScreenState extends State<_MyBagScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  Add items — the dead-simple catalogue browser.
+//  Add items - the dead-simple catalogue browser.
 // ---------------------------------------------------------------------------
 class _AddItemsScreen extends StatefulWidget {
   const _AddItemsScreen({required this.controller});
@@ -1196,7 +1196,7 @@ class _AddItemsScreenState extends State<_AddItemsScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  Keepsake — "Baby's bag is ready 💛".
+//  Keepsake - "Baby's bag is ready 💛".
 // ---------------------------------------------------------------------------
 class _KeepsakeScreen extends StatelessWidget {
   const _KeepsakeScreen({required this.controller});
@@ -1313,7 +1313,7 @@ class _BagHeroPainter extends CustomPainter {
 }
 
 // ===========================================================================
-//  OLD UI (Bag / Planner / Shopping) — replaced by _MyBagScreen above.
+//  OLD UI (Bag / Planner / Shopping) - replaced by _MyBagScreen above.
 //  Preserved (commented out) for an easy revert, per "comment out, never delete".
 // ===========================================================================
 /* OLD_BAG_UI_DISABLED
@@ -1362,7 +1362,7 @@ class _BagHome extends StatelessWidget {
           ),
         ),
         // Each tab listens to the store itself (see below). The TabBarView is NOT
-        // wrapped in an AnimatedBuilder anymore — rebuilding it on every store
+        // wrapped in an AnimatedBuilder anymore - rebuilding it on every store
         // change, combined with a lazy DefaultTabController.of() in an onTap, left
         // a stale tab-controller dependent and crashed with "_dependents.isEmpty".
         body: TabBarView(
@@ -1426,7 +1426,7 @@ class _BagView extends StatefulWidget {
 }
 
 class _BagViewState extends State<_BagView> {
-  // Category cards expanded to show their items inline — so she can pack /
+  // Category cards expanded to show their items inline - so she can pack /
   // favourite right there, without drilling into a separate screen.
   final Set<BagCategory> _expanded = {};
 
@@ -1436,7 +1436,7 @@ class _BagViewState extends State<_BagView> {
     final lang = widget.controller.language;
     final store = HospitalBagStore.instance;
     // Capture the TabController during BUILD so its dependency is registered (and
-    // cleaned up) properly — not lazily inside an onTap, which was the crash.
+    // cleaned up) properly - not lazily inside an onTap, which was the crash.
     final tabs = DefaultTabController.of(context);
 
     return AnimatedBuilder(
@@ -1446,7 +1446,7 @@ class _BagViewState extends State<_BagView> {
         children: [
           _progressCard(context, s, store, tabs),
           const SizedBox(height: 18),
-          // Category cards — tap to expand and pack items inline.
+          // Category cards - tap to expand and pack items inline.
           for (final c in store.activeCategories) ...[
             _categoryCard(context, s, lang, store, c),
             if (_expanded.contains(c)) ...[
@@ -1494,7 +1494,7 @@ class _BagViewState extends State<_BagView> {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
-        // Tap to jump to the Planner (the full list of items in the bag) — uses
+        // Tap to jump to the Planner (the full list of items in the bag) - uses
         // the controller captured during build, not a lazy .of() in the callback.
         onTap: () => tabs.animateTo(1),
         child: Ink(
@@ -1719,7 +1719,7 @@ class _CategoryScreen extends StatelessWidget {
   }
 }
 
-/// One item row — packed checkbox + name + status chip; tap opens the sheet.
+/// One item row - packed checkbox + name + status chip; tap opens the sheet.
 class _ItemRow extends StatelessWidget {
   const _ItemRow({
     required this.controller,
@@ -1781,7 +1781,7 @@ class _ItemRow extends StatelessWidget {
             ]),
           ),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            // Favourite heart — builds the mother's own must-have list.
+            // Favourite heart - builds the mother's own must-have list.
             IconButton(
               tooltip: s.hbMarkFavourite,
               visualDensity: VisualDensity.compact,
@@ -1923,7 +1923,7 @@ class _ShoppingView extends StatelessWidget {
       builder: (context, _) => ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
         children: [
-        // Cost totals — kept strictly separate.
+        // Cost totals - kept strictly separate.
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -2218,7 +2218,7 @@ Widget _buyElseSummary(
 }
 
 // ===========================================================================
-//  Product (marketplace) screen — for sellable items
+//  Product (marketplace) screen - for sellable items
 // ===========================================================================
 
 class _ProductScreen extends StatelessWidget {
@@ -2257,7 +2257,7 @@ class _ProductScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
               ],
-              // Affiliate split — also available elsewhere (external links).
+              // Affiliate split - also available elsewhere (external links).
               if (affiliate.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Text(s.hbAlsoElsewhere,
@@ -2442,7 +2442,7 @@ Widget _productCard(BuildContext context, S s, BagItem item, BagProduct p) {
   );
 }
 
-/// Product "photo" — a real network image when [BagProduct.imageUrl] is set,
+/// Product "photo" - a real network image when [BagProduct.imageUrl] is set,
 /// otherwise a soft emoji tile (so real images can be added later).
 Widget _productImage(BagProduct p) {
   final tile = Container(

@@ -1,5 +1,5 @@
 // =============================================================================
-//  NameDetailScreen — Baby Name Finder · name detail (parenting · S27·detail)
+//  NameDetailScreen - Baby Name Finder · name detail (parenting · S27·detail)
 // -----------------------------------------------------------------------------
 //  The full story of one name: meaning, origin/syllables/numerology, the
 //  ParentVeda perspective, similar names, and a "Learn" cross-link. The heart
@@ -80,7 +80,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
             Center(
               child: GestureDetector(
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Pronunciation audio — coming soon'), behavior: SnackBarBehavior.floating),
+                  const SnackBar(content: Text('Pronunciation audio - coming soon'), behavior: SnackBarBehavior.floating),
                 ),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -127,7 +127,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
               _fact('${n.numerology}', 'numerology'),
             ])),
 
-            // nakshatra fit — offered as tradition
+            // nakshatra fit - offered as tradition
             const SizedBox(height: 14),
             _pad(Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -141,7 +141,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
                     const SizedBox(height: 6),
                     Text(n.nakshatra, style: ppBody(13, color: ppInk, h: 1.5)),
                     const SizedBox(height: 4),
-                    Text('Offered as tradition, if it matters to you — not a claim.', style: ppBody(11, color: ppMuted, h: 1.4)),
+                    Text('Offered as tradition, if it matters to you - not a claim.', style: ppBody(11, color: ppMuted, h: 1.4)),
                   ]),
                 ),
               ]),

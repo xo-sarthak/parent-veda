@@ -2,7 +2,7 @@
 //  App-wide constants / feature flags
 // =============================================================================
 
-/// Global flag for gradient card backgrounds. Now ON for every week — the soft
+/// Global flag for gradient card backgrounds. Now ON for every week - the soft
 /// blush gradient (previewed on weeks 4 & 5) is rolled out app-wide.
 const bool kEnableGradientCards = true;
 

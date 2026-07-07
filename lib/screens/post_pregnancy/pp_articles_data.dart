@@ -1,8 +1,8 @@
 // =============================================================================
-//  Articles — content model + data
+//  Articles - content model + data
 // -----------------------------------------------------------------------------
 //  Backs the browsable Article Archive (S20·archive) and the Article Reader
-//  (S20). The archive is an SEO/casual-browse surface — never promoted on the
+//  (S20). The archive is an SEO/casual-browse surface - never promoted on the
 //  home. The "Why baby sleep cycles change at 4 months" article carries the full
 //  designed reader body; the rest are list entries (full copy on the way).
 //  Faithful to Claude Design "post pregnancy - content.dc.html". Isolated module.

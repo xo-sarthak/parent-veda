@@ -1,11 +1,11 @@
 // =============================================================================
-//  NameSwipeScreen — Baby Name Finder · swipe deck (parenting · S27·swipe)
+//  NameSwipeScreen - Baby Name Finder · swipe deck (parenting · S27·swipe)
 // -----------------------------------------------------------------------------
 //  The swipe-to-match deck: like (♥) or pass (✕) each name, undo (↺) the last,
 //  tap a card for the full story, and when a name is a mutual yes a celebration
 //  overlay appears. Likes flow into the shared NameMatchStore, which the matches
 //  screen reads. Faithful build of Claude Design "post pregnancy - content.dc.html"
-//  · S27·swipe — functional, nothing static.
+//  · S27·swipe - functional, nothing static.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -37,14 +37,14 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
   bool _showMatch = false;
   BabyName? _matched;
 
-  // Distinct like/pass feedback — a coral heart-burst + warm pulse on a like,
+  // Distinct like/pass feedback - a coral heart-burst + warm pulse on a like,
   // a quieter muted pulse on a pass. Its own controller so it can outlast the
   // 260ms fly-off.
   late final AnimationController _fb;
   String? _fbKind;
 
   // Drag-to-swipe: the front card follows the finger; a fling past the threshold
-  // (or a button press) animates it off-screen — right = love, left = pass — and
+  // (or a button press) animates it off-screen - right = love, left = pass - and
   // a short release springs it back. One controller drives both the fly-off and
   // the spring-back.
   late final AnimationController _ctrl;
@@ -247,7 +247,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                   child: Row(children: [
                     _filterChip('Boy', on: true, onTap: () {}),
                     const SizedBox(width: 7),
-                    _filterChip('Starts with', on: false, onTap: () => _snack('Filter by starting letter — coming soon')),
+                    _filterChip('Starts with', on: false, onTap: () => _snack('Filter by starting letter - coming soon')),
                     const SizedBox(width: 7),
                     _filterChip('Rare only', on: _rareOnly, onTap: _toRare),
                   ]),
@@ -333,7 +333,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
         bottom: 24,
         child: Container(decoration: BoxDecoration(color: const Color(0xFFEEE8F4), borderRadius: BorderRadius.circular(26))),
       ),
-      // front card — draggable
+      // front card - draggable
       Positioned(
         left: 0,
         right: 0,
@@ -398,7 +398,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                 Text(n.script, textAlign: TextAlign.center, style: ppFraunces(22, color: ppPurple, h: 1.1)),
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () => _snack('Pronunciation audio — coming soon'),
+                  onTap: () => _snack('Pronunciation audio - coming soon'),
                   behavior: HitTestBehavior.opaque,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Container(
@@ -534,7 +534,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                   Text.rich(TextSpan(children: [
                     TextSpan(text: 'You both love ', style: ppBody(14, h: 1.55)),
                     TextSpan(text: n.name, style: ppBody(14, color: ppPurple, w: FontWeight.w700, h: 1.55)),
-                    TextSpan(text: ' — “${n.meaningShort}”', style: ppBody(14, h: 1.55)),
+                    TextSpan(text: ' - “${n.meaningShort}”', style: ppBody(14, h: 1.55)),
                   ]), textAlign: TextAlign.center),
                   const SizedBox(height: 20),
                   Row(children: [

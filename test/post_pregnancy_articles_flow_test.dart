@@ -1,4 +1,4 @@
-// Functional test for the Article archive filters — the topic + age-band
+// Functional test for the Article archive filters - the topic + age-band
 // queries behind the chips actually narrow the list.
 import 'package:flutter_test/flutter_test.dart';
 

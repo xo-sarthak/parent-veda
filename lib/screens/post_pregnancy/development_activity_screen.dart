@@ -1,8 +1,8 @@
 // =============================================================================
-//  DevelopmentActivityScreen — one activity to try together
+//  DevelopmentActivityScreen - one activity to try together
 // -----------------------------------------------------------------------------
 //  Duration, materials, difficulty, the skills it supports, how to do it, safety
-//  notes and the developmental benefit — plus save and "we did this" (a quiet
+//  notes and the developmental benefit - plus save and "we did this" (a quiet
 //  celebration, never a streak). Warm and doable, not clinical.
 // =============================================================================
 

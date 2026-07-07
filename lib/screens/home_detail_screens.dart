@@ -2,10 +2,10 @@
 //  Home detail screens
 // -----------------------------------------------------------------------------
 //  The reading / composing surfaces a mother reaches from the Home daily moment:
-//    * GrowReaderScreen   — expanded parenting insight + optional deep dive
-//    * StoryReaderScreen  — full "Read To Your Baby" story (with Listen)
-//    * TalkComposerScreen — write or speak a message saved into Dear Baby
-//  Plus showGarbhInfoSheet() — the little "i" explainer for Garbh Sanskar.
+//    * GrowReaderScreen   - expanded parenting insight + optional deep dive
+//    * StoryReaderScreen  - full "Read To Your Baby" story (with Listen)
+//    * TalkComposerScreen - write or speak a message saved into Dear Baby
+//  Plus showGarbhInfoSheet() - the little "i" explainer for Garbh Sanskar.
 //
 //  All reuse the existing design language (AppTheme, BabyVoiceService, speech).
 // =============================================================================
@@ -103,7 +103,7 @@ class GrowReaderScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Father Learn reader — expanded fatherhood lesson + optional deep dive
+//  Father Learn reader - expanded fatherhood lesson + optional deep dive
 // ---------------------------------------------------------------------------
 
 class FatherLearnReaderScreen extends StatelessWidget {
@@ -229,7 +229,7 @@ class StoryReaderScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 12),
                   child: TextButton.icon(
                     onPressed: () => BabyVoiceService.instance.toggleCard(
-                      // Always narrate the English text with an English voice —
+                      // Always narrate the English text with an English voice -
                       // TTS can't read Roman-script Hinglish. (UI text below
                       // still follows the selected language.)
                       story.body.en,

@@ -1,5 +1,5 @@
 // =============================================================================
-//  CohortsScreen (S3) — Prepare › Cohort Programs (data-driven)
+//  CohortsScreen (S3) - Prepare › Cohort Programs (data-driven)
 //  Every program opens its cohort detail page.
 // =============================================================================
 
@@ -37,7 +37,7 @@ class CohortsScreen extends StatelessWidget {
             pvBanner(spans: [
               pvText("You're "),
               pvBold('30 weeks'),
-              pvText(' — the Birth-Ready cohort starts Monday.'),
+              pvText(' - the Birth-Ready cohort starts Monday.'),
             ]),
 
             // featured cohort
@@ -113,7 +113,7 @@ class CohortsScreen extends StatelessWidget {
                 ),
               ]),
             ),
-            pvFooterNote('Small cohorts, real accountability — our most-loved way to prepare.'),
+            pvFooterNote('Small cohorts, real accountability - our most-loved way to prepare.'),
           ],
         ),
       ),

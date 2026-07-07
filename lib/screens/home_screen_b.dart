@@ -1,5 +1,5 @@
 // =============================================================================
-//  HomeScreenB — Mother Home / Daily Moment · "Warm Nest" (Direction B)
+//  HomeScreenB - Mother Home / Daily Moment · "Warm Nest" (Direction B)
 // -----------------------------------------------------------------------------
 //  The revamped daily moment from the Claude Design "Warm Nest" direction:
 //    brand header → purple gradient hero (greeting · Week/Day · baby size ·
@@ -8,7 +8,7 @@
 //
 //  Each ritual tile re-opens the EXISTING daily-moment module (GrowModule,
 //  ReadModule, …) verbatim in a sheet, so every underlying behaviour (readers,
-//  Talk composer, raga player, "keep this with me") is preserved — this screen
+//  Talk composer, raga player, "keep this with me") is preserved - this screen
 //  is a re-skin of the entry points, not a rewrite of the content.
 //
 //  Built entirely against AppTheme tokens, which already hold the Warm-Nest
@@ -124,7 +124,7 @@ class HomeScreenB extends StatelessWidget {
             // Temporary doorway into the new (isolated) post-pregnancy app.
             _postPregnancyDoorway(context),
             const SizedBox(height: 14),
-            // ===== WEEKLY SNAPSHOT — the hero + quick shortcuts as one unit ====
+            // ===== WEEKLY SNAPSHOT - the hero + quick shortcuts as one unit ====
             _sectionEyebrow(s.snapshotTitle),
             const SizedBox(height: 8),
             _heroCard(
@@ -136,10 +136,10 @@ class HomeScreenB extends StatelessWidget {
               greeting: s.greeting(DateTime.now().hour, pregnancy.motherName),
             ),
             const SizedBox(height: 24),
-            // ===== TODAY'S JOURNEY — everything daily lives under this heading ==
+            // ===== TODAY'S JOURNEY - everything daily lives under this heading ==
             _todaysJourneyHeading(s),
             const SizedBox(height: 14),
-            // Today's Video — the week's recommended Watch & Learn pick.
+            // Today's Video - the week's recommended Watch & Learn pick.
             TodaysVideoCard(controller: pregnancy),
             const SizedBox(height: 20),
             // Daily parenting tip.
@@ -155,7 +155,7 @@ class HomeScreenB extends StatelessWidget {
             // Scans & appointments due around now (above the Trimester chart).
             _scansDailySection(context, lang),
             const SizedBox(height: 16),
-            // Trimester chart — quick "where am I" reference (above My Journal).
+            // Trimester chart - quick "where am I" reference (above My Journal).
             TrimesterChartCard(controller: pregnancy),
             const SizedBox(height: 16),
             // Daily My Journal.
@@ -164,7 +164,7 @@ class HomeScreenB extends StatelessWidget {
             // Daily medication & supplements (shown inline).
             _medicationSection(context, lang),
             const SizedBox(height: 16),
-            // Daily Reads — day-rotating articles + books, with check-off.
+            // Daily Reads - day-rotating articles + books, with check-off.
             DailyReadsHomeCard(controller: pregnancy, lang: lang),
             const SizedBox(height: 16),
             // Read Next moved to the Tools hub (kept commented for revert).
@@ -252,7 +252,7 @@ class HomeScreenB extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        // Saved hub — a bookmark right on Home, beside search.
+        // Saved hub - a bookmark right on Home, beside search.
         GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => SavedHubScreen(controller: pregnancy))),
@@ -286,7 +286,7 @@ class HomeScreenB extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        // Profile entry — Direction B has no Profile tab, so it lives here as
+        // Profile entry - Direction B has no Profile tab, so it lives here as
         // the avatar (it holds language, My Journal, Dear Baby, products…).
         GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -317,10 +317,10 @@ class HomeScreenB extends StatelessWidget {
   }
 
   // The "Weekly Snapshot" was folded into the hero's "this week" brief +
-  // "View week" (see _heroCard) per the latest direction — no separate card,
+  // "View week" (see _heroCard) per the latest direction - no separate card,
   // no Baby/Mother/Health circles.
 
-  // OLD Daily / Weekly flow toggle — replaced by the hero "this week" brief.
+  // OLD Daily / Weekly flow toggle - replaced by the hero "this week" brief.
   // Kept (commented) for an easy revert.
   /*
   Widget _flowToggle(S s) {
@@ -470,7 +470,7 @@ class HomeScreenB extends StatelessWidget {
                       _progressRing(pct, (40 - week).clamp(0, 40)),
                     ],
                   ),
-                  // Baby / Mother / What's next — now part of the hero itself.
+                  // Baby / Mother / What's next - now part of the hero itself.
                   const SizedBox(height: 16),
                   Container(
                       height: 1, color: Colors.white.withValues(alpha: 0.18)),
@@ -558,7 +558,7 @@ class HomeScreenB extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 5),
-        // The remaining stretch, said warmly — how much is left to go.
+        // The remaining stretch, said warmly - how much is left to go.
         Text(
           S(pregnancy.language).weeksLeftShort(weeksToGo),
           textAlign: TextAlign.center,
@@ -598,7 +598,7 @@ class HomeScreenB extends StatelessWidget {
         ]),
       );
 
-  // Baby / Mother / What's next — old standalone row (now integrated INTO the
+  // Baby / Mother / What's next - old standalone row (now integrated INTO the
   // hero card via _heroShortcut); kept for an easy revert.
   // ignore: unused_element
   Widget _snapshotShortcuts(BuildContext context, int week, AppLanguage lang) {
@@ -644,7 +644,7 @@ class HomeScreenB extends StatelessWidget {
   }
 
   // --- today's rituals -------------------------------------------------------
-  // Old Baby/Mother shortcut cards — replaced by _snapshotShortcuts above, kept
+  // Old Baby/Mother shortcut cards - replaced by _snapshotShortcuts above, kept
   // for revert.
   // ignore: unused_element
   Widget _motherBabyRow(BuildContext context, int week, AppLanguage lang) {
@@ -702,7 +702,7 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
-  // Today's product recommendation — a horizontal CAROUSEL of product cards
+  // Today's product recommendation - a horizontal CAROUSEL of product cards
   // (real photos, affiliate badge where relevant). Picks rotate by day.
   Widget _productsCarousel(BuildContext context, int week, AppLanguage lang) {
     final s = S(lang);
@@ -1025,7 +1025,7 @@ class HomeScreenB extends StatelessWidget {
     }
   }
 
-  // Parked per the daily redesign — kept intact for an easy revert.
+  // Parked per the daily redesign - kept intact for an easy revert.
   // ignore: unused_element
   Widget _ritualsSection(
       BuildContext context, S s, AppLanguage lang, HomeDay day) {
@@ -1205,7 +1205,7 @@ class HomeScreenB extends StatelessWidget {
   }
 
   // --- affirmation -----------------------------------------------------------
-  // Parked per the daily redesign — kept intact for an easy revert.
+  // Parked per the daily redesign - kept intact for an easy revert.
   // ignore: unused_element
   Widget _affirmationCard(S s, AppLanguage lang, HomeDay day) {
     var text = day.garbhSanskar.affirmation.of(lang).trim();
@@ -1256,11 +1256,11 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
-  // (Quick row removed — Kicks lives in the Tools hub; Water was never a
+  // (Quick row removed - Kicks lives in the Tools hub; Water was never a
   //  ParentVeda feature. Read Next now sits here instead.)
 
   // Garbh Sanskar entry card (opens the full Garbh library).
-  // Daily "My Journal" — 5 quick entry types; everything is stored in the full
+  // Daily "My Journal" - 5 quick entry types; everything is stored in the full
   // My Journal (reached via the "View My Journal Timeline" link / Profile).
   Widget _journalDailySection(BuildContext context, AppLanguage lang) {
     final s = S(lang);
@@ -1344,7 +1344,7 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
-  // Daily medication & supplements — shown INLINE on Home (today's items with a
+  // Daily medication & supplements - shown INLINE on Home (today's items with a
   // tick-off), so it's usable with least clicks rather than hidden behind a CTA.
   // Scans & appointments due AROUND NOW (anchor week ± 2) + any upcoming
   // appointments, each scan with an "Already done" tick. Future scans surface
@@ -1650,7 +1650,7 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
-  // Daily Garbh Sanskar — the 5 rituals, each showing TODAY's single item
+  // Daily Garbh Sanskar - the 5 rituals, each showing TODAY's single item
   // (day-rotating, no in-pillar recommendations). The full 5-pillar Garbh lives
   // in Tools; tapping a ritual here opens its pillar screen in `daily: true`
   // mode. Progress N/5 + streak come from GarbhStore.
@@ -1738,7 +1738,7 @@ class HomeScreenB extends StatelessWidget {
                 kriyaForDay(cd).title, '🌿', const Color(0xFF5E8B7E),
                 store.isDone('kriya'),
                 () => KriyaScreen(controller: pregnancy, daily: true)),
-            // Ahara (nourishment) commented out per request — kept for revert.
+            // Ahara (nourishment) commented out per request - kept for revert.
             // _garbhPillarRow(context, s.gsAhara, s.gsAharaTag,
             //     nutritionForDay(cd).tip, '🍲', const Color(0xFFC97B4A),
             //     store.isDone('ahara'),

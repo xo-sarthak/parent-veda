@@ -1,8 +1,8 @@
 // =============================================================================
-//  ToolsHubScreen — the "Tools" tab (Warm Nest)
+//  ToolsHubScreen - the "Tools" tab (Warm Nest)
 // -----------------------------------------------------------------------------
 //  The calm toolbox: the Pregnancy Journey map as the hero, then a grid of all
-//  the gentle helpers — Baby Movement, Weight, Kegel, Contractions, Hospital
+//  the gentle helpers - Baby Movement, Weight, Kegel, Contractions, Hospital
 //  Bag, Medication & Supplements, Understanding Your Report, Can I?. Lives in
 //  the bottom pill (replacing the Sanskar slot, which moved to Home).
 // =============================================================================
@@ -16,7 +16,7 @@ import '../theme/app_theme.dart';
 import 'bump_journey_screen.dart';
 import 'can_i_screen.dart';
 import 'father/father_journal_screen.dart';
-// father_stories_screen parked — the "Stories, Fables & Mythology" tile was
+// father_stories_screen parked - the "Stories, Fables & Mythology" tile was
 // removed from Tools. Kept commented for revert.
 // import 'father/father_stories_screen.dart';
 import 'garbh_screen.dart';
@@ -108,7 +108,7 @@ class ToolsHubScreen extends StatelessWidget {
       // from the father product). Kept commented for revert.
       // _Tool('Stories, Fables & Mythology', Icons.history_edu_rounded,
       //     const Color(0xFFE0915B), () => open(() => const FatherStoriesScreen())),
-      // Father's simple journal (memory / note / photo / voice) — separate store.
+      // Father's simple journal (memory / note / photo / voice) - separate store.
       _Tool("Father's Journal", Icons.menu_book_rounded, const Color(0xFF2E5266),
           () => open(() => FatherJournalScreen(controller: controller))),
     ];

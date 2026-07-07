@@ -1,6 +1,6 @@
 // Ask Veda unification: ONE engine (ask_veda/veda_core.dart), two tagged feeds.
 // These assert the parenting side now retrieves real parenting content through
-// the shared core, and that the domain tag keeps the feeds isolated — a parenting
+// the shared core, and that the domain tag keeps the feeds isolated - a parenting
 // search only ever returns parenting (or universal) docs.
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,7 +8,7 @@ import 'package:parentveda/ask_veda/veda_core.dart';
 import 'package:parentveda/screens/post_pregnancy/parenting_veda.dart';
 
 void main() {
-  group('Ask Veda — one engine, parenting feed (domain-tagged)', () {
+  group('Ask Veda - one engine, parenting feed (domain-tagged)', () {
     test('the whole parenting corpus is stamped parenting', () {
       expect(parentingCorpus(), isNotEmpty);
       expect(parentingCorpus().every((d) => d.domain == VedaDomain.parenting), isTrue);

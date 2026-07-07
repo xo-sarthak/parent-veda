@@ -1,16 +1,16 @@
 // =============================================================================
-//  Read to your baby — content pools (gentle pieces to read aloud)
+//  Read to your baby - content pools (gentle pieces to read aloud)
 // -----------------------------------------------------------------------------
 //  Original, warm pieces for the customizable "Read to your baby" daily feed:
 //  children's stories, rhymes/lullabies, and affirmations/blessings. The
 //  spiritual-reading category draws from kSpiritualTraditions instead (not here).
 //
-//  TONE: every piece is written to be read DIRECTLY TO THE BABY — the mother is
+//  TONE: every piece is written to be read DIRECTLY TO THE BABY - the mother is
 //  speaking to her little one ("Little one…", "My darling…"). It's "read to your
 //  baby", so it feels addressed to the baby, not narrated about the world.
 //
 //  IMPORTANT: every piece below is ORIGINAL writing. No existing or copyrighted
-//  nursery rhyme, lullaby, song, poem or story is reproduced or reworded — these
+//  nursery rhyme, lullaby, song, poem or story is reproduced or reworded - these
 //  are fresh, gentle pieces written for an expectant mother to read aloud.
 // =============================================================================
 
@@ -37,27 +37,27 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbStories,
       title: 'The Little Cloud Who Loved to Rain',
       body:
-          "Little one, let me tell you about a small grey cloud that drifted over the fields, sprinkling soft rain so the flowers could drink and the rivers could sing. Everywhere it floated, the world turned a little greener. You are like that little cloud, my love — wherever you go, you will leave the world a little fresher and kinder, just by being you."),
+          "Little one, let me tell you about a small grey cloud that drifted over the fields, sprinkling soft rain so the flowers could drink and the rivers could sing. Everywhere it floated, the world turned a little greener. You are like that little cloud, my love - wherever you go, you will leave the world a little fresher and kinder, just by being you."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'Mira and the Sleepy Moon',
       body:
-          "My darling, a little girl named Mira waved to the moon every night. One evening the moon looked tired, its glow soft and dim, so Mira whispered, \"Rest now — I'll keep watch.\" And she hummed a quiet tune until morning. One day, when I am tired, you and I will keep watch for each other too. That is what love does, sweet one."),
+          "My darling, a little girl named Mira waved to the moon every night. One evening the moon looked tired, its glow soft and dim, so Mira whispered, \"Rest now - I'll keep watch.\" And she hummed a quiet tune until morning. One day, when I am tired, you and I will keep watch for each other too. That is what love does, sweet one."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Elephant Who Shared His Shade',
       body:
-          "Sweet baby, under the hot afternoon sun a kind elephant stood beneath the only tree, and one by one he waved all the little animals into his cool shade. \"There's room for everyone,\" he rumbled softly. I hope you grow up with a heart like his, little one — big enough to make room for everyone you meet."),
+          "Sweet baby, under the hot afternoon sun a kind elephant stood beneath the only tree, and one by one he waved all the little animals into his cool shade. \"There's room for everyone,\" he rumbled softly. I hope you grow up with a heart like his, little one - big enough to make room for everyone you meet."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Smallest Seed',
       body:
-          "Little one, in a corner of the garden lay the tiniest seed, sure it was far too small to matter. But the rain came, and the sun came, and slowly it pushed up a single green leaf — until one morning it was the tallest sunflower of all. You are small right now too, my love, but oh, how wonderfully you are growing."),
+          "Little one, in a corner of the garden lay the tiniest seed, sure it was far too small to matter. But the rain came, and the sun came, and slowly it pushed up a single green leaf - until one morning it was the tallest sunflower of all. You are small right now too, my love, but oh, how wonderfully you are growing."),
   ReadAloudPiece(
       category: kRtbStories,
       title: "Bunny's Lost Button",
       body:
-          "My love, a little bunny once lost the button from her coat, and all her friends helped her look — the birds, the beetles, even the breeze, lifting the leaves. At last they found it shining in the grass. \"Thank you, friends,\" said Bunny. One day you'll have friends like that, little one, and a family who is always here to help you."),
+          "My love, a little bunny once lost the button from her coat, and all her friends helped her look - the birds, the beetles, even the breeze, lifting the leaves. At last they found it shining in the grass. \"Thank you, friends,\" said Bunny. One day you'll have friends like that, little one, and a family who is always here to help you."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Star That Came to Visit',
@@ -67,22 +67,22 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbStories,
       title: 'The River and the Stone',
       body:
-          "Little one, a round little stone sat in the middle of a river, worried it was in the way. But the water simply sang around it, and over the years made it smooth and beautiful. \"We are better together,\" laughed the river. You and I are like that too, my love — gentler, and stronger, together."),
+          "Little one, a round little stone sat in the middle of a river, worried it was in the way. But the water simply sang around it, and over the years made it smooth and beautiful. \"We are better together,\" laughed the river. You and I are like that too, my love - gentler, and stronger, together."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'Little Owl Learns to Wait',
       body:
-          "My darling, a little owl wanted to fly before her wings were quite ready. \"Soon,\" said her mother, tucking her close. Each night she grew a little stronger, until one evening she lifted into the sky all on her own. There's no hurry, little one — I'm holding you close, and your day to soar will surely come."),
+          "My darling, a little owl wanted to fly before her wings were quite ready. \"Soon,\" said her mother, tucking her close. Each night she grew a little stronger, until one evening she lifted into the sky all on her own. There's no hurry, little one - I'm holding you close, and your day to soar will surely come."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Kind Little Boat',
       body:
-          "Sweet baby, a small wooden boat carried anyone who needed to cross the pond — the duck, the frog, the careful little mouse. It was never the fastest or the grandest, but it was always there. \"Slow and kind gets everyone home,\" it creaked happily. May you always be that kind, my love."),
+          "Sweet baby, a small wooden boat carried anyone who needed to cross the pond - the duck, the frog, the careful little mouse. It was never the fastest or the grandest, but it was always there. \"Slow and kind gets everyone home,\" it creaked happily. May you always be that kind, my love."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'Mango for Everyone',
       body:
-          "Little one, a monkey once found one perfect mango at the very top of the tree. He could have kept it all, but instead he called his friends and shared it slice by slice. The mango was small, but the laughter was big. \"Shared sweetness tastes the best,\" he grinned — and one day, my love, I think you'll agree."),
+          "Little one, a monkey once found one perfect mango at the very top of the tree. He could have kept it all, but instead he called his friends and shared it slice by slice. The mango was small, but the laughter was big. \"Shared sweetness tastes the best,\" he grinned - and one day, my love, I think you'll agree."),
   ReadAloudPiece(
       category: kRtbStories,
       title: "The Firefly's Little Light",
@@ -92,27 +92,27 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbStories,
       title: 'Tortoise Takes His Time',
       body:
-          "Sweet baby, while everyone rushed past, a tortoise walked slowly along the path, noticing the dewdrops and the singing birds. He arrived last, but he had seen the most beautiful morning of all. \"The world is lovely when you take your time,\" he smiled. Take your time, my love — we have all the time we need."),
+          "Sweet baby, while everyone rushed past, a tortoise walked slowly along the path, noticing the dewdrops and the singing birds. He arrived last, but he had seen the most beautiful morning of all. \"The world is lovely when you take your time,\" he smiled. Take your time, my love - we have all the time we need."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Blanket of Stars',
       body:
-          "Little one, when night fell, the sky pulled a soft blanket of stars over the sleeping world. The mountains grew quiet, the oceans grew calm, and every little creature curled up safe and warm. \"Goodnight, world,\" whispered the sky. And goodnight to you, my darling — safe, and warm, and so very loved."),
+          "Little one, when night fell, the sky pulled a soft blanket of stars over the sleeping world. The mountains grew quiet, the oceans grew calm, and every little creature curled up safe and warm. \"Goodnight, world,\" whispered the sky. And goodnight to you, my darling - safe, and warm, and so very loved."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'Pip the Curious Sparrow',
       body:
-          "My love, a little sparrow named Pip longed to see what lay beyond the garden wall. He flew a little farther each day — past the pond, past the field — then returned each evening to tell his family all about it. The world is big and wonderful, little one, and no matter how far you go, home will always be here for you."),
+          "My love, a little sparrow named Pip longed to see what lay beyond the garden wall. He flew a little farther each day - past the pond, past the field - then returned each evening to tell his family all about it. The world is big and wonderful, little one, and no matter how far you go, home will always be here for you."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Two Little Streams',
       body:
-          "Sweet baby, two little streams trickled down the hillside, each one all alone. When they finally met in the valley, they became a wide, happy river, strong enough to turn the old mill wheel. \"Together we can do so much,\" they sang. You are never alone, my darling — we will flow through this life together."),
+          "Sweet baby, two little streams trickled down the hillside, each one all alone. When they finally met in the valley, they became a wide, happy river, strong enough to turn the old mill wheel. \"Together we can do so much,\" they sang. You are never alone, my darling - we will flow through this life together."),
   ReadAloudPiece(
       category: kRtbStories,
       title: 'The Gentle Giant',
       body:
-          "Little one, deep in the forest lived a giant so big that birds nested in his hair. Yet he moved so softly he never startled a deer or crushed a single flower. \"Big hearts step gently,\" he would say. May you grow a heart that big and that gentle, my love — and the whole world will feel safe beside you."),
+          "Little one, deep in the forest lived a giant so big that birds nested in his hair. Yet he moved so softly he never startled a deer or crushed a single flower. \"Big hearts step gently,\" he would say. May you grow a heart that big and that gentle, my love - and the whole world will feel safe beside you."),
 
   // ---------- Rhymes, poems & lullabies (sung to the baby) ----------
   ReadAloudPiece(
@@ -134,12 +134,12 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbRhymes,
       title: 'Tiny Toes',
       body:
-          "Ten tiny toes and ten tiny fingers,\nA soft little nose where your sweet smile lingers.\nTwo little ears and one sleepy yawn —\nDream, little darling, until the dawn."),
+          "Ten tiny toes and ten tiny fingers,\nA soft little nose where your sweet smile lingers.\nTwo little ears and one sleepy yawn -\nDream, little darling, until the dawn."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'Moonbeam Boat',
       body:
-          "Climb aboard the moonbeam boat,\nAcross the quiet sky we'll float,\nPast the clouds so soft and white —\nSail with me, my love, tonight."),
+          "Climb aboard the moonbeam boat,\nAcross the quiet sky we'll float,\nPast the clouds so soft and white -\nSail with me, my love, tonight."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: "The Garden's Asleep",
@@ -149,7 +149,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbRhymes,
       title: 'Whispering Wind',
       body:
-          "The wind goes whispering through the trees,\nA soft and sleepy, swaying breeze.\nIt hums a tune both low and sweet —\nA lullaby for your tiny feet."),
+          "The wind goes whispering through the trees,\nA soft and sleepy, swaying breeze.\nIt hums a tune both low and sweet -\nA lullaby for your tiny feet."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'My Little Wonder',
@@ -159,32 +159,32 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbRhymes,
       title: 'Cradle of Leaves',
       body:
-          "In a cradle made of leaves,\nRocked by gentle evening breeze,\nThe little bird tucks in its head —\nAnd you, my love, in your soft bed."),
+          "In a cradle made of leaves,\nRocked by gentle evening breeze,\nThe little bird tucks in its head -\nAnd you, my love, in your soft bed."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'Slow the Day',
       body:
-          "Slow the day and dim the light,\nSoft the blanket, warm and tight.\nThe world says hush, the stars agree —\nSleep, my love, so peacefully."),
+          "Slow the day and dim the light,\nSoft the blanket, warm and tight.\nThe world says hush, the stars agree -\nSleep, my love, so peacefully."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'Tiny Heartbeat',
       body:
-          "Your tiny heartbeat, soft and true,\nBeats its little song just for you.\nDrum, drum, drum, so steady and small —\nThe sweetest sound I know at all."),
+          "Your tiny heartbeat, soft and true,\nBeats its little song just for you.\nDrum, drum, drum, so steady and small -\nThe sweetest sound I know at all."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'Dreamland Train',
       body:
-          "All aboard the dreamland train,\nDown the soft and sleepy lane,\nChugging slow past fields of sheep —\nOff we go, my love, to sleep."),
+          "All aboard the dreamland train,\nDown the soft and sleepy lane,\nChugging slow past fields of sheep -\nOff we go, my love, to sleep."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: "Bumble's Lullaby",
       body:
-          "The busy bee has flown back home,\nNo more across the fields to roam.\nIt folds its wings, begins to hum —\nSleep now, my love, till morning's come."),
+          "The busy bee has flown back home,\nNo more across the fields to roam.\nIt folds its wings, begins to hum -\nSleep now, my love, till morning's come."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'Snug as Can Be',
       body:
-          "Snug as a pea in a cosy pod,\nSafe as a seed in the warm soft sod,\nTucked away where the world is mild —\nSleep, my dear, my little child."),
+          "Snug as a pea in a cosy pod,\nSafe as a seed in the warm soft sod,\nTucked away where the world is mild -\nSleep, my dear, my little child."),
   ReadAloudPiece(
       category: kRtbRhymes,
       title: 'The Sleepy Sea',
@@ -194,7 +194,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbRhymes,
       title: 'Goodnight, Everything',
       body:
-          "Goodnight to the hills, goodnight to the streams,\nGoodnight to the world and all of its dreams.\nGoodnight to the stars and the silvery moon —\nGoodnight, my love, I'll hold you soon."),
+          "Goodnight to the hills, goodnight to the streams,\nGoodnight to the world and all of its dreams.\nGoodnight to the stars and the silvery moon -\nGoodnight, my love, I'll hold you soon."),
 
   // ---------- Affirmations & blessings (spoken to the baby) ----------
   ReadAloudPiece(
@@ -206,7 +206,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbAffirmations,
       title: 'Grow gently',
       body:
-          "Take your time, my darling. Grow strong and grow gently — there is no rush at all. We will be right here, waiting with open arms."),
+          "Take your time, my darling. Grow strong and grow gently - there is no rush at all. We will be right here, waiting with open arms."),
   ReadAloudPiece(
       category: kRtbAffirmations,
       title: 'You are safe',
@@ -246,7 +246,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbAffirmations,
       title: 'The world is waiting',
       body:
-          "There is so much beauty waiting for you — sunrises and seashells, music and friends. We cannot wait to show you all of it."),
+          "There is so much beauty waiting for you - sunrises and seashells, music and friends. We cannot wait to show you all of it."),
   ReadAloudPiece(
       category: kRtbAffirmations,
       title: 'Held in love',
@@ -271,7 +271,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
       category: kRtbAffirmations,
       title: 'Loved beyond measure',
       body:
-          "There is no measuring how much you are loved — it is wider than the sky and deeper than the sea."),
+          "There is no measuring how much you are loved - it is wider than the sky and deeper than the sea."),
   ReadAloudPiece(
       category: kRtbAffirmations,
       title: 'A blessing for the journey',
@@ -282,7 +282,7 @@ const List<ReadAloudPiece> kReadAloudPieces = [
 List<ReadAloudPiece> readAloudByCategory(String category) =>
     kReadAloudPieces.where((p) => p.category == category).toList();
 
-/// The FATHER's affirmations & blessings — a distinct half of the shared pool,
+/// The FATHER's affirmations & blessings - a distinct half of the shared pool,
 /// so his "Read to your baby" affirmations differ from the mother's (she keeps
 /// the full set). Same dataset, different slice; refine the selection anytime.
 List<ReadAloudPiece> readAloudFatherAffirmations() {

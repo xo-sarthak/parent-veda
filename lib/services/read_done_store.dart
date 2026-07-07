@@ -1,5 +1,5 @@
 // =============================================================================
-//  ReadDoneStore — which Daily Reads / Read Next items the mother has finished
+//  ReadDoneStore - which Daily Reads / Read Next items the mother has finished
 // -----------------------------------------------------------------------------
 //  A small, satisfying "accomplished" layer: tick a read as done and it sticks.
 //  Lazy-loaded (no main.dart wiring) + persisted via shared_preferences.
@@ -18,7 +18,7 @@ class ReadDoneStore extends ChangeNotifier with CloudSyncedStore {
   final Set<String> _done = {};
   bool _loaded = false;
 
-  /// Load once (call from build — it's a no-op after the first time).
+  /// Load once (call from build - it's a no-op after the first time).
   void ensureLoaded() {
     if (_loaded) return;
     _loaded = true;

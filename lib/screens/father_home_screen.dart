@@ -1,7 +1,7 @@
 // =============================================================================
-//  FatherHomeScreen — the Father Mode "Daily Moment"
+//  FatherHomeScreen - the Father Mode "Daily Moment"
 // -----------------------------------------------------------------------------
-//  The first screen a father sees each day. Not pregnancy education — a small
+//  The first screen a father sees each day. Not pregnancy education - a small
 //  daily act of becoming a father: a warm greeting, a gentle "Today's Moment"
 //  invitation, then three modules (Learn → Talk To Your Baby → Mission), a soft
 //  acknowledgement, and an Emotional Check-In.
@@ -120,7 +120,7 @@ class _FatherHomeScreenState extends State<FatherHomeScreen> {
             onChanged: (v) => setState(() => _thisWeek = v),
           ),
           const SizedBox(height: 18),
-          // Today (Daily Moment) — exactly three modules, no check-in.
+          // Today (Daily Moment) - exactly three modules, no check-in.
           if (!_thisWeek) ...[
             FatherMomentCard(intro: day.intro.of(lang), lang: lang),
             const SizedBox(height: 16),
@@ -132,7 +132,7 @@ class _FatherHomeScreenState extends State<FatherHomeScreen> {
             const SizedBox(height: 28),
             FatherCompletionBanner(lang: lang),
           ]
-          // This Week (Weekly Journey) — four short sections.
+          // This Week (Weekly Journey) - four short sections.
           else if (weekData != null)
             FatherWeeklyView(week: weekData, lang: lang)
           else

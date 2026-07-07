@@ -1,5 +1,5 @@
 // =============================================================================
-//  MicDictateButton — tap-to-dictate speech into any TextField
+//  MicDictateButton - tap-to-dictate speech into any TextField
 // -----------------------------------------------------------------------------
 //  A small mic icon that appends recognized speech to a [TextEditingController].
 //  Tap to start listening (mic turns coral), tap again to stop. Self-contained;

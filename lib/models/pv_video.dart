@@ -1,7 +1,7 @@
 // =============================================================================
-//  PvVideo — "Watch & Learn" contextual learning videos
+//  PvVideo - "Watch & Learn" contextual learning videos
 // -----------------------------------------------------------------------------
-//  Not a video library — the right video at the right time. Metadata is authored
+//  Not a video library - the right video at the right time. Metadata is authored
 //  in Dart (bilingual); real playback (videoUrl) is wired later, so for now the
 //  player is a gentle "coming soon". Each video answers "why this matters now".
 // =============================================================================

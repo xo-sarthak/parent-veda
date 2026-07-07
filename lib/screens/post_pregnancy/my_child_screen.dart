@@ -1,19 +1,19 @@
 // =============================================================================
-//  MyChildScreen — the living profile of the child ("Who is my child today?")
+//  MyChildScreen - the living profile of the child ("Who is my child today?")
 // -----------------------------------------------------------------------------
 //  The understanding-oriented counterpart to the action-oriented "Today" home.
 //  Where Home answers "what does my child need from me today?", this page answers
-//  "who is my child today?" — a single, gently-revealed flow (no tabs, no grid,
+//  "who is my child today?" - a single, gently-revealed flow (no tabs, no grid,
 //  no dashboard) that carries the child's story: Identity, a Snapshot of the five
 //  developmental domains, the Development Journey (a story, not a checklist),
 //  Growth, a compact Health Snapshot, the Memory Timeline (My Journal), and
-//  Looking Ahead — the hub that connects outward to the rest of ParentVeda.
+//  Looking Ahead - the hub that connects outward to the rest of ParentVeda.
 //
 //  Built to the "My Child" Claude Design prompt. Reached from the home's Child
 //  Snapshot card / "My Child →" link, and from the Explore drawer. Pushed screen
 //  (back button, no bottom nav). Scenario: Aarav / 4 months / Leap 4 / Priya.
 //  Everything here is hand-authored for the scenario; a real Age/Development/
-//  Health/Memory engine would generate it per child. No green — warm palette
+//  Health/Memory engine would generate it per child. No green - warm palette
 //  (ppPurple identity · ppCoral the living "now" · amber anticipation · muted).
 // =============================================================================
 
@@ -35,6 +35,7 @@ import 'journal_v2/journal_storybook_screens.dart';
 import 'multichild_sheet.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
@@ -43,7 +44,7 @@ import 'vax_tracker_screen.dart';
 import 'wonder_week_screen.dart';
 
 // journey / status accents (green-free, warm)
-const Color _cNext = Color(0xFFC98A2B); // amber — anticipation
+const Color _cNext = Color(0xFFC98A2B); // amber - anticipation
 
 class MyChildScreen extends StatefulWidget {
   const MyChildScreen({super.key});
@@ -171,7 +172,7 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
               ]),
               const SizedBox(height: 18),
               Text(
-                'Aarav is reaching for the world with real intent now, and lighting up at familiar faces — his curiosity and his need to connect grow a little more every week.',
+                'Aarav is reaching for the world with real intent now, and lighting up at familiar faces - his curiosity and his need to connect grow a little more every week.',
                 style: ppFraunces(17, h: 1.45),
               ),
               const SizedBox(height: 20),
@@ -199,18 +200,18 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
       );
 
   // =========================================================================
-  //  2 · Child Snapshot (five developmental domains — no numbers, no charts)
+  //  2 · Child Snapshot (five developmental domains - no numbers, no charts)
   // =========================================================================
   Widget _snapshot() {
     final cards = <(IconData, String, String, String, String, VoidCallback)>[
       (Icons.psychology_outlined, 'Brain', 'Cause & effect', 'Following your hand all the way to the toy it reaches for.', 'Developing', () => _push(DevelopmentAreaScreen(area: devAreaById('cognitive')))),
-      (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest, he pushes up — a first roll any day.', 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
+      (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest, he pushes up - a first roll any day.', 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
       (Icons.chat_bubble_outline_rounded, 'Language', 'Musical babble', "Coos stretching into 'aah-goo', raspberries and squeals.", 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('language')))),
       (Icons.favorite_border, 'Emotional', 'Social joy', 'Beams at you across a room; a laugh now earns a laugh back.', 'Blossoming', () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
-      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months — a few weeks away yet.', 'On track', () => _push(const FoodHomeScreen())),
+      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months - a few weeks away yet.', 'On track', () => _push(const FoodHomeScreen())),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _pad(_header('Child snapshot', 'How Aarav is doing', sub: 'Five windows into his development — where he is right now, not a scorecard. Tap any to go deeper.')),
+      _pad(_header('Child snapshot', 'How Aarav is doing', sub: 'Five windows into his development - where he is right now, not a scorecard. Tap any to go deeper.')),
       const SizedBox(height: 18),
       _pad(Column(children: [
         for (final c in cards) ...[
@@ -282,14 +283,14 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
       ('First social smile', 'Beams at the faces he loves', 'done'),
       ('Cooing & babble', 'Rehearsing the music of conversation', 'done'),
       ('Hands to midline', 'Clasps them together at his chest', 'done'),
-      ('Rolling over', 'He pushes up and rocks — any day now', 'now'),
+      ('Rolling over', 'He pushes up and rocks - any day now', 'now'),
       ('Sitting with support', 'Propped upright, wobbling but proud', 'next'),
       ('Reaching & grasping', 'Aiming a hand for exactly what he wants', 'next'),
       ('Sitting on his own', 'Hands free to explore', 'future'),
       ('Crawling', 'The whole floor becomes his', 'future'),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _pad(_header('Development journey', "Aarav's story so far", sub: 'Every skill builds on the last. This is the path he is walking — behind him, right now, and just ahead.')),
+      _pad(_header('Development journey', "Aarav's story so far", sub: 'Every skill builds on the last. This is the path he is walking - behind him, right now, and just ahead.')),
       const SizedBox(height: 20),
       _pad(Column(children: [
         for (int i = 0; i < steps.length; i++) _journeyRow(steps[i].$1, steps[i].$2, steps[i].$3, first: i == 0, last: i == steps.length - 1),
@@ -431,7 +432,7 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
       );
 
   // =========================================================================
-  //  5 · Health Snapshot (compact — opens the detailed modules)
+  //  5 · Health Snapshot (compact - opens the detailed modules)
   // =========================================================================
   Widget _health() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _pad(_header('Health', 'A quick, calm overview')),
@@ -441,11 +442,11 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
             _healthRow(Icons.vaccines_outlined, 'Vaccinations', 'Up to date · next PCV due 22 Jul', () => _push(const VaxTrackerScreen())),
-            // Was: _push(const HealthGuideScreen()) — now opens the Health ecosystem:
+            // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
             _healthRow(Icons.medical_services_outlined, 'Last doctor visit', '12 Jun · routine check, all well', () => _push(const HealthHomeScreen())),
             _healthRow(Icons.shield_outlined, 'Allergies', 'None recorded yet', () => _push(const HealthRecordsScreen(category: 'allergies')), muted: true),
             _healthRow(Icons.medication_outlined, 'Medications', 'None right now', () => _push(const HealthRecordsScreen(category: 'medications')), muted: true),
-            // Was: _push(const HealthGuideScreen()) — now opens the Health ecosystem:
+            // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
             _healthRow(Icons.timeline_rounded, 'Health timeline', 'Growth, visits & vaccines in one place', () => _push(const HealthHomeScreen()), last: true),
           ]),
         )),
@@ -533,21 +534,21 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
       );
 
   // =========================================================================
-  //  7 · Looking Ahead (the hub — connects outward)
+  //  7 · Looking Ahead (the hub - connects outward)
   // =========================================================================
   Widget _lookingAhead() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _pad(_header('Looking ahead', "What's coming for Aarav", sub: 'A gentle sense of the road just ahead — and where to explore it.')),
+        _pad(_header('Looking ahead', "What's coming for Aarav", sub: 'A gentle sense of the road just ahead - and where to explore it.')),
         const SizedBox(height: 18),
         _pad(Container(
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            _aheadRow(Icons.flag_outlined, 'Next milestone', 'Rolling over — any day now', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
+            _aheadRow(Icons.flag_outlined, 'Next milestone', 'Rolling over - any day now', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
             _aheadRow(Icons.brightness_4_rounded, 'Next leap', 'Leap 5 · The World of Relationships · ~3 weeks', () => _push(const WonderWeekScreen())),
             _aheadRow(Icons.vaccines_outlined, 'Next vaccine', 'PCV dose 3 · 22 Jul', () => _push(const VaxTrackerScreen())),
-            _aheadRow(Icons.extension_outlined, 'Suggested activity', 'Reach for the ring — grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
+            _aheadRow(Icons.extension_outlined, 'Suggested activity', 'Reach for the ring - grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
             _aheadRow(Icons.menu_book_outlined, 'Recommended read', 'The games that build object permanence', () => _push(const ArticleReaderScreen())),
-            _aheadRow(Icons.shopping_bag_outlined, 'Recommended product', 'Dozy white-noise soother', () => _push(const ProductDetailScreen()), last: true),
+            _aheadRow(Icons.shopping_bag_outlined, 'Recommended product', 'Dozy white-noise soother', () => _push(ProductDetailScreen(product: productById('dozy'))), last: true),
           ]),
         )),
       ]);

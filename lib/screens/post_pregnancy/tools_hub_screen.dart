@@ -1,9 +1,9 @@
 // =============================================================================
-//  ToolsHubScreen — Tools · hub (parenting · S22 v2 premium)
+//  ToolsHubScreen - Tools · hub (parenting · S22 v2 premium)
 // -----------------------------------------------------------------------------
 //  The Tools tab landing, premium editorial version: two "ParentVeda originals"
 //  (What Changed? · Wonder Week Window) and a vertical list of everyday trackers
-//  with live-status lines — including Compare (a tool in its own right, right
+//  with live-status lines - including Compare (a tool in its own right, right
 //  under Growth percentile). Faithful build of Claude Design "post pregnancy -
 //  content.dc.html" · S22 v2. A hero tab (index 2 in the bottom-nav pill).
 // =============================================================================
@@ -51,7 +51,7 @@ class ToolsHubScreen extends StatelessWidget {
               TextSpan(text: 'in one calm place.', style: ppFraunces(38, color: ppPurple, h: 1.08).copyWith(fontStyle: FontStyle.italic)),
             ]), style: ppFraunces(38, h: 1.08))),
             const SizedBox(height: 14),
-            _pad(Text('Two ParentVeda originals that think with you — and the everyday trackers, quietly kept.',
+            _pad(Text('Two ParentVeda originals that think with you - and the everyday trackers, quietly kept.',
                 style: ppBody(15))),
 
             // hero: What Changed
@@ -88,7 +88,7 @@ class ToolsHubScreen extends StatelessWidget {
             _pad(Text('Kept simple, so you never leave the app for them.', style: ppBody(13))),
             const SizedBox(height: 16),
             _pad(Column(children: [
-              _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth percentile', 'Weight, height, head', ppMuted, () => _soon(context, 'Growth percentile tracker — coming soon')),
+              _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth percentile', 'Weight, height, head', ppMuted, () => _soon(context, 'Growth percentile tracker - coming soon')),
               const SizedBox(height: 10),
               _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
                   () => _push(context, const ProductsCompareScreen())),
@@ -96,19 +96,19 @@ class ToolsHubScreen extends StatelessWidget {
               _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', 'Next due in 3 weeks', ppCoral,
                   () => _push(context, const VaxTrackerScreen())),
               const SizedBox(height: 10),
-              // Was: direct to the V1 finder — now opens the V1|V2 front door.
+              // Was: direct to the V1 finder - now opens the V1|V2 front door.
               // _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby name finder', 'Swipe together, match a name', ppPurple,
               //     () => _push(context, const NameFinderScreen())),
-              _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby names', 'Two ways to choose — swipe or journey', ppPurple,
+              _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby names', 'Two ways to choose - swipe or journey', ppPurple,
                   () => _push(context, const BabyNamingHomeScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _soon(context, 'Feeding tracker — coming soon')),
+              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _soon(context, 'Feeding tracker - coming soon')),
               const SizedBox(height: 10),
-              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep tracker', '11h yesterday', ppMuted, () => _soon(context, 'Sleep tracker — coming soon')),
+              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep tracker', '11h yesterday', ppMuted, () => _soon(context, 'Sleep tracker - coming soon')),
               const SizedBox(height: 10),
-              _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Milestone checklist', '3 new this month', ppMuted, () => _soon(context, 'Milestone checklist — coming soon')),
+              _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Milestone checklist', '3 new this month', ppMuted, () => _soon(context, 'Milestone checklist - coming soon')),
               const SizedBox(height: 10),
-              _tracker(context, Icons.calendar_month_outlined, const Color(0xFFFBEAF0), 'Due date & ovulation', 'Plan the next', ppMuted, () => _soon(context, 'Due date & ovulation planner — coming soon')),
+              _tracker(context, Icons.calendar_month_outlined, const Color(0xFFFBEAF0), 'Due date & ovulation', 'Plan the next', ppMuted, () => _soon(context, 'Due date & ovulation planner - coming soon')),
             ])),
           ],
         ),

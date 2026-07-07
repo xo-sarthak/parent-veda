@@ -75,7 +75,7 @@ class BabyVoiceService extends ChangeNotifier {
         notifyListeners();
       });
     } catch (_) {
-      // TTS is an enhancement — never fatal.
+      // TTS is an enhancement - never fatal.
     }
     _ready = true;
   }

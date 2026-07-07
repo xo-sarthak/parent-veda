@@ -1,5 +1,5 @@
 // =============================================================================
-//  CommunityProfileScreen — an X/Twitter-style author profile
+//  CommunityProfileScreen - an X/Twitter-style author profile
 // -----------------------------------------------------------------------------
 //  Tapping a post's avatar/name opens this. Experts get a Follow button + bio +
 //  stats; regular members get a simpler "Member" profile. Below the header, the

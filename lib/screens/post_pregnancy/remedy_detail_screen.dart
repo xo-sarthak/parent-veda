@@ -1,8 +1,8 @@
 // =============================================================================
-//  RemedyDetailScreen — Nuskha · remedy detail (parenting · S19·detail)
+//  RemedyDetailScreen - Nuskha · remedy detail (parenting · S19·detail)
 // -----------------------------------------------------------------------------
 //  A single validated home remedy: what it is, quick facts, what you'll need,
-//  how to make it, when to use it, and — the differentiator — a clear "when NOT
+//  how to make it, when to use it, and - the differentiator - a clear "when NOT
 //  to use, see a doctor instead" safety block, the reviewing panel, related
 //  shop/read links and a labelled sponsored slot. Faithful build of Claude
 //  Design "post pregnancy - content.dc.html" · S19·detail. Reached from Nuskhe.
@@ -83,7 +83,7 @@ class RemedyDetailScreen extends StatelessWidget {
             _pad(Text('Ajwain potli for a blocked nose', style: ppFraunces(29, h: 1.15))),
             const SizedBox(height: 10),
             _pad(Text(
-                'A warm carom-seed compress that eases congestion and helps a stuffy baby breathe and feed. Preventive and soothing — never applied to skin directly.',
+                'A warm carom-seed compress that eases congestion and helps a stuffy baby breathe and feed. Preventive and soothing - never applied to skin directly.',
                 style: ppBody(14, h: 1.6))),
 
             // quick facts
@@ -138,12 +138,12 @@ class RemedyDetailScreen extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.warning_amber_rounded, size: 18, color: _red),
                   const SizedBox(width: 8),
-                  Flexible(child: Text('When NOT to use — see a doctor instead', style: ppJakarta(15, color: _red), maxLines: 2)),
+                  Flexible(child: Text('When NOT to use - see a doctor instead', style: ppJakarta(15, color: _red), maxLines: 2)),
                 ]),
                 const SizedBox(height: 12),
                 _dont('Fever above 100.4°F (38°C) in a baby under 3 months.'),
                 _dont('Fast, laboured, or wheezy breathing.'),
-                _dont('Never place the hot potli directly on skin — warm only.'),
+                _dont('Never place the hot potli directly on skin - warm only.'),
                 _dont('Cold lasting beyond 5 days, or a baby refusing feeds.'),
                 const SizedBox(height: 12),
                 GestureDetector(
@@ -189,7 +189,7 @@ class RemedyDetailScreen extends StatelessWidget {
             // related
             _pad(Text('Related', style: ppJakarta(16))),
             const SizedBox(height: 14),
-            _pad(_related(context, 'Shop', 'Buy organic ajwain — 24 Mantra', top: true)),
+            _pad(_related(context, 'Shop', 'Buy organic ajwain - 24 Mantra', top: true)),
             _pad(_related(context, 'Read', 'Baby colds: what actually helps', top: true, bottom: true)),
 
             // sponsored

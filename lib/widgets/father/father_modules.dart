@@ -1,5 +1,5 @@
 // =============================================================================
-//  Father Mode — Daily Moment modules
+//  Father Mode - Daily Moment modules
 // -----------------------------------------------------------------------------
 //  The vertical stack of soft cards that make up a father's daily moment:
 //    Header → Today's Moment → Learn → Talk To Your Baby → Mission
@@ -7,7 +7,7 @@
 //
 //  Same design language and four-colour palette as the mother experience, but
 //  the signature accent shifts from purple to the grounded slate (AppTheme
-//  .fatherSlate) — coral stays for warmth, amber marks the daily Mission.
+//  .fatherSlate) - coral stays for warmth, amber marks the daily Mission.
 //  Shared scaffolding (HomeCard, HomePrimaryButton, LangToggle, ModeToggle) is
 //  reused from the mother modules so both modes feel of-a-piece.
 // =============================================================================
@@ -182,7 +182,7 @@ class FatherMomentCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  1 · Learn — a fatherhood lesson
+//  1 · Learn - a fatherhood lesson
 // ---------------------------------------------------------------------------
 
 class FatherLearnModule extends StatelessWidget {
@@ -235,7 +235,7 @@ class FatherLearnModule extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  2 · Talk To Your Baby — bonding before birth
+//  2 · Talk To Your Baby - bonding before birth
 // ---------------------------------------------------------------------------
 
 class FatherTalkModule extends StatelessWidget {
@@ -336,7 +336,7 @@ class FatherTalkModule extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  3 · Mission — one small, real-world action
+//  3 · Mission - one small, real-world action
 // ---------------------------------------------------------------------------
 
 class FatherMissionModule extends StatelessWidget {
@@ -471,7 +471,7 @@ class FatherCompletionBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Today | This Week — the segmented toggle between Daily Moment & Weekly Journey
+//  Today | This Week - the segmented toggle between Daily Moment & Weekly Journey
 // ---------------------------------------------------------------------------
 
 class FatherSectionToggle extends StatelessWidget {
@@ -530,7 +530,7 @@ class FatherSectionToggle extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Weekly Journey — the deeper once-a-week experience (4 sections)
+//  Weekly Journey - the deeper once-a-week experience (4 sections)
 // ---------------------------------------------------------------------------
 
 class FatherWeeklyView extends StatelessWidget {

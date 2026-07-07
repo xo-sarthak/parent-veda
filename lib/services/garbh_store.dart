@@ -1,9 +1,9 @@
 // =============================================================================
-//  GarbhStore — Garbh Sanskar daily-ritual state (v2.0)
+//  GarbhStore - Garbh Sanskar daily-ritual state (v2.0)
 // -----------------------------------------------------------------------------
 //  Garbh Sanskar is a daily ritual, not a content library. This store tracks the
 //  5 daily pillars completed TODAY (resets each day), a gentle day streak, and
-//  favorites. The goal is ritual formation — 5/5 pillars a day.
+//  favorites. The goal is ritual formation - 5/5 pillars a day.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';

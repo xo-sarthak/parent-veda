@@ -1,16 +1,16 @@
 // =============================================================================
-//  VedaIndex — the PREGNANCY corpus + adapter for the Ask Veda engine
+//  VedaIndex - the PREGNANCY corpus + adapter for the Ask Veda engine
 // -----------------------------------------------------------------------------
-//  Builds the pregnancy side's searchable content — Can I?, symptoms, weekly
+//  Builds the pregnancy side's searchable content - Can I?, symptoms, weekly
 //  baby/mother content, products, reads, weekly articles, scan guides, trimester
 //  tips, spiritual reading, read-to-baby, garbh sanskar, body changes, tools and
-//  community insights — each stamped `domain: pregnancy`, then hands it to the
+//  community insights - each stamped `domain: pregnancy`, then hands it to the
 //  app-neutral core (`ask_veda/veda_core.dart`) to rank. This file is the
 //  pregnancy ADAPTER: the content and the faith-gating rules live here; the
 //  matching lives in the core, so the parenting side reuses the exact same engine
 //  with its own corpus. Re-exports the core so existing importers keep their
 //  VedaKind / VedaDoc without changing their imports.
-//  Purely on-device: no LLM, no network — grounded retrieval, not generation.
+//  Purely on-device: no LLM, no network - grounded retrieval, not generation.
 // =============================================================================
 
 import '../ask_veda/veda_core.dart';
@@ -50,12 +50,12 @@ const List<(String, String, String)> _kTools = [
   (
     'kick',
     'Baby Kick Counter',
-    "Count and time your baby's movements and kicks — find it in the Tools tab."
+    "Count and time your baby's movements and kicks - find it in the Tools tab."
   ),
   (
     'contraction',
     'Contraction Timer',
-    'Time your contractions — how long they last and how far apart — in the Tools tab.'
+    'Time your contractions - how long they last and how far apart - in the Tools tab.'
   ),
   (
     'kegel',
@@ -186,7 +186,7 @@ class VedaIndex {
     // --- Scan & test guides (what the scan is + how to read the report) ---
     kScanGuides.forEach((id, g) {
       final terms = g.interpret
-          .map((r) => '${r.term.of(lang)} — ${r.meaning.of(lang)}')
+          .map((r) => '${r.term.of(lang)} - ${r.meaning.of(lang)}')
           .join(' ');
       docs.add(VedaDoc(
         id: 'scan_$id',
@@ -263,7 +263,7 @@ class VedaIndex {
         keywords: const ['raga', 'music', 'listening', 'calm', 'relax'],
       ));
     }
-    // Kriya — breath & grounding practices (answers "breathing exercise to calm
+    // Kriya - breath & grounding practices (answers "breathing exercise to calm
     // down / relax / ease anxiety").
     for (final k in kKriya) {
       docs.add(VedaDoc(
@@ -278,12 +278,12 @@ class VedaIndex {
         ],
       ));
     }
-    // Samvad — womb-connection speaking cards, one doc per trimester set
+    // Samvad - womb-connection speaking cards, one doc per trimester set
     // (affirmations / read-aloud scripts / visualizations).
     const samvadSets = <(String, String, List<GarbhPrompt>)>[
-      ('samvad_t1', 'Speaking to your baby — affirmations', kSamvadT1),
-      ('samvad_t2', 'Speaking to your baby — read-aloud scripts', kSamvadT2),
-      ('samvad_t3', 'Speaking to your baby — visualizations', kSamvadT3),
+      ('samvad_t1', 'Speaking to your baby - affirmations', kSamvadT1),
+      ('samvad_t2', 'Speaking to your baby - read-aloud scripts', kSamvadT2),
+      ('samvad_t3', 'Speaking to your baby - visualizations', kSamvadT3),
     ];
     for (final set in samvadSets) {
       docs.add(VedaDoc(
@@ -298,7 +298,7 @@ class VedaIndex {
         ],
       ));
     }
-    // Vichara — Sacred Insights (short reflective verses).
+    // Vichara - Sacred Insights (short reflective verses).
     final insights = garbhAllInsights();
     for (var i = 0; i < insights.length; i++) {
       docs.add(VedaDoc(
@@ -394,7 +394,7 @@ class VedaIndex {
   }
 }
 
-/// Rank the pregnancy corpus against [query] via the shared engine — best-first
+/// Rank the pregnancy corpus against [query] via the shared engine - best-first
 /// hits above the relevance threshold; empty for junk / no real match (so we can
 /// say "I don't have that" honestly instead of surfacing noise). Scoped to the
 /// pregnancy domain (+ universal), with community excluded from the answer when
@@ -403,7 +403,7 @@ List<VedaHit> vedaSearch(String query, PregnancyController p,
     {int limit = 6, bool includeCommunity = true}) {
   // Religion guardrail: faith content (spiritual reading + read-to-baby) is
   // surfaced ONLY for traditions the mother has explicitly chosen in her
-  // Read-to-baby customization — we never push a religion she hasn't opted into.
+  // Read-to-baby customization - we never push a religion she hasn't opted into.
   final religions = ReadToBabyStore.instance.religions;
   return vedaScore(
     query,
@@ -416,7 +416,7 @@ List<VedaHit> vedaSearch(String query, PregnancyController p,
   );
 }
 
-/// Top COMMUNITY matches for [query] — used ONLY for the social-proof
+/// Top COMMUNITY matches for [query] - used ONLY for the social-proof
 /// "Community insights" section (Section 5). These are never used to form the
 /// actual answer (Sections 1–4); they're someone's opinion, not guidance.
 List<VedaHit> vedaCommunityMatches(String query, PregnancyController p,

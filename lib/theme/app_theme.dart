@@ -90,7 +90,7 @@ class AppTheme {
   // ---- Father slate (charcoal) ----------------------------------------------
   //  Father Mode's signature accent. Same four-colour palette as the mother
   //  experience, but the lead role shifts from purple to this grounded slate
-  //  (board value #2D3436) — a calm, masculine counterpart. Coral stays for
+  //  (board value #2D3436) - a calm, masculine counterpart. Coral stays for
   //  warmth, amber for the daily Mission. Used only inside Father Mode.
   static const Color fatherSlate = Color(0xFF2D3436); // base
   static const Color fatherSlate50 = Color(0xFFEDEEEE);

@@ -1,8 +1,8 @@
 // =============================================================================
-//  Global search — one search box for the whole app
+//  Global search - one search box for the whole app
 // -----------------------------------------------------------------------------
-//  Opened from the Home search icon. Searches across our own content — products,
-//  the Read Next library, Can I? answers, symptoms — plus app tools & sections,
+//  Opened from the Home search icon. Searches across our own content - products,
+//  the Read Next library, Can I? answers, symptoms - plus app tools & sections,
 //  and jumps straight to the right screen. No backend; all local data.
 // =============================================================================
 

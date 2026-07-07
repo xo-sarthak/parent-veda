@@ -1,7 +1,7 @@
 // =============================================================================
-//  NameMatchesScreen — Baby Name Finder · matches + crown (parenting · S27·match)
+//  NameMatchesScreen - Baby Name Finder · matches + crown (parenting · S27·match)
 // -----------------------------------------------------------------------------
-//  The shared shortlist — every name both parents said yes to — with one name
+//  The shared shortlist - every name both parents said yes to - with one name
 //  crowned the favourite. Tap any "also loved" name to crown it, then begin its
 //  story. Reads the shared NameMatchStore. Faithful build of Claude Design
 //  "post pregnancy - content.dc.html" · S27·match.
@@ -55,7 +55,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                 ),
               ),
               GestureDetector(
-                onTap: () => _snack('Share your shortlist — coming soon'),
+                onTap: () => _snack('Share your shortlist - coming soon'),
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text('Share', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
@@ -148,7 +148,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
             )),
 
             const SizedBox(height: 20),
-            _pad(Text('Next, plan the Namkaran — muhurat, invitations & a celebration checklist.',
+            _pad(Text('Next, plan the Namkaran - muhurat, invitations & a celebration checklist.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

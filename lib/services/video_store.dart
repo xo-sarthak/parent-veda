@@ -1,5 +1,5 @@
 // =============================================================================
-//  VideoStore — saved "Watch & Learn" videos
+//  VideoStore - saved "Watch & Learn" videos
 // -----------------------------------------------------------------------------
 //  The set of saved video ids (persisted) + when each was saved, so the Saved
 //  hub can show newest-first with a date. Video content itself is static

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ReadingCollectionScreen — a learning collection (a finishable path)
+//  ReadingCollectionScreen - a learning collection (a finishable path)
 // -----------------------------------------------------------------------------
 //  Cover, count, estimated reading time, progress, then the ordered reads with
 //  completed ticks. Reached from the Reading home's collections.

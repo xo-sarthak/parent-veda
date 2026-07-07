@@ -1,7 +1,7 @@
 // =============================================================================
-//  ProblemSolverScreen — Find the right help · local services (parenting · S18)
+//  ProblemSolverScreen - Find the right help · local services (parenting · S18)
 // -----------------------------------------------------------------------------
-//  "Trusted help, near you" — a ParentVeda top pick, browse-by-need categories
+//  "Trusted help, near you" - a ParentVeda top pick, browse-by-need categories
 //  routing to vetted partner platforms, and a labelled sponsored slot. Reached
 //  from the Explore drawer (design path: from My Child). "Paediatricians" opens
 //  the ranked results. Faithful build of Claude Design · S18.
@@ -46,7 +46,7 @@ class ProblemSolverScreen extends StatelessWidget {
               Text('Find the right help', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  'Paediatricians, therapists, nannies, daycare — we point you to vetted partners and add our own top picks for your city.',
+                  'Paediatricians, therapists, nannies, daycare - we point you to vetted partners and add our own top picks for your city.',
                   style: ppBody(15)),
             ])),
 
@@ -178,7 +178,7 @@ class ProblemSolverScreen extends StatelessWidget {
 
             const SizedBox(height: 22),
             _pad(Text(
-                "ParentVeda routes you to trusted partners and adds its own top picks & mother reviews. Sponsored placements are always labelled. We don't run the vetting — the partner does.",
+                "ParentVeda routes you to trusted partners and adds its own top picks & mother reviews. Sponsored placements are always labelled. We don't run the vetting - the partner does.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

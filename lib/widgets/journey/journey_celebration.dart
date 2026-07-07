@@ -1,5 +1,5 @@
 // =============================================================================
-//  Journey celebration  —  full-screen moment for a reached major milestone
+//  Journey celebration  -  full-screen moment for a reached major milestone
 // -----------------------------------------------------------------------------
 //  Achievements and ParentVeda-journey milestones that the mother has already
 //  reached open this celebratory full screen (large illustration, copy, and a

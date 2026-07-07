@@ -1,5 +1,5 @@
 // =============================================================================
-//  veda_suggestions — the doc's stage-wise "Quick Question Cards"
+//  veda_suggestions - the doc's stage-wise "Quick Question Cards"
 // -----------------------------------------------------------------------------
 //  Suggested questions that appear on the Ask Veda home BEFORE the mother types,
 //  grouped by life-stage (Pregnancy → Newborn → Toddler → Parenting), so she can
@@ -8,7 +8,7 @@
 //  render lighter with a "soon" tag (tapping just gives the honest "not yet").
 //
 //  The Pregnancy questions are deliberately worded so they contain a real match
-//  term — the 5 showcase ones hit their structured card; papaya/back-pain/
+//  term - the 5 showcase ones hit their structured card; papaya/back-pain/
 //  hospital-bag resolve via the whole-app retrieval.
 // =============================================================================
 
@@ -54,8 +54,8 @@ const List<VedaSuggestionSection> kVedaSuggestions = [
           en: 'Can I eat papaya in pregnancy?',
           hi: 'Kya pregnancy mein papaya kha sakti hoon?'),
       LocalizedText(
-          en: 'I have back pain — what helps?',
-          hi: 'Mujhe kamar dard hai — kya help karega?'),
+          en: 'I have back pain - what helps?',
+          hi: 'Mujhe kamar dard hai - kya help karega?'),
       LocalizedText(
           en: 'What should I pack in my hospital bag?',
           hi: 'Hospital bag mein kya pack karun?'),

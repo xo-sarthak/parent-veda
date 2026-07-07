@@ -1,5 +1,5 @@
 // =============================================================================
-//  Read Next ❤️ — curated, week-aware content (prototype)
+//  Read Next ❤️ - curated, week-aware content (prototype)
 // -----------------------------------------------------------------------------
 //  A small, curated set across articles, research summaries, books and expert
 //  picks. Each item is tagged with the week window where it is relevant, so the
@@ -17,14 +17,14 @@ const List<ReadItem> kReadItems = [
     weekStart: 5,
     weekEnd: 14,
     priority: 'high',
-    reason: 'Nausea is common in the first trimester — small, gentle changes help.',
+    reason: 'Nausea is common in the first trimester - small, gentle changes help.',
     readingTime: '4 min',
     category: 'Mother Changes',
     emoji: '🤢',
     body:
         'Morning sickness affects many mothers in the first trimester, and despite the name it can strike at any time of day.\n\n'
-        'Small, frequent meals keep your stomach from getting empty, which often makes nausea worse. Dry foods like toast or crackers before getting out of bed can help. Ginger — in tea, or a little ginger-honey water — is one of the better-studied natural settlers.\n\n'
-        'Stay hydrated in small sips, and rest when you can. For most mothers this eases by the second trimester. If you cannot keep fluids down, tell your doctor — there is safe, effective help available.',
+        'Small, frequent meals keep your stomach from getting empty, which often makes nausea worse. Dry foods like toast or crackers before getting out of bed can help. Ginger - in tea, or a little ginger-honey water - is one of the better-studied natural settlers.\n\n'
+        'Stay hydrated in small sips, and rest when you can. For most mothers this eases by the second trimester. If you cannot keep fluids down, tell your doctor - there is safe, effective help available.',
   ),
   ReadItem(
     id: 'first_scan',
@@ -33,7 +33,7 @@ const List<ReadItem> kReadItems = [
     weekStart: 7,
     weekEnd: 13,
     priority: 'medium',
-    reason: 'Your early dating scan is around now — here is what to expect.',
+    reason: 'Your early dating scan is around now - here is what to expect.',
     readingTime: '3 min',
     category: 'Preparation',
     emoji: '🩻',
@@ -55,11 +55,11 @@ const List<ReadItem> kReadItems = [
     emoji: '🌱',
     body:
         'The first trimester is a time of enormous, mostly invisible change. Your baby grows from a tiny cluster of cells to a recognisable form with a beating heart.\n\n'
-        'You may feel tired, queasy or emotional — your body is doing remarkable work. Rest is not laziness; it is part of the process. Be gentle with yourself, and know that energy often returns in the second trimester.',
+        'You may feel tired, queasy or emotional - your body is doing remarkable work. Rest is not laziness; it is part of the process. Be gentle with yourself, and know that energy often returns in the second trimester.',
   ),
   ReadItem(
     id: 'halfway',
-    title: 'You Are Halfway — What Changes Now',
+    title: 'You Are Halfway - What Changes Now',
     type: ReadType.article,
     weekStart: 18,
     weekEnd: 22,
@@ -70,7 +70,7 @@ const List<ReadItem> kReadItems = [
     emoji: '🌗',
     body:
         'Reaching the halfway mark is a real milestone. Many mothers feel more energetic now, the bump becomes visible, and the first kicks often arrive.\n\n'
-        'This is a lovely window to connect — talk or sing to your baby, who is beginning to hear sounds. It is also a practical time to start thinking gently about the months ahead, without rushing.',
+        'This is a lovely window to connect - talk or sing to your baby, who is beginning to hear sounds. It is also a practical time to start thinking gently about the months ahead, without rushing.',
   ),
   ReadItem(
     id: 'anomaly_scan',
@@ -84,8 +84,8 @@ const List<ReadItem> kReadItems = [
     category: 'Preparation',
     emoji: '🔍',
     body:
-        'The anomaly scan is a detailed look at how your baby is developing — the heart, brain, spine, limbs and organs.\n\n'
-        'It takes longer than earlier scans. You can usually bring your partner. It is okay to ask the sonographer to explain what they are measuring. If anything needs a closer look, your doctor will guide the next steps calmly — most findings are reassuring.',
+        'The anomaly scan is a detailed look at how your baby is developing - the heart, brain, spine, limbs and organs.\n\n'
+        'It takes longer than earlier scans. You can usually bring your partner. It is okay to ask the sonographer to explain what they are measuring. If anything needs a closer look, your doctor will guide the next steps calmly - most findings are reassuring.',
   ),
   ReadItem(
     id: 'baby_sound',
@@ -99,7 +99,7 @@ const List<ReadItem> kReadItems = [
     category: 'Baby Development',
     emoji: '🎵',
     body:
-        'Around the middle of pregnancy, your baby\'s hearing develops quickly. They begin to pick up sounds — your heartbeat, your voice, and music from the world outside.\n\n'
+        'Around the middle of pregnancy, your baby\'s hearing develops quickly. They begin to pick up sounds - your heartbeat, your voice, and music from the world outside.\n\n'
         'This is why talking, reading or singing to your bump is more than sweet ritual: your baby is genuinely starting to recognise the rhythm and tone of familiar voices. A few quiet minutes each day is a beautiful way to begin your bond.',
   ),
   ReadItem(
@@ -139,12 +139,12 @@ const List<ReadItem> kReadItems = [
     weekStart: 14,
     weekEnd: 27,
     priority: 'medium',
-    reason: 'Your appetite often returns now — a good time to nourish well.',
+    reason: 'Your appetite often returns now - a good time to nourish well.',
     readingTime: '4 min',
     category: 'Nutrition',
     emoji: '🥗',
     body:
-        'With nausea easing, the second trimester is a great time to focus on balanced, nourishing meals — iron-rich greens and dal, calcium from dairy, fruit, and steady hydration.\n\n'
+        'With nausea easing, the second trimester is a great time to focus on balanced, nourishing meals - iron-rich greens and dal, calcium from dairy, fruit, and steady hydration.\n\n'
         'You do not need to eat for two; quality matters more than quantity. Keep taking your prescribed supplements, and enjoy your food.',
   ),
   ReadItem(
@@ -154,13 +154,13 @@ const List<ReadItem> kReadItems = [
     weekStart: 24,
     weekEnd: 30,
     priority: 'medium',
-    reason: 'The third trimester is coming up — a gentle heads-up helps.',
+    reason: 'The third trimester is coming up - a gentle heads-up helps.',
     readingTime: '4 min',
     category: 'Preparation',
     emoji: '🗓️',
     body:
         'The third trimester brings a bigger bump, more movement, and the first thoughts of birth. Energy can dip again, and rest becomes important.\n\n'
-        'There is no need to rush — but knowing what is ahead, from growth scans to birth planning, helps you feel calm and prepared.',
+        'There is no need to rush - but knowing what is ahead, from growth scans to birth planning, helps you feel calm and prepared.',
   ),
   ReadItem(
     id: 'movement_awareness',
@@ -184,13 +184,13 @@ const List<ReadItem> kReadItems = [
     weekStart: 12,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Support makes the journey lighter — share this with your partner.',
+    reason: 'Support makes the journey lighter - share this with your partner.',
     readingTime: '3 min',
     category: 'Partner Support',
     emoji: '🤝',
     body:
         'Partners often want to help but are not sure how. Small, specific acts matter most: coming to scans, taking a task off your plate, listening without trying to fix, and learning alongside you.\n\n'
-        'Becoming a parent is a shared journey — and feeling supported is good for both you and your baby.',
+        'Becoming a parent is a shared journey - and feeling supported is good for both you and your baby.',
   ),
   ReadItem(
     id: 'hospital_bag',
@@ -205,7 +205,7 @@ const List<ReadItem> kReadItems = [
     emoji: '🧳',
     body:
         'Packing your bag a few weeks early brings real peace of mind. Think in three parts: things for labour, things for after delivery, and things for your baby.\n\n'
-        'ParentVeda\'s Hospital Bag planner can build the full checklist for you — this is a good time to start it.',
+        'ParentVeda\'s Hospital Bag planner can build the full checklist for you - this is a good time to start it.',
   ),
   ReadItem(
     id: 'labour_prep',
@@ -220,7 +220,7 @@ const List<ReadItem> kReadItems = [
     emoji: '🌅',
     body:
         'Labour usually unfolds in stages, often more gradually than films suggest. Understanding early signs, when to head in, and what each stage feels like can replace fear with confidence.\n\n'
-        'Your birth plan is a guide, not a rulebook — staying flexible and trusting your care team matters most.',
+        'Your birth plan is a guide, not a rulebook - staying flexible and trusting your care team matters most.',
   ),
   ReadItem(
     id: 'first_24h',
@@ -234,7 +234,7 @@ const List<ReadItem> kReadItems = [
     category: 'Preparation',
     emoji: '👶',
     body:
-        'The first day is a blur of firsts — skin-to-skin, the first feed, tiny checks by the team. Your baby may be sleepy, and that is normal.\n\n'
+        'The first day is a blur of firsts - skin-to-skin, the first feed, tiny checks by the team. Your baby may be sleepy, and that is normal.\n\n'
         'Rest whenever you can, accept help, and know that you and your baby are learning each other. There is no need to have everything figured out at once.',
   ),
 
@@ -251,7 +251,7 @@ const List<ReadItem> kReadItems = [
     category: 'Baby Development',
     emoji: '🔬',
     body:
-        'Research suggests that in the later months, babies begin to recognise voices and sounds they hear often — especially their mother\'s.\n\n'
+        'Research suggests that in the later months, babies begin to recognise voices and sounds they hear often - especially their mother\'s.\n\n'
         'After birth, newborns tend to turn toward familiar voices and can be soothed by them. It is a lovely reason to talk and read aloud now.',
   ),
   ReadItem(
@@ -266,7 +266,7 @@ const List<ReadItem> kReadItems = [
     category: 'Baby Development',
     emoji: '🎶',
     body:
-        'Studies on music in pregnancy point to a simple, reassuring idea: calm, gentle sound is soothing — mostly because it helps the mother relax, and that calm is shared.\n\n'
+        'Studies on music in pregnancy point to a simple, reassuring idea: calm, gentle sound is soothing - mostly because it helps the mother relax, and that calm is shared.\n\n'
         'There is no magic playlist that makes babies smarter. Choose what relaxes you.',
   ),
   ReadItem(
@@ -281,7 +281,7 @@ const List<ReadItem> kReadItems = [
     category: 'Emotional Wellbeing',
     emoji: '🌿',
     body:
-        'Some stress in pregnancy is completely normal. What research highlights is the value of everyday calming habits — rest, breathing, connection, and asking for support.\n\n'
+        'Some stress in pregnancy is completely normal. What research highlights is the value of everyday calming habits - rest, breathing, connection, and asking for support.\n\n'
         'You do not need to be perfectly serene. Small moments of calm, repeated, are what matter.',
   ),
 
@@ -324,13 +324,13 @@ const List<ReadItem> kReadItems = [
     type: ReadType.book,
     weekStart: 28,
     weekEnd: 44,
-    reason: 'Worth reading before birth — nourishing yourself afterwards.',
+    reason: 'Worth reading before birth - nourishing yourself afterwards.',
     readingTime: 'Book',
     category: 'Preparation',
     emoji: '📙',
     author: 'Heng Ou',
     why:
-        'A warm guide to the often-overlooked first weeks after birth — rest, recovery and nourishing food — so you feel cared for, not just the baby. It blends traditional postpartum wisdom with practical recipes. Best read before delivery, while you still have time to prepare.',
+        'A warm guide to the often-overlooked first weeks after birth - rest, recovery and nourishing food - so you feel cared for, not just the baby. It blends traditional postpartum wisdom with practical recipes. Best read before delivery, while you still have time to prepare.',
     rating: 4.5,
     ratingCount: 1100,
   ),
@@ -367,7 +367,7 @@ const List<ReadItem> kReadItems = [
     authorRole: 'Pediatrician',
     why: 'Understanding emotional connection before birth helps many families feel more confident.',
     body:
-        'Bonding does not begin at birth — it begins now. Talking to your baby, responding to movements, and taking quiet moments together build a foundation of security.\n\n'
+        'Bonding does not begin at birth - it begins now. Talking to your baby, responding to movements, and taking quiet moments together build a foundation of security.\n\n'
         'Parents who connect during pregnancy often feel more confident and calm when their baby arrives.',
   ),
   ReadItem(
@@ -386,7 +386,7 @@ const List<ReadItem> kReadItems = [
     why: 'Learning the basics before birth makes those first days much easier.',
     body:
         'Breastfeeding is natural, but it is also a skill that both you and your baby learn together. Knowing the basics of positioning and latch before birth removes a lot of first-week stress.\n\n'
-        'You do not have to master it now — just gently familiarise yourself.',
+        'You do not have to master it now - just gently familiarise yourself.',
   ),
 ];
 
@@ -433,7 +433,7 @@ List<ReadItem> lookingAhead(int week) {
 List<ReadItem> readByType(ReadType type) =>
     kReadItems.where((r) => r.type == type).toList();
 
-/// Daily Reads — [count] article picks for [week], rotating by [day] so the set
+/// Daily Reads - [count] article picks for [week], rotating by [day] so the set
 /// refreshes each day. Week-relevant articles come first; if there are fewer
 /// than [count], it tops up with other articles so the section always fills.
 List<ReadItem> dailyArticleReads(int week, int day, {int count = 3}) {
@@ -452,7 +452,7 @@ List<ReadItem> dailyArticleReads(int week, int day, {int count = 3}) {
   return List.generate(count.clamp(0, n), (i) => pool[(start + i) % n]);
 }
 
-/// Daily Reads — [count] book picks, rotating by [day].
+/// Daily Reads - [count] book picks, rotating by [day].
 List<ReadItem> dailyBookReads(int day, {int count = 3}) {
   final books = readByType(ReadType.book);
   if (books.isEmpty) return const [];

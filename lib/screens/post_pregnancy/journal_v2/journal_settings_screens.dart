@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Journal V2 — library, hardcover customization, print & settings
+//  My Journal V2 - library, hardcover customization, print & settings
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class StorybookLibraryScreen extends StatelessWidget {
           jvPad(jvTopBar(context, title: 'Storybooks')),
           const SizedBox(height: 18),
           jvPad(GestureDetector(
-            onTap: () => _snack(context, 'New storybook — coming soon'),
+            onTap: () => _snack(context, 'New storybook - coming soon'),
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -156,7 +156,7 @@ class _HardcoverCustomizationScreenState extends State<HardcoverCustomizationScr
                 ),
               ),
             GestureDetector(
-              onTap: () => _snack(context, 'Add a photo — coming soon'),
+              onTap: () => _snack(context, 'Add a photo - coming soon'),
               child: Container(width: 52, height: 52, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.add, size: 20, color: ppPurple)),
             ),
           ])),
@@ -275,7 +275,7 @@ class JournalSettingsScreen extends StatelessWidget {
       );
 
   Widget _row(BuildContext context, IconData icon, String label, String value) => GestureDetector(
-        onTap: () => _snack(context, '$label — coming soon'),
+        onTap: () => _snack(context, '$label - coming soon'),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),

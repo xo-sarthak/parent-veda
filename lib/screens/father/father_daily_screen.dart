@@ -1,10 +1,10 @@
 // =============================================================================
-//  FatherDailyScreen — standalone port of the Claude Design "Father Daily"
+//  FatherDailyScreen - standalone port of the Claude Design "Father Daily"
 // -----------------------------------------------------------------------------
-//  The father's daily space ("grounded, warm — getting ready to meet my baby").
+//  The father's daily space ("grounded, warm - getting ready to meet my baby").
 //  A faithful Flutter port of the design, in the SLATE palette (Teal toggle too).
 //  Self-contained: its OWN father palette (NOT AppTheme), English copy verbatim.
-//  NOT integrated anywhere yet — just a screen that exists and runs.
+//  NOT integrated anywhere yet - just a screen that exists and runs.
 // =============================================================================
 
 import 'dart:async';
@@ -18,7 +18,7 @@ import '../../data/father/father_tales.dart';
 import '../../data/garbh_data.dart';
 import '../../data/scan_guide_data.dart';
 import '../../data/scan_schedule.dart';
-// garbh_content (GarbhPrompt) parked — the father read-aloud now uses the shared
+// garbh_content (GarbhPrompt) parked - the father read-aloud now uses the shared
 // SamvadPiece pool. Kept commented for revert.
 // import '../../models/garbh_content.dart';
 import '../../models/journal_entry.dart';
@@ -102,11 +102,11 @@ const Map<String, _Detail> _kDetails = {
   'tip': _Detail(
     id: 'tip',
     eyebrow: 'Daily tip for Dad',
-    title: "Tonight, don't fix it — just sit with her",
+    title: "Tonight, don't fix it - just sit with her",
     meta: '2 min · showing up',
     paras: [
       "When she can't sleep, the instinct is to solve it. Resist that. You don't need the right words.",
-      "Sit up with her. A hand on her back. Let the quiet do the work — that's the part she'll remember.",
+      "Sit up with her. A hand on her back. Let the quiet do the work - that's the part she'll remember.",
     ],
     list: [
       'Phone face-down',
@@ -119,22 +119,22 @@ const Map<String, _Detail> _kDetails = {
   'partner': _Detail(
     id: 'partner',
     eyebrow: 'Support your partner',
-    title: "Week 20 — what she's carrying",
+    title: "Week 20 - what she's carrying",
     paras: [
       'Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.',
-      'Small, specific help lands bigger than grand gestures right now. You do not have to be asked — noticing first is the whole gift.',
+      'Small, specific help lands bigger than grand gestures right now. You do not have to be asked - noticing first is the whole gift.',
     ],
     list: [
-      'Take dinner off her plate — cook her favourite, or order it before she has to ask.',
-      'Rub her lower back for five minutes — no phone, no agenda.',
+      'Take dinner off her plate - cook her favourite, or order it before she has to ask.',
+      'Rub her lower back for five minutes - no phone, no agenda.',
       'Quietly handle a chore she usually does, without announcing it.',
       'Keep water and a small snack by her side of the bed.',
-      'Ask "how are you feeling today?" and just listen — resist fixing it.',
+      'Ask "how are you feeling today?" and just listen - resist fixing it.',
       'Take over the heavy lifting: groceries, laundry baskets, anything that strains her back.',
       'Come to the next scan, and write down the questions together beforehand.',
-      'Let her nap without guilt — take the evening shift on the house.',
+      'Let her nap without guilt - take the evening shift on the house.',
       'Help her settle on her side with a pillow tucked behind her back.',
-      'Say the small things out loud — "you are doing something incredible."',
+      'Say the small things out loud - "you are doing something incredible."',
     ],
     cta: "I'll handle dinner",
     confirm: "Dinner's handled tonight. She'll feel it.",
@@ -145,11 +145,11 @@ const Map<String, _Detail> _kDetails = {
     title: 'What your baby can hear at 20 weeks',
     meta: '4 min read · ParentVeda Reads',
     paras: [
-      'Around now the tiny bones of the inner ear finish forming — and your voice, lower and slower than hers, carries especially well through the body.',
+      'Around now the tiny bones of the inner ear finish forming - and your voice, lower and slower than hers, carries especially well through the body.',
       "Reading a few lines a day isn't sentimental. It's how your baby starts to know you before they ever see you.",
     ],
     cta: 'Done reading',
-    confirm: 'Nice — a few minutes well spent.',
+    confirm: 'Nice - a few minutes well spent.',
   ),
   'talk': _Detail(
     id: 'talk',
@@ -159,11 +159,11 @@ const Map<String, _Detail> _kDetails = {
     // [script] is injected at render time from the mother's Samvad read-aloud
     // set (see _readAloudToday) so Mom and Dad share the same words.
     paras: [
-      'Baby can recognise your voice now — lower and slower than hers, it carries especially well. Read it aloud, let your voice rise and fall, and play with the words.',
+      'Baby can recognise your voice now - lower and slower than hers, it carries especially well. Read it aloud, let your voice rise and fall, and play with the words.',
       "A minute is plenty. It's the rhythm that reaches them, not the meaning.",
     ],
     cta: 'Done reading tonight',
-    confirm: 'Beautiful — your voice is a gift they already know.',
+    confirm: 'Beautiful - your voice is a gift they already know.',
   ),
   'story': _Detail(
     id: 'story',
@@ -172,7 +172,7 @@ const Map<String, _Detail> _kDetails = {
     meta: 'A 3-minute myth · read aloud',
     paras: [
       'Long ago, gods and demons gripped the same great rope, coiled it around a mountain, and churned the sea of milk for the nectar of immortality.',
-      "Read it slow. The bump can't follow the plot yet — but it can feel the rise and fall of your voice.",
+      "Read it slow. The bump can't follow the plot yet - but it can feel the rise and fall of your voice.",
     ],
     cta: 'Start reading',
     confirm: 'Find a quiet spot and read it slow.',
@@ -197,7 +197,7 @@ class FatherDailyScreen extends StatefulWidget {
   const FatherDailyScreen(
       {super.key, required this.controller, this.embedded = false});
 
-  /// Pregnancy controller — used by the Baby / Mother / What's-next quick
+  /// Pregnancy controller - used by the Baby / Mother / What's-next quick
   /// circles to open the (father-skinned) weekly detail screens for week 20.
   final PregnancyController controller;
 
@@ -217,7 +217,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // "Read to your baby" mirrors the mother's daily Samvad EXACTLY: same shared
   // pool, same customization (ReadToBabyStore, mother-owned), same day pick. The
-  // father has NO controls of his own — whatever the mother enables is what he
+  // father has NO controls of his own - whatever the mother enables is what he
   // sees here. Uses her live stage (not the fixed week-20 framing) so the daily
   // piece is identical to the one on her side.
   List<SamvadPiece> get _readAloudPool => samvadDailyPool(
@@ -233,7 +233,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     return pool[((day - 1) + off) % pool.length];
   }
 
-  // Days-since-epoch — a stable index that ticks over once per day, used to
+  // Days-since-epoch - a stable index that ticks over once per day, used to
   // refresh the daily read + the daily tale.
   int get _dayIndex =>
       DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
@@ -265,7 +265,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     _Entry('Yesterday',
         'Felt the first kick against my palm tonight. I actually teared up.'),
     _Entry('Tuesday',
-        'Told her the nursery can wait — we just need each other right now.'),
+        'Told her the nursery can wait - we just need each other right now.'),
   ];
 
   String _toast = '';
@@ -384,7 +384,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(0, 2, 0, widget.embedded ? 120 : 24),
                 children: [
-                  // Weekly snapshot — mirrors the mother's home hero, in Slate.
+                  // Weekly snapshot - mirrors the mother's home hero, in Slate.
                   _weeklySnapshot(p),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
@@ -441,7 +441,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // ---- Baby / Mother / What's-next quick circles ----
   // Same shortcuts as the mother's weekly; they open the (father-skinned when
-  // FatherPreview is on) week-20 detail screens. Parked — the snapshot hero now
+  // FatherPreview is on) week-20 detail screens. Parked - the snapshot hero now
   // carries these shortcuts. Kept for revert.
   // ignore: unused_element
   Widget _quickCircles(_Pal p) {
@@ -670,7 +670,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     );
   }
 
-  // Circular percentage ring — the father-skin twin of the mother hero's ring.
+  // Circular percentage ring - the father-skin twin of the mother hero's ring.
   Widget _snapRing(_Pal p, double pct, int weeksToGo) => SizedBox(
         width: 74,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -729,7 +729,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       );
 
-  // Parked — replaced by _weeklySnapshot above. Kept for revert.
+  // Parked - replaced by _weeklySnapshot above. Kept for revert.
   // ignore: unused_element
   Widget _greeting(_Pal p) {
     final hour = DateTime.now().hour;
@@ -894,7 +894,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       Text('SUPPORT YOUR PARTNER',
                           style: _eyebrow(p.accent, 0.12)),
                       const SizedBox(height: 3),
-                      Text("Week 20 — what she's carrying",
+                      Text("Week 20 - what she's carrying",
                           style: _serif(19, p.ink, w: FontWeight.w600)),
                     ]),
               ),
@@ -915,7 +915,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     Text('DO THIS TODAY', style: _eyebrow(p.accent2, 0.12)),
                     const SizedBox(height: 4),
                     Text(
-                        'Take dinner off her plate — cook her favourite, or order it before she has to ask.',
+                        'Take dinner off her plate - cook her favourite, or order it before she has to ask.',
                         style: _body(13.5, p.ink, h: 1.45)),
                   ]),
             ),
@@ -925,7 +925,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       );
 
-  // ---- card 3: daily read — a looping swipe carousel of the day's reads, with
+  // ---- card 3: daily read - a looping swipe carousel of the day's reads, with
   //      a subtle Instagram-style "more slides" indicator. Card layout per slide
   //      is unchanged; tapping the visible slide opens that read.
   Widget _dailyRead(_Pal p) {
@@ -948,7 +948,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 _tap(() => _openCard('read'), _readRow(p, _reads[i % n])),
           ),
         ),
-        // Floating dots, centred at the bottom — quiet, just "there's more".
+        // Floating dots, centred at the bottom - quiet, just "there's more".
         Positioned(
           left: 0,
           right: 0,
@@ -960,7 +960,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     );
   }
 
-  // One read slide — identical to the original Daily Read card content.
+  // One read slide - identical to the original Daily Read card content.
   Widget _readRow(_Pal p, ReadItem r) => Row(children: [
         Expanded(
           child: Column(
@@ -1136,7 +1136,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               ]),
               const SizedBox(height: 13),
               if (due.isEmpty && appts.isEmpty)
-                Text("Nothing due right now — you're both up to date.",
+                Text("Nothing due right now - you're both up to date.",
                     style: _body(14, p.muted))
               else ...[
                 for (final m in due) _fScanRow(p, m),
@@ -1218,7 +1218,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   String _fmtApptDate(DateTime d) =>
       '${d.day} ${_scanMonths[d.month - 1]} ${d.year}';
 
-  // "View all scans" — a Slate sheet of every scan with a done tick, so he can
+  // "View all scans" - a Slate sheet of every scan with a done tick, so he can
   // also clear older ones (handy if they joined the app late).
   void _openAllScans() {
     final p = _p;
@@ -1250,7 +1250,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   Text('All scans', style: _serif(20, p.ink)),
                   const SizedBox(height: 4),
                   Text(
-                      'Tick off the ones already done — even older ones, if you joined late.',
+                      'Tick off the ones already done - even older ones, if you joined late.',
                       style: _body(13, p.muted)),
                   const SizedBox(height: 14),
                   Expanded(
@@ -1317,7 +1317,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     );
   }
 
-  // ---- card 5: stories & myth — REMOVED from the father's daily home (kept
+  // ---- card 5: stories & myth - REMOVED from the father's daily home (kept
   //      here, unused, for an easy revert). The full collection in Tools was
   //      removed too.
   // ignore: unused_element
@@ -1438,7 +1438,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   }
 
   // ---- card 6: journal ----
-  // Father journal card — the four quick-add circles (memory / note / photo /
+  // Father journal card - the four quick-add circles (memory / note / photo /
   // voice) into the separate FatherJournalStore, plus a live recent preview.
   // (The old local-only journal overlay '_journalBody' is kept for revert.)
   Widget _journalCard(_Pal p) => _whiteCard(
@@ -1560,7 +1560,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               Text('Your journal', style: _serif(20, p.ink)),
               const SizedBox(height: 8),
               Text(
-                  'Your memories, photos and voice notes will live here. Tap a circle above to add one — a memory, a note to your baby, a photo or a voice note.',
+                  'Your memories, photos and voice notes will live here. Tap a circle above to add one - a memory, a note to your baby, a photo or a voice note.',
                   style: _body(14, p.muted, h: 1.5)),
             ]),
       ),
@@ -1768,7 +1768,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ]),
       ));
     }
-    // Removed the repeated "DO THIS TODAY" box — it already shows on the home
+    // Removed the repeated "DO THIS TODAY" box - it already shows on the home
     // card, so repeating it inside the detail was redundant. Kept for revert:
     /*
     if (d.id == 'partner') {
@@ -1781,7 +1781,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           Text('DO THIS TODAY', style: _eyebrow(p.accent2, 0.12)),
           const SizedBox(height: 5),
           Text(
-              'Take dinner off her plate — cook her favourite, or order it before she has to ask. Then rub her lower back for five minutes, no phone.',
+              'Take dinner off her plate - cook her favourite, or order it before she has to ask. Then rub her lower back for five minutes, no phone.',
               style: _body(15, p.ink)),
         ]),
       ));
@@ -1861,7 +1861,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ),
       ));
     }
-    // "MORE TO READ ALOUD" list removed — this is a daily section, so just the
+    // "MORE TO READ ALOUD" list removed - this is a daily section, so just the
     // one piece (matching the mother's daily Samvad). Kept commented for revert.
     // PURE READ-ALOUD: the record block was also removed here (see _recordBlock).
     if (d.id == 'journal') {
@@ -1870,7 +1870,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     return out;
   }
 
-  // ignore: unused_element  (kept for revert — see PURE READ-ALOUD note above)
+  // ignore: unused_element  (kept for revert - see PURE READ-ALOUD note above)
   Widget _recordBlock(_Pal p) => Column(children: [
         GestureDetector(
           onTap: () => setState(() => _recording
@@ -2032,7 +2032,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   ]),
                   const SizedBox(height: 16),
                   Text(
-                      "Mom's daily space — her body this week, cravings, kicks and her own journal — lives one tap away. Anything you mark here shows up for her too.",
+                      "Mom's daily space - her body this week, cravings, kicks and her own journal - lives one tap away. Anything you mark here shows up for her too.",
                       style: _body(14.5, p.ink.withValues(alpha: 0.85), h: 1.55)),
                   const SizedBox(height: 20),
                   GestureDetector(
@@ -2166,7 +2166,7 @@ const List<double> _kWaveBig = [
 
 // ---- waveform (static bars) ----
 // ===========================================================================
-//  Father scan detail — mirrors the mother's rich scan detail, in the Slate
+//  Father scan detail - mirrors the mother's rich scan detail, in the Slate
 //  skin + a father voice. Same content (what-is / sections / bullets / how to
 //  read the report) so the father gets the depth she does. Read-only; the
 //  done-toggle stays on the scan rows/tiles.
@@ -2211,7 +2211,7 @@ class _FatherScanDetail extends StatelessWidget {
               style: _b(12.5, c: kFMuted)),
           const SizedBox(height: 16),
           Text(
-              "Here's what this scan is — so you can be there for it with her, and understand what you're looking at together.",
+              "Here's what this scan is - so you can be there for it with her, and understand what you're looking at together.",
               style: _b(13.5, c: kFMuted)),
           const SizedBox(height: 16),
           if (guide != null) ...[
@@ -2228,7 +2228,7 @@ class _FatherScanDetail extends StatelessWidget {
             decoration: BoxDecoration(
                 color: kFAccentSoft, borderRadius: BorderRadius.circular(14)),
             child: Text(
-                'General guidance to help you support her — every pregnancy is different, so always follow her doctor.',
+                'General guidance to help you support her - every pregnancy is different, so always follow her doctor.',
                 style: _b(12.5, c: kFInk)),
           ),
           if (guide != null && guide.interpret.isNotEmpty) ...[
@@ -2245,7 +2245,7 @@ class _FatherScanDetail extends StatelessWidget {
               decoration: BoxDecoration(
                   color: kFWarmSoft, borderRadius: BorderRadius.circular(14)),
               child: Text(
-                  "Plain-language explanations, not a diagnosis. Numbers only mean something in full context — read the report with her doctor.",
+                  "Plain-language explanations, not a diagnosis. Numbers only mean something in full context - read the report with her doctor.",
                   style: _b(12.5, c: kFInk)),
             ),
             const SizedBox(height: 12),
@@ -2362,7 +2362,7 @@ class _Waveform extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Daily-read art — soft expanding "sound" ripples + pulsing centre dot.
+//  Daily-read art - soft expanding "sound" ripples + pulsing centre dot.
 // ===========================================================================
 class _SoundRippleArt extends StatefulWidget {
   const _SoundRippleArt({required this.pal});
@@ -2442,7 +2442,7 @@ class _SoundRippleArtState extends State<_SoundRippleArt>
 }
 
 // ===========================================================================
-//  Story art — a warm glow rising over a slowly churning ocean.
+//  Story art - a warm glow rising over a slowly churning ocean.
 // ===========================================================================
 class _OceanArt extends StatefulWidget {
   const _OceanArt({required this.pal});

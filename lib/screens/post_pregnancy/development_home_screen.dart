@@ -1,7 +1,7 @@
 // =============================================================================
-//  DevelopmentHomeScreen — ParentVeda Development (a development COMPANION)
+//  DevelopmentHomeScreen - ParentVeda Development (a development COMPANION)
 // -----------------------------------------------------------------------------
-//  Answers "how can I help my child grow and learn at this stage?" — one Today's
+//  Answers "how can I help my child grow and learn at this stage?" - one Today's
 //  Focus, the birth-to-five Development Map, the eight development areas (each its
 //  own journey), today's activities, a Brain Development window, Looking Ahead,
 //  and a gentle check-in. Inspires action, never evaluates. Playful and warm,
@@ -41,9 +41,9 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _pad(Text('Help Aarav grow', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Not a checklist of what he’s done — what he’s learning now, and how you can nurture it today.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Not a checklist of what he’s done - what he’s learning now, and how you can nurture it today.', style: ppBody(14, h: 1.5))),
 
-            // 1 — today's focus
+            // 1 - today's focus
             const SizedBox(height: 24),
             _pad(_focusHero(context, focus)),
 
@@ -51,11 +51,11 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _pad(_mapCta(context)),
 
-            // 2 — development areas
+            // 2 - development areas
             const SizedBox(height: 30),
             _pad(devSectionHeader('Every part of him, growing')),
             const SizedBox(height: 4),
-            _pad(Text('Eight areas, each its own little journey — tap to explore.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Eight areas, each its own little journey - tap to explore.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             SizedBox(
               height: 208,
@@ -68,7 +68,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
               ),
             ),
 
-            // 4 — today's activities
+            // 4 - today's activities
             const SizedBox(height: 30),
             _pad(devSectionHeader("Try together today")),
             const SizedBox(height: 4),
@@ -76,15 +76,15 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _pad(Column(children: [for (final a in activities) DevActivityCard(activity: a, onTap: () => _push(context, DevelopmentActivityScreen(activity: a)))])),
 
-            // 5 — brain development
+            // 5 - brain development
             const SizedBox(height: 14),
             _pad(_brain(context)),
 
-            // 6 — looking ahead
+            // 6 - looking ahead
             const SizedBox(height: 30),
             _pad(devSectionHeader('Looking ahead')),
             const SizedBox(height: 4),
-            _pad(Text('Something to look forward to — no rigid timelines, just the joy of what’s coming.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Something to look forward to - no rigid timelines, just the joy of what’s coming.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             SizedBox(
               height: 150,
@@ -172,7 +172,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('The Development Map', style: ppJakarta(15.5, color: Colors.white)),
                 const SizedBox(height: 3),
-                Text('Birth to five, as one beautiful journey. See where he is — and the wonder ahead.', style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.8), h: 1.4)),
+                Text('Birth to five, as one beautiful journey. See where he is - and the wonder ahead.', style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.8), h: 1.4)),
               ]),
             ),
             const SizedBox(width: 10),
@@ -226,7 +226,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text('How his brain is growing', style: ppFraunces(24, h: 1.12)),
               const SizedBox(height: 6),
-              Text('Simple windows into a remarkable month — each with one practical thing you can do.', style: ppBody(13, h: 1.5)),
+              Text('Simple windows into a remarkable month - each with one practical thing you can do.', style: ppBody(13, h: 1.5)),
               const SizedBox(height: 18),
               for (final t in kBrainTopics) ...[
                 Container(
@@ -283,7 +283,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('A gentle check-in', style: ppJakarta(15)),
                 const SizedBox(height: 2),
-                Text('A few soft questions — to understand, never to grade or compare.', style: ppBody(12, h: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text('A few soft questions - to understand, never to grade or compare.', style: ppBody(12, h: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
               ]),
             ),
             const SizedBox(width: 8),

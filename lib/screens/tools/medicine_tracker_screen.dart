@@ -1,9 +1,9 @@
 // =============================================================================
-//  MedicineTrackerScreen — Daily Medication & Supplement Tracking
+//  MedicineTrackerScreen - Daily Medication & Supplement Tracking
 // -----------------------------------------------------------------------------
 //  A calm "nourishment companion": Today's Nourishment with a gentle
 //  mark-as-taken, a weekly awareness view, supplement education, and custom
-//  medicines. Never shaming, never gamified — just easy tracking. Warm-Nest UI.
+//  medicines. Never shaming, never gamified - just easy tracking. Warm-Nest UI.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   static const List<BoxShadow> _soft = [
     BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
   ];
-  static const Color _accent = Color(0xFF4F7A52); // calm green — "nourishment"
+  static const Color _accent = Color(0xFF4F7A52); // calm green - "nourishment"
 
   @override
   Widget build(BuildContext context) {

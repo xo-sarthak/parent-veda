@@ -1,9 +1,9 @@
 // =============================================================================
-//  My Journal V2 — shared design tokens & building blocks
+//  My Journal V2 - shared design tokens & building blocks
 // -----------------------------------------------------------------------------
 //  A new, isolated "keepsake Storybook" journal (reached from the Explore
 //  drawer, below Astrology). Reuses ParentVeda's palette/typography from
-//  pp_common — NO green anywhere — and adds a warm "paper" set that gives the
+//  pp_common - NO green anywhere - and adds a warm "paper" set that gives the
 //  Storybook its heirloom-book feel. Photos are represented by soft toned
 //  gradient tiles (JvPhoto), not blank placeholders. Nothing here touches the
 //  existing journal; the two live side by side.
@@ -15,7 +15,7 @@ import '../pp_common.dart';
 
 export '../pp_common.dart';
 
-// ---- warm "paper" palette (storybook only — no green) -----------------------
+// ---- warm "paper" palette (storybook only - no green) -----------------------
 const Color jvPaper = Color(0xFFFBF7F0); // ivory book paper
 const Color jvPaperDeep = Color(0xFFF3EADB); // beige page / card
 const Color jvPaperEdge = Color(0xFFE9DEC9); // page-edge shadow
@@ -39,7 +39,7 @@ const List<List<Color>> _jvTints = [
 ];
 
 // Curated, royalty-free photography (Unsplash) mapped by seed to the memory
-// topics — mother & baby, child & dog, family, beach, play, newborn. Loaded at
+// topics - mother & baby, child & dog, family, beach, play, newborn. Loaded at
 // runtime over the network; the gradient above stays as the loading/offline
 // fallback so a tile is never blank.
 const String _jvQ = '?w=900&q=70&auto=format&fit=crop';
@@ -75,7 +75,7 @@ class JvPhoto extends StatelessWidget {
         height: height,
         width: width,
         child: Stack(fit: StackFit.expand, children: [
-          // gradient base — shows while the photo loads and if it can't be fetched
+          // gradient base - shows while the photo loads and if it can't be fetched
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: t),
@@ -158,7 +158,7 @@ Widget jvTopBar(BuildContext context, {String? title, Widget? trailing, VoidCall
       if (trailing != null) trailing else const SizedBox(width: 36),
     ]);
 
-/// A little hardcover book render (deep aubergine, gold-foil title + sprig) —
+/// A little hardcover book render (deep aubergine, gold-foil title + sprig) -
 /// our heirloom cover, no green. Reused on the home, library, print & reader.
 class JvBookCover extends StatelessWidget {
   const JvBookCover({super.key, this.width = 96, this.height = 128, this.title = 'OUR STORY', this.subtitle = jvChildUpper, this.since});

@@ -1,5 +1,5 @@
 // =============================================================================
-//  Home Screen — Daily Moment modules
+//  Home Screen - Daily Moment modules
 // -----------------------------------------------------------------------------
 //  The vertical stack of soft cards that make up a mother's daily moment:
 //    Header → Grow → Read → Talk → Garbh Sanskar → A Moment For You
@@ -30,7 +30,7 @@ import '../cards/raga_player.dart';
 //  Shared soft module card
 // ---------------------------------------------------------------------------
 
-/// The calm, rounded scaffold every Home module sits in — a softer sibling of
+/// The calm, rounded scaffold every Home module sits in - a softer sibling of
 /// [CardShell] sized for a vertical feed (no full-page scroll area).
 class HomeCard extends StatelessWidget {
   const HomeCard({
@@ -237,7 +237,7 @@ class HomeHeader extends StatelessWidget {
             const Spacer(),
             LangToggle(lang: lang, onChanged: onLanguageChanged),
             const SizedBox(width: 10),
-            // Home-scoped mute for the baby voice — independent of the Weekly
+            // Home-scoped mute for the baby voice - independent of the Weekly
             // Journey's mute, so neither surface can silence the other.
             AnimatedBuilder(
               animation: BabyVoiceService.instance,
@@ -546,7 +546,7 @@ class ReadModule extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // Save this piece — it surfaces in the Profile › Saved hub.
+          // Save this piece - it surfaces in the Profile › Saved hub.
           IconButton(
             visualDensity: VisualDensity.compact,
             tooltip: s.rtbSave,
@@ -568,7 +568,7 @@ class ReadModule extends StatelessWidget {
   }
 
   // The day's piece, drawn from the mother's chosen categories (stable per day,
-  // changes daily via the day index — no randomness).
+  // changes daily via the day index - no randomness).
   ({String title, String body, String tag}) _todaysPiece(S s) {
     final store = ReadToBabyStore.instance;
     final pool = <({String title, String body, String tag})>[];

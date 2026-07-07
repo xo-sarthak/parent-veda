@@ -1,7 +1,7 @@
 // =============================================================================
-//  Symptom + SymptomLog — "Symptoms Companion"
+//  Symptom + SymptomLog - "Symptoms Companion"
 // -----------------------------------------------------------------------------
-//  Not a tracker or checker — an understanding & reassurance library. Each
+//  Not a tracker or checker - an understanding & reassurance library. Each
 //  symptom answers: how common is it, why it happens, what may help, and when
 //  to contact a doctor. Logging is optional. Urgent symptoms are a calm,
 //  clearly-flagged category (no panic language). Content is bilingual.

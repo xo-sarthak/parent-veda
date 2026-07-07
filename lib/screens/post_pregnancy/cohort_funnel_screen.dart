@@ -1,8 +1,8 @@
 // =============================================================================
-//  CohortFunnelScreen — Cohort Courses · full page (parenting)
+//  CohortFunnelScreen - Cohort Courses · full page (parenting)
 // -----------------------------------------------------------------------------
 //  The sales/detail page for a cohort programme (Sleep Bootcamp). Unlike a
-//  one-off masterclass, a cohort is multi-week and scheduled — so this page
+//  one-off masterclass, a cohort is multi-week and scheduled - so this page
 //  leads with a week-by-week timetable, the live-call rhythm, what's included,
 //  the coach, a guarantee row, an FAQ, and a sticky "Join cohort" bar. Net-new
 //  page (no Claude Design frame) modelled on the masterclass funnel + the iMumz
@@ -35,10 +35,10 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
       );
 
   static const List<List<String>> _faqs = [
-    ['What if I miss a live call?', 'Every call is recorded and shared within the hour — you never fall behind.'],
+    ['What if I miss a live call?', 'Every call is recorded and shared within the hour - you never fall behind.'],
     ['How big is the group?', 'Capped at 20 parents, all with babies around your stage, so the coach knows every baby by name.'],
     ["What if it doesn't work for us?", "There's a 7-day money-back guarantee, and you can pause the plan for up to 90 days if life gets in the way."],
-    ['Do I get anything to keep?', 'Yes — the recordings, a downloadable sleep toolkit, and lifetime access to the private group.'],
+    ['Do I get anything to keep?', 'Yes - the recordings, a downloadable sleep toolkit, and lifetime access to the private group.'],
   ];
 
   @override
@@ -102,7 +102,7 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
               _pad(Text('Sleep Bootcamp', style: ppFraunces(30, h: 1.14))),
               const SizedBox(height: 10),
               _pad(Text(
-                  'Two guided weeks with a paediatric sleep consultant and a small group of parents at exactly your stage. A real plan for your baby, built together — never alone at 2am.',
+                  'Two guided weeks with a paediatric sleep consultant and a small group of parents at exactly your stage. A real plan for your baby, built together - never alone at 2am.',
                   style: ppBody(15))),
 
               // quick facts
@@ -119,18 +119,18 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
               const SizedBox(height: 28),
               _pad(Text('Your 2-week schedule', style: ppJakarta(18))),
               const SizedBox(height: 4),
-              _pad(Text('Live group calls Mondays & Thursdays, 8–9pm IST — recorded if you miss one.', style: ppBody(13))),
+              _pad(Text('Live group calls Mondays & Thursdays, 8–9pm IST - recorded if you miss one.', style: ppBody(13))),
               const SizedBox(height: 14),
               _pad(_week('Week 1', 'Foundations', 'Mon 21 & Thu 24 Jul · 8–9pm', [
                 "How your baby's sleep actually works at this age",
                 'Building a wind-down routine that sticks',
-                'The sleep environment — light, sound, temperature',
+                'The sleep environment - light, sound, temperature',
               ])),
               const SizedBox(height: 12),
               _pad(_week('Week 2', 'Practice & troubleshoot', 'Mon 28 & Thu 31 Jul · 8–9pm', [
                 'Drowsy-but-awake, and gentle settling',
                 'Night wakings and early mornings',
-                "Your baby's personal plan — reviewed live",
+                "Your baby's personal plan - reviewed live",
               ])),
 
               // what's included
@@ -215,7 +215,7 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
               ])),
 
               const SizedBox(height: 22),
-              _pad(Text("Small cohorts by design — so your coach actually knows your baby's name.",
+              _pad(Text("Small cohorts by design - so your coach actually knows your baby's name.",
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
             ],
           ),

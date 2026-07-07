@@ -1,5 +1,5 @@
 // =============================================================================
-//  HealthGuideScreen — Customised Health Guide (parenting app · S17)
+//  HealthGuideScreen - Customised Health Guide (parenting app · S17)
 // -----------------------------------------------------------------------------
 //  A private, longitudinal health record for the child: a proactive "pattern
 //  spotted" alert, quick-add (symptom / prescription / scan), a searchable
@@ -64,7 +64,7 @@ class HealthGuideScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Text('Health Guide', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
-              Text("A private, growing memory of Aarav's health — so the next cough, rash or fever isn't a mystery.",
+              Text("A private, growing memory of Aarav's health - so the next cough, rash or fever isn't a mystery.",
                   style: ppBody(15)),
             ])),
 
@@ -88,7 +88,7 @@ class HealthGuideScreen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
                 Text(
-                    'Last winter Aarav caught a cough after the first cold day. The first cold snap is forecast next week — keep him layered and watch for a runny nose.',
+                    'Last winter Aarav caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
                     style: ppBody(15, color: ppInk, h: 1.55)),
                 const SizedBox(height: 12),
                 GestureDetector(
@@ -122,7 +122,7 @@ class HealthGuideScreen extends StatelessWidget {
             )),
             const SizedBox(height: 14),
             _pad(_entry('Cold & cough', 'Jan 2026', 'first cold day · woke up congested',
-                'saline drops, steam — Dr. Ananya Rao',
+                'saline drops, steam - Dr. Ananya Rao',
                 top: true)),
             _pad(_entry('Nappy rash', 'Dec 2025', 'new wipes brand', 'zinc barrier cream',
                 top: true, bottom: true)),
@@ -150,7 +150,7 @@ class HealthGuideScreen extends StatelessWidget {
                     const SizedBox(width: 9),
                     Expanded(
                       child: Text(
-                          'A memory aid, not medical advice — always consult your doctor before reusing any medication.',
+                          'A memory aid, not medical advice - always consult your doctor before reusing any medication.',
                           style: ppBody(12, color: ppBrown, h: 1.5)),
                     ),
                   ]),
@@ -162,7 +162,7 @@ class HealthGuideScreen extends StatelessWidget {
             const SizedBox(height: 28),
             _pad(Text('Talk to a paediatrician', style: ppJakarta(18))),
             const SizedBox(height: 6),
-            _pad(Text("Location-matched, children's specialists only — via our telehealth partner.",
+            _pad(Text("Location-matched, children's specialists only - via our telehealth partner.",
                 style: ppBody(12))),
             const SizedBox(height: 14),
             _pad(_doctor(context)),

@@ -1,7 +1,7 @@
 // =============================================================================
-//  BumpPhoto — one entry in "My Bump Journey" (the visual pregnancy timeline)
+//  BumpPhoto - one entry in "My Bump Journey" (the visual pregnancy timeline)
 // -----------------------------------------------------------------------------
-//  Not a gallery item — a keepsake. One photo per week, with an optional
+//  Not a gallery item - a keepsake. One photo per week, with an optional
 //  caption, a favourite flag, and the gestational week/trimester it belongs to.
 //  The image file lives in the app documents dir; only metadata is persisted.
 // =============================================================================

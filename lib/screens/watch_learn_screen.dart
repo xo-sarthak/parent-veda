@@ -1,9 +1,9 @@
 // =============================================================================
-//  Watch & Learn — contextual learning videos
+//  Watch & Learn - contextual learning videos
 // -----------------------------------------------------------------------------
-//  * TodaysVideoCard — the daily "recommended for this week" video, surfaced on
+//  * TodaysVideoCard - the daily "recommended for this week" video, surfaced on
 //    Home (between the greeting hero and Today's Moment).
-//  * WatchLearnScreen — the full feature: Recommended / Learn a Skill / Expert
+//  * WatchLearnScreen - the full feature: Recommended / Learn a Skill / Expert
 //    Explains / Birth Prep / Newborn Prep / Saved.
 //  Real playback (videoUrl) is wired later; for now Watch opens a calm detail
 //  with a "coming soon" note. Warm-Nest, never YouTube-styled.

@@ -1,14 +1,14 @@
 // =============================================================================
-//  Samvad pool — the unified "read to your baby" content for Garbh Sanskar
+//  Samvad pool - the unified "read to your baby" content for Garbh Sanskar
 // -----------------------------------------------------------------------------
 //  After the "Read to your baby" feature was folded into Garbh Sanskar › Samvad,
 //  ONE shared pool drives every surface:
-//    • Mother — daily Samvad (today's piece + Customize)         → samvadTodaysPiece
-//    • Mother — Tools Samvad library (segregated groups)         → samvadLibraryGroups
-//    • Father — daily "Read to your baby" card (mirror of mom)   → samvadTodaysPiece
+//    • Mother - daily Samvad (today's piece + Customize)         → samvadTodaysPiece
+//    • Mother - Tools Samvad library (segregated groups)         → samvadLibraryGroups
+//    • Father - daily "Read to your baby" card (mirror of mom)   → samvadTodaysPiece
 //
 //  The mother's ReadToBabyStore is the single owner of customization. The father
-//  has NO controls of his own — he simply reads the same pool, so whatever the
+//  has NO controls of his own - he simply reads the same pool, so whatever the
 //  mother enables is exactly what he sees.
 //
 //  Categories (all toggled via the one Customize sheet):
@@ -82,7 +82,7 @@ List<SamvadPiece> samvadDailyPool(ReadToBabyStore store, int trimester) {
   return pool;
 }
 
-/// The segregated library view for Tools — each enabled category becomes one or
+/// The segregated library view for Tools - each enabled category becomes one or
 /// more headed groups (speaking splits into its three classic sub-sets).
 List<SamvadGroup> samvadLibraryGroups(ReadToBabyStore store, int trimester) {
   final groups = <SamvadGroup>[];

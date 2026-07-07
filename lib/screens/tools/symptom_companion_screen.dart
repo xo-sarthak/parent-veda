@@ -1,5 +1,5 @@
 // =============================================================================
-//  SymptomCompanionScreen — "Symptoms Companion"
+//  SymptomCompanionScreen - "Symptoms Companion"
 // -----------------------------------------------------------------------------
 //  Calm understanding & reassurance: search, "common around this week", browse
 //  by category, a clearly-flagged (non-alarming) urgent section, and a detail

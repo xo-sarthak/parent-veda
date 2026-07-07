@@ -1,5 +1,5 @@
 // =============================================================================
-//  FoodNutritionScreen — a single nutrition focus, explained
+//  FoodNutritionScreen - a single nutrition focus, explained
 // -----------------------------------------------------------------------------
 //  The educational core: why the nutrient matters, where to get it, easy foods,
 //  gentle signs of deficiency, and the recipes/article that deliver it. Reached

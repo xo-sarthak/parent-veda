@@ -1,5 +1,5 @@
 // =============================================================================
-//  TrimesterChartCard — the "Trimester · Month · Week" overview
+//  TrimesterChartCard - the "Trimester · Month · Week" overview
 // -----------------------------------------------------------------------------
 //  A calm reference card: three colour-coded trimester blocks, each split into
 //  its months and the gestational weeks they cover, with the mother's CURRENT
@@ -7,7 +7,7 @@
 //
 //  Layout note: built from plain Containers + Wrap (no IntrinsicHeight / cross-
 //  axis stretch). The earlier grid used IntrinsicHeight around an Expanded+Wrap,
-//  which can't resolve its constraints and crashed layout — keep it simple here.
+//  which can't resolve its constraints and crashed layout - keep it simple here.
 // =============================================================================
 
 import 'package:flutter/material.dart';

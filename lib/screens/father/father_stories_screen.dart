@@ -1,9 +1,9 @@
 // =============================================================================
-//  FatherStoriesScreen — "Stories, Fables & Mythology" library (Father mode)
+//  FatherStoriesScreen - "Stories, Fables & Mythology" library (Father mode)
 // -----------------------------------------------------------------------------
 //  Opened from the Father Daily "Stories, fables & mythology" card. A Slate-
-//  palette library (matching the Father Daily screen) with three tabs —
-//  Stories / Fables / Mythology — each listing read-aloud pieces. Tapping one
+//  palette library (matching the Father Daily screen) with three tabs -
+//  Stories / Fables / Mythology - each listing read-aloud pieces. Tapping one
 //  opens a calm reading view with the dad's framing note.
 // =============================================================================
 
@@ -240,7 +240,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.auto_stories_rounded, size: 16, color: _muted),
                   const SizedBox(width: 7),
-                  Text('Read it aloud — let your voice rise and fall',
+                  Text('Read it aloud - let your voice rise and fall',
                       style: _body(12.5, _muted, w: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 20),

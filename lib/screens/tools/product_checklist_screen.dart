@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductChecklistScreen — build your own checklists from our products
+//  ProductChecklistScreen - build your own checklists from our products
 // -----------------------------------------------------------------------------
 //  The mother browses ParentVeda's product catalogue and assembles her own
 //  named checklists: each item carries a custom "when/for" note and a tick-off.
@@ -664,7 +664,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                   _itemRow(context, s, store, list.id, item),
             ],
           ),
-          // Sticky finish bar — Save list (back to your lists) + Add to cart.
+          // Sticky finish bar - Save list (back to your lists) + Add to cart.
           bottomNavigationBar:
               list.items.isEmpty ? null : _bottomBar(context, s, list),
         );
@@ -1273,7 +1273,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
             title: s.cartProductsTitle));
   }
 
-  // Add a product we don't stock — her own name + link + price + note.
+  // Add a product we don't stock - her own name + link + price + note.
   void _addOwnProduct() {
     final s = S(widget.controller.language);
     final nameC = TextEditingController();

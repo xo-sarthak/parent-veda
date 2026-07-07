@@ -1,10 +1,10 @@
 // =============================================================================
-//  Focused courses — catalogue + Go-Deeper lookup
+//  Focused courses - catalogue + Go-Deeper lookup
 // -----------------------------------------------------------------------------
 //  Short, focused courses that sit alongside the flagship "Complete Parenting
 //  Guide". Their lessons are named to match the "Go deeper · Course" rows across
 //  the app (activities, challenges), so a Course row opens the RIGHT course with
-//  the referenced lesson highlighted — never the generic list. Static content;
+//  the referenced lesson highlighted - never the generic list. Static content;
 //  playback is previewed through the existing course funnel.
 // =============================================================================
 
@@ -52,7 +52,7 @@ const List<Course> kCourses = [
     title: 'Play & Brain',
     tagline: 'How the right play grows a four-month-old mind.',
     about:
-        'A short, practical course on what your baby is working out right now — cause and effect, object permanence, hand-eye coordination — and the simple, everyday play that supports each one. No flashcards, no pressure; just the "why" behind the games.',
+        'A short, practical course on what your baby is working out right now - cause and effect, object permanence, hand-eye coordination - and the simple, everyday play that supports each one. No flashcards, no pressure; just the "why" behind the games.',
     expert: 'Vetted by Dr. Ananya Rao, Paediatrician',
     ageTag: '3–6 months',
     accent: _violet,
@@ -69,7 +69,7 @@ const List<Course> kCourses = [
     title: 'Motor Skills',
     tagline: 'The road from tummy time to those first steps.',
     about:
-        'Every big movement builds on the last. This course walks the physical journey — head control, rolling, sitting, crawling — with the gentle, joyful practice that helps each one arrive in its own time.',
+        'Every big movement builds on the last. This course walks the physical journey - head control, rolling, sitting, crawling - with the gentle, joyful practice that helps each one arrive in its own time.',
     expert: 'Vetted by Dr. Meher Shah, Paediatric Physio',
     ageTag: '2–12 months',
     accent: _amber,
@@ -85,7 +85,7 @@ const List<Course> kCourses = [
     title: 'Language & Communication',
     tagline: 'The conversation that starts long before the first word.',
     about:
-        'Your baby is learning language now, in the everyday back-and-forth. This course shows how narration, "serve and return", and simple songs wire the brain for talking — months before real words appear.',
+        'Your baby is learning language now, in the everyday back-and-forth. This course shows how narration, "serve and return", and simple songs wire the brain for talking - months before real words appear.',
     expert: 'Vetted by Dr. Kabir Menon, Speech & Language',
     ageTag: '3–12 months',
     accent: _rose,
@@ -99,7 +99,7 @@ const List<Course> kCourses = [
   Course(
     id: 'sleep',
     title: 'Sleep Bootcamp',
-    tagline: 'Understanding baby sleep — and working with it, gently.',
+    tagline: 'Understanding baby sleep - and working with it, gently.',
     about:
         'A calm, no-cry course through the science of infant sleep and the 4-month shift. Learn what is actually happening, what genuinely helps, and how to build a wind-down your baby can rely on.',
     expert: 'Vetted by Dr. Meher Shah, Paediatric Sleep',

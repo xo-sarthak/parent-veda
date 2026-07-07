@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Community — data models
+//  ParentVeda Community - data models
 // -----------------------------------------------------------------------------
 //  A personalized parenting social layer (prototype): communities feed into one
 //  algorithmic feed. Every post carries multi-dimensional metadata (community,
@@ -99,7 +99,7 @@ class CommunityPost {
   final bool isUser; // created by the user this session
 
   /// Author's professional credential (e.g. "IBCLC", "OB-GYN"). Non-empty marks
-  /// this author as a verified expert — rendered with the gradient seal avatar.
+  /// this author as a verified expert - rendered with the gradient seal avatar.
   final String cred;
 
   /// A member experience that a verified expert has publicly backed. When set,
@@ -107,20 +107,20 @@ class CommunityPost {
   final String endorsedBy; // expert's name, '' if not endorsed
   final String endorsedByCred; // that expert's credential
 
-  /// How many OTHER verified experts have also backed this — drives the
+  /// How many OTHER verified experts have also backed this - drives the
   /// "+ N other experts" credibility line (Facebook "liked by … and N others").
   final int expertEndorseCount;
 
   /// The author asked for an expert to review/confirm this post. Only such posts
   /// surface the "Verify this" button to experts (and an expert "Needs
-  /// verification" filter) — experts don't get a verify button on every post.
+  /// verification" filter) - experts don't get a verify button on every post.
   final bool wantsVerification;
 
   /// When [wantsVerification], the specialty of doctor the author prefers (e.g.
   /// 'gynae', 'pediatric', or 'all'). Curates which experts the request reaches.
   final String preferredSpecialty;
 
-  /// Creation time (epoch ms) for user-made posts — newest float to the top.
+  /// Creation time (epoch ms) for user-made posts - newest float to the top.
   /// 0 for seed posts (which have no real timestamp).
   final int createdAt;
 

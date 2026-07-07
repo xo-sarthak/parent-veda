@@ -1,5 +1,5 @@
 // =============================================================================
-//  Journal create / edit flows — shared by the Home daily "My Journal" section
+//  Journal create / edit flows - shared by the Home daily "My Journal" section
 //  and the full My Journal screen, so both entry points behave identically.
 // -----------------------------------------------------------------------------
 //  Five manual entry types: write memory · note for baby · add photo (multiple)

@@ -1,9 +1,9 @@
 // =============================================================================
-//  ReminderStore — the mother's customizable reminders (persisted)
+//  ReminderStore - the mother's customizable reminders (persisted)
 // -----------------------------------------------------------------------------
 //  Holds every reminder she's created and persists them via shared_preferences.
 //  On any change it (Phase 2) asks NotificationService to (re)schedule or cancel
-//  the underlying OS notification — that hook is marked below and wired once
+//  the underlying OS notification - that hook is marked below and wired once
 //  flutter_local_notifications is installed.
 // =============================================================================
 
@@ -66,22 +66,22 @@ class ReminderStore extends ChangeNotifier {
         ..addAll(byId.values);
       await _persist();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
-  // Fire-and-forget cloud writes (like _persist) — best-effort.
+  // Fire-and-forget cloud writes (like _persist) - best-effort.
   Future<void> _cloudPush(Reminder r) async {
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       await SupabaseRepo.upsert('reminders', _toRow(r), onConflict: 'id');
-    } catch (_) {/* offline — syncs up on next init */}
+    } catch (_) {/* offline - syncs up on next init */}
   }
 
   Future<void> _cloudDelete(String id) async {
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       await SupabaseRepo.delete('reminders', id);
-    } catch (_) {/* offline — best-effort */}
+    } catch (_) {/* offline - best-effort */}
   }
 
   // camelCase model <-> snake_case columns. `dayOfMonth` -> `day_of_month`;
@@ -127,7 +127,7 @@ class ReminderStore extends ChangeNotifier {
   bool get isEmpty => _items.isEmpty;
 
   /// Just the medication reminders (shown on the Daily Medication card). These
-  /// are never tied to a specific medicine — they're free self-reminders.
+  /// are never tied to a specific medicine - they're free self-reminders.
   List<Reminder> get medication =>
       _items.where((r) => r.category == 'medication').toList();
 

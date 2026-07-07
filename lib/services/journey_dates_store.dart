@@ -1,5 +1,5 @@
 // =============================================================================
-//  JourneyDatesStore — per-mother ACTUAL dates for subjective journey events
+//  JourneyDatesStore - per-mother ACTUAL dates for subjective journey events
 // -----------------------------------------------------------------------------
 //  Bump, kicks, scans, birth etc. happen on different dates for everyone
 //  (premature / postmature deliveries, scans scheduled at varying dates, …), so
@@ -7,7 +7,7 @@
 //  WHEN a milestone actually happened; the override is shown on the map trail +
 //  in the milestone card.
 //
-//  NOTE: for now only the displayed DATE changes — the node keeps its default
+//  NOTE: for now only the displayed DATE changes - the node keeps its default
 //  POSITION on the trail (re-anchoring the trail to edited dates can come later).
 // =============================================================================
 

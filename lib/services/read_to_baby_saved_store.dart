@@ -1,8 +1,8 @@
 // =============================================================================
-//  ReadToBabySavedStore — read-to-baby pieces the mother has bookmarked
+//  ReadToBabySavedStore - read-to-baby pieces the mother has bookmarked
 // -----------------------------------------------------------------------------
 //  The day's read-to-baby piece is ephemeral, so saving keeps a copy (title,
-//  body, source tag) with a timestamp — surfaced newest-first in the Saved hub.
+//  body, source tag) with a timestamp - surfaced newest-first in the Saved hub.
 // =============================================================================
 
 import 'dart:convert';

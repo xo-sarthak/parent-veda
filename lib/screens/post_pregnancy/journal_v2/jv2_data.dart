@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Journal V2 — data models + realistic sample content
+//  My Journal V2 - data models + realistic sample content
 // -----------------------------------------------------------------------------
 //  Meaningful, hand-written sample content (no Lorem Ipsum), per the spec.
 //  Scenario: Priya keeping the story of her son Aarav (born Jan 2023).
@@ -83,7 +83,7 @@ const List<JvMemory> jvMemories = [
     title: 'First Day at School',
     date: '20 June 2025',
     age: '2 years 3 months',
-    body: 'You were so brave walking in on your own — no tears, just a little wave goodbye and a grin over your shoulder.',
+    body: 'You were so brave walking in on your own - no tears, just a little wave goodbye and a grin over your shoulder.',
     kind: JvKind.guided,
     seed: 2,
   ),
@@ -117,7 +117,7 @@ const List<JvMemory> jvMemories = [
 
 // ---- letters ----------------------------------------------------------------
 const String jvLetterBody =
-    'Dear Aarav,\n\nOne day, when you read this letter, I hope you know how much love and joy you bring to our lives — every single day.\n\nThe way you laugh, the way you reach for us in the morning, the way you see wonder in the smallest things — it changes everything.\n\nWhatever you grow up to be, know that you were loved from the very first moment.\n\nLove,\nMom';
+    'Dear Aarav,\n\nOne day, when you read this letter, I hope you know how much love and joy you bring to our lives - every single day.\n\nThe way you laugh, the way you reach for us in the morning, the way you see wonder in the smallest things - it changes everything.\n\nWhatever you grow up to be, know that you were loved from the very first moment.\n\nLove,\nMom';
 
 const List<JvMemory> jvLetters = [
   JvMemory(

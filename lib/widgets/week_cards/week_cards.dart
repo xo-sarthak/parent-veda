@@ -5,7 +5,7 @@
 //    1 Size Reveal      2 Baby's Update   3 Mom's Journey   4 Nourishment
 //    5 Action Plan      6 Bonding Ritual  7 Reflect & Remember
 //    8 Share Your Journey  ← always the LAST card
-//  (Week 40 appends a celebration finale — see celebration_card.dart.)
+//  (Week 40 appends a celebration finale - see celebration_card.dart.)
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -35,11 +35,11 @@ import 'week_overview_card.dart';
 /// Ordered card list for a week. Reflect & Remember is second-last, Share Your
 /// Journey is always last.
 List<Widget> buildWeekCards(WeekContent w, AppLanguage lang) {
-  // ── Week 20 — "ParentVeda Journey" design PREVIEW ────────────────────────
+  // ── Week 20 - "ParentVeda Journey" design PREVIEW ────────────────────────
   // An elevated, de-cluttered overview card (progress-ring hero + Baby / Mother
   // / Health accordions) folds the Size, Baby Update and Mom's Journey cards
   // into one. The horizontal carousel stays; each card just reads cleaner.
-  // The original cards are NOT removed — every other week keeps them; once this
+  // The original cards are NOT removed - every other week keeps them; once this
   // look is approved, roll it out to more weeks.
   if (w.week == 20) {
     return [
@@ -51,7 +51,7 @@ List<Widget> buildWeekCards(WeekContent w, AppLanguage lang) {
         WeekTipsCard(w: w, lang: lang),
       WeekActionCard(w: w, lang: lang),
       // Weekly Garbh Sanskar (Bonding) + Journaling (Reflect) removed from the
-      // weekly stack per Excel — both are daily-only. Kept for revert:
+      // weekly stack per Excel - both are daily-only. Kept for revert:
       // BondingRitualCard(w: w, lang: lang),
       // ReflectRememberCard(w: w, lang: lang),
       WeekShareCard(w: w, lang: lang),
@@ -66,7 +66,7 @@ List<Widget> buildWeekCards(WeekContent w, AppLanguage lang) {
     NourishmentCard(w: w, lang: lang),
     ActionPlanCard(w: w, lang: lang),
     // Weekly Garbh Sanskar (Bonding) + Journaling (Reflect) removed from the
-    // weekly stack per Excel — both are daily-only. Kept for revert:
+    // weekly stack per Excel - both are daily-only. Kept for revert:
     // BondingRitualCard(w: w, lang: lang),
     // ReflectRememberCard(w: w, lang: lang),
     ShareJourneyCard(w: w, lang: lang),
@@ -225,8 +225,8 @@ class SizeRevealCard extends StatelessWidget {
           Center(child: SoftPill(label: snap.milestone.of(lang), color: AppTheme.primary500, icon: Icons.flag_rounded)),
           const SizedBox(height: 16),
           // Warm-Nest "Your Week" image hero: a soft striped frame holding the
-          // week's figure — the food emoji, or the real in-womb baby image via
-          // the Fruit/Baby toggle — with a "baby · week N" tag and Size /
+          // week's figure - the food emoji, or the real in-womb baby image via
+          // the Fruit/Baby toggle - with a "baby · week N" tag and Size /
           // Length·Weight corner tags.
           _SizeHero(
             week: w.week,
@@ -254,7 +254,7 @@ class SizeRevealCard extends StatelessWidget {
   }
 }
 
-/// A single horizontal segmented pill — two equal halves ("Fruit" / "Baby").
+/// A single horizontal segmented pill - two equal halves ("Fruit" / "Baby").
 /// Each half fills its side completely and centres its icon + label both
 /// horizontally and vertically; the selected half gets a soft coral fill.
 class _FruitBabyToggle extends StatelessWidget {
@@ -351,14 +351,14 @@ class _FruitBabyToggle extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Size hero — striped "image" frame (Warm-Nest "Your Week" design)
+//  Size hero - striped "image" frame (Warm-Nest "Your Week" design)
 // ---------------------------------------------------------------------------
 
 /// The redesigned Size centrepiece: a soft diagonally-striped "image" frame.
 /// The figure crossfades between the week's food emoji and the real in-womb
 /// baby image (assets/baby/week_NN.jpg) via the Fruit/Baby toggle below. A
 /// "baby · week N" tag sits top-centre; Size (food) bottom-left; Length &
-/// Weight bottom-right — matching the Claude-Design weekly screen.
+/// Weight bottom-right - matching the Claude-Design weekly screen.
 class _SizeHero extends StatelessWidget {
   const _SizeHero({
     required this.week,
@@ -571,7 +571,7 @@ class _BabyHeroImage extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Weekly Video — first carousel slot after the Size hero
+//  Weekly Video - first carousel slot after the Size hero
 // ---------------------------------------------------------------------------
 
 /// The recommended Watch & Learn video for [week] (the nearest one if the week
@@ -841,7 +841,7 @@ class _RedFlag extends StatelessWidget {
   }
 }
 
-/// Mother's Body Changes — week-by-week biological sections (shown inside the
+/// Mother's Body Changes - week-by-week biological sections (shown inside the
 /// Mom's Journey card when this week has authored content in kBodyChanges).
 class _BodyChangesBlock extends StatelessWidget {
   const _BodyChangesBlock(
@@ -893,7 +893,7 @@ class _BodyChangesBlock extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Trimester Tips — 2-3 gentle tips for the week (kTrimesterTips)
+//  Trimester Tips - 2-3 gentle tips for the week (kTrimesterTips)
 // ---------------------------------------------------------------------------
 class TrimesterTipsCard extends StatelessWidget {
   const TrimesterTipsCard({super.key, required this.w, required this.lang});
@@ -1042,7 +1042,7 @@ class ActionPlanCard extends StatelessWidget {
       icon: Icons.checklist_rounded,
       accent: AppTheme.primary500,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // "What to do this week" removed per Deepti ruling — keep only "what to
+        // "What to do this week" removed per Deepti ruling - keep only "what to
         // skip" + the myth buster. Kept for revert:
         // _Block(label: s.doThisWeek, body: a.doThisWeek.of(lang), color: const Color(0xFF3FA37A), icon: Icons.check_circle_rounded),
         _Block(label: s.skipThisWeek, body: a.skipThisWeek.of(lang), color: AppTheme.secondary500, icon: Icons.do_not_disturb_on_rounded),
@@ -1191,7 +1191,7 @@ class _WeeklyJournalCta extends StatelessWidget {
           source: 'reflect_remember',
           prompt: s.howWasYourWeek,
           // Open this week's existing entry (if any) so saving updates it rather
-          // than creating a duplicate — each week holds a single entry now.
+          // than creating a duplicate - each week holds a single entry now.
           existing: MemoryStore.instance.journalForWeek(week),
         ),
       )),

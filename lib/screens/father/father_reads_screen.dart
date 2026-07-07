@@ -1,5 +1,5 @@
 // =============================================================================
-//  FatherReadsScreen — the father's "Reads" tab (Slate)
+//  FatherReadsScreen - the father's "Reads" tab (Slate)
 // -----------------------------------------------------------------------------
 //  A tab in the unified father shell (mirrors the mother's nav structure, in the
 //  father palette/fonts). Lists the father read articles (kFatherReadItems) with
@@ -40,7 +40,7 @@ class FatherReadsScreen extends StatelessWidget {
             Text('Short reads about her, the baby, and how to show up.',
                 style: _body(13, c: kFMuted)),
             const SizedBox(height: 16),
-            // Tales entry — the Stories, Fables & Mythology collection.
+            // Tales entry - the Stories, Fables & Mythology collection.
             _talesCard(context),
             const SizedBox(height: 18),
             Text('ARTICLES', style: _eyebrow(kFAccent)),

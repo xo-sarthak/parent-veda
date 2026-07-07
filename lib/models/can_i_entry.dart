@@ -1,10 +1,10 @@
 // =============================================================================
-//  Can I?™  — entry model
+//  Can I?™  - entry model
 // -----------------------------------------------------------------------------
 //  A fast, calm lookup: one question → one trustworthy verdict. NOT a blog, a
 //  forum, or AI reasoning. Each entry follows the same fixed answer structure:
 //  verdict → short answer → why → (trimester notes) → (Indian context) →
-//  related questions. Educational general guidance, never a diagnosis — every
+//  related questions. Educational general guidance, never a diagnosis - every
 //  answer ends with a gentle "Ask Veda" handoff for anything beyond the lookup.
 //
 //  English-first: content uses LocalizedText so Hindi can be filled in later
@@ -50,12 +50,12 @@ class CanIEntry {
   /// 3–5 lines, no jargon, no scare tactics.
   final LocalizedText why;
 
-  /// Trimester notes — shown only if present (any one may be null).
+  /// Trimester notes - shown only if present (any one may be null).
   final LocalizedText? t1;
   final LocalizedText? t2;
   final LocalizedText? t3;
 
-  /// The ParentVeda differentiator — local foods/habits framing. Optional.
+  /// The ParentVeda differentiator - local foods/habits framing. Optional.
   final LocalizedText? indian;
 
   /// Related entry ids (the spec wants at least 3 where possible).

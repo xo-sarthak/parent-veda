@@ -1,5 +1,5 @@
 // =============================================================================
-//  PhotoViewerScreen — full-screen memory photo with a week badge + date.
+//  PhotoViewerScreen - full-screen memory photo with a week badge + date.
 // =============================================================================
 
 import 'package:flutter/material.dart';

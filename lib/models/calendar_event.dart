@@ -1,5 +1,5 @@
 // =============================================================================
-//  CalendarEvent — the unit of "My Calendar" (the pregnancy command center)
+//  CalendarEvent - the unit of "My Calendar" (the pregnancy command center)
 // -----------------------------------------------------------------------------
 //  A single event on the calendar / journey timeline / upcoming list. Most are
 //  SYSTEM-generated (milestones, medical, ParentVeda unlocks, journal/health
@@ -12,12 +12,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 enum CalEventCategory {
-  milestone, // purple — pregnancy/system milestones
-  medical, // blue — scans, tests, vaccinations
-  appointment, // green — doctor appointments
-  journal, // pink — memories, photos, weight, kicks
-  personal, // grey — mother-added events
-  parentveda, // gold — feature unlocks, "days together"
+  milestone, // purple - pregnancy/system milestones
+  medical, // blue - scans, tests, vaccinations
+  appointment, // green - doctor appointments
+  journal, // pink - memories, photos, weight, kicks
+  personal, // grey - mother-added events
+  parentveda, // gold - feature unlocks, "days together"
 }
 
 enum CalEventStatus { completed, current, upcoming }

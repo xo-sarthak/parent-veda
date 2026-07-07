@@ -1,5 +1,5 @@
 // =============================================================================
-//  GrowthActivityScreen — Growth · activity detail (parenting app · S8)
+//  GrowthActivityScreen - Growth · activity detail (parenting app · S8)
 // -----------------------------------------------------------------------------
 //  A play, fully explained: why it works → how to play (numbered) → mark-done →
 //  optional extensions → go-deeper. Faithful build of Claude Design S8.
@@ -42,16 +42,16 @@ const GrowthActivity kActPeekaboo = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Peekaboo, slow and silly',
   why:
-      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches Aarav that you still exist when you vanish — the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
+      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches Aarav that you still exist when you vanish - the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
   steps: [
     'Cover your face with your hands, or a light muslin cloth.',
-    'Pause a beat — let him wonder where you went.',
+    'Pause a beat - let him wonder where you went.',
     'Reappear with a bright "peekaboo!" and a big smile.',
     "Repeat while he's delighted; stop before he tires.",
   ],
-  extendNote: 'Optional — the game needs nothing but you.',
+  extendNote: 'Optional - the game needs nothing but you.',
   products: [
-    ('Peekaboo Cloth Book', 'Flaps that hide and reveal — object permanence you can hold.', '₹399', 'clothbook'),
+    ('Peekaboo Cloth Book', 'Flaps that hide and reveal - object permanence you can hold.', '₹399', 'clothbook'),
     ('Crinkle Sensory Set', 'Crinkly textures to hide and find during play.', '₹499', 'crinkle'),
   ],
   deeper: [
@@ -65,14 +65,14 @@ const GrowthActivity kActReachRing = GrowthActivity(
   eyebrow: 'Grow · 4 min',
   title: 'Reach for the ring',
   why:
-      "At four months, reaching becomes intentional — hand and eye start working as a team. Holding a light ring just within reach invites Aarav to plan a movement, stretch and grasp: the groundwork for every skill that needs two coordinated hands.",
+      "At four months, reaching becomes intentional - hand and eye start working as a team. Holding a light ring just within reach invites Aarav to plan a movement, stretch and grasp: the groundwork for every skill that needs two coordinated hands.",
   steps: [
     'Sit him propped, or lay him on his back, well supported.',
     'Hold a light ring or rattle a hand-span above his chest.',
-    'Wait — let him track it, then aim and swipe. Cheer the try, not just the catch.',
+    'Wait - let him track it, then aim and swipe. Cheer the try, not just the catch.',
     'Move it slowly side to side so he reaches across his midline.',
   ],
-  extendNote: 'Optional — your hands and any light toy are enough.',
+  extendNote: 'Optional - your hands and any light toy are enough.',
   products: [
     ('Crinkle Sensory Set', 'Light, grabbable textures that reward a reach.', '₹499', 'crinkle'),
     ('High-Contrast Play Gym', 'Dangling toys at the perfect height to reach for.', '₹1,999', 'playgym'),
@@ -88,14 +88,14 @@ const GrowthActivity kActNewSound = GrowthActivity(
   eyebrow: 'Grow · 3 min',
   title: 'Introduce a new sound',
   why:
-      "Aarav is mapping the world by ear now. A gentle new sound — a shaker, a spoon on a cup, your humming — makes him still, search and connect what he hears to where it comes from. That listening-and-locating is the very root of language and attention.",
+      "Aarav is mapping the world by ear now. A gentle new sound - a shaker, a spoon on a cup, your humming - makes him still, search and connect what he hears to where it comes from. That listening-and-locating is the very root of language and attention.",
   steps: [
-    'Choose one soft, clear sound — a rattle, a spoon on a cup, a hum.',
+    'Choose one soft, clear sound - a rattle, a spoon on a cup, a hum.',
     'Out of his sight, make the sound to one side and pause.',
-    'Watch him still, then turn toward it — narrate: "You heard that!"',
+    'Watch him still, then turn toward it - narrate: "You heard that!"',
     'Try the other side, and let him reach for the source.',
   ],
-  extendNote: 'Optional — everyday household sounds work beautifully.',
+  extendNote: 'Optional - everyday household sounds work beautifully.',
   products: [
     ('Crinkle Sensory Set', 'Gentle crinkle sounds to find and turn toward.', '₹499', 'crinkle'),
     ('Peekaboo Cloth Book', 'Soft, crinkly pages that make a findable sound.', '₹399', 'clothbook'),
@@ -111,14 +111,14 @@ const GrowthActivity kActTummyTime = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Tummy time, made joyful',
   why:
-      "Every minute on his front strengthens the neck, shoulders and core that rolling, sitting and crawling will need. Many babies protest at four months — so we make it short, social and rewarding, with your face as the prize.",
+      "Every minute on his front strengthens the neck, shoulders and core that rolling, sitting and crawling will need. Many babies protest at four months - so we make it short, social and rewarding, with your face as the prize.",
   steps: [
     'Lay him on a firm, flat surface on his tummy.',
     'Get down to his level, face to face, and talk.',
     'Add a mirror or toy just ahead to tempt a reach.',
-    'Keep it short and frequent — stop before the fuss builds.',
+    'Keep it short and frequent - stop before the fuss builds.',
   ],
-  extendNote: 'Optional — a mirror or toy simply adds delight.',
+  extendNote: 'Optional - a mirror or toy simply adds delight.',
   products: [
     ('High-Contrast Play Gym', 'A mirror and toys to lift up and reach for.', '₹1,999', 'playgym'),
     ('Peekaboo Cloth Book', 'Props up an inch of interest during tummy time.', '₹399', 'clothbook'),
@@ -134,14 +134,14 @@ const GrowthActivity kActNarrate = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Narrate your day',
   why:
-      "Long before his first word, Aarav is building the ear for language. When you narrate — 'now we pour the water' — and pause as if for his reply, you hand him the rhythm of conversation and thousands of words a day to soak in.",
+      "Long before his first word, Aarav is building the ear for language. When you narrate - 'now we pour the water' - and pause as if for his reply, you hand him the rhythm of conversation and thousands of words a day to soak in.",
   steps: [
-    'Pick an everyday moment — a nappy change, cooking, a walk.',
+    'Pick an everyday moment - a nappy change, cooking, a walk.',
     'Say what you are doing, simply and warmly.',
     'Pause, as if waiting for his answer.',
-    'When he coos back, respond — that is his first conversation.',
+    'When he coos back, respond - that is his first conversation.',
   ],
-  extendNote: 'Optional — your voice is the only tool you need.',
+  extendNote: 'Optional - your voice is the only tool you need.',
   products: [
     ('Peekaboo Cloth Book', 'First words and pictures to read aloud together.', '₹399', 'clothbook'),
     ('Crinkle Sensory Set', 'Textures to name as you narrate play.', '₹499', 'crinkle'),

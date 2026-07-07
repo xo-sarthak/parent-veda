@@ -1,8 +1,8 @@
 // =============================================================================
-//  WatchHomeScreen — ParentVeda Watch home ("what should I watch today?")
+//  WatchHomeScreen - ParentVeda Watch home ("what should I watch today?")
 // -----------------------------------------------------------------------------
 //  The daily habit. One carefully-chosen Today's Video, Continue Watching,
-//  personalised picks, category feeds and expert collections — all learning-first
+//  personalised picks, category feeds and expert collections - all learning-first
 //  (topic · age · expert · duration, never likes/views). A Quick Learn / Deep
 //  Learn toggle switches the hero + picks between 30–90s clips and 5–30 min
 //  sessions, sharing the same catalog, progress and collections. Reached from the
@@ -56,7 +56,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(height: 8),
                 _pad(Text('Learn something today', style: ppFraunces(30, h: 1.1))),
                 const SizedBox(height: 6),
-                _pad(Text('Five minutes here should make you a better parent today — not just pass the time.',
+                _pad(Text('Five minutes here should make you a better parent today - not just pass the time.',
                     style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 18),
@@ -77,7 +77,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(height: 30),
                 _pad(watchSectionHeader(_quick ? 'Quick lessons for you' : 'Chosen for you')),
                 const SizedBox(height: 4),
-                _pad(Text('Picked for his age and where he is right now — never random.', style: ppBody(12.5, color: ppMuted))),
+                _pad(Text('Picked for his age and where he is right now - never random.', style: ppBody(12.5, color: ppMuted))),
                 const SizedBox(height: 16),
                 _pad(Column(children: [
                   for (final v in picks.take(5)) WatchListCard(video: v, onTap: () => _open(v), progress: store.progressOf(v.id) > 0.02 && store.progressOf(v.id) < 0.98 ? store.progressOf(v.id) : null),
@@ -91,7 +91,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(height: 30),
                 _pad(watchSectionHeader('Expert collections')),
                 const SizedBox(height: 4),
-                _pad(Text('Short, finishable learning paths — not endless playlists.', style: ppBody(12.5, color: ppMuted))),
+                _pad(Text('Short, finishable learning paths - not endless playlists.', style: ppBody(12.5, color: ppMuted))),
                 const SizedBox(height: 16),
                 _collectionsRail(),
 

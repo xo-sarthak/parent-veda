@@ -1,5 +1,5 @@
 // =============================================================================
-//  RecipesScreen — Recipes (parenting · S15 v2, under "Explore")
+//  RecipesScreen - Recipes (parenting · S15 v2, under "Explore")
 // -----------------------------------------------------------------------------
 //  Indian food for Indian kids: a Sick-mode doorway, a "Recommended" carousel,
 //  a "Healthier version" default, veg/non-veg + category filters, and a recipe
@@ -71,7 +71,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               ),
             ])),
             const SizedBox(height: 12),
-            _pad(Text('Every recipe age-tagged, with the nutrition context you actually need — and a healthier twist built in.',
+            _pad(Text('Every recipe age-tagged, with the nutrition context you actually need - and a healthier twist built in.',
                 style: ppBody(15))),
 
             // veg / non-veg
@@ -141,7 +141,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               _pad(Container(
                 padding: const EdgeInsets.symmetric(vertical: 28),
                 alignment: Alignment.center,
-                child: Text('No ${_veg ? 'veg' : 'non-veg'} recipes here yet — try another category.',
+                child: Text('No ${_veg ? 'veg' : 'non-veg'} recipes here yet - try another category.',
                     textAlign: TextAlign.center, style: ppBody(13, color: ppMuted)),
               ))
             else
@@ -151,7 +151,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               ])),
 
             const SizedBox(height: 22),
-            _pad(Text("Every recipe is age-tagged, with nutrition, frequency and cautions — in ParentVeda's voice.",
+            _pad(Text("Every recipe is age-tagged, with nutrition, frequency and cautions - in ParentVeda's voice.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

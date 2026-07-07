@@ -1,11 +1,13 @@
 // =============================================================================
-//  NameJourneyFeedScreen — V2 taste quiz + couple swipe + match celebration
+//  NameJourneyFeedScreen - V2 taste quiz + primer + couple swipe + celebration
 // -----------------------------------------------------------------------------
-//  The heart of the Baby Naming Journey. A 30-second tap-only taste quiz (weights
-//  gently, never blocks) leads into the couple swipe feed: beautiful name cards,
-//  Love/Pass with real drag physics (reused from the V1 deck), tap for the Deep
-//  Dive. Only shared matches surface; a match raises a gentle celebration
-//  ("You both loved Aarav" + meaning) — no confetti, no badges, no gamification.
+//  Discoverability-first (not a redesign): a 30-sec tap-only taste quiz, then a
+//  one-screen PRIMER that sets the mental model ("Discover names one by one"),
+//  then the couple swipe feed. The feed never assumes parents know to swipe:
+//  a gentle card nudge, an always-visible instruction, and large LABELLED
+//  Like/Skip buttons make tapping an equal path. Light progressive + personalized
+//  feedback reassures parents that ParentVeda is adapting. A "Just show me names"
+//  option opens a no-swipe browsable list. Match celebration is gentle.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -15,11 +17,14 @@ import 'package:flutter/services.dart';
 
 import 'name_journey_detail_screen.dart';
 import 'name_journey_shortlist_screen.dart';
+import 'name_list_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
 
 const Color _feelBg = Color(0xFFEDE6F5);
+
+enum _Phase { quiz, primer, swipe }
 
 class NameJourneyFeedScreen extends StatefulWidget {
   const NameJourneyFeedScreen({super.key, this.collection});
@@ -32,8 +37,7 @@ class NameJourneyFeedScreen extends StatefulWidget {
 class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with TickerProviderStateMixin {
   final NameMatchStore _store = NameMatchStore.instance;
 
-  // phase: the quick taste quiz, then the swipe feed.
-  bool _quizDone = false;
+  _Phase _phase = _Phase.quiz;
   int _who = 0;
   int _feel = 0;
 
@@ -46,12 +50,14 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
 
   // swipe state
   int _index = 0;
+  int _interactions = 0; // likes + passes, for progressive feedback
   bool _showMatch = false;
   BabyName? _matched;
 
   late final AnimationController _fb;
   String? _fbKind;
   late final AnimationController _ctrl;
+  late final AnimationController _hint; // one gentle nudge to signal draggability
   Offset _drag = Offset.zero;
   Offset _animFrom = Offset.zero;
   Offset _animTo = Offset.zero;
@@ -80,12 +86,17 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
       ..addStatusListener((s) {
         if (s == AnimationStatus.completed) _fb.reset();
       });
+    _hint = AnimationController(vsync: this, duration: const Duration(milliseconds: 950))
+      ..addListener(() {
+        if (mounted) setState(() {});
+      });
   }
 
   @override
   void dispose() {
     _ctrl.dispose();
     _fb.dispose();
+    _hint.dispose();
     super.dispose();
   }
 
@@ -97,6 +108,11 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   bool get _done => _index >= _deck.length;
   BabyName? get _current => _done ? null : _deck[_index];
 
+  void _startSwiping() {
+    setState(() => _phase = _Phase.swipe);
+    _hint.forward(from: 0); // one gentle nudge so the first card looks movable
+  }
+
   void _next() => setState(() {
         _showMatch = false;
         _matched = null;
@@ -104,13 +120,17 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
       });
 
   void _undo() => setState(() {
-        if (_index > 0) _index--;
+        if (_index > 0) {
+          _index--;
+          if (_interactions > 0) _interactions--;
+        }
       });
 
   void _commitLike() {
     final n = _current;
     if (n == null) return;
     _store.like(n.name);
+    _interactions++;
     if (n.mutual) {
       setState(() {
         _matched = n;
@@ -146,6 +166,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     _pending = kind;
     _ctrl.forward(from: 0);
     if (kind != null) {
+      if (kind == 'pass') _interactions++; // like counts in _commitLike
       _fbKind = kind;
       _fb.forward(from: 0);
       kind == 'like' ? HapticFeedback.mediumImpact() : HapticFeedback.lightImpact();
@@ -153,6 +174,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   }
 
   void _openList() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const NameJourneyShortlistScreen()));
+  void _openBrowse() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const NameListScreen()));
   void _openDetail(BabyName n) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => NameJourneyDetailScreen(name: n.name)));
 
   @override
@@ -161,10 +183,16 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: _quizDone ? _swipeView() : _quizView(),
+        child: switch (_phase) {
+          _Phase.quiz => _quizView(),
+          _Phase.primer => _primerView(),
+          _Phase.swipe => _swipeView(),
+        },
       ),
     );
   }
+
+  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   // ---- taste quiz ---------------------------------------------------------
   Widget _quizView() => ListView(
@@ -176,9 +204,9 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           const SizedBox(height: 22),
           _pad(ppEyebrow('Taste quiz · about 30 seconds', color: ppPurple)),
           const SizedBox(height: 10),
-          _pad(Text('A couple of taps, and we\'ll tune your feed', style: ppFraunces(26, h: 1.15))),
+          _pad(Text('A couple of taps, and we\'ll tune your names', style: ppFraunces(26, h: 1.15))),
           const SizedBox(height: 8),
-          _pad(Text('This only gently weights what you see first — it never hides names from you.', style: ppBody(13.5, h: 1.55))),
+          _pad(Text('This only gently weights what you see first. It never hides names from you.', style: ppBody(13.5, h: 1.55))),
 
           const SizedBox(height: 26),
           _pad(Text('Who are we naming?', style: ppJakarta(17))),
@@ -197,7 +225,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
 
           const SizedBox(height: 30),
           _pad(GestureDetector(
-            onTap: () => setState(() => _quizDone = true),
+            onTap: () => setState(() => _phase = _Phase.primer),
             behavior: HitTestBehavior.opaque,
             child: Container(
               height: 54,
@@ -208,22 +236,20 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                 boxShadow: const [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))],
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('Start swiping', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                Text('Start discovering', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 const SizedBox(width: 8),
-                const Text('→', style: TextStyle(color: Colors.white, fontSize: 16)),
+                const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
               ]),
             ),
           )),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           _pad(Center(child: GestureDetector(
-            onTap: () => setState(() => _quizDone = true),
+            onTap: _openBrowse,
             behavior: HitTestBehavior.opaque,
-            child: Text('Skip — just show me names', style: ppBody(13, color: ppMuted, w: FontWeight.w600)),
+            child: Text('Just show me names', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ))),
         ],
       );
-
-  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   Widget _whoCard(int i) {
     final on = i == _who;
@@ -263,10 +289,115 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     );
   }
 
+  // ---- primer (sets the mental model - one screen, not a tutorial) --------
+  Widget _primerView() => ListView(
+        padding: const EdgeInsets.only(top: 12, bottom: 40),
+        children: [
+          _pad(GestureDetector(
+            onTap: () => setState(() => _phase = _Phase.quiz),
+            behavior: HitTestBehavior.opaque,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.arrow_back, size: 20, color: ppSoft),
+              const SizedBox(width: 12),
+              Text('Back', style: ppBody(14, color: ppSoft)),
+            ]),
+          )),
+          const SizedBox(height: 30),
+          Center(
+            child: Container(
+              width: 132,
+              height: 132,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF1EAF8), Color(0xFFE6D8F1)]),
+                shape: BoxShape.circle,
+              ),
+              child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+                Transform.rotate(angle: -0.12, child: Container(width: 58, height: 76, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: const [BoxShadow(color: Color(0x226A30B6), blurRadius: 12, offset: Offset(0, 6))]))),
+                Transform.rotate(angle: 0.10, child: Container(width: 58, height: 76, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder), boxShadow: const [BoxShadow(color: Color(0x226A30B6), blurRadius: 14, offset: Offset(0, 8))]), child: const Icon(Icons.favorite, size: 22, color: ppCoral))),
+              ]),
+            ),
+          ),
+          const SizedBox(height: 28),
+          _pad(Text('Discover names one by one', textAlign: TextAlign.center, style: ppFraunces(28, h: 1.15))),
+          const SizedBox(height: 12),
+          _pad(Text('We\'ll show you one beautiful name at a time. Tell us how you feel about each - by tapping a button or swiping the card.', textAlign: TextAlign.center, style: ppBody(14.5, h: 1.6))),
+
+          const SizedBox(height: 24),
+          _pad(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            _sampleAction(Icons.favorite, ppPurple, Colors.white, 'Love it'),
+            const SizedBox(width: 16),
+            _sampleAction(Icons.close_rounded, Colors.white, ppMuted, 'Skip', outlined: true),
+          ])),
+          const SizedBox(height: 20),
+          _pad(Text('We\'ll learn what you love and gradually tailor every suggestion.', textAlign: TextAlign.center, style: ppBody(13, color: ppSoft, h: 1.5))),
+
+          const SizedBox(height: 30),
+          _pad(GestureDetector(
+            onTap: _startSwiping,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 54,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]),
+              child: Text('Let\'s begin', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+            ),
+          )),
+        ],
+      );
+
+  Widget _sampleAction(IconData icon, Color bg, Color fg, String label, {bool outlined = false}) => Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 60,
+          height: 60,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: bg, shape: BoxShape.circle, border: outlined ? Border.all(color: ppLine) : null, boxShadow: const [BoxShadow(color: Color(0x1A2F2C30), blurRadius: 16, spreadRadius: -10, offset: Offset(0, 6))]),
+          child: Icon(icon, size: 26, color: fg),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: ppBody(12.5, color: ppInk, w: FontWeight.w700)),
+      ]);
+
   // ---- swipe feed ---------------------------------------------------------
+  String? get _feedback {
+    if (_interactions == 0) {
+      return 'Let\'s begin with a few thoughtfully chosen names. We\'ll personalise as we learn what you like.';
+    }
+    if (_interactions < 3) return null;
+    final feel = _dominantLikedFeel();
+    if (_interactions >= 5 && feel != null) return 'Showing more $feel names.';
+    return 'We\'re learning the names you like. Suggestions will get more personal.';
+  }
+
+  String? _dominantLikedFeel() {
+    final liked = _store.liked.map(babyNameByName).toList();
+    if (liked.isEmpty) return null;
+    final counts = <String, int>{};
+    for (final n in liked) {
+      final f = n.feel.toLowerCase();
+      final key = f.contains('rooted') || f.contains('devotional')
+          ? 'rooted, traditional'
+          : f.contains('modern')
+              ? 'modern, fresh'
+              : f.contains('rare')
+                  ? 'rare Sanskrit'
+                  : null;
+      if (key != null) counts[key] = (counts[key] ?? 0) + 1;
+    }
+    if (counts.isEmpty) return null;
+    return counts.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+  }
+
+  Offset get _hintOffset {
+    if (_hint.value == 0) return Offset.zero;
+    final v = _hint.value;
+    return Offset(math.sin(v * math.pi * 2) * (1 - v) * 16, 0);
+  }
+
   Widget _swipeView() {
     final total = _deck.isEmpty ? 1 : _deck.length;
     final progress = (_index / total).clamp(0.0, 1.0);
+    final feedback = _feedback;
     return Stack(children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
@@ -299,21 +430,48 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               child: Container(decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFB79BDD), ppPurple]), borderRadius: BorderRadius.circular(999))),
             ),
           ),
-          Expanded(child: Padding(padding: const EdgeInsets.only(top: 20), child: _cardArea())),
-          const SizedBox(height: 8),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _actionButton(size: 58, bg: Colors.white, border: ppLine, icon: Icons.close_rounded, iconColor: ppMuted, iconSize: 24, onTap: _done ? null : () => _flyOff('pass')),
-            const SizedBox(width: 22),
-            _actionButton(size: 44, bg: Colors.white, border: ppLine, icon: Icons.undo_rounded, iconColor: ppPurple, iconSize: 18, onTap: _index > 0 ? _undo : null),
-            const SizedBox(width: 22),
-            _actionButton(size: 66, bg: ppPurple, border: ppPurple, icon: Icons.favorite, iconColor: Colors.white, iconSize: 28, onTap: _done ? null : () => _flyOff('like'), glow: true),
+          // gentle, reassuring feedback (empty state / progressive / personalised)
+          if (feedback != null) ...[
+            const SizedBox(height: 12),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Container(
+                key: ValueKey(feedback),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
+                child: Row(children: [
+                  const Icon(Icons.auto_awesome, size: 14, color: ppPurple),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(feedback, style: ppBody(12, color: ppInk, h: 1.4))),
+                ]),
+              ),
+            ),
+          ],
+          Expanded(child: Padding(padding: const EdgeInsets.only(top: 16), child: _cardArea())),
+          if (!_done) ...[
+            const SizedBox(height: 4),
+            Text('Swipe the card, or use the buttons below', style: ppBody(11.5, color: ppMuted)),
+          ],
+          const SizedBox(height: 10),
+          Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _labelled('Not for us', _actionButton(size: 58, bg: Colors.white, border: ppLine, icon: Icons.close_rounded, iconColor: ppMuted, iconSize: 24, onTap: _done ? null : () => _flyOff('pass'), semantic: 'Not for us')),
+            const SizedBox(width: 20),
+            _labelled('Undo', _actionButton(size: 44, bg: Colors.white, border: ppLine, icon: Icons.undo_rounded, iconColor: ppPurple, iconSize: 18, onTap: _index > 0 ? _undo : null, semantic: 'Undo the last name')),
+            const SizedBox(width: 20),
+            _labelled('We like this', _actionButton(size: 66, bg: ppPurple, border: ppPurple, icon: Icons.favorite, iconColor: Colors.white, iconSize: 28, onTap: _done ? null : () => _flyOff('like'), glow: true, semantic: 'We like this')),
           ]),
         ]),
       ),
-      _feedback(),
+      _feedbackOverlay(),
       if (_showMatch && _matched != null) _matchOverlay(_matched!),
     ]);
   }
+
+  Widget _labelled(String label, Widget button) => Column(mainAxisSize: MainAxisSize.min, children: [
+        button,
+        const SizedBox(height: 7),
+        Text(label, style: ppBody(11, color: ppSoft, w: FontWeight.w600)),
+      ]);
 
   Widget _cardArea() {
     if (_done) return _endCard();
@@ -333,9 +491,9 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
           child: Transform.translate(
-            offset: _drag,
+            offset: _drag + _hintOffset,
             child: Transform.rotate(
-              angle: _drag.dx / w * 0.3,
+              angle: (_drag.dx + _hintOffset.dx) / w * 0.3,
               child: Stack(children: [
                 _nameCard(n),
                 Positioned(top: 64, left: 24, child: _stamp('Loved', ppCoral, (_drag.dx / _threshold).clamp(0.0, 1.0), -0.22)),
@@ -383,7 +541,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                 Text(n.pron, style: ppBody(13)),
               ]),
               const SizedBox(height: 18),
-              Text('“${n.meaningShort}”', textAlign: TextAlign.center, style: ppBody(15, h: 1.5)),
+              Text('"${n.meaningShort}"', textAlign: TextAlign.center, style: ppBody(15, h: 1.5)),
             ]),
           ),
           Text('Tap for the full story', style: ppBody(12, color: ppMuted)),
@@ -399,7 +557,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           const SizedBox(height: 14),
           Text("That's every name for now", textAlign: TextAlign.center, style: ppFraunces(24, h: 1.15)),
           const SizedBox(height: 8),
-          Text('${_store.matchedCount} names are waiting in the ones you both love.', textAlign: TextAlign.center, style: ppBody(14)),
+          Text('${_store.matchedCount} names are waiting in the ones you both love. Skipped names are never gone; find them anytime in Browse.', textAlign: TextAlign.center, style: ppBody(14, h: 1.5)),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: _openList,
@@ -410,6 +568,12 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               child: Text('See our shortlist', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
             ),
           ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: _openBrowse,
+            behavior: HitTestBehavior.opaque,
+            child: Text('Browse all names', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+          ),
         ]),
       );
 
@@ -419,24 +583,28 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(10.5, color: fg, w: FontWeight.w700)),
       );
 
-  Widget _actionButton({required double size, required Color bg, required Color border, required IconData icon, required Color iconColor, required double iconSize, required VoidCallback? onTap, bool glow = false}) => Opacity(
+  Widget _actionButton({required double size, required Color bg, required Color border, required IconData icon, required Color iconColor, required double iconSize, required VoidCallback? onTap, bool glow = false, String? semantic}) => Opacity(
         opacity: onTap == null ? 0.4 : 1,
-        child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: size,
-            height: size,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: bg,
-              shape: BoxShape.circle,
-              border: Border.all(color: border),
-              boxShadow: glow
-                  ? const [BoxShadow(color: Color(0x996A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]
-                  : const [BoxShadow(color: Color(0x1A2F2C30), blurRadius: 20, spreadRadius: -12, offset: Offset(0, 8))],
+        child: Semantics(
+          button: true,
+          label: semantic,
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: size,
+              height: size,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: bg,
+                shape: BoxShape.circle,
+                border: Border.all(color: border),
+                boxShadow: glow
+                    ? const [BoxShadow(color: Color(0x996A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]
+                    : const [BoxShadow(color: Color(0x1A2F2C30), blurRadius: 20, spreadRadius: -12, offset: Offset(0, 8))],
+              ),
+              child: Icon(icon, size: iconSize, color: iconColor),
             ),
-            child: Icon(icon, size: iconSize, color: iconColor),
           ),
         ),
       );
@@ -452,7 +620,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     (0.58, 24.0, 0.09),
   ];
 
-  Widget _feedback() => IgnorePointer(
+  Widget _feedbackOverlay() => IgnorePointer(
         child: AnimatedBuilder(
           animation: _fb,
           builder: (context, _) {
@@ -505,12 +673,12 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                   const SizedBox(height: 4),
                   Text(n.name, textAlign: TextAlign.center, style: ppFraunces(34, h: 1.02)),
                   const SizedBox(height: 8),
-                  Text('“${n.meaningShort}”', textAlign: TextAlign.center, style: ppBody(14, h: 1.55)),
+                  Text('"${n.meaningShort}"', textAlign: TextAlign.center, style: ppBody(14, h: 1.55)),
                   const SizedBox(height: 22),
                   Row(children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => _openDetail(n), // overlay stays behind the pushed detail
+                        onTap: () => _openDetail(n),
                         behavior: HitTestBehavior.opaque,
                         child: Container(height: 46, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)), child: Text('Read its story', style: ppBody(14, color: ppPurple, w: FontWeight.w700))),
                       ),
@@ -520,7 +688,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                       child: GestureDetector(
                         onTap: _next,
                         behavior: HitTestBehavior.opaque,
-                        child: Container(height: 46, alignment: Alignment.center, decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)), child: Text('Keep swiping', style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
+                        child: Container(height: 46, alignment: Alignment.center, decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)), child: Text('Keep going', style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
                       ),
                     ),
                   ]),

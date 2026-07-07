@@ -17,8 +17,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/app_theme.dart';
 
-const Color _activeColor = Color(0xFFE8833A); // orange — active contraction
-const Color _restColor = Color(0xFF3B82C4); // blue — rest interval
+const Color _activeColor = Color(0xFFE8833A); // orange - active contraction
+const Color _restColor = Color(0xFF3B82C4); // blue - rest interval
 
 enum _Phase { home, active, rest }
 
@@ -396,7 +396,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         const SizedBox(height: 6),
         Text(s.assessSummary(key),
             style: text.bodyMedium?.copyWith(color: AppTheme.neutral800)),
-        // ALWAYS point to the doctor — even on a calm "no pattern" reading, since
+        // ALWAYS point to the doctor - even on a calm "no pattern" reading, since
         // timing can't rule labour in or out. (Emergency/preterm already carry
         // their own urgent contact message, so skip the softer line there.)
         if (!urgent) ...[
@@ -415,7 +415,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     );
   }
 
-  /// "Understanding contractions" — what they are, true vs false (Braxton
+  /// "Understanding contractions" - what they are, true vs false (Braxton
   /// Hicks), and how to time one. Helps a first-time user know what this is.
   Widget _aboutCard(S s, TextTheme text) => Container(
         padding: const EdgeInsets.all(16),
@@ -436,7 +436,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         ]),
       );
 
-  /// The "this is a timer, not a diagnosis / not a medical app" disclaimer —
+  /// The "this is a timer, not a diagnosis / not a medical app" disclaimer -
   /// kept clearly visible so the tool never reads as medical advice.
   Widget _disclaimerCard(S s, TextTheme text) => Container(
         padding: const EdgeInsets.all(16),
@@ -465,7 +465,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         ]),
       );
 
-  /// The Layer-2 symptom "safety check" entry — shows current state + Update.
+  /// The Layer-2 symptom "safety check" entry - shows current state + Update.
   Widget _safetyCard(S s) {
     final text = Theme.of(context).textTheme;
     final reported = _symptoms.anyReported;
@@ -593,7 +593,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                 color: yes ? _activeColor : _restColor)),
       );
 
-  /// The contractions logged so far this session, newest first — so the record
+  /// The contractions logged so far this session, newest first - so the record
   /// grows in front of the mother without opening the summary or history.
   Widget _sessionList(S s, TextTheme text) {
     if (_current.isEmpty) return const SizedBox.shrink();
@@ -643,7 +643,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
             child: Text(s.minSecLabel(c.durationSeconds), style: text.bodyMedium)),
         Expanded(
             child: Text(
-                c.intervalSeconds == 0 ? '—' : s.minSecLabel(c.intervalSeconds),
+                c.intervalSeconds == 0 ? '-' : s.minSecLabel(c.intervalSeconds),
                 style: text.bodyMedium)),
       ]),
     );
@@ -698,9 +698,9 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  Two-layer assessment engine (NOT a diagnosis — see the product spec)
-//   Layer 1 — classify the pattern from the contraction data alone.
-//   Layer 2 — a medical-symptom override that takes priority over Layer 1.
+//  Two-layer assessment engine (NOT a diagnosis - see the product spec)
+//   Layer 1 - classify the pattern from the contraction data alone.
+//   Layer 2 - a medical-symptom override that takes priority over Layer 1.
 // ---------------------------------------------------------------------------
 
 enum LaborState { insufficient, noPattern, earlyLabor, laborLikely, activeLabor }
@@ -757,7 +757,7 @@ class ContractionSymptoms {
 
 double _mean(Iterable<num> xs) {
   if (xs.isEmpty) return 0;
-  // Sum with a loop (not reduce) — reduce on a List<int> would reject the
+  // Sum with a loop (not reduce) - reduce on a List<int> would reject the
   // widened num closure at runtime ("(num,num)=>num is not (int,int)=>int").
   num sum = 0;
   for (final x in xs) {
@@ -797,7 +797,7 @@ int _trackingSeconds(List<Contraction> cs) {
   return end.difference(start).inSeconds;
 }
 
-/// Layer 1 — classify the pattern from the contractions alone.
+/// Layer 1 - classify the pattern from the contractions alone.
 LaborState classifyContractions(List<Contraction> cs) {
   final n = cs.length;
   if (n < 3) return LaborState.insufficient;
@@ -811,18 +811,18 @@ LaborState classifyContractions(List<Contraction> cs) {
   final reg = _regularity(ints);
   final tracking = _trackingSeconds(cs);
 
-  // State 4 — Active labour likely.
+  // State 4 - Active labour likely.
   if (avgIntSec <= 300 &&
       avgDur >= 60 &&
       reg >= 0.80 &&
       (tracking >= 3600 || n >= 8)) {
     return LaborState.activeLabor;
   }
-  // State 3 — Labour pattern likely.
+  // State 3 - Labour pattern likely.
   if (n >= 5 && avgDur > 30 && avgIntSec <= 600 && reg >= 0.70) {
     return LaborState.laborLikely;
   }
-  // State 2 — Possible early labour.
+  // State 2 - Possible early labour.
   if (n >= 5 &&
       avgDur >= 20 &&
       avgDur <= 45 &&
@@ -832,7 +832,7 @@ LaborState classifyContractions(List<Contraction> cs) {
       (_intervalsDecreasing(ints) || _durationsIncreasing(durs))) {
     return LaborState.earlyLabor;
   }
-  // State 1 — No clear labour pattern (fallback for 3+ contractions).
+  // State 1 - No clear labour pattern (fallback for 3+ contractions).
   return LaborState.noPattern;
 }
 
@@ -1143,7 +1143,7 @@ class _SessionDetailScreen extends StatelessWidget {
                 Expanded(
                     child: Text(
                         c.intervalSeconds == 0
-                            ? '—'
+                            ? '-'
                             : s.minSecLabel(c.intervalSeconds),
                         style: text.bodyMedium)),
               ]),

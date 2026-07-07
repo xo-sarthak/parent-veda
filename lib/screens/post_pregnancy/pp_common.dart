@@ -1,9 +1,9 @@
 // =============================================================================
-//  Post-Pregnancy — shared styling & building blocks ("Editorial Calm")
+//  Post-Pregnancy - shared styling & building blocks ("Editorial Calm")
 // -----------------------------------------------------------------------------
 //  Self-contained styling for the NEW parenting app (My Child · AskVeda ·
 //  Community · Products). Kept inside the post_pregnancy module so nothing here
-//  depends on the pregnancy app — the two products stay fully isolated.
+//  depends on the pregnancy app - the two products stay fully isolated.
 //  Direction A "Editorial Calm": magazine-like, serif-forward, airy, restrained
 //  to a single purple accent. Palette mirrors the Claude Design mock.
 // =============================================================================
@@ -77,7 +77,7 @@ Widget ppSeeAll([String label = 'See all →']) => Text(label,
     style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppPurple));
 
 // A location chip (pin · label · caret) used across the Problem Solver / local-services
-// screens. Visual only — the city is fixed to the mock's Delhi NCR for now.
+// screens. Visual only - the city is fixed to the mock's Delhi NCR for now.
 Widget ppLocationPill(String city) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
@@ -234,7 +234,7 @@ class PpBottomNav extends StatelessWidget {
 }
 
 // ---- shared deep-dive pieces (back bar, section divider, rows) --------------
-// No longer used — the product/deeper rows now route to real destinations.
+// No longer used - the product/deeper rows now route to real destinations.
 // Kept (commented) in case a future placeholder needs it.
 // void _ppSoon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
 //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
@@ -256,7 +256,7 @@ Widget ppSectionDivider() => const Padding(
     );
 
 // A round back button (34px lavender circle with ←) as used on the newer
-// tracker/finder frames — with an optional uppercase eyebrow and/or trailing
+// tracker/finder frames - with an optional uppercase eyebrow and/or trailing
 // widget on the right. Tapping pops the current route.
 Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) => Row(
       children: [
@@ -282,7 +282,7 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
 
 // An explained product row (image · title + why · price). When a [productId] is
 // given it ALWAYS shows that product's own name + price (from the catalog) and
-// opens exactly that product — so the row can never display one thing and open
+// opens exactly that product - so the row can never display one thing and open
 // another. The caller's [title]/[price] are only used as a fallback when there's
 // no productId (then it opens the Products section). [desc] is the contextual
 // "why it helps here" line and is always the caller's.
@@ -319,14 +319,14 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
   );
 }
 
-// A "frequently-asked-question" answer sheet — shows the actual answer inline
+// A "frequently-asked-question" answer sheet - shows the actual answer inline
 // (via the shared Veda engine) so an "FAQ" tap answers the question instead of
 // bouncing to a search screen. Offers a follow-up in Ask Veda underneath.
 void ppFaqSheet(BuildContext context, String question) {
   final VedaAnswerView v = parentingVedaAnswer(question);
   final answer = v.answer.trim().isNotEmpty
       ? v.answer.trim()
-      : 'Here\'s the short version — and you can ask Veda for more detail below.';
+      : 'Here\'s the short version - and you can ask Veda for more detail below.';
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -372,7 +372,7 @@ void ppFaqSheet(BuildContext context, String question) {
               ]),
             ),
             const SizedBox(height: 16),
-            Text('General guidance for your child\'s stage — please confirm anything important with your paediatrician.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
+            Text('General guidance for your child\'s stage - please confirm anything important with your paediatrician.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
           ],
         ),
       ),
@@ -381,7 +381,7 @@ void ppFaqSheet(BuildContext context, String question) {
 }
 
 // A "go deeper" row (pill · text · →). Routes to the real surface for its pill
-// (FAQ → Ask Veda, Room → Community, Course → Courses) — never a dead end.
+// (FAQ → Ask Veda, Room → Community, Course → Courses) - never a dead end.
 Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = false, bool bottom = false}) =>
     GestureDetector(
       onTap: () {

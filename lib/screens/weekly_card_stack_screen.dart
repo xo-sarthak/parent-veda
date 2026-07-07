@@ -85,7 +85,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     if (mounted) setState(() {});
   }
 
-  /// Classic ⟷ New (V2) toggle — parked (V2 is now the only view). Kept for revert.
+  /// Classic ⟷ New (V2) toggle - parked (V2 is now the only view). Kept for revert.
   // ignore: unused_element
   Widget _v2Toggle() {
     final s = S(_c.language);
@@ -127,7 +127,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     );
   }
 
-  /// A smooth, minimal "‹ Daily" pill that returns to the Today (Daily) tab —
+  /// A smooth, minimal "‹ Daily" pill that returns to the Today (Daily) tab -
   /// the mirror of the Home → weekly hop, so the loop feels two-way.
   Widget _backToDaily() {
     final s = S(_c.language);
@@ -158,7 +158,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Father weekly re-skin (Slate) — colours/fonts only, week-20 + Dad switch.
+    // Father weekly re-skin (Slate) - colours/fonts only, week-20 + Dad switch.
     final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
     return Scaffold(
       backgroundColor: father ? kFBg : null,
@@ -171,7 +171,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
             Image.asset('assets/brand/pv-mark.png', height: 26),
             const SizedBox(width: 8),
             // Flexible so a tight app bar (mute + EN/Hi toggle on the right)
-            // never overflows — it shrinks/ellipsises instead of clipping.
+            // never overflows - it shrinks/ellipsises instead of clipping.
             Flexible(
               child: Text(
                 'ParentVeda',
@@ -199,10 +199,10 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
         actions: [
           // Mirror of Home → weekly: hop back to the Daily tab.
           _backToDaily(),
-          // Classic/New toggle removed — the New (V2) flow is the only weekly
+          // Classic/New toggle removed - the New (V2) flow is the only weekly
           // view now (all weeks). Kept (commented) for revert.
           // if (_c.selectedWeek == 20) _v2Toggle(),
-          // Mute / unmute baby voice — design's soft round speaker button.
+          // Mute / unmute baby voice - design's soft round speaker button.
           AnimatedBuilder(
             animation: BabyVoiceService.instance,
             builder: (context, _) {
@@ -235,7 +235,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
               );
             },
           ),
-          // EN / Hindi toggle — hidden for now per request. Kept (commented) for
+          // EN / Hindi toggle - hidden for now per request. Kept (commented) for
           // an easy revert; _LanguageToggle is preserved below.
           // Padding(
           //   padding: const EdgeInsets.only(right: 16),
@@ -333,7 +333,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     );
   }
 
-  /// The swipeable card carousel — parked (the V2 flow replaced it for all
+  /// The swipeable card carousel - parked (the V2 flow replaced it for all
   /// weeks). Kept for revert.
   // ignore: unused_element
   Widget _pagerBody(int week) {
@@ -427,7 +427,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
       text = data.snapshot.reveal.of(lang);
       card = 'size_reveal';
     } else if (_cardIndex == 2 && week != 20) {
-      // Card 1 is the Weekly Video; Baby Update sits at index 2 — except week 20,
+      // Card 1 is the Weekly Video; Baby Update sits at index 2 - except week 20,
       // whose overview card folds Baby into an accordion (no separate card).
       text = data.development.whatImDoing.of(lang);
       card = 'baby_update';
@@ -440,7 +440,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   }
 
   /// The week-40 celebration finale (the keepsake-booklet entry), built so the
-  /// V2 flow can append it at the bottom — same construction the classic
+  /// V2 flow can append it at the bottom - same construction the classic
   /// carousel used.
   Widget _celebrationCard() {
     final lang = _c.language;
@@ -655,7 +655,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Container(
                           height: 9,
                           decoration: BoxDecoration(
-                            // Flat single-colour track — no two-colour gradient
+                            // Flat single-colour track - no two-colour gradient
                             // (the slate→amber "ghost" was removed per request).
                             color: (father ? kFAccent : AppTheme.primary500)
                                 .withValues(alpha: 0.14),
@@ -721,7 +721,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 // ---------------------------------------------------------------------------
-//  Week navigation strip — OLD scrollable carousel, replaced by the compact
+//  Week navigation strip - OLD scrollable carousel, replaced by the compact
 //  _WeekBar (design). Kept (commented) for an easy revert.
 // ---------------------------------------------------------------------------
 /*
@@ -735,7 +735,7 @@ class _WeekStrip extends StatefulWidget {
   final PregnancyController controller;
 
   /// Called with true when the user starts scrolling the strip and false once
-  /// it settles — lets the screen hush the baby voice while browsing weeks.
+  /// it settles - lets the screen hush the baby voice while browsing weeks.
   final ValueChanged<bool> onScrollActive;
 
   @override
@@ -826,7 +826,7 @@ class _WeekStripState extends State<_WeekStrip> {
     final c = _c;
     final weeks = c.availableWeeks;
 
-    // Just the tightened week-dot carousel — the date range now lives in the
+    // Just the tightened week-dot carousel - the date range now lives in the
     // pinned header line, and the redundant "weeks" caption is gone.
     return Padding(
       padding: const EdgeInsets.only(top: 4, bottom: 2),
@@ -852,7 +852,7 @@ class _WeekStripState extends State<_WeekStrip> {
                 controller: _scroll,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                // Don't clip children — let the round glow spill past cells.
+                // Don't clip children - let the round glow spill past cells.
                 clipBehavior: Clip.none,
                 padding: EdgeInsets.symmetric(horizontal: padH),
                 itemExtent: _extent,
@@ -884,10 +884,10 @@ class _WeekStripState extends State<_WeekStrip> {
 */
 
 // ---------------------------------------------------------------------------
-//  Week bar (design) — current week ±2 on one compact row, dots between, the
+//  Week bar (design) - current week ±2 on one compact row, dots between, the
 //  selected week a filled purple disc. Tapping a neighbour steps the week.
 // ---------------------------------------------------------------------------
-/// A horizontally scrollable week strip — all weeks in one row, the selected
+/// A horizontally scrollable week strip - all weeks in one row, the selected
 /// week a filled purple disc. Scrolls left/right to browse; tap to switch; the
 /// selected week auto-centres.
 class _WeekBar extends StatefulWidget {
@@ -994,10 +994,10 @@ String _fmtRange(DateTime a, DateTime b) {
   return '${a.day} ${_months[a.month - 1]} – ${b.day} ${_months[b.month - 1]}';
 }
 
-/// Full "18 Jun 2026" — used for the booklet completion date.
+/// Full "18 Jun 2026" - used for the booklet completion date.
 String _fmtFull(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
 
-/// A single circular week marker — just the number. The selected week is a
+/// A single circular week marker - just the number. The selected week is a
 /// filled, slightly larger disc; the rest are soft and faint.
 class _WeekDot extends StatelessWidget {
   const _WeekDot({
@@ -1019,7 +1019,7 @@ class _WeekDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = father ? kFAccent : AppTheme.primary500;
-    // Selected week — a filled disc with a soft glow (design).
+    // Selected week - a filled disc with a soft glow (design).
     if (isSelected) {
       return GestureDetector(
         onTap: onTap,
@@ -1054,7 +1054,7 @@ class _WeekDot extends StatelessWidget {
         ),
       );
     }
-    // Other weeks — a soft number; the current week gets a small accent dot.
+    // Other weeks - a soft number; the current week gets a small accent dot.
     final color = locked
         ? AppTheme.neutral300
         : (isCurrent ? accent : (father ? kFMuted : AppTheme.neutral400));

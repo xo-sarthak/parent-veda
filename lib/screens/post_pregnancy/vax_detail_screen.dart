@@ -1,9 +1,9 @@
 // =============================================================================
-//  VaxDetailScreen — per-vaccine Learn Why + After-Care + actions
+//  VaxDetailScreen - per-vaccine Learn Why + After-Care + actions
 // -----------------------------------------------------------------------------
 //  Educate before asking parents to act. For each vaccine in a visit: WHY it
 //  matters, the diseases it prevents, expected mild reactions, myths vs facts,
-//  FAQs — and then After-Care (what to expect, comfort, red flags/call-now, Ask
+//  FAQs - and then After-Care (what to expect, comfort, red flags/call-now, Ask
 //  Veda, and gentle related products, only within after-care, never as ads).
 //  Sticky actions: Mark as done, and Set a reminder (real local notification via
 //  NotificationService). Reassuring, warm, never clinical.
@@ -158,14 +158,14 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                   const SizedBox(height: 20),
                   _pad(Text('Comfort essentials', style: ppJakarta(15))),
                   const SizedBox(height: 4),
-                  _pad(Text('Only if it helps your home — never a must.', style: ppBody(12, color: ppMuted))),
+                  _pad(Text('Only if it helps your home - never a must.', style: ppBody(12, color: ppMuted))),
                   const SizedBox(height: 12),
                   for (int i = 0; i < _vax.products.length; i++)
                     _pad(ppProductRow(context, _vax.products[i].$1, _vax.products[i].$2, _vax.products[i].$3, top: true, bottom: i == _vax.products.length - 1, productId: _vax.products[i].$4)),
                 ],
 
                 const SizedBox(height: 20),
-                _pad(Text('Informational only, not medical advice — always confirm with your paediatrician.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+                _pad(Text('Informational only, not medical advice - always confirm with your paediatrician.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
               ],
             );
           },
@@ -311,13 +311,13 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
       NotificationService.instance.requestPermission();
       NotificationService.instance.scheduleOneOff(
         id: (_visit.id.hashCode & 0x7fffffff),
-        title: 'Vaccine reminder — ${_vax.shortName}',
+        title: 'Vaccine reminder - ${_vax.shortName}',
         body: daysBefore == 0
             ? "Aarav's ${_vax.shortName} (${_visit.ageLabel}) is due today."
-            : "Aarav's ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} — ${_visit.date}.",
+            : "Aarav's ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${_visit.date}.",
         when: when.subtract(Duration(days: daysBefore)),
       );
-      messenger.showSnackBar(SnackBar(content: Text('Reminder set — $label'), behavior: SnackBarBehavior.floating));
+      messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));
     }
 
     showModalBottomSheet<void>(

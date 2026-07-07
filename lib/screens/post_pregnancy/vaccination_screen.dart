@@ -1,5 +1,5 @@
 // =============================================================================
-//  VaccinationScreen — Vaccination Tracker · home (parenting · S26)
+//  VaccinationScreen - Vaccination Tracker · home (parenting · S26)
 // -----------------------------------------------------------------------------
 //  Aarav's immunisation record: a progress ring, the dose due this month, his
 //  timeline (upcoming + a collapsible "completed" list), a three-way cost
@@ -23,19 +23,19 @@ const Color _green = Color(0xFF1F8A5B);
 const Color _greenTint = Color(0xFFEAF4EE);
 const Color _ringTrack = Color(0xFFECE5F2);
 
-// Aarav's completed first-year vaccines (all 13 — the count and the list match).
+// Aarav's completed first-year vaccines (all 13 - the count and the list match).
 const List<(String, String)> _completedVaccines = [
-  ('PCV — dose 2', '10 wk · 14 Jun'),
-  ('Pentavalent — dose 2', '10 wk · 14 Jun'),
-  ('Rotavirus — dose 2', '10 wk · 14 Jun'),
-  ('IPV — dose 2', '10 wk · 14 Jun'),
-  ('PCV — dose 1', '6 wk · 19 Apr'),
-  ('Pentavalent — dose 1', '6 wk · 19 Apr'),
-  ('Rotavirus — dose 1', '6 wk · 19 Apr'),
-  ('IPV — dose 1', '6 wk · 19 Apr'),
-  ('OPV — dose 1', '6 wk · 19 Apr'),
-  ('Hepatitis B — birth', 'Birth · 8 Mar'),
-  ('OPV — 0 (birth)', 'Birth · 8 Mar'),
+  ('PCV - dose 2', '10 wk · 14 Jun'),
+  ('Pentavalent - dose 2', '10 wk · 14 Jun'),
+  ('Rotavirus - dose 2', '10 wk · 14 Jun'),
+  ('IPV - dose 2', '10 wk · 14 Jun'),
+  ('PCV - dose 1', '6 wk · 19 Apr'),
+  ('Pentavalent - dose 1', '6 wk · 19 Apr'),
+  ('Rotavirus - dose 1', '6 wk · 19 Apr'),
+  ('IPV - dose 1', '6 wk · 19 Apr'),
+  ('OPV - dose 1', '6 wk · 19 Apr'),
+  ('Hepatitis B - birth', 'Birth · 8 Mar'),
+  ('OPV - 0 (birth)', 'Birth · 8 Mar'),
   ('BCG', 'Birth · 8 Mar'),
   ('Vitamin K', 'Birth · 8 Mar'),
 ];
@@ -108,7 +108,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 const SizedBox(width: 11),
                 Expanded(
                   child: Text.rich(TextSpan(children: [
-                    TextSpan(text: 'Why now? At 14 weeks the primary series wraps up — the window his immunity is built. ', style: ppBody(13, color: ppInk, h: 1.55)),
+                    TextSpan(text: 'Why now? At 14 weeks the primary series wraps up - the window his immunity is built. ', style: ppBody(13, color: ppInk, h: 1.55)),
                     TextSpan(text: 'Learn why →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
                   ])),
                 ),
@@ -135,7 +135,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('PCV — dose 3', style: ppJakarta(18)),
+                      Text('PCV - dose 3', style: ppJakarta(18)),
                       const SizedBox(height: 3),
                       Text('Protects against pneumonia, meningitis', style: ppBody(12)),
                     ]),

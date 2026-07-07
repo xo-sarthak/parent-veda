@@ -1,9 +1,9 @@
 // =============================================================================
-//  VedaContext — the mother's own data, for PERSONALIZED Ask Veda answers
+//  VedaContext - the mother's own data, for PERSONALIZED Ask Veda answers
 // -----------------------------------------------------------------------------
-//  Gathers what we already know about her locally — current week/trimester, the
+//  Gathers what we already know about her locally - current week/trimester, the
 //  symptoms she's logged (and roughly which week she logged them), and her active
-//  medications — so Ask Veda's "What this means for you" can speak to HER, not a
+//  medications - so Ask Veda's "What this means for you" can speak to HER, not a
 //  generic mother. No backend: read straight from the on-device stores. When real
 //  login/profiles land, only this gather() changes, not Ask Veda's logic.
 // =============================================================================
@@ -121,8 +121,8 @@ class VedaContext {
       if (terms.any((t) => q.contains(t))) {
         final n = ls.symptom.name.of(lang);
         parts.add(en
-            ? "You noted $n around week ${ls.week} — keep an eye on it and mention it at your next visit."
-            : "Aapne $n week ${ls.week} ke aas-paas note kiya tha — ispar nazar rakhein aur agli visit par doctor ko zaroor batayein.");
+            ? "You noted $n around week ${ls.week} - keep an eye on it and mention it at your next visit."
+            : "Aapne $n week ${ls.week} ke aas-paas note kiya tha - ispar nazar rakhein aur agli visit par doctor ko zaroor batayein.");
         break;
       }
     }
@@ -131,8 +131,8 @@ class VedaContext {
     for (final m in medications) {
       if (m.trim().length >= 3 && q.contains(m.toLowerCase())) {
         parts.add(en
-            ? "You're tracking $m — check anything new against it with your doctor."
-            : "Aap $m track kar rahi hain — koi nayi cheez iske saath doctor se confirm kar lein.");
+            ? "You're tracking $m - check anything new against it with your doctor."
+            : "Aap $m track kar rahi hain - koi nayi cheez iske saath doctor se confirm kar lein.");
         break;
       }
     }

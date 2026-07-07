@@ -1,5 +1,5 @@
 // =============================================================================
-//  DevelopmentAreaScreen — one area's journey (a story, not a checklist)
+//  DevelopmentAreaScreen - one area's journey (a story, not a checklist)
 // -----------------------------------------------------------------------------
 //  The developmental roadmap for one area (e.g. Gross Motor: head control →
 //  rolling → sitting → crawling → walking), with what each skill means, why it

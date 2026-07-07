@@ -11,6 +11,7 @@ import 'package:parentveda/screens/post_pregnancy/baby_naming_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/name_journey_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/name_journey_feed_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/name_journey_shortlist_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_list_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_names_v2_data.dart';
 import 'package:parentveda/screens/post_pregnancy/book_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_courses_screen.dart';
@@ -195,6 +196,7 @@ void main() {
     'Name Journey feed': const NameJourneyFeedScreen(),
     'Name Journey detail': const NameJourneyDetailScreen(name: 'Aarav'),
     'Name Journey shortlist': const NameJourneyShortlistScreen(),
+    'Name list (browse)': const NameListScreen(),
     'Name compare (V2)': const NameCompareScreen(),
     'Name chosen (V2)': const NameChosenScreen(name: 'Aarav'),
     'Investments & Savings': const InvestmentsScreen(),
@@ -234,8 +236,8 @@ void main() {
   });
 
   // The home is now a single-scroll "Today" daily briefing (no tabs). Let the
-  // staggered reveal settle, then scroll the whole briefing — hero, What Matters,
-  // Continue, Discover, Looking Ahead, Snapshot, Focus, Tiny Wins, Quick Actions —
+  // staggered reveal settle, then scroll the whole briefing - hero, What Matters,
+  // Continue, Discover, Looking Ahead, Snapshot, Focus, Tiny Wins, Quick Actions -
   // to confirm every section (and its horizontal rails) builds without overflow.
   testWidgets('My Child home: daily-briefing sections render', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
@@ -257,7 +259,7 @@ void main() {
   });
 
   // The "Deals for the day" commerce shelf sits at the very bottom of the home
-  // (below the fold, lazily built) — scroll to it and confirm it renders clean.
+  // (below the fold, lazily built) - scroll to it and confirm it renders clean.
   testWidgets('My Child home: deals-for-the-day renders at the bottom', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
@@ -277,7 +279,7 @@ void main() {
   });
 
   // Tapping the child's photo opens the details bottom sheet (not the Snapshot
-  // screen) — faithful to S1 v2's data-detailsmodal.
+  // screen) - faithful to S1 v2's data-detailsmodal.
   testWidgets('My Child home: photo opens the child-details sheet', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
@@ -459,9 +461,9 @@ void main() {
     expect(find.text('0–1 Year'), findsWidgets); // parenting room chip + post tag
 
     // scroll the whole feed (building every post) to the labelled sponsored slot
-    await tester.scrollUntilVisible(find.text('Nunu — breathable muslin swaddles'), 300,
+    await tester.scrollUntilVisible(find.text('Nunu - breathable muslin swaddles'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.text('Nunu — breathable muslin swaddles'), findsOneWidget);
+    expect(find.text('Nunu - breathable muslin swaddles'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -640,7 +642,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: BabyNamingHomeScreen()));
     await tester.pumpAndSettle();
 
-    // defaults to V2 — the Journey
+    // defaults to V2 - the Journey
     expect(find.text('Begin the journey'), findsOneWidget);
 
     await tester.tap(find.text('V1'));
@@ -653,8 +655,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // Baby names V2: the taste quiz leads into the swipe deck.
-  testWidgets('Baby names V2: quiz -> swipe deck renders', (tester) async {
+  // Baby names V2: quiz -> primer (sets the mental model) -> swipe deck.
+  testWidgets('Baby names V2: quiz -> primer -> swipe deck renders', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -662,18 +664,45 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: NameJourneyFeedScreen()));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Start swiping'), 200,
+    await tester.scrollUntilVisible(find.text('Start discovering'), 200,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
-    await tester.tap(find.text('Start swiping'));
+    await tester.tap(find.text('Start discovering'));
     await tester.pumpAndSettle();
 
-    // a name card is on screen with its tap hint
+    // the transitional primer sets the mental model
+    expect(find.text('Discover names one by one'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text("Let's begin"), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.tap(find.text("Let's begin"));
+    await tester.pumpAndSettle();
+
+    // the swipe deck, with a labelled tap alternative
     expect(find.text('Tap for the full story'), findsOneWidget);
+    expect(find.text('We like this'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Baby names: the no-swipe "Just show me names" path opens a browsable list.
+  testWidgets('Baby names: Just show me names opens the browse list', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: NameJourneyFeedScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Just show me names'), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.tap(find.text('Just show me names'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(NameListScreen), findsOneWidget);
+    expect(find.text('Take your time'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
   // Development: the companion home opens the birth-to-five Development Map,
-  // which marks the child's current stage ("you are here") — not a checklist.
+  // which marks the child's current stage ("you are here") - not a checklist.
   testWidgets('Development: home opens the Development Map', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;

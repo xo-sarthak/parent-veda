@@ -1,5 +1,5 @@
 // =============================================================================
-//  ArticleReaderScreen — Article · reader (parenting · S20)
+//  ArticleReaderScreen - Article · reader (parenting · S20)
 // -----------------------------------------------------------------------------
 //  The reading view: cover, taxonomy tags, byline (reviewed), the article body,
 //  an author card, "keep reading" links, and a related-product cross-link.
@@ -148,7 +148,7 @@ class ArticleReaderScreen extends StatelessWidget {
             )),
 
             const SizedBox(height: 22),
-            _pad(Text("Articles are surfaced across ParentVeda — in AskVeda answers and each section's related rail. Every one is reviewed by our medical panel.",
+            _pad(Text("Articles are surfaced across ParentVeda - in AskVeda answers and each section's related rail. Every one is reviewed by our medical panel.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),
@@ -158,18 +158,18 @@ class ArticleReaderScreen extends StatelessWidget {
 
   List<Widget> _fullBody() => [
         _pad(Text(
-            "If your baby was a champion sleeper and has suddenly started waking every couple of hours — you're not doing anything wrong. Something real has changed inside their brain.",
+            "If your baby was a champion sleeper and has suddenly started waking every couple of hours - you're not doing anything wrong. Something real has changed inside their brain.",
             style: ppFraunces(18, h: 1.6))),
-        _para('Around the four-month mark, a baby\'s sleep matures from the simple newborn pattern into a more adult-like structure. Instead of drifting between just two states, they now move through several distinct cycles a night — and between each one, there\'s a brief moment of near-waking.'),
+        _para('Around the four-month mark, a baby\'s sleep matures from the simple newborn pattern into a more adult-like structure. Instead of drifting between just two states, they now move through several distinct cycles a night - and between each one, there\'s a brief moment of near-waking.'),
         _h2("What's actually happening"),
-        _para('A newborn falls straight into deep sleep. A four-month-old, like an adult, cycles through lighter and deeper stages roughly every 45 minutes. At the end of each cycle they surface — and if they don\'t yet know how to resettle on their own, they wake fully and call for you.'),
+        _para('A newborn falls straight into deep sleep. A four-month-old, like an adult, cycles through lighter and deeper stages roughly every 45 minutes. At the end of each cycle they surface - and if they don\'t yet know how to resettle on their own, they wake fully and call for you.'),
         _callout('This isn\'t a step backwards. It\'s a sign your baby\'s brain is developing exactly on schedule.'),
         _h2('What helps'),
-        _para("The goal isn't to force sleep — it's to give your baby the chance to practise resettling:"),
+        _para("The goal isn't to force sleep - it's to give your baby the chance to practise resettling:"),
         _bullet('A short, identical wind-down every night.'),
         _bullet('Putting down drowsy but awake, so they learn the last step themselves.'),
         _bullet('A calm, dark, consistent room between cycles.'),
-        _para('Most of all — hold your routine and be patient. This phase settles within two to six weeks, and your baby comes out the other side a more capable sleeper.'),
+        _para('Most of all - hold your routine and be patient. This phase settles within two to six weeks, and your baby comes out the other side a more capable sleeper.'),
       ];
 
   List<Widget> _lightBody(Article a) => [
@@ -183,7 +183,7 @@ class ArticleReaderScreen extends StatelessWidget {
             const Icon(Icons.auto_awesome_outlined, size: 18, color: ppPurple),
             const SizedBox(width: 11),
             Expanded(
-              child: Text('The full article is being written — it lands soon, reviewed by our medical panel.',
+              child: Text('The full article is being written - it lands soon, reviewed by our medical panel.',
                   style: ppBody(13, color: ppInk, h: 1.5)),
             ),
           ]),

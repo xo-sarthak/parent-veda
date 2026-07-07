@@ -1,8 +1,8 @@
 // =============================================================================
-//  AstrologyScreen — Astrology & Numerology · opt-in (parenting · S23)
+//  AstrologyScreen - Astrology & Numerology · opt-in (parenting · S23)
 // -----------------------------------------------------------------------------
 //  An explicitly optional, off-by-default section. The toggle reveals Aarav's
-//  "cosmic notes" — a monthly horoscope card and a life-path numerology card —
+//  "cosmic notes" - a monthly horoscope card and a life-path numerology card -
 //  framed as culture, not medical guidance. Faithful build of Claude Design
 //  "post pregnancy - content.dc.html" · S23 (both OFF + ON states in one
 //  screen). Reached from the Explore drawer.
@@ -41,7 +41,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
           const SizedBox(height: 10),
           _pad(Text('Astrology & Numerology', style: ppFraunces(30, h: 1.12))),
           const SizedBox(height: 8),
-          _pad(Text("Off by default. Turn it on to add cosmic notes to Aarav's world — you can switch it off anytime.",
+          _pad(Text("Off by default. Turn it on to add cosmic notes to Aarav's world - you can switch it off anytime.",
               style: ppBody(15))),
 
           // toggle card
@@ -130,7 +130,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                       ppEyebrow('This month', color: ppPurple, spacing: 0.8),
                       const SizedBox(height: 8),
                       Text(
-                          'A gentle, watery month for your little Piscean. Expect him to be especially cuddly and tuned in to your moods — soft routines and calm evenings suit him best right now.',
+                          'A gentle, watery month for your little Piscean. Expect him to be especially cuddly and tuned in to your moods - soft routines and calm evenings suit him best right now.',
                           style: ppBody(14, color: ppInk, h: 1.65)),
                     ]),
                   ),
@@ -162,7 +162,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                   ),
                 ]),
                 const SizedBox(height: 14),
-                Text('The number of expression and joy — a signal of a sociable, creative, chatty child. Give him room to make noise and play.',
+                Text('The number of expression and joy - a signal of a sociable, creative, chatty child. Give him room to make noise and play.',
                     style: ppBody(14, color: ppInk, h: 1.6)),
               ]),
             )),
@@ -175,7 +175,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
             ])),
 
             const SizedBox(height: 22),
-            _pad(Text('AI-generated from date, time & place of birth. For cultural interest — not advice. Turn off anytime in Settings.',
+            _pad(Text('AI-generated from date, time & place of birth. For cultural interest - not advice. Turn off anytime in Settings.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ],

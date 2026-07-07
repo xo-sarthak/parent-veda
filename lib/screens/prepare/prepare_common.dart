@@ -1,7 +1,7 @@
 // =============================================================================
-//  Prepare — shared styling & building blocks ("Warm Nest")
+//  Prepare - shared styling & building blocks ("Warm Nest")
 // -----------------------------------------------------------------------------
-//  The "Prepare" tab (mother side) is ParentVeda's guided/paid-experience hub —
+//  The "Prepare" tab (mother side) is ParentVeda's guided/paid-experience hub -
 //  Masterclasses · 1:1 Consultations · Cohort Programs · Prenatal Yoga ·
 //  Birthing Classes. It replaces the old Journey tab (the weekly stack is now
 //  reached from the Home hero). This file holds the palette + reusable pieces
@@ -9,7 +9,7 @@
 //
 //  Design source: Claude Design "pregnancy app commerce.dc.html". Content is a
 //  faithful static replica of that mock (Priya · 30 weeks). Purchase CTAs are
-//  placeholders for now — no payment gateway is wired yet.
+//  placeholders for now - no payment gateway is wired yet.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -234,7 +234,7 @@ const BoxDecoration pvBottomFade = BoxDecoration(
 );
 
 // =============================================================================
-//  Mock booking flow (no payment yet) — a confirm sheet → success, persisted
+//  Mock booking flow (no payment yet) - a confirm sheet → success, persisted
 //  via PrepareStore so the item shows as booked afterwards.
 // =============================================================================
 Future<void> showPrepareBooking(
@@ -329,7 +329,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         ]),
       ),
       const SizedBox(height: 14),
-      Text("We'll hold your spot and remind you before it starts. Payments aren't live yet — nothing is charged now.",
+      Text("We'll hold your spot and remind you before it starts. Payments aren't live yet - nothing is charged now.",
           style: pvBody(kMuted, 12).copyWith(height: 1.5)),
       const SizedBox(height: 18),
       SizedBox(

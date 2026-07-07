@@ -1,5 +1,5 @@
 // =============================================================================
-//  MainScaffold — the app shell ("Warm Nest" / Direction B)
+//  MainScaffold - the app shell ("Warm Nest" / Direction B)
 // -----------------------------------------------------------------------------
 //  A floating pill tab bar (PvTabBar) over the five Direction-B destinations:
 //    Today (Daily Moment) · Journey (week stack → map/tools) · Sanskar
@@ -45,7 +45,7 @@ class MainScaffold extends StatefulWidget {
   /// Kept threaded through for when Father Mode is un-parked (currently unused).
   final FatherContentController father;
 
-  /// True when this user is the (paired) FATHER — the whole shell runs in the
+  /// True when this user is the (paired) FATHER - the whole shell runs in the
   /// father (Slate) structure. The testing Mom|Dad toggle (FatherPreview) also
   /// flips this at runtime for previewing on a mother account.
   final bool isFather;
@@ -59,7 +59,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   void initState() {
     super.initState();
     // A paired father turns on FatherPreview so every existing father (Slate)
-    // skin — the nav pill, the weekly stack, the week pop-ups — fires too. Set
+    // skin - the nav pill, the weekly stack, the week pop-ups - fires too. Set
     // before wiring the listener so it doesn't bounce a setState during init.
     if (widget.isFather) FatherPreview.instance.on = true;
     AppNav.instance.addListener(_onNav);
@@ -89,7 +89,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       animation: widget.pregnancy,
       builder: (context, _) {
         final s = S(widget.pregnancy.language);
-        // Father mode is driven by FatherPreview — set true in initState for a
+        // Father mode is driven by FatherPreview - set true in initState for a
         // paired father, and flipped by the testing Mom|Dad toggle otherwise.
         final fatherMode = FatherPreview.instance.on;
 
@@ -145,7 +145,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                   father: fatherMode,
                 ),
               ),
-              // TESTING-ONLY Mom | Dad switch — moved to the BOTTOM-RIGHT (floats
+              // TESTING-ONLY Mom | Dad switch - moved to the BOTTOM-RIGHT (floats
               // above the pill tab bar) so the top-right is free for the profile
               // avatar on both Mom and Dad. On the Today tab only. Remove before
               // launch.

@@ -1,8 +1,8 @@
 // =============================================================================
-//  VaxTrackerScreen — Vaccination Tracker home (redesign · journey-first)
+//  VaxTrackerScreen - Vaccination Tracker home (redesign · journey-first)
 // -----------------------------------------------------------------------------
 //  Answers "What does my child need today, why does it matter, and what should I
-//  do next?" — not "which vaccine is due?". A calm snapshot hero (completed,
+//  do next?" - not "which vaccine is due?". A calm snapshot hero (completed,
 //  next, reminder, progress), a single Due-Today action, a preview of the
 //  journey timeline, and quiet entries to the doctor summary. Calm before
 //  clinical; reassuring language throughout. Replaces the old VaccinationScreen
@@ -163,7 +163,7 @@ class VaxTrackerScreen extends StatelessWidget {
           Expanded(
             child: Text.rich(TextSpan(children: [
               TextSpan(text: 'Next reminder: ', style: ppBody(12.5, color: ppSoft, w: FontWeight.w700)),
-              TextSpan(text: reminder ?? 'none set yet — add one from any vaccine', style: ppBody(12.5, color: ppInk)),
+              TextSpan(text: reminder ?? 'none set yet - add one from any vaccine', style: ppBody(12.5, color: ppInk)),
             ]), maxLines: 2),
           ),
         ]),

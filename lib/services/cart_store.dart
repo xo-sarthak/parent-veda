@@ -1,9 +1,9 @@
 // =============================================================================
-//  CartStore — a local, preview-only shopping cart
+//  CartStore - a local, preview-only shopping cart
 // -----------------------------------------------------------------------------
 //  A believable "real shopping" layer over our catalogue: products (and planned
 //  hospital-bag items) can be added to a cart, with quantities + optional size /
-//  colour, then taken through a preview checkout. NO real payment is taken — the
+//  colour, then taken through a preview checkout. NO real payment is taken - the
 //  flow ends at a friendly "order placed" preview. Two separate carts are kept
 //  (Products vs Hospital bag). Persisted locally.
 // =============================================================================
@@ -210,7 +210,7 @@ double parsePriceString(String s) {
   return double.tryParse(digits) ?? 0;
 }
 
-/// A believable, STABLE mock price (₹) derived from [id] — no randomness, so it
+/// A believable, STABLE mock price (₹) derived from [id] - no randomness, so it
 /// stays the same across rebuilds. Used for items with no real price.
 double mockPriceFor(String id) {
   final base = 199 + (id.hashCode.abs() % 2300);

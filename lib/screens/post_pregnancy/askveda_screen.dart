@@ -1,12 +1,12 @@
 // =============================================================================
-//  AskVedaScreen — parenting Ask Veda (SAME UI as the pregnancy app's Ask Veda)
+//  AskVedaScreen - parenting Ask Veda (SAME UI as the pregnancy app's Ask Veda)
 // -----------------------------------------------------------------------------
 //  A faithful port of the pregnancy "Ask Veda Results" design (gradient wash, the
 //  pinned white search pill, stage-wise suggestion cards, and the fixed 7-section
 //  result: Veda Answer → What this means → Recommended actions → More information
 //  → Community → Products → disclaimer). Only the FUNCTION differs: it runs the
 //  shared engine over the PARENTING corpus (parentingVedaAnswer). Reached from
-//  the bottom nav (openPpTab 1). No emojis (parenting rule) — line icons instead.
+//  the bottom nav (openPpTab 1). No emojis (parenting rule) - line icons instead.
 // =============================================================================
 
 import 'dart:math';
@@ -89,7 +89,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       'Could this be teething?',
     ]),
     ('For you', Icons.favorite_border, [
-      'I’m exhausted — is that normal?',
+      'I’m exhausted - is that normal?',
       'How do I cope with the fourth-trimester fog?',
     ]),
   ];
@@ -397,7 +397,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Container(width: 32, height: 32, alignment: Alignment.center, decoration: const BoxDecoration(color: Color(0xFFF6F0FE), shape: BoxShape.circle), child: const Icon(Icons.volume_up_rounded, size: 18, color: _vPurple2)),
       );
 
-  // S1 — Veda Answer
+  // S1 - Veda Answer
   Widget _answerCard(String answer) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
@@ -417,7 +417,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  // S2 — What this means for you
+  // S2 - What this means for you
   Widget _meaning(VedaAnswerView v) {
     if (v.meaning.trim().isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -426,7 +426,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     ]);
   }
 
-  // S3 — Recommended next actions
+  // S3 - Recommended next actions
   Widget _actions(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.task_alt_rounded, 'Recommended next actions'),
         _card(padding: EdgeInsets.zero, child: Column(children: [
@@ -464,7 +464,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S4 — More information
+  // S4 - More information
   Widget _content(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.library_books_rounded, 'More information'),
         for (final c in v.content) _contentCard(c),
@@ -496,7 +496,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S5 — Community insights
+  // S5 - Community insights
   Widget _communitySection(String text) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.forum_rounded, 'Community insights'),
         GestureDetector(
@@ -526,7 +526,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Container(width: 28, height: 28, decoration: BoxDecoration(gradient: LinearGradient(colors: colors), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
       );
 
-  // S6 — Products
+  // S6 - Products
   Widget _productsSection(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.redeem_rounded, 'Products', top: 28),
         Padding(padding: const EdgeInsets.only(left: 30, bottom: 13), child: Text('Suggested for your question', style: GoogleFonts.manrope(fontSize: 12, color: _vMuted2))),
@@ -584,7 +584,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Padding(padding: EdgeInsets.only(top: 1), child: Icon(Icons.shield_rounded, size: 17, color: Color(0xFFB6A9CC))),
           const SizedBox(width: 9),
-          Expanded(child: Text('This is general guidance for your child’s stage — please confirm anything important with your paediatrician.', style: GoogleFonts.manrope(fontSize: 11.5, height: 1.55, color: _vMuted2))),
+          Expanded(child: Text('This is general guidance for your child’s stage - please confirm anything important with your paediatrician.', style: GoogleFonts.manrope(fontSize: 11.5, height: 1.55, color: _vMuted2))),
         ]),
       );
 
@@ -622,7 +622,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               const SizedBox(height: 12),
               Text(ref.body.trim(), style: GoogleFonts.manrope(fontSize: 14.5, height: 1.6, color: _vBody)),
               const SizedBox(height: 18),
-              Text('This is general guidance for your child’s stage — please confirm anything important with your paediatrician.', style: GoogleFonts.manrope(fontSize: 11.5, height: 1.5, color: _vMuted2)),
+              Text('This is general guidance for your child’s stage - please confirm anything important with your paediatrician.', style: GoogleFonts.manrope(fontSize: 11.5, height: 1.5, color: _vMuted2)),
             ],
           ),
         ),

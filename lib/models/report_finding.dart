@@ -1,5 +1,5 @@
 // =============================================================================
-//  Understanding Your Report™  — finding model
+//  Understanding Your Report™  - finding model
 // -----------------------------------------------------------------------------
 //  A calm, reassurance-first explainer for a scan/test finding. NOT a diagnosis,
 //  prediction, symptom checker or risk calculator. Every finding uses the EXACT
@@ -43,7 +43,7 @@ class ReportFinding {
   final LocalizedText howCommon; // §2
   final LocalizedText whatNext; // §3 (the most important)
 
-  /// §4 — "Typically identified around Week [weekFrom]–[weekTo]". Either may be
+  /// §4 - "Typically identified around Week [weekFrom]–[weekTo]". Either may be
   /// null (e.g. "from Week 20" or omitted entirely).
   final int? weekFrom;
   final int? weekTo;

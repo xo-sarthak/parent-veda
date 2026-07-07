@@ -1,5 +1,5 @@
 // =============================================================================
-//  MasterclassFunnelScreen — Masterclass · full page (parenting · S11·detail)
+//  MasterclassFunnelScreen - Masterclass · full page (parenting · S11·detail)
 // -----------------------------------------------------------------------------
 //  The sales/detail page for a single masterclass: intro video, quick facts,
 //  what's covered, what you walk away with, the expert, a testimonial, an FAQ
@@ -39,7 +39,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
     ],
     [
       'Is this cry-it-out?',
-      'No. Everything Dr. Rao teaches is gentle, responsive settling — never leaving Aarav to cry it out.',
+      'No. Everything Dr. Rao teaches is gentle, responsive settling - never leaving Aarav to cry it out.',
     ],
     [
       'In Hindi or English?',
@@ -120,12 +120,12 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
               _pad(Text('What this masterclass covers', style: ppJakarta(18))),
               const SizedBox(height: 6),
               _pad(Column(children: [
-                _covers('Why sleep cycles mature at 4 months — the science, simply.', top: true),
+                _covers('Why sleep cycles mature at 4 months - the science, simply.', top: true),
                 _covers('The link between Leap 4 and the sleep regression.'),
                 _covers('Building a wind-down routine that actually sticks.'),
                 _covers('Drowsy-but-awake, and gentle no-cry-it-out settling.'),
                 _covers('Night wakings and naps in Indian joint-family homes.'),
-                _covers('A live Q&A — bring your exact situation.'),
+                _covers('A live Q&A - bring your exact situation.'),
               ])),
 
               // walk away with
@@ -137,7 +137,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
                   ppEyebrow("What you'll walk away with", color: ppBrown, spacing: 0.8),
                   const SizedBox(height: 14),
                   _take('A calm, repeatable bedtime routine you can start tonight.'),
-                  _take('The reassurance that this phase is normal — and ends.'),
+                  _take('The reassurance that this phase is normal - and ends.'),
                   _take('A printable one-page plan, yours to keep.'),
                 ]),
               )),

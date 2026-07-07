@@ -1,8 +1,8 @@
 // =============================================================================
-//  Ask Veda — app-neutral search core (the single engine, no app dependencies)
+//  Ask Veda - app-neutral search core (the single engine, no app dependencies)
 // -----------------------------------------------------------------------------
 //  This folder is the ONE Ask Veda brain for the whole product. It knows nothing
-//  about pregnancy or parenting — it only knows how to hold tagged content and
+//  about pregnancy or parenting - it only knows how to hold tagged content and
 //  score a question against it. Each side of the app (pregnancy, post-pregnancy)
 //  is a thin adapter that:
 //    1. builds its own content as VedaDocs, each stamped with its `domain` tag,
@@ -11,9 +11,9 @@
 //  So a question carries the tag of where it came from, every doc carries the
 //  tag of what it's for, and the engine answers "in the direction of the tag".
 //  Adding content later = add more tagged VedaDocs to that side's corpus. That's
-//  the whole contract — plug in data, the knowledge improves.
+//  the whole contract - plug in data, the knowledge improves.
 //
-//  Purely on-device: no LLM, no network. Grounded RETRIEVAL — we surface the most
+//  Purely on-device: no LLM, no network. Grounded RETRIEVAL - we surface the most
 //  relevant things we already have (with their source), we don't generate. It
 //  also doubles as the retrieval layer an AI backend can plug into later.
 //
@@ -21,7 +21,7 @@
 //  (screens, controllers, data). That independence is the whole point.
 // =============================================================================
 
-/// Which side of the app a doc belongs to — and which a question is scoped to.
+/// Which side of the app a doc belongs to - and which a question is scoped to.
 /// `universal` content is shared by both sides (general wellness, breathing…).
 enum VedaDomain { pregnancy, parenting, universal }
 
@@ -65,7 +65,7 @@ const Set<String> _kStop = {
 
 // Ubiquitous context words: they appear in almost every doc, so on their own
 // they must NOT drive a match (heavily down-weighted, never a "specific" hit).
-// This keeps "More information" topically relevant — e.g. "papaya in pregnancy"
+// This keeps "More information" topically relevant - e.g. "papaya in pregnancy"
 // no longer surfaces "Sex during pregnancy" just because both say "pregnancy".
 const Set<String> _kGeneric = {
   'pregnancy', 'pregnant', 'pregnancies', 'baby', 'babies', 'week', 'weeks',
@@ -142,7 +142,7 @@ class VedaDoc {
     }
     // Require at least one SPECIFIC word to land. A doc that only shares
     // ubiquitous words ("pregnancy", "baby", "week") with the query isn't a real
-    // match — this is what stops irrelevant "More information" cards.
+    // match - this is what stops irrelevant "More information" cards.
     if (matched == 0) return 0;
     if (qLower.length >= 3 && titleLower.contains(qLower)) s += 8;
     if (titleLower == qLower) s += 8;
@@ -157,7 +157,7 @@ class VedaHit {
   final double score;
 }
 
-/// True when [doc] is servable to a question scoped to [domain] — its own domain
+/// True when [doc] is servable to a question scoped to [domain] - its own domain
 /// or `universal` (shared) content. The one rule that makes the tag "point" the
 /// engine: a pregnancy question never sees parenting docs, and vice-versa.
 bool vedaInDomain(VedaDoc doc, VedaDomain domain) =>
@@ -166,7 +166,7 @@ bool vedaInDomain(VedaDoc doc, VedaDomain domain) =>
 /// Rank [corpus] against [query], best-first, above a relevance [threshold]
 /// (empty for junk / no real match, so callers can honestly say "I don't have
 /// that" instead of surfacing noise). The [where] predicate is how a caller
-/// scopes the search — by domain, by kind, by faith-gating, or any combination —
+/// scopes the search - by domain, by kind, by faith-gating, or any combination -
 /// keeping this core free of app-specific rules.
 List<VedaHit> vedaScore(
   String query,
@@ -189,7 +189,7 @@ List<VedaHit> vedaScore(
 }
 
 // ===========================================================================
-//  The shared ANSWER model — the fixed 7-section result, identical for both
+//  The shared ANSWER model - the fixed 7-section result, identical for both
 //  sides of the app. Each adapter (pregnancy / parenting) fills this in from its
 //  own corpus + context; the shared result UI renders it. Empty sections are
 //  omitted by the UI. Sections 1–4 are formed only from vetted content (never
@@ -197,7 +197,7 @@ List<VedaHit> vedaScore(
 // ===========================================================================
 
 /// One typed content card for Section 4 ("ParentVeda content"). Carries a human
-/// TYPE label ("Weekly journey", "Read", "Recipe"…) — what the user asked for —
+/// TYPE label ("Weekly journey", "Read", "Recipe"…) - what the user asked for -
 /// while tap-routing uses [kind]. [docId] lets a caller resolve the exact doc.
 class VedaContentRef {
   const VedaContentRef({

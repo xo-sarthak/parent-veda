@@ -140,7 +140,7 @@ class _BabyFacePainter extends CustomPainter {
     for (final sign in [-1.0, 1.0]) {
       final eyeCenter = Offset(c.dx + sign * eyeDx, eyeY);
       if (eyeOpen < 0.15) {
-        // closed — a gentle curved lash line
+        // closed - a gentle curved lash line
         final p = Path()
           ..moveTo(eyeCenter.dx - eyeRx, eyeCenter.dy)
           ..quadraticBezierTo(

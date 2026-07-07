@@ -1,5 +1,5 @@
 // =============================================================================
-//  VaccineDetailScreen — vaccine detail · after-care (parenting · S26·detail)
+//  VaccineDetailScreen - vaccine detail · after-care (parenting · S26·detail)
 // -----------------------------------------------------------------------------
 //  One dose, in full: what it protects against, quick facts, honest after-care,
 //  the red-flag "call now" box, gentle comfort-essential commerce, and Learn /
@@ -63,7 +63,7 @@ class VaccineDetailScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ppEyebrow('Protects against', color: ppPurple, spacing: 0.8),
                 const SizedBox(height: 8),
-                Text("Pneumonia, meningitis and blood infections (sepsis) — among the most serious illnesses in a baby's first years.",
+                Text("Pneumonia, meningitis and blood infections (sepsis) - among the most serious illnesses in a baby's first years.",
                     style: ppBody(14, color: ppInk, h: 1.6)),
               ]),
             )),
@@ -83,12 +83,12 @@ class VaccineDetailScreen extends StatelessWidget {
             // after care
             _pad(Align(alignment: Alignment.centerLeft, child: Text('After the shot', style: ppJakarta(16)))),
             const SizedBox(height: 12),
-            _pad(Text('Mild soreness at the site and a low fever for a day or two are normal and expected — a sign his body is building protection.',
+            _pad(Text('Mild soreness at the site and a low fever for a day or two are normal and expected - a sign his body is building protection.',
                 style: ppBody(14))),
             const SizedBox(height: 12),
             _pad(_check('Extra cuddles and feeds; a cool compress for soreness.')),
             const SizedBox(height: 9),
-            _pad(_check("Paracetamol only if he's uncomfortable — weight-based, confirm the dose with your paediatrician. Not before the shot.")),
+            _pad(_check("Paracetamol only if he's uncomfortable - weight-based, confirm the dose with your paediatrician. Not before the shot.")),
 
             // red flag
             const SizedBox(height: 18),
@@ -128,7 +128,7 @@ class VaccineDetailScreen extends StatelessWidget {
             _pad(_crossLink(context, 'Ask Veda', 'Can he get it if he has a fever?', const AskVedaScreen(), top: true, bottom: true)),
 
             const SizedBox(height: 20),
-            _pad(Text('Informational only, not medical advice — always confirm with your paediatrician.',
+            _pad(Text('Informational only, not medical advice - always confirm with your paediatrician.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),
@@ -201,17 +201,17 @@ class VaccineDetailScreen extends StatelessWidget {
       final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
       // Best-effort local notification (Android configured; a no-op if the
-      // platform can't schedule). Fire-and-forget — no context use after await.
+      // platform can't schedule). Fire-and-forget - no context use after await.
       NotificationService.instance.requestPermission();
       NotificationService.instance.scheduleOneOff(
         id: 700003,
-        title: 'Vaccine reminder — PCV dose 3',
+        title: 'Vaccine reminder - PCV dose 3',
         body: daysBefore == 0
             ? "Aarav's PCV dose 3 is due today (22 Jul)."
-            : "Aarav's PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} — 22 Jul.",
+            : "Aarav's PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - 22 Jul.",
         when: due.subtract(Duration(days: daysBefore)),
       );
-      messenger.showSnackBar(SnackBar(content: Text('Reminder set — $label'), behavior: SnackBarBehavior.floating));
+      messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));
     }
 
     showModalBottomSheet<void>(

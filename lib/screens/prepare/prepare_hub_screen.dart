@@ -1,8 +1,8 @@
 // =============================================================================
-//  PrepareHubScreen (S0) — the "Prepare" tab root
+//  PrepareHubScreen (S0) - the "Prepare" tab root
 // -----------------------------------------------------------------------------
 //  Landing for ParentVeda's guided/paid experiences. Sits under the real
-//  PvTabBar (rendered by MainScaffold), so it draws no nav of its own — just a
+//  PvTabBar (rendered by MainScaffold), so it draws no nav of its own - just a
 //  generous bottom pad to clear the floating pill. Routes into the five section
 //  screens. Faithful replica of design S0 (Priya · 30 weeks).
 // =============================================================================
@@ -45,7 +45,7 @@ class PrepareHubScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text('Prepare for your baby,\none guided step at a time.', style: pvHeroStyle()),
               const SizedBox(height: 14),
-              Text('Live classes, expert sessions, and gentle movement — chosen for exactly where you are.',
+              Text('Live classes, expert sessions, and gentle movement - chosen for exactly where you are.',
                   style: pvSubStyle()),
             ])),
 

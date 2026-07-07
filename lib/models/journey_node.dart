@@ -9,7 +9,7 @@
 
 import '../localization/app_language.dart';
 
-/// The kind of node — drives colour, icon and which card opens on tap.
+/// The kind of node - drives colour, icon and which card opens on tap.
 enum JourneyNodeType {
   week, // major week checkpoint -> week card stack
   achievement, // gold celebration -> achievement modal
@@ -56,7 +56,7 @@ class JourneyMilestone {
   /// Representative gestational week (drives trail position + day = week*7).
   final int anchorWeek;
 
-  /// Optional explicit pregnancy day (1–280) — used by [JourneyNodeType.pvJourney]
+  /// Optional explicit pregnancy day (1–280) - used by [JourneyNodeType.pvJourney]
   /// "Day 30/100/…" milestones instead of [anchorWeek]*7.
   final int? anchorDay;
 
@@ -82,21 +82,21 @@ class JourneyMilestone {
   double get posDay => (anchorDay ?? anchorWeek * 7).toDouble();
 
   /// A clinic-scheduled appointment (a scan / medical visit). The exact date is
-  /// set by the doctor — usually in the FUTURE — so it's "set", not a past event.
+  /// set by the doctor - usually in the FUTURE - so it's "set", not a past event.
   bool get isAppointment => type == JourneyNodeType.medical;
 
   /// Whether this milestone has a real, personal date worth editing. Only two
   /// kinds qualify, so the map stays simple and never asks for a date that can't
   /// exist:
   ///   • appointments the clinic schedules (every medical scan/visit), and
-  ///   • the handful of moments the mother actually witnesses on a day —
+  ///   • the handful of moments the mother actually witnesses on a day -
   ///     first movements felt (a_w18) and the bump's first kicks (mo_w20).
   /// Gestational/educational growth, the "N days together" counters and feature
   /// unlocks are derived from her dates and shown read-only (no edit button).
   bool get isDatable => isAppointment || id == 'a_w18' || id == 'mo_w20';
 }
 
-/// A resolved stop on the trail — either a week checkpoint or a milestone.
+/// A resolved stop on the trail - either a week checkpoint or a milestone.
 class MapNode {
   const MapNode({
     required this.type,

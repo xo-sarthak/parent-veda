@@ -18,7 +18,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../models/home_day.dart';
 
 /// The baby-focused modules that make up a complete daily moment (Emotional
-/// Check-In sits outside this — it is mother-focused reflection).
+/// Check-In sits outside this - it is mother-focused reflection).
 enum DailyModule { grow, read, talk, garbhSanskar, nurture, movement }
 
 class HomeContentController extends ChangeNotifier {
@@ -36,7 +36,7 @@ class HomeContentController extends ChangeNotifier {
   bool _isLoading = true;
   Object? _error;
 
-  /// Modules engaged in the current session (resets on relaunch — the daily
+  /// Modules engaged in the current session (resets on relaunch - the daily
   /// moment is a gentle ritual, not a persisted checklist).
   final Set<DailyModule> _engaged = {};
 
@@ -65,7 +65,7 @@ class HomeContentController extends ChangeNotifier {
         final path = '$_weekDir/week_${w.toString().padLeft(2, '0')}.json';
         await _tryLoadInto(path);
       }
-      // Legacy fallback day(s) — only added for days we don't already have.
+      // Legacy fallback day(s) - only added for days we don't already have.
       await _tryLoadInto(_legacyPath, fallbackOnly: true);
 
       _days.sort((a, b) => a.day.compareTo(b.day));
@@ -92,7 +92,7 @@ class HomeContentController extends ChangeNotifier {
         _days.add(d);
       }
     } catch (_) {
-      // Missing / unparseable file — skipped (expected during rollout).
+      // Missing / unparseable file - skipped (expected during rollout).
     }
   }
 

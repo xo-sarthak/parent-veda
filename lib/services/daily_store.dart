@@ -7,7 +7,7 @@
 //    * Kept Nurture affirmations  ("Keep This With Me")
 //    * Baby Movement responses    (Week 28+, stored per day)
 //
-//  shared_preferences only — no files. ChangeNotifier so Home cards react.
+//  shared_preferences only - no files. ChangeNotifier so Home cards react.
 //  Mirrors the lightweight style of [MemoryStore].
 // =============================================================================
 
@@ -153,13 +153,13 @@ class DailyStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
-  // === Cloud sync (Supabase) — two day-maps, a list, a string-list, and the
+  // === Cloud sync (Supabase) - two day-maps, a list, a string-list, and the
   //     father's mission-done day set. ==========================================
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
-      // daily_moods — one mood per day, keyed by (user_id, day)
+      // daily_moods - one mood per day, keyed by (user_id, day)
       final moodRows = await SupabaseRepo.fetch('daily_moods',
           orderBy: 'day', ascending: true);
       final cloudMoodDays = <int>{};
@@ -180,7 +180,7 @@ class DailyStore extends ChangeNotifier {
       await _persist(_moodKey,
           jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
 
-      // baby_talk — list, by id
+      // baby_talk - list, by id
       final talkRows = await SupabaseRepo.fetch('baby_talk');
       final talkById = {
         for (final r in talkRows) r['id'].toString(): _talkFromRow(r)
@@ -197,7 +197,7 @@ class DailyStore extends ChangeNotifier {
       await _persist(
           _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
 
-      // kept_affirmations — plain strings, keyed by the text itself
+      // kept_affirmations - plain strings, keyed by the text itself
       final keptRows = await SupabaseRepo.fetch('kept_affirmations');
       final cloudKept =
           keptRows.map((r) => (r['text'] ?? '').toString()).toSet();
@@ -213,7 +213,7 @@ class DailyStore extends ChangeNotifier {
         ..addAll(mergedKept);
       await _persist(_keptKey, jsonEncode(_kept));
 
-      // daily_movement_responses — one response per day, keyed by (user_id, day)
+      // daily_movement_responses - one response per day, keyed by (user_id, day)
       final mvRows = await SupabaseRepo.fetch('daily_movement_responses',
           orderBy: 'day', ascending: true);
       final cloudMvDays = <int>{};
@@ -234,7 +234,7 @@ class DailyStore extends ChangeNotifier {
       await _persist(_movementKey,
           jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
 
-      // father_missions — done days, keyed by (user_id, day)
+      // father_missions - done days, keyed by (user_id, day)
       final missionRows = await SupabaseRepo.fetch('father_missions',
           orderBy: 'day', ascending: true);
       final cloudMissionDays = <int>{};
@@ -255,7 +255,7 @@ class DailyStore extends ChangeNotifier {
       await _persist(_missionKey, jsonEncode(_missionsDone.toList()));
 
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   Map<String, dynamic> _talkToRow(TalkEntry e) => {
@@ -351,7 +351,7 @@ class DailyStore extends ChangeNotifier {
   }
 
   /// Appends a free-standing note to the Dear Baby vault (does NOT dedup by
-  /// day, unlike [saveTalk]). Used by tools — e.g. a Baby Movement memory.
+  /// day, unlike [saveTalk]). Used by tools - e.g. a Baby Movement memory.
   Future<TalkEntry> addDearBabyNote({
     required int week,
     required String prompt,

@@ -1,5 +1,5 @@
 // =============================================================================
-//  JournalScreen — "My Journal" (the mother's pregnancy memory timeline)
+//  JournalScreen - "My Journal" (the mother's pregnancy memory timeline)
 // -----------------------------------------------------------------------------
 //  A chronological, emotional feed (newest first) of memories, photos, notes
 //  for baby, and auto milestones/health logs. Warm-Nest visual language:
@@ -55,7 +55,7 @@ class _JournalScreenState extends State<JournalScreen> {
   bool _groupsTouched = false; // false → default (only most-recent group open)
   final PageController _bookCtrl = PageController();
 
-  // Combined (you + Dad) booklet — a separate mode, reached via its own app-bar
+  // Combined (you + Dad) booklet - a separate mode, reached via its own app-bar
   // icon. Father entries surface ONLY here; her List/Booklet stay her own.
   bool _combined = false;
   final PageController _combinedBookCtrl = PageController();
@@ -169,7 +169,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   ? _JournalView.booklet
                   : _JournalView.list),
             ),
-          // Combined (you + Dad) booklet — its own toggle.
+          // Combined (you + Dad) booklet - its own toggle.
           if (!_searching)
             IconButton(
               tooltip: _combined ? 'My journal' : 'Combined · you + Dad',
@@ -223,7 +223,7 @@ class _JournalScreenState extends State<JournalScreen> {
                             : _groupedList(s, list)),
                   ),
                 ])),
-      // Just a "+" — the create options open on tap (the long label was
+      // Just a "+" - the create options open on tap (the long label was
       // spilling out of the button).
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreate(s),
@@ -516,7 +516,7 @@ class _JournalScreenState extends State<JournalScreen> {
         ),
       );
 
-  // --- timeline (grouped by day) — replaced by _groupedList; kept for revert.
+  // --- timeline (grouped by day) - replaced by _groupedList; kept for revert.
   // ignore: unused_element
   Widget _timeline(S s, List<JournalEntry> list) {
     final groups = <String, List<JournalEntry>>{};
@@ -1377,7 +1377,7 @@ class _JournalScreenState extends State<JournalScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  Booklet decoration — backdrop, ruled-paper texture, ribbon bookmark.
+//  Booklet decoration - backdrop, ruled-paper texture, ribbon bookmark.
 //  Quiet, low-opacity warm elements so even a single-entry page feels cosy.
 // ---------------------------------------------------------------------------
 

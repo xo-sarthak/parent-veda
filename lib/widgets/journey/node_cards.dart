@@ -224,7 +224,7 @@ class _NodeCard extends StatelessWidget {
     final m = milestone;
     final override = JourneyDatesStore.instance.dateFor(m.id);
     // Displayed date = the mother's override if set, else computed from her due
-    // date. (Editing changes only the SHOWN date — the node keeps its trail
+    // date. (Editing changes only the SHOWN date - the node keeps its trail
     // position for now.)
     final date = override ?? controller.dateForDay(m.posDay.round());
     final dateStr = s.formatLongDate(date);
@@ -369,7 +369,7 @@ class _NodeCard extends StatelessWidget {
         return () => KegelCareScreen(controller: controller);
       case 'f_contraction':
         return () => ContractionTrackerScreen(controller: controller);
-      default: // f_hospital — not built yet
+      default: // f_hospital - not built yet
         return null;
     }
   }

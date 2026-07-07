@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Development — shared UI building blocks
+//  ParentVeda Development - shared UI building blocks
 // -----------------------------------------------------------------------------
 //  Playful, optimistic, activity-driven (deliberately warmer/brighter than
 //  Health): area cards with their own accent, supportive progress words (never
@@ -11,14 +11,14 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 
-/// A supportive progress pill — "Growing", never a number.
+/// A supportive progress pill - "Growing", never a number.
 Widget devWordPill(DevWord w, Color accent) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(color: accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
       child: Text(devWordLabel(w), style: ppBody(11, color: accent, w: FontWeight.w700)),
     );
 
-/// A soft, encouraging progress bar (not a score — just visual warmth).
+/// A soft, encouraging progress bar (not a score - just visual warmth).
 Widget devProgressBar(DevWord w, Color accent) => ClipRRect(
       borderRadius: BorderRadius.circular(999),
       child: Container(
@@ -36,7 +36,7 @@ Widget devSectionHeader(String title, {String? action, VoidCallback? onAction}) 
       ],
     );
 
-/// A playful area card — its own accent, current stage, supportive word.
+/// A playful area card - its own accent, current stage, supportive word.
 class DevAreaCard extends StatelessWidget {
   const DevAreaCard({super.key, required this.area, required this.onTap, this.width});
   final DevArea area;
@@ -76,7 +76,7 @@ class DevAreaCard extends StatelessWidget {
   }
 }
 
-/// An activity list card (thumb-free, icon-led — activities are about doing).
+/// An activity list card (thumb-free, icon-led - activities are about doing).
 class DevActivityCard extends StatelessWidget {
   const DevActivityCard({super.key, required this.activity, required this.onTap});
   final DevActivity activity;

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ExpertFollowStore — who the user follows (EXPERTS ONLY)
+//  ExpertFollowStore - who the user follows (EXPERTS ONLY)
 // -----------------------------------------------------------------------------
 //  Twitter-style following, limited to verified experts (regular members can't
 //  be followed yet). A followed expert's posts show up in the "Following" feed,

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ScansAppointmentsScreen — "Scans & Appointments" care roadmap
+//  ScansAppointmentsScreen - "Scans & Appointments" care roadmap
 // -----------------------------------------------------------------------------
 //  Calm, confidence-building roadmap (not hospital software): Upcoming /
 //  Completed / Care Roadmap. Scan content is reused from kJourneyMilestones
@@ -19,7 +19,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/app_theme.dart';
 
-const Color _scanColor = Color(0xFF2E9C8E); // teal — matches Journal "Scans"
+const Color _scanColor = Color(0xFF2E9C8E); // teal - matches Journal "Scans"
 const List<BoxShadow> _soft = [
   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
 ];
@@ -85,7 +85,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
   }
 
   Widget _segmented(S s) {
-    // Care roadmap removed — Roadmap tab dropped. _roadmap/_roadmapRow kept
+    // Care roadmap removed - Roadmap tab dropped. _roadmap/_roadmapRow kept
     // (ignore: unused_element) for revert.
     final tabs = [s.scnTabUpcoming, s.scnTabCompleted];
     return Container(
@@ -697,7 +697,7 @@ class _ScanDetail extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 18),
-          // "What is this scan?" — a plain-language intro at the very top.
+          // "What is this scan?" - a plain-language intro at the very top.
           if (guide != null) ...[
             _whatIsCard(s, guide.whatIs.of(lang)),
             const SizedBox(height: 18),
@@ -868,7 +868,7 @@ class _ScanDetail extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Full-screen "How to interpret your report" — glossary + clear disclaimer
+//  Full-screen "How to interpret your report" - glossary + clear disclaimer
 // ---------------------------------------------------------------------------
 class _ScanInterpretScreen extends StatelessWidget {
   const _ScanInterpretScreen(

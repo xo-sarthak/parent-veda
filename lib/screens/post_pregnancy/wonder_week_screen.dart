@@ -1,5 +1,5 @@
 // =============================================================================
-//  WonderWeekScreen — Tools · Wonder Week Window (parenting · S22b v2 premium)
+//  WonderWeekScreen - Tools · Wonder Week Window (parenting · S22b v2 premium)
 // -----------------------------------------------------------------------------
 //  A ParentVeda original: which leap the baby is in, how far through the storm,
 //  an Indian-context "nazar" reframe, what he's working on, the sunny side,
@@ -121,7 +121,7 @@ class WonderWeekScreen extends StatelessWidget {
                       Text('"NAZAR LAG GAYI?"', style: ppBody(11, color: const Color(0xFFC6295A), w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
                     ]),
                     const SizedBox(height: 8),
-                    Text("Clingy and crying more? It's not the evil eye — it's Leap 4's fussiness, and it passes. This is growth.",
+                    Text("Clingy and crying more? It's not the evil eye - it's Leap 4's fussiness, and it passes. This is growth.",
                         style: ppFraunces(17, h: 1.45)),
                   ]),
                 )),
@@ -152,7 +152,7 @@ class WonderWeekScreen extends StatelessWidget {
                     ppEyebrow('On the sunny side', color: ppBrown, spacing: 0.8),
                   ]),
                   const SizedBox(height: 8),
-                  Text('A calmer, more capable baby — steadier reaching, the first real rolls, and longer, settled sleep stretches.',
+                  Text('A calmer, more capable baby - steadier reaching, the first real rolls, and longer, settled sleep stretches.',
                       style: ppBody(14, color: ppInk, h: 1.6)),
                 ]),
               )),
@@ -161,7 +161,7 @@ class WonderWeekScreen extends StatelessWidget {
               const SizedBox(height: 28),
               _pad(Text('Riding out the storm', style: ppJakarta(17))),
               const SizedBox(height: 12),
-              _pad(_link(context, 'Play', ppPurple, 'Peekaboo — soothe the clinginess',
+              _pad(_link(context, 'Play', ppPurple, 'Peekaboo - soothe the clinginess',
                   () => _push(context, const GrowthActivityScreen()), top: true)),
               _pad(_link(context, 'Nuskha', ppBrown, 'Ajwain potli for leap-time sniffles',
                   () => _push(context, const RemedyDetailScreen()), top: true)),

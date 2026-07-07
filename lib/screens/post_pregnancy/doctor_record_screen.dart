@@ -1,5 +1,5 @@
 // =============================================================================
-//  DoctorRecordScreen — the "Doctor-ready record" (a shareable summary)
+//  DoctorRecordScreen - the "Doctor-ready record" (a shareable summary)
 // -----------------------------------------------------------------------------
 //  Compiles one clean, hand-to-the-doctor summary from the child's health data:
 //  vaccinations, growth, allergies, medical history / medications, recent
@@ -41,7 +41,7 @@ class DoctorRecordScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 _pad(Text('Doctor-ready record', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('A clean summary of Aarav’s health so far — everything a doctor might ask, in one place.', style: ppBody(14, h: 1.5))),
+                _pad(Text('A clean summary of Aarav’s health so far - everything a doctor might ask, in one place.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 20),
                 _pad(_headerCard()),
@@ -67,11 +67,11 @@ class DoctorRecordScreen extends StatelessWidget {
 
                 _section('Recent illnesses', Icons.sick_outlined, illnesses.isEmpty
                     ? [_line('Recorded', 'None')]
-                    : [for (final e in illnesses) _line(e.date, '${e.title} — ${e.summary}')]),
+                    : [for (final e in illnesses) _line(e.date, '${e.title} - ${e.summary}')]),
 
                 _section('Reports', Icons.description_outlined, store.reports.isEmpty
                     ? [_line('Recorded', 'None')]
-                    : [for (final r in store.reports) _line(r.date, '${r.name}${r.summary.isNotEmpty ? ' — ${r.summary}' : ''}')]),
+                    : [for (final r in store.reports) _line(r.date, '${r.name}${r.summary.isNotEmpty ? ' - ${r.summary}' : ''}')]),
 
                 const SizedBox(height: 24),
                 _pad(GestureDetector(
@@ -89,7 +89,7 @@ class DoctorRecordScreen extends StatelessWidget {
                   ),
                 )),
                 const SizedBox(height: 14),
-                _pad(Text('A summary for your convenience — your paediatrician’s own records remain the source of truth.',
+                _pad(Text('A summary for your convenience - your paediatrician’s own records remain the source of truth.',
                     textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
               ],
             );
@@ -138,13 +138,13 @@ class DoctorRecordScreen extends StatelessWidget {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           SizedBox(width: 96, child: Text(label, style: ppBody(12, color: ppMuted, w: FontWeight.w700))),
           const SizedBox(width: 10),
-          Expanded(child: Text(value.isEmpty ? '—' : value, style: ppBody(13, color: ppInk, h: 1.45))),
+          Expanded(child: Text(value.isEmpty ? '-' : value, style: ppBody(13, color: ppInk, h: 1.45))),
         ]),
       );
 
   String _shareText(HealthStore store, List<HealthEvent> vax, List<HealthEvent> illnesses, GrowthPoint latest) {
     final b = StringBuffer()
-      ..writeln('DOCTOR-READY RECORD — Aarav')
+      ..writeln('DOCTOR-READY RECORD - Aarav')
       ..writeln('Born 8 March 2026 · 4 months · Blood group B+')
       ..writeln('')
       ..writeln('VACCINATIONS')
@@ -173,7 +173,7 @@ class DoctorRecordScreen extends StatelessWidget {
       b.writeln('  None recorded');
     } else {
       for (final m in store.medications) {
-        b.writeln('  ${m.name} — ${m.reason} · ${m.dosage} · ${m.completed ? 'completed' : 'ongoing'}');
+        b.writeln('  ${m.name} - ${m.reason} · ${m.dosage} · ${m.completed ? 'completed' : 'ongoing'}');
       }
     }
     b
@@ -183,7 +183,7 @@ class DoctorRecordScreen extends StatelessWidget {
       b.writeln('  None recorded');
     } else {
       for (final e in illnesses) {
-        b.writeln('  ${e.date}: ${e.title} — ${e.summary}');
+        b.writeln('  ${e.date}: ${e.title} - ${e.summary}');
       }
     }
     b
@@ -193,7 +193,7 @@ class DoctorRecordScreen extends StatelessWidget {
       b.writeln('  None recorded');
     } else {
       for (final r in store.reports) {
-        b.writeln('  ${r.date}: ${r.name}${r.summary.isNotEmpty ? ' — ${r.summary}' : ''}');
+        b.writeln('  ${r.date}: ${r.name}${r.summary.isNotEmpty ? ' - ${r.summary}' : ''}');
       }
     }
     return b.toString();

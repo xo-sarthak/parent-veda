@@ -1,12 +1,12 @@
 // =============================================================================
-//  WeekOverviewCard — "ParentVeda Journey" design (de-cluttered week card)
+//  WeekOverviewCard - "ParentVeda Journey" design (de-cluttered week card)
 // -----------------------------------------------------------------------------
 //  An elevated, de-cluttered take on the week's opening card per the Claude
 //  Design "ParentVeda Journey" screen: a soft gradient panel with a progress-
 //  RING hero around the baby/fruit figure (size · length · weight beneath), then
 //  collapsible accordions (Baby / Mother / Health) so content de-clutters into
 //  dropdowns. Horizontal swipe stays (this is one carousel card); each card just
-//  scrolls cleaner. Currently used ONLY for week 20 as a preview — the original
+//  scrolls cleaner. Currently used ONLY for week 20 as a preview - the original
 //  Size/Baby/Mother cards are untouched (see buildWeekCards).
 //
 //  PvAccordion is reusable, so the same dropdown pattern can roll out to the
@@ -107,7 +107,7 @@ class WeekOverviewCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Hero — progress ring around baby/fruit + size/length/weight
+//  Hero - progress ring around baby/fruit + size/length/weight
 // ---------------------------------------------------------------------------
 class WeekSizeHero extends StatelessWidget {
   const WeekSizeHero(
@@ -115,7 +115,7 @@ class WeekSizeHero extends StatelessWidget {
   final WeekContent w;
   final AppLanguage lang;
 
-  /// Father re-skin (Slate) — colours/fonts only; the real baby/fruit images
+  /// Father re-skin (Slate) - colours/fonts only; the real baby/fruit images
   /// are never touched.
   final bool father;
 
@@ -243,7 +243,7 @@ class _RingPainter extends CustomPainter {
     final c = size.center(Offset.zero);
     final r = (size.width - stroke) / 2;
     final track = father ? kFAccent : AppTheme.primary500;
-    // Single arc colour (was a 2-colour gradient) — matches the progress bar.
+    // Single arc colour (was a 2-colour gradient) - matches the progress bar.
     final arc = father ? kFAccent : AppTheme.primary500;
     canvas.drawCircle(
       c,
@@ -364,7 +364,7 @@ class _StatCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  PvAccordion — the reusable dropdown that de-clutters card content
+//  PvAccordion - the reusable dropdown that de-clutters card content
 // ---------------------------------------------------------------------------
 class PvAccordion extends StatefulWidget {
   const PvAccordion({
@@ -500,7 +500,7 @@ class _RichMother extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(m.emotionalState.of(lang), style: _bodyStyle()),
       const SizedBox(height: 12),
-      // Mother's Body Changes — bucketed biological sections when authored for
+      // Mother's Body Changes - bucketed biological sections when authored for
       // this week; otherwise the single physical-changes paragraph.
       if (changes != null) ...[
         for (final ch in changes)
@@ -613,7 +613,7 @@ class _Tinted extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Week-20 design cards — same elevated panel + dropdown pattern for the rest
+//  Week-20 design cards - same elevated panel + dropdown pattern for the rest
 //  of the carousel (Video / Nutrition / Action Plan / Share). Week 20 only.
 // ===========================================================================
 
@@ -714,7 +714,7 @@ class WeekVideoCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
-            // One heading for the whole week's video — just "Pregnancy Week N".
+            // One heading for the whole week's video - just "Pregnancy Week N".
             // The specific video title was removed: this video covers the entire
             // week, not a single event.
             child: Row(children: [
@@ -734,7 +734,7 @@ class WeekVideoCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     // Father uses the MOTHER's heading font (plusJakartaSans),
-                    // a bit bolder (w800), in Slate ink — the serif read poorly.
+                    // a bit bolder (w800), in Slate ink - the serif read poorly.
                     style: father
                         ? GoogleFonts.plusJakartaSans(
                             fontSize: 18,
@@ -816,7 +816,7 @@ class WeekVideoCard extends StatelessWidget {
             ),
           ),
         ),
-        // "Why this matters" removed from the Watch-this-week section — just
+        // "Why this matters" removed from the Watch-this-week section - just
         // the video now. Kept (commented) for revert.
         // const SizedBox(height: 12),
         // PvAccordion(
@@ -925,7 +925,7 @@ class WeekActionCard extends StatelessWidget {
         _cardHeader(Icons.checklist_rounded, AppTheme.primary500,
             s.guidanceEyebrow, s.doSkipTruth),
         const SizedBox(height: 14),
-        // "What to do this week" removed per Deepti — skip + myth buster only.
+        // "What to do this week" removed per Deepti - skip + myth buster only.
         PvAccordion(
           icon: Icons.do_not_disturb_on_rounded,
           color: AppTheme.secondary500,
@@ -1061,7 +1061,7 @@ class WeekTipsCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Milestone card — baby's journey as a vertical timeline (reached / this
+//  Milestone card - baby's journey as a vertical timeline (reached / this
 //  week / upcoming). Week 20 preview; curated baby milestones.
 // ---------------------------------------------------------------------------
 class _MS {
@@ -1079,8 +1079,8 @@ const List<_MS> _milestones = [
           hi: 'Aapke baby ka dil dhadakna shuru hua.')),
   _MS(12, '🤏', LocalizedText(en: 'First movements', hi: 'Pehli harkatein'),
       LocalizedText(
-          en: 'Baby started moving — still too small to feel.',
-          hi: 'Baby ne hilna shuru kiya — abhi mehsoos hone ke liye bahut chhota.')),
+          en: 'Baby started moving - still too small to feel.',
+          hi: 'Baby ne hilna shuru kiya - abhi mehsoos hone ke liye bahut chhota.')),
   _MS(18, '👂', LocalizedText(en: 'Beginning to hear', hi: 'Sunna shuru'),
       LocalizedText(
           en: "Baby's hearing is developing and picking up sound.",
@@ -1091,8 +1091,8 @@ const List<_MS> _milestones = [
       LocalizedText(
           en: 'Halfway & first flutters', hi: 'Aadha safar & pehli harkat'),
       LocalizedText(
-          en: "You may feel the first kicks — and you're halfway there!",
-          hi: 'Aap pehli kicks mehsoos kar sakti hain — aur aadha safar poora!')),
+          en: "You may feel the first kicks - and you're halfway there!",
+          hi: 'Aap pehli kicks mehsoos kar sakti hain - aur aadha safar poora!')),
   _MS(24, '🛡️', LocalizedText(en: 'Viability milestone', hi: 'Viability padaav'),
       LocalizedText(
           en: "A major step in your baby's development.",

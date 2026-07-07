@@ -1,5 +1,5 @@
 // =============================================================================
-//  Can I?™  — the Explore tab
+//  Can I?™  - the Explore tab
 // -----------------------------------------------------------------------------
 //  The fastest way to settle a everyday "is this okay?" worry: search → a clear
 //  verdict card → short answer → why → trimester notes → Indian context →
@@ -425,7 +425,7 @@ class CanIAnswerScreen extends StatelessWidget {
   final PregnancyController controller;
 
   void _askVeda(BuildContext context, S s) {
-    // Ask Veda is live — open it pre-filled with this question (it has the data).
+    // Ask Veda is live - open it pre-filled with this question (it has the data).
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => AskVedaScreen(
           controller: controller,

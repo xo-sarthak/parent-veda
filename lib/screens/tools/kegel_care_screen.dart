@@ -1,7 +1,7 @@
 // =============================================================================
 //  Kegel Care
 // -----------------------------------------------------------------------------
-//  Pregnancy self-care & birth preparation — NOT a workout or gamified app.
+//  Pregnancy self-care & birth preparation - NOT a workout or gamified app.
 //  No levels, XP, streaks or achievements. A pregnancy-aware adaptive routine
 //  (3 stages by week), a guided hold/relax session, and a calm "Care Journey".
 //  Per the product spec.
@@ -60,7 +60,7 @@ _Routine _recommendedFor(int week) {
   );
 }
 
-/// The EFFECTIVE routine that's actually used — the user's custom one if set,
+/// The EFFECTIVE routine that's actually used - the user's custom one if set,
 /// otherwise the recommended one.
 _Routine _routineFor(int week) {
   final rec = _recommendedFor(week);
@@ -126,9 +126,9 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
             children: [
-              // Hero ("Pelvic Floor Care") removed per request — its intro now
+              // Hero ("Pelvic Floor Care") removed per request - its intro now
               // lives inside the "Why am I doing this?" collapsible below.
-              // What is a Kegel & how to do it — at the top, OPEN by default.
+              // What is a Kegel & how to do it - at the top, OPEN by default.
               _Expandable(
                 title: s.kegelHowTitle,
                 body: s.kegelHowBody,
@@ -136,13 +136,13 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 onToggle: () => setState(() => _howExpanded = !_howExpanded),
               ),
               const SizedBox(height: 14),
-              // Current routine — now contains the ℹ️ "Why this routine?", the
+              // Current routine - now contains the ℹ️ "Why this routine?", the
               // Edit ✏️ (Customize), and the Start session button.
               _currentRoutineCard(context, s, text, r),
               const SizedBox(height: 14),
-              // "Why this routine?" box removed — it opens from the ℹ️ in the
-              // card. Standalone "Start Care Session" button removed — now in card.
-              // Why am I doing this? — now holds the Pelvic Floor Care intro
+              // "Why this routine?" box removed - it opens from the ℹ️ in the
+              // card. Standalone "Start Care Session" button removed - now in card.
+              // Why am I doing this? - now holds the Pelvic Floor Care intro
               // (its old text dropped).
               _Expandable(
                 title: s.whyAmIDoingThis,
@@ -161,7 +161,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                     ]),
               ),
               const SizedBox(height: 14),
-              // Safety — styled as a clear WARNING banner, not a plain text box.
+              // Safety - styled as a clear WARNING banner, not a plain text box.
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -277,7 +277,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
               ),
             ]),
           ),
-          // Edit (✏️) — opens the Customize sheet (moved here from the old
+          // Edit (✏️) - opens the Customize sheet (moved here from the old
           // bottom "Customize" button; Reset-to-recommended lives in the sheet).
           IconButton(
             visualDensity: VisualDensity.compact,
@@ -301,7 +301,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
           ),
         ],
         const SizedBox(height: 14),
-        // Start session — replaces the old "Customize" button (the standalone
+        // Start session - replaces the old "Customize" button (the standalone
         // Start Care Session button was removed; Customize is now the ✏️ above).
         SizedBox(
           width: double.infinity,
@@ -352,7 +352,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
     );
   }
 
-  // Old recommended-routine info popup — no longer used (the ℹ️ now shows "Why
+  // Old recommended-routine info popup - no longer used (the ℹ️ now shows "Why
   // this routine?"); kept for revert.
   // ignore: unused_element
   Future<void> _showRecommendInfo(BuildContext context, S s, _Routine rec) {
@@ -904,7 +904,7 @@ class _CareJourneyScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Session ring — a soft disc with a depleting arc for the current phase.
+//  Session ring - a soft disc with a depleting arc for the current phase.
 // ---------------------------------------------------------------------------
 
 class _RingPainter extends CustomPainter {

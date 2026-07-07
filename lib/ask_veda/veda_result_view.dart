@@ -1,15 +1,15 @@
 // =============================================================================
-//  VedaResultView — the ONE shared Ask Veda result UI (both sides of the app)
+//  VedaResultView - the ONE shared Ask Veda result UI (both sides of the app)
 // -----------------------------------------------------------------------------
 //  Renders the neutral VedaAnswerView (the fixed 7-section result) so pregnancy
-//  and parenting show the SAME interface — never two designs for the same thing.
+//  and parenting show the SAME interface - never two designs for the same thing.
 //  It's driven entirely by data + a theme + routing callbacks:
 //    • VedaViewTheme supplies the colours (each app passes its own palette),
-//    • VedaContentRef.typeLabel already carries the human label (plug-and-play —
+//    • VedaContentRef.typeLabel already carries the human label (plug-and-play -
 //      a new content type needs no switch here),
 //    • the host screen supplies what a tap DOES (routing needs its Navigator).
 //  Empty sections are omitted. Typography (Fraunces + Manrope) is shared by both
-//  apps, so it lives here. No app imports — only flutter + google_fonts + core.
+//  apps, so it lives here. No app imports - only flutter + google_fonts + core.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class VedaResultView extends StatelessWidget {
     required this.view,
     required this.theme,
     this.disclaimer =
-        'General guidance for your stage — not a diagnosis, and never a substitute for your doctor.',
+        'General guidance for your stage - not a diagnosis, and never a substitute for your doctor.',
     this.onOpenContent,
     this.onOpenProducts,
     this.onOpenServices,
@@ -62,7 +62,7 @@ class VedaResultView extends StatelessWidget {
   final VoidCallback? onOpenCommunity;
   final void Function(int index)? onAction;
 
-  // Icon per kind — a small map with a sensible default, so adding a kind never
+  // Icon per kind - a small map with a sensible default, so adding a kind never
   // forces an edit here (the label already comes from the doc).
   static const Map<VedaKind, IconData> _icons = {
     VedaKind.canI: Icons.help_outline_rounded,
@@ -97,40 +97,40 @@ class VedaResultView extends StatelessWidget {
     final sections = <Widget>[];
     void gap() => sections.add(const SizedBox(height: 24));
 
-    // S1 — Veda answer (hero)
+    // S1 - Veda answer (hero)
     sections.add(_answer());
 
-    // S2 — What this means for you
+    // S2 - What this means for you
     if (view.meaning.trim().isNotEmpty) {
       gap();
       sections.add(_meaning());
     }
 
-    // S3 — Recommended actions
+    // S3 - Recommended actions
     if (view.actions.isNotEmpty) {
       gap();
       sections.add(_actions());
     }
 
-    // S4 — ParentVeda content
+    // S4 - ParentVeda content
     if (view.content.isNotEmpty) {
       gap();
       sections.add(_content());
     }
 
-    // S5 — Community insight (social proof)
+    // S5 - Community insight (social proof)
     if (view.community != null && view.community!.trim().isNotEmpty) {
       gap();
       sections.add(_community(view.community!));
     }
 
-    // S6 — Products
+    // S6 - Products
     if (view.products.isNotEmpty) {
       gap();
       sections.add(_list('Products', view.products, Icons.shopping_bag_outlined, onOpenProducts));
     }
 
-    // S7 — Services
+    // S7 - Services
     if (view.services.isNotEmpty) {
       gap();
       sections.add(_list('Services', view.services, Icons.handshake_outlined, onOpenServices));

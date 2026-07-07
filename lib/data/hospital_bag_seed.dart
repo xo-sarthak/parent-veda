@@ -27,7 +27,7 @@ class _Seed {
 }
 
 // ---------------------------------------------------------------------------
-//  ParentVeda recommendations (trust layer) — placeholder prices.
+//  ParentVeda recommendations (trust layer) - placeholder prices.
 // ---------------------------------------------------------------------------
 
 const _recNursingBra = BagRecommendation(
@@ -51,7 +51,7 @@ const _recMaternityPads = BagRecommendation(
 );
 const _recNippleCream = BagRecommendation(
   price: 449,
-  why: ['Soothes sore, sensitive skin', 'Safe for baby — no need to wipe off'],
+  why: ['Soothes sore, sensitive skin', 'Safe for baby - no need to wipe off'],
   consider: ['A little goes a long way'],
 );
 const _recSwaddle = BagRecommendation(
@@ -65,7 +65,7 @@ const _recBodysuits = BagRecommendation(
   price: 899,
   why: ['Gentle cotton on newborn skin', 'Easy snap changes',
         'A pack of everyday essentials'],
-  consider: ['Newborn size is outgrown quickly — do not over-buy'],
+  consider: ['Newborn size is outgrown quickly - do not over-buy'],
 );
 const _recDiapers = BagRecommendation(
   price: 499,
@@ -136,7 +136,7 @@ const List<_Seed> _seed = [
 ];
 
 // ---------------------------------------------------------------------------
-//  Suggested essentials ("Most mothers also pack") — optional add-ons.
+//  Suggested essentials ("Most mothers also pack") - optional add-ons.
 // ---------------------------------------------------------------------------
 
 const List<_Seed> _suggested = [
@@ -166,13 +166,13 @@ List<BagItem> generateDefaultBag(DeliveryType delivery) => [
 List<BagItem> suggestedEssentials() =>
     [for (final s in _suggested) _itemFromSeed(s)];
 
-/// EVERY catalogue item (default + suggested) as fresh templates — for the
+/// EVERY catalogue item (default + suggested) as fresh templates - for the
 /// "Add items" browser, which shows them all and ticks the ones already in her
 /// bag. (Delivery-specific items are included; the bag onboarding filters them.)
 List<BagItem> allBagCatalogItems() =>
     [for (final s in [..._seed, ..._suggested]) _itemFromSeed(s)];
 
-/// The catalogue grouped by section, in display order — for the browser.
+/// The catalogue grouped by section, in display order - for the browser.
 Map<BagCategory, List<BagItem>> bagCatalogByCategory() {
   final out = <BagCategory, List<BagItem>>{};
   for (final s in [..._seed, ..._suggested]) {

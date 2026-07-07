@@ -1,11 +1,11 @@
 // =============================================================================
-//  Mother's Body Changes — week-by-week, in gentle biological sections
+//  Mother's Body Changes - week-by-week, in gentle biological sections
 // -----------------------------------------------------------------------------
 //  Richer, researched "what is changing in your body this week" content, broken
 //  into small biological sections (hormones, womb, breasts…). Seeded for the
 //  preview weeks (4 & 5); when a week is present here, the Mom's Journey card
 //  renders these sections instead of the single physical-changes paragraph.
-//  Educational + reassuring only — never diagnostic.
+//  Educational + reassuring only - never diagnostic.
 // =============================================================================
 
 import '../localization/app_language.dart';
@@ -21,8 +21,8 @@ const Map<int, List<BodyChange>> kBodyChanges = {
     BodyChange(
       LocalizedText(en: 'Hormones', hi: 'Hormones'),
       LocalizedText(
-          en: 'The pregnancy hormone hCG is rising — this is what a home test detects.',
-          hi: 'Pregnancy hormone hCG badh raha hai — yahi home test detect karta hai.'),
+          en: 'The pregnancy hormone hCG is rising - this is what a home test detects.',
+          hi: 'Pregnancy hormone hCG badh raha hai - yahi home test detect karta hai.'),
     ),
     BodyChange(
       LocalizedText(en: 'Your womb', hi: 'Aapka garbhashay'),
@@ -33,8 +33,8 @@ const Map<int, List<BodyChange>> kBodyChanges = {
     BodyChange(
       LocalizedText(en: 'How you may feel', hi: 'Kaisa lag sakta hai'),
       LocalizedText(
-          en: 'Often nothing obvious yet — perhaps mild cramps or slightly tender breasts.',
-          hi: 'Aksar abhi kuch khaas nahi — halki cramps ya breasts mein halka khinchaav ho sakta hai.'),
+          en: 'Often nothing obvious yet - perhaps mild cramps or slightly tender breasts.',
+          hi: 'Aksar abhi kuch khaas nahi - halki cramps ya breasts mein halka khinchaav ho sakta hai.'),
     ),
     BodyChange(
       LocalizedText(en: 'Blood supply', hi: 'Blood supply'),
@@ -65,28 +65,28 @@ const Map<int, List<BodyChange>> kBodyChanges = {
     BodyChange(
       LocalizedText(en: 'Nausea', hi: 'Matli'),
       LocalizedText(
-          en: 'Early morning sickness may begin — small, frequent meals help.',
-          hi: 'Subah ki matli shuru ho sakti hai — thode-thode baar-baar meals madad karte hain.'),
+          en: 'Early morning sickness may begin - small, frequent meals help.',
+          hi: 'Subah ki matli shuru ho sakti hai - thode-thode baar-baar meals madad karte hain.'),
     ),
     BodyChange(
       LocalizedText(en: 'Your womb', hi: 'Aapka garbhashay'),
       LocalizedText(
-          en: 'Your uterus is still small (about a lemon) — no visible bump yet.',
-          hi: 'Aapka uterus abhi chhota hai (lagbhag nimbu jitna) — abhi bump nahi dikhega.'),
+          en: 'Your uterus is still small (about a lemon) - no visible bump yet.',
+          hi: 'Aapka uterus abhi chhota hai (lagbhag nimbu jitna) - abhi bump nahi dikhega.'),
     ),
   ],
   20: [
     BodyChange(
       LocalizedText(en: 'Hormones', hi: 'Hormones'),
       LocalizedText(
-          en: 'Levels are steadier now — many feel more energy in the second trimester.',
-          hi: 'Ab levels zyada sthir hain — doosri trimester mein kai logon ko zyada urja mehsoos hoti hai.'),
+          en: 'Levels are steadier now - many feel more energy in the second trimester.',
+          hi: 'Ab levels zyada sthir hain - doosri trimester mein kai logon ko zyada urja mehsoos hoti hai.'),
     ),
     BodyChange(
       LocalizedText(en: 'Your bump', hi: 'Aapka bump'),
       LocalizedText(
-          en: 'The top of your uterus reaches your belly button — your bump is clearly showing.',
-          hi: 'Aapke uterus ka upri hissa naabhi tak pahunch jaata hai — bump saaf dikhne lagta hai.'),
+          en: 'The top of your uterus reaches your belly button - your bump is clearly showing.',
+          hi: 'Aapke uterus ka upri hissa naabhi tak pahunch jaata hai - bump saaf dikhne lagta hai.'),
     ),
     BodyChange(
       LocalizedText(en: 'First movements', hi: 'Pehli harkatein'),

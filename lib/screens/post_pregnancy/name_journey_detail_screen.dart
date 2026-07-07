@@ -1,8 +1,8 @@
 // =============================================================================
-//  NameJourneyDetailScreen — V2 "Deep Dive" (every name's beautiful page)
+//  NameJourneyDetailScreen - V2 "Deep Dive" (every name's beautiful page)
 // -----------------------------------------------------------------------------
 //  The star of the journey: meaning, pronunciation, origin, script, mythology,
-//  numerology, nakshatra and similar names, PLUS the three V2 heroes — the AI
+//  numerology, nakshatra and similar names, PLUS the three V2 heroes - the AI
 //  Name Story (the name's personality, beautifully written), the ParentVeda
 //  Perspective (educate, never influence), the Decision Companion ("help me
 //  decide": why parents choose it, alternatives, nicknames, international
@@ -111,7 +111,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
               _sectionDivider(),
               _pad(_iconHead(Icons.compare_arrows_rounded, 'Help me decide')),
               const SizedBox(height: 6),
-              _pad(Text('The Decision Companion helps you feel confident — it never chooses for you.', style: ppBody(12.5, color: ppMuted))),
+              _pad(Text('The Decision Companion helps you feel confident - it never chooses for you.', style: ppBody(12.5, color: ppMuted))),
               const SizedBox(height: 14),
               _pad(_softRow(Icons.favorite_border, 'Why parents choose ${n.name}', v2.decisionWhy)),
               if (v2.nicknames.isNotEmpty) ...[
@@ -135,7 +135,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
               _sectionDivider(),
               _pad(_iconHead(Icons.auto_stories_outlined, 'Picture the name')),
               const SizedBox(height: 6),
-              _pad(Text('See ${n.name} the way you soon will — everywhere, every day.', style: ppBody(12.5, color: ppMuted))),
+              _pad(Text('See ${n.name} the way you soon will - everywhere, every day.', style: ppBody(12.5, color: ppMuted))),
               const SizedBox(height: 16),
               _previewRail(n.name),
             ],

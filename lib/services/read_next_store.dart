@@ -1,9 +1,9 @@
 // =============================================================================
-//  ReadNextStore — saved / reading / completed states for Read Next
+//  ReadNextStore - saved / reading / completed states for Read Next
 // -----------------------------------------------------------------------------
 //  Two clean concepts: a per-item STATUS (reading | completed) for the Read Next
 //  chip, and an explicit SAVED/bookmark set with a save-timestamp (so the Saved
-//  hub can show newest-first). No gamification — gentle bookkeeping only.
+//  hub can show newest-first). No gamification - gentle bookkeeping only.
 // =============================================================================
 
 import 'dart:convert';
@@ -35,7 +35,7 @@ class ReadNextStore extends ChangeNotifier with CloudSyncedStore {
         m.forEach((k, v) => _saved[k.toString()] = (v as num).toInt());
       } catch (_) {/* ignore */}
     }
-    // Legacy combined map (id → 'saved' | 'reading' | 'completed') — split it.
+    // Legacy combined map (id → 'saved' | 'reading' | 'completed') - split it.
     final raw = _prefs?.getString(_key);
     if (raw != null) {
       try {

@@ -1,5 +1,5 @@
 // =============================================================================
-//  JourneyBackdropPainter  —  the "map" behind the trail
+//  JourneyBackdropPainter  -  the "map" behind the trail
 // -----------------------------------------------------------------------------
 //  Soft, full-width trimester regions (peach / lavender / mint) stacked top to
 //  bottom, with a warm arrival glow near Birth, so the canvas reads like a

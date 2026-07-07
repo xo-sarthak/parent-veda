@@ -1,7 +1,7 @@
 // =============================================================================
-//  Hospital Bag V2 — a from-scratch redesign (lives behind a toggle vs V1)
+//  Hospital Bag V2 - a from-scratch redesign (lives behind a toggle vs V1)
 // -----------------------------------------------------------------------------
-//  "I'm getting ready to meet my baby" — calm, emotional, ONE decision at a time.
+//  "I'm getting ready to meet my baby" - calm, emotional, ONE decision at a time.
 //  The mother never sees "states"; every item moves along a single journey in
 //  plain language:  Needs your decision → Planning to buy → Ready at home → Packed
 //  (plus a gentle "Maybe later" set). Commerce stays hidden until she taps
@@ -70,7 +70,7 @@ const List<BagCategory> _catOrder = [
 }
 
 // ===========================================================================
-//  Entry — onboarding (first open) or the calm home.
+//  Entry - onboarding (first open) or the calm home.
 // ===========================================================================
 class HospitalBagV2Screen extends StatefulWidget {
   const HospitalBagV2Screen({super.key, required this.controller});
@@ -103,7 +103,7 @@ class _HospitalBagV2ScreenState extends State<HospitalBagV2Screen> {
 }
 
 // ===========================================================================
-//  Onboarding — one gentle screen, then a smart bag is generated.
+//  Onboarding - one gentle screen, then a smart bag is generated.
 // ===========================================================================
 class _Onboarding extends StatefulWidget {
   const _Onboarding({required this.controller});
@@ -145,7 +145,7 @@ class _OnboardingState extends State<_Onboarding> {
                 textAlign: TextAlign.center,
                 style: text.bodyLarge?.copyWith(color: AppTheme.neutral600, height: 1.5)),
             const SizedBox(height: 28),
-            // One gentle question — helps tailor the bag.
+            // One gentle question - helps tailor the bag.
             Text(s.hb2v2DeliveryQ,
                 style: text.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
@@ -187,7 +187,7 @@ String _deliveryLabel(S s, DeliveryType d) {
 }
 
 // ===========================================================================
-//  Home — attention first, then categories; emotional progress; no counts.
+//  Home - attention first, then categories; emotional progress; no counts.
 // ===========================================================================
 class _Home extends StatelessWidget {
   const _Home({required this.controller});
@@ -411,7 +411,7 @@ class _Home extends StatelessWidget {
   }
 }
 
-// A compact row used in "Needs your attention" — shows the next step + status.
+// A compact row used in "Needs your attention" - shows the next step + status.
 class _AttentionRow extends StatelessWidget {
   const _AttentionRow({required this.item, required this.controller});
   final BagItem item;
@@ -458,7 +458,7 @@ class _AttentionRow extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Category screen — clean list + "Add my own" + collapsed "Maybe later".
+//  Category screen - clean list + "Add my own" + collapsed "Maybe later".
 // ===========================================================================
 class _Category extends StatefulWidget {
   const _Category({required this.controller, required this.category});
@@ -681,7 +681,7 @@ class _LaterRow extends StatelessWidget {
 }
 
 // ===========================================================================
-//  The ONE action sheet — only five options, ever.
+//  The ONE action sheet - only five options, ever.
 // ===========================================================================
 void showItemActions(
     BuildContext context, PregnancyController controller, String itemId) {
@@ -767,7 +767,7 @@ Widget _action(BuildContext ctx, IconData icon, Color color, String label,
     );
 
 // ===========================================================================
-//  Buy elsewhere — one decision: where? (store optional, details never forced)
+//  Buy elsewhere - one decision: where? (store optional, details never forced)
 // ===========================================================================
 void _showBuyElse(
     BuildContext context, PregnancyController controller, String itemId) {
@@ -865,7 +865,7 @@ void _addCustom(
 }
 
 // ===========================================================================
-//  ParentVeda Product Experience — the ONLY commerce path.
+//  ParentVeda Product Experience - the ONLY commerce path.
 // ===========================================================================
 class _ProductExperience extends StatelessWidget {
   const _ProductExperience({required this.controller, required this.itemId});
@@ -1098,7 +1098,7 @@ class _ProductExperience extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Shopping summary — auto-generated; PV vs external never mixed.
+//  Shopping summary - auto-generated; PV vs external never mixed.
 // ===========================================================================
 class _Summary extends StatelessWidget {
   const _Summary({required this.controller});

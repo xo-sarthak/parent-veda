@@ -1,5 +1,5 @@
 // =============================================================================
-//  RecipePageScreen — Recipe page (parenting · S15·detail v2)
+//  RecipePageScreen - Recipe page (parenting · S15·detail v2)
 // -----------------------------------------------------------------------------
 //  A full recipe with ParentVeda depth: video hero, nutrition per serving with
 //  key-nutrient RDAs, why-it's-good, ingredients + equipment, method, frequency
@@ -112,7 +112,7 @@ class RecipePageScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _pad(Column(children: [
                 _nutrient('Vitamin A', '(from carrots)', '35% RDA',
-                    'Builds his immunity and eyesight — important now as he explores and mouths everything.'),
+                    'Builds his immunity and eyesight - important now as he explores and mouths everything.'),
                 _nutrient('Iron', '', '12% RDA',
                     'His birth iron stores run low around now, and iron fuels the brain growth of these months.'),
                 _nutrient('Fibre', '(peas + wheat)', '4g',
@@ -164,7 +164,7 @@ class RecipePageScreen extends StatelessWidget {
               _pad(Row(children: [
                 Expanded(child: _panel('Frequency', ppPurple, 'Once a week is plenty.')),
                 const SizedBox(width: 12),
-                Expanded(child: _panel('Watch for', ppBrown, 'Still salty — use half the masala.')),
+                Expanded(child: _panel('Watch for', ppBrown, 'Still salty - use half the masala.')),
               ])),
 
               const SizedBox(height: 24),
@@ -179,7 +179,7 @@ class RecipePageScreen extends StatelessWidget {
                   const SizedBox(width: 11),
                   Expanded(
                     child: Text(
-                        'Full ingredients, method and baby-customisation for this recipe are on the way — every recipe gets the ParentVeda treatment.',
+                        'Full ingredients, method and baby-customisation for this recipe are on the way - every recipe gets the ParentVeda treatment.',
                         style: ppBody(13, color: ppInk, h: 1.5)),
                   ),
                 ]),
@@ -282,10 +282,10 @@ class RecipePageScreen extends StatelessWidget {
             Flexible(child: Text('Customise for baby', style: ppJakarta(17), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
           const SizedBox(height: 6),
-          Text('Make the same dish safe and easy for a younger one — Aarav will be ready around 8 months.',
+          Text('Make the same dish safe and easy for a younger one - Aarav will be ready around 8 months.',
               style: ppBody(13, h: 1.55)),
           const SizedBox(height: 16),
-          _cust('Form', 'Chop noodles small or blend to a soft mash — no long strands.'),
+          _cust('Form', 'Chop noodles small or blend to a soft mash - no long strands.'),
           const SizedBox(height: 11),
           _cust('Ingredients', 'Skip the masala entirely; flavour with a pinch of jeera and the veggies alone.'),
           const SizedBox(height: 11),

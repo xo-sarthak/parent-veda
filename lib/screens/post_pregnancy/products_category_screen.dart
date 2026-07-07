@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductsCategoryScreen — Products · category (parenting · S3·category v2)
+//  ProductsCategoryScreen - Products · category (parenting · S3·category v2)
 // -----------------------------------------------------------------------------
 //  A curated category (e.g. Sleep): intro + an ⓘ stage-relevance reveal,
 //  subcategory filter chips, and its subcategories shown as compare-tickable
@@ -31,12 +31,12 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
   PpCategory get _cat => categoryByName(widget.category);
 
   String get _intro => widget.category == 'Sleep'
-      ? 'Good sleep is built, not bought — but a few well-chosen things genuinely help. At 4 months, when cycles are maturing, the right environment does more than any gadget.'
-      : 'A curated ${widget.category.toLowerCase()} shelf — every pick reviewed by ParentVeda, ranked by expert read and verified-mother ratings.';
+      ? 'Good sleep is built, not bought - but a few well-chosen things genuinely help. At 4 months, when cycles are maturing, the right environment does more than any gadget.'
+      : 'A curated ${widget.category.toLowerCase()} shelf - every pick reviewed by ParentVeda, ranked by expert read and verified-mother ratings.';
 
   String get _note => widget.category == 'Sleep'
-      ? "Relevant for Aarav now — he's in the 4-month regression, so soothers and blackout matter most this month."
-      : 'These picks are chosen for Aarav\'s stage right now — curated and safety-checked by ParentVeda.';
+      ? "Relevant for Aarav now - he's in the 4-month regression, so soothers and blackout matter most this month."
+      : 'These picks are chosen for Aarav\'s stage right now - curated and safety-checked by ParentVeda.';
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +127,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
             ],
 
             const SizedBox(height: 24),
-            _pad(Text('Every product is curated and reviewed by ParentVeda — named, verified-mother ratings on each.',
+            _pad(Text('Every product is curated and reviewed by ParentVeda - named, verified-mother ratings on each.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

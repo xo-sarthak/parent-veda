@@ -1,7 +1,7 @@
 // =============================================================================
-//  DevelopmentMapScreen — the birth-to-five journey, as one map (signature)
+//  DevelopmentMapScreen - the birth-to-five journey, as one map (signature)
 // -----------------------------------------------------------------------------
-//  A single, beautiful roadmap of the whole early journey — age bands from birth
+//  A single, beautiful roadmap of the whole early journey - age bands from birth
 //  to five, each with its headline skills. "You are here" marks the current
 //  stage; the past is celebrated, the future is something to look forward to. Tap
 //  any band to see what it holds. No timelines-as-deadlines, no comparison.
@@ -45,7 +45,7 @@ class DevelopmentMapScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _pad(Text('Birth to five', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('The whole early journey, as one gentle map. Ages are guides, not deadlines — every child walks it at their own pace.', style: ppBody(14, h: 1.5))),
+            _pad(Text('The whole early journey, as one gentle map. Ages are guides, not deadlines - every child walks it at their own pace.', style: ppBody(14, h: 1.5))),
             const SizedBox(height: 22),
             _pad(Column(children: [
               for (int i = 0; i < _bands.length; i++) _band(context, i, first: i == 0, last: i == _bands.length - 1),
@@ -154,7 +154,7 @@ class DevelopmentMapScreen extends StatelessWidget {
                 ]),
               ),
             const SizedBox(height: 12),
-            Text('Many children grow into these across this window — some sooner, some later, and all of it normal.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
+            Text('Many children grow into these across this window - some sooner, some later, and all of it normal.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
           ]),
         ),
       ),

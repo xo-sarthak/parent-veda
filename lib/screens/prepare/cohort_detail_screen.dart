@@ -1,5 +1,5 @@
 // =============================================================================
-//  CohortDetailScreen — Prepare › Cohort Program detail
+//  CohortDetailScreen - Prepare › Cohort Program detail
 //  Data-driven (any Cohort). Sticky CTA runs the mock join flow ("Enrolled").
 // =============================================================================
 
@@ -98,7 +98,7 @@ class CohortDetailScreen extends StatelessWidget {
                   style: pvBody(kInk, 14).copyWith(height: 1.5),
                 ),
               ),
-              pvFooterNote('Small cohorts, real accountability — our most-loved way to prepare.'),
+              pvFooterNote('Small cohorts, real accountability - our most-loved way to prepare.'),
             ],
           ),
         ),

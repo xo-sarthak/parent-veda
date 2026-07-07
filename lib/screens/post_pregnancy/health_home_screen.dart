@@ -1,12 +1,12 @@
 // =============================================================================
-//  HealthHomeScreen — ParentVeda Health (a living health companion)
+//  HealthHomeScreen - ParentVeda Health (a living health companion)
 // -----------------------------------------------------------------------------
 //  One continuous, calm flow (no tabs, no folders): a Health Snapshot, the
 //  Health Timeline (the backbone), Growth, a Vaccination SUMMARY that opens the
 //  existing tracker, Medical History, AI-style insights, the Doctor Visit
 //  Companion and the Emergency Card. Answers "how is my child's health today,
 //  and what do I need to know?". Reached from the Explore drawer. Vaccination is
-//  an existing module — integrated here, never redesigned.
+//  an existing module - integrated here, never redesigned.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -50,41 +50,41 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _pad(Text('Aarav’s health', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Not a folder of reports — the living story of his health, understood.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Not a folder of reports - the living story of his health, understood.', style: ppBody(14, h: 1.5))),
 
-            // 1 — snapshot
+            // 1 - snapshot
             const SizedBox(height: 22),
             _pad(_snapshot()),
 
-            // 2 — timeline preview
+            // 2 - timeline preview
             const SizedBox(height: 30),
             _pad(_sectionHeader('Health timeline', 'Full timeline →', () => _push(context, const HealthTimelineScreen()))),
             const SizedBox(height: 6),
-            _pad(Text('Everything that’s happened, as a story — not folders to dig through.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Everything that’s happened, as a story - not folders to dig through.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [for (final e in latest) _timelineRow(context, e)])),
 
-            // 3 — growth
+            // 3 - growth
             const SizedBox(height: 22),
             _pad(_sectionHeader('Growth', 'Details →', () => _push(context, const HealthGrowthScreen()))),
             const SizedBox(height: 14),
             _pad(_growthCard(context, current)),
 
-            // 4 — vaccination summary (existing module)
+            // 4 - vaccination summary (existing module)
             const SizedBox(height: 30),
             _pad(_sectionHeader('Vaccinations')),
             const SizedBox(height: 14),
             _pad(_vaxCard(context)),
 
-            // 5 — medical history
+            // 5 - medical history
             const SizedBox(height: 30),
             _pad(_sectionHeader('Medical history')),
             const SizedBox(height: 4),
-            _pad(Text('Organised for you — never a pile of PDFs.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Organised for you - never a pile of PDFs.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(_history(context)),
 
-            // 6 — AI insights
+            // 6 - AI insights
             const SizedBox(height: 30),
             _pad(_insights(context)),
 
@@ -92,7 +92,7 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _pad(_bigCta(context, Icons.summarize_outlined, ppPurple, 'Doctor Visit Companion', 'Generate a ready-to-share summary before your next appointment.', () => _push(context, const HealthDoctorVisitScreen()))),
             const SizedBox(height: 12),
-            _pad(_bigCta(context, Icons.emergency_outlined, ppCoral, 'Emergency Card', 'Blood group, allergies, contacts — ready offline, in seconds.', () => _push(context, const HealthEmergencyScreen()))),
+            _pad(_bigCta(context, Icons.emergency_outlined, ppCoral, 'Emergency Card', 'Blood group, allergies, contacts - ready offline, in seconds.', () => _push(context, const HealthEmergencyScreen()))),
             const SizedBox(height: 12),
             _pad(_healthGuideLink(context)),
           ],
@@ -302,7 +302,7 @@ class HealthHomeScreen extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 8),
-          Text('Patterns from your records — general understanding, never a diagnosis.', style: ppBody(11, color: ppMuted, h: 1.5)),
+          Text('Patterns from your records - general understanding, never a diagnosis.', style: ppBody(11, color: ppMuted, h: 1.5)),
         ]),
       );
 
@@ -338,7 +338,7 @@ class HealthHomeScreen extends StatelessWidget {
           child: Row(children: [
             const Icon(Icons.menu_book_outlined, size: 19, color: ppPurple),
             const SizedBox(width: 13),
-            Expanded(child: Text('Health Guide — what helped last time & telehealth', style: ppBody(13.5, color: ppInk, w: FontWeight.w600))),
+            Expanded(child: Text('Health Guide - what helped last time & telehealth', style: ppBody(13.5, color: ppInk, w: FontWeight.w600))),
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),

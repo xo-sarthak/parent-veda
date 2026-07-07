@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 //  Reusable, self-contained audio player for the bundled tanpura-style drone
 //  (assets/audio/raga_drone.wav), looped. Play/pause, live equalizer, seek bar
-//  and timer. Audio is a gentle enhancement — failures never crash the card.
+//  and timer. Audio is a gentle enhancement - failures never crash the card.
 // =============================================================================
 
 import 'dart:async';

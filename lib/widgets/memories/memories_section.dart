@@ -1,7 +1,7 @@
 // =============================================================================
-//  Memories — interactive memory book + read-only celebration collage
+//  Memories - interactive memory book + read-only celebration collage
 // -----------------------------------------------------------------------------
-//  MemoriesSection: the mother's "memory book" — every weekly note (text + up to
+//  MemoriesSection: the mother's "memory book" - every weekly note (text + up to
 //  two photos), tap to edit, delete with a tap. Used on Reflect & Remember.
 //  MemoryCollage: a structured, read-only photo + journal compilation for the
 //  week-40 finale.
@@ -203,7 +203,7 @@ class _EntryCard extends StatelessWidget {
 
 /// The week-scoped journal view used on the Reflect & Remember card for the
 /// weeks 4–5 preview. Shows ONLY this week's single entry (text + up to two
-/// photos) inline — tap to edit, delete to remove — or a calm prompt to add one.
+/// photos) inline - tap to edit, delete to remove - or a calm prompt to add one.
 /// No cross-week contamination: it reads [MemoryStore.journalForWeek].
 class WeekEntryView extends StatelessWidget {
   const WeekEntryView({super.key, required this.lang, required this.week});

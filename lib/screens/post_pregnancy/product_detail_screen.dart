@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductDetailScreen — Products · detail (parenting · S3·detail v2)
+//  ProductDetailScreen - Products · detail (parenting · S3·detail v2)
 // -----------------------------------------------------------------------------
 //  Trust-first product page: for a soother, an explain-first "what's inside &
 //  how it works", the ParentVeda take, good / consider, "choose this if…", the
@@ -114,14 +114,14 @@ class ProductDetailScreen extends StatelessWidget {
                   style: ppBody(13, h: 1.55))),
               _pad(Column(children: [
                 _feature(Icons.volume_up_outlined, 'White-noise speaker',
-                    'Plays a steady “shhh” that masks door slams and traffic — the sounds that jolt a baby out of light sleep.',
+                    'Plays a steady “shhh” that masks door slams and traffic - the sounds that jolt a baby out of light sleep.',
                     top: true),
                 _feature(Icons.timer_outlined, 'Auto-off timer',
-                    'Runs 30/60 min then fades out on its own — no getting up to switch it off.'),
+                    'Runs 30/60 min then fades out on its own - no getting up to switch it off.'),
                 _feature(Icons.bedtime_outlined, 'Soft night-light',
                     'A dim amber glow for feeds and nappy changes, without fully waking the room.'),
                 _feature(Icons.battery_charging_full_outlined, 'USB power / power-bank',
-                    "No fixed socket needed — works on a power bank, so it travels for holidays and nani's house.",
+                    "No fixed socket needed - works on a power bank, so it travels for holidays and nani's house.",
                     bottom: true),
               ])),
               const SizedBox(height: 14),
@@ -129,7 +129,7 @@ class ProductDetailScreen extends StatelessWidget {
                 TextSpan(text: 'In short: ', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
                 const TextSpan(
                     text:
-                        "a small bedside box that makes a room calmer and darker for sleep, and turns itself off — that's the whole job."),
+                        "a small bedside box that makes a room calmer and darker for sleep, and turns itself off - that's the whole job."),
               ]), style: ppBody(13, color: ppInk, h: 1.55))),
             ],
 
@@ -139,11 +139,11 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
             _pad(Text(
                 _isSoother
-                    ? 'A no-frills soother that actually helps during the 4-month regression. Steady white noise — not looping lullabies — masks household sound in Indian joint homes. Simple, timer-based, and cheap enough to justify.'
-                    : 'A ParentVeda-reviewed pick for its category — chosen for everyday usefulness, safety, and value. Named, verified-mother ratings back it up.',
+                    ? 'A no-frills soother that actually helps during the 4-month regression. Steady white noise - not looping lullabies - masks household sound in Indian joint homes. Simple, timer-based, and cheap enough to justify.'
+                    : 'A ParentVeda-reviewed pick for its category - chosen for everyday usefulness, safety, and value. Named, verified-mother ratings back it up.',
                 style: ppBody(15, color: ppInk, h: 1.65))),
 
-            // good / consider + "choose this if" — all still under "The ParentVeda take"
+            // good / consider + "choose this if" - all still under "The ParentVeda take"
             if (_isSoother) ...[
               const SizedBox(height: 20),
               _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -178,9 +178,9 @@ class ProductDetailScreen extends StatelessWidget {
               _div(),
               _pad(Text('Read the research', style: ppJakarta(16))),
               const SizedBox(height: 4),
-              _pad(Text('The evidence behind the claims — read it yourself.', style: ppBody(12, color: ppMuted))),
+              _pad(Text('The evidence behind the claims - read it yourself.', style: ppBody(12, color: ppMuted))),
               const SizedBox(height: 12),
-              _pad(_paper(context, 'Paper', ppPurple, 'White noise & infant sleep onset — a review', top: true)),
+              _pad(_paper(context, 'Paper', ppPurple, 'White noise & infant sleep onset - a review', top: true)),
               _pad(_paper(context, 'Safety', ppBrown, 'Safe decibel levels for a nursery (AAP)', top: true, bottom: true)),
             ],
 
@@ -188,7 +188,7 @@ class ProductDetailScreen extends StatelessWidget {
             _div(),
             _pad(Text('From verified parents', style: ppJakarta(16))),
             const SizedBox(height: 4),
-            _pad(Text('Named, with child & age — never anonymous.', style: ppBody(12, color: ppMuted))),
+            _pad(Text('Named, with child & age - never anonymous.', style: ppBody(12, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(_review('Priya', 'mother of Aarav (4 mo)', '★★★★★', 'purchase',
                 '“The only thing that got us through the regression. On within the routine, off by morning.”',

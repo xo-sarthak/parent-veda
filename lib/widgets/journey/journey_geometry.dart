@@ -1,5 +1,5 @@
 // =============================================================================
-//  JourneyGeometry  —  the winding-trail maths (sequence-of-stops layout)
+//  JourneyGeometry  -  the winding-trail maths (sequence-of-stops layout)
 // -----------------------------------------------------------------------------
 //  Each stop on the trail gets its own vertical slot (collision-free, even when
 //  several milestones share a week). The path winds left/right via a sine of the

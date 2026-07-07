@@ -1,9 +1,9 @@
 // =============================================================================
-//  QuickLearnScreen — Quick Learn vertical mode (30–90s expert clips)
+//  QuickLearnScreen - Quick Learn vertical mode (30–90s expert clips)
 // -----------------------------------------------------------------------------
 //  Borrows the vertical-swipe INTERACTION (learn while rocking the baby), never
 //  the clutter: learning metadata only, expert-led, Save (not like), no
-//  view/like/follow counts. Deliberately FINITE — after the curated set it ends
+//  view/like/follow counts. Deliberately FINITE - after the curated set it ends
 //  on a calm "that's enough for now" card instead of scrolling forever. Shares
 //  the same catalog, save + progress store as Deep Learn.
 // =============================================================================
@@ -203,7 +203,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
             const SizedBox(height: 20),
             Text("That's enough for now", textAlign: TextAlign.center, style: ppFraunces(24, color: Colors.white, h: 1.2)),
             const SizedBox(height: 12),
-            Text('You learned something real today. Close the app, and go be with your baby — that’s the point.',
+            Text('You learned something real today. Close the app, and go be with your baby - that’s the point.',
                 textAlign: TextAlign.center, style: ppBody(14, color: Colors.white.withValues(alpha: 0.85), h: 1.6)),
             const SizedBox(height: 24),
             GestureDetector(

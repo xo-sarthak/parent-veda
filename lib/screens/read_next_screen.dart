@@ -1,5 +1,5 @@
 // =============================================================================
-//  Read Next ❤️ — stage-aware reading & discovery (opened from the mother Home)
+//  Read Next ❤️ - stage-aware reading & discovery (opened from the mother Home)
 // -----------------------------------------------------------------------------
 //  A curated, week-aware feed: a hero "This Week's Pick", recommendations for
 //  the current week, a "looking ahead" row, curated books, research-simplified
@@ -567,7 +567,7 @@ class ReadItemScreen extends StatelessWidget {
                         style: text.bodyLarge?.copyWith(height: 1.6, fontSize: 16)),
                   ),
               const SizedBox(height: 8),
-              // status actions — once it's completed we DON'T offer "reading"
+              // status actions - once it's completed we DON'T offer "reading"
               // any more (completed and reading are mutually exclusive).
               Row(children: [
                 if (!done) ...[
@@ -593,7 +593,7 @@ class ReadItemScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     // Marking complete here ticks the Home daily-reads checkbox
-                    // too (same ReadDoneStore) and clears any "reading" status —
+                    // too (same ReadDoneStore) and clears any "reading" status -
                     // no second tap, no contradictory state.
                     onPressed: () {
                       ReadDoneStore.instance.toggle(item.id);
@@ -635,7 +635,7 @@ Widget _sectionCard(BuildContext context, String title, String body) {
 }
 
 // ===========================================================================
-//  Home card — clean entry point on the mother Home screen
+//  Home card - clean entry point on the mother Home screen
 // ===========================================================================
 
 class ReadNextHomeCard extends StatelessWidget {
@@ -721,7 +721,7 @@ class ReadNextHomeCard extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Daily Reads — home section (above Read Next): 3 rotating articles + a
+//  Daily Reads - home section (above Read Next): 3 rotating articles + a
 //  books column. Vertical list (no carousel): heading on top, content below.
 // ===========================================================================
 
@@ -867,7 +867,7 @@ class DailyReadsHomeCard extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          // Daily Reads is a clean read row now — no check-off here, just the
+          // Daily Reads is a clean read row now - no check-off here, just the
           // read + a bookmark heart (per request). Completion can still be set
           // from the full article view; that just dims the title below.
           Expanded(
@@ -897,7 +897,7 @@ class DailyReadsHomeCard extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             // "Read" is now shown by a small tick on the right
-                            // (below) — no strike-through / dimming.
+                            // (below) - no strike-through / dimming.
                             style: text.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700, height: 1.25),
                           ),
@@ -936,7 +936,7 @@ class DailyReadsHomeCard extends StatelessWidget {
                 size: 18, color: Color(0xFF4F7A52)),
             const SizedBox(width: 8),
           ],
-          // Bookmark this read — saved reads surface in the Profile › Saved hub.
+          // Bookmark this read - saved reads surface in the Profile › Saved hub.
           _SaveHeart(id: r.id),
         ]),
       ),

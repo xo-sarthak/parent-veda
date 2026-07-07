@@ -1,9 +1,9 @@
 // =============================================================================
-//  Can I?™  — curated seed database
+//  Can I?™  - curated seed database
 // -----------------------------------------------------------------------------
 //  A hand-picked set of the most common, well-established questions (covering
 //  all six "popular searches" + a spread across Eat / Drink / Take / Do). This
-//  is GENERAL educational guidance, written carefully and conservatively — it is
+//  is GENERAL educational guidance, written carefully and conservatively - it is
 //  not a medical review, and every answer defers to the mother's own doctor.
 //
 //  English-first: every entry carries en + hi (today hi mirrors en) so Hindi can
@@ -50,8 +50,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Many mothers prefer to be extra cautious in the first trimester and skip raw papaya entirely.',
     ),
     indian: LocalizedText(
-      en: 'Raw papaya turns up in salads and some sabzis — that is the form to be careful with. Ripe, sweet papaya as fruit is the safer choice.',
-      hi: 'Raw papaya turns up in salads and some sabzis — that is the form to be careful with. Ripe, sweet papaya as fruit is the safer choice.',
+      en: 'Raw papaya turns up in salads and some sabzis - that is the form to be careful with. Ripe, sweet papaya as fruit is the safer choice.',
+      hi: 'Raw papaya turns up in salads and some sabzis - that is the form to be careful with. Ripe, sweet papaya as fruit is the safer choice.',
     ),
     related: ['pineapple', 'mango', 'street_food'],
     aliases: ['papita', 'raw papaya', 'ripe papaya'],
@@ -86,8 +86,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Mango is a nutritious fruit and fine in moderation.',
     ),
     why: LocalizedText(
-      en: 'Mango is rich in vitamins A and C and folate. It is also high in natural sugar, so keep portions reasonable — especially if your doctor is watching your blood sugar.',
-      hi: 'Mango is rich in vitamins A and C and folate. It is also high in natural sugar, so keep portions reasonable — especially if your doctor is watching your blood sugar.',
+      en: 'Mango is rich in vitamins A and C and folate. It is also high in natural sugar, so keep portions reasonable - especially if your doctor is watching your blood sugar.',
+      hi: 'Mango is rich in vitamins A and C and folate. It is also high in natural sugar, so keep portions reasonable - especially if your doctor is watching your blood sugar.',
     ),
     indian: LocalizedText(
       en: 'Wash well and enjoy in season. If you have (or are at risk of) gestational diabetes, ask your doctor about quantity.',
@@ -122,8 +122,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Paneer made from pasteurised milk and eaten fresh or cooked is fine. Avoid unpasteurised soft cheese.',
     ),
     why: LocalizedText(
-      en: 'The concern with some soft cheeses is listeria, a bacteria that can grow in unpasteurised dairy. Paneer from pasteurised milk — cooked or freshly made — sidesteps that.',
-      hi: 'The concern with some soft cheeses is listeria, a bacteria that can grow in unpasteurised dairy. Paneer from pasteurised milk — cooked or freshly made — sidesteps that.',
+      en: 'The concern with some soft cheeses is listeria, a bacteria that can grow in unpasteurised dairy. Paneer from pasteurised milk - cooked or freshly made - sidesteps that.',
+      hi: 'The concern with some soft cheeses is listeria, a bacteria that can grow in unpasteurised dairy. Paneer from pasteurised milk - cooked or freshly made - sidesteps that.',
     ),
     indian: LocalizedText(
       en: 'Branded and most home-made paneer uses pasteurised milk. When in doubt, cook it (paneer bhurji, palak paneer) rather than eating it raw.',
@@ -158,8 +158,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Chocolate is fine to enjoy in moderation.',
     ),
     why: LocalizedText(
-      en: 'Chocolate contains a little caffeine, so it counts towards your daily caffeine total. A few squares are a lovely treat — just keep the overall amount sensible.',
-      hi: 'Chocolate contains a little caffeine, so it counts towards your daily caffeine total. A few squares are a lovely treat — just keep the overall amount sensible.',
+      en: 'Chocolate contains a little caffeine, so it counts towards your daily caffeine total. A few squares are a lovely treat - just keep the overall amount sensible.',
+      hi: 'Chocolate contains a little caffeine, so it counts towards your daily caffeine total. A few squares are a lovely treat - just keep the overall amount sensible.',
     ),
     related: ['coffee', 'ice_cream', 'tea'],
     aliases: ['cocoa'],
@@ -170,8 +170,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.eat,
     verdict: CanIVerdict.depends,
     short: LocalizedText(
-      en: 'It depends entirely on hygiene and freshness — the risk is contamination, not the dish itself.',
-      hi: 'It depends entirely on hygiene and freshness — the risk is contamination, not the dish itself.',
+      en: 'It depends entirely on hygiene and freshness - the risk is contamination, not the dish itself.',
+      hi: 'It depends entirely on hygiene and freshness - the risk is contamination, not the dish itself.',
     ),
     why: LocalizedText(
       en: 'Pregnancy lowers your resistance to food-borne infections. Hot, freshly-cooked food from a busy, clean stall is far safer than anything sitting out, raw, or rinsed in tap water.',
@@ -234,16 +234,16 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Up to about one cup a day (under ~200mg caffeine) is generally considered okay.',
     ),
     why: LocalizedText(
-      en: 'The usual guidance is to keep total caffeine under roughly 200mg a day. Remember it adds up across coffee, tea, cola and chocolate — not coffee alone.',
-      hi: 'The usual guidance is to keep total caffeine under roughly 200mg a day. Remember it adds up across coffee, tea, cola and chocolate — not coffee alone.',
+      en: 'The usual guidance is to keep total caffeine under roughly 200mg a day. Remember it adds up across coffee, tea, cola and chocolate - not coffee alone.',
+      hi: 'The usual guidance is to keep total caffeine under roughly 200mg a day. Remember it adds up across coffee, tea, cola and chocolate - not coffee alone.',
     ),
     t1: LocalizedText(
-      en: 'Many mothers naturally go off coffee in the first trimester — listen to that.',
-      hi: 'Many mothers naturally go off coffee in the first trimester — listen to that.',
+      en: 'Many mothers naturally go off coffee in the first trimester - listen to that.',
+      hi: 'Many mothers naturally go off coffee in the first trimester - listen to that.',
     ),
     indian: LocalizedText(
-      en: 'A strong South-Indian filter coffee can be higher in caffeine than you think — one a day is a reasonable ceiling.',
-      hi: 'A strong South-Indian filter coffee can be higher in caffeine than you think — one a day is a reasonable ceiling.',
+      en: 'A strong South-Indian filter coffee can be higher in caffeine than you think - one a day is a reasonable ceiling.',
+      hi: 'A strong South-Indian filter coffee can be higher in caffeine than you think - one a day is a reasonable ceiling.',
     ),
     related: ['tea', 'green_tea', 'soft_drinks'],
     aliases: ['caffeine', 'espresso', 'filter coffee'],
@@ -254,8 +254,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.drink,
     verdict: CanIVerdict.moderation,
     short: LocalizedText(
-      en: 'Regular tea in moderation is fine — just mind the caffeine total.',
-      hi: 'Regular tea in moderation is fine — just mind the caffeine total.',
+      en: 'Regular tea in moderation is fine - just mind the caffeine total.',
+      hi: 'Regular tea in moderation is fine - just mind the caffeine total.',
     ),
     why: LocalizedText(
       en: 'Tea has less caffeine than coffee but still counts towards your ~200mg daily limit. Two to three cups of normal chai is generally considered reasonable.',
@@ -298,8 +298,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'It is mostly water with natural electrolytes, so it helps with hydration and can be soothing if you feel queasy. Fresh is best.',
     ),
     indian: LocalizedText(
-      en: 'Nariyal paani is widely recommended — drink it fresh from a tender coconut rather than a sugary packaged version.',
-      hi: 'Nariyal paani is widely recommended — drink it fresh from a tender coconut rather than a sugary packaged version.',
+      en: 'Nariyal paani is widely recommended - drink it fresh from a tender coconut rather than a sugary packaged version.',
+      hi: 'Nariyal paani is widely recommended - drink it fresh from a tender coconut rather than a sugary packaged version.',
     ),
     related: ['water', 'buttermilk', 'soft_drinks'],
     aliases: ['nariyal pani', 'tender coconut'],
@@ -362,8 +362,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.drink,
     verdict: CanIVerdict.safe,
     short: LocalizedText(
-      en: 'Drink plenty — staying well hydrated is one of the simplest good habits.',
-      hi: 'Drink plenty — staying well hydrated is one of the simplest good habits.',
+      en: 'Drink plenty - staying well hydrated is one of the simplest good habits.',
+      hi: 'Drink plenty - staying well hydrated is one of the simplest good habits.',
     ),
     why: LocalizedText(
       en: 'Aim for roughly 8–10 glasses a day (more in heat or if active). Good hydration helps with constipation, swelling and those common Braxton-Hicks tightenings.',
@@ -382,8 +382,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.moderation,
     short: LocalizedText(
-      en: 'Paracetamol is generally considered the preferred choice for fever or pain — lowest dose that helps, for the shortest time.',
-      hi: 'Paracetamol is generally considered the preferred choice for fever or pain — lowest dose that helps, for the shortest time.',
+      en: 'Paracetamol is generally considered the preferred choice for fever or pain - lowest dose that helps, for the shortest time.',
+      hi: 'Paracetamol is generally considered the preferred choice for fever or pain - lowest dose that helps, for the shortest time.',
     ),
     why: LocalizedText(
       en: 'It is the most widely used pain/fever medicine in pregnancy and is usually preferred over alternatives. Still, use it only when needed and let your doctor know if you are taking it often.',
@@ -398,16 +398,16 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.avoid,
     short: LocalizedText(
-      en: 'Generally avoided in pregnancy — especially in the third trimester. Ask your doctor first.',
-      hi: 'Generally avoided in pregnancy — especially in the third trimester. Ask your doctor first.',
+      en: 'Generally avoided in pregnancy - especially in the third trimester. Ask your doctor first.',
+      hi: 'Generally avoided in pregnancy - especially in the third trimester. Ask your doctor first.',
     ),
     why: LocalizedText(
       en: 'Ibuprofen is an anti-inflammatory (NSAID) that is usually not recommended in pregnancy, particularly later on. Paracetamol is normally suggested instead.',
       hi: 'Ibuprofen is an anti-inflammatory (NSAID) that is usually not recommended in pregnancy, particularly later on. Paracetamol is normally suggested instead.',
     ),
     t3: LocalizedText(
-      en: 'In the third trimester it is best avoided altogether — it can affect the baby. Do not take it without your doctor.',
-      hi: 'In the third trimester it is best avoided altogether — it can affect the baby. Do not take it without your doctor.',
+      en: 'In the third trimester it is best avoided altogether - it can affect the baby. Do not take it without your doctor.',
+      hi: 'In the third trimester it is best avoided altogether - it can affect the baby. Do not take it without your doctor.',
     ),
     related: ['paracetamol', 'combiflam', 'aspirin'],
     aliases: ['brufen', 'advil', 'nsaid'],
@@ -418,8 +418,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.askDoctor,
     short: LocalizedText(
-      en: 'Best not taken on your own — it contains ibuprofen. Check with your doctor.',
-      hi: 'Best not taken on your own — it contains ibuprofen. Check with your doctor.',
+      en: 'Best not taken on your own - it contains ibuprofen. Check with your doctor.',
+      hi: 'Best not taken on your own - it contains ibuprofen. Check with your doctor.',
     ),
     why: LocalizedText(
       en: 'Combiflam combines paracetamol with ibuprofen, and the ibuprofen part is the one usually avoided in pregnancy. For fever or pain, plain paracetamol is the safer default.',
@@ -434,8 +434,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.askDoctor,
     short: LocalizedText(
-      en: 'Some are safe in pregnancy and some are not — only take antibiotics your doctor prescribes.',
-      hi: 'Some are safe in pregnancy and some are not — only take antibiotics your doctor prescribes.',
+      en: 'Some are safe in pregnancy and some are not - only take antibiotics your doctor prescribes.',
+      hi: 'Some are safe in pregnancy and some are not - only take antibiotics your doctor prescribes.',
     ),
     why: LocalizedText(
       en: 'It depends entirely on which antibiotic. Several are used safely in pregnancy; a few are avoided. This is one to never self-prescribe or reuse from an old strip.',
@@ -450,16 +450,16 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.safe,
     short: LocalizedText(
-      en: 'Folic acid is recommended in pregnancy — take it as your doctor advises.',
-      hi: 'Folic acid is recommended in pregnancy — take it as your doctor advises.',
+      en: 'Folic acid is recommended in pregnancy - take it as your doctor advises.',
+      hi: 'Folic acid is recommended in pregnancy - take it as your doctor advises.',
     ),
     why: LocalizedText(
       en: 'It supports your baby\'s early brain and spine development, which is why it is advised from before conception through early pregnancy. It is one of the few things actively encouraged.',
       hi: 'It supports your baby\'s early brain and spine development, which is why it is advised from before conception through early pregnancy. It is one of the few things actively encouraged.',
     ),
     t1: LocalizedText(
-      en: 'Most important in the first trimester (and ideally before) — do not skip it.',
-      hi: 'Most important in the first trimester (and ideally before) — do not skip it.',
+      en: 'Most important in the first trimester (and ideally before) - do not skip it.',
+      hi: 'Most important in the first trimester (and ideally before) - do not skip it.',
     ),
     related: ['iron', 'calcium', 'vitamin_d'],
     aliases: ['folate', 'vitamin b9'],
@@ -470,12 +470,12 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.take,
     verdict: CanIVerdict.safe,
     short: LocalizedText(
-      en: 'Iron is commonly recommended — take the dose your doctor prescribes.',
-      hi: 'Iron is commonly recommended — take the dose your doctor prescribes.',
+      en: 'Iron is commonly recommended - take the dose your doctor prescribes.',
+      hi: 'Iron is commonly recommended - take the dose your doctor prescribes.',
     ),
     why: LocalizedText(
-      en: 'Your blood volume rises in pregnancy, so iron needs go up and many mothers are advised supplements. It can cause constipation — fluids and fibre help.',
-      hi: 'Your blood volume rises in pregnancy, so iron needs go up and many mothers are advised supplements. It can cause constipation — fluids and fibre help.',
+      en: 'Your blood volume rises in pregnancy, so iron needs go up and many mothers are advised supplements. It can cause constipation - fluids and fibre help.',
+      hi: 'Your blood volume rises in pregnancy, so iron needs go up and many mothers are advised supplements. It can cause constipation - fluids and fibre help.',
     ),
     related: ['folic_acid', 'calcium', 'vitamin_d'],
     aliases: ['ferrous', 'haemoglobin', 'iron tablet'],
@@ -522,20 +522,20 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.depends,
     short: LocalizedText(
-      en: 'Air travel is generally fine in an uncomplicated pregnancy — usually most comfortable in the second trimester.',
-      hi: 'Air travel is generally fine in an uncomplicated pregnancy — usually most comfortable in the second trimester.',
+      en: 'Air travel is generally fine in an uncomplicated pregnancy - usually most comfortable in the second trimester.',
+      hi: 'Air travel is generally fine in an uncomplicated pregnancy - usually most comfortable in the second trimester.',
     ),
     why: LocalizedText(
       en: 'Flying does not harm a low-risk pregnancy. On long flights, walk and stretch, keep hydrated, and wear your seatbelt low under the bump. Always clear travel with your doctor first.',
       hi: 'Flying does not harm a low-risk pregnancy. On long flights, walk and stretch, keep hydrated, and wear your seatbelt low under the bump. Always clear travel with your doctor first.',
     ),
     t2: LocalizedText(
-      en: 'Usually the easiest window to travel — nausea has eased and the bump is still manageable.',
-      hi: 'Usually the easiest window to travel — nausea has eased and the bump is still manageable.',
+      en: 'Usually the easiest window to travel - nausea has eased and the bump is still manageable.',
+      hi: 'Usually the easiest window to travel - nausea has eased and the bump is still manageable.',
     ),
     t3: LocalizedText(
-      en: 'Many airlines restrict travel after about 36 weeks and may ask for a doctor\'s note — check before booking.',
-      hi: 'Many airlines restrict travel after about 36 weeks and may ask for a doctor\'s note — check before booking.',
+      en: 'Many airlines restrict travel after about 36 weeks and may ask for a doctor\'s note - check before booking.',
+      hi: 'Many airlines restrict travel after about 36 weeks and may ask for a doctor\'s note - check before booking.',
     ),
     related: ['long_travel', 'walking', 'water'],
     aliases: ['flight', 'flying', 'air travel', 'airplane', 'plane'],
@@ -546,8 +546,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.depends,
     short: LocalizedText(
-      en: 'Usually fine — break the journey often to move, stretch and use the toilet.',
-      hi: 'Usually fine — break the journey often to move, stretch and use the toilet.',
+      en: 'Usually fine - break the journey often to move, stretch and use the toilet.',
+      hi: 'Usually fine - break the journey often to move, stretch and use the toilet.',
     ),
     why: LocalizedText(
       en: 'Sitting for hours can make legs swell and feel stiff. Stop every couple of hours, walk a little, stay hydrated, and keep the seatbelt below the bump. Avoid very bumpy roads late in pregnancy.',
@@ -598,8 +598,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Walking is safe and encouraged throughout pregnancy.',
     ),
     why: LocalizedText(
-      en: 'It is gentle cardio that helps your mood, sleep, digestion and stamina for labour — with almost no downside. Comfortable shoes and a steady pace are all you need.',
-      hi: 'It is gentle cardio that helps your mood, sleep, digestion and stamina for labour — with almost no downside. Comfortable shoes and a steady pace are all you need.',
+      en: 'It is gentle cardio that helps your mood, sleep, digestion and stamina for labour - with almost no downside. Comfortable shoes and a steady pace are all you need.',
+      hi: 'It is gentle cardio that helps your mood, sleep, digestion and stamina for labour - with almost no downside. Comfortable shoes and a steady pace are all you need.',
     ),
     related: ['yoga', 'swimming', 'lifting'],
     aliases: ['walk', 'morning walk'],
@@ -622,8 +622,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Many mothers choose to wait until after the first trimester, just for peace of mind.',
     ),
     indian: LocalizedText(
-      en: 'Natural henna (mehndi) is a popular, gentler alternative for colour — patch-test first, and avoid "black henna" which can contain harsh chemicals.',
-      hi: 'Natural henna (mehndi) is a popular, gentler alternative for colour — patch-test first, and avoid "black henna" which can contain harsh chemicals.',
+      en: 'Natural henna (mehndi) is a popular, gentler alternative for colour - patch-test first, and avoid "black henna" which can contain harsh chemicals.',
+      hi: 'Natural henna (mehndi) is a popular, gentler alternative for colour - patch-test first, and avoid "black henna" which can contain harsh chemicals.',
     ),
     related: ['waxing', 'keratin', 'nail_polish'],
     aliases: ['hair dye', 'dye', 'colour', 'mehndi', 'henna'],
@@ -634,8 +634,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.safe,
     short: LocalizedText(
-      en: 'Waxing is generally fine — your skin may just be more sensitive now.',
-      hi: 'Waxing is generally fine — your skin may just be more sensitive now.',
+      en: 'Waxing is generally fine - your skin may just be more sensitive now.',
+      hi: 'Waxing is generally fine - your skin may just be more sensitive now.',
     ),
     why: LocalizedText(
       en: 'There is no harm to the baby. Hormones can make skin more sensitive and prone to redness, so patch-test new products and tell your salon you are pregnant.',
@@ -670,8 +670,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Sex is safe in a normal, uncomplicated pregnancy.',
     ),
     why: LocalizedText(
-      en: 'Your baby is well protected by the womb and fluid, so intimacy will not harm them. Comfort changes as the bump grows — adjust as needed.',
-      hi: 'Your baby is well protected by the womb and fluid, so intimacy will not harm them. Comfort changes as the bump grows — adjust as needed.',
+      en: 'Your baby is well protected by the womb and fluid, so intimacy will not harm them. Comfort changes as the bump grows - adjust as needed.',
+      hi: 'Your baby is well protected by the womb and fluid, so intimacy will not harm them. Comfort changes as the bump grows - adjust as needed.',
     ),
     indian: LocalizedText(
       en: 'It is a common worry but a normal, healthy part of pregnancy. Your doctor may advise against it only in specific situations (such as bleeding or placenta previa).',
@@ -694,12 +694,12 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'As the womb grows heavier, lying flat on your back can press on a large vein and make you feel dizzy. Sleeping on your side keeps blood flowing comfortably to you and the baby.',
     ),
     t2: LocalizedText(
-      en: 'A good time to get used to side-sleeping — tuck a pillow behind your back and between your knees.',
-      hi: 'A good time to get used to side-sleeping — tuck a pillow behind your back and between your knees.',
+      en: 'A good time to get used to side-sleeping - tuck a pillow behind your back and between your knees.',
+      hi: 'A good time to get used to side-sleeping - tuck a pillow behind your back and between your knees.',
     ),
     t3: LocalizedText(
-      en: 'Prefer the left side. If you wake up on your back, just turn over — no need to panic.',
-      hi: 'Prefer the left side. If you wake up on your back, just turn over — no need to panic.',
+      en: 'Prefer the left side. If you wake up on your back, just turn over - no need to panic.',
+      hi: 'Prefer the left side. If you wake up on your back, just turn over - no need to panic.',
     ),
     related: ['yoga', 'sex', 'lifting'],
     aliases: ['sleep position', 'sleeping side', 'back sleeping'],
@@ -710,8 +710,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.depends,
     short: LocalizedText(
-      en: 'Use them — mosquito-borne illness is the bigger risk — but prefer gentler options and good ventilation.',
-      hi: 'Use them — mosquito-borne illness is the bigger risk — but prefer gentler options and good ventilation.',
+      en: 'Use them - mosquito-borne illness is the bigger risk - but prefer gentler options and good ventilation.',
+      hi: 'Use them - mosquito-borne illness is the bigger risk - but prefer gentler options and good ventilation.',
     ),
     why: LocalizedText(
       en: 'Dengue, malaria and chikungunya are genuinely risky in pregnancy, so protection matters. Creams and roll-ons used as directed are considered fine; air out the room if you use liquid vaporisers or coils.',
@@ -730,8 +730,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.safe,
     short: LocalizedText(
-      en: 'Routine dental care is safe and important — just tell your dentist you are pregnant.',
-      hi: 'Routine dental care is safe and important — just tell your dentist you are pregnant.',
+      en: 'Routine dental care is safe and important - just tell your dentist you are pregnant.',
+      hi: 'Routine dental care is safe and important - just tell your dentist you are pregnant.',
     ),
     why: LocalizedText(
       en: 'Gums often become tender and bleed in pregnancy, so cleanings and necessary treatment matter. Most procedures are fine; dental X-rays use a shield and a tiny, focused dose.',
@@ -754,8 +754,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Avoid routine X-rays. If one is medically needed, your doctor will shield you and keep it minimal.',
     ),
     why: LocalizedText(
-      en: 'Elective imaging is usually postponed during pregnancy. When an X-ray is genuinely needed (say after an injury), the dose is small and your abdomen is shielded — always tell the team you are pregnant.',
-      hi: 'Elective imaging is usually postponed during pregnancy. When an X-ray is genuinely needed (say after an injury), the dose is small and your abdomen is shielded — always tell the team you are pregnant.',
+      en: 'Elective imaging is usually postponed during pregnancy. When an X-ray is genuinely needed (say after an injury), the dose is small and your abdomen is shielded - always tell the team you are pregnant.',
+      hi: 'Elective imaging is usually postponed during pregnancy. When an X-ray is genuinely needed (say after an injury), the dose is small and your abdomen is shielded - always tell the team you are pregnant.',
     ),
     related: ['dental', 'mosquito_repellent'],
     aliases: ['radiograph', 'scan', 'ct scan'],
@@ -766,8 +766,8 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.avoid,
     short: LocalizedText(
-      en: 'Best avoided — getting overheated is not recommended in pregnancy.',
-      hi: 'Best avoided — getting overheated is not recommended in pregnancy.',
+      en: 'Best avoided - getting overheated is not recommended in pregnancy.',
+      hi: 'Best avoided - getting overheated is not recommended in pregnancy.',
     ),
     why: LocalizedText(
       en: 'Saunas, steam rooms and hot tubs can raise your core temperature too much, especially early on. A warm (not hot) bath or shower is the comfortable, safe alternative.',
@@ -790,8 +790,8 @@ final List<CanIEntry> kCanIEntries = [
       hi: 'Pregnancy hormones loosen your ligaments and your balance shifts, so heavy or awkward lifting risks your back more than the baby. Bend at the knees, hold things close, and ask for help with the heavy stuff.',
     ),
     t3: LocalizedText(
-      en: 'Take extra care now — your centre of gravity is well forward and strain is easier.',
-      hi: 'Take extra care now — your centre of gravity is well forward and strain is easier.',
+      en: 'Take extra care now - your centre of gravity is well forward and strain is easier.',
+      hi: 'Take extra care now - your centre of gravity is well forward and strain is easier.',
     ),
     related: ['walking', 'yoga', 'sleeping_back'],
     aliases: ['lifting weights', 'heavy lifting', 'carrying'],
@@ -802,16 +802,16 @@ final List<CanIEntry> kCanIEntries = [
     category: CanICategory.doActivity,
     verdict: CanIVerdict.askDoctor,
     short: LocalizedText(
-      en: 'Talk to your doctor before fasting — whether it is okay depends on your health and stage.',
-      hi: 'Talk to your doctor before fasting — whether it is okay depends on your health and stage.',
+      en: 'Talk to your doctor before fasting - whether it is okay depends on your health and stage.',
+      hi: 'Talk to your doctor before fasting - whether it is okay depends on your health and stage.',
     ),
     why: LocalizedText(
       en: 'Steady nutrition and hydration matter a lot in pregnancy. Some shorter or partial fasts may be okay for some mothers; long or strict fasts are often advised against. It is very individual.',
       hi: 'Steady nutrition and hydration matter a lot in pregnancy. Some shorter or partial fasts may be okay for some mothers; long or strict fasts are often advised against. It is very individual.',
     ),
     indian: LocalizedText(
-      en: 'For festival vrats, many mothers keep a fruit-and-milk (phalahar) fast rather than a nirjala one — but please confirm with your doctor first.',
-      hi: 'For festival vrats, many mothers keep a fruit-and-milk (phalahar) fast rather than a nirjala one — but please confirm with your doctor first.',
+      en: 'For festival vrats, many mothers keep a fruit-and-milk (phalahar) fast rather than a nirjala one - but please confirm with your doctor first.',
+      hi: 'For festival vrats, many mothers keep a fruit-and-milk (phalahar) fast rather than a nirjala one - but please confirm with your doctor first.',
     ),
     related: ['water', 'street_food'],
     aliases: ['vrat', 'upvas', 'roza', 'navratri'],

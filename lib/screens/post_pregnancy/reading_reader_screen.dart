@@ -1,5 +1,5 @@
 // =============================================================================
-//  ReadingReaderScreen — the premium article reader (the centerpiece)
+//  ReadingReaderScreen - the premium article reader (the centerpiece)
 // -----------------------------------------------------------------------------
 //  Long-form reading, done with care (Kindle/Medium sensibility): a scroll
 //  progress bar, a table of contents, adjustable font size, light/sepia/dark
@@ -271,19 +271,19 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(done ? Icons.check_circle_rounded : Icons.check_rounded, size: 18, color: done ? t.accent : Colors.white),
           const SizedBox(width: 8),
-          Text(done ? 'Read — nicely done' : 'Mark as read', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: done ? t.accent : Colors.white)),
+          Text(done ? 'Read - nicely done' : 'Mark as read', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: done ? t.accent : Colors.white)),
         ]),
       ),
     );
   }
 
-  // ---- read next (articles only — keep reading) ---------------------------
+  // ---- read next (articles only - keep reading) ---------------------------
   Widget _readNext(_RTheme t) {
     final next = readNextArticles(a);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Read next', style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
-      Text('Keep reading — more on this, one after another.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+      Text('Keep reading - more on this, one after another.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
         GestureDetector(

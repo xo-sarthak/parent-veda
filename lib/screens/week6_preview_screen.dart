@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 //  A faithful, self-contained replica of the proposed home-screen mockup, wired
 //  for WEEK 6 only ("just to see how it looks"). Nothing here is hooked into the
-//  real card-stack flow — it is a static visual prototype. Values for week 6 are
+//  real card-stack flow - it is a static visual prototype. Values for week 6 are
 //  pulled from weekContent.json (pomegranate seed · 4–6 mm · <1 g).
 //
 //  To stop previewing, point main.dart `home:` back at WeeklyCardStackScreen.
@@ -56,7 +56,7 @@ class Week6PreviewScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Top bar — logo + EN, then "Week 6 of 40"
+//  Top bar - logo + EN, then "Week 6 of 40"
 // ---------------------------------------------------------------------------
 
 class _TopBar extends StatelessWidget {
@@ -154,7 +154,7 @@ class _DateRange extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Week strip — 4,5,[6],7,8 with 6 selected
+//  Week strip - 4,5,[6],7,8 with 6 selected
 // ---------------------------------------------------------------------------
 
 class _WeekStrip extends StatelessWidget {
@@ -247,7 +247,7 @@ class _Card extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Size card — "How big am I?"
+//  Size card - "How big am I?"
 // ---------------------------------------------------------------------------
 
 class _SizeCard extends StatelessWidget {

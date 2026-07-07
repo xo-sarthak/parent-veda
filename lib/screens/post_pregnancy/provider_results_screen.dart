@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProviderResultsScreen — Problem Solver · category results (parenting · S18·list)
+//  ProviderResultsScreen - Problem Solver · category results (parenting · S18·list)
 // -----------------------------------------------------------------------------
 //  Ranked paediatricians near you: filter chips, a ParentVeda #1 editorial pick,
 //  aggregated partner results, and a labelled sponsored slot. Reached from
@@ -47,7 +47,7 @@ class ProviderResultsScreen extends StatelessWidget {
               Text('Paediatricians near you', style: ppFraunces(30, h: 1.14)),
               const SizedBox(height: 12),
               Text(
-                  'Doctors for everyday illnesses, vaccinations, and growth check-ups — aggregated from our partners, then ranked by ParentVeda.',
+                  'Doctors for everyday illnesses, vaccinations, and growth check-ups - aggregated from our partners, then ranked by ParentVeda.',
                   style: ppBody(15)),
             ])),
 

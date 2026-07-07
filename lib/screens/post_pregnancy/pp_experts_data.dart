@@ -1,9 +1,9 @@
 // =============================================================================
-//  Experts / doctors — shared data for the reusable profile (parenting)
+//  Experts / doctors - shared data for the reusable profile (parenting)
 // -----------------------------------------------------------------------------
 //  Every masterclass, cohort, course or local service is led by a named expert.
 //  This backs a single reusable profile screen (ProviderProfileScreen, the
-//  S18·detail layout) so tapping any expert — anywhere — opens their page. A
+//  S18·detail layout) so tapping any expert - anywhere - opens their page. A
 //  handful of seed profiles for now; real experts slot in here later without
 //  touching any screen. Kept inside the post_pregnancy module (fully isolated).
 // =============================================================================
@@ -39,8 +39,8 @@ class Expert {
   final String topPickLabel;
   final String rating; // "4.9"
   final String reviewsCount; // "1,020 reviews"
-  final (String, String) mid; // (value, label) — e.g. ("12k+", "parents taught")
-  final (String, String) fee; // (value, label) — e.g. ("₹1,499", "per class")
+  final (String, String) mid; // (value, label) - e.g. ("12k+", "parents taught")
+  final (String, String) fee; // (value, label) - e.g. ("₹1,499", "per class")
   final String whyHeading; // "Why ParentVeda picks her"
   final String why; // paragraph
   final List<String> tags; // languages & specialties
@@ -52,7 +52,7 @@ class Expert {
 }
 
 const List<Expert> kExperts = [
-  // The original Problem Solver provider — keeps the S18·detail screen identical.
+  // The original Problem Solver provider - keeps the S18·detail screen identical.
   Expert(
     id: 'neha',
     name: 'Dr. Neha Sharma',
@@ -74,7 +74,7 @@ const List<Expert> kExperts = [
     ctaPrice: '₹800',
     ctaSub: 'via Practo',
     ctaLabel: 'Book on Practo',
-    disclaimer: 'Booking is handled by Practo. ParentVeda earns a small referral fee — it never changes your price.',
+    disclaimer: 'Booking is handled by Practo. ParentVeda earns a small referral fee - it never changes your price.',
   ),
 
   // Masterclass + featured expert.
@@ -90,7 +90,7 @@ const List<Expert> kExperts = [
     fee: ('₹1,499', 'per class'),
     whyHeading: 'Why ParentVeda picks her',
     why:
-        'Has guided thousands of Indian families through the fourth-month wobble — calm, practical, and firmly no-cry-it-out. Her sleep masterclass is our most-attended session.',
+        'Has guided thousands of Indian families through the fourth-month wobble - calm, practical, and firmly no-cry-it-out. Her sleep masterclass is our most-attended session.',
     tags: ['Hindi', 'English', 'Infant sleep', 'Vaccinations'],
     reviews: [
       ('Priya', 'mother of Aarav (4 mo)', '“Her class finally made the 4-month regression make sense. We slept that week.”'),
@@ -99,7 +99,7 @@ const List<Expert> kExperts = [
     ctaPrice: '₹1,499',
     ctaSub: 'per masterclass',
     ctaLabel: 'View sessions',
-    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay — no hidden fees.',
+    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay - no hidden fees.',
   ),
 
   // Cohort coach.
@@ -124,10 +124,10 @@ const List<Expert> kExperts = [
     ctaPrice: '₹5,999',
     ctaSub: 'per cohort',
     ctaLabel: 'View cohorts',
-    disclaimer: 'Cohorts are hosted inside ParentVeda. The price you see is what you pay — no hidden fees.',
+    disclaimer: 'Cohorts are hosted inside ParentVeda. The price you see is what you pay - no hidden fees.',
   ),
 
-  // Masterclass — Wonder Weeks.
+  // Masterclass - Wonder Weeks.
   Expert(
     id: 'kabir',
     name: 'Dr. Kabir Sen',
@@ -148,10 +148,10 @@ const List<Expert> kExperts = [
     ctaPrice: '₹2,499',
     ctaSub: 'per masterclass',
     ctaLabel: 'View sessions',
-    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay — no hidden fees.',
+    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay - no hidden fees.',
   ),
 
-  // Masterclass — baby-proofing.
+  // Masterclass - baby-proofing.
   Expert(
     id: 'meera',
     name: 'Meera Iyer',
@@ -172,10 +172,10 @@ const List<Expert> kExperts = [
     ctaPrice: '₹1,299',
     ctaSub: 'per masterclass',
     ctaLabel: 'View sessions',
-    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay — no hidden fees.',
+    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay - no hidden fees.',
   ),
 
-  // Masterclass — starting solids.
+  // Masterclass - starting solids.
   Expert(
     id: 'ritu',
     name: 'Ritu Malhotra',
@@ -187,16 +187,16 @@ const List<Expert> kExperts = [
     fee: ('₹999', 'per class'),
     whyHeading: 'Why ParentVeda picks her',
     why:
-        'Makes starting solids calm and mess-friendly — Indian-first foods, an allergy-safe order, and portions that suit real families and joint kitchens.',
+        'Makes starting solids calm and mess-friendly - Indian-first foods, an allergy-safe order, and portions that suit real families and joint kitchens.',
     tags: ['Hindi', 'English', 'Punjabi', 'Weaning', 'Nutrition'],
     reviews: [
       ('Pooja', 'mother of Reyansh (6 mo)', '“First solids stopped being scary. Loved the Indian-first approach.”'),
-      ('Anil', 'father of Sara (7 mo)', '“Practical and reassuring — no fads.”'),
+      ('Anil', 'father of Sara (7 mo)', '“Practical and reassuring - no fads.”'),
     ],
     ctaPrice: '₹999',
     ctaSub: 'per masterclass',
     ctaLabel: 'View sessions',
-    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay — no hidden fees.',
+    disclaimer: 'Sessions are hosted inside ParentVeda. The price you see is what you pay - no hidden fees.',
   ),
 ];
 

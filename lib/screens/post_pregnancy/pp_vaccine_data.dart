@@ -1,20 +1,20 @@
 // =============================================================================
-//  ParentVeda Vaccination Tracker — schedule data, content + store (redesign)
+//  ParentVeda Vaccination Tracker - schedule data, content + store (redesign)
 // -----------------------------------------------------------------------------
 //  The journey-first tracker's source of truth. Models the immunisation schedule
 //  as a chronological set of age VISITS, each carrying its vaccines, status,
-//  govt/IAP note, date and one educational insight — so parents feel they are
+//  govt/IAP note, date and one educational insight - so parents feel they are
 //  following their child's health journey, not browsing records. Each Vaccine
 //  carries its "Learn Why" (why it matters, diseases, expected reactions, myths,
 //  FAQs) and "After-Care" (comfort, red flags, products). Reassuring language
-//  only — never "missed/danger/critical". Seeded for Aarav (born 8 Mar 2026,
+//  only - never "missed/danger/critical". Seeded for Aarav (born 8 Mar 2026,
 //  ~4 months). Reuses the existing NotificationService for reminders. This is the
 //  redesign that replaces the old vaccination_screen (kept, commented, for revert).
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
 
-// Reassuring status language — "due" means recommended now, never "missed".
+// Reassuring status language - "due" means recommended now, never "missed".
 enum VaxStatus { done, due, upcoming }
 
 String vaxStatusLabel(VaxStatus s) => switch (s) {
@@ -23,7 +23,7 @@ String vaxStatusLabel(VaxStatus s) => switch (s) {
       VaxStatus.upcoming => 'Upcoming',
     };
 
-/// One vaccine — everything the Learn-Why + After-Care surfaces show for it.
+/// One vaccine - everything the Learn-Why + After-Care surfaces show for it.
 class Vaccine {
   const Vaccine({
     required this.id,
@@ -35,7 +35,7 @@ class Vaccine {
     this.reactions = const ['Mild soreness or redness where the shot was given', 'A low-grade fever for a day or two', 'Being a little more sleepy or fussy than usual'],
     this.myths = const [],
     this.faqs = const [],
-    this.comfort = const ['Extra cuddles and feeds; a cool compress for soreness', "Paracetamol only if he's uncomfortable — weight-based, as your paediatrician advises"],
+    this.comfort = const ['Extra cuddles and feeds; a cool compress for soreness', "Paracetamol only if he's uncomfortable - weight-based, as your paediatrician advises"],
     this.redFlags = const ['Difficult or noisy breathing, or swelling of the face/lips', 'A seizure, or unusual floppiness/drowsiness', 'A high fever that won\'t settle, or a rash with vomiting'],
     this.products = const [],
   });
@@ -93,12 +93,12 @@ const List<Vaccine> kVaccines = [
     protects: 'Guards against some of the most serious infections of the early years.',
     diseases: ['Pneumonia', 'Meningitis (infection of the brain\'s lining)', 'Blood infections (sepsis)', 'Some ear infections'],
     why:
-        'PCV protects against pneumococcus — a bacterium behind some of the most dangerous infections a baby can face. The primary series finishes around now, exactly as the passive immunity from birth is fading, which is what makes the timing so powerful.',
+        'PCV protects against pneumococcus - a bacterium behind some of the most dangerous infections a baby can face. The primary series finishes around now, exactly as the passive immunity from birth is fading, which is what makes the timing so powerful.',
     myths: [
-      ("It's just for pneumonia, so it's optional.", 'PCV also prevents meningitis and sepsis — among the most serious infant illnesses. It is a core part of the schedule for good reason.'),
+      ("It's just for pneumonia, so it's optional.", 'PCV also prevents meningitis and sepsis - among the most serious infant illnesses. It is a core part of the schedule for good reason.'),
     ],
     faqs: [
-      ('Can he have it with a mild cold?', 'A mild cold without a high fever is usually fine — your paediatrician makes the final call on the day.'),
+      ('Can he have it with a mild cold?', 'A mild cold without a high fever is usually fine - your paediatrician makes the final call on the day.'),
       ('Will three doses hurt more than one?', 'Each dose is a small pinch. The three-dose series is what builds strong, lasting protection.'),
     ],
     products: [
@@ -113,7 +113,7 @@ const List<Vaccine> kVaccines = [
     protects: 'Five diseases in one gentle shot.',
     diseases: ['Diphtheria', 'Tetanus', 'Whooping cough (pertussis)', 'Hepatitis B', 'Hib (a cause of meningitis)'],
     why:
-        'The pentavalent shot bundles protection against five serious diseases into a single injection — fewer pricks for your baby, and strong early cover against illnesses that are hardest on the very young.',
+        'The pentavalent shot bundles protection against five serious diseases into a single injection - fewer pricks for your baby, and strong early cover against illnesses that are hardest on the very young.',
     myths: [
       ('The fever afterwards means something went wrong.', 'A mild fever is expected and is a sign the immune system is responding. It usually settles within a day or two.'),
     ],
@@ -128,11 +128,11 @@ const List<Vaccine> kVaccines = [
     protects: 'Prevents severe vomiting-and-diarrhoea illness.',
     diseases: ['Rotavirus gastroenteritis (severe vomiting and diarrhoea, a major cause of dehydration in babies)'],
     why:
-        'Rotavirus is a leading cause of severe diarrhoea and dangerous dehydration in babies. This one is given as drops by mouth — no needle — and dramatically reduces the risk of a hospital visit for dehydration.',
+        'Rotavirus is a leading cause of severe diarrhoea and dangerous dehydration in babies. This one is given as drops by mouth - no needle - and dramatically reduces the risk of a hospital visit for dehydration.',
     reactions: ['Occasionally a little extra fussiness or mild, temporary loose stools'],
     faqs: [
-      ('Is it a drink, not a shot?', 'Yes — rotavirus vaccine is given as oral drops. Most babies take it happily.'),
-      ('What if he spits it out?', "Mention it to the nurse — they'll advise whether a top-up dose is needed."),
+      ('Is it a drink, not a shot?', 'Yes - rotavirus vaccine is given as oral drops. Most babies take it happily.'),
+      ('What if he spits it out?', "Mention it to the nurse - they'll advise whether a top-up dose is needed."),
     ],
   ),
   Vaccine(
@@ -140,7 +140,7 @@ const List<Vaccine> kVaccines = [
     name: 'Polio (IPV)',
     shortName: 'IPV',
     protects: 'Protects against polio.',
-    diseases: ['Poliomyelitis (polio) — a virus that can cause lifelong paralysis'],
+    diseases: ['Poliomyelitis (polio) - a virus that can cause lifelong paralysis'],
     why:
         'Polio can cause permanent paralysis. Thanks to vaccination it is now extremely rare, but keeping every baby protected is exactly how it stays that way. IPV is the injectable form, given alongside oral polio drops.',
   ),
@@ -151,7 +151,7 @@ const List<Vaccine> kVaccines = [
     protects: 'Oral drops against polio.',
     diseases: ['Poliomyelitis (polio)'],
     why: 'OPV is the oral (drops) polio vaccine, given alongside IPV for broad, lasting protection against polio.',
-    reactions: ['Usually none — it is given as gentle oral drops'],
+    reactions: ['Usually none - it is given as gentle oral drops'],
   ),
   Vaccine(
     id: 'bcg',
@@ -161,7 +161,7 @@ const List<Vaccine> kVaccines = [
     diseases: ['Severe childhood tuberculosis (including TB meningitis)'],
     why:
         'Given at birth, BCG protects newborns against the most severe forms of TB. A small raised mark or tiny scar at the injection site over the following weeks is normal and expected.',
-    reactions: ['A small swelling that may form a tiny scar over weeks — this is normal'],
+    reactions: ['A small swelling that may form a tiny scar over weeks - this is normal'],
   ),
   Vaccine(
     id: 'hepb',
@@ -187,9 +187,9 @@ const List<Vaccine> kVaccines = [
     protects: 'Protects against measles, mumps and rubella.',
     diseases: ['Measles', 'Mumps', 'Rubella (German measles)'],
     why:
-        'Measles is far more dangerous than many parents realise, and highly contagious. The MMR given around nine months (with a booster later) is the strongest protection — for your child and for the babies around him too soon to be vaccinated.',
+        'Measles is far more dangerous than many parents realise, and highly contagious. The MMR given around nine months (with a booster later) is the strongest protection - for your child and for the babies around him too soon to be vaccinated.',
     myths: [
-      ('MMR is linked to autism.', 'This has been thoroughly and repeatedly disproven by large, careful studies. MMR does not cause autism — the original claim was retracted as fraudulent.'),
+      ('MMR is linked to autism.', 'This has been thoroughly and repeatedly disproven by large, careful studies. MMR does not cause autism - the original claim was retracted as fraudulent.'),
       ('Measles is a harmless childhood illness.', 'Measles can cause pneumonia, brain inflammation and, rarely, death. The vaccine prevents this entirely.'),
     ],
     faqs: [
@@ -202,7 +202,7 @@ const List<Vaccine> kVaccines = [
     shortName: 'Typhoid',
     protects: 'Protects against typhoid fever.',
     diseases: ['Typhoid fever (a serious bacterial infection common in many regions)'],
-    why: 'Typhoid conjugate vaccine gives lasting protection against typhoid fever — especially valuable in regions where it is common.',
+    why: 'Typhoid conjugate vaccine gives lasting protection against typhoid fever - especially valuable in regions where it is common.',
   ),
   Vaccine(
     id: 'hepa',
@@ -234,7 +234,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.done,
     govtFree: true,
     date: '8 Mar 2026',
-    insight: 'The very first protection — given in the first hours to guard against TB, polio and hepatitis B from day one.',
+    insight: 'The very first protection - given in the first hours to guard against TB, polio and hepatitis B from day one.',
     leadVaccineId: 'bcg',
   ),
   VaxVisit(
@@ -245,7 +245,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.done,
     govtFree: true,
     date: '19 Apr 2026',
-    insight: 'The first big visit — five diseases covered in one shot, plus oral drops. A little fussiness after is normal.',
+    insight: 'The first big visit - five diseases covered in one shot, plus oral drops. A little fussiness after is normal.',
     leadVaccineId: 'penta',
   ),
   VaxVisit(
@@ -256,7 +256,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.done,
     govtFree: true,
     date: '17 May 2026',
-    insight: 'The second doses — each one deepens the protection the first began to build.',
+    insight: 'The second doses - each one deepens the protection the first began to build.',
     leadVaccineId: 'penta',
   ),
   VaxVisit(
@@ -267,7 +267,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.due,
     govtFree: true,
     date: '22 Jul 2026',
-    insight: "The third doses complete his primary series — the window his early immunity is fully built. It's due now.",
+    insight: "The third doses complete his primary series - the window his early immunity is fully built. It's due now.",
     leadVaccineId: 'pcv',
     due: null, // set at runtime via vaxDueDate()
   ),
@@ -279,7 +279,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.upcoming,
     govtFree: true,
     date: '8 Sep 2026',
-    insight: 'A lighter visit — a top-up of polio and hepatitis B protection. Often around when first foods begin.',
+    insight: 'A lighter visit - a top-up of polio and hepatitis B protection. Often around when first foods begin.',
     leadVaccineId: 'opv',
   ),
   VaxVisit(
@@ -290,7 +290,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.upcoming,
     govtFree: true,
     date: '8 Dec 2026',
-    insight: 'The first measles protection — one of the most important of all, as maternal immunity fades.',
+    insight: 'The first measles protection - one of the most important of all, as maternal immunity fades.',
     leadVaccineId: 'mmr',
   ),
   VaxVisit(
@@ -323,7 +323,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.upcoming,
     govtFree: true,
     date: '8 Sep 2027',
-    insight: 'First boosters of the early shots — keeping the protection strong into the toddler years.',
+    insight: 'First boosters of the early shots - keeping the protection strong into the toddler years.',
     leadVaccineId: 'penta',
   ),
   VaxVisit(
@@ -334,7 +334,7 @@ const List<VaxVisit> kVaxVisits = [
     status: VaxStatus.upcoming,
     govtFree: false,
     date: '8 Mar 2028',
-    insight: 'Typhoid protection and the second hepatitis A dose — valuable cover for the exploring years ahead.',
+    insight: 'Typhoid protection and the second hepatitis A dose - valuable cover for the exploring years ahead.',
     leadVaccineId: 'typhoid',
   ),
 ];
@@ -359,7 +359,7 @@ DateTime? vaxVisitDate(VaxVisit v) {
 }
 
 // =============================================================================
-//  VaxStore — completed visits + reminders (in-memory, ChangeNotifier singleton)
+//  VaxStore - completed visits + reminders (in-memory, ChangeNotifier singleton)
 // =============================================================================
 class VaxStore extends ChangeNotifier {
   VaxStore._();
@@ -399,7 +399,7 @@ class VaxStore extends ChangeNotifier {
   int get firstYearTotal =>
       kVaxVisits.where((v) => v.ageDays <= 365).fold<int>(0, (a, v) => a + v.vaccineIds.length);
 
-  /// The next visit that needs action — the due one, else the soonest upcoming.
+  /// The next visit that needs action - the due one, else the soonest upcoming.
   VaxVisit? get nextVisit {
     for (final v in kVaxVisits) {
       if (statusOf(v) == VaxStatus.due) return v;
@@ -418,7 +418,7 @@ class VaxStore extends ChangeNotifier {
     return null;
   }
 
-  /// No "overdue/missed" shaming — the scenario is on track. Returns null unless
+  /// No "overdue/missed" shaming - the scenario is on track. Returns null unless
   /// a genuinely past-due visit is ever modelled.
   VaxVisit? get catchUpVisit => null;
 

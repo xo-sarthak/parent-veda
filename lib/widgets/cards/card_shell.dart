@@ -91,7 +91,7 @@ class CardShell extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppTheme.outlineVariant, width: 1),
         boxShadow: [
-          // One soft, lavender-tinted shadow — never harsh.
+          // One soft, lavender-tinted shadow - never harsh.
           BoxShadow(
             color: AppTheme.primary900.withValues(alpha: 0.06),
             blurRadius: 28,
@@ -102,7 +102,7 @@ class CardShell extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Padding(
         // Cards now flow at their natural height inside the screen-level scroll
-        // (the weekly stack owns scrolling), so the content is a plain Column —
+        // (the weekly stack owns scrolling), so the content is a plain Column -
         // no inner scroll view, no Expanded.
         padding: const EdgeInsets.fromLTRB(24, 18, 24, 20),
         child: Column(

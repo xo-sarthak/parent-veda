@@ -1,9 +1,9 @@
 // =============================================================================
-//  PrepareVideoScreen — tidy placeholder player
+//  PrepareVideoScreen - tidy placeholder player
 // -----------------------------------------------------------------------------
 //  Yoga sessions, birthing classes and the masterclass intro all "play" into
 //  here. Real clips aren't wired yet, so this shows a calm "video coming soon"
-//  player with the title + blurb — ready to drop a real player into later.
+//  player with the title + blurb - ready to drop a real player into later.
 // =============================================================================
 
 import 'package:flutter/material.dart';

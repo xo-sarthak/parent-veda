@@ -1,5 +1,5 @@
 // =============================================================================
-//  WatchLibraryScreen — "Watch later" / your library
+//  WatchLibraryScreen - "Watch later" / your library
 // -----------------------------------------------------------------------------
 //  Continue watching, Saved, Recently watched and Collections in one calm place.
 //  (Downloads/offline is a stubbed future row.) Reflects the WatchStore live.
@@ -62,7 +62,7 @@ class WatchLibraryScreen extends StatelessWidget {
                   child: Row(children: [
                     const Icon(Icons.download_outlined, size: 18, color: ppPurple),
                     const SizedBox(width: 10),
-                    Text('Downloaded — offline viewing', style: ppBody(13.5, color: ppInk, w: FontWeight.w600)),
+                    Text('Downloaded - offline viewing', style: ppBody(13.5, color: ppInk, w: FontWeight.w600)),
                     const Spacer(),
                     Text('Soon', style: ppBody(11, color: ppMuted, w: FontWeight.w700)),
                   ]),

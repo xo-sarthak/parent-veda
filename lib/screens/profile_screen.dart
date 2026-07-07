@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProfileScreen  —  the "Profile" tab
+//  ProfileScreen  -  the "Profile" tab
 // -----------------------------------------------------------------------------
 //  A light profile header, the Dear Baby memory-vault entry point, and a
 //  language toggle. Dear Baby lives here (rather than its own tab) so the Tools
@@ -98,7 +98,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           // Mother-only memory vaults (Journal / Bump / Dear Baby / Saved) are
-          // hidden for the father — they belong to her account; he sees a
+          // hidden for the father - they belong to her account; he sees a
           // partner-account note instead.
           if (father) ...[
             Container(
@@ -238,7 +238,7 @@ class ProfileScreen extends StatelessWidget {
           // --- Reset to Week 20 (testing) ---------------------------------
           // Clears any saved due date + the pregnancy-map data and snaps the app
           // back to the week-20 placeholder, so features can be re-tested from a
-          // clean "halfway" state. (Testing aid — remove/gate before release.)
+          // clean "halfway" state. (Testing aid - remove/gate before release.)
           OutlinedButton.icon(
             onPressed: () => _resetForTesting(context),
             icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -276,7 +276,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  /// Testing reset — clear the due date + pregnancy-map data, snap back to the
+  /// Testing reset - clear the due date + pregnancy-map data, snap back to the
   /// week-20 placeholder, and drop the user on a fresh Today screen.
   Future<void> _resetForTesting(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -287,10 +287,10 @@ class ProfileScreen extends StatelessWidget {
     AppNav.instance.goToday();
     nav.popUntil((r) => r.isFirst); // back to the main scaffold (Today)
     messenger.showSnackBar(const SnackBar(
-        content: Text('Reset to Week 20 — due date & pregnancy map cleared')));
+        content: Text('Reset to Week 20 - due date & pregnancy map cleared')));
   }
 
-  /// "Sign out" — clears the local auth flag and replays the auth flow over the
+  /// "Sign out" - clears the local auth flag and replays the auth flow over the
   /// app; completing it re-sets the flag (and feeds any picked due date in).
   Future<void> _signOut(BuildContext context) async {
     final nav = Navigator.of(context);
@@ -328,7 +328,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-/// The mother's "Invite your partner" card — shows her persistent pairing code
+/// The mother's "Invite your partner" card - shows her persistent pairing code
 /// with Share + Copy. The father enters this code to link the two accounts.
 class _InvitePartnerCard extends StatefulWidget {
   const _InvitePartnerCard();

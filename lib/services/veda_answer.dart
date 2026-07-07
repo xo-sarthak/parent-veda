@@ -1,10 +1,10 @@
 // =============================================================================
-//  vedaAnswer — offline "answer from the whole app"
+//  vedaAnswer - offline "answer from the whole app"
 // -----------------------------------------------------------------------------
 //  No LLM backend: Ask Veda now searches the ENTIRE app's content (via
-//  VedaIndex) — Can I?, symptoms, the weekly baby/mother content, products,
+//  VedaIndex) - Can I?, symptoms, the weekly baby/mother content, products,
 //  reads, trimester tips, spiritual reading, read-to-baby, garbh sanskar, body
-//  changes, tools and community insights — picks the best match for the answer,
+//  changes, tools and community insights - picks the best match for the answer,
 //  and lists the next best matches as "From your ParentVeda" source cards. The
 //  rich Can-I (verdict/why/trimester) and Symptom (why/tips/doctor) formatting
 //  is preserved when one of those is the top match. Anything below the relevance
@@ -85,7 +85,7 @@ VedaResult vedaAnswer(String query, PregnancyController p) {
   final ctx = VedaContext.gather(p);
 
   // Curated structured showcase answers take priority over retrieval. The
-  // personal line (symptom/medication only — the showcase already states the
+  // personal line (symptom/medication only - the showcase already states the
   // week) is woven into "What this means for you" by the UI.
   final show = matchShowcase(query);
   if (show != null) {
@@ -97,7 +97,7 @@ VedaResult vedaAnswer(String query, PregnancyController p) {
     );
   }
 
-  // Retrieval forms the answer from VETTED content only — community is EXCLUDED
+  // Retrieval forms the answer from VETTED content only - community is EXCLUDED
   // (it's opinion; it can only appear as social proof in Section 5).
   final hits = vedaSearch(query, p, limit: 8, includeCommunity: false);
   if (hits.isEmpty) {
@@ -107,7 +107,7 @@ VedaResult vedaAnswer(String query, PregnancyController p) {
   final top = hits.first.doc;
   String answer;
   // Preserve the rich Can-I / Symptom answers when they win (no trailing
-  // disclaimer — the result page shows its own at the bottom).
+  // disclaimer - the result page shows its own at the bottom).
   if (top.kind == VedaKind.canI && top.id.startsWith('cani_')) {
     final e = _canIById(top.id.substring('cani_'.length));
     answer = e != null
@@ -122,7 +122,7 @@ VedaResult vedaAnswer(String query, PregnancyController p) {
     answer = _formatDoc(top, s, disclaimer: false);
   }
 
-  // S4 — ParentVeda content (typed). Products are pulled out to S6.
+  // S4 - ParentVeda content (typed). Products are pulled out to S6.
   final content = <VedaContentRef>[
     for (final h in hits.skip(1))
       if (h.doc.kind != VedaKind.product)
@@ -136,13 +136,13 @@ VedaResult vedaAnswer(String query, PregnancyController p) {
         ),
   ].take(5).toList();
 
-  // S6 — products (only if any product matched).
+  // S6 - products (only if any product matched).
   final products = <String>[
     for (final h in hits)
       if (h.doc.kind == VedaKind.product) h.doc.title,
   ].take(4).toList();
 
-  // S5 — community insight (social proof only; never sourced into the answer).
+  // S5 - community insight (social proof only; never sourced into the answer).
   final commHits = vedaCommunityMatches(query, p, limit: 3);
   final community =
       commHits.isEmpty ? null : s.vedaCommunitySocial(commHits.length);
@@ -178,7 +178,7 @@ bool _topIsUrgent(VedaDoc top) {
   return x?.urgent ?? false;
 }
 
-/// Human content-TYPE label per kind (Section 4 eyebrow) — replaces the raw
+/// Human content-TYPE label per kind (Section 4 eyebrow) - replaces the raw
 /// "Can I?"/"Week 12" source labels the old fallback showed.
 String _typeLabel(VedaKind k, S s) {
   switch (k) {
@@ -259,7 +259,7 @@ String _formatCanI(CanIEntry e, S s, AppLanguage lang, PregnancyController p,
   final tri = p.currentWeek <= 13 ? 1 : (p.currentWeek <= 27 ? 2 : 3);
   final triNote = tri == 1 ? e.t1 : (tri == 2 ? e.t2 : e.t3);
   final b = StringBuffer()
-    ..writeln('${e.name.of(lang)} — ${_verdict(s, e.verdict)}')
+    ..writeln('${e.name.of(lang)} - ${_verdict(s, e.verdict)}')
     ..writeln()
     ..writeln(e.short.of(lang));
   final why = e.why.of(lang).trim();

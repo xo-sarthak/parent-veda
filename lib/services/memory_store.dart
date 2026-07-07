@@ -79,7 +79,7 @@ class MemoryStore extends ChangeNotifier {
     notifyListeners();
 
     // Sync the weekly notes with the cloud (no-op if logged out). photo_memories
-    // are deferred — a pure-file store (no text), so metadata-only sync isn't
+    // are deferred - a pure-file store (no text), so metadata-only sync isn't
     // useful until files move to Supabase Storage in Phase 3.
     await _syncFromCloud();
   }
@@ -102,7 +102,7 @@ class MemoryStore extends ChangeNotifier {
       await _persistJournal();
       await _backfillMedia();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // Upload any note photos still stored as local paths; rewrite to cloud paths.
@@ -145,7 +145,7 @@ class MemoryStore extends ChangeNotifier {
 
   /// Upgrade-safe migration: older builds allowed several notes per week. We now
   /// keep exactly one entry per week. Collapse any duplicates into a single
-  /// entry — newest text first (blank texts dropped), keeping up to two photos —
+  /// entry - newest text first (blank texts dropped), keeping up to two photos -
   /// so nothing the mother wrote or photographed is lost.
   Future<void> _migrateToOnePerWeek() async {
     final byWeek = <int, List<JournalEntry>>{};
@@ -203,7 +203,7 @@ class MemoryStore extends ChangeNotifier {
 
   // ---- Journal --------------------------------------------------------------
 
-  /// Creates the entry for [week], or updates it if one already exists — each
+  /// Creates the entry for [week], or updates it if one already exists - each
   /// week holds at most one entry, with up to two photos.
   Future<JournalEntry> addJournal({
     required int week,
@@ -332,7 +332,7 @@ class MemoryStore extends ChangeNotifier {
   }
 
   /// Captures a photo and saves it to the documents dir, returning the file
-  /// path (or null if cancelled). Used to attach photos to a journal note —
+  /// path (or null if cancelled). Used to attach photos to a journal note -
   /// the path is stored on the [JournalEntry], not as a standalone memory.
   Future<String?> capturePhotoFile() async {
     try {

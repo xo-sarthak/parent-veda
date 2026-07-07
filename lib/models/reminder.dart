@@ -1,14 +1,14 @@
 // =============================================================================
-//  Reminder — a customizable local reminder/notification
+//  Reminder - a customizable local reminder/notification
 // -----------------------------------------------------------------------------
-//  The mother can ask the app to nudge her at a chosen time — for a Kegel
+//  The mother can ask the app to nudge her at a chosen time - for a Kegel
 //  session, a prenatal vitamin, reading to her baby, a hospital-bag task, water,
 //  or anything custom. Pure data; the actual OS notification scheduling lives in
 //  NotificationService (wired once flutter_local_notifications is installed).
 //
 //  A single reminder can fire at MULTIPLE times of day ([times], for twice/thrice
 //  daily) and supports richer cadences (fortnightly / monthly / specific
-//  weekdays) — used by the medication-reminders feature on the Daily Medication
+//  weekdays) - used by the medication-reminders feature on the Daily Medication
 //  card, which is deliberately NOT tied to any specific medicine.
 // =============================================================================
 
@@ -50,10 +50,10 @@ class Reminder {
   /// (twice/thrice a day). Empty → just the single [hour]:[minute] is used.
   final List<int> times;
 
-  /// Day of month (1–28) — only used when repeat == monthly.
+  /// Day of month (1–28) - only used when repeat == monthly.
   final int dayOfMonth;
 
-  /// Specific weekdays (1=Mon … 7=Sun) — only used when repeat == customDays.
+  /// Specific weekdays (1=Mon … 7=Sun) - only used when repeat == customDays.
   final List<int> weekdays;
 
   /// Every time-of-day this reminder fires (minutes since midnight).

@@ -1,9 +1,9 @@
 // =============================================================================
-//  Baby Naming Journey (Version 2) — data, version toggle + content engine
+//  Baby Naming Journey (Version 2) - data, version toggle + content engine
 // -----------------------------------------------------------------------------
 //  V2 is the emotional "Baby Naming Journey" (keepsake-book feel) that sits
 //  behind the V1|V2 header toggle. It REUSES the existing name catalogue
-//  (BabyName / kBabyNames) and the shared NameMatchStore — nothing here changes
+//  (BabyName / kBabyNames) and the shared NameMatchStore - nothing here changes
 //  or deletes the V1 tool. It adds: curated Collections, the AI Name Story, the
 //  Decision Companion content, and the journey-timeline steps. Content is
 //  hand-authored for a few heroes and generated (from existing fields) for the
@@ -20,7 +20,7 @@ enum NameVersion { v1, v2 }
 
 /// Which naming experience is active. A ChangeNotifier singleton (same pattern as
 /// the app's other stores); session-persistent. Defaults to V2 so the new
-/// Journey is what opens — flip to V1 in the header to see the classic Finder.
+/// Journey is what opens - flip to V1 in the header to see the classic Finder.
 class NameVersionStore extends ChangeNotifier {
   NameVersionStore._();
   static final NameVersionStore instance = NameVersionStore._();
@@ -98,16 +98,16 @@ class NameV2 {
 const Map<String, NameV2> _nameV2 = {
   'Aarav': NameV2(
     aiStory:
-        'Aarav has become popular because it balances timeless Sanskrit roots with a gentle, modern sound. Parents often choose it because it feels peaceful, is easy to pronounce across cultures, and carries a quietly musical meaning — the calm sound of music itself. It is a name that sounds like the feeling most parents want for their child.',
+        'Aarav has become popular because it balances timeless Sanskrit roots with a gentle, modern sound. Parents often choose it because it feels peaceful, is easy to pronounce across cultures, and carries a quietly musical meaning - the calm sound of music itself. It is a name that sounds like the feeling most parents want for their child.',
     decisionWhy:
-        'Aarav suits families looking for a name that is traditional in root yet effortlessly modern — soft on the tongue, recognised everywhere, and never harsh or heavy.',
+        'Aarav suits families looking for a name that is traditional in root yet effortlessly modern - soft on the tongue, recognised everywhere, and never harsh or heavy.',
     alternatives: ['Aarush', 'Vihaan', 'Reyansh'],
     nicknames: ['Aaru', 'Rav'],
     intlPron: 'AA-rav (travels easily across languages)',
   ),
   'Vihaan': NameV2(
     aiStory:
-        'Vihaan feels like a beginning. Rooted in the Sanskrit for daybreak, it pairs a bright, hopeful meaning with a clean, modern sound that rarely gets shortened or mispronounced. Parents are drawn to the sense of a fresh start it carries — the first light of a new day, held in two easy syllables.',
+        'Vihaan feels like a beginning. Rooted in the Sanskrit for daybreak, it pairs a bright, hopeful meaning with a clean, modern sound that rarely gets shortened or mispronounced. Parents are drawn to the sense of a fresh start it carries - the first light of a new day, held in two easy syllables.',
     decisionWhy:
         'Vihaan suits parents who want an optimistic, forward-looking name that still feels grounded in tradition, and one that travels well across languages.',
     alternatives: ['Vivaan', 'Aarav', 'Reyansh'],
@@ -116,7 +116,7 @@ const Map<String, NameV2> _nameV2 = {
   ),
   'Kabir': NameV2(
     aiStory:
-        'Kabir carries genuine weight. Named for the 15th-century mystic poet-saint whose verses are loved across faiths, it is short, dignified and instantly recognised — a name with literary and devotional depth that still sits easily in the modern world. It crosses communities gracefully, which is a large part of its quiet appeal.',
+        'Kabir carries genuine weight. Named for the 15th-century mystic poet-saint whose verses are loved across faiths, it is short, dignified and instantly recognised - a name with literary and devotional depth that still sits easily in the modern world. It crosses communities gracefully, which is a large part of its quiet appeal.',
     decisionWhy:
         'Kabir suits families who want a name with real cultural and literary roots, one that feels strong and timeless without being ornate.',
     alternatives: ['Arjun', 'Aarav', 'Ishaan'],
@@ -127,7 +127,7 @@ const Map<String, NameV2> _nameV2 = {
 
 int _min(int a, int b) => a < b ? a : b;
 
-/// Every name's V2 content — hand-authored where we have it, gracefully generated
+/// Every name's V2 content - hand-authored where we have it, gracefully generated
 /// from the existing fields otherwise. So no name ever reads thin.
 NameV2 nameV2(BabyName n) {
   final hand = _nameV2[n.name];
@@ -135,9 +135,9 @@ NameV2 nameV2(BabyName n) {
   final meaning = n.meaningShort.replaceAll(RegExp(r'[.;]+$'), '').toLowerCase();
   return NameV2(
     aiStory:
-        '${n.name} carries ${n.origin.split('·').first.trim().toLowerCase()} roots and a ${n.popularity.toLowerCase()} feel. ${n.perspective} Its meaning — $meaning — gives it a warmth many parents quietly fall for.',
+        '${n.name} carries ${n.origin.split('·').first.trim().toLowerCase()} roots and a ${n.popularity.toLowerCase()} feel. ${n.perspective} Its meaning - $meaning - gives it a warmth many parents quietly fall for.',
     decisionWhy:
-        'Parents drawn to ${n.name} tend to love that it is ${n.popularity.toLowerCase()}, easy to say and rich in meaning — a natural fit for families who want a name that feels ${n.feel.toLowerCase()}.',
+        'Parents drawn to ${n.name} tend to love that it is ${n.popularity.toLowerCase()}, easy to say and rich in meaning - a natural fit for families who want a name that feels ${n.feel.toLowerCase()}.',
     alternatives: n.similar.map((s) => s.$1).toList(),
     nicknames: [n.name.substring(0, _min(3, n.name.length))],
     intlPron: n.pron,
@@ -150,15 +150,15 @@ String decisionCompare(List<BabyName> names) {
   final trad = names.where((n) => n.feel.toLowerCase().contains('rooted') || n.feel.toLowerCase().contains('devotional')).length;
   final modern = names.length - trad;
   if (trad > 0 && modern > 0) {
-    return 'Your shortlist mixes rooted, traditional names with fresher modern ones — a lovely sign you\'re weighing heritage against everyday ease. Neither is more "right"; it comes down to the feeling you want when you call your child in from the garden.';
+    return 'Your shortlist mixes rooted, traditional names with fresher modern ones - a lovely sign you\'re weighing heritage against everyday ease. Neither is more "right"; it comes down to the feeling you want when you call your child in from the garden.';
   }
   if (trad >= modern) {
-    return 'Your shortlist leans traditional and rooted — names with story and heritage behind them. You clearly value meaning that carries weight.';
+    return 'Your shortlist leans traditional and rooted - names with story and heritage behind them. You clearly value meaning that carries weight.';
   }
-  return 'Your shortlist leans modern and fresh — bright, easy names that travel well. You seem to value a name that feels effortless and contemporary.';
+  return 'Your shortlist leans modern and fresh - bright, easy names that travel well. You seem to value a name that feels effortless and contemporary.';
 }
 
-/// The Name Journey Timeline ribbon — a reassuring sense of progress (never
+/// The Name Journey Timeline ribbon - a reassuring sense of progress (never
 /// gamification: no points, no rewards). [active] indexes into kNameJourneySteps.
 Widget nameJourneyRibbon({required int active}) => SizedBox(
       height: 30,

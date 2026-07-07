@@ -1,13 +1,13 @@
 // =============================================================================
 //  FatherDay model (Father Mode "Daily Moment", bilingual)
 // -----------------------------------------------------------------------------
-//  Parses lib/data/father/fatherDailyContent.json — the Father Mode daily moment.
+//  Parses lib/data/father/fatherDailyContent.json - the Father Mode daily moment.
 //  Father Mode is a fatherhood-transformation experience, NOT pregnancy
 //  education, so each day carries exactly three modules:
 //
-//    1 · Learn         — a fatherhood lesson (3 layers: card → expanded → deep dive)
-//    2 · Talk To Baby  — a bonding prompt (story / value / memory, never baby-talk)
-//    3 · Mission       — one small, real-world action (1–10 minutes)
+//    1 · Learn         - a fatherhood lesson (3 layers: card → expanded → deep dive)
+//    2 · Talk To Baby  - a bonding prompt (story / value / memory, never baby-talk)
+//    3 · Mission       - one small, real-world action (1–10 minutes)
 //
 //  Every text leaf is a {en, hi} LocalizedText, mirroring HomeDay / WeekContent.
 //  Prototype scope: a single representative day for week 20 (day 143). The schema
@@ -27,7 +27,7 @@ int _i(Object? v, [int d = 0]) =>
     v is int ? v : int.tryParse(v?.toString() ?? '') ?? d;
 
 // ---------------------------------------------------------------------------
-//  1 · Learn — a fatherhood lesson
+//  1 · Learn - a fatherhood lesson
 // ---------------------------------------------------------------------------
 
 @immutable
@@ -48,13 +48,13 @@ class FatherLesson {
   /// Short headline ("Presence Over Provision").
   final LocalizedText title;
 
-  /// Layer 1 — the daily card line (3–5 seconds).
+  /// Layer 1 - the daily card line (3–5 seconds).
   final LocalizedText insight;
 
-  /// Layer 2 — expanded insight behind "Open" (30–60 seconds).
+  /// Layer 2 - expanded insight behind "Open" (30–60 seconds).
   final LocalizedText expanded;
 
-  /// Layer 3 — optional deep dive (older-and-wiser perspective). May be empty.
+  /// Layer 3 - optional deep dive (older-and-wiser perspective). May be empty.
   final LocalizedText? deepDive;
 
   /// One line worth carrying through the day.
@@ -74,7 +74,7 @@ class FatherLesson {
 }
 
 // ---------------------------------------------------------------------------
-//  2 · Talk To Your Baby — bonding before birth
+//  2 · Talk To Your Baby - bonding before birth
 // ---------------------------------------------------------------------------
 
 @immutable
@@ -105,7 +105,7 @@ class FatherTalkPrompt {
 }
 
 // ---------------------------------------------------------------------------
-//  3 · Mission — turn intention into action
+//  3 · Mission - turn intention into action
 // ---------------------------------------------------------------------------
 
 @immutable

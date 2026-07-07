@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 //  Builds the week-40 keepsake: a warm, blush-and-cream multi-page PDF booklet
 //  of the mother's journey. A cover page, one page per week that has a memory
-//  (journal entry and/or photos), and a closing message — with an elegant serif
+//  (journal entry and/or photos), and a closing message - with an elegant serif
 //  for the week numbers and gentle botanical accents in the page corners.
 //  "A keepsake booklet a mother gives her child years later."
 // =============================================================================
@@ -133,7 +133,7 @@ class JourneyPdf {
               ),
             ),
             pw.SizedBox(height: 36),
-            pw.Text('— ${s.appName} —',
+            pw.Text('- ${s.appName} -',
                 style: pw.TextStyle(font: bodyFont, fontSize: 11, color: _rose)),
           ],
         ),
@@ -156,7 +156,7 @@ class JourneyPdf {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Header — big serif week number + date range.
+        // Header - big serif week number + date range.
         pw.Row(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [

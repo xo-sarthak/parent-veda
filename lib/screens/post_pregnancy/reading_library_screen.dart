@@ -1,5 +1,5 @@
 // =============================================================================
-//  ReadingLibraryScreen — your reading library (bookmarks + progress)
+//  ReadingLibraryScreen - your reading library (bookmarks + progress)
 // -----------------------------------------------------------------------------
 //  Continue reading, Saved, Completed and Collections in one calm place, so the
 //  parent always knows where they left off. Reflects the ReadingStore live.
@@ -78,7 +78,7 @@ class ReadingLibraryScreen extends StatelessWidget {
   String _emptyFor(String title) {
     switch (title) {
       case 'Continue reading':
-        return 'Nothing in progress — open Today’s read to begin.';
+        return 'Nothing in progress - open Today’s read to begin.';
       case 'Saved':
         return 'Tap the bookmark on any read to keep it here.';
       default:

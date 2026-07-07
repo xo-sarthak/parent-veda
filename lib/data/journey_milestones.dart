@@ -2,7 +2,7 @@
 //  Journey milestone content (bilingual)
 // -----------------------------------------------------------------------------
 //  Authored in Dart (type-safe LocalizedText) rather than JSON: this is small,
-//  structured, config-like content — unlike the bulk week/daily JSON sets.
+//  structured, config-like content - unlike the bulk week/daily JSON sets.
 //  Educational only; never diagnosis or medical advice.
 // =============================================================================
 
@@ -12,7 +12,7 @@ import '../models/journey_node.dart';
 /// Every milestone node on the Pregnancy Journey trail.
 const List<JourneyMilestone> kJourneyMilestones = [
   // ===========================================================================
-  //  TYPE 2 · ACHIEVEMENTS (gold) — celebrate progress
+  //  TYPE 2 · ACHIEVEMENTS (gold) - celebrate progress
   // ===========================================================================
   JourneyMilestone(
     id: 'a_w5',
@@ -40,8 +40,8 @@ const List<JourneyMilestone> kJourneyMilestones = [
       CardSection(
         LocalizedText(en: '', hi: ''),
         LocalizedText(
-          en: 'Your baby\'s heart has started to beat — a quiet, steady rhythm just for you. ❤️',
-          hi: 'Aapke baby ka dil dhadakne laga hai — ek shaant, sthir dhadkan sirf aapke liye. ❤️',
+          en: 'Your baby\'s heart has started to beat - a quiet, steady rhythm just for you. ❤️',
+          hi: 'Aapke baby ka dil dhadakne laga hai - ek shaant, sthir dhadkan sirf aapke liye. ❤️',
         ),
       ),
     ],
@@ -74,8 +74,8 @@ const List<JourneyMilestone> kJourneyMilestones = [
       CardSection(
         LocalizedText(en: '', hi: ''),
         LocalizedText(
-          en: 'Those first flutters — like tiny butterflies — are your baby saying hello. 🦋',
-          hi: 'Woh pehli halki harkatein — jaise nanhi titliyan — aapka baby hello keh raha hai. 🦋',
+          en: 'Those first flutters - like tiny butterflies - are your baby saying hello. 🦋',
+          hi: 'Woh pehli halki harkatein - jaise nanhi titliyan - aapka baby hello keh raha hai. 🦋',
         ),
       ),
     ],
@@ -106,8 +106,8 @@ const List<JourneyMilestone> kJourneyMilestones = [
       CardSection(
         LocalizedText(en: '', hi: ''),
         LocalizedText(
-          en: 'An important milestone — your baby is growing stronger every single day. 🎉',
-          hi: 'Ek zaroori padaav — aapka baby har din aur mazboot ho raha hai. 🎉',
+          en: 'An important milestone - your baby is growing stronger every single day. 🎉',
+          hi: 'Ek zaroori padaav - aapka baby har din aur mazboot ho raha hai. 🎉',
         ),
       ),
     ],
@@ -138,8 +138,8 @@ const List<JourneyMilestone> kJourneyMilestones = [
       CardSection(
         LocalizedText(en: '', hi: ''),
         LocalizedText(
-          en: 'Your baby is now full term — ready to meet the world whenever the time is right. 🎉',
-          hi: 'Aapka baby ab full term hai — sahi waqt aane par duniya se milne ke liye taiyaar. 🎉',
+          en: 'Your baby is now full term - ready to meet the world whenever the time is right. 🎉',
+          hi: 'Aapka baby ab full term hai - sahi waqt aane par duniya se milne ke liye taiyaar. 🎉',
         ),
       ),
     ],
@@ -162,7 +162,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
   ),
 
   // ===========================================================================
-  //  TYPE 3 · MEDICAL (purple) — preparation & education (no diagnosis)
+  //  TYPE 3 · MEDICAL (purple) - preparation & education (no diagnosis)
   // ===========================================================================
   JourneyMilestone(
     id: 'm_ultrasound',
@@ -188,7 +188,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       BulletBlock(
         LocalizedText(en: 'Preparation tips', hi: 'Taiyaari ke tips'),
         [
-          LocalizedText(en: 'A full bladder can help an early scan — ask your clinic.', hi: 'Jaldi wale scan mein bhari bladder madad karti hai — apne clinic se poochein.'),
+          LocalizedText(en: 'A full bladder can help an early scan - ask your clinic.', hi: 'Jaldi wale scan mein bhari bladder madad karti hai - apne clinic se poochein.'),
           LocalizedText(en: 'Wear comfortable, loose clothing.', hi: 'Aaraamdayak, dheele kapde pehnein.'),
         ],
       ),
@@ -226,7 +226,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
         LocalizedText(en: 'Preparation tips', hi: 'Taiyaari ke tips'),
         [
           LocalizedText(en: 'Carry any previous reports with you.', hi: 'Apni purani reports saath le jaayein.'),
-          LocalizedText(en: 'Stay relaxed — it is a gentle, routine check.', hi: 'Shaant rahein — yeh ek aaram se hone wala routine check hai.'),
+          LocalizedText(en: 'Stay relaxed - it is a gentle, routine check.', hi: 'Shaant rahein - yeh ek aaram se hone wala routine check hai.'),
         ],
       ),
       BulletBlock(
@@ -261,7 +261,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       BulletBlock(
         LocalizedText(en: 'Preparation tips', hi: 'Taiyaari ke tips'),
         [
-          LocalizedText(en: 'It can take longer than other scans — plan some time.', hi: 'Yeh doosre scans se zyada waqt le sakta hai — thoda samay rakhein.'),
+          LocalizedText(en: 'It can take longer than other scans - plan some time.', hi: 'Yeh doosre scans se zyada waqt le sakta hai - thoda samay rakhein.'),
           LocalizedText(en: 'You may be able to learn the baby\'s position.', hi: 'Aapko baby ki position pata chal sakti hai.'),
         ],
       ),
@@ -298,7 +298,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       BulletBlock(
         LocalizedText(en: 'Preparation tips', hi: 'Taiyaari ke tips'),
         [
-          LocalizedText(en: 'Your clinic may ask you to fast — confirm beforehand.', hi: 'Clinic aapse khaali pet aane ko keh sakti hai — pehle confirm karein.'),
+          LocalizedText(en: 'Your clinic may ask you to fast - confirm beforehand.', hi: 'Clinic aapse khaali pet aane ko keh sakti hai - pehle confirm karein.'),
           LocalizedText(en: 'Carry a snack for after the test.', hi: 'Test ke baad ke liye ek snack saath rakhein.'),
         ],
       ),
@@ -407,7 +407,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
   ),
 
   // ===========================================================================
-  //  TYPE 4 · BABY DEVELOPMENT (blue) — wonder & education
+  //  TYPE 4 · BABY DEVELOPMENT (blue) - wonder & education
   // ===========================================================================
   JourneyMilestone(
     id: 'b_w8',
@@ -419,7 +419,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     sections: [
       CardSection(
         LocalizedText(en: 'What is happening', hi: 'Kya ho raha hai'),
-        LocalizedText(en: 'Your baby has graduated from embryo to fetus — tiny limbs and features are forming.', hi: 'Aapka baby embryo se fetus ban gaya hai — nanhe haath-pair aur features ban rahe hain.'),
+        LocalizedText(en: 'Your baby has graduated from embryo to fetus - tiny limbs and features are forming.', hi: 'Aapka baby embryo se fetus ban gaya hai - nanhe haath-pair aur features ban rahe hain.'),
       ),
       CardSection(
         LocalizedText(en: 'What it means', hi: 'Iska matlab'),
@@ -543,7 +543,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
   ),
 
   // ===========================================================================
-  //  TYPE 5 · MOTHER (pink) — make the mother feel seen
+  //  TYPE 5 · MOTHER (pink) - make the mother feel seen
   // ===========================================================================
   JourneyMilestone(
     id: 'mo_w12',
@@ -558,7 +558,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       ),
       CardSection(
         LocalizedText(en: 'Emotional support', hi: 'Bhaavnaatmak sahaara'),
-        LocalizedText(en: 'If you\'re still feeling unwell, that\'s okay too — every body is different.', hi: 'Agar abhi bhi tabiyat theek nahi lag rahi, toh yeh bhi theek hai — har sharir alag hota hai.'),
+        LocalizedText(en: 'If you\'re still feeling unwell, that\'s okay too - every body is different.', hi: 'Agar abhi bhi tabiyat theek nahi lag rahi, toh yeh bhi theek hai - har sharir alag hota hai.'),
       ),
     ],
     bullets: [
@@ -610,7 +610,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       ),
       CardSection(
         LocalizedText(en: 'Emotional support', hi: 'Bhaavnaatmak sahaara'),
-        LocalizedText(en: 'You\'re carrying a lot — be as gentle with yourself as you would a friend.', hi: 'Aap bahut kuch sambhaal rahi hain — khud par utni hi narmi rakhein jitni ek dost par.'),
+        LocalizedText(en: 'You\'re carrying a lot - be as gentle with yourself as you would a friend.', hi: 'Aap bahut kuch sambhaal rahi hain - khud par utni hi narmi rakhein jitni ek dost par.'),
       ),
     ],
     bullets: [
@@ -651,7 +651,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
   ),
 
   // ===========================================================================
-  //  TYPE 6 · PARENTVEDA JOURNEY (green) — emotional engagement (day-anchored)
+  //  TYPE 6 · PARENTVEDA JOURNEY (green) - emotional engagement (day-anchored)
   // ===========================================================================
   JourneyMilestone(
     id: 'pv_d30',
@@ -691,7 +691,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     sections: [
       CardSection(
         LocalizedText(en: '', hi: ''),
-        LocalizedText(en: 'One hundred and forty days — exactly halfway. Look how far you\'ve come. ❤️', hi: 'Ek sau chaalis din — theek aadhe. Dekhiye aap kitni door aa chuki hain. ❤️'),
+        LocalizedText(en: 'One hundred and forty days - exactly halfway. Look how far you\'ve come. ❤️', hi: 'Ek sau chaalis din - theek aadhe. Dekhiye aap kitni door aa chuki hain. ❤️'),
       ),
     ],
   ),
@@ -725,7 +725,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
   ),
 
   // ===========================================================================
-  //  TYPE 7 · FEATURE UNLOCKS (teal) — natural feature discovery
+  //  TYPE 7 · FEATURE UNLOCKS (teal) - natural feature discovery
   // ===========================================================================
   JourneyMilestone(
     id: 'f_weight',
@@ -773,7 +773,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     sections: [
       CardSection(
         LocalizedText(en: 'What it does', hi: 'Yeh kya karta hai'),
-        LocalizedText(en: 'Helps you notice your baby\'s daily pattern of movements — no counting pressure.', hi: 'Aapke baby ki rozaana harkaton ke pattern par dhyan dene mein madad karta hai — ginti ka koi dabaav nahi.'),
+        LocalizedText(en: 'Helps you notice your baby\'s daily pattern of movements - no counting pressure.', hi: 'Aapke baby ki rozaana harkaton ke pattern par dhyan dene mein madad karta hai - ginti ka koi dabaav nahi.'),
       ),
       CardSection(
         LocalizedText(en: 'Why it matters', hi: 'Yeh kyun maayne rakhta hai'),
@@ -791,7 +791,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     sections: [
       CardSection(
         LocalizedText(en: 'What it does', hi: 'Yeh kya karta hai'),
-        LocalizedText(en: 'A ready checklist for your hospital bag — for you, your baby and your partner.', hi: 'Aapke hospital bag ke liye taiyaar checklist — aapke, baby aur partner ke liye.'),
+        LocalizedText(en: 'A ready checklist for your hospital bag - for you, your baby and your partner.', hi: 'Aapke hospital bag ke liye taiyaar checklist - aapke, baby aur partner ke liye.'),
       ),
       CardSection(
         LocalizedText(en: 'Why it matters', hi: 'Yeh kyun maayne rakhta hai'),

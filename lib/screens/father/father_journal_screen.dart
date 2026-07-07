@@ -1,5 +1,5 @@
 // =============================================================================
-//  FatherJournalScreen — the father's simple memory journal (Slate)
+//  FatherJournalScreen - the father's simple memory journal (Slate)
 // -----------------------------------------------------------------------------
 //  A deliberately small, less-cluttered cousin of the mother's My Journal: four
 //  quick actions (Write a memory · Note for baby · Add photo · Record voice) and
@@ -177,7 +177,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
     );
   }
 
-  // A Slate week divider — "Week N" highlight + the week's date range, so the
+  // A Slate week divider - "Week N" highlight + the week's date range, so the
   // entries beneath it visibly belong together.
   Widget _weekHeader(int wk, List<JournalEntry> es) {
     final dates = es.map((e) => e.date).toList()..sort();

@@ -1,7 +1,7 @@
 // =============================================================================
-//  FoodRecipeScreen — a recipe as a food companion page (not a blog post)
+//  FoodRecipeScreen - a recipe as a food companion page (not a blog post)
 // -----------------------------------------------------------------------------
-//  Ingredients + steps, yes — but wrapped in understanding: a Nutrition
+//  Ingredients + steps, yes - but wrapped in understanding: a Nutrition
 //  Breakdown, the signature Healthier-Version toggle (everyday ⇄ ParentVeda,
 //  with what changed & why), why it's good, how often to serve, storage, common
 //  mistakes, substitutions, and links out to the article/video/product/community/
@@ -167,7 +167,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             Text(r.healthierNote, style: ppBody(13.5, color: ppInk, h: 1.55))
           else
             Text(
-              'The way it’s usually made leans on sugar, refined flour or deep-frying. Tap “ParentVeda” to see the small changes that make the same dish genuinely better for your baby — without losing what he loves.',
+              'The way it’s usually made leans on sugar, refined flour or deep-frying. Tap “ParentVeda” to see the small changes that make the same dish genuinely better for your baby - without losing what he loves.',
               style: ppBody(13.5, color: ppSoft, h: 1.55),
             ),
         ]),
@@ -248,7 +248,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   Widget _nutrition() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Nutrition breakdown', style: ppJakarta(17)),
         const SizedBox(height: 4),
-        Text('What’s in it, and why it helps him — no calorie counting.', style: ppBody(12.5, color: ppMuted)),
+        Text('What’s in it, and why it helps him - no calorie counting.', style: ppBody(12.5, color: ppMuted)),
         const SizedBox(height: 14),
         for (final n in r.nutrients)
           Container(

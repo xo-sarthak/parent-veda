@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Journal V2 — welcome, empty state & the "Our Story" home
+//  My Journal V2 - welcome, empty state & the "Our Story" home
 // -----------------------------------------------------------------------------
 //  The entry surface (reached from the Explore drawer, below Astrology). Welcome
 //  → Home. Home is the calm "Our Story" surface: greeting, continue-reading,

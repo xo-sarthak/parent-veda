@@ -1,5 +1,5 @@
 // =============================================================================
-//  MasterclassesScreen (S1) — Prepare › Masterclasses (data-driven)
+//  MasterclassesScreen (S1) - Prepare › Masterclasses (data-driven)
 //  Every card opens the real masterclass detail (S6).
 // =============================================================================
 
@@ -37,7 +37,7 @@ class MasterclassesScreen extends StatelessWidget {
             pvBanner(spans: [
               pvText("You're "),
               pvBold('30 weeks'),
-              pvText(' — birth is on your mind. Start here.'),
+              pvText(' - birth is on your mind. Start here.'),
             ]),
 
             // featured

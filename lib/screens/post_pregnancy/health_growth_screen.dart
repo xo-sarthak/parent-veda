@@ -1,5 +1,5 @@
 // =============================================================================
-//  HealthGrowthScreen — growth, gently visualised
+//  HealthGrowthScreen - growth, gently visualised
 // -----------------------------------------------------------------------------
 //  Current measurements, a simple weight/length trend (no overwhelming clinical
 //  charts), percentiles and a plain-language interpretation. "Following his own

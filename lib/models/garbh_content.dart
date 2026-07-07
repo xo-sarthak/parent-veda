@@ -1,5 +1,5 @@
 // =============================================================================
-//  Garbh Sanskar Journey — content models
+//  Garbh Sanskar Journey - content models
 // -----------------------------------------------------------------------------
 //  Four pillars, four content shapes:
 //    Shravan  → GarbhAudio    (Spotify-like listening)
@@ -8,7 +8,7 @@
 //    Samvad   → GarbhPrompt   (Memory-Vault-like womb connection prompts)
 //
 //  English-first plain strings (this is a calm, content-light experience; Hindi
-//  can be layered later). Audio files are placeholders for now — the player uses
+//  can be layered later). Audio files are placeholders for now - the player uses
 //  the bundled drone until real recordings are added.
 // =============================================================================
 

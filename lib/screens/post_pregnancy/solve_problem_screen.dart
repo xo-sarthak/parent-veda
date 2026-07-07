@@ -1,5 +1,5 @@
 // =============================================================================
-//  SolveProblemScreen — Solve Problem · full guide (parenting app · S7)
+//  SolveProblemScreen - Solve Problem · full guide (parenting app · S7)
 // -----------------------------------------------------------------------------
 //  A challenge, fully explained: what's happening → what helps (numbered) →
 //  watch → explained products → go-deeper (FAQ/course/room). Faithful build of
@@ -37,16 +37,16 @@ class SolveProblemScreen extends StatelessWidget {
             _pad(Text('The 4-month sleep regression', style: ppFraunces(31, h: 1.15))),
             const SizedBox(height: 14),
             _pad(Text(
-                "Around now, his sleep cycles reorganise into mature, adult-like patterns with lighter phases he briefly surfaces from. Layered on top of Leap 4's clinginess, bedtime can fall apart almost overnight. It's development, not regression — and it's temporary.",
+                "Around now, his sleep cycles reorganise into mature, adult-like patterns with lighter phases he briefly surfaces from. Layered on top of Leap 4's clinginess, bedtime can fall apart almost overnight. It's development, not regression - and it's temporary.",
                 style: ppBody(15, h: 1.65))),
 
             _pad(ppSectionDivider()),
             _pad(ppEyebrow('What helps', color: ppSoft, spacing: 1.2)),
             const SizedBox(height: 6),
             _pad(_num('01', 'Start winding down earlier',
-                '20 minutes before you think you need to — an overtired baby fights sleep harder.', top: true)),
+                '20 minutes before you think you need to - an overtired baby fights sleep harder.', top: true)),
             _pad(_num('02', 'Same 3-step routine, every night',
-                'Feed, dim, cuddle — in that order. Predictability is the cue his brain learns.', top: true)),
+                'Feed, dim, cuddle - in that order. Predictability is the cue his brain learns.', top: true)),
             _pad(_num('03', 'Practise rolling in the daytime',
                 'So the new skill gets rehearsed on the mat, not at 2am in the cot.', top: true, bottom: true)),
 

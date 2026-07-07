@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Products ❤️ (Tools card) — a trust-first decision engine
+//  ParentVeda Products ❤️ (Tools card) - a trust-first decision engine
 // -----------------------------------------------------------------------------
 //  Recommended (stage-aware) / Browse all / Saved. Each category leads with a
 //  20-second guidance card, then ParentVeda Picks (scored, trust visible on the
@@ -44,7 +44,7 @@ void _push(BuildContext c, Widget w) =>
 }
 
 // ===========================================================================
-//  Home — 3 tabs
+//  Home - 3 tabs
 // ===========================================================================
 
 class ProductsScreen extends StatelessWidget {
@@ -123,7 +123,7 @@ class _RecommendedTab extends StatelessWidget {
   }
 }
 
-/// A category entry — emoji + name + a guidance preview, opening the category
+/// A category entry - emoji + name + a guidance preview, opening the category
 /// page (with the full ParentVeda guidance). Shared by Recommended + Browse.
 class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
@@ -343,7 +343,7 @@ class _ProductCard extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 12),
-          // Trust on the card — always with its heading.
+          // Trust on the card - always with its heading.
           if (product.why.isNotEmpty) ...[
             _trustHeading(context, s.prWhy),
             const SizedBox(height: 6),
@@ -874,7 +874,7 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
             for (final r in product.reviews) _reviewCard(context, r, s),
           ],
-          // Buy actions — affiliate (Amazon only) vs ParentVeda (cart + buy now).
+          // Buy actions - affiliate (Amazon only) vs ParentVeda (cart + buy now).
           const SizedBox(height: 16),
           if (productIsAffiliate(product)) ...[
             SizedBox(

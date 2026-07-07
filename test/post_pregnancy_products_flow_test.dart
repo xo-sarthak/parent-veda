@@ -37,7 +37,7 @@ void main() {
     await tester.pump();
     expect(PpCompareStore.instance.count, 2);
 
-    // ticking a third drops the oldest — still two
+    // ticking a third drops the oldest - still two
     await tester.ensureVisible(compareLabels.at(2));
     await tester.pump();
     await tester.tap(compareLabels.at(2));
@@ -58,19 +58,26 @@ void main() {
     expect(find.text('CloudTunes Soother'), findsNothing); // filtered out
   });
 
-  testWidgets('Compare screen is dynamic — reflects the two picked products', (tester) async {
+  testWidgets('Compare screen is dynamic - reflects the two picked products', (tester) async {
     PpCompareStore.instance
       ..toggle(productById('hush'))
       ..toggle(productById('lull'));
 
     await pumpPhone(tester, const ProductsCompareScreen());
 
-    // both selected products render in the overview
+    // both selected products render in the overview (the "Before you compare"
+    // education section now sits above it, so scroll it into view first)
+    await tester.scrollUntilVisible(
+      find.text('Hush Mini Sound Machine'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 20,
+    );
     expect(find.text('Hush Mini Sound Machine'), findsWidgets);
     expect(find.text('Lull Portable Soother'), findsWidgets);
 
     // a differentiated, product-specific "worth knowing" point for Hush lives
-    // further down in its own take card — scroll it into view
+    // further down in its own take card - scroll it into view
     await tester.scrollUntilVisible(
       find.textContaining('No auto-off timer'),
       300,

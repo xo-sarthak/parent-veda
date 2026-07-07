@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 //  A premium, comforting "this week is still ahead of you" state for future,
 //  not-yet-unlocked weeks. Gentle floating clouds drift behind a frosted glass
-//  panel with a softly glowing lock — reassuring, never a harsh error screen.
+//  panel with a softly glowing lock - reassuring, never a harsh error screen.
 // =============================================================================
 
 import 'dart:ui';

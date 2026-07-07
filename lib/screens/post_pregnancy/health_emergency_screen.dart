@@ -1,5 +1,5 @@
 // =============================================================================
-//  HealthEmergencyScreen — the Emergency Card (create / edit / delete + share)
+//  HealthEmergencyScreen - the Emergency Card (create / edit / delete + share)
 // -----------------------------------------------------------------------------
 //  The one screen you can hand to anyone in a crisis: name, photo, DOB, weight,
 //  blood group, allergies, emergency contacts, paediatrician and current meds.
@@ -55,7 +55,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                 const SizedBox(height: 8),
                 _pad(Text('In case of emergency', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('Everything a doctor or carer needs, fast — and available offline.', style: ppBody(14, h: 1.5))),
+                _pad(Text('Everything a doctor or carer needs, fast - and available offline.', style: ppBody(14, h: 1.5))),
                 const SizedBox(height: 20),
                 if (e == null) _pad(_emptyState()) else ..._cardView(e),
               ],
@@ -75,7 +75,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
             const SizedBox(height: 12),
             Text('No emergency card yet', style: ppJakarta(16)),
             const SizedBox(height: 6),
-            Text('Create one so anyone can act fast in a crisis — even offline.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
+            Text('Create one so anyone can act fast in a crisis - even offline.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
           ]),
         ),
         const SizedBox(height: 16),
@@ -137,7 +137,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                     child: const Icon(Icons.qr_code_2_rounded, size: 56, color: ppInk),
                   ),
                   const SizedBox(width: 14),
-                  Expanded(child: Text('Scan for the full profile. This card works offline — screenshot it or add it to your lock screen.', style: ppBody(12.5, color: ppSoft, h: 1.5))),
+                  Expanded(child: Text('Scan for the full profile. This card works offline - screenshot it or add it to your lock screen.', style: ppBody(12.5, color: ppSoft, h: 1.5))),
                 ]),
               ]),
             ),
@@ -177,14 +177,14 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
       ];
 
   String _shareText(EmergencyProfile e) => [
-        'EMERGENCY CARD — ${e.name}',
+        'EMERGENCY CARD - ${e.name}',
         'Born ${e.dob} · ${e.weight}',
         'Blood group: ${e.bloodGroup}',
         'Allergies: ${e.allergies}',
         'Current medications: ${e.medications}',
         'Paediatrician: ${e.pediatrician}',
         'Emergency contacts:',
-        for (final c in e.contacts) '  • ${c.name} (${c.relation}) — ${c.phone}',
+        for (final c in e.contacts) '  • ${c.name} (${c.relation}) - ${c.phone}',
       ].join('\n');
 
   Widget _big(String label, String value, Color color) => Container(

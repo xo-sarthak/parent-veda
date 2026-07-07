@@ -1,5 +1,5 @@
 // =============================================================================
-//  PrenatalYogaScreen (S4) — Prepare › Prenatal Yoga (interactive)
+//  PrenatalYogaScreen (S4) - Prepare › Prenatal Yoga (interactive)
 //  Trimester tabs switch the track; the safe (T3) track lists sessions that
 //  play into the placeholder video screen. Earlier trimesters show a locked
 //  explanation (their poses aren't safe at 30 weeks).
@@ -40,7 +40,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             pvBanner(icon: Icons.shield_outlined, spans: [
               pvText("You're in your "),
               pvBold('third trimester'),
-              pvText(" — here's your safe track. We hide anything that isn't right for 30 weeks."),
+              pvText(" - here's your safe track. We hide anything that isn't right for 30 weeks."),
             ]),
 
             // program card
@@ -92,10 +92,10 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             if (_tri == 2) ..._sessions() else _lockedTrack(),
 
             const SizedBox(height: 18),
-            Text("Earlier trimesters include poses that aren't safe now — that's why they're tucked away.",
+            Text("Earlier trimesters include poses that aren't safe now - that's why they're tucked away.",
                 style: pvBody(kSoft, 13).copyWith(fontStyle: FontStyle.italic, height: 1.6)),
             pvFooterNote(
-                'Certified prenatal instructor. Every session filtered for your exact week — nothing unsafe ever surfaces.'),
+                'Certified prenatal instructor. Every session filtered for your exact week - nothing unsafe ever surfaces.'),
           ],
         ),
       ),

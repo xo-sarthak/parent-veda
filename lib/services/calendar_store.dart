@@ -1,5 +1,5 @@
 // =============================================================================
-//  CalendarStore — personal events + the assembled "My Calendar" event list
+//  CalendarStore - personal events + the assembled "My Calendar" event list
 // -----------------------------------------------------------------------------
 //  PERSONAL events (baby shower, family function, custom reminders…) are added
 //  by the mother and persisted. [allEvents] then merges them with SYSTEM events
@@ -54,7 +54,7 @@ class CalendarStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
-  // Same recipe as symptom_store — but no translator needed here, since the
+  // Same recipe as symptom_store - but no translator needed here, since the
   // field names already match the column names. We reuse the model's toJson /
   // personalFromJson directly.
   Future<void> _syncFromCloud() async {
@@ -77,7 +77,7 @@ class CalendarStore extends ChangeNotifier {
         ..addAll(byId.values);
       await _persist();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   Future<void> addPersonal(
@@ -97,7 +97,7 @@ class CalendarStore extends ChangeNotifier {
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.insert('calendar_personal_events', ev.toJson());
-      } catch (_) {/* offline — syncs up on next init */}
+      } catch (_) {/* offline - syncs up on next init */}
     }
   }
 
@@ -109,7 +109,7 @@ class CalendarStore extends ChangeNotifier {
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.delete('calendar_personal_events', id);
-      } catch (_) {/* offline — best-effort */}
+      } catch (_) {/* offline - best-effort */}
     }
   }
 
@@ -151,7 +151,7 @@ class CalendarStore extends ChangeNotifier {
         JourneyNodeType.medical => CalEventCategory.medical,
         JourneyNodeType.feature => CalEventCategory.parentveda,
         JourneyNodeType.pvJourney => CalEventCategory.parentveda,
-        _ => null, // babyDev, mother, week — live in the Journal, not here
+        _ => null, // babyDev, mother, week - live in the Journal, not here
       };
       if (cat == null) continue;
       final date = p.dueDate.subtract(

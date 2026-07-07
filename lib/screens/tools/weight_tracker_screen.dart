@@ -3,11 +3,11 @@
 // -----------------------------------------------------------------------------
 //  Two experiences: a one-time onboarding (pre-pregnancy weight, with an
 //  OPTIONAL height → personalized gain range) and an ongoing dashboard that
-//  reframes weight as "my body is supporting my baby" — never a scorecard.
+//  reframes weight as "my body is supporting my baby" - never a scorecard.
 //  Per the product spec: the gain number is shown calmly, never celebrated or
 //  judged, and the chart never shows above/below-target or warning colours.
 //
-//  Entries are kept individually — multiple weigh-ins per day are allowed and
+//  Entries are kept individually - multiple weigh-ins per day are allowed and
 //  never overwrite each other (so the record never appears to "reset").
 // =============================================================================
 
@@ -43,7 +43,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
       appBar: AppBar(
         title: Text(s.weightToolTitle),
         actions: [
-          // The single top-level add affordance — labelled so it's obvious what
+          // The single top-level add affordance - labelled so it's obvious what
           // the + does. (Only once the profile is set.)
           AnimatedBuilder(
             animation: _store,
@@ -316,7 +316,7 @@ class _Dashboard extends StatelessWidget {
           ],
         )),
         const SizedBox(height: 14),
-        // Weight gain (calm — small, not celebrated).
+        // Weight gain (calm - small, not celebrated).
         if (gain != null)
           _card(context, title: s.weightGainSince, child: Text(
             '${gain >= 0 ? '+' : ''}${gain.toStringAsFixed(1)} ${s.kgUnit}',
@@ -350,7 +350,7 @@ class _Dashboard extends StatelessWidget {
             controller: controller,
           )),
         if (entries.isNotEmpty) const SizedBox(height: 14),
-        // History — every entry, with column headings.
+        // History - every entry, with column headings.
         if (entries.isNotEmpty)
           _card(context, title: s.weightHistoryTitle, child: Column(
             children: [
@@ -360,7 +360,7 @@ class _Dashboard extends StatelessWidget {
                 _historyRow(context, entries[i], pre, s, text),
                 Divider(height: 1, color: AppTheme.outlineVariant),
               ],
-              // The starting (pre-pregnancy) weight — the baseline every "change"
+              // The starting (pre-pregnancy) weight - the baseline every "change"
               // is measured from. Tinted + badged so it reads as the origin.
               if (pre > 0) _startingRow(pre, s, text),
             ],
@@ -503,7 +503,7 @@ class _Dashboard extends StatelessWidget {
     );
   }
 
-  /// The pre-pregnancy starting weight, shown as the origin row of the history —
+  /// The pre-pregnancy starting weight, shown as the origin row of the history -
   /// a leading "START" chip + label (sharing the Date+Week width so it never
   /// crowds), with the weight aligned under the Weight column.
   Widget _startingRow(double pre, S s, TextTheme text) {
@@ -548,7 +548,7 @@ class _Dashboard extends StatelessWidget {
             ),
           ]),
         ),
-        // Weight column (flex 4) — lines up with the Weight heading above.
+        // Weight column (flex 4) - lines up with the Weight heading above.
         Expanded(
           flex: 4,
           child: Text(
@@ -556,10 +556,10 @@ class _Dashboard extends StatelessWidget {
             style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
-        // Change column (fixed 56) — baseline, so a quiet dash.
+        // Change column (fixed 56) - baseline, so a quiet dash.
         SizedBox(
           width: 56,
-          child: Text('—',
+          child: Text('-',
               textAlign: TextAlign.right,
               style: text.labelMedium?.copyWith(color: AppTheme.neutral400)),
         ),
@@ -678,7 +678,7 @@ class _ChartView extends StatelessWidget {
   const _ChartView({required this.controller});
   final PregnancyController controller;
 
-  /// Fractional gestational week for an entry, from its actual date — so two
+  /// Fractional gestational week for an entry, from its actual date - so two
   /// entries on different days land at different x positions (and same-day ones
   /// sit together), instead of every entry snapping to an integer week.
   double _weekOf(WeightEntry e) {

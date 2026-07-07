@@ -1,5 +1,5 @@
 // =============================================================================
-//  Products — shared widgets: the compare-aware product card + the floating
+//  Products - shared widgets: the compare-aware product card + the floating
 //  Compare button. Both listen to PpCompareStore so a tick in one place shows
 //  up everywhere and the button reflects the running count. Used by the
 //  category and subcategory screens. Isolated to the post_pregnancy module.
@@ -102,7 +102,7 @@ class PpProductCard extends StatelessWidget {
       );
 }
 
-/// Floating Compare button — appears once anything is selected, shows the count,
+/// Floating Compare button - appears once anything is selected, shows the count,
 /// and opens the Compare screen when two are picked. Drop inside a Stack.
 class PpCompareFab extends StatelessWidget {
   const PpCompareFab({super.key});

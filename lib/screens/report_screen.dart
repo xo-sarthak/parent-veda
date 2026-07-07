@@ -1,11 +1,11 @@
 // =============================================================================
-//  Understanding Your Report™  — Tools tab feature
+//  Understanding Your Report™  - Tools tab feature
 // -----------------------------------------------------------------------------
 //  A calm, searchable library that helps a worried mother understand a scan or
 //  test finding. Reassurance-first: every article answers "What does this mean?"
 //  before anything else, follows the same 7 sections, and ends with a fixed
 //  reassurance message + an Ask Veda handoff. No verdicts, no diagnosis, no
-//  predictions — just clear, balanced explanations.
+//  predictions - just clear, balanced explanations.
 //
 //  Content: lib/data/report_findings_data.dart (curated seed).
 // =============================================================================
@@ -19,8 +19,8 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'tools/ask_veda_screen.dart';
 
-const Color _calm = Color(0xFF18A39B); // teal — calm, non-alarming accent
-const Color _reassure = Color(0xFF3FA56A); // soft green — "things to remember"
+const Color _calm = Color(0xFF18A39B); // teal - calm, non-alarming accent
+const Color _reassure = Color(0xFF3FA56A); // soft green - "things to remember"
 
 void _openArticle(BuildContext context, ReportFinding f, PregnancyController c) {
   Navigator.of(context).push(MaterialPageRoute(
@@ -187,7 +187,7 @@ class ReportArticleScreen extends StatelessWidget {
   final PregnancyController controller;
 
   void _askVeda(BuildContext context, S s) {
-    // Ask Veda is live — open it pre-filled with this finding (it has the data).
+    // Ask Veda is live - open it pre-filled with this finding (it has the data).
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => AskVedaScreen(
           controller: controller,
@@ -213,16 +213,16 @@ class ReportArticleScreen extends StatelessWidget {
                   style: text.titleMedium?.copyWith(color: AppTheme.neutral500)),
             ),
 
-          // §1 — What does this mean? (always first)
+          // §1 - What does this mean? (always first)
           _Section(title: s.rSecMeans, body: finding.whatItMeans.of(lang)),
 
-          // §2 — How common is it?
+          // §2 - How common is it?
           _Section(title: s.rSecCommon, body: finding.howCommon.of(lang)),
 
-          // §3 — What usually happens next? (the most important — gently emphasised)
+          // §3 - What usually happens next? (the most important - gently emphasised)
           _EmphasisSection(title: s.rSecNext, body: finding.whatNext.of(lang)),
 
-          // §4 — When is it usually discussed?
+          // §4 - When is it usually discussed?
           if (finding.hasWhen) ...[
             const SizedBox(height: 22),
             _SectionTitle(s.rSecWhen),
@@ -233,7 +233,7 @@ class ReportArticleScreen extends StatelessWidget {
             ),
           ],
 
-          // §5 — Questions to ask your doctor
+          // §5 - Questions to ask your doctor
           if (finding.questions.isNotEmpty) ...[
             const SizedBox(height: 24),
             _SectionTitle(s.rSecQuestions),
@@ -242,7 +242,7 @@ class ReportArticleScreen extends StatelessWidget {
               _QuestionRow(text: q.of(lang)),
           ],
 
-          // §6 — Things to remember
+          // §6 - Things to remember
           if (finding.remember.isNotEmpty) ...[
             const SizedBox(height: 24),
             _SectionTitle(s.rSecRemember),
@@ -251,7 +251,7 @@ class ReportArticleScreen extends StatelessWidget {
               _RememberRow(text: r.of(lang)),
           ],
 
-          // §7 — Reassurance message (mandatory, fixed)
+          // §7 - Reassurance message (mandatory, fixed)
           const SizedBox(height: 24),
           _ReassuranceCard(text: s.rReassurance),
 

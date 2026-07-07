@@ -1,9 +1,9 @@
 // =============================================================================
-//  CourseFunnelScreen — Courses · full page (parenting)
+//  CourseFunnelScreen - Courses · full page (parenting)
 // -----------------------------------------------------------------------------
 //  The sales/detail page for the flagship documentary course (The Complete
 //  Parenting Guide). Unlike a masterclass or cohort, a course is a big evergreen
-//  curriculum — so this page leads with "what you'll learn" and a Udemy-style
+//  curriculum - so this page leads with "what you'll learn" and a Udemy-style
 //  expandable syllabus (stages → modules), then how it's made, reviews, a
 //  guarantee row, an FAQ, and a sticky "Get the course" bar. Net-new page (no
 //  Claude Design frame). Reached from Courses → the flagship.
@@ -45,7 +45,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
       ('Leap 4 & the 4-month brain', '18 min · playing now', false),
       ('Surviving the sleep regression', '22 min', false),
       ('Reaching, rolling and first grasps', '15 min', false),
-      ('First solids — a preview', 'Unlocks at 6 months · open anyway', true),
+      ('First solids - a preview', 'Unlocks at 6 months · open anyway', true),
     ]),
     ('612', '6–12 months', '24 modules · 4h 40m', false, []),
     ('12', 'Toddler · 1–2 years', '20 modules · 3h 30m', false, []),
@@ -54,9 +54,9 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
   ];
 
   static const List<List<String>> _faqs = [
-    ['Is it self-paced?', 'Completely. Watch on your schedule — the course remembers exactly where you left off.'],
+    ['Is it self-paced?', 'Completely. Watch on your schedule - the course remembers exactly where you left off.'],
     ["What does 'stage-personalised' mean?", "You see the modules for your child's age first; earlier and later stages are always one tap away."],
-    ['Do I keep it forever?', 'Yes — one payment, lifetime access. It keeps growing as your child does, at no extra cost.'],
+    ['Do I keep it forever?', 'Yes - one payment, lifetime access. It keeps growing as your child does, at no extra cost.'],
     ['Can I get a refund?', "There's a 7-day money-back guarantee, no questions asked."],
   ];
 
@@ -119,7 +119,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
               _pad(Text('The Complete Parenting Guide', style: ppFraunces(30, h: 1.14))),
               const SizedBox(height: 10),
               _pad(Text(
-                  'Pregnancy through age 12 — every stage, taught properly, once. A documentary-style course that unlocks as your child grows and stays yours for life.',
+                  'Pregnancy through age 12 - every stage, taught properly, once. A documentary-style course that unlocks as your child grows and stays yours for life.',
                   style: ppBody(15))),
 
               // quick facts
@@ -173,7 +173,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
                   const SizedBox(width: 11),
                   Expanded(
                     child: Text(
-                        "Told through ParentVeda's own animated guides — scripted from research and approved by paediatricians & child psychologists before anything reaches you.",
+                        "Told through ParentVeda's own animated guides - scripted from research and approved by paediatricians & child psychologists before anything reaches you.",
                         style: ppBody(13, color: ppInk, h: 1.5)),
                   ),
                 ]),
@@ -194,7 +194,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('★★★★★', style: ppBody(13, color: ppCoral, w: FontWeight.w700)),
                   const SizedBox(height: 10),
-                  Text('“The only parenting content I actually kept coming back to. It grows with my daughter — I open it at every new stage.”',
+                  Text('“The only parenting content I actually kept coming back to. It grows with my daughter - I open it at every new stage.”',
                       style: ppBody(15, color: ppInk, h: 1.55)),
                   const SizedBox(height: 10),
                   Text.rich(TextSpan(children: [
@@ -219,7 +219,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
               ])),
 
               const SizedBox(height: 22),
-              _pad(Text('One course, the whole journey. You only see what fits your child now — everything else waits, one tap away.',
+              _pad(Text('One course, the whole journey. You only see what fits your child now - everything else waits, one tap away.',
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
             ],
           ),

@@ -1,7 +1,7 @@
 // =============================================================================
-//  CohortCoursesScreen — Learn · Cohort Courses (parenting · S12)
+//  CohortCoursesScreen - Learn · Cohort Courses (parenting · S12)
 // -----------------------------------------------------------------------------
-//  "Guided, together" — a small group, a real coach, a set start and finish.
+//  "Guided, together" - a small group, a real coach, a set start and finish.
 //  A featured cohort with a join CTA plus other upcoming cohorts. Reached from
 //  the Explore drawer (design path: Products → Learn → Cohort Courses).
 //  Faithful build of Claude Design · S12.
@@ -41,7 +41,7 @@ class CohortCoursesScreen extends StatelessWidget {
               Text('Cohort Courses', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  'A small group, a real coach, a set start and finish. You move through it week by week — with other parents at exactly your stage. Never alone at 2am.',
+                  'A small group, a real coach, a set start and finish. You move through it week by week - with other parents at exactly your stage. Never alone at 2am.',
                   style: ppBody(15)),
             ])),
 
@@ -115,7 +115,7 @@ class CohortCoursesScreen extends StatelessWidget {
                 bottom: true)),
 
             const SizedBox(height: 22),
-            _pad(Text("Small cohorts by design — so your coach actually knows your baby's name.",
+            _pad(Text("Small cohorts by design - so your coach actually knows your baby's name.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

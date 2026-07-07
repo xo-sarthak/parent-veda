@@ -1,8 +1,8 @@
 // =============================================================================
-//  JourneyProgressCard  —  the always-visible summary at the top of the map
+//  JourneyProgressCard  -  the always-visible summary at the top of the map
 // -----------------------------------------------------------------------------
 //  Week • Day, trimester, days completed / remaining, a progress bar, and a
-//  warm dynamic line — all derived from the PregnancyController.
+//  warm dynamic line - all derived from the PregnancyController.
 // =============================================================================
 
 import 'package:flutter/material.dart';

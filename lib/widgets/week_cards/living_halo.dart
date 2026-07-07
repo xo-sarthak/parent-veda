@@ -1,7 +1,7 @@
 // =============================================================================
 //  LivingHalo
 // -----------------------------------------------------------------------------
-//  The Size Reveal centrepiece: one calm container for every week — soft
+//  The Size Reveal centrepiece: one calm container for every week - soft
 //  concentric rings with the week's figure gently floating at the centre. The
 //  figure crossfades between the week's Fruit emoji and an original cartoon
 //  Baby illustration (a stage-accurate embryo for weeks 4–5, a growing
@@ -66,7 +66,7 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
 
   /// Picks the right "baby mode" art for this week. The earliest weeks show
   /// genuinely different *stages* (a ball of cells, then a curled embryo); from
-  /// week 6 on, a single curled figure that *develops* week by week — never the
+  /// week 6 on, a single curled figure that *develops* week by week - never the
   /// same silhouette zoomed in.
   CustomPainter _babyPainter() {
     final entry = 0.6 + 0.4 * _morph.value; // gentle flipbook scale-in
@@ -159,7 +159,7 @@ class _LivingHaloState extends State<LivingHalo> with TickerProviderStateMixin {
 ///
 /// The provided artwork has a soft-pink background baked in (not transparent),
 /// so the image is clipped to a circle: the square edges vanish and the image's
-/// own pink blends into the surrounding rings — the figure reads as floating in
+/// own pink blends into the surrounding rings - the figure reads as floating in
 /// the halo rather than sitting in a square box.
 class _BabyFigure extends StatelessWidget {
   const _BabyFigure({super.key, required this.week, required this.fallback});
@@ -192,8 +192,8 @@ class _BabyFigure extends StatelessWidget {
 
 /// Stage-accurate early-pregnancy art (weeks 4–5), drawn fresh per stage so the
 /// "first appearance → forming embryo" transformation reads clearly:
-///   • Week 4 — a blastocyst: a soft membrane holding a little cluster of cells.
-///   • Week 5 — the first embryo: a curled C-shaped body with a head, eye spot
+///   • Week 4 - a blastocyst: a soft membrane holding a little cluster of cells.
+///   • Week 5 - the first embryo: a curled C-shaped body with a head, eye spot
 ///     and a tiny limb bud, the baby's very first form.
 /// [t] (0.6..1) drives a gentle scale/fade-in flipbook when the week appears.
 class _EmbryoStagePainter extends CustomPainter {
@@ -217,7 +217,7 @@ class _EmbryoStagePainter extends CustomPainter {
     }
   }
 
-  // Week 4 — a ball of cells inside a soft membrane.
+  // Week 4 - a ball of cells inside a soft membrane.
   void _paintBlastocyst(Canvas canvas, Offset c, double r, double alpha) {
     // Outer membrane (zona pellucida).
     canvas.drawCircle(
@@ -231,7 +231,7 @@ class _EmbryoStagePainter extends CustomPainter {
         ..color = _peachMid.withValues(alpha: 0.7 * alpha),
     );
 
-    // Inner cell mass — a few overlapping cells in two warm shades.
+    // Inner cell mass - a few overlapping cells in two warm shades.
     final cells = <(Offset, double, Color)>[
       (Offset(c.dx - r * 0.30, c.dy - r * 0.24), r * 0.40, _peachMid),
       (Offset(c.dx + r * 0.28, c.dy - r * 0.28), r * 0.36, _peachLight),
@@ -250,7 +250,7 @@ class _EmbryoStagePainter extends CustomPainter {
     }
   }
 
-  // Week 5 — a curled C-shaped embryo with a head, eye spot and limb bud.
+  // Week 5 - a curled C-shaped embryo with a head, eye spot and limb bud.
   void _paintEmbryo(Canvas canvas, Offset c, double r, double alpha) {
     final headC = Offset(c.dx + r * 0.20, c.dy - r * 0.46);
     final bodyRect = Rect.fromCircle(center: c, radius: r);
@@ -306,7 +306,7 @@ class _EmbryoStagePainter extends CustomPainter {
 }
 
 /// An original, soft-shaded "growing baby": a curled, left-facing side-profile
-/// figure that genuinely *develops* with the week — a big-headed early fetus
+/// figure that genuinely *develops* with the week - a big-headed early fetus
 /// (~wk 6) that lengthens, rounds out, grows real arms and legs, and gains
 /// facial features (closed eye, nose, mouth, ear, chubby cheek) toward a full
 /// curled newborn (~wk 40). Proportions are driven by [week], so each week
@@ -375,7 +375,7 @@ class _GrowingBabyPainter extends CustomPainter {
       );
     }
 
-    // 3) Body (torso + rump) — a single smooth curled mass, belly facing left.
+    // 3) Body (torso + rump) - a single smooth curled mass, belly facing left.
     final body = Path()
       ..moveTo(w * 0.50, h * 0.44)
       ..cubicTo(w * 0.66, h * 0.40, w * 0.78, h * 0.50, w * 0.76, h * 0.62)
@@ -407,7 +407,7 @@ class _GrowingBabyPainter extends CustomPainter {
       canvas.drawLine(pt(0.55, 0.50), pt(0.42, 0.48 + 0.02 * (1 - limb)), armPaint);
     }
 
-    // 5) Head — large early, a touch smaller (relatively) later.
+    // 5) Head - large early, a touch smaller (relatively) later.
     final headR = s * (0.255 - 0.045 * p);
     final headC = pt(0.44, 0.355);
     canvas.drawCircle(headC, headR, fill);

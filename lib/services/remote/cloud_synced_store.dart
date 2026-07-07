@@ -1,5 +1,5 @@
 // =============================================================================
-//  CloudSyncedStore — one-blob-per-user cloud sync for the light stores
+//  CloudSyncedStore - one-blob-per-user cloud sync for the light stores
 // -----------------------------------------------------------------------------
 //  A reusable mixin for the many small "saved / liked / preference" stores. It
 //  keeps the store's LOCAL shared_preferences behaviour exactly as-is and layers
@@ -11,7 +11,7 @@
 //      local. Logged out → it's a no-op and the app runs from local as before.
 //    * On every change afterwards: the store already calls notifyListeners();
 //      this mixin overrides that to ALSO push the latest blob up. So we don't
-//      have to hunt down every mutation site — one override covers them all.
+//      have to hunt down every mutation site - one override covers them all.
 //
 //  A store adopts it by:  `class FooStore extends ChangeNotifier with
 //  CloudSyncedStore`, implementing [cloudKey] / [cloudData] / [applyCloudData]
@@ -32,7 +32,7 @@ mixin CloudSyncedStore on ChangeNotifier {
   /// The per-store key this blob lives under in the user_state table.
   String get cloudKey;
 
-  /// Serialize the store's current state to a json-encodable blob (Map/List) —
+  /// Serialize the store's current state to a json-encodable blob (Map/List) -
   /// typically the same structure it writes to shared_preferences.
   Object cloudData();
 
@@ -64,7 +64,7 @@ mixin CloudSyncedStore on ChangeNotifier {
         } else {
           await SupabaseRepo.saveState(cloudKey, cloudData()); // seed from local
         }
-      } catch (_) {/* offline — keep local */}
+      } catch (_) {/* offline - keep local */}
     }
     _cloudReady = true;
     // Reflect the adopted state WITHOUT re-pushing (use the base notifier).

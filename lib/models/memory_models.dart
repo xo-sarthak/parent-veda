@@ -1,5 +1,5 @@
 // =============================================================================
-//  Memory models — journal entries and photo memories (local only)
+//  Memory models - journal entries and photo memories (local only)
 // =============================================================================
 
 class JournalEntry {

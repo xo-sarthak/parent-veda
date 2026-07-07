@@ -1,15 +1,15 @@
 // =============================================================================
-//  HospitalBagV2Store — a SEPARATE bag for the "V2" redesign (toggle vs V1)
+//  HospitalBagV2Store - a SEPARATE bag for the "V2" redesign (toggle vs V1)
 // -----------------------------------------------------------------------------
 //  Holds its OWN copy of the bag (independent persistence keys), so the V1 and V2
 //  experiences can be compared side-by-side on different data. Reuses the V1
-//  [BagItem] model — its status / packed / purchased / selectedProductId /
+//  [BagItem] model - its status / packed / purchased / selectedProductId /
 //  store-link-price / isCustom already map cleanly onto the V2 "item journey":
 //
 //     Needs your decision  →  Planning to buy  →  Ready at home  →  Packed
 //
 //  (plus a gentle "Maybe later" set = status.skip). The mother never sees a
-//  "state" — the screens render plain language; this store just keeps the data.
+//  "state" - the screens render plain language; this store just keeps the data.
 // =============================================================================
 
 import 'dart:convert';
@@ -111,11 +111,11 @@ class HospitalBagV2Store extends ChangeNotifier with CloudSyncedStore {
       .length;
   int get _packedCount => active.where((i) => i.packed).length;
 
-  /// 0..1 — how much of the bag is acquired (have / bought).
+  /// 0..1 - how much of the bag is acquired (have / bought).
   double get shoppingProgress =>
       _activeCount == 0 ? 0 : _acquiredCount / _activeCount;
 
-  /// 0..1 — how much of the bag is packed.
+  /// 0..1 - how much of the bag is packed.
   double get packingProgress =>
       _activeCount == 0 ? 0 : _packedCount / _activeCount;
 

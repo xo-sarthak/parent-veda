@@ -1,7 +1,7 @@
 // =============================================================================
-//  GuidesToolsScreen — Learn · Guides & Tools (parenting · S13)
+//  GuidesToolsScreen - Learn · Guides & Tools (parenting · S13)
 // -----------------------------------------------------------------------------
-//  "Yours to keep" — beautiful, practical downloads (routines, trackers, plans)
+//  "Yours to keep" - beautiful, practical downloads (routines, trackers, plans)
 //  made by experts. A featured pick plus a grid of guides. Reached from the
 //  Explore drawer (design path: Products → Learn → Guides & Tools).
 //  Faithful build of Claude Design · S13 (Digital Products).
@@ -41,7 +41,7 @@ class GuidesToolsScreen extends StatelessWidget {
               Text('Guides & Tools', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  'Beautiful, practical downloads — routines, trackers and plans made by experts, designed to live on your phone and be used at 3am.',
+                  'Beautiful, practical downloads - routines, trackers and plans made by experts, designed to live on your phone and be used at 3am.',
                   style: ppBody(15)),
             ])),
 

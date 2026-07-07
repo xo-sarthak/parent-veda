@@ -1,5 +1,5 @@
 // =============================================================================
-//  StorageService — files (photos + voice notes) <-> Supabase Storage
+//  StorageService - files (photos + voice notes) <-> Supabase Storage
 // -----------------------------------------------------------------------------
 //  The DB tables hold text/metadata; the actual image + audio BYTES live in a
 //  private Storage bucket ("media"), foldered per user + type:
@@ -20,7 +20,7 @@
 //
 //  resolve() downloads whatever [ref] points at, so it already works for a
 //  PARTNER's file (e.g. the merged journal) the moment the storage read policy
-//  allows it — no code change needed for that later step.
+//  allows it - no code change needed for that later step.
 // =============================================================================
 
 import 'dart:io';
@@ -58,7 +58,7 @@ class StorageService {
 
   /// Upload a local file to `media/<uid>/<type>/<name>` and return the STORAGE
   /// object path to persist. Falls back to the original local path if logged
-  /// out / the file is missing / the upload fails (offline — back-fill later).
+  /// out / the file is missing / the upload fails (offline - back-fill later).
   static Future<String> upload(String localPath, String type) async {
     final uid = _uid;
     final file = File(localPath);
@@ -76,7 +76,7 @@ class StorageService {
       if (!cache.existsSync()) await file.copy(cache.path);
       return objectPath;
     } catch (_) {
-      return localPath; // offline / not set up yet — keep working locally
+      return localPath; // offline / not set up yet - keep working locally
     }
   }
 

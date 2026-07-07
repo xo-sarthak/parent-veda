@@ -1,8 +1,8 @@
 // =============================================================================
-//  Prepare — content model + data
+//  Prepare - content model + data
 // -----------------------------------------------------------------------------
 //  Single source of truth for the "Prepare" tab. Every category screen lists
-//  from here, and every detail page renders from the matching object — so
+//  from here, and every detail page renders from the matching object - so
 //  nothing dead-ends. Content is a faithful, on-brand extension of the Claude
 //  Design mock (Priya · 30 weeks). Static for now; a future pass can make it
 //  week-adaptive and back it with a CMS/DB.
@@ -93,13 +93,13 @@ const List<Masterclass> kMasterclasses = [
     listDesc:
         'What labour really feels like: breathing, pain relief, C-section prep, and emotional readiness. 90 min live + lifetime recording.',
     longDesc:
-        'What labour really feels like — breathing, pain relief, C-section prep, and the emotional readiness no one talks about. One live evening that changes how you walk into the delivery room.',
+        'What labour really feels like - breathing, pain relief, C-section prep, and the emotional readiness no one talks about. One live evening that changes how you walk into the delivery room.',
     facts: [QuickFact('90 min', 'live'), QuickFact('Sun 13 Jul', '8:00 pm'), QuickFact('Forever', 'recording')],
     coaches: [
       Coach('Dr. Ananya Rao', 'Obstetrician · 15 years',
           "Has delivered over 3,000 babies across Delhi's leading hospitals. Known for calm, plain-language guidance."),
       Coach('Deepti Sharma', 'Doula & birth coach',
-          'Has supported 400+ births. Brings the emotional side — fear, partners, and staying in control.'),
+          'Has supported 400+ births. Brings the emotional side - fear, partners, and staying in control.'),
     ],
     learn: [
       'A clear picture of each stage of labour, minute by minute.',
@@ -130,16 +130,16 @@ const List<Masterclass> kMasterclasses = [
     listChip: 'Great to catch up on',
     listDesc: 'The whole journey, trimester by trimester, with a practical action plan.',
     longDesc:
-        'The whole pregnancy journey, trimester by trimester — what to expect, how to prepare in body and mind, the common fears addressed head-on, and a practical action plan you will actually use.',
+        'The whole pregnancy journey, trimester by trimester - what to expect, how to prepare in body and mind, the common fears addressed head-on, and a practical action plan you will actually use.',
     facts: [QuickFact('120 min', 'recorded'), QuickFact('On demand', 'anytime'), QuickFact('Forever', 'access')],
     coaches: [
       Coach('Deepti Sharma', 'Doula & birth coach',
-          'Distils a whole pregnancy into a calm, do-this-next plan — warm, practical, and refreshingly non-preachy.'),
+          'Distils a whole pregnancy into a calm, do-this-next plan - warm, practical, and refreshingly non-preachy.'),
     ],
     learn: [
       'A month-by-month map of your pregnancy.',
       'How to prepare your body and your mind for each trimester.',
-      'The fears no one talks about — named and addressed.',
+      'The fears no one talks about - named and addressed.',
       'A practical, week-by-week action plan.',
     ],
     testimonials: [
@@ -148,7 +148,7 @@ const List<Masterclass> kMasterclasses = [
     ],
     faqs: [
       Faq('When should I take this?',
-          "It's built for early second trimester, but it's useful at any stage — you keep lifetime access."),
+          "It's built for early second trimester, but it's useful at any stage - you keep lifetime access."),
       Faq('Is there a workbook?'),
     ],
   ),
@@ -166,40 +166,40 @@ const List<Masterclass> kMasterclasses = [
       Coach('Dr. Kabir Rao', 'Paediatrician · 12 years',
           'Guides new parents through the newborn weeks with steady, no-panic advice grounded in Indian homes.'),
       Coach('Deepti Sharma', 'Doula & birth coach',
-          'Covers the mother\'s side of the fourth trimester — recovery, mood, and asking for help.'),
+          'Covers the mother\'s side of the fourth trimester - recovery, mood, and asking for help.'),
     ],
     learn: [
       'Reading your newborn\'s feeding and hunger cues.',
-      'Realistic newborn sleep — and how to protect your own.',
+      'Realistic newborn sleep - and how to protect your own.',
       'The fourth trimester for you: recovery and mood.',
       'Setting up help in a joint family without friction.',
     ],
     faqs: [
       Faq('Is this before or after birth?',
-          'Take it now to feel ready — most mothers watch it again in the first week with the recording.'),
+          'Take it now to feel ready - most mothers watch it again in the first week with the recording.'),
     ],
   ),
   Masterclass(
     id: 'mc_bf',
     title: 'Breastfeeding Basics',
     price: '₹699',
-    listDesc: 'Latch, supply, and the first week — before baby arrives.',
+    listDesc: 'Latch, supply, and the first week - before baby arrives.',
     longDesc:
-        'Latch, supply, and the first tender week — everything you need to feel ready to breastfeed before baby arrives, from an IBCLC lactation expert.',
+        'Latch, supply, and the first tender week - everything you need to feel ready to breastfeed before baby arrives, from an IBCLC lactation expert.',
     facts: [QuickFact('75 min', 'live'), QuickFact('Wed 16 Jul', '7:00 pm'), QuickFact('Forever', 'recording')],
     coaches: [
       Coach('Sana Khan', 'Lactation Consultant · IBCLC',
-          'An IBCLC who makes the first week feel far less daunting — practical, gentle, and judgement-free.'),
+          'An IBCLC who makes the first week feel far less daunting - practical, gentle, and judgement-free.'),
     ],
     learn: [
       'What a good latch looks and feels like.',
-      'How milk supply really works — and how to protect it.',
+      'How milk supply really works - and how to protect it.',
       'Troubleshooting the tricky first week.',
       'Pumping and return-to-work basics.',
     ],
     faqs: [
       Faq('Can I take this before the baby is here?',
-          'Yes — preparing antenatally is exactly when it helps most.'),
+          'Yes - preparing antenatally is exactly when it helps most.'),
     ],
   ),
 ];
@@ -281,7 +281,7 @@ const List<Specialist> kSpecialists = [
     rating: '★ 4.8',
     desc: 'Eat right for you and baby.',
     about:
-        'A registered dietitian who makes pregnancy nutrition simple and Indian-kitchen-friendly — no fads, no imported superfoods, just food that works for you and baby.',
+        'A registered dietitian who makes pregnancy nutrition simple and Indian-kitchen-friendly - no fads, no imported superfoods, just food that works for you and baby.',
     helps: [
       'Trimester-wise diet plans built around Indian meals',
       'Managing nausea, acidity and cravings',
@@ -303,7 +303,7 @@ const List<Specialist> kSpecialists = [
     rating: '★ 4.9',
     desc: 'Prepare to breastfeed before baby arrives.',
     about:
-        'An IBCLC who helps you prepare to breastfeed before the baby arrives — so day one feels a little less daunting, and you know what a good start looks like.',
+        'An IBCLC who helps you prepare to breastfeed before the baby arrives - so day one feels a little less daunting, and you know what a good start looks like.',
     helps: [
       'Getting ready to breastfeed before birth',
       'What a good latch looks and feels like',
@@ -325,7 +325,7 @@ const List<Specialist> kSpecialists = [
     rating: '★ 5.0',
     desc: 'Anxiety, mood, and the mental side of pregnancy.',
     about:
-        'A clinical psychologist who holds space for the parts of pregnancy that are hard to say out loud — anxiety, mood swings, and the quiet weight of expectation.',
+        'A clinical psychologist who holds space for the parts of pregnancy that are hard to say out loud - anxiety, mood swings, and the quiet weight of expectation.',
     helps: [
       'Pregnancy anxiety and intrusive worries',
       'Mood changes and low days',
@@ -347,7 +347,7 @@ const List<Specialist> kSpecialists = [
     rating: '★ 4.7',
     desc: 'Back pain, pelvic floor, posture.',
     about:
-        'A women\'s-health physiotherapist who eases the aches pregnancy brings and prepares your body for birth and recovery — with simple moves you can actually keep up.',
+        'A women\'s-health physiotherapist who eases the aches pregnancy brings and prepares your body for birth and recovery - with simple moves you can actually keep up.',
     helps: [
       'Back, hip and pelvic-girdle pain',
       'Pelvic-floor prep for birth and recovery',
@@ -414,7 +414,7 @@ const List<Cohort> kCohorts = [
     recommended: 'Recommended · 30–34 weeks',
     coachName: 'Meera Nair',
     desc:
-        'Labour prep, breathing, and partner training — a live coach plus a peer group of mums due right around when you are.',
+        'Labour prep, breathing, and partner training - a live coach plus a peer group of mums due right around when you are.',
     whatsInside: [
       '4 live weekly sessions with Meera',
       'A small peer group of 30–34-week mums',
@@ -438,7 +438,7 @@ const List<Cohort> kCohorts = [
     duration: '3 weeks',
     forWhen: 'for 6–13 weeks',
     coachName: 'Deepti Sharma',
-    desc: 'Steady your first trimester — manage symptoms, quiet the early fears, and start pregnancy in control.',
+    desc: 'Steady your first trimester - manage symptoms, quiet the early fears, and start pregnancy in control.',
     whatsInside: [
       '3 live weekly sessions',
       'A first-trimester peer group',
@@ -457,7 +457,7 @@ const List<Cohort> kCohorts = [
     price: '₹7,999',
     duration: '6 weeks',
     coachName: 'Sana Kapoor',
-    desc: 'A guided prenatal fitness cohort — safe, progressive workouts scaled to your trimester by a certified coach.',
+    desc: 'A guided prenatal fitness cohort - safe, progressive workouts scaled to your trimester by a certified coach.',
     whatsInside: [
       '6 weeks of guided workouts',
       'Trimester-safe progressions',
@@ -471,7 +471,7 @@ const List<Cohort> kCohorts = [
     price: '₹6,499',
     duration: '4 weeks',
     coachName: 'Dr. Kabir Rao',
-    desc: 'Get ready for the newborn weeks before they arrive — feeding, sleep, recovery, and support at home.',
+    desc: 'Get ready for the newborn weeks before they arrive - feeding, sleep, recovery, and support at home.',
     whatsInside: [
       '4 live weekly sessions',
       'A due-soon peer group',
@@ -523,17 +523,17 @@ class BirthingClass {
 
 const List<BirthingClass> kBirthingClasses = [
   BirthingClass(1, 'The stages of labour, demystified', '22 min video',
-      'A calm walkthrough of early, active and transition labour — so nothing takes you by surprise.',
+      'A calm walkthrough of early, active and transition labour - so nothing takes you by surprise.',
       free: true),
   BirthingClass(2, 'Breathing & relaxation that actually works', '18 min video',
       'The breathing and relaxation tools that genuinely help when contractions build.'),
   BirthingClass(3, 'Positions & movement for an easier labour', '20 min video',
       'How to move, sway and rest in positions that help labour progress and ease pain.'),
-  BirthingClass(4, 'Pain relief — natural, epidural & C-section', '24 min video',
+  BirthingClass(4, 'Pain relief - natural, epidural & C-section', '24 min video',
       'An honest look at every pain-relief option, so your choices are informed, not fearful.'),
   BirthingClass(5, 'Your partner as birth support', '16 min video',
-      'Exactly how your partner can help — from counter-pressure to knowing when to speak up.'),
-  BirthingClass(6, 'The golden hour — the first hour after birth', '15 min video',
+      'Exactly how your partner can help - from counter-pressure to knowing when to speak up.'),
+  BirthingClass(6, 'The golden hour - the first hour after birth', '15 min video',
       'Skin-to-skin, the first feed, and what really happens in the precious first hour.'),
 ];
 

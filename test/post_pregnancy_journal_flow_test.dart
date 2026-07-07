@@ -16,7 +16,7 @@ void main() {
     await tester.pump();
     expect(find.text('1 / 13'), findsOneWidget);
 
-    // walk to the last page — builds every page template on the way
+    // walk to the last page - builds every page template on the way
     for (var i = 0; i < 12; i++) {
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();

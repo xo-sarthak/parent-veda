@@ -1,16 +1,16 @@
 // =============================================================================
-//  AskVedaScreen — ParentVeda's companion (the "Ask Veda Results" design)
+//  AskVedaScreen - ParentVeda's companion (the "Ask Veda Results" design)
 // -----------------------------------------------------------------------------
 //  Ask Veda is now a SEARCH → STRUCTURED RESULT page (matching the product doc's
 //  fixed result page), not a chat thread:
-//    • Initial view  — logo·wordmark·profile bar → the white search pill pinned
+//    • Initial view  - logo·wordmark·profile bar → the white search pill pinned
 //      at the TOP (where she types) → stage-wise suggestion cards below it.
-//    • After a question — the pill stays put at the TOP (now showing her query),
+//    • After a question - the pill stays put at the TOP (now showing her query),
 //      and the structured 7-section result renders below: Veda Answer →
 //      What this means → Recommended actions → More information → Community →
 //      Products → Services → disclaimer.
 //  All the offline logic (vedaAnswer / matchShowcase / retrieval / suggestions /
-//  rotation) is untouched — this is the visual + layout layer. The UI is shaped
+//  rotation) is untouched - this is the visual + layout layer. The UI is shaped
 //  exactly for a real LLM to fill later (Phase B).
 // =============================================================================
 
@@ -41,7 +41,7 @@ import 'hospital_bag_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
 
-// ---- design palette (the "Ask Veda Results" mock — our brand purple/coral) ----
+// ---- design palette (the "Ask Veda Results" mock - our brand purple/coral) ----
 const _vBgTop = Color(0xFFF8F4FD);
 const _vBgMid = Color(0xFFF2EBF9);
 const _vBgBot = Color(0xFFEFE7F6);
@@ -70,7 +70,7 @@ class AskVedaScreen extends StatefulWidget {
   final PregnancyController controller;
 
   /// When set (e.g. opened from a Can-I? or Report handoff), Ask Veda runs this
-  /// question immediately — it already has the whole-app data to answer it.
+  /// question immediately - it already has the whole-app data to answer it.
   final String? initialQuery;
 
   @override
@@ -180,7 +180,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     }
   }
 
-  /// Route a showcase "More information" card by what it is — its weekly journey,
+  /// Route a showcase "More information" card by what it is - its weekly journey,
   /// the calendar, the matching tool, or the reading hub for articles/videos.
   void _openContent(LocalizedText label) {
     final l = label.en.toLowerCase();
@@ -244,8 +244,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                         : _initialScroll(s),
                   ),
                 ),
-                // The white search pill now sits at the TOP in BOTH views — the
-                // initial (edit) view and the result view — so it never jumps;
+                // The white search pill now sits at the TOP in BOTH views - the
+                // initial (edit) view and the result view - so it never jumps;
                 // only its contents cross-fade (edit field ↔ the asked query).
                 AnimatedAlign(
                   duration: const Duration(milliseconds: 380),
@@ -374,7 +374,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             ),
           ),
         ),
-        // Real speech-to-text — dictates straight into the search field.
+        // Real speech-to-text - dictates straight into the search field.
         MicDictateButton(controller: _ctrl, s: s, color: _vPurple),
         const SizedBox(width: 2),
         GestureDetector(
@@ -420,7 +420,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       ]);
 
   // ===========================================================================
-  //  INITIAL VIEW — stage-wise suggestion cards (pill sits at the bottom)
+  //  INITIAL VIEW - stage-wise suggestion cards (pill sits at the bottom)
   // ===========================================================================
   Widget _initialScroll(S s) => ListView(
         key: const ValueKey('initial'),
@@ -522,7 +522,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // ===========================================================================
-  //  RESULT VIEW — the fixed structured page (pill sits at the top)
+  //  RESULT VIEW - the fixed structured page (pill sits at the top)
   // ===========================================================================
   Widget _resultScroll(S s) {
     final r = _result!;
@@ -541,7 +541,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         _disclaimer(s),
       ];
     } else if (r.view != null) {
-      // Retrieval answers now render the SAME fixed 7 sections — the content is
+      // Retrieval answers now render the SAME fixed 7 sections - the content is
       // pulled from across the app as context (typed by content-kind, never a
       // raw "Can I"/"Week N" source card; community is social-proof only).
       children = _viewSections(r.view!, s, lang);
@@ -558,11 +558,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   }
 
   // ===========================================================================
-  //  RETRIEVAL view — the SAME 7 sections as the showcase page, built from
+  //  RETRIEVAL view - the SAME 7 sections as the showcase page, built from
   //  vetted app content. Community is excluded from S1–S4 (social proof only).
   // ===========================================================================
   List<Widget> _viewSections(VedaAnswerView v, S s, AppLanguage lang) => [
-        _plainAnswerCard(v.answer, s), // S1 — Veda Answer
+        _plainAnswerCard(v.answer, s), // S1 - Veda Answer
         _viewMeaning(v, s), // S2
         if (v.actions.isNotEmpty) _viewActions(v, s), // S3
         if (v.content.isNotEmpty) _viewContent(v, s), // S4
@@ -682,7 +682,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Content TYPE label (e.g. "Weekly journey") — NOT a raw source.
+              // Content TYPE label (e.g. "Weekly journey") - NOT a raw source.
               Text(ref.typeLabel.toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -854,7 +854,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  // S1 — Veda Answer ----------------------------------------------------------
+  // S1 - Veda Answer ----------------------------------------------------------
   Widget _vedaAnswerCard(VedaShowcase sc, S s, AppLanguage lang) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
@@ -927,7 +927,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S2 — What this means for you ----------------------------------------------
+  // S2 - What this means for you ----------------------------------------------
   Widget _whatMeans(VedaShowcase sc, S s, AppLanguage lang,
           {String? personalLine}) =>
       Column(
@@ -991,7 +991,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  // S3 — Recommended next actions ---------------------------------------------
+  // S3 - Recommended next actions ---------------------------------------------
   Widget _nextActions(VedaShowcase sc, S s, AppLanguage lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1063,13 +1063,13 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               style: GoogleFonts.manrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ),
-        // No trailing chevron: these are guidance, not navigation — the arrow
+        // No trailing chevron: these are guidance, not navigation - the arrow
         // wrongly implied each row opened somewhere.
       ]),
     );
   }
 
-  // S4 — More information (ParentVeda content) --------------------------------
+  // S4 - More information (ParentVeda content) --------------------------------
   Widget _moreInfoShowcase(VedaShowcase sc, S s, AppLanguage lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1189,7 +1189,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S5 — Community insights ----------------------------------------------------
+  // S5 - Community insights ----------------------------------------------------
   Widget _community(VedaShowcase sc, S s, AppLanguage lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1241,7 +1241,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
       );
 
-  // S6 — Products --------------------------------------------------------------
+  // S6 - Products --------------------------------------------------------------
   Widget _products(VedaShowcase sc, S s, AppLanguage lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1328,7 +1328,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S7 — Services --------------------------------------------------------------
+  // S7 - Services --------------------------------------------------------------
   Widget _services(VedaShowcase sc, S s, AppLanguage lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

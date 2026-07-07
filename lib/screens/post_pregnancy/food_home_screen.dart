@@ -1,10 +1,10 @@
 // =============================================================================
-//  FoodHomeScreen — ParentVeda Food companion ("what to feed my child today?")
+//  FoodHomeScreen - ParentVeda Food companion ("what to feed my child today?")
 // -----------------------------------------------------------------------------
-//  Not a recipe list — a food companion. Opens on Today's Meals (the five-slot
+//  Not a recipe list - a food companion. Opens on Today's Meals (the five-slot
 //  plan), a daily Nutrition Focus (the educational core), personalised
 //  recommendations, the Smart Meal Builder, dynamic meal plans, category browse,
-//  and the shopping list + saved. Reached from the Explore drawer. Recipes V2 —
+//  and the shopping list + saved. Reached from the Explore drawer. Recipes V2 -
 //  the existing Recipes module is left untouched.
 // =============================================================================
 
@@ -48,12 +48,12 @@ class FoodHomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _pad(Text('What to feed Aarav today', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Not just recipes — what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Not just recipes - what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
 
             const SizedBox(height: 16),
             _pad(_vegToggle(store)),
 
-            // 1 — Today's meals
+            // 1 - Today's meals
             const SizedBox(height: 26),
             _pad(foodSectionHeader("Today's meals", action: 'Meal plan →', onAction: () => _push(context, const FoodMealPlanScreen()))),
             const SizedBox(height: 14),
@@ -72,7 +72,7 @@ class FoodHomeScreen extends StatelessWidget {
               ),
             ),
 
-            // 2 — Nutrition focus
+            // 2 - Nutrition focus
             const SizedBox(height: 30),
             _pad(foodSectionHeader("Today's nutrition focus")),
             const SizedBox(height: 14),
@@ -82,7 +82,7 @@ class FoodHomeScreen extends StatelessWidget {
             const SizedBox(height: 26),
             _pad(_builderCard(context)),
 
-            // 3 — Recommended
+            // 3 - Recommended
             const SizedBox(height: 30),
             _pad(foodSectionHeader('Chosen for his stage')),
             const SizedBox(height: 4),
@@ -93,7 +93,7 @@ class FoodHomeScreen extends StatelessWidget {
                 FoodListCard(recipe: r, onTap: () => _push(context, FoodRecipeScreen(recipe: r))),
             ])),
 
-            // 5 — Categories
+            // 5 - Categories
             const SizedBox(height: 14),
             _pad(foodSectionHeader('Explore by kind')),
             const SizedBox(height: 14),
@@ -201,7 +201,7 @@ class FoodHomeScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Smart Meal Builder', style: ppJakarta(15.5, color: Colors.white)),
                 const SizedBox(height: 3),
-                Text('Tell us the time you have and what’s in the kitchen — we’ll do the thinking.',
+                Text('Tell us the time you have and what’s in the kitchen - we’ll do the thinking.',
                     style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.8), h: 1.4)),
               ]),
             ),

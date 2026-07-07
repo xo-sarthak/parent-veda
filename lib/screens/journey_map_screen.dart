@@ -1,5 +1,5 @@
 // =============================================================================
-//  JourneyMapScreen  —  "Your Pregnancy Journey" (the map)
+//  JourneyMapScreen  -  "Your Pregnancy Journey" (the map)
 // -----------------------------------------------------------------------------
 //  A winding trail from Week 4 → Birth. Week checkpoints open the week card
 //  stack; milestone nodes (achievement / medical / baby / mother / journey /
@@ -97,7 +97,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
 
   /// Index (in display order) of the node to LAND on when the map opens: the
   /// week checkpoint for the current week if present, else the nearest week
-  /// checkpoint. Landing is WEEKLY — it always settles squarely on a week node,
+  /// checkpoint. Landing is WEEKLY - it always settles squarely on a week node,
   /// never on the fractional day-point between two weeks.
   int _currentWeekNodeIndex(List<MapNode> display) {
     final cw = _c.currentWeek;
@@ -166,10 +166,10 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     }
   }
 
-  // --- late-joiner catch-up + overdue (additive — the trail is unchanged) -----
+  // --- late-joiner catch-up + overdue (additive - the trail is unchanged) -----
 
   /// Editable personal milestones already behind "now" that she hasn't dated yet
-  /// — the moments a late-joiner can fill in so the map reflects HER journey.
+  /// - the moments a late-joiner can fill in so the map reflects HER journey.
   List<JourneyMilestone> _catchUpCandidates() {
     final cur = _c.currentDay;
     return _nodes
@@ -402,7 +402,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
 
   Widget _buildTrail(BuildContext context, S s) {
     // Natural display order: index 0 = the start / Week 4 (TOP), last = Birth
-    // (BOTTOM) — reading top→bottom moves forward in time toward birth.
+    // (BOTTOM) - reading top→bottom moves forward in time toward birth.
     final display = _nodes;
     final count = display.length;
     if (count == 0) return const SizedBox.shrink();
@@ -427,14 +427,14 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
         final double currentIndex =
             _currentDisplayIndex().clamp(0.0, (count - 1).toDouble()).toDouble();
         // Landing anchor = the CURRENT WEEK checkpoint node (integer index), not
-        // the fractional day-point — so opening lands squarely on the week
+        // the fractional day-point - so opening lands squarely on the week
         // you're in regardless of the day-within-week. (The path painter still
         // uses the fractional currentIndex for progress colouring.)
         final int hereNodeIndex =
             _currentWeekNodeIndex(display).clamp(0, count - 1);
         final herePoint = geometry.pointAtIndex(hereNodeIndex.toDouble());
 
-        // Crisp static nodes + caption pills (no perspective) — reference look.
+        // Crisp static nodes + caption pills (no perspective) - reference look.
         final nodeWidgets = <Widget>[];
         for (int i = 0; i < count; i++) {
           nodeWidgets.add(_node(points[i], display[i], i, count));
@@ -475,7 +475,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     );
   }
 
-  /// Diameter for a node by role/state — the MapB sizes.
+  /// Diameter for a node by role/state - the MapB sizes.
   double _diameterFor(MapNode node, {required bool isDestination}) {
     if (isDestination) return 58;
     if (node.isWeekCheckpoint) {
@@ -488,13 +488,13 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
           return 44;
       }
     }
-    return 36; // milestone — a colour disc with a type icon
+    return 36; // milestone - a colour disc with a type icon
   }
 
   Widget _markerFor(MapNode node, bool isDestination, double size) {
     if (isDestination) {
       final unlocked = node.posDay <= _c.currentDay;
-      // The journey's end (Birth) — a clean white disc labelled "Birth".
+      // The journey's end (Birth) - a clean white disc labelled "Birth".
       final disc = Container(
         width: size,
         height: size,
@@ -531,7 +531,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                // Steady aura — always on, much brighter once unlocked.
+                // Steady aura - always on, much brighter once unlocked.
                 OverflowBox(
                   maxWidth: double.infinity,
                   maxHeight: double.infinity,
@@ -544,7 +544,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                     ),
                   ),
                 ),
-                // Expanding ping — small/faint when locked, wide/bright unlocked.
+                // Expanding ping - small/faint when locked, wide/bright unlocked.
                 OverflowBox(
                   maxWidth: double.infinity,
                   maxHeight: double.infinity,
@@ -620,7 +620,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
         dark = true;
       }
     } else {
-      // Milestone — show WHEN it falls. For an editable personal moment she's
+      // Milestone - show WHEN it falls. For an editable personal moment she's
       // already passed but hasn't dated yet, nudge with "· Set date" so it's
       // obvious she can tell us when it actually happened.
       final m = node.milestone!;
@@ -666,7 +666,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
 }
 
 // ---------------------------------------------------------------------------
-//  Trail header card — design's "Your trail to birth · N weeks to go" + ring
+//  Trail header card - design's "Your trail to birth · N weeks to go" + ring
 // ---------------------------------------------------------------------------
 class _TrailHeaderCard extends StatelessWidget {
   const _TrailHeaderCard({required this.controller});

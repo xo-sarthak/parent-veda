@@ -1,8 +1,8 @@
 // =============================================================================
-//  BoughtStore — which catalogue products the mother has "bought" (preview)
+//  BoughtStore - which catalogue products the mother has "bought" (preview)
 // -----------------------------------------------------------------------------
 //  The preview checkout takes no real payment, but once an order is "placed" we
-//  remember the product ids so they can be reflected elsewhere — most notably an
+//  remember the product ids so they can be reflected elsewhere - most notably an
 //  "Already bought ✓" marker on her Product Checklists. Persisted locally.
 // =============================================================================
 
@@ -57,7 +57,7 @@ class BoughtStore extends ChangeNotifier with CloudSyncedStore {
     }
   }
 
-  /// Mark several at once — used when an order with multiple lines is placed.
+  /// Mark several at once - used when an order with multiple lines is placed.
   void markBoughtMany(Iterable<String> productIds) {
     var changed = false;
     for (final id in productIds) {

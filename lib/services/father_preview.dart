@@ -1,5 +1,5 @@
 // =============================================================================
-//  FatherPreview — TESTING-ONLY mother/father mode switch
+//  FatherPreview - TESTING-ONLY mother/father mode switch
 // -----------------------------------------------------------------------------
 //  A tiny global flag the app reads to preview the Father experience without
 //  going through the pairing flow. When [on], MainScaffold swaps the Today tab
@@ -7,7 +7,7 @@
 //  variant; everything else stays the mother app.
 //
 //  This is a DEV affordance (a small "Mom | Dad" pill on the Today tab) so the
-//  team can eyeball both modes quickly. It is NOT part of the final product —
+//  team can eyeball both modes quickly. It is NOT part of the final product -
 //  in the shipped app, role is fixed at pairing. Strip the pill + these reads
 //  before launch (search for FatherPreview).
 // =============================================================================

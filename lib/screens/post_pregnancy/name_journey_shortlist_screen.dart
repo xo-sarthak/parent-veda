@@ -1,12 +1,12 @@
 // =============================================================================
-//  Baby Naming Journey (V2) — Shortlist -> Compare -> Chosen -> Story
+//  Baby Naming Journey (V2) - Shortlist -> Compare -> Chosen -> Story
 // -----------------------------------------------------------------------------
 //  The closing arc of the journey:
-//   • NameJourneyShortlistScreen — "Names We Both Love" (auto from matches).
-//   • NameCompareScreen — a calm side-by-side (meaning, origin, say-it, length,
+//   • NameJourneyShortlistScreen - "Names We Both Love" (auto from matches).
+//   • NameCompareScreen - a calm side-by-side (meaning, origin, say-it, length,
 //     popularity, feel, numerology, nakshatra). We help parents SEE the
 //     differences; we never recommend one.
-//   • NameChosenScreen — "You've chosen Aarav" -> "A beautiful name deserves a
+//   • NameChosenScreen - "You've chosen Aarav" -> "A beautiful name deserves a
 //     beautiful story" -> Begin the story, which opens the Journal to write
 //     "The Story Behind My Name" as Chapter One.
 // =============================================================================
@@ -47,7 +47,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 _pad(Text('Your shared shortlist', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('Every name you both swiped right on gathers here — no manual saving. Compare them, then choose together.', style: ppBody(14, h: 1.55))),
+                _pad(Text('Every name you both swiped right on gathers here - no manual saving. Compare them, then choose together.', style: ppBody(14, h: 1.55))),
 
                 const SizedBox(height: 22),
                 if (names.isEmpty)
@@ -87,7 +87,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Text('No matches yet', style: ppJakarta(16)),
           const SizedBox(height: 6),
-          Text('Head back and swipe a few names you love — the ones you both like will appear here.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
+          Text('Head back and swipe a few names you love - the ones you both like will appear here.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
         ]),
       );
 
@@ -126,7 +126,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
 }
 
 // =============================================================================
-//  NameCompareScreen — a calm side-by-side (never a recommendation)
+//  NameCompareScreen - a calm side-by-side (never a recommendation)
 // =============================================================================
 class NameCompareScreen extends StatelessWidget {
   const NameCompareScreen({super.key});
@@ -238,7 +238,7 @@ class NameCompareScreen extends StatelessWidget {
 }
 
 // =============================================================================
-//  NameChosenScreen — the final selection, flowing into the Journal
+//  NameChosenScreen - the final selection, flowing into the Journal
 // =============================================================================
 class NameChosenScreen extends StatelessWidget {
   const NameChosenScreen({super.key, required this.name});
@@ -282,7 +282,7 @@ class NameChosenScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('A beautiful name deserves a beautiful story.', style: ppFraunces(20, h: 1.3)),
                 const SizedBox(height: 8),
-                Text('Write why you chose ${n.name} — what it means to your family, who suggested it, the memory behind it. It becomes Chapter One of ${n.name}\'s journal.', style: ppBody(13.5, h: 1.6)),
+                Text('Write why you chose ${n.name} - what it means to your family, who suggested it, the memory behind it. It becomes Chapter One of ${n.name}\'s journal.', style: ppBody(13.5, h: 1.6)),
                 const SizedBox(height: 18),
                 GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WriteStoryScreen())),
@@ -304,7 +304,7 @@ class NameChosenScreen extends StatelessWidget {
             _pad(Row(children: [
               const Icon(Icons.check_circle_outline_rounded, size: 16, color: ppPurple),
               const SizedBox(width: 10),
-              Expanded(child: Text('${n.name} will gently flow through ParentVeda — Child Profile, Journal, Storybook and Namkaran — so you never enter it again.', style: ppBody(12.5, color: ppSoft, h: 1.5))),
+              Expanded(child: Text('${n.name} will gently flow through ParentVeda - Child Profile, Journal, Storybook and Namkaran - so you never enter it again.', style: ppBody(12.5, color: ppSoft, h: 1.5))),
             ])),
           ],
         ),

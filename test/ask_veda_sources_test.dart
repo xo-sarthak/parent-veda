@@ -1,4 +1,4 @@
-// Ask Veda retrieval: the corpus now indexes the newer app content — scan/test
+// Ask Veda retrieval: the corpus now indexes the newer app content - scan/test
 // guides, the remaining Garbh pillars (breath + womb-connection) and the weekly
 // written articles. These assert each new family is actually reachable through
 // vedaSearch/vedaAnswer (content-only path; community stays excluded).
@@ -17,7 +17,7 @@ void main() {
   bool hasDocId(String q, String idPrefix) =>
       vedaSearch(q, p, limit: 8).any((h) => h.doc.id.startsWith(idPrefix));
 
-  group('Ask Veda — newly indexed sources', () {
+  group('Ask Veda - newly indexed sources', () {
     test('scan & test guides are retrievable', () {
       expect(hasKind('anomaly scan', VedaKind.scan), isTrue);
       expect(hasKind('glucose screening in pregnancy', VedaKind.scan), isTrue);
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('community is still never a source for the answer path', () {
-      // includeCommunity:false is what the answer uses — no community docs leak in.
+      // includeCommunity:false is what the answer uses - no community docs leak in.
       final hits = vedaSearch('pregnancy', p, includeCommunity: false, limit: 20);
       expect(hits.any((h) => h.doc.kind == VedaKind.community), isFalse);
     });

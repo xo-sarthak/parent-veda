@@ -1,10 +1,10 @@
 // =============================================================================
-//  JournalStore — persistence + timeline assembly for "My Journal"
+//  JournalStore - persistence + timeline assembly for "My Journal"
 // -----------------------------------------------------------------------------
 //  Manual entries (memory / note-for-baby / photo / voice) are persisted in
 //  shared_preferences; photo files live in the app documents dir. The full
 //  timeline merges those manual entries with AUTO entries derived from the
-//  mother's existing data — pregnancy milestones, weight logs, kick sessions —
+//  mother's existing data - pregnancy milestones, weight logs, kick sessions -
 //  so the journal feels alive without her logging anything twice.
 // =============================================================================
 
@@ -66,7 +66,7 @@ class JournalStore extends ChangeNotifier {
 
     // Then sync with the cloud (no-op if logged out). Only MANUAL entries are
     // persisted/synced (auto entries are derived at runtime). NOTE: the image/
-    // audio columns hold local file PATHS for now — the actual files move to
+    // audio columns hold local file PATHS for now - the actual files move to
     // Supabase Storage in Phase 3.
     await _syncFromCloud();
   }
@@ -100,7 +100,7 @@ class JournalStore extends ChangeNotifier {
       await _persist();
       await _backfillMedia();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // Upload any media still stored as local paths (captured offline/logged-out,
@@ -350,7 +350,7 @@ class JournalStore extends ChangeNotifier {
       ));
     }
 
-    // Kick sessions are intentionally NOT shown in the journal — they live in
+    // Kick sessions are intentionally NOT shown in the journal - they live in
     // the Baby Movement tool. Kept commented for an easy revert.
     /*
     var first = true;

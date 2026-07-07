@@ -1,10 +1,10 @@
 // =============================================================================
-//  CommunityStore — local state for the Community prototype
+//  CommunityStore - local state for the Community prototype
 // -----------------------------------------------------------------------------
 //  Holds joins, mutes, likes, saves, poll votes, user-created posts and user
 //  comments, persisted via shared_preferences. Also provides a lightweight feed
 //  "ranking" (algorithmic, not chronological): user posts pinned, then joined
-//  communities, then recommended — ordered by engagement.
+//  communities, then recommended - ordered by engagement.
 // =============================================================================
 
 import 'dart:convert';
@@ -50,7 +50,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   bool _doctorMode = false;
   final Set<String> _doctorEndorsed = {};
   final Set<String> _reposted = {};
-  final Set<String> _hidden = {}; // "Not interested" — session only, not saved
+  final Set<String> _hidden = {}; // "Not interested" - session only, not saved
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -210,11 +210,11 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   /// All posts (user-created first, then seed).
   List<CommunityPost> get _allPosts => [..._created, ...kSeedPosts];
 
-  /// The personalized feed — algorithmic, not chronological.
+  /// The personalized feed - algorithmic, not chronological.
   List<CommunityPost> feed() {
     final posts = _allPosts.where((p) => !_muted.contains(p.communityId)).toList();
     int score(CommunityPost p) {
-      // Rank on the post's BASE engagement only — NOT the viewer's own live
+      // Rank on the post's BASE engagement only - NOT the viewer's own live
       // like/save/repost toggles. Otherwise bookmarking or liking a post bumps
       // its score and re-ranks the feed, making rows jump up and down under your
       // finger. Stable score = the row stays put when you tap save.
@@ -329,7 +329,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
 
   void addComment(String postId, String text) {
     (_userComments[postId] ??= []).add(text);
-    // A doctor commenting on a post that ASKED for verification verifies it —
+    // A doctor commenting on a post that ASKED for verification verifies it -
     // this replaces the old explicit "Verify this" button.
     if (_doctorMode) {
       final p = postById(postId);

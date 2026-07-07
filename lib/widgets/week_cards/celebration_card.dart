@@ -4,7 +4,7 @@
 //  A calm, premium "Welcome, little one." moment: a soft baby orb, an elegant
 //  title, a short message, and a single button to download the keepsake booklet.
 //  Gentle bokeh drifts behind it and re-fires every time the card appears.
-//  Deliberately simple — no emoji clutter, no on-card memories grid.
+//  Deliberately simple - no emoji clutter, no on-card memories grid.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -92,7 +92,7 @@ class _CelebrationCardState extends State<CelebrationCard>
               gradient: const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                // Soft blush easing into clean white — calm, not loud.
+                // Soft blush easing into clean white - calm, not loud.
                 colors: [AppTheme.secondary50, AppTheme.primary50, Colors.white],
                 stops: [0.0, 0.5, 1.0],
               ),
@@ -261,7 +261,7 @@ class _CelebrationCardState extends State<CelebrationCard>
       );
 }
 
-/// Soft, slow-drifting pastel bokeh — a calm celebratory shimmer, far quieter
+/// Soft, slow-drifting pastel bokeh - a calm celebratory shimmer, far quieter
 /// than confetti. Deterministic layout, gentle downward drift, low opacity.
 class _BokehPainter extends CustomPainter {
   _BokehPainter(this.t);

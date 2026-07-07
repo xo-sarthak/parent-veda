@@ -1,10 +1,10 @@
 // =============================================================================
-//  BabyNamingHomeScreen — the naming tool's front door (V1 | V2 header toggle)
+//  BabyNamingHomeScreen - the naming tool's front door (V1 | V2 header toggle)
 // -----------------------------------------------------------------------------
 //  A single entry that lets us flip between the two naming experiences:
-//    • Version 1 — the classic Baby Name Finder (quiz -> swipe deck -> detail ->
+//    • Version 1 - the classic Baby Name Finder (quiz -> swipe deck -> detail ->
 //      matches). Untouched; opened as-is.
-//    • Version 2 — the new Baby Naming Journey (curated collections -> taste quiz
+//    • Version 2 - the new Baby Naming Journey (curated collections -> taste quiz
 //      -> couple swipe -> shared matches -> shortlist -> compare -> chosen ->
 //      story), with the Name Journey Timeline ribbon.
 //  The toggle lives in the header (NameVersionStore, session-persistent) so we can
@@ -81,7 +81,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
   }
 
   // =========================================================================
-  //  Version 1 — the classic Finder (opened as-is)
+  //  Version 1 - the classic Finder (opened as-is)
   // =========================================================================
   List<Widget> _v1Home(BuildContext context) => [
         _pad(ppEyebrow('Version 1 · Baby Name Finder', color: ppMuted)),
@@ -91,7 +91,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
           TextSpan(text: 'you both love.', style: ppFraunces(32, color: ppPurple, h: 1.1).copyWith(fontStyle: FontStyle.italic)),
         ]), style: ppFraunces(32, h: 1.1))),
         const SizedBox(height: 12),
-        _pad(Text('A quick taste quiz, then you each swipe — only the names you both adore ever surface. Shortlist, compare and choose together.',
+        _pad(Text('A quick taste quiz, then you each swipe - only the names you both adore ever surface. Shortlist, compare and choose together.',
             style: ppBody(14.5, h: 1.6))),
         const SizedBox(height: 22),
         _pad(GestureDetector(
@@ -119,13 +119,13 @@ class BabyNamingHomeScreen extends StatelessWidget {
           child: Row(children: [
             const Icon(Icons.tune_rounded, size: 18, color: ppPurple),
             const SizedBox(width: 12),
-            Expanded(child: Text('Switch to V2 (top-right) for the new Baby Naming Journey — a guided, keepsake-style experience.', style: ppBody(12.5, h: 1.5))),
+            Expanded(child: Text('Switch to V2 (top-right) for the new Baby Naming Journey - a guided, keepsake-style experience.', style: ppBody(12.5, h: 1.5))),
           ]),
         )),
       ];
 
   // =========================================================================
-  //  Version 2 — the Baby Naming Journey home
+  //  Version 2 - the Baby Naming Journey home
   // =========================================================================
   List<Widget> _v2Home(BuildContext context) {
     return [
@@ -139,7 +139,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
         const TextSpan(text: ' together.'),
       ]), style: ppFraunces(33, h: 1.08))),
       const SizedBox(height: 12),
-      _pad(Text('Not a database to search — a gentle journey from the first spark to the name that becomes the first chapter of your child\'s story.',
+      _pad(Text('Not a database to search - a gentle journey from the first spark to the name that becomes the first chapter of your child\'s story.',
           style: ppBody(14.5, h: 1.6))),
 
       const SizedBox(height: 22),
@@ -162,7 +162,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text('Take the taste quiz, then start swiping', style: ppFraunces(20, h: 1.25)),
             const SizedBox(height: 8),
-            Text('You each swipe privately — only the names you both love appear. Every match is a small, happy moment.', style: ppBody(13.5, h: 1.55)),
+            Text('You each swipe privately - only the names you both love appear. Every match is a small, happy moment.', style: ppBody(13.5, h: 1.55)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),

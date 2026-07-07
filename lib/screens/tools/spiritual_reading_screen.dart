@@ -1,8 +1,8 @@
 // =============================================================================
-//  SpiritualReadingScreen — a gentle, surface-level reading tool (testing)
+//  SpiritualReadingScreen - a gentle, surface-level reading tool (testing)
 // -----------------------------------------------------------------------------
 //  A respectful, neutral look at how a few faith traditions approach calm,
-//  gratitude, family and motherhood. Framed clearly as comfort & curiosity —
+//  gratitude, family and motherhood. Framed clearly as comfort & curiosity -
 //  NOT religious instruction, and not promoting any belief. Content lives in
 //  data/spiritual_reading_data.dart (original reflections, organised by
 //  tradition → sub-heading → read). The main screen previews each tradition;
@@ -43,7 +43,7 @@ class SpiritualReadingScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          // Respectful framing — informational, not instruction.
+          // Respectful framing - informational, not instruction.
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
@@ -165,7 +165,7 @@ Widget _readRow(BuildContext context, PregnancyController controller,
     );
 
 // ===========================================================================
-//  Tradition detail — all readings, grouped by sub-heading
+//  Tradition detail - all readings, grouped by sub-heading
 // ===========================================================================
 class _TraditionDetailScreen extends StatelessWidget {
   const _TraditionDetailScreen(

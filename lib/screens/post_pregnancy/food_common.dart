@@ -1,7 +1,7 @@
 // =============================================================================
-//  ParentVeda Food — shared UI building blocks
+//  ParentVeda Food - shared UI building blocks
 // -----------------------------------------------------------------------------
-//  Warm, appetising, calm — never a recipe-blog look. Placeholder food images
+//  Warm, appetising, calm - never a recipe-blog look. Placeholder food images
 //  (warm tints), the learning-metadata line (time · age · veg · nutrition
 //  highlight), recipe cards and the little veg/non-veg indicator. pp-themed.
 // =============================================================================

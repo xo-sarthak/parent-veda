@@ -23,11 +23,11 @@ void main() {
     expect(find.text('The 4-month sleep regression'), findsNothing);
 
     const firstOptions = [
-      'Yes — a new food or formula',
-      'Yes — travel or a new routine',
-      'Yes — travel, guests, or a move',
-      'Yes — a runny nose or cough',
-      'Yes — much clingier than usual',
+      'Yes - a new food or formula',
+      'Yes - travel or a new routine',
+      'Yes - travel, guests, or a move',
+      'Yes - a runny nose or cough',
+      'Yes - much clingier than usual',
     ];
 
     for (var step = 0; step < 5; step++) {
@@ -39,7 +39,7 @@ void main() {
         scrollable: scrollable, maxScrolls: 30);
     expect(find.text('The 4-month sleep regression'), findsOneWidget);
 
-    // escalation lives further down the result — scroll it into view
+    // escalation lives further down the result - scroll it into view
     await tester.scrollUntilVisible(find.text('Still worried?'), 150, scrollable: scrollable, maxScrolls: 30);
     expect(find.text('Still worried?'), findsOneWidget);
   });

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductsSubcategoryScreen — Products · subcategory (parenting · S3·subcat v2)
+//  ProductsSubcategoryScreen - Products · subcategory (parenting · S3·subcat v2)
 // -----------------------------------------------------------------------------
 //  A subcategory (e.g. Soothers & white noise): what-to-look-for, working brand
 //  + sort filters, and a ParentVeda-ranked compare-tickable product grid.
@@ -37,8 +37,8 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
   }
 
   String get _intro => widget.sub == 'Soothers & white noise'
-      ? 'Steady white noise — not looping lullabies — masks the household sounds that pull a baby out of light sleep. Look for true continuous sound, an auto-off timer, and a volume you can keep gentle. Below, ranked by ParentVeda.'
-      : 'What to look for, and the picks worth your money — ranked by ParentVeda from expert review and verified-mother ratings.';
+      ? 'Steady white noise - not looping lullabies - masks the household sounds that pull a baby out of light sleep. Look for true continuous sound, an auto-off timer, and a volume you can keep gentle. Below, ranked by ParentVeda.'
+      : 'What to look for, and the picks worth your money - ranked by ParentVeda from expert review and verified-mother ratings.';
 
   List<PpProduct> get _all => productsInSub(widget.category, widget.sub);
 
@@ -118,7 +118,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
               _pad(Container(
                 padding: const EdgeInsets.symmetric(vertical: 28),
                 alignment: Alignment.center,
-                child: Text('No matches — try loosening a filter.', style: ppBody(13, color: ppMuted)),
+                child: Text('No matches - try loosening a filter.', style: ppBody(13, color: ppMuted)),
               ))
             else
               _pad(_grid(items)),

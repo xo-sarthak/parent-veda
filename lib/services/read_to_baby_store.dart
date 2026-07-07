@@ -1,5 +1,5 @@
 // =============================================================================
-//  ReadToBabyStore — preferences for the customizable "Read to your baby" feed
+//  ReadToBabyStore - preferences for the customizable "Read to your baby" feed
 // -----------------------------------------------------------------------------
 //  Holds which content categories the mother wants her daily read to draw from
 //  (children's stories / spiritual reading / rhymes / affirmations) and, when
@@ -30,7 +30,7 @@ class ReadToBabyStore extends ChangeNotifier {
   final Set<String> _religions = {};
   // Enabled sub-sections, keyed "<traditionId>|<sectionIndex>".
   final Set<String> _sections = {};
-  // "Another prompt" offset for the daily Samvad piece — SHARED so when the
+  // "Another prompt" offset for the daily Samvad piece - SHARED so when the
   // mother cycles, the father's "Read to your baby" advances to the same piece.
   int _promptOffset = 0;
   bool _loaded = false;
@@ -67,7 +67,7 @@ class ReadToBabyStore extends ChangeNotifier {
   Set<String> get religions => Set.unmodifiable(_religions);
   int get promptOffset => _promptOffset;
 
-  /// Advance the daily Samvad "another prompt" — shared by mother + father.
+  /// Advance the daily Samvad "another prompt" - shared by mother + father.
   void nextPrompt() {
     _promptOffset++;
     _persist();
@@ -87,11 +87,11 @@ class ReadToBabyStore extends ChangeNotifier {
 
   void toggleReligion(String id) {
     if (_religions.remove(id)) {
-      // turned OFF — drop all of its sub-section keys too.
+      // turned OFF - drop all of its sub-section keys too.
       _sections.removeWhere((k) => k.startsWith('$id|'));
     } else {
       _religions.add(id);
-      // turned ON — default-enable every sub-section so it works immediately.
+      // turned ON - default-enable every sub-section so it works immediately.
       final t = kSpiritualTraditions.where((x) => x.id == id);
       if (t.isNotEmpty) {
         for (var i = 0; i < t.first.sections.length; i++) {

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Community (Tools tab) — prototype
+//  ParentVeda Community (Tools tab) - prototype
 // -----------------------------------------------------------------------------
 //  A personalized parenting social layer over seeded data: a stories-style row
 //  of joined communities, recommended communities, a Community Pulse strip, and
@@ -8,7 +8,7 @@
 //  Pregnancy-adapted; no gender communities.
 // =============================================================================
 
-// import 'dart:async'; // only Timer (Community Pulse) used it — Pulse removed
+// import 'dart:async'; // only Timer (Community Pulse) used it - Pulse removed
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -31,7 +31,7 @@ import 'community_profile_screen.dart';
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
 
-/// `endFloat`, lifted up by [lift] logical px — used to clear the floating
+/// `endFloat`, lifted up by [lift] logical px - used to clear the floating
 /// bottom nav pill that MainScaffold paints over the Community screen. Measuring
 /// from the standard (safe-area-aware) endFloat base keeps it correct on every
 /// device, unlike a fixed Padding lift.
@@ -45,7 +45,7 @@ class _EndFloatLifted extends StandardFabLocation
       super.getOffsetY(scaffoldGeometry, adjustment) - lift;
 }
 
-// Warm tints from the old story-circle row — kept for reference; the Community
+// Warm tints from the old story-circle row - kept for reference; the Community
 // Pro layout uses gradient mono badges (_commGradients) instead.
 // const List<Color> _storyTints = [
 //   AppTheme.secondary100,
@@ -388,7 +388,7 @@ void _showExpertsSheet(BuildContext context, S s, int total) {
 }
 
 /// The gradient endorsement strip shown atop a post a verified expert (or the
-/// test doctor) has publicly backed — with a Facebook-style "+ N other experts"
+/// test doctor) has publicly backed - with a Facebook-style "+ N other experts"
 /// credibility line that opens the "who verified" sheet.
 ///
 /// REPLACED by the subtle [_verifiedHint] (the full-width purple bar read like a
@@ -466,7 +466,7 @@ Widget _endorsementBanner(BuildContext context, S s, CommunityPost post) {
   );
 }
 
-/// A small, subtle "verified by an expert" line for an endorsed post — replaces
+/// A small, subtle "verified by an expert" line for an endorsed post - replaces
 /// the old full-width purple banner (which read like a heading). Tapping it (when
 /// other experts also backed the post) opens the "who verified" sheet.
 Widget _verifiedHint(BuildContext context, S s, CommunityPost post) {
@@ -507,7 +507,7 @@ Widget _verifiedHint(BuildContext context, S s, CommunityPost post) {
 
 /// The verification-requested tag. For a MEMBER it shows "Awaiting [specialty]
 /// verification"; for a DOCTOR it shows "Comment to verify this post" (the new
-/// way a post becomes expert-verified — by a doctor commenting on it).
+/// way a post becomes expert-verified - by a doctor commenting on it).
 Widget _pendingVerifyTag(S s, CommunityPost post, {bool doctor = false}) {
   final spKey = post.preferredSpecialty;
   final sp = (spKey.isEmpty || spKey == 'all') ? null : s.cmSpecialty(spKey);
@@ -535,9 +535,9 @@ Widget _pendingVerifyTag(S s, CommunityPost post, {bool doctor = false}) {
   );
 }
 
-/// Share a post via the OS share sheet (share_plus — house style).
+/// Share a post via the OS share sheet (share_plus - house style).
 void _sharePost(S s, CommunityPost post) {
-  final body = '"${post.text}"\n\n— ${post.author} · ${s.cmShareVia}';
+  final body = '"${post.text}"\n\n- ${post.author} · ${s.cmShareVia}';
   Share.share(body);
 }
 
@@ -594,14 +594,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Expert (doctor-mode) filter: show only posts that asked to be verified.
   // Works in BOTH For You and Following so an expert can triage requests fast.
   bool _needsVerifyOnly = false;
-  // Community Pulse removed per request — fields kept commented for revert.
+  // Community Pulse removed per request - fields kept commented for revert.
   // final PageController _pulseCtrl = PageController(viewportFraction: 0.84);
   // int _pulsePage = 0;
   // Timer? _pulseTimer;
 
   PregnancyController get controller => widget.controller;
 
-  // initState/dispose only drove Community Pulse (removed per request) — kept
+  // initState/dispose only drove Community Pulse (removed per request) - kept
   // commented for an easy revert.
   /*
   @override
@@ -629,7 +629,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   /// Community Pulse cards, matching the Community Pro design (tag + dot, a big
   /// reassuring line, and a foot note), with soft per-card gradients.
-  /// (Pulse section removed per request — kept for an easy revert.)
+  /// (Pulse section removed per request - kept for an easy revert.)
   List<({String tag, String text, String foot, List<Color> bg, Color dot})>
       // ignore: unused_element
       _proPulse(S s) => [
@@ -877,11 +877,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
             return ListView(
               padding: EdgeInsets.only(top: topPad, bottom: 110),
               children: [
-                // Top utility icons (in-scroll, like the design) — no wasted bar.
+                // Top utility icons (in-scroll, like the design) - no wasted bar.
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 2, 14, 0),
                   child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    // Doctor (test) mode toggle — for trying the doctor flow.
+                    // Doctor (test) mode toggle - for trying the doctor flow.
                     IconButton(
                       tooltip: s.cmDoctorMode,
                       visualDensity: VisualDensity.compact,
@@ -932,7 +932,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ),
                 _header(s),
                 if (store.doctorMode) _doctorModeBanner(s),
-                // Your communities — premium mono-badge cards
+                // Your communities - premium mono-badge cards
                 if (joined.isNotEmpty) ...[
                   _label(s.cmJoinedSection),
                   SizedBox(
@@ -957,7 +957,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     ),
                   ),
                 ],
-                // Recommended for you — communities you haven't joined yet. The
+                // Recommended for you - communities you haven't joined yet. The
                 // section now ALWAYS renders (header + either the list or a clear
                 // note) so it can never silently disappear when you've joined all.
                 _label(s.cmRecommended),
@@ -1009,7 +1009,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       ]),
                     ),
                   ),
-                // Community Pulse REMOVED per request — kept commented for revert.
+                // Community Pulse REMOVED per request - kept commented for revert.
                 /*
                 _label(s.cmPulse),
                 SizedBox(
@@ -1052,7 +1052,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 const SizedBox(height: 8),
                 // Feed tabs + feed
                 _feedTabs(s),
-                // Expert triage filter — only while viewing as a doctor.
+                // Expert triage filter - only while viewing as a doctor.
                 if (store.doctorMode) _verifyFilterChip(s),
                 const SizedBox(height: 8),
                 if (feed.isEmpty && _needsVerifyOnly)
@@ -1118,9 +1118,9 @@ Widget _sectionTitle(BuildContext context, String title) => Padding(
               ?.copyWith(fontWeight: FontWeight.w800)),
     );
 
-/// Community Pulse card — soft gradient, a coloured tag dot, a big reassuring
+/// Community Pulse card - soft gradient, a coloured tag dot, a big reassuring
 /// line and a foot note (Community Pro design).
-// Pulse card — kept for revert (Community Pulse section removed per request).
+// Pulse card - kept for revert (Community Pulse section removed per request).
 // ignore: unused_element
 class _ProPulseCard extends StatelessWidget {
   const _ProPulseCard({
@@ -1593,7 +1593,7 @@ class CommunityPostCard extends StatelessWidget {
     final reposted = store.isReposted(post.id);
     return Container(
       // Flat Twitter-style row (no card chrome). Verified posts no longer get a
-      // purple wash or full-width banner — just a small inline "Verified by …"
+      // purple wash or full-width banner - just a small inline "Verified by …"
       // hint on its own line below (see the verification line near the actions).
       color: AppTheme.surface,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1711,7 +1711,7 @@ class CommunityPostCard extends StatelessWidget {
                         ]),
                       ],
                       const SizedBox(height: 10),
-                      // engagement row — reply · repost · like · views · save · share
+                      // engagement row - reply · repost · like · views · save · share
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1765,7 +1765,7 @@ class CommunityPostCard extends StatelessWidget {
                       //     "Awaiting [specialty] verification" tag; for a doctor,
                       //     a "Comment to verify this post" prompt.
                       // A post is verified when a DOCTOR COMMENTS on it (see
-                      // CommunityStore.addComment) — the old explicit "Verify
+                      // CommunityStore.addComment) - the old explicit "Verify
                       // this" button is removed (kept commented just below).
                       if (endorsed) ...[
                         const SizedBox(height: 8),
@@ -1796,7 +1796,7 @@ class CommunityPostCard extends StatelessWidget {
   }
 }
 
-// Old engagement chip — replaced by the Twitter-style `_EngageButton` row.
+// Old engagement chip - replaced by the Twitter-style `_EngageButton` row.
 // Kept for an easy revert.
 // ignore: unused_element
 class _ActionButton extends StatelessWidget {
@@ -1829,8 +1829,8 @@ class _ActionButton extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Doctor (test) mode — verify/endorse a post with a celebratory flourish
-//  No longer shown (verification is comment-driven now) — kept for an easy
+//  Doctor (test) mode - verify/endorse a post with a celebratory flourish
+//  No longer shown (verification is comment-driven now) - kept for an easy
 //  revert if we ever want the explicit button back.
 // ===========================================================================
 // ignore: unused_element
@@ -2126,7 +2126,7 @@ class CommunityDetailScreen extends StatelessWidget {
                   ),
                 ]),
               ),
-              // Composer entry — write a post (with photos) to this group.
+              // Composer entry - write a post (with photos) to this group.
               if (joined)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 2),
@@ -2401,7 +2401,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   void initState() {
     super.initState();
     // Default to "Your feed" (general timeline). Only pre-select a community the
-    // user has actually joined — you can't post into one you're not part of.
+    // user has actually joined - you can't post into one you're not part of.
     final init = widget.initialCommunityId ?? '';
     _communityId = CommunityStore.instance.isJoined(init) ? init : '';
   }
@@ -2433,7 +2433,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   void _share(S s) {
     final t = _textCtrl.text.trim();
     if ((t.isEmpty && _photos.isEmpty) || _communityId == null) return;
-    // In doctor (test) mode the post is authored AS the verified doctor — name +
+    // In doctor (test) mode the post is authored AS the verified doctor - name +
     // credential, so it renders with the gradient expert seal, not a plain user.
     final asDoctor = CommunityStore.instance.doctorMode;
     final post = CommunityPost(
@@ -2515,7 +2515,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ],
           // ── Ask an expert to verify (members only) ───────────────────────
           // A doctor's own post is already authoritative; a member can request a
-          // verification — it marks the post so experts see a "Verify this"
+          // verification - it marks the post so experts see a "Verify this"
           // button and can find it via their "Needs verification" filter.
           if (!CommunityStore.instance.doctorMode) ...[
             Container(

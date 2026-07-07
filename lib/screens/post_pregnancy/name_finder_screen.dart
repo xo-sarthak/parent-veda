@@ -1,8 +1,8 @@
 // =============================================================================
-//  NameFinderScreen — Baby Name Finder · quiz (parenting · S27)
+//  NameFinderScreen - Baby Name Finder · quiz (parenting · S27)
 // -----------------------------------------------------------------------------
 //  The taste quiz that opens the Name Finder: who you're naming, the feel you
-//  want, and an optional birth-star. Then both parents swipe — only mutual
+//  want, and an optional birth-star. Then both parents swipe - only mutual
 //  yeses ever surface. Faithful build of Claude Design "post pregnancy -
 //  content.dc.html" · S27. Reached from the Tools hub "Baby names" tracker row.
 // =============================================================================
@@ -52,10 +52,10 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
             _pad(Text.rich(TextSpan(children: [
               TextSpan(text: 'A quick taste quiz, then you each swipe. We only show you the names you ', style: ppBody(15)),
               TextSpan(text: 'both', style: ppBody(15, w: FontWeight.w700).copyWith(fontStyle: FontStyle.italic)),
-              TextSpan(text: " adore — nobody ever sees the other's no.", style: ppBody(15)),
+              TextSpan(text: " adore - nobody ever sees the other's no.", style: ppBody(15)),
             ]))),
 
-            // Q1 — who
+            // Q1 - who
             const SizedBox(height: 22),
             _pad(Text('Question 1 of 6', style: ppBody(12, color: ppMuted, w: FontWeight.w600))),
             const SizedBox(height: 8),
@@ -68,7 +68,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
               ],
             ])),
 
-            // Q2 — feel
+            // Q2 - feel
             const SizedBox(height: 28),
             _pad(Text('The feel you want', style: ppJakarta(19))),
             const SizedBox(height: 16),

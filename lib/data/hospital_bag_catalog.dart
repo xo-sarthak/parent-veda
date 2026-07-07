@@ -37,7 +37,7 @@ class BagProduct {
   final String? imageUrl; // optional real photo (network)
 
   // Affiliate option (sold elsewhere, e.g. Amazon/FirstCry) → "Buy" opens the
-  // external site, NO in-app cart — mirrors Product.isAffiliate in the product
+  // external site, NO in-app cart - mirrors Product.isAffiliate in the product
   // checklist. ParentVeda picks (false) are chosen as her "buy from us" option.
   final bool isAffiliate;
   final String store; // 'Amazon' | 'FirstCry' (affiliate only)
@@ -88,7 +88,7 @@ const Map<String, _Cat> _catalog = {
   'after_breastpads': _Cat('⚪', 299, 'ParentVeda Breast Pads',
       why: ['Super absorbent, stay-dry', 'Gentle on sensitive skin']),
   'after_nipplecream': _Cat('🧴', 449, 'ParentVeda Nipple Cream',
-      why: ['Soothes sore skin', 'Safe for baby — no need to wipe off']),
+      why: ['Soothes sore skin', 'Safe for baby - no need to wipe off']),
   'after_outfit': _Cat('👗', 899, 'ParentVeda Going-Home Set',
       why: ['Loose & soft on a healing body', 'Easy nursing access']),
   'after_toiletries': _Cat('🪥', 299, 'ParentVeda Travel Kit',
@@ -182,7 +182,7 @@ List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) {
   final query = c?.brand ?? itemId.replaceAll('_', ' ');
   final out = <BagProduct>[];
   if (c == null) {
-    // Sellable but uncatalogued — a gentle generic recommendation.
+    // Sellable but uncatalogued - a gentle generic recommendation.
     out.add(BagProduct(
       id: '${itemId}_pv',
       name: 'ParentVeda pick',
@@ -210,7 +210,7 @@ List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) {
       why: const ['A simpler, budget-friendly option'],
     ));
   }
-  // Affiliate options (sold elsewhere) — the same split as the product checklist.
+  // Affiliate options (sold elsewhere) - the same split as the product checklist.
   out.add(_affiliate(itemId, 'amazon', 'Amazon', (base * 1.05).round(), emoji, query));
   out.add(_affiliate(
       itemId, 'firstcry', 'FirstCry', (base * 0.95).round(), emoji, query));

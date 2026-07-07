@@ -1,8 +1,8 @@
 // =============================================================================
-//  Father weekly skin — Slate palette + Fraunces headers
+//  Father weekly skin - Slate palette + Fraunces headers
 // -----------------------------------------------------------------------------
 //  The father's weekly section is the EXACT same mother weekly UI/layout/
-//  components/images — only the colour scheme (Slate) and header fonts
+//  components/images - only the colour scheme (Slate) and header fonts
 //  (Fraunces) differ, plus the father language (handled in week_flow_screen).
 //  These tokens are applied as `fatherWeekActive(week) ? <slate> : <existing>`
 //  so the mother path and every week != 20 stay byte-identical.

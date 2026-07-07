@@ -1,8 +1,8 @@
 // =============================================================================
-//  HealthTimelineScreen — the health story, chronologically (the backbone)
+//  HealthTimelineScreen - the health story, chronologically (the backbone)
 // -----------------------------------------------------------------------------
-//  Every health event as a vertical timeline — doctor visits, vaccines,
-//  illnesses, growth checks, lab tests, milestones — newest first, with the one
+//  Every health event as a vertical timeline - doctor visits, vaccines,
+//  illnesses, growth checks, lab tests, milestones - newest first, with the one
 //  upcoming event pinned on top. Tap any event for its detail. Never folders.
 // =============================================================================
 
@@ -32,7 +32,7 @@ class HealthTimelineScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _pad(Text('Aarav’s health story', style: ppFraunces(28, h: 1.12))),
             const SizedBox(height: 6),
-            _pad(Text('${events.where((e) => !e.upcoming).length} events so far — the whole journey in one place.', style: ppBody(13))),
+            _pad(Text('${events.where((e) => !e.upcoming).length} events so far - the whole journey in one place.', style: ppBody(13))),
             const SizedBox(height: 22),
             _pad(Column(children: [
               for (int i = 0; i < events.length; i++) _row(context, events[i], first: i == 0, last: i == events.length - 1),

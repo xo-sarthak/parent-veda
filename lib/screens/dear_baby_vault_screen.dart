@@ -1,5 +1,5 @@
 // =============================================================================
-//  DearBabyVaultScreen  —  the "Dear Baby" memory vault
+//  DearBabyVaultScreen  -  the "Dear Baby" memory vault
 // -----------------------------------------------------------------------------
 //  Surfaces every Talk-To-Your-Baby message the mother has saved (persisted in
 //  DailyStore). Reached from a card on the Profile tab. Read-only for now.
@@ -25,7 +25,7 @@ class _DearBabyVaultScreenState extends State<DearBabyVaultScreen> {
   @override
   void initState() {
     super.initState();
-    // Idempotent — ensures entries are loaded if this is opened very early.
+    // Idempotent - ensures entries are loaded if this is opened very early.
     DailyStore.instance.init();
   }
 

@@ -1,10 +1,10 @@
 // =============================================================================
-//  HealthDoctorVisitScreen — the Doctor Visit Companion (a key differentiator)
+//  HealthDoctorVisitScreen - the Doctor Visit Companion (a key differentiator)
 // -----------------------------------------------------------------------------
-//  Generates a clean, shareable summary before an appointment — age, growth,
-//  vaccinations, current medications, allergies, recent history, recent reports —
+//  Generates a clean, shareable summary before an appointment - age, growth,
+//  vaccinations, current medications, allergies, recent history, recent reports -
 //  plus the questions the parent saved for the doctor. Formatted like a printable
-//  sheet; PDF share is stubbed. Never a diagnosis — just organised facts.
+//  sheet; PDF share is stubbed. Never a diagnosis - just organised facts.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -28,14 +28,14 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
 
   String _shareText(GrowthPoint g) {
     final b = StringBuffer()
-      ..writeln('VISIT SUMMARY — Aarav')
+      ..writeln('VISIT SUMMARY - Aarav')
       ..writeln('Child: Aarav · 4 months (born 8 Mar 2026) · Boy')
-      ..writeln('Growth: ${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm — on track')
+      ..writeln('Growth: ${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm - on track')
       ..writeln('Vaccinations: Up to date · next: $kVaxNext')
       ..writeln('Medications: Vitamin D drops (routine daily)')
       ..writeln('Allergies: None recorded')
       ..writeln('Recent history: Mild cold (early Jun) · brief fever after 14-week vaccines')
-      ..writeln('Recent reports: 4-month growth summary (12 Jun) — all normal')
+      ..writeln('Recent reports: 4-month growth summary (12 Jun) - all normal')
       ..writeln('')
       ..writeln('QUESTIONS TO ASK');
     for (final q in _s.questions) {
@@ -68,7 +68,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
               const SizedBox(height: 8),
               _pad(Text('Ready for the appointment', style: ppFraunces(28, h: 1.12))),
               const SizedBox(height: 6),
-              _pad(Text('Everything the paediatrician needs, gathered for you — bring it, or share it ahead.', style: ppBody(14, h: 1.5))),
+              _pad(Text('Everything the paediatrician needs, gathered for you - bring it, or share it ahead.', style: ppBody(14, h: 1.5))),
 
               const SizedBox(height: 20),
               // the printable summary sheet
@@ -85,12 +85,12 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                   ]),
                   const SizedBox(height: 14),
                   _line('Child', 'Aarav · 4 months (born 8 Mar 2026) · Boy'),
-                  _line('Growth', '${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm — on track'),
+                  _line('Growth', '${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm - on track'),
                   _line('Vaccinations', 'Up to date · next: $kVaxNext'),
                   _line('Medications', 'Vitamin D drops (routine daily)'),
                   _line('Allergies', 'None recorded'),
                   _line('Recent history', 'Mild cold (early Jun) · brief fever after 14-week vaccines'),
-                  _line('Recent reports', '4-month growth summary (12 Jun) — all normal', last: true),
+                  _line('Recent reports', '4-month growth summary (12 Jun) - all normal', last: true),
                 ]),
               )),
 

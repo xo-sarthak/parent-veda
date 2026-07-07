@@ -1,5 +1,5 @@
 // =============================================================================
-//  WatchCategoryScreen — a single category's learning feed
+//  WatchCategoryScreen - a single category's learning feed
 // -----------------------------------------------------------------------------
 //  A calm vertical feed of the videos in one category (e.g. Sleep). Large cards,
 //  learning metadata only. Reached from the Watch home's category chips.

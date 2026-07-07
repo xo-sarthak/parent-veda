@@ -1,9 +1,9 @@
 // =============================================================================
-//  ProductsCompareScreen — Products · compare (parenting · S3·compare v2 premium)
+//  ProductsCompareScreen - Products · compare (parenting · S3·compare v2 premium)
 // -----------------------------------------------------------------------------
 //  Compare as a first-class tool, fully DYNAMIC and fully DIFFERENTIATED: it
-//  reads the two products picked in the Products flow (PpCompareStore) — or a
-//  sensible default pair when opened cold from the Tools hub — and renders every
+//  reads the two products picked in the Products flow (PpCompareStore) - or a
+//  sensible default pair when opened cold from the Tools hub - and renders every
 //  section per-product. Ratings sit up top in each overview; the spec sheet is
 //  built from each product's own specs; and "The ParentVeda take" is one card
 //  PER product with that product's own what's-right / worth-knowing. No generic
@@ -37,7 +37,7 @@ class ProductsCompareScreen extends StatelessWidget {
 
   String _summaryOf(PpProduct p) => p.summary.isNotEmpty ? p.summary : '${p.brand} · ${p.sub}';
 
-  // Each product's spec sheet — its own `specs`, else derived from its fields —
+  // Each product's spec sheet - its own `specs`, else derived from its fields -
   // with the rating appended as its own row (like Warranty), up front in the table.
   Map<String, String> _specsOf(PpProduct p) {
     final m = <String, String>{};
@@ -58,7 +58,7 @@ class ProductsCompareScreen extends StatelessWidget {
   List<String> _prosOf(PpProduct p) {
     if (p.pros.isNotEmpty) return p.pros;
     final l = <String>[];
-    if (p.rating >= 4.6) l.add('Highly rated — ${p.ratingLabel} from ${p.reviews} reviews');
+    if (p.rating >= 4.6) l.add('Highly rated - ${p.ratingLabel} from ${p.reviews} reviews');
     if (p.parentVeda) l.add('Made by ParentVeda');
     if (p.verified) l.add('ParentVeda-verified purchase reviews');
     if (p.bestseller) l.add('A bestseller in its category');
@@ -70,7 +70,7 @@ class ProductsCompareScreen extends StatelessWidget {
     if (p.cons.isNotEmpty) return p.cons;
     final l = <String>[];
     if (p.price >= 2000) l.add('A premium price point');
-    if (p.reviews < 60) l.add('Fewer reviews so far — newer to the shelf');
+    if (p.reviews < 60) l.add('Fewer reviews so far - newer to the shelf');
     if (!p.verified && !p.parentVeda) l.add('Not yet ParentVeda-verified');
     if (l.isEmpty) l.add('Nothing major flagged by parents yet');
     return l;
@@ -119,11 +119,23 @@ class ProductsCompareScreen extends StatelessWidget {
               ]), style: ppFraunces(31, h: 1.12))),
               if (usingDefault) ...[
                 const SizedBox(height: 10),
-                _pad(Text('A sample pair — tick two products in Products to compare your own.',
+                _pad(Text('A sample pair - tick two products in Products to compare your own.',
                     style: ppBody(12, color: ppMuted, h: 1.5))),
               ],
 
-              // overview cards — rating sits up top in each
+              // child context - the comparison is personalised to his stage
+              const SizedBox(height: 14),
+              _pad(Row(children: [
+                const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Comparing ${a.sub.toLowerCase()} for Aarav · 4 months - tuned to his stage.', style: ppBody(12.5, color: ppSoft, h: 1.4))),
+              ])),
+
+              // the differentiator: education BEFORE the comparison
+              const SizedBox(height: 18),
+              _pad(_beforeYouCompare(a)),
+
+              // overview cards - rating sits up top in each
               const SizedBox(height: 22),
               _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(child: _overview(a)),
@@ -138,25 +150,25 @@ class ProductsCompareScreen extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: Column(children: [
                   for (var i = 0; i < specKeys.length; i++)
-                    _specRow(specKeys[i], sa[specKeys[i]] ?? '—', sb[specKeys[i]] ?? '—', last: i == specKeys.length - 1),
+                    _specRow(specKeys[i], sa[specKeys[i]] ?? '-', sb[specKeys[i]] ?? '-', last: i == specKeys.length - 1),
                 ]),
               )),
 
-              // the take — one card PER product
+              // the take - one card PER product
               const SizedBox(height: 28),
               _pad(Text('The ParentVeda take', style: ppJakarta(16))),
               const SizedBox(height: 4),
-              _pad(Text('For each pick, honestly — what works, and what to know.', style: ppBody(12))),
+              _pad(Text('For each pick, honestly - what works, and what to know.', style: ppBody(12))),
               const SizedBox(height: 14),
               _pad(_takeCard(a)),
               const SizedBox(height: 12),
               _pad(_takeCard(b)),
 
-              // community — segregated from the comparison (generalized, but kept)
+              // community - segregated from the comparison (generalized, but kept)
               _pad(ppSectionDivider()),
               _pad(Text('What parents say', style: ppJakarta(16))),
               const SizedBox(height: 4),
-              _pad(Text('Named, verified-mother reviews — the same trust system as every Product page.', style: ppBody(12))),
+              _pad(Text('Named, verified-mother reviews - the same trust system as every Product page.', style: ppBody(12))),
               const SizedBox(height: 14),
               _pad(Row(children: [
                 Expanded(child: _communityStat(a)),
@@ -194,6 +206,64 @@ class ProductsCompareScreen extends StatelessWidget {
     );
   }
 
+  // ---- before you compare (education first - the differentiator) ---------
+  Widget _beforeYouCompare(PpProduct a) {
+    final g = compareGuideFor(a.category);
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF1EAF8), Color(0xFFF6EEF9)]),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.school_outlined, size: 17, color: ppPurple),
+          const SizedBox(width: 8),
+          ppEyebrow('Before you compare', color: ppPurple, spacing: 0.8),
+        ]),
+        const SizedBox(height: 12),
+        Text('What actually matters', style: ppJakarta(14.5)),
+        const SizedBox(height: 9),
+        for (final w in g.whatMatters)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 7),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Padding(padding: EdgeInsets.only(top: 2), child: Icon(Icons.check_circle_outline_rounded, size: 15, color: ppPurple)),
+              const SizedBox(width: 9),
+              Expanded(child: Text(w, style: ppBody(13, color: ppInk, h: 1.5))),
+            ]),
+          ),
+        const SizedBox(height: 6),
+        _guideLine(Icons.remove_circle_outline, 'Often doesn\'t matter', g.oftenSkip),
+        const SizedBox(height: 8),
+        _guideLine(Icons.error_outline_rounded, 'A common mistake', g.mistake),
+        if (g.contextTip != null) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(12)),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
+              const SizedBox(width: 9),
+              Expanded(child: Text(g.contextTip!, style: ppBody(12.5, color: ppInk, h: 1.5))),
+            ]),
+          ),
+        ],
+      ]),
+    );
+  }
+
+  Widget _guideLine(IconData icon, String label, String text) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.only(top: 2), child: Icon(icon, size: 15, color: ppSoft)),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text.rich(TextSpan(children: [
+            TextSpan(text: '$label: ', style: ppBody(13, color: ppInk, w: FontWeight.w700, h: 1.5)),
+            TextSpan(text: text, style: ppBody(13, color: ppSoft, h: 1.5)),
+          ])),
+        ),
+      ]);
+
   // ---- overview (rating prominent, up top) -------------------------------
   Widget _overview(PpProduct p) => Container(
         padding: const EdgeInsets.all(14),
@@ -205,7 +275,7 @@ class ProductsCompareScreen extends StatelessWidget {
           const SizedBox(height: 2),
           Text(p.name, style: ppJakarta(14).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 8),
-          // rating first — it matters most
+          // rating first - it matters most
           Row(children: [
             const Icon(Icons.star_rounded, size: 15, color: ppCoral),
             const SizedBox(width: 3),
@@ -313,7 +383,7 @@ class ProductsCompareScreen extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(
             child: Text.rich(TextSpan(children: [
-              TextSpan(text: '$brand — ', style: ppBody(13, color: ppInk, w: FontWeight.w700, h: 1.5)),
+              TextSpan(text: '$brand - ', style: ppBody(13, color: ppInk, w: FontWeight.w700, h: 1.5)),
               TextSpan(text: text, style: ppBody(13, color: ppInk, h: 1.5)),
             ])),
           ),

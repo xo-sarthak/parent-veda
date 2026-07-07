@@ -1,9 +1,9 @@
 // =============================================================================
-//  ParentVeda Watch — shared UI building blocks
+//  ParentVeda Watch - shared UI building blocks
 // -----------------------------------------------------------------------------
 //  Reusable pieces so every Watch surface reads as one calm, learning-first
 //  system: placeholder thumbnails (with play / duration / progress), the
-//  learning-metadata line (category · age · expert · duration — never social
+//  learning-metadata line (category · age · expert · duration - never social
 //  metrics), and the rail/list video cards. pp-themed, no emojis.
 // =============================================================================
 
@@ -105,7 +105,7 @@ class WatchThumb extends StatelessWidget {
       );
 }
 
-/// The learning-metadata line — category · child age · expert. No social metrics.
+/// The learning-metadata line - category · child age · expert. No social metrics.
 Widget watchMeta(WatchVideo v, {Color color = ppMuted}) => Text(
       '${v.category}  ·  ${v.ageTag}  ·  ${v.expert.name}',
       style: ppBody(11.5, color: color, w: FontWeight.w600),
@@ -123,7 +123,7 @@ Widget watchSectionHeader(String title, {String? action, VoidCallback? onAction}
       ],
     );
 
-/// A rail card (fixed width) — thumbnail + title + meta.
+/// A rail card (fixed width) - thumbnail + title + meta.
 class WatchRailCard extends StatelessWidget {
   const WatchRailCard({super.key, required this.video, required this.onTap, this.width = 230, this.progress});
   final WatchVideo video;
@@ -148,7 +148,7 @@ class WatchRailCard extends StatelessWidget {
       );
 }
 
-/// A wide list card (thumbnail left, text right) — for feeds & "For you".
+/// A wide list card (thumbnail left, text right) - for feeds & "For you".
 class WatchListCard extends StatelessWidget {
   const WatchListCard({super.key, required this.video, required this.onTap, this.progress});
   final WatchVideo video;

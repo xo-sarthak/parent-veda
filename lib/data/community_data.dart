@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Community — seed data (prototype)
+//  ParentVeda Community - seed data (prototype)
 // -----------------------------------------------------------------------------
 //  Pregnancy-adapted seed: cohort / trimester / location communities are
 //  auto-joined; the rest are recommended. NO gender communities during
@@ -11,7 +11,7 @@ import '../models/community_models.dart';
 // Stable id used for the Community Pulse "question of the week" poll.
 const String kPulseKicksPollId = 'pulse_kicks';
 
-/// Specialties a mother can request when she asks for expert verification — so
+/// Specialties a mother can request when she asks for expert verification - so
 /// the request reaches the right kind of doctor (curating the doctor feed).
 const List<String> kVerifySpecialties = [
   'all',
@@ -29,7 +29,7 @@ const List<Community> kCommunities = [
     id: 'nov2026',
     name: 'November 2026 Moms',
     emoji: '🤰',
-    description: 'Mothers due in November 2026, going through it together — week by week.',
+    description: 'Mothers due in November 2026, going through it together - week by week.',
     members: 1284,
     auto: true,
     topics: ['Pregnancy Symptoms', 'Labor', 'Nutrition'],
@@ -38,7 +38,7 @@ const List<Community> kCommunities = [
     id: 'second_tri',
     name: 'Second Trimester',
     emoji: '🌸',
-    description: 'The golden trimester — energy returns, the bump grows, the kicks begin.',
+    description: 'The golden trimester - energy returns, the bump grows, the kicks begin.',
     members: 8640,
     auto: true,
     topics: ['Pregnancy Symptoms', 'Brain Development'],
@@ -47,7 +47,7 @@ const List<Community> kCommunities = [
     id: 'delhi_moms',
     name: 'Delhi Moms',
     emoji: '📍',
-    description: 'Local mothers in Delhi — hospitals, doctors, services and meetups.',
+    description: 'Local mothers in Delhi - hospitals, doctors, services and meetups.',
     members: 5120,
     auto: true,
     topics: ['Labor'],
@@ -57,7 +57,7 @@ const List<Community> kCommunities = [
     id: 'first_time',
     name: 'First Time Moms',
     emoji: '🌷',
-    description: 'Everything is new — ask anything, no question is too small here.',
+    description: 'Everything is new - ask anything, no question is too small here.',
     members: 12400,
     topics: ['Pregnancy Symptoms', 'Labor', 'Breastfeeding'],
   ),
@@ -73,7 +73,7 @@ const List<Community> kCommunities = [
     id: 'working_moms',
     name: 'Working Moms',
     emoji: '💼',
-    description: 'Balancing pregnancy and work — leave, comfort and the road back.',
+    description: 'Balancing pregnancy and work - leave, comfort and the road back.',
     members: 7100,
     topics: ['Pregnancy Symptoms'],
   ),
@@ -81,7 +81,7 @@ const List<Community> kCommunities = [
     id: 'preg_fitness',
     name: 'Pregnancy Fitness',
     emoji: '🧘',
-    description: 'Gentle, safe movement — prenatal yoga, walking and staying strong.',
+    description: 'Gentle, safe movement - prenatal yoga, walking and staying strong.',
     members: 4200,
     topics: ['Pregnancy Fitness'],
   ),
@@ -89,7 +89,7 @@ const List<Community> kCommunities = [
     id: 'breastfeeding_prep',
     name: 'Breastfeeding Prep',
     emoji: '🤱',
-    description: 'Get ready before baby arrives — latch, supply and the first week.',
+    description: 'Get ready before baby arrives - latch, supply and the first week.',
     members: 6800,
     topics: ['Breastfeeding'],
   ),
@@ -97,7 +97,7 @@ const List<Community> kCommunities = [
     id: 'twin_preg',
     name: 'Twin Pregnancy',
     emoji: '👯',
-    description: 'Two at once — extra scans, extra love, and parents who get it.',
+    description: 'Two at once - extra scans, extra love, and parents who get it.',
     members: 1900,
     topics: ['Pregnancy Symptoms'],
   ),
@@ -105,7 +105,7 @@ const List<Community> kCommunities = [
     id: 'high_risk',
     name: 'High Risk Pregnancy',
     emoji: '💗',
-    description: 'Extra care, extra support — a gentle space to share and lean on others.',
+    description: 'Extra care, extra support - a gentle space to share and lean on others.',
     members: 2600,
     topics: ['Pregnancy Symptoms'],
   ),
@@ -113,7 +113,7 @@ const List<Community> kCommunities = [
     id: 'ivf',
     name: 'IVF Pregnancy',
     emoji: '🌱',
-    description: 'The long road that led here — a community that understands the journey.',
+    description: 'The long road that led here - a community that understands the journey.',
     members: 2100,
     topics: ['Pregnancy Symptoms'],
   ),
@@ -187,7 +187,7 @@ const List<CommunityPost> kSeedPosts = [
     communityId: 'breastfeeding_prep',
     author: 'Dr. Meera',
     authorEmoji: '👩‍⚕️',
-    text: 'Lactation tip: start learning the latch positions now — it makes the first week so much easier.',
+    text: 'Lactation tip: start learning the latch positions now - it makes the first week so much easier.',
     type: PostType.expert,
     topics: ['Breastfeeding'],
     likes: 140,
@@ -252,7 +252,7 @@ const List<CommunityPost> kSeedPosts = [
     communityId: 'second_tri',
     author: 'Aishwarya',
     authorEmoji: '🌸',
-    text: 'Halfway there — completed my anomaly scan today and everything looks perfect 💛',
+    text: 'Halfway there - completed my anomaly scan today and everything looks perfect 💛',
     type: PostType.milestone,
     topics: ['Pregnancy Symptoms'],
     likes: 188,
@@ -313,7 +313,7 @@ const List<CommunityPost> kSeedPosts = [
     author: 'Aisha',
     authorEmoji: '🌷',
     text:
-        'My birth story 💕 After a long labour we did skin-to-skin right away and started feeding within the first hour. To every first-time mom reading this — trust your body, it truly knows the way.',
+        'My birth story 💕 After a long labour we did skin-to-skin right away and started feeding within the first hour. To every first-time mom reading this - trust your body, it truly knows the way.',
     type: PostType.milestone,
     topics: ['Labor', 'Breastfeeding'],
     likes: 264,
@@ -323,7 +323,7 @@ const List<CommunityPost> kSeedPosts = [
     endorsedByCred: 'IBCLC',
     expertEndorseCount: 320,
   ),
-  // --- General feed (no community) — your main timeline ---
+  // --- General feed (no community) - your main timeline ---
   CommunityPost(
     id: 'g1',
     communityId: '',
@@ -343,7 +343,7 @@ const List<CommunityPost> kSeedPosts = [
     author: 'Dr. Aarti Desai',
     authorEmoji: '👩‍⚕️',
     text:
-        'Quick iron tip: pair your dal, spinach or beans with something rich in vitamin C (lemon, tomato, orange) and keep tea/coffee away from meals — you absorb a lot more iron that way.',
+        'Quick iron tip: pair your dal, spinach or beans with something rich in vitamin C (lemon, tomato, orange) and keep tea/coffee away from meals - you absorb a lot more iron that way.',
     type: PostType.expert,
     topics: ['Nutrition'],
     likes: 198,
@@ -373,7 +373,7 @@ const List<CommunityPost> kSeedPosts = [
 typedef CommunityExpert = ({String name, String cred, String specialty});
 
 /// The pool of verified experts shown in the "who verified this" sheet.
-/// All fictional — placeholder data until real doctor accounts exist.
+/// All fictional - placeholder data until real doctor accounts exist.
 const List<CommunityExpert> kCommunityExperts = [
   (name: 'Dr. Meera Nair', cred: 'IBCLC', specialty: 'Lactation'),
   (name: 'Dr. Priya Sharma', cred: 'MD', specialty: 'Pediatrics'),
@@ -488,26 +488,26 @@ List<String> inferTopics(String text) {
 
 // ===========================================================================
 //  PARENTING-STAGE communities (post-birth). Kept as their OWN lists so the
-//  pre-birth (pregnancy) feed above stays exactly as it was — the parenting
+//  pre-birth (pregnancy) feed above stays exactly as it was - the parenting
 //  Community screen (post_pregnancy) reads these; interactions (join/like/save/
 //  vote/comment) reuse the same CommunityStore, which is keyed by id. Gender
-//  communities are fine now (unlike during pregnancy). `emoji` is left blank —
+//  communities are fine now (unlike during pregnancy). `emoji` is left blank -
 //  the parenting UI renders monogram/icon avatars, never emojis.
 // ===========================================================================
 const List<Community> kParentingCommunities = [
   // --- Auto-joined for the scenario child (Aarav · 4-mo boy · Delhi NCR) ---
-  Community(id: 'infants_0_1', name: '0–1 Year', emoji: '', description: 'The whole first year — feeding, sleep, milestones and the fourth-trimester fog, together.', members: 14200, auto: true, topics: ['Sleep', 'Feeding', 'Milestones']),
-  Community(id: 'boy_moms', name: 'Boy Moms', emoji: '', description: 'Raising boys — the mess, the cuddles and everything in between.', members: 9800, auto: true, topics: ['Behaviour']),
-  Community(id: 'delhi_parents', name: 'Delhi Parents', emoji: '', description: 'Local parents in Delhi NCR — paediatricians, daycares, classes and meetups.', members: 6400, auto: true, topics: ['Health']),
+  Community(id: 'infants_0_1', name: '0–1 Year', emoji: '', description: 'The whole first year - feeding, sleep, milestones and the fourth-trimester fog, together.', members: 14200, auto: true, topics: ['Sleep', 'Feeding', 'Milestones']),
+  Community(id: 'boy_moms', name: 'Boy Moms', emoji: '', description: 'Raising boys - the mess, the cuddles and everything in between.', members: 9800, auto: true, topics: ['Behaviour']),
+  Community(id: 'delhi_parents', name: 'Delhi Parents', emoji: '', description: 'Local parents in Delhi NCR - paediatricians, daycares, classes and meetups.', members: 6400, auto: true, topics: ['Health']),
   // --- Recommended · the ages that come next ---
-  Community(id: 'ones', name: '1 Year Olds', emoji: '', description: 'First steps, first words, first birthday — life with a one-year-old.', members: 11200, topics: ['Milestones', 'Feeding']),
-  Community(id: 'twos', name: '2 Year Olds', emoji: '', description: 'Big feelings, big words and the famous twos — you are not alone.', members: 10600, topics: ['Behaviour']),
+  Community(id: 'ones', name: '1 Year Olds', emoji: '', description: 'First steps, first words, first birthday - life with a one-year-old.', members: 11200, topics: ['Milestones', 'Feeding']),
+  Community(id: 'twos', name: '2 Year Olds', emoji: '', description: 'Big feelings, big words and the famous twos - you are not alone.', members: 10600, topics: ['Behaviour']),
   Community(id: 'threes', name: '3 Year Olds', emoji: '', description: 'Preschool, endless “why?”, and a little person with big opinions.', members: 7300, topics: ['Behaviour', 'Development']),
-  Community(id: 'toddlers', name: 'Toddler Life', emoji: '', description: 'The 1–3 whirlwind — tantrums, milestones and tiny triumphs.', members: 13400, topics: ['Behaviour', 'Development']),
+  Community(id: 'toddlers', name: 'Toddler Life', emoji: '', description: 'The 1–3 whirlwind - tantrums, milestones and tiny triumphs.', members: 13400, topics: ['Behaviour', 'Development']),
   // --- Topics that only matter once baby is here ---
-  Community(id: 'first_foods', name: 'Starting Solids', emoji: '', description: 'First foods, weaning and fussy eating — recipes and reassurance.', members: 8900, topics: ['Feeding']),
-  Community(id: 'baby_sleep', name: 'Baby Sleep', emoji: '', description: 'Regressions, naps and nights — gentle, no-judgement sleep support.', members: 12800, topics: ['Sleep']),
-  Community(id: 'milestones', name: 'Milestones & Development', emoji: '', description: 'Rolling, sitting, crawling, talking — celebrate and compare notes.', members: 9100, topics: ['Milestones', 'Development']),
+  Community(id: 'first_foods', name: 'Starting Solids', emoji: '', description: 'First foods, weaning and fussy eating - recipes and reassurance.', members: 8900, topics: ['Feeding']),
+  Community(id: 'baby_sleep', name: 'Baby Sleep', emoji: '', description: 'Regressions, naps and nights - gentle, no-judgement sleep support.', members: 12800, topics: ['Sleep']),
+  Community(id: 'milestones', name: 'Milestones & Development', emoji: '', description: 'Rolling, sitting, crawling, talking - celebrate and compare notes.', members: 9100, topics: ['Milestones', 'Development']),
   Community(id: 'working_parents', name: 'Working Parents', emoji: '', description: 'Daycare, nannies, pumping and the juggle of going back to work.', members: 7600, topics: ['Health']),
   Community(id: 'potty', name: 'Potty Training', emoji: '', description: 'When to start, what worked, and surviving the accidents.', members: 4300, topics: ['Behaviour']),
 ];
@@ -523,7 +523,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'baby_sleep',
     author: 'Meera',
     authorEmoji: '',
-    text: 'Night 6 of the 4-month sleep regression. What finally helped us: an earlier bedtime and a darker, more boring room. If you are in it right now — hang in there, it does pass.',
+    text: 'Night 6 of the 4-month sleep regression. What finally helped us: an earlier bedtime and a darker, more boring room. If you are in it right now - hang in there, it does pass.',
     type: PostType.experience,
     topics: ['Sleep'],
     stage: 'Parenting',
@@ -568,7 +568,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'milestones',
     author: 'Dr. Neha Sharma',
     authorEmoji: '',
-    text: 'A reminder from clinic: milestones are a range, not a deadline. Most babies roll between 4 and 6 months, and some skip it entirely and go straight to sitting. Watch the overall trend, not the calendar — and always ask us if something feels off.',
+    text: 'A reminder from clinic: milestones are a range, not a deadline. Most babies roll between 4 and 6 months, and some skip it entirely and go straight to sitting. Watch the overall trend, not the calendar - and always ask us if something feels off.',
     type: PostType.expert,
     topics: ['Milestones', 'Development'],
     stage: 'Parenting',
@@ -610,7 +610,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'infants_0_1',
     author: 'ParentVeda',
     authorEmoji: '',
-    text: 'Leap 5 is around the corner. Here’s what the next developmental leap looks like — and why the fussiness is a good sign.',
+    text: 'Leap 5 is around the corner. Here’s what the next developmental leap looks like - and why the fussiness is a good sign.',
     type: PostType.parentVeda,
     topics: ['Development'],
     stage: 'Parenting',
@@ -636,7 +636,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'working_parents',
     author: 'Simran',
     authorEmoji: '',
-    text: 'Back to work next month and dreading the daycare drop-off. How did you make the transition easier — for the baby and for yourself?',
+    text: 'Back to work next month and dreading the daycare drop-off. How did you make the transition easier - for the baby and for yourself?',
     type: PostType.question,
     topics: ['Health'],
     stage: 'Parenting',
@@ -649,7 +649,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'first_foods',
     author: 'Kavya',
     authorEmoji: '',
-    text: 'Baby-led weaning vs purées — what did you actually end up doing, and would you do it the same way again?',
+    text: 'Baby-led weaning vs purées - what did you actually end up doing, and would you do it the same way again?',
     type: PostType.question,
     topics: ['Feeding'],
     stage: 'Parenting',
@@ -679,7 +679,7 @@ const Map<String, List<CommunityComment>> kParentingComments = {
     CommunityComment(author: 'Priya', emoji: '', text: 'The darker room made the biggest difference for us too. Blackout curtains were worth every rupee.', likes: 7),
   ],
   'pp2': [
-    CommunityComment(author: 'Dr. Neha Sharma', emoji: '', text: 'Totally normal range. If he has good head control and is reaching for things, he is on track — mention it at the 6-month visit and we can check together.', likes: 22),
+    CommunityComment(author: 'Dr. Neha Sharma', emoji: '', text: 'Totally normal range. If he has good head control and is reaching for things, he is on track - mention it at the 6-month visit and we can check together.', likes: 22),
     CommunityComment(author: 'Ritika', emoji: '', text: 'Mine rolled at nearly 6 months and is a happy, busy toddler now. Try not to compare!', likes: 6),
   ],
 };

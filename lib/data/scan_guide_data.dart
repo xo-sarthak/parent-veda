@@ -1,10 +1,10 @@
 // =============================================================================
-//  Scan guides — "What is this scan" + "How to interpret the report"
+//  Scan guides - "What is this scan" + "How to interpret the report"
 // -----------------------------------------------------------------------------
 //  Keyed by the medical milestone id (see journey_milestones.dart). Each guide
 //  adds, to a scan's detail page: a plain-language "what is this scan" intro, and
 //  a "how to interpret the report" glossary (the terms a mother sees on her
-//  report and what they mean — the WHOLE picture, not half-knowledge).
+//  report and what they mean - the WHOLE picture, not half-knowledge).
 //
 //  EDUCATIONAL ONLY. This is general information to help a mother understand her
 //  own report; it is NOT a diagnosis and never replaces her doctor. The detail
@@ -34,8 +34,8 @@ const Map<String, ScanGuide> kScanGuides = {
   // ---------------------------------------------------------------------------
   'm_ultrasound': ScanGuide(
     whatIs: LocalizedText(
-      en: "Your first ultrasound (a 'dating' or 'viability' scan) is usually done between about 6 and 9 weeks. A small probe shows your baby in the womb — it confirms the pregnancy is in the right place, looks for a heartbeat, sees how many babies there are, and measures your baby to work out an accurate due date.",
-      hi: "Aapka pehla ultrasound ('dating' ya 'viability' scan) aam taur par karib 6 se 9 hafte ke beech hota hai. Ek chhota probe aapke baby ko garbh mein dikhata hai — yeh confirm karta hai ki pregnancy sahi jagah hai, dhadkan dekhta hai, kitne baby hain yeh dekhta hai, aur sahi due date ke liye baby ko naapta hai.",
+      en: "Your first ultrasound (a 'dating' or 'viability' scan) is usually done between about 6 and 9 weeks. A small probe shows your baby in the womb - it confirms the pregnancy is in the right place, looks for a heartbeat, sees how many babies there are, and measures your baby to work out an accurate due date.",
+      hi: "Aapka pehla ultrasound ('dating' ya 'viability' scan) aam taur par karib 6 se 9 hafte ke beech hota hai. Ek chhota probe aapke baby ko garbh mein dikhata hai - yeh confirm karta hai ki pregnancy sahi jagah hai, dhadkan dekhta hai, kitne baby hain yeh dekhta hai, aur sahi due date ke liye baby ko naapta hai.",
     ),
     interpret: [
       ScanInterpretRow(
@@ -79,8 +79,8 @@ const Map<String, ScanGuide> kScanGuides = {
   // ---------------------------------------------------------------------------
   'm_nt': ScanGuide(
     whatIs: LocalizedText(
-      en: "The NT (nuchal translucency) scan is done between 11 and 14 weeks. It measures a small pocket of fluid at the back of your baby's neck. With a blood test (the 'combined' or 'double marker' test) and your age, it gives a CHANCE for conditions like Down's syndrome. A newer blood test, NIPT, can also be offered. These are SCREENING tests — they give a likelihood, not a diagnosis.",
-      hi: "NT (nuchal translucency) scan 11 se 14 hafte ke beech hota hai. Yeh baby ki gardan ke peechhe ke dravya ko naapta hai. Ek blood test ('combined' ya 'double marker' test) aur aapki umar ke saath, yeh Down's syndrome jaisi cheezon ki SAMBHAVNA batata hai. Ek naya blood test, NIPT, bhi offer ho sakta hai. Ye SCREENING test hain — ye sambhavna batate hain, diagnosis nahi.",
+      en: "The NT (nuchal translucency) scan is done between 11 and 14 weeks. It measures a small pocket of fluid at the back of your baby's neck. With a blood test (the 'combined' or 'double marker' test) and your age, it gives a CHANCE for conditions like Down's syndrome. A newer blood test, NIPT, can also be offered. These are SCREENING tests - they give a likelihood, not a diagnosis.",
+      hi: "NT (nuchal translucency) scan 11 se 14 hafte ke beech hota hai. Yeh baby ki gardan ke peechhe ke dravya ko naapta hai. Ek blood test ('combined' ya 'double marker' test) aur aapki umar ke saath, yeh Down's syndrome jaisi cheezon ki SAMBHAVNA batata hai. Ek naya blood test, NIPT, bhi offer ho sakta hai. Ye SCREENING test hain - ye sambhavna batate hain, diagnosis nahi.",
     ),
     interpret: [
       ScanInterpretRow(
@@ -92,8 +92,8 @@ const Map<String, ScanGuide> kScanGuides = {
       ScanInterpretRow(
         LocalizedText(en: 'Nasal bone', hi: 'Nasal bone'),
         LocalizedText(
-            en: 'Present or absent. An absent nasal bone can slightly raise the calculated chance — on its own it is not a diagnosis.',
-            hi: 'Maujood ya gair-maujood. Nasal bone na hona sambhavna thodi badha sakta hai — akele mein yeh diagnosis nahi hai.'),
+            en: 'Present or absent. An absent nasal bone can slightly raise the calculated chance - on its own it is not a diagnosis.',
+            hi: 'Maujood ya gair-maujood. Nasal bone na hona sambhavna thodi badha sakta hai - akele mein yeh diagnosis nahi hai.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'Free β-hCG / PAPP-A', hi: 'Free β-hCG / PAPP-A'),
@@ -131,14 +131,14 @@ const Map<String, ScanGuide> kScanGuides = {
       ScanInterpretRow(
         LocalizedText(en: 'Amniotic fluid (AFI / liquor)', hi: 'Amniotic fluid (AFI / liquor)'),
         LocalizedText(
-            en: 'The fluid around your baby — reported as normal, increased or reduced.',
-            hi: 'Baby ke aas-paas ka dravya — normal, zyada ya kam bataya jaata hai.'),
+            en: 'The fluid around your baby - reported as normal, increased or reduced.',
+            hi: 'Baby ke aas-paas ka dravya - normal, zyada ya kam bataya jaata hai.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'Biometry (BPD, HC, AC, FL)', hi: 'Biometry (BPD, HC, AC, FL)'),
         LocalizedText(
             en: 'Head, abdomen and thigh-bone measurements used to track growth and estimate weight.',
-            hi: 'Sir, pet aur jaangh-haddi ki naap — growth track karne aur wazan ka andaaza lagaane ke liye.'),
+            hi: 'Sir, pet aur jaangh-haddi ki naap - growth track karne aur wazan ka andaaza lagaane ke liye.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'Soft markers', hi: 'Soft markers'),
@@ -170,14 +170,14 @@ const Map<String, ScanGuide> kScanGuides = {
       ScanInterpretRow(
         LocalizedText(en: 'Normal vs raised', hi: 'Normal vs raised'),
         LocalizedText(
-            en: 'Values within the lab range are reassuring. Raised values may mean gestational diabetes — very manageable with diet, monitoring and sometimes medication.',
-            hi: 'Lab range ke andar values aashwasan deti hain. Zyada values gestational diabetes dikha sakti hain — diet, monitoring aur kabhi dawa se aasaani se sambhalti hai.'),
+            en: 'Values within the lab range are reassuring. Raised values may mean gestational diabetes - very manageable with diet, monitoring and sometimes medication.',
+            hi: 'Lab range ke andar values aashwasan deti hain. Zyada values gestational diabetes dikha sakti hain - diet, monitoring aur kabhi dawa se aasaani se sambhalti hai.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'HbA1c', hi: 'HbA1c'),
         LocalizedText(
-            en: 'Sometimes checked — it reflects your average blood sugar over recent weeks.',
-            hi: 'Kabhi check hota hai — yeh pichhle hafton ki average blood sugar dikhata hai.'),
+            en: 'Sometimes checked - it reflects your average blood sugar over recent weeks.',
+            hi: 'Kabhi check hota hai - yeh pichhle hafton ki average blood sugar dikhata hai.'),
       ),
     ],
   ),
@@ -203,8 +203,8 @@ const Map<String, ScanGuide> kScanGuides = {
       ScanInterpretRow(
         LocalizedText(en: 'AFI / liquor', hi: 'AFI / liquor'),
         LocalizedText(
-            en: 'The amount of fluid around your baby — reported normal, increased or reduced.',
-            hi: 'Baby ke aas-paas dravya ki maatra — normal, zyada ya kam bataai jaati hai.'),
+            en: 'The amount of fluid around your baby - reported normal, increased or reduced.',
+            hi: 'Baby ke aas-paas dravya ki maatra - normal, zyada ya kam bataai jaati hai.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'Doppler (PI / RI)', hi: 'Doppler (PI / RI)'),
@@ -230,8 +230,8 @@ const Map<String, ScanGuide> kScanGuides = {
       ScanInterpretRow(
         LocalizedText(en: 'Positive / carrier', hi: 'Positive / carrier'),
         LocalizedText(
-            en: "GBS was found. It's common and not an infection in you — you'd simply be offered antibiotics in labour as a precaution.",
-            hi: 'GBS mila. Yeh aam hai aur aapme infection nahi — bas ehtiyaat ke taur par labour mein antibiotics offer kiye jaate hain.'),
+            en: "GBS was found. It's common and not an infection in you - you'd simply be offered antibiotics in labour as a precaution.",
+            hi: 'GBS mila. Yeh aam hai aur aapme infection nahi - bas ehtiyaat ke taur par labour mein antibiotics offer kiye jaate hain.'),
       ),
       ScanInterpretRow(
         LocalizedText(en: 'Negative', hi: 'Negative'),

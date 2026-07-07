@@ -1,5 +1,5 @@
 // =============================================================================
-//  SplashScreen — the launch screen ("Warm Nest" Direction B)
+//  SplashScreen - the launch screen ("Warm Nest" Direction B)
 // -----------------------------------------------------------------------------
 //  The first thing shown when the app opens: the ParentVeda mark on a soft
 //  lavender→blush gradient with the "Nurturing wisdom" tagline, gently fading
@@ -20,7 +20,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/remote/sync_registry.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
-// father_daily_screen import parked — the paired father now lands on the unified
+// father_daily_screen import parked - the paired father now lands on the unified
 // MainScaffold (father mode), not the standalone Father Daily screen.
 // import 'father/father_daily_screen.dart';
 import 'main_scaffold.dart';
@@ -109,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
             FadeTransition(opacity: anim, child: child),
       );
 
-  // Father (paired partner) lands on the SAME shell as the mother — the unified
+  // Father (paired partner) lands on the SAME shell as the mother - the unified
   // father (Slate) MainScaffold, so both entry points share one structure.
   Route<void> _fatherRoute() => PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 450),

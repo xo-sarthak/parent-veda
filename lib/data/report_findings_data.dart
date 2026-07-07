@@ -1,9 +1,9 @@
 // =============================================================================
-//  Understanding Your Report™  — curated seed
+//  Understanding Your Report™  - curated seed
 // -----------------------------------------------------------------------------
 //  Calm, reassurance-first explainers for the most common scan/test findings
-//  (all six "popular topics" + several more). GENERAL educational guidance — not
-//  a diagnosis, not a prediction — written to leave a worried mother CALMER, per
+//  (all six "popular topics" + several more). GENERAL educational guidance - not
+//  a diagnosis, not a prediction - written to leave a worried mother CALMER, per
 //  the spec's writing rules (never "dangerous/serious/fatal"; "what does this
 //  mean?" before "what are the risks?"). Needs medical review before the long
 //  tail is expanded to the full ~27-condition launch list.
@@ -82,7 +82,7 @@ final List<ReportFinding> kReportFindings = [
     altName: _t('Nuchal Cord'),
     weekFrom: 36,
     whatItMeans: _t(
-        'This means the umbilical cord is looped around the baby\'s neck. Scans often pick this up, and in most pregnancies it does not cause problems — the cord is built to keep delivering oxygen.'),
+        'This means the umbilical cord is looped around the baby\'s neck. Scans often pick this up, and in most pregnancies it does not cause problems - the cord is built to keep delivering oxygen.'),
     howCommon: _t(
         'A nuchal cord is a frequent scan finding, especially closer to term. Many babies are born safely with a cord around the neck.'),
     whatNext: _t(
@@ -154,7 +154,7 @@ final List<ReportFinding> kReportFindings = [
     whatItMeans: _t(
         'This means your blood pressure is raised during pregnancy, sometimes with other signs that your body needs closer attention. It is something doctors watch carefully and manage step by step.'),
     howCommon: _t(
-        'It is a recognised pregnancy finding that care teams screen for at routine visits — which is why your blood pressure and urine are checked each time.'),
+        'It is a recognised pregnancy finding that care teams screen for at routine visits - which is why your blood pressure and urine are checked each time.'),
     whatNext: _t(
         'Your doctor will monitor your blood pressure more closely, may run some tests, and will guide the timing and plan for a safe delivery. Rest and follow-up visits are usually part of this.'),
     questions: _l([
@@ -266,7 +266,7 @@ final List<ReportFinding> kReportFindings = [
     id: 'anemia',
     name: _t('Anemia During Pregnancy'),
     whatItMeans: _t(
-        'This means your blood has fewer healthy red cells or less iron than ideal — common in pregnancy as your body makes more blood for your baby. It is usually straightforward to improve.'),
+        'This means your blood has fewer healthy red cells or less iron than ideal - common in pregnancy as your body makes more blood for your baby. It is usually straightforward to improve.'),
     howCommon: _t(
         'Mild anemia is very common in pregnancy and is picked up by routine blood tests.'),
     whatNext: _t(
@@ -292,14 +292,14 @@ final List<ReportFinding> kReportFindings = [
     howCommon: _t(
         'Many mothers notice changes in movement at some point. It is one of the most common reasons for a quick reassurance check.'),
     whatNext: _t(
-        'If you ever feel reduced movements, contact your doctor or hospital — they will check your baby, often with a simple heartbeat or monitoring test. It is always okay to get checked.'),
+        'If you ever feel reduced movements, contact your doctor or hospital - they will check your baby, often with a simple heartbeat or monitoring test. It is always okay to get checked.'),
     questions: _l([
       'What is the best way to monitor movements?',
       'When exactly should I call you?',
       'Can I come in for a reassurance check?',
     ]),
     remember: _l([
-      'Always get reduced movements checked — never wait it out.',
+      'Always get reduced movements checked - never wait it out.',
       'A reassurance check is quick and very common.',
       'You know your baby\'s usual pattern best.',
     ]),
@@ -310,7 +310,7 @@ final List<ReportFinding> kReportFindings = [
     name: _t('Braxton Hicks Contractions'),
     weekFrom: 20,
     whatItMeans: _t(
-        'This means you are feeling practice contractions — your uterus tightening and relaxing as it prepares for labour. They are usually irregular and ease off with rest or a change of position.'),
+        'This means you are feeling practice contractions - your uterus tightening and relaxing as it prepares for labour. They are usually irregular and ease off with rest or a change of position.'),
     howCommon: _t(
         'Braxton Hicks are a very common, normal part of the second half of pregnancy.'),
     whatNext: _t(
@@ -335,7 +335,7 @@ final List<ReportFinding> kReportFindings = [
     whatItMeans: _t(
         'This means your blood pressure is higher than usual during pregnancy. It is something your care team watches closely and manages step by step.'),
     howCommon: _t(
-        'Raised blood pressure is a recognised pregnancy finding — which is why it is checked at every routine visit.'),
+        'Raised blood pressure is a recognised pregnancy finding - which is why it is checked at every routine visit.'),
     whatNext: _t(
         'Your doctor will monitor your readings more often, may suggest some rest and a few tests, and will guide you on what to watch for. Many mothers manage it well with regular follow-up.'),
     questions: _l([
@@ -357,7 +357,7 @@ final List<ReportFinding> kReportFindings = [
     weekFrom: 28,
     weekTo: 36,
     whatItMeans: _t(
-        'This is good news — a placenta that was earlier sitting low has now moved upward, away from the cervix, as the uterus grew. This is exactly what usually happens.'),
+        'This is good news - a placenta that was earlier sitting low has now moved upward, away from the cervix, as the uterus grew. This is exactly what usually happens.'),
     howCommon: _t(
         'Most low-lying placentas resolve this way by the later scans. It is the common, expected outcome.'),
     whatNext: _t(
@@ -455,7 +455,7 @@ final List<ReportFinding> kReportFindings = [
     howCommon: _t(
         'This is a recognised early-pregnancy event, noticed more often now that scans are done so early.'),
     whatNext: _t(
-        'Your doctor will continue caring for your ongoing pregnancy as usual. It is natural to have mixed feelings — please be gentle with yourself.'),
+        'Your doctor will continue caring for your ongoing pregnancy as usual. It is natural to have mixed feelings - please be gentle with yourself.'),
     questions: _l([
       'Does this affect my continuing baby?',
       'Is any extra monitoring needed?',
@@ -568,11 +568,11 @@ final List<ReportFinding> kReportFindings = [
     weekFrom: 18,
     weekTo: 22,
     whatItMeans: _t(
-        'This means the scan noted one or more "soft markers" — small, subtle features that are usually harmless variations. They are not abnormalities in themselves.'),
+        'This means the scan noted one or more "soft markers" - small, subtle features that are usually harmless variations. They are not abnormalities in themselves.'),
     howCommon: _t(
         'Soft markers are seen on many routine anomaly scans. On their own, most are of no concern.'),
     whatNext: _t(
-        'Your doctor will look at any marker in the context of your whole scan and earlier tests, and explain whether anything further is helpful — often it is not.'),
+        'Your doctor will look at any marker in the context of your whole scan and earlier tests, and explain whether anything further is helpful - often it is not.'),
     questions: _l([
       'Which soft marker was seen?',
       'Are the rest of my scan and screening normal?',
@@ -591,7 +591,7 @@ final List<ReportFinding> kReportFindings = [
     weekFrom: 8,
     weekTo: 20,
     whatItMeans: _t(
-        'This means there are one or more fibroids — non-cancerous growths of muscle in the wall of the uterus. Many women have them, and most pregnancies with fibroids progress smoothly.'),
+        'This means there are one or more fibroids - non-cancerous growths of muscle in the wall of the uterus. Many women have them, and most pregnancies with fibroids progress smoothly.'),
     howCommon: _t(
         'Fibroids are common, and are often noticed for the first time on a pregnancy scan. The majority cause no trouble during pregnancy.'),
     whatNext: _t(
@@ -638,7 +638,7 @@ final List<ReportFinding> kReportFindings = [
     altName: _t('Rh Negative Blood'),
     weekFrom: 28,
     whatItMeans: _t(
-        'This means your blood type is Rh-negative. It is completely normal — it just means your doctor takes a simple, routine step to protect your future pregnancies.'),
+        'This means your blood type is Rh-negative. It is completely normal - it just means your doctor takes a simple, routine step to protect your future pregnancies.'),
     howCommon: _t(
         'Being Rh-negative is common and well understood. The care for it is straightforward and routine.'),
     whatNext: _t(

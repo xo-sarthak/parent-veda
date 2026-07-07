@@ -1,5 +1,5 @@
 // =============================================================================
-//  UpcomingSection  —  "Coming Up" below the map
+//  UpcomingSection  -  "Coming Up" below the map
 // -----------------------------------------------------------------------------
 //  Shows the next not-yet-reached milestone in each category (medical,
 //  achievement, baby development, feature unlock) with how far away it is.

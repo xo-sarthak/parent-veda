@@ -1,9 +1,9 @@
 // =============================================================================
-//  FatherReadAloudScreen — the father's "Read to baby" tab (Slate)
+//  FatherReadAloudScreen - the father's "Read to baby" tab (Slate)
 // -----------------------------------------------------------------------------
 //  Same 4-tab structure as the mother's Samvad (Affirmations & Blessings ·
 //  Stories & Fables · Mantras & Lullabies · Spiritual Reading), in the Slate
-//  father skin. The father CANNOT customize — Spiritual mirrors whatever the
+//  father skin. The father CANNOT customize - Spiritual mirrors whatever the
 //  mother has chosen (read-only). Everything is the same as the mother's except
 //  Affirmations & Blessings, which draws from a distinct father slice.
 //  Embedded as a tab → no back button, bottom padding clears the floating pill.
@@ -76,7 +76,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
                       style: fatherSerif(26, weight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   Text(
-                      "The same words she's reading — say them aloud to the bump. Your voice is one they already know.",
+                      "The same words she's reading - say them aloud to the bump. Your voice is one they already know.",
                       style: _body(13, c: kFMuted)),
                 ],
               ),
@@ -155,7 +155,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
           ),
       ];
 
-  // Spiritual — mirrors the mother's chosen traditions (father can't customize).
+  // Spiritual - mirrors the mother's chosen traditions (father can't customize).
   List<_FSP> _spiritual() {
     final out = <_FSP>[];
     for (final tr in kSpiritualTraditions) {
@@ -197,7 +197,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
                     border: Border.all(color: kFLine),
                   ),
                   child: Text(
-                      "Nothing chosen yet — she picks the spiritual reading in her app, and it shows up here for you.",
+                      "Nothing chosen yet - she picks the spiritual reading in her app, and it shows up here for you.",
                       style: _body(14, c: kFInk)),
                 ),
               ],

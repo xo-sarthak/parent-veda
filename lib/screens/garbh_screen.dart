@@ -1,9 +1,9 @@
 // =============================================================================
-//  Garbh Sanskar Journey v2.0 — a daily 5-ritual companion (Tools)
+//  Garbh Sanskar Journey v2.0 - a daily 5-ritual companion (Tools)
 // -----------------------------------------------------------------------------
-//  Not a content library — a 5–15 minute daily pregnancy ritual. The home is
+//  Not a content library - a 5–15 minute daily pregnancy ritual. The home is
 //  "Today": greeting, week/day, baby size, progress (N/5) and a streak, then the
-//  five pillars — Shravan (sound), Vichara (mindset), Samvad (connection),
+//  five pillars - Shravan (sound), Vichara (mindset), Samvad (connection),
 //  Kriya (movement & breath), Ahara (nourishment). Each is trimester-aware and
 //  answers "what to do / why it matters / how long", with a completion tick.
 // =============================================================================
@@ -23,7 +23,7 @@ import '../services/read_to_baby_store.dart';
 import '../services/samvad_pool.dart';
 import '../theme/app_theme.dart';
 import '../widgets/cards/raga_player.dart';
-// TalkComposerScreen parked — the Samvad record/write composer was removed when
+// TalkComposerScreen parked - the Samvad record/write composer was removed when
 // "Read to your baby" folded into Samvad. Kept commented for revert.
 // import 'home_detail_screens.dart' show TalkComposerScreen;
 import 'tools/ask_veda_screen.dart';
@@ -90,7 +90,7 @@ class GarbhScreen extends StatelessWidget {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
 
-    // Tools Garbh Sanskar = a calm LIBRARY (NO "today" framing — that lives only
+    // Tools Garbh Sanskar = a calm LIBRARY (NO "today" framing - that lives only
     // in the daily Garbh section on Home). Intro → four pillar tiles → each opens
     // the FULL repository of that pillar (daily == false).
     final pillars = <({String id, String name, String desc})>[
@@ -109,7 +109,7 @@ class GarbhScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
         children: [
-          // Intro — what Garbh Sanskar is + why it matters (no kicker/title hero,
+          // Intro - what Garbh Sanskar is + why it matters (no kicker/title hero,
           // no raga "video" hero, no progress/streak, no "today's rituals").
           Text(s.garbhSanskar,
               style: GoogleFonts.fraunces(
@@ -158,7 +158,7 @@ class GarbhScreen extends StatelessWidget {
   }
 }
 
-// A plain library tile (name + description) — no done-tick, no "today's todo".
+// A plain library tile (name + description) - no done-tick, no "today's todo".
 class _LibraryTile extends StatelessWidget {
   const _LibraryTile(
       {required this.id,
@@ -219,7 +219,7 @@ class _LibraryTile extends StatelessWidget {
   }
 }
 
-// The design's calm raga/breathing hero — no longer on the Tools hub (kept for
+// The design's calm raga/breathing hero - no longer on the Tools hub (kept for
 // revert).
 // ignore: unused_element
 class _RagaHero extends StatelessWidget {
@@ -292,7 +292,7 @@ class _RagaHero extends StatelessWidget {
   }
 }
 
-// Today's progress/streak — only on the daily Garbh (Home); kept for revert.
+// Today's progress/streak - only on the daily Garbh (Home); kept for revert.
 // ignore: unused_element
 class _ProgressCard extends StatelessWidget {
   const _ProgressCard({required this.done, required this.streak, required this.s});
@@ -354,7 +354,7 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
-// Old "today's ritual" card (done-tick + todo) — replaced by _LibraryTile on the
+// Old "today's ritual" card (done-tick + todo) - replaced by _LibraryTile on the
 // Tools hub; kept for revert.
 // ignore: unused_element
 class _PillarCard extends StatelessWidget {
@@ -518,7 +518,7 @@ class _LearnMore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    // Ask Veda is live — open it (it can pull the whole app for guidance).
+    // Ask Veda is live - open it (it can pull the whole app for guidance).
     return Align(
       alignment: Alignment.centerLeft,
       child: TextButton.icon(
@@ -533,7 +533,7 @@ class _LearnMore extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Pillar 1 — Shravan
+//  Pillar 1 - Shravan
 // ===========================================================================
 
 class ShravanScreen extends StatelessWidget {
@@ -650,7 +650,7 @@ class _ShravanHero extends StatelessWidget {
   }
 }
 
-// A single raga's detail in the Tools library (player only — no mark-complete).
+// A single raga's detail in the Tools library (player only - no mark-complete).
 class _ShravanDetailScreen extends StatelessWidget {
   const _ShravanDetailScreen({required this.audio, required this.controller});
   final GarbhAudio audio;
@@ -678,7 +678,7 @@ class _ShravanDetailScreen extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Pillar 2 — Vichara (3 tabs)
+//  Pillar 2 - Vichara (3 tabs)
 // ===========================================================================
 
 class VicharaScreen extends StatelessWidget {
@@ -796,7 +796,7 @@ class _BrainTab extends StatelessWidget {
   final PregnancyController controller;
 
   /// In the Tools library (daily == false), finishing a game does NOT mark the
-  /// Vichara ritual done — it's just play.
+  /// Vichara ritual done - it's just play.
   final bool daily;
   @override
   Widget build(BuildContext context) {
@@ -830,7 +830,7 @@ class _BrainTab extends StatelessWidget {
               TextButton(
                 // Opens the real game; in DAILY mode finishing marks Vichara done
                 // (inside each game). In the Tools library (daily=false) it does
-                // not — it's just play. (gsPuzzleSoon kept for revert.)
+                // not - it's just play. (gsPuzzleSoon kept for revert.)
                 onPressed: () => _push(
                     context, _gameFor(p, controller, markComplete: daily)),
                 child: Text(s.gsStart),
@@ -938,7 +938,7 @@ class _VicharaReader extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Pillar 3 — Samvad
+//  Pillar 3 - Samvad
 // ===========================================================================
 
 class SamvadScreen extends StatefulWidget {
@@ -978,7 +978,7 @@ class _SamvadScreenState extends State<SamvadScreen>
     final s = S(widget.controller.language);
     // Vichara-style: 4 fixed tabs, one section each. Daily = one piece per tab;
     // Tools = the full library per tab. (The old vertical customize-feed scroll
-    // is replaced; category on/off is gone — only Spiritual keeps a chooser.)
+    // is replaced; category on/off is gone - only Spiritual keeps a chooser.)
     return Scaffold(
       backgroundColor: _cream,
       appBar: AppBar(
@@ -1051,7 +1051,7 @@ class _SamvadScreenState extends State<SamvadScreen>
           ),
       ];
 
-  // Spiritual reading — only from the traditions/sections the mother enabled.
+  // Spiritual reading - only from the traditions/sections the mother enabled.
   List<_SP> _spiritualPieces() {
     final out = <_SP>[];
     for (final tr in kSpiritualTraditions) {
@@ -1243,7 +1243,7 @@ class _SamvadScreenState extends State<SamvadScreen>
       ]);
 
   // -------------------------------------------------------------------------
-  //  Customize sheet — the single owner of "read to your baby" preferences.
+  //  Customize sheet - the single owner of "read to your baby" preferences.
   //  Ported from the old mother ReadModule; this is now the mother's ONLY
   //  control, and the source the father's daily card mirrors (he has none).
   // -------------------------------------------------------------------------
@@ -1288,7 +1288,7 @@ class _SamvadScreenState extends State<SamvadScreen>
                         style: const TextStyle(fontSize: 13, color: _muted)),
                   ),
                   const SizedBox(height: 10),
-                  // Spiritual-only customization now (category on/off retired —
+                  // Spiritual-only customization now (category on/off retired -
                   // the 4 sections are fixed tabs). _catTile kept for revert.
                   Align(
                     alignment: Alignment.centerLeft,
@@ -1408,7 +1408,7 @@ class _SamvadScreenState extends State<SamvadScreen>
   }
 }
 
-// Parked — only used by the removed Samvad record/write composer. Kept for revert.
+// Parked - only used by the removed Samvad record/write composer. Kept for revert.
 // ignore: unused_element
 class _MemorySavedScreen extends StatelessWidget {
   const _MemorySavedScreen({required this.controller});
@@ -1447,7 +1447,7 @@ class _MemorySavedScreen extends StatelessWidget {
 }
 
 // ===========================================================================
-//  Pillar 4 — Kriya
+//  Pillar 4 - Kriya
 // ===========================================================================
 
 class KriyaScreen extends StatelessWidget {
@@ -1682,7 +1682,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
               if (widget.daily) GarbhStore.instance.markDone('kriya');
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${s.gsWellDone} — ${s.gsWellDoneBody}')),
+                SnackBar(content: Text('${s.gsWellDone} - ${s.gsWellDoneBody}')),
               );
             },
             child: Text(s.gsFinish),
@@ -1694,7 +1694,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
 }
 
 // ===========================================================================
-//  Pillar 5 — Ahara
+//  Pillar 5 - Ahara
 // ===========================================================================
 
 class AharaScreen extends StatelessWidget {

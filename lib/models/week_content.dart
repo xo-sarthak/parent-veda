@@ -1,7 +1,7 @@
 // =============================================================================
 //  WeekContent model (rich, bilingual)
 // -----------------------------------------------------------------------------
-//  Parses lib/data/weekContent.json — the richer PDF-derived schema, with every
+//  Parses lib/data/weekContent.json - the richer PDF-derived schema, with every
 //  text leaf as a {en, hi} LocalizedText. Null-safe throughout.
 // =============================================================================
 
@@ -192,7 +192,7 @@ class GarbhSanskar {
   factory GarbhSanskar.fromJson(Map? j) {
     j ??= {};
     return GarbhSanskar(
-      raga: _s(j['raga'], '—'),
+      raga: _s(j['raga'], '-'),
       affirmation: _loc(j['affirmation']),
       reflectionPrompt: _loc(j['reflectionPrompt']),
       spokenLine: j['spokenLine'] == null ? null : _loc(j['spokenLine']),

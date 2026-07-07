@@ -1,5 +1,5 @@
 // =============================================================================
-//  PvTabBar — the floating pill bottom navigation ("Warm Nest" / Direction B)
+//  PvTabBar - the floating pill bottom navigation ("Warm Nest" / Direction B)
 // -----------------------------------------------------------------------------
 //  A detached, rounded white bar that floats above the content. The active tab
 //  expands into a purple pill showing icon + label; inactive tabs are icon-only.
@@ -33,7 +33,7 @@ class PvTabBar extends StatelessWidget {
   /// In Dad (father-preview) mode the bar takes the father Slate palette.
   final bool father;
 
-  // Father (Slate) accents — mirror the Father Daily / father_skin palette.
+  // Father (Slate) accents - mirror the Father Daily / father_skin palette.
   static const Color _fAccent = Color(0xFF2E5266);
   static const Color _fMuted = Color(0xFF6A7B82);
 

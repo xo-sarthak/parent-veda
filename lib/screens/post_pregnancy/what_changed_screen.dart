@@ -1,5 +1,5 @@
 // =============================================================================
-//  WhatChangedScreen — Tools · "What Changed?" diagnostic (parenting · S22a v2)
+//  WhatChangedScreen - Tools · "What Changed?" diagnostic (parenting · S22a v2)
 // -----------------------------------------------------------------------------
 //  A ParentVeda original: something suddenly different with the baby? A guided
 //  5-step questionnaire (Diet · Sleep · Home · Illness · Mood), shown as an
@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 
 import 'article_reader_screen.dart';
 import 'pp_common.dart';
+import 'pp_products_data.dart';
 import 'problem_solver_screen.dart';
 import 'product_detail_screen.dart';
 import 'remedy_detail_screen.dart';
@@ -31,11 +32,11 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
   final List<int?> _answers = List<int?>.filled(5, null);
 
   static const List<(String, IconData, String, List<String>)> _steps = [
-    ('Diet', Icons.restaurant_outlined, 'Any recent change to feeds or new foods?', ['Yes — a new food or formula', 'Weaning or dropping a feed', "No, feeding's the same"]),
-    ('Sleep', Icons.bedtime_outlined, 'Has his sleep routine or schedule shifted?', ['Yes — travel or a new routine', 'Naps got shorter or longer', "No, the routine's the same"]),
-    ('Home', Icons.home_outlined, 'Anything different at home lately?', ['Yes — travel, guests, or a move', 'A room or temperature change', "No, nothing's changed"]),
-    ('Illness', Icons.medical_services_outlined, 'Any recent signs of a cold, fever, or teething?', ['Yes — a runny nose or cough', 'Drooling, hands in mouth', 'No — he seems physically well']),
-    ('Mood', Icons.favorite_border, 'More clingy, fussy, or seeking you out?', ['Yes — much clingier than usual', 'A bit, on and off', "No, he's his usual self"]),
+    ('Diet', Icons.restaurant_outlined, 'Any recent change to feeds or new foods?', ['Yes - a new food or formula', 'Weaning or dropping a feed', "No, feeding's the same"]),
+    ('Sleep', Icons.bedtime_outlined, 'Has his sleep routine or schedule shifted?', ['Yes - travel or a new routine', 'Naps got shorter or longer', "No, the routine's the same"]),
+    ('Home', Icons.home_outlined, 'Anything different at home lately?', ['Yes - travel, guests, or a move', 'A room or temperature change', "No, nothing's changed"]),
+    ('Illness', Icons.medical_services_outlined, 'Any recent signs of a cold, fever, or teething?', ['Yes - a runny nose or cough', 'Drooling, hands in mouth', 'No - he seems physically well']),
+    ('Mood', Icons.favorite_border, 'More clingy, fussy, or seeking you out?', ['Yes - much clingier than usual', 'A bit, on and off', "No, he's his usual self"]),
   ];
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
@@ -261,7 +262,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
                 const SizedBox(height: 14),
                 Text('The 4-month sleep regression', style: ppFraunces(24, h: 1.15)),
                 const SizedBox(height: 10),
-                Text('Sleep and development shifted together, with no physical cause — the classic Leap 4 pattern.',
+                Text('Sleep and development shifted together, with no physical cause - the classic Leap 4 pattern.',
                     style: ppBody(14, h: 1.6)),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 18), child: SizedBox(height: 1, child: ColoredBox(color: Color(0xFFEAE1F2)))),
                 ppEyebrow('What to do tonight', color: ppPurple, spacing: 0.8),
@@ -289,7 +290,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
               _railCard(context, Icons.brightness_4_outlined, 'Wonder Week', "Aarav's Leap 4 window", _lav, dark: true, onTap: () => _push(context, const WonderWeekScreen())),
               _railCard(context, Icons.eco_outlined, 'Nuskha', 'Nutmeg for restful sleep', ppBrown, onTap: () => _push(context, const RemedyDetailScreen())),
               _railCard(context, Icons.menu_book_outlined, 'Article', 'Why sleep cycles change at 4 months', ppPurple, onTap: () => _push(context, const ArticleReaderScreen())),
-              _railCard(context, Icons.volume_up_outlined, 'Product', 'White-noise soother', ppPurple, onTap: () => _push(context, const ProductDetailScreen())),
+              _railCard(context, Icons.volume_up_outlined, 'Product', 'White-noise soother', ppPurple, onTap: () => _push(context, ProductDetailScreen(product: productById('dozy')))),
             ],
           ),
         ),

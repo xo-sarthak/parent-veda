@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// Shared cloud data-access layer ("repository") for ParentVeda.
 ///
 /// WHY THIS EXISTS:
-/// Every store needs the same handful of Supabase operations — load my rows,
+/// Every store needs the same handful of Supabase operations - load my rows,
 /// add a row, update a row, delete a row. Instead of copy-pasting those calls
 /// into all ~25 stores, they ALL go through this one helper. Benefits:
 ///   * one place to change how syncing works (offline queue, retries, logging),
@@ -14,7 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// LOCAL-FIRST: these are the CLOUD half only. Each store keeps its existing
 /// shared_preferences cache for instant, offline-capable reads, and uses these
 /// methods to sync up/down. If nobody is logged in, reads return an empty list
-/// and writes are skipped — so the app keeps working from its local cache.
+/// and writes are skipped - so the app keeps working from its local cache.
 ///
 /// All methods are scoped to the current user via `user_id`. (Row-Level
 /// Security enforces the same thing on the server; this is the client-side
@@ -49,7 +49,7 @@ class SupabaseRepo {
   }
 
   /// Fetch rows belonging to ANOTHER user (e.g. your paired partner) from
-  /// [table]. RLS still applies — you only get rows the policies allow (own or
+  /// [table]. RLS still applies - you only get rows the policies allow (own or
   /// partner). Used for the mother's merged journal view. [] if logged out.
   static Future<List<Map<String, dynamic>>> fetchByUser(
     String table,

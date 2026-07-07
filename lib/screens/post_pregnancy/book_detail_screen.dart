@@ -1,5 +1,5 @@
 // =============================================================================
-//  BookDetailScreen — Recommendations · book detail (parenting · S16·book)
+//  BookDetailScreen - Recommendations · book detail (parenting · S16·book)
 // -----------------------------------------------------------------------------
 //  A single recommended book: the ParentVeda take, what's good / consider,
 //  who it's for, verified-parent reviews, and buy links. Reached from
@@ -81,7 +81,7 @@ class BookDetailScreen extends StatelessWidget {
             _pad(Text('The ParentVeda take', style: ppJakarta(18))),
             const SizedBox(height: 8),
             _pad(Text(
-                "One of the best first books you can own. The high-contrast pages hold a 4-month-old's gaze, and the textured patches give little hands their first reason to reach and explore — exactly the Leap 4 skill Aarav's building now. Sturdy enough to survive being chewed.",
+                "One of the best first books you can own. The high-contrast pages hold a 4-month-old's gaze, and the textured patches give little hands their first reason to reach and explore - exactly the Leap 4 skill Aarav's building now. Sturdy enough to survive being chewed.",
                 style: ppBody(15, h: 1.6))),
 
             // what's good / consider
@@ -101,7 +101,7 @@ class BookDetailScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   ppEyebrow('Consider', color: ppMuted, spacing: 0.6),
                   const SizedBox(height: 10),
-                  _con('Very short — read on repeat'),
+                  _con('Very short - read on repeat'),
                   _con('Grows out of it by ~2'),
                 ]),
               ),
@@ -116,7 +116,7 @@ class BookDetailScreen extends StatelessWidget {
                 ppEyebrow('Choose this if…', color: ppBrown, spacing: 0.8),
                 const SizedBox(height: 8),
                 Text(
-                    "you want a first book that's as much a toy as a story — for reaching, touching and gazing.",
+                    "you want a first book that's as much a toy as a story - for reaching, touching and gazing.",
                     style: ppBody(14, color: ppInk, h: 1.55)),
               ]),
             )),
@@ -125,7 +125,7 @@ class BookDetailScreen extends StatelessWidget {
             const SizedBox(height: 28),
             _pad(Text('From verified parents', style: ppJakarta(18))),
             const SizedBox(height: 4),
-            _pad(Text('Named, with child & age — never anonymous.', style: ppBody(12))),
+            _pad(Text('Named, with child & age - never anonymous.', style: ppBody(12))),
             const SizedBox(height: 14),
             _pad(_review('Priya', 'mother of Aarav (4 mo)', '★★★★★',
                 '“The only book that makes him go still and stare. The fuzzy patches get the biggest reaction.”',

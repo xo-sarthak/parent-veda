@@ -1,9 +1,9 @@
 // =============================================================================
-//  NotificationService — schedules the mother's reminders as OS notifications
+//  NotificationService - schedules the mother's reminders as OS notifications
 // -----------------------------------------------------------------------------
 //  Thin wrapper over flutter_local_notifications + timezone. ReminderStore calls
 //  schedule / cancel / syncAll as reminders change. Everything is wrapped in
-//  try/catch so a missing platform permission never crashes the app — it just
+//  try/catch so a missing platform permission never crashes the app - it just
 //  means the nudge won't fire until permission is granted.
 // =============================================================================
 
@@ -26,7 +26,7 @@ class NotificationService {
 
   Future<void> init() async {
     if (_ready) return;
-    // Timezone setup — required so a "9:00 AM" reminder means 9 AM locally.
+    // Timezone setup - required so a "9:00 AM" reminder means 9 AM locally.
     try {
       tzdata.initializeTimeZones();
       final name = await FlutterTimezone.getLocalTimezone();
@@ -48,7 +48,7 @@ class NotificationService {
         const InitializationSettings(android: android, iOS: ios),
       );
       _ready = true;
-    } catch (_) {/* platform not ready — schedule() will simply no-op */}
+    } catch (_) {/* platform not ready - schedule() will simply no-op */}
   }
 
   /// Ask the OS for permission to post notifications (Android 13+ / iOS).
@@ -64,7 +64,7 @@ class NotificationService {
         // the OS batches/delays them (Doze) and a reminder can miss its time.
         try {
           await android.requestExactAlarmsPermission();
-        } catch (_) {/* older Android — not needed */}
+        } catch (_) {/* older Android - not needed */}
         return granted;
       }
       final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -78,11 +78,11 @@ class NotificationService {
     return true;
   }
 
-  /// Fire a notification immediately — a quick way to confirm notifications
+  /// Fire a notification immediately - a quick way to confirm notifications
   /// work at all on this device, independent of scheduling/timing.
   Future<void> showNow({
     String title = 'ParentVeda',
-    String body = "Test notification — you're all set ✅",
+    String body = "Test notification - you're all set ✅",
   }) async {
     if (!_ready) await init();
     try {
@@ -99,7 +99,7 @@ class NotificationService {
       await _plugin.zonedSchedule(
         999002,
         'Scheduled test',
-        'Fired ~1 min after you tapped — scheduling works ✅',
+        'Fired ~1 min after you tapped - scheduling works ✅',
         when,
         _details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -113,7 +113,7 @@ class NotificationService {
     }
   }
 
-  /// Schedule a ONE-OFF notification at an absolute date/time — used for
+  /// Schedule a ONE-OFF notification at an absolute date/time - used for
   /// vaccine-due reminders (e.g. "1 day before"). Best-effort: no-ops if the
   /// platform isn't ready or the time is in the past.
   Future<void> scheduleOneOff({

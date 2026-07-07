@@ -1,5 +1,5 @@
 // =============================================================================
-//  MedicineStore — persistence for Daily Medication & Supplement Tracking
+//  MedicineStore - persistence for Daily Medication & Supplement Tracking
 // -----------------------------------------------------------------------------
 //  Stores the mother's medications/supplements and a log of which were taken on
 //  which day (once-per-day model for v1). Exposes gentle, judgment-free stats:
@@ -85,7 +85,7 @@ class MedicineStore extends ChangeNotifier {
         ..addAll(logById.values);
       await _persistLogs();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // ---- camelCase model <-> snake_case columns -------------------------------
@@ -172,7 +172,7 @@ class MedicineStore extends ChangeNotifier {
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.insert('medications', _toMedRow(m));
-      } catch (_) {/* offline — syncs up on next init */}
+      } catch (_) {/* offline - syncs up on next init */}
     }
   }
 

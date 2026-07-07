@@ -2,10 +2,10 @@
 //  ToolsStore
 // -----------------------------------------------------------------------------
 //  Local-only persistence (shared_preferences) for the ParentVeda Tools:
-//    * Baby Movement Tracker  — movement timestamps
-//    * Weight Tracker         — profile + weight entries
-//    * Kegel Care             — progress + adaptive routine offsets + feedback
-//    * Contraction Tracker    — sessions of timed contractions
+//    * Baby Movement Tracker  - movement timestamps
+//    * Weight Tracker         - profile + weight entries
+//    * Kegel Care             - progress + adaptive routine offsets + feedback
+//    * Contraction Tracker    - sessions of timed contractions
 //
 //  ChangeNotifier so tool screens react. Mirrors the style of [DailyStore].
 // =============================================================================
@@ -36,10 +36,10 @@ class WeightEntry {
 
   final String id;
 
-  /// Calendar date (yyyy-MM-dd) — used for grouping / "today" checks.
+  /// Calendar date (yyyy-MM-dd) - used for grouping / "today" checks.
   final String dateIso;
 
-  /// Full timestamp — used for ordering and showing the time of each entry, so
+  /// Full timestamp - used for ordering and showing the time of each entry, so
   /// multiple entries on the same day are kept (and shown) distinctly.
   final String timeIso;
 
@@ -59,7 +59,7 @@ class WeightEntry {
   factory WeightEntry.fromJson(Map<String, dynamic> j) {
     final dateIso = (j['dateIso'] ?? '').toString();
     return WeightEntry(
-      // Legacy entries had no id/timeIso — derive stable fallbacks.
+      // Legacy entries had no id/timeIso - derive stable fallbacks.
       id: (j['id'] ?? 'w_${dateIso}_${j['weight']}').toString(),
       dateIso: dateIso,
       timeIso: (j['timeIso'] ?? dateIso).toString(),
@@ -233,7 +233,7 @@ class ToolsStore extends ChangeNotifier {
   ToolsStore._();
   static final ToolsStore instance = ToolsStore._();
 
-  static const _movementKey = 'tool_movements'; // legacy [iso] — migrated
+  static const _movementKey = 'tool_movements'; // legacy [iso] - migrated
   static const _movementSessionsKey =
       'tool_movement_sessions'; // [MovementSession]
   static const _weightProfileKey = 'tool_weight_profile'; // {pre,height}
@@ -291,7 +291,7 @@ class ToolsStore extends ChangeNotifier {
 
   int get currentSessionCount => activeMovementSession?.times.length ?? 0;
 
-  /// Total movements logged today across all sessions (active or ended) — used
+  /// Total movements logged today across all sessions (active or ended) - used
   /// by the Home quick-row "Kicks" tile.
   int get kicksToday {
     final today = _isoDate(DateTime.now());
@@ -334,7 +334,7 @@ class ToolsStore extends ChangeNotifier {
 
   // ---- Weight getters -------------------------------------------------------
 
-  // Height is optional — only the pre-pregnancy weight is required to start.
+  // Height is optional - only the pre-pregnancy weight is required to start.
   bool get weightOnboarded => _prePregnancyWeight != null;
   double? get prePregnancyWeight => _prePregnancyWeight;
   double? get heightCm => _heightCm;
@@ -446,7 +446,7 @@ class ToolsStore extends ChangeNotifier {
           }
         }
       }
-      // A session left open by a previous run (app killed) is closed now —
+      // A session left open by a previous run (app killed) is closed now -
       // sessions never span app launches.
       _closeDanglingSessions();
 
@@ -501,7 +501,7 @@ class ToolsStore extends ChangeNotifier {
   }
 
   // ===========================================================================
-  //  Cloud sync (Supabase) — local-first. Five data kinds sync here; kegel
+  //  Cloud sync (Supabase) - local-first. Five data kinds sync here; kegel
   //  *history* is deferred (no-id append-only log). camelCase <-> snake_case.
   // ===========================================================================
 
@@ -536,7 +536,7 @@ class ToolsStore extends ChangeNotifier {
       await _persist(_weightEntriesKey,
           jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
 
-      // movement_sessions (list, by id — only ended sessions are pushed)
+      // movement_sessions (list, by id - only ended sessions are pushed)
       final msRows = await SupabaseRepo.fetch('movement_sessions');
       final msById = {
         for (final r in msRows) r['id'].toString(): _movementFromRow(r)
@@ -591,7 +591,7 @@ class ToolsStore extends ChangeNotifier {
       await _persist(_contractionKey,
           jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
 
-      // kegel_history — append-only; synced as a whole blob in user_state,
+      // kegel_history - append-only; synced as a whole blob in user_state,
       // merged with the cloud by dateIso (its natural key), then pushed back.
       final khCloud = await SupabaseRepo.loadState('tool_kegel_history');
       if (khCloud is List) {
@@ -612,7 +612,7 @@ class ToolsStore extends ChangeNotifier {
           jsonEncode(_kegelHistory.map((e) => e.toJson()).toList()));
 
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   Future<void> _cloudUpsertWeightProfile() async {
@@ -779,7 +779,7 @@ class ToolsStore extends ChangeNotifier {
     await _cloudUpsertWeightProfile();
   }
 
-  /// Add a weight entry. Multiple entries per day are allowed (and kept) — they
+  /// Add a weight entry. Multiple entries per day are allowed (and kept) - they
   /// are never overwritten.
   Future<void> addWeightEntry(WeightEntry entry) async {
     _weightEntries.add(entry);

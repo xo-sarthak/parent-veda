@@ -1,7 +1,7 @@
 // =============================================================================
-//  CalendarScreen — "My Calendar" (the pregnancy command center)
+//  CalendarScreen - "My Calendar" (the pregnancy command center)
 // -----------------------------------------------------------------------------
-//  Three calm tabs: Journey Timeline (default), Calendar grid, and Upcoming —
+//  Three calm tabs: Journey Timeline (default), Calendar grid, and Upcoming -
 //  with a subtle progress card, category filters, search, and mother-added
 //  personal events. Answers: where am I, what's happened, what's next. Warm-Nest
 //  visual language (no mockup existed; extrapolated). Reuses the shared event
@@ -533,7 +533,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final inCurrentWeek = wk == p.currentWeek && wk >= 4 && wk <= 40;
     final selected = _selectedDay != null && _sameDay(date, _selectedDay!);
     // A new trimester begins at week 14 (T2) and week 28 (T3); week 4 marks the
-    // visible start of the journey (T1) — shown as a small pill on that day.
+    // visible start of the journey (T1) - shown as a small pill on that day.
     final triStart = isWeekStart && (wk == 4 || wk == 14 || wk == 28);
     final tri = wk == 28 ? 3 : (wk == 14 ? 2 : 1);
     // Round only where the current-week band starts/stops on this calendar row,
@@ -1049,12 +1049,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
       );
 
-  // The selected-day panel below the grid — date + pregnancy week + that day's
+  // The selected-day panel below the grid - date + pregnancy week + that day's
   // events + an "Add Note" entry (a calendar-only note for any date).
   Widget _selectedDayPanel(S s, List<CalendarEvent> events) {
     final date = _selectedDay ?? DateTime.now();
     final wk = _weekAt(date);
-    // Every event on this day, across all categories — so each coloured dot is
+    // Every event on this day, across all categories - so each coloured dot is
     // named + explained (she never has to guess what a dot means).
     final dayEvents = events.where((e) => _sameDay(e.date, date)).toList()
       ..sort((a, b) => a.category.index.compareTo(b.category.index));

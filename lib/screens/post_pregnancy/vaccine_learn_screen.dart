@@ -1,5 +1,5 @@
 // =============================================================================
-//  VaccineLearnScreen — "Learn why" (the educational page for a vaccine)
+//  VaccineLearnScreen - "Learn why" (the educational page for a vaccine)
 // -----------------------------------------------------------------------------
 //  A dedicated, calm explainer: why this vaccine matters, the diseases it
 //  prevents, when it's given, the benefits, the common (expected) side effects,
@@ -17,10 +17,10 @@ class VaccineLearnScreen extends StatelessWidget {
     super.key,
     this.vaccine = 'Pneumococcal (PCV)',
     this.importance =
-        'PCV protects against pneumococcus — a bacterium behind some of the most serious infections of the first years of life. The primary series finishes around now, which is exactly when a baby’s own passive immunity from birth is fading, so the timing is what makes it powerful.',
+        'PCV protects against pneumococcus - a bacterium behind some of the most serious infections of the first years of life. The primary series finishes around now, which is exactly when a baby’s own passive immunity from birth is fading, so the timing is what makes it powerful.',
     this.diseases = const [
-      'Pneumonia — a leading cause of serious childhood illness',
-      'Meningitis — infection of the lining of the brain',
+      'Pneumonia - a leading cause of serious childhood illness',
+      'Meningitis - infection of the lining of the brain',
       'Blood infections (sepsis)',
       'Some ear infections',
     ],
@@ -37,7 +37,7 @@ class VaccineLearnScreen extends StatelessWidget {
       'Being a little more sleepy or fussy than usual',
     ],
     this.guidance =
-        'Expected reactions are a good sign — they mean the immune system is responding. Offer extra cuddles and feeds, a cool compress for soreness, and paracetamol only if he’s genuinely uncomfortable, at the weight-based dose your paediatrician advises. Seek help urgently for difficult breathing, facial swelling, a seizure or unusual floppiness.',
+        'Expected reactions are a good sign - they mean the immune system is responding. Offer extra cuddles and feeds, a cool compress for soreness, and paracetamol only if he’s genuinely uncomfortable, at the weight-based dose your paediatrician advises. Seek help urgently for difficult breathing, facial swelling, a seizure or unusual floppiness.',
   });
 
   final String vaccine;
@@ -86,7 +86,7 @@ class VaccineLearnScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Text('Common side effects', style: ppJakarta(17))),
             const SizedBox(height: 6),
-            _pad(Text('Usually mild and short-lived — a sign the vaccine is working.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Usually mild and short-lived - a sign the vaccine is working.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 12),
             for (final s in sideEffects) _pad(_bullet(s, icon: Icons.circle, small: true)),
 
@@ -94,7 +94,7 @@ class VaccineLearnScreen extends StatelessWidget {
             _pad(_panel('ParentVeda guidance', guidance)),
 
             const SizedBox(height: 20),
-            _pad(Text('Educational only, not medical advice — always confirm anything important with your paediatrician.',
+            _pad(Text('Educational only, not medical advice - always confirm anything important with your paediatrician.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

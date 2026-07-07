@@ -1,5 +1,5 @@
 // =============================================================================
-//  CanIStore — persistence for the Can I? feature
+//  CanIStore - persistence for the Can I? feature
 // -----------------------------------------------------------------------------
 //  Currently just the mother's "Saved questions" (a list of entry ids, most
 //  recent first), persisted via shared_preferences. Mirrors the other singleton

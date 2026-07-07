@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 //  Awareness, not counting. Movements are grouped into SESSIONS: the mother taps
 //  "Start Session", logs movements by tapping the heart, and the session ends
-//  when she taps "End Session" — or when she leaves this screen / the app is
+//  when she taps "End Session" - or when she leaves this screen / the app is
 //  backgrounded. History shows one entry per session (e.g. "20 June · Session 2").
 //  The primary screen NEVER shows a long scroll of timestamps: it gives a calm
 //  count + the last time, with all times one tap away. An optional memory note
@@ -220,7 +220,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   }
 
   /// A calm, confined summary of the current session: a big count, the last
-  /// time, and all times one tap away — never a long scroll.
+  /// time, and all times one tap away - never a long scroll.
   Widget _sessionSummary(BuildContext context) {
     final s = _s;
     final text = Theme.of(context).textTheme;

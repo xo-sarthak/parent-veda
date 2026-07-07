@@ -2,7 +2,7 @@
 //  JournalWriterScreen
 // -----------------------------------------------------------------------------
 //  The one merged journaling surface for the whole app. A single gentle prompt
-//  — "How was your last week?" — that the mother can either WRITE or SPEAK
+//  - "How was your last week?" - that the mother can either WRITE or SPEAK
 //  (on-device speech-to-text), plus up to TWO photos kept with the note.
 //  Creates a new entry or edits an existing one.
 // =============================================================================

@@ -1,9 +1,9 @@
 // =============================================================================
-//  ProviderProfileScreen — reusable expert / provider profile (parenting · S18·detail)
+//  ProviderProfileScreen - reusable expert / provider profile (parenting · S18·detail)
 // -----------------------------------------------------------------------------
 //  A single expert or provider: why ParentVeda picks them, languages &
 //  specialties, verified-mother reviews, a disclosure, and a sticky book bar.
-//  Data-driven — pass any `Expert` (from pp_experts_data) and it renders that
+//  Data-driven - pass any `Expert` (from pp_experts_data) and it renders that
 //  person; with no expert it defaults to Dr. Neha Sharma (the Problem Solver
 //  provider), so the S18·detail flow is unchanged. Reused everywhere an expert
 //  is named: masterclasses, cohorts, courses, and local services. Faithful build
@@ -101,7 +101,7 @@ class ProviderProfileScreen extends StatelessWidget {
               const SizedBox(height: 28),
               _pad(Text('From verified mothers', style: ppJakarta(18))),
               const SizedBox(height: 4),
-              _pad(Text('Same review system as Products — named, never anonymous.', style: ppBody(12))),
+              _pad(Text('Same review system as Products - named, never anonymous.', style: ppBody(12))),
               const SizedBox(height: 14),
               for (var i = 0; i < e.reviews.length; i++)
                 _pad(_review(e.reviews[i].$1, e.reviews[i].$2, '★★★★★', e.reviews[i].$3,

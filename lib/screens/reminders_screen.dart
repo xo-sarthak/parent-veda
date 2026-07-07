@@ -1,5 +1,5 @@
 // =============================================================================
-//  RemindersScreen — customizable local reminders
+//  RemindersScreen - customizable local reminders
 // -----------------------------------------------------------------------------
 //  The mother creates gentle nudges (Kegel session, prenatal vitamin, read to
 //  baby, water, or her own) at a time + repeat she chooses. This is the full
@@ -81,7 +81,7 @@ class RemindersScreen extends StatelessWidget {
                   ..clearSnackBars()
                   ..showSnackBar(const SnackBar(
                       content: Text(
-                          'Test notification sent — check your tray')));
+                          'Test notification sent - check your tray')));
               }
             },
           ),
@@ -96,7 +96,7 @@ class RemindersScreen extends StatelessWidget {
                   ..clearSnackBars()
                   ..showSnackBar(const SnackBar(
                       content: Text(
-                          'Scheduled a test for ~1 min — lock the phone and wait')));
+                          'Scheduled a test for ~1 min - lock the phone and wait')));
               }
             },
           ),
@@ -536,7 +536,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
 }
 
 // =============================================================================
-//  Medication reminders — a richer editor (frequency + multiple times + custom
+//  Medication reminders - a richer editor (frequency + multiple times + custom
 //  cadences) used by the Daily Medication card. Deliberately NOT tied to any
 //  medicine: she just sets when to be pinged + a note.
 // =============================================================================
@@ -805,7 +805,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
                 label: Text(_times.first.format(context)),
               ),
             ),
-          // Weekday (weekly / fortnightly — single)
+          // Weekday (weekly / fortnightly - single)
           if (needsWeekday) ...[
             const SizedBox(height: 12),
             Align(
@@ -824,7 +824,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
                 ),
             ]),
           ],
-          // Specific weekdays (custom — multi)
+          // Specific weekdays (custom - multi)
           if (_freq == _MedFreq.custom) ...[
             const SizedBox(height: 12),
             Align(

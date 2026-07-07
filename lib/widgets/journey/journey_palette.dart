@@ -1,5 +1,5 @@
 // =============================================================================
-//  JourneyColors  —  the Pregnancy Journey map's own colour language
+//  JourneyColors  -  the Pregnancy Journey map's own colour language
 // -----------------------------------------------------------------------------
 //  The map deliberately uses a louder, more literal colour system than the rest
 //  of the (restrained) app: state colours signal progress, and each milestone
@@ -18,9 +18,9 @@ class JourneyColors {
   JourneyColors._();
 
   // ---- Path / node STATE colours -------------------------------------------
-  static const Color completed = Color(0xFF6A30B6); // purple — past, achieved
-  static const Color current = Color(0xFFFF5A79); // coral  — you are here
-  static const Color future = Color(0xFFD2CCDB); // soft grey-lavender — ahead
+  static const Color completed = Color(0xFF6A30B6); // purple - past, achieved
+  static const Color current = Color(0xFFFF5A79); // coral  - you are here
+  static const Color future = Color(0xFFD2CCDB); // soft grey-lavender - ahead
 
   // ---- Arrival / destination (the end of the journey, near Birth) ----------
   static const Color arrivalGold = Color(0xFF6A30B6); // purple (Warm Nest)
@@ -29,9 +29,9 @@ class JourneyColors {
   // ---- Trimester backdrop bands (soft washes behind the trail) -------------
   // index 0 = first trimester, 1 = second, 2 = third.
   static const List<Color> trimesterFill = [
-    Color(0xFFFBEAE0), // soft peach   — first trimester
-    Color(0xFFEDE6F7), // soft lavender — second trimester
-    Color(0xFFE2F1E8), // soft mint    — third trimester
+    Color(0xFFFBEAE0), // soft peach   - first trimester
+    Color(0xFFEDE6F7), // soft lavender - second trimester
+    Color(0xFFE2F1E8), // soft mint    - third trimester
   ];
   static const List<Color> trimesterInk = [
     Color(0xFFC07A4E), // muted terracotta
@@ -79,7 +79,7 @@ class JourneyColors {
     }
   }
 
-  /// A tasteful Material icon for each milestone TYPE — shown inside the marker
+  /// A tasteful Material icon for each milestone TYPE - shown inside the marker
   /// so a milestone reads as a real checkpoint, without emoji clutter.
   static IconData iconForType(JourneyNodeType type) {
     switch (type) {

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ConsultationDetailScreen (S7) — Prepare › Consultation specialist profile
+//  ConsultationDetailScreen (S7) - Prepare › Consultation specialist profile
 //  Data-driven (any Specialist). Time slots are selectable; the sticky CTA runs
 //  the mock booking flow and reflects "Booked".
 // =============================================================================

@@ -1,9 +1,9 @@
 // =============================================================================
-//  Symptom content (bilingual) — "Symptoms Companion"
+//  Symptom content (bilingual) - "Symptoms Companion"
 // -----------------------------------------------------------------------------
 //  Educational + reassurance only. Never diagnosis. Calm, human language; the
 //  doctor is always the authority. Urgent symptoms use clear, non-alarming
-//  guidance. Easy to extend — this is just data.
+//  guidance. Easy to extend - this is just data.
 // =============================================================================
 
 import '../localization/app_language.dart';
@@ -73,8 +73,8 @@ const List<Symptom> kSymptoms = [
     tips: [
       LocalizedText(en: 'Drink plenty of water.', hi: 'Khoob paani piyein.'),
       LocalizedText(
-          en: 'Eat fibre — fruit, vegetables, whole grains.',
-          hi: 'Fibre khaayein — phal, sabziyan, saabut anaaj.'),
+          en: 'Eat fibre - fruit, vegetables, whole grains.',
+          hi: 'Fibre khaayein - phal, sabziyan, saabut anaaj.'),
       LocalizedText(
           en: 'Gentle daily movement helps.', hi: 'Halki rozaana harkat madad karti hai.'),
     ],
@@ -256,8 +256,8 @@ const List<Symptom> kSymptoms = [
         hi: 'Aapka baby saans ki practice karta hai, jo chhoti lai-bhari kudaan jaisi lag sakti hai.'),
     tips: [
       LocalizedText(
-          en: "Enjoy the moment — it's usually a reassuring sign.",
-          hi: 'Is pal ka aanand lein — yeh aksar tasalli dene wala sanket hai.'),
+          en: "Enjoy the moment - it's usually a reassuring sign.",
+          hi: 'Is pal ka aanand lein - yeh aksar tasalli dene wala sanket hai.'),
     ],
     doctorGuidance: LocalizedText(
         en: "If you're ever worried about a change in your baby's movements, contact your maternity unit.",
@@ -286,7 +286,7 @@ const List<Symptom> kSymptoms = [
         hi: 'Agar kasaav niyamit, dard-bhare ya baar-baar ho, doctor se sampark karein.'),
   ),
 
-  // ---- Urgent (calm, clear guidance — no panic language) --------------------
+  // ---- Urgent (calm, clear guidance - no panic language) --------------------
   Symptom(
     id: 'u_bleeding',
     category: SymptomCategory.urgent,
@@ -299,8 +299,8 @@ const List<Symptom> kSymptoms = [
     why: LocalizedText(en: '', hi: ''),
     tips: [],
     doctorGuidance: LocalizedText(
-        en: 'Heavy vaginal bleeding needs urgent care — contact your doctor or maternity unit now.',
-        hi: 'Tej vaginal bleeding ke liye turant care chahiye — abhi doctor ya maternity unit se sampark karein.'),
+        en: 'Heavy vaginal bleeding needs urgent care - contact your doctor or maternity unit now.',
+        hi: 'Tej vaginal bleeding ke liye turant care chahiye - abhi doctor ya maternity unit se sampark karein.'),
   ),
   Symptom(
     id: 'u_movement',
@@ -310,13 +310,13 @@ const List<Symptom> kSymptoms = [
     name: LocalizedText(
         en: "Reduced Baby Movement", hi: 'Baby Ki Harkat Kam'),
     commonness: LocalizedText(
-        en: 'Always worth checking — never feel you are overreacting.',
-        hi: 'Hamesha check karne layak — kabhi na sochein ki aap zyada react kar rahi hain.'),
+        en: 'Always worth checking - never feel you are overreacting.',
+        hi: 'Hamesha check karne layak - kabhi na sochein ki aap zyada react kar rahi hain.'),
     why: LocalizedText(en: '', hi: ''),
     tips: [],
     doctorGuidance: LocalizedText(
-        en: "If your baby's movements slow or change noticeably, contact your maternity unit straight away — any time, day or night.",
-        hi: 'Agar baby ki harkat dheemi ya saaf taur par badle, turant maternity unit se sampark karein — kabhi bhi, din ya raat.'),
+        en: "If your baby's movements slow or change noticeably, contact your maternity unit straight away - any time, day or night.",
+        hi: 'Agar baby ki harkat dheemi ya saaf taur par badle, turant maternity unit se sampark karein - kabhi bhi, din ya raat.'),
   ),
   Symptom(
     id: 'u_headache',
@@ -330,8 +330,8 @@ const List<Symptom> kSymptoms = [
     why: LocalizedText(en: '', hi: ''),
     tips: [],
     doctorGuidance: LocalizedText(
-        en: 'A severe headache, especially with blurred vision or swelling, can be serious — seek medical care promptly.',
-        hi: 'Tej sir dard, khaaskar dhundhli nazar ya soojan ke saath, gambhir ho sakta hai — turant medical care lein.'),
+        en: 'A severe headache, especially with blurred vision or swelling, can be serious - seek medical care promptly.',
+        hi: 'Tej sir dard, khaaskar dhundhli nazar ya soojan ke saath, gambhir ho sakta hai - turant medical care lein.'),
   ),
   Symptom(
     id: 'u_swelling',
@@ -345,8 +345,8 @@ const List<Symptom> kSymptoms = [
     why: LocalizedText(en: '', hi: ''),
     tips: [],
     doctorGuidance: LocalizedText(
-        en: 'Sudden swelling can need urgent review — contact your doctor.',
-        hi: 'Achaanak soojan ke liye turant jaanch zaroori ho sakti hai — doctor se sampark karein.'),
+        en: 'Sudden swelling can need urgent review - contact your doctor.',
+        hi: 'Achaanak soojan ke liye turant jaanch zaroori ho sakti hai - doctor se sampark karein.'),
   ),
   Symptom(
     id: 'u_fluid',
@@ -360,7 +360,7 @@ const List<Symptom> kSymptoms = [
     why: LocalizedText(en: '', hi: ''),
     tips: [],
     doctorGuidance: LocalizedText(
-        en: 'A gush or steady leak of fluid may mean your waters have broken — contact your maternity unit.',
-        hi: 'Fluid ka behaav ya risaav matlab aapka paani toot sakta hai — maternity unit se sampark karein.'),
+        en: 'A gush or steady leak of fluid may mean your waters have broken - contact your maternity unit.',
+        hi: 'Fluid ka behaav ya risaav matlab aapka paani toot sakta hai - maternity unit se sampark karein.'),
   ),
 ];

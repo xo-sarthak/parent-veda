@@ -1,9 +1,9 @@
 // =============================================================================
-//  Medication + MedicationLog — "Daily Medication & Supplement Tracking"
+//  Medication + MedicationLog - "Daily Medication & Supplement Tracking"
 // -----------------------------------------------------------------------------
 //  A pregnancy nourishment companion, not a pillbox. A Medication is something
 //  the doctor recommended (supplement / medicine / custom); a MedicationLog
-//  records that it was taken on a given day. Tracking only — never advice.
+//  records that it was taken on a given day. Tracking only - never advice.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -44,7 +44,7 @@ class Medication {
   final String frequency;
   final String notes;
 
-  /// For preset supplements (iron/calcium/…) — drives the educational blurb.
+  /// For preset supplements (iron/calcium/…) - drives the educational blurb.
   final String? presetKey;
   final String startDateIso;
   final String? endDateIso;

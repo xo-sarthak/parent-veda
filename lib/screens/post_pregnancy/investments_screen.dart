@@ -1,5 +1,5 @@
 // =============================================================================
-//  InvestmentsScreen — Investments & Savings · goal-led (parenting · S21)
+//  InvestmentsScreen - Investments & Savings · goal-led (parenting · S21)
 // -----------------------------------------------------------------------------
 //  A goal-led savings surface: set a target for Aarav's future and the card
 //  computes the monthly SIP needed; browse vetted ways to get there, a
@@ -109,7 +109,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           _pad(Text('Start small, for a big day.', style: ppFraunces(32, h: 1.12))),
           const SizedBox(height: 12),
           _pad(Text(
-              "Set a goal for Aarav's future and we'll explain the ways to get there — in plain language, with vetted partners. You stay in control of every rupee.",
+              "Set a goal for Aarav's future and we'll explain the ways to get there - in plain language, with vetted partners. You stay in control of every rupee.",
               style: ppBody(15))),
 
           // goal-led entry (dark card)
@@ -155,7 +155,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           const SizedBox(height: 12),
           _pad(Text.rich(
             TextSpan(children: [
-              TextSpan(text: 'Execution happens on a vetted partner platform — ', style: ppBody(12, h: 1.55)),
+              TextSpan(text: 'Execution happens on a vetted partner platform - ', style: ppBody(12, h: 1.55)),
               TextSpan(text: 'they', style: ppBody(12, color: ppInk, w: FontWeight.w700, h: 1.55)),
               TextSpan(text: ' handle KYC and your money. ParentVeda never touches it.', style: ppBody(12, h: 1.55)),
             ]),
@@ -181,7 +181,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           )),
 
           const SizedBox(height: 18),
-          _pad(Text('We earn a referral fee from partner platforms — it never changes your returns or your cost.',
+          _pad(Text('We earn a referral fee from partner platforms - it never changes your returns or your cost.',
               textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
         ],
       ),
@@ -272,7 +272,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   Widget _wayRow((IconData, String, String, String, Color, String?) w, {required bool last}) {
     final (icon, title, desc, pill, pillColor, note) = w;
     return GestureDetector(
-      onTap: () => _soon('$title — how it works, coming soon'),
+      onTap: () => _soon('$title - how it works, coming soon'),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -327,7 +327,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             Text('2 of 6 done', style: ppBody(11, color: ppPurple, w: FontWeight.w700)),
           ]),
           const SizedBox(height: 6),
-          Text('Two-minute lessons that explain each option in plain language — no jargon.', style: ppBody(13)),
+          Text('Two-minute lessons that explain each option in plain language - no jargon.', style: ppBody(13)),
           const SizedBox(height: 14),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
@@ -335,7 +335,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           const SizedBox(height: 8),
           GestureDetector(
-            onTap: () => _soon('Lesson: What is an SIP, really? — coming soon'),
+            onTap: () => _soon('Lesson: What is an SIP, really? - coming soon'),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),

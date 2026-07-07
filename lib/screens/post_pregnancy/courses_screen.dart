@@ -1,5 +1,5 @@
 // =============================================================================
-//  CoursesScreen — Learn · Documentary Courses (parenting · S14)
+//  CoursesScreen - Learn · Documentary Courses (parenting · S14)
 // -----------------------------------------------------------------------------
 //  The flagship "Complete Parenting Guide" (pregnancy → age 12) that unlocks
 //  stage by stage, plus a second specialist course. You only see modules for
@@ -43,7 +43,7 @@ class CoursesScreen extends StatelessWidget {
               Text('Courses', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  "Deep, documentary-style guides that unlock stage by stage — you only see what's relevant to Aarav right now, with everything else a tap away.",
+                  "Deep, documentary-style guides that unlock stage by stage - you only see what's relevant to Aarav right now, with everything else a tap away.",
                   style: ppBody(15)),
             ])),
 
@@ -78,7 +78,7 @@ class CoursesScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text('The Complete Parenting Guide', style: ppFraunces(24, h: 1.15)),
                     const SizedBox(height: 10),
-                    Text('Pregnancy through age 12 — every stage, taught properly, once. It grows up alongside your child.',
+                    Text('Pregnancy through age 12 - every stage, taught properly, once. It grows up alongside your child.',
                         style: ppBody(14, h: 1.55)),
                     const SizedBox(height: 16),
                     Row(children: [
@@ -161,7 +161,7 @@ class CoursesScreen extends StatelessWidget {
                     Text('Parenting a Child with Special Needs', style: ppJakarta(18)),
                     const SizedBox(height: 8),
                     Text(
-                        'An autism-focused course, made with developmental specialists — with ADHD & learning differences coming next.',
+                        'An autism-focused course, made with developmental specialists - with ADHD & learning differences coming next.',
                         style: ppBody(13, h: 1.55)),
                     const SizedBox(height: 12),
                     Text.rich(TextSpan(children: [
@@ -177,7 +177,7 @@ class CoursesScreen extends StatelessWidget {
             const SizedBox(height: 28),
             _pad(Text('Focused courses', style: ppJakarta(18))),
             const SizedBox(height: 4),
-            _pad(Text('Short, single-topic courses — start one in a spare few minutes.', style: ppBody(13, color: ppMuted))),
+            _pad(Text('Short, single-topic courses - start one in a spare few minutes.', style: ppBody(13, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [for (final c in kCourses) _focusedCourse(context, c)])),
 
@@ -191,7 +191,7 @@ class CoursesScreen extends StatelessWidget {
                 const SizedBox(width: 11),
                 Expanded(
                   child: Text(
-                      "Told through ParentVeda's own animated guides — scripted from research and approved by paediatricians & child psychologists before anything reaches you.",
+                      "Told through ParentVeda's own animated guides - scripted from research and approved by paediatricians & child psychologists before anything reaches you.",
                       style: ppBody(13, color: ppInk, h: 1.5)),
                 ),
               ]),
@@ -199,7 +199,7 @@ class CoursesScreen extends StatelessWidget {
 
             const SizedBox(height: 22),
             _pad(Text(
-                "You only see what fits your child's age — everything else waits, one tap away. Free with ParentVeda+.",
+                "You only see what fits your child's age - everything else waits, one tap away. Free with ParentVeda+.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

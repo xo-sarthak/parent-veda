@@ -1,11 +1,11 @@
 // =============================================================================
-//  PostPregnancyHome — My Child "Today" home (parenting app · daily briefing)
+//  PostPregnancyHome - My Child "Today" home (parenting app · daily briefing)
 // -----------------------------------------------------------------------------
 //  Rebuilt to the "Home (Today Journey)" spec: not a dashboard or a feature grid,
-//  but a calm daily briefing that answers one question — "what does my child need
+//  but a calm daily briefing that answers one question - "what does my child need
 //  from me today?". A single, gently-revealed scroll: a Today's-Journey hero, then
 //  What Matters Today, Continue Your Journey, Discover, Looking Ahead, a Child
-//  Snapshot, Today's Focus, Tiny Wins and Quick Actions — every card earning its
+//  Snapshot, Today's Focus, Tiny Wins and Quick Actions - every card earning its
 //  place. Content is our Aarav / Leap-4 scenario, structured so a real context
 //  engine can generate it per child later. A slim Deals shelf sits at the very
 //  bottom (off the face). Nothing imports pregnancy code. Scenario: Priya & Aarav.
@@ -15,7 +15,10 @@ import 'package:flutter/material.dart';
 
 import 'article_reader_screen.dart';
 import 'explore_drawer.dart';
+import 'food_home_screen.dart';
+import 'food_recipe_screen.dart';
 import 'growth_activity_screen.dart';
+import 'pp_food_data.dart';
 // The Health quick action now opens the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
 // import 'health_guide_screen.dart';
@@ -27,7 +30,6 @@ import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_compare_screen.dart';
-import 'recipes_screen.dart';
 import 'snapshot_expanded_screen.dart';
 import 'solve_problem_screen.dart';
 import 'vax_tracker_screen.dart';
@@ -190,7 +192,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                 ]),
                 const SizedBox(height: 16),
                 Text(
-                  "Today, Aarav is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder — a little slow, narrated play and plenty of eye contact goes a long way.",
+                  "Today, Aarav is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder - a little slow, narrated play and plenty of eye contact goes a long way.",
                   style: ppFraunces(19, h: 1.45),
                 ),
                 const SizedBox(height: 20),
@@ -218,7 +220,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         _pad(_sectionHeader('What matters today')),
         const SizedBox(height: 14),
         _pad(Column(children: [
-          _bigRow(Icons.psychology_outlined, _tPurple, ppPurple, "Today's brain activity", 'Peekaboo — the first seed of object permanence', () => _push(const GrowthActivityScreen())),
+          _bigRow(Icons.psychology_outlined, _tPurple, ppPurple, "Today's brain activity", 'Peekaboo - the first seed of object permanence', () => _push(const GrowthActivityScreen())),
           const SizedBox(height: 12),
           _bigRow(Icons.vaccines_outlined, ppCoralTint, ppCoral, 'PCV · dose 3 due 22 Jul', 'Free at a govt centre · tap to plan the visit', () => _push(const VaxTrackerScreen())),
           const SizedBox(height: 12),
@@ -230,9 +232,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
   Widget _continueJourney() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _pad(_sectionHeader('Continue your journey')),
         const SizedBox(height: 14),
-        // Continue the unfinished task itself — an in-progress journal memory opens
+        // Continue the unfinished task itself - an in-progress journal memory opens
         // the Journal editor directly (not the Storybook preview).
-        _pad(_bigRow(Icons.edit_note_rounded, _tPurple, ppPurple, "Today's memory", 'You started a note this morning — finish it', () => _push(const WriteStoryScreen()))),
+        _pad(_bigRow(Icons.edit_note_rounded, _tPurple, ppPurple, "Today's memory", 'You started a note this morning - finish it', () => _push(const WriteStoryScreen()))),
         const SizedBox(height: 12),
         _pad(_bigRow(Icons.article_outlined, _tGreen, _greenFg, 'The 4-month sleep regression', 'You were halfway through the guide', () => _push(const SolveProblemScreen()))),
       ]);
@@ -246,9 +248,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
             _discoverCard('Activity', 'Reach for the ring', '4 min · grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
             const SizedBox(width: 14),
-            _discoverCard('Recipe', 'First-taste veggie mash', 'from 6 months · iron-rich', () => _push(const RecipesScreen())),
+            _discoverCard('Recipe', 'Sweet potato mash', 'from 6 months · vitamin A', () => _push(FoodRecipeScreen(recipe: foodRecipeById('sweetpotatomash')))),
             const SizedBox(width: 14),
-            _discoverCard('Product', 'Dozy white-noise soother', '₹1,499 · verified', () => _push(const ProductDetailScreen())),
+            _discoverCard('Product', 'Dozy white-noise soother', '₹1,499 · verified', () => _push(ProductDetailScreen(product: productById('dozy')))),
           ]),
         ),
       ]);
@@ -292,7 +294,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             const SizedBox(width: 12),
             _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxTrackerScreen())),
             const SizedBox(width: 12),
-            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const RecipesScreen())),
+            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const FoodHomeScreen())),
           ]),
         ),
       ]);
@@ -371,7 +373,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
               const SizedBox(height: 12),
               Text('Your baby is learning language long before he speaks.', style: ppFraunces(20, h: 1.3)),
               const SizedBox(height: 8),
-              Text('Try narrating your everyday moments today — "now we\'re pouring the water" — and pause, as if for his reply. Those small conversations build his ear for language.',
+              Text('Try narrating your everyday moments today - "now we\'re pouring the water" - and pause, as if for his reply. Those small conversations build his ear for language.',
                   style: ppBody(14, h: 1.6)),
             ]),
           ),
@@ -427,7 +429,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           _qa(Icons.auto_awesome_outlined, 'Ask Veda', () => openPpTab(context, 1)),
           _qa(Icons.menu_book_outlined, 'Journal', () => _push(const JournalV2Home())),
           _qa(Icons.compare_arrows_rounded, 'Compare', () => _push(const ProductsCompareScreen())),
-          // Was: _push(const HealthGuideScreen()) — now opens the Health ecosystem:
+          // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
           _qa(Icons.monitor_heart_outlined, 'Health', () => _push(const HealthHomeScreen())),
         ])),
       ]);
@@ -487,7 +489,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Deals for the day', style: ppJakarta(18)),
             const SizedBox(height: 2),
-            Text("Handpicked for Aarav's stage — affiliate & ParentVeda picks.", style: ppBody(12)),
+            Text("Handpicked for Aarav's stage - affiliate & ParentVeda picks.", style: ppBody(12)),
           ]),
         ),
         const SizedBox(width: 10),
@@ -505,7 +507,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         ),
       ),
       const SizedBox(height: 12),
-      _pad(Text('Sponsored & affiliate picks — always labelled, and never on your research pages.',
+      _pad(Text('Sponsored & affiliate picks - always labelled, and never on your research pages.',
           textAlign: TextAlign.center, style: ppBody(11, color: ppMuted, h: 1.5))),
     ]);
   }

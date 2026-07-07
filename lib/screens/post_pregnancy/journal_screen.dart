@@ -1,5 +1,5 @@
 // =============================================================================
-//  MyChildJournalScreen — Journal · private space (parenting app · S9)
+//  MyChildJournalScreen - Journal · private space (parenting app · S9)
 // -----------------------------------------------------------------------------
 //  The child's private, auto-transcribing journal: quick-capture, then a
 //  reverse-chronological feed of voice / photo / note moments (with a milestone
@@ -91,7 +91,7 @@ class MyChildJournalScreen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 14),
                 Text(
-                    '"He rolled halfway across the mat and looked so proud of himself. I actually gasped out loud — his little face just lit up."',
+                    '"He rolled halfway across the mat and looked so proud of himself. I actually gasped out loud - his little face just lit up."',
                     style: ppBody(14, color: ppInk, h: 1.6)),
                 const SizedBox(height: 12),
                 Container(

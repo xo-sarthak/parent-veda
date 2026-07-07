@@ -38,7 +38,7 @@ class FatherContentController extends ChangeNotifier {
   bool _isLoading = true;
   Object? _error;
 
-  /// Modules engaged this session (resets on relaunch — a gentle ritual, not a
+  /// Modules engaged this session (resets on relaunch - a gentle ritual, not a
   /// persisted checklist).
   final Set<FatherModule> _engaged = {};
 
@@ -94,7 +94,7 @@ class FatherContentController extends ChangeNotifier {
         _days.add(d);
       }
     } catch (_) {
-      // Missing / unparseable file — skipped (expected during rollout).
+      // Missing / unparseable file - skipped (expected during rollout).
     }
   }
 
@@ -107,7 +107,7 @@ class FatherContentController extends ChangeNotifier {
       if (decoded is! Map) return;
       _weeks.add(FatherWeek.fromJson(Map<String, dynamic>.from(decoded)));
     } catch (_) {
-      // Missing / unparseable file — skipped (expected during rollout).
+      // Missing / unparseable file - skipped (expected during rollout).
     }
   }
 

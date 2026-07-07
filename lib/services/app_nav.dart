@@ -1,5 +1,5 @@
 // =============================================================================
-//  AppNav — tiny shared tab router
+//  AppNav - tiny shared tab router
 // -----------------------------------------------------------------------------
 //  Lets any screen request a MainScaffold tab change (e.g. the Home → Weekly
 //  "flow" toggle) without threading callbacks everywhere. MainScaffold listens

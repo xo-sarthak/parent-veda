@@ -1,7 +1,7 @@
 // =============================================================================
-//  FoodMealPlanScreen — dynamic meal plans (Today / 3-Day / Weekly)
+//  FoodMealPlanScreen - dynamic meal plans (Today / 3-Day / Weekly)
 // -----------------------------------------------------------------------------
-//  Not a static plan — regenerate while keeping the five-slot balance. Each day
+//  Not a static plan - regenerate while keeping the five-slot balance. Each day
 //  shows Breakfast → Dinner; tap any meal to open the recipe. Reached from the
 //  Food home ("Meal plan →").
 // =============================================================================
@@ -42,7 +42,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
             const SizedBox(height: 8),
             _pad(Text('A balanced few days', style: ppFraunces(28, h: 1.12))),
             const SizedBox(height: 6),
-            _pad(Text('Regenerate any time — the nutrition stays balanced across the day.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Regenerate any time - the nutrition stays balanced across the day.', style: ppBody(14, h: 1.5))),
 
             const SizedBox(height: 18),
             _pad(_rangeToggle()),

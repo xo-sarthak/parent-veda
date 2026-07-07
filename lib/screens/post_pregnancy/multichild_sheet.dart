@@ -1,5 +1,5 @@
 // =============================================================================
-//  MultiChildSheet — Multi-child switcher (parenting app · S10)
+//  MultiChildSheet - Multi-child switcher (parenting app · S10)
 // -----------------------------------------------------------------------------
 //  A bottom sheet listing the account's children (everything personalises to
 //  whoever's active) with an "add a child" affordance. Faithful build of Claude
@@ -129,7 +129,7 @@ class MultiChildSheet extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Add a child', style: ppJakarta(15, color: ppPurple)),
                       const SizedBox(height: 2),
-                      Text('Name, birthday, a photo — takes a minute.', style: ppBody(12, color: ppMuted)),
+                      Text('Name, birthday, a photo - takes a minute.', style: ppBody(12, color: ppMuted)),
                     ]),
                   ),
                 ]),

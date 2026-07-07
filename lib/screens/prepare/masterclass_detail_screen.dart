@@ -1,5 +1,5 @@
 // =============================================================================
-//  MasterclassDetailScreen (S6) — Prepare › Masterclass full page
+//  MasterclassDetailScreen (S6) - Prepare › Masterclass full page
 //  Data-driven (any Masterclass). Intro play → placeholder video; sticky CTA →
 //  mock booking flow (reflects "Reserved" after).
 // =============================================================================
@@ -53,7 +53,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => PrepareVideoScreen(
-                            title: '${m.title} — intro', subtitle: '90-sec preview'))),
+                            title: '${m.title} - intro', subtitle: '90-sec preview'))),
                     child: Container(
                       width: 60,
                       height: 60,

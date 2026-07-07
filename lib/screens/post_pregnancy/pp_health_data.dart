@@ -1,12 +1,12 @@
 // =============================================================================
-//  ParentVeda Health — content model, seed data + store
+//  ParentVeda Health - content model, seed data + store
 // -----------------------------------------------------------------------------
 //  A living health COMPANION (not an EMR, not a document store): the child's
 //  health as a calm, understandable story. Backs the Health Snapshot, the Health
 //  Timeline (the backbone), Growth, a Vaccination SUMMARY (the tracker itself is
 //  a separate existing module), Medical History, AI-style insights, the Doctor
 //  Visit Companion and the Emergency Card. Seeded for Aarav (born 8 Mar 2026,
-//  ~4 months). Static prototype — a real Health Intelligence engine slots in
+//  ~4 months). Static prototype - a real Health Intelligence engine slots in
 //  later. Nothing here depends on the pregnancy app.
 // =============================================================================
 
@@ -134,15 +134,15 @@ const int kVaxTotalDue = 8;
 
 // ---- timeline ---------------------------------------------------------------
 const List<HealthEvent> kHealthTimeline = [
-  HealthEvent(id: 'e_up', type: HealthEventType.vaccination, date: '22 Jul 2026', title: 'PCV dose 3 due', summary: 'Third pneumococcal dose — free at a govt centre.', sortKey: 200, upcoming: true),
+  HealthEvent(id: 'e_up', type: HealthEventType.vaccination, date: '22 Jul 2026', title: 'PCV dose 3 due', summary: 'Third pneumococcal dose - free at a govt centre.', sortKey: 200, upcoming: true),
   HealthEvent(id: 'e1', type: HealthEventType.doctorVisit, date: '12 Jun 2026', title: '4-month well-baby check', summary: 'Weight 6.4 kg (50th), length 63 cm. Development on track. Solids discussed for ~6 months.', doctor: 'Dr. Neha Sharma', notes: 'Reassured about the 4-month sleep regression.', attachments: 1, sortKey: 150),
   HealthEvent(id: 'e2', type: HealthEventType.vaccination, date: '14 Jun 2026', title: '14-week vaccines', summary: 'DTP-3, IPV-3, Hep-B, Hib, Rota, PCV-2 given. Mild fever after, settled in a day.', doctor: 'Dr. Neha Sharma', sortKey: 148),
   HealthEvent(id: 'e3', type: HealthEventType.illness, date: '2 Jun 2026', title: 'Mild cold', summary: 'Runny nose and light congestion for 3 days. No fever. Managed with saline drops.', sortKey: 120),
-  HealthEvent(id: 'e4', type: HealthEventType.growthCheck, date: '17 May 2026', title: 'Growth check (10 weeks)', summary: 'Weight 5.4 kg, length 58 cm — following his own curve nicely.', doctor: 'Dr. Neha Sharma', sortKey: 100),
+  HealthEvent(id: 'e4', type: HealthEventType.growthCheck, date: '17 May 2026', title: 'Growth check (10 weeks)', summary: 'Weight 5.4 kg, length 58 cm - following his own curve nicely.', doctor: 'Dr. Neha Sharma', sortKey: 100),
   HealthEvent(id: 'e5', type: HealthEventType.vaccination, date: '17 May 2026', title: '10-week vaccines', summary: 'DTP-2, IPV-2, Hib, Rota, PCV-1 given. Well tolerated.', sortKey: 98),
-  HealthEvent(id: 'e6', type: HealthEventType.vaccination, date: '19 Apr 2026', title: '6-week vaccines', summary: 'First set — DTP-1, IPV-1, Hep-B, Hib, Rota, PCV. Slight fussiness after.', sortKey: 60),
-  HealthEvent(id: 'e7', type: HealthEventType.labTest, date: '10 Mar 2026', title: 'Newborn screening', summary: 'Routine heel-prick metabolic screen — all results normal.', attachments: 1, sortKey: 20),
-  HealthEvent(id: 'e8', type: HealthEventType.assessment, date: '8 Mar 2026', title: 'Born — healthy', summary: '3.2 kg, 49 cm. APGAR 9/10. Birth vaccines (BCG, OPV-0, Hep-B) given.', doctor: 'Dr. Kavita Menon', sortKey: 0),
+  HealthEvent(id: 'e6', type: HealthEventType.vaccination, date: '19 Apr 2026', title: '6-week vaccines', summary: 'First set - DTP-1, IPV-1, Hep-B, Hib, Rota, PCV. Slight fussiness after.', sortKey: 60),
+  HealthEvent(id: 'e7', type: HealthEventType.labTest, date: '10 Mar 2026', title: 'Newborn screening', summary: 'Routine heel-prick metabolic screen - all results normal.', attachments: 1, sortKey: 20),
+  HealthEvent(id: 'e8', type: HealthEventType.assessment, date: '8 Mar 2026', title: 'Born - healthy', summary: '3.2 kg, 49 cm. APGAR 9/10. Birth vaccines (BCG, OPV-0, Hep-B) given.', doctor: 'Dr. Kavita Menon', sortKey: 0),
 ];
 
 // ---- growth -----------------------------------------------------------------
@@ -152,7 +152,7 @@ const List<GrowthPoint> kGrowth = [
   GrowthPoint('10 wk', 5.4, 58, 40, 50),
   GrowthPoint('4 mo', 6.4, 63, 41, 50),
 ];
-const String kGrowthInterpretation = 'Aarav is growing steadily and following his own healthy curve — weight, length and head size are all tracking together, which is exactly what we like to see.';
+const String kGrowthInterpretation = 'Aarav is growing steadily and following his own healthy curve - weight, length and head size are all tracking together, which is exactly what we like to see.';
 
 // ---- medical history --------------------------------------------------------
 const List<Medication> kMedications = [
@@ -162,7 +162,7 @@ const List<Medication> kMedications = [
 ];
 
 const List<Allergy> kAllergies = [
-  // Empty of "known" on purpose — shows the reassuring empty state.
+  // Empty of "known" on purpose - shows the reassuring empty state.
 ];
 
 const List<SymptomEntry> kSymptoms = [
@@ -171,7 +171,7 @@ const List<SymptomEntry> kSymptoms = [
 ];
 
 const List<MedicalReport> kReports = [
-  MedicalReport(name: 'Newborn metabolic screen', date: '10 Mar 2026', doctor: 'Dr. Kavita Menon', summary: 'All screened conditions normal — nothing to follow up.', values: [
+  MedicalReport(name: 'Newborn metabolic screen', date: '10 Mar 2026', doctor: 'Dr. Kavita Menon', summary: 'All screened conditions normal - nothing to follow up.', values: [
     ReportValue('TSH (thyroid)', 'Normal', 'normal'),
     ReportValue('G6PD', 'Normal', 'normal'),
     ReportValue('Hearing (OAE)', 'Pass', 'normal'),
@@ -185,10 +185,10 @@ const List<MedicalReport> kReports = [
 
 // ---- AI-style insights (reassuring patterns, never diagnosis) ---------------
 const List<String> kHealthInsights = [
-  'Aarav has grown steadily along his own curve for four months — weight, length and head size all tracking together.',
+  'Aarav has grown steadily along his own curve for four months - weight, length and head size all tracking together.',
   'All vaccinations are up to date. The next, PCV dose 3, is due around 22 July.',
   'No allergies have been recorded so far.',
-  'His only illnesses have been a mild seasonal cold and brief post-vaccine fever — both common and self-limiting.',
+  'His only illnesses have been a mild seasonal cold and brief post-vaccine fever - both common and self-limiting.',
 ];
 
 // ---- emergency profile ------------------------------------------------------
@@ -270,7 +270,7 @@ List<HealthEvent> healthTimelineSorted() {
 }
 
 // =============================================================================
-//  HealthStore — mutable health record (seeded from the constants above). Holds
+//  HealthStore - mutable health record (seeded from the constants above). Holds
 //  the parent's doctor-visit questions plus full CRUD over medications,
 //  allergies, symptoms and reports. A ChangeNotifier singleton like the app's
 //  other stores; a real backend slots in behind these same methods later.

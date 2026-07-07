@@ -1,9 +1,9 @@
 // =============================================================================
-//  CartScreen — a marketplace-style cart + preview checkout (no real payments)
+//  CartScreen - a marketplace-style cart + preview checkout (no real payments)
 // -----------------------------------------------------------------------------
 //  Shows what the mother has chosen (image, name, size/colour, quantity, unit
 //  price, line total), a price summary, and a "Buy now" that leads to a tidy
-//  preview checkout ending in a friendly "order placed" — no payment is taken.
+//  preview checkout ending in a friendly "order placed" - no payment is taken.
 //  Reusable helpers expose an add-to-cart flow + a cart icon with a live badge.
 // =============================================================================
 

@@ -1,7 +1,7 @@
 // =============================================================================
-//  DueDateCalculatorScreen — the warm "gateway" calculator
+//  DueDateCalculatorScreen - the warm "gateway" calculator
 // -----------------------------------------------------------------------------
-//  Not a utility — the first chapter of the journey. Pick a method (LMP /
+//  Not a utility - the first chapter of the journey. Pick a method (LMP /
 //  conception / IVF / ultrasound / known), and the result blooms into a
 //  pregnancy roadmap (EDD, current week·day·trimester, mini timeline, key
 //  milestones, trimester breakdown, conception window, month view) ending in
@@ -69,7 +69,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   void initState() {
     super.initState();
     // If she's already set her due date, open straight to the saved roadmap
-    // (with the Recalculate / edit option) instead of a blank calculator — she
+    // (with the Recalculate / edit option) instead of a blank calculator - she
     // sees her stored date, she doesn't have to compute it again.
     if (p.isDueDateSet) _edd = p.dueDate;
   }

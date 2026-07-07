@@ -1,7 +1,7 @@
 // =============================================================================
-//  VaxTimelineScreen — the full chronological journey (the backbone)
+//  VaxTimelineScreen - the full chronological journey (the backbone)
 // -----------------------------------------------------------------------------
-//  Every age visit, in order, as a story the parent is following — not a table.
+//  Every age visit, in order, as a story the parent is following - not a table.
 //  Each node shows the age, the vaccines, a warm status, the Govt/IAP note, a
 //  reminder indicator, and one educational insight ("why now"). Tapping a visit
 //  opens its Learn-Why + After-Care detail. Timelines over tables; warm language.
@@ -36,7 +36,7 @@ class VaxTimelineScreen extends StatelessWidget {
               const SizedBox(height: 22),
               _pad(Text('Every step, in order', style: ppFraunces(30, h: 1.12))),
               const SizedBox(height: 8),
-              _pad(Text("From his first day to the toddler years — where he's been, what's due, and the calm road ahead.", style: ppBody(14, h: 1.55))),
+              _pad(Text("From his first day to the toddler years - where he's been, what's due, and the calm road ahead.", style: ppBody(14, h: 1.55))),
               const SizedBox(height: 24),
               _pad(Column(children: [
                 for (int i = 0; i < kVaxVisits.length; i++)

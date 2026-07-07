@@ -1,5 +1,5 @@
 // =============================================================================
-//  Scan & Appointment models — "Scans & Appointments" care roadmap
+//  Scan & Appointment models - "Scans & Appointments" care roadmap
 // -----------------------------------------------------------------------------
 //  Scan *content* (the roadmap) is reused from kJourneyMilestones (type medical).
 //  Here we only persist the mother's own data: which scans she marked completed,

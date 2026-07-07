@@ -1,5 +1,5 @@
 // =============================================================================
-//  ConsultationsScreen (S2) — Prepare › 1:1 Consultations (data-driven)
+//  ConsultationsScreen (S2) - Prepare › 1:1 Consultations (data-driven)
 //  Every specialist opens their profile (S7).
 // =============================================================================
 
@@ -52,7 +52,7 @@ class ConsultationsScreen extends StatelessWidget {
               ]),
             ),
             pvFooterNote(
-                'Verified specialists only — obstetric & paediatric, never generalists. Real ratings from real mothers. Transparent pricing, no surprises.'),
+                'Verified specialists only - obstetric & paediatric, never generalists. Real ratings from real mothers. Transparent pricing, no surprises.'),
           ],
         ),
       ),

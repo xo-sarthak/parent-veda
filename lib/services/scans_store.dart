@@ -1,5 +1,5 @@
 // =============================================================================
-//  ScansStore — completed scans + appointments ("Scans & Appointments")
+//  ScansStore - completed scans + appointments ("Scans & Appointments")
 // -----------------------------------------------------------------------------
 //  Scan roadmap content is reused from kJourneyMilestones; this store only holds
 //  the mother's own data. Marking a scan completed creates a Journal scan entry
@@ -65,7 +65,7 @@ class ScansStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
-      // completed_scans — keyed by scan_id (no `id` column)
+      // completed_scans - keyed by scan_id (no `id` column)
       final scanRows = await SupabaseRepo.fetch('completed_scans');
       final byScan = {
         for (final r in scanRows) r['scan_id'].toString(): _fromScanRow(r)
@@ -82,7 +82,7 @@ class ScansStore extends ChangeNotifier {
         ..addAll(byScan.values);
       await _persistCompleted();
 
-      // appointments — keyed by id
+      // appointments - keyed by id
       final apptRows =
           await SupabaseRepo.fetch('appointments', orderBy: 'date_iso');
       final byId = {for (final r in apptRows) r['id'].toString(): _fromApptRow(r)};
@@ -98,7 +98,7 @@ class ScansStore extends ChangeNotifier {
       await _persistAppts();
 
       // Partner share: also pull the paired partner's done-scans + appointments
-      // (read-only — RLS allows reading the partner's rows).
+      // (read-only - RLS allows reading the partner's rows).
       _partnerCompleted.clear();
       _partnerAppts.clear();
       final partnerId = await SupabaseRepo.myPartnerId();
@@ -112,7 +112,7 @@ class ScansStore extends ChangeNotifier {
       }
 
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // ---- camelCase model <-> snake_case columns -------------------------------

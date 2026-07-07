@@ -59,8 +59,8 @@ class PregnancyController extends ChangeNotifier {
   String? _myRole; // 'mother' | 'father'
   String? _partnerName; // the paired partner's name (if paired)
 
-  /// When true, every week is viewable (used so the full journey — including
-  /// the week-40 celebration — can be reached and reviewed).
+  /// When true, every week is viewable (used so the full journey - including
+  /// the week-40 celebration - can be reached and reviewed).
   bool unlockAllWeeks = true;
 
   /// Week currently being viewed in the stack (defaults to the current week).
@@ -77,12 +77,12 @@ class PregnancyController extends ChangeNotifier {
   /// Whether the mother has set her real due date (vs the week-20 placeholder).
   bool get isDueDateSet => _dueDateIsSet;
 
-  /// The mother's name — the logged-in user's own name in mother mode, or the
+  /// The mother's name - the logged-in user's own name in mother mode, or the
   /// paired mother's name in father mode. Falls back to a placeholder.
   String get motherName =>
       (_myRole == 'mother' ? _myName : _partnerName) ?? 'Priya';
 
-  /// The father's name — the logged-in user's own name in father mode, or the
+  /// The father's name - the logged-in user's own name in father mode, or the
   /// paired father's name in mother mode. Falls back to a placeholder.
   String get fatherName =>
       (_myRole == 'father' ? _myName : _partnerName) ?? 'Dad';
@@ -165,7 +165,7 @@ class PregnancyController extends ChangeNotifier {
 
   /// Days the mother is PAST her due date (0 if not overdue). Lets the journey
   /// map cater to overdue pregnancies ("baby comes when ready") without changing
-  /// the trail — currentWeek/currentDay still clamp at 40 / 280.
+  /// the trail - currentWeek/currentDay still clamp at 40 / 280.
   int get daysPastDue {
     final d = _dateOnly(_now).difference(_dateOnly(_dueDate)).inDays;
     return d > 0 ? d : 0;
@@ -300,7 +300,7 @@ class PregnancyController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Persisted due date set from the Due Date Calculator — drives the whole app
+  /// Persisted due date set from the Due Date Calculator - drives the whole app
   /// (current week/day everywhere). Survives restarts.
   Future<void> setDueDate(DateTime dueDate) async {
     _dueDate = _dateOnly(dueDate);
@@ -320,10 +320,10 @@ class PregnancyController extends ChangeNotifier {
             {'due_date': _dueDate.toIso8601String().split('T').first}).eq(
             'id', uid);
       }
-    } catch (_) {/* offline — local only */}
+    } catch (_) {/* offline - local only */}
   }
 
-  /// Testing helper — clear any saved due date and snap back to the week-20
+  /// Testing helper - clear any saved due date and snap back to the week-20
   /// placeholder, so the app + pregnancy map present a fresh "halfway" state.
   Future<void> resetForTesting() async {
     _dueDate = _placeholderDueDate(_now);
@@ -343,14 +343,14 @@ class PregnancyController extends ChangeNotifier {
             .from('profiles')
             .update({'due_date': null}).eq('id', uid);
       }
-    } catch (_) {/* offline — local only */}
+    } catch (_) {/* offline - local only */}
   }
 
   // --- helpers ---------------------------------------------------------------
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  /// Placeholder due date so the demo opens mid-journey (~week 20 — "halfway
+  /// Placeholder due date so the demo opens mid-journey (~week 20 - "halfway
   /// there"), giving a healthy mix of unlocked past weeks and locked future
   /// weeks while matching the Home Screen daily-moment prototype.
   static DateTime _placeholderDueDate(DateTime now) {

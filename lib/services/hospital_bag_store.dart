@@ -1,7 +1,7 @@
 // =============================================================================
 //  HospitalBagStore
 // -----------------------------------------------------------------------------
-//  "My Hospital Bag ❤️" — a personalized preparation planner (NOT a checklist).
+//  "My Hospital Bag ❤️" - a personalized preparation planner (NOT a checklist).
 //  Local-only persistence (shared_preferences). Holds the mother's bag: a list
 //  of items, each with a state (needed / already-have / buy-from-ParentVeda /
 //  buy-elsewhere / skip) plus a "packed" flag, optional buy details and an
@@ -41,7 +41,7 @@ BagItemStatus _statusFromString(String s) =>
     BagItemStatus.values.firstWhere((c) => c.name == s,
         orElse: () => BagItemStatus.needed);
 
-/// The ParentVeda "trust layer" for a recommended product — never pushy.
+/// The ParentVeda "trust layer" for a recommended product - never pushy.
 @immutable
 class BagRecommendation {
   const BagRecommendation({
@@ -57,7 +57,7 @@ class BagRecommendation {
   /// ParentVeda price in ₹ (null = no price shown).
   final int? price;
 
-  /// "Why ParentVeda recommends this" — max 3.
+  /// "Why ParentVeda recommends this" - max 3.
   final List<String> why;
 
   /// "Things to consider".
@@ -314,7 +314,7 @@ class HospitalBagStore extends ChangeNotifier with CloudSyncedStore {
       }
     } catch (_) {/* start empty */}
     _loaded = true;
-    // Auto-reflect in-app ParentVeda purchases as "bought" — now and on change.
+    // Auto-reflect in-app ParentVeda purchases as "bought" - now and on change.
     BoughtStore.instance.addListener(markBoughtFromBought);
     markBoughtFromBought();
     notifyListeners();
@@ -432,7 +432,7 @@ class HospitalBagStore extends ChangeNotifier with CloudSyncedStore {
     await _touch();
   }
 
-  /// The mother's own favourites — her must-have items, regardless of category.
+  /// The mother's own favourites - her must-have items, regardless of category.
   Future<void> toggleFavourite(String id) async {
     final i = byId(id);
     if (i == null) return;
@@ -477,7 +477,7 @@ class HospitalBagStore extends ChangeNotifier with CloudSyncedStore {
   /// Add one of the "suggested essentials" into the bag (if not already there).
   Future<void> addSuggested(BagItem item) async {
     if (_items.any((i) => i.id == item.id)) {
-      // already present — un-skip it if it was skipped
+      // already present - un-skip it if it was skipped
       final existing = byId(item.id)!;
       if (existing.isSkipped) existing.status = BagItemStatus.needed;
     } else {

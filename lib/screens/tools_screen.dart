@@ -1,5 +1,5 @@
 // =============================================================================
-//  ToolsScreen  —  the "Tools" tab landing (a grid of tools)
+//  ToolsScreen  -  the "Tools" tab landing (a grid of tools)
 // -----------------------------------------------------------------------------
 //  The first tool is "Your Pregnancy Journey" (the map). The remaining tiles are
 //  gentle "coming soon" placeholders, so the tab already reads as a growing

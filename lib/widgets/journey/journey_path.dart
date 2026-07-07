@@ -1,9 +1,9 @@
 // =============================================================================
-//  JourneyPathPainter  —  the winding trail (design: white path + dotted line)
+//  JourneyPathPainter  -  the winding trail (design: white path + dotted line)
 // -----------------------------------------------------------------------------
 //  A single, confident trail: a soft shadow, a thick rounded WHITE path, and a
 //  fine dotted lavender overlay on top (the design's "1 16" dashes). Calm and
-//  premium — not a bright two-tone zig-zag. Progress is read from the nodes and
+//  premium - not a bright two-tone zig-zag. Progress is read from the nodes and
 //  the "you are here" marker, not from the path colour.
 // =============================================================================
 
@@ -98,8 +98,8 @@ class JourneyPathPainter extends CustomPainter {
       return path;
     }
 
-    drawDots(subPath(0, ci), const Color(0xFFD8C9EE)); // ahead — lighter
-    drawDots(subPath(ci, maxP), AppTheme.primary200); // passed — normal
+    drawDots(subPath(0, ci), const Color(0xFFD8C9EE)); // ahead - lighter
+    drawDots(subPath(ci, maxP), AppTheme.primary200); // passed - normal
   }
 
   @override

@@ -1,11 +1,11 @@
 // =============================================================================
-//  ParentVeda Food ("Food Companion") — content model, catalog + store
+//  ParentVeda Food ("Food Companion") - content model, catalog + store
 // -----------------------------------------------------------------------------
-//  Recipes V2 — NOT a recipe library. A personalised food companion that answers
+//  Recipes V2 - NOT a recipe library. A personalised food companion that answers
 //  one question: "What should I feed my child today?". So the model carries far
 //  more than a recipe: the WHY, key nutrients, serving frequency, storage,
 //  common mistakes, ingredient substitutions, and a "Healthier ParentVeda
-//  version" — plus canonical ingredient keys that power the Smart Meal Builder.
+//  version" - plus canonical ingredient keys that power the Smart Meal Builder.
 //  Indian-family first, evidence-based, no calorie counting / diet culture.
 //  Brand-new + self-contained: does NOT touch the existing Recipes module
 //  (pp_recipes_data.dart). Scenario child: Aarav (first foods from ~6 months).
@@ -21,7 +21,7 @@ class FoodNutrient {
   final String note; // one-line why
 }
 
-/// A food/recipe — the unit of the Food companion.
+/// A food/recipe - the unit of the Food companion.
 class FoodRecipe {
   const FoodRecipe({
     required this.id,
@@ -85,7 +85,7 @@ class FoodRecipe {
   String get vegLabel => veg ? 'Veg' : 'Non-veg';
 }
 
-/// One "nutrition focus of the day" — the educational strength.
+/// One "nutrition focus of the day" - the educational strength.
 class NutritionFocus {
   const NutritionFocus({
     required this.id,
@@ -151,7 +151,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 1,
     highlight: 'Iron + calcium',
     why:
-        'Ragi (nachni) is one of the richest vegetarian sources of iron and calcium — exactly what a baby needs as his own iron stores start to run low around 6 months. Banana adds natural sweetness so there’s no need for sugar, and the soft, sturdy texture is perfect for little fingers learning to self-feed.',
+        'Ragi (nachni) is one of the richest vegetarian sources of iron and calcium - exactly what a baby needs as his own iron stores start to run low around 6 months. Banana adds natural sweetness so there’s no need for sugar, and the soft, sturdy texture is perfect for little fingers learning to self-feed.',
     nutrients: [
       FoodNutrient('Iron', 'good source', 'Supports his blood and brain as birth stores deplete.'),
       FoodNutrient('Calcium', 'good source', 'For growing bones and teeth.'),
@@ -166,10 +166,10 @@ const List<FoodRecipe> kFoodRecipes = [
       'Cool to just-warm and cut into strips he can hold.',
     ],
     storage: ['Best fresh; keep leftovers covered in the fridge up to 24 hours and warm gently.'],
-    mistakes: ['Cooking on high heat — ragi burns fast; keep it low and slow.', 'Adding sugar or honey — never honey before 1 year.'],
+    mistakes: ['Cooking on high heat - ragi burns fast; keep it low and slow.', 'Adding sugar or honey - never honey before 1 year.'],
     substitutions: {'banana': 'stewed apple or mashed sweet potato', 'ragi flour': 'oat flour (less iron)'},
     healthierNote:
-        'The everyday version uses maida and sugar. Ours swaps in iron-and-calcium-rich ragi and lets ripe banana do the sweetening — same comforting pancake, far more nourishment and no added sugar.',
+        'The everyday version uses maida and sugar. Ours swaps in iron-and-calcium-rich ragi and lets ripe banana do the sweetening - same comforting pancake, far more nourishment and no added sugar.',
     tags: {'iron', 'calcium', 'breakfast', 'finger food', 'ragi', 'banana', 'no sugar'},
     ingredientKeys: {'ragi', 'banana', 'milk'},
     relatedArticle: 'Distracted feeds: is he getting enough?',
@@ -196,7 +196,7 @@ const List<FoodRecipe> kFoodRecipes = [
       FoodNutrient('Fibre', 'good', 'Keeps digestion gentle and regular.'),
       FoodNutrient('Carbohydrate', 'good', 'Steady energy for a growing body.'),
     ],
-    frequency: 'Anytime — a great daily first food',
+    frequency: 'Anytime - a great daily first food',
     ingredients: ['1 small sweet potato', 'A splash of breast milk / formula / water'],
     steps: [
       'Steam or boil the peeled, cubed sweet potato until very soft.',
@@ -204,9 +204,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Serve just-warm; thin it more for a first taste.',
     ],
     storage: ['Fridge up to 2 days, or freeze in an ice-cube tray for quick single portions.'],
-    mistakes: ['Serving too thick at the very first taste — start runny and thicken over weeks.'],
+    mistakes: ['Serving too thick at the very first taste - start runny and thicken over weeks.'],
     substitutions: {'sweet potato': 'pumpkin or carrot (both vitamin-A rich)'},
-    healthierNote: 'No added salt, sugar or butter — just the vegetable, the way a first food should be.',
+    healthierNote: 'No added salt, sugar or butter - just the vegetable, the way a first food should be.',
     tags: {'first food', 'vitamin a', 'sweet potato', 'puree', 'vegetables'},
     ingredientKeys: {'sweet potato'},
     relatedVideoId: 'solids101',
@@ -225,10 +225,10 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 3,
     highlight: 'Protein + iron',
     why:
-        'Rice and moong dal together make a complete protein — all the building blocks in one soft, comforting bowl. It’s the classic Indian first meal for good reason: gentle to digest, easy to mash, and endlessly adaptable as he grows.',
+        'Rice and moong dal together make a complete protein - all the building blocks in one soft, comforting bowl. It’s the classic Indian first meal for good reason: gentle to digest, easy to mash, and endlessly adaptable as he grows.',
     nutrients: [
       FoodNutrient('Protein', 'complete', 'Dal + rice = all essential amino acids.'),
-      FoodNutrient('Iron', 'moderate', 'From the dal — pair with a squeeze of lemon later on.'),
+      FoodNutrient('Iron', 'moderate', 'From the dal - pair with a squeeze of lemon later on.'),
       FoodNutrient('Carbohydrate', 'good', 'Warm, filling energy.'),
     ],
     frequency: '3–4 times a week',
@@ -239,9 +239,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Stir in a little ghee, cool to just-warm and serve.',
     ],
     storage: ['Fridge up to 24 hours; loosen with warm water when reheating.'],
-    mistakes: ['Too little water — khichdi should be soft and porridge-like for a baby, not fluffy.', 'Adding salt before 1 year is best kept minimal.'],
+    mistakes: ['Too little water - khichdi should be soft and porridge-like for a baby, not fluffy.', 'Adding salt before 1 year is best kept minimal.'],
     substitutions: {'moong dal': 'toor or masoor dal', 'rice': 'broken wheat (dalia) for older babies'},
-    healthierNote: 'We keep it low-salt, add a vegetable for extra nutrients, and finish with ghee for healthy fats and vitamin absorption — not a fried tadka.',
+    healthierNote: 'We keep it low-salt, add a vegetable for extra nutrients, and finish with ghee for healthy fats and vitamin absorption - not a fried tadka.',
     tags: {'protein', 'iron', 'lunch', 'first food', 'khichdi', 'rice', 'dal', 'moong dal'},
     ingredientKeys: {'rice', 'moong dal', 'vegetables'},
     relatedCommunity: 'Khichdi variations we love',
@@ -260,7 +260,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 4,
     highlight: 'Fibre + B-vitamins',
     why:
-        'Oats cook down soft and creamy, and a handful of grated vegetables turns breakfast into a small nutrition win. The fibre keeps digestion happy — useful in the months when new foods can slow things down.',
+        'Oats cook down soft and creamy, and a handful of grated vegetables turns breakfast into a small nutrition win. The fibre keeps digestion happy - useful in the months when new foods can slow things down.',
     nutrients: [
       FoodNutrient('Fibre', 'good', 'Keeps digestion moving.'),
       FoodNutrient('Iron', 'moderate', 'Oats add a little plant iron.'),
@@ -273,10 +273,10 @@ const List<FoodRecipe> kFoodRecipes = [
       'Add oats and milk; simmer to a soft, creamy porridge.',
       'Mash any lumps, cool to just-warm and serve.',
     ],
-    storage: ['Best fresh — oats thicken as they sit; loosen with warm milk if needed.'],
-    mistakes: ['Using flavoured/instant oats — plain oats only, no added sugar or salt.'],
+    storage: ['Best fresh - oats thicken as they sit; loosen with warm milk if needed.'],
+    mistakes: ['Using flavoured/instant oats - plain oats only, no added sugar or salt.'],
     substitutions: {'oats': 'daliya (broken wheat)', 'carrot': 'any soft-cooked veg'},
-    healthierNote: 'A savoury, vegetable-forward take instead of sugary oats — same 10-minute ease, real nourishment.',
+    healthierNote: 'A savoury, vegetable-forward take instead of sugary oats - same 10-minute ease, real nourishment.',
     tags: {'fibre', 'breakfast', 'oats', 'vegetables'},
     ingredientKeys: {'oats', 'milk', 'vegetables'},
     relatedVideoId: 'q_iron',
@@ -295,7 +295,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 5,
     highlight: 'Protein + calcium',
     why:
-        'Paneer is a baby-friendly powerhouse — soft, mild and rich in protein and calcium. Shaped into little cutlets your baby can grip, it’s a brilliant self-feeding snack that builds his pincer grasp while it nourishes.',
+        'Paneer is a baby-friendly powerhouse - soft, mild and rich in protein and calcium. Shaped into little cutlets your baby can grip, it’s a brilliant self-feeding snack that builds his pincer grasp while it nourishes.',
     nutrients: [
       FoodNutrient('Protein', 'excellent', 'For muscle and steady growth.'),
       FoodNutrient('Calcium', 'excellent', 'Bones and teeth.'),
@@ -310,7 +310,7 @@ const List<FoodRecipe> kFoodRecipes = [
       'Cool and cut into grippable strips.',
     ],
     storage: ['Fridge up to a day; warm before serving. Freeze uncooked patties for quick snacks.'],
-    mistakes: ['Deep frying — a light pan-fry in ghee is plenty.', 'Making them too big or firm to gum.'],
+    mistakes: ['Deep frying - a light pan-fry in ghee is plenty.', 'Making them too big or firm to gum.'],
     substitutions: {'paneer': 'crumbled tofu', 'potato': 'sweet potato or peas'},
     healthierNote: 'Pan-fried in a little ghee, not deep-fried, and bound with rice flour instead of a heavy breadcrumb coating.',
     tags: {'protein', 'calcium', 'finger food', 'snack', 'paneer', 'vegetables'},
@@ -331,7 +331,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 6,
     highlight: 'Iron + folate',
     why:
-        'Folding soft-cooked spinach into dal is the gentlest way to get greens — and their iron and folate — into a baby who might refuse them plain. Blended smooth into the dal, the taste is mild and the colour is fun.',
+        'Folding soft-cooked spinach into dal is the gentlest way to get greens - and their iron and folate - into a baby who might refuse them plain. Blended smooth into the dal, the taste is mild and the colour is fun.',
     nutrients: [
       FoodNutrient('Iron', 'good', 'Plant iron from spinach and dal.'),
       FoodNutrient('Folate', 'good', 'For rapid cell growth.'),
@@ -346,9 +346,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Serve with soft rice.',
     ],
     storage: ['Fridge up to 24 hours; reheat gently.'],
-    mistakes: ['Overcooking spinach for long — a quick wilt keeps more nutrients.'],
+    mistakes: ['Overcooking spinach for long - a quick wilt keeps more nutrients.'],
     substitutions: {'spinach': 'methi or soft-cooked bottle gourd'},
-    healthierNote: 'Vitamin C (that drop of lemon) is added on purpose — it helps his body absorb far more of the plant iron.',
+    healthierNote: 'Vitamin C (that drop of lemon) is added on purpose - it helps his body absorb far more of the plant iron.',
     tags: {'iron', 'folate', 'greens', 'lunch', 'dinner', 'spinach', 'dal'},
     ingredientKeys: {'spinach', 'moong dal', 'rice'},
     relatedArticle: 'Distracted feeds: is he getting enough?',
@@ -367,19 +367,19 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 7,
     highlight: 'Probiotics',
     why:
-        'Soft rice mashed with curd is cooling, gentle and full of gut-friendly probiotics. It needs no cooking and travels well — the easiest thing to carry for a day out, and a soother on a hot day or an upset tummy.',
+        'Soft rice mashed with curd is cooling, gentle and full of gut-friendly probiotics. It needs no cooking and travels well - the easiest thing to carry for a day out, and a soother on a hot day or an upset tummy.',
     nutrients: [
       FoodNutrient('Probiotics', 'good', 'Friendly bacteria for gut health.'),
       FoodNutrient('Calcium', 'good', 'From the curd.'),
       FoodNutrient('Carbohydrate', 'good', 'Easy, gentle energy.'),
     ],
-    frequency: 'Anytime — great for travel & recovery',
+    frequency: 'Anytime - great for travel & recovery',
     ingredients: ['3 tbsp soft-cooked rice', '2 tbsp fresh curd', 'A little water to loosen'],
     steps: ['Mash the rice soft.', 'Fold in fresh curd and loosen to a soft, spoonable texture.', 'Serve cool (not cold).'],
     storage: ['Best fresh; in a cool flask it holds a few hours for travel.'],
     mistakes: ['Using sour or very cold curd.'],
     substitutions: {'curd': 'hung curd for a thicker travel version'},
-    healthierNote: 'Fresh curd and no tempering or salt — just the cooling, probiotic basics a little tummy loves.',
+    healthierNote: 'Fresh curd and no tempering or salt - just the cooling, probiotic basics a little tummy loves.',
     tags: {'probiotic', 'travel', 'lunch', 'curd', 'rice', 'sick day'},
     ingredientKeys: {'curd', 'rice'},
   ),
@@ -397,7 +397,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 8,
     highlight: 'Protein + choline',
     why:
-        'Once eggs are introduced, soft-scrambled bhurji is a wonderful protein-rich breakfast. Eggs bring choline, which supports the fast brain development happening this year — and the soft curds are easy for little hands.',
+        'Once eggs are introduced, soft-scrambled bhurji is a wonderful protein-rich breakfast. Eggs bring choline, which supports the fast brain development happening this year - and the soft curds are easy for little hands.',
     nutrients: [
       FoodNutrient('Protein', 'excellent', 'High-quality and complete.'),
       FoodNutrient('Choline', 'excellent', 'Supports brain and memory development.'),
@@ -410,10 +410,10 @@ const List<FoodRecipe> kFoodRecipes = [
       'Cook low and slow in a little ghee, stirring to soft, small curds.',
       'Keep it moist (not dry); cool to just-warm.',
     ],
-    storage: ['Serve fresh — eggs are best not stored once cooked for a baby.'],
-    mistakes: ['Overcooking to dry, rubbery curds.', 'Introducing egg alongside other new foods — try it alone first to spot any reaction.'],
+    storage: ['Serve fresh - eggs are best not stored once cooked for a baby.'],
+    mistakes: ['Overcooking to dry, rubbery curds.', 'Introducing egg alongside other new foods - try it alone first to spot any reaction.'],
     substitutions: {'egg': 'for vegetarians, soft crumbled paneer bhurji'},
-    healthierNote: 'Cooked in a little ghee, kept soft and moist, low salt — gentle on his tummy and easy to gum.',
+    healthierNote: 'Cooked in a little ghee, kept soft and moist, low salt - gentle on his tummy and easy to gum.',
     tags: {'protein', 'brain', 'breakfast', 'egg', 'non-veg'},
     ingredientKeys: {'egg', 'milk', 'tomato'},
     relatedVideoId: 'leap4brain',
@@ -446,9 +446,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Serve fresh in a sipper or spoon.',
     ],
     storage: ['Drink fresh; ragi thickens on standing.'],
-    mistakes: ['Serving raw (uncooked) ragi flour — always cook it first.'],
+    mistakes: ['Serving raw (uncooked) ragi flour - always cook it first.'],
     substitutions: {'dates': 'ripe mango or extra banana for sweetness'},
-    healthierNote: 'Sweetened only with fruit and dates — no sugar, no syrups — and thickened with iron-rich ragi instead of cornflour.',
+    healthierNote: 'Sweetened only with fruit and dates - no sugar, no syrups - and thickened with iron-rich ragi instead of cornflour.',
     tags: {'iron', 'calcium', 'smoothie', 'drink', 'ragi', 'banana', 'fussy eater'},
     ingredientKeys: {'ragi', 'banana', 'milk', 'dates'},
   ),
@@ -466,7 +466,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 10,
     highlight: 'Vitamin A + C',
     why:
-        'A silky tomato-carrot soup is warmth and vitamins in a cup — vitamin A for immunity and vitamin C to help him absorb iron from the rest of his meals. Lovely as a light evening sip, especially with a stuffy nose.',
+        'A silky tomato-carrot soup is warmth and vitamins in a cup - vitamin A for immunity and vitamin C to help him absorb iron from the rest of his meals. Lovely as a light evening sip, especially with a stuffy nose.',
     nutrients: [
       FoodNutrient('Vitamin A', 'good', 'Immunity and eyes.'),
       FoodNutrient('Vitamin C', 'good', 'Boosts iron absorption.'),
@@ -476,9 +476,9 @@ const List<FoodRecipe> kFoodRecipes = [
     ingredients: ['1 tomato', '1 small carrot', 'A little water', 'A drop of ghee'],
     steps: ['Cook tomato and carrot soft.', 'Blend smooth and strain if needed.', 'Warm through with a drop of ghee; serve just-warm.'],
     storage: ['Fridge up to 2 days; reheat gently.'],
-    mistakes: ['Adding stock cubes or salt — the vegetables are sweet enough.'],
+    mistakes: ['Adding stock cubes or salt - the vegetables are sweet enough.'],
     substitutions: {'carrot': 'pumpkin or bottle gourd'},
-    healthierNote: 'No cream, no salt, no stock cubes — just blended vegetables and a drop of ghee for absorption.',
+    healthierNote: 'No cream, no salt, no stock cubes - just blended vegetables and a drop of ghee for absorption.',
     tags: {'vitamin a', 'vitamin c', 'soup', 'sick day', 'tomato', 'vegetables'},
     ingredientKeys: {'tomato', 'vegetables'},
     relatedCommunity: 'Sick-day meals that worked',
@@ -497,7 +497,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 11,
     highlight: 'Protein + iron',
     why:
-        'Besan (gram flour) is quietly high in protein and iron. Thinned soft and cooked gently, chilla makes a savoury, grippable snack — a nice change from sweet foods and a good way to widen his palate.',
+        'Besan (gram flour) is quietly high in protein and iron. Thinned soft and cooked gently, chilla makes a savoury, grippable snack - a nice change from sweet foods and a good way to widen his palate.',
     nutrients: [
       FoodNutrient('Protein', 'good', 'Plant protein from gram flour.'),
       FoodNutrient('Iron', 'moderate', 'A useful vegetarian source.'),
@@ -511,9 +511,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Cool and cut into strips he can hold.',
     ],
     storage: ['Best fresh; batter keeps in the fridge a few hours.'],
-    mistakes: ['Making it thick and doughy — keep the batter thin so the chilla stays soft.'],
+    mistakes: ['Making it thick and doughy - keep the batter thin so the chilla stays soft.'],
     substitutions: {'besan': 'moong dal batter (soaked & ground)'},
-    healthierNote: 'Cooked soft in a little ghee, loaded with vegetables, no chilli or heavy salt — savoury nutrition, gently done.',
+    healthierNote: 'Cooked soft in a little ghee, loaded with vegetables, no chilli or heavy salt - savoury nutrition, gently done.',
     tags: {'protein', 'iron', 'snack', 'savoury', 'besan', 'vegetables', 'finger food'},
     ingredientKeys: {'besan', 'vegetables'},
   ),
@@ -531,7 +531,7 @@ const List<FoodRecipe> kFoodRecipes = [
     seed: 12,
     highlight: 'Iron + energy',
     why:
-        'A treat that still nourishes — dates bring natural sweetness plus iron, and banana makes it creamy. It proves dessert doesn’t need sugar to feel special, and it’s a gentle way to end a meal.',
+        'A treat that still nourishes - dates bring natural sweetness plus iron, and banana makes it creamy. It proves dessert doesn’t need sugar to feel special, and it’s a gentle way to end a meal.',
     nutrients: [
       FoodNutrient('Iron', 'moderate', 'Dates are a sweet iron source.'),
       FoodNutrient('Calcium', 'good', 'From the milk.'),
@@ -545,9 +545,9 @@ const List<FoodRecipe> kFoodRecipes = [
       'Warm through and cool to just-warm.',
     ],
     storage: ['Fridge up to a day; reheat gently.'],
-    mistakes: ['Adding sugar or condensed milk — the dates are the sweetness.'],
+    mistakes: ['Adding sugar or condensed milk - the dates are the sweetness.'],
     substitutions: {'dates': 'ripe mango or stewed apple'},
-    healthierNote: 'Traditional kheer is sugar-and-condensed-milk heavy. Ours sweetens only with dates and banana — a real dessert, no added sugar.',
+    healthierNote: 'Traditional kheer is sugar-and-condensed-milk heavy. Ours sweetens only with dates and banana - a real dessert, no added sugar.',
     tags: {'dessert', 'iron', 'no sugar', 'dates', 'banana', 'milk'},
     ingredientKeys: {'dates', 'banana', 'milk'},
   ),
@@ -560,10 +560,10 @@ const List<NutritionFocus> kNutritionFocuses = [
     nutrient: 'Iron',
     oneLine: 'The nutrient that matters most right now',
     why:
-        'Babies are born with an iron store that starts to run low around 6 months — right when solids begin. Iron builds healthy blood and, crucially, fuels the fast brain growth of the first two years. It’s the single most important nutrient to be intentional about as your baby starts eating.',
+        'Babies are born with an iron store that starts to run low around 6 months - right when solids begin. Iron builds healthy blood and, crucially, fuels the fast brain growth of the first two years. It’s the single most important nutrient to be intentional about as your baby starts eating.',
     sources: ['Ragi (nachni)', 'Moong & other dals', 'Spinach & greens', 'Dates', 'Egg yolk', 'Iron-fortified cereals'],
     easyFoods: ['Ragi banana pancakes', 'Palak dal with rice', 'A few mashed dates'],
-    deficiency: 'Persistent paleness, unusual tiredness or poor appetite can be signs — mention it to your paediatrician, who can check simply.',
+    deficiency: 'Persistent paleness, unusual tiredness or poor appetite can be signs - mention it to your paediatrician, who can check simply.',
     recipeIds: ['ragipancake', 'palakdal', 'ragismoothie', 'datekheer'],
     seed: 31,
     article: 'Distracted feeds: is he getting enough?',
@@ -573,7 +573,7 @@ const List<NutritionFocus> kNutritionFocuses = [
     nutrient: 'Protein',
     oneLine: 'The building blocks of growth',
     why:
-        'Protein builds and repairs everything — muscle, skin, the immune system. For a rapidly growing baby it’s essential, but it doesn’t take much: a little dal, paneer, egg or curd at meals is plenty. Balance matters more than quantity.',
+        'Protein builds and repairs everything - muscle, skin, the immune system. For a rapidly growing baby it’s essential, but it doesn’t take much: a little dal, paneer, egg or curd at meals is plenty. Balance matters more than quantity.',
     sources: ['Dals & pulses', 'Paneer', 'Curd', 'Egg', 'Besan (gram flour)'],
     easyFoods: ['Moong dal khichdi', 'Paneer cutlets', 'Soft egg bhurji'],
     deficiency: 'Rare in a varied diet; a paediatrician can advise if your baby is a very selective eater.',
@@ -597,7 +597,7 @@ const List<NutritionFocus> kNutritionFocuses = [
     nutrient: 'Vitamin A',
     oneLine: 'For eyes and immunity',
     why:
-        'Vitamin A supports healthy eyes, skin and a strong immune system — helpful as your baby meets more of the world (and its germs). The orange and dark-green vegetables are the friendliest sources, and they’re naturally sweet.',
+        'Vitamin A supports healthy eyes, skin and a strong immune system - helpful as your baby meets more of the world (and its germs). The orange and dark-green vegetables are the friendliest sources, and they’re naturally sweet.',
     sources: ['Sweet potato', 'Carrot', 'Pumpkin', 'Spinach', 'Mango'],
     easyFoods: ['Sweet potato mash', 'Tomato & carrot soup'],
     deficiency: 'A varied vegetable diet usually covers it; ask your paediatrician if unsure.',
@@ -609,10 +609,10 @@ const List<NutritionFocus> kNutritionFocuses = [
     nutrient: 'Fibre & hydration',
     oneLine: 'Keeping digestion gentle',
     why:
-        'New foods can slow a baby’s digestion. Gentle fibre from wholegrains, fruit and vegetables — plus enough fluids — keeps things comfortable and regular. It’s about balance, not loading up: too much fibre can be as troublesome as too little.',
+        'New foods can slow a baby’s digestion. Gentle fibre from wholegrains, fruit and vegetables - plus enough fluids - keeps things comfortable and regular. It’s about balance, not loading up: too much fibre can be as troublesome as too little.',
     sources: ['Oats & wholegrains', 'Fruit (banana, prune, apple)', 'Vegetables', 'Water (from 6 months, small sips)'],
     easyFoods: ['Savoury vegetable oats', 'Stewed fruit', 'Extra water with meals'],
-    deficiency: 'Hard, infrequent stools can signal too little fibre or fluid — a paediatrician can guide you.',
+    deficiency: 'Hard, infrequent stools can signal too little fibre or fluid - a paediatrician can guide you.',
     recipeIds: ['veggieoats', 'sweetpotatomash'],
     seed: 35,
   ),
@@ -629,7 +629,7 @@ List<FoodRecipe> foodByCategory(String category) => kFoodRecipes
 List<FoodRecipe> get recommendedFood =>
     kFoodRecipes.where((r) => !FoodStore.instance.vegOnly || r.veg).take(6).toList();
 
-/// The controlled ingredient library — every ingredient key used anywhere in the
+/// The controlled ingredient library - every ingredient key used anywhere in the
 /// recipe database. The Smart Meal Builder offers only these (never arbitrary
 /// items), so a chosen ingredient always maps to real, matchable recipes.
 List<String> foodIngredientLibrary() {
@@ -699,7 +699,7 @@ List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, 
 }
 
 // =============================================================================
-//  FoodStore — saved recipes + the shopping list (ingredient -> purchased).
+//  FoodStore - saved recipes + the shopping list (ingredient -> purchased).
 // =============================================================================
 class FoodStore extends ChangeNotifier {
   FoodStore._();

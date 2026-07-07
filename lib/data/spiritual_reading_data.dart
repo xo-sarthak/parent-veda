@@ -1,13 +1,13 @@
 // =============================================================================
-//  Spiritual Reading — seed content (a gentle, surface-level testing feature)
+//  Spiritual Reading - seed content (a gentle, surface-level testing feature)
 // -----------------------------------------------------------------------------
 //  A respectful, neutral look at how a few faith traditions approach calm,
-//  gratitude, family and motherhood — shared for comfort and curiosity, NOT as
+//  gratitude, family and motherhood - shared for comfort and curiosity, NOT as
 //  religious instruction, and with no intent to promote any one belief.
 //
 //  IMPORTANT: every reflection below is ORIGINAL, written in plain words. No
 //  scripture, verse, prayer, mantra, hymn or copyrighted translation is quoted
-//  or paraphrased — only general themes are described and reflected on gently.
+//  or paraphrased - only general themes are described and reflected on gently.
 //
 //  Organised by TRADITION → SECTION (sub-heading) → READS. Seeded with ~20 reads
 //  per tradition; designed to scale (add reads to a section, or sections to a
@@ -90,7 +90,7 @@ const List<SpiritualTradition> kSpiritualTraditions = [
         SpiritualRead(
             title: 'Your effort is enough',
             body:
-                "This teaching values wholehearted effort over a perfect result. On the days you simply eat well, rest, and get through, that is not 'not enough' — that is exactly the work."),
+                "This teaching values wholehearted effort over a perfect result. On the days you simply eat well, rest, and get through, that is not 'not enough' - that is exactly the work."),
         SpiritualRead(
             title: 'Let the worry pass through',
             body:
@@ -1500,7 +1500,7 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   ),
 
   // ===========================================================================
-  //  OTHERS — Jainism & Buddhism
+  //  OTHERS - Jainism & Buddhism
   // ===========================================================================
   SpiritualTradition(
     id: 'others',

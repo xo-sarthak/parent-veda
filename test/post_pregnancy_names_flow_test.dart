@@ -22,7 +22,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Vihaan'), findsWidgets);
 
-    // Like Vihaan — a mutual yes — and the celebration overlay appears.
+    // Like Vihaan - a mutual yes - and the celebration overlay appears.
     await tester.tap(find.byKey(const ValueKey('name-like')));
     await tester.pumpAndSettle();
     expect(find.text("It's a match!"), findsOneWidget);

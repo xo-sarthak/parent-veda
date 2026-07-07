@@ -1,7 +1,7 @@
 // =============================================================================
-//  SickDaysScreen — Recipes · Sick-day meals (parenting · S15·sick)
+//  SickDaysScreen - Recipes · Sick-day meals (parenting · S15·sick)
 // -----------------------------------------------------------------------------
-//  Comfort meals for when the child is unwell — gentle, settling foods filtered
+//  Comfort meals for when the child is unwell - gentle, settling foods filtered
 //  by what's troubling him (constipation / loose motion / cough & cold / fever),
 //  with an ⓘ safety note (these support recovery, not medical remedies).
 //  Faithful build of Claude Design · S15·sick. Reached from Recipes → Sick mode.
@@ -64,7 +64,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
               ),
             ])),
             const SizedBox(height: 12),
-            _pad(Text("Gentle, settling foods for when Aarav's under the weather — soft, mild, and easy on a poorly tummy. Pick what's troubling him.",
+            _pad(Text("Gentle, settling foods for when Aarav's under the weather - soft, mild, and easy on a poorly tummy. Pick what's troubling him.",
                 style: ppBody(15))),
 
             if (_noteOpen) ...[

@@ -1,5 +1,5 @@
 // =============================================================================
-//  Recipes — shared widgets: the list row and the carousel card. Both open the
+//  Recipes - shared widgets: the list row and the carousel card. Both open the
 //  recipe page for their RecipeItem. Warm-toned variant for sick-day comfort
 //  meals. Isolated to the post_pregnancy module.
 // =============================================================================

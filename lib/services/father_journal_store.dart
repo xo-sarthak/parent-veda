@@ -1,9 +1,9 @@
 // =============================================================================
-//  FatherJournalStore — the father's own simple journal (manual entries only)
+//  FatherJournalStore - the father's own simple journal (manual entries only)
 // -----------------------------------------------------------------------------
 //  A deliberately small, SEPARATE store from the mother's JournalStore: it holds
 //  only the father's manual entries (a memory, a note for baby, a photo, a voice
-//  note) under its own prefs key — no auto milestones / health / scans. Photos +
+//  note) under its own prefs key - no auto milestones / health / scans. Photos +
 //  voice clips reuse JournalStore's static saveImage / saveAudio helpers and the
 //  shared JournalEntry model. (Mother + father journals stay separate for now;
 //  merging into one shared source can come later.)
@@ -65,7 +65,7 @@ class FatherJournalStore extends ChangeNotifier {
       await _persist();
       await _backfillMedia();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // Upload any media still stored as local paths; rewrite to the cloud path.

@@ -1,8 +1,8 @@
 // =============================================================================
-//  WatchPlayerScreen — Deep Learn video player (the signature experience)
+//  WatchPlayerScreen - Deep Learn video player (the signature experience)
 // -----------------------------------------------------------------------------
 //  A premium, calm player. Learning-only actions (Save · Share · Ask Veda ·
-//  More) — never likes/comments/followers. Below the video, instead of a comment
+//  More) - never likes/comments/followers. Below the video, instead of a comment
 //  feed, a curated "Learn next" CHAIN that walks the parent onward through the
 //  ParentVeda ecosystem (Activity → Article → Product → Recipe → Community → Ask
 //  Veda → Quiz), plus the expert (Follow, not Subscribe). No autoplay-to-nowhere.
@@ -217,7 +217,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
   Widget _moreRow(BuildContext ctx, IconData i, String label) => GestureDetector(
         onTap: () {
           Navigator.of(ctx).pop();
-          _soon('$label — coming soon');
+          _soon('$label - coming soon');
         },
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -278,7 +278,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
         },
       );
 
-  // ---- Learn next (videos only — keep the learning thread going) -----------
+  // ---- Learn next (videos only - keep the learning thread going) -----------
   void _openVideo(WatchVideo nv) {
     if (nv.quick) {
       _push(QuickLearnScreen(startId: nv.id));
@@ -292,7 +292,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       ppEyebrow('Learn next', color: ppPurple, spacing: 1.0),
       const SizedBox(height: 6),
-      Text('Keep the thread going — more short lessons on this, one after another.', style: ppBody(13, color: ppSoft)),
+      Text('Keep the thread going - more short lessons on this, one after another.', style: ppBody(13, color: ppSoft)),
       const SizedBox(height: 16),
       for (int i = 0; i < next.length; i++)
         _step(Icons.play_circle_outline, next[i].category, next[i].title, () => _openVideo(next[i]), last: i == next.length - 1),

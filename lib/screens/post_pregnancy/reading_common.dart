@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Reading — shared UI building blocks
+//  ParentVeda Reading - shared UI building blocks
 // -----------------------------------------------------------------------------
 //  Editorial, calm, magazine-like: cover placeholders (warm tints), the reading
 //  metadata line (collection · minutes · age), and the article cards. pp-themed.

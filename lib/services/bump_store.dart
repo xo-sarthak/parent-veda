@@ -1,10 +1,10 @@
 // =============================================================================
-//  BumpStore — persistence for "My Bump Journey"
+//  BumpStore - persistence for "My Bump Journey"
 // -----------------------------------------------------------------------------
 //  Stores weekly bump photos (metadata in shared_preferences; image files in
 //  the app documents dir). Each added photo ALSO creates a Journal PHOTO entry
 //  (its own file copy, id "bump_<id>") so the photo flows into My Journal and
-//  My Calendar automatically — and the two stay independent (deleting one never
+//  My Calendar automatically - and the two stay independent (deleting one never
 //  breaks the other).
 // =============================================================================
 
@@ -67,7 +67,7 @@ class BumpStore extends ChangeNotifier {
       await _persist();
       await _backfillMedia();
       notifyListeners();
-    } catch (_) {/* offline — keep local */}
+    } catch (_) {/* offline - keep local */}
   }
 
   // Upload any bump photo still stored as a local path; rewrite to cloud path.

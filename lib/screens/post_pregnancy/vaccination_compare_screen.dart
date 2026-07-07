@@ -1,7 +1,7 @@
 // =============================================================================
-//  VaccinationCompareScreen — Govt vs IAP vs Private (parenting · S26·compare)
+//  VaccinationCompareScreen - Govt vs IAP vs Private (parenting · S26·compare)
 // -----------------------------------------------------------------------------
-//  The three-way cost compare — what the government's UIP covers free, what the
+//  The three-way cost compare - what the government's UIP covers free, what the
 //  IAP recommends on top, and the real private price range. Faithful build of
 //  Claude Design "post pregnancy - content.dc.html" · S26·compare. Reached from
 //  the Vaccination Tracker's "Compare all →".
@@ -18,12 +18,12 @@ const Color _brownTint = Color(0xFFF5EEE6);
 const Color _iapTint = Color(0xFFEDE6F5);
 const Color _dash = Color(0xFFC7BBD6);
 
-// (name, iapAdds?, govt: '✓' | '—', iap: '✓' | '—', privatePrice)
+// (name, iapAdds?, govt: '✓' | '-', iap: '✓' | '-', privatePrice)
 const List<(String, bool, String, String, String)> _rows = [
   ('PCV (Pneumococcal)', false, '✓', '✓', '₹3.8–5.5k'),
   ('Rotavirus', false, '✓', '✓', '₹900–2.5k'),
-  ('Hepatitis A', true, '—', '✓', '₹1.4–2.2k'),
-  ('Typhoid (TCV)', true, '—', '✓', '₹1.5–2k'),
+  ('Hepatitis A', true, '-', '✓', '₹1.4–2.2k'),
+  ('Typhoid (TCV)', true, '-', '✓', '₹1.5–2k'),
 ];
 
 class VaccinationCompareScreen extends StatelessWidget {
@@ -41,7 +41,7 @@ class VaccinationCompareScreen extends StatelessWidget {
           _pad(ppCircleBack(context, eyebrow: 'Compare schedules')),
 
           const SizedBox(height: 20),
-          _pad(Text("What's free, what's extra — honestly.", style: ppFraunces(29, h: 1.14))),
+          _pad(Text("What's free, what's extra - honestly.", style: ppFraunces(29, h: 1.14))),
           const SizedBox(height: 12),
           _pad(Text('Every vaccine across the three schedules, side by side. No other app shows you the real cost.',
               style: ppBody(14))),

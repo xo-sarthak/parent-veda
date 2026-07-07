@@ -1,5 +1,5 @@
 // =============================================================================
-//  Products — content model, catalog data + Compare selection store
+//  Products - content model, catalog data + Compare selection store
 // -----------------------------------------------------------------------------
 //  Single source of truth for the parenting app's Products flow (discovery →
 //  category → subcategory → detail → compare). The Sleep category is a faithful
@@ -68,7 +68,7 @@ class PpProduct {
   final bool? volumeLock;
   final String? power;
 
-  // Per-product compare content — every section is differentiated (no generic
+  // Per-product compare content - every section is differentiated (no generic
   // shared text): a one-line summary, a category spec sheet, and this product's
   // own "what's right" / "worth knowing".
   final String summary;
@@ -140,7 +140,7 @@ const List<PpProduct> kPpProducts = [
       autoOff: true,
       volumeLock: false,
       power: 'USB + power bank',
-      summary: 'Our top soother — true continuous white noise that never loops.',
+      summary: 'Our top soother - true continuous white noise that never loops.',
       specs: {
         'Sound': 'True continuous white noise',
         'Auto-off timer': 'Yes',
@@ -150,7 +150,7 @@ const List<PpProduct> kPpProducts = [
       },
       pros: [
         'True non-looping white noise that stays steady all night',
-        'Runs off a power bank — great for travel and power cuts',
+        'Runs off a power bank - great for travel and power cuts',
         'ParentVeda-verified purchase reviews',
       ],
       cons: [
@@ -186,7 +186,7 @@ const List<PpProduct> kPpProducts = [
         'Good value at under ₹1,000',
       ],
       cons: [
-        'Tracks loop on a short cycle — some babies notice the repeat',
+        'Tracks loop on a short cycle - some babies notice the repeat',
         'Battery-only; nothing to plug in overnight',
       ]),
   PpProduct(
@@ -204,7 +204,7 @@ const List<PpProduct> kPpProducts = [
       autoOff: false,
       volumeLock: true,
       power: 'USB',
-      summary: 'The budget pick — continuous noise, volume-locked.',
+      summary: 'The budget pick - continuous noise, volume-locked.',
       specs: {
         'Sound': 'Continuous white noise',
         'Auto-off timer': 'No',
@@ -218,7 +218,7 @@ const List<PpProduct> kPpProducts = [
         'Simple, one-button operation',
       ],
       cons: [
-        'No auto-off timer — it runs until you switch it off',
+        'No auto-off timer - it runs until you switch it off',
         'USB-only, so it needs a plug nearby',
       ]),
   PpProduct(
@@ -241,7 +241,7 @@ const List<PpProduct> kPpProducts = [
         'Auto-off timer': 'Yes',
         'Volume lock': 'No',
         'Power': 'Battery (replaceable)',
-        'Warranty': '—',
+        'Warranty': '-',
       },
       pros: [
         'Melodies and white noise in one device',
@@ -376,12 +376,12 @@ const List<PpProduct> kPpProducts = [
         'Size': '400 ml',
       },
       pros: [
-        'Tear-free — hair and body in one bottle',
+        'Tear-free - hair and body in one bottle',
         'Big 400 ml pump lasts months',
         'Soap-free formula',
       ],
       cons: [
-        'Lightly fragranced — not fully fragrance-free',
+        'Lightly fragranced - not fully fragrance-free',
         'Pricier per wash than a plain cleanser',
       ]),
 
@@ -434,14 +434,87 @@ const List<(String, Set<String>)> kPpStages = [
   ('2 years +', {'Play & Development'}),
 ];
 
-/// Distinct brands across the catalog, sorted — for the brand filter.
+/// Distinct brands across the catalog, sorted - for the brand filter.
 List<String> ppBrands() => kPpProducts.map((p) => p.brand).toSet().toList()..sort();
 
 List<PpProduct> productsInSub(String category, String subName) =>
     kPpProducts.where((p) => p.category == category && p.sub == subName).toList();
 
+// ---- "Before you compare" - per-category buying guidance (the differentiator) --
+//  Education before comparison: what actually matters for THIS category, what
+//  usually doesn't, and a common mistake - so parents choose confidently.
+class CompareGuide {
+  const CompareGuide({required this.whatMatters, required this.oftenSkip, required this.mistake, this.contextTip});
+  final List<String> whatMatters; // the 2-3 things that actually matter
+  final String oftenSkip; // what usually doesn't matter
+  final String mistake; // a common mistake / overlooked thing
+  final String? contextTip; // an age/stage-aware nudge
+}
+
+const Map<String, CompareGuide> kCompareGuides = {
+  'Sleep': CompareGuide(
+    whatMatters: [
+      'Continuous (non-looping) sound - babies notice a short loop',
+      'A volume lock, so little hands can not crank it up',
+      'How it is powered - a plug you can rely on overnight',
+    ],
+    oftenSkip: 'The number of melodies rarely matters; one steady sound is what soothes.',
+    mistake: 'Buying loud. Keep white noise gentle, about the level of a soft shower.',
+    contextTip: 'At four months, steady white noise helps most through the sleep shift.',
+  ),
+  'Skincare': CompareGuide(
+    whatMatters: [
+      'Fragrance-free for young or sensitive skin',
+      'A short, recognisable ingredient list',
+      'Matched to the skin type (normal / dry / rash-prone)',
+    ],
+    oftenSkip: 'Front-of-pack "natural" claims matter less than the actual ingredients.',
+    mistake: 'Using a fragranced lotion on sensitive or eczema-prone skin.',
+    contextTip: 'For a baby, gentler and simpler almost always wins.',
+  ),
+  'Feeding': CompareGuide(
+    whatMatters: [
+      'An anti-colic vent system if your baby is gassy',
+      'A material you trust (BPA-free glass or PPSU)',
+      'A flow rate that matches your baby\'s age',
+    ],
+    oftenSkip: 'Extra accessories in the box rarely change the daily experience.',
+    mistake: 'Picking a fast flow too early; it can overwhelm a young feeder.',
+  ),
+  'Play & Development': CompareGuide(
+    whatMatters: [
+      'Right for your baby\'s age and stage',
+      'Genuinely engaging (contrast, texture, sound)',
+      'Safe, with nothing small enough to swallow',
+    ],
+    oftenSkip: 'Battery-heavy, flashing toys are not "more developmental".',
+    mistake: 'Choosing by age-up features rather than what suits him now.',
+    contextTip: 'At four months, high contrast and simple cause-and-effect win.',
+  ),
+  'Health & Safety': CompareGuide(
+    whatMatters: [
+      'Accuracy and consistency you can trust',
+      'Quick and calm to use on a fussy baby',
+      'Age-appropriate and easy to clean',
+    ],
+    oftenSkip: 'A long feature list matters less than a reading you believe.',
+    mistake: 'Buying the cheapest thermometer, then second-guessing every reading.',
+  ),
+  'On the move': CompareGuide(
+    whatMatters: [
+      'Weight and fold - will you actually carry it?',
+      'Safety standards and a secure harness',
+      'Comfort for your baby on longer trips',
+    ],
+    oftenSkip: 'Cup holders and extras rarely decide daily happiness.',
+    mistake: 'Buying big and feature-heavy, then finding it too bulky to use.',
+  ),
+};
+
+CompareGuide compareGuideFor(String category) => kCompareGuides[category] ?? kCompareGuides['Sleep']!;
+
 // =============================================================================
-//  Compare selection store — pick up to two, drives the floating Compare button
+//  Compare selection store - pick up to two, drives the floating Compare button
 //  and the Compare screen. Plain ChangeNotifier singleton (no Provider).
 // =============================================================================
 class PpCompareStore extends ChangeNotifier {
@@ -455,7 +528,7 @@ class PpCompareStore extends ChangeNotifier {
 
   bool isSelected(PpProduct p) => _selected.any((x) => x.id == p.id);
 
-  /// Toggle a product. Caps at two — adding a third drops the oldest.
+  /// Toggle a product. Caps at two - adding a third drops the oldest.
   void toggle(PpProduct p) {
     final i = _selected.indexWhere((x) => x.id == p.id);
     if (i >= 0) {

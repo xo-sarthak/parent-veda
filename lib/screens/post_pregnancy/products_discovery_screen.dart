@@ -1,10 +1,10 @@
 // =============================================================================
-//  ProductsDiscoveryScreen — Products · home / categories (parenting · S3 v2)
+//  ProductsDiscoveryScreen - Products · home / categories (parenting · S3 v2)
 // -----------------------------------------------------------------------------
 //  "Research first. Buy when you're sure." A search/ask bar, a marketplace-style
 //  Filters + Sort bar (a Filters BUTTON opens a full filter sheet, not inline
-//  toggles), the four discovery entry points from the Products brief —
-//  Concern / Age-stage / Category / Compare — plus Brand · Price · Rating and
+//  toggles), the four discovery entry points from the Products brief -
+//  Concern / Age-stage / Category / Compare - plus Brand · Price · Rating and
 //  sort. With no filter set it shows the browse-by-category list; once anything
 //  is set it shows a ranked results grid. The Products hero tab.
 // =============================================================================
@@ -525,7 +525,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
 
   // ---- category browse block ---------------------------------------------
   // Category header (tap → category page) with its subcategories always shown,
-  // laid out as an even 3-up row of tiles (tap → subcategory) — no dropdown.
+  // laid out as an even 3-up row of tiles (tap → subcategory) - no dropdown.
   Widget _catRow(PpCategory cat) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         GestureDetector(
           onTap: () => _openCategory(cat.name),

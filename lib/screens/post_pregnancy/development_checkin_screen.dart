@@ -1,7 +1,7 @@
 // =============================================================================
-//  DevelopmentCheckinScreen — a gentle check-in (not an assessment)
+//  DevelopmentCheckinScreen - a gentle check-in (not an assessment)
 // -----------------------------------------------------------------------------
-//  A few soft, adaptive questions to build understanding — never a score, never
+//  A few soft, adaptive questions to build understanding - never a score, never
 //  a comparison. Answers gather a warm, reassuring reflection; if some are "not
 //  yet", it simply, kindly suggests keeping an eye and mentioning it to the
 //  paediatrician if the parent wishes. Understanding over evaluation.
@@ -40,7 +40,7 @@ class DevelopmentCheckinScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 _pad(Text('Let’s see how Aarav is doing', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('A few soft questions — just to understand where he is. There are no right answers, no scores, and no comparing.', style: ppBody(14, h: 1.5))),
+                _pad(Text('A few soft questions - just to understand where he is. There are no right answers, no scores, and no comparing.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 20),
                 _pad(Column(children: [for (final q in kCheckIns) _question(q)])),
@@ -50,7 +50,7 @@ class DevelopmentCheckinScreen extends StatelessWidget {
                   _pad(_reflection(context, yeses, notYet)),
                 ] else ...[
                   const SizedBox(height: 8),
-                  _pad(Text('${kCheckIns.length - answered} to go — answer them however feels true today.', style: ppBody(12.5, color: ppMuted))),
+                  _pad(Text('${kCheckIns.length - answered} to go - answer them however feels true today.', style: ppBody(12.5, color: ppMuted))),
                 ],
               ],
             );
@@ -108,8 +108,8 @@ class DevelopmentCheckinScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           allYes
-              ? 'Lovely — Aarav is doing so much of what we’d hope for right now, and clearly delighting in you along the way. Keep offering the everyday moments of play and closeness; they’re doing exactly what they should.'
-              : 'Aarav is showing lots of lovely, emerging skills. A few “not yet”s are completely normal — every baby walks this path at their own pace, and these can bloom any week now. Keep gently offering chances to practise, and enjoy where he is.',
+              ? 'Lovely - Aarav is doing so much of what we’d hope for right now, and clearly delighting in you along the way. Keep offering the everyday moments of play and closeness; they’re doing exactly what they should.'
+              : 'Aarav is showing lots of lovely, emerging skills. A few “not yet”s are completely normal - every baby walks this path at their own pace, and these can bloom any week now. Keep gently offering chances to practise, and enjoy where he is.',
           style: ppBody(14, color: ppInk, h: 1.6),
         ),
         if (!allYes) ...[
@@ -120,7 +120,7 @@ class DevelopmentCheckinScreen extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Icon(Icons.medical_services_outlined, size: 16, color: ppPurple),
               const SizedBox(width: 10),
-              Expanded(child: Text('If anything ever sits on your mind, there’s no need to wait or worry alone — a quick word with your paediatrician is always a good idea. That’s peace of mind, not a red flag.', style: ppBody(12.5, color: ppInk, h: 1.5))),
+              Expanded(child: Text('If anything ever sits on your mind, there’s no need to wait or worry alone - a quick word with your paediatrician is always a good idea. That’s peace of mind, not a red flag.', style: ppBody(12.5, color: ppInk, h: 1.5))),
             ]),
           ),
         ],

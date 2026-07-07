@@ -1,5 +1,5 @@
 // =============================================================================
-//  ExploreDrawer — the "Explore" left drawer (parenting app)
+//  ExploreDrawer - the "Explore" left drawer (parenting app)
 // -----------------------------------------------------------------------------
 //  Opened from the hamburger on the My Child home. Home for the section pages
 //  that don't sit in the bottom-nav's four hero tabs: Recipes, Recommendations,
@@ -58,7 +58,7 @@ class ExploreDrawer extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 16),
                 children: [
                   _section(context, Icons.child_care_outlined, 'My Child',
-                      "Who Aarav is today — his whole story.", const MyChildScreen(),
+                      "Who Aarav is today - his whole story.", const MyChildScreen(),
                       top: true),
                   _section(context, Icons.play_circle_outline, 'Watch',
                       'Expert videos, chosen for his stage.', const WatchHomeScreen()),
@@ -71,7 +71,7 @@ class ExploreDrawer extends StatelessWidget {
                   _section(context, Icons.monitor_heart_outlined, 'Health',
                       "Aarav's living health story, organised.", const HealthHomeScreen()),
                   _section(context, Icons.ramen_dining_outlined, 'Food',
-                      "What to feed Aarav today — a food companion.", const FoodHomeScreen()),
+                      "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
                   _section(context, Icons.restaurant_menu_outlined, 'Recipes',
                       'Age-tagged, healthier Indian food.', const RecipesScreen()),
                   _section(context, Icons.recommend_outlined, 'Recommendations',
@@ -81,7 +81,7 @@ class ExploreDrawer extends StatelessWidget {
                   _section(context, Icons.school_outlined, 'Masterclasses',
                       'One evening with an expert.', const MasterclassesScreen()),
                   _section(context, Icons.groups_outlined, 'Cohort Courses',
-                      'Guided, together — small groups.', const CohortCoursesScreen()),
+                      'Guided, together - small groups.', const CohortCoursesScreen()),
                   _section(context, Icons.article_outlined, 'Guides & Tools',
                       'Downloads you keep forever.', const GuidesToolsScreen()),
                   _section(context, Icons.video_library_outlined, 'Courses',

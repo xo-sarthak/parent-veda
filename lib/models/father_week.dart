@@ -2,7 +2,7 @@
 //  FatherWeek model (Father Mode "Weekly Journey", bilingual)
 // -----------------------------------------------------------------------------
 //  The deeper, once-a-week fatherhood experience (Week 4–40, 37 weeks). It is
-//  deliberately small — exactly FOUR sections, each a short line (+ optional
+//  deliberately small - exactly FOUR sections, each a short line (+ optional
 //  body): Father Insight, Supporting Your Partner, Connecting With Your Baby,
 //  This Week's Mission. NOT pregnancy education.
 //

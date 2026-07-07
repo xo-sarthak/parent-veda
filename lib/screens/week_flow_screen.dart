@@ -1,5 +1,5 @@
 // =============================================================================
-//  WeekFlowView — "V2" vertical week flow (week 20 preview, behind a toggle)
+//  WeekFlowView - "V2" vertical week flow (week 20 preview, behind a toggle)
 // -----------------------------------------------------------------------------
 //  Re-flows the weekly content as ONE vertical scroll of sections instead of a
 //  horizontal card swipe. Info sections show a brief; tapping opens a full-
@@ -36,7 +36,7 @@ import '../widgets/week_cards/week_overview_card.dart';
 // Mother flow + every other week are unchanged. Strip with FatherPreview.
 bool _fatherWeek(int week) => FatherPreview.instance.on && week == 20;
 
-// Father (Slate) SKIN gate — now ALL weeks (the colour scheme rolled out to
+// Father (Slate) SKIN gate - now ALL weeks (the colour scheme rolled out to
 // every week). CONTENT/copy stays week-20 via [_fatherWeek] until each week is
 // re-voiced, so a non-week-20 father week shows the mother's per-week content in
 // the Slate skin.
@@ -51,7 +51,7 @@ const Color _fMuted = Color(0xFF6A7B82);
 const Color _fAccent = Color(0xFF2E5266); // deep slate (was purple/coral)
 const Color _fAccent2 = Color(0xFFE0915B); // amber highlight
 
-// Father serif header (Fraunces) — parked: the father weekly headings moved to
+// Father serif header (Fraunces) - parked: the father weekly headings moved to
 // the mother's sans font (plusJakartaSans). Kept for revert.
 // ignore: unused_element
 TextStyle _fSerif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
@@ -69,7 +69,7 @@ class _Fact {
   final LocalizedText desc;
 }
 
-// Distinct "did you know" trivia — kept separate from the article read so the
+// Distinct "did you know" trivia - kept separate from the article read so the
 // two don't repeat each other.
 const List<_Fact> _babyScience = [
   _Fact(
@@ -77,29 +77,29 @@ const List<_Fact> _babyScience = [
       Color(0xFFF2E9FB),
       LocalizedText(en: 'My busy little brain', hi: 'Mera vyast nanha dimaag'),
       LocalizedText(
-          en: "I'm forming millions of new nerve connections every single day — my brain is working at an astonishing pace!",
-          hi: 'Main har din laakhon naye nerve connections bana raha hoon — mera dimaag gajab raftaar se kaam kar raha hai!')),
+          en: "I'm forming millions of new nerve connections every single day - my brain is working at an astonishing pace!",
+          hi: 'Main har din laakhon naye nerve connections bana raha hoon - mera dimaag gajab raftaar se kaam kar raha hai!')),
   _Fact(
       '🤏',
       Color(0xFFFCE3E6),
       LocalizedText(en: 'My tiny grip', hi: 'Meri nanhi pakad'),
       LocalizedText(
-          en: "I can curl my little fingers and sometimes grab the umbilical cord — I'm practising for our very first cuddles.",
-          hi: 'Main apni nanhi ungliyan mod sakta hoon aur kabhi gard-naal pakad leta hoon — main hamari pehli cuddles ki practice kar raha hoon.')),
+          en: "I can curl my little fingers and sometimes grab the umbilical cord - I'm practising for our very first cuddles.",
+          hi: 'Main apni nanhi ungliyan mod sakta hoon aur kabhi gard-naal pakad leta hoon - main hamari pehli cuddles ki practice kar raha hoon.')),
   _Fact(
       '🫧',
       Color(0xFFE6F0FA),
       LocalizedText(en: 'I get hiccups!', hi: 'Mujhe hichki aati hai!'),
       LocalizedText(
-          en: "Sometimes you'll feel tiny rhythmic taps — that's just me having hiccups, and it's completely normal.",
-          hi: 'Kabhi aap chhoti taal-baddh thaap mehsoos karengi — yeh bas meri hichki hai, aur bilkul normal hai.')),
+          en: "Sometimes you'll feel tiny rhythmic taps - that's just me having hiccups, and it's completely normal.",
+          hi: 'Kabhi aap chhoti taal-baddh thaap mehsoos karengi - yeh bas meri hichki hai, aur bilkul normal hai.')),
   _Fact(
       '🦶',
       Color(0xFFFDF0C4),
       LocalizedText(en: 'My own prints', hi: 'Mere apne nishaan'),
       LocalizedText(
-          en: "My very own fingerprints — and footprints — are forming right now, patterns that will be mine alone for life.",
-          hi: 'Mere apne fingerprints — aur footprints — abhi ban rahe hain, jo zindagi bhar sirf mere honge.')),
+          en: "My very own fingerprints - and footprints - are forming right now, patterns that will be mine alone for life.",
+          hi: 'Mere apne fingerprints - aur footprints - abhi ban rahe hain, jo zindagi bhar sirf mere honge.')),
   _Fact(
       '💗',
       Color(0xFFEAF1EA),
@@ -112,8 +112,8 @@ const List<_Fact> _babyScience = [
       Color(0xFFEDEAF6),
       LocalizedText(en: 'I can sense light', hi: 'Main roshni mehsoos karta hoon'),
       LocalizedText(
-          en: 'Shine a soft light on your bump and I might turn towards it — my eyes are getting ready to see you.',
-          hi: 'Bump par halki roshni daalein to main uski taraf mud sakta hoon — meri aankhein aapko dekhne ko taiyar ho rahi hain.')),
+          en: 'Shine a soft light on your bump and I might turn towards it - my eyes are getting ready to see you.',
+          hi: 'Bump par halki roshni daalein to main uski taraf mud sakta hoon - meri aankhein aapko dekhne ko taiyar ho rahi hain.')),
 ];
 
 class _Article {
@@ -131,18 +131,18 @@ const List<_Article> _babyArticle = [
   _Article(
       LocalizedText(en: 'How big am I?', hi: 'Main kitna bada hoon?'),
       LocalizedText(
-          en: "I'm about the size of a banana now — roughly 25 cm from my head to my heels and around 300 g. From this week, you'll measure me head-to-heel instead of head-to-bottom.",
-          hi: 'Main ab lagbhag ek kele jitna hoon — sir se edi tak takreeban 25 cm aur ~300 g. Is hafte se aap meri lambai sir-se-edi naapengi.')),
+          en: "I'm about the size of a banana now - roughly 25 cm from my head to my heels and around 300 g. From this week, you'll measure me head-to-heel instead of head-to-bottom.",
+          hi: 'Main ab lagbhag ek kele jitna hoon - sir se edi tak takreeban 25 cm aur ~300 g. Is hafte se aap meri lambai sir-se-edi naapengi.')),
   _Article(
       LocalizedText(en: "You'll feel me move", hi: 'Aap mujhe mehsoos karengi'),
       LocalizedText(
-          en: "My first little flutters — called \"quickening\" — often start around now. They feel like bubbles or a gentle tap, and over the next few weeks they'll grow into clear kicks. If this is your first baby you might feel me a little later — that's completely normal.",
-          hi: 'Meri pehli halki harkatein — "quickening" — aksar is samay shuru hoti hain. Yeh bulbule ya halke tap jaisi lagti hain, aur agle kuch hafton mein saaf kicks ban jaayengi. Agar yeh aapka pehla baby hai to aap mujhe thodi der se mehsoos kar sakti hain — yeh bilkul normal hai.')),
+          en: "My first little flutters - called \"quickening\" - often start around now. They feel like bubbles or a gentle tap, and over the next few weeks they'll grow into clear kicks. If this is your first baby you might feel me a little later - that's completely normal.",
+          hi: 'Meri pehli halki harkatein - "quickening" - aksar is samay shuru hoti hain. Yeh bulbule ya halke tap jaisi lagti hain, aur agle kuch hafton mein saaf kicks ban jaayengi. Agar yeh aapka pehla baby hai to aap mujhe thodi der se mehsoos kar sakti hain - yeh bilkul normal hai.')),
   _Article(
       LocalizedText(en: 'I can hear you now', hi: 'Main ab aapko sun sakta hoon'),
       LocalizedText(
-          en: "The tiny bones in my ears are in place, so I can hear your voice, your heartbeat and the world around us. When you talk, hum or sing to me, it helps us bond — and I'll often recognise your favourite tune after I'm born.",
-          hi: 'Mere kaano ki nanhi haddiyan ban gayi hain, isliye main aapki awaaz, aapki dhadkan aur aas-paas ki duniya sun sakta hoon. Jab aap mujhse baat karti, gungunaati ya gaati hain, to hamari bonding hoti hai — aur janm ke baad main aksar aapki pasandeeda dhun pehchaan loonga.')),
+          en: "The tiny bones in my ears are in place, so I can hear your voice, your heartbeat and the world around us. When you talk, hum or sing to me, it helps us bond - and I'll often recognise your favourite tune after I'm born.",
+          hi: 'Mere kaano ki nanhi haddiyan ban gayi hain, isliye main aapki awaaz, aapki dhadkan aur aas-paas ki duniya sun sakta hoon. Jab aap mujhse baat karti, gungunaati ya gaati hain, to hamari bonding hoti hai - aur janm ke baad main aksar aapki pasandeeda dhun pehchaan loonga.')),
   _Article(
       LocalizedText(en: "I'm tasting your meals", hi: 'Main aapke khaane ka swaad leta hoon'),
       LocalizedText(
@@ -167,8 +167,8 @@ const List<_Food> _avoidFoods = [
           en: 'Raw or undercooked meat & eggs',
           hi: 'Kaccha ya adhpaka maans & ande'),
       LocalizedText(
-          en: 'Can carry bacteria like salmonella or listeria — cook everything thoroughly.',
-          hi: 'Salmonella ya listeria jaise bacteria ho sakte hain — sab kuch achhe se pakaayein.')),
+          en: 'Can carry bacteria like salmonella or listeria - cook everything thoroughly.',
+          hi: 'Salmonella ya listeria jaise bacteria ho sakte hain - sab kuch achhe se pakaayein.')),
   _Food(
       '🧀',
       LocalizedText(
@@ -181,20 +181,20 @@ const List<_Food> _avoidFoods = [
       '🐟',
       LocalizedText(en: 'High-mercury fish', hi: 'High-mercury machhli'),
       LocalizedText(
-          en: "Limit shark, swordfish and king mackerel — mercury can affect baby's developing brain.",
-          hi: 'Shark, swordfish aur king mackerel kam karein — mercury baby ke dimaag ko prabhavit kar sakta hai.')),
+          en: "Limit shark, swordfish and king mackerel - mercury can affect baby's developing brain.",
+          hi: 'Shark, swordfish aur king mackerel kam karein - mercury baby ke dimaag ko prabhavit kar sakta hai.')),
   _Food(
       '☕',
       LocalizedText(en: 'Too much caffeine', hi: 'Zyada caffeine'),
       LocalizedText(
-          en: 'Keep it under about 200 mg a day — roughly one cup of coffee.',
-          hi: 'Ise din mein ~200 mg se kam rakhein — lagbhag ek cup coffee.')),
+          en: 'Keep it under about 200 mg a day - roughly one cup of coffee.',
+          hi: 'Ise din mein ~200 mg se kam rakhein - lagbhag ek cup coffee.')),
   _Food(
       '🍷',
       LocalizedText(en: 'Alcohol', hi: 'Sharab'),
       LocalizedText(
-          en: 'No amount is considered safe in pregnancy — best avoided completely.',
-          hi: 'Pregnancy mein koi bhi maatra surakshit nahi maani jaati — poori tarah bachna behtar.')),
+          en: 'No amount is considered safe in pregnancy - best avoided completely.',
+          hi: 'Pregnancy mein koi bhi maatra surakshit nahi maani jaati - poori tarah bachna behtar.')),
 ];
 
 class _Food {
@@ -207,28 +207,28 @@ class _Food {
 const List<_Food> _eatFoods = [
   _Food('🧀', LocalizedText(en: 'Paneer & dairy', hi: 'Paneer & dairy'),
       LocalizedText(
-          en: "Rich in calcium and protein — builds your baby's bones and teeth, and keeps yours strong too.",
-          hi: 'Calcium aur protein se bharpoor — baby ki haddiyan-daant banata hai aur aapki haddiyan bhi mazboot rakhta hai.')),
+          en: "Rich in calcium and protein - builds your baby's bones and teeth, and keeps yours strong too.",
+          hi: 'Calcium aur protein se bharpoor - baby ki haddiyan-daant banata hai aur aapki haddiyan bhi mazboot rakhta hai.')),
   _Food('🫘', LocalizedText(en: 'Rajma & legumes', hi: 'Rajma & dalein'),
       LocalizedText(
           en: 'Plant iron, protein and fibre. The iron supports the extra blood your body is making, and the fibre eases constipation.',
           hi: 'Plant iron, protein aur fibre. Iron aapke badhte khoon ko support karta hai, aur fibre kabz mein aaram deta hai.')),
   _Food('🥬', LocalizedText(en: 'Spinach & greens', hi: 'Paalak & saag'),
       LocalizedText(
-          en: "Loaded with folate, iron and calcium — key for baby's growth and your own energy.",
-          hi: 'Folate, iron aur calcium se bharpoor — baby ke vikas aur aapki urja ke liye zaroori.')),
+          en: "Loaded with folate, iron and calcium - key for baby's growth and your own energy.",
+          hi: 'Folate, iron aur calcium se bharpoor - baby ke vikas aur aapki urja ke liye zaroori.')),
   _Food('🥛', LocalizedText(en: 'Curd & yoghurt', hi: 'Dahi'),
       LocalizedText(
-          en: 'Probiotics plus calcium — gentle on digestion and cooling in the heat.',
-          hi: 'Probiotics aur calcium — pachan ke liye halka aur garmi mein thandak deta hai.')),
+          en: 'Probiotics plus calcium - gentle on digestion and cooling in the heat.',
+          hi: 'Probiotics aur calcium - pachan ke liye halka aur garmi mein thandak deta hai.')),
   _Food('🥚', LocalizedText(en: 'Eggs', hi: 'Ande'),
       LocalizedText(
           en: "Complete protein and choline, which supports your baby's brain development. Cook them well.",
           hi: 'Poora protein aur choline, jo baby ke dimaag ke vikas mein madad karta hai. Achhe se pakaayein.')),
   _Food('🍊', LocalizedText(en: 'Citrus & amla', hi: 'Khatte phal & amla'),
       LocalizedText(
-          en: 'Vitamin C helps your body absorb iron better — pair them with your rajma or spinach.',
-          hi: 'Vitamin C aapke sharir ko iron behtar absorb karne mein madad karta hai — inhe rajma ya paalak ke saath lein.')),
+          en: 'Vitamin C helps your body absorb iron better - pair them with your rajma or spinach.',
+          hi: 'Vitamin C aapke sharir ko iron behtar absorb karne mein madad karta hai - inhe rajma ya paalak ke saath lein.')),
 ];
 
 class _ToDo {
@@ -241,22 +241,22 @@ class _ToDo {
 const List<_ToDo> _toDos = [
   _ToDo('🩺', LocalizedText(en: 'Your anomaly scan', hi: 'Aapka anomaly scan'),
       LocalizedText(
-          en: "If you haven't already, book or attend your 20-week scan. This gentle ultrasound checks baby's growth, heart, spine and organs — and you may catch a lovely glimpse of your little one. Take your partner along if you can.",
-          hi: 'Agar abhi tak nahi kiya, to apna 20-hafte ka scan book karein ya karwaayein. Yeh halka ultrasound baby ki growth, dil, reedh aur organs check karta hai — aur aapko apne nanhe ki jhalak bhi mil sakti hai. Ho sake to partner ko saath le jaayein.')),
+          en: "If you haven't already, book or attend your 20-week scan. This gentle ultrasound checks baby's growth, heart, spine and organs - and you may catch a lovely glimpse of your little one. Take your partner along if you can.",
+          hi: 'Agar abhi tak nahi kiya, to apna 20-hafte ka scan book karein ya karwaayein. Yeh halka ultrasound baby ki growth, dil, reedh aur organs check karta hai - aur aapko apne nanhe ki jhalak bhi mil sakti hai. Ho sake to partner ko saath le jaayein.')),
   _ToDo(
       '🛏️',
       LocalizedText(en: 'Start sleeping on your side', hi: 'Karwat par sona shuru karein'),
       LocalizedText(
-          en: "As your bump grows, resting on your side — a pillow tucked between your knees helps — keeps blood flowing well to baby. If you wake on your back, don't worry; just settle gently onto your side again.",
-          hi: 'Bump badhne ke saath, karwat par aaram karna — ghutno ke beech takiya rakhne se aaram milta hai — baby tak khoon achhe se pahunchata hai. Agar peeth ke bal jaag jaayein to ghabraayein nahi; dheere se phir karwat le lein.')),
+          en: "As your bump grows, resting on your side - a pillow tucked between your knees helps - keeps blood flowing well to baby. If you wake on your back, don't worry; just settle gently onto your side again.",
+          hi: 'Bump badhne ke saath, karwat par aaram karna - ghutno ke beech takiya rakhne se aaram milta hai - baby tak khoon achhe se pahunchata hai. Agar peeth ke bal jaag jaayein to ghabraayein nahi; dheere se phir karwat le lein.')),
   _ToDo('🚶‍♀️', LocalizedText(en: 'Move gently, every day', hi: 'Roz halki harkat karein'),
       LocalizedText(
-          en: "A short walk or some prenatal stretches can lift your mood, boost your energy and ease swelling. There's no need to push — listen to your body and rest whenever you need to.",
-          hi: 'Choti si tehel ya prenatal stretches aapka mood, urja badha sakti hain aur soojan kam karti hain. Zor lagane ki zaroorat nahi — apne sharir ki sunein aur jab chahein aaram karein.')),
+          en: "A short walk or some prenatal stretches can lift your mood, boost your energy and ease swelling. There's no need to push - listen to your body and rest whenever you need to.",
+          hi: 'Choti si tehel ya prenatal stretches aapka mood, urja badha sakti hain aur soojan kam karti hain. Zor lagane ki zaroorat nahi - apne sharir ki sunein aur jab chahein aaram karein.')),
   _ToDo('🎵', LocalizedText(en: 'Talk and sing to your bump', hi: 'Bump se baat karein, gaayein'),
       LocalizedText(
-          en: 'Baby can hear you now, and your voice is already comforting to them. Just a few quiet minutes a day — a song, a story, a hello — is a beautiful way to begin bonding.',
-          hi: 'Baby ab aapko sun sakta hai, aur aapki awaaz use abhi se sukoon deti hai. Din ke kuch shaant minute — ek gaana, ek kahani, ek hello — bonding shuru karne ka pyaara tareeka hai.')),
+          en: 'Baby can hear you now, and your voice is already comforting to them. Just a few quiet minutes a day - a song, a story, a hello - is a beautiful way to begin bonding.',
+          hi: 'Baby ab aapko sun sakta hai, aur aapki awaaz use abhi se sukoon deti hai. Din ke kuch shaant minute - ek gaana, ek kahani, ek hello - bonding shuru karne ka pyaara tareeka hai.')),
 ];
 
 class _Vid {
@@ -295,25 +295,25 @@ class _WeekMs {
   final LocalizedText detail;
 }
 
-// At least one happy "milestone" per week so the section is never blank — a
+// At least one happy "milestone" per week so the section is never blank - a
 // mix of baby development and what your body is achieving.
 const List<_WeekMs> _weekMilestones = [
   _WeekMs(20, '✨',
       LocalizedText(en: 'Halfway & first kicks', hi: 'Aadha safar & pehli kicks'),
       LocalizedText(en: "You've reached the midpoint and may feel the first flutters.", hi: 'Aap aadhe raaste par hain aur pehli harkatein mehsoos kar sakti hain.'),
-      LocalizedText(en: 'Week 20 is the midpoint of pregnancy. Many mums feel the first gentle movements — "quickening" — around now, like soft bubbles that grow into clear kicks.', hi: 'Hafta 20 pregnancy ka madhya bindu hai. Kai maa is samay pehli halki harkatein ("quickening") mehsoos karti hain — narm bulbule jo aage saaf kicks ban jaate hain.')),
+      LocalizedText(en: 'Week 20 is the midpoint of pregnancy. Many mums feel the first gentle movements - "quickening" - around now, like soft bubbles that grow into clear kicks.', hi: 'Hafta 20 pregnancy ka madhya bindu hai. Kai maa is samay pehli halki harkatein ("quickening") mehsoos karti hain - narm bulbule jo aage saaf kicks ban jaate hain.')),
   _WeekMs(20, '🍌',
       LocalizedText(en: 'Size of a banana', hi: 'Kele jitna'),
       LocalizedText(en: 'Baby is about 25 cm and 300 g now.', hi: 'Baby ab lagbhag 25 cm aur 300 g ka hai.'),
-      LocalizedText(en: 'Your baby is around the size of a banana — about 25 cm from head to heel and 300 g. From this week, length is measured head-to-heel instead of head-to-bottom.', hi: 'Aapka baby lagbhag ek kele jitna hai — sir se edi ~25 cm aur 300 g. Is hafte se lambai sir-se-edi naapi jaati hai.')),
+      LocalizedText(en: 'Your baby is around the size of a banana - about 25 cm from head to heel and 300 g. From this week, length is measured head-to-heel instead of head-to-bottom.', hi: 'Aapka baby lagbhag ek kele jitna hai - sir se edi ~25 cm aur 300 g. Is hafte se lambai sir-se-edi naapi jaati hai.')),
   _WeekMs(20, '👂',
       LocalizedText(en: 'Baby can hear you', hi: 'Baby aapko sun sakta hai'),
-      LocalizedText(en: 'The ears are working — baby hears your voice.', hi: 'Kaan kaam kar rahe hain — baby aapki awaaz sunta hai.'),
-      LocalizedText(en: "The tiny bones in baby's ears are in place, so baby can hear your voice and heartbeat. Talk, hum and sing to your bump — it's wonderful early bonding.", hi: 'Baby ke kaano ki nanhi haddiyan ban gayi hain, isliye baby aapki awaaz aur dhadkan sun sakta hai. Bump se baat karein, gungunaayein aur gaayein.')),
+      LocalizedText(en: 'The ears are working - baby hears your voice.', hi: 'Kaan kaam kar rahe hain - baby aapki awaaz sunta hai.'),
+      LocalizedText(en: "The tiny bones in baby's ears are in place, so baby can hear your voice and heartbeat. Talk, hum and sing to your bump - it's wonderful early bonding.", hi: 'Baby ke kaano ki nanhi haddiyan ban gayi hain, isliye baby aapki awaaz aur dhadkan sun sakta hai. Bump se baat karein, gungunaayein aur gaayein.')),
   _WeekMs(21, '🍽️',
       LocalizedText(en: 'Tasting flavours', hi: 'Swaad lena'),
       LocalizedText(en: 'Baby swallows and tastes the flavours of your meals.', hi: 'Baby nigalta hai aur aapke khaane ke swaad mehsoos karta hai.'),
-      LocalizedText(en: "Baby's taste buds are working and it swallows amniotic fluid daily, getting a hint of what you eat — variety now may shape later tastes.", hi: 'Baby ki swaad-kaliyan kaam kar rahi hain aur woh roz amniotic fluid nigalta hai — variety aage chal kar swaad banati hai.')),
+      LocalizedText(en: "Baby's taste buds are working and it swallows amniotic fluid daily, getting a hint of what you eat - variety now may shape later tastes.", hi: 'Baby ki swaad-kaliyan kaam kar rahi hain aur woh roz amniotic fluid nigalta hai - variety aage chal kar swaad banati hai.')),
   _WeekMs(22, '👀',
       LocalizedText(en: 'Senses sharpening', hi: 'Indriyaan tez'),
       LocalizedText(en: 'Lips, eyelids and tiny eyebrows are now formed.', hi: 'Hont, palkein aur nanhi bhauhein ban gayi hain.'),
@@ -321,10 +321,10 @@ const List<_WeekMs> _weekMilestones = [
   _WeekMs(23, '👂',
       LocalizedText(en: 'Responding to sound', hi: 'Aawaz par react'),
       LocalizedText(en: 'Baby can hear and may react to loud sounds.', hi: 'Baby sun sakta hai aur tez aawaz par react kar sakta hai.'),
-      LocalizedText(en: 'Hearing is improving — baby may move or startle at loud sounds and grow familiar with your voice and favourite music.', hi: 'Sun-ne ki shakti behtar ho rahi hai — baby tez aawaz par hil ya chaunk sakta hai aur aapki awaaz se waakif ho jaata hai.')),
+      LocalizedText(en: 'Hearing is improving - baby may move or startle at loud sounds and grow familiar with your voice and favourite music.', hi: 'Sun-ne ki shakti behtar ho rahi hai - baby tez aawaz par hil ya chaunk sakta hai aur aapki awaaz se waakif ho jaata hai.')),
   _WeekMs(24, '🛡️',
       LocalizedText(en: 'Viability milestone', hi: 'Viability padaav'),
-      LocalizedText(en: "A major milestone — baby's lungs start developing surfactant.", hi: 'Ek bada padaav — baby ke phephde surfactant banana shuru karte hain.'),
+      LocalizedText(en: "A major milestone - baby's lungs start developing surfactant.", hi: 'Ek bada padaav - baby ke phephde surfactant banana shuru karte hain.'),
       LocalizedText(en: 'Week 24 is an important development milestone. The lungs begin producing surfactant, which will help baby breathe after birth.', hi: 'Hafta 24 ek ahem padaav hai. Phephde surfactant banana shuru karte hain, jo janm ke baad saans lene mein madad karega.')),
   _WeekMs(25, '🤚',
       LocalizedText(en: 'Responds to touch', hi: 'Chhoone par react'),
@@ -333,14 +333,14 @@ const List<_WeekMs> _weekMilestones = [
   _WeekMs(26, '👁️',
       LocalizedText(en: 'Eyes begin to open', hi: 'Aankhein khulna shuru'),
       LocalizedText(en: "Baby's eyes start to open and can blink.", hi: 'Baby ki aankhein khulna shuru hoti hain aur palak jhapak sakti hain.'),
-      LocalizedText(en: 'After weeks fused shut, the eyelids begin to open and baby can blink — and may respond to bright light.', hi: 'Kai hafton tak band rehne ke baad palkein khulna shuru hoti hain aur baby palak jhapak sakta hai — tez roshni par react bhi kar sakta hai.')),
+      LocalizedText(en: 'After weeks fused shut, the eyelids begin to open and baby can blink - and may respond to bright light.', hi: 'Kai hafton tak band rehne ke baad palkein khulna shuru hoti hain aur baby palak jhapak sakta hai - tez roshni par react bhi kar sakta hai.')),
   _WeekMs(27, '💤',
       LocalizedText(en: 'Sleep cycles & dreams', hi: 'Neend ke cycle & sapne'),
       LocalizedText(en: 'Baby now has regular sleep–wake cycles and REM (dream) sleep.', hi: 'Baby ke ab niyamit sone-jaagne ke cycle aur REM (sapno wali) neend hai.'),
-      LocalizedText(en: 'Baby settles into regular sleep and wake cycles and shows REM sleep — the stage linked with dreaming.', hi: 'Baby niyamit sone-jaagne ke cycle mein aa jaata hai aur REM neend dikhata hai — sapno se juda charan.')),
+      LocalizedText(en: 'Baby settles into regular sleep and wake cycles and shows REM sleep - the stage linked with dreaming.', hi: 'Baby niyamit sone-jaagne ke cycle mein aa jaata hai aur REM neend dikhata hai - sapno se juda charan.')),
   _WeekMs(28, '🌸',
       LocalizedText(en: 'Third trimester begins', hi: 'Teesri trimester shuru'),
-      LocalizedText(en: 'The final stretch begins — check-ups become more frequent.', hi: 'Aakhri padav shuru — check-ups zyada baar hone lagti hain.'),
+      LocalizedText(en: 'The final stretch begins - check-ups become more frequent.', hi: 'Aakhri padav shuru - check-ups zyada baar hone lagti hain.'),
       LocalizedText(en: "Welcome to the third trimester. Baby's eyes can open and close, and your appointments will start coming more often.", hi: 'Teesri trimester mein swaagat hai. Baby ki aankhein khul-band ho sakti hain, aur appointments zyada baar hone lagengi.')),
   _WeekMs(29, '💪',
       LocalizedText(en: 'Growing stronger', hi: 'Aur mazboot'),
@@ -357,7 +357,7 @@ const List<_WeekMs> _weekMilestones = [
   _WeekMs(32, '💅',
       LocalizedText(en: 'Nails & hair', hi: 'Naakhun & baal'),
       LocalizedText(en: 'Fingernails and toenails are formed; hair is growing.', hi: 'Haath-paer ke naakhun ban gaye; baal badh rahe hain.'),
-      LocalizedText(en: 'Tiny fingernails and toenails have formed and baby may have a head of hair — the body is filling out with fat.', hi: 'Nanhe naakhun ban gaye hain aur baby ke sir par baal ho sakte hain — sharir fat se bhar raha hai.')),
+      LocalizedText(en: 'Tiny fingernails and toenails have formed and baby may have a head of hair - the body is filling out with fat.', hi: 'Nanhe naakhun ban gaye hain aur baby ke sir par baal ho sakte hain - sharir fat se bhar raha hai.')),
   _WeekMs(33, '💡',
       LocalizedText(en: 'Reacting to light', hi: 'Roshni par react'),
       LocalizedText(en: "Baby's pupils react to light now.", hi: 'Baby ki aankh ki putli ab roshni par react karti hai.'),
@@ -368,7 +368,7 @@ const List<_WeekMs> _weekMilestones = [
       LocalizedText(en: "Baby's lungs and nervous system are maturing, and the protective vernix coating thickens.", hi: 'Baby ke phephde aur nervous system pak rahe hain, aur surakshit vernix parat ghani hoti hai.')),
   _WeekMs(35, '⚖️',
       LocalizedText(en: 'Gaining weight fast', hi: 'Tezi se vazan'),
-      LocalizedText(en: 'Most development is done — baby is plumping up.', hi: 'Zyada vikas ho chuka — baby gol-matol ho raha hai.'),
+      LocalizedText(en: 'Most development is done - baby is plumping up.', hi: 'Zyada vikas ho chuka - baby gol-matol ho raha hai.'),
       LocalizedText(en: "Baby's main development is largely complete; from now the focus is gaining weight and building fat for warmth.", hi: 'Baby ka mukhya vikas lagbhag poora; ab focus vazan badhane aur garmi ke liye fat banane par hai.')),
   _WeekMs(36, '🙃',
       LocalizedText(en: 'Settling head-down', hi: 'Sir-neeche position'),
@@ -377,19 +377,19 @@ const List<_WeekMs> _weekMilestones = [
   _WeekMs(37, '✅',
       LocalizedText(en: 'Early term', hi: 'Early term'),
       LocalizedText(en: 'Baby is now considered early term.', hi: 'Baby ab early term maana jaata hai.'),
-      LocalizedText(en: "At 37 weeks baby is 'early term' — the lungs and brain are nearly ready for life outside the womb.", hi: '37 hafte par baby "early term" hai — phephde aur dimaag bahar ki zindagi ke liye lagbhag taiyar hain.')),
+      LocalizedText(en: "At 37 weeks baby is 'early term' - the lungs and brain are nearly ready for life outside the womb.", hi: '37 hafte par baby "early term" hai - phephde aur dimaag bahar ki zindagi ke liye lagbhag taiyar hain.')),
   _WeekMs(38, '🤝',
       LocalizedText(en: 'Firm grasp', hi: 'Mazboot pakad'),
       LocalizedText(en: 'Baby has a firm grasp; organs are ready.', hi: 'Baby ki pakad mazboot; organs taiyar.'),
-      LocalizedText(en: "Baby's grasp is strong and the organs are ready to function outside the womb — just final touches now.", hi: 'Baby ki pakad mazboot hai aur organs bahar kaam karne ko taiyar hain — bas aakhri taiyariyan.')),
+      LocalizedText(en: "Baby's grasp is strong and the organs are ready to function outside the womb - just final touches now.", hi: 'Baby ki pakad mazboot hai aur organs bahar kaam karne ko taiyar hain - bas aakhri taiyariyan.')),
   _WeekMs(39, '🌟',
       LocalizedText(en: 'Full term', hi: 'Full term'),
-      LocalizedText(en: 'Baby is full term — brain and lungs keep maturing.', hi: 'Baby full term — dimaag aur phephde pakte rehte hain.'),
+      LocalizedText(en: 'Baby is full term - brain and lungs keep maturing.', hi: 'Baby full term - dimaag aur phephde pakte rehte hain.'),
       LocalizedText(en: 'Baby is full term. The brain and lungs continue to mature right up until birth.', hi: 'Baby full term hai. Dimaag aur phephde janm tak pakte rehte hain.')),
   _WeekMs(40, '🎉',
       LocalizedText(en: 'Due date!', hi: 'Due date!'),
       LocalizedText(en: 'Baby is ready to meet you.', hi: 'Baby aapse milne ko taiyar hai.'),
-      LocalizedText(en: "It's your due date! Remember, only about 1 in 20 babies arrive exactly on it — baby will come when ready.", hi: 'Aapki due date! Yaad rakhein, sirf 20 mein se 1 baby theek isi din aata hai — baby taiyar hone par aayega.')),
+      LocalizedText(en: "It's your due date! Remember, only about 1 in 20 babies arrive exactly on it - baby will come when ready.", hi: 'Aapki due date! Yaad rakhein, sirf 20 mein se 1 baby theek isi din aata hai - baby taiyar hone par aayega.')),
 ];
 
 const List<LocalizedText> _nextRadar = [
@@ -400,11 +400,11 @@ const List<LocalizedText> _nextRadar = [
       en: 'Glucose screening usually comes up between weeks 24–28.',
       hi: 'Glucose screening aksar hafte 24–28 ke beech hoti hai.'),
   LocalizedText(
-      en: "A lovely time to start thinking about your birth plan and hospital bag — no rush.",
-      hi: 'Birth plan aur hospital bag ke baare mein sochne ka achha samay — koi jaldi nahi.'),
+      en: "A lovely time to start thinking about your birth plan and hospital bag - no rush.",
+      hi: 'Birth plan aur hospital bag ke baare mein sochne ka achha samay - koi jaldi nahi.'),
 ];
 
-// "Mother this week" topics — a short teaser on the card, a fuller read in a
+// "Mother this week" topics - a short teaser on the card, a fuller read in a
 // tap-to-open dialog.
 class _MotherTopic {
   const _MotherTopic(this.emoji, this.label, this.short, this.detail);
@@ -419,11 +419,11 @@ const List<_MotherTopic> _motherTopics = [
       '🌀',
       LocalizedText(en: 'Hormones', hi: 'Hormones'),
       LocalizedText(
-          en: 'Levels are steadier now — many feel more energy.',
-          hi: 'Ab levels sthir hain — kai logon ko zyada urja.'),
+          en: 'Levels are steadier now - many feel more energy.',
+          hi: 'Ab levels sthir hain - kai logon ko zyada urja.'),
       LocalizedText(
-          en: "After the ups and downs of the first trimester, your hormones settle into a steadier rhythm. Many women feel a welcome lift in energy and mood — the 'pregnancy glow' often shows up around now.",
-          hi: 'Pehli trimester ke utaar-chadhaav ke baad hormones sthir ho jaate hain. Kai mahilaon ko urja aur mood mein sudhaar mehsoos hota hai — "pregnancy glow" aksar abhi dikhta hai.')),
+          en: "After the ups and downs of the first trimester, your hormones settle into a steadier rhythm. Many women feel a welcome lift in energy and mood - the 'pregnancy glow' often shows up around now.",
+          hi: 'Pehli trimester ke utaar-chadhaav ke baad hormones sthir ho jaate hain. Kai mahilaon ko urja aur mood mein sudhaar mehsoos hota hai - "pregnancy glow" aksar abhi dikhta hai.')),
   _MotherTopic(
       '🤰',
       LocalizedText(en: 'Your bump', hi: 'Aapka bump'),
@@ -440,8 +440,8 @@ const List<_MotherTopic> _motherTopics = [
           en: 'You may feel the first gentle flutters (quickening).',
           hi: 'Aap pehli halki harkatein (quickening) mehsoos kar sakti hain.'),
       LocalizedText(
-          en: "Those first movements — called 'quickening' — often arrive around week 20. They can feel like bubbles, a light tap or butterflies, and will be irregular at first. Over the coming weeks they grow stronger and more regular. First-time mums sometimes feel them a little later — perfectly normal.",
-          hi: 'Pehli harkatein — "quickening" — aksar hafta 20 ke aas-paas aati hain. Yeh bulbule, halki thaap ya titli jaisi lag sakti hain, aur pehle anyamit hoti hain. Aage chal kar yeh mazboot aur niyamit ho jaati hain.')),
+          en: "Those first movements - called 'quickening' - often arrive around week 20. They can feel like bubbles, a light tap or butterflies, and will be irregular at first. Over the coming weeks they grow stronger and more regular. First-time mums sometimes feel them a little later - perfectly normal.",
+          hi: 'Pehli harkatein - "quickening" - aksar hafta 20 ke aas-paas aati hain. Yeh bulbule, halki thaap ya titli jaisi lag sakti hain, aur pehle anyamit hoti hain. Aage chal kar yeh mazboot aur niyamit ho jaati hain.')),
   _MotherTopic(
       '✨',
       LocalizedText(en: 'Skin & body', hi: 'Tvacha & sharir'),
@@ -449,14 +449,14 @@ const List<_MotherTopic> _motherTopics = [
           en: 'More blood flow brings a warm glow and fuller hair.',
           hi: 'Zyada blood flow se glow aur ghane baal.'),
       LocalizedText(
-          en: 'The extra blood your body is making can give your skin a warm glow and your hair a fuller look. Some women notice a dark line down the belly (linea nigra) or slight skin changes — these are normal and usually fade after birth.',
-          hi: 'Aapka sharir jo zyada khoon bana raha hai usse tvacha mein glow aur baal ghane lagte hain. Kuch mahilaon ko pet par gehri rekha (linea nigra) dikhti hai — yeh normal hai aur janm ke baad aksar mit jaati hai.')),
+          en: 'The extra blood your body is making can give your skin a warm glow and your hair a fuller look. Some women notice a dark line down the belly (linea nigra) or slight skin changes - these are normal and usually fade after birth.',
+          hi: 'Aapka sharir jo zyada khoon bana raha hai usse tvacha mein glow aur baal ghane lagte hain. Kuch mahilaon ko pet par gehri rekha (linea nigra) dikhti hai - yeh normal hai aur janm ke baad aksar mit jaati hai.')),
   _MotherTopic(
       '💗',
       LocalizedText(en: 'Heart & breath', hi: 'Dil & saans'),
       LocalizedText(
-          en: 'Your heart works harder — you may feel breathless.',
-          hi: 'Aapka dil zyada kaam karta hai — saans phool sakti hai.'),
+          en: 'Your heart works harder - you may feel breathless.',
+          hi: 'Aapka dil zyada kaam karta hai - saans phool sakti hai.'),
       LocalizedText(
           en: 'Your heart is now pumping much more blood than usual, so you may feel a little breathless on the stairs or notice your heart racing at times. Move at your own pace, rest when you need to, and stay well hydrated.',
           hi: 'Aapka dil ab pehle se kahin zyada khoon pump kar raha hai, isliye seedhi chadhte hue saans phool sakti hai ya dil tez dhadak sakta hai. Apni raftaar se chalein, zaroorat par aaram karein aur paani peete rahein.')),
@@ -467,31 +467,31 @@ const List<_MotherTopic> _motherTopics = [
           en: 'Round-ligament twinges as your bump stretches.',
           hi: 'Bump khinchne se round-ligament khinchaav.'),
       LocalizedText(
-          en: "You may feel occasional sharp twinges low on the sides of your bump — round-ligament pain — as the ligaments supporting your growing uterus stretch. It's usually brief and harmless; moving slowly helps. Mention anything severe or persistent to your doctor.",
-          hi: 'Bump ke nichle hisson mein kabhi-kabhi tez khinchaav mehsoos ho sakta hai — round-ligament pain — jab badhte uterus ko sambhalne wale ligaments khinchte hain. Yeh aksar thodi der ka aur harmless hota hai; dheere position badalna madad karta hai.')),
+          en: "You may feel occasional sharp twinges low on the sides of your bump - round-ligament pain - as the ligaments supporting your growing uterus stretch. It's usually brief and harmless; moving slowly helps. Mention anything severe or persistent to your doctor.",
+          hi: 'Bump ke nichle hisson mein kabhi-kabhi tez khinchaav mehsoos ho sakta hai - round-ligament pain - jab badhte uterus ko sambhalne wale ligaments khinchte hain. Yeh aksar thodi der ka aur harmless hota hai; dheere position badalna madad karta hai.')),
 ];
 
 // Father-focused "how you can help" lines for the partner share message.
 const List<LocalizedText> _partnerHelp = [
   LocalizedText(
-      en: 'Come along to the anomaly scan if you can — seeing baby together is special.',
-      hi: 'Ho sake to anomaly scan par saath jaayein — baby ko saath dekhna khaas hota hai.'),
+      en: 'Come along to the anomaly scan if you can - seeing baby together is special.',
+      hi: 'Ho sake to anomaly scan par saath jaayein - baby ko saath dekhna khaas hota hai.'),
   LocalizedText(
-      en: 'Help her sleep on her side — a pillow between the knees works wonders.',
-      hi: 'Use karwat par sone mein madad karein — ghutno ke beech takiya bahut aaram deta hai.'),
+      en: 'Help her sleep on her side - a pillow between the knees works wonders.',
+      hi: 'Use karwat par sone mein madad karein - ghutno ke beech takiya bahut aaram deta hai.'),
   LocalizedText(
       en: 'Take over a few chores; her body is working hard for two.',
       hi: 'Kuch kaam apne zimme lein; uska sharir do logon ke liye mehnat kar raha hai.'),
   LocalizedText(
-      en: 'Keep iron- and calcium-rich meals handy — greens, dairy and dal.',
-      hi: 'Iron aur calcium wale khaane rakhein — saag, dairy aur dal.'),
+      en: 'Keep iron- and calcium-rich meals handy - greens, dairy and dal.',
+      hi: 'Iron aur calcium wale khaane rakhein - saag, dairy aur dal.'),
   LocalizedText(
-      en: 'Talk or sing to the bump — baby can hear your voice now.',
-      hi: 'Bump se baat karein ya gaayein — baby ab aapki awaaz sunta hai.'),
+      en: 'Talk or sing to the bump - baby can hear your voice now.',
+      hi: 'Bump se baat karein ya gaayein - baby ab aapki awaaz sunta hai.'),
 ];
 
 // ===========================================================================
-//  FATHER (Dad-preview) WEEK-20 COPY — same content, re-voiced for the partner
+//  FATHER (Dad-preview) WEEK-20 COPY - same content, re-voiced for the partner
 //  reading it for/about her. Used only when _fatherWeek(week) is true; the
 //  mother data above is never touched. Strip with FatherPreview before launch.
 // ===========================================================================
@@ -503,17 +503,17 @@ const LocalizedText _fBabyBrief = LocalizedText(
 const LocalizedText _fMotherTitle =
     LocalizedText(en: "How she's doing", hi: 'Woh kaisi hai');
 const LocalizedText _fMotherBrief = LocalizedText(
-    en: "She's in the gentlest stretch of pregnancy — steadier energy, a visible bump, big feelings. Here's how to show up for her this week.",
-    hi: 'Woh pregnancy ke sabse aaramdeh daur mein hai — sthir energy, dikhta hua bump, gehre jazbaat. Is hafte uske liye kaise saath dein, yahan dekhein.');
+    en: "She's in the gentlest stretch of pregnancy - steadier energy, a visible bump, big feelings. Here's how to show up for her this week.",
+    hi: 'Woh pregnancy ke sabse aaramdeh daur mein hai - sthir energy, dikhta hua bump, gehre jazbaat. Is hafte uske liye kaise saath dein, yahan dekhein.');
 const LocalizedText _fNextBrief = LocalizedText(
-    en: "See the scans and check-ups coming up for her — and how to be there for each.",
-    hi: 'Uske aane wale scans aur check-ups dekhein — aur har ek mein kaise saath dein.');
+    en: "See the scans and check-ups coming up for her - and how to be there for each.",
+    hi: 'Uske aane wale scans aur check-ups dekhein - aur har ek mein kaise saath dein.');
 const LocalizedText _fYouThisWeek =
     LocalizedText(en: 'Her this week', hi: 'Is hafte woh');
 
 // ===========================================================================
 //  PER-WEEK father section briefs (the re-voicing pass). 3rd-person, warm,
-//  partner-facing. Authored trimester by trimester — TRIMESTER 1 (weeks 4–13)
+//  partner-facing. Authored trimester by trimester - TRIMESTER 1 (weeks 4–13)
 //  + week 20 below; weeks not yet revoiced fall back to the mother's per-week
 //  content via [_fBabyBriefFor] / [_fMotherBriefFor].
 // ===========================================================================
@@ -537,8 +537,8 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby's arms and legs are getting longer, the joints are forming, and the first small movements are beginning. The heart now has all four chambers and is working hard.",
       hi: "Aapke baby ke haath-pair lambe ho rahe hain, joints ban rahe hain, aur pehli chhoti harkatein shuru ho rahi hain. Dil ab chaaron chambers ke saath ban chuka hai aur mehnat kar raha hai."),
   10: LocalizedText(
-      en: "Your baby's fingers and toes are separating, the jaw and face are taking shape, and the brain is building millions of new connections. There are tiny movements now — still far too small for her to feel.",
-      hi: "Aapke baby ki ungliyaan aur pair alag ho rahe hain, jaw aur chehra ban raha hai, aur brain laakhon nayi connections bana raha hai. Ab nanhi harkatein bhi hoti hain — abhi itni chhoti ki use mehsoos nahi hotin."),
+      en: "Your baby's fingers and toes are separating, the jaw and face are taking shape, and the brain is building millions of new connections. There are tiny movements now - still far too small for her to feel.",
+      hi: "Aapke baby ki ungliyaan aur pair alag ho rahe hain, jaw aur chehra ban raha hai, aur brain laakhon nayi connections bana raha hai. Ab nanhi harkatein bhi hoti hain - abhi itni chhoti ki use mehsoos nahi hotin."),
   11: LocalizedText(
       en: "Your baby's fingers and toes are fully separated now, the bones are starting to harden, and there's stretching, kicking and moving inside that tiny world. The little face grows clearer by the day.",
       hi: "Aapke baby ki ungliyaan ab poori tarah alag ho gayi hain, haddiyan mazboot honi shuru ho rahi hain, aur woh apni chhoti duniya mein stretch, kick aur move kar raha hai. Nanha chehra din-ba-din saaf hota ja raha hai."),
@@ -555,8 +555,8 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby's muscles and bones are getting stronger, with smoother movements of the arms, legs and joints. The ears are developing too, getting ready to hear the world in the weeks ahead.",
       hi: "Aapke baby ki muscles aur haddiyan mazboot ho rahi hain, aur haath, pair aur joints ki harkatein zyada smooth ho gayi hain. Kaan bhi develop ho rahe hain, aane wale hafton mein duniya sunne ki taiyaari mein."),
   16: LocalizedText(
-      en: "Your baby's bones are hardening, the muscles are getting stronger, and the ears are developing fast — soon there'll be the first responses to sounds from the outside world.",
-      hi: "Aapke baby ki haddiyan mazboot ho rahi hain, muscles strong ho rahe hain, aur kaan tezi se develop ho rahe hain — jald hi bahar ki duniya ki aawaazon par pehli react dikhegi."),
+      en: "Your baby's bones are hardening, the muscles are getting stronger, and the ears are developing fast - soon there'll be the first responses to sounds from the outside world.",
+      hi: "Aapke baby ki haddiyan mazboot ho rahi hain, muscles strong ho rahe hain, aur kaan tezi se develop ho rahe hain - jald hi bahar ki duniya ki aawaazon par pehli react dikhegi."),
   17: LocalizedText(
       en: "Your baby's skeleton is turning from soft cartilage into stronger bone, the muscles are growing more powerful, and there's lots of practising of the movements that help growth.",
       hi: "Aapke baby ka skeleton naram cartilage se mazboot haddi mein badal raha hai, muscles aur powerful ho rahi hain, aur woh aisi movements practice kar raha hai jo growth mein madad karti hain."),
@@ -571,11 +571,11 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby's taste buds are developing, more amniotic fluid is being swallowed, and the movements are getting stronger and better coordinated. The brain keeps making millions of new connections.",
       hi: "Aapke baby ke taste buds develop ho rahe hain, woh zyada amniotic fluid nigal raha hai, aur harkatein mazboot aur zyada coordinated ho rahi hain. Brain laakhon naye connections banata ja raha hai."),
   22: LocalizedText(
-      en: "Your baby's hearing is developing fast — picking up her heartbeat, voices (yours included) and even some sounds from outside the womb. That little brain is busy learning from all of it.",
-      hi: "Aapke baby ki hearing tezi se develop ho rahi hai — uski dil ki dhadkan, awaazein (aapki bhi) aur womb ke bahar ki kuch aawaazein bhi sun raha hai. Woh nanha brain in sab se seekhta ja raha hai."),
+      en: "Your baby's hearing is developing fast - picking up her heartbeat, voices (yours included) and even some sounds from outside the womb. That little brain is busy learning from all of it.",
+      hi: "Aapke baby ki hearing tezi se develop ho rahi hai - uski dil ki dhadkan, awaazein (aapki bhi) aur womb ke bahar ki kuch aawaazein bhi sun raha hai. Woh nanha brain in sab se seekhta ja raha hai."),
   23: LocalizedText(
-      en: "Your baby's brain is developing at an incredible pace — new connections forming every second, laying the groundwork for learning, memory and movement. The hearing keeps improving, and familiar sounds are being recognised.",
-      hi: "Aapke baby ka brain zabardast raftaar se develop ho raha hai — har second naye connections ban rahe hain, jo seekhne, yaad rakhne aur movement ki neenv banate hain. Hearing behtar ho rahi hai, aur jaani-pehchaani aawazein pehchaani jaane lagi hain."),
+      en: "Your baby's brain is developing at an incredible pace - new connections forming every second, laying the groundwork for learning, memory and movement. The hearing keeps improving, and familiar sounds are being recognised.",
+      hi: "Aapke baby ka brain zabardast raftaar se develop ho raha hai - har second naye connections ban rahe hain, jo seekhne, yaad rakhne aur movement ki neenv banate hain. Hearing behtar ho rahi hai, aur jaani-pehchaani aawazein pehchaani jaane lagi hain."),
   24: LocalizedText(
       en: "Your baby's hearing is getting sharper, the brain keeps building new pathways, and regular periods of sleep and activity are starting to form. The lungs are continuing their important development too.",
       hi: "Aapke baby ki hearing aur sharp ho rahi hai, brain naye rastey banata ja raha hai, aur sone-jaagne ke regular periods ban-ne lage hain. Lungs bhi apna important development safar jaari rakhe hue hain."),
@@ -595,8 +595,8 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby is building fat under the skin, strengthening those muscles, and maturing the lungs and brain. The movements are getting more powerful with every passing week.",
       hi: "Aapka baby skin ke neeche fat bana raha hai, muscles mazboot kar raha hai, aur lungs aur brain ko mature kar raha hai. Har hafte ke saath harkatein aur powerful hoti ja rahi hain."),
   30: LocalizedText(
-      en: "Your baby's brain is developing new folds and connections, the lungs keep maturing, and body fat is building up — the kind that helps keep warm after birth.",
-      hi: "Aapke baby ke brain mein naye folds aur connections ban rahe hain, lungs mature hote ja rahe hain, aur body fat badh raha hai — wahi jo birth ke baad garam rakhne mein madad karta hai."),
+      en: "Your baby's brain is developing new folds and connections, the lungs keep maturing, and body fat is building up - the kind that helps keep warm after birth.",
+      hi: "Aapke baby ke brain mein naye folds aur connections ban rahe hain, lungs mature hote ja rahe hain, aur body fat badh raha hai - wahi jo birth ke baad garam rakhne mein madad karta hai."),
   31: LocalizedText(
       en: "Your baby is gaining body fat, building muscle, and maturing the lungs and brain. The movements are stronger than ever, even as space inside starts to feel a little tighter.",
       hi: "Aapka baby body fat badha raha hai, muscles bana raha hai, aur lungs aur brain ko mature kar raha hai. Andar jagah thodi tang hone lagi hai, phir bhi harkatein pehle se zyada mazboot hain."),
@@ -604,8 +604,8 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby is practising breathing movements, sleeping in cycles, and maturing the lungs and nervous system. The body is storing up the nutrients and energy needed for life after birth.",
       hi: "Aapka baby saans lene ki movements practice kar raha hai, cycles mein so raha hai, aur lungs aur nervous system ko mature kar raha hai. Body janam ke baad ki zindagi ke liye zaroori nutrients aur energy store kar raha hai."),
   33: LocalizedText(
-      en: "Your baby's brain and lungs keep maturing, and antibodies are passing across from her — protection that will help after birth. There's more fat and a little more strength every day.",
-      hi: "Aapke baby ke brain aur lungs mature hote ja rahe hain, aur uss se antibodies baby tak pahunch rahi hain — jo birth ke baad raksha mein madad karengi. Har din thoda aur fat aur thodi aur mazbooti aati hai."),
+      en: "Your baby's brain and lungs keep maturing, and antibodies are passing across from her - protection that will help after birth. There's more fat and a little more strength every day.",
+      hi: "Aapke baby ke brain aur lungs mature hote ja rahe hain, aur uss se antibodies baby tak pahunch rahi hain - jo birth ke baad raksha mein madad karengi. Har din thoda aur fat aur thodi aur mazbooti aati hai."),
   34: LocalizedText(
       en: "Your baby's lungs keep maturing, the brain is developing fast, and body fat is building to help with temperature after birth. Most of the systems are now getting ready for life outside the womb.",
       hi: "Aapke baby ke lungs mature hote ja rahe hain, brain tezi se develop ho raha hai, aur body fat badh raha hai jo birth ke baad temperature mein madad karega. Zyadatar systems ab womb ke bahar ki zindagi ke liye taiyaar ho rahe hain."),
@@ -613,11 +613,11 @@ const Map<int, LocalizedText> _fBabyBriefs = {
       en: "Your baby's lungs are nearly mature, the brain keeps developing fast, and body fat is building every day. Around this stage many babies begin settling into a head-down position, ready for the way out.",
       hi: "Aapke baby ke lungs lagbhag mature ho chuke hain, brain tezi se develop hota ja raha hai, aur har din body fat badh raha hai. Is stage ke aas-paas kai babies head-down position mein settle hone lagte hain, bahar aane ke liye taiyaar."),
   36: LocalizedText(
-      en: "Your baby's lungs are almost fully mature, the brain keeps developing fast, and the reflexes for after birth — sucking, grasping — are being practised. Nearly ready to meet you both.",
-      hi: "Aapke baby ke lungs lagbhag poori tarah mature ho chuke hain, brain tezi se develop hota ja raha hai, aur birth ke baad ke reflexes — chusna, pakadna — practice ho rahe hain. Aap dono se milne ke lagbhag taiyaar."),
+      en: "Your baby's lungs are almost fully mature, the brain keeps developing fast, and the reflexes for after birth - sucking, grasping - are being practised. Nearly ready to meet you both.",
+      hi: "Aapke baby ke lungs lagbhag poori tarah mature ho chuke hain, brain tezi se develop hota ja raha hai, aur birth ke baad ke reflexes - chusna, pakadna - practice ho rahe hain. Aap dono se milne ke lagbhag taiyaar."),
   37: LocalizedText(
-      en: "Your baby's lungs are ready for life outside the womb, the brain keeps developing, and the reflexes for after birth are being practised. Most of the growth now is about gaining strength and storing energy — full-term is here.",
-      hi: "Aapke baby ke lungs womb ke bahar ki zindagi ke liye taiyaar hain, brain develop hota rehta hai, aur birth ke baad ke reflexes practice ho rahe hain. Ab zyadatar growth taakat banane aur energy store karne par hai — full-term aa gaya hai."),
+      en: "Your baby's lungs are ready for life outside the womb, the brain keeps developing, and the reflexes for after birth are being practised. Most of the growth now is about gaining strength and storing energy - full-term is here.",
+      hi: "Aapke baby ke lungs womb ke bahar ki zindagi ke liye taiyaar hain, brain develop hota rehta hai, aur birth ke baad ke reflexes practice ho rahe hain. Ab zyadatar growth taakat banane aur energy store karne par hai - full-term aa gaya hai."),
   38: LocalizedText(
       en: "Your baby's lungs are ready, the brain is still developing fast, and strength and energy reserves keep building. Most of the work now is simply getting ready for birth and the world outside.",
       hi: "Aapke baby ke lungs taiyaar hain, brain abhi bhi tezi se develop ho raha hai, aur taakat aur energy reserves banti ja rahi hain. Ab zyadatar kaam bas janam aur bahar ki duniya ke liye taiyaari karna hai."),
@@ -634,35 +634,35 @@ const Map<int, LocalizedText> _fMotherBriefs = {
       en: "Excitement, disbelief and a little anxiety are probably arriving all at once as she takes in the news. A calm, steady you helps more than you'd think.",
       hi: "News ko samajhte hue excitement, yakeen na hona aur thodi anxiety shayad ek saath aa rahe hain. Aapka shaant aur sthir hona socha se zyada madad karta hai."),
   5: LocalizedText(
-      en: "She may swing between excitement, joy, disbelief and worry through the day. None of it needs fixing — just let her know you're in it together.",
-      hi: "Din bhar woh excitement, khushi, yakeen na hona aur fikr ke beech jhool sakti hai. Inhe theek karne ki zaroorat nahi — bas use ehsaas dilayein ki aap saath hain."),
+      en: "She may swing between excitement, joy, disbelief and worry through the day. None of it needs fixing - just let her know you're in it together.",
+      hi: "Din bhar woh excitement, khushi, yakeen na hona aur fikr ke beech jhool sakti hai. Inhe theek karne ki zaroorat nahi - bas use ehsaas dilayein ki aap saath hain."),
   6: LocalizedText(
-      en: "She might feel excited one moment and wiped out the next — the ups and downs are normal this week. Picking up a few chores quietly goes a long way.",
-      hi: "Kabhi woh excited feel karegi, agle hi pal thaki hui — is hafte yeh utaar-chadhaav normal hai. Chupchaap kuch kaam sambhaal lena bahut madad karta hai."),
+      en: "She might feel excited one moment and wiped out the next - the ups and downs are normal this week. Picking up a few chores quietly goes a long way.",
+      hi: "Kabhi woh excited feel karegi, agle hi pal thaki hui - is hafte yeh utaar-chadhaav normal hai. Chupchaap kuch kaam sambhaal lena bahut madad karta hai."),
   7: LocalizedText(
-      en: "She may feel excited one moment and worried the next — those swings are a normal part of early pregnancy. Patience and a listening ear are the best things you can offer.",
-      hi: "Kabhi woh excited, to agle pal pareshaan — early pregnancy mein yeh utaar-chadhaav normal hai. Sabra aur dhyaan se sunna sabse achhi cheez hai jo aap de sakte hain."),
+      en: "She may feel excited one moment and worried the next - those swings are a normal part of early pregnancy. Patience and a listening ear are the best things you can offer.",
+      hi: "Kabhi woh excited, to agle pal pareshaan - early pregnancy mein yeh utaar-chadhaav normal hai. Sabra aur dhyaan se sunna sabse achhi cheez hai jo aap de sakte hain."),
   8: LocalizedText(
-      en: "With her first big scan coming up, she's probably feeling a mix of excitement and uncertainty. Offer to go with her — it helps to have you there.",
-      hi: "Pehla bada scan paas aate hue, woh shayad excitement aur uncertainty dono mehsoos kar rahi hai. Saath jaane ki peshkash karein — aapka wahan hona madad karta hai."),
+      en: "With her first big scan coming up, she's probably feeling a mix of excitement and uncertainty. Offer to go with her - it helps to have you there.",
+      hi: "Pehla bada scan paas aate hue, woh shayad excitement aur uncertainty dono mehsoos kar rahi hai. Saath jaane ki peshkash karein - aapka wahan hona madad karta hai."),
   9: LocalizedText(
-      en: "She may feel more connected to the pregnancy now, even while wondering what's ahead. Small check-ins — 'how are you feeling today?' — mean a lot.",
-      hi: "Ab woh pregnancy se zyada juda mehsoos kar sakti hai, bhale hi aage kya hoga yeh soch rahi ho. Chhote sawaal — 'aaj kaisa lag raha hai?' — bahut maayne rakhte hain."),
+      en: "She may feel more connected to the pregnancy now, even while wondering what's ahead. Small check-ins - 'how are you feeling today?' - mean a lot.",
+      hi: "Ab woh pregnancy se zyada juda mehsoos kar sakti hai, bhale hi aage kya hoga yeh soch rahi ho. Chhote sawaal - 'aaj kaisa lag raha hai?' - bahut maayne rakhte hain."),
   10: LocalizedText(
       en: "She may feel closer to the pregnancy while still carrying some uncertainty about the future. Just being someone she can talk it through with helps settle the nerves.",
       hi: "Woh pregnancy se zyada juda mehsoos kar sakti hai, par future ko le kar thodi uncertainty bhi reh sakti hai. Bas aisa koi hona jisse woh baat kar sake, ghabraahat ko shaant karta hai."),
   11: LocalizedText(
-      en: "She may feel more confident than a few weeks ago, though the odd worry is still completely normal. Keep reassuring her — and keep showing up at the appointments.",
-      hi: "Kuch hafte pehle ke mukable woh zyada confident mehsoos kar sakti hai, par kabhi-kabhi fikr hona bilkul normal hai. Use bharosa dilaate rahein — aur appointments mein saath aate rahein."),
+      en: "She may feel more confident than a few weeks ago, though the odd worry is still completely normal. Keep reassuring her - and keep showing up at the appointments.",
+      hi: "Kuch hafte pehle ke mukable woh zyada confident mehsoos kar sakti hai, par kabhi-kabhi fikr hona bilkul normal hai. Use bharosa dilaate rahein - aur appointments mein saath aate rahein."),
   12: LocalizedText(
-      en: "Reaching the end of the first trimester, she may feel relief, gratitude and fresh confidence. A lovely moment to celebrate together — you've come through the hardest early stretch.",
-      hi: "Pehle trimester ke ant tak pahunchte hue, woh rahat, kritagyata aur naya confidence mehsoos kar sakti hai. Yeh saath jashn manane ka pyaara pal hai — aap sabse mushkil shuruaati daur paar kar aaye hain."),
+      en: "Reaching the end of the first trimester, she may feel relief, gratitude and fresh confidence. A lovely moment to celebrate together - you've come through the hardest early stretch.",
+      hi: "Pehle trimester ke ant tak pahunchte hue, woh rahat, kritagyata aur naya confidence mehsoos kar sakti hai. Yeh saath jashn manane ka pyaara pal hai - aap sabse mushkil shuruaati daur paar kar aaye hain."),
   13: LocalizedText(
       en: "As the first trimester closes, relief and excitement often take the place of the early uncertainty. A good time to start dreaming and planning the next stretch together.",
       hi: "Pehla trimester khatam hote hue, shuruaati uncertainty ki jagah aksar rahat aur excitement le leti hai. Agle daur ke sapne dekhne aur saath planning shuru karne ka achha samay."),
   14: LocalizedText(
-      en: "She may feel more connected to the baby now that the pregnancy is starting to show to the world. Noticing the bump with her — without making her self-conscious — is a sweet way to share it.",
-      hi: "Ab jab pregnancy bahar dikhne lagi hai, woh baby se aur juda mehsoos kar sakti hai. Bump ko uske saath notice karna — bina use self-conscious banaaye — ise baantne ka pyaara tareeka hai."),
+      en: "She may feel more connected to the baby now that the pregnancy is starting to show to the world. Noticing the bump with her - without making her self-conscious - is a sweet way to share it.",
+      hi: "Ab jab pregnancy bahar dikhne lagi hai, woh baby se aur juda mehsoos kar sakti hai. Bump ko uske saath notice karna - bina use self-conscious banaaye - ise baantne ka pyaara tareeka hai."),
   15: LocalizedText(
       en: "She may feel more settled and optimistic now, and might be starting to picture life after the birth. It's a lovely time to dream about it together.",
       hi: "Ab woh zyada settled aur umeed se bhari mehsoos kar sakti hai, aur janm ke baad ki zindagi ki kalpana karne lag sakti hai. Ise saath sapna dekhne ka pyaara samay hai."),
@@ -670,30 +670,30 @@ const Map<int, LocalizedText> _fMotherBriefs = {
       en: "She's likely feeling more confident and emotionally settled in this phase. A good stretch to enjoy together before the busier weeks ahead.",
       hi: "Is phase mein woh shayad zyada confident aur emotionally settled mehsoos kar rahi hai. Aage ke vyast hafton se pehle ise saath enjoy karne ka achha daur hai."),
   17: LocalizedText(
-      en: "Excitement often grows around now as she starts anticipating the first movements she'll actually feel. Ask her about them — sharing that wait builds the bond.",
-      hi: "Is samay aksar excitement badh jaati hai kyunki woh pehli mehsoos hone wali harkaton ka intezaar karne lagti hai. Unke baare mein uss se poochein — woh intezaar baantna bond banata hai."),
+      en: "Excitement often grows around now as she starts anticipating the first movements she'll actually feel. Ask her about them - sharing that wait builds the bond.",
+      hi: "Is samay aksar excitement badh jaati hai kyunki woh pehli mehsoos hone wali harkaton ka intezaar karne lagti hai. Unke baare mein uss se poochein - woh intezaar baantna bond banata hai."),
   18: LocalizedText(
       en: "With the anomaly scan approaching, excitement is building and the baby feels more real than ever for her. Plan to be at that scan with her if you can.",
       hi: "Anomaly scan paas aate hue excitement badh rahi hai aur baby uske liye pehle se kahin zyada real lag raha hai. Ho sake to us scan mein uske saath rehne ka plan banayein."),
   19: LocalizedText(
-      en: "She may feel excited about the anomaly scan while also wondering what the second half of pregnancy holds. Being curious alongside her — not rushing to reassure — helps most.",
-      hi: "Woh anomaly scan ko lekar excited mehsoos kar sakti hai, saath hi soch sakti hai ki pregnancy ka agla aadha hissa kya laayega. Uske saath jigyasu rehna — jaldi bharosa dene ke bajaye — sabse zyada madad karta hai."),
+      en: "She may feel excited about the anomaly scan while also wondering what the second half of pregnancy holds. Being curious alongside her - not rushing to reassure - helps most.",
+      hi: "Woh anomaly scan ko lekar excited mehsoos kar sakti hai, saath hi soch sakti hai ki pregnancy ka agla aadha hissa kya laayega. Uske saath jigyasu rehna - jaldi bharosa dene ke bajaye - sabse zyada madad karta hai."),
   20: _fMotherBrief,
   21: LocalizedText(
-      en: "As the movements get more frequent and noticeable, she's likely feeling more and more connected to the baby. Put a hand on the bump with her when there's a kick — it's a moment you can share.",
-      hi: "Jaise-jaise harkatein zyada frequent aur noticeable hoti hain, woh baby se aur juda mehsoos kar rahi hai. Jab kick ho to uske saath bump par haath rakhein — yeh pal aap dono baant sakte hain."),
+      en: "As the movements get more frequent and noticeable, she's likely feeling more and more connected to the baby. Put a hand on the bump with her when there's a kick - it's a moment you can share.",
+      hi: "Jaise-jaise harkatein zyada frequent aur noticeable hoti hain, woh baby se aur juda mehsoos kar rahi hai. Jab kick ho to uske saath bump par haath rakhein - yeh pal aap dono baant sakte hain."),
   22: LocalizedText(
-      en: "Many mothers feel a stronger bond once they realise the baby can hear their voice — she may too. A good reason for you both to talk and sing to the bump now.",
-      hi: "Bahut si mothers ko gehra bond mehsoos hota hai jab pata chalta hai ki baby unki awaaz sun sakta hai — woh bhi aisa feel kar sakti hai. Ab bump se baat karne aur gungunaane ka achha bahaana."),
+      en: "Many mothers feel a stronger bond once they realise the baby can hear their voice - she may too. A good reason for you both to talk and sing to the bump now.",
+      hi: "Bahut si mothers ko gehra bond mehsoos hota hai jab pata chalta hai ki baby unki awaaz sun sakta hai - woh bhi aisa feel kar sakti hai. Ab bump se baat karne aur gungunaane ka achha bahaana."),
   23: LocalizedText(
-      en: "She's likely feeling deeply connected now as the baby's movement patterns become familiar. She may start noticing when the baby is awake or resting — ask her about it.",
-      hi: "Ab jab baby ke movement patterns familiar ho rahe hain, woh gehraai se juda mehsoos kar rahi hai. Woh notice karne lag sakti hai ki baby kab jaag raha hai ya aaram kar raha hai — uss se poochein."),
+      en: "She's likely feeling deeply connected now as the baby's movement patterns become familiar. She may start noticing when the baby is awake or resting - ask her about it.",
+      hi: "Ab jab baby ke movement patterns familiar ho rahe hain, woh gehraai se juda mehsoos kar rahi hai. Woh notice karne lag sakti hai ki baby kab jaag raha hai ya aaram kar raha hai - uss se poochein."),
   24: LocalizedText(
-      en: "As the baby's movement patterns become familiar, she may be feeling a deeper connection. Around now there may be a glucose test too — offer to go along and keep her company.",
-      hi: "Jaise-jaise baby ke movement patterns familiar hote hain, woh gehra connection mehsoos kar sakti hai. Is samay glucose test bhi ho sakta hai — saath jaane aur uska saath dene ki peshkash karein."),
+      en: "As the baby's movement patterns become familiar, she may be feeling a deeper connection. Around now there may be a glucose test too - offer to go along and keep her company.",
+      hi: "Jaise-jaise baby ke movement patterns familiar hote hain, woh gehra connection mehsoos kar sakti hai. Is samay glucose test bhi ho sakta hai - saath jaane aur uska saath dene ki peshkash karein."),
   25: LocalizedText(
-      en: "She may feel a deeper connection as she starts recognising the baby's own unique movement patterns. When she points one out, lean in — those shared moments matter.",
-      hi: "Jab woh baby ke apne khaas movement patterns pehchaanne lagti hai, woh gehra connection mehsoos kar sakti hai. Jab woh koi harkat bataye, dhyaan dein — woh saanjhe pal maayne rakhte hain."),
+      en: "She may feel a deeper connection as she starts recognising the baby's own unique movement patterns. When she points one out, lean in - those shared moments matter.",
+      hi: "Jab woh baby ke apne khaas movement patterns pehchaanne lagti hai, woh gehra connection mehsoos kar sakti hai. Jab woh koi harkat bataye, dhyaan dein - woh saanjhe pal maayne rakhte hain."),
   26: LocalizedText(
       en: "She may feel grateful and connected, and increasingly aware that the third trimester is near. A good moment to start thinking together about the months ahead.",
       hi: "Woh grateful aur juda mehsoos kar sakti hai, aur yeh ehsaas badh raha hai ki teesra trimester kareeb hai. Aane wale mahinon ke baare mein saath sochna shuru karne ka achha pal."),
@@ -704,8 +704,8 @@ const Map<int, LocalizedText> _fMotherBriefs = {
       en: "She may be balancing excitement about meeting the baby with the first real thoughts about labour and birth. A good time to start learning the plan together.",
       hi: "Woh baby se milne ki excitement ke saath labour aur birth ke pehle asli khayaalon ko balance kar rahi ho sakti hai. Plan saath seekhna shuru karne ka achha samay."),
   29: LocalizedText(
-      en: "She may be thinking more and more about labour, delivery and life with the newborn. Listening as she talks it through — and helping where you can — eases the load.",
-      hi: "Woh labour, delivery aur newborn ke saath zindagi ke baare mein zyada sochne lag sakti hai. Jab woh ise baat karke samjhe to sunna — aur jahan ho sake madad karna — bojh halka karta hai."),
+      en: "She may be thinking more and more about labour, delivery and life with the newborn. Listening as she talks it through - and helping where you can - eases the load.",
+      hi: "Woh labour, delivery aur newborn ke saath zindagi ke baare mein zyada sochne lag sakti hai. Jab woh ise baat karke samjhe to sunna - aur jahan ho sake madad karna - bojh halka karta hai."),
   30: LocalizedText(
       en: "She may be thinking seriously now about labour, delivery and the recovery afterwards. Reading up on postpartum support with her shows you're in this for the long haul.",
       hi: "Woh ab labour, delivery aur uske baad ki recovery ke baare mein gambhirta se soch sakti hai. Postpartum support ke baare mein uske saath padhna dikhaata hai ki aap lambe safar ke liye saath hain."),
@@ -713,32 +713,32 @@ const Map<int, LocalizedText> _fMotherBriefs = {
       en: "She may swing between excitement about meeting the baby and feeling overwhelmed by all there still is to prepare. Taking a few prep tasks off her list is a real gift right now.",
       hi: "Woh kabhi baby se milne ke excitement aur kabhi abhi tak taiyaar karne wali har cheez se overwhelmed mehsoos kar sakti hai. Kuch prep ke kaam uski list se hata lena abhi sacha tohfa hai."),
   32: LocalizedText(
-      en: "She may be mentally preparing for labour while picturing life with the newborn. Around now there's often a growth scan — go along if you can, it's reassuring for you both.",
-      hi: "Woh newborn ke saath zindagi ki kalpana karte hue labour ke liye mansik taiyaari kar rahi ho sakti hai. Is samay aksar growth scan hota hai — ho sake to saath jaayein, aap dono ke liye rahat-bhara hota hai."),
+      en: "She may be mentally preparing for labour while picturing life with the newborn. Around now there's often a growth scan - go along if you can, it's reassuring for you both.",
+      hi: "Woh newborn ke saath zindagi ki kalpana karte hue labour ke liye mansik taiyaari kar rahi ho sakti hai. Is samay aksar growth scan hota hai - ho sake to saath jaayein, aap dono ke liye rahat-bhara hota hai."),
   33: LocalizedText(
       en: "She may feel excited, protective and increasingly focused on getting ready for the baby's arrival. Sorting the nursery or the hospital bag together channels that energy well.",
       hi: "Woh excited, protective aur baby ke aane ki taiyaari par zyada focused mehsoos kar sakti hai. Nursery ya hospital bag saath taiyaar karna us energy ko achhe se istemaal karta hai."),
   34: LocalizedText(
-      en: "She may feel a mix of excitement, anticipation and the odd flash of nerves about labour and delivery. Steady reassurance — and having the plan ready — settles a lot of that.",
-      hi: "Woh labour aur delivery ko le kar excitement, intezaar aur kabhi-kabhi nervousness ka mishran mehsoos kar sakti hai. Sthir bharosa — aur plan taiyaar rakhna — usmein se bahut kuch shaant kar deta hai."),
+      en: "She may feel a mix of excitement, anticipation and the odd flash of nerves about labour and delivery. Steady reassurance - and having the plan ready - settles a lot of that.",
+      hi: "Woh labour aur delivery ko le kar excitement, intezaar aur kabhi-kabhi nervousness ka mishran mehsoos kar sakti hai. Sthir bharosa - aur plan taiyaar rakhna - usmein se bahut kuch shaant kar deta hai."),
   35: LocalizedText(
-      en: "Excitement and anticipation are often mixed with a real curiosity about when labour will start. The 'any day now' feeling is exciting — and a little nerve-wracking for her.",
-      hi: "Excitement aur intezaar ke saath aksar yeh curiosity bhi hoti hai ki labour kab shuru hoga. 'Kisi bhi din' wala ehsaas exciting hai — aur uske liye thoda nerve-wracking bhi."),
+      en: "Excitement and anticipation are often mixed with a real curiosity about when labour will start. The 'any day now' feeling is exciting - and a little nerve-wracking for her.",
+      hi: "Excitement aur intezaar ke saath aksar yeh curiosity bhi hoti hai ki labour kab shuru hoga. 'Kisi bhi din' wala ehsaas exciting hai - aur uske liye thoda nerve-wracking bhi."),
   36: LocalizedText(
       en: "Excitement, impatience and anticipation often grow stronger as the due date nears. This is the week to have the hospital bag packed and the plan locked in together.",
       hi: "Jaise-jaise due date paas aati hai, excitement, besabri aur intezaar aksar aur badh jaate hain. Yeh woh hafta hai jab hospital bag pack aur plan saath taiyaar hona chahiye."),
   37: LocalizedText(
-      en: "Excitement, impatience and anticipation are very common now — she may be wondering every single day whether today's the day. Keep your phone on and stay close by.",
-      hi: "Ab excitement, besabri aur intezaar bahut aam hain — woh har din soch sakti hai ki kya aaj woh din hai. Apna phone on rakhein aur paas rahein."),
+      en: "Excitement, impatience and anticipation are very common now - she may be wondering every single day whether today's the day. Keep your phone on and stay close by.",
+      hi: "Ab excitement, besabri aur intezaar bahut aam hain - woh har din soch sakti hai ki kya aaj woh din hai. Apna phone on rakhein aur paas rahein."),
   38: LocalizedText(
-      en: "As the end of pregnancy nears, she may feel excited, impatient, emotional or deeply reflective — sometimes all at once. Just being present and unhurried with her means a lot now.",
-      hi: "Pregnancy ke ant ke kareeb aate hue, woh excited, beqaraar, emotional ya gehraai se vichaarsheel mehsoos kar sakti hai — kabhi sab ek saath. Abhi uske saath maujood aur bina jaldbaazi ke rehna bahut maayne rakhta hai."),
+      en: "As the end of pregnancy nears, she may feel excited, impatient, emotional or deeply reflective - sometimes all at once. Just being present and unhurried with her means a lot now.",
+      hi: "Pregnancy ke ant ke kareeb aate hue, woh excited, beqaraar, emotional ya gehraai se vichaarsheel mehsoos kar sakti hai - kabhi sab ek saath. Abhi uske saath maujood aur bina jaldbaazi ke rehna bahut maayne rakhta hai."),
   39: LocalizedText(
-      en: "She may feel excited, impatient, emotional, nervous — or all of them in the same day. Every one of those feelings is normal; your calm, steady presence is the anchor.",
-      hi: "Woh excited, beqaraar, emotional, nervous — ya ek hi din mein yeh sab mehsoos kar sakti hai. In sab feelings ka aana normal hai; aapki shaant, sthir maujoodgi hi sahara hai."),
+      en: "She may feel excited, impatient, emotional, nervous - or all of them in the same day. Every one of those feelings is normal; your calm, steady presence is the anchor.",
+      hi: "Woh excited, beqaraar, emotional, nervous - ya ek hi din mein yeh sab mehsoos kar sakti hai. In sab feelings ka aana normal hai; aapki shaant, sthir maujoodgi hi sahara hai."),
   40: LocalizedText(
-      en: "She may feel excited, impatient, emotional, nervous, peaceful — or all of these in a single day. Every feeling is valid; you've reached the finish line together, and your steadiness matters most now.",
-      hi: "Woh excited, beqaraar, emotional, nervous, peaceful — ya ek hi din mein yeh sab mehsoos kar sakti hai. Har feeling valid hai; aap saath finish line tak pahunch gaye hain, aur abhi aapki sthirta sabse zyada maayne rakhti hai."),
+      en: "She may feel excited, impatient, emotional, nervous, peaceful - or all of these in a single day. Every feeling is valid; you've reached the finish line together, and your steadiness matters most now.",
+      hi: "Woh excited, beqaraar, emotional, nervous, peaceful - ya ek hi din mein yeh sab mehsoos kar sakti hai. Har feeling valid hai; aap saath finish line tak pahunch gaye hain, aur abhi aapki sthirta sabse zyada maayne rakhti hai."),
 };
 
 // The father section brief for a week: the re-voiced copy where authored, else
@@ -748,7 +748,7 @@ LocalizedText _fBabyBriefFor(WeekContent w) =>
 LocalizedText _fMotherBriefFor(WeekContent w) =>
     _fMotherBriefs[w.week] ?? w.mom.emotionalState;
 
-// Father "What's next" — Scans & appointments only, re-voiced for the partner:
+// Father "What's next" - Scans & appointments only, re-voiced for the partner:
 // what's coming up for her, and how he can show up for each.
 const LocalizedText _fNextLabel =
     LocalizedText(en: "What's coming up", hi: 'Aage kya aana hai');
@@ -764,13 +764,13 @@ class _FScan {
 }
 
 const LocalizedText _fScansIntro = LocalizedText(
-    en: "These are the same scans and check-ups she'll have — here's what each one is, and how to be there for it.",
-    hi: "Yeh wahi scans aur check-ups hain jo use honge — har ek kya hai, aur usmein kaise saath dein, yahan dekhein.");
+    en: "These are the same scans and check-ups she'll have - here's what each one is, and how to be there for it.",
+    hi: "Yeh wahi scans aur check-ups hain jo use honge - har ek kya hai, aur usmein kaise saath dein, yahan dekhein.");
 
 // The MOTHER's scans (same data as kJourneyMilestones medical), re-voiced for the
 // partner: what each is + how to show up. One per scan type, filtered by week, so
 // the father's What's-next works on EVERY week (not just 20). NOT father-only
-// scans — the same appointments, his lens.
+// scans - the same appointments, his lens.
 const List<_FScan> _fScans = [
   _FScan(
     7,
@@ -778,11 +778,11 @@ const List<_FScan> _fScans = [
     LocalizedText(en: 'Dating / early scan', hi: 'Dating / early scan'),
     LocalizedText(en: 'Weeks 6–9', hi: 'Hafte 6–9'),
     LocalizedText(
-        en: "The first proper look at the baby — it confirms the due date and the heartbeat. For many couples this is the moment it all feels real.",
-        hi: "Baby ki pehli theek-thaak jhalak — yeh due date aur dhadkan confirm karta hai. Kai couples ke liye yahi woh pal hota hai jab sab kuch asli lagne lagta hai."),
+        en: "The first proper look at the baby - it confirms the due date and the heartbeat. For many couples this is the moment it all feels real.",
+        hi: "Baby ki pehli theek-thaak jhalak - yeh due date aur dhadkan confirm karta hai. Kai couples ke liye yahi woh pal hota hai jab sab kuch asli lagne lagta hai."),
     LocalizedText(
-        en: "Go with her if you can — it's a lovely first memory to share. A full bladder is often needed, so plan the timing together.",
-        hi: "Ho sake to uske saath jaayein — yeh saath baantne wali pehli pyaari yaad hai. Aksar bhara hua bladder chahiye hota hai, isliye timing saath plan karein."),
+        en: "Go with her if you can - it's a lovely first memory to share. A full bladder is often needed, so plan the timing together.",
+        hi: "Ho sake to uske saath jaayein - yeh saath baantne wali pehli pyaari yaad hai. Aksar bhara hua bladder chahiye hota hai, isliye timing saath plan karein."),
   ),
   _FScan(
     12,
@@ -803,8 +803,8 @@ const List<_FScan> _fScans = [
         en: 'Her 20-week anomaly scan', hi: 'Uska 20-hafte ka anomaly scan'),
     LocalizedText(en: 'Weeks 18–22', hi: 'Hafte 18–22'),
     LocalizedText(
-        en: "This detailed scan checks the baby's heart, brain, spine and organs — and often shows the sex, if you both want to know. A big, emotional moment, and most findings are reassuring.",
-        hi: "Yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai — aur agar aap dono jaanna chaahein to aksar sex bhi dikha deta hai. Ek bada, bhaavuk pal, aur zyaadatar findings rahat dene wale hote hain."),
+        en: "This detailed scan checks the baby's heart, brain, spine and organs - and often shows the sex, if you both want to know. A big, emotional moment, and most findings are reassuring.",
+        hi: "Yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai - aur agar aap dono jaanna chaahein to aksar sex bhi dikha deta hai. Ek bada, bhaavuk pal, aur zyaadatar findings rahat dene wale hote hain."),
     LocalizedText(
         en: "Go with her if you possibly can. Write your questions down together beforehand, and just be the calm beside her in the room.",
         hi: "Ho sake to zaroor uske saath jaayein. Sawaal pehle se saath likh lein, aur room mein uske paas bas shaant maujoodgi banein."),
@@ -830,8 +830,8 @@ const List<_FScan> _fScans = [
         en: "A check on the baby's size, position and the fluid around them, making sure everything is on track for the weeks ahead.",
         hi: "Baby ke size, position aur uske aas-paas ke fluid ki jaanch, taaki aane wale hafton ke liye sab theek raste par ho."),
     LocalizedText(
-        en: "Another lovely one to attend together. If the baby isn't head-down yet, don't worry — there's still plenty of time to turn.",
-        hi: "Saath jaane wala ek aur pyaara moka. Agar baby abhi sir-neeche nahi hai to chinta na karein — palatne ke liye abhi kaafi samay hai."),
+        en: "Another lovely one to attend together. If the baby isn't head-down yet, don't worry - there's still plenty of time to turn.",
+        hi: "Saath jaane wala ek aur pyaara moka. Agar baby abhi sir-neeche nahi hai to chinta na karein - palatne ke liye abhi kaafi samay hai."),
   ),
   _FScan(
     36,
@@ -847,20 +847,20 @@ const List<_FScan> _fScans = [
   ),
 ];
 
-// Father trimester section — same topics as the mother's tips, re-voiced as
+// Father trimester section - same topics as the mother's tips, re-voiced as
 // "what she's going through + how you can help" (he isn't in the trimester, so
 // the heading avoids "your trimester tips").
 const LocalizedText _fTipsTitle = LocalizedText(
     en: 'Supporting her this trimester', hi: 'Is trimester mein uska saath');
 const LocalizedText _fTipsSubtitle = LocalizedText(
-    en: "What she's going through — and how to help",
+    en: "What she's going through - and how to help",
     hi: 'Woh kya mehsoos kar rahi hai, aur kaise madad karein');
 
 // Father "supporting her this trimester" tips, now PER-TRIMESTER so every week
 // has them (T1/T3 added; T2 kept). Re-voiced as "what she's going through + how
 // you can help."
 const Map<int, List<TrimesterTip>> _fTrimesterTips = {
-  // First trimester — early days, mostly invisible but hard for her.
+  // First trimester - early days, mostly invisible but hard for her.
   1: [
     TrimesterTip(
       emoji: '🤢',
@@ -868,8 +868,8 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Ride out the nausea with her',
           hi: 'Matli mein uska saath dein'),
       body: LocalizedText(
-          en: "Morning sickness and bone-deep tiredness are at their worst now, even though nothing shows yet. Keep plain crackers by the bed, offer ginger or lemon water, and never take the mood swings personally — it's the hormones, not you.",
-          hi: "Subah ki matli aur gehri thakaan abhi sabse zyada hoti hai, bhale hi bahar kuch na dikhe. Bistar ke paas saade crackers rakhein, adrak ya nimbu paani dein, aur mood swings ko kabhi dil par na lein — yeh hormones hain, aap nahi."),
+          en: "Morning sickness and bone-deep tiredness are at their worst now, even though nothing shows yet. Keep plain crackers by the bed, offer ginger or lemon water, and never take the mood swings personally - it's the hormones, not you.",
+          hi: "Subah ki matli aur gehri thakaan abhi sabse zyada hoti hai, bhale hi bahar kuch na dikhe. Bistar ke paas saade crackers rakhein, adrak ya nimbu paani dein, aur mood swings ko kabhi dil par na lein - yeh hormones hain, aap nahi."),
     ),
     TrimesterTip(
       emoji: '🩺',
@@ -877,8 +877,8 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Come to the first scan',
           hi: 'Pehle scan mein saath aayein'),
       body: LocalizedText(
-          en: "The early dating scan and booking appointment usually happen now — the first glimpse of the baby and the heartbeat. Go with her if you can; it's a big, emotional first, and there's a lot to take in together.",
-          hi: "Shuruaati dating scan aur booking appointment aksar abhi hote hain — baby aur dhadkan ki pehli jhalak. Ho sake to uske saath jaayein; yeh ek bada, bhaavuk pehla pal hai, aur saath samajhne layak kaafi kuch hota hai."),
+          en: "The early dating scan and booking appointment usually happen now - the first glimpse of the baby and the heartbeat. Go with her if you can; it's a big, emotional first, and there's a lot to take in together.",
+          hi: "Shuruaati dating scan aur booking appointment aksar abhi hote hain - baby aur dhadkan ki pehli jhalak. Ho sake to uske saath jaayein; yeh ek bada, bhaavuk pehla pal hai, aur saath samajhne layak kaafi kuch hota hai."),
     ),
     TrimesterTip(
       emoji: '🍲',
@@ -886,11 +886,11 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Take the cooking off her plate',
           hi: 'Cooking uske zimme se hata dein'),
       body: LocalizedText(
-          en: "Smells and food aversions can make cooking unbearable for her right now. Step in — cook, order, or keep strong smells out of the kitchen — and keep simple snacks and water within her reach all day.",
-          hi: "Abhi smells aur food aversions ki wajah se cooking uske liye mushkil ho sakti hai. Aage aayein — khaana banayein, order karein, ya tez smells kitchen se door rakhein — aur din bhar saade snacks aur paani uske paas rakhein."),
+          en: "Smells and food aversions can make cooking unbearable for her right now. Step in - cook, order, or keep strong smells out of the kitchen - and keep simple snacks and water within her reach all day.",
+          hi: "Abhi smells aur food aversions ki wajah se cooking uske liye mushkil ho sakti hai. Aage aayein - khaana banayein, order karein, ya tez smells kitchen se door rakhein - aur din bhar saade snacks aur paani uske paas rakhein."),
     ),
   ],
-  // Second trimester — the gentlest stretch.
+  // Second trimester - the gentlest stretch.
   2: [
     TrimesterTip(
       emoji: '🔍',
@@ -898,8 +898,8 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Be there for her anomaly scan',
           hi: 'Uske anomaly scan mein saath rahein'),
       body: LocalizedText(
-          en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs. Go with her if you can — your presence steadies the nerves these visits can stir. Write the questions down together beforehand. Most findings are reassuring.",
-          hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai. Ho sake to uske saath jaayein — aapki maujoodgi in visits ki ghabraahat sambhaal deti hai. Sawaal pehle se saath likh lein. Zyaadatar findings rahat dene wale hote hain.'),
+          en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs. Go with her if you can - your presence steadies the nerves these visits can stir. Write the questions down together beforehand. Most findings are reassuring.",
+          hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai. Ho sake to uske saath jaayein - aapki maujoodgi in visits ki ghabraahat sambhaal deti hai. Sawaal pehle se saath likh lein. Zyaadatar findings rahat dene wale hote hain.'),
     ),
     TrimesterTip(
       emoji: '🛌',
@@ -907,7 +907,7 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Help her sleep on her side',
           hi: 'Use karwat par sone mein madad karein'),
       body: LocalizedText(
-          en: "As her bump grows, sleeping on her side — the left is ideal — helps blood and nutrients reach the baby. Slip a pillow between her knees or under the bump. If she wakes up on her back, gently help her settle back onto her side.",
+          en: "As her bump grows, sleeping on her side - the left is ideal - helps blood and nutrients reach the baby. Slip a pillow between her knees or under the bump. If she wakes up on her back, gently help her settle back onto her side.",
           hi: 'Jaise-jaise bump badhta hai, karwat (khaaskar baayein) par sona blood aur nutrients ko baby tak pahunchne mein madad karta hai. Ghutno ke beech ya bump ke neeche takiya laga dein. Agar woh peeth ke bal jaag jaaye to pyaar se use wapas karwat par le aayein.'),
     ),
     TrimesterTip(
@@ -920,7 +920,7 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           hi: 'Abhi uska shareer baby ki haddiyaan aur khoon bana raha hai. Iron (hari sabziyaan, dal, gud) aur calcium (doodh, dahi, paneer) aaram se haath mein rakhein, aur iron wale khaane ke saath thoda vitamin C dein. Doctor ke diye supplements ke liye use pyaar se yaad dilaate rahein.'),
     ),
   ],
-  // Third trimester — getting ready, getting heavier.
+  // Third trimester - getting ready, getting heavier.
   3: [
     TrimesterTip(
       emoji: '🎒',
@@ -946,14 +946,14 @@ const Map<int, List<TrimesterTip>> _fTrimesterTips = {
           en: 'Learn the signs of labour',
           hi: 'Labour ke sanket seekhein'),
       body: LocalizedText(
-          en: "Know the difference between real contractions and practice (Braxton-Hicks) ones, what 'waters breaking' looks like, and when the hospital wants a call. Keep your phone on and charged — being reachable is half the job.",
-          hi: "Asli contractions aur practice (Braxton-Hicks) ke beech farak jaanein, 'paani toot-na' kaisa hota hai, aur hospital ko kab call karna hai. Apna phone on aur charged rakhein — reachable rehna aadha kaam hai."),
+          en: "Know the difference between real contractions and practice (Braxton-Hicks) ones, what 'waters breaking' looks like, and when the hospital wants a call. Keep your phone on and charged - being reachable is half the job.",
+          hi: "Asli contractions aur practice (Braxton-Hicks) ke beech farak jaanein, 'paani toot-na' kaisa hota hai, aur hospital ko kab call karna hai. Apna phone on aur charged rakhein - reachable rehna aadha kaam hai."),
     ),
   ],
 };
 
-// Father "don't miss" body — points to what's actually on HIS home (daily read,
-// a story to read aloud, a journal prompt — NOT Garbh Sanskar).
+// Father "don't miss" body - points to what's actually on HIS home (daily read,
+// a story to read aloud, a journal prompt - NOT Garbh Sanskar).
 const LocalizedText _fDailyBridgeBody = LocalizedText(
     en: 'Your daily read, a story to read aloud and a journal prompt are waiting for you on Home.',
     hi: 'Aapka daily read, baby ko sunane ke liye ek kahaani, aur ek journal prompt aapke Home par taiyaar hain.');
@@ -967,18 +967,18 @@ const List<_Article> _babyArticleFather = [
   _Article(
       LocalizedText(en: 'How big is baby?', hi: 'Baby kitna bada hai?'),
       LocalizedText(
-          en: "Baby is about the size of a banana now — roughly 25 cm from head to heel and around 300 g. From this week, length is measured head-to-heel instead of head-to-bottom.",
-          hi: 'Baby ab lagbhag ek kele jitna hai — sir se edi tak takreeban 25 cm aur ~300 g. Is hafte se lambai sir-se-edi naapi jaati hai.')),
+          en: "Baby is about the size of a banana now - roughly 25 cm from head to heel and around 300 g. From this week, length is measured head-to-heel instead of head-to-bottom.",
+          hi: 'Baby ab lagbhag ek kele jitna hai - sir se edi tak takreeban 25 cm aur ~300 g. Is hafte se lambai sir-se-edi naapi jaati hai.')),
   _Article(
       LocalizedText(en: "She'll feel baby move", hi: 'Woh baby ko mehsoos karegi'),
       LocalizedText(
-          en: "Baby's first little flutters — called \"quickening\" — often start around now. They feel like bubbles or a gentle tap, and over the next few weeks they'll grow into clear kicks. With a first baby she might feel them a little later — that's completely normal.",
-          hi: 'Baby ki pehli halki harkatein — "quickening" — aksar is samay shuru hoti hain. Yeh bulbule ya halke tap jaisi lagti hain, aur agle kuch hafton mein saaf kicks ban jaayengi. Pehle baby mein woh thodi der se mehsoos kar sakti hai — yeh bilkul normal hai.')),
+          en: "Baby's first little flutters - called \"quickening\" - often start around now. They feel like bubbles or a gentle tap, and over the next few weeks they'll grow into clear kicks. With a first baby she might feel them a little later - that's completely normal.",
+          hi: 'Baby ki pehli halki harkatein - "quickening" - aksar is samay shuru hoti hain. Yeh bulbule ya halke tap jaisi lagti hain, aur agle kuch hafton mein saaf kicks ban jaayengi. Pehle baby mein woh thodi der se mehsoos kar sakti hai - yeh bilkul normal hai.')),
   _Article(
       LocalizedText(en: 'Baby can hear you both now', hi: 'Baby ab aap dono ko sun sakta hai'),
       LocalizedText(
-          en: "The tiny bones in baby's ears are in place, so baby can hear her voice, yours, the heartbeat and the world around. When you talk, hum or sing, it helps you bond — and baby will often recognise a favourite tune after birth.",
-          hi: 'Baby ke kaano ki nanhi haddiyan ban gayi hain, isliye baby uski awaaz, aapki awaaz, dhadkan aur aas-paas ki duniya sun sakta hai. Jab aap baat karte, gungunaate ya gaate hain, to bonding hoti hai — aur janm ke baad baby aksar pasandeeda dhun pehchaan leta hai.')),
+          en: "The tiny bones in baby's ears are in place, so baby can hear her voice, yours, the heartbeat and the world around. When you talk, hum or sing, it helps you bond - and baby will often recognise a favourite tune after birth.",
+          hi: 'Baby ke kaano ki nanhi haddiyan ban gayi hain, isliye baby uski awaaz, aapki awaaz, dhadkan aur aas-paas ki duniya sun sakta hai. Jab aap baat karte, gungunaate ya gaate hain, to bonding hoti hai - aur janm ke baad baby aksar pasandeeda dhun pehchaan leta hai.')),
   _Article(
       LocalizedText(en: "Baby's tasting her meals", hi: 'Baby uske khaane ka swaad leta hai'),
       LocalizedText(
@@ -1002,29 +1002,29 @@ const List<_Fact> _babyScienceFather = [
       Color(0xFFF2E9FB),
       LocalizedText(en: 'A busy little brain', hi: 'Ek vyast nanha dimaag'),
       LocalizedText(
-          en: "Your baby is forming millions of new nerve connections every single day — that little brain is working at an astonishing pace!",
-          hi: 'Aapka baby har din laakhon naye nerve connections bana raha hai — woh nanha dimaag gajab raftaar se kaam kar raha hai!')),
+          en: "Your baby is forming millions of new nerve connections every single day - that little brain is working at an astonishing pace!",
+          hi: 'Aapka baby har din laakhon naye nerve connections bana raha hai - woh nanha dimaag gajab raftaar se kaam kar raha hai!')),
   _Fact(
       '🤏',
       Color(0xFFFCE3E6),
       LocalizedText(en: 'A tiny grip', hi: 'Ek nanhi pakad'),
       LocalizedText(
-          en: "Baby can curl those little fingers and sometimes grabs the umbilical cord — practising for your very first cuddles.",
-          hi: 'Baby apni nanhi ungliyan mod sakta hai aur kabhi gard-naal pakad leta hai — aapki pehli cuddles ki practice kar raha hai.')),
+          en: "Baby can curl those little fingers and sometimes grabs the umbilical cord - practising for your very first cuddles.",
+          hi: 'Baby apni nanhi ungliyan mod sakta hai aur kabhi gard-naal pakad leta hai - aapki pehli cuddles ki practice kar raha hai.')),
   _Fact(
       '🫧',
       Color(0xFFE6F0FA),
       LocalizedText(en: 'Baby gets hiccups!', hi: 'Baby ko hichki aati hai!'),
       LocalizedText(
-          en: "Sometimes she'll feel tiny rhythmic taps — that's just baby having hiccups, and it's completely normal.",
-          hi: 'Kabhi woh chhoti taal-baddh thaap mehsoos karegi — yeh bas baby ki hichki hai, aur bilkul normal hai.')),
+          en: "Sometimes she'll feel tiny rhythmic taps - that's just baby having hiccups, and it's completely normal.",
+          hi: 'Kabhi woh chhoti taal-baddh thaap mehsoos karegi - yeh bas baby ki hichki hai, aur bilkul normal hai.')),
   _Fact(
       '🦶',
       Color(0xFFFDF0C4),
       LocalizedText(en: "Baby's own prints", hi: 'Baby ke apne nishaan'),
       LocalizedText(
-          en: "Baby's very own fingerprints — and footprints — are forming right now, patterns that will be theirs alone for life.",
-          hi: 'Baby ke apne fingerprints — aur footprints — abhi ban rahe hain, jo zindagi bhar sirf uske honge.')),
+          en: "Baby's very own fingerprints - and footprints - are forming right now, patterns that will be theirs alone for life.",
+          hi: 'Baby ke apne fingerprints - aur footprints - abhi ban rahe hain, jo zindagi bhar sirf uske honge.')),
   _Fact(
       '💗',
       Color(0xFFEAF1EA),
@@ -1037,31 +1037,31 @@ const List<_Fact> _babyScienceFather = [
       Color(0xFFEDEAF6),
       LocalizedText(en: 'Baby senses light', hi: 'Baby roshni mehsoos karta hai'),
       LocalizedText(
-          en: 'Shine a soft light on her bump and baby might turn towards it — those eyes are getting ready to see you both.',
-          hi: 'Uske bump par halki roshni daalein to baby uski taraf mud sakta hai — woh aankhein aap dono ko dekhne ko taiyar ho rahi hain.')),
+          en: 'Shine a soft light on her bump and baby might turn towards it - those eyes are getting ready to see you both.',
+          hi: 'Uske bump par halki roshni daalein to baby uski taraf mud sakta hai - woh aankhein aap dono ko dekhne ko taiyar ho rahi hain.')),
 ];
 
 const List<_Article> _motherArticleFather = [
   _Article(
       LocalizedText(en: 'How she might be feeling', hi: 'Woh kaisa mehsoos kar sakti hai'),
       LocalizedText(
-          en: "The second trimester is often the gentlest stretch of pregnancy — the early nausea has usually eased, her energy is back, and her bump is becoming a lovely, visible reminder of the little one growing inside. Emotionally, though, it can still be a rollercoaster: moments of pure joy, then a wave of worry or tears from nowhere. That's completely normal. Her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
-          hi: "Doosra trimester aksar pregnancy ka sabse aaramdeh hissa hota hai — shuruaati matli kam ho jaati hai, uski energy lautti hai, aur uska bump andar pal rahe nanhe se jeev ki pyaari nishaani ban jaata hai. Lekin emotionally yeh abhi bhi ek rollercoaster ho sakta hai: kabhi khushi ke pal, to kabhi bina baat ke chinta ya aansoo. Yeh bilkul normal hai. Uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
+          en: "The second trimester is often the gentlest stretch of pregnancy - the early nausea has usually eased, her energy is back, and her bump is becoming a lovely, visible reminder of the little one growing inside. Emotionally, though, it can still be a rollercoaster: moments of pure joy, then a wave of worry or tears from nowhere. That's completely normal. Her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
+          hi: "Doosra trimester aksar pregnancy ka sabse aaramdeh hissa hota hai - shuruaati matli kam ho jaati hai, uski energy lautti hai, aur uska bump andar pal rahe nanhe se jeev ki pyaari nishaani ban jaata hai. Lekin emotionally yeh abhi bhi ek rollercoaster ho sakta hai: kabhi khushi ke pal, to kabhi bina baat ke chinta ya aansoo. Yeh bilkul normal hai. Uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
   _Article(
       LocalizedText(en: 'Her changing body', hi: 'Uska badalta shareer'),
       LocalizedText(
-          en: "Around now her womb has risen to about her belly button, and many mothers notice their bump 'pop' this month. A few new aches can come with it — a stretching feeling low in the belly, a little backache, or the odd dizzy moment. None of it means something is wrong; her body is simply making room. Moving gently, standing up slowly, and resting all help — and so does your hand to lean on.",
-          hi: "Is samay tak uski kokh lagbhag naabhi tak aa jaati hai, aur kai maaein is mahine apna bump 'pop' hote dekhti hain. Iske saath kuch nayi takleefein aa sakti hain — pet ke nichle hisse mein khinchaav, halka kamar dard, ya kabhi chakkar. In mein se kuch bhi galat nahi hai; uska shareer bas jagah bana raha hai. Halki harkat, dheere uthna, aur aaram — sab madad karte hain, aur aapka sahara bhi.")),
+          en: "Around now her womb has risen to about her belly button, and many mothers notice their bump 'pop' this month. A few new aches can come with it - a stretching feeling low in the belly, a little backache, or the odd dizzy moment. None of it means something is wrong; her body is simply making room. Moving gently, standing up slowly, and resting all help - and so does your hand to lean on.",
+          hi: "Is samay tak uski kokh lagbhag naabhi tak aa jaati hai, aur kai maaein is mahine apna bump 'pop' hote dekhti hain. Iske saath kuch nayi takleefein aa sakti hain - pet ke nichle hisse mein khinchaav, halka kamar dard, ya kabhi chakkar. In mein se kuch bhi galat nahi hai; uska shareer bas jagah bana raha hai. Halki harkat, dheere uthna, aur aaram - sab madad karte hain, aur aapka sahara bhi.")),
   _Article(
       LocalizedText(en: 'The first flutters', hi: 'Pehli halki harkatein'),
       LocalizedText(
-          en: "Week 20 is famous for one magical milestone — the first movements, often called 'quickening'. They can feel like bubbles, a gentle tap, or a tiny flutter, and are easy to miss at first. Over the coming weeks they grow into unmistakable kicks. If she hasn't felt anything yet, there's no need to worry — a first pregnancy or the position of the placenta can both delay it, and it will come.",
-          hi: "Hafta 20 ek jaadui padaav ke liye mashhoor hai — pehli harkatein, jise aksar 'quickening' kehte hain. Yeh bulbule, halke tap, ya chhoti si phurphuri jaisi lag sakti hain, aur pehle inhe pakadna mushkil hota hai. Aane wale hafton mein yeh saaf kicks ban jaati hain. Agar abhi tak use kuch mehsoos nahi hua to chinta ki baat nahi — pehli pregnancy ya placenta ki position dono isse thoda der kar sakti hain, aur yeh zaroor aayegi.")),
+          en: "Week 20 is famous for one magical milestone - the first movements, often called 'quickening'. They can feel like bubbles, a gentle tap, or a tiny flutter, and are easy to miss at first. Over the coming weeks they grow into unmistakable kicks. If she hasn't felt anything yet, there's no need to worry - a first pregnancy or the position of the placenta can both delay it, and it will come.",
+          hi: "Hafta 20 ek jaadui padaav ke liye mashhoor hai - pehli harkatein, jise aksar 'quickening' kehte hain. Yeh bulbule, halke tap, ya chhoti si phurphuri jaisi lag sakti hain, aur pehle inhe pakadna mushkil hota hai. Aane wale hafton mein yeh saaf kicks ban jaati hain. Agar abhi tak use kuch mehsoos nahi hua to chinta ki baat nahi - pehli pregnancy ya placenta ki position dono isse thoda der kar sakti hain, aur yeh zaroor aayegi.")),
   _Article(
       LocalizedText(en: 'How to be there for her', hi: 'Uske liye kaise saath dein'),
       LocalizedText(
-          en: "This is a beautiful time to help her slow down and connect — a few quiet minutes with a hand on the bump, a short walk together, a proper night's sleep. Ask how she's feeling and really listen. Looking after her calm is one of the very best things you can do for your baby right now.",
-          hi: 'Yeh use dheere hone aur judne mein madad karne ka khoobsurat samay hai — bump par haath rakhe kuch shaant pal, saath mein ek chhoti si sair, ya bharpoor neend. Poochein woh kaisa mehsoos kar rahi hai aur dhyaan se sunein. Uske sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakte hain unmein se ek hai.')),
+          en: "This is a beautiful time to help her slow down and connect - a few quiet minutes with a hand on the bump, a short walk together, a proper night's sleep. Ask how she's feeling and really listen. Looking after her calm is one of the very best things you can do for your baby right now.",
+          hi: 'Yeh use dheere hone aur judne mein madad karne ka khoobsurat samay hai - bump par haath rakhe kuch shaant pal, saath mein ek chhoti si sair, ya bharpoor neend. Poochein woh kaisa mehsoos kar rahi hai aur dhyaan se sunein. Uske sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakte hain unmein se ek hai.')),
 ];
 
 const List<_MotherTopic> _motherTopicsFather = [
@@ -1069,11 +1069,11 @@ const List<_MotherTopic> _motherTopicsFather = [
       '🌀',
       LocalizedText(en: 'Hormones', hi: 'Hormones'),
       LocalizedText(
-          en: 'Levels are steadier now — she may have more energy.',
-          hi: 'Ab levels sthir hain — use zyada urja ho sakti hai.'),
+          en: 'Levels are steadier now - she may have more energy.',
+          hi: 'Ab levels sthir hain - use zyada urja ho sakti hai.'),
       LocalizedText(
-          en: "After the ups and downs of the first trimester, her hormones settle into a steadier rhythm. Many women feel a welcome lift in energy and mood — the 'pregnancy glow' often shows up around now.",
-          hi: 'Pehli trimester ke utaar-chadhaav ke baad uske hormones sthir ho jaate hain. Kai mahilaon ko urja aur mood mein sudhaar mehsoos hota hai — "pregnancy glow" aksar abhi dikhta hai.')),
+          en: "After the ups and downs of the first trimester, her hormones settle into a steadier rhythm. Many women feel a welcome lift in energy and mood - the 'pregnancy glow' often shows up around now.",
+          hi: 'Pehli trimester ke utaar-chadhaav ke baad uske hormones sthir ho jaate hain. Kai mahilaon ko urja aur mood mein sudhaar mehsoos hota hai - "pregnancy glow" aksar abhi dikhta hai.')),
   _MotherTopic(
       '🤰',
       LocalizedText(en: 'Her bump', hi: 'Uska bump'),
@@ -1081,8 +1081,8 @@ const List<_MotherTopic> _motherTopicsFather = [
           en: 'The top of her uterus reaches her belly button.',
           hi: 'Uske uterus ka upri hissa naabhi tak pahunchta hai.'),
       LocalizedText(
-          en: "Her uterus has grown to about the level of her navel, so the bump is clearly showing now. Roomier clothes and a supportive bra help, and sleeping on her side becomes the comfiest position from here on — keep a pillow handy for between the knees.",
-          hi: 'Uska uterus lagbhag naabhi tak badh gaya hai, isliye bump ab saaf dikhta hai. Khule kapde aur supportive bra aaram dete hain, aur ab karwat par sona sabse aaramdayak hota hai — ghutno ke beech takiya paas rakhein.')),
+          en: "Her uterus has grown to about the level of her navel, so the bump is clearly showing now. Roomier clothes and a supportive bra help, and sleeping on her side becomes the comfiest position from here on - keep a pillow handy for between the knees.",
+          hi: 'Uska uterus lagbhag naabhi tak badh gaya hai, isliye bump ab saaf dikhta hai. Khule kapde aur supportive bra aaram dete hain, aur ab karwat par sona sabse aaramdayak hota hai - ghutno ke beech takiya paas rakhein.')),
   _MotherTopic(
       '🦋',
       LocalizedText(en: 'First movements', hi: 'Pehli harkatein'),
@@ -1090,8 +1090,8 @@ const List<_MotherTopic> _motherTopicsFather = [
           en: 'She may feel the first gentle flutters (quickening).',
           hi: 'Woh pehli halki harkatein (quickening) mehsoos kar sakti hai.'),
       LocalizedText(
-          en: "Those first movements — called 'quickening' — often arrive around week 20. They can feel like bubbles, a light tap or butterflies, and will be irregular at first. Over the coming weeks they grow stronger and more regular. First-time mums sometimes feel them a little later — perfectly normal.",
-          hi: 'Pehli harkatein — "quickening" — aksar hafta 20 ke aas-paas aati hain. Yeh bulbule, halki thaap ya titli jaisi lag sakti hain, aur pehle anyamit hoti hain. Aage chal kar yeh mazboot aur niyamit ho jaati hain.')),
+          en: "Those first movements - called 'quickening' - often arrive around week 20. They can feel like bubbles, a light tap or butterflies, and will be irregular at first. Over the coming weeks they grow stronger and more regular. First-time mums sometimes feel them a little later - perfectly normal.",
+          hi: 'Pehli harkatein - "quickening" - aksar hafta 20 ke aas-paas aati hain. Yeh bulbule, halki thaap ya titli jaisi lag sakti hain, aur pehle anyamit hoti hain. Aage chal kar yeh mazboot aur niyamit ho jaati hain.')),
   _MotherTopic(
       '✨',
       LocalizedText(en: 'Skin & body', hi: 'Tvacha & sharir'),
@@ -1099,14 +1099,14 @@ const List<_MotherTopic> _motherTopicsFather = [
           en: 'More blood flow brings a warm glow and fuller hair.',
           hi: 'Zyada blood flow se glow aur ghane baal.'),
       LocalizedText(
-          en: 'The extra blood her body is making can give her skin a warm glow and her hair a fuller look. Some women notice a dark line down the belly (linea nigra) or slight skin changes — these are normal and usually fade after birth.',
-          hi: 'Uska sharir jo zyada khoon bana raha hai usse tvacha mein glow aur baal ghane lagte hain. Kuch mahilaon ko pet par gehri rekha (linea nigra) dikhti hai — yeh normal hai aur janm ke baad aksar mit jaati hai.')),
+          en: 'The extra blood her body is making can give her skin a warm glow and her hair a fuller look. Some women notice a dark line down the belly (linea nigra) or slight skin changes - these are normal and usually fade after birth.',
+          hi: 'Uska sharir jo zyada khoon bana raha hai usse tvacha mein glow aur baal ghane lagte hain. Kuch mahilaon ko pet par gehri rekha (linea nigra) dikhti hai - yeh normal hai aur janm ke baad aksar mit jaati hai.')),
   _MotherTopic(
       '💗',
       LocalizedText(en: 'Heart & breath', hi: 'Dil & saans'),
       LocalizedText(
-          en: 'Her heart works harder — she may feel breathless.',
-          hi: 'Uska dil zyada kaam karta hai — saans phool sakti hai.'),
+          en: 'Her heart works harder - she may feel breathless.',
+          hi: 'Uska dil zyada kaam karta hai - saans phool sakti hai.'),
       LocalizedText(
           en: 'Her heart is now pumping much more blood than usual, so she may feel a little breathless on the stairs or notice her heart racing at times. Let her move at her own pace, rest when she needs to, and keep water close by.',
           hi: 'Uska dil ab pehle se kahin zyada khoon pump kar raha hai, isliye seedhi chadhte hue saans phool sakti hai ya dil tez dhadak sakta hai. Use apni raftaar se chalne dein, zaroorat par aaram, aur paani paas rakhein.')),
@@ -1117,8 +1117,8 @@ const List<_MotherTopic> _motherTopicsFather = [
           en: 'Round-ligament twinges as her bump stretches.',
           hi: 'Bump khinchne se round-ligament khinchaav.'),
       LocalizedText(
-          en: "She may feel occasional sharp twinges low on the sides of the bump — round-ligament pain — as the ligaments supporting her growing uterus stretch. It's usually brief and harmless; moving slowly helps. Anything severe or persistent is worth a mention to her doctor.",
-          hi: 'Bump ke nichle hisson mein kabhi-kabhi tez khinchaav mehsoos ho sakta hai — round-ligament pain — jab badhte uterus ko sambhalne wale ligaments khinchte hain. Yeh aksar thodi der ka aur harmless hota hai; dheere position badalna madad karta hai. Kuch tez ya lagataar ho to doctor ko batayein.')),
+          en: "She may feel occasional sharp twinges low on the sides of the bump - round-ligament pain - as the ligaments supporting her growing uterus stretch. It's usually brief and harmless; moving slowly helps. Anything severe or persistent is worth a mention to her doctor.",
+          hi: 'Bump ke nichle hisson mein kabhi-kabhi tez khinchaav mehsoos ho sakta hai - round-ligament pain - jab badhte uterus ko sambhalne wale ligaments khinchte hain. Yeh aksar thodi der ka aur harmless hota hai; dheere position badalna madad karta hai. Kuch tez ya lagataar ho to doctor ko batayein.')),
 ];
 
 // Father versions of the two tint cards on the mother read (self-care/reassurance).
@@ -1128,11 +1128,11 @@ const LocalizedText _fHelpBody = LocalizedText(
     en: "Run her a bath, take a chore off her plate, and make sure she's resting on her side. Small, specific help lands bigger than grand gestures right now.",
     hi: 'Uske liye bath chalayein, koi ek kaam apne zimme lein, aur dhyaan rakhein ki woh karwat par aaram kare. Abhi chhoti, theek madad badi baaton se zyada maayne rakhti hai.');
 const LocalizedText _fReassureBody = LocalizedText(
-    en: "These ups and downs are normal — your steady, calm presence is exactly what she needs most this week.",
-    hi: 'Yeh utaar-chadhaav normal hain — aapka sthir, shaant saath hi is hafte use sabse zyada chahiye.');
+    en: "These ups and downs are normal - your steady, calm presence is exactly what she needs most this week.",
+    hi: 'Yeh utaar-chadhaav normal hain - aapka sthir, shaant saath hi is hafte use sabse zyada chahiye.');
 
 // ===========================================================================
-//  GENERIC (week-agnostic) father DEEP READS — used on every father week EXCEPT
+//  GENERIC (week-agnostic) father DEEP READS - used on every father week EXCEPT
 //  week 20 (which keeps its richer, week-specific father read). Everything here
 //  is always-true and in 3rd-person partner voice, so the father never reads the
 //  mother's voice (baby-to-mum / "you" = mum) on any week. See [_BabyDetailScreen]
@@ -1144,8 +1144,8 @@ const List<_Article> _babyArticleGen = [
           en: 'Growing a little more every day',
           hi: 'Har din thoda aur badhta hua'),
       LocalizedText(
-          en: "Week by week your baby is forming and strengthening — organs, senses, muscles and brain, each on its own remarkable schedule. The note at the top of this week tells you what's developing right now.",
-          hi: "Hafte-dar-hafte aapka baby ban aur mazboot ho raha hai — organs, senses, muscles aur brain, har ek apne khaas schedule par. Is hafte ke upar ka note batata hai ki abhi kya develop ho raha hai.")),
+          en: "Week by week your baby is forming and strengthening - organs, senses, muscles and brain, each on its own remarkable schedule. The note at the top of this week tells you what's developing right now.",
+          hi: "Hafte-dar-hafte aapka baby ban aur mazboot ho raha hai - organs, senses, muscles aur brain, har ek apne khaas schedule par. Is hafte ke upar ka note batata hai ki abhi kya develop ho raha hai.")),
   _Article(
       LocalizedText(en: 'Your voice matters', hi: 'Aapki awaaz maayne rakhti hai'),
       LocalizedText(
@@ -1156,13 +1156,13 @@ const List<_Article> _babyArticleGen = [
           en: 'Every baby is on their own clock',
           hi: 'Har baby apne samay par'),
       LocalizedText(
-          en: "Sizes and milestones are averages, not rules. Whether something happens a little earlier or later, it's almost always perfectly normal — and the scans are there to reassure you both along the way.",
-          hi: "Size aur milestones average hain, niyam nahi. Kuch thoda jaldi ya der se ho, yeh lagbhag hamesha bilkul normal hota hai — aur scans aap dono ko raaste mein bharosa dene ke liye hain.")),
+          en: "Sizes and milestones are averages, not rules. Whether something happens a little earlier or later, it's almost always perfectly normal - and the scans are there to reassure you both along the way.",
+          hi: "Size aur milestones average hain, niyam nahi. Kuch thoda jaldi ya der se ho, yeh lagbhag hamesha bilkul normal hota hai - aur scans aap dono ko raaste mein bharosa dene ke liye hain.")),
   _Article(
       LocalizedText(en: "You're part of this too", hi: 'Aap bhi iska hissa hain'),
       LocalizedText(
-          en: "Your baby will come to know your voice, your touch through the bump and the calm you bring. Being present now — for her and for your little one — is the start of a bond that lasts a lifetime.",
-          hi: "Aapka baby aapki awaaz, bump ke zariye aapka sparsh aur aapka laaya sukoon pehchaanne lagega. Abhi maujood rehna — uske aur aapke nanhe ke liye — zindagi bhar chalne wale bond ki shuruaat hai.")),
+          en: "Your baby will come to know your voice, your touch through the bump and the calm you bring. Being present now - for her and for your little one - is the start of a bond that lasts a lifetime.",
+          hi: "Aapka baby aapki awaaz, bump ke zariye aapka sparsh aur aapka laaya sukoon pehchaanne lagega. Abhi maujood rehna - uske aur aapke nanhe ke liye - zindagi bhar chalne wale bond ki shuruaat hai.")),
 ];
 
 const List<_Article> _motherArticleGen = [
@@ -1171,13 +1171,13 @@ const List<_Article> _motherArticleGen = [
           en: 'How she might be feeling',
           hi: 'Woh kaisa mehsoos kar sakti hai'),
       LocalizedText(
-          en: "Pregnancy moves through very different stages, and how she feels shifts with them — energy, appetite, mood and sleep can all change from week to week. Whatever this week brings, her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
-          hi: "Pregnancy bahut alag-alag stages se guzarti hai, aur uske saath uska mehsoos karna badalta hai — energy, bhookh, mood aur neend sab hafte-dar-hafte badal sakte hain. Yeh hafta jo bhi laaye, uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
+          en: "Pregnancy moves through very different stages, and how she feels shifts with them - energy, appetite, mood and sleep can all change from week to week. Whatever this week brings, her hormones are working hard, and feeling everything a little more deeply is simply part of it.",
+          hi: "Pregnancy bahut alag-alag stages se guzarti hai, aur uske saath uska mehsoos karna badalta hai - energy, bhookh, mood aur neend sab hafte-dar-hafte badal sakte hain. Yeh hafta jo bhi laaye, uske hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
   _Article(
       LocalizedText(en: 'Her changing body', hi: 'Uska badalta shareer'),
       LocalizedText(
-          en: "Her body is doing extraordinary work, and that brings visible changes and the odd ache along the way. Most are completely normal and pass on their own — but anything sharp, severe or that won't settle is always worth a word with her doctor.",
-          hi: "Uska shareer asaadharan kaam kar raha hai, aur uske saath dikhne wale badlaav aur kabhi-kabhi takleef aati hai. Zyadatar bilkul normal hain aur khud chale jaate hain — lekin kuch tez, gambhir ya jo theek na ho, use hamesha doctor se kehna chahiye.")),
+          en: "Her body is doing extraordinary work, and that brings visible changes and the odd ache along the way. Most are completely normal and pass on their own - but anything sharp, severe or that won't settle is always worth a word with her doctor.",
+          hi: "Uska shareer asaadharan kaam kar raha hai, aur uske saath dikhne wale badlaav aur kabhi-kabhi takleef aati hai. Zyadatar bilkul normal hain aur khud chale jaate hain - lekin kuch tez, gambhir ya jo theek na ho, use hamesha doctor se kehna chahiye.")),
   _Article(
       LocalizedText(en: 'How to be there for her', hi: 'Uske liye kaise saath dein'),
       LocalizedText(
@@ -1193,8 +1193,8 @@ const List<_MotherTopic> _motherTopicsGen = [
           en: 'They shape a lot of how she feels.',
           hi: 'Yeh uske mehsoos karne ko kaafi banate hain.'),
       LocalizedText(
-          en: "Pregnancy hormones drive a lot of how she feels — energy, mood and appetite can all swing, sometimes within a single day. None of it is her 'being difficult'; it's her body doing its work.",
-          hi: "Pregnancy hormones uske mehsoos karne ko kaafi chalate hain — energy, mood aur bhookh sab badal sakte hain, kabhi ek hi din mein. Yeh uska 'mushkil karna' nahi hai; yeh uska shareer apna kaam kar raha hai.")),
+          en: "Pregnancy hormones drive a lot of how she feels - energy, mood and appetite can all swing, sometimes within a single day. None of it is her 'being difficult'; it's her body doing its work.",
+          hi: "Pregnancy hormones uske mehsoos karne ko kaafi chalate hain - energy, mood aur bhookh sab badal sakte hain, kabhi ek hi din mein. Yeh uska 'mushkil karna' nahi hai; yeh uska shareer apna kaam kar raha hai.")),
   _MotherTopic(
       '😴',
       LocalizedText(en: 'Rest & sleep', hi: 'Aaram & neend'),
@@ -1212,7 +1212,7 @@ const List<_MotherTopic> _motherTopicsGen = [
           hi: 'Chhoti sthir aadtein sabse zyada madad karti hain.'),
       LocalizedText(
           en: "Gentle movement, plenty of water, decent food and a calm home all help her feel better. The single biggest thing you bring, though, is a steady, reassuring presence she can lean on.",
-          hi: "Halki harkat, khoob paani, achha khaana aur ek shaant ghar — sab use behtar mehsoos karaate hain. Lekin sabse badi cheez jo aap dete hain woh hai ek sthir, bharosa dene wali maujoodgi jiska woh sahara le sake.")),
+          hi: "Halki harkat, khoob paani, achha khaana aur ek shaant ghar - sab use behtar mehsoos karaate hain. Lekin sabse badi cheez jo aap dete hain woh hai ek sthir, bharosa dene wali maujoodgi jiska woh sahara le sake.")),
 ];
 
 // ===========================================================================
@@ -1223,7 +1223,7 @@ class WeekFlowView extends StatelessWidget {
       {super.key, required this.controller, this.trailing});
   final PregnancyController controller;
 
-  /// Optional widget appended to the bottom of the flow — used for the week-40
+  /// Optional widget appended to the bottom of the flow - used for the week-40
   /// celebration finale, so the new flow keeps the keepsake-booklet moment.
   final Widget? trailing;
 
@@ -1245,10 +1245,10 @@ class WeekFlowView extends StatelessWidget {
           children: [
             WeekSizeHero(w: w, lang: lang, father: fatherSkin),
             const SizedBox(height: 18),
-            // S2 — Weekly video.
+            // S2 - Weekly video.
             WeekVideoCard(w: w, lang: lang, father: fatherSkin),
             const SizedBox(height: 14),
-            // S3 — About baby → Baby Science pop-up. (colour = skin, copy = week-20)
+            // S3 - About baby → Baby Science pop-up. (colour = skin, copy = week-20)
             _SectionBrief(
               icon: Icons.child_care_rounded,
               color: fatherSkin ? _fAccent : AppTheme.primary500,
@@ -1262,7 +1262,7 @@ class WeekFlowView extends StatelessWidget {
               onTap: () => _push(context, _BabyDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
-            // S4 — For you, mum (→ "How she's doing" in father preview).
+            // S4 - For you, mum (→ "How she's doing" in father preview).
             _SectionBrief(
               icon: Icons.favorite_rounded,
               color: fatherSkin ? _fAccent2 : AppTheme.secondary500,
@@ -1274,7 +1274,7 @@ class WeekFlowView extends StatelessWidget {
               onTap: () => _push(context, _MotherDetailScreen(w: w, lang: lang)),
             ),
             const SizedBox(height: 14),
-            // S5 — What's next.
+            // S5 - What's next.
             _SectionBrief(
               icon: Icons.event_note_rounded,
               color: fatherSkin ? _fAccent : const Color(0xFF2E9C8E),
@@ -1286,23 +1286,23 @@ class WeekFlowView extends StatelessWidget {
                   context, _WhatsNextScreen(controller: controller, lang: lang)),
             ),
             const SizedBox(height: 18),
-            // Organic nudge — a clean, warm reminder, woven mid-flow (NOT at the
-            // top), that the daily section is waiting — without pulling her out
+            // Organic nudge - a clean, warm reminder, woven mid-flow (NOT at the
+            // top), that the daily section is waiting - without pulling her out
             // of the week.
             _DailyMomentBridge(controller: controller, father: fatherSkin),
             const SizedBox(height: 18),
-            // S6 — This week's videos feed.
+            // S6 - This week's videos feed.
             _VideoFeed(lang: lang),
             const SizedBox(height: 18),
-            // This week's reads — an articles carousel below the videos
+            // This week's reads - an articles carousel below the videos
             // (shared by mother + father; hides itself when the week has none).
             _ArticleFeed(lang: lang, week: w.week),
             const SizedBox(height: 18),
-            // S6.5 — Trimester tips (3 tips for this trimester; tap → pop-up).
+            // S6.5 - Trimester tips (3 tips for this trimester; tap → pop-up).
             _TrimesterTips(
                 week: controller.selectedWeek, lang: lang, father: fatherSkin),
             const SizedBox(height: 16),
-            // S7 — Share with partner. Hidden in father mode: that section is
+            // S7 - Share with partner. Hidden in father mode: that section is
             // for the mother to share her week WITH the father, so it's pointless
             // when you already are the father.
             if (!fatherSkin) _PartnerSection(w: w, lang: lang),
@@ -1324,7 +1324,7 @@ void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
 
 /// A gentle, illustrated "your daily moment is waiting" card woven into the
-/// weekly flow — a soft reminder that the daily Home has more for her today,
+/// weekly flow - a soft reminder that the daily Home has more for her today,
 /// without nagging or pulling her away from the week. Tapping returns to Home.
 class _DailyMomentBridge extends StatelessWidget {
   const _DailyMomentBridge({required this.controller, this.father = false});
@@ -1335,7 +1335,7 @@ class _DailyMomentBridge extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     // Minimalistic: a subtle inline link row (not a full card) woven into the
-    // flow — 🌅 + one line + arrow, tapping jumps to the Today (Daily) tab.
+    // flow - 🌅 + one line + arrow, tapping jumps to the Today (Daily) tab.
     return InkWell(
       onTap: () {
         AppNav.instance.goToday();
@@ -1395,7 +1395,7 @@ void openWeekWhatsNext(
 }
 
 /// Shared bottom overlay for swipeable pop-ups: a "swipe" hint pill (page 0
-/// only) above animated page dots. Parked — the weekly pop-ups moved from swipe
+/// only) above animated page dots. Parked - the weekly pop-ups moved from swipe
 /// to top toggles; kept for revert / reuse.
 // ignore: unused_element
 Widget _swipeOverlay({
@@ -1492,7 +1492,7 @@ Widget _carouselArrows({VoidCallback? onPrev, VoidCallback? onNext}) {
   );
 }
 
-// The "swipe for more" pill — shows briefly on the first page, then fades out
+// The "swipe for more" pill - shows briefly on the first page, then fades out
 // (the arrows + dots are enough once the user knows the carousel scrolls).
 class _FadingSwipeHint extends StatefulWidget {
   const _FadingSwipeHint({required this.hint});
@@ -1601,7 +1601,7 @@ class _SectionBrief extends StatelessWidget {
             Expanded(
               child: Text(title,
                   // Father headings use the MOTHER's font (plusJakartaSans), a
-                  // bit bolder (w800), in Slate ink — the serif read poorly.
+                  // bit bolder (w800), in Slate ink - the serif read poorly.
                   style: father
                       ? GoogleFonts.plusJakartaSans(
                           fontSize: 17,
@@ -1636,7 +1636,7 @@ class _SectionBrief extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Trimester tips — 3 gentle tips for this trimester. Tapping a tip opens a
+//  Trimester tips - 3 gentle tips for this trimester. Tapping a tip opens a
 //  small pop-up that explains it, without leaving the weekly screen.
 // ---------------------------------------------------------------------------
 class _TrimesterTips extends StatelessWidget {
@@ -1869,7 +1869,7 @@ Widget _popupTitle(String week, String title, {bool father = false}) => Padding(
         const SizedBox(height: 2),
         Text(title,
             // Father pop-up headers use the MOTHER's font (plusJakartaSans),
-            // bolder, Slate ink — consistent with the weekly headings.
+            // bolder, Slate ink - consistent with the weekly headings.
             style: father
                 ? GoogleFonts.plusJakartaSans(
                     fontSize: 24, fontWeight: FontWeight.w800, color: _fInk)
@@ -1971,7 +1971,7 @@ Widget _mediaPlaceholder(BuildContext context, S s,
   );
 }
 
-/// Article sections with image/video placeholders woven between them — a
+/// Article sections with image/video placeholders woven between them - a
 /// deterministic pattern (no randomness): a frame after every other section,
 /// alternating photo / video, so the read reads as a mix of text + media.
 List<Widget> _articleWithMedia(
@@ -1989,7 +1989,7 @@ List<Widget> _articleWithMedia(
 }
 
 // ---------------------------------------------------------------------------
-//  S3 — Baby detail (Baby Science carousel + descriptive article)
+//  S3 - Baby detail (Baby Science carousel + descriptive article)
 // ---------------------------------------------------------------------------
 // Opens on the descriptive "About your baby" read (page 0), then a swipe hint
 // leads into the Baby Science fact cards (pages 1..N).
@@ -2000,7 +2000,7 @@ class _BabyDetailScreen extends StatelessWidget {
 
   // About your baby is now ONE scrolling page (no swipe carousel): the read
   // (text woven with image/video frames), then the Baby Science facts stacked
-  // VERTICALLY — tap any one to read it in a small pop-up.
+  // VERTICALLY - tap any one to read it in a small pop-up.
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
@@ -2158,11 +2158,11 @@ class _BabyDetailScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  S4 — Mother detail (This week / Health / Eat / To-do)
+//  S4 - Mother detail (This week / Health / Eat / To-do)
 // ---------------------------------------------------------------------------
 // Opens on the detailed "Mother this week" read (page 0), then swipes through
 // Health (tappable symptoms), What to eat, and What to do. Prominent headings.
-// The "For you, mum" in-depth read (page 0 of the Mother pop-up) — continues
+// The "For you, mum" in-depth read (page 0 of the Mother pop-up) - continues
 // the section brief into a full page before "Mother this week".
 const List<_Article> _motherArticle = [
   _Article(
@@ -2170,24 +2170,24 @@ const List<_Article> _motherArticle = [
           en: 'How you might be feeling',
           hi: 'Aap kaisa mehsoos kar sakti hain'),
       LocalizedText(
-          en: "The second trimester is often the gentlest stretch of pregnancy — the early nausea has usually eased, your energy is back, and your bump is becoming a lovely, visible reminder of the little one growing inside. Emotionally, though, it can still be a rollercoaster: moments of pure joy, then a wave of worry or tears from nowhere. That is completely normal. Your hormones are working hard, and feeling everything a little more deeply is simply part of it.",
-          hi: "Doosra trimester aksar pregnancy ka sabse aaramdeh hissa hota hai — shuruaati matli kam ho jaati hai, energy lautti hai, aur aapka bump andar pal rahe nanhe se jeev ki pyaari nishaani ban jaata hai. Lekin emotionally yeh abhi bhi ek rollercoaster ho sakta hai: kabhi khushi ke pal, to kabhi bina baat ke chinta ya aansoo. Yeh bilkul normal hai. Aapke hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
+          en: "The second trimester is often the gentlest stretch of pregnancy - the early nausea has usually eased, your energy is back, and your bump is becoming a lovely, visible reminder of the little one growing inside. Emotionally, though, it can still be a rollercoaster: moments of pure joy, then a wave of worry or tears from nowhere. That is completely normal. Your hormones are working hard, and feeling everything a little more deeply is simply part of it.",
+          hi: "Doosra trimester aksar pregnancy ka sabse aaramdeh hissa hota hai - shuruaati matli kam ho jaati hai, energy lautti hai, aur aapka bump andar pal rahe nanhe se jeev ki pyaari nishaani ban jaata hai. Lekin emotionally yeh abhi bhi ek rollercoaster ho sakta hai: kabhi khushi ke pal, to kabhi bina baat ke chinta ya aansoo. Yeh bilkul normal hai. Aapke hormones mehnat kar rahe hain, aur har cheez ko thoda gehrayi se mehsoos karna iska hissa hai.")),
   _Article(
       LocalizedText(en: 'Your changing body', hi: 'Aapka badalta shareer'),
       LocalizedText(
-          en: "Around now your womb has risen to about your belly button, and many mothers notice their bump 'pop' this month. A few new aches can come with it — a stretching feeling low in your belly, a little backache, or the odd dizzy moment. None of it means something is wrong; it is simply your body making room. Moving gently, standing up slowly, and resting when you need to all help.",
-          hi: "Is samay tak aapki kokh lagbhag naabhi tak aa jaati hai, aur kai maaein is mahine apna bump 'pop' hote dekhti hain. Iske saath kuch nayi takleefein aa sakti hain — pet ke nichle hisse mein khinchaav, halka kamar dard, ya kabhi chakkar. In mein se kuch bhi galat nahi hai; yeh bas aapka shareer jagah bana raha hai. Halki harkat, dheere uthna, aur zaroorat par aaram karna — sab madad karte hain.")),
+          en: "Around now your womb has risen to about your belly button, and many mothers notice their bump 'pop' this month. A few new aches can come with it - a stretching feeling low in your belly, a little backache, or the odd dizzy moment. None of it means something is wrong; it is simply your body making room. Moving gently, standing up slowly, and resting when you need to all help.",
+          hi: "Is samay tak aapki kokh lagbhag naabhi tak aa jaati hai, aur kai maaein is mahine apna bump 'pop' hote dekhti hain. Iske saath kuch nayi takleefein aa sakti hain - pet ke nichle hisse mein khinchaav, halka kamar dard, ya kabhi chakkar. In mein se kuch bhi galat nahi hai; yeh bas aapka shareer jagah bana raha hai. Halki harkat, dheere uthna, aur zaroorat par aaram karna - sab madad karte hain.")),
   _Article(
       LocalizedText(en: 'The first flutters', hi: 'Pehli halki harkatein'),
       LocalizedText(
-          en: "Week 20 is famous for one magical milestone — the first movements, often called 'quickening'. They can feel like bubbles, a gentle tap, or a tiny flutter, and they are easy to miss at first. Over the coming weeks they grow into unmistakable kicks. If you haven't felt anything yet, please don't worry — a first pregnancy or the position of your placenta can both delay it, and it will come.",
-          hi: "Hafta 20 ek jaadui padaav ke liye mashhoor hai — pehli harkatein, jise aksar 'quickening' kehte hain. Yeh bulbule, halke tap, ya chhoti si phurphuri jaisi lag sakti hain, aur pehle inhe pakadna mushkil hota hai. Aane wale hafton mein yeh saaf kicks ban jaati hain. Agar abhi tak kuch mehsoos nahi hua to chinta na karein — pehli pregnancy ya placenta ki position dono isse thoda der kar sakti hain, aur yeh zaroor aayegi.")),
+          en: "Week 20 is famous for one magical milestone - the first movements, often called 'quickening'. They can feel like bubbles, a gentle tap, or a tiny flutter, and they are easy to miss at first. Over the coming weeks they grow into unmistakable kicks. If you haven't felt anything yet, please don't worry - a first pregnancy or the position of your placenta can both delay it, and it will come.",
+          hi: "Hafta 20 ek jaadui padaav ke liye mashhoor hai - pehli harkatein, jise aksar 'quickening' kehte hain. Yeh bulbule, halke tap, ya chhoti si phurphuri jaisi lag sakti hain, aur pehle inhe pakadna mushkil hota hai. Aane wale hafton mein yeh saaf kicks ban jaati hain. Agar abhi tak kuch mehsoos nahi hua to chinta na karein - pehli pregnancy ya placenta ki position dono isse thoda der kar sakti hain, aur yeh zaroor aayegi.")),
   _Article(
       LocalizedText(
           en: 'Be kind to yourself', hi: 'Apne aap par meherbaan rahein'),
       LocalizedText(
-          en: "This is a beautiful time to slow down and connect — a few quiet minutes with your hand on your bump, a short walk, a proper night's sleep. Share how you're feeling with someone you trust. Looking after your own calm is one of the very best things you can do for your baby right now.",
-          hi: "Yeh dheere hone aur judne ka ek khoobsurat samay hai — bump par haath rakhe kuch shaant pal, ek chhoti si sair, ya bharpoor neend. Jo aap mehsoos kar rahi hain woh kisi apne ke saath baatein karein. Apne sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakti hain unmein se ek hai.")),
+          en: "This is a beautiful time to slow down and connect - a few quiet minutes with your hand on your bump, a short walk, a proper night's sleep. Share how you're feeling with someone you trust. Looking after your own calm is one of the very best things you can do for your baby right now.",
+          hi: "Yeh dheere hone aur judne ka ek khoobsurat samay hai - bump par haath rakhe kuch shaant pal, ek chhoti si sair, ya bharpoor neend. Jo aap mehsoos kar rahi hain woh kisi apne ke saath baatein karein. Apne sukoon ka khayal rakhna abhi aap apne baby ke liye jo sabse achhi cheezein kar sakti hain unmein se ek hai.")),
 ];
 
 class _MotherDetailScreen extends StatefulWidget {
@@ -2222,7 +2222,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                     : s.wfHealthThisWeek,
                 father: fatherSkin)),
         const SizedBox(height: 6),
-        // Father: no Health tab — that's her symptoms & diet in her own voice,
+        // Father: no Health tab - that's her symptoms & diet in her own voice,
         // which doesn't belong in the partner view. Just the "Her this week" read.
         if (!fatherSkin) ...[
           Padding(
@@ -2240,7 +2240,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  // The top toggle row — click a section, the whole page is about it (no swipe).
+  // The top toggle row - click a section, the whole page is about it (no swipe).
   Widget _motherTabs(S s, AppLanguage lang, bool father) {
     final accent = father ? _fAccent : AppTheme.secondary500;
     Widget seg(int i, IconData icon, String label) {
@@ -2291,7 +2291,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  // "You this week" — the "for you, mum" read (woven with image/video frames),
+  // "You this week" - the "for you, mum" read (woven with image/video frames),
   // then this week's topics + self-care + reassurance. (Title now sits above the
   // toggle row, so this body no longer repeats it.)
   Widget _combinedBody(BuildContext context, S s, AppLanguage lang) {
@@ -2334,7 +2334,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     );
   }
 
-  // Health — Symptoms / Diet on one body, switched by the sub-toggle.
+  // Health - Symptoms / Diet on one body, switched by the sub-toggle.
   Widget _healthBody(BuildContext context, S s, AppLanguage lang, bool father) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
@@ -2391,7 +2391,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       child: Row(children: [
         seg(0, Icons.healing_rounded, s.wfTabSymptoms),
         seg(1, Icons.restaurant_rounded, s.wfTabDiet),
-        // "Actions" tab removed — its to-dos now live in the Trimester Tips
+        // "Actions" tab removed - its to-dos now live in the Trimester Tips
         // section below (per request). seg(2, …, s.wfTabActions) kept commented.
       ]),
     );
@@ -2528,7 +2528,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // Toggle: Symptoms — common, normal things to notice now (tap → detail sheet).
+  // Toggle: Symptoms - common, normal things to notice now (tap → detail sheet).
   List<Widget> _symptomsContent(S s, AppLanguage lang) {
     final syms = kSymptoms
         .where((x) => !x.urgent && x.commonInTrimester(2))
@@ -2700,11 +2700,11 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // Toggle: Diet — Indian superfood of the week + foods to favour / to limit.
+  // Toggle: Diet - Indian superfood of the week + foods to favour / to limit.
   List<Widget> _dietContent(S s, AppLanguage lang) {
     final n = widget.w.nutrition;
     return [
-      // Indian superfood of the week — restored into the V2 diet section (it had
+      // Indian superfood of the week - restored into the V2 diet section (it had
       // only survived in the classic layout when the Classic/New toggle was added).
       if (n.superfood != null) ...[
         _superfoodCard(n.superfood!, s, lang),
@@ -2763,7 +2763,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // "Indian superfood of the week" — a highlighted hero card (food + benefit +
+  // "Indian superfood of the week" - a highlighted hero card (food + benefit +
   // how to eat it), gold-tinted to set it apart from the favour/avoid lists.
   Widget _superfoodCard(Superfood sf, S s, AppLanguage lang) => Container(
         width: double.infinity,
@@ -2813,7 +2813,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         ]),
       );
 
-  // Toggle: Actions — moved into the Trimester Tips section; kept for revert.
+  // Toggle: Actions - moved into the Trimester Tips section; kept for revert.
   // ignore: unused_element
   List<Widget> _actionsContent(S s, AppLanguage lang) => [
         for (final t in _toDos) _toDoCard(t, lang),
@@ -2847,7 +2847,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  S5 — What's next (Scans / Upcoming milestones)
+//  S5 - What's next (Scans / Upcoming milestones)
 // ---------------------------------------------------------------------------
 // Opens on a "what's next" read, then swipes to Upcoming milestones, then
 // Scans & appointments. Milestones and scans open a centered detail pop-up.
@@ -2858,7 +2858,7 @@ class _WhatsNextScreen extends StatefulWidget {
   final AppLanguage lang;
 
   /// When true (the father's "What's next"), show Scans & appointments only,
-  /// re-voiced for the partner — no milestones, no "for you" body section.
+  /// re-voiced for the partner - no milestones, no "for you" body section.
   final bool father;
   @override
   State<_WhatsNextScreen> createState() => _WhatsNextScreenState();
@@ -2956,7 +2956,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   }
 
   /// The journey-progress card (trimester · weeks to go · % there). Currently
-  /// not shown (removed from the Scans page) — kept for revert / reuse.
+  /// not shown (removed from the Scans page) - kept for revert / reuse.
   // ignore: unused_element
   Widget _progressCard(S s) {
     final wk = widget.controller.selectedWeek;
@@ -3006,7 +3006,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Old overview page — kept for reference after the 3 → 2 merge (its useful
+  // Old overview page - kept for reference after the 3 → 2 merge (its useful
   // progress card now lives on the Scans page; the "on your radar" list dropped).
   // ignore: unused_element
   Widget _overview(S s, AppLanguage lang) {
@@ -3060,9 +3060,9 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Tab 3 — Upcoming milestones (current week onward, tappable).
+  // Tab 3 - Upcoming milestones (current week onward, tappable).
   Widget _milestonesList(S s, AppLanguage lang, int cw) {
-    // A focused window — the current week's milestones plus a few weeks ahead.
+    // A focused window - the current week's milestones plus a few weeks ahead.
     final list = _weekMilestones
         .where((m) => m.week >= cw && m.week <= cw + 6)
         .take(8)
@@ -3213,7 +3213,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Tab 1 — Scans & appointments (tappable). The default tab.
+  // Tab 1 - Scans & appointments (tappable). The default tab.
   Widget _scansList(S s, AppLanguage lang, int cw) {
     final scans = kJourneyMilestones
         .where((m) =>
@@ -3238,7 +3238,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // Tab 2 — "What's next for you": a forward look at how she may feel in the
+  // Tab 2 - "What's next for you": a forward look at how she may feel in the
   // coming weeks (per-week body + emotional changes), tappable for the full read.
   Widget _motherNextList(S s, AppLanguage lang, int cw) {
     final last = (cw + 4) > 40 ? 40 : (cw + 4);
@@ -3386,7 +3386,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     );
   }
 
-  // ---- Father (week-20) Scans & appointments — re-voiced for the partner -----
+  // ---- Father (week-20) Scans & appointments - re-voiced for the partner -----
   Widget _fatherScansBody(S s, AppLanguage lang, int cw) {
     // The week-relevant scans (same ±window as the mother's Scans tab), so this
     // works on EVERY week, not just 20.
@@ -3658,7 +3658,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
 }
 
 // ---------------------------------------------------------------------------
-//  S6 — This week's videos (Instagram-style horizontal feed; placeholders)
+//  S6 - This week's videos (Instagram-style horizontal feed; placeholders)
 // ---------------------------------------------------------------------------
 class _VideoFeed extends StatelessWidget {
   const _VideoFeed({required this.lang});
@@ -3680,7 +3680,7 @@ class _VideoFeed extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 12),
-      // A horizontal reel/shorts-style feed — uniform 9:16 tiles.
+      // A horizontal reel/shorts-style feed - uniform 9:16 tiles.
       SizedBox(
         height: 250,
         child: ListView.separated(
@@ -3793,7 +3793,7 @@ class _VideoFeed extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  Weekly articles — "This week's reads" carousel (mirrors _VideoFeed)
+//  Weekly articles - "This week's reads" carousel (mirrors _VideoFeed)
 // ---------------------------------------------------------------------------
 class _ArticleFeed extends StatelessWidget {
   const _ArticleFeed({required this.lang, required this.week});
@@ -3929,7 +3929,7 @@ class _ArticleReader extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-//  S7 — Share with partner (richer, segmented WhatsApp summary)
+//  S7 - Share with partner (richer, segmented WhatsApp summary)
 // ---------------------------------------------------------------------------
 class _PartnerSection extends StatelessWidget {
   const _PartnerSection({required this.w, required this.lang});
@@ -3959,7 +3959,7 @@ class _PartnerSection extends StatelessWidget {
         '🌸 ${s.ovMother}: $mum\n\n'
         '🩺 ${s.wfPartnerScansHeader}\n$scanLines\n\n'
         '🤝 ${s.wfPartnerHelp}:\n$helpLines\n\n'
-        '${s.wfPartnerSignoff}\n— ParentVeda 💜';
+        '${s.wfPartnerSignoff}\n- ParentVeda 💜';
   }
 
   @override

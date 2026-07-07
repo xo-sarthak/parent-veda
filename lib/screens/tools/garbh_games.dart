@@ -1,7 +1,7 @@
 // =============================================================================
-//  Garbh Sanskar — Vichara "Brain Fitness" mini-games
+//  Garbh Sanskar - Vichara "Brain Fitness" mini-games
 // -----------------------------------------------------------------------------
-//  Four gentle, calming games for "a few quiet minutes of focused calm" — never
+//  Four gentle, calming games for "a few quiet minutes of focused calm" - never
 //  competitive: no countdown timers, no scores, no harsh fail states. Completing
 //  any one marks the Vichara pillar done for the day. Each game is self-contained
 //  (hand-picked data; word grids placed at runtime so they're always solvable).
@@ -26,7 +26,7 @@ const Color _surface = Color(0xFFFFFFFF);
 const Color _softRed = Color(0xFFC07A6A);
 
 // ---------------------------------------------------------------------------
-//  Shared chrome — warm Scaffold + the completion state
+//  Shared chrome - warm Scaffold + the completion state
 // ---------------------------------------------------------------------------
 class _GameChrome extends StatelessWidget {
   const _GameChrome({
@@ -123,7 +123,7 @@ class WordSearchGame extends StatefulWidget {
   final PregnancyController controller;
 
   /// When false (opened from the Tools library), finishing does NOT mark the
-  /// Vichara ritual done for today — it's just play, not "today's Sanskar".
+  /// Vichara ritual done for today - it's just play, not "today's Sanskar".
   final bool markComplete;
   @override
   State<WordSearchGame> createState() => _WordSearchGameState();

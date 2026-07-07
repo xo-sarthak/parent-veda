@@ -1,11 +1,11 @@
 // =============================================================================
-//  AuthFlowScreen — ParentVeda auth (Claude Design "Soft solid", UI only)
+//  AuthFlowScreen - ParentVeda auth (Claude Design "Soft solid", UI only)
 // -----------------------------------------------------------------------------
 //  Faithful Flutter build of the "ParentVeda Auth - Transparent Logo" design
 //  (Soft-solid treatment: a radial purple→white wash, glass cards, floating
 //  dots, Plus Jakarta Sans). Eight screens with internal navigation:
 //    welcome → login / signup → profile → success, plus forgot → otp → reset.
-//  No backend — buttons just navigate. [onDone] fires when auth completes
+//  No backend - buttons just navigate. [onDone] fires when auth completes
 //  (Success → "Get started"), so the caller can enter the app.
 // =============================================================================
 
@@ -32,7 +32,7 @@ const _muted = Color(0xFF7B6B8E);
 const _muted2 = Color(0xFF857591);
 const _label = Color(0xFF8B7AA0);
 const _pink = Color(0xFFC2407A);
-// Partner (father) accent — teal, from the Partner Pairing design.
+// Partner (father) accent - teal, from the Partner Pairing design.
 const _teal = Color(0xFF1F9E86);
 const _tealDeep = Color(0xFF1B9079);
 const _fieldBg = Color(0xFFF7F2FD);
@@ -122,7 +122,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   void _soon(String label) => ScaffoldMessenger.of(context)
     ..clearSnackBars()
     ..showSnackBar(SnackBar(
-        content: Text('$label — coming soon'),
+        content: Text('$label - coming soon'),
         duration: const Duration(milliseconds: 1100)));
 
   // Shows a message at the bottom of the screen (errors, hints). Pass a larger
@@ -174,7 +174,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // Saves the collected profile details (name, role, due date) into the
   // user's row in the `profiles` table, then continues to success.
   //
-  // This is the .update() WRITE pattern — the same shape we'll reuse to save
+  // This is the .update() WRITE pattern - the same shape we'll reuse to save
   // data into every other table later. `.eq('id', userId)` targets only the
   // current user's row (RLS enforces that too).
   Future<void> _saveProfile() async {
@@ -190,7 +190,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         // This happens when "Confirm email" is ON (sign-up doesn't start a
         // session until the emailed link is clicked).
         if (mounted) {
-          _toast('Not logged in — turn OFF "Confirm email" & sign up fresh.',
+          _toast('Not logged in - turn OFF "Confirm email" & sign up fresh.',
               ms: 9000);
         }
       } else {
@@ -226,7 +226,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   }
 
   // Logs an EXISTING user in, then routes straight into the app based on their
-  // saved profile (role + due date) — no need to re-pick role/due-date.
+  // saved profile (role + due date) - no need to re-pick role/due-date.
   Future<void> _submitLogin() async {
     final email = _email.text.trim();
     final password = _password.text;
@@ -270,7 +270,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   }
 
   // Marks the current account as the father, then enters the app. (The real
-  // partner link — pairing code → mother — is a separate step; for now this
+  // partner link - pairing code → mother - is a separate step; for now this
   // records the role so routing + father content work.)
   Future<void> _finishFather() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
@@ -279,7 +279,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       try {
         await Supabase.instance.client.from('profiles').update({
           'role': 'father',
-          'pairing_code': null, // the father shares no code — clear his unused one
+          'pairing_code': null, // the father shares no code - clear his unused one
           if (name.isNotEmpty) 'name': name,
         }).eq('id', uid);
       } catch (_) {/* best-effort */}
@@ -294,7 +294,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     return Scaffold(
       backgroundColor: _bg,
       body: Stack(children: [
-        // Soft-solid background — radial purple wash fading to near-white.
+        // Soft-solid background - radial purple wash fading to near-white.
         const Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -610,7 +610,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   }
 
   // ===========================================================================
-  //  ROLE — mother vs father (shown after login/signup; the father branch
+  //  ROLE - mother vs father (shown after login/signup; the father branch
   //  diverges into partner pairing, the mother continues to Profile).
   // ===========================================================================
   Widget _role() => _formScroll([
@@ -700,7 +700,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       );
 
   // ===========================================================================
-  //  PAIR CODE — father enters the code the mother shared (front-end stub:
+  //  PAIR CODE - father enters the code the mother shared (front-end stub:
   //  any code of 4+ chars proceeds; no backend yet).
   // ===========================================================================
   Widget _pairCode() => _formScroll([
@@ -784,7 +784,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   }
 
   // ===========================================================================
-  //  PAIRING — loading beat while we "connect" the two accounts.
+  //  PAIRING - loading beat while we "connect" the two accounts.
   // ===========================================================================
   Widget _pairing() => SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -819,7 +819,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       );
 
   // ===========================================================================
-  //  PAIRED — success; "Continue" enters the app as the father.
+  //  PAIRED - success; "Continue" enters the app as the father.
   // ===========================================================================
   Widget _paired() => SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -957,7 +957,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // ===========================================================================
   Widget _forgot() => _formScroll([
         _centeredHeader('Forgot password?',
-            "No worries — enter your email and we'll send a reset code."),
+            "No worries - enter your email and we'll send a reset code."),
         const SizedBox(height: 14),
         _glass(
           child: Column(children: [
@@ -1564,7 +1564,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 const SizedBox(height: 3),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Tell us what you know — we'll do the math.",
+                  child: Text("Tell us what you know - we'll do the math.",
                       style: GoogleFonts.plusJakartaSans(
                           fontSize: 12.5, color: _muted)),
                 ),

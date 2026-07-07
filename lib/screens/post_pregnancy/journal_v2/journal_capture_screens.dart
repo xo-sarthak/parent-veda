@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Journal V2 — capture flow (add sheet + 4 capture modes)
+//  My Journal V2 - capture flow (add sheet + 4 capture modes)
 // -----------------------------------------------------------------------------
 //  Two taps to a saved memory: the FAB opens the add sheet, each option opens a
 //  focused capture screen with one obvious primary action.
@@ -74,7 +74,7 @@ Widget _mediaRow(BuildContext context) {
   Widget item(IconData icon, String label) => Expanded(
         child: GestureDetector(
           onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$label — coming soon'), behavior: SnackBarBehavior.floating),
+            SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
           ),
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -209,7 +209,7 @@ class QuickCaptureScreen extends StatelessWidget {
           const Spacer(),
           GestureDetector(
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Voice capture — coming soon'), behavior: SnackBarBehavior.floating),
+              const SnackBar(content: Text('Voice capture - coming soon'), behavior: SnackBarBehavior.floating),
             ),
             child: Container(
               width: 88,

@@ -1,8 +1,8 @@
 // =============================================================================
-//  SymptomStore — optional symptom logs for "Symptoms Companion"
+//  SymptomStore - optional symptom logs for "Symptoms Companion"
 // -----------------------------------------------------------------------------
 //  Logging is optional and never the point of the feature. When the mother
-//  chooses, a log can also create a Journal entry (type symptom) — which then
+//  chooses, a log can also create a Journal entry (type symptom) - which then
 //  also surfaces in My Calendar. Provides a gentle "you've noted this N times
 //  this week" insight (supportive, never diagnostic).
 // =============================================================================
@@ -28,7 +28,7 @@ class SymptomStore extends ChangeNotifier {
 
   Future<void> init() async {
     if (_loaded) return;
-    // 1) Local cache first — instant, works offline.
+    // 1) Local cache first - instant, works offline.
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
@@ -47,7 +47,7 @@ class SymptomStore extends ChangeNotifier {
 
   // Pull the user's rows from Supabase and merge with what we have locally:
   // cloud wins, but local-only rows (e.g. logged offline) are kept AND pushed
-  // up. Best-effort — on any error we just keep the local cache.
+  // up. Best-effort - on any error we just keep the local cache.
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
@@ -66,7 +66,7 @@ class SymptomStore extends ChangeNotifier {
         ..addAll(byId.values);
       await _persist();
       notifyListeners();
-    } catch (_) {/* offline / transient — keep local */}
+    } catch (_) {/* offline / transient - keep local */}
   }
 
   // camelCase model  <->  snake_case table columns
@@ -133,7 +133,7 @@ class SymptomStore extends ChangeNotifier {
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.insert('symptom_logs', _toRow(entry));
-      } catch (_) {/* offline — will sync up on next init */}
+      } catch (_) {/* offline - will sync up on next init */}
     }
 
     if (addToJournal) {

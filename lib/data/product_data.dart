@@ -1,5 +1,5 @@
 // =============================================================================
-//  ParentVeda Products ❤️ — seed data (decision-engine prototype)
+//  ParentVeda Products ❤️ - seed data (decision-engine prototype)
 // -----------------------------------------------------------------------------
 //  Pregnancy-stage-aware categories, each with a guidance card and 3 scored
 //  ParentVeda Picks (Best Overall / Budget / Premium / etc.) carrying the
@@ -25,7 +25,7 @@ const List<ProductCategory> kProductCategories = [
     id: 'stretch_care',
     name: 'Stretch Mark Care',
     emoji: '🧴',
-    guidance: 'Daily moisturising keeps skin supple as your bump grows — consistency matters more than the brand.',
+    guidance: 'Daily moisturising keeps skin supple as your bump grows - consistency matters more than the brand.',
     lookFor: ['Deeply moisturising', 'Fragrance-free', 'Non-sticky finish'],
     avoid: ['Strong fragrances', 'Retinol-based creams'],
     fromWeek: 12,
@@ -47,7 +47,7 @@ const List<ProductCategory> kProductCategories = [
     id: 'belly_band',
     name: 'Belly Support Band',
     emoji: '🤰',
-    guidance: 'A support band can ease back and bump strain later on — fit and adjustability matter most.',
+    guidance: 'A support band can ease back and bump strain later on - fit and adjustability matter most.',
     lookFor: ['Adjustable gentle support', 'Breathable material', 'Eases back strain'],
     avoid: ['Bands that are too tight', 'Non-breathable nylon'],
     fromWeek: 20,
@@ -58,7 +58,7 @@ const List<ProductCategory> kProductCategories = [
     id: 'compression_socks',
     name: 'Compression Socks',
     emoji: '🧦',
-    guidance: 'Compression socks help with swelling and tired legs — graduated compression is the key feature.',
+    guidance: 'Compression socks help with swelling and tired legs - graduated compression is the key feature.',
     lookFor: ['Graduated compression', 'Breathable knit', 'Easy to pull on'],
     avoid: ['Very tight tops', 'Rough seams'],
     fromWeek: 20,
@@ -69,7 +69,7 @@ const List<ProductCategory> kProductCategories = [
     id: 'nursing_bra',
     name: 'Nursing Bra',
     emoji: '👚',
-    guidance: 'Comfort and easy one-hand opening matter most — get sized later in pregnancy.',
+    guidance: 'Comfort and easy one-hand opening matter most - get sized later in pregnancy.',
     lookFor: ['Soft wireless support', 'Easy clip-down', 'Breathable fabric'],
     avoid: ['Underwire that digs in', 'Tight bands'],
     fromWeek: 30,
@@ -80,7 +80,7 @@ const List<ProductCategory> kProductCategories = [
     id: 'breast_pump',
     name: 'Breast Pump',
     emoji: '🍼',
-    guidance: 'Think about how often you will pump — occasional use suits manual, regular use suits electric.',
+    guidance: 'Think about how often you will pump - occasional use suits manual, regular use suits electric.',
     lookFor: ['Comfortable flange fit', 'Quiet motor', 'Easy to clean'],
     avoid: ['Hard-to-clean parts', 'Very loud motors'],
     fromWeek: 34,
@@ -125,7 +125,7 @@ const List<Product> kProducts = [
         author: 'Neha',
         role: 'Mother of Aarav',
         usedDuring: 'Week 22 → Delivery',
-        liked: 'Excellent support — my back pain eased a lot at night.',
+        liked: 'Excellent support - my back pain eased a lot at night.',
         watchOut: 'Requires a larger bed.',
       ),
       ProductReview(

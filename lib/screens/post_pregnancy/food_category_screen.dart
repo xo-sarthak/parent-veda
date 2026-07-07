@@ -1,5 +1,5 @@
 // =============================================================================
-//  FoodCategoryScreen — a single food category's feed
+//  FoodCategoryScreen - a single food category's feed
 // -----------------------------------------------------------------------------
 //  A calm vertical feed of the recipes in one kind (First Foods, Snacks, …).
 //  Reached from the Food home's category chips.

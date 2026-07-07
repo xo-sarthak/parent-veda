@@ -1,15 +1,15 @@
 // =============================================================================
-//  ParentVeda Watch — content model, seed catalog + viewing store
+//  ParentVeda Watch - content model, seed catalog + viewing store
 // -----------------------------------------------------------------------------
 //  Watch is a personalised video LEARNING experience (not YouTube, not Reels).
-//  Every video is expert-led and carries learning metadata only — topic, child
-//  age, expert, duration, category — never likes/views/followers/trending. The
+//  Every video is expert-led and carries learning metadata only - topic, child
+//  age, expert, duration, category - never likes/views/followers/trending. The
 //  same catalog + store powers both viewing modes:
-//    • Quick Learn — 30–90s vertical expert clips for a fast daily lesson.
-//    • Deep Learn  — 5–30 min sessions/workshops.
+//    • Quick Learn - 30–90s vertical expert clips for a fast daily lesson.
+//    • Deep Learn  - 5–30 min sessions/workshops.
 //  They share recommendations, continue-watching, collections and progress.
 //  Static seed data for now (a CMS/recommendation engine slots in later). Kept in
-//  the post_pregnancy module — nothing here depends on the pregnancy app.
+//  the post_pregnancy module - nothing here depends on the pregnancy app.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class WatchVideo {
   String get durationLabel => quick ? '${seconds}s' : '${(seconds / 60).round()} min';
 }
 
-/// A curated learning collection (not a playlist — a path with a finish line).
+/// A curated learning collection (not a playlist - a path with a finish line).
 class WatchCollection {
   const WatchCollection({
     required this.id,
@@ -121,7 +121,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 600,
     quick: false,
     why:
-        'The clinginess and broken naps aren’t a step back — they’re a leap forward. See what your baby is working out about cause and effect right now.',
+        'The clinginess and broken naps aren’t a step back - they’re a leap forward. See what your baby is working out about cause and effect right now.',
     seed: 2,
     relatedArticle: 'Leap 4, decoded',
     relatedActivity: 'Reach-for-the-ring',
@@ -167,7 +167,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 540,
     quick: false,
     why:
-        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep Aarav comfortable — so vaccine day feels calm, not scary.',
+        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep Aarav comfortable - so vaccine day feels calm, not scary.',
     seed: 5,
     relatedArticle: 'The 4-month vaccines, explained calmly',
     relatedCommunity: 'Vaccine-day tips',
@@ -197,7 +197,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 660,
     quick: false,
     why:
-        'A clear, calm guide to baby fever — what’s normal, what helps, and the red flags that mean call the doctor now.',
+        'A clear, calm guide to baby fever - what’s normal, what helps, and the red flags that mean call the doctor now.',
     seed: 7,
     relatedRecipe: 'Moong dal water',
     relatedCommunity: 'When did you call the doctor?',
@@ -227,7 +227,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 360,
     quick: false,
     why:
-        'One mother’s honest account of the fourth month — the hard nights, the first belly laugh, and what she’d tell herself again.',
+        'One mother’s honest account of the fourth month - the hard nights, the first belly laugh, and what she’d tell herself again.',
     seed: 9,
     relatedCommunity: 'Share your fourth-month story',
   ),
@@ -242,7 +242,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '3–6 mo',
     seconds: 45,
     quick: true,
-    why: 'A rolled towel under the chest makes tummy time comfier — and buys you a few more happy minutes.',
+    why: 'A rolled towel under the chest makes tummy time comfier - and buys you a few more happy minutes.',
     seed: 10,
     relatedActivity: 'Chest-to-chest tummy time',
   ),
@@ -255,7 +255,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 60,
     quick: true,
-    why: 'Steady white noise recreates the constant whoosh of the womb — familiar, and genuinely soothing for sleep.',
+    why: 'Steady white noise recreates the constant whoosh of the womb - familiar, and genuinely soothing for sleep.',
     seed: 11,
     relatedProductId: 'dozy',
   ),
@@ -268,7 +268,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '6–12 mo',
     seconds: 50,
     quick: true,
-    why: 'Ragi, well-cooked dal and soft greens — three easy, iron-rich firsts for when your baby is ready to eat.',
+    why: 'Ragi, well-cooked dal and soft greens - three easy, iron-rich firsts for when your baby is ready to eat.',
     seed: 12,
     relatedRecipe: 'Ragi & banana smoothie',
   ),
@@ -293,7 +293,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '3–6 mo',
     seconds: 55,
     quick: true,
-    why: '“Now we’re pouring the water…” — talking through the ordinary is how your baby learns the music of speech.',
+    why: '“Now we’re pouring the water…” - talking through the ordinary is how your baby learns the music of speech.',
     seed: 14,
     relatedActivity: 'Narrate your day',
   ),
@@ -306,7 +306,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 45,
     quick: true,
-    why: 'Young eyes see bold contrast best — a simple black-and-white card can hold real fascination.',
+    why: 'Young eyes see bold contrast best - a simple black-and-white card can hold real fascination.',
     seed: 15,
   ),
   WatchVideo(
@@ -335,7 +335,7 @@ const List<WatchCollection> kWatchCollections = [
   WatchCollection(
     id: 'understandingsleep',
     title: 'Understanding Sleep',
-    subtitle: 'Why it changes, and how to work with it — gently.',
+    subtitle: 'Why it changes, and how to work with it - gently.',
     videoIds: ['sleep4mo', 'q_noise', 'tummytime'],
     seed: 22,
   ),
@@ -376,7 +376,7 @@ List<WatchVideo> get deepVideos => kWatchVideos.where((v) => !v.quick).toList();
 /// the stage-relevant hero (real engine would personalise; seeded for Aarav).
 WatchVideo todaysVideo({bool quick = false}) => quick ? watchVideoById('q_noise') : watchVideoById('sleep4mo');
 
-/// "Learn next" — the next VIDEOS to keep the learning thread going (videos only,
+/// "Learn next" - the next VIDEOS to keep the learning thread going (videos only,
 /// never mixed content). Prefers the same category (and mode), then the same
 /// expert, then collection siblings, padding with the wider catalog if needed.
 List<WatchVideo> learnNextVideos(WatchVideo video, {int limit = 4}) {
@@ -400,7 +400,7 @@ List<WatchVideo> learnNextVideos(WatchVideo video, {int limit = 4}) {
 }
 
 /// Expert collections, generated automatically from the catalog: every expert
-/// with 2+ videos becomes a finishable learning path — no per-collection authoring.
+/// with 2+ videos becomes a finishable learning path - no per-collection authoring.
 List<WatchCollection> expertCollections() {
   final byExpert = <String, List<WatchVideo>>{};
   for (final v in kWatchVideos) {
@@ -423,7 +423,7 @@ List<WatchCollection> expertCollections() {
 }
 
 // =============================================================================
-//  WatchStore — saved, following + continue-watching progress (in-memory seed).
+//  WatchStore - saved, following + continue-watching progress (in-memory seed).
 //  A ChangeNotifier singleton, matching the app's other stores.
 // =============================================================================
 class WatchStore extends ChangeNotifier {

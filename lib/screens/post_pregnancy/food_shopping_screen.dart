@@ -1,5 +1,5 @@
 // =============================================================================
-//  FoodShoppingScreen — the auto-generated shopping list
+//  FoodShoppingScreen - the auto-generated shopping list
 // -----------------------------------------------------------------------------
 //  Ingredients added from recipes (and the Smart Meal Builder's "buy missing")
 //  gather here as a checklist. Mark purchased, clear the bought, future-ready for
@@ -70,7 +70,7 @@ class FoodShoppingScreen extends StatelessWidget {
                       ]),
                     )),
                   const SizedBox(height: 16),
-                  _pad(Text('Grocery delivery integration is coming — for now this is your checklist.', style: ppBody(11.5, color: ppMuted, h: 1.5))),
+                  _pad(Text('Grocery delivery integration is coming - for now this is your checklist.', style: ppBody(11.5, color: ppMuted, h: 1.5))),
                 ],
               ],
             );

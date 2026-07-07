@@ -1,8 +1,8 @@
 // =============================================================================
-//  HealthRecordsScreen — one Medical History category, with full CRUD
+//  HealthRecordsScreen - one Medical History category, with full CRUD
 // -----------------------------------------------------------------------------
-//  Renders a single category — Doctor visits / Medications / Reports / Symptoms /
-//  Allergies — as clean cards with search and thoughtful empty states, backed by
+//  Renders a single category - Doctor visits / Medications / Reports / Symptoms /
+//  Allergies - as clean cards with search and thoughtful empty states, backed by
 //  the mutable HealthStore. Medications, allergies and symptoms can be added,
 //  edited and deleted; reports can be added and deleted. Every section that shows
 //  information also offers an obvious way to add to it. Doctor visits are drawn
@@ -145,7 +145,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Icon(Icons.auto_awesome, size: 15, color: ppPurple),
               const SizedBox(width: 10),
-              Expanded(child: Text('Log anything you notice — a temperature, a rash, a rough night. A clear record helps you and the doctor spot patterns.', style: ppBody(12.5, h: 1.5))),
+              Expanded(child: Text('Log anything you notice - a temperature, a rash, a rough night. A clear record helps you and the doctor spot patterns.', style: ppBody(12.5, h: 1.5))),
             ]),
           )),
           const SizedBox(height: 16),
@@ -334,7 +334,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         final m = Medication(
           name: name.text.trim(),
           reason: reason.text.trim(),
-          doctor: doctor.text.trim().isEmpty ? '—' : doctor.text.trim(),
+          doctor: doctor.text.trim().isEmpty ? '-' : doctor.text.trim(),
           dosage: dosage.text.trim(),
           duration: duration.text.trim(),
           completed: completed,

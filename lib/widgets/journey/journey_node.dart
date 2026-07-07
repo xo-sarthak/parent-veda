@@ -1,8 +1,8 @@
 // =============================================================================
 //  Journey map markers
 // -----------------------------------------------------------------------------
-//  * JourneyNodeMarker  — a week checkpoint on the trail (green / gold / grey).
-//  * YouAreHereMarker   — the gently pulsing "you are here" marker + label pill.
+//  * JourneyNodeMarker  - a week checkpoint on the trail (green / gold / grey).
+//  * YouAreHereMarker   - the gently pulsing "you are here" marker + label pill.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -89,7 +89,7 @@ class JourneyNodeMarker extends StatelessWidget {
     if (pulse != null && current) {
       // The current week must be unmistakable: two staggered "ping" rings (a
       // soft filled halo + a crisp expanding ring) radiate outward and fade on
-      // a loop, behind a gently breathing core — clearly alive next to the
+      // a loop, behind a gently breathing core - clearly alive next to the
       // static completed/future circles.
       child = AnimatedBuilder(
         animation: pulse!,
@@ -195,7 +195,7 @@ class MilestoneMarker extends StatelessWidget {
 }
 
 /// The small caption pill that sits directly below a node (MapB design): a
-/// single rounded pill — white with deep-purple text for ordinary stops, or a
+/// single rounded pill - white with deep-purple text for ordinary stops, or a
 /// deep-purple pill with white text for the current "You're here" stop.
 class JourneyNodeLabel extends StatelessWidget {
   const JourneyNodeLabel({
@@ -401,7 +401,7 @@ class YouAreHereMarker extends StatelessWidget {
   }
 }
 
-/// The journey's destination — the final node near Birth. Bigger than a normal
+/// The journey's destination - the final node near Birth. Bigger than a normal
 /// stop, with a warm gold→rose gradient and a soft expanding glow, so the end of
 /// the trail clearly reads as "the arrival". Always shown lit (it is the goal).
 class DestinationMarker extends StatelessWidget {

@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductChecklistStore — user-built checklists over the product catalogue
+//  ProductChecklistStore - user-built checklists over the product catalogue
 // -----------------------------------------------------------------------------
 //  Lets a mother turn ParentVeda's products into her own checklists: she browses
 //  the catalogue, adds the products she wants, tags each with a custom "when /
@@ -49,7 +49,7 @@ class ChecklistItem {
         'c': checked,
       };
   factory ChecklistItem.fromJson(Map<String, dynamic> j) => ChecklistItem(
-        // Back-compat: old items had no 'id' — fall back to the productId.
+        // Back-compat: old items had no 'id' - fall back to the productId.
         id: (j['id'] as String?) ?? (j['p'] as String? ?? ''),
         productId: j['p'] as String? ?? '',
         name: j['name'] as String? ?? '',

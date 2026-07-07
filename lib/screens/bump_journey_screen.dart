@@ -1,5 +1,5 @@
 // =============================================================================
-//  BumpJourneyScreen — "My Bump Journey" (a visual pregnancy timeline)
+//  BumpJourneyScreen - "My Bump Journey" (a visual pregnancy timeline)
 // -----------------------------------------------------------------------------
 //  A warm, editorial, memory-book feel (not a gallery): a progress header, a
 //  week-by-week vertical timeline of bump photos with milestone badges woven
@@ -88,7 +88,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                 ..._timeline(s, filtered),
               ],
             ),
-      // Plain round FAB (the photo icon fits the circle cleanly) — the extended
+      // Plain round FAB (the photo icon fits the circle cleanly) - the extended
       // label was getting clipped by the circular background.
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addFlow(s),

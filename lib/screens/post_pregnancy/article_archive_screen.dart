@@ -1,9 +1,9 @@
 // =============================================================================
-//  ArticleArchiveScreen — Articles · browsable archive (parenting · S20·archive)
+//  ArticleArchiveScreen - Articles · browsable archive (parenting · S20·archive)
 // -----------------------------------------------------------------------------
 //  "Everything we've written, to browse at your pace." A search bar, topic +
 //  age-band filters, an Article-of-the-day feature and a list. An SEO / casual-
-//  browse surface — never promoted on the home. Reached from the Explore drawer;
+//  browse surface - never promoted on the home. Reached from the Explore drawer;
 //  opens the reader. Faithful build of Claude Design · S20·archive.
 // =============================================================================
 
@@ -98,7 +98,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
               _pad(Container(
                 padding: const EdgeInsets.symmetric(vertical: 32),
                 alignment: Alignment.center,
-                child: Text('No articles for this filter yet — try another topic or age.',
+                child: Text('No articles for this filter yet - try another topic or age.',
                     textAlign: TextAlign.center, style: ppBody(13, color: ppMuted)),
               ))
             else ...[
@@ -112,7 +112,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
             ],
 
             const SizedBox(height: 22),
-            _pad(Text("This archive exists for browsing and search — it's never surfaced on the home screen. Articles reach you where they're relevant.",
+            _pad(Text("This archive exists for browsing and search - it's never surfaced on the home screen. Articles reach you where they're relevant.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

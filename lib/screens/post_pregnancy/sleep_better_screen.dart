@@ -1,5 +1,5 @@
 // =============================================================================
-//  SleepBetterScreen — "Sleep Better" · Preparation Journey (parenting · S5)
+//  SleepBetterScreen - "Sleep Better" · Preparation Journey (parenting · S5)
 // -----------------------------------------------------------------------------
 //  The commerce-as-preparation flow: a 4-step guided journey (understand → set
 //  routine → fix environment [with explained products] → track), plus a soft
@@ -91,11 +91,11 @@ class SleepBetterScreen extends StatelessWidget {
             _pad(_step(
               _dot(),
               _content('Fix the sleep environment', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Two small changes make the biggest difference. We explain each — add only if it helps.',
+                Text('Two small changes make the biggest difference. We explain each - add only if it helps.',
                     style: ppBody(13, h: 1.55)),
                 const SizedBox(height: 14),
                 _productCard(context, 'Blackout curtains',
-                    'His room is too bright for the maturing cycles — light is pulling him out of lighter sleep.', '₹1,299'),
+                    'His room is too bright for the maturing cycles - light is pulling him out of lighter sleep.', '₹1,299'),
                 const SizedBox(height: 12),
                 _productCard(context, 'White-noise soother',
                     "Masks joint-home noise so a slammed door doesn't wake him mid-cycle.", '₹1,499'),
@@ -104,7 +104,7 @@ class SleepBetterScreen extends StatelessWidget {
             _pad(_step(
               _dot(),
               _content('Track & adjust',
-                  Text("A simple night-log — jot each waking, and we'll help you read the pattern.",
+                  Text("A simple night-log - jot each waking, and we'll help you read the pattern.",
                       style: ppBody(13, h: 1.55))),
               line: false,
             )),
@@ -119,7 +119,7 @@ class SleepBetterScreen extends StatelessWidget {
                 Text('Want a human in your corner?', style: ppJakarta(17)),
                 const SizedBox(height: 8),
                 Text.rich(TextSpan(children: [
-                  const TextSpan(text: 'The 2-week Sleep Bootcamp cohort, with a real sleep consultant — '),
+                  const TextSpan(text: 'The 2-week Sleep Bootcamp cohort, with a real sleep consultant - '),
                   TextSpan(text: 'included with ParentVeda+', style: TextStyle(color: ppInk, fontWeight: FontWeight.w600)),
                   const TextSpan(text: '.'),
                 ]), style: ppBody(14, h: 1.6)),

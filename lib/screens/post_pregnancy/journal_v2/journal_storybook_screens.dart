@@ -1,9 +1,9 @@
 // =============================================================================
-//  My Journal V2 — the Storybook (the hero)
+//  My Journal V2 - the Storybook (the hero)
 // -----------------------------------------------------------------------------
 //  A single book's page (cover + chapters) and an immersive paper reader: title
 //  page, contents, chapter dividers, photo/text spreads, a timeline page and an
-//  end page — warm heirloom paper, elegant serif type, no green. Reader controls
+//  end page - warm heirloom paper, elegant serif type, no green. Reader controls
 //  (Previous · Contents · Next) with a live page counter. (Phase 2 adds page-curl,
 //  full-screen, monthly covers and the contents/bookmarks nav sheet.)
 // =============================================================================
@@ -85,7 +85,7 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
   bool _immersive = false; // tap a page to hide the chrome and read full-screen
   final Set<int> _bookmarks = {};
 
-  // (chapter label in the bar, page) — varied templates per spec, no repeats.
+  // (chapter label in the bar, page) - varied templates per spec, no repeats.
   late final List<(String, Widget)> _pages = [
     ('Our Story', _titlePage()),
     ('Contents', _contentsPage()),
@@ -127,7 +127,7 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
       backgroundColor: const Color(0xFFEDE4D3), // the "table" the book rests on
       body: SafeArea(
         child: Stack(children: [
-          // pages — tap toggles immersive full-screen reading
+          // pages - tap toggles immersive full-screen reading
           Positioned.fill(
             child: GestureDetector(
               onTap: () => setState(() => _immersive = !_immersive),

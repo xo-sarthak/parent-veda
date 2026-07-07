@@ -1,8 +1,8 @@
 // =============================================================================
-//  PrepareStore — local "booked / enrolled / saved" state for the Prepare tab
+//  PrepareStore - local "booked / enrolled / saved" state for the Prepare tab
 // -----------------------------------------------------------------------------
 //  The Prepare commerce flows are a MOCK for now (no payment gateway). This tiny
-//  store remembers, per item id, whether the mother has "booked" it — so a
+//  store remembers, per item id, whether the mother has "booked" it - so a
 //  reserved masterclass, a booked consult, or a joined cohort reflects back in
 //  the UI and survives an app restart (SharedPreferences). When the real
 //  commerce backend lands, this is the seam it plugs into.

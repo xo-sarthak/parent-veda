@@ -1,5 +1,5 @@
 // =============================================================================
-//  ProductStore — saved products for ParentVeda Products
+//  ProductStore - saved products for ParentVeda Products
 // -----------------------------------------------------------------------------
 //  Just the "Saved" list for now (persisted). Commerce/cart is future affiliate.
 // =============================================================================

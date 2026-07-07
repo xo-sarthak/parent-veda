@@ -1,5 +1,5 @@
 // =============================================================================
-//  StorageImage — drop-in replacement for Image.file that resolves a stored
+//  StorageImage - drop-in replacement for Image.file that resolves a stored
 //  reference (a Supabase Storage object path OR a legacy local path) to a local
 //  file, downloading + caching on demand. Shows a gentle loading box while it
 //  fetches and a "broken image" placeholder if it can't be resolved.

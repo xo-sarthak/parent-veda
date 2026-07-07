@@ -1,7 +1,7 @@
 // =============================================================================
-//  ReadingHomeScreen — ParentVeda "Learn" (the Reading Experience home)
+//  ReadingHomeScreen - ParentVeda "Learn" (the Reading Experience home)
 // -----------------------------------------------------------------------------
-//  Answers "what should I learn today to be a more confident parent?" — one
+//  Answers "what should I learn today to be a more confident parent?" - one
 //  carefully-chosen Today's Read (not ten), Continue Reading, a few personalised
 //  picks, and learning collections. A calm, magazine-like start, never a feed.
 //  A filter row (All / Articles / Book Summaries / Research Summaries) narrows the
@@ -53,7 +53,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                 const SizedBox(height: 8),
                 _pad(Text('What to learn today', style: ppFraunces(30, h: 1.1))),
                 const SizedBox(height: 6),
-                _pad(Text('One good read, chosen for where you and Aarav are right now — not a feed to scroll.', style: ppBody(14, h: 1.5))),
+                _pad(Text('One good read, chosen for where you and Aarav are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 20),
                 _filterRow(),
@@ -114,7 +114,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
       _pad(readSectionHeader(readKindLabel(_filter!))),
       const SizedBox(height: 14),
       if (items.isEmpty)
-        _pad(Text('Nothing here yet — check back soon.', style: ppBody(13, color: ppMuted)))
+        _pad(Text('Nothing here yet - check back soon.', style: ppBody(13, color: ppMuted)))
       else
         _pad(Column(children: [
           for (final a in items)
@@ -154,7 +154,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
       const SizedBox(height: 30),
       _pad(readSectionHeader('Chosen for you')),
       const SizedBox(height: 4),
-      _pad(Text('For his age and your recent reads — never random.', style: ppBody(12.5, color: ppMuted))),
+      _pad(Text('For his age and your recent reads - never random.', style: ppBody(12.5, color: ppMuted))),
       const SizedBox(height: 16),
       _pad(Column(children: [
         for (final a in forYou().take(5))

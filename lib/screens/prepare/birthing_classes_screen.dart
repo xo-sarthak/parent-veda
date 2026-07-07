@@ -1,5 +1,5 @@
 // =============================================================================
-//  BirthingClassesScreen (S5) — Prepare › Birthing Classes (interactive)
+//  BirthingClassesScreen (S5) - Prepare › Birthing Classes (interactive)
 //  Class 1 is a free preview; enrolling (mock) unlocks classes 2–6. Every
 //  unlocked class plays into the placeholder video screen.
 // =============================================================================
@@ -52,7 +52,7 @@ class BirthingClassesScreen extends StatelessWidget {
                 pvBanner(spans: [
                   pvText("You're "),
                   pvBold('30 weeks'),
-                  pvText(' — exactly when most mums prepare for birth.'),
+                  pvText(' - exactly when most mums prepare for birth.'),
                 ]),
 
                 // overview card
@@ -138,7 +138,7 @@ class BirthingClassesScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   SizedBox(
                     width: double.infinity,
-                    child: pvPrimaryButton('Enroll — unlock all 6 classes', enroll,
+                    child: pvPrimaryButton('Enroll - unlock all 6 classes', enroll,
                         padding: const EdgeInsets.symmetric(vertical: 15)),
                   ),
                 ],

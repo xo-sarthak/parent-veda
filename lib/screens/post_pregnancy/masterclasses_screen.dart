@@ -1,7 +1,7 @@
 // =============================================================================
-//  MasterclassesScreen — Learn · Masterclasses (parenting · S11)
+//  MasterclassesScreen - Learn · Masterclasses (parenting · S11)
 // -----------------------------------------------------------------------------
-//  "One evening with an expert" — a featured live masterclass plus recorded
+//  "One evening with an expert" - a featured live masterclass plus recorded
 //  ones to watch anytime. Reached from the Explore drawer (design path:
 //  Products → Learn → Masterclasses). Each class opens the full funnel page.
 //  Faithful build of Claude Design "post pregnancy app.dc.html" · S11.
@@ -48,7 +48,7 @@ class MasterclassesScreen extends StatelessWidget {
               Text('Masterclasses', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  "A single, focused sitting with India's most trusted paediatricians and consultants. One topic, all your questions answered — live, then yours to rewatch.",
+                  "A single, focused sitting with India's most trusted paediatricians and consultants. One topic, all your questions answered - live, then yours to rewatch.",
                   style: ppBody(15)),
             ])),
 
@@ -135,7 +135,7 @@ class MasterclassesScreen extends StatelessWidget {
             const SizedBox(height: 28),
             _pad(Text('More masterclasses', style: ppJakarta(18))),
             const SizedBox(height: 4),
-            _pad(Text('Recorded — watch anytime.', style: ppBody(13))),
+            _pad(Text('Recorded - watch anytime.', style: ppBody(13))),
             const SizedBox(height: 12),
             _pad(_row(context, 'Starting solids without the stress',
                 'Ritu Malhotra, Nutritionist · 75 min', '₹999',

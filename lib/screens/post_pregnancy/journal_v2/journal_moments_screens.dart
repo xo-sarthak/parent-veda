@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Journal V2 — moments (memory detail, timeline, search, letters)
+//  My Journal V2 - moments (memory detail, timeline, search, letters)
 // =============================================================================
 
 import 'package:flutter/material.dart';

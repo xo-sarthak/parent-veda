@@ -1,7 +1,7 @@
 // =============================================================================
-//  WatchCollectionScreen — a curated learning collection (a path with an end)
+//  WatchCollectionScreen - a curated learning collection (a path with an end)
 // -----------------------------------------------------------------------------
-//  Not a playlist — a short, finishable path: cover, count, estimated time,
+//  Not a playlist - a short, finishable path: cover, count, estimated time,
 //  progress, then the ordered videos with completed ticks. Reached from the Watch
 //  home's Expert Collections rail.
 // =============================================================================

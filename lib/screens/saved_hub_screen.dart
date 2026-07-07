@@ -1,8 +1,8 @@
 // =============================================================================
-//  SavedHubScreen — everything the mother has bookmarked, in one place
+//  SavedHubScreen - everything the mother has bookmarked, in one place
 // -----------------------------------------------------------------------------
-//  Opened from Profile › Saved. Groups her saved things — Read-to-baby pieces,
-//  Daily reads, and Videos — newest-saved first within each group, with the
+//  Opened from Profile › Saved. Groups her saved things - Read-to-baby pieces,
+//  Daily reads, and Videos - newest-saved first within each group, with the
 //  save date. The saved content is the priority; a light "discover more" sits
 //  below. Empty groups are hidden; a friendly empty state shows when nothing's
 //  saved yet.

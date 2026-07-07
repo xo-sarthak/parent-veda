@@ -1,11 +1,11 @@
 // =============================================================================
-//  ParentVeda Products ❤️ — models (a trust-first decision engine)
+//  ParentVeda Products ❤️ - models (a trust-first decision engine)
 // -----------------------------------------------------------------------------
 //  Not a catalogue: the goal is a confident decision. Every category leads with
 //  a 20-second guidance card, then ParentVeda Picks (scored, with the reasons to
 //  buy and things to consider visible on the card), then reviews, then browse.
 //  Recommendations are pregnancy-stage aware (each item has a "useful during"
-//  week window). Commerce (Buy Now) is future affiliate — stubbed for now.
+//  week window). Commerce (Buy Now) is future affiliate - stubbed for now.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';

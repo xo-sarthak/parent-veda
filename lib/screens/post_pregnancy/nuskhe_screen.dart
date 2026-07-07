@@ -1,5 +1,5 @@
 // =============================================================================
-//  NuskheScreen — Dadi / Nani ke Nuskhe · home remedies (parenting · S19)
+//  NuskheScreen - Dadi / Nani ke Nuskhe · home remedies (parenting · S19)
 // -----------------------------------------------------------------------------
 //  Traditional grandmother home-remedies, each validated by an ayurvedic panel
 //  + an MBBS paediatrician: a validation banner, search, a browse-by-situation
@@ -56,7 +56,7 @@ class NuskheScreen extends StatelessWidget {
                 TextSpan(children: [
                   const TextSpan(
                       text:
-                          'The remedies your grandmother swore by — each one reviewed and signed off by qualified ayurvedic doctors, with clear notes on when '),
+                          'The remedies your grandmother swore by - each one reviewed and signed off by qualified ayurvedic doctors, with clear notes on when '),
                   TextSpan(text: 'not', style: ppBody(15).copyWith(fontStyle: FontStyle.italic, color: ppBrown)),
                   const TextSpan(text: ' to use them.'),
                 ]),
@@ -129,7 +129,7 @@ class NuskheScreen extends StatelessWidget {
                 top: true, bottom: true)),
 
             const SizedBox(height: 22),
-            _pad(Text('No WhatsApp forwards here — only nuskhe reviewed and signed off by qualified ayurvedic practitioners.',
+            _pad(Text('No WhatsApp forwards here - only nuskhe reviewed and signed off by qualified ayurvedic practitioners.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

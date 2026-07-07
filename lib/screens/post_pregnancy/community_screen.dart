@@ -1,9 +1,9 @@
 // =============================================================================
-//  CommunityScreen — Community feed (parenting app)
+//  CommunityScreen - Community feed (parenting app)
 // -----------------------------------------------------------------------------
 //  Carried forward from the pre-birth Community: the SAME social layer (models +
 //  CommunityStore for joins/likes/saves/reposts/poll-votes/comments/verified-
-//  expert endorsements), now with PARENTING communities added — the things that
+//  expert endorsements), now with PARENTING communities added - the things that
 //  change once baby is here: 0–1 Year, 1/2/3 Year Olds, Toddler Life, Starting
 //  Solids, Baby Sleep, Milestones, Working Parents, Potty Training, plus Boy Moms
 //  and Delhi Parents. Reads its own parenting content (kParenting*) so the
@@ -80,7 +80,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 children: [
                   _pad(Text('Community', style: ppJakarta(24))),
                   const SizedBox(height: 4),
-                  _pad(Text('Your rooms, already full — now for this stage.', style: ppBody(13))),
+                  _pad(Text('Your rooms, already full - now for this stage.', style: ppBody(13))),
                   const SizedBox(height: 18),
                   _rooms(),
                   const SizedBox(height: 8),
@@ -337,7 +337,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Nunu — breathable muslin swaddles', style: ppJakarta(15), maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text('Nunu - breathable muslin swaddles', style: ppJakarta(15), maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 4),
               Text('New from an Indian parent brand.', style: ppBody(12)),
             ]),
@@ -438,7 +438,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             const SizedBox(height: 12),
             _menuRow(ctx, Icons.visibility_off_outlined, 'Not interested', () => _s.hidePost(p.id)),
             _menuRow(ctx, Icons.notifications_off_outlined, 'Mute this community', () => _s.toggleMute(p.communityId)),
-            _menuRow(ctx, Icons.flag_outlined, 'Report', () => _soon('Thanks — our team will take a look')),
+            _menuRow(ctx, Icons.flag_outlined, 'Report', () => _soon('Thanks - our team will take a look')),
           ]),
         ),
       ),
@@ -495,7 +495,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       for (final c in seed) _comment(c.author, c.text),
                       for (final t in mine) _comment('You', t),
                       if (seed.isEmpty && mine.isEmpty)
-                        Padding(padding: const EdgeInsets.symmetric(vertical: 30), child: Text('Be the first to reply — a kind word helps.', textAlign: TextAlign.center, style: ppBody(13.5, color: ppMuted))),
+                        Padding(padding: const EdgeInsets.symmetric(vertical: 30), child: Text('Be the first to reply - a kind word helps.', textAlign: TextAlign.center, style: ppBody(13.5, color: ppMuted))),
                     ],
                   ),
                 ),

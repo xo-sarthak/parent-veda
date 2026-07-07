@@ -1,5 +1,5 @@
 // =============================================================================
-//  CourseDetailScreen — one focused course, in full
+//  CourseDetailScreen - one focused course, in full
 // -----------------------------------------------------------------------------
 //  The real destination for a "Go deeper · Course" row: what the course is, who
 //  vetted it, its lessons (with the referenced one marked "Start here"), and a
@@ -70,7 +70,7 @@ class CourseDetailScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Text('What you\'ll learn', style: ppJakarta(17))),
             const SizedBox(height: 6),
-            _pad(Text('Short lessons, in order — start anywhere.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Short lessons, in order - start anywhere.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [
               for (int i = 0; i < course.lessons.length; i++)

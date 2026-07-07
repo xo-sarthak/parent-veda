@@ -1,5 +1,5 @@
 // =============================================================================
-//  FoodBuilderScreen — the Smart Meal Builder (signature)
+//  FoodBuilderScreen - the Smart Meal Builder (signature)
 // -----------------------------------------------------------------------------
 //  Reduces decision fatigue: the parent says the meal, the time they have and
 //  what's in the kitchen; ParentVeda suggests 3–5 recipes that fit, explains why
@@ -50,7 +50,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
             const SizedBox(height: 8),
             _pad(Text('Let’s figure out this meal together', style: ppFraunces(28, h: 1.12))),
             const SizedBox(height: 6),
-            _pad(Text('Tell us three things — we’ll suggest what fits, and why.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Tell us three things - we’ll suggest what fits, and why.', style: ppBody(14, h: 1.5))),
 
             const SizedBox(height: 12),
             _pad(_childChip()),
@@ -92,7 +92,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
               const SizedBox(height: 6),
               _pad(Text(
                   _results!.isEmpty
-                      ? 'Try more time, another meal, or add an ingredient — feeding is flexible, not perfect.'
+                      ? 'Try more time, another meal, or add an ingredient - feeding is flexible, not perfect.'
                       : 'Best matches for your kitchen and time, newest-friendly first.',
                   style: ppBody(12.5, color: ppMuted))),
               const SizedBox(height: 16),

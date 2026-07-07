@@ -1,5 +1,5 @@
 // =============================================================================
-//  Garbh Sanskar Journey — curated seed content
+//  Garbh Sanskar Journey - curated seed content
 // -----------------------------------------------------------------------------
 //  A starter library across the four pillars. Warm, universal, non-religious;
 //  enough to make the experience feel real. Scales to the launch quantities
@@ -9,7 +9,7 @@
 import '../models/garbh_content.dart';
 
 // ---------------------------------------------------------------------------
-//  Shravan — Sacred Listening (placeholder audio uses the bundled drone)
+//  Shravan - Sacred Listening (placeholder audio uses the bundled drone)
 // ---------------------------------------------------------------------------
 const List<GarbhAudio> kShravan = [
   GarbhAudio(id: 'morning_raga', title: 'Morning Calm Raga', subtitle: 'Begin the day with calmness', emoji: '🌅', minutes: 7, kind: GarbhKind.raga),
@@ -25,7 +25,7 @@ const List<GarbhAudio> kShravan = [
 ];
 
 // ---------------------------------------------------------------------------
-//  Vichara — Positive Contemplation (short reflective reads)
+//  Vichara - Positive Contemplation (short reflective reads)
 // ---------------------------------------------------------------------------
 const List<GarbhStory> kVichara = [
   GarbhStory(
@@ -35,9 +35,9 @@ const List<GarbhStory> kVichara = [
     blurb: 'A short reflection on curiosity, wonder and lifelong learning.',
     body:
         'There was once a child who asked "why" about everything. Why is the sky blue? Why do birds sing in the morning? Why does the moon follow us home?\n\n'
-        'At first the grown-ups answered quickly, and then they grew tired of answering at all. But the child kept asking — not to be difficult, but because the world felt endlessly interesting.\n\n'
+        'At first the grown-ups answered quickly, and then they grew tired of answering at all. But the child kept asking - not to be difficult, but because the world felt endlessly interesting.\n\n'
         'Years later, that same curiosity became the child\'s greatest gift. It made them a careful listener, a patient learner, and someone who never stopped growing.\n\n'
-        'Every child is born with this spark. It does not need to be taught — only protected, welcomed, and answered with a little patience.',
+        'Every child is born with this spark. It does not need to be taught - only protected, welcomed, and answered with a little patience.',
     reflection: 'What quality would you most like your child to keep as they grow?',
   ),
   GarbhStory(
@@ -47,7 +47,7 @@ const List<GarbhStory> kVichara = [
     blurb: 'A gentle reminder that the strongest things take time.',
     body:
         'A tree does not rush. In its first year it may look like nothing more than a thin stem, easily bent by the wind.\n\n'
-        'But beneath the soil, quietly and unseen, it is doing the most important work — sending roots deep and wide. Only later does it rise tall, and by then it can hold the weight of storms.\n\n'
+        'But beneath the soil, quietly and unseen, it is doing the most important work - sending roots deep and wide. Only later does it rise tall, and by then it can hold the weight of storms.\n\n'
         'Pregnancy is a little like this. So much of what matters is happening quietly, unseen, day by day. You do not have to feel productive for important things to be growing.\n\n'
         'Slow is not the same as still. You and your baby are both becoming, a little more each day.',
     reflection: 'Where in your life could you offer yourself a little more patience?',
@@ -58,7 +58,7 @@ const List<GarbhStory> kVichara = [
     title: 'The Warmth of a Small Gesture',
     blurb: 'How the smallest kindnesses leave the deepest mark.',
     body:
-        'We often think kindness has to be grand — a big gift, a great sacrifice. But ask anyone about a kindness they still remember, and it is almost always something small.\n\n'
+        'We often think kindness has to be grand - a big gift, a great sacrifice. But ask anyone about a kindness they still remember, and it is almost always something small.\n\n'
         'A warm word on a hard day. Someone who waited. Someone who noticed. These tiny moments stay with us for years.\n\n'
         'Children learn kindness not from lectures but from feeling it, again and again, in ordinary moments. The way they are spoken to becomes the way they speak to the world.\n\n'
         'Your gentleness, even now, is already shaping a gentle heart.',
@@ -95,8 +95,8 @@ const List<GarbhStory> kVichara = [
     blurb: 'Remembering how to look at the world with fresh eyes.',
     body:
         'Children look at the night sky and gasp. Adults, often, forget to look up at all.\n\n'
-        'Wonder is the ability to be amazed by ordinary things — a leaf, a raindrop, a sky full of distant light. It is not childish; it is one of the great quiet joys of being alive.\n\n'
-        'Your baby will arrive seeing everything for the very first time. In their company, you may rediscover wonder too — the world made new through their eyes.\n\n'
+        'Wonder is the ability to be amazed by ordinary things - a leaf, a raindrop, a sky full of distant light. It is not childish; it is one of the great quiet joys of being alive.\n\n'
+        'Your baby will arrive seeing everything for the very first time. In their company, you may rediscover wonder too - the world made new through their eyes.\n\n'
         'For a moment now, let yourself simply marvel that a whole new person is forming, quietly, within you.',
     reflection: 'When did you last feel genuine wonder?',
   ),
@@ -104,7 +104,7 @@ const List<GarbhStory> kVichara = [
     id: 'compassion',
     theme: 'Compassion',
     title: 'The Bird with the Tired Wing',
-    blurb: 'On caring for others — and for yourself.',
+    blurb: 'On caring for others - and for yourself.',
     body:
         'A flock once paused its long journey because one bird could fly no further that day. Rather than leaving it behind, the others rested too, until it was ready.\n\n'
         'Compassion is simply this: noticing when someone needs gentleness, and offering it without keeping score.\n\n'
@@ -120,14 +120,14 @@ const List<GarbhStory> kVichara = [
     body:
         'A river never argues with the rock in its path. It simply finds a way around, or over, or slowly, over time, straight through.\n\n'
         'Resilience is not about being hard. It is about being able to bend, adapt, and keep moving toward what matters.\n\n'
-        'There will be easier days and harder ones ahead. You will not need to be unbreakable — only to keep flowing, gently, in your own direction.\n\n'
+        'There will be easier days and harder ones ahead. You will not need to be unbreakable - only to keep flowing, gently, in your own direction.\n\n'
         'You have already come further than you sometimes give yourself credit for.',
     reflection: 'What is something difficult you have already moved through?',
   ),
 ];
 
 // ---------------------------------------------------------------------------
-//  Kriya — Breath & Grounding (each is one breath cycle, looped)
+//  Kriya - Breath & Grounding (each is one breath cycle, looped)
 // ---------------------------------------------------------------------------
 const List<GarbhPractice> kKriya = [
   GarbhPractice(
@@ -192,15 +192,15 @@ const List<GarbhPractice> kKriya = [
 ];
 
 // ---------------------------------------------------------------------------
-//  Samvad — Womb Connection prompts (one shown as "today's connection")
+//  Samvad - Womb Connection prompts (one shown as "today's connection")
 // ---------------------------------------------------------------------------
 // Three trimester-specific sets of SPEAKING cards (read aloud to the bump), per
-// the Garbh spec (Pillar 3 — Womb Connection):
-//  T1 = affirmations — welcome the baby + grow the mother's own confidence.
+// the Garbh spec (Pillar 3 - Womb Connection):
+//  T1 = affirmations - welcome the baby + grow the mother's own confidence.
 //  T2 = expressive, multi-genre read-aloud scripts for the "peak auditory window";
-//       the punctuation is deliberately dramatic (— … ! CAPS) so her voice
+//       the punctuation is deliberately dramatic (- … ! CAPS) so her voice
 //       naturally rises, falls and plays, helping baby map sound.
-//  T3 = visualization prompts — welcome + the birth day as a cooperative team.
+//  T3 = visualization prompts - welcome + the birth day as a cooperative team.
 // (Old generic kSamvad prompts removed; replaced by these trimester sets.)
 
 const List<GarbhPrompt> kSamvadT1 = [
@@ -209,7 +209,7 @@ const List<GarbhPrompt> kSamvadT1 = [
   GarbhPrompt('aff2',
       'My darling, every single day my heart makes a little more room for you. I am strong, and I am yours.'),
   GarbhPrompt('aff3',
-      'Hello, tiny love. You are safe inside me. We are learning this journey together — you and I, side by side.'),
+      'Hello, tiny love. You are safe inside me. We are learning this journey together - you and I, side by side.'),
   GarbhPrompt('aff4',
       'Sweet baby, I welcome you with my whole heart. I trust my body, and I trust the gentle way you are growing.'),
   GarbhPrompt('aff5',
@@ -220,28 +220,28 @@ const List<GarbhPrompt> kSamvadT1 = [
 
 const List<GarbhPrompt> kSamvadT2 = [
   GarbhPrompt('scr1',
-      "Once upon a time, there was a tiny seed… who dreamed of touching the SKY. 'I'm far too small!' it sighed. But the soft rain whispered, 'Just grow — one little leaf at a time.' And do you know what happened, my love? That tiny seed became a GREAT, tall tree!"),
+      "Once upon a time, there was a tiny seed… who dreamed of touching the SKY. 'I'm far too small!' it sighed. But the soft rain whispered, 'Just grow - one little leaf at a time.' And do you know what happened, my love? That tiny seed became a GREAT, tall tree!"),
   GarbhPrompt('scr2',
-      "Knock, knock! Who's there? It's the morning sun, peeking through the window — 'Good morning, little one!' it calls. And the birds all answer, 'Tweet! Tweet! Wake UP — it's a beautiful day!'"),
+      "Knock, knock! Who's there? It's the morning sun, peeking through the window - 'Good morning, little one!' it calls. And the birds all answer, 'Tweet! Tweet! Wake UP - it's a beautiful day!'"),
   GarbhPrompt('scr3',
-      "Listen… can you hear me? My voice goes soft and low… and then — bright and HIGH! This is how we'll talk, you and I. One day you'll giggle right back — and oh, how I cannot WAIT to hear it!"),
+      "Listen… can you hear me? My voice goes soft and low… and then - bright and HIGH! This is how we'll talk, you and I. One day you'll giggle right back - and oh, how I cannot WAIT to hear it!"),
   GarbhPrompt('scr4',
-      "Let me tell you about a clever little crow. He was SO thirsty! He found a pot — but the water sat low, low, low. 'What shall I do?' he wondered… Then — plop! plop! PLOP! — in went the pebbles, and the water rose UP. Clever crow! We never give up, do we, my love?"),
+      "Let me tell you about a clever little crow. He was SO thirsty! He found a pot - but the water sat low, low, low. 'What shall I do?' he wondered… Then - plop! plop! PLOP! - in went the pebbles, and the water rose UP. Clever crow! We never give up, do we, my love?"),
   GarbhPrompt('scr5',
-      "Round and round the garden hums a gentle bee. Buzz, buzz, BUZZ! 'Hello, flowers!' she sings. And every flower nods — 'Hello, busy bee!' What a happy, humming, wonderful day."),
+      "Round and round the garden hums a gentle bee. Buzz, buzz, BUZZ! 'Hello, flowers!' she sings. And every flower nods - 'Hello, busy bee!' What a happy, humming, wonderful day."),
 ];
 
 const List<GarbhPrompt> kSamvadT3 = [
   GarbhPrompt('vis1',
-      'Close your eyes with me, little one. Picture the day we meet — soft light, gentle hands, and the voice you already know so well. We will do this together, as a team.'),
+      'Close your eyes with me, little one. Picture the day we meet - soft light, gentle hands, and the voice you already know so well. We will do this together, as a team.'),
   GarbhPrompt('vis2',
       'Soon, my love, you will make your way toward my arms. I am strong, you are strong, and we move as one. I am right here, and I will welcome you.'),
   GarbhPrompt('vis3',
-      'Imagine it, sweet baby: the very first time I hold you on my chest. Your tiny breath and my steady heartbeat — the two sounds you have always known, finally together.'),
+      'Imagine it, sweet baby: the very first time I hold you on my chest. Your tiny breath and my steady heartbeat - the two sounds you have always known, finally together.'),
   GarbhPrompt('vis4',
       'On your birth day, we are a team. When you are ready, you will show me the way, and I will breathe you gently into the world. I trust you, and I trust us.'),
   GarbhPrompt('vis5',
-      'Picture us, little one — you nestled close, me holding you near. Whatever the day brings, we meet it together. You are not arriving alone; I am right here with you.'),
+      'Picture us, little one - you nestled close, me holding you near. Whatever the day brings, we meet it together. You are not arriving alone; I am right here with you.'),
 ];
 
 /// The speaking-cards for trimester [t]: affirmations (1) → read-aloud scripts
@@ -273,7 +273,7 @@ GarbhPractice? kriyaById(String id) {
   return null;
 }
 
-/// Today's connection card, rotating gently by day — from the set that matches
+/// Today's connection card, rotating gently by day - from the set that matches
 /// the mother's [trimester] (affirmation / read-aloud script / visualization).
 GarbhPrompt promptForDay(int day, int trimester) {
   final list = samvadForTrimester(trimester);
@@ -281,7 +281,7 @@ GarbhPrompt promptForDay(int day, int trimester) {
 }
 
 // ===========================================================================
-//  v2.0 — trimester engine + per-pillar "today" pickers
+//  v2.0 - trimester engine + per-pillar "today" pickers
 // ===========================================================================
 int garbhTrimester(int week) => week <= 13 ? 1 : (week <= 27 ? 2 : 3);
 
@@ -302,7 +302,7 @@ String shravanWhy(int t) {
     case 1:
       return 'Calming sound can ease early-pregnancy stress and help you settle into the day.';
     case 2:
-      return 'Your baby is beginning to hear — gentle melodies are soothing for you both.';
+      return 'Your baby is beginning to hear - gentle melodies are soothing for you both.';
     default:
       return 'Calming music may help create a relaxing environment as birth approaches.';
   }
@@ -312,7 +312,7 @@ String shravanWhy(int t) {
 const List<GarbhInsight> _insights = [
   GarbhInsight(
     sloka: 'Begin gently; the smallest steady step still moves you forward.',
-    meaning: 'You do not have to do everything at once — showing up softly is enough.',
+    meaning: 'You do not have to do everything at once - showing up softly is enough.',
     lesson: 'Consistency, not intensity, builds calm.',
     reflection: 'What is one small, kind thing you can do for yourself today?',
   ),
@@ -325,18 +325,18 @@ const List<GarbhInsight> _insights = [
   GarbhInsight(
     sloka: 'Trust the body that has carried you this far.',
     meaning: 'As birth nears, confidence and rest matter as much as preparation.',
-    lesson: 'Strength can be soft — trusting is its own kind of courage.',
+    lesson: 'Strength can be soft - trusting is its own kind of courage.',
     reflection: 'What are you most looking forward to about meeting your baby?',
   ),
 ];
 GarbhInsight insightForTrimester(int t) => _insights[(t - 1).clamp(0, 2)];
 
-/// All Sacred-Insight verses (used by the Tools library — the full repository).
+/// All Sacred-Insight verses (used by the Tools library - the full repository).
 List<GarbhInsight> garbhAllInsights() => _insights;
 
 // --- Vichara: Brain Fitness (gentle puzzles for focused calm) ---
 const List<GarbhPuzzle> kPuzzles = [
-  GarbhPuzzle('Word Search', '🔤', 'Find the hidden words — a quiet few minutes.'),
+  GarbhPuzzle('Word Search', '🔤', 'Find the hidden words - a quiet few minutes.'),
   GarbhPuzzle('Sudoku', '🔢', 'A gentle number puzzle to settle a busy mind.'),
   GarbhPuzzle('Logic Puzzle', '🧩', 'A light brain-teaser for focused calm.'),
   GarbhPuzzle('Memory Match', '🃏', 'A simple memory game to relax into.'),
@@ -346,11 +346,11 @@ const List<GarbhPuzzle> kPuzzles = [
 String samvadThemeForTrimester(int t) {
   switch (t) {
     case 1:
-      return 'Say these affirmations aloud — welcome your baby, and let your own confidence grow with every word.';
+      return 'Say these affirmations aloud - welcome your baby, and let your own confidence grow with every word.';
     case 2:
-      return "Your baby's hearing is awake now. Read aloud with feeling — let your voice rise, fall and play, so they learn its music.";
+      return "Your baby's hearing is awake now. Read aloud with feeling - let your voice rise, fall and play, so they learn its music.";
     default:
-      return 'Picture the day you meet, and speak it softly — you and your baby, a team getting ready together.';
+      return 'Picture the day you meet, and speak it softly - you and your baby, a team getting ready together.';
   }
 }
 
@@ -388,7 +388,7 @@ const List<GarbhNutrition> _nutrition = [
   ),
   GarbhNutrition(
     tip: 'Add a good source of protein and iron to today\'s meals.',
-    why: 'The second trimester is a growth phase — protein, iron and healthy fats support it.',
+    why: 'The second trimester is a growth phase - protein, iron and healthy fats support it.',
     recipe: 'Moong dal khichdi with a side of curd.',
     swap: 'Swap white rice for a dal-and-vegetable bowl.',
     habit: 'Pair iron-rich food with vitamin C (lemon, amla) for absorption.',
@@ -404,7 +404,7 @@ const List<GarbhNutrition> _nutrition = [
 GarbhNutrition nutritionForTrimester(int t) => _nutrition[(t - 1).clamp(0, 2)];
 
 // ===========================================================================
-//  Daily rotation pickers — used ONLY by the Home daily Garbh section, where
+//  Daily rotation pickers - used ONLY by the Home daily Garbh section, where
 //  each pillar shows a different item each day (no recommendation lists). The
 //  full Tools Garbh keeps the trimester pickers above.
 // ===========================================================================

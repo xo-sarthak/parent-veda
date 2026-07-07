@@ -1,7 +1,7 @@
 // =============================================================================
 //  HomeDay model (Daily Moment content, bilingual)
 // -----------------------------------------------------------------------------
-//  Parses lib/data/homeDailyContent.json — the daily Home Screen content. Each
+//  Parses lib/data/homeDailyContent.json - the daily Home Screen content. Each
 //  day is a self-contained "Daily Moment": Grow, Read To Your Baby, Talk To Your
 //  Baby, Garbh Sanskar, A Moment For You (Nurture), and (Week 28+) Baby Movement.
 //  Every text leaf is a {en, hi} LocalizedText, mirroring WeekContent.
@@ -22,7 +22,7 @@ int _i(Object? v, [int d = 0]) =>
 bool _b(Object? v, [bool d = false]) => v is bool ? v : d;
 
 // ---------------------------------------------------------------------------
-//  1 · Grow — parenting wisdom
+//  1 · Grow - parenting wisdom
 // ---------------------------------------------------------------------------
 
 @immutable
@@ -63,7 +63,7 @@ class GrowContent {
 }
 
 // ---------------------------------------------------------------------------
-//  2 · Read To Your Baby — story + bonding
+//  2 · Read To Your Baby - story + bonding
 // ---------------------------------------------------------------------------
 
 @immutable
@@ -96,7 +96,7 @@ class ReadStory {
 }
 
 // ---------------------------------------------------------------------------
-//  3 · Talk To Your Baby — memory creation
+//  3 · Talk To Your Baby - memory creation
 // ---------------------------------------------------------------------------
 
 @immutable
@@ -119,7 +119,7 @@ class TalkPrompt {
 }
 
 // ---------------------------------------------------------------------------
-//  4 · Garbh Sanskar — spiritual / emotional ritual
+//  4 · Garbh Sanskar - spiritual / emotional ritual
 // ---------------------------------------------------------------------------
 
 enum GarbhType { raga, meditation, affirmation }
@@ -169,10 +169,10 @@ class GarbhSanskarDaily {
   /// Meditation closing thought (meditation type only; otherwise empty).
   final LocalizedText closingThought;
 
-  /// "What is this & why it matters" — for the little "i" info sheet.
+  /// "What is this & why it matters" - for the little "i" info sheet.
   final LocalizedText about;
 
-  /// "How to use it during pregnancy" — for the "i" info sheet.
+  /// "How to use it during pregnancy" - for the "i" info sheet.
   final LocalizedText howToUse;
 
   bool get hasTimedAudio =>
@@ -195,7 +195,7 @@ class GarbhSanskarDaily {
 }
 
 // ---------------------------------------------------------------------------
-//  5 · A Moment For You (Nurture) — mother self-care
+//  5 · A Moment For You (Nurture) - mother self-care
 // ---------------------------------------------------------------------------
 
 enum NurtureType { affirm, breathe, food }

@@ -1,7 +1,7 @@
 // =============================================================================
-//  RecommendationsScreen — Explore · Recommendations (parenting · S16)
+//  RecommendationsScreen - Explore · Recommendations (parenting · S16)
 // -----------------------------------------------------------------------------
-//  "Chosen for Aarav" — what to read, watch, play & do, tuned to his stage and
+//  "Chosen for Aarav" - what to read, watch, play & do, tuned to his stage and
 //  your city. Books (→ book detail), an honest screen-time note, and nearby
 //  places. Reached from the Explore drawer. Faithful build of Claude Design ·
 //  S16. Pushed screen (no bottom nav).
@@ -49,7 +49,7 @@ class RecommendationsScreen extends StatelessWidget {
               Text('What to read, watch,\nplay & do', style: ppFraunces(30, h: 1.15)),
               const SizedBox(height: 12),
               Text(
-                  "Never wonder “what's good for this age?” again — every pick is tuned to his stage and your city.",
+                  "Never wonder “what's good for this age?” again - every pick is tuned to his stage and your city.",
                   style: ppBody(15)),
             ])),
 
@@ -101,15 +101,15 @@ class RecommendationsScreen extends StatelessWidget {
             ])),
             const SizedBox(height: 12),
             _pad(_book(context, "That's Not My Tiger",
-                'A touch-and-feel board book — high-contrast pages and textures made for tiny, curious hands.',
+                'A touch-and-feel board book - high-contrast pages and textures made for tiny, curious hands.',
                 '₹299',
                 top: true)),
             _pad(_book(context, 'Black & White Baby Book',
                 "Bold high-contrast art that a 4-month-old's developing eyes can actually lock onto.", '₹349')),
             _pad(_book(context, 'Cloth Crinkle Book',
-                'Soft, washable and crinkly — sound and texture in one, and safe to chew.', '₹249')),
+                'Soft, washable and crinkly - sound and texture in one, and safe to chew.', '₹249')),
             _pad(_book(context, 'Peekaboo Baby (Indian faces)',
-                'Familiar Indian faces and a mirror page — the first seed of peekaboo and object permanence.',
+                'Familiar Indian faces and a mirror page - the first seed of peekaboo and object permanence.',
                 '₹399',
                 bottom: true)),
             const SizedBox(height: 16),
@@ -123,7 +123,7 @@ class RecommendationsScreen extends StatelessWidget {
               ),
             )),
 
-            // Shows — honest note
+            // Shows - honest note
             const SizedBox(height: 28),
             _pad(Row(children: [
               const Icon(Icons.tv_outlined, size: 18, color: ppPurple),
@@ -141,7 +141,7 @@ class RecommendationsScreen extends StatelessWidget {
                     TextSpan(text: 'no screens yet', style: TextStyle(color: ppInk, fontWeight: FontWeight.w700)),
                     const TextSpan(
                         text:
-                            " — his brain learns from your face, not a screen. We'll surface show picks (with reasons) once he's older."),
+                            " - his brain learns from your face, not a screen. We'll surface show picks (with reasons) once he's older."),
                   ]),
                   style: ppBody(14, color: ppInk, h: 1.55),
                 ),
@@ -173,7 +173,7 @@ class RecommendationsScreen extends StatelessWidget {
 
             const SizedBox(height: 22),
             _pad(Text(
-                "Every pick is tied to Aarav's age and your city — books & toys via trusted links, places & activities curated by a local editor.",
+                "Every pick is tied to Aarav's age and your city - books & toys via trusted links, places & activities curated by a local editor.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

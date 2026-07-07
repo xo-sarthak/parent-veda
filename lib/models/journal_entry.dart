@@ -1,5 +1,5 @@
 // =============================================================================
-//  JournalEntry — the unit of "My Journal" (the mother's pregnancy timeline)
+//  JournalEntry - the unit of "My Journal" (the mother's pregnancy timeline)
 // -----------------------------------------------------------------------------
 //  My Journal is a chronological memory timeline, not a tracker. Entries are
 //  either MANUAL (a memory, a note for baby, a photo, a voice note) or
@@ -172,7 +172,7 @@ class JournalMeta {
 }
 
 // Subtle category colours (kept gentle, per spec "never overwhelming").
-const Color _jOrange = Color(0xFFE0921C); // Memories — warm
+const Color _jOrange = Color(0xFFE0921C); // Memories - warm
 const Color _jPink = Color(0xFFFF5A79); // Photos
 const Color _jPurple = AppTheme.primary500; // Milestones
 const Color _jBlue = Color(0xFF4A7BC8); // Health

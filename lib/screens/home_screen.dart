@@ -1,10 +1,10 @@
 // =============================================================================
-//  HomeScreen — the Mother Home Screen (Daily Moment)
+//  HomeScreen - the Mother Home Screen (Daily Moment)
 // -----------------------------------------------------------------------------
 //  The first thing a mother sees each day: a warm acknowledgement, then a gentle
 //  4–6 minute arc of six modules (Grow → Read → Talk → Garbh Sanskar → A Moment
 //  For You → Baby Movement [wk 28+]), a soft completion message, and finally the
-//  Emotional Check-In. Not a dashboard, not a checklist — a small daily moment.
+//  Emotional Check-In. Not a dashboard, not a checklist - a small daily moment.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -53,7 +53,7 @@ class HomeScreen extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Father Mode — the father's own Daily Moment.
+    // Father Mode - the father's own Daily Moment.
     if (fatherMode) {
       return FatherHomeScreen(
         pregnancy: pregnancy,
@@ -121,7 +121,7 @@ class HomeScreen extends StatelessWidget {
             MovementModule(day: day, lang: lang, home: home),
           ],
           const SizedBox(height: 22),
-          // Read Next — stage-aware reading discovery, surfaced on Home.
+          // Read Next - stage-aware reading discovery, surfaced on Home.
           ReadNextHomeCard(controller: pregnancy, lang: lang),
           const SizedBox(height: 28),
           CompletionBanner(lang: lang),
