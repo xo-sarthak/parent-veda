@@ -9,16 +9,27 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_watch_data.dart';
 import 'watch_home_screen.dart';
+import 'watch_player_screen.dart';
+import 'watch_quicklearn_screen.dart';
 
 class SolveProblemScreen extends StatelessWidget {
   const SolveProblemScreen({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  // The Watch section routes to the real video-learning module (ParentVeda Watch).
+  // "See all" routes to the video-learning hub (ParentVeda Watch).
   void _watch(BuildContext context) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WatchHomeScreen()));
+
+  // A video row opens THAT video's player directly - a deep video in the player,
+  // a quick clip in Quick Learn - no intermediate hub, no extra tap.
+  void _play(BuildContext context, WatchVideo v) => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v),
+      ));
+
+  String _dur(WatchVideo v) => v.seconds < 90 ? '${v.seconds}s' : '${(v.seconds / 60).round()} min';
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +40,7 @@ class SolveProblemScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, "Today's challenge")),
+            _pad(ppBack(context, 'Sleep guide')),
 
             const SizedBox(height: 24),
             _pad(ppEyebrow('Solve · sleep')),
@@ -56,8 +67,8 @@ class SolveProblemScreen extends StatelessWidget {
               GestureDetector(onTap: () => _watch(context), child: Text('See all', style: ppBody(12, color: ppPurple, w: FontWeight.w600))),
             ])),
             const SizedBox(height: 14),
-            _pad(_video(context, 'The 4-month regression, explained', '3 min')),
-            _pad(_video(context, 'Drowsy but awake: the hardest skill', '4 min', top: true)),
+            _pad(_video(context, watchVideoById('sleep4mo'))),
+            _pad(_video(context, watchVideoById('q_noise'), top: true)),
 
             _pad(ppSectionDivider()),
             _pad(Text('What can help', style: ppJakarta(16))),
@@ -100,8 +111,8 @@ class SolveProblemScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _video(BuildContext context, String title, String dur, {bool top = false}) => GestureDetector(
-        onTap: () => _watch(context),
+  Widget _video(BuildContext context, WatchVideo v, {bool top = false}) => GestureDetector(
+        onTap: () => _play(context, v),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: EdgeInsets.only(top: top ? 14 : 0, bottom: 14),
@@ -112,18 +123,28 @@ class SolveProblemScreen extends StatelessWidget {
               height: 54,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Stack(alignment: Alignment.center, children: const [
-                  PpStriped(height: 60),
-                  Icon(Icons.play_arrow_rounded, color: ppPurple, size: 24),
+                child: Stack(alignment: Alignment.center, children: [
+                  const PpStriped(height: 60),
+                  if (v.quick)
+                    Positioned(
+                      top: 4,
+                      left: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), borderRadius: BorderRadius.circular(999)),
+                        child: Text('QUICK', style: ppBody(7.5, color: ppPurple, w: FontWeight.w700).copyWith(letterSpacing: 0.5)),
+                      ),
+                    ),
+                  const Icon(Icons.play_arrow_rounded, color: ppPurple, size: 24),
                 ]),
               ),
             ),
             const SizedBox(width: 13),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: ppBody(14, color: ppInk, h: 1.35)),
+                Text(v.title, style: ppBody(14, color: ppInk, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text(dur, style: ppBody(12, color: ppMuted)),
+                Text('${v.quick ? 'Quick Learn · ' : ''}${_dur(v)}', style: ppBody(12, color: ppMuted)),
               ]),
             ),
           ]),

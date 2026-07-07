@@ -293,7 +293,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
             child: TextField(
               controller: c,
               style: ppBody(14, color: ppInk),
-              decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
+              decoration: const InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
             ),
           ),
         ]),

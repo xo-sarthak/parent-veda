@@ -202,3 +202,15 @@ const List<Expert> kExperts = [
 
 /// Lookup by id; falls back to the first expert (Dr. Neha Sharma).
 Expert expertById(String id) => kExperts.firstWhere((e) => e.id == id, orElse: () => kExperts.first);
+
+/// Lookup by display name - tolerant of the "Dr." prefix and punctuation.
+/// Returns null when no seed profile matches, so callers can skip the link
+/// rather than open the wrong profile.
+Expert? expertByName(String name) {
+  String norm(String s) => s.toLowerCase().replaceAll(RegExp('[^a-z]'), '');
+  final key = norm(name);
+  for (final e in kExperts) {
+    if (norm(e.name) == key) return e;
+  }
+  return null;
+}

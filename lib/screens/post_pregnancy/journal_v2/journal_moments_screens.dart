@@ -225,7 +225,7 @@ class SearchScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      decoration: InputDecoration(border: InputBorder.none, isDense: true, hintText: 'Search memories, stories, letters', hintStyle: ppBody(13, color: ppMuted)),
+                      decoration: InputDecoration(border: InputBorder.none, isDense: true, filled: false, hintText: 'Search memories, stories, letters', hintStyle: ppBody(13, color: ppMuted)),
                       style: ppBody(13, color: ppInk),
                     ),
                   ),

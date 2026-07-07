@@ -12,6 +12,8 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'provider_profile_screen.dart';
 
 class HealthGuideScreen extends StatelessWidget {
   const HealthGuideScreen({super.key});
@@ -228,8 +230,14 @@ class HealthGuideScreen extends StatelessWidget {
   }
 
   Widget _doctor(BuildContext context) {
+    // A real seed paediatrician - tapping opens her reusable profile (never a
+    // dead "coming soon"). Everything shown is drawn from her profile data.
+    final e = expertById('neha');
+    final languages = e.tags.take(2).join(' / ');
+    void openProfile() => Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e)));
     return GestureDetector(
-      onTap: () => _soon(context),
+      onTap: openProfile,
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -245,16 +253,16 @@ class HealthGuideScreen extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Dr. Meera Iyer', style: ppBody(15, color: ppInk, w: FontWeight.w700)),
+              Text(e.name, style: ppBody(15, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 1),
-              Text('Paediatrician · Delhi', style: ppBody(12)),
+              Text(e.credential, style: ppBody(12), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 6),
               Row(children: [
-                Text('★ 4.9', style: ppBody(12, color: ppCoral, w: FontWeight.w700)),
+                Text('★ ${e.rating}', style: ppBody(12, color: ppCoral, w: FontWeight.w700)),
                 const SizedBox(width: 10),
-                Text('Hindi / English', style: ppBody(12, color: ppMuted)),
+                Flexible(child: Text(languages, style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 10),
-                Text('₹599', style: ppBody(12, color: ppInk, w: FontWeight.w600)),
+                Text(e.ctaPrice, style: ppBody(12, color: ppInk, w: FontWeight.w600)),
               ]),
             ]),
           ),

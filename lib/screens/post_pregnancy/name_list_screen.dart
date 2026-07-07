@@ -96,7 +96,7 @@ class _NameListScreenState extends State<NameListScreen> {
             child: TextField(
               onChanged: (v) => setState(() => _q = v),
               style: ppBody(14, color: ppInk),
-              decoration: InputDecoration(isDense: true, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 13), hintText: 'Search names, meanings, origins…', hintStyle: ppBody(14, color: ppMuted)),
+              decoration: InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 13), hintText: 'Search names, meanings, origins…', hintStyle: ppBody(14, color: ppMuted)),
             ),
           ),
         ]),

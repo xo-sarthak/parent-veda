@@ -14,10 +14,12 @@
 import 'package:flutter/material.dart';
 
 import 'article_reader_screen.dart';
+import 'development_area_screen.dart';
 import 'explore_drawer.dart';
 import 'food_home_screen.dart';
 import 'food_recipe_screen.dart';
 import 'growth_activity_screen.dart';
+import 'pp_development_data.dart';
 import 'pp_food_data.dart';
 // The Health quick action now opens the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
@@ -32,6 +34,7 @@ import 'product_detail_screen.dart';
 import 'products_compare_screen.dart';
 import 'snapshot_expanded_screen.dart';
 import 'solve_problem_screen.dart';
+import 'vax_detail_screen.dart';
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
@@ -290,9 +293,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
             _aheadCard('Tomorrow', 'A new sound', Icons.graphic_eq_rounded, () => _push(const GrowthActivityScreen(activity: kActNewSound))),
             const SizedBox(width: 12),
-            _aheadCard('in ~3 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(const WonderWeekScreen())),
+            _aheadCard('in ~6 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(const WonderWeekScreen())),
             const SizedBox(width: 12),
-            _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxTrackerScreen())),
+            _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxDetailScreen(visitId: 'mo6'))),
             const SizedBox(width: 12),
             _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const FoodHomeScreen())),
           ]),
@@ -327,28 +330,36 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair), boxShadow: const [BoxShadow(color: Color(0x146A30B6), blurRadius: 22, spreadRadius: -16, offset: Offset(0, 10))]),
             clipBehavior: Clip.antiAlias,
             child: Column(children: [
-              _domainRow(Icons.psychology_outlined, ppPurple, 'Brain', 'Developing'),
-              _domainRow(Icons.directions_walk_rounded, _greenFg, 'Motor', 'On track'),
-              _domainRow(Icons.chat_bubble_outline_rounded, ppCoral, 'Language', 'Emerging'),
-              _domainRow(Icons.favorite_border, ppPurple, 'Emotional', 'Blossoming', last: true),
+              _domainRow(Icons.psychology_outlined, ppPurple, 'Brain', 'Developing', onTap: () => _push(DevelopmentAreaScreen(area: devAreaById('cognitive')))),
+              _domainRow(Icons.directions_walk_rounded, _greenFg, 'Motor', 'On track', onTap: () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
+              _domainRow(Icons.chat_bubble_outline_rounded, ppCoral, 'Language', 'Emerging', onTap: () => _push(DevelopmentAreaScreen(area: devAreaById('language')))),
+              _domainRow(Icons.favorite_border, ppPurple, 'Emotional', 'Blossoming', last: true, onTap: () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
             ]),
           ),
         )),
       ]);
 
-  Widget _domainRow(IconData icon, Color fg, String label, String status, {bool last = false}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(border: Border(bottom: last ? BorderSide.none : const BorderSide(color: ppHair))),
-        child: Row(children: [
-          Icon(icon, size: 19, color: fg),
-          const SizedBox(width: 14),
-          Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(color: fg.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
-            child: Text(status, style: ppBody(11, color: fg, w: FontWeight.w700)),
-          ),
-        ]),
+  Widget _domainRow(IconData icon, Color fg, String label, String status, {bool last = false, VoidCallback? onTap}) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(border: Border(bottom: last ? BorderSide.none : const BorderSide(color: ppHair))),
+          child: Row(children: [
+            Icon(icon, size: 19, color: fg),
+            const SizedBox(width: 14),
+            Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(color: fg.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
+              child: Text(status, style: ppBody(11, color: fg, w: FontWeight.w700)),
+            ),
+            if (onTap != null) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right_rounded, size: 17, color: ppMuted),
+            ],
+          ]),
+        ),
       );
 
   // ---- today's focus ------------------------------------------------------

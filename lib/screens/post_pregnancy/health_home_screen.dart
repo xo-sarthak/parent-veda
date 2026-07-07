@@ -296,7 +296,7 @@ class HealthHomeScreen extends StatelessWidget {
             onTap: () => openPpTab(context, 1),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [
-              Flexible(child: Text('Ask Veda about his health', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              Flexible(child: Text('Explore this with AskVeda', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
               const SizedBox(width: 6),
               const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
             ]),

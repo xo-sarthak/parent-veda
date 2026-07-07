@@ -200,6 +200,7 @@ class QuickCaptureScreen extends StatelessWidget {
                 style: ppFraunces(22, h: 1.2),
                 decoration: InputDecoration(
                   border: InputBorder.none,
+                  filled: false,
                   hintText: prompt ?? "What's happening today?",
                   hintStyle: ppFraunces(22, color: ppMuted, h: 1.2),
                 ),
@@ -258,13 +259,13 @@ class WriteStoryScreen extends StatelessWidget {
               children: [
                 TextField(
                   style: ppFraunces(28, h: 1.15),
-                  decoration: InputDecoration(border: InputBorder.none, hintText: 'Add a title', hintStyle: ppFraunces(28, color: ppMuted, h: 1.15)),
+                  decoration: InputDecoration(border: InputBorder.none, filled: false, hintText: 'Add a title', hintStyle: ppFraunces(28, color: ppMuted, h: 1.15)),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   maxLines: null,
                   style: ppBody(15, color: ppInk, h: 1.7),
-                  decoration: InputDecoration(border: InputBorder.none, hintText: 'Today was so special…', hintStyle: ppBody(15, color: ppMuted, h: 1.7)),
+                  decoration: InputDecoration(border: InputBorder.none, filled: false, hintText: 'Today was so special…', hintStyle: ppBody(15, color: ppMuted, h: 1.7)),
                 ),
               ],
             ),
@@ -311,6 +312,7 @@ class LetterScreen extends StatelessWidget {
                   style: ppFraunces(16, color: ppInk, h: 1.9).copyWith(fontStyle: FontStyle.italic),
                   decoration: InputDecoration(
                     border: InputBorder.none,
+                    filled: false,
                     hintText: 'Dear $jvChild,\n\nOne day, when you read this…',
                     hintStyle: ppFraunces(16, color: ppMuted, h: 1.9).copyWith(fontStyle: FontStyle.italic),
                   ),

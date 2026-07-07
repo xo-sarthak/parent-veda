@@ -25,6 +25,7 @@ import 'package:parentveda/screens/post_pregnancy/development_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_map_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_development_data.dart';
 import 'package:parentveda/screens/post_pregnancy/course_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/course_lesson_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_courses_data.dart';
 import 'package:parentveda/screens/post_pregnancy/explore_drawer.dart';
@@ -47,6 +48,7 @@ import 'package:parentveda/screens/post_pregnancy/health_guide_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_records_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_timeline_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_health_data.dart';
 import 'package:parentveda/screens/post_pregnancy/investments_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_capture_screens.dart';
@@ -161,6 +163,7 @@ void main() {
     'Courses': const CoursesScreen(),
     'Course detail (Play & Brain)': CourseDetailScreen(course: courseById('playbrain')),
     'Course detail (Sleep Bootcamp)': CourseDetailScreen(course: courseById('sleep')),
+    'Course lesson (Sleep · Module 2)': CourseLessonScreen(course: courseById('sleep'), index: 1),
     'Recommendations': const RecommendationsScreen(),
     'Book detail': const BookDetailScreen(),
     'Problem Solver': const ProblemSolverScreen(),
@@ -188,6 +191,7 @@ void main() {
     'Vax detail (MMR)': const VaxDetailScreen(visitId: 'mo9'),
     'Health records (medications)': const HealthRecordsScreen(category: 'medications'),
     'Health records (allergies)': const HealthRecordsScreen(category: 'allergies'),
+    'Health records (visits)': const HealthRecordsScreen(category: 'visits'),
     'Name finder quiz': const NameFinderScreen(),
     'Name swipe deck': const NameSwipeScreen(),
     'Name detail': const NameDetailScreen(),
@@ -510,6 +514,25 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // Health: doctor visits are no longer read-only - a parent can add one, and it
+  // shows in the list (the "Add a visit" affordance now exists for visits).
+  testWidgets('Health: a parent-added doctor visit shows in the visits list', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    HealthStore.instance.addVisit(const HealthEvent(
+      id: 't_visit', type: HealthEventType.doctorVisit, date: '7 Jul 2026',
+      title: 'Six-month check', summary: 'All well.', sortKey: 1000));
+    addTearDown(() => HealthStore.instance.removeVisit(0));
+
+    await tester.pumpWidget(const MaterialApp(home: HealthRecordsScreen(category: 'visits')));
+    await tester.pump();
+
+    expect(find.text('Add a visit'), findsOneWidget); // the add affordance exists
+    expect(find.text('Six-month check'), findsOneWidget); // the added visit renders
+  });
+
   // Learn: the reading filters narrow the library to a single kind.
   testWidgets('Learn: the Book Summaries filter narrows the list', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
@@ -629,6 +652,29 @@ void main() {
     expect(find.byType(CourseDetailScreen), findsOneWidget);
     expect(find.text('Play & Brain'), findsWidgets);
     expect(find.text('Start here'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // A lesson opens its own module page INSIDE the right course (marked as a
+  // preview) - never the flagship "Complete Parenting Guide" funnel.
+  testWidgets('Course lesson opens inside the right course, not the flagship funnel', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(MaterialApp(home: CourseDetailScreen(course: courseById('sleep'))));
+    await tester.pumpAndSettle();
+
+    final lesson = find.text('Module 2 · The 4-month regression');
+    await tester.scrollUntilVisible(lesson, 200, scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+    await tester.ensureVisible(lesson);
+    await tester.pumpAndSettle();
+    await tester.tap(lesson);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CourseLessonScreen), findsOneWidget);
+    expect(find.text('Preview lesson'), findsOneWidget); // honest in-review marker
+    expect(find.text('The Complete Parenting Guide'), findsNothing); // not the flagship
     expect(tester.takeException(), isNull);
   });
 

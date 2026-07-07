@@ -1,5 +1,6 @@
-// Functional test for the revised Products flow: the Compare selection store
-// caps at two, and the subcategory brand filter actually filters the grid.
+// Functional test for the revised Products flow: the Compare Manager caps at
+// three same-category products (and blocks a fourth / a cross-category pick),
+// and the subcategory brand filter actually filters the grid.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,30 +20,52 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('Compare selection ticks products and caps at two', (tester) async {
-    await pumpPhone(tester, const ProductsSubcategoryScreen()); // Sleep · Soothers (4 items)
+  testWidgets('Compare ticks products and caps at three', (tester) async {
+    await pumpPhone(tester, const ProductsSubcategoryScreen()); // Sleep · Soothers (4 items, same category)
 
-    final compareLabels = find.text('Compare');
-    expect(compareLabels, findsWidgets);
+    // Tick three. Each ticked card relabels to "Added", so always tap the first
+    // remaining "Compare" chip.
+    for (var i = 0; i < 3; i++) {
+      final labels = find.text('Compare');
+      await tester.ensureVisible(labels.at(0));
+      await tester.pump();
+      await tester.tap(labels.at(0));
+      await tester.pump();
+    }
+    expect(PpCompareStore.instance.count, 3);
 
-    await tester.ensureVisible(compareLabels.at(0));
-    await tester.pump();
-    await tester.tap(compareLabels.at(0));
-    await tester.pump();
-    expect(PpCompareStore.instance.count, 1);
+    // One card is still un-ticked - the list is full. (That a fourth tap is
+    // refused is covered by the store unit test below.)
+    expect(find.text('Compare'), findsOneWidget);
+  });
 
-    await tester.ensureVisible(compareLabels.at(1));
-    await tester.pump();
-    await tester.tap(compareLabels.at(1));
-    await tester.pump();
-    expect(PpCompareStore.instance.count, 2);
+  test('Compare Manager enforces same-category and a max of three', () {
+    final store = PpCompareStore.instance..clear();
 
-    // ticking a third drops the oldest - still two
-    await tester.ensureVisible(compareLabels.at(2));
-    await tester.pump();
-    await tester.tap(compareLabels.at(2));
-    await tester.pump();
-    expect(PpCompareStore.instance.count, 2);
+    expect(store.toggle(productById('dozy')), PpCompareResult.added); // Sleep
+    expect(store.toggle(productById('lull')), PpCompareResult.added); // Sleep
+    expect(store.category, 'Sleep');
+
+    // a different category is refused (not silently added)
+    expect(store.toggle(productById('lotion')), PpCompareResult.wrongCategory); // Skincare
+    expect(store.count, 2);
+
+    expect(store.toggle(productById('hush')), PpCompareResult.added); // 3rd Sleep
+    expect(store.isFull, true);
+
+    // a fourth (even same-category) is refused
+    expect(store.toggle(productById('cloudtunes')), PpCompareResult.full);
+    expect(store.count, 3);
+
+    // suggestions are same-category and exclude what's already picked
+    store
+      ..clear()
+      ..toggle(productById('dozy'));
+    final sug = store.suggestions();
+    expect(sug.every((p) => p.category == 'Sleep'), true);
+    expect(sug.any((p) => p.id == 'dozy'), false);
+
+    store.clear();
   });
 
   testWidgets('Brand filter narrows the grid', (tester) async {

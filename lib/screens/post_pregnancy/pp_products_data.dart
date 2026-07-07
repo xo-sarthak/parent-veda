@@ -514,30 +514,105 @@ const Map<String, CompareGuide> kCompareGuides = {
 CompareGuide compareGuideFor(String category) => kCompareGuides[category] ?? kCompareGuides['Sleep']!;
 
 // =============================================================================
-//  Compare selection store - pick up to two, drives the floating Compare button
-//  and the Compare screen. Plain ChangeNotifier singleton (no Provider).
+//  Compare Manager - the dynamic comparison engine for the Products ecosystem.
+// -----------------------------------------------------------------------------
+//  One source of truth for "what the parent is comparing right now". Every
+//  product surface (grid cards, the detail page, recommendations) adds and
+//  removes through here; the floating Compare bar and the Compare screen are
+//  pure presentation on top - they hold NO product state of their own. Rules:
+//  2-3 products, all of the SAME category (a lotion can't sit next to a
+//  stroller). The selection lives for the app session, so nothing is lost when
+//  the parent navigates away and comes back. Plain ChangeNotifier singleton.
 // =============================================================================
+
+/// The outcome of trying to add/toggle a product - lets each surface show the
+/// right friendly message instead of silently dropping a tap.
+enum PpCompareResult { added, removed, full, wrongCategory }
+
 class PpCompareStore extends ChangeNotifier {
   PpCompareStore._();
   static final PpCompareStore instance = PpCompareStore._();
 
+  /// A comparison holds at most this many products (minimum 2 to compare).
+  static const int maxItems = 3;
+
   final List<PpProduct> _selected = [];
   List<PpProduct> get selected => List.unmodifiable(_selected);
   int get count => _selected.length;
-  bool get ready => _selected.length == 2;
+
+  /// Enough picked to render a side-by-side comparison.
+  bool get ready => _selected.length >= 2;
+  bool get isFull => _selected.length >= maxItems;
+
+  /// The category every selected product shares (null when nothing is picked).
+  String? get category => _selected.isEmpty ? null : _selected.first.category;
 
   bool isSelected(PpProduct p) => _selected.any((x) => x.id == p.id);
 
-  /// Toggle a product. Caps at two - adding a third drops the oldest.
-  void toggle(PpProduct p) {
+  /// Whether [p] could be added right now - not full, and the same category as
+  /// the running selection. Surfaces call this to pre-check the category rule.
+  bool canAdd(PpProduct p) {
+    if (isSelected(p)) return true; // toggling one back off is always allowed
+    if (isFull) return false;
+    return _selected.isEmpty || _selected.first.category == p.category;
+  }
+
+  /// Toggle a product in/out of the comparison, honouring the rules. Returns
+  /// what happened so the caller can surface the right message.
+  PpCompareResult toggle(PpProduct p) {
     final i = _selected.indexWhere((x) => x.id == p.id);
     if (i >= 0) {
       _selected.removeAt(i);
-    } else {
-      if (_selected.length >= 2) _selected.removeAt(0);
-      _selected.add(p);
+      notifyListeners();
+      return PpCompareResult.removed;
     }
+    if (isFull) return PpCompareResult.full;
+    if (_selected.isNotEmpty && _selected.first.category != p.category) {
+      return PpCompareResult.wrongCategory;
+    }
+    _selected.add(p);
     notifyListeners();
+    return PpCompareResult.added;
+  }
+
+  /// Remove one product from the comparison.
+  void remove(PpProduct p) {
+    final i = _selected.indexWhere((x) => x.id == p.id);
+    if (i < 0) return;
+    _selected.removeAt(i);
+    notifyListeners();
+  }
+
+  /// Swap [oldP] for [newP] in place (used by "Replace" in the Compare screen).
+  /// [newP] must share the category with any remaining picks; else it's a no-op.
+  void replace(PpProduct oldP, PpProduct newP) {
+    final i = _selected.indexWhere((x) => x.id == oldP.id);
+    if (i < 0 || isSelected(newP)) return;
+    if (_selected.length > 1) {
+      final otherCat = _selected.firstWhere((x) => x.id != oldP.id).category;
+      if (otherCat != newP.category) return;
+    }
+    _selected[i] = newP;
+    notifyListeners();
+  }
+
+  /// Start a fresh comparison anchored on [p] (clearing any other-category
+  /// selection first). Used when "Compare" is tapped from a product whose
+  /// category differs from the current list.
+  void startWith(PpProduct p) {
+    _selected
+      ..clear()
+      ..add(p);
+    notifyListeners();
+  }
+
+  /// Other products in the same category that aren't picked yet - the pool for
+  /// "Add another" and smart suggestions. Empty until something is selected.
+  List<PpProduct> suggestions() {
+    if (_selected.isEmpty) return const [];
+    final cat = _selected.first.category;
+    return kPpProducts.where((p) => p.category == cat && !isSelected(p)).toList()
+      ..sort((a, b) => b.rating.compareTo(a.rating));
   }
 
   void clear() {

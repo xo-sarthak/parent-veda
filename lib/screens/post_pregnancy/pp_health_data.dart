@@ -284,6 +284,9 @@ class HealthStore extends ChangeNotifier {
   final List<Allergy> _allergies = [...kAllergies];
   final List<SymptomEntry> _symptoms = [...kSymptoms];
   final List<MedicalReport> _reports = [...kReports];
+  // Parent-added doctor visits. The seeded visits still come from the health
+  // timeline (read-only); these are ones the parent records themselves.
+  final List<HealthEvent> _visits = [];
 
   // ---- doctor-visit questions ----
   List<String> get questions => List.unmodifiable(_questions);
@@ -375,6 +378,27 @@ class HealthStore extends ChangeNotifier {
   void removeReport(int i) {
     if (i >= 0 && i < _reports.length) {
       _reports.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- doctor visits (parent-added; the seeded ones stay in the timeline) ----
+  List<HealthEvent> get visits => List.unmodifiable(_visits);
+  void addVisit(HealthEvent v) {
+    _visits.insert(0, v);
+    notifyListeners();
+  }
+
+  void updateVisit(int i, HealthEvent v) {
+    if (i >= 0 && i < _visits.length) {
+      _visits[i] = v;
+      notifyListeners();
+    }
+  }
+
+  void removeVisit(int i) {
+    if (i >= 0 && i < _visits.length) {
+      _visits.removeAt(i);
       notifyListeners();
     }
   }

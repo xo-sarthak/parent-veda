@@ -182,7 +182,7 @@ class _HardcoverCustomizationScreenState extends State<HardcoverCustomizationScr
             child: TextField(
               controller: controller,
               style: ppBody(14, color: ppInk),
-              decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+              decoration: const InputDecoration(border: InputBorder.none, isDense: true, filled: false),
             ),
           ),
         ]),

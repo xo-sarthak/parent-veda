@@ -34,9 +34,14 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
   void initState() {
     super.initState();
     // Register the video as being watched (continue-watching + recent), without
-    // clobbering real progress if the parent resumed partway.
-    final store = WatchStore.instance;
-    if (store.progressOf(v.id) < 0.02) store.setProgress(v.id, 0.06);
+    // clobbering real progress if the parent resumed partway. Deferred to after
+    // the first frame: setProgress() notifies WatchStore, and doing that during
+    // initState/build would rebuild the store's listeners mid-build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final store = WatchStore.instance;
+      if (store.progressOf(v.id) < 0.02) store.setProgress(v.id, 0.06);
+    });
   }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 22), child: c);

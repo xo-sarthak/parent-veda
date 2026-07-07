@@ -3,13 +3,14 @@
 // -----------------------------------------------------------------------------
 //  The real destination for a "Go deeper · Course" row: what the course is, who
 //  vetted it, its lessons (with the referenced one marked "Start here"), and a
-//  preview CTA. Reached from the Go-Deeper rows and the Courses screen. Lesson
-//  playback previews through the existing course funnel (video engine is future).
+//  preview CTA. Reached from the Go-Deeper rows and the Courses screen. Tapping a
+//  lesson (or Preview) opens that module's own CourseLessonScreen inside THIS
+//  course - never the flagship funnel (video engine is future).
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-import 'course_funnel_screen.dart';
+import 'course_lesson_screen.dart';
 import 'pp_common.dart';
 import 'pp_courses_data.dart';
 
@@ -19,7 +20,10 @@ class CourseDetailScreen extends StatelessWidget {
   final String? highlight; // the Go-Deeper text, to mark a "start here" lesson
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _preview(BuildContext context) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CourseFunnelScreen()));
+
+  // Open a lesson (module) inside THIS course - never the flagship funnel.
+  void _openLesson(BuildContext context, int i) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => CourseLessonScreen(course: course, index: i)));
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,8 @@ class CourseDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 18),
             _pad(GestureDetector(
-              onTap: () => _preview(context),
+              // preview = start on the referenced lesson (else the first one)
+              onTap: () => _openLesson(context, startAt >= 0 ? startAt : 0),
               behavior: HitTestBehavior.opaque,
               child: Container(
                 height: 54,
@@ -133,7 +138,7 @@ class CourseDetailScreen extends StatelessWidget {
 
   Widget _lessonRow(BuildContext context, CourseLesson l, int i, {bool first = false, bool startHere = false, required Color accent}) {
     return GestureDetector(
-      onTap: () => _preview(context),
+      onTap: () => _openLesson(context, i),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),

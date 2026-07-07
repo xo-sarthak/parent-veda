@@ -12,6 +12,10 @@ import 'package:flutter/material.dart';
 
 import 'pp_articles_data.dart';
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'pp_products_data.dart';
+import 'product_detail_screen.dart';
+import 'provider_profile_screen.dart';
 
 class ArticleReaderScreen extends StatelessWidget {
   const ArticleReaderScreen({super.key, this.article});
@@ -30,10 +34,15 @@ class ArticleReaderScreen extends StatelessWidget {
   void _open(BuildContext context, Article a) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ArticleReaderScreen(article: a)));
 
+  // Open the author's reusable Expert profile (when we have a seed for them).
+  void _openAuthor(BuildContext context, Expert e) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e)));
+
   @override
   Widget build(BuildContext context) {
     final a = article ?? kArticles.firstWhere((e) => e.id == 'sleepcycles');
     final related = kArticles.where((x) => x.category == a.category && x.id != a.id).take(2).toList();
+    final expert = expertByName(a.author); // null when we have no seed profile
 
     return Scaffold(
       backgroundColor: ppBg,
@@ -72,16 +81,30 @@ class ArticleReaderScreen extends StatelessWidget {
             const SizedBox(height: 14),
             _pad(Text(a.title, style: ppFraunces(31, h: 1.18))),
 
-            // byline
+            // byline (tap the author to open their profile)
             const SizedBox(height: 18),
             _pad(Row(children: [
-              _avatar(38),
-              const SizedBox(width: 11),
               Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(a.author, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
-                  Text('${a.authorRole} · ${a.readMin} min read', style: ppBody(12, color: ppMuted)),
-                ]),
+                child: GestureDetector(
+                  onTap: expert == null ? null : () => _openAuthor(context, expert),
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(children: [
+                    _avatar(38),
+                    const SizedBox(width: 11),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                        Row(children: [
+                          Flexible(child: Text(a.author, style: ppBody(13, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          if (expert != null) ...[
+                            const SizedBox(width: 5),
+                            const Icon(Icons.chevron_right_rounded, size: 15, color: ppPurple),
+                          ],
+                        ]),
+                        Text('${a.authorRole} · ${a.readMin} min read', style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ]),
+                    ),
+                  ]),
+                ),
               ),
               const SizedBox(width: 10),
               Container(
@@ -102,21 +125,33 @@ class ArticleReaderScreen extends StatelessWidget {
 
             _div(),
 
-            // author card
-            _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _avatar(48),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(a.author, style: ppJakarta(14)),
-                  const SizedBox(height: 1),
-                  Text('${a.authorRole} · 15 years', style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
-                  const SizedBox(height: 6),
-                  Text("Writes ParentVeda's sleep and development library. Reviewed by our medical panel.",
-                      style: ppBody(13, h: 1.55)),
-                ]),
-              ),
-            ])),
+            // author card (opens the author's profile)
+            _pad(GestureDetector(
+              onTap: expert == null ? null : () => _openAuthor(context, expert),
+              behavior: HitTestBehavior.opaque,
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                _avatar(48),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(a.author, style: ppJakarta(14)),
+                    const SizedBox(height: 1),
+                    Text('${a.authorRole} · 15 years', style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
+                    const SizedBox(height: 6),
+                    Text("Writes ParentVeda's sleep and development library. Reviewed by our medical panel.",
+                        style: ppBody(13, h: 1.55)),
+                    if (expert != null) ...[
+                      const SizedBox(height: 8),
+                      Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text('View profile', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+                        const SizedBox(width: 3),
+                        const Icon(Icons.arrow_forward_rounded, size: 14, color: ppPurple),
+                      ]),
+                    ],
+                  ]),
+                ),
+              ]),
+            )),
 
             _div(),
 
@@ -126,10 +161,12 @@ class ArticleReaderScreen extends StatelessWidget {
             for (int i = 0; i < related.length; i++)
               _pad(_keepRow(context, related[i], top: true, bottom: i == related.length - 1)),
 
-            // related product
+            // related product - a typed cross-link that opens the actual product
             const SizedBox(height: 14),
             _pad(GestureDetector(
-              onTap: () => _soon(context),
+              onTap: () => Navigator.of(context)
+                  .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: productById('dozy')))),
+              behavior: HitTestBehavior.opaque,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
@@ -137,10 +174,14 @@ class ArticleReaderScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                    child: Text('Related', style: ppBody(10, color: ppPurple, w: FontWeight.w700)),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.shopping_bag_outlined, size: 11, color: ppPurple),
+                      const SizedBox(width: 4),
+                      Text('Product', style: ppBody(10, color: ppPurple, w: FontWeight.w700)),
+                    ]),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: Text('White-noise soothers for lighter sleep', style: ppBody(14, color: ppInk, h: 1.4))),
+                  Expanded(child: Text('Dozy White-Noise Soother - for lighter sleep', style: ppBody(14, color: ppInk, h: 1.4))),
                   const SizedBox(width: 8),
                   const Text('→', style: TextStyle(color: ppMuted)),
                 ]),

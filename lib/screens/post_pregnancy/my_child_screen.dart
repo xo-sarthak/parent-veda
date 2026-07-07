@@ -28,8 +28,8 @@ import 'growth_activity_screen.dart';
 // HealthGuideScreen import is kept (commented) for easy revert.
 // import 'health_guide_screen.dart';
 import 'health_growth_screen.dart';
-import 'health_home_screen.dart';
 import 'health_records_screen.dart';
+import 'health_timeline_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'journal_v2/journal_storybook_screens.dart';
 import 'multichild_sheet.dart';
@@ -442,12 +442,12 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
             _healthRow(Icons.vaccines_outlined, 'Vaccinations', 'Up to date · next PCV due 22 Jul', () => _push(const VaxTrackerScreen())),
-            // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
-            _healthRow(Icons.medical_services_outlined, 'Last doctor visit', '12 Jun · routine check, all well', () => _push(const HealthHomeScreen())),
+            // Land on the doctor-visits record directly (not the health home).
+            _healthRow(Icons.medical_services_outlined, 'Last doctor visit', '12 Jun · routine check, all well', () => _push(const HealthRecordsScreen(category: 'visits'))),
             _healthRow(Icons.shield_outlined, 'Allergies', 'None recorded yet', () => _push(const HealthRecordsScreen(category: 'allergies')), muted: true),
             _healthRow(Icons.medication_outlined, 'Medications', 'None right now', () => _push(const HealthRecordsScreen(category: 'medications')), muted: true),
-            // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
-            _healthRow(Icons.timeline_rounded, 'Health timeline', 'Growth, visits & vaccines in one place', () => _push(const HealthHomeScreen()), last: true),
+            // Open the full health timeline directly (not the home, then a tap in).
+            _healthRow(Icons.timeline_rounded, 'Health timeline', 'Growth, visits & vaccines in one place', () => _push(const HealthTimelineScreen()), last: true),
           ]),
         )),
       ]);

@@ -3,10 +3,10 @@
 // -----------------------------------------------------------------------------
 //  Renders a single category - Doctor visits / Medications / Reports / Symptoms /
 //  Allergies - as clean cards with search and thoughtful empty states, backed by
-//  the mutable HealthStore. Medications, allergies and symptoms can be added,
-//  edited and deleted; reports can be added and deleted. Every section that shows
-//  information also offers an obvious way to add to it. Doctor visits are drawn
-//  from the health timeline and stay read-only here.
+//  the mutable HealthStore. Every section offers an obvious way to add to it, and
+//  editable cards carry a visible "Edit". Visits, medications, allergies and
+//  symptoms can be added, edited and deleted; reports can be added and deleted.
+//  Seeded visits from the health timeline still show here, tagged read-only.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -76,6 +76,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   }
 
   String? get _addLabel => switch (widget.category) {
+        'visits' => 'Add a visit',
         'medications' => 'Add medication',
         'reports' => 'Add a report',
         'symptoms' => 'Log a symptom',
@@ -85,6 +86,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
   void _onAdd() {
     switch (widget.category) {
+      case 'visits':
+        _visitSheet();
       case 'medications':
         _medSheet();
       case 'reports':
@@ -106,7 +109,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             child: TextField(
               onChanged: (v) => setState(() => _q = v),
               style: ppBody(14, color: ppInk),
-              decoration: InputDecoration(isDense: true, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 13), hintText: 'Search ${_title.toLowerCase()}…', hintStyle: ppBody(14, color: ppMuted)),
+              decoration: InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 13), hintText: 'Search ${_title.toLowerCase()}…', hintStyle: ppBody(14, color: ppMuted)),
             ),
           ),
         ]),
@@ -155,8 +158,16 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         return _allergies();
       case 'visits':
       default:
-        final visits = kHealthTimeline.where((e) => e.type == HealthEventType.doctorVisit || e.type == HealthEventType.growthCheck).toList()..sort((a, b) => b.sortKey.compareTo(a.sortKey));
-        return _list([for (final e in visits) if (_match('${e.title} ${e.summary} ${e.doctor ?? ''}')) _visitCard(e)], 'No visits recorded.');
+        final added = _store.visits; // parent-added, editable
+        final timeline = kHealthTimeline.where((e) => e.type == HealthEventType.doctorVisit || e.type == HealthEventType.growthCheck).toList()
+          ..sort((a, b) => b.sortKey.compareTo(a.sortKey)); // seeded, read-only
+        final cards = <Widget>[
+          for (int i = 0; i < added.length; i++)
+            if (_match('${added[i].title} ${added[i].summary} ${added[i].doctor ?? ''}')) _visitCard(added[i], index: i),
+          for (final e in timeline)
+            if (_match('${e.title} ${e.summary} ${e.doctor ?? ''}')) _visitCard(e),
+        ];
+        return _list(cards, 'No visits recorded yet.');
     }
   }
 
@@ -193,7 +204,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               child: Text(m.completed ? 'Completed' : 'Ongoing', style: ppBody(10.5, color: m.completed ? ppSoft : ppPurple, w: FontWeight.w700)),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+            _editHint(),
           ]),
           const SizedBox(height: 6),
           Text(m.reason, style: ppBody(13, h: 1.4)),
@@ -204,12 +215,29 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ]),
       );
 
-  Widget _visitCard(HealthEvent e) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text(e.title, style: ppJakarta(14.5))), Text(e.date, style: ppBody(11, color: ppMuted))]),
-        const SizedBox(height: 6),
-        Text(e.summary, style: ppBody(13, h: 1.5)),
-        if (e.doctor != null) ...[const SizedBox(height: 8), Text(e.doctor!, style: ppBody(11.5, color: ppMuted))],
-      ]));
+  // Parent-added visits (index != null) are editable; seeded timeline visits are
+  // read-only and carry a small "From the timeline" tag so the difference is clear.
+  Widget _visitCard(HealthEvent e, {int? index}) => _card(
+        onTap: index == null ? null : () => _visitSheet(existing: e, index: index),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(e.title, style: ppJakarta(14.5))),
+            const SizedBox(width: 8),
+            Text(e.date, style: ppBody(11, color: ppMuted)),
+          ]),
+          const SizedBox(height: 6),
+          Text(e.summary, style: ppBody(13, h: 1.5)),
+          if (e.doctor != null) ...[const SizedBox(height: 8), Text(e.doctor!, style: ppBody(11.5, color: ppMuted))],
+          const SizedBox(height: 8),
+          index == null
+              ? Row(children: [
+                  const Icon(Icons.lock_outline_rounded, size: 12, color: ppMuted),
+                  const SizedBox(width: 5),
+                  Text('From the timeline', style: ppBody(10.5, color: ppMuted, w: FontWeight.w600)),
+                ])
+              : _editHint(),
+        ]),
+      );
 
   Widget _symptomCard(SymptomEntry s, int i) => _card(
         onTap: () => _symptomSheet(existing: s, index: i),
@@ -217,6 +245,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           Row(children: [Expanded(child: Text(s.name, style: ppJakarta(14.5))), Text(s.date, style: ppBody(11, color: ppMuted))]),
           const SizedBox(height: 5),
           Text(s.note, style: ppBody(13, h: 1.4)),
+          const SizedBox(height: 8),
+          _editHint(),
         ]),
       );
 
@@ -299,7 +329,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               child: Text(_allergyStatusLabel(a.status), style: ppBody(10.5, color: ppPurple, w: FontWeight.w700)),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+            _editHint(),
           ]),
           if (a.severity.isNotEmpty || a.note.isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -385,6 +415,37 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         if (name.text.trim().isEmpty) return false;
         final s = SymptomEntry(name.text.trim(), existing?.date ?? _today(), note.text.trim());
         index == null ? _store.addSymptom(s) : _store.updateSymptom(index, s);
+        return true;
+      },
+    );
+  }
+
+  void _visitSheet({HealthEvent? existing, int? index}) {
+    final title = TextEditingController(text: existing?.title ?? '');
+    final date = TextEditingController(text: existing?.date ?? _today());
+    final doctor = TextEditingController(text: existing?.doctor ?? '');
+    final summary = TextEditingController(text: existing?.summary ?? '');
+    _sheet(
+      title: existing == null ? 'Add a visit' : 'Edit visit',
+      onDelete: index == null ? null : () => _store.removeVisit(index),
+      fields: (setSheet) => [
+        _tf(title, 'Visit (e.g. 6-month check, fever review)'),
+        _tf(date, 'Date'),
+        _tf(doctor, 'Doctor / clinic'),
+        _tf(summary, 'What happened / advice', maxLines: 4),
+      ],
+      onSave: () {
+        if (title.text.trim().isEmpty) return false;
+        final v = HealthEvent(
+          id: existing?.id ?? 'v_added_${DateTime.now().microsecondsSinceEpoch}',
+          type: HealthEventType.doctorVisit,
+          date: date.text.trim().isEmpty ? _today() : date.text.trim(),
+          title: title.text.trim(),
+          summary: summary.text.trim(),
+          doctor: doctor.text.trim().isEmpty ? null : doctor.text.trim(),
+          sortKey: 1000, // parent-added visits sort to the top of the list
+        );
+        index == null ? _store.addVisit(v) : _store.updateVisit(index, v);
         return true;
       },
     );
@@ -518,6 +579,13 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         child: Text(t, style: ppBody(12, color: ppSoft, w: FontWeight.w700)),
       );
 
+  // A visible "Edit" affordance on editable cards, so tapping to edit is obvious.
+  Widget _editHint() => Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.edit_outlined, size: 13, color: ppPurple),
+        const SizedBox(width: 4),
+        Text('Edit', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
+      ]);
+
   Widget _tf(TextEditingController c, String label, {int maxLines = 1}) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -529,7 +597,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               controller: c,
               maxLines: maxLines,
               style: ppBody(14, color: ppInk),
-              decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
+              decoration: const InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
             ),
           ),
         ]),

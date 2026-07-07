@@ -1,13 +1,16 @@
 // =============================================================================
 //  ProductsCompareScreen - Products · compare (parenting · S3·compare v2 premium)
 // -----------------------------------------------------------------------------
-//  Compare as a first-class tool, fully DYNAMIC and fully DIFFERENTIATED: it
-//  reads the two products picked in the Products flow (PpCompareStore) - or a
-//  sensible default pair when opened cold from the Tools hub - and renders every
-//  section per-product. Ratings sit up top in each overview; the spec sheet is
-//  built from each product's own specs; and "The ParentVeda take" is one card
-//  PER product with that product's own what's-right / worth-knowing. No generic
-//  shared copy anywhere. Reached from the Products flow and the Tools hub.
+//  Compare as a first-class TOOL, and now a pure PRESENTATION layer over the
+//  Compare Manager (PpCompareStore). It holds no products of its own - it builds
+//  itself from whatever the parent has picked while browsing:
+//    · 0 picked  → an elegant empty state that sends them to browse Products
+//    · 1 picked  → the current product + smart same-category suggestions
+//    · 2-3       → a full, per-product differentiated side-by-side
+//  Everything is dynamic: add, remove, replace or clear and the screen refreshes
+//  instantly (it listens to the store). Every section is per-product - ratings
+//  up top, a spec sheet built from each product's own specs, and "The ParentVeda
+//  take" one card PER product. No hardcoded pair, no generic shared copy.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -28,17 +31,366 @@ class ProductsCompareScreen extends StatelessWidget {
         const SnackBar(content: Text('Opening the store soon'), behavior: SnackBarBehavior.floating),
       );
 
-  // The pair to compare: the live selection when two are picked, else a default.
-  List<PpProduct> _pair() {
-    final sel = PpCompareStore.instance.selected;
-    if (sel.length == 2) return sel;
-    return [productById('dozy'), productById('lull')];
+  @override
+  Widget build(BuildContext context) {
+    // The screen is a live view of the Compare Manager - any add/remove/replace
+    // refreshes it in place.
+    return AnimatedBuilder(
+      animation: PpCompareStore.instance,
+      builder: (context, _) {
+        final sel = PpCompareStore.instance.selected;
+        if (sel.isEmpty) return _emptyScaffold(context);
+        if (sel.length == 1) return _oneScaffold(context, sel.first);
+        return _comparisonScaffold(context, sel);
+      },
+    );
   }
+
+  // ---- back row (shared) --------------------------------------------------
+  Widget _backRow(BuildContext context, String eyebrow, {bool showClear = false}) => _pad(Row(children: [
+        GestureDetector(
+          onTap: () => Navigator.of(context).maybePop(),
+          child: Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+            child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: ppEyebrow(eyebrow, color: ppMuted, spacing: 1.2)),
+        if (showClear)
+          GestureDetector(
+            onTap: () => PpCompareStore.instance.clear(),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Text('Clear', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+            ),
+          ),
+      ]));
+
+  // =========================================================================
+  //  0 PRODUCTS - empty state (no placeholder products)
+  // =========================================================================
+  Widget _emptyScaffold(BuildContext context) => Scaffold(
+        backgroundColor: ppBg,
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            children: [
+              _backRow(context, 'Compare'),
+              const SizedBox(height: 60),
+              Center(
+                child: Container(
+                  width: 96,
+                  height: 96,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+                  child: const Icon(Icons.compare_arrows_rounded, size: 42, color: ppPurple),
+                ),
+              ),
+              const SizedBox(height: 26),
+              _pad(Text('No products selected yet.', textAlign: TextAlign.center, style: ppFraunces(25, h: 1.15))),
+              const SizedBox(height: 12),
+              _pad(Text(
+                  'Add products while browsing ParentVeda to compare them side by side - tap "Compare" on any product card, or "Add to Compare" on a product page.',
+                  textAlign: TextAlign.center,
+                  style: ppBody(14, color: ppSoft, h: 1.6))),
+              const SizedBox(height: 28),
+              _pad(GestureDetector(
+                onTap: () => openPpTab(context, 4),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 52,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
+                  child: Text('Browse Products', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                ),
+              )),
+              const SizedBox(height: 22),
+              _pad(Text('Only products in the same category can be compared, so every comparison stays meaningful.',
+                  textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+            ],
+          ),
+        ),
+      );
+
+  // =========================================================================
+  //  1 PRODUCT - current pick + smart same-category suggestions
+  // =========================================================================
+  Widget _oneScaffold(BuildContext context, PpProduct p) {
+    final suggestions = PpCompareStore.instance.suggestions();
+    return Scaffold(
+      backgroundColor: ppBg,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          children: [
+            _backRow(context, 'Compare · ${p.category}', showClear: true),
+            const SizedBox(height: 20),
+            _pad(Text('Add one more to compare.', style: ppFraunces(29, h: 1.14))),
+            const SizedBox(height: 10),
+            _pad(Text('You have one ${p.category.toLowerCase()} product picked. Add another (up to three) to see them side by side.',
+                style: ppBody(14, color: ppSoft, h: 1.55))),
+
+            // the current pick
+            const SizedBox(height: 22),
+            _pad(ppEyebrow('Your pick', color: ppMuted, spacing: 0.8)),
+            const SizedBox(height: 10),
+            _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: _overview(context, p)),
+              const SizedBox(width: 12),
+              Expanded(child: _addSlot(context)),
+            ])),
+
+            // education carries over so the wait is useful
+            const SizedBox(height: 22),
+            _pad(_beforeYouCompare(p)),
+
+            // smart suggestions - same category, tap to add
+            if (suggestions.isNotEmpty) ...[
+              const SizedBox(height: 26),
+              _pad(Text('Compare with similar ${_categoryNoun(p.category)}', style: ppJakarta(16))),
+              const SizedBox(height: 4),
+              _pad(Text('Same category, so the comparison stays meaningful. Tap to add.', style: ppBody(12))),
+              const SizedBox(height: 14),
+              for (final s in suggestions) _pad(_suggestionRow(context, s)),
+            ],
+
+            const SizedBox(height: 22),
+            _pad(Text("ParentVeda's take is evidence-based, neutral and never promotional.",
+                textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // an "Add another" placeholder that sits next to the single pick
+  Widget _addSlot(BuildContext context) => GestureDetector(
+        onTap: () => _openPicker(context),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 232,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: ppPanel.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: ppBorder),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.add_rounded, size: 24, color: ppPurple),
+            ),
+            const SizedBox(height: 12),
+            Text('Add another', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+            const SizedBox(height: 2),
+            Text('up to 3', style: ppBody(11, color: ppMuted)),
+          ]),
+        ),
+      );
+
+  Widget _suggestionRow(BuildContext context, PpProduct p) => GestureDetector(
+        onTap: () => PpCompareStore.instance.toggle(p),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+          child: Row(children: [
+            const SizedBox(width: 54, child: PpStriped(height: 54, radius: 12)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(p.name, style: ppJakarta(13.5).copyWith(height: 1.2), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 4),
+                Row(children: [
+                  const Icon(Icons.star_rounded, size: 13, color: ppCoral),
+                  const SizedBox(width: 3),
+                  Text(p.rating.toStringAsFixed(1), style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
+                  const SizedBox(width: 8),
+                  Flexible(child: Text(p.priceLabel, style: ppBody(11.5, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                ]),
+              ]),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.add_rounded, size: 14, color: ppPurple),
+                const SizedBox(width: 4),
+                Text('Add', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+              ]),
+            ),
+          ]),
+        ),
+      );
+
+  // =========================================================================
+  //  2-3 PRODUCTS - the full, dynamic side-by-side
+  // =========================================================================
+  Widget _comparisonScaffold(BuildContext context, List<PpProduct> ps) {
+    final sameSub = ps.every((x) => x.sub == ps.first.sub);
+    final eyebrow = 'Compare · ${sameSub ? ps.first.sub : ps.first.category}';
+    final noun = sameSub ? ps.first.sub.toLowerCase() : '${ps.first.category.toLowerCase()} products';
+
+    // union of spec keys across every selected product
+    final specMaps = [for (final p in ps) _specsOf(p)];
+    final specKeys = <String>[];
+    for (final m in specMaps) {
+      for (final k in m.keys) {
+        if (!specKeys.contains(k)) specKeys.add(k);
+      }
+    }
+    final canAddMore = ps.length < PpCompareStore.maxItems && PpCompareStore.instance.suggestions().isNotEmpty;
+
+    return Scaffold(
+      backgroundColor: ppBg,
+      body: SafeArea(
+        bottom: false,
+        child: Stack(children: [
+          ListView(
+            padding: const EdgeInsets.only(top: 12, bottom: 108),
+            children: [
+              _backRow(context, eyebrow, showClear: true),
+
+              const SizedBox(height: 20),
+              _pad(Text('${_title(ps)}.', style: ppFraunces(30, h: 1.14))),
+
+              // child context - the comparison is personalised to his stage
+              const SizedBox(height: 14),
+              _pad(Row(children: [
+                const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Comparing ${ps.length} $noun for Aarav · 4 months - tuned to his stage.',
+                      style: ppBody(12.5, color: ppSoft, h: 1.4)),
+                ),
+              ])),
+
+              // the differentiator: education BEFORE the comparison
+              const SizedBox(height: 18),
+              _pad(_beforeYouCompare(ps.first)),
+
+              // overview cards - rating up top, plus per-card remove / replace
+              const SizedBox(height: 22),
+              _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                for (var i = 0; i < ps.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  Expanded(child: _overview(context, ps[i], manage: true)),
+                ],
+              ])),
+
+              // add another (up to 3)
+              if (canAddMore) ...[
+                const SizedBox(height: 14),
+                _pad(GestureDetector(
+                  onTap: () => _openPicker(context),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: ppBorder),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.add_rounded, size: 16, color: ppPurple),
+                      const SizedBox(width: 8),
+                      Text('Add another product', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                    ]),
+                  ),
+                )),
+              ],
+
+              // spec sheet (per-product columns)
+              const SizedBox(height: 22),
+              _pad(Container(
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
+                clipBehavior: Clip.antiAlias,
+                child: Column(children: [
+                  for (var i = 0; i < specKeys.length; i++)
+                    _specRow(specKeys[i], [for (final m in specMaps) m[specKeys[i]] ?? '-'], last: i == specKeys.length - 1),
+                ]),
+              )),
+
+              // the take - one card PER product
+              const SizedBox(height: 28),
+              _pad(Text('The ParentVeda take', style: ppJakarta(16))),
+              const SizedBox(height: 4),
+              _pad(Text('For each pick, honestly - what works, and what to know.', style: ppBody(12))),
+              const SizedBox(height: 14),
+              for (var i = 0; i < ps.length; i++) ...[
+                if (i > 0) const SizedBox(height: 12),
+                _pad(_takeCard(ps[i])),
+              ],
+
+              // community - segregated from the comparison
+              _pad(ppSectionDivider()),
+              _pad(Text('What parents say', style: ppJakarta(16))),
+              const SizedBox(height: 4),
+              _pad(Text('Named, verified-mother reviews - the same trust system as every Product page.', style: ppBody(12))),
+              const SizedBox(height: 14),
+              _pad(Row(children: [
+                for (var i = 0; i < ps.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  Expanded(child: _communityStat(ps[i])),
+                ],
+              ])),
+              const SizedBox(height: 14),
+              _pad(_lovedNoted(ps)),
+
+              const SizedBox(height: 22),
+              _pad(Text("ParentVeda's take is evidence-based, neutral and never promotional.",
+                  textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+            ],
+          ),
+
+          // sticky buy bar (one per product, dynamic)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FBF9FE), ppBg], stops: [0, 0.26]),
+              ),
+              child: Row(children: [
+                for (var i = 0; i < ps.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  Expanded(child: _buyBtn(context, ps[i], primary: i == 0)),
+                ],
+              ]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  // The editorial headline: "A vs B" for two, "A, B & C" for three. Uses the
+  // brand when brands differ, else the product name.
+  String _title(List<PpProduct> ps) {
+    final sameBrand = ps.every((x) => x.brand == ps.first.brand);
+    final labels = [for (final p in ps) sameBrand ? p.name : p.brand];
+    if (labels.length == 2) return '${labels[0]} vs ${labels[1]}';
+    return '${labels.sublist(0, labels.length - 1).join(', ')} & ${labels.last}';
+  }
+
+  String _categoryNoun(String category) => category == 'Sleep' ? 'sleep products' : '${category.toLowerCase()} products';
 
   String _summaryOf(PpProduct p) => p.summary.isNotEmpty ? p.summary : '${p.brand} · ${p.sub}';
 
   // Each product's spec sheet - its own `specs`, else derived from its fields -
-  // with the rating appended as its own row (like Warranty), up front in the table.
+  // with the rating appended as its own row, up front in the table.
   Map<String, String> _specsOf(PpProduct p) {
     final m = <String, String>{};
     if (p.specs.isNotEmpty) {
@@ -76,132 +428,89 @@ class ProductsCompareScreen extends StatelessWidget {
     return l;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final pair = _pair();
-    final a = pair[0], b = pair[1];
-    final usingDefault = PpCompareStore.instance.selected.length != 2;
-
-    final sa = _specsOf(a), sb = _specsOf(b);
-    final specKeys = <String>[...sa.keys, for (final k in sb.keys) if (!sa.containsKey(k)) k];
-
-    final titleA = a.brand == b.brand ? a.name : a.brand;
-    final titleB = a.brand == b.brand ? b.name : b.brand;
-    final eyebrow = a.sub == b.sub ? 'Compare · ${a.sub}' : 'Compare · ${a.category}';
-
-    return Scaffold(
+  // ---- product picker sheet (add / replace, same category only) ----------
+  void _openPicker(BuildContext context, {PpProduct? replace}) {
+    final options = PpCompareStore.instance.suggestions();
+    showModalBottomSheet<void>(
+      context: context,
       backgroundColor: ppBg,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(children: [
-          ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 108),
-            children: [
-              _pad(Row(children: [
-                GestureDetector(
-                  onTap: () => Navigator.of(context).maybePop(),
-                  child: Container(
-                    width: 34,
-                    height: 34,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
-                    child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Flexible(child: ppEyebrow(eyebrow, color: ppMuted, spacing: 1.2)),
-              ])),
-
-              const SizedBox(height: 20),
-              _pad(Text.rich(TextSpan(children: [
-                TextSpan(text: '$titleA '),
-                TextSpan(text: 'vs $titleB.', style: ppFraunces(31, color: ppPurple, h: 1.12).copyWith(fontStyle: FontStyle.italic)),
-              ]), style: ppFraunces(31, h: 1.12))),
-              if (usingDefault) ...[
-                const SizedBox(height: 10),
-                _pad(Text('A sample pair - tick two products in Products to compare your own.',
-                    style: ppBody(12, color: ppMuted, h: 1.5))),
-              ],
-
-              // child context - the comparison is personalised to his stage
-              const SizedBox(height: 14),
-              _pad(Row(children: [
-                const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
-                const SizedBox(width: 8),
-                Expanded(child: Text('Comparing ${a.sub.toLowerCase()} for Aarav · 4 months - tuned to his stage.', style: ppBody(12.5, color: ppSoft, h: 1.4))),
-              ])),
-
-              // the differentiator: education BEFORE the comparison
-              const SizedBox(height: 18),
-              _pad(_beforeYouCompare(a)),
-
-              // overview cards - rating sits up top in each
-              const SizedBox(height: 22),
-              _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(child: _overview(a)),
-                const SizedBox(width: 12),
-                Expanded(child: _overview(b)),
-              ])),
-
-              // spec sheet (per-product columns)
-              const SizedBox(height: 22),
-              _pad(Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
-                clipBehavior: Clip.antiAlias,
-                child: Column(children: [
-                  for (var i = 0; i < specKeys.length; i++)
-                    _specRow(specKeys[i], sa[specKeys[i]] ?? '-', sb[specKeys[i]] ?? '-', last: i == specKeys.length - 1),
-                ]),
-              )),
-
-              // the take - one card PER product
-              const SizedBox(height: 28),
-              _pad(Text('The ParentVeda take', style: ppJakarta(16))),
-              const SizedBox(height: 4),
-              _pad(Text('For each pick, honestly - what works, and what to know.', style: ppBody(12))),
-              const SizedBox(height: 14),
-              _pad(_takeCard(a)),
-              const SizedBox(height: 12),
-              _pad(_takeCard(b)),
-
-              // community - segregated from the comparison (generalized, but kept)
-              _pad(ppSectionDivider()),
-              _pad(Text('What parents say', style: ppJakarta(16))),
-              const SizedBox(height: 4),
-              _pad(Text('Named, verified-mother reviews - the same trust system as every Product page.', style: ppBody(12))),
-              const SizedBox(height: 14),
-              _pad(Row(children: [
-                Expanded(child: _communityStat(a)),
-                const SizedBox(width: 12),
-                Expanded(child: _communityStat(b)),
-              ])),
-              const SizedBox(height: 14),
-              _pad(_lovedNoted(a, b)),
-
-              const SizedBox(height: 22),
-              _pad(Text("ParentVeda's take is evidence-based, neutral and never promotional.",
-                  textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
-            ],
-          ),
-
-          // sticky dual buy (dynamic)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FBF9FE), ppBg], stops: [0, 0.26]),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (sheetCtx) => SafeArea(
+        top: false,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(sheetCtx).size.height * 0.72),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(height: 10),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 14, 24, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(replace == null ? 'Add a product' : 'Replace ${replace.brand}', style: ppFraunces(23, h: 1.1)),
               ),
-              child: Row(children: [
-                Expanded(child: _buyBtn(context, 'Buy ${a.brand} · ${a.priceLabel}', primary: true)),
-                const SizedBox(width: 12),
-                Expanded(child: _buyBtn(context, 'Buy ${b.brand} · ${b.priceLabel}', primary: false)),
-              ]),
             ),
-          ),
-        ]),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Same category, so the comparison stays meaningful.', style: ppBody(12.5, color: ppSoft)),
+              ),
+            ),
+            if (options.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                child: Text('No other ${PpCompareStore.instance.category?.toLowerCase() ?? ''} products to add yet.',
+                    style: ppBody(13, color: ppMuted)),
+              )
+            else
+              Flexible(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+                  children: [
+                    for (final o in options)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            if (replace != null) {
+                              PpCompareStore.instance.replace(replace, o);
+                            } else {
+                              PpCompareStore.instance.toggle(o);
+                            }
+                            Navigator.of(sheetCtx).pop();
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+                            child: Row(children: [
+                              const SizedBox(width: 48, child: PpStriped(height: 48, radius: 10)),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Text(o.name, style: ppJakarta(13.5).copyWith(height: 1.2), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  const SizedBox(height: 3),
+                                  Row(children: [
+                                    const Icon(Icons.star_rounded, size: 13, color: ppCoral),
+                                    const SizedBox(width: 3),
+                                    Text(o.rating.toStringAsFixed(1), style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
+                                    const SizedBox(width: 8),
+                                    Flexible(child: Text(o.priceLabel, style: ppBody(11.5, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                  ]),
+                                ]),
+                              ),
+                              const SizedBox(width: 10),
+                              Icon(replace == null ? Icons.add_circle_outline_rounded : Icons.swap_horiz_rounded, size: 20, color: ppPurple),
+                            ]),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ]),
+        ),
       ),
     );
   }
@@ -264,16 +573,25 @@ class ProductsCompareScreen extends StatelessWidget {
         ),
       ]);
 
-  // ---- overview (rating prominent, up top) -------------------------------
-  Widget _overview(PpProduct p) => Container(
-        padding: const EdgeInsets.all(14),
+  // ---- overview (rating prominent; manage = remove / replace controls) ---
+  Widget _overview(BuildContext context, PpProduct p, {bool manage = false}) => Container(
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const PpStriped(height: 80, radius: 12),
+          if (manage) ...[
+            Row(children: [
+              const Spacer(),
+              _miniIcon(Icons.swap_horiz_rounded, () => _openPicker(context, replace: p)),
+              const SizedBox(width: 6),
+              _miniIcon(Icons.close_rounded, () => PpCompareStore.instance.remove(p)),
+            ]),
+            const SizedBox(height: 4),
+          ],
+          const PpStriped(height: 76, radius: 12),
           const SizedBox(height: 10),
-          Text(p.brand, style: ppBody(11, color: ppMuted)),
+          Text(p.brand, style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),
-          Text(p.name, style: ppJakarta(14).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(p.name, style: ppJakarta(13.5).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 8),
           // rating first - it matters most
           Row(children: [
@@ -281,17 +599,29 @@ class ProductsCompareScreen extends StatelessWidget {
             const SizedBox(width: 3),
             Text(p.rating.toStringAsFixed(1), style: ppBody(14, color: ppInk, w: FontWeight.w800)),
             const SizedBox(width: 5),
-            Flexible(child: Text('${p.reviews} reviews', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            Flexible(child: Text('${p.reviews}', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
           const SizedBox(height: 6),
           Text(p.priceLabel, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           const SizedBox(height: 8),
-          Text(_summaryOf(p), style: ppBody(12, h: 1.45)),
+          Text(_summaryOf(p), style: ppBody(12, h: 1.45), maxLines: 3, overflow: TextOverflow.ellipsis),
         ]),
       );
 
-  // ---- spec sheet --------------------------------------------------------
-  Widget _specRow(String label, String a, String b, {bool last = false}) {
+  Widget _miniIcon(IconData icon, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 26,
+          height: 26,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+          child: Icon(icon, size: 15, color: ppSoft),
+        ),
+      );
+
+  // ---- spec sheet (N value columns) --------------------------------------
+  Widget _specRow(String label, List<String> values, {bool last = false}) {
     final free = label.toLowerCase().startsWith('free');
     final rating = label == 'Rating';
     Widget val(String t) => Text(t,
@@ -303,9 +633,10 @@ class ProductsCompareScreen extends StatelessWidget {
         ppEyebrow(label, color: ppMuted, spacing: 0.6),
         const SizedBox(height: 8),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(child: val(a)),
-          const SizedBox(width: 12),
-          Expanded(child: val(b)),
+          for (var i = 0; i < values.length; i++) ...[
+            if (i > 0) const SizedBox(width: 10),
+            Expanded(child: val(values[i])),
+          ],
         ]),
       ]),
     );
@@ -344,7 +675,7 @@ class ProductsCompareScreen extends StatelessWidget {
 
   // ---- community (segregated section) ------------------------------------
   Widget _communityStat(PpProduct p) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
         alignment: Alignment.center,
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
         child: Column(children: [
@@ -353,26 +684,24 @@ class ProductsCompareScreen extends StatelessWidget {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.star_rounded, size: 16, color: ppCoral),
             const SizedBox(width: 3),
-            Text(p.rating.toStringAsFixed(1), style: ppJakarta(20)),
+            Text(p.rating.toStringAsFixed(1), style: ppJakarta(19)),
           ]),
           const SizedBox(height: 2),
-          Text('${p.reviews} parents', style: ppBody(11, color: ppMuted)),
+          Text('${p.reviews} parents', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
       );
 
-  Widget _lovedNoted(PpProduct a, PpProduct b) => Container(
+  Widget _lovedNoted(List<PpProduct> ps) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('PARENTS LOVED', style: ppBody(10, color: _green, w: FontWeight.w700).copyWith(letterSpacing: 0.8)),
           const SizedBox(height: 9),
-          _cLine(Icons.check_rounded, _green, a.brand, _prosOf(a).first),
-          _cLine(Icons.check_rounded, _green, b.brand, _prosOf(b).first),
+          for (final p in ps) _cLine(Icons.check_rounded, _green, p.brand, _prosOf(p).first),
           const SizedBox(height: 14),
           Text('PARENTS ALSO NOTED', style: ppBody(10, color: ppBrown, w: FontWeight.w700).copyWith(letterSpacing: 0.8)),
           const SizedBox(height: 9),
-          _cLine(Icons.info_outline, ppBrown, a.brand, _consOf(a).first),
-          _cLine(Icons.info_outline, ppBrown, b.brand, _consOf(b).first),
+          for (final p in ps) _cLine(Icons.info_outline, ppBrown, p.brand, _consOf(p).first),
         ]),
       );
 
@@ -390,18 +719,26 @@ class ProductsCompareScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _buyBtn(BuildContext context, String label, {required bool primary}) => GestureDetector(
+  Widget _buyBtn(BuildContext context, PpProduct p, {required bool primary}) => GestureDetector(
         onTap: () => _soon(context),
         child: Container(
-          height: 52,
+          height: 56,
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
             color: primary ? ppPurple : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: primary ? null : Border.all(color: ppLine),
           ),
-          child: Text(label, style: ppBody(14, color: primary ? Colors.white : ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('Buy ${p.brand}',
+                style: ppBody(11.5, color: primary ? Colors.white.withValues(alpha: 0.85) : ppSoft, w: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 1),
+            Text(p.priceLabel,
+                style: ppBody(14, color: primary ? Colors.white : ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
+          ]),
         ),
       );
 }

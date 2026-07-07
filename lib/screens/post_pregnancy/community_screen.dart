@@ -35,12 +35,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   void initState() {
     super.initState();
-    if (!_seededParentingAutos) {
+    if (_seededParentingAutos) return;
+    // Auto-join the default parenting rooms once — but AFTER the first frame.
+    // toggleJoin() fires notifyListeners(), and doing that during initState
+    // (i.e. mid-build) makes the store's AnimatedBuilder listeners rebuild
+    // during build, which throws "setState() called during build".
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _seededParentingAutos) return;
       _seededParentingAutos = true;
       for (final c in kParentingCommunities) {
         if (c.auto && !_s.isJoined(c.id)) _s.toggleJoin(c.id);
       }
-    }
+    });
   }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);

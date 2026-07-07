@@ -5,7 +5,7 @@
 //  Guide". Their lessons are named to match the "Go deeper · Course" rows across
 //  the app (activities, challenges), so a Course row opens the RIGHT course with
 //  the referenced lesson highlighted - never the generic list. Static content;
-//  playback is previewed through the existing course funnel.
+//  each lesson opens its own CourseLessonScreen (marked "preview" until filmed).
 // =============================================================================
 
 import 'package:flutter/material.dart';
