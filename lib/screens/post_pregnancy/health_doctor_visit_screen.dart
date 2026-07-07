@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'pp_common.dart';
 import 'pp_health_data.dart';
@@ -24,6 +25,24 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
   HealthStore get _s => HealthStore.instance;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+
+  String _shareText(GrowthPoint g) {
+    final b = StringBuffer()
+      ..writeln('VISIT SUMMARY — Aarav')
+      ..writeln('Child: Aarav · 4 months (born 8 Mar 2026) · Boy')
+      ..writeln('Growth: ${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm — on track')
+      ..writeln('Vaccinations: Up to date · next: $kVaxNext')
+      ..writeln('Medications: Vitamin D drops (routine daily)')
+      ..writeln('Allergies: None recorded')
+      ..writeln('Recent history: Mild cold (early Jun) · brief fever after 14-week vaccines')
+      ..writeln('Recent reports: 4-month growth summary (12 Jun) — all normal')
+      ..writeln('')
+      ..writeln('QUESTIONS TO ASK');
+    for (final q in _s.questions) {
+      b.writeln('  • $q');
+    }
+    return b.toString();
+  }
 
   @override
   void dispose() {
@@ -86,7 +105,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
 
               const SizedBox(height: 24),
               _pad(GestureDetector(
-                onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Shareable PDF export coming soon'), behavior: SnackBarBehavior.floating)),
+                onTap: () => Share.share(_shareText(g)),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 15),
@@ -95,7 +114,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     const Icon(Icons.ios_share_rounded, size: 18, color: Colors.white),
                     const SizedBox(width: 8),
-                    Text('Share with paediatrician (PDF)', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
+                    Text('Share with paediatrician', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
                   ]),
                 ),
               )),

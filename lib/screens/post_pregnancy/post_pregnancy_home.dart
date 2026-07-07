@@ -20,8 +20,8 @@ import 'growth_activity_screen.dart';
 // HealthGuideScreen import is kept (commented) for easy revert.
 // import 'health_guide_screen.dart';
 import 'health_home_screen.dart';
+import 'journal_v2/journal_capture_screens.dart';
 import 'journal_v2/journal_home_screen.dart';
-import 'journal_v2/journal_storybook_screens.dart';
 import 'my_child_screen.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
@@ -227,7 +227,9 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
   Widget _continueJourney() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _pad(_sectionHeader('Continue your journey')),
         const SizedBox(height: 14),
-        _pad(_bigRow(Icons.auto_stories_outlined, _tPurple, ppPurple, "Aarav's Storybook", 'Chapter 8 · Puppy Kisses · page 84 of 168', () => _push(const StorybookReaderScreen(startPage: 9)))),
+        // Continue the unfinished task itself — an in-progress journal memory opens
+        // the Journal editor directly (not the Storybook preview).
+        _pad(_bigRow(Icons.edit_note_rounded, _tPurple, ppPurple, "Today's memory", 'You started a note this morning — finish it', () => _push(const WriteStoryScreen()))),
         const SizedBox(height: 12),
         _pad(_bigRow(Icons.article_outlined, _tGreen, _greenFg, 'The 4-month sleep regression', 'You were halfway through the guide', () => _push(const SolveProblemScreen()))),
       ]);
@@ -239,7 +241,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         SizedBox(
           height: 208,
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
-            _discoverCard('Activity', 'Reach for the ring', '4 min · grasp & intent', () => _push(const GrowthActivityScreen())),
+            _discoverCard('Activity', 'Reach for the ring', '4 min · grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
             const SizedBox(width: 14),
             _discoverCard('Recipe', 'First-taste veggie mash', 'from 6 months · iron-rich', () => _push(const RecipesScreen())),
             const SizedBox(width: 14),
@@ -281,7 +283,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         SizedBox(
           height: 128,
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
-            _aheadCard('Tomorrow', 'A new sound', Icons.graphic_eq_rounded, () => _push(const GrowthActivityScreen())),
+            _aheadCard('Tomorrow', 'A new sound', Icons.graphic_eq_rounded, () => _push(const GrowthActivityScreen(activity: kActNewSound))),
             const SizedBox(width: 12),
             _aheadCard('in ~3 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(const WonderWeekScreen())),
             const SizedBox(width: 12),
@@ -349,7 +351,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         _pad(_sectionHeader("Today's focus")),
         const SizedBox(height: 14),
         _pad(GestureDetector(
-          onTap: () => _push(const GrowthActivityScreen()),
+          onTap: () => _push(const GrowthActivityScreen(activity: kActNarrate)),
           behavior: HitTestBehavior.opaque,
           child: Container(
             padding: const EdgeInsets.all(20),
@@ -383,7 +385,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: Column(children: [
             _win("Logged today's memory", done: true, onTap: () => _push(const JournalV2Home())),
             _win("Read today's article", done: true, onTap: () => _push(const ArticleReaderScreen())),
-            _win('Completed tummy time', done: false, onTap: () => _push(const GrowthActivityScreen())),
+            _win('Completed tummy time', done: false, onTap: () => _push(const GrowthActivityScreen(activity: kActTummyTime))),
             _win("Finished today's activity", done: false, onTap: () => _push(const GrowthActivityScreen()), last: true),
           ]),
         )),

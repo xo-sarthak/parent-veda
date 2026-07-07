@@ -68,7 +68,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
             const SizedBox(height: 22),
             _pad(_label('3 · What’s in the kitchen?')),
             const SizedBox(height: 10),
-            _pad(_chips(kBuilderIngredients, _has.contains, (s) => setState(() => _has.contains(s) ? _has.remove(s) : _has.add(s)))),
+            _pad(_chips(foodIngredientLibrary(), _has.contains, (s) => setState(() => _has.contains(s) ? _has.remove(s) : _has.add(s)))),
 
             const SizedBox(height: 24),
             _pad(GestureDetector(

@@ -20,6 +20,9 @@
 import 'package:flutter/material.dart';
 
 import 'article_reader_screen.dart';
+import 'development_area_screen.dart';
+import 'development_map_screen.dart';
+import 'food_home_screen.dart';
 import 'growth_activity_screen.dart';
 // My Child's health rows now open the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
@@ -31,9 +34,8 @@ import 'journal_v2/journal_home_screen.dart';
 import 'journal_v2/journal_storybook_screens.dart';
 import 'multichild_sheet.dart';
 import 'pp_common.dart';
+import 'pp_development_data.dart';
 import 'product_detail_screen.dart';
-import 'recipes_screen.dart';
-import 'snapshot_expanded_screen.dart';
 import 'vaccination_screen.dart';
 import 'wonder_week_screen.dart';
 
@@ -198,11 +200,11 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
   // =========================================================================
   Widget _snapshot() {
     final cards = <(IconData, String, String, String, String, VoidCallback)>[
-      (Icons.psychology_outlined, 'Brain', 'Cause & effect', 'Following your hand all the way to the toy it reaches for.', 'Developing', () => _push(const SnapshotExpandedScreen())),
-      (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest, he pushes up — a first roll any day.', 'Emerging', () => _push(const SnapshotExpandedScreen())),
-      (Icons.chat_bubble_outline_rounded, 'Language', 'Musical babble', "Coos stretching into 'aah-goo', raspberries and squeals.", 'Emerging', () => _push(const SnapshotExpandedScreen())),
-      (Icons.favorite_border, 'Emotional', 'Social joy', 'Beams at you across a room; a laugh now earns a laugh back.', 'Blossoming', () => _push(const SnapshotExpandedScreen())),
-      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months — a few weeks away yet.', 'On track', () => _push(const RecipesScreen())),
+      (Icons.psychology_outlined, 'Brain', 'Cause & effect', 'Following your hand all the way to the toy it reaches for.', 'Developing', () => _push(DevelopmentAreaScreen(area: devAreaById('cognitive')))),
+      (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest, he pushes up — a first roll any day.', 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
+      (Icons.chat_bubble_outline_rounded, 'Language', 'Musical babble', "Coos stretching into 'aah-goo', raspberries and squeals.", 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('language')))),
+      (Icons.favorite_border, 'Emotional', 'Social joy', 'Beams at you across a room; a laugh now earns a laugh back.', 'Blossoming', () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
+      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months — a few weeks away yet.', 'On track', () => _push(const FoodHomeScreen())),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _pad(_header('Child snapshot', 'How Aarav is doing', sub: 'Five windows into his development — where he is right now, not a scorecard. Tap any to go deeper.')),
@@ -291,7 +293,7 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
       ])),
       const SizedBox(height: 6),
       _pad(GestureDetector(
-        onTap: () => _push(const SnapshotExpandedScreen()),
+        onTap: () => _push(const DevelopmentMapScreen()),
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
           Flexible(child: Text('Understand this stage', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
@@ -537,10 +539,10 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            _aheadRow(Icons.flag_outlined, 'Next milestone', 'Rolling over — any day now', () => _push(const SnapshotExpandedScreen())),
+            _aheadRow(Icons.flag_outlined, 'Next milestone', 'Rolling over — any day now', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
             _aheadRow(Icons.brightness_4_rounded, 'Next leap', 'Leap 5 · The World of Relationships · ~3 weeks', () => _push(const WonderWeekScreen())),
             _aheadRow(Icons.vaccines_outlined, 'Next vaccine', 'PCV dose 3 · 22 Jul', () => _push(const VaccinationScreen())),
-            _aheadRow(Icons.extension_outlined, 'Suggested activity', 'Reach for the ring — grasp & intent', () => _push(const GrowthActivityScreen())),
+            _aheadRow(Icons.extension_outlined, 'Suggested activity', 'Reach for the ring — grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
             _aheadRow(Icons.menu_book_outlined, 'Recommended read', 'The games that build object permanence', () => _push(const ArticleReaderScreen())),
             _aheadRow(Icons.shopping_bag_outlined, 'Recommended product', 'Dozy white-noise soother', () => _push(const ProductDetailScreen()), last: true),
           ]),

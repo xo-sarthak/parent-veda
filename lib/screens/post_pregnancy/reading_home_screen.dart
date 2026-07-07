@@ -4,7 +4,8 @@
 //  Answers "what should I learn today to be a more confident parent?" — one
 //  carefully-chosen Today's Read (not ten), Continue Reading, a few personalised
 //  picks, and learning collections. A calm, magazine-like start, never a feed.
-//  Reached from the Explore drawer ("Learn"). Pushed screen (back, no bottom nav).
+//  A filter row (All / Articles / Book Summaries / Research Summaries) narrows the
+//  library to one kind. Reached from the Explore drawer ("Learn"). Pushed screen.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -16,12 +17,20 @@ import 'reading_common.dart';
 import 'reading_library_screen.dart';
 import 'reading_reader_screen.dart';
 
-class ReadingHomeScreen extends StatelessWidget {
+class ReadingHomeScreen extends StatefulWidget {
   const ReadingHomeScreen({super.key});
 
+  @override
+  State<ReadingHomeScreen> createState() => _ReadingHomeScreenState();
+}
+
+class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
+  // null = All; otherwise only that kind is shown.
+  ReadKind? _filter;
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
-  void _open(BuildContext c, ReadArticle a) => _push(c, ReadingReaderScreen(article: a));
+  void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
+  void _open(ReadArticle a) => _push(ReadingReaderScreen(article: a));
 
   @override
   Widget build(BuildContext context) {
@@ -46,44 +55,13 @@ class ReadingHomeScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 _pad(Text('One good read, chosen for where you and Aarav are right now — not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
-                const SizedBox(height: 24),
-                _pad(_todayHero(context, today)),
+                const SizedBox(height: 20),
+                _filterRow(),
 
-                if (continues.isNotEmpty) ...[
-                  const SizedBox(height: 30),
-                  _pad(readSectionHeader('Continue reading')),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    height: 214,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      itemCount: continues.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 14),
-                      itemBuilder: (_, i) => _continueCard(context, continues[i]),
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 30),
-                _pad(readSectionHeader('Chosen for you')),
-                const SizedBox(height: 4),
-                _pad(Text('For his age and your recent reads — never random.', style: ppBody(12.5, color: ppMuted))),
-                const SizedBox(height: 16),
-                _pad(Column(children: [
-                  for (final a in forYou().take(5))
-                    ReadListCard(article: a, onTap: () => _open(context, a), progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null),
-                ])),
-
-                const SizedBox(height: 14),
-                _pad(readSectionHeader('Learning collections')),
-                const SizedBox(height: 4),
-                _pad(Text('Short, finishable paths through a topic.', style: ppBody(12.5, color: ppMuted))),
-                const SizedBox(height: 16),
-                _collections(context),
-
-                const SizedBox(height: 30),
-                _pad(_savedLink(context)),
+                if (_filter != null)
+                  ..._filteredView()
+                else
+                  ..._fullView(context, store, continues, today),
               ],
             );
           },
@@ -92,8 +70,111 @@ class ReadingHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _todayHero(BuildContext context, ReadArticle a) => GestureDetector(
-        onTap: () => _open(context, a),
+  // ---- filter row ---------------------------------------------------------
+  Widget _filterRow() {
+    const options = <(String, ReadKind?)>[
+      ('All', null),
+      ('Articles', ReadKind.article),
+      ('Book Summaries', ReadKind.bookSummary),
+      ('Research Summaries', ReadKind.research),
+    ];
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: options.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final on = _filter == options[i].$2;
+          return GestureDetector(
+            onTap: () => setState(() => _filter = options[i].$2),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: on ? ppPurple : Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: on ? ppPurple : ppHair),
+              ),
+              child: Text(options[i].$1, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ---- filtered view (one kind only) --------------------------------------
+  List<Widget> _filteredView() {
+    final items = articlesOfKind(_filter!);
+    return [
+      const SizedBox(height: 22),
+      _pad(readSectionHeader(readKindLabel(_filter!))),
+      const SizedBox(height: 14),
+      if (items.isEmpty)
+        _pad(Text('Nothing here yet — check back soon.', style: ppBody(13, color: ppMuted)))
+      else
+        _pad(Column(children: [
+          for (final a in items)
+            ReadListCard(
+              article: a,
+              onTap: () => _open(a),
+              progress: ReadingStore.instance.isInProgress(a.id) ? ReadingStore.instance.progressOf(a.id) : null,
+            ),
+        ])),
+      const SizedBox(height: 30),
+      _pad(_savedLink()),
+    ];
+  }
+
+  // ---- full view (All) ----------------------------------------------------
+  List<Widget> _fullView(BuildContext context, ReadingStore store, List<ReadArticle> continues, ReadArticle today) {
+    return [
+      const SizedBox(height: 22),
+      _pad(_todayHero(today)),
+
+      if (continues.isNotEmpty) ...[
+        const SizedBox(height: 30),
+        _pad(readSectionHeader('Continue reading')),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 214,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: continues.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 14),
+            itemBuilder: (_, i) => _continueCard(continues[i]),
+          ),
+        ),
+      ],
+
+      const SizedBox(height: 30),
+      _pad(readSectionHeader('Chosen for you')),
+      const SizedBox(height: 4),
+      _pad(Text('For his age and your recent reads — never random.', style: ppBody(12.5, color: ppMuted))),
+      const SizedBox(height: 16),
+      _pad(Column(children: [
+        for (final a in forYou().take(5))
+          ReadListCard(article: a, onTap: () => _open(a), progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null),
+      ])),
+
+      const SizedBox(height: 14),
+      _pad(readSectionHeader('Learning collections')),
+      const SizedBox(height: 4),
+      _pad(Text('Short, finishable paths through a topic.', style: ppBody(12.5, color: ppMuted))),
+      const SizedBox(height: 16),
+      _collections(context),
+
+      const SizedBox(height: 30),
+      _pad(_savedLink()),
+    ];
+  }
+
+  Widget _todayHero(ReadArticle a) => GestureDetector(
+        onTap: () => _open(a),
         behavior: HitTestBehavior.opaque,
         child: Container(
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: ppHair), boxShadow: ppCardShadow),
@@ -140,10 +221,10 @@ class ReadingHomeScreen extends StatelessWidget {
         ),
       );
 
-  Widget _continueCard(BuildContext context, ReadArticle a) {
+  Widget _continueCard(ReadArticle a) {
     final p = ReadingStore.instance.progressOf(a.id);
     return GestureDetector(
-      onTap: () => _open(context, a),
+      onTap: () => _open(a),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 220,
@@ -170,7 +251,7 @@ class ReadingHomeScreen extends StatelessWidget {
             final mins = c.articleIds.map(readArticleById).fold<int>(0, (a, x) => a + x.minutes);
             final prog = ReadingStore.instance.collectionProgress(c);
             return GestureDetector(
-              onTap: () => _push(context, ReadingCollectionScreen(collection: c)),
+              onTap: () => _push(ReadingCollectionScreen(collection: c)),
               behavior: HitTestBehavior.opaque,
               child: Container(
                 width: 208,
@@ -191,8 +272,8 @@ class ReadingHomeScreen extends StatelessWidget {
         ),
       );
 
-  Widget _savedLink(BuildContext context) => GestureDetector(
-        onTap: () => _push(context, const ReadingLibraryScreen()),
+  Widget _savedLink() => GestureDetector(
+        onTap: () => _push(const ReadingLibraryScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),

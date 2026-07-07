@@ -113,6 +113,33 @@ class NotificationService {
     }
   }
 
+  /// Schedule a ONE-OFF notification at an absolute date/time — used for
+  /// vaccine-due reminders (e.g. "1 day before"). Best-effort: no-ops if the
+  /// platform isn't ready or the time is in the past.
+  Future<void> scheduleOneOff({
+    required int id,
+    required String title,
+    String? body,
+    required DateTime when,
+  }) async {
+    if (!_ready) await init();
+    if (!_ready) return;
+    try {
+      final tzWhen = tz.TZDateTime.from(when, tz.local);
+      if (!tzWhen.isAfter(tz.TZDateTime.now(tz.local))) return;
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tzWhen,
+        _details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (_) {/* best-effort */}
+  }
+
   NotificationDetails get _details => const NotificationDetails(
         android: AndroidNotificationDetails(
           'reminders',

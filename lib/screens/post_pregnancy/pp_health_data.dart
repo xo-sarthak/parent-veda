@@ -270,15 +270,22 @@ List<HealthEvent> healthTimelineSorted() {
 }
 
 // =============================================================================
-//  HealthStore — the parent's saved doctor-visit questions (the one bit of
-//  mutable state in the prototype).
+//  HealthStore — mutable health record (seeded from the constants above). Holds
+//  the parent's doctor-visit questions plus full CRUD over medications,
+//  allergies, symptoms and reports. A ChangeNotifier singleton like the app's
+//  other stores; a real backend slots in behind these same methods later.
 // =============================================================================
 class HealthStore extends ChangeNotifier {
   HealthStore._();
   static final HealthStore instance = HealthStore._();
 
   final List<String> _questions = [...kSeedDoctorQuestions];
+  final List<Medication> _medications = [...kMedications];
+  final List<Allergy> _allergies = [...kAllergies];
+  final List<SymptomEntry> _symptoms = [...kSymptoms];
+  final List<MedicalReport> _reports = [...kReports];
 
+  // ---- doctor-visit questions ----
   List<String> get questions => List.unmodifiable(_questions);
   void addQuestion(String q) {
     final t = q.trim();
@@ -292,5 +299,96 @@ class HealthStore extends ChangeNotifier {
       _questions.removeAt(i);
       notifyListeners();
     }
+  }
+
+  // ---- medications (also covers prescriptions) ----
+  List<Medication> get medications => List.unmodifiable(_medications);
+  void addMedication(Medication m) {
+    _medications.insert(0, m);
+    notifyListeners();
+  }
+
+  void updateMedication(int i, Medication m) {
+    if (i >= 0 && i < _medications.length) {
+      _medications[i] = m;
+      notifyListeners();
+    }
+  }
+
+  void removeMedication(int i) {
+    if (i >= 0 && i < _medications.length) {
+      _medications.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- allergies ----
+  List<Allergy> get allergies => List.unmodifiable(_allergies);
+  List<Allergy> get knownAllergies => _allergies.where((a) => a.status == AllergyStatus.known).toList();
+  void addAllergy(Allergy a) {
+    _allergies.insert(0, a);
+    notifyListeners();
+  }
+
+  void updateAllergy(int i, Allergy a) {
+    if (i >= 0 && i < _allergies.length) {
+      _allergies[i] = a;
+      notifyListeners();
+    }
+  }
+
+  void removeAllergy(int i) {
+    if (i >= 0 && i < _allergies.length) {
+      _allergies.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- symptoms ----
+  List<SymptomEntry> get symptoms => List.unmodifiable(_symptoms);
+  void addSymptom(SymptomEntry s) {
+    _symptoms.insert(0, s);
+    notifyListeners();
+  }
+
+  void updateSymptom(int i, SymptomEntry s) {
+    if (i >= 0 && i < _symptoms.length) {
+      _symptoms[i] = s;
+      notifyListeners();
+    }
+  }
+
+  void removeSymptom(int i) {
+    if (i >= 0 && i < _symptoms.length) {
+      _symptoms.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- reports (manual records; file attachment is a future add) ----
+  List<MedicalReport> get reports => List.unmodifiable(_reports);
+  void addReport(MedicalReport r) {
+    _reports.insert(0, r);
+    notifyListeners();
+  }
+
+  void removeReport(int i) {
+    if (i >= 0 && i < _reports.length) {
+      _reports.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- emergency card (create / edit / delete) ----
+  EmergencyProfile? _emergency = kEmergency;
+  EmergencyProfile? get emergency => _emergency;
+  void setEmergency(EmergencyProfile e) {
+    _emergency = e;
+    notifyListeners();
+  }
+
+  void clearEmergency() {
+    _emergency = null;
+    notifyListeners();
   }
 }

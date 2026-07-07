@@ -44,7 +44,11 @@ const List<BoxShadow> _vCardShadow = [
 ];
 
 class AskVedaScreen extends StatefulWidget {
-  const AskVedaScreen({super.key});
+  const AskVedaScreen({super.key, this.initialQuery});
+
+  /// When provided (e.g. from a "FAQ" deep-link elsewhere in the app), the
+  /// screen opens straight onto the answer for this question.
+  final String? initialQuery;
 
   @override
   State<AskVedaScreen> createState() => _AskVedaScreenState();
@@ -94,6 +98,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   void initState() {
     super.initState();
     _roll();
+    final q = widget.initialQuery?.trim();
+    if (q != null && q.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _send(q);
+      });
+    }
   }
 
   void _roll() {

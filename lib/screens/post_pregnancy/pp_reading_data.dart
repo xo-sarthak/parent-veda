@@ -43,6 +43,15 @@ class ReadSection {
   final bool image;
 }
 
+/// The kind of read, used by the Learn filters.
+enum ReadKind { article, bookSummary, research }
+
+String readKindLabel(ReadKind k) => switch (k) {
+      ReadKind.article => 'Articles',
+      ReadKind.bookSummary => 'Book Summaries',
+      ReadKind.research => 'Research Summaries',
+    };
+
 class ReadArticle {
   const ReadArticle({
     required this.id,
@@ -56,6 +65,7 @@ class ReadArticle {
     required this.author,
     required this.authorRole,
     required this.sections,
+    this.kind = ReadKind.article,
     this.evidence,
     this.relatedActivity,
     this.relatedVideoId,
@@ -75,6 +85,7 @@ class ReadArticle {
   final String author;
   final String authorRole;
   final List<ReadSection> sections;
+  final ReadKind kind;
   final String? evidence; // a plain-language evidence note
   final String? relatedActivity;
   final String? relatedVideoId;
@@ -127,6 +138,7 @@ const List<ReadArticle> kReadArticles = [
     seed: 1,
     author: 'Dr. Ananya Rao',
     authorRole: 'Paediatrician',
+    kind: ReadKind.research,
     evidence: 'Aligned with paediatric sleep research on the maturation of infant sleep architecture around 3–4 months.',
     relatedVideoId: 'sleep4mo',
     relatedProductId: 'dozy',
@@ -254,6 +266,7 @@ const List<ReadArticle> kReadArticles = [
     seed: 4,
     author: 'Dr. Tara Joshi',
     authorRole: 'Child Psychologist',
+    kind: ReadKind.bookSummary,
     relatedCommunity: '2 Year Olds',
     sections: [
       ReadSection(paragraphs: [
@@ -292,6 +305,7 @@ const List<ReadArticle> kReadArticles = [
     seed: 5,
     author: 'Dr. Neha Sharma',
     authorRole: 'Paediatrician',
+    kind: ReadKind.research,
     evidence: 'Consistent with standard paediatric guidance; not a substitute for your doctor.',
     relatedCommunity: 'Delhi Parents',
     sections: [
@@ -436,6 +450,7 @@ const List<ReadArticle> kReadArticles = [
     seed: 9,
     author: 'Dr. Tara Joshi',
     authorRole: 'Perinatal Mental Health',
+    kind: ReadKind.bookSummary,
     relatedVideoId: 'mumwellness',
     relatedCommunity: 'Working Parents',
     sections: [
@@ -480,6 +495,28 @@ ReadArticle todaysRead() => readArticleById('sleepcycles');
 
 /// Personalised picks (seeded order stands in for the recommendation engine).
 List<ReadArticle> forYou() => ['leap4', 'solids', 'talking', 'tummytime', 'fever', 'matrescence'].map(readArticleById).toList();
+
+/// Articles of a given kind — for the Learn filters (All / Articles / Book
+/// Summaries / Research Summaries).
+List<ReadArticle> articlesOfKind(ReadKind k) => kReadArticles.where((a) => a.kind == k).toList();
+
+/// "Read next" — the next ARTICLES to keep reading (articles only, never mixed
+/// content). Prefers the same collection, then personalised picks, then catalog.
+List<ReadArticle> readNextArticles(ReadArticle article, {int limit = 4}) {
+  final seen = <String>{article.id};
+  final out = <ReadArticle>[];
+  void add(Iterable<ReadArticle> arts) {
+    for (final a in arts) {
+      if (out.length >= limit) return;
+      if (seen.add(a.id)) out.add(a);
+    }
+  }
+
+  add(kReadArticles.where((a) => a.collection == article.collection));
+  add(forYou());
+  add(kReadArticles);
+  return out.take(limit).toList();
+}
 
 // =============================================================================
 //  ReadingStore — saved, reading progress, and reader preferences.

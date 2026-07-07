@@ -12,15 +12,33 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'article_archive_screen.dart';
+import 'doctor_record_screen.dart';
 import 'pp_common.dart';
 import 'vaccination_compare_screen.dart';
 import 'vaccine_detail_screen.dart';
+import 'vaccine_learn_screen.dart';
 
 // Local status palette (green = free/done, brown = private-cost).
 const Color _green = Color(0xFF1F8A5B);
 const Color _greenTint = Color(0xFFEAF4EE);
 const Color _ringTrack = Color(0xFFECE5F2);
+
+// Aarav's completed first-year vaccines (all 13 — the count and the list match).
+const List<(String, String)> _completedVaccines = [
+  ('PCV — dose 2', '10 wk · 14 Jun'),
+  ('Pentavalent — dose 2', '10 wk · 14 Jun'),
+  ('Rotavirus — dose 2', '10 wk · 14 Jun'),
+  ('IPV — dose 2', '10 wk · 14 Jun'),
+  ('PCV — dose 1', '6 wk · 19 Apr'),
+  ('Pentavalent — dose 1', '6 wk · 19 Apr'),
+  ('Rotavirus — dose 1', '6 wk · 19 Apr'),
+  ('IPV — dose 1', '6 wk · 19 Apr'),
+  ('OPV — dose 1', '6 wk · 19 Apr'),
+  ('Hepatitis B — birth', 'Birth · 8 Mar'),
+  ('OPV — 0 (birth)', 'Birth · 8 Mar'),
+  ('BCG', 'Birth · 8 Mar'),
+  ('Vitamin K', 'Birth · 8 Mar'),
+];
 
 class VaccinationScreen extends StatefulWidget {
   const VaccinationScreen({super.key});
@@ -35,10 +53,6 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
-
-  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +98,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           // educational insight
           const SizedBox(height: 14),
           _pad(GestureDetector(
-            onTap: () => _push(const ArticleArchiveScreen()),
+            onTap: () => _push(const VaccineLearnScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -187,10 +201,8 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
               if (_showCompleted)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(children: const [
-                    _CompletedRow('PCV — dose 2', '10 wk · 14 Jun'),
-                    _CompletedRow('Pentavalent — dose 2', '10 wk · 14 Jun'),
-                    _CompletedRow('Rotavirus — dose 2', '10 wk · 14 Jun'),
+                  child: Column(children: [
+                    for (final v in _completedVaccines) _CompletedRow(v.$1, v.$2),
                   ]),
                 ),
             ]),
@@ -199,7 +211,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           // export
           const SizedBox(height: 18),
           _pad(GestureDetector(
-            onTap: _soon,
+            onTap: () => _push(const DoctorRecordScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -216,7 +228,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('Doctor-ready record', style: ppJakarta(14)),
                     const SizedBox(height: 1),
-                    Text('Export a clean PDF for the next visit', style: ppBody(12, color: ppMuted)),
+                    Text('A clean summary to share at the next visit', style: ppBody(12, color: ppMuted)),
                   ]),
                 ),
                 const SizedBox(width: 10),

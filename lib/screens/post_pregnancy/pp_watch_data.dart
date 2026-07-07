@@ -376,6 +376,52 @@ List<WatchVideo> get deepVideos => kWatchVideos.where((v) => !v.quick).toList();
 /// the stage-relevant hero (real engine would personalise; seeded for Aarav).
 WatchVideo todaysVideo({bool quick = false}) => quick ? watchVideoById('q_noise') : watchVideoById('sleep4mo');
 
+/// "Learn next" — the next VIDEOS to keep the learning thread going (videos only,
+/// never mixed content). Prefers the same category (and mode), then the same
+/// expert, then collection siblings, padding with the wider catalog if needed.
+List<WatchVideo> learnNextVideos(WatchVideo video, {int limit = 4}) {
+  final seen = <String>{video.id};
+  final out = <WatchVideo>[];
+  void add(Iterable<WatchVideo> vids) {
+    for (final v in vids) {
+      if (out.length >= limit) return;
+      if (seen.add(v.id)) out.add(v);
+    }
+  }
+
+  add(kWatchVideos.where((v) => v.category == video.category && v.quick == video.quick));
+  add(kWatchVideos.where((v) => v.category == video.category));
+  add(kWatchVideos.where((v) => v.expertId == video.expertId));
+  for (final c in kWatchCollections) {
+    if (c.videoIds.contains(video.id)) add(c.videoIds.map(watchVideoById));
+  }
+  add(kWatchVideos);
+  return out.take(limit).toList();
+}
+
+/// Expert collections, generated automatically from the catalog: every expert
+/// with 2+ videos becomes a finishable learning path — no per-collection authoring.
+List<WatchCollection> expertCollections() {
+  final byExpert = <String, List<WatchVideo>>{};
+  for (final v in kWatchVideos) {
+    (byExpert[v.expertId] ??= <WatchVideo>[]).add(v);
+  }
+  final out = <WatchCollection>[];
+  byExpert.forEach((expertId, vids) {
+    if (vids.length < 2) return;
+    final e = expertById(expertId);
+    out.add(WatchCollection(
+      id: 'expert_$expertId',
+      title: e.name,
+      subtitle: '${e.credential} · ${vids.length} lessons',
+      videoIds: vids.map((v) => v.id).toList(),
+      seed: vids.first.seed,
+    ));
+  });
+  out.sort((a, b) => b.videoIds.length.compareTo(a.videoIds.length));
+  return out;
+}
+
 // =============================================================================
 //  WatchStore — saved, following + continue-watching progress (in-memory seed).
 //  A ChangeNotifier singleton, matching the app's other stores.

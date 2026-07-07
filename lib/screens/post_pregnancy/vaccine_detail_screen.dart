@@ -10,10 +10,11 @@
 
 import 'package:flutter/material.dart';
 
-import 'article_archive_screen.dart';
+import '../../services/notification_service.dart';
 import 'askveda_screen.dart';
 import 'pp_common.dart';
 import 'product_detail_screen.dart';
+import 'vaccine_learn_screen.dart';
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -123,7 +124,7 @@ class VaccineDetailScreen extends StatelessWidget {
 
             // learn + ask veda
             const SizedBox(height: 20),
-            _pad(_crossLink(context, 'Learn', 'PCV: myths & safety, explained', const ArticleArchiveScreen(), top: true)),
+            _pad(_crossLink(context, 'Learn', 'PCV: why it matters, explained', const VaccineLearnScreen(), top: true)),
             _pad(_crossLink(context, 'Ask Veda', 'Can he get it if he has a fever?', const AskVedaScreen(), top: true, bottom: true)),
 
             const SizedBox(height: 20),
@@ -176,7 +177,7 @@ class VaccineDetailScreen extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () => _snack(context, 'Reminder set'),
+                onTap: () => _reminderSheet(context),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   width: 54,
@@ -192,6 +193,67 @@ class VaccineDetailScreen extends StatelessWidget {
       ]),
     );
   }
+
+  // ---- reminder scheduling ------------------------------------------------
+  void _reminderSheet(BuildContext context) {
+    final due = DateTime(2026, 7, 22, 9, 0); // PCV dose 3 due date (scenario)
+    void set(int daysBefore, String label) {
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.of(context).pop();
+      // Best-effort local notification (Android configured; a no-op if the
+      // platform can't schedule). Fire-and-forget — no context use after await.
+      NotificationService.instance.requestPermission();
+      NotificationService.instance.scheduleOneOff(
+        id: 700003,
+        title: 'Vaccine reminder — PCV dose 3',
+        body: daysBefore == 0
+            ? "Aarav's PCV dose 3 is due today (22 Jul)."
+            : "Aarav's PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} — 22 Jul.",
+        when: due.subtract(Duration(days: daysBefore)),
+      );
+      messenger.showSnackBar(SnackBar(content: Text('Reminder set — $label'), behavior: SnackBarBehavior.floating));
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ppBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
+            const SizedBox(height: 16),
+            Text('Remind me about this vaccine', style: ppJakarta(17)),
+            const SizedBox(height: 4),
+            Text('Due 22 Jul · we’ll send a gentle nudge.', style: ppBody(12.5, color: ppMuted)),
+            const SizedBox(height: 14),
+            _reminderOption('The day before', '21 Jul', () => set(1, '1 day before')),
+            _reminderOption('3 days before', '19 Jul', () => set(3, '3 days before')),
+            _reminderOption('A week before', '15 Jul', () => set(7, '1 week before')),
+            _reminderOption('On the day', '22 Jul', () => set(0, 'on the day')),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _reminderOption(String label, String date, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
+          child: Row(children: [
+            const Icon(Icons.notifications_active_outlined, size: 18, color: ppPurple),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+            Text(date, style: ppBody(12.5, color: ppMuted)),
+          ]),
+        ),
+      );
 
   Widget _fact(String big, String small, Color bigColor) => Expanded(
         child: Container(

@@ -215,15 +215,17 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         ],
       );
 
-  Widget _collectionsRail() => SizedBox(
+  Widget _collectionsRail() {
+    final cols = expertCollections();
+    return SizedBox(
         height: 216,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: kWatchCollections.length,
+          itemCount: cols.length,
           separatorBuilder: (_, _) => const SizedBox(width: 14),
           itemBuilder: (_, i) {
-            final c = kWatchCollections[i];
+            final c = cols[i];
             final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
             final prog = WatchStore.instance.collectionProgress(c);
             return GestureDetector(
@@ -246,6 +248,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           },
         ),
       );
+  }
 
   Widget _libraryLink() => GestureDetector(
         onTap: () => _push(const WatchLibraryScreen()),

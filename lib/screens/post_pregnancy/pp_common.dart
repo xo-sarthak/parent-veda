@@ -177,7 +177,7 @@ class PpBottomNav extends StatelessWidget {
   /// 0 = My Child · 1 = AskVeda · 2 = Tools · 3 = Community · 4 = Products
   final int active;
 
-  static const List<String> _labels = ['My Child', 'AskVeda', 'Tools', 'Community', 'Products'];
+  static const List<String> _labels = ['Today', 'AskVeda', 'Tools', 'Community', 'Products'];
 
   void _tap(BuildContext context, int i) {
     if (i == active) return;
@@ -320,8 +320,8 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
             Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoursesScreen()));
           case 'Room':
             openPpTab(context, 3); // Community
-          default: // FAQ and anything else → Ask Veda
-            openPpTab(context, 1);
+          default: // FAQ and anything else → Ask Veda, with the question preloaded
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AskVedaScreen(initialQuery: text)));
         }
       },
       behavior: HitTestBehavior.opaque,

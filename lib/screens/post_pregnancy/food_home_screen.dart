@@ -29,13 +29,17 @@ class FoodHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final meals = todaysMeals();
-    final focus = todaysFocus();
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: ListView(
+        child: AnimatedBuilder(
+          animation: FoodStore.instance,
+          builder: (context, _) {
+            final store = FoodStore.instance;
+            final meals = todaysMeals();
+            final focus = todaysFocus();
+            return ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
             _pad(ppBack(context, 'Explore')),
@@ -45,6 +49,9 @@ class FoodHomeScreen extends StatelessWidget {
             _pad(Text('What to feed Aarav today', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
             _pad(Text('Not just recipes — what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
+
+            const SizedBox(height: 16),
+            _pad(_vegToggle(store)),
 
             // 1 — Today's meals
             const SizedBox(height: 26),
@@ -98,10 +105,31 @@ class FoodHomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _pad(_savedLink(context)),
           ],
+        );
+          },
         ),
       ),
     );
   }
+
+  // ---- vegetarian toggle --------------------------------------------------
+  Widget _vegToggle(FoodStore store) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+        child: Row(children: [
+          Icon(Icons.eco_outlined, size: 18, color: store.vegOnly ? ppPurple : ppMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Vegetarian only', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('Show only veg meals, plans & suggestions', style: ppBody(12)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(onTap: store.toggleVeg, behavior: HitTestBehavior.opaque, child: ppSwitch(store.vegOnly)),
+        ]),
+      );
 
   // ---- today's meal card --------------------------------------------------
   Widget _mealCard(BuildContext context, String slot, FoodRecipe r) => GestureDetector(

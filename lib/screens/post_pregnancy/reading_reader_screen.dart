@@ -11,17 +11,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'food_recipe_screen.dart';
-import 'growth_activity_screen.dart';
 import 'pp_common.dart';
-import 'pp_food_data.dart';
-import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
-import 'pp_watch_data.dart';
-import 'product_detail_screen.dart';
 import 'reading_common.dart';
-import 'watch_player_screen.dart';
-import 'watch_quicklearn_screen.dart';
 
 class _RTheme {
   const _RTheme(this.bg, this.ink, this.soft, this.panel, this.rule, this.accent);
@@ -94,7 +86,6 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
   void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   @override
@@ -286,41 +277,30 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
     );
   }
 
-  // ---- read next ----------------------------------------------------------
+  // ---- read next (articles only — keep reading) ---------------------------
   Widget _readNext(_RTheme t) {
-    final steps = <(IconData, String, String, VoidCallback)>[
-      if (a.relatedActivity != null) (Icons.extension_outlined, 'Activity', a.relatedActivity!, () => _push(const GrowthActivityScreen())),
-      if (a.relatedVideoId != null)
-        (Icons.play_circle_outline, 'Watch', watchVideoById(a.relatedVideoId!).title, () {
-          final v = watchVideoById(a.relatedVideoId!);
-          _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
-        }),
-      if (a.relatedRecipeId != null) (Icons.restaurant_menu_outlined, 'Recipe', foodRecipeById(a.relatedRecipeId!).title, () => _push(FoodRecipeScreen(recipe: foodRecipeById(a.relatedRecipeId!)))),
-      if (a.relatedProductId != null) (Icons.shopping_bag_outlined, 'Product', productById(a.relatedProductId!).name, () => _push(ProductDetailScreen(product: productById(a.relatedProductId!)))),
-      if (a.relatedCommunity != null) (Icons.groups_outlined, 'Community', a.relatedCommunity!, () => openPpTab(context, 3)),
-      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about this', () => openPpTab(context, 1)),
-    ];
+    final next = readNextArticles(a);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Read next', style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
-      Text('Where this naturally leads — one step onward.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+      Text('Keep reading — more on this, one after another.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
-      for (final s in steps)
+      for (final na in next)
         GestureDetector(
-          onTap: s.$4,
+          onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => ReadingReaderScreen(article: na))),
           behavior: HitTestBehavior.opaque,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(15)),
             child: Row(children: [
-              Container(width: 38, height: 38, alignment: Alignment.center, decoration: BoxDecoration(color: t.bg, borderRadius: BorderRadius.circular(11)), child: Icon(s.$1, size: 18, color: t.accent)),
+              Container(width: 38, height: 38, alignment: Alignment.center, decoration: BoxDecoration(color: t.bg, borderRadius: BorderRadius.circular(11)), child: Icon(Icons.menu_book_outlined, size: 18, color: t.accent)),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(s.$2.toUpperCase(), style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
+                  Text('${readKindLabel(na.kind).toUpperCase()} · ${na.minutes} MIN', style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
                   const SizedBox(height: 3),
-                  Text(s.$3, style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(na.title, style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
               Icon(Icons.chevron_right_rounded, size: 20, color: t.soft),

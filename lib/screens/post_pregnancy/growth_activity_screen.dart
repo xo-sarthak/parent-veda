@@ -2,16 +2,161 @@
 //  GrowthActivityScreen — Growth · activity detail (parenting app · S8)
 // -----------------------------------------------------------------------------
 //  A play, fully explained: why it works → how to play (numbered) → mark-done →
-//  optional extensions → go-deeper. Faithful build of Claude Design S8. Reached
-//  from Home → Today's play → How to play.
+//  optional extensions → go-deeper. Faithful build of Claude Design S8.
+//
+//  Now DATA-DRIVEN: the screen renders whichever [GrowthActivity] it is given so
+//  that every "activity" card across the app (Peekaboo, Reach for the ring, a new
+//  sound, tummy time, narrating) opens its OWN content instead of always showing
+//  Peekaboo. Defaults to Peekaboo for back-compatibility with existing callers.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 
+/// One fully-explained play. Kept small and const so callers can pass a preset.
+class GrowthActivity {
+  const GrowthActivity({
+    required this.eyebrow,
+    required this.title,
+    required this.why,
+    required this.steps,
+    required this.extendNote,
+    required this.products,
+    required this.deeper,
+  });
+
+  final String eyebrow;
+  final String title;
+  final String why;
+  final List<String> steps;
+  final String extendNote;
+  // (title, why, price, productId)
+  final List<(String, String, String, String)> products;
+  // (pill, text)
+  final List<(String, String)> deeper;
+}
+
+// ---- presets ----------------------------------------------------------------
+const GrowthActivity kActPeekaboo = GrowthActivity(
+  eyebrow: 'Grow · 5 min',
+  title: 'Peekaboo, slow and silly',
+  why:
+      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches Aarav that you still exist when you vanish — the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
+  steps: [
+    'Cover your face with your hands, or a light muslin cloth.',
+    'Pause a beat — let him wonder where you went.',
+    'Reappear with a bright "peekaboo!" and a big smile.',
+    "Repeat while he's delighted; stop before he tires.",
+  ],
+  extendNote: 'Optional — the game needs nothing but you.',
+  products: [
+    ('Curious Cubs · peekaboo cloth book', 'Flaps that hide and reveal.', '₹399', 'clothbook'),
+    ('Soft baby mirror', 'Tummy-time faces to reappear into.', '₹549', 'crinkle'),
+  ],
+  deeper: [
+    ('FAQ', 'When does object permanence develop?'),
+    ('Course', 'Play & Brain · Leap 4 activities'),
+    ('Room', 'Boy moms · favourite 4-month games'),
+  ],
+);
+
+const GrowthActivity kActReachRing = GrowthActivity(
+  eyebrow: 'Grow · 4 min',
+  title: 'Reach for the ring',
+  why:
+      "At four months, reaching becomes intentional — hand and eye start working as a team. Holding a light ring just within reach invites Aarav to plan a movement, stretch and grasp: the groundwork for every skill that needs two coordinated hands.",
+  steps: [
+    'Sit him propped, or lay him on his back, well supported.',
+    'Hold a light ring or rattle a hand-span above his chest.',
+    'Wait — let him track it, then aim and swipe. Cheer the try, not just the catch.',
+    'Move it slowly side to side so he reaches across his midline.',
+  ],
+  extendNote: 'Optional — your hands and any light toy are enough.',
+  products: [
+    ('Wooden grasping ring', 'Light, easy for new hands to hold.', '₹299', 'crinkle'),
+    ('Soft crinkle toy', 'Sound rewards every reach.', '₹349', 'clothbook'),
+  ],
+  deeper: [
+    ('FAQ', 'When do babies reach and grasp?'),
+    ('Course', 'Play & Brain · hand skills'),
+    ('Room', '4-month play ideas'),
+  ],
+);
+
+const GrowthActivity kActNewSound = GrowthActivity(
+  eyebrow: 'Grow · 3 min',
+  title: 'Introduce a new sound',
+  why:
+      "Aarav is mapping the world by ear now. A gentle new sound — a shaker, a spoon on a cup, your humming — makes him still, search and connect what he hears to where it comes from. That listening-and-locating is the very root of language and attention.",
+  steps: [
+    'Choose one soft, clear sound — a rattle, a spoon on a cup, a hum.',
+    'Out of his sight, make the sound to one side and pause.',
+    'Watch him still, then turn toward it — narrate: "You heard that!"',
+    'Try the other side, and let him reach for the source.',
+  ],
+  extendNote: 'Optional — everyday household sounds work beautifully.',
+  products: [
+    ('Soft chime rattle', 'A clear, gentle sound to find.', '₹349', 'crinkle'),
+    ('Cloth activity book', 'Crinkle pages to explore.', '₹399', 'clothbook'),
+  ],
+  deeper: [
+    ('FAQ', 'How does hearing shape early language?'),
+    ('Course', 'Play & Brain · sound & listening'),
+    ('Room', 'Sensory play ideas'),
+  ],
+);
+
+const GrowthActivity kActTummyTime = GrowthActivity(
+  eyebrow: 'Grow · 5 min',
+  title: 'Tummy time, made joyful',
+  why:
+      "Every minute on his front strengthens the neck, shoulders and core that rolling, sitting and crawling will need. Many babies protest at four months — so we make it short, social and rewarding, with your face as the prize.",
+  steps: [
+    'Lay him on a firm, flat surface on his tummy.',
+    'Get down to his level, face to face, and talk.',
+    'Add a mirror or toy just ahead to tempt a reach.',
+    'Keep it short and frequent — stop before the fuss builds.',
+  ],
+  extendNote: 'Optional — a mirror or toy simply adds delight.',
+  products: [
+    ('Soft baby mirror', 'A friendly face to lift up for.', '₹549', 'crinkle'),
+    ('Tummy-time cloth book', 'Props up an inch of interest.', '₹399', 'clothbook'),
+  ],
+  deeper: [
+    ('FAQ', 'How much tummy time at 4 months?'),
+    ('Course', 'Motor skills · the road to rolling'),
+    ('Room', 'Tummy-time wins & tips'),
+  ],
+);
+
+const GrowthActivity kActNarrate = GrowthActivity(
+  eyebrow: 'Grow · 5 min',
+  title: 'Narrate your day',
+  why:
+      "Long before his first word, Aarav is building the ear for language. When you narrate — 'now we pour the water' — and pause as if for his reply, you hand him the rhythm of conversation and thousands of words a day to soak in.",
+  steps: [
+    'Pick an everyday moment — a nappy change, cooking, a walk.',
+    'Say what you are doing, simply and warmly.',
+    'Pause, as if waiting for his answer.',
+    'When he coos back, respond — that is his first conversation.',
+  ],
+  extendNote: 'Optional — your voice is the only tool you need.',
+  products: [
+    ('Soft cloth book', 'First words to read aloud.', '₹399', 'clothbook'),
+    ('Board book set', 'Simple images to name together.', '₹499', 'crinkle'),
+  ],
+  deeper: [
+    ('FAQ', 'How do babies learn language before speaking?'),
+    ('Course', 'Language · the talking baby'),
+    ('Room', 'Chatty-baby ideas'),
+  ],
+);
+
 class GrowthActivityScreen extends StatefulWidget {
-  const GrowthActivityScreen({super.key});
+  const GrowthActivityScreen({super.key, this.activity = kActPeekaboo});
+
+  final GrowthActivity activity;
 
   @override
   State<GrowthActivityScreen> createState() => _GrowthActivityScreenState();
@@ -25,6 +170,7 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final a = widget.activity;
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -35,9 +181,9 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
             _pad(ppBack(context, "Today's play")),
 
             const SizedBox(height: 24),
-            _pad(ppEyebrow('Grow · 5 min')),
+            _pad(ppEyebrow(a.eyebrow)),
             const SizedBox(height: 10),
-            _pad(Text('Peekaboo, slow and silly', style: ppFraunces(31, h: 1.15))),
+            _pad(Text(a.title, style: ppFraunces(31, h: 1.15))),
 
             const SizedBox(height: 20),
             _pad(Container(
@@ -46,19 +192,15 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ppEyebrow('Why it works', color: ppPurple, spacing: 0.8),
                 const SizedBox(height: 8),
-                Text(
-                    "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches Aarav that you still exist when you vanish — the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
-                    style: ppBody(14, color: ppInk, h: 1.6)),
+                Text(a.why, style: ppBody(14, color: ppInk, h: 1.6)),
               ]),
             )),
 
             _pad(ppSectionDivider()),
             _pad(ppEyebrow('How to play', color: ppSoft, spacing: 1.2)),
             const SizedBox(height: 6),
-            _pad(_step('01', 'Cover your face with your hands, or a light muslin cloth.', top: true)),
-            _pad(_step('02', 'Pause a beat — let him wonder where you went.', top: true)),
-            _pad(_step('03', 'Reappear with a bright "peekaboo!" and a big smile.', top: true)),
-            _pad(_step('04', "Repeat while he's delighted; stop before he tires.", top: true, bottom: true)),
+            for (int i = 0; i < a.steps.length; i++)
+              _pad(_step((i + 1).toString().padLeft(2, '0'), a.steps[i], top: true, bottom: i == a.steps.length - 1)),
 
             const SizedBox(height: 22),
             _pad(Row(children: [
@@ -94,17 +236,17 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
             _pad(ppSectionDivider()),
             _pad(Text('To extend the play', style: ppJakarta(16))),
             const SizedBox(height: 6),
-            _pad(Text('Optional — the game needs nothing but you.', style: ppBody(12, color: ppMuted))),
+            _pad(Text(a.extendNote, style: ppBody(12, color: ppMuted))),
             const SizedBox(height: 14),
-            _pad(ppProductRow(context, 'Curious Cubs · peekaboo cloth book', 'Flaps that hide and reveal.', '₹399', top: true, productId: 'clothbook')),
-            _pad(ppProductRow(context, 'Soft baby mirror', 'Tummy-time faces to reappear into.', '₹549', top: true, bottom: true, productId: 'crinkle')),
+            for (int i = 0; i < a.products.length; i++)
+              _pad(ppProductRow(context, a.products[i].$1, a.products[i].$2, a.products[i].$3,
+                  top: true, bottom: i == a.products.length - 1, productId: a.products[i].$4)),
 
             _pad(ppSectionDivider()),
             _pad(Text('Go deeper', style: ppJakarta(16))),
             const SizedBox(height: 14),
-            _pad(ppDeeperRow(context, 'FAQ', 'When does object permanence develop?', top: true)),
-            _pad(ppDeeperRow(context, 'Course', 'Play & Brain · Leap 4 activities', top: true)),
-            _pad(ppDeeperRow(context, 'Room', 'Boy moms · favourite 4-month games', top: true, bottom: true)),
+            for (int i = 0; i < a.deeper.length; i++)
+              _pad(ppDeeperRow(context, a.deeper[i].$1, a.deeper[i].$2, top: true, bottom: i == a.deeper.length - 1)),
           ],
         ),
       ),

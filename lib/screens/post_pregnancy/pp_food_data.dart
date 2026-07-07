@@ -623,9 +623,22 @@ FoodRecipe foodRecipeById(String id) =>
     kFoodRecipes.firstWhere((r) => r.id == id, orElse: () => kFoodRecipes.first);
 NutritionFocus focusById(String id) =>
     kNutritionFocuses.firstWhere((f) => f.id == id, orElse: () => kNutritionFocuses.first);
-List<FoodRecipe> foodByCategory(String category) =>
-    kFoodRecipes.where((r) => r.category == category || r.tags.contains(category.toLowerCase())).toList();
-List<FoodRecipe> get recommendedFood => kFoodRecipes.take(6).toList();
+List<FoodRecipe> foodByCategory(String category) => kFoodRecipes
+    .where((r) => (r.category == category || r.tags.contains(category.toLowerCase())) && (!FoodStore.instance.vegOnly || r.veg))
+    .toList();
+List<FoodRecipe> get recommendedFood =>
+    kFoodRecipes.where((r) => !FoodStore.instance.vegOnly || r.veg).take(6).toList();
+
+/// The controlled ingredient library — every ingredient key used anywhere in the
+/// recipe database. The Smart Meal Builder offers only these (never arbitrary
+/// items), so a chosen ingredient always maps to real, matchable recipes.
+List<String> foodIngredientLibrary() {
+  final set = <String>{};
+  for (final r in kFoodRecipes) {
+    set.addAll(r.ingredientKeys);
+  }
+  return set.toList()..sort();
+}
 
 /// Today's focus (a real engine would rotate/personalise; iron leads for a
 /// baby starting solids).
@@ -644,7 +657,7 @@ Map<String, FoodRecipe> todaysMeals() => {
 /// day index so "regenerate" can vary it without randomness in tests.
 Map<String, FoodRecipe> planForDay(int dayIndex) {
   FoodRecipe slot(String s, int offset) {
-    final pool = kFoodRecipes.where((r) => r.slot == s).toList();
+    final pool = kFoodRecipes.where((r) => r.slot == s && (!FoodStore.instance.vegOnly || r.veg)).toList();
     final list = pool.isEmpty ? kFoodRecipes : pool;
     return list[(dayIndex + offset) % list.length];
   }
@@ -673,6 +686,7 @@ List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, 
   for (final r in kFoodRecipes) {
     if (r.slot != meal) continue;
     if (r.totalMin > maxMinutes) continue;
+    if (FoodStore.instance.vegOnly && !r.veg) continue;
     final matched = r.ingredientKeys.where(has.contains).length;
     final missing = r.ingredientKeys.where((k) => !has.contains(k)).toList();
     scored.add(MealSuggestion(r, missing, matched));
@@ -694,12 +708,23 @@ class FoodStore extends ChangeNotifier {
   final Set<String> _saved = {'moongkhichdi', 'ragipancake'};
   final Map<String, bool> _shopping = {}; // ingredient line -> purchased
   final List<String> _cooked = ['moongkhichdi', 'sweetpotatomash'];
+  bool _vegOnly = false;
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {
     _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
     notifyListeners();
   }
+
+  /// Vegetarian-only mode: when on, every suggestion, plan, recommendation and
+  /// Smart-Meal-Builder result is filtered to vegetarian recipes.
+  bool get vegOnly => _vegOnly;
+  void setVeg(bool v) {
+    _vegOnly = v;
+    notifyListeners();
+  }
+
+  void toggleVeg() => setVeg(!_vegOnly);
 
   List<FoodRecipe> get saved => _saved.map(foodRecipeById).toList();
   List<FoodRecipe> get recentlyCooked => _cooked.map(foodRecipeById).toList();

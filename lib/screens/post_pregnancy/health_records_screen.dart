@@ -1,10 +1,12 @@
 // =============================================================================
-//  HealthRecordsScreen — one Medical History category, organised (not folders)
+//  HealthRecordsScreen — one Medical History category, with full CRUD
 // -----------------------------------------------------------------------------
 //  Renders a single category — Doctor visits / Medications / Reports / Symptoms /
-//  Allergies — as clean, understandable cards with a search field and thoughtful
-//  empty states. Reports show extracted values (with any abnormal flags); the
-//  symptom list carries a gentle pattern note. Uploading a report is stubbed.
+//  Allergies — as clean cards with search and thoughtful empty states, backed by
+//  the mutable HealthStore. Medications, allergies and symptoms can be added,
+//  edited and deleted; reports can be added and deleted. Every section that shows
+//  information also offers an obvious way to add to it. Doctor visits are drawn
+//  from the health timeline and stay read-only here.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -22,10 +24,10 @@ class HealthRecordsScreen extends StatefulWidget {
 
 class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   String _q = '';
+  final _store = HealthStore.instance;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   bool _match(String s) => _q.isEmpty || s.toLowerCase().contains(_q.toLowerCase());
-  void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   String get _title => switch (widget.category) {
         'visits' => 'Doctor visits',
@@ -36,28 +38,62 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         _ => 'Records',
       };
 
+  static String _today() {
+    final d = DateTime.now();
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${d.day} ${m[d.month - 1]} ${d.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
-          children: [
-            _pad(ppBack(context, 'Health')),
-            const SizedBox(height: 18),
-            _pad(ppEyebrow('Medical history', color: ppPurple)),
-            const SizedBox(height: 8),
-            _pad(Text(_title, style: ppFraunces(28, h: 1.12))),
-            const SizedBox(height: 16),
-            _pad(_search()),
-            const SizedBox(height: 20),
-            ..._body(),
-          ],
+        child: AnimatedBuilder(
+          animation: _store,
+          builder: (context, _) => ListView(
+            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            children: [
+              _pad(ppBack(context, 'Health')),
+              const SizedBox(height: 18),
+              _pad(ppEyebrow('Medical history', color: ppPurple)),
+              const SizedBox(height: 8),
+              _pad(Text(_title, style: ppFraunces(28, h: 1.12))),
+              const SizedBox(height: 16),
+              _pad(_search()),
+              const SizedBox(height: 16),
+              if (_addLabel != null) ...[
+                _pad(_addButton(_addLabel!, _onAdd)),
+                const SizedBox(height: 16),
+              ],
+              ..._body(),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  String? get _addLabel => switch (widget.category) {
+        'medications' => 'Add medication',
+        'reports' => 'Add a report',
+        'symptoms' => 'Log a symptom',
+        'allergies' => 'Add an allergy',
+        _ => null,
+      };
+
+  void _onAdd() {
+    switch (widget.category) {
+      case 'medications':
+        _medSheet();
+      case 'reports':
+        _reportSheet();
+      case 'symptoms':
+        _symptomSheet();
+      case 'allergies':
+        _allergySheet();
+    }
   }
 
   Widget _search() => Container(
@@ -76,16 +112,32 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ]),
       );
 
+  Widget _addButton(String label, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 13),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.add_rounded, size: 18, color: ppPurple),
+            const SizedBox(width: 8),
+            Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+          ]),
+        ),
+      );
+
   List<Widget> _body() {
     switch (widget.category) {
       case 'medications':
-        return _list([for (final m in kMedications) if (_match('${m.name} ${m.reason} ${m.doctor}')) _medCard(m)], 'No medications recorded.');
+        final meds = _store.medications;
+        final cards = [for (int i = 0; i < meds.length; i++) if (_match('${meds[i].name} ${meds[i].reason} ${meds[i].doctor}')) _medCard(meds[i], i)];
+        return _list(cards, 'No medications recorded yet.');
       case 'reports':
-        return [
-          ...[for (final r in kReports) if (_match('${r.name} ${r.summary}')) _pad(_reportCard(r))],
-          _pad(_uploadRow()),
-        ];
+        final reports = _store.reports;
+        return [for (int i = 0; i < reports.length; i++) if (_match('${reports[i].name} ${reports[i].summary}')) _pad(_reportCard(reports[i], i))];
       case 'symptoms':
+        final syms = _store.symptoms;
         return [
           _pad(Container(
             padding: const EdgeInsets.all(15),
@@ -93,11 +145,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Icon(Icons.auto_awesome, size: 15, color: ppPurple),
               const SizedBox(width: 10),
-              Expanded(child: Text('So far, his symptoms have been limited to a single mild cold and a brief post-vaccine fever — both common and self-limiting.', style: ppBody(12.5, h: 1.5))),
+              Expanded(child: Text('Log anything you notice — a temperature, a rash, a rough night. A clear record helps you and the doctor spot patterns.', style: ppBody(12.5, h: 1.5))),
             ]),
           )),
           const SizedBox(height: 16),
-          ..._list([for (final s in kSymptoms) if (_match('${s.name} ${s.note}')) _symptomCard(s)], 'No symptoms recorded.'),
+          ..._list([for (int i = 0; i < syms.length; i++) if (_match('${syms[i].name} ${syms[i].note}')) _symptomCard(syms[i], i)], 'No symptoms logged yet.'),
         ];
       case 'allergies':
         return _allergies();
@@ -119,29 +171,38 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         child: Text(msg, style: ppBody(13.5, color: ppMuted, h: 1.5)),
       );
 
-  Widget _card(Widget child) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
-        child: child,
+  Widget _card(Widget child, {VoidCallback? onTap}) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+          child: child,
+        ),
       );
 
-  Widget _medCard(Medication m) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(child: Text(m.name, style: ppJakarta(14.5))),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-            decoration: BoxDecoration(color: (m.completed ? ppMuted : ppPurple).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
-            child: Text(m.completed ? 'Completed' : 'Ongoing', style: ppBody(10.5, color: m.completed ? ppSoft : ppPurple, w: FontWeight.w700)),
-          ),
+  Widget _medCard(Medication m, int i) => _card(
+        onTap: () => _medSheet(existing: m, index: i),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(m.name, style: ppJakarta(14.5))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(color: (m.completed ? ppMuted : ppPurple).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+              child: Text(m.completed ? 'Completed' : 'Ongoing', style: ppBody(10.5, color: m.completed ? ppSoft : ppPurple, w: FontWeight.w700)),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+          ]),
+          const SizedBox(height: 6),
+          Text(m.reason, style: ppBody(13, h: 1.4)),
+          const SizedBox(height: 8),
+          Text('${m.dosage} · ${m.duration}', style: ppBody(12, color: ppSoft)),
+          const SizedBox(height: 3),
+          Text('${m.doctor} · ${m.date}', style: ppBody(11.5, color: ppMuted)),
         ]),
-        const SizedBox(height: 6),
-        Text(m.reason, style: ppBody(13, h: 1.4)),
-        const SizedBox(height: 8),
-        Text('${m.dosage} · ${m.duration}', style: ppBody(12, color: ppSoft)),
-        const SizedBox(height: 3),
-        Text('${m.doctor} · ${m.date}', style: ppBody(11.5, color: ppMuted)),
-      ]));
+      );
 
   Widget _visitCard(HealthEvent e) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [Expanded(child: Text(e.title, style: ppJakarta(14.5))), Text(e.date, style: ppBody(11, color: ppMuted))]),
@@ -150,13 +211,16 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         if (e.doctor != null) ...[const SizedBox(height: 8), Text(e.doctor!, style: ppBody(11.5, color: ppMuted))],
       ]));
 
-  Widget _symptomCard(SymptomEntry s) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text(s.name, style: ppJakarta(14.5))), Text(s.date, style: ppBody(11, color: ppMuted))]),
-        const SizedBox(height: 5),
-        Text(s.note, style: ppBody(13, h: 1.4)),
-      ]));
+  Widget _symptomCard(SymptomEntry s, int i) => _card(
+        onTap: () => _symptomSheet(existing: s, index: i),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [Expanded(child: Text(s.name, style: ppJakarta(14.5))), Text(s.date, style: ppBody(11, color: ppMuted))]),
+          const SizedBox(height: 5),
+          Text(s.note, style: ppBody(13, h: 1.4)),
+        ]),
+      );
 
-  Widget _reportCard(MedicalReport r) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget _reportCard(MedicalReport r, int i) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.description_outlined, size: 18, color: ppPurple)),
           const SizedBox(width: 12),
@@ -165,47 +229,42 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             const SizedBox(height: 2),
             Text('${r.date}${r.doctor != null ? ' · ${r.doctor}' : ''}', style: ppBody(11.5, color: ppMuted)),
           ])),
+          GestureDetector(
+            onTap: () => _confirmDelete('Delete this report?', () => _store.removeReport(i)),
+            behavior: HitTestBehavior.opaque,
+            child: const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
+          ),
         ]),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: ppBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppHair)),
-          child: Column(children: [
-            for (final v in r.values)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(children: [
-                  Expanded(child: Text(v.label, style: ppBody(12.5, color: ppSoft))),
-                  Text(v.value, style: ppBody(12.5, color: v.flag == 'normal' ? ppInk : ppCoral, w: FontWeight.w700)),
-                ]),
-              ),
+        if (r.values.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: ppBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppHair)),
+            child: Column(children: [
+              for (final v in r.values)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(children: [
+                    Expanded(child: Text(v.label, style: ppBody(12.5, color: ppSoft))),
+                    Text(v.value, style: ppBody(12.5, color: v.flag == 'normal' ? ppInk : ppCoral, w: FontWeight.w700)),
+                  ]),
+                ),
+            ]),
+          ),
+        ],
+        if (r.summary.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Icon(Icons.auto_awesome, size: 14, color: ppPurple),
+            const SizedBox(width: 8),
+            Expanded(child: Text(r.summary, style: ppBody(12.5, color: ppInk, h: 1.5))),
           ]),
-        ),
-        const SizedBox(height: 10),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.auto_awesome, size: 14, color: ppPurple),
-          const SizedBox(width: 8),
-          Expanded(child: Text(r.summary, style: ppBody(12.5, color: ppInk, h: 1.5))),
-        ]),
+        ],
       ]));
 
-  Widget _uploadRow() => GestureDetector(
-        onTap: () => _soon('Report upload — extracting values automatically is coming soon'),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.upload_file_outlined, size: 18, color: ppPurple),
-            const SizedBox(width: 8),
-            Text('Upload a report', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-          ]),
-        ),
-      );
-
   List<Widget> _allergies() {
-    final known = kAllergies.where((a) => a.status == AllergyStatus.known).toList();
+    final all = _store.allergies;
+    final known = _store.knownAllergies;
     return [
       _pad(Container(
         padding: const EdgeInsets.all(18),
@@ -221,12 +280,294 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ]),
       )),
       const SizedBox(height: 14),
-      if (known.isNotEmpty) _pad(Column(children: [for (final a in known) _card(Text(a.name, style: ppJakarta(14)))])),
-      _pad(GestureDetector(
-        onTap: () => _soon('Add an allergy — coming soon'),
-        behavior: HitTestBehavior.opaque,
-        child: Row(children: [const Icon(Icons.add_rounded, size: 18, color: ppPurple), const SizedBox(width: 8), Text('Add an allergy', style: ppBody(13, color: ppPurple, w: FontWeight.w700))]),
-      )),
+      if (all.isNotEmpty)
+        _pad(Column(children: [
+          for (int i = 0; i < all.length; i++)
+            if (_match('${all[i].name} ${all[i].note}')) _allergyCard(all[i], i),
+        ])),
     ];
   }
+
+  Widget _allergyCard(Allergy a, int i) => _card(
+        onTap: () => _allergySheet(existing: a, index: i),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(a.name, style: ppJakarta(14.5))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
+              child: Text(_allergyStatusLabel(a.status), style: ppBody(10.5, color: ppPurple, w: FontWeight.w700)),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+          ]),
+          if (a.severity.isNotEmpty || a.note.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text([if (a.severity.isNotEmpty) a.severity, if (a.note.isNotEmpty) a.note].join(' · '), style: ppBody(13, h: 1.4)),
+          ],
+        ]),
+      );
+
+  // =========================================================================
+  //  Add / edit sheets
+  // =========================================================================
+  void _medSheet({Medication? existing, int? index}) {
+    final name = TextEditingController(text: existing?.name ?? '');
+    final reason = TextEditingController(text: existing?.reason ?? '');
+    final dosage = TextEditingController(text: existing?.dosage ?? '');
+    final duration = TextEditingController(text: existing?.duration ?? '');
+    final doctor = TextEditingController(text: existing?.doctor ?? '');
+    bool completed = existing?.completed ?? false;
+    _sheet(
+      title: existing == null ? 'Add medication' : 'Edit medication',
+      onDelete: index == null ? null : () => _store.removeMedication(index),
+      fields: (setSheet) => [
+        _tf(name, 'Name'),
+        _tf(reason, 'Reason'),
+        _tf(dosage, 'Dosage'),
+        _tf(duration, 'Duration'),
+        _tf(doctor, 'Prescribed by'),
+        _toggleRow('Completed', completed, (v) => setSheet(() => completed = v)),
+      ],
+      onSave: () {
+        if (name.text.trim().isEmpty) return false;
+        final m = Medication(
+          name: name.text.trim(),
+          reason: reason.text.trim(),
+          doctor: doctor.text.trim().isEmpty ? '—' : doctor.text.trim(),
+          dosage: dosage.text.trim(),
+          duration: duration.text.trim(),
+          completed: completed,
+          date: existing?.date ?? _today(),
+        );
+        index == null ? _store.addMedication(m) : _store.updateMedication(index, m);
+        return true;
+      },
+    );
+  }
+
+  void _allergySheet({Allergy? existing, int? index}) {
+    final name = TextEditingController(text: existing?.name ?? '');
+    final severity = TextEditingController(text: existing?.severity ?? '');
+    final note = TextEditingController(text: existing?.note ?? '');
+    AllergyStatus status = existing?.status ?? AllergyStatus.known;
+    _sheet(
+      title: existing == null ? 'Add allergy' : 'Edit allergy',
+      onDelete: index == null ? null : () => _store.removeAllergy(index),
+      fields: (setSheet) => [
+        _tf(name, 'Allergen'),
+        _label('Status'),
+        _statusChips(status, (s) => setSheet(() => status = s)),
+        const SizedBox(height: 12),
+        _tf(severity, 'Severity (e.g. mild, severe)'),
+        _tf(note, 'Note', maxLines: 3),
+      ],
+      onSave: () {
+        if (name.text.trim().isEmpty) return false;
+        final a = Allergy(name.text.trim(), status, severity.text.trim(), note.text.trim());
+        index == null ? _store.addAllergy(a) : _store.updateAllergy(index, a);
+        return true;
+      },
+    );
+  }
+
+  void _symptomSheet({SymptomEntry? existing, int? index}) {
+    final name = TextEditingController(text: existing?.name ?? '');
+    final note = TextEditingController(text: existing?.note ?? '');
+    _sheet(
+      title: existing == null ? 'Log a symptom' : 'Edit symptom',
+      onDelete: index == null ? null : () => _store.removeSymptom(index),
+      fields: (setSheet) => [
+        _tf(name, 'Symptom (e.g. fever, rash)'),
+        _tf(note, 'What you noticed', maxLines: 3),
+      ],
+      onSave: () {
+        if (name.text.trim().isEmpty) return false;
+        final s = SymptomEntry(name.text.trim(), existing?.date ?? _today(), note.text.trim());
+        index == null ? _store.addSymptom(s) : _store.updateSymptom(index, s);
+        return true;
+      },
+    );
+  }
+
+  void _reportSheet() {
+    final name = TextEditingController();
+    final summary = TextEditingController();
+    _sheet(
+      title: 'Add a report',
+      fields: (setSheet) => [
+        _tf(name, 'Report name (e.g. Blood test)'),
+        _tf(summary, 'Summary / key findings', maxLines: 4),
+      ],
+      onSave: () {
+        if (name.text.trim().isEmpty) return false;
+        _store.addReport(MedicalReport(name: name.text.trim(), date: _today(), summary: summary.text.trim()));
+        return true;
+      },
+    );
+  }
+
+  // ---- sheet scaffolding --------------------------------------------------
+  void _sheet({
+    required String title,
+    required List<Widget> Function(void Function(void Function())) fields,
+    required bool Function() onSave,
+    VoidCallback? onDelete,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ppBg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
+                const SizedBox(height: 16),
+                Row(children: [
+                  Expanded(child: Text(title, style: ppJakarta(18))),
+                  if (onDelete != null)
+                    GestureDetector(
+                      onTap: () {
+                        onDelete();
+                        Navigator.of(ctx).pop();
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: const Icon(Icons.delete_outline_rounded, size: 22, color: ppCoral),
+                    ),
+                ]),
+                const SizedBox(height: 16),
+                ...fields(setSheet),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    if (onSave()) Navigator.of(ctx).pop();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                    child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmDelete(String title, VoidCallback onConfirm) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ppBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text(title, style: ppJakarta(16)),
+            const SizedBox(height: 18),
+            Row(children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(ctx).pop(),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    height: 48,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
+                    child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    onConfirm();
+                    Navigator.of(ctx).pop();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    height: 48,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
+                    child: Text('Delete', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
+                  ),
+                ),
+              ),
+            ]),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // ---- small form parts ---------------------------------------------------
+  Widget _label(String t) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(t, style: ppBody(12, color: ppSoft, w: FontWeight.w700)),
+      );
+
+  Widget _tf(TextEditingController c, String label, {int maxLines = 1}) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _label(label),
+          Container(
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppLine)),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: TextField(
+              controller: c,
+              maxLines: maxLines,
+              style: ppBody(14, color: ppInk),
+              decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
+            ),
+          ),
+        ]),
+      );
+
+  Widget _toggleRow(String label, bool value, ValueChanged<bool> onChanged) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(children: [
+          Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+          GestureDetector(onTap: () => onChanged(!value), behavior: HitTestBehavior.opaque, child: ppSwitch(value)),
+        ]),
+      );
+
+  Widget _statusChips(AllergyStatus value, ValueChanged<AllergyStatus> onChanged) => Row(
+        children: [
+          for (final s in AllergyStatus.values)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => onChanged(s),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: value == s ? ppPurple : Colors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: value == s ? ppPurple : ppLine),
+                  ),
+                  child: Text(_allergyStatusLabel(s), style: ppBody(12, color: value == s ? Colors.white : ppInk, w: FontWeight.w700)),
+                ),
+              ),
+            ),
+        ],
+      );
+
+  String _allergyStatusLabel(AllergyStatus s) => switch (s) {
+        AllergyStatus.known => 'Known',
+        AllergyStatus.suspected => 'Suspected',
+        AllergyStatus.resolved => 'Resolved',
+      };
 }

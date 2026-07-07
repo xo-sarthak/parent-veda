@@ -11,15 +11,11 @@
 
 import 'package:flutter/material.dart';
 
-import 'article_reader_screen.dart';
-import 'growth_activity_screen.dart';
 import 'pp_common.dart';
-import 'pp_products_data.dart';
 import 'pp_watch_data.dart';
-import 'product_detail_screen.dart';
 import 'provider_profile_screen.dart';
-import 'recipes_screen.dart';
 import 'watch_common.dart';
+import 'watch_quicklearn_screen.dart';
 
 class WatchPlayerScreen extends StatefulWidget {
   const WatchPlayerScreen({super.key, required this.video});
@@ -282,29 +278,24 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
         },
       );
 
-  // ---- Learn next (the signature chain) -----------------------------------
+  // ---- Learn next (videos only — keep the learning thread going) -----------
+  void _openVideo(WatchVideo nv) {
+    if (nv.quick) {
+      _push(QuickLearnScreen(startId: nv.id));
+    } else {
+      Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => WatchPlayerScreen(video: nv)));
+    }
+  }
+
   Widget _learnNext() {
-    final steps = <(IconData, String, String, VoidCallback?)>[
-      if (v.relatedActivity != null)
-        (Icons.extension_outlined, 'Activity', v.relatedActivity!, () => _push(const GrowthActivityScreen())),
-      if (v.relatedArticle != null)
-        (Icons.menu_book_outlined, 'Article', v.relatedArticle!, () => _push(const ArticleReaderScreen())),
-      if (v.relatedProductId != null)
-        (Icons.shopping_bag_outlined, 'Product', productById(v.relatedProductId!).name, () => _push(ProductDetailScreen(product: productById(v.relatedProductId!)))),
-      if (v.relatedRecipe != null)
-        (Icons.restaurant_menu_outlined, 'Recipe', v.relatedRecipe!, () => _push(const RecipesScreen())),
-      if (v.relatedCommunity != null)
-        (Icons.groups_outlined, 'Community', v.relatedCommunity!, () => openPpTab(context, 3)),
-      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about “${v.topic}”', () => openPpTab(context, 1)),
-      (Icons.quiz_outlined, 'Quiz', 'Check what you learned', null), // future
-    ];
+    final next = learnNextVideos(v);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       ppEyebrow('Learn next', color: ppPurple, spacing: 1.0),
       const SizedBox(height: 6),
-      Text('One small step onward — not another random video.', style: ppBody(13, color: ppSoft)),
+      Text('Keep the thread going — more short lessons on this, one after another.', style: ppBody(13, color: ppSoft)),
       const SizedBox(height: 16),
-      for (int i = 0; i < steps.length; i++)
-        _step(steps[i].$1, steps[i].$2, steps[i].$3, steps[i].$4, last: i == steps.length - 1),
+      for (int i = 0; i < next.length; i++)
+        _step(Icons.play_circle_outline, next[i].category, next[i].title, () => _openVideo(next[i]), last: i == next.length - 1),
     ]);
   }
 

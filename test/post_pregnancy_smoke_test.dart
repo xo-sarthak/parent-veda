@@ -31,6 +31,7 @@ import 'package:parentveda/screens/post_pregnancy/food_shopping_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_food_data.dart';
 import 'package:parentveda/screens/post_pregnancy/growth_activity_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/guides_tools_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/doctor_record_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_doctor_visit_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_emergency_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_growth_screen.dart';
@@ -81,6 +82,7 @@ import 'package:parentveda/screens/post_pregnancy/tools_hub_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/vaccination_compare_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/vaccination_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/vaccine_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vaccine_learn_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_category_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_collection_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_home_screen.dart';
@@ -165,6 +167,10 @@ void main() {
     'Vaccination home': const VaccinationScreen(),
     'Vaccination compare': const VaccinationCompareScreen(),
     'Vaccine detail': const VaccineDetailScreen(),
+    'Vaccine Learn (why)': const VaccineLearnScreen(),
+    'Doctor-ready record': const DoctorRecordScreen(),
+    'Health records (medications)': const HealthRecordsScreen(category: 'medications'),
+    'Health records (allergies)': const HealthRecordsScreen(category: 'allergies'),
     'Name finder quiz': const NameFinderScreen(),
     'Name swipe deck': const NameSwipeScreen(),
     'Name detail': const NameDetailScreen(),
@@ -477,6 +483,46 @@ void main() {
     await tester.tap(find.text('Emergency Card'));
     await tester.pumpAndSettle();
     expect(find.byType(HealthEmergencyScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Learn: the reading filters narrow the library to a single kind.
+  testWidgets('Learn: the Book Summaries filter narrows the list', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: ReadingHomeScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Book Summaries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Book Summaries'));
+    await tester.pumpAndSettle();
+
+    // a book-summary-tagged article appears once the filter is applied
+    expect(find.textContaining('Big feelings in a small body'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Vaccination: the completed section expands to show every completed vaccine
+  // (the count "13 completed" now matches a full 13-item list).
+  testWidgets('Vaccination: the completed list expands to all 13', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: VaccinationScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('13 completed'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    await tester.tap(find.text('13 completed'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('BCG'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    expect(find.text('BCG'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
