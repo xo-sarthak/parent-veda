@@ -88,6 +88,9 @@ import 'package:parentveda/screens/post_pregnancy/vaccination_compare_screen.dar
 import 'package:parentveda/screens/post_pregnancy/vaccination_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/vaccine_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/vaccine_learn_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vax_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vax_timeline_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/vax_tracker_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_category_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_collection_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_home_screen.dart';
@@ -174,6 +177,10 @@ void main() {
     'Vaccine detail': const VaccineDetailScreen(),
     'Vaccine Learn (why)': const VaccineLearnScreen(),
     'Doctor-ready record': const DoctorRecordScreen(),
+    'Vax tracker (redesign)': const VaxTrackerScreen(),
+    'Vax timeline': const VaxTimelineScreen(),
+    'Vax detail (due · PCV)': const VaxDetailScreen(visitId: 'wk14'),
+    'Vax detail (MMR)': const VaxDetailScreen(visitId: 'mo9'),
     'Health records (medications)': const HealthRecordsScreen(category: 'medications'),
     'Health records (allergies)': const HealthRecordsScreen(category: 'allergies'),
     'Name finder quiz': const NameFinderScreen(),
@@ -534,6 +541,28 @@ void main() {
     await tester.scrollUntilVisible(find.text('BCG'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('BCG'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Vaccination redesign: the tracker opens a vaccine's Learn-Why + After-Care.
+  testWidgets('Vaccination redesign: tracker opens a vaccine detail', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: VaxTrackerScreen()));
+    await tester.pumpAndSettle();
+
+    // the Due-Today card spotlights PCV at 14 weeks
+    expect(find.text('PCV · 14 weeks'), findsWidgets);
+    await tester.tap(find.text('PCV · 14 weeks').first);
+    await tester.pumpAndSettle();
+
+    // the PCV detail (Learn Why + After-Care) opens
+    expect(find.text('Pneumococcal (PCV)'), findsWidgets);
+    await tester.scrollUntilVisible(find.text('After the shot'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    expect(find.text('After the shot'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -19,7 +19,10 @@ import 'health_records_screen.dart';
 import 'health_timeline_screen.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
-import 'vaccination_screen.dart';
+import 'vax_tracker_screen.dart';
+// Redesigned tracker (vax_tracker_screen) is the live entry now; the old
+// VaccinationScreen is kept for revert.
+// import 'vaccination_screen.dart';
 
 class HealthHomeScreen extends StatelessWidget {
   const HealthHomeScreen({super.key});
@@ -217,7 +220,7 @@ class HealthHomeScreen extends StatelessWidget {
           ]),
           const SizedBox(height: 14),
           GestureDetector(
-            onTap: () => _push(context, const VaccinationScreen()),
+            onTap: () => _push(context, const VaxTrackerScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),

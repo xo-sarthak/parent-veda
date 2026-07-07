@@ -30,7 +30,10 @@ import 'products_compare_screen.dart';
 import 'recipes_screen.dart';
 import 'snapshot_expanded_screen.dart';
 import 'solve_problem_screen.dart';
-import 'vaccination_screen.dart';
+import 'vax_tracker_screen.dart';
+// Redesigned tracker (vax_tracker_screen) is the live entry now; the old
+// VaccinationScreen is kept for revert.
+// import 'vaccination_screen.dart';
 import 'wonder_week_screen.dart';
 
 // section-icon tints
@@ -217,7 +220,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         _pad(Column(children: [
           _bigRow(Icons.psychology_outlined, _tPurple, ppPurple, "Today's brain activity", 'Peekaboo — the first seed of object permanence', () => _push(const GrowthActivityScreen())),
           const SizedBox(height: 12),
-          _bigRow(Icons.vaccines_outlined, ppCoralTint, ppCoral, 'PCV · dose 3 due 22 Jul', 'Free at a govt centre · tap to plan the visit', () => _push(const VaccinationScreen())),
+          _bigRow(Icons.vaccines_outlined, ppCoralTint, ppCoral, 'PCV · dose 3 due 22 Jul', 'Free at a govt centre · tap to plan the visit', () => _push(const VaxTrackerScreen())),
           const SizedBox(height: 12),
           _bigRow(Icons.menu_book_outlined, _tBlue, _blueFg, "Today's read", 'Why baby sleep cycles change at 4 months', () => _push(const ArticleReaderScreen())),
         ])),
@@ -287,7 +290,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             const SizedBox(width: 12),
             _aheadCard('in ~3 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(const WonderWeekScreen())),
             const SizedBox(width: 12),
-            _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaccinationScreen())),
+            _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxTrackerScreen())),
             const SizedBox(width: 12),
             _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const RecipesScreen())),
           ]),

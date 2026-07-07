@@ -16,7 +16,10 @@ import 'baby_naming_home_screen.dart';
 // import 'name_finder_screen.dart';
 import 'pp_common.dart';
 import 'products_compare_screen.dart';
-import 'vaccination_screen.dart';
+import 'vax_tracker_screen.dart';
+// Redesigned tracker (vax_tracker_screen) is the live entry now; the old
+// VaccinationScreen is kept for revert.
+// import 'vaccination_screen.dart';
 import 'what_changed_screen.dart';
 import 'wonder_week_screen.dart';
 
@@ -91,7 +94,7 @@ class ToolsHubScreen extends StatelessWidget {
                   () => _push(context, const ProductsCompareScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', 'Next due in 3 weeks', ppCoral,
-                  () => _push(context, const VaccinationScreen())),
+                  () => _push(context, const VaxTrackerScreen())),
               const SizedBox(height: 10),
               // Was: direct to the V1 finder — now opens the V1|V2 front door.
               // _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby name finder', 'Swipe together, match a name', ppPurple,

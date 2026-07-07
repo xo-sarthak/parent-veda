@@ -36,7 +36,10 @@ import 'multichild_sheet.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'product_detail_screen.dart';
-import 'vaccination_screen.dart';
+import 'vax_tracker_screen.dart';
+// Redesigned tracker (vax_tracker_screen) is the live entry now; the old
+// VaccinationScreen is kept for revert.
+// import 'vaccination_screen.dart';
 import 'wonder_week_screen.dart';
 
 // journey / status accents (green-free, warm)
@@ -437,7 +440,7 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            _healthRow(Icons.vaccines_outlined, 'Vaccinations', 'Up to date · next PCV due 22 Jul', () => _push(const VaccinationScreen())),
+            _healthRow(Icons.vaccines_outlined, 'Vaccinations', 'Up to date · next PCV due 22 Jul', () => _push(const VaxTrackerScreen())),
             // Was: _push(const HealthGuideScreen()) — now opens the Health ecosystem:
             _healthRow(Icons.medical_services_outlined, 'Last doctor visit', '12 Jun · routine check, all well', () => _push(const HealthHomeScreen())),
             _healthRow(Icons.shield_outlined, 'Allergies', 'None recorded yet', () => _push(const HealthRecordsScreen(category: 'allergies')), muted: true),
@@ -541,7 +544,7 @@ class _MyChildScreenState extends State<MyChildScreen> with SingleTickerProvider
           child: Column(children: [
             _aheadRow(Icons.flag_outlined, 'Next milestone', 'Rolling over — any day now', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
             _aheadRow(Icons.brightness_4_rounded, 'Next leap', 'Leap 5 · The World of Relationships · ~3 weeks', () => _push(const WonderWeekScreen())),
-            _aheadRow(Icons.vaccines_outlined, 'Next vaccine', 'PCV dose 3 · 22 Jul', () => _push(const VaccinationScreen())),
+            _aheadRow(Icons.vaccines_outlined, 'Next vaccine', 'PCV dose 3 · 22 Jul', () => _push(const VaxTrackerScreen())),
             _aheadRow(Icons.extension_outlined, 'Suggested activity', 'Reach for the ring — grasp & intent', () => _push(const GrowthActivityScreen(activity: kActReachRing))),
             _aheadRow(Icons.menu_book_outlined, 'Recommended read', 'The games that build object permanence', () => _push(const ArticleReaderScreen())),
             _aheadRow(Icons.shopping_bag_outlined, 'Recommended product', 'Dozy white-noise soother', () => _push(const ProductDetailScreen()), last: true),
