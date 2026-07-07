@@ -7,6 +7,11 @@ import 'package:parentveda/screens/post_pregnancy/article_archive_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/article_reader_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/askveda_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/astrology_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/baby_naming_home_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_journey_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_journey_feed_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/name_journey_shortlist_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_names_v2_data.dart';
 import 'package:parentveda/screens/post_pregnancy/book_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_funnel_screen.dart';
@@ -175,6 +180,12 @@ void main() {
     'Name swipe deck': const NameSwipeScreen(),
     'Name detail': const NameDetailScreen(),
     'Name matches': const NameMatchesScreen(),
+    'Baby Naming front door (V2)': const BabyNamingHomeScreen(),
+    'Name Journey feed': const NameJourneyFeedScreen(),
+    'Name Journey detail': const NameJourneyDetailScreen(name: 'Aarav'),
+    'Name Journey shortlist': const NameJourneyShortlistScreen(),
+    'Name compare (V2)': const NameCompareScreen(),
+    'Name chosen (V2)': const NameChosenScreen(name: 'Aarav'),
     'Investments & Savings': const InvestmentsScreen(),
     'Astrology & Numerology': const AstrologyScreen(),
     'Explore drawer': const ExploreDrawer(),
@@ -523,6 +534,48 @@ void main() {
     await tester.scrollUntilVisible(find.text('BCG'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('BCG'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Baby names: the V1|V2 header toggle switches the whole experience.
+  testWidgets('Baby names: the V1|V2 toggle switches versions', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    addTearDown(() => NameVersionStore.instance.setVersion(NameVersion.v2));
+
+    await tester.pumpWidget(const MaterialApp(home: BabyNamingHomeScreen()));
+    await tester.pumpAndSettle();
+
+    // defaults to V2 — the Journey
+    expect(find.text('Begin the journey'), findsOneWidget);
+
+    await tester.tap(find.text('V1'));
+    await tester.pumpAndSettle();
+    expect(find.text('Open the Name Finder'), findsOneWidget);
+
+    await tester.tap(find.text('V2'));
+    await tester.pumpAndSettle();
+    expect(find.text('Begin the journey'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Baby names V2: the taste quiz leads into the swipe deck.
+  testWidgets('Baby names V2: quiz -> swipe deck renders', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: NameJourneyFeedScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Start swiping'), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.tap(find.text('Start swiping'));
+    await tester.pumpAndSettle();
+
+    // a name card is on screen with its tap hint
+    expect(find.text('Tap for the full story'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

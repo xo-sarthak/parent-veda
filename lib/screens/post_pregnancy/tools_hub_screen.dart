@@ -10,7 +10,10 @@
 
 import 'package:flutter/material.dart';
 
-import 'name_finder_screen.dart';
+import 'baby_naming_home_screen.dart';
+// Was a direct entry to the V1 finder; the front door (baby_naming_home_screen)
+// now owns the V1|V2 toggle and imports NameFinderScreen itself.
+// import 'name_finder_screen.dart';
 import 'pp_common.dart';
 import 'products_compare_screen.dart';
 import 'vaccination_screen.dart';
@@ -90,8 +93,11 @@ class ToolsHubScreen extends StatelessWidget {
               _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', 'Next due in 3 weeks', ppCoral,
                   () => _push(context, const VaccinationScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby name finder', 'Swipe together, match a name', ppPurple,
-                  () => _push(context, const NameFinderScreen())),
+              // Was: direct to the V1 finder — now opens the V1|V2 front door.
+              // _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby name finder', 'Swipe together, match a name', ppPurple,
+              //     () => _push(context, const NameFinderScreen())),
+              _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby names', 'Two ways to choose — swipe or journey', ppPurple,
+                  () => _push(context, const BabyNamingHomeScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _soon(context)),
               const SizedBox(height: 10),
