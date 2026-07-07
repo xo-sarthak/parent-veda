@@ -9,15 +9,16 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'watch_home_screen.dart';
 
 class SolveProblemScreen extends StatelessWidget {
   const SolveProblemScreen({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  // The Watch section routes to the real video-learning module (ParentVeda Watch).
+  void _watch(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WatchHomeScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +53,7 @@ class SolveProblemScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('Watch', style: ppJakarta(16)),
-              GestureDetector(onTap: () => _soon(context), child: Text('See all', style: ppBody(12, color: ppPurple, w: FontWeight.w600))),
+              GestureDetector(onTap: () => _watch(context), child: Text('See all', style: ppBody(12, color: ppPurple, w: FontWeight.w600))),
             ])),
             const SizedBox(height: 14),
             _pad(_video(context, 'The 4-month regression, explained', '3 min')),
@@ -100,7 +101,7 @@ class SolveProblemScreen extends StatelessWidget {
       );
 
   Widget _video(BuildContext context, String title, String dur, {bool top = false}) => GestureDetector(
-        onTap: () => _soon(context),
+        onTap: () => _watch(context),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: EdgeInsets.only(top: top ? 14 : 0, bottom: 14),

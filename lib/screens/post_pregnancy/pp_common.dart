@@ -13,9 +13,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../ask_veda/veda_core.dart';
 import 'askveda_screen.dart';
 import 'community_screen.dart';
+import 'parenting_veda.dart';
+import 'course_detail_screen.dart';
 import 'courses_screen.dart';
+import 'pp_courses_data.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_discovery_screen.dart';
@@ -276,39 +280,105 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
       ],
     );
 
-// An explained product row (image · title + why · price). Tapping opens the
-// real product detail when a [productId] is given, otherwise the Products
-// section — never a dead "coming soon".
+// An explained product row (image · title + why · price). When a [productId] is
+// given it ALWAYS shows that product's own name + price (from the catalog) and
+// opens exactly that product — so the row can never display one thing and open
+// another. The caller's [title]/[price] are only used as a fallback when there's
+// no productId (then it opens the Products section). [desc] is the contextual
+// "why it helps here" line and is always the caller's.
 Widget ppProductRow(BuildContext context, String title, String desc, String price,
-        {bool top = false, bool bottom = false, String? productId}) =>
-    GestureDetector(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => productId != null
-              ? ProductDetailScreen(product: productById(productId))
-              : const ProductsDiscoveryScreen())),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-            border: Border(
-          top: top ? const BorderSide(color: ppHair) : BorderSide.none,
-          bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
-        )),
-        child: Row(children: [
-          const PpStriped(height: 48, width: 48, radius: 14, border: true),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: ppBody(14, color: ppInk, w: FontWeight.w600)),
-              const SizedBox(height: 2),
-              Text(desc, style: ppBody(12)),
-            ]),
-          ),
-          const SizedBox(width: 10),
-          Text(price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
-        ]),
+    {bool top = false, bool bottom = false, String? productId}) {
+  final product = productId != null ? productById(productId) : null;
+  final shownTitle = product?.name ?? title;
+  final shownPrice = product?.priceLabel ?? price;
+  return GestureDetector(
+    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => product != null ? ProductDetailScreen(product: product) : const ProductsDiscoveryScreen())),
+    behavior: HitTestBehavior.opaque,
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+          border: Border(
+        top: top ? const BorderSide(color: ppHair) : BorderSide.none,
+        bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
+      )),
+      child: Row(children: [
+        const PpStriped(height: 48, width: 48, radius: 14, border: true),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(shownTitle, style: ppBody(14, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 2),
+            Text(desc, style: ppBody(12), maxLines: 2, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+        const SizedBox(width: 10),
+        Text(shownPrice, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+      ]),
+    ),
+  );
+}
+
+// A "frequently-asked-question" answer sheet — shows the actual answer inline
+// (via the shared Veda engine) so an "FAQ" tap answers the question instead of
+// bouncing to a search screen. Offers a follow-up in Ask Veda underneath.
+void ppFaqSheet(BuildContext context, String question) {
+  final VedaAnswerView v = parentingVedaAnswer(question);
+  final answer = v.answer.trim().isNotEmpty
+      ? v.answer.trim()
+      : 'Here\'s the short version — and you can ask Veda for more detail below.';
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (ctx) => DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (ctx, sc) => Container(
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        child: ListView(
+          controller: sc,
+          padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
+          children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(99)))),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(99)),
+                child: Text('FAQ', style: ppBody(11, color: ppPurple, w: FontWeight.w800)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(question, style: ppFraunces(22, h: 1.2)),
+            const SizedBox(height: 14),
+            Text(answer, style: ppBody(14.5, color: ppInk, h: 1.6)),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(ctx).pop();
+                Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AskVedaScreen(initialQuery: question)));
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Row(children: [
+                const Icon(Icons.auto_awesome_outlined, size: 16, color: ppPurple),
+                const SizedBox(width: 8),
+                Flexible(child: Text('Ask a follow-up in Ask Veda', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                const SizedBox(width: 6),
+                const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
+              ]),
+            ),
+            const SizedBox(height: 16),
+            Text('General guidance for your child\'s stage — please confirm anything important with your paediatrician.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
+          ],
+        ),
       ),
-    );
+    ),
+  );
+}
 
 // A "go deeper" row (pill · text · →). Routes to the real surface for its pill
 // (FAQ → Ask Veda, Room → Community, Course → Courses) — never a dead end.
@@ -317,11 +387,15 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
       onTap: () {
         switch (pill) {
           case 'Course':
-            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoursesScreen()));
+            // Open the matching focused course (with the named lesson marked
+            // "start here"); fall back to the Courses list if nothing matches.
+            final course = courseByDeeperText(text);
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) =>
+                course != null ? CourseDetailScreen(course: course, highlight: text) : const CoursesScreen()));
           case 'Room':
             openPpTab(context, 3); // Community
-          default: // FAQ and anything else → Ask Veda, with the question preloaded
-            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AskVedaScreen(initialQuery: text)));
+          default: // FAQ and anything else → answer it inline (not a redirect)
+            ppFaqSheet(context, text);
         }
       },
       behavior: HitTestBehavior.opaque,

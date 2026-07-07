@@ -23,7 +23,9 @@ import 'package:parentveda/screens/post_pregnancy/development_checkin_screen.dar
 import 'package:parentveda/screens/post_pregnancy/development_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_map_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_development_data.dart';
+import 'package:parentveda/screens/post_pregnancy/course_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/courses_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_courses_data.dart';
 import 'package:parentveda/screens/post_pregnancy/explore_drawer.dart';
 import 'package:parentveda/screens/post_pregnancy/food_builder_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/food_category_screen.dart';
@@ -156,6 +158,8 @@ void main() {
     'Cohort Courses': const CohortCoursesScreen(),
     'Guides & Tools': const GuidesToolsScreen(),
     'Courses': const CoursesScreen(),
+    'Course detail (Play & Brain)': CourseDetailScreen(course: courseById('playbrain')),
+    'Course detail (Sleep Bootcamp)': CourseDetailScreen(course: courseById('sleep')),
     'Recommendations': const RecommendationsScreen(),
     'Book detail': const BookDetailScreen(),
     'Problem Solver': const ProblemSolverScreen(),
@@ -563,6 +567,66 @@ void main() {
     await tester.scrollUntilVisible(find.text('After the shot'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('After the shot'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Redirect audit: a product row opens exactly the product it names.
+  testWidgets('Product rows open the product they name', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: GrowthActivityScreen()));
+    await tester.pumpAndSettle();
+
+    // the row shows the real catalogue product (name comes from the catalog now)
+    await tester.scrollUntilVisible(find.text('Peekaboo Cloth Book'), 250,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+    await tester.tap(find.text('Peekaboo Cloth Book'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProductDetailScreen), findsOneWidget);
+    expect(find.text('Peekaboo Cloth Book'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Redirect audit: a "Go deeper · FAQ" answers inline instead of redirecting.
+  testWidgets('Go-deeper FAQ answers inline', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: GrowthActivityScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('When does object permanence develop?'), 250,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+    await tester.tap(find.text('When does object permanence develop?'));
+    await tester.pumpAndSettle();
+
+    // the FAQ answer sheet appears (with a follow-up option), not a full redirect
+    expect(find.text('Ask a follow-up in Ask Veda'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Redirect audit: a "Go deeper · Course" opens the matching focused course.
+  testWidgets('Go-deeper Course opens the matching course', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: GrowthActivityScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Play & Brain · Leap 4 activities'), 250,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+    await tester.tap(find.text('Play & Brain · Leap 4 activities'));
+    await tester.pumpAndSettle();
+
+    // opens the matching course, with the named lesson marked "Start here"
+    expect(find.byType(CourseDetailScreen), findsOneWidget);
+    expect(find.text('Play & Brain'), findsWidgets);
+    expect(find.text('Start here'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

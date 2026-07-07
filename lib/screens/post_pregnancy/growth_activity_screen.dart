@@ -51,8 +51,8 @@ const GrowthActivity kActPeekaboo = GrowthActivity(
   ],
   extendNote: 'Optional — the game needs nothing but you.',
   products: [
-    ('Curious Cubs · peekaboo cloth book', 'Flaps that hide and reveal.', '₹399', 'clothbook'),
-    ('Soft baby mirror', 'Tummy-time faces to reappear into.', '₹549', 'crinkle'),
+    ('Peekaboo Cloth Book', 'Flaps that hide and reveal — object permanence you can hold.', '₹399', 'clothbook'),
+    ('Crinkle Sensory Set', 'Crinkly textures to hide and find during play.', '₹499', 'crinkle'),
   ],
   deeper: [
     ('FAQ', 'When does object permanence develop?'),
@@ -74,8 +74,8 @@ const GrowthActivity kActReachRing = GrowthActivity(
   ],
   extendNote: 'Optional — your hands and any light toy are enough.',
   products: [
-    ('Wooden grasping ring', 'Light, easy for new hands to hold.', '₹299', 'crinkle'),
-    ('Soft crinkle toy', 'Sound rewards every reach.', '₹349', 'clothbook'),
+    ('Crinkle Sensory Set', 'Light, grabbable textures that reward a reach.', '₹499', 'crinkle'),
+    ('High-Contrast Play Gym', 'Dangling toys at the perfect height to reach for.', '₹1,999', 'playgym'),
   ],
   deeper: [
     ('FAQ', 'When do babies reach and grasp?'),
@@ -97,8 +97,8 @@ const GrowthActivity kActNewSound = GrowthActivity(
   ],
   extendNote: 'Optional — everyday household sounds work beautifully.',
   products: [
-    ('Soft chime rattle', 'A clear, gentle sound to find.', '₹349', 'crinkle'),
-    ('Cloth activity book', 'Crinkle pages to explore.', '₹399', 'clothbook'),
+    ('Crinkle Sensory Set', 'Gentle crinkle sounds to find and turn toward.', '₹499', 'crinkle'),
+    ('Peekaboo Cloth Book', 'Soft, crinkly pages that make a findable sound.', '₹399', 'clothbook'),
   ],
   deeper: [
     ('FAQ', 'How does hearing shape early language?'),
@@ -120,8 +120,8 @@ const GrowthActivity kActTummyTime = GrowthActivity(
   ],
   extendNote: 'Optional — a mirror or toy simply adds delight.',
   products: [
-    ('Soft baby mirror', 'A friendly face to lift up for.', '₹549', 'crinkle'),
-    ('Tummy-time cloth book', 'Props up an inch of interest.', '₹399', 'clothbook'),
+    ('High-Contrast Play Gym', 'A mirror and toys to lift up and reach for.', '₹1,999', 'playgym'),
+    ('Peekaboo Cloth Book', 'Props up an inch of interest during tummy time.', '₹399', 'clothbook'),
   ],
   deeper: [
     ('FAQ', 'How much tummy time at 4 months?'),
@@ -143,8 +143,8 @@ const GrowthActivity kActNarrate = GrowthActivity(
   ],
   extendNote: 'Optional — your voice is the only tool you need.',
   products: [
-    ('Soft cloth book', 'First words to read aloud.', '₹399', 'clothbook'),
-    ('Board book set', 'Simple images to name together.', '₹499', 'crinkle'),
+    ('Peekaboo Cloth Book', 'First words and pictures to read aloud together.', '₹399', 'clothbook'),
+    ('Crinkle Sensory Set', 'Textures to name as you narrate play.', '₹499', 'crinkle'),
   ],
   deeper: [
     ('FAQ', 'How do babies learn language before speaking?'),

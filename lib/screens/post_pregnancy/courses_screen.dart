@@ -9,8 +9,10 @@
 
 import 'package:flutter/material.dart';
 
+import 'course_detail_screen.dart';
 import 'course_funnel_screen.dart';
 import 'pp_common.dart';
+import 'pp_courses_data.dart';
 
 class CoursesScreen extends StatelessWidget {
   const CoursesScreen({super.key});
@@ -171,6 +173,14 @@ class CoursesScreen extends StatelessWidget {
               ]),
             )),
 
+            // focused short courses
+            const SizedBox(height: 28),
+            _pad(Text('Focused courses', style: ppJakarta(18))),
+            const SizedBox(height: 4),
+            _pad(Text('Short, single-topic courses — start one in a spare few minutes.', style: ppBody(13, color: ppMuted))),
+            const SizedBox(height: 14),
+            _pad(Column(children: [for (final c in kCourses) _focusedCourse(context, c)])),
+
             // how it's made
             const SizedBox(height: 18),
             _pad(Container(
@@ -252,4 +262,26 @@ class CoursesScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _focusedCourse(BuildContext context, Course c) => GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CourseDetailScreen(course: c))),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+          child: Row(children: [
+            Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: c.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Icon(Icons.play_circle_outline, size: 20, color: c.accent)),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(c.title, style: ppJakarta(15)),
+                const SizedBox(height: 2),
+                Text('${c.lessons.length} lessons · ~${c.totalMinutes} min · ${c.ageTag}', style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+          ]),
+        ),
+      );
 }
