@@ -10,17 +10,24 @@
 
 import 'package:flutter/material.dart';
 
-import 'article_archive_screen.dart';
 import 'astrology_screen.dart';
 import 'cohort_courses_screen.dart';
 import 'courses_screen.dart';
+import 'development_home_screen.dart';
+import 'food_home_screen.dart';
 import 'guides_tools_screen.dart';
-import 'health_guide_screen.dart';
+// The Health Guide is now reached from inside the Health ecosystem, not the
+// drawer directly. Kept (commented) in case we want the direct entry back.
+// import 'health_guide_screen.dart';
+import 'health_home_screen.dart';
 import 'investments_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'masterclasses_screen.dart';
+import 'my_child_screen.dart';
 import 'nuskhe_screen.dart';
 import 'pp_common.dart';
+import 'reading_home_screen.dart';
+import 'watch_home_screen.dart';
 import 'problem_solver_screen.dart';
 import 'recipes_screen.dart';
 import 'recommendations_screen.dart';
@@ -50,15 +57,27 @@ class ExploreDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 16),
                 children: [
-                  _section(context, Icons.monitor_heart_outlined, 'Health Guide',
-                      "Aarav's health record & guidance.", const HealthGuideScreen(),
+                  _section(context, Icons.child_care_outlined, 'My Child',
+                      "Who Aarav is today — his whole story.", const MyChildScreen(),
                       top: true),
+                  _section(context, Icons.play_circle_outline, 'Watch',
+                      'Expert videos, chosen for his stage.', const WatchHomeScreen()),
+                  _section(context, Icons.emoji_objects_outlined, 'Development',
+                      'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
+                  // Replaced by the full Health ecosystem (the Health Guide lives
+                  // inside it now). Old row kept, commented, for easy revert:
+                  // _section(context, Icons.monitor_heart_outlined, 'Health Guide',
+                  //     "Aarav's health record & guidance.", const HealthGuideScreen()),
+                  _section(context, Icons.monitor_heart_outlined, 'Health',
+                      "Aarav's living health story, organised.", const HealthHomeScreen()),
+                  _section(context, Icons.ramen_dining_outlined, 'Food',
+                      "What to feed Aarav today — a food companion.", const FoodHomeScreen()),
                   _section(context, Icons.restaurant_menu_outlined, 'Recipes',
                       'Age-tagged, healthier Indian food.', const RecipesScreen()),
                   _section(context, Icons.recommend_outlined, 'Recommendations',
                       'What to read, watch, play & do.', const RecommendationsScreen()),
-                  _section(context, Icons.feed_outlined, 'Articles',
-                      "Everything we've written, to browse.", const ArticleArchiveScreen()),
+                  _section(context, Icons.auto_stories_outlined, 'Learn',
+                      'A premium reading experience for parents.', const ReadingHomeScreen()),
                   _section(context, Icons.school_outlined, 'Masterclasses',
                       'One evening with an expert.', const MasterclassesScreen()),
                   _section(context, Icons.groups_outlined, 'Cohort Courses',
