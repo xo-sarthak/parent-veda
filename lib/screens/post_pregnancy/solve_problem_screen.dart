@@ -63,8 +63,8 @@ class SolveProblemScreen extends StatelessWidget {
             const SizedBox(height: 6),
             _pad(Text('Explained, never pushed. Add only if it fits your home.', style: ppBody(12, color: ppMuted))),
             const SizedBox(height: 14),
-            _pad(ppProductRow(context, 'White-noise soother', 'Masks joint-home sound between cycles.', '₹1,499', top: true)),
-            _pad(ppProductRow(context, 'Blackout curtains', 'Keeps early light from ending naps too soon.', '₹1,299', top: true, bottom: true)),
+            _pad(ppProductRow(context, 'White-noise soother', 'Masks joint-home sound between cycles.', '₹1,499', top: true, productId: 'dozy')),
+            _pad(ppProductRow(context, 'Blackout curtains', 'Keeps early light from ending naps too soon.', '₹1,299', top: true, bottom: true, productId: 'hushcurtains')),
 
             _pad(ppSectionDivider()),
             _pad(Text('Go deeper', style: ppJakarta(16))),

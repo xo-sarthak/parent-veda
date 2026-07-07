@@ -1081,6 +1081,7 @@ class S {
   String get vedaTypeTool => _p('Tool', 'Tool');
   String get vedaTypeProduct => _p('Product', 'Product');
   String get vedaTypeCommunity => _p('Community', 'Community');
+  String get vedaTypeScan => _p('Scan guide', 'Scan guide');
   String get vedaTalkExpert => _p('Talk to an expert', 'Expert se baat karein');
   String get vedaProductsHint =>
       _p('Suggested for your question', 'Aapke sawaal ke hisaab se');

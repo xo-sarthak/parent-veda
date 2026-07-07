@@ -485,3 +485,208 @@ List<String> inferTopics(String text) {
   });
   return found.take(3).toList();
 }
+
+// ===========================================================================
+//  PARENTING-STAGE communities (post-birth). Kept as their OWN lists so the
+//  pre-birth (pregnancy) feed above stays exactly as it was — the parenting
+//  Community screen (post_pregnancy) reads these; interactions (join/like/save/
+//  vote/comment) reuse the same CommunityStore, which is keyed by id. Gender
+//  communities are fine now (unlike during pregnancy). `emoji` is left blank —
+//  the parenting UI renders monogram/icon avatars, never emojis.
+// ===========================================================================
+const List<Community> kParentingCommunities = [
+  // --- Auto-joined for the scenario child (Aarav · 4-mo boy · Delhi NCR) ---
+  Community(id: 'infants_0_1', name: '0–1 Year', emoji: '', description: 'The whole first year — feeding, sleep, milestones and the fourth-trimester fog, together.', members: 14200, auto: true, topics: ['Sleep', 'Feeding', 'Milestones']),
+  Community(id: 'boy_moms', name: 'Boy Moms', emoji: '', description: 'Raising boys — the mess, the cuddles and everything in between.', members: 9800, auto: true, topics: ['Behaviour']),
+  Community(id: 'delhi_parents', name: 'Delhi Parents', emoji: '', description: 'Local parents in Delhi NCR — paediatricians, daycares, classes and meetups.', members: 6400, auto: true, topics: ['Health']),
+  // --- Recommended · the ages that come next ---
+  Community(id: 'ones', name: '1 Year Olds', emoji: '', description: 'First steps, first words, first birthday — life with a one-year-old.', members: 11200, topics: ['Milestones', 'Feeding']),
+  Community(id: 'twos', name: '2 Year Olds', emoji: '', description: 'Big feelings, big words and the famous twos — you are not alone.', members: 10600, topics: ['Behaviour']),
+  Community(id: 'threes', name: '3 Year Olds', emoji: '', description: 'Preschool, endless “why?”, and a little person with big opinions.', members: 7300, topics: ['Behaviour', 'Development']),
+  Community(id: 'toddlers', name: 'Toddler Life', emoji: '', description: 'The 1–3 whirlwind — tantrums, milestones and tiny triumphs.', members: 13400, topics: ['Behaviour', 'Development']),
+  // --- Topics that only matter once baby is here ---
+  Community(id: 'first_foods', name: 'Starting Solids', emoji: '', description: 'First foods, weaning and fussy eating — recipes and reassurance.', members: 8900, topics: ['Feeding']),
+  Community(id: 'baby_sleep', name: 'Baby Sleep', emoji: '', description: 'Regressions, naps and nights — gentle, no-judgement sleep support.', members: 12800, topics: ['Sleep']),
+  Community(id: 'milestones', name: 'Milestones & Development', emoji: '', description: 'Rolling, sitting, crawling, talking — celebrate and compare notes.', members: 9100, topics: ['Milestones', 'Development']),
+  Community(id: 'working_parents', name: 'Working Parents', emoji: '', description: 'Daycare, nannies, pumping and the juggle of going back to work.', members: 7600, topics: ['Health']),
+  Community(id: 'potty', name: 'Potty Training', emoji: '', description: 'When to start, what worked, and surviving the accidents.', members: 4300, topics: ['Behaviour']),
+];
+
+const Set<String> kParentingCommunityIds = {
+  'infants_0_1', 'boy_moms', 'delhi_parents', 'ones', 'twos', 'threes',
+  'toddlers', 'first_foods', 'baby_sleep', 'milestones', 'working_parents', 'potty',
+};
+
+const List<CommunityPost> kParentingPosts = [
+  CommunityPost(
+    id: 'pp1',
+    communityId: 'baby_sleep',
+    author: 'Meera',
+    authorEmoji: '',
+    text: 'Night 6 of the 4-month sleep regression. What finally helped us: an earlier bedtime and a darker, more boring room. If you are in it right now — hang in there, it does pass.',
+    type: PostType.experience,
+    topics: ['Sleep'],
+    stage: 'Parenting',
+    likes: 128,
+    comments: 42,
+    saves: 26,
+    endorsedBy: 'Dr. Ananya Rao',
+    endorsedByCred: 'Paediatrician',
+    expertEndorseCount: 34,
+  ),
+  CommunityPost(
+    id: 'pp2',
+    communityId: 'infants_0_1',
+    author: 'Anjali',
+    authorEmoji: '',
+    text: 'My baby is 4 months and not rolling over yet. Everyone else’s seems to be. Should I be worried, or is this still normal?',
+    type: PostType.question,
+    topics: ['Milestones'],
+    stage: 'Parenting',
+    likes: 64,
+    comments: 31,
+    saves: 9,
+    wantsVerification: true,
+    preferredSpecialty: 'pediatric',
+  ),
+  CommunityPost(
+    id: 'pp3',
+    communityId: 'first_foods',
+    author: 'Ritu',
+    authorEmoji: '',
+    text: 'When did you actually start solids?',
+    type: PostType.poll,
+    topics: ['Feeding'],
+    stage: 'Parenting',
+    pollOptions: ['Around 4 months', 'At 6 months', 'After 6 months'],
+    likes: 38,
+    comments: 15,
+    saves: 4,
+  ),
+  CommunityPost(
+    id: 'pp4',
+    communityId: 'milestones',
+    author: 'Dr. Neha Sharma',
+    authorEmoji: '',
+    text: 'A reminder from clinic: milestones are a range, not a deadline. Most babies roll between 4 and 6 months, and some skip it entirely and go straight to sitting. Watch the overall trend, not the calendar — and always ask us if something feels off.',
+    type: PostType.expert,
+    topics: ['Milestones', 'Development'],
+    stage: 'Parenting',
+    likes: 172,
+    comments: 24,
+    saves: 118,
+    upvotes: 89,
+    cred: 'MD, Paediatrics',
+    expertEndorseCount: 46,
+  ),
+  CommunityPost(
+    id: 'pp5',
+    communityId: 'twos',
+    author: 'Sneha',
+    authorEmoji: '',
+    text: 'The tantrums at 2 nearly broke me this week. What helped a little: naming the feeling out loud ("you’re so frustrated") and staying calm-ish myself. Solidarity, anyone?',
+    type: PostType.experience,
+    topics: ['Behaviour'],
+    stage: 'Parenting',
+    likes: 96,
+    comments: 40,
+    saves: 17,
+  ),
+  CommunityPost(
+    id: 'pp6',
+    communityId: 'delhi_parents',
+    author: 'Neha',
+    authorEmoji: '',
+    text: 'Which paediatrician do you love in South Delhi for the 6-month vaccines? Looking for someone gentle and not rushed.',
+    type: PostType.question,
+    topics: ['Health'],
+    stage: 'Parenting',
+    likes: 47,
+    comments: 28,
+    saves: 15,
+  ),
+  CommunityPost(
+    id: 'pp7',
+    communityId: 'infants_0_1',
+    author: 'ParentVeda',
+    authorEmoji: '',
+    text: 'Leap 5 is around the corner. Here’s what the next developmental leap looks like — and why the fussiness is a good sign.',
+    type: PostType.parentVeda,
+    topics: ['Development'],
+    stage: 'Parenting',
+    likes: 54,
+    comments: 12,
+    saves: 20,
+  ),
+  CommunityPost(
+    id: 'pp8',
+    communityId: 'ones',
+    author: 'Divya',
+    authorEmoji: '',
+    text: 'First steps today at 13 months! I cried a little (okay, a lot). All those months of cruising the furniture finally paid off.',
+    type: PostType.milestone,
+    topics: ['Milestones'],
+    stage: 'Parenting',
+    likes: 188,
+    comments: 33,
+    saves: 12,
+  ),
+  CommunityPost(
+    id: 'pp9',
+    communityId: 'working_parents',
+    author: 'Simran',
+    authorEmoji: '',
+    text: 'Back to work next month and dreading the daycare drop-off. How did you make the transition easier — for the baby and for yourself?',
+    type: PostType.question,
+    topics: ['Health'],
+    stage: 'Parenting',
+    likes: 58,
+    comments: 27,
+    saves: 11,
+  ),
+  CommunityPost(
+    id: 'pp10',
+    communityId: 'first_foods',
+    author: 'Kavya',
+    authorEmoji: '',
+    text: 'Baby-led weaning vs purées — what did you actually end up doing, and would you do it the same way again?',
+    type: PostType.question,
+    topics: ['Feeding'],
+    stage: 'Parenting',
+    likes: 71,
+    comments: 44,
+    saves: 22,
+  ),
+  // --- General parenting timeline (no community) ---
+  CommunityPost(
+    id: 'pg1',
+    communityId: '',
+    author: 'Tanvi',
+    authorEmoji: '',
+    text: 'To every parent up at 3am reading this: you are doing so much better than you think. This stage is hard and it is temporary. Rest when you can.',
+    type: PostType.experience,
+    topics: ['Behaviour'],
+    stage: 'Parenting',
+    likes: 152,
+    comments: 28,
+    saves: 19,
+  ),
+];
+
+const Map<String, List<CommunityComment>> kParentingComments = {
+  'pp1': [
+    CommunityComment(author: 'Anjali', emoji: '', text: 'Thank you for this. Night 4 here and I needed to read it.', likes: 11),
+    CommunityComment(author: 'Priya', emoji: '', text: 'The darker room made the biggest difference for us too. Blackout curtains were worth every rupee.', likes: 7),
+  ],
+  'pp2': [
+    CommunityComment(author: 'Dr. Neha Sharma', emoji: '', text: 'Totally normal range. If he has good head control and is reaching for things, he is on track — mention it at the 6-month visit and we can check together.', likes: 22),
+    CommunityComment(author: 'Ritika', emoji: '', text: 'Mine rolled at nearly 6 months and is a happy, busy toddler now. Try not to compare!', likes: 6),
+  ],
+};
+
+Community? parentingCommunityById(String id) {
+  for (final c in kParentingCommunities) {
+    if (c.id == id) return c;
+  }
+  return null;
+}

@@ -37,51 +37,9 @@ class VedaSource {
   final String body;
 }
 
-/// One typed ParentVeda content card for Section 4. Unlike [VedaSource] (which
-/// exposed a raw "Can I?"/"Week 12" source label), this carries a human content
-/// TYPE label ("Weekly journey", "Read", "Garbh Sanskar"…) — what the user
-/// asked for. Tap-routing still uses [kind].
-class VedaContentRef {
-  const VedaContentRef({
-    required this.kind,
-    required this.typeLabel,
-    required this.title,
-    required this.snippet,
-    required this.body,
-    this.docId,
-  });
-  final VedaKind kind;
-  final String typeLabel;
-  final String title;
-  final String snippet;
-  final String body;
-  final String? docId;
-}
-
-/// The unified fixed-format answer for the RETRIEVAL path (non-showcase). The UI
-/// renders the SAME seven sections it uses for showcase answers, omitting any
-/// empty section. Sections 1–4 are formed only from vetted app content (never
-/// community); community feeds Section 5 (social proof) only.
-class VedaAnswerView {
-  const VedaAnswerView({
-    this.urgent = false,
-    required this.answer, // S1
-    required this.meaning, // S2
-    required this.actions, // S3
-    required this.content, // S4
-    this.community, // S5
-    this.products = const [], // S6
-    this.services = const [], // S7
-  });
-  final bool urgent;
-  final String answer;
-  final String meaning;
-  final List<String> actions;
-  final List<VedaContentRef> content;
-  final String? community;
-  final List<String> products;
-  final List<String> services;
-}
+// VedaContentRef + VedaAnswerView (the shared 7-section answer model) now live
+// in the app-neutral core (ask_veda/veda_core.dart) so both sides produce the
+// same structure; they're visible here via veda_index's re-export of the core.
 
 /// The structured answer. When [showcase] is non-null the UI renders the fixed
 /// 7-section page from it; otherwise it renders the same 7 sections from [view].
@@ -249,6 +207,17 @@ String _typeLabel(VedaKind k, S s) {
       return s.vedaTypeProduct;
     case VedaKind.community:
       return s.vedaTypeCommunity;
+    case VedaKind.scan:
+      return s.vedaTypeScan;
+    // Parenting-side kinds never reach the pregnancy answer path (queries are
+    // domain-scoped), but the switch stays exhaustive:
+    case VedaKind.recipe:
+      return s.vedaTypeRead;
+    case VedaKind.expert:
+      return s.vedaTypeCommunity;
+    case VedaKind.activity:
+    case VedaKind.health:
+      return s.vedaTypeRead;
   }
 }
 

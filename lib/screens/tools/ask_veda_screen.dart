@@ -1576,6 +1576,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       case VedaKind.spiritual:
       case VedaKind.readToBaby:
       case VedaKind.garbh:
+      case VedaKind.scan:
+        _showSourceSheet(src);
+        return;
+      default: // parenting kinds never reach the pregnancy screen
         _showSourceSheet(src);
         return;
     }
@@ -1680,6 +1684,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         return _vPurple2;
       case VedaKind.community:
         return _vPurple;
+      case VedaKind.scan:
+        return const Color(0xFF3E6DA6);
+      default:
+        return _vPurple;
     }
   }
 
@@ -1711,6 +1719,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         return Icons.build_rounded;
       case VedaKind.community:
         return Icons.groups_rounded;
+      case VedaKind.scan:
+        return Icons.monitor_heart_rounded;
+      default:
+        return Icons.menu_book_rounded;
     }
   }
 }

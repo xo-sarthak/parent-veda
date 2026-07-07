@@ -328,14 +328,13 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: AskVedaScreen()));
     await tester.pumpAndSettle();
 
-    // empty state offers suggestions
-    expect(find.text('Why does he wake every 2 hours at night?'), findsOneWidget);
-
-    await tester.tap(find.text('Why does he wake every 2 hours at night?'));
+    // type a question into the pinned search pill and submit
+    await tester.enterText(find.byType(TextField), 'the 4-month sleep regression');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    // the shared result view renders the answer hero (eyebrow is uppercased)
-    expect(find.text('VEDA ANSWER'), findsOneWidget);
+    // the pregnancy-style result page renders with the 'Veda Answer' card
+    expect(find.text('Veda Answer'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -96,8 +96,8 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
             const SizedBox(height: 6),
             _pad(Text('Optional — the game needs nothing but you.', style: ppBody(12, color: ppMuted))),
             const SizedBox(height: 14),
-            _pad(ppProductRow(context, 'Curious Cubs · peekaboo cloth book', 'Flaps that hide and reveal.', '₹399', top: true)),
-            _pad(ppProductRow(context, 'Soft baby mirror', 'Tummy-time faces to reappear into.', '₹549', top: true, bottom: true)),
+            _pad(ppProductRow(context, 'Curious Cubs · peekaboo cloth book', 'Flaps that hide and reveal.', '₹399', top: true, productId: 'clothbook')),
+            _pad(ppProductRow(context, 'Soft baby mirror', 'Tummy-time faces to reappear into.', '₹549', top: true, bottom: true, productId: 'crinkle')),
 
             _pad(ppSectionDivider()),
             _pad(Text('Go deeper', style: ppJakarta(16))),

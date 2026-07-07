@@ -15,6 +15,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'askveda_screen.dart';
 import 'community_screen.dart';
+import 'courses_screen.dart';
+import 'pp_products_data.dart';
+import 'product_detail_screen.dart';
 import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
 
@@ -227,9 +230,11 @@ class PpBottomNav extends StatelessWidget {
 }
 
 // ---- shared deep-dive pieces (back bar, section divider, rows) --------------
-void _ppSoon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-    );
+// No longer used — the product/deeper rows now route to real destinations.
+// Kept (commented) in case a future placeholder needs it.
+// void _ppSoon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+//     );
 
 Widget ppBack(BuildContext context, String label) => GestureDetector(
       onTap: () => Navigator.of(context).maybePop(),
@@ -271,11 +276,16 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
       ],
     );
 
-// An explained product row (image · title + why · price). Tap = coming soon.
+// An explained product row (image · title + why · price). Tapping opens the
+// real product detail when a [productId] is given, otherwise the Products
+// section — never a dead "coming soon".
 Widget ppProductRow(BuildContext context, String title, String desc, String price,
-        {bool top = false, bool bottom = false}) =>
+        {bool top = false, bool bottom = false, String? productId}) =>
     GestureDetector(
-      onTap: () => _ppSoon(context),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => productId != null
+              ? ProductDetailScreen(product: productById(productId))
+              : const ProductsDiscoveryScreen())),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -300,10 +310,20 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
       ),
     );
 
-// A "go deeper" row (pill · text · →). Tap = coming soon.
+// A "go deeper" row (pill · text · →). Routes to the real surface for its pill
+// (FAQ → Ask Veda, Room → Community, Course → Courses) — never a dead end.
 Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = false, bool bottom = false}) =>
     GestureDetector(
-      onTap: () => _ppSoon(context),
+      onTap: () {
+        switch (pill) {
+          case 'Course':
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoursesScreen()));
+          case 'Room':
+            openPpTab(context, 3); // Community
+          default: // FAQ and anything else → Ask Veda
+            openPpTab(context, 1);
+        }
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 13),

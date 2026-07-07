@@ -1,15 +1,19 @@
 // =============================================================================
-//  VedaIndex — offline "whole-app" retrieval corpus for Ask Veda
+//  VedaIndex — the PREGNANCY corpus + adapter for the Ask Veda engine
 // -----------------------------------------------------------------------------
-//  Builds a searchable index over EVERY content source we ship — Can I?,
-//  symptoms, the weekly baby/mother content, products, reads, trimester tips,
-//  spiritual reading, read-to-baby, garbh sanskar, body changes, the tools, and
-//  community insights — then scores a question against all of it. Purely
-//  on-device: no LLM, no network. This is grounded RETRIEVAL — we surface the
-//  most relevant things we already have (with their source), we don't generate.
-//  It also doubles as the retrieval layer an AI backend could plug into later.
+//  Builds the pregnancy side's searchable content — Can I?, symptoms, weekly
+//  baby/mother content, products, reads, weekly articles, scan guides, trimester
+//  tips, spiritual reading, read-to-baby, garbh sanskar, body changes, tools and
+//  community insights — each stamped `domain: pregnancy`, then hands it to the
+//  app-neutral core (`ask_veda/veda_core.dart`) to rank. This file is the
+//  pregnancy ADAPTER: the content and the faith-gating rules live here; the
+//  matching lives in the core, so the parenting side reuses the exact same engine
+//  with its own corpus. Re-exports the core so existing importers keep their
+//  VedaKind / VedaDoc without changing their imports.
+//  Purely on-device: no LLM, no network — grounded retrieval, not generation.
 // =============================================================================
 
+import '../ask_veda/veda_core.dart';
 import '../data/body_changes.dart';
 import '../data/can_i_data.dart';
 import '../data/community_data.dart';
@@ -17,129 +21,29 @@ import '../data/garbh_data.dart';
 import '../data/product_data.dart';
 import '../data/read_next_data.dart';
 import '../data/read_to_baby_data.dart';
+import '../data/scan_guide_data.dart';
 import '../data/spiritual_reading_data.dart';
 import '../data/symptom_data.dart';
 import '../data/trimester_tips.dart';
+import '../data/week_articles_data.dart';
+import '../models/garbh_content.dart';
 import 'pregnancy_controller.dart';
 import 'read_to_baby_store.dart';
 
-/// Every content family the index can surface.
-enum VedaKind {
-  canI,
-  symptom,
-  weekBaby,
-  weekMother,
-  product,
-  read,
-  trimesterTip,
-  spiritual,
-  readToBaby,
-  garbh,
-  bodyChange,
-  tool,
-  community,
-}
+// Re-export the neutral core so existing importers of this file keep seeing
+// VedaKind / VedaDoc / VedaHit / VedaDomain / vedaScore without new imports.
+export '../ask_veda/veda_core.dart';
 
-// A small stop-word set so common words don't create noise.
-const Set<String> _kStop = {
-  'the', 'a', 'an', 'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
-  'i', 'my', 'me', 'mine', 'we', 'our', 'you', 'your', 'it', 'its', 'this',
-  'that', 'these', 'those', 'to', 'of', 'in', 'on', 'for', 'and', 'or', 'but',
-  'can', 'could', 'do', 'does', 'did', 'what', 'how', 'when', 'where', 'why',
-  'who', 'should', 'would', 'will', 'at', 'as', 'if', 'with', 'about', 'from',
-  'into', 'than', 'then', 'too', 'any', 'some', 'have', 'has', 'had', 'get',
-  'getting', 'during', 'while', 'okay', 'tell', 'know', 'need',
+// Human titles for the scan guides (keyed by the medical milestone id in
+// kScanGuides). Kept here so the index doesn't depend on the journey-map data.
+const Map<String, String> _kScanTitles = {
+  'm_ultrasound': 'Dating / first ultrasound scan',
+  'm_nt': 'NT scan (nuchal translucency)',
+  'm_anomaly': 'Anomaly scan (20-week scan)',
+  'm_glucose': 'Glucose screening (GTT)',
+  'm_growth': 'Growth scan',
+  'm_gbs': 'Group B Strep (GBS) swab',
 };
-
-// Ubiquitous pregnancy-context words: they appear in almost every doc, so on
-// their own they must NOT drive a match (they're heavily down-weighted and never
-// count as a "specific" hit). This keeps "More information" topically relevant —
-// e.g. "papaya in pregnancy" no longer surfaces "Sex during pregnancy" just
-// because both contain the word "pregnancy".
-const Set<String> _kGeneric = {
-  'pregnancy', 'pregnant', 'pregnancies', 'baby', 'babies', 'week', 'weeks',
-  'trimester', 'mom', 'mum', 'mother', 'mothers', 'maternal', 'womb',
-};
-
-// Keep tokens of 3+ chars, plus numbers (so "week 20" / "20 weeks" can pin the
-// exact week), dropping stop-words.
-List<String> _tokens(String s) => s
-    .toLowerCase()
-    .split(RegExp(r'[^a-z0-9]+'))
-    .where((t) =>
-        (t.length >= 3 || int.tryParse(t) != null) && !_kStop.contains(t))
-    .toList();
-
-/// One searchable unit of app content.
-class VedaDoc {
-  VedaDoc({
-    required this.id,
-    required this.kind,
-    required this.sourceLabel,
-    required this.title,
-    required this.body,
-    this.keywords = const [],
-  })  : titleLower = title.toLowerCase(),
-        _titleTokens = _tokens(title).toSet(),
-        _keywordTokens = _tokens(keywords.join(' ')).toSet(),
-        _bodyTokens = _tokens(body).toSet();
-
-  final String id;
-  final VedaKind kind;
-  final String sourceLabel; // e.g. "Can I?", "Week 20 · Baby", "Islam · …"
-  final String title;
-  final String body;
-  final List<String> keywords;
-
-  final String titleLower;
-  final Set<String> _titleTokens;
-  final Set<String> _keywordTokens;
-  final Set<String> _bodyTokens;
-
-  String get snippet {
-    final b = body.trim().replaceAll(RegExp(r'\s+'), ' ');
-    return b.length <= 130 ? b : '${b.substring(0, 130).trimRight()}…';
-  }
-
-  /// Weighted overlap: title hit >> keyword hit >> body hit, with a strong
-  /// boost when the whole query appears in the title, and a small reward for
-  /// queries whose several distinct words all land somewhere.
-  double score(List<String> qTokens, String qLower) {
-    double s = 0;
-    var matched = 0; // counts only SPECIFIC (non-generic) token hits
-    for (final t in qTokens) {
-      final generic = _kGeneric.contains(t);
-      var hit = false;
-      if (_titleTokens.contains(t)) {
-        s += generic ? 1.5 : 6;
-        hit = true;
-      }
-      if (_keywordTokens.contains(t)) {
-        s += generic ? 1.0 : 4;
-        hit = true;
-      }
-      if (_bodyTokens.contains(t)) {
-        s += generic ? 0.0 : 1.5;
-        hit = true;
-      }
-      if (hit && !generic) matched++;
-    }
-    // Require at least one SPECIFIC word to land. A doc that only shares
-    // ubiquitous words ("pregnancy", "baby", "week") with the query isn't a real
-    // match — this is what stops irrelevant "More information" cards.
-    if (matched == 0) return 0;
-    if (qLower.length >= 3 && titleLower.contains(qLower)) s += 8;
-    if (titleLower == qLower) s += 8;
-    if (matched >= 2) s += matched * 1.5;
-    return s;
-  }
-}
-
-class VedaHit {
-  const VedaHit(this.doc, this.score);
-  final VedaDoc doc;
-  final double score;
-}
 
 // One-line descriptions of the app's tools (so "where do I count kicks" works).
 const List<(String, String, String)> _kTools = [
@@ -200,8 +104,9 @@ const List<(String, String, String)> _kTools = [
   ),
 ];
 
-/// Builds + caches the corpus. Rebuilt when the language or the number of
-/// loaded weeks changes (so weekly docs appear once content is ready).
+/// Builds + caches the pregnancy corpus (all `domain: pregnancy`). Rebuilt when
+/// the language or the number of loaded weeks changes (so weekly docs appear
+/// once content is ready).
 class VedaIndex {
   static List<VedaDoc>? _cache;
   static String _key = '';
@@ -260,6 +165,40 @@ class VedaIndex {
         keywords: [r.category],
       ));
     }
+
+    // --- Weekly written articles ("This week's reads") ---
+    // Full-length written pieces, searchable regardless of the mother's current
+    // week. De-duplicated by title (some articles repeat across weeks).
+    final seenArticles = <String>{};
+    for (var i = 0; i < kWeekArticles.length; i++) {
+      final a = kWeekArticles[i];
+      if (!seenArticles.add(a.title)) continue;
+      docs.add(VedaDoc(
+        id: 'wkarticle_$i',
+        kind: VedaKind.read,
+        sourceLabel: 'Weekly read',
+        title: a.title,
+        body: a.body,
+        keywords: ['week ${a.week}', 'article', 'read'],
+      ));
+    }
+
+    // --- Scan & test guides (what the scan is + how to read the report) ---
+    kScanGuides.forEach((id, g) {
+      final terms = g.interpret
+          .map((r) => '${r.term.of(lang)} — ${r.meaning.of(lang)}')
+          .join(' ');
+      docs.add(VedaDoc(
+        id: 'scan_$id',
+        kind: VedaKind.scan,
+        sourceLabel: 'Scan guide',
+        title: _kScanTitles[id] ?? 'Scan guide',
+        body: '${g.whatIs.of(lang)} $terms',
+        keywords: const [
+          'scan', 'ultrasound', 'test', 'report', 'result', 'screening', 'pregnancy scan',
+        ],
+      ));
+    });
 
     // --- Trimester tips ---
     kTrimesterTipsV2.forEach((tri, tips) {
@@ -322,6 +261,53 @@ class VedaIndex {
         title: a.title,
         body: a.subtitle,
         keywords: const ['raga', 'music', 'listening', 'calm', 'relax'],
+      ));
+    }
+    // Kriya — breath & grounding practices (answers "breathing exercise to calm
+    // down / relax / ease anxiety").
+    for (final k in kKriya) {
+      docs.add(VedaDoc(
+        id: 'kriya_${k.id}',
+        kind: VedaKind.garbh,
+        sourceLabel: 'Garbh Sanskar · Breath',
+        title: k.title,
+        body: '${k.blurb}. ${k.phases.map((ph) => ph.label).join(', ')}.',
+        keywords: const [
+          'kriya', 'breath', 'breathing', 'pranayama', 'calm', 'relax',
+          'anxiety', 'stress', 'grounding', 'panic',
+        ],
+      ));
+    }
+    // Samvad — womb-connection speaking cards, one doc per trimester set
+    // (affirmations / read-aloud scripts / visualizations).
+    const samvadSets = <(String, String, List<GarbhPrompt>)>[
+      ('samvad_t1', 'Speaking to your baby — affirmations', kSamvadT1),
+      ('samvad_t2', 'Speaking to your baby — read-aloud scripts', kSamvadT2),
+      ('samvad_t3', 'Speaking to your baby — visualizations', kSamvadT3),
+    ];
+    for (final set in samvadSets) {
+      docs.add(VedaDoc(
+        id: set.$1,
+        kind: VedaKind.garbh,
+        sourceLabel: 'Garbh Sanskar · Samvad',
+        title: set.$2,
+        body: set.$3.map((pr) => pr.text).join(' '),
+        keywords: const [
+          'samvad', 'bonding', 'talk to baby', 'speak', 'read aloud',
+          'affirmation', 'connection', 'womb',
+        ],
+      ));
+    }
+    // Vichara — Sacred Insights (short reflective verses).
+    final insights = garbhAllInsights();
+    for (var i = 0; i < insights.length; i++) {
+      docs.add(VedaDoc(
+        id: 'insight_$i',
+        kind: VedaKind.garbh,
+        sourceLabel: 'Garbh Sanskar · Insight',
+        title: insights[i].sloka,
+        body: '${insights[i].meaning} ${insights[i].lesson}',
+        keywords: const ['insight', 'calm', 'mindful', 'peace', 'reflection', 'wisdom'],
       ));
     }
 
@@ -408,28 +394,26 @@ class VedaIndex {
   }
 }
 
-/// Rank the whole-app corpus against [query]. Best-first hits above a relevance
-/// threshold; empty for junk / no real match (so we can say "I don't have that"
-/// honestly instead of surfacing noise).
+/// Rank the pregnancy corpus against [query] via the shared engine — best-first
+/// hits above the relevance threshold; empty for junk / no real match (so we can
+/// say "I don't have that" honestly instead of surfacing noise). Scoped to the
+/// pregnancy domain (+ universal), with community excluded from the answer when
+/// [includeCommunity] is false and faith content gated to the mother's choices.
 List<VedaHit> vedaSearch(String query, PregnancyController p,
     {int limit = 6, bool includeCommunity = true}) {
-  final qTokens = _tokens(query);
-  if (qTokens.isEmpty) return const [];
-  final qLower = query.toLowerCase().trim();
   // Religion guardrail: faith content (spiritual reading + read-to-baby) is
   // surfaced ONLY for traditions the mother has explicitly chosen in her
   // Read-to-baby customization — we never push a religion she hasn't opted into.
   final religions = ReadToBabyStore.instance.religions;
-  final hits = <VedaHit>[];
-  for (final d in VedaIndex.corpus(p)) {
-    // Community posts are opinions — never a source for the actual answer.
-    if (!includeCommunity && d.kind == VedaKind.community) continue;
-    if (!_religionAllowed(d, religions)) continue;
-    final sc = d.score(qTokens, qLower);
-    if (sc >= 4.0) hits.add(VedaHit(d, sc));
-  }
-  hits.sort((a, b) => b.score.compareTo(a.score));
-  return hits.length <= limit ? hits : hits.sublist(0, limit);
+  return vedaScore(
+    query,
+    VedaIndex.corpus(p),
+    limit: limit,
+    where: (d) =>
+        vedaInDomain(d, VedaDomain.pregnancy) &&
+        (includeCommunity || d.kind != VedaKind.community) &&
+        _religionAllowed(d, religions),
+  );
 }
 
 /// Top COMMUNITY matches for [query] — used ONLY for the social-proof
@@ -437,17 +421,12 @@ List<VedaHit> vedaSearch(String query, PregnancyController p,
 /// actual answer (Sections 1–4); they're someone's opinion, not guidance.
 List<VedaHit> vedaCommunityMatches(String query, PregnancyController p,
     {int limit = 3}) {
-  final qTokens = _tokens(query);
-  if (qTokens.isEmpty) return const [];
-  final qLower = query.toLowerCase().trim();
-  final hits = <VedaHit>[];
-  for (final d in VedaIndex.corpus(p)) {
-    if (d.kind != VedaKind.community) continue;
-    final sc = d.score(qTokens, qLower);
-    if (sc >= 4.0) hits.add(VedaHit(d, sc));
-  }
-  hits.sort((a, b) => b.score.compareTo(a.score));
-  return hits.length <= limit ? hits : hits.sublist(0, limit);
+  return vedaScore(
+    query,
+    VedaIndex.corpus(p),
+    limit: limit,
+    where: (d) => d.kind == VedaKind.community && vedaInDomain(d, VedaDomain.pregnancy),
+  );
 }
 
 /// Whether a (possibly faith-specific) doc may be shown given the mother's
