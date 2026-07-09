@@ -122,7 +122,7 @@ const List<ReadCollection> kReadCollections = [
   ReadCollection(id: 'behaviour', title: 'Behaviour & Emotions', subtitle: 'Making sense of big feelings.', icon: Icons.favorite_border, articleIds: ['tantrums'], seed: 44),
   ReadCollection(id: 'health', title: 'Health & Illness', subtitle: 'Calm, clear guidance for the worried moments.', icon: Icons.monitor_heart_outlined, articleIds: ['fever'], seed: 45),
   ReadCollection(id: 'play', title: 'Play & Language', subtitle: 'How the everyday builds a mind.', icon: Icons.toys_outlined, articleIds: ['tummytime', 'talking'], seed: 46),
-  ReadCollection(id: 'parent', title: 'The Parent, Too', subtitle: 'Because you matter in this story.', icon: Icons.self_improvement_outlined, articleIds: ['matrescence'], seed: 47),
+  ReadCollection(id: 'parent', title: 'The Parent, Too', subtitle: 'Because you matter in this story.', icon: Icons.self_improvement_outlined, articleIds: ['matrescence', 'csection'], seed: 47),
 ];
 
 // ---- catalog ----------------------------------------------------------------
@@ -476,6 +476,121 @@ const List<ReadArticle> kReadArticles = [
           'One small thing',
           'Each day, do one small thing that’s only for you - a hot drink while it’s still hot, five minutes outside, a message to a friend. Tiny, but it keeps you tethered to yourself.',
         ),
+      ),
+    ],
+  ),
+  ReadArticle(
+    id: 'csection',
+    title: 'C-section recovery: the full picture',
+    teaser: 'Major surgery, and a recovery that deserves as much attention as the birth - here’s what the weeks afterward really involve.',
+    whyToday: 'Whether you’re still deciding, have a date fixed, or are already home with your baby, this is the clear picture of recovery few people give you - in body and in heart.',
+    collection: 'parent',
+    ageTag: 'All stages',
+    minutes: 9,
+    seed: 10,
+    author: 'Dr. Anjali Verma',
+    authorRole: 'Obstetrician & Gynaecologist',
+    evidence: 'Aligned with standard obstetric guidance on caesarean recovery, wound healing and VBAC. General information for understanding, not a diagnosis - your own doctor knows your situation and your incision best.',
+    sections: [
+      ReadSection(paragraphs: [
+        'A C-section is major surgery, and the recovery deserves as much attention as the birth itself. Yet it is the part least talked about. Whether a mother is still deciding, has a date fixed, or is already home with her baby, this is a clear picture of what the weeks afterward involve, and what genuinely helps, in body and in heart.',
+        'A quick note: this is for understanding, not diagnosis. Every recovery differs, and the timings here are general guides. A mother’s own doctor knows her situation and her incision best.',
+      ]),
+      ReadSection(
+        heading: 'What matters most',
+        paragraphs: [
+          'The essentials, first:',
+          '•  The skin heals in about six to eight weeks; the deeper layers take months.\n•  There is no single “right” pace. Recovery varies widely, and slower is not wrong.\n•  Breastfeeding is safe and helpful; the milk may simply take a little longer to arrive.\n•  Nothing heavier than the baby for about six weeks.\n•  Pain that is easing, even slowly, is a good sign. Pain that is worsening needs a doctor.',
+        ],
+      ),
+      ReadSection(
+        heading: 'The scar is the smallest part',
+        paragraphs: [
+          'The line on the skin is the last and shallowest of several layers the surgeon moved through: skin, fat, the sheet of tissue over the muscles, the muscles themselves (parted, not cut), and the womb, each closed in turn.',
+          'The skin heals within weeks. The layers beneath keep healing for months. This is why a mother can look almost back to normal at six weeks and still feel tender and tired inside. The scar cannot show the whole of what is mending.',
+        ],
+      ),
+      ReadSection(
+        heading: 'Recovery has its own timeline',
+        paragraphs: [
+          'There is no fixed schedule. Some mothers move comfortably within two weeks; others feel real pain and stiffness for much longer. Both are normal. It depends on whether the surgery was planned or an emergency, whether labour came first, whether it is a repeat C-section, and on the individual body.',
+          'The useful signal is direction, not speed. Easing pain reassures; worsening pain is worth a call to the doctor.',
+        ],
+      ),
+      ReadSection(
+        heading: 'The first few days',
+        paragraphs: [
+          'The early days hold most of the surprises. In hospital, a mother can usually expect:',
+          '•  Gentle walking, early. It feels hard at first, but it lowers the risk of clots and helps the gut wake up.\n•  A catheter for the first day or so, usually removed the next morning.\n•  Firm pressure on the belly from a nurse, to help the womb contract. Uncomfortable, but it limits bleeding.\n•  Afterpains - cramps as the womb shrinks, often stronger during breastfeeding.\n•  Trapped gas, which can be surprisingly uncomfortable. Walking, warm fluids, and a stool softener help.',
+          'The first bowel movement is often awaited with worry, and is usually far easier than expected.',
+        ],
+      ),
+      ReadSection(
+        heading: 'When the milk comes in',
+        paragraphs: [
+          'Few worries feel as tender as wondering whether there is enough milk. So it helps to know how normal a slow start is.',
+          'After a C-section, milk often comes in a little later. The fuller feeling many expect around day three can take longer, and research finds this happens to about one in three mothers, more so after a first baby. It is not a sign that something is wrong, or that there will not be enough.',
+          'In those first days, the body is already making colostrum - the concentrated early milk, which is exactly what a newborn needs in tiny amounts. What helps the fuller milk arrive is gentle and simple: feeding or expressing often, so the body receives the signal to make more; skin-to-skin contact, which calms both mother and baby and supports let-down; and a lactation consultant’s support if feeding feels hard.',
+          'The delay is common, temporary, and no one’s fault.',
+        ],
+      ),
+      ReadSection(
+        heading: 'Feeding and moving while it heals',
+        paragraphs: [
+          'A C-section recovery is unusual, in that the patient is also the round-the-clock carer. A few practical habits make that kinder on a healing body.',
+          'Feeding positions that keep weight off the scar: the rugby (football) hold, with the baby along the mother’s side and nothing resting on the incision; side-lying, mother and baby facing each other, ideal for night feeds; and laid-back, reclining slightly with a pillow across the lap as a cushion between baby and incision.',
+          'Moving with less strain: get up by rolling onto one side first, then push up with the arms rather than the stomach. Take pain relief on the schedule a doctor advises, rather than waiting for the pain to peak. Keep water, snacks and baby essentials within reach of the feeding spot. Lift nothing heavier than the baby in the first weeks. And accept help - it is part of recovery, not a failure of it.',
+        ],
+        tip: ReadTip(
+          'Splint before you cough',
+          'Press a hand or a folded pillow firmly over the scar before you cough, laugh, sneeze or stand up. That gentle support takes the strain off the incision and makes the movement far less sharp.',
+        ),
+      ),
+      ReadSection(
+        heading: 'About the belly',
+        paragraphs: [
+          '“How to reduce the belly” is one of the most common questions after a C-section, and the honest answer is reassuring. In the early weeks, the rounded tummy is mostly swelling, a still-shrinking womb, and muscles that separated during pregnancy - not fat.',
+          'So it is not something to attack with crash diets or hard workouts, especially while the body is healing and making milk. The gentler path works better: eating well rather than eating less, and, once a doctor gives clearance, rebuilding from the inside with breathing and pelvic-floor work before any sit-ups. A support binder can feel comforting, though it supports rather than slims. The shape returns with time.',
+        ],
+      ),
+      ReadSection(
+        heading: 'Healing the heart, too',
+        paragraphs: [
+          'Recovery after a C-section is as much emotional as physical, and this side receives far less attention than it deserves.',
+          'Feelings about the birth. A planned C-section can feel settled, or not, and either is fine. After an emergency, or a birth that unfolded differently than hoped, a mother may feel disappointment, or a sense that her body fell short. It did not. A C-section is not a lesser birth, and not a failing of effort or will. It is often the reason mother and baby came through safely.',
+          'Bonding that takes time. Love does not always arrive like a thunderbolt, and that is normal. After surgery, pain and broken sleep, connection often builds slowly, over days and weeks of holding and feeding. A mother who feels no instant rush has done nothing wrong. Attachment grows in its own time.',
+          'When to reach out. Tearfulness and feeling overwhelmed in the first couple of weeks are common - the “baby blues” - and usually settle on their own. What deserves attention is low mood, anxiety, or a sense of distance from the baby that lingers beyond that or deepens. Postpartum depression and anxiety are common and very treatable. A doctor or counsellor can help, and reaching out early is a quiet act of strength.',
+        ],
+      ),
+      ReadSection(
+        heading: 'Once a C-section, always? Not necessarily',
+        paragraphs: [
+          'This belief is widely repeated, and for many mothers it is untrue. Whether a future vaginal birth fits depends on why the first C-section happened, the type of cut on the womb, and the gap before the next pregnancy - all of which a doctor can weigh.',
+          'In India, only about one in ten eligible mothers even attempt it, often because no one told them it was possible. Knowing it is an option is where a real choice begins.',
+        ],
+        mythFact: MythFact(
+          'Once a C-section, always a C-section.',
+          'For many mothers this isn’t true. A vaginal birth after caesarean (VBAC) is a safe and reasonable option for many, succeeding roughly three times in four when suitable mothers attempt it, with serious risks kept low.',
+        ),
+      ),
+      ReadSection(
+        heading: 'When to see a doctor',
+        paragraphs: [
+          'General information, not medical advice. It is worth contacting a doctor promptly for:',
+          '•  A wound that grows redder, more swollen or warm, or leaks fluid or pus.\n•  An incision that opens, or pain that worsens instead of easing.\n•  Fever, or heavy bleeding that soaks a pad in an hour or passes large clots.\n•  Pain, redness or swelling in a leg, or any breathlessness - which need urgent care.\n•  A low mood that will not lift, or a sense of distance from the baby - which deserve support, not silence.',
+        ],
+      ),
+      ReadSection(
+        heading: 'ParentVeda Insight',
+        paragraphs: [
+          'Recovery is usually measured by how quickly a mother “bounces back” - the flat belly, the faded scar, the day she looks like she never had surgery. Her body is measuring something quieter: layers reconnecting, nerves regrowing a millimetre a month, a womb returning to size, milk arriving in its own time, love growing at its own pace. Bouncing back was never the real goal. Healing, in body and in heart, at her own pace, is.',
+        ],
+      ),
+      ReadSection(
+        heading: 'Looking ahead',
+        paragraphs: [
+          'Most C-section recoveries unfold gently and fully, even if slower than expected. The scar fades, sensation returns, milk settles into a rhythm, bonding deepens, and the cautious early days become a memory. Whatever led to the surgery, the body did something remarkable - and it is doing something equally remarkable now, quietly, layer by layer.',
+        ],
       ),
     ],
   ),
