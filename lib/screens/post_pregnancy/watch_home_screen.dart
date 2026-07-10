@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_section_extras.dart';
 import 'pp_watch_data.dart';
 import 'watch_category_screen.dart';
 import 'watch_collection_screen.dart';
@@ -30,16 +31,48 @@ class WatchHomeScreen extends StatefulWidget {
 class _WatchHomeScreenState extends State<WatchHomeScreen> {
   bool _quick = false; // false = Deep Learn, true = Quick Learn
 
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
   void _open(WatchVideo v) => v.quick ? _push(QuickLearnScreen(startId: v.id)) : _push(WatchPlayerScreen(video: v));
 
+  // ---- search results (title contains query) ------------------------------
+  List<Widget> _searchView(WatchStore store) {
+    final q = _query.trim().toLowerCase();
+    final items = kWatchVideos.where((v) => v.title.toLowerCase().contains(q)).toList();
+    return [
+      const SizedBox(height: 26),
+      _pad(watchSectionHeader('Search results')),
+      const SizedBox(height: 14),
+      if (items.isEmpty)
+        _pad(Text('No matches for "$_query" - try another word.', style: ppBody(13, color: ppMuted)))
+      else
+        _pad(Column(children: [
+          for (final v in items)
+            WatchListCard(
+              video: v,
+              onTap: () => _open(v),
+              progress: store.progressOf(v.id) > 0.02 && store.progressOf(v.id) < 0.98 ? store.progressOf(v.id) : null,
+            ),
+        ])),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: AnimatedBuilder(
           animation: WatchStore.instance,
@@ -59,6 +92,16 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 _pad(Text('Five minutes here should make you a better parent today - not just pass the time.',
                     style: ppBody(14, h: 1.5))),
 
+                const SizedBox(height: 16),
+                _pad(ppSearchField(
+                  controller: _searchCtl,
+                  hint: 'Search videos…',
+                  onChanged: (v) => setState(() => _query = v),
+                )),
+
+                if (_query.trim().isNotEmpty)
+                  ..._searchView(store)
+                else ...[
                 const SizedBox(height: 18),
                 _pad(_modeToggle()),
 
@@ -97,11 +140,14 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
 
                 const SizedBox(height: 30),
                 _pad(_libraryLink()),
+                ],
               ],
             );
           },
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 

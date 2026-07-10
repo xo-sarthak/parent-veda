@@ -12,6 +12,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'pp_attachments.dart';
+
 enum HealthEventType { doctorVisit, vaccination, illness, medication, growthCheck, labTest, allergy, note, emergency, assessment }
 
 /// One event on the health timeline. `sortKey` orders newest-first (higher =
@@ -51,7 +53,20 @@ class GrowthPoint {
 }
 
 class Medication {
-  const Medication({required this.name, required this.reason, required this.doctor, required this.dosage, required this.duration, required this.completed, required this.date});
+  const Medication({
+    required this.name,
+    required this.reason,
+    required this.doctor,
+    required this.dosage,
+    required this.duration,
+    required this.completed,
+    required this.date,
+    this.frequency = '',
+    this.reminderOn = false,
+    this.reminderHour,
+    this.reminderMinute,
+    this.reminderId,
+  });
   final String name;
   final String reason;
   final String doctor;
@@ -59,6 +74,18 @@ class Medication {
   final String duration;
   final bool completed;
   final String date;
+
+  // ---- richer scheduling (mirrors the pregnancy-side medicine feature) ----
+  /// How often, in plain words (e.g. "Twice daily", "Every morning").
+  final String frequency;
+
+  /// A gentle local reminder to give the medicine. When on, [reminderHour] /
+  /// [reminderMinute] hold the time and [reminderId] is the OS notification id
+  /// used to (re)schedule and cancel it.
+  final bool reminderOn;
+  final int? reminderHour;
+  final int? reminderMinute;
+  final int? reminderId;
 }
 
 enum AllergyStatus { known, suspected, resolved }
@@ -79,12 +106,33 @@ class ReportValue {
 }
 
 class MedicalReport {
-  const MedicalReport({required this.name, required this.date, required this.summary, this.doctor, this.values = const []});
+  const MedicalReport({required this.name, required this.date, required this.summary, this.doctor, this.values = const [], this.attachments = const []});
   final String name;
   final String date;
   final String summary;
   final String? doctor;
   final List<ReportValue> values;
+  final List<Attachment> attachments; // scanned images / PDFs of the report
+}
+
+/// A prescription the child was given - the paper (or photo/PDF) plus the who,
+/// when and any notes. Simpler than a Medication: it's the record of the script,
+/// not a schedule to track.
+class Prescription {
+  const Prescription({
+    required this.id,
+    required this.name,
+    required this.doctor,
+    required this.date,
+    this.notes = '',
+    this.attachments = const [],
+  });
+  final String id;
+  final String name;
+  final String doctor;
+  final String date;
+  final String notes;
+  final List<Attachment> attachments;
 }
 
 class SymptomEntry {
@@ -181,6 +229,16 @@ const List<MedicalReport> kReports = [
     ReportValue('Length', '63 cm (48th)', 'normal'),
     ReportValue('Head circumference', '41 cm (52nd)', 'normal'),
   ]),
+];
+
+const List<Prescription> kPrescriptions = [
+  Prescription(
+    id: 'rx_seed',
+    name: 'Post-vaccine care',
+    doctor: 'Dr. Neha Sharma',
+    date: '14 Jun 2026',
+    notes: 'Paracetamol (weight-based) only if fever crosses 38°C. Extra feeds, light clothing, plenty of rest.',
+  ),
 ];
 
 // ---- AI-style insights (reassuring patterns, never diagnosis) ---------------
@@ -281,6 +339,7 @@ class HealthStore extends ChangeNotifier {
 
   final List<String> _questions = [...kSeedDoctorQuestions];
   final List<Medication> _medications = [...kMedications];
+  final List<Prescription> _prescriptions = [...kPrescriptions];
   final List<Allergy> _allergies = [...kAllergies];
   final List<SymptomEntry> _symptoms = [...kSymptoms];
   final List<MedicalReport> _reports = [...kReports];
@@ -321,6 +380,27 @@ class HealthStore extends ChangeNotifier {
   void removeMedication(int i) {
     if (i >= 0 && i < _medications.length) {
       _medications.removeAt(i);
+      notifyListeners();
+    }
+  }
+
+  // ---- prescriptions (the script itself; may carry image/PDF attachments) ----
+  List<Prescription> get prescriptions => List.unmodifiable(_prescriptions);
+  void addPrescription(Prescription p) {
+    _prescriptions.insert(0, p);
+    notifyListeners();
+  }
+
+  void updatePrescription(int i, Prescription p) {
+    if (i >= 0 && i < _prescriptions.length) {
+      _prescriptions[i] = p;
+      notifyListeners();
+    }
+  }
+
+  void removePrescription(int i) {
+    if (i >= 0 && i < _prescriptions.length) {
+      _prescriptions.removeAt(i);
       notifyListeners();
     }
   }
@@ -368,11 +448,18 @@ class HealthStore extends ChangeNotifier {
     }
   }
 
-  // ---- reports (manual records; file attachment is a future add) ----
+  // ---- reports (manual records; may carry image/PDF attachments) ----
   List<MedicalReport> get reports => List.unmodifiable(_reports);
   void addReport(MedicalReport r) {
     _reports.insert(0, r);
     notifyListeners();
+  }
+
+  void updateReport(int i, MedicalReport r) {
+    if (i >= 0 && i < _reports.length) {
+      _reports[i] = r;
+      notifyListeners();
+    }
   }
 
   void removeReport(int i) {

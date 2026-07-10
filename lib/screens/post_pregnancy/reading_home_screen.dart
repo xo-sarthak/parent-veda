@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
+import 'pp_section_extras.dart';
 import 'reading_collection_screen.dart';
 import 'reading_common.dart';
 import 'reading_library_screen.dart';
@@ -28,15 +29,47 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
   // null = All; otherwise only that kind is shown.
   ReadKind? _filter;
 
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
   void _open(ReadArticle a) => _push(ReadingReaderScreen(article: a));
+
+  // ---- search results (title contains query) ------------------------------
+  List<Widget> _searchView(ReadingStore store) {
+    final q = _query.trim().toLowerCase();
+    final items = kReadArticles.where((a) => a.title.toLowerCase().contains(q)).toList();
+    return [
+      const SizedBox(height: 22),
+      _pad(readSectionHeader('Search results')),
+      const SizedBox(height: 14),
+      if (items.isEmpty)
+        _pad(Text('No matches for "$_query" - try another word.', style: ppBody(13, color: ppMuted)))
+      else
+        _pad(Column(children: [
+          for (final a in items)
+            ReadListCard(
+              article: a,
+              onTap: () => _open(a),
+              progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null,
+            ),
+        ])),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: AnimatedBuilder(
           animation: ReadingStore.instance,
@@ -55,18 +88,30 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                 const SizedBox(height: 6),
                 _pad(Text('One good read, chosen for where you and Aarav are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
-                const SizedBox(height: 20),
-                _filterRow(),
+                const SizedBox(height: 16),
+                _pad(ppSearchField(
+                  controller: _searchCtl,
+                  hint: 'Search articles…',
+                  onChanged: (v) => setState(() => _query = v),
+                )),
 
-                if (_filter != null)
-                  ..._filteredView()
-                else
-                  ..._fullView(context, store, continues, today),
+                if (_query.trim().isNotEmpty)
+                  ..._searchView(store)
+                else ...[
+                  const SizedBox(height: 20),
+                  _filterRow(),
+                  if (_filter != null)
+                    ..._filteredView()
+                  else
+                    ..._fullView(context, store, continues, today),
+                ],
               ],
             );
           },
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 

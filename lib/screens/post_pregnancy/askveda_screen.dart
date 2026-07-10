@@ -17,7 +17,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../ask_veda/veda_core.dart';
 import '../../localization/app_language.dart';
 import '../../widgets/mic_dictation_button.dart';
-import 'my_child_screen.dart';
+// My Child is reached via the bottom-nav home tab (openPpTab 0) now.
+// import 'my_child_screen.dart';
 import 'parenting_veda.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
@@ -209,7 +210,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             ),
           ]),
           GestureDetector(
-            onTap: () => _open(const MyChildScreen()),
+            onTap: () => openPpTab(context, 0), // My Child is the home tab now
             child: Container(
               width: 36,
               height: 36,

@@ -533,8 +533,8 @@ class PpCompareStore extends ChangeNotifier {
   PpCompareStore._();
   static final PpCompareStore instance = PpCompareStore._();
 
-  /// A comparison holds at most this many products (minimum 2 to compare).
-  static const int maxItems = 3;
+  /// A comparison holds exactly two products (minimum 2 to compare).
+  static const int maxItems = 2;
 
   final List<PpProduct> _selected = [];
   List<PpProduct> get selected => List.unmodifiable(_selected);

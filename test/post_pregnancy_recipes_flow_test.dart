@@ -22,11 +22,15 @@ void main() {
       expect(desserts, isNot(contains('cutlets')));
     });
 
-    test('veg / non-veg toggle narrows the list', () {
-      expect(normalRecipes(veg: true).every((r) => r.veg), isTrue);
-      expect(normalRecipes(veg: true).map((r) => r.id), isNot(contains('eggbhurji')));
-      expect(normalRecipes(veg: false).every((r) => !r.veg), isTrue);
-      expect(normalRecipes(veg: false).map((r) => r.id), contains('eggbhurji'));
+    test('diet (veg / vegan / non-veg) + immunity filters narrow the list', () {
+      expect(normalRecipes(diet: 'veg').every((r) => r.veg), isTrue);
+      expect(normalRecipes(diet: 'veg').map((r) => r.id), isNot(contains('eggbhurji')));
+      expect(normalRecipes(diet: 'nonveg').every((r) => !r.veg), isTrue);
+      expect(normalRecipes(diet: 'nonveg').map((r) => r.id), contains('eggbhurji'));
+      expect(normalRecipes(diet: 'vegan').every((r) => r.vegan), isTrue);
+      expect(normalRecipes(diet: 'vegan').map((r) => r.id), contains('tomatosoup'));
+      expect(normalRecipes(immunity: true).every((r) => r.immunity), isTrue);
+      expect(normalRecipes(immunity: true).map((r) => r.id), contains('tomatosoup'));
     });
 
     test('sick situation selects the right comfort meals', () {

@@ -47,6 +47,13 @@ class WatchLibraryScreen extends StatelessWidget {
                 _section(context, 'Saved', store.saved),
                 _section(context, 'Recently watched', store.recentlyWatched),
 
+                _pad(watchSectionHeader('Your collections')),
+                const SizedBox(height: 14),
+                _pad(Column(children: [
+                  for (final uc in store.userCollections) _userCollectionRow(context, uc),
+                ])),
+                const SizedBox(height: 26),
+
                 _pad(watchSectionHeader('Collections')),
                 const SizedBox(height: 14),
                 _pad(Column(children: [
@@ -114,6 +121,38 @@ class WatchLibraryScreen extends StatelessWidget {
               Text(c.title, style: ppJakarta(14), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 3),
               Text('${c.videoIds.length} videos · ~$mins min', style: ppBody(12, color: ppMuted)),
+            ]),
+          ),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+        ]),
+      ),
+    );
+  }
+
+  // A parent's own collection. Reuses WatchCollectionScreen by wrapping the user
+  // collection in a WatchCollection; empty ones still show, with a gentle state.
+  Widget _userCollectionRow(BuildContext context, UserWatchCollection uc) {
+    final count = uc.videoIds.length;
+    final wc = WatchCollection(
+      id: uc.id,
+      title: uc.name,
+      subtitle: count == 1 ? '1 video' : '$count videos',
+      videoIds: uc.videoIds,
+      seed: 30,
+    );
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WatchCollectionScreen(collection: wc))),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(children: [
+          SizedBox(width: 96, child: WatchThumb(seed: wc.seed, height: 60, showPlay: false)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(uc.name, style: ppJakarta(14), maxLines: 1, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 3),
+              Text(count == 0 ? 'No videos yet' : (count == 1 ? '1 video' : '$count videos'), style: ppBody(12, color: ppMuted)),
             ]),
           ),
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),

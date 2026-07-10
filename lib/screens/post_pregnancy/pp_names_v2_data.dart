@@ -102,7 +102,7 @@ const Map<String, NameV2> _nameV2 = {
     decisionWhy:
         'Aarav suits families looking for a name that is traditional in root yet effortlessly modern - soft on the tongue, recognised everywhere, and never harsh or heavy.',
     alternatives: ['Aarush', 'Vihaan', 'Reyansh'],
-    nicknames: ['Aaru', 'Rav'],
+    nicknames: ['Aaru', 'Rav', 'Ari'],
     intlPron: 'AA-rav (travels easily across languages)',
   ),
   'Vihaan': NameV2(
@@ -111,7 +111,7 @@ const Map<String, NameV2> _nameV2 = {
     decisionWhy:
         'Vihaan suits parents who want an optimistic, forward-looking name that still feels grounded in tradition, and one that travels well across languages.',
     alternatives: ['Vivaan', 'Aarav', 'Reyansh'],
-    nicknames: ['Vihu', 'Vee'],
+    nicknames: ['Vihu', 'Vee', 'Viho'],
     intlPron: 'vi-HAAN',
   ),
   'Kabir': NameV2(
@@ -120,12 +120,32 @@ const Map<String, NameV2> _nameV2 = {
     decisionWhy:
         'Kabir suits families who want a name with real cultural and literary roots, one that feels strong and timeless without being ornate.',
     alternatives: ['Arjun', 'Aarav', 'Ishaan'],
-    nicknames: ['Kabu', 'Kay'],
+    nicknames: ['Kabu', 'Kay', 'Kabi'],
     intlPron: 'ka-BEER',
   ),
 };
 
 int _min(int a, int b) => a < b ? a : b;
+
+/// At least three affectionate nicknames, generated from the name so no name
+/// ever shows just one. Deterministic and readable (first-3, first-4, a soft
+/// diminutive), de-duplicated.
+List<String> generatedNicknames(String name) {
+  String cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
+  final l = name.toLowerCase();
+  final out = <String>[];
+  void add(String s) {
+    final c = cap(s);
+    if (c.length >= 2 && !out.contains(c)) out.add(c);
+  }
+
+  add(l.substring(0, _min(3, l.length))); // Rey / Ana / Adv
+  if (l.length >= 5) add(l.substring(0, 4)); // Reya / Anay
+  add('${l.substring(0, _min(2, l.length))}u'); // Anu / Adu / Reu
+  add('${l.substring(0, _min(3, l.length))}i'); // Reyi / Anai
+  add('${l.substring(0, _min(3, l.length))}o'); // Reyo / Anao
+  return out.take(3).toList();
+}
 
 /// Every name's V2 content - hand-authored where we have it, gracefully generated
 /// from the existing fields otherwise. So no name ever reads thin.
@@ -139,9 +159,47 @@ NameV2 nameV2(BabyName n) {
     decisionWhy:
         'Parents drawn to ${n.name} tend to love that it is ${n.popularity.toLowerCase()}, easy to say and rich in meaning - a natural fit for families who want a name that feels ${n.feel.toLowerCase()}.',
     alternatives: n.similar.map((s) => s.$1).toList(),
-    nicknames: [n.name.substring(0, _min(3, n.name.length))],
+    nicknames: generatedNicknames(n.name),
     intlPron: n.pron,
   );
+}
+
+// ---- "The feeling you want" - multi-select vibes (folds the old Collections) -
+//  These replace the separate "Discover by collection" grid: the collection
+//  categories now live here as selectable feelings. Multi-select, OR-matched.
+class NameVibe {
+  const NameVibe(this.label, this.match);
+  final String label;
+  final bool Function(BabyName) match;
+}
+
+final List<NameVibe> kNameVibes = [
+  NameVibe('Rooted & traditional', (n) => n.feel.toLowerCase().contains('rooted')),
+  NameVibe('Modern & fresh', (n) => n.feel.toLowerCase().contains('modern')),
+  NameVibe('Rare & unique', (n) => n.rare || n.feel.toLowerCase().contains('rare')),
+  NameVibe('Devotional', (n) => n.feel.toLowerCase().contains('devotional')),
+  NameVibe('Timeless classics', (n) => n.popularity == 'Classic'),
+  NameVibe('Trending now', (n) => n.popularity == 'Trending'),
+  NameVibe('Sun & light', (n) => RegExp(r'light|sun|dawn|ray').hasMatch('${n.meaningShort} ${n.meaningFull}'.toLowerCase())),
+  NameVibe('Short & sweet', (n) => n.syllables <= 2),
+];
+
+/// The deck for the journey: names filtered by who-are-we-naming + region/
+/// religion, then narrowed to the chosen feelings (OR-matched). If the feeling
+/// filter would empty the deck, we keep the who/region result rather than show
+/// nothing (feelings "gently weight", never hide everyone).
+List<BabyName> namesForSelection({
+  String gender = 'Both',
+  String community = 'Any',
+  String region = 'Any',
+  Set<String> vibes = const {},
+}) {
+  final base = namesFiltered(gender: gender, community: community, region: region);
+  if (vibes.isEmpty) return base;
+  final chosen = kNameVibes.where((v) => vibes.contains(v.label)).toList();
+  if (chosen.isEmpty) return base;
+  final narrowed = base.where((n) => chosen.any((v) => v.match(n))).toList();
+  return narrowed.isEmpty ? base : narrowed;
 }
 
 /// A gentle "why this fits your shortlist" line for the Decision Companion.

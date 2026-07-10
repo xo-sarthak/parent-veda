@@ -13,6 +13,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../services/notification_service.dart';
 import 'doctor_record_screen.dart';
 import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
@@ -33,6 +34,17 @@ class VaxTrackerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
+      floatingActionButton: GestureDetector(
+        onTap: () => openPpTab(context, 1),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
+          child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
+        ),
+      ),
       body: AnimatedBuilder(
         animation: VaxStore.instance,
         builder: (context, _) {
@@ -58,10 +70,10 @@ class VaxTrackerScreen extends StatelessWidget {
               const SizedBox(height: 22),
               _pad(_snapshot(context, done, total, due, next)),
 
-              // due today
+              // next vaccination
               if (due != null) ...[
                 const SizedBox(height: 26),
-                _pad(_railLabel('Due today', color: ppPurple)),
+                _pad(_railLabel('Next vaccination', color: ppPurple)),
                 const SizedBox(height: 14),
                 _pad(_dueCard(context, due)),
               ],
@@ -220,18 +232,110 @@ class VaxTrackerScreen extends StatelessWidget {
           const SizedBox(height: 14),
           const Divider(height: 1, color: ppHair),
           const SizedBox(height: 14),
+          // alarm on its own row, so nothing crowds it
+          Row(children: [_alarmChip(context, v), const Spacer()]),
+          const SizedBox(height: 10),
           Row(children: [
             if (v.govtFree) ...[
               Flexible(child: _pill('Free at govt centre', fg: _green, bg: _greenTint)),
               const SizedBox(width: 8),
             ],
             const Spacer(),
-            Text('Learn why & plan →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+            Text('Learn why →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ]),
         ]),
       ),
     );
   }
+
+  Widget _alarmChip(BuildContext context, VaxVisit v) {
+    final on = VaxStore.instance.hasReminder(v.id);
+    return GestureDetector(
+      onTap: () => _alarmSheet(context, v),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(999)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(on ? Icons.alarm_on_rounded : Icons.add_alarm_rounded, size: 15, color: ppPurple),
+          const SizedBox(width: 6),
+          Text(on ? 'Alarm set' : 'Set alarm', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
+        ]),
+      ),
+    );
+  }
+
+  // ---- alarm / reminder scheduling (mirrors the vaccine detail's flow) -----
+  void _alarmSheet(BuildContext context, VaxVisit v) {
+    final lead = v.lead;
+    final base = vaxVisitDate(v) ?? vaxDueDate();
+    void set(int daysBefore, String label) {
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.of(context).pop();
+      VaxStore.instance.setReminder(v.id, true);
+      NotificationService.instance.requestPermission();
+      NotificationService.instance.scheduleOneOff(
+        id: (v.id.hashCode & 0x7fffffff),
+        title: 'Vaccine reminder - ${lead.shortName}',
+        body: daysBefore == 0
+            ? "Aarav's ${lead.shortName} (${v.ageLabel}) is due today."
+            : "Aarav's ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${v.date}.",
+        when: base.subtract(Duration(days: daysBefore)),
+      );
+      messenger.showSnackBar(SnackBar(content: Text('Alarm set - $label'), behavior: SnackBarBehavior.floating));
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ppBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
+            const SizedBox(height: 16),
+            Text('Set a vaccination alarm', style: ppJakarta(17)),
+            const SizedBox(height: 4),
+            Text('${lead.shortName} · due ${v.date}. We\'ll send a gentle reminder.', style: ppBody(12.5, color: ppMuted)),
+            const SizedBox(height: 14),
+            _alarmOption('The day before', () => set(1, '1 day before')),
+            _alarmOption('3 days before', () => set(3, '3 days before')),
+            _alarmOption('A week before', () => set(7, '1 week before')),
+            _alarmOption('On the day', () => set(0, 'on the day')),
+            if (VaxStore.instance.hasReminder(v.id)) ...[
+              const SizedBox(height: 4),
+              Center(child: GestureDetector(
+                onTap: () {
+                  VaxStore.instance.setReminder(v.id, false);
+                  Navigator.of(ctx).pop();
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Text('Remove alarm', style: ppBody(13, color: ppCoral, w: FontWeight.w700)),
+              )),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _alarmOption(String label, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
+          child: Row(children: [
+            const Icon(Icons.notifications_none_rounded, size: 18, color: ppPurple),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+          ]),
+        ),
+      );
 
   Widget _pill(String t, {required Color fg, required Color bg}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

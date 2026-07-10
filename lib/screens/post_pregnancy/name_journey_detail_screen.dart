@@ -12,6 +12,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'name_astro_screens.dart';
 import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
@@ -75,52 +76,36 @@ class NameJourneyDetailScreen extends StatelessWidget {
                 child: Text(v2.aiStory, style: ppBody(14.5, color: ppInk, h: 1.65)),
               )),
 
-              // ParentVeda perspective
-              const SizedBox(height: 16),
-              _pad(Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  ppEyebrow('The ParentVeda perspective', color: ppPurple, spacing: 0.8),
-                  const SizedBox(height: 8),
-                  Text(n.perspective, style: ppBody(13.5, color: ppInk, h: 1.6)),
-                ]),
-              )),
-
-              // facts
+              // essentials - Origin · Astrology · Numerology · Popularity
+              // (Astrology & Numerology open their own detail pages.)
               _sectionDivider(),
               _pad(_iconHead(Icons.info_outline_rounded, 'The essentials')),
               const SizedBox(height: 14),
               _pad(Row(children: [
                 Expanded(child: _fact('Origin', n.origin)),
                 const SizedBox(width: 10),
-                Expanded(child: _fact('Syllables', '${n.syllables}')),
+                Expanded(child: _fact('Astrology', 'Ruled by ${numProfile(n.numerology).planet}', onTap: () => _push(context, NameAstrologyScreen(name: n.name)))),
               ])),
               const SizedBox(height: 10),
               _pad(Row(children: [
-                Expanded(child: _fact('Numerology', '${n.numerology} · tradition')),
+                Expanded(child: _fact('Numerology', '${n.numerology} · ${numProfile(n.numerology).vibe}', onTap: () => _push(context, NameNumerologyScreen(name: n.name)))),
                 const SizedBox(width: 10),
                 Expanded(child: _fact('Popularity', n.popularity)),
               ])),
-              const SizedBox(height: 14),
-              _pad(_softRow(Icons.menu_book_outlined, 'Mythology & history', n.famous)),
-              const SizedBox(height: 10),
-              _pad(_softRow(Icons.star_border_rounded, 'Nakshatra fit', n.nakshatra)),
 
-              // Decision Companion
+              // Decision Companion - now carries the detailed ParentVeda's
+              // perspective (folding in heritage/story + tradition).
               _sectionDivider(),
               _pad(_iconHead(Icons.compare_arrows_rounded, 'Help me decide')),
               const SizedBox(height: 6),
               _pad(Text('The Decision Companion helps you feel confident - it never chooses for you.', style: ppBody(12.5, color: ppMuted))),
               const SizedBox(height: 14),
+              _pad(_perspectiveCard(n)),
+              const SizedBox(height: 10),
               _pad(_softRow(Icons.favorite_border, 'Why parents choose ${n.name}', v2.decisionWhy)),
               if (v2.nicknames.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 _pad(_chipsRow('Sweet nicknames', v2.nicknames)),
-              ],
-              if (v2.intlPron.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                _pad(_softRow(Icons.public_rounded, 'Around the world', v2.intlPron)),
               ],
               if (v2.alternatives.isNotEmpty) ...[
                 const SizedBox(height: 14),
@@ -130,14 +115,6 @@ class NameJourneyDetailScreen extends StatelessWidget {
                   for (final a in v2.alternatives) _linkChip(context, a),
                 ])),
               ],
-
-              // Name Preview
-              _sectionDivider(),
-              _pad(_iconHead(Icons.auto_stories_outlined, 'Picture the name')),
-              const SizedBox(height: 6),
-              _pad(Text('See ${n.name} the way you soon will - everywhere, every day.', style: ppBody(12.5, color: ppMuted))),
-              const SizedBox(height: 16),
-              _previewRail(n.name),
             ],
           ),
         ),
@@ -210,15 +187,44 @@ class NameJourneyDetailScreen extends StatelessWidget {
         child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(10.5, color: fg, w: FontWeight.w700)),
       );
 
-  Widget _fact(String label, String value) => Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
+  Widget _fact(String label, String value, {VoidCallback? onTap}) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: onTap != null ? ppPurple.withValues(alpha: 0.35) : ppHair)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Expanded(child: Text(label.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6))),
+              if (onTap != null) const Icon(Icons.chevron_right_rounded, size: 15, color: ppPurple),
+            ]),
+            const SizedBox(height: 6),
+            Text(value, style: ppJakarta(14).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+      );
+
+  // The detailed "ParentVeda's perspective" - now the home for the removed
+  // mythology/history + nakshatra content, woven together.
+  Widget _perspectiveCard(BabyName n) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
-          const SizedBox(height: 6),
-          Text(value, style: ppJakarta(14).copyWith(height: 1.25)),
+          ppEyebrow("ParentVeda's perspective", color: ppPurple, spacing: 0.8),
+          const SizedBox(height: 8),
+          Text(n.perspective, style: ppBody(13.5, color: ppInk, h: 1.6)),
+          const SizedBox(height: 12),
+          _miniPerspective('Heritage & story', n.famous),
+          const SizedBox(height: 10),
+          _miniPerspective('In tradition', '${n.nakshatra} Its Chaldean number ${n.numerology} leans toward ${numProfile(n.numerology).vibe.toLowerCase()}.'),
         ]),
       );
+
+  Widget _miniPerspective(String label, String body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
+        const SizedBox(height: 3),
+        Text(body, style: ppBody(12.5, color: ppInk, h: 1.55)),
+      ]);
 
   Widget _softRow(IconData icon, String label, String value) => Container(
         padding: const EdgeInsets.all(15),
@@ -259,52 +265,4 @@ class NameJourneyDetailScreen extends StatelessWidget {
         ),
       );
 
-  // ---- name preview rail (seeing the name in the child's world) -----------
-  Widget _previewRail(String name) {
-    const items = <(String, IconData, List<Color>)>[
-      ('Journal cover', Icons.menu_book_outlined, [Color(0xFFF1EAF8), Color(0xFFE6D8F1)]),
-      ('Storybook', Icons.auto_stories_outlined, [Color(0xFFFFF1F4), Color(0xFFF7E9EF)]),
-      ('Birthday card', Icons.cake_outlined, [Color(0xFFFDF3E7), Color(0xFFF6ECD9)]),
-      ('Announcement', Icons.celebration_outlined, [Color(0xFFEAF4EE), Color(0xFFDCEDE3)]),
-      ('Namkaran invite', Icons.temple_hindu_outlined, [Color(0xFFF3ECF8), Color(0xFFEBDDF3)]),
-    ];
-    return SizedBox(
-      height: 190,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 14),
-        itemBuilder: (_, i) {
-          final it = items[i];
-          return Container(
-            width: 150,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
-            clipBehavior: Clip.antiAlias,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: it.$3)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Icon(it.$2, size: 20, color: ppPurple.withValues(alpha: 0.7)),
-                      const SizedBox(height: 8),
-                      Text(name, textAlign: TextAlign.center, style: ppFraunces(24, h: 1.05), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ]),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Text(it.$1, style: ppBody(12, color: ppSoft, w: FontWeight.w700)),
-              ),
-            ]),
-          );
-        },
-      ),
-    );
-  }
 }

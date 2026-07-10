@@ -38,15 +38,16 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   final NameMatchStore _store = NameMatchStore.instance;
 
   _Phase _phase = _Phase.quiz;
-  int _who = 0;
-  int _feel = 0;
+  int _who = 2; // default 'Both'
+  final Set<String> _vibes = {}; // multi-select feelings (empty = no preference)
+  String _community = 'Any'; // religion / tradition
+  String _region = 'Any';
 
   static const List<(IconData, String)> _genders = [
     (Icons.male_rounded, 'Boy'),
     (Icons.female_rounded, 'Girl'),
-    (Icons.auto_awesome_outlined, 'Surprise'),
+    (Icons.all_inclusive_rounded, 'Both'),
   ];
-  static const List<String> _feels = ['Rooted & traditional', 'Modern & fresh', 'Rare & unique', 'Devotional'];
 
   // swipe state
   int _index = 0;
@@ -58,6 +59,8 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   String? _fbKind;
   late final AnimationController _ctrl;
   late final AnimationController _hint; // one gentle nudge to signal draggability
+  late final AnimationController _hand; // bounded swipe hand demo (yeah / nahh)
+  int _handLoops = 0;
   Offset _drag = Offset.zero;
   Offset _animFrom = Offset.zero;
   Offset _animTo = Offset.zero;
@@ -90,6 +93,17 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
       ..addListener(() {
         if (mounted) setState(() {});
       });
+    // A few gentle loops, then it settles (so it never blocks pumpAndSettle).
+    _hand = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))
+      ..addStatusListener((s) {
+        if (s == AnimationStatus.completed) {
+          _hand.reverse();
+        } else if (s == AnimationStatus.dismissed) {
+          _handLoops++;
+          if (_handLoops < 3) _hand.forward();
+        }
+      })
+      ..forward();
   }
 
   @override
@@ -97,12 +111,23 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     _ctrl.dispose();
     _fb.dispose();
     _hint.dispose();
+    _hand.dispose();
     super.dispose();
   }
 
   List<BabyName> get _deck {
-    final base = widget.collection?.names ?? kBabyNames;
-    return base.isEmpty ? kBabyNames : base;
+    // A passed collection (legacy) wins; otherwise the deck honours the quiz.
+    if (widget.collection != null) {
+      final c = widget.collection!.names;
+      return c.isEmpty ? kBabyNames : c;
+    }
+    final d = namesForSelection(
+      gender: kNameGenders[_who],
+      community: _community,
+      region: _region,
+      vibes: _vibes,
+    );
+    return d.isEmpty ? kBabyNames : d;
   }
 
   bool get _done => _index >= _deck.length;
@@ -219,9 +244,28 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           ])),
 
           const SizedBox(height: 28),
-          _pad(Text('The feeling you want', style: ppJakarta(17))),
-          const SizedBox(height: 14),
-          _pad(Wrap(spacing: 10, runSpacing: 10, children: [for (var i = 0; i < _feels.length; i++) _feelChip(i)])),
+          _pad(Row(children: [
+            Expanded(child: Text('The feeling you want', style: ppJakarta(17))),
+            Text('pick any', style: ppBody(12, color: ppMuted)),
+          ])),
+          const SizedBox(height: 12),
+          _pad(Wrap(spacing: 10, runSpacing: 10, children: [
+            _noPrefChip(),
+            for (final v in kNameVibes) _vibeChip(v.label),
+          ])),
+
+          const SizedBox(height: 28),
+          _pad(Text('Region or tradition', style: ppJakarta(17))),
+          const SizedBox(height: 6),
+          _pad(Text('Optional - localise names by community and region.', style: ppBody(12.5, color: ppMuted))),
+          const SizedBox(height: 12),
+          _pad(Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final c in kNameCommunities) _pillChip(c, c == _community, () => setState(() => _community = c)),
+          ])),
+          const SizedBox(height: 10),
+          _pad(Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final r in kNameRegions) _pillChip(r, r == _region, () => setState(() => _region = r)),
+          ])),
 
           const SizedBox(height: 30),
           _pad(GestureDetector(
@@ -272,22 +316,56 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     );
   }
 
-  Widget _feelChip(int i) {
-    final on = i == _feel;
+  Widget _vibeChip(String label) {
+    final on = _vibes.contains(label);
     return GestureDetector(
-      onTap: () => setState(() => _feel = i),
+      onTap: () => setState(() => on ? _vibes.remove(label) : _vibes.add(label)),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
         decoration: BoxDecoration(
           color: on ? ppPurple : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: on ? null : Border.all(color: ppLine),
         ),
-        child: Text(_feels[i], style: ppBody(13, color: on ? Colors.white : ppInk, w: on ? FontWeight.w700 : FontWeight.w600)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (on) ...[const Icon(Icons.check_rounded, size: 14, color: Colors.white), const SizedBox(width: 6)],
+          Text(label, style: ppBody(13, color: on ? Colors.white : ppInk, w: on ? FontWeight.w700 : FontWeight.w600)),
+        ]),
       ),
     );
   }
+
+  Widget _noPrefChip() {
+    final on = _vibes.isEmpty;
+    return GestureDetector(
+      onTap: () => setState(_vibes.clear),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+        decoration: BoxDecoration(
+          color: on ? ppInk : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: on ? null : Border.all(color: ppLine),
+        ),
+        child: Text('No preference', style: ppBody(13, color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
+      ),
+    );
+  }
+
+  Widget _pillChip(String label, bool on, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+          decoration: BoxDecoration(
+            color: on ? ppStripeB : Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: on ? ppPurple : ppLine, width: on ? 1.5 : 1),
+          ),
+          child: Text(label, style: ppBody(12.5, color: on ? ppPurple : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
+        ),
+      );
 
   // ---- primer (sets the mental model - one screen, not a tutorial) --------
   Widget _primerView() => ListView(
@@ -462,10 +540,60 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           ]),
         ]),
       ),
+      if (_interactions == 0 && !_done && !_showMatch)
+        Positioned.fill(child: IgnorePointer(child: _swipeHandHint())),
       _feedbackOverlay(),
       if (_showMatch && _matched != null) _matchOverlay(_matched!),
     ]);
   }
+
+  // An animated hand that slides right (yeah) then left (nahh), shown on the
+  // very first card so the swipe gesture is obvious. Fades out once the parent
+  // interacts with any name.
+  Widget _swipeHandHint() => AnimatedBuilder(
+        animation: _hand,
+        builder: (context, _) {
+          final s = math.sin(_hand.value * 2 * math.pi);
+          final dx = s * 48;
+          return Align(
+            alignment: const Alignment(0, 0.28),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              decoration: BoxDecoration(color: ppInk.withValues(alpha: 0.82), borderRadius: BorderRadius.circular(20)),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  _hintSide('Nahh', Icons.west_rounded, const Color(0xFFFFB0C0), s < -0.15),
+                  const SizedBox(width: 12),
+                  Transform.translate(
+                    offset: Offset(dx, 0),
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))]),
+                      child: const Icon(Icons.back_hand_rounded, size: 24, color: ppPurple),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _hintSide('Yeah', Icons.east_rounded, const Color(0xFF9FE4BC), s > 0.15),
+                ]),
+                const SizedBox(height: 10),
+                Text('Swipe right to love, left to skip', style: ppBody(12, color: Colors.white, w: FontWeight.w600)),
+              ]),
+            ),
+          );
+        },
+      );
+
+  Widget _hintSide(String label, IconData icon, Color color, bool active) => AnimatedOpacity(
+        duration: const Duration(milliseconds: 150),
+        opacity: active ? 1 : 0.4,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(height: 2),
+          Text(label, style: ppBody(11, color: color, w: FontWeight.w800)),
+        ]),
+      );
 
   Widget _labelled(String label, Widget button) => Column(mainAxisSize: MainAxisSize.min, children: [
         button,

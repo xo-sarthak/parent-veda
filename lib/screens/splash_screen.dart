@@ -171,19 +171,12 @@ class _SplashScreenState extends State<SplashScreen>
                       // gradient (no white card behind it).
                       Image.asset('assets/brand/pv-mark-transparent.png',
                           width: 168),
-                      const SizedBox(height: 24),
+                      // The logo already carries the ParentVeda wordmark, so we
+                      // no longer repeat it as text - just one clean tagline.
+                      const SizedBox(height: 22),
                       Text(
-                        'ParentVeda',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.primary600,
-                          letterSpacing: -0.8,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        s.splashTagline,
+                        'Your trusted parenting companion',
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.fraunces(
                           fontSize: 17,
                           fontStyle: FontStyle.italic,

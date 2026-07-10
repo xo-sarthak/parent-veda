@@ -19,6 +19,7 @@ import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
+import 'pp_section_extras.dart';
 
 class BabyNamingHomeScreen extends StatelessWidget {
   const BabyNamingHomeScreen({super.key});
@@ -30,7 +31,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: AnimatedBuilder(
           animation: NameVersionStore.instance,
@@ -50,6 +52,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
           },
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 
@@ -203,39 +207,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
         ),
       )),
 
-      // curated collections
-      const SizedBox(height: 30),
-      _pad(Text('Discover by collection', style: ppJakarta(18))),
-      const SizedBox(height: 4),
-      _pad(Text('Browse a few beautiful stories, not endless lists.', style: ppBody(12.5, color: ppMuted))),
-      const SizedBox(height: 16),
-      _pad(Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: [for (final c in kNameCollections) _collectionCard(context, c)],
-      )),
+      // "Discover by collection" removed - the collection categories now live
+      // inside the taste quiz's multi-select "feeling you want" step.
     ];
-  }
-
-  Widget _collectionCard(BuildContext context, NameCollection c) {
-    final count = c.names.length;
-    return GestureDetector(
-      onTap: () => _push(context, NameJourneyFeedScreen(collection: c)),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: (MediaQuery.of(context).size.width - 48 - 12) / 2,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)), child: Icon(c.icon, size: 20, color: ppPurple)),
-          const SizedBox(height: 12),
-          Text(c.title, style: ppJakarta(14.5).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text(c.subtitle, style: ppBody(12, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 8),
-          Text('$count ${count == 1 ? 'name' : 'names'}', style: ppBody(11, color: ppMuted, w: FontWeight.w700)),
-        ]),
-      ),
-    );
   }
 }

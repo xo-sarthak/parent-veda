@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
+import 'pp_section_extras.dart';
 import 'products_category_screen.dart';
 import 'products_compare_screen.dart';
 import 'products_subcategory_screen.dart';
@@ -40,11 +41,17 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
   double _minRating = 0;
   String _sort = 'Top rated';
 
-  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+  // free-text search (name / brand)
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
 
-  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
+
+  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   void _openCategory(String name) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductsCategoryScreen(category: name)));
@@ -69,6 +76,10 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
   // Apply the discovery filters, then sort.
   List<PpProduct> _results() {
     var list = kPpProducts.toList();
+    final q = _query.trim().toLowerCase();
+    if (q.isNotEmpty) {
+      list = list.where((p) => p.name.toLowerCase().contains(q) || p.brand.toLowerCase().contains(q)).toList();
+    }
     if (_concerns.isNotEmpty) {
       final cats = <String>{for (final c in kPpConcerns) if (_concerns.contains(c.$1)) ...c.$3};
       list = list.where((p) => cats.contains(p.category)).toList();
@@ -99,7 +110,9 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final results = _active ? _results() : const <PpProduct>[];
+    final searching = _query.trim().isNotEmpty;
+    final showResults = _active || searching;
+    final results = showResults ? _results() : const <PpProduct>[];
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [
@@ -124,20 +137,12 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
               ),
             ])),
 
-            // search / ask bar
+            // search (name / brand)
             const SizedBox(height: 18),
-            _pad(GestureDetector(
-              onTap: _soon,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
-                child: Row(children: [
-                  const Icon(Icons.auto_awesome_outlined, size: 15, color: ppPurple),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text('Search or ask AskVeda…', style: ppBody(13, color: ppMuted))),
-                  const Icon(Icons.search_rounded, size: 16, color: ppMuted),
-                ]),
-              ),
+            _pad(ppSearchField(
+              controller: _searchCtl,
+              hint: 'Search products or brands…',
+              onChanged: (v) => setState(() => _query = v),
             )),
 
             // filters + sort bar
@@ -154,7 +159,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
               _pad(_activeChips()),
             ],
 
-            if (_active) ...[
+            if (showResults) ...[
               // results
               const SizedBox(height: 18),
               _pad(Row(children: [
@@ -169,7 +174,8 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
                   child: Column(children: [
                     const Icon(Icons.search_off_rounded, size: 30, color: ppMuted),
                     const SizedBox(height: 12),
-                    Text('No products match those filters yet.', textAlign: TextAlign.center, style: ppBody(13)),
+                    Text(searching ? 'No matches for "$_query" yet.' : 'No products match those filters yet.',
+                        textAlign: TextAlign.center, style: ppBody(13)),
                   ]),
                 ))
               else
@@ -233,6 +239,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
             ),
           ),
         ),
+        const PpAskVedaFab(bottom: 96),
         const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 4)),
       ]),
     );

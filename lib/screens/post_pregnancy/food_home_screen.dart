@@ -20,18 +20,54 @@ import 'food_saved_screen.dart';
 import 'food_shopping_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import 'pp_section_extras.dart';
 
-class FoodHomeScreen extends StatelessWidget {
+class FoodHomeScreen extends StatefulWidget {
   const FoodHomeScreen({super.key});
+
+  @override
+  State<FoodHomeScreen> createState() => _FoodHomeScreenState();
+}
+
+class _FoodHomeScreenState extends State<FoodHomeScreen> {
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
+
+  // ---- search results (recipe title contains query) -----------------------
+  List<Widget> _foodSearchResults(BuildContext context) {
+    final q = _query.trim().toLowerCase();
+    final items = kFoodRecipes.where((r) => r.title.toLowerCase().contains(q)).toList();
+    return [
+      const SizedBox(height: 16),
+      if (items.isEmpty)
+        _pad(Container(
+          padding: const EdgeInsets.symmetric(vertical: 28),
+          alignment: Alignment.center,
+          child: Text('No matches for "$_query" - try another dish.',
+              textAlign: TextAlign.center, style: ppBody(13, color: ppMuted)),
+        ))
+      else
+        _pad(Column(children: [
+          for (final r in items) FoodListCard(recipe: r, onTap: () => _push(context, FoodRecipeScreen(recipe: r))),
+        ])),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: AnimatedBuilder(
           animation: FoodStore.instance,
@@ -50,6 +86,16 @@ class FoodHomeScreen extends StatelessWidget {
             const SizedBox(height: 6),
             _pad(Text('Not just recipes - what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
 
+            const SizedBox(height: 16),
+            _pad(ppSearchField(
+              controller: _searchCtl,
+              hint: 'Search recipes…',
+              onChanged: (v) => setState(() => _query = v),
+            )),
+
+            if (_query.trim().isNotEmpty)
+              ..._foodSearchResults(context)
+            else ...[
             const SizedBox(height: 16),
             _pad(_vegToggle(store)),
 
@@ -104,11 +150,14 @@ class FoodHomeScreen extends StatelessWidget {
             _pad(_shoppingLink(context)),
             const SizedBox(height: 12),
             _pad(_savedLink(context)),
+            ],
           ],
         );
           },
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 

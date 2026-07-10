@@ -13,6 +13,7 @@ import 'name_journey_detail_screen.dart';
 import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
+import 'pp_section_extras.dart';
 
 class NameListScreen extends StatefulWidget {
   const NameListScreen({super.key});
@@ -22,7 +23,14 @@ class NameListScreen extends StatefulWidget {
 }
 
 class _NameListScreenState extends State<NameListScreen> {
+  final TextEditingController _searchCtl = TextEditingController();
   String _q = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -37,7 +45,8 @@ class _NameListScreenState extends State<NameListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: AnimatedBuilder(
           animation: NameMatchStore.instance,
@@ -55,7 +64,11 @@ class _NameListScreenState extends State<NameListScreen> {
                 _pad(Text('Scroll, search and tap any name to read its story or add it to your shortlist. No swiping needed.', style: ppBody(14, h: 1.55))),
 
                 const SizedBox(height: 16),
-                _pad(_search()),
+                _pad(ppSearchField(
+                  controller: _searchCtl,
+                  hint: 'Search names, meanings, origins…',
+                  onChanged: (v) => setState(() => _q = v),
+                )),
 
                 const SizedBox(height: 14),
                 _pad(AnimatedBuilder(
@@ -83,24 +96,10 @@ class _NameListScreenState extends State<NameListScreen> {
           },
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
-
-  Widget _search() => Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Row(children: [
-          const Icon(Icons.search_rounded, size: 18, color: ppMuted),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              onChanged: (v) => setState(() => _q = v),
-              style: ppBody(14, color: ppInk),
-              decoration: InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 13), hintText: 'Search names, meanings, origins…', hintStyle: ppBody(14, color: ppMuted)),
-            ),
-          ),
-        ]),
-      );
 
   Widget _empty() => Container(
         padding: const EdgeInsets.all(20),

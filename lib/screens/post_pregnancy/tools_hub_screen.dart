@@ -11,10 +11,12 @@
 import 'package:flutter/material.dart';
 
 import 'baby_naming_home_screen.dart';
+import 'feeding_tracker_screen.dart';
 // Was a direct entry to the V1 finder; the front door (baby_naming_home_screen)
 // now owns the V1|V2 toggle and imports NameFinderScreen itself.
 // import 'name_finder_screen.dart';
 import 'pp_common.dart';
+import 'sleep_tracker_screen.dart';
 import 'products_compare_screen.dart';
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
@@ -102,9 +104,9 @@ class ToolsHubScreen extends StatelessWidget {
               _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby names', 'Two ways to choose - swipe or journey', ppPurple,
                   () => _push(context, const BabyNamingHomeScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _soon(context, 'Feeding tracker - coming soon')),
+              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _push(context, const FeedingTrackerScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep tracker', '11h yesterday', ppMuted, () => _soon(context, 'Sleep tracker - coming soon')),
+              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep tracker', '11h yesterday', ppMuted, () => _push(context, const SleepTrackerScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Milestone checklist', '3 new this month', ppMuted, () => _soon(context, 'Milestone checklist - coming soon')),
               const SizedBox(height: 10),

@@ -37,11 +37,11 @@ class DevelopmentHomeScreen extends StatelessWidget {
           children: [
             _pad(ppBack(context, 'Explore')),
             const SizedBox(height: 18),
-            _pad(ppEyebrow('ParentVeda Development', color: ppPurple)),
+            _pad(ppEyebrow('Skill Development', color: ppPurple)),
             const SizedBox(height: 8),
             _pad(Text('Help Aarav grow', style: ppFraunces(30, h: 1.1))),
-            const SizedBox(height: 6),
-            _pad(Text('Not a checklist of what he’s done - what he’s learning now, and how you can nurture it today.', style: ppBody(14, h: 1.5))),
+            const SizedBox(height: 8),
+            _pad(Text('This is where you nurture how Aarav is growing - his thinking, his body, his words and his feelings. Not a checklist to tick off, but a gentle companion: what he is learning right now, and the small, joyful things that help it along.', style: ppBody(14, h: 1.55))),
 
             // 1 - today's focus
             const SizedBox(height: 24),
@@ -51,22 +51,21 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _pad(_mapCta(context)),
 
-            // 2 - development areas
+            // 2 - the four windows (same as the My Child snapshot; no progress bars)
             const SizedBox(height: 30),
             _pad(devSectionHeader('Every part of him, growing')),
             const SizedBox(height: 4),
-            _pad(Text('Eight areas, each its own little journey - tap to explore.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Four windows into how he grows - tap any to go deeper.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
-            SizedBox(
-              height: 208,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemCount: kDevAreas.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 14),
-                itemBuilder: (_, i) => DevAreaCard(area: kDevAreas[i], width: 210, onTap: () => _push(context, DevelopmentAreaScreen(area: kDevAreas[i]))),
-              ),
-            ),
+            _pad(Column(children: [
+              _domainCard(context, Icons.psychology_outlined, 'Brain', devAreaById('cognitive')),
+              const SizedBox(height: 12),
+              _domainCard(context, Icons.child_care_outlined, 'Physical', devAreaById('gross_motor')),
+              const SizedBox(height: 12),
+              _domainCard(context, Icons.chat_bubble_outline_rounded, 'Language', devAreaById('language')),
+              const SizedBox(height: 12),
+              _domainCard(context, Icons.favorite_border, 'Emotional', devAreaById('emotional')),
+            ])),
 
             // 4 - today's activities
             const SizedBox(height: 30),
@@ -75,27 +74,6 @@ class DevelopmentHomeScreen extends StatelessWidget {
             _pad(Text('Small, joyful things that support exactly where he is.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             _pad(Column(children: [for (final a in activities) DevActivityCard(activity: a, onTap: () => _push(context, DevelopmentActivityScreen(activity: a)))])),
-
-            // 5 - brain development
-            const SizedBox(height: 14),
-            _pad(_brain(context)),
-
-            // 6 - looking ahead
-            const SizedBox(height: 30),
-            _pad(devSectionHeader('Looking ahead')),
-            const SizedBox(height: 4),
-            _pad(Text('Something to look forward to - no rigid timelines, just the joy of what’s coming.', style: ppBody(12.5, color: ppMuted))),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 150,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemCount: kLookAhead.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 14),
-                itemBuilder: (_, i) => _aheadCard(kLookAhead[i]),
-              ),
-            ),
 
             // check-in
             const SizedBox(height: 26),
@@ -181,93 +159,28 @@ class DevelopmentHomeScreen extends StatelessWidget {
         ),
       );
 
-  // ---- brain development --------------------------------------------------
-  Widget _brain(BuildContext context) => Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF1EAF8), Color(0xFFEFE9FB)]),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.psychology_outlined, size: 17, color: ppPurple),
-            const SizedBox(width: 8),
-            ppEyebrow('Inside his brain this month', color: ppPurple, spacing: 0.8),
+  // ---- one of the four "how he grows" windows (matches My Child snapshot) --
+  Widget _domainCard(BuildContext context, IconData icon, String label, DevArea a) => GestureDetector(
+        onTap: () => _push(context, DevelopmentAreaScreen(area: a)),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair), boxShadow: const [BoxShadow(color: Color(0x0F6A30B6), blurRadius: 18, spreadRadius: -14, offset: Offset(0, 8))]),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: a.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Icon(icon, size: 19, color: a.accent)),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(label.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+                const SizedBox(height: 2),
+                Text(a.stage, style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ])),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+            ]),
+            const SizedBox(height: 12),
+            Text(a.summary, style: ppBody(13, h: 1.5)),
           ]),
-          const SizedBox(height: 12),
-          Text(kBrainThisWeek, style: ppBody(13.5, color: ppInk, h: 1.6)),
-          const SizedBox(height: 14),
-          GestureDetector(
-            onTap: () => _brainSheet(context),
-            behavior: HitTestBehavior.opaque,
-            child: Row(children: [
-              Flexible(child: Text('How his brain is growing', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              const SizedBox(width: 6),
-              const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
-            ]),
-          ),
-        ]),
-      );
-
-  void _brainSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: ppBg,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-      builder: (ctx) => SafeArea(
-        top: false,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 30),
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
-              const SizedBox(height: 16),
-              Text('How his brain is growing', style: ppFraunces(24, h: 1.12)),
-              const SizedBox(height: 6),
-              Text('Simple windows into a remarkable month - each with one practical thing you can do.', style: ppBody(13, h: 1.5)),
-              const SizedBox(height: 18),
-              for (final t in kBrainTopics) ...[
-                Container(
-                  margin: const EdgeInsets.only(bottom: 14),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(t.title, style: ppJakarta(15)),
-                    const SizedBox(height: 8),
-                    Text(t.body, style: ppBody(13.5, h: 1.55)),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.07), borderRadius: BorderRadius.circular(12)),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Icon(Icons.lightbulb_outline_rounded, size: 15, color: ppPurple),
-                        const SizedBox(width: 9),
-                        Expanded(child: Text(t.tip, style: ppBody(12.5, color: ppInk, h: 1.5))),
-                      ]),
-                    ),
-                  ]),
-                ),
-              ],
-            ]),
-          ),
         ),
-      ),
-    );
-  }
-
-  Widget _aheadCard(LookAhead a) => Container(
-        width: 230,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 36, height: 36, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: Icon(a.icon, size: 18, color: ppPurple)),
-          const SizedBox(height: 12),
-          Text(a.title, style: ppJakarta(13.5).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 5),
-          Expanded(child: Text(a.body, style: ppBody(11.5, color: ppSoft, h: 1.4), maxLines: 3, overflow: TextOverflow.ellipsis)),
-        ]),
       );
 
   Widget _checkinCta(BuildContext context) => GestureDetector(

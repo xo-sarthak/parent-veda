@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_recipe_widgets.dart';
 import 'pp_recipes_data.dart';
+import 'pp_section_extras.dart';
 import 'sick_days_screen.dart';
 
 class RecipesScreen extends StatefulWidget {
@@ -22,20 +23,35 @@ class RecipesScreen extends StatefulWidget {
 }
 
 class _RecipesScreenState extends State<RecipesScreen> {
-  bool _veg = true;
+  String _diet = 'All'; // 'All' | 'veg' | 'vegan' | 'nonveg'
+  bool _immunity = false;
   bool _healthier = true;
   String _category = 'All';
+
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   @override
   Widget build(BuildContext context) {
-    final list = normalRecipes(veg: _veg, category: _category);
-    final sectionTitle = '${_veg ? 'Veg' : 'Non-veg'} ${_category == 'All' ? 'recipes' : _category.toLowerCase()}';
+    final q = _query.trim().toLowerCase();
+    var list = normalRecipes(diet: _diet, category: _category, immunity: _immunity);
+    if (q.isNotEmpty) list = list.where((r) => r.title.toLowerCase().contains(q)).toList();
+    final dietLabel = kRecipeDiets.firstWhere((d) => d.$2 == _diet, orElse: () => kRecipeDiets.first).$1;
+    final catWord = _category == 'All' ? 'recipes' : _category.toLowerCase();
+    final sectionTitle = '${_diet == 'All' ? 'All' : dietLabel} $catWord${_immunity ? ' · immunity boosters' : ''}';
 
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
@@ -74,13 +90,24 @@ class _RecipesScreenState extends State<RecipesScreen> {
             _pad(Text('Every recipe age-tagged, with the nutrition context you actually need - and a healthier twist built in.',
                 style: ppBody(15))),
 
-            // veg / non-veg
+            // search (recipe title)
+            const SizedBox(height: 16),
+            _pad(ppSearchField(
+              controller: _searchCtl,
+              hint: 'Search recipes…',
+              onChanged: (v) => setState(() => _query = v),
+            )),
+
+            // diet filter (All / Veg / Vegan / Non-veg) + immunity - no scroll
             const SizedBox(height: 20),
             _pad(Row(children: [
-              Expanded(child: _seg('Veg', _veg, () => setState(() => _veg = true))),
-              const SizedBox(width: 10),
-              Expanded(child: _seg('Non-veg', !_veg, () => setState(() => _veg = false))),
+              for (int i = 0; i < kRecipeDiets.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(child: _dietSeg(kRecipeDiets[i].$1, kRecipeDiets[i].$2)),
+              ],
             ])),
+            const SizedBox(height: 10),
+            _pad(Align(alignment: Alignment.centerLeft, child: _immunityChip())),
 
             // recommended carousel
             const SizedBox(height: 22),
@@ -123,15 +150,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
               child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
             )),
 
-            // category chips
-            SizedBox(
-              height: 34,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                children: [for (final c in kRecipeCategories) _chip(c)],
-              ),
-            ),
+            // category chips (wrap - all visible, no horizontal scroll)
+            _pad(Wrap(spacing: 9, runSpacing: 9, children: [for (final c in kRecipeCategories) _chip(c)])),
 
             // list
             const SizedBox(height: 26),
@@ -141,7 +161,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               _pad(Container(
                 padding: const EdgeInsets.symmetric(vertical: 28),
                 alignment: Alignment.center,
-                child: Text('No ${_veg ? 'veg' : 'non-veg'} recipes here yet - try another category.',
+                child: Text(q.isNotEmpty ? 'No matches for "$_query" - try another dish.' : 'No recipes match these filters yet - try another combination.',
                     textAlign: TextAlign.center, style: ppBody(13, color: ppMuted)),
               ))
             else
@@ -156,25 +176,49 @@ class _RecipesScreenState extends State<RecipesScreen> {
           ],
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 
-  Widget _seg(String label, bool on, VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(14)),
-          child: Text(label, style: ppBody(13, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
-        ),
-      );
+  Widget _dietSeg(String label, String code) {
+    final on = _diet == code;
+    return GestureDetector(
+      onTap: () => setState(() => _diet = code),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(12)),
+        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(12.5, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
+      ),
+    );
+  }
+
+  Widget _immunityChip() {
+    final on = _immunity;
+    const amber = Color(0xFFC98A2B);
+    return GestureDetector(
+      onTap: () => setState(() => _immunity = !_immunity),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        decoration: BoxDecoration(color: on ? amber : Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: on ? amber : ppLine)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.shield_moon_outlined, size: 15, color: on ? Colors.white : amber),
+          const SizedBox(width: 6),
+          Text('Immunity boosters', style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
+        ]),
+      ),
+    );
+  }
 
   Widget _chip(String c) {
     final on = _category == c;
     return GestureDetector(
       onTap: () => setState(() => _category = c),
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        margin: const EdgeInsets.only(right: 9),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(c, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),

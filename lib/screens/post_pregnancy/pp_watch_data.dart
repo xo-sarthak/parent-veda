@@ -74,6 +74,17 @@ class WatchCollection {
   final int seed;
 }
 
+/// A collection the parent builds themselves - a plain named bucket of videos.
+/// In-memory only for now (no persistence); ids are minted from a counter in the
+/// store, so they're stable within a session without leaning on time/random.
+class UserWatchCollection {
+  UserWatchCollection({required this.id, required this.name, List<String>? videoIds})
+      : videoIds = videoIds ?? <String>[];
+  final String id;
+  String name;
+  final List<String> videoIds;
+}
+
 // ---- categories (each opens its own feed) -----------------------------------
 const List<(String, IconData)> kWatchCategories = [
   ('Brain Development', Icons.psychology_outlined),
@@ -475,5 +486,54 @@ class WatchStore extends ChangeNotifier {
     if (c.videoIds.isEmpty) return 0;
     final done = c.videoIds.where((id) => progressOf(id) >= 0.9).length;
     return done / c.videoIds.length;
+  }
+
+  // ---- user-built collections (in-memory) ---------------------------------
+  // Named buckets the parent creates and drops videos into. Ids are minted from
+  // a simple incrementing counter - no DateTime.now()/random, so they stay
+  // predictable within a session. One example is seeded so the library isn't bare.
+  int _seq = 2; // next id to mint; 'uc_1' is the seeded example below.
+  final List<UserWatchCollection> _userCollections = [
+    UserWatchCollection(id: 'uc_1', name: 'My favourites', videoIds: ['tummytime', 'q_play']),
+  ];
+
+  List<UserWatchCollection> get userCollections => List.unmodifiable(_userCollections);
+
+  UserWatchCollection? _userCollectionById(String id) {
+    for (final c in _userCollections) {
+      if (c.id == id) return c;
+    }
+    return null;
+  }
+
+  UserWatchCollection createCollection(String name) {
+    final c = UserWatchCollection(id: 'uc_${_seq++}', name: name.trim());
+    _userCollections.add(c);
+    notifyListeners();
+    return c;
+  }
+
+  void addToCollection(String collectionId, String videoId) {
+    final c = _userCollectionById(collectionId);
+    if (c == null || c.videoIds.contains(videoId)) return;
+    c.videoIds.add(videoId);
+    notifyListeners();
+  }
+
+  void removeFromCollection(String collectionId, String videoId) {
+    final c = _userCollectionById(collectionId);
+    if (c == null) return;
+    if (c.videoIds.remove(videoId)) notifyListeners();
+  }
+
+  void deleteCollection(String collectionId) {
+    final before = _userCollections.length;
+    _userCollections.removeWhere((c) => c.id == collectionId);
+    if (_userCollections.length != before) notifyListeners();
+  }
+
+  bool collectionContains(String collectionId, String videoId) {
+    final c = _userCollectionById(collectionId);
+    return c != null && c.videoIds.contains(videoId);
   }
 }

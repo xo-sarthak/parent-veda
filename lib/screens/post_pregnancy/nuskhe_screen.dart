@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_section_extras.dart';
 import 'remedy_detail_screen.dart';
 
 class NuskheScreen extends StatelessWidget {
@@ -38,7 +39,8 @@ class NuskheScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      body: SafeArea(
+      body: Stack(children: [
+        SafeArea(
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
@@ -134,6 +136,8 @@ class NuskheScreen extends StatelessWidget {
           ],
         ),
       ),
+      const PpAskVedaFab(),
+      ]),
     );
   }
 

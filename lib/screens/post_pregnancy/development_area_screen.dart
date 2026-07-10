@@ -1,20 +1,30 @@
 // =============================================================================
-//  DevelopmentAreaScreen - one area's journey (a story, not a checklist)
+//  DevelopmentAreaScreen - one area's story (description → skills → go deeper)
 // -----------------------------------------------------------------------------
-//  The developmental roadmap for one area (e.g. Gross Motor: head control →
-//  rolling → sitting → crawling → walking), with what each skill means, why it
-//  matters, activities to encourage it, a brain window and related content. Reads
-//  like the child's story unfolding.
+//  Opened from a Child-Snapshot tile (Brain / Physical / Language / Emotional)
+//  and from Development. Structure:
+//    • a real 2-3 paragraph description of the area,
+//    • its skills as clickable boxes (each opens the skill in full),
+//    • "Go deeper" = three rails, always: Watch, Learn and Explore products,
+//      each a horizontal scroll with a "View more" that opens the matching
+//      screen filtered to THIS area.
+//  (Nutrition keeps its own Food home - it is not one of these area screens.)
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-import 'article_reader_screen.dart';
-import 'development_activity_screen.dart';
+import 'dev_stage_detail_screen.dart';
 import 'development_common.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+import 'pp_products_data.dart';
+import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
+import 'product_detail_screen.dart';
+import 'products_category_screen.dart';
+import 'reading_collection_screen.dart';
+import 'reading_reader_screen.dart';
+import 'watch_category_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
 
@@ -29,7 +39,12 @@ class DevelopmentAreaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activities = activitiesForArea(area.id);
+    final videos = watchByCategory(watchCategoryForArea(area.id));
+    final collectionId = readCollectionForArea(area.id);
+    final reads = articlesInCollection(collectionId);
+    final productCat = productCategoryForArea(area.id);
+    final products = kPpProducts.where((p) => p.category == productCat).toList();
+
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -48,11 +63,16 @@ class DevelopmentAreaScreen extends StatelessWidget {
                 Row(children: [devWordPill(area.word, _a), const SizedBox(width: 8), Flexible(child: Text(area.stage, style: ppBody(12.5, color: _a, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis))]),
               ])),
             ])),
-            const SizedBox(height: 14),
-            _pad(Text(area.summary, style: ppBody(14.5, color: ppInk, h: 1.55))),
+
+            // description (2–3 paragraphs)
+            const SizedBox(height: 18),
+            for (final p in area.description) ...[
+              _pad(Text(p, style: ppBody(14.5, color: ppInk, h: 1.65))),
+              const SizedBox(height: 12),
+            ],
 
             // brain window
-            const SizedBox(height: 18),
+            const SizedBox(height: 6),
             _pad(Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: _a.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(16)),
@@ -63,146 +83,195 @@ class DevelopmentAreaScreen extends StatelessWidget {
               ]),
             )),
 
-            // the journey
+            // skills as clickable boxes
             const SizedBox(height: 26),
-            _pad(Text('His journey', style: ppJakarta(18))),
+            _pad(Text('Skills', style: ppJakarta(18))),
             const SizedBox(height: 4),
-            _pad(Text('Where he’s been, where he is, and the wonder just ahead.', style: ppBody(12.5, color: ppMuted))),
-            const SizedBox(height: 18),
+            _pad(Text('Where he is on this path - tap any skill to understand it, and how to help.', style: ppBody(12.5, color: ppMuted))),
+            const SizedBox(height: 14),
             _pad(Column(children: [
-              for (int i = 0; i < area.journey.length; i++) _stageRow(context, area.journey[i], first: i == 0, last: i == area.journey.length - 1),
+              for (final s in area.journey) _skillBox(context, s),
             ])),
 
-            // activities
-            if (activities.isNotEmpty) ...[
-              const SizedBox(height: 14),
-              _pad(Text('Ways to support it', style: ppJakarta(18))),
-              const SizedBox(height: 14),
-              _pad(Column(children: [for (final act in activities) DevActivityCard(activity: act, onTap: () => _push(context, DevelopmentActivityScreen(activity: act)))])),
-            ],
+            // go deeper - three rails
+            _pad(ppSectionDivider()),
+            _pad(Text('Go deeper', style: ppJakarta(18))),
 
-            // related
-            const SizedBox(height: 8),
-            _pad(_related(context)),
+            const SizedBox(height: 18),
+            _railHeader(context, 'Watch', videos.isEmpty ? null : () => _push(context, WatchCategoryScreen(category: watchCategoryForArea(area.id)))),
+            const SizedBox(height: 12),
+            if (videos.isEmpty) _pad(_emptyRail('Videos for this area are on the way.')) else _watchRail(context, videos),
+
+            const SizedBox(height: 24),
+            _railHeader(context, 'Learn', reads.isEmpty ? null : () => _push(context, ReadingCollectionScreen(collection: readCollectionById(collectionId)))),
+            const SizedBox(height: 12),
+            if (reads.isEmpty) _pad(_emptyRail('Reads for this area are on the way.')) else _readRail(context, reads),
+
+            const SizedBox(height: 24),
+            _railHeader(context, 'Explore products', products.isEmpty ? null : () => _push(context, ProductsCategoryScreen(category: productCat))),
+            const SizedBox(height: 12),
+            if (products.isEmpty) _pad(_emptyRail('Product picks for this area are on the way.')) else _productRail(context, products),
           ],
         ),
       ),
     );
   }
 
-  Widget _stageRow(BuildContext context, DevStage s, {bool first = false, bool last = false}) {
-    return IntrinsicHeight(
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(
-          width: 30,
-          child: Column(children: [
-            SizedBox(height: 3, child: first ? null : Container(width: 2, color: _a.withValues(alpha: 0.25))),
-            _node(s.status),
-            if (!last) Expanded(child: Container(width: 2, color: _a.withValues(alpha: 0.25))),
-          ]),
+  // ---- skill box ----------------------------------------------------------
+  Widget _skillBox(BuildContext context, DevStage s) {
+    final (label, color) = switch (s.status) {
+      'mastered' => ('Mastered', _a),
+      'current' => ('Practising now', _a),
+      'next' => ('Coming next', _a),
+      _ => ('Further ahead', ppMuted),
+    };
+    return GestureDetector(
+      onTap: () => _push(context, DevStageDetailScreen(area: area, stage: s, kindLabel: 'Skill')),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: s.status == 'current' ? _a.withValues(alpha: 0.07) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: s.status == 'current' ? _a.withValues(alpha: 0.4) : ppHair),
         ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: s.status == 'current' ? _a.withValues(alpha: 0.07) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: s.status == 'current' ? _a.withValues(alpha: 0.4) : ppHair),
-            ),
+        child: Row(children: [
+          Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Flexible(child: Text(s.name, style: ppJakarta(15, color: s.status == 'future' ? ppMuted : ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 10),
-                _tag(s.status),
+                Text(label.toUpperCase(), style: ppBody(9, color: color, w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
               ]),
-              const SizedBox(height: 6),
-              Text(s.meaning, style: ppBody(13, color: s.status == 'future' ? ppMuted : ppInk, h: 1.45)),
-              const SizedBox(height: 4),
-              Text(s.why, style: ppBody(12, color: ppMuted, h: 1.4)),
-              if (s.activities.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                for (final id in s.activities)
-                  GestureDetector(
-                    onTap: () => _push(context, DevelopmentActivityScreen(activity: devActivityById(id))),
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Row(children: [
-                        Icon(Icons.play_arrow_rounded, size: 15, color: _a),
-                        const SizedBox(width: 6),
-                        Expanded(child: Text(devActivityById(id).title, style: ppBody(12.5, color: _a, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                      ]),
-                    ),
-                  ),
-              ],
+              const SizedBox(height: 5),
+              Text(s.meaning, style: ppBody(13, color: s.status == 'future' ? ppMuted : ppInk, h: 1.45), maxLines: 2, overflow: TextOverflow.ellipsis),
             ]),
           ),
-        ),
-      ]),
+          const SizedBox(width: 10),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+        ]),
+      ),
     );
   }
 
-  Widget _node(String status) {
-    switch (status) {
-      case 'mastered':
-        return Container(width: 24, height: 24, alignment: Alignment.center, decoration: BoxDecoration(color: _a, shape: BoxShape.circle), child: const Icon(Icons.check_rounded, size: 13, color: Colors.white));
-      case 'current':
-        return Container(width: 28, height: 28, alignment: Alignment.center, decoration: BoxDecoration(shape: BoxShape.circle, color: _a.withValues(alpha: 0.15), border: Border.all(color: _a, width: 2)), child: Container(width: 11, height: 11, decoration: BoxDecoration(color: _a, shape: BoxShape.circle)));
-      case 'next':
-        return Container(width: 24, height: 24, alignment: Alignment.center, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: _a, width: 2)), child: Container(width: 7, height: 7, decoration: BoxDecoration(color: _a, shape: BoxShape.circle)));
-      default:
-        return Container(width: 20, height: 20, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: const Color(0xFFCFC5DB), width: 1.5)));
-    }
-  }
+  // ---- rails --------------------------------------------------------------
+  Widget _railHeader(BuildContext context, String title, VoidCallback? onViewMore) => _pad(Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: ppJakarta(16)),
+          if (onViewMore != null)
+            GestureDetector(
+              onTap: onViewMore,
+              behavior: HitTestBehavior.opaque,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('View more', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+                const SizedBox(width: 3),
+                const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
+              ]),
+            ),
+        ],
+      ));
 
-  Widget _tag(String status) {
-    final (String label, Color c) = switch (status) {
-      'mastered' => ('Mastered', _a),
-      'current' => ('Practicing now', _a),
-      'next' => ('Coming next', _a),
-      _ => ('Later', ppMuted),
-    };
-    return Text(label.toUpperCase(), style: ppBody(9, color: c, w: FontWeight.w800).copyWith(letterSpacing: 0.5));
-  }
+  Widget _emptyRail(String msg) => Text(msg, style: ppBody(13, color: ppMuted));
 
-  Widget _related(BuildContext context) {
-    final rows = <(IconData, String, String, VoidCallback)>[
-      if (area.relatedArticle != null) (Icons.menu_book_outlined, 'Read', area.relatedArticle!, () => _push(context, const ArticleReaderScreen())),
-      if (area.relatedVideoId != null)
-        (Icons.play_circle_outline, 'Watch', watchVideoById(area.relatedVideoId!).title, () {
-          final v = watchVideoById(area.relatedVideoId!);
-          _push(context, v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
-        }),
-      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about ${area.name.toLowerCase()}', () => openPpTab(context, 1)),
-      (Icons.groups_outlined, 'Community', 'Compare notes with other parents', () => openPpTab(context, 3)),
-    ];
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Go deeper', style: ppJakarta(18)),
-      const SizedBox(height: 14),
-      for (final r in rows)
-        GestureDetector(
-          onTap: r.$4,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: ppHair)),
-            child: Row(children: [
-              Container(width: 38, height: 38, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: Icon(r.$1, size: 18, color: ppPurple)),
-              const SizedBox(width: 13),
-              Expanded(
+  Widget _railThumb(IconData icon, {String? badge}) => Container(
+        height: 96,
+        decoration: BoxDecoration(color: _a.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(14)),
+        alignment: Alignment.center,
+        child: Stack(children: [
+          Center(child: Icon(icon, size: 30, color: _a)),
+          if (badge != null)
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(color: ppInk.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(999)),
+                child: Text(badge, style: ppBody(9.5, color: Colors.white, w: FontWeight.w700)),
+              ),
+            ),
+        ]),
+      );
+
+  Widget _watchRail(BuildContext context, List<WatchVideo> videos) => SizedBox(
+        height: 176,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: videos.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) {
+            final v = videos[i];
+            return GestureDetector(
+              onTap: () => _push(context, v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v)),
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 178,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(r.$2.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.6)),
+                  _railThumb(Icons.play_circle_outline, badge: v.durationLabel),
+                  const SizedBox(height: 9),
+                  Text(v.title, style: ppJakarta(13.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),
-                  Text(r.$3, style: ppBody(13.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(v.expert.name, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
-              const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
-            ]),
-          ),
+            );
+          },
         ),
-    ]);
-  }
+      );
+
+  Widget _readRail(BuildContext context, List<ReadArticle> reads) => SizedBox(
+        height: 176,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: reads.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) {
+            final a = reads[i];
+            return GestureDetector(
+              onTap: () => _push(context, ReadingReaderScreen(article: a)),
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 178,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _railThumb(Icons.menu_book_outlined, badge: '${a.minutes} min'),
+                  const SizedBox(height: 9),
+                  Text(a.title, style: ppJakarta(13.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 3),
+                  Text(a.author, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+
+  Widget _productRail(BuildContext context, List<PpProduct> products) => SizedBox(
+        height: 176,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: products.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) {
+            final p = products[i];
+            return GestureDetector(
+              onTap: () => _push(context, ProductDetailScreen(product: p)),
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 178,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _railThumb(Icons.shopping_bag_outlined),
+                  const SizedBox(height: 9),
+                  Text(p.name, style: ppJakarta(13.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 3),
+                  Text('${p.brand} · ★ ${p.rating}', style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
 }

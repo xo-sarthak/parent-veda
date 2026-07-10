@@ -54,6 +54,7 @@ class DevArea {
     required this.brainNote,
     required this.journey,
     required this.seed,
+    this.about = const [],
     this.nextActivityId,
     this.relatedArticle,
     this.relatedVideoId,
@@ -69,9 +70,14 @@ class DevArea {
   final String brainNote;
   final List<DevStage> journey;
   final int seed;
+  final List<String> about; // 2–3 paragraph description for the area screen
   final String? nextActivityId;
   final String? relatedArticle;
   final String? relatedVideoId;
+
+  /// The area's full description; falls back to summary + brain note if no
+  /// dedicated `about` copy has been written yet.
+  List<String> get description => about.isNotEmpty ? about : [summary, brainNote];
 }
 
 class DevActivity {
@@ -141,6 +147,11 @@ const List<DevArea> kDevAreas = [
     todayTip: 'Show him a simple cause and effect - shake a rattle, then pause, and let him take it in.',
     brainNote: 'His brain is wiring the idea that his actions change the world - the seed of all problem-solving.',
     seed: 1,
+    about: [
+      'Thinking begins with a simple, astonishing discovery: that one thing makes another happen. Right now your baby is working out that his own hand reaching is what makes the toy move — cause, meet effect. It is the foundation every future bit of problem-solving is built on.',
+      'You will see it in the way he studies things: following your hand all the way to the toy, watching what happens when he bats at a rattle, beginning to expect the peekaboo before it comes. He is running tiny experiments all day long.',
+      'None of this needs flashcards or “brain-training”. It needs everyday moments where his actions clearly change something, and a calm narrator — you — putting words to what he is figuring out.',
+    ],
     nextActivityId: 'peekaboo',
     relatedVideoId: 'leap4brain',
     journey: [
@@ -162,6 +173,11 @@ const List<DevArea> kDevAreas = [
     todayTip: 'Have a “conversation”: say something, then pause and wait for his coo - and answer it back.',
     brainNote: 'Long before words, his brain is mapping the rhythm and melody of your voice.',
     seed: 2,
+    about: [
+      'The conversation starts long before the first word. Your baby is soaking up the melody, rhythm and turn-taking of language now, in every coo and every reply you give back. This is the groundwork the first words will stand on.',
+      'He is learning that sounds mean something, that his voice earns a response, and that talking happens back-and-forth. Squeals, raspberries and sing-song “aah-goo” are all rehearsal — the more you answer them, the more he practises.',
+      'The simplest things matter most: narrate your day, sing, and pause to leave room for his reply. You do not need to teach words; you just need to have the conversation.',
+    ],
     nextActivityId: 'narrate',
     relatedArticle: 'Talking to your baby before they can talk',
     relatedVideoId: 'babbling',
@@ -184,6 +200,11 @@ const List<DevArea> kDevAreas = [
     todayTip: 'A little tummy time with a toy just out of reach - it builds the strength to roll.',
     brainNote: 'Each push-up wires the neck, core and coordination he’ll build every future move on.',
     seed: 3,
+    about: [
+      'Every big movement builds on the last. Head control came first; now your baby is pushing up strong on the floor and rocking — the first roll is close. Each of these is a rung on the ladder that leads to sitting, crawling and, eventually, those first steps.',
+      'This is physical strength and brain wiring at the same time: every push-up and wobble is teaching his neck, core and coordination to work together. Being on the floor, free to move, is the single best thing for it.',
+      'You cannot rush the timeline — every baby arrives at each move in his own week. What helps is plenty of safe, happy floor time and a little something just out of reach to tempt him toward it.',
+    ],
     nextActivityId: 'tummy_play',
     relatedVideoId: 'tummytime',
     journey: [
@@ -226,6 +247,11 @@ const List<DevArea> kDevAreas = [
     todayTip: 'When he fusses, slow your own breathing and voice - he tunes to your calm.',
     brainNote: 'He can’t regulate emotions alone yet - he literally borrows yours. That’s co-regulation.',
     seed: 5,
+    about: [
+      'Your baby feels big feelings, but he has none of the tools to manage them yet — so he borrows yours. When he settles fastest in your steady arms, that is not a habit to break; it is exactly how emotional development is meant to work at this age.',
+      'This is called co-regulation: your calm voice and slow breathing literally settle his nervous system. Every time you soothe him, you are laying down the wiring he will one day use to soothe himself.',
+      'The social side is blossoming too — he beams across a room, and a laugh now earns a laugh back. Warm, responsive back-and-forth is what teaches him that he is safe, loved and understood.',
+    ],
     relatedVideoId: 'mumwellness',
     journey: [
       DevStage('Social smile', 'mastered', 'Smiles on purpose at the people he loves.', 'The first true connection.'),
@@ -448,6 +474,44 @@ List<DevActivity> activitiesForArea(String areaId) => kDevActivities.where((a) =
 
 /// Today's one highlighted area (a real engine would rotate/personalise).
 DevArea todaysFocus() => devAreaById('language');
+
+// ---- domain → cross-content mapping -----------------------------------------
+//  Maps a development area to the Watch category, Read collection and Product
+//  category used by its three "Go deeper" rails and their "view more" screens.
+String watchCategoryForArea(String areaId) => switch (areaId) {
+      'cognitive' => 'Brain Development',
+      'language' => 'Language',
+      'gross_motor' => 'Activities',
+      'fine_motor' => 'Activities',
+      'emotional' => 'Behaviour',
+      'social' => 'Behaviour',
+      'creativity' => 'Play',
+      'selfcare' => 'Health',
+      _ => 'Brain Development',
+    };
+
+String readCollectionForArea(String areaId) => switch (areaId) {
+      'cognitive' => 'brain',
+      'language' => 'play',
+      'gross_motor' => 'play',
+      'fine_motor' => 'play',
+      'emotional' => 'behaviour',
+      'social' => 'behaviour',
+      'creativity' => 'play',
+      'selfcare' => 'feeding',
+      _ => 'brain',
+    };
+
+String productCategoryForArea(String areaId) => switch (areaId) {
+      'emotional' => 'Sleep',
+      'selfcare' => 'Feeding',
+      _ => 'Play & Development',
+    };
+
+/// The current + emerging skills of an area (its 'current' and 'next' stages) -
+/// what the My Child "Milestones" section and the area screen surface.
+List<DevStage> activeStages(DevArea area) =>
+    area.journey.where((s) => s.status == 'current' || s.status == 'next').toList();
 
 // =============================================================================
 //  DevStore - saved & completed activities + gentle check-in answers.

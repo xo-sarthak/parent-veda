@@ -26,6 +26,9 @@ class BabyName {
     required this.famous,
     required this.nakshatra,
     required this.popularity,
+    this.gender = 'boy', // 'boy' | 'girl' | 'unisex'
+    this.community = 'Hindu', // Hindu | Muslim | Sikh | Christian | Secular
+    this.region = 'Pan-India', // Pan-India | North | South | East | West
     this.blend,
     this.similar = const [],
     this.rare = false,
@@ -45,6 +48,9 @@ class BabyName {
   final String famous; // famous / mythological reference (Section 7)
   final String nakshatra; // nakshatra / rashi fit - offered as tradition, not fact
   final String popularity; // Trending / Classic / Rare (popularity trend)
+  final String gender; // who the name is for
+  final String community; // religion / tradition, for the region-religion filter
+  final String region; // regional flavour, for the region filter
   final String? blend; // optional "blend of Ravi + Deepti" note
   final List<(String, String)> similar; // (name, gloss)
   final bool rare;
@@ -256,11 +262,218 @@ const List<BabyName> kBabyNames = [
       ('Ishaan', 'the sun'),
     ],
   ),
+
+  // ---- Girls & wider communities (for the who-are-we-naming filter) ---------
+  BabyName(
+    name: 'Anaya', gender: 'girl', community: 'Hindu', region: 'Pan-India',
+    script: 'अनाया', pron: 'a-naa-ya',
+    meaningShort: 'Caring; without a superior.',
+    meaningFull: 'Caring and compassionate - and "without a superior", wholly free.',
+    feel: 'Modern · Feminine', origin: 'Sanskrit', syllables: 3, numerology: 6,
+    perspective: 'Anaya is soft, modern and widely loved, with a gentle meaning of care. Easy across languages and rarely shortened.',
+    famous: 'A contemporary favourite rather than a mythological name - chosen for its softness and warmth.',
+    nakshatra: "Fits the 'A' sound - Ashwini or Bharani nakshatra.",
+    popularity: 'Trending',
+    similar: [('Aadhya', 'first power'), ('Ira', 'earth'), ('Saanvi', 'goddess')],
+  ),
+  BabyName(
+    name: 'Aadhya', gender: 'girl', community: 'Hindu', region: 'South',
+    script: 'अद्या', pron: 'aa-dhya',
+    meaningShort: 'The first power; the Goddess.',
+    meaningFull: 'The first, the beginning - a name of the Goddess, the primordial power.',
+    feel: 'Rooted · Devotional', origin: 'Sanskrit', syllables: 3, numerology: 7,
+    perspective: 'Aadhya carries devotional depth with a fresh sound. A top pick for its meaning of beginnings.',
+    famous: 'A name of Adi Shakti, the primordial Goddess - "the first".',
+    nakshatra: "Fits the 'A' sound - Ashwini or Krittika nakshatra.",
+    popularity: 'Trending',
+    similar: [('Anaya', 'caring'), ('Saanvi', 'goddess'), ('Ira', 'earth')],
+  ),
+  BabyName(
+    name: 'Ira', gender: 'girl', community: 'Hindu', region: 'Pan-India',
+    script: 'ईरा', pron: 'ee-ra',
+    meaningShort: 'The earth; Goddess Saraswati.',
+    meaningFull: 'The earth - and a name of Saraswati, goddess of learning.',
+    feel: 'Rooted · Sanskrit', origin: 'Sanskrit', syllables: 2, numerology: 1,
+    perspective: 'Ira is short, timeless and cross-cultural, with a lovely Saraswati association. Two letters, endless warmth.',
+    famous: 'A name of Saraswati; also found across cultures, from Sanskrit to Hebrew.',
+    nakshatra: "Fits the 'Ee'/'I' sound - Revati or Ashwini nakshatra.",
+    popularity: 'Classic',
+    similar: [('Myra', 'beloved'), ('Anaya', 'caring'), ('Kiara', 'first ray')],
+  ),
+  BabyName(
+    name: 'Myra', gender: 'girl', community: 'Secular', region: 'Pan-India',
+    script: 'मायरा', pron: 'my-ra',
+    meaningShort: 'Beloved; sweetly scented.',
+    meaningFull: 'Beloved and sweetly scented - soft, modern, and easy everywhere.',
+    feel: 'Modern · Feminine', origin: 'Latin · Sanskrit', syllables: 2, numerology: 5,
+    perspective: 'Myra bridges cultures effortlessly - familiar in India and abroad. Gentle, current, and simple to say.',
+    famous: 'A modern favourite with roots in both Latin ("beloved") and the Sanskrit "Meera".',
+    nakshatra: "Fits the 'Ma'/'Mi' sound - Magha or Ashlesha nakshatra.",
+    popularity: 'Trending',
+    similar: [('Ira', 'earth'), ('Kiara', 'first ray'), ('Anaya', 'caring')],
+  ),
+  BabyName(
+    name: 'Saanvi', gender: 'girl', community: 'Hindu', region: 'South',
+    script: 'सान्वी', pron: 'saan-vi',
+    meaningShort: 'Goddess Lakshmi; kind.',
+    meaningFull: 'A name of Lakshmi, goddess of fortune - gentle and kind.',
+    feel: 'Rooted · Devotional', origin: 'Sanskrit', syllables: 2, numerology: 3,
+    perspective: 'Saanvi has soared in popularity for its Lakshmi association and soft sound. Auspicious and modern at once.',
+    famous: 'A name of Goddess Lakshmi.',
+    nakshatra: "Fits the 'Sa' sound - Pushya or Uttarabhadra nakshatra.",
+    popularity: 'Trending',
+    similar: [('Aadhya', 'first power'), ('Anaya', 'caring'), ('Ira', 'earth')],
+  ),
+  BabyName(
+    name: 'Zara', gender: 'girl', community: 'Muslim', region: 'North',
+    script: 'ज़ारा', pron: 'zaa-ra',
+    meaningShort: 'Blooming flower; radiance.',
+    meaningFull: 'A blooming flower, and radiance - bright and graceful.',
+    feel: 'Modern · Graceful', origin: 'Arabic', syllables: 2, numerology: 8,
+    perspective: 'Zara is globally loved and effortlessly elegant, with a bright meaning. Crosses cultures with ease.',
+    famous: 'Borne across the Arab world and beyond; associated with blossoming and light.',
+    nakshatra: "A soft 'Za' sound; pairs well with a Rohini or Ashlesha star.",
+    popularity: 'Trending',
+    similar: [('Inaya', 'grace'), ('Myra', 'beloved'), ('Aria', 'melody')],
+  ),
+  BabyName(
+    name: 'Inaya', gender: 'girl', community: 'Muslim', region: 'North',
+    script: 'इनाया', pron: 'i-naa-ya',
+    meaningShort: "God's grace; care.",
+    meaningFull: 'Care, concern and the grace of God - tender and warm.',
+    feel: 'Rooted · Graceful', origin: 'Arabic', syllables: 3, numerology: 2,
+    perspective: 'Inaya pairs a beautiful meaning of grace with a soft, modern sound. Increasingly chosen and easy to love.',
+    famous: 'From the Arabic for care and divine grace.',
+    nakshatra: "A gentle 'I' sound; sits well with a Revati star.",
+    popularity: 'Trending',
+    similar: [('Zara', 'radiance'), ('Anaya', 'caring'), ('Ayaan', 'gift of God')],
+  ),
+  BabyName(
+    name: 'Ayaan', gender: 'boy', community: 'Muslim', region: 'North',
+    script: 'अयान', pron: 'a-yaan',
+    meaningShort: 'Gift of God; a time of prosperity.',
+    meaningFull: 'A gift of God, and a time of prosperity - hopeful and bright.',
+    feel: 'Modern · Graceful', origin: 'Arabic · Persian', syllables: 2, numerology: 4,
+    perspective: 'Ayaan is warm, modern and widely loved across communities. A hopeful meaning with an easy sound.',
+    famous: 'From Arabic/Persian roots meaning a gift of God and a time of prosperity.',
+    nakshatra: "A bright 'A' sound; pairs with an Ashwini star.",
+    popularity: 'Trending',
+    similar: [('Kabir', 'noble'), ('Aarav', 'peaceful'), ('Ishaan', 'the sun')],
+  ),
+  BabyName(
+    name: 'Gurleen', gender: 'girl', community: 'Sikh', region: 'North',
+    script: 'गुरलीन', pron: 'gur-leen',
+    meaningShort: 'Absorbed in the Guru.',
+    meaningFull: 'One absorbed in the Guru - devotion and serenity.',
+    feel: 'Rooted · Devotional', origin: 'Punjabi · Sikh', syllables: 2, numerology: 9,
+    perspective: 'Gurleen carries gentle Sikh devotion and a melodic sound. Beloved in Punjabi families and beyond.',
+    famous: 'A cherished Sikh name expressing absorption in the Guru.',
+    nakshatra: "A soft 'Gu' sound; sits well with a Pushya star.",
+    popularity: 'Classic',
+    similar: [('Ekam', 'oneness'), ('Saanvi', 'goddess'), ('Anaya', 'caring')],
+  ),
+  BabyName(
+    name: 'Ekam', gender: 'unisex', community: 'Sikh', region: 'North',
+    script: 'एकम', pron: 'ay-kam',
+    meaningShort: 'One; oneness with God.',
+    meaningFull: 'One - the oneness of the divine, from Ik Onkar.',
+    feel: 'Rare · Devotional', origin: 'Punjabi · Sikh', syllables: 2, numerology: 1,
+    perspective: 'Ekam is spare and profound, echoing Ik Onkar. Modern, unisex, and quietly powerful.',
+    famous: 'Rooted in "Ik Onkar" - the oneness of God in Sikhi.',
+    nakshatra: "A clear 'E'/'A' sound; pairs with an Ashwini star.",
+    popularity: 'Rare', rare: true,
+    similar: [('Gurleen', 'absorbed in the Guru'), ('Advait', 'oneness'), ('Ira', 'earth')],
+  ),
+  BabyName(
+    name: 'Aria', gender: 'girl', community: 'Christian', region: 'Pan-India',
+    script: 'आरिया', pron: 'aa-ri-ya',
+    meaningShort: 'A melody; air.',
+    meaningFull: 'A melody, a solo song - and "air". Lyrical and light.',
+    feel: 'Modern · Melodic', origin: 'Italian · Sanskrit', syllables: 3, numerology: 6,
+    perspective: 'Aria is musical and international, at home in many cultures. Soft, current, and simple to spell.',
+    famous: 'A musical term ("aria") for a solo song; also linked to the Sanskrit "Arya".',
+    nakshatra: "A bright 'A' sound; pairs with an Ashwini star.",
+    popularity: 'Trending',
+    similar: [('Myra', 'beloved'), ('Kiara', 'first ray'), ('Zara', 'radiance')],
+  ),
+  BabyName(
+    name: 'Kiara', gender: 'girl', community: 'Secular', region: 'Pan-India',
+    script: 'कियारा', pron: 'ki-aa-ra',
+    meaningShort: 'First ray of sun; bright.',
+    meaningFull: 'The first ray of the sun - bright, warm and modern.',
+    feel: 'Modern · Feminine', origin: 'Italian · Sanskrit', syllables: 3, numerology: 5,
+    perspective: 'Kiara is bright and globally loved, blending Italian and Indian roots. Effortlessly modern.',
+    famous: 'From Italian "chiara" (bright/clear) and Sanskrit associations with light.',
+    nakshatra: "Fits the 'Ki' sound - Pushya nakshatra.",
+    popularity: 'Trending',
+    similar: [('Myra', 'beloved'), ('Aria', 'melody'), ('Ira', 'earth')],
+  ),
 ];
 
 /// Lookup by name (used by detail/similar links). Falls back to Aarav.
 BabyName babyNameByName(String name) =>
     kBabyNames.firstWhere((n) => n.name == name, orElse: () => kBabyNames.first);
+
+// -----------------------------------------------------------------------------
+//  Filter options + query for the "who are we naming" step.
+// -----------------------------------------------------------------------------
+const List<String> kNameGenders = ['Boy', 'Girl', 'Both'];
+const List<String> kNameCommunities = ['Any', 'Hindu', 'Muslim', 'Sikh', 'Christian', 'Secular'];
+const List<String> kNameRegions = ['Any', 'Pan-India', 'North', 'South', 'East', 'West'];
+
+/// The catalogue filtered by who the parents are naming + region/religion.
+/// 'Both' includes unisex; 'Any' region/community is unrestricted.
+List<BabyName> namesFiltered({String gender = 'Both', String community = 'Any', String region = 'Any'}) {
+  return kBabyNames.where((n) {
+    final g = gender == 'Both' ||
+        (gender == 'Boy' && (n.gender == 'boy' || n.gender == 'unisex')) ||
+        (gender == 'Girl' && (n.gender == 'girl' || n.gender == 'unisex'));
+    final c = community == 'Any' || n.community == community;
+    final r = region == 'Any' || n.region == region;
+    return g && c && r;
+  }).toList();
+}
+
+// -----------------------------------------------------------------------------
+//  Numerology (Chaldean) - each number maps to a ruling planet and a vibe.
+//  Powers BOTH the Astrology page (ruling planet, lucky day/colour/element,
+//  nakshatra fit) and the Numerology page (number, traits). Offered as gentle
+//  tradition, never a claim.
+// -----------------------------------------------------------------------------
+class NumProfile {
+  const NumProfile(this.number, this.planet, this.vibe, this.traits, this.luckyDay, this.luckyColour, this.element, this.blurb);
+  final int number;
+  final String planet;
+  final String vibe; // one word
+  final String traits; // comma phrase
+  final String luckyDay;
+  final String luckyColour;
+  final String element;
+  final String blurb; // a friendly paragraph for the numerology page
+}
+
+const Map<int, NumProfile> kNumerology = {
+  1: NumProfile(1, 'Sun', 'Leadership', 'independent, original, a natural leader', 'Sunday', 'Gold & amber', 'Fire',
+      'Ones are born to lead. The number carries the Sun\'s confidence and originality - a child who likes to do things their own way, and often first.'),
+  2: NumProfile(2, 'Moon', 'Gentleness', 'sensitive, intuitive, gentle, cooperative', 'Monday', 'White & cream', 'Water',
+      'Twos carry the Moon\'s softness - tender, intuitive and deeply caring. A peacemaker who feels the world keenly and brings people together.'),
+  3: NumProfile(3, 'Jupiter', 'Expression', 'expressive, joyful, creative, wise', 'Thursday', 'Yellow', 'Ether',
+      'Threes shine with Jupiter\'s warmth - joyful, expressive and quick to learn. A child who loves words, laughter and colour.'),
+  4: NumProfile(4, 'Rahu', 'Steadiness', 'grounded, practical, hard-working, original', 'Wednesday', 'Grey & soft blue', 'Air',
+      'Fours are the steady builders - practical, patient and quietly unconventional. They value structure and finish what they start.'),
+  5: NumProfile(5, 'Mercury', 'Curiosity', 'quick, adaptable, communicative, free-spirited', 'Wednesday', 'Green', 'Air',
+      'Fives dance to Mercury\'s quick step - curious, adaptable and charming. A free spirit who loves variety and a good conversation.'),
+  6: NumProfile(6, 'Venus', 'Warmth', 'loving, harmonious, artistic, nurturing', 'Friday', 'Pink & white', 'Water',
+      'Sixes glow with Venus\'s warmth - loving, harmonious and drawn to beauty. A natural nurturer who makes any room feel like home.'),
+  7: NumProfile(7, 'Ketu', 'Depth', 'thoughtful, spiritual, introspective, wise', 'Monday', 'Sea-green', 'Water',
+      'Sevens carry Ketu\'s quiet depth - thoughtful, intuitive and old-souled. A child who wonders about everything and feels things deeply.'),
+  8: NumProfile(8, 'Saturn', 'Resolve', 'determined, disciplined, ambitious, enduring', 'Saturday', 'Deep blue & black', 'Earth',
+      'Eights hold Saturn\'s resolve - determined, disciplined and built for the long game. Strong-willed, fair, and quietly powerful.'),
+  9: NumProfile(9, 'Mars', 'Courage', 'brave, energetic, passionate, protective', 'Tuesday', 'Red & coral', 'Fire',
+      'Nines burn with Mars\'s courage - brave, passionate and protective of those they love. A born champion with a big, warm heart.'),
+};
+
+NumProfile numProfile(int n) => kNumerology[((n - 1) % 9) + 1] ?? kNumerology[1]!;
 
 // -----------------------------------------------------------------------------
 //  Shared match store - the names both parents have said yes to.

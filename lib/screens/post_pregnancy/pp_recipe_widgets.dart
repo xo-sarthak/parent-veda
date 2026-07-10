@@ -20,6 +20,30 @@ Widget _meta(IconData icon, String text) => Row(mainAxisSize: MainAxisSize.min, 
       Text(text, style: ppBody(12)),
     ]);
 
+/// The standard India-style diet marker: a bordered square with a filled
+/// circle (veg), a leaf (vegan) or a triangle (non-veg). Colour-coded so it
+/// reads at a glance. Functional iconography, so the green/brown are kept.
+Widget dietMark(String diet, {double size = 16}) {
+  const green = Color(0xFF2E7D32);
+  const brown = Color(0xFF9A3B2E);
+  final c = diet == 'nonveg' ? brown : green;
+  final Widget inner;
+  if (diet == 'vegan') {
+    inner = Icon(Icons.eco, size: size * 0.66, color: c);
+  } else if (diet == 'nonveg') {
+    inner = Icon(Icons.arrow_drop_up, size: size * 0.98, color: c);
+  } else {
+    inner = Container(width: size * 0.44, height: size * 0.44, decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+  }
+  return Container(
+    width: size,
+    height: size,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(3), border: Border.all(color: c, width: 1.5)),
+    child: inner,
+  );
+}
+
 void _openRecipe(BuildContext context, RecipeItem r) =>
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RecipePageScreen(recipe: r)));
 
@@ -58,7 +82,11 @@ class PpRecipeRow extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(recipe.title, style: ppJakarta(16).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(padding: const EdgeInsets.only(top: 2), child: dietMark(recipe.diet)),
+                const SizedBox(width: 8),
+                Expanded(child: Text(recipe.title, style: ppJakarta(16).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis)),
+              ]),
               const SizedBox(height: 2),
               Text(recipe.subtitle, style: ppBody(12, color: warm ? ppPurple : ppSoft, w: warm ? FontWeight.w600 : FontWeight.w400)),
               const SizedBox(height: 10),
@@ -128,7 +156,11 @@ class PpRecipeCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(recipe.title, style: ppJakarta(16).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(padding: const EdgeInsets.only(top: 2), child: dietMark(recipe.diet, size: 15)),
+                  const SizedBox(width: 7),
+                  Expanded(child: Text(recipe.title, style: ppJakarta(16).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis)),
+                ]),
                 const SizedBox(height: 8),
                 Wrap(spacing: 10, children: [
                   _meta(Icons.schedule, '${recipe.minutes} min'),

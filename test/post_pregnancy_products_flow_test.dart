@@ -20,42 +20,41 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('Compare ticks products and caps at three', (tester) async {
+  testWidgets('Compare ticks products and caps at two', (tester) async {
     await pumpPhone(tester, const ProductsSubcategoryScreen()); // Sleep · Soothers (4 items, same category)
 
-    // Tick three. Each ticked card relabels to "Added", so always tap the first
+    // Tick two. Each ticked card relabels to "Added", so always tap the first
     // remaining "Compare" chip.
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 2; i++) {
       final labels = find.text('Compare');
       await tester.ensureVisible(labels.at(0));
       await tester.pump();
       await tester.tap(labels.at(0));
       await tester.pump();
     }
-    expect(PpCompareStore.instance.count, 3);
+    expect(PpCompareStore.instance.count, 2);
 
-    // One card is still un-ticked - the list is full. (That a fourth tap is
+    // Cards remain un-ticked - the list is full at two. (That a third tap is
     // refused is covered by the store unit test below.)
-    expect(find.text('Compare'), findsOneWidget);
+    expect(find.text('Compare'), findsWidgets);
   });
 
-  test('Compare Manager enforces same-category and a max of three', () {
+  test('Compare Manager enforces same-category and a max of two', () {
     final store = PpCompareStore.instance..clear();
 
     expect(store.toggle(productById('dozy')), PpCompareResult.added); // Sleep
-    expect(store.toggle(productById('lull')), PpCompareResult.added); // Sleep
-    expect(store.category, 'Sleep');
 
-    // a different category is refused (not silently added)
+    // a different category is refused while there's still room (not full yet)
     expect(store.toggle(productById('lotion')), PpCompareResult.wrongCategory); // Skincare
+    expect(store.count, 1);
+
+    expect(store.toggle(productById('lull')), PpCompareResult.added); // 2nd Sleep
+    expect(store.category, 'Sleep');
+    expect(store.isFull, true); // full at two
+
+    // a third (even same-category) is refused - full at two
+    expect(store.toggle(productById('hush')), PpCompareResult.full);
     expect(store.count, 2);
-
-    expect(store.toggle(productById('hush')), PpCompareResult.added); // 3rd Sleep
-    expect(store.isFull, true);
-
-    // a fourth (even same-category) is refused
-    expect(store.toggle(productById('cloudtunes')), PpCompareResult.full);
-    expect(store.count, 3);
 
     // suggestions are same-category and exclude what's already picked
     store
@@ -88,26 +87,23 @@ void main() {
 
     await pumpPhone(tester, const ProductsCompareScreen());
 
-    // both selected products render in the overview (the "Before you compare"
-    // education section now sits above it, so scroll it into view first)
-    await tester.scrollUntilVisible(
-      find.text('Hush Mini Sound Machine'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-      maxScrolls: 20,
-    );
-    expect(find.text('Hush Mini Sound Machine'), findsWidgets);
+    // both selected products render (in the overview + the table header row)
+    final hush = find.text('Hush Mini Sound Machine');
+    for (var i = 0; i < 20 && hush.evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+      await tester.pump();
+    }
+    expect(hush, findsWidgets);
     expect(find.text('Lull Portable Soother'), findsWidgets);
 
-    // a differentiated, product-specific "worth knowing" point for Hush lives
-    // further down in its own take card - scroll it into view
-    await tester.scrollUntilVisible(
-      find.textContaining('No auto-off timer'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-      maxScrolls: 20,
-    );
-    expect(find.textContaining('No auto-off timer'), findsOneWidget);
+    // Hush's differentiated "worth knowing" point renders further down (it shows
+    // in both the "parents noted" summary row and the detailed take row).
+    final con = find.textContaining('No auto-off timer');
+    for (var i = 0; i < 30 && con.evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -250));
+      await tester.pump();
+    }
+    expect(con, findsWidgets);
   });
 
   testWidgets('Filters button opens a sheet and narrows the home to a concern', (tester) async {

@@ -11,12 +11,14 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/notification_service.dart';
+import 'pp_attachments.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
 
 class HealthRecordsScreen extends StatefulWidget {
   const HealthRecordsScreen({super.key, required this.category});
-  final String category; // visits | medications | reports | symptoms | allergies
+  final String category; // visits | medications | prescriptions | reports | symptoms | allergies
 
   @override
   State<HealthRecordsScreen> createState() => _HealthRecordsScreenState();
@@ -32,6 +34,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   String get _title => switch (widget.category) {
         'visits' => 'Doctor visits',
         'medications' => 'Medications',
+        'prescriptions' => 'Prescriptions',
         'reports' => 'Reports',
         'symptoms' => 'Symptoms',
         'allergies' => 'Allergies',
@@ -78,6 +81,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   String? get _addLabel => switch (widget.category) {
         'visits' => 'Add a visit',
         'medications' => 'Add medication',
+        'prescriptions' => 'Add a prescription',
         'reports' => 'Add a report',
         'symptoms' => 'Log a symptom',
         'allergies' => 'Add an allergy',
@@ -90,6 +94,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         _visitSheet();
       case 'medications':
         _medSheet();
+      case 'prescriptions':
+        _prescriptionSheet();
       case 'reports':
         _reportSheet();
       case 'symptoms':
@@ -136,6 +142,10 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         final meds = _store.medications;
         final cards = [for (int i = 0; i < meds.length; i++) if (_match('${meds[i].name} ${meds[i].reason} ${meds[i].doctor}')) _medCard(meds[i], i)];
         return _list(cards, 'No medications recorded yet.');
+      case 'prescriptions':
+        final scripts = _store.prescriptions;
+        final cards = [for (int i = 0; i < scripts.length; i++) if (_match('${scripts[i].name} ${scripts[i].doctor} ${scripts[i].notes}')) _prescriptionCard(scripts[i], i)];
+        return _list(cards, 'No prescriptions saved yet.');
       case 'reports':
         final reports = _store.reports;
         return [for (int i = 0; i < reports.length; i++) if (_match('${reports[i].name} ${reports[i].summary}')) _pad(_reportCard(reports[i], i))];
@@ -209,9 +219,17 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           const SizedBox(height: 6),
           Text(m.reason, style: ppBody(13, h: 1.4)),
           const SizedBox(height: 8),
-          Text('${m.dosage} · ${m.duration}', style: ppBody(12, color: ppSoft)),
+          Text([m.dosage, m.frequency, m.duration].where((x) => x.trim().isNotEmpty).join(' · '), style: ppBody(12, color: ppSoft)),
           const SizedBox(height: 3),
           Text('${m.doctor} · ${m.date}', style: ppBody(11.5, color: ppMuted)),
+          if (m.reminderOn && m.reminderHour != null) ...[
+            const SizedBox(height: 8),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.notifications_active_outlined, size: 13, color: ppPurple),
+              const SizedBox(width: 5),
+              Text('Reminder at ${_fmtTime(m.reminderHour!, m.reminderMinute ?? 0)}', style: ppBody(11.5, color: ppPurple, w: FontWeight.w600)),
+            ]),
+          ],
         ]),
       );
 
@@ -290,7 +308,36 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             Expanded(child: Text(r.summary, style: ppBody(12.5, color: ppInk, h: 1.5))),
           ]),
         ],
+        if (r.attachments.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          attachmentSummary(r.attachments),
+        ],
       ]));
+
+  Widget _prescriptionCard(Prescription p, int i) => _card(
+        onTap: () => _prescriptionSheet(existing: p, index: i),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.receipt_long_outlined, size: 18, color: ppPurple)),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(p.name, style: ppJakarta(14.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 2),
+              Text('${p.date}${p.doctor.isNotEmpty ? ' · ${p.doctor}' : ''}', style: ppBody(11.5, color: ppMuted)),
+            ])),
+            const SizedBox(width: 8),
+            _editHint(),
+          ]),
+          if (p.notes.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(p.notes, style: ppBody(12.5, color: ppInk, h: 1.5)),
+          ],
+          if (p.attachments.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            attachmentSummary(p.attachments),
+          ],
+        ]),
+      );
 
   List<Widget> _allergies() {
     final all = _store.allergies;
@@ -345,35 +392,96 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     final name = TextEditingController(text: existing?.name ?? '');
     final reason = TextEditingController(text: existing?.reason ?? '');
     final dosage = TextEditingController(text: existing?.dosage ?? '');
+    final frequency = TextEditingController(text: existing?.frequency ?? '');
     final duration = TextEditingController(text: existing?.duration ?? '');
     final doctor = TextEditingController(text: existing?.doctor ?? '');
     bool completed = existing?.completed ?? false;
+    bool remindOn = existing?.reminderOn ?? false;
+    TimeOfDay? remindAt = (existing?.reminderHour != null && existing?.reminderMinute != null)
+        ? TimeOfDay(hour: existing!.reminderHour!, minute: existing.reminderMinute!)
+        : null;
     _sheet(
       title: existing == null ? 'Add medication' : 'Edit medication',
-      onDelete: index == null ? null : () => _store.removeMedication(index),
+      onDelete: index == null
+          ? null
+          : () {
+              final id = existing?.reminderId;
+              if (id != null) NotificationService.instance.cancel(id);
+              _store.removeMedication(index);
+            },
       fields: (setSheet) => [
         _tf(name, 'Name'),
         _tf(reason, 'Reason'),
-        _tf(dosage, 'Dosage'),
+        _tf(dosage, 'Dosage (e.g. 2.5 ml, 400 IU)'),
+        _tf(frequency, 'Frequency (e.g. twice daily)'),
         _tf(duration, 'Duration'),
         _tf(doctor, 'Prescribed by'),
         _toggleRow('Completed', completed, (v) => setSheet(() => completed = v)),
+        _toggleRow('Remind me to give this', remindOn, (v) => setSheet(() {
+              remindOn = v;
+              if (v && remindAt == null) remindAt = const TimeOfDay(hour: 9, minute: 0);
+            })),
+        if (remindOn)
+          _timePickRow(remindAt, () async {
+            final picked = await showTimePicker(context: context, initialTime: remindAt ?? const TimeOfDay(hour: 9, minute: 0));
+            if (picked != null) setSheet(() => remindAt = picked);
+          }),
       ],
       onSave: () {
         if (name.text.trim().isEmpty) return false;
+        final on = remindOn && remindAt != null && !completed;
         final m = Medication(
           name: name.text.trim(),
           reason: reason.text.trim(),
           doctor: doctor.text.trim().isEmpty ? '-' : doctor.text.trim(),
           dosage: dosage.text.trim(),
+          frequency: frequency.text.trim(),
           duration: duration.text.trim(),
           completed: completed,
           date: existing?.date ?? _today(),
+          reminderOn: on,
+          reminderHour: remindAt?.hour,
+          reminderMinute: remindAt?.minute,
+          reminderId: existing?.reminderId ?? (DateTime.now().microsecondsSinceEpoch & 0x7fffffff),
         );
         index == null ? _store.addMedication(m) : _store.updateMedication(index, m);
+        _applyMedReminder(m);
         return true;
       },
     );
+  }
+
+  // Schedule (or cancel) the gentle "time to give this medicine" reminder. Fire-
+  // and-forget: permission + scheduling are best-effort and never block saving.
+  Future<void> _applyMedReminder(Medication m) async {
+    final id = m.reminderId;
+    if (id == null) return;
+    if (m.reminderOn && m.reminderHour != null && m.reminderMinute != null && !m.completed) {
+      await NotificationService.instance.requestPermission();
+      final detail = [m.dosage, m.frequency].where((x) => x.trim().isNotEmpty).join(' · ');
+      await NotificationService.instance.scheduleOneOff(
+        id: id,
+        title: 'Time for ${m.name}',
+        body: detail.isEmpty ? 'A gentle reminder for ${m.name}.' : detail,
+        when: _nextOccurrence(m.reminderHour!, m.reminderMinute!),
+      );
+    } else {
+      await NotificationService.instance.cancel(id);
+    }
+  }
+
+  // The next time [hour]:[minute] falls - later today, else tomorrow.
+  DateTime _nextOccurrence(int hour, int minute) {
+    final now = DateTime.now();
+    var dt = DateTime(now.year, now.month, now.day, hour, minute);
+    if (!dt.isAfter(now)) dt = dt.add(const Duration(days: 1));
+    return dt;
+  }
+
+  String _fmtTime(int h, int m) {
+    final ap = h >= 12 ? 'PM' : 'AM';
+    final hh = h % 12 == 0 ? 12 : h % 12;
+    return '$hh:${m.toString().padLeft(2, '0')} $ap';
   }
 
   void _allergySheet({Allergy? existing, int? index}) {
@@ -453,16 +561,58 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
   void _reportSheet() {
     final name = TextEditingController();
+    final doctor = TextEditingController();
     final summary = TextEditingController();
+    final List<Attachment> atts = [];
     _sheet(
       title: 'Add a report',
       fields: (setSheet) => [
         _tf(name, 'Report name (e.g. Blood test)'),
+        _tf(doctor, 'Doctor / lab'),
         _tf(summary, 'Summary / key findings', maxLines: 4),
+        _attachRow(atts, setSheet),
       ],
       onSave: () {
         if (name.text.trim().isEmpty) return false;
-        _store.addReport(MedicalReport(name: name.text.trim(), date: _today(), summary: summary.text.trim()));
+        _store.addReport(MedicalReport(
+          name: name.text.trim(),
+          date: _today(),
+          doctor: doctor.text.trim().isEmpty ? null : doctor.text.trim(),
+          summary: summary.text.trim(),
+          attachments: List.of(atts),
+        ));
+        return true;
+      },
+    );
+  }
+
+  void _prescriptionSheet({Prescription? existing, int? index}) {
+    final name = TextEditingController(text: existing?.name ?? '');
+    final doctor = TextEditingController(text: existing?.doctor ?? '');
+    final date = TextEditingController(text: existing?.date ?? _today());
+    final notes = TextEditingController(text: existing?.notes ?? '');
+    final List<Attachment> atts = [...?existing?.attachments];
+    _sheet(
+      title: existing == null ? 'Add a prescription' : 'Edit prescription',
+      onDelete: index == null ? null : () => _store.removePrescription(index),
+      fields: (setSheet) => [
+        _tf(name, 'Prescription name (e.g. Fever review)'),
+        _tf(doctor, 'Prescribed by'),
+        _tf(date, 'Date'),
+        _tf(notes, 'Notes / instructions', maxLines: 4),
+        _attachRow(atts, setSheet),
+      ],
+      onSave: () {
+        if (name.text.trim().isEmpty) return false;
+        final p = Prescription(
+          id: existing?.id ?? 'rx_${DateTime.now().microsecondsSinceEpoch}',
+          name: name.text.trim(),
+          doctor: doctor.text.trim(),
+          date: date.text.trim().isEmpty ? _today() : date.text.trim(),
+          notes: notes.text.trim(),
+          attachments: List.of(atts),
+        );
+        index == null ? _store.addPrescription(p) : _store.updatePrescription(index, p);
         return true;
       },
     );
@@ -608,6 +758,58 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         child: Row(children: [
           Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
           GestureDetector(onTap: () => onChanged(!value), behavior: HitTestBehavior.opaque, child: ppSwitch(value)),
+        ]),
+      );
+
+  // A tappable "Add attachment" button (image + PDF, multiple) plus a live row of
+  // chips for what's been added. Backed by the shared pp_attachments picker.
+  Widget _attachRow(List<Attachment> atts, void Function(void Function()) setSheet) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _label('Attachments'),
+          GestureDetector(
+            onTap: () async {
+              final picked = await showAttachmentPicker(context);
+              if (picked.isNotEmpty) setSheet(() => atts.addAll(picked));
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: ppBorder)),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.attach_file_rounded, size: 17, color: ppPurple),
+                const SizedBox(width: 8),
+                Text('Add attachment', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+              ]),
+            ),
+          ),
+          if (atts.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            attachmentChips(atts, onRemove: (i) => setSheet(() => atts.removeAt(i))),
+          ],
+        ]),
+      );
+
+  // A tappable "reminder time" row that opens the platform time picker.
+  Widget _timePickRow(TimeOfDay? t, VoidCallback onTap) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _label('Reminder time'),
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppLine)),
+              child: Row(children: [
+                const Icon(Icons.schedule_rounded, size: 17, color: ppPurple),
+                const SizedBox(width: 10),
+                Expanded(child: Text(t == null ? 'Set a time' : _fmtTime(t.hour, t.minute), style: ppBody(14, color: t == null ? ppMuted : ppInk, w: FontWeight.w600))),
+                const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+              ]),
+            ),
+          ),
         ]),
       );
 

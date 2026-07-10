@@ -310,42 +310,22 @@ class ProductsCompareScreen extends StatelessWidget {
                 )),
               ],
 
-              // spec sheet (per-product columns)
+              // one fully column-divided comparison table: a header row of
+              // product names, the spec rows, what parents rated & loved, and -
+              // last - the ParentVeda take (the verdict sits at the bottom).
               const SizedBox(height: 22),
               _pad(Container(
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
                 clipBehavior: Clip.antiAlias,
                 child: Column(children: [
-                  for (var i = 0; i < specKeys.length; i++)
-                    _specRow(specKeys[i], [for (final m in specMaps) m[specKeys[i]] ?? '-'], last: i == specKeys.length - 1),
+                  _tRow(null, [for (final p in ps) Text(p.name, style: ppJakarta(13.5).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis)], header: true),
+                  for (final k in specKeys)
+                    _tRow(k, [for (final m in specMaps) _specCell(k, m[k] ?? '-')]),
+                  _tRow('Parents rated', [for (final p in ps) _ratedCell(p)]),
+                  _tRow('Parents loved', [for (final p in ps) _lovedCell(p)]),
+                  _tRow('The ParentVeda take', [for (final p in ps) _takeCell(p)], last: true),
                 ]),
               )),
-
-              // the take - one card PER product
-              const SizedBox(height: 28),
-              _pad(Text('The ParentVeda take', style: ppJakarta(16))),
-              const SizedBox(height: 4),
-              _pad(Text('For each pick, honestly - what works, and what to know.', style: ppBody(12))),
-              const SizedBox(height: 14),
-              for (var i = 0; i < ps.length; i++) ...[
-                if (i > 0) const SizedBox(height: 12),
-                _pad(_takeCard(ps[i])),
-              ],
-
-              // community - segregated from the comparison
-              _pad(ppSectionDivider()),
-              _pad(Text('What parents say', style: ppJakarta(16))),
-              const SizedBox(height: 4),
-              _pad(Text('Named, verified-mother reviews - the same trust system as every Product page.', style: ppBody(12))),
-              const SizedBox(height: 14),
-              _pad(Row(children: [
-                for (var i = 0; i < ps.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 10),
-                  Expanded(child: _communityStat(ps[i])),
-                ],
-              ])),
-              const SizedBox(height: 14),
-              _pad(_lovedNoted(ps)),
 
               const SizedBox(height: 22),
               _pad(Text("ParentVeda's take is evidence-based, neutral and never promotional.",
@@ -620,40 +600,52 @@ class ProductsCompareScreen extends StatelessWidget {
         ),
       );
 
-  // ---- spec sheet (N value columns) --------------------------------------
-  Widget _specRow(String label, List<String> values, {bool last = false}) {
-    final free = label.toLowerCase().startsWith('free');
-    final rating = label == 'Rating';
-    Widget val(String t) => Text(t,
-        style: ppBody(13, color: rating ? ppCoral : (free ? _green : ppInk), w: (rating || free) ? FontWeight.w700 : FontWeight.w400, h: 1.4));
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: last ? Colors.transparent : const Color(0xFFF3EEF7)))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ppEyebrow(label, color: ppMuted, spacing: 0.6),
-        const SizedBox(height: 8),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          for (var i = 0; i < values.length; i++) ...[
-            if (i > 0) const SizedBox(width: 10),
-            Expanded(child: val(values[i])),
-          ],
-        ]),
-      ]),
-    );
-  }
-
-  // ---- per-product take --------------------------------------------------
-  Widget _takeCard(PpProduct p) => Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
+  // ---- unified comparison table (2 divided columns, one row per attribute) -
+  Widget _tRow(String? label, List<Widget> cells, {bool last = false, bool header = false}) => Container(
+        decoration: BoxDecoration(
+          color: header ? ppPanel : (last ? const Color(0xFFF7F2FC) : Colors.white),
+          border: Border(bottom: BorderSide(color: last ? Colors.transparent : const Color(0xFFF3EEF7))),
+        ),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(p.name, style: ppJakarta(15).copyWith(height: 1.2)),
-          const SizedBox(height: 14),
-          _takeBlock("What's right", _green, _greenBg, Icons.check_rounded, _prosOf(p)),
-          const SizedBox(height: 10),
-          _takeBlock('Worth knowing', ppBrown, _amberBg, Icons.info_outline, _consOf(p)),
+          if (label != null) ...[
+            ppEyebrow(label, color: last ? ppPurple : ppMuted, spacing: 0.6),
+            const SizedBox(height: 8),
+          ],
+          IntrinsicHeight(
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              for (var i = 0; i < cells.length; i++) ...[
+                if (i > 0) Container(width: 1, color: const Color(0xFFF0EAF6), margin: const EdgeInsets.symmetric(horizontal: 12)),
+                Expanded(child: cells[i]),
+              ],
+            ]),
+          ),
         ]),
       );
+
+  Widget _specCell(String label, String value) {
+    final free = label.toLowerCase().startsWith('free');
+    final rating = label == 'Rating';
+    return Text(value, style: ppBody(13, color: rating ? ppCoral : (free ? _green : ppInk), w: (rating || free) ? FontWeight.w700 : FontWeight.w400, h: 1.4));
+  }
+
+  Widget _ratedCell(PpProduct p) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [const Icon(Icons.star_rounded, size: 16, color: ppCoral), const SizedBox(width: 3), Text(p.rating.toStringAsFixed(1), style: ppJakarta(17))]),
+        const SizedBox(height: 2),
+        Text('${p.reviews} parents', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+      ]);
+
+  Widget _lovedCell(PpProduct p) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(Icons.check_rounded, size: 14, color: _green), const SizedBox(width: 6), Expanded(child: Text(_prosOf(p).first, style: ppBody(12.5, color: ppInk, h: 1.45)))]),
+        const SizedBox(height: 8),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [const Icon(Icons.info_outline, size: 14, color: ppBrown), const SizedBox(width: 6), Expanded(child: Text(_consOf(p).first, style: ppBody(12.5, color: ppSoft, h: 1.45)))]),
+      ]);
+
+  Widget _takeCell(PpProduct p) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _takeBlock("What's right", _green, _greenBg, Icons.check_rounded, _prosOf(p)),
+        const SizedBox(height: 10),
+        _takeBlock('Worth knowing', ppBrown, _amberBg, Icons.info_outline, _consOf(p)),
+      ]);
 
   Widget _takeBlock(String title, Color fg, Color bg, IconData icon, List<String> items) => Container(
         padding: const EdgeInsets.all(14),
@@ -670,52 +662,6 @@ class ProductsCompareScreen extends StatelessWidget {
                 Expanded(child: Text(items[i], style: ppBody(13, color: ppInk, h: 1.5))),
               ]),
             ),
-        ]),
-      );
-
-  // ---- community (segregated section) ------------------------------------
-  Widget _communityStat(PpProduct p) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
-        child: Column(children: [
-          Text(p.brand, style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 5),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.star_rounded, size: 16, color: ppCoral),
-            const SizedBox(width: 3),
-            Text(p.rating.toStringAsFixed(1), style: ppJakarta(19)),
-          ]),
-          const SizedBox(height: 2),
-          Text('${p.reviews} parents', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
-        ]),
-      );
-
-  Widget _lovedNoted(List<PpProduct> ps) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('PARENTS LOVED', style: ppBody(10, color: _green, w: FontWeight.w700).copyWith(letterSpacing: 0.8)),
-          const SizedBox(height: 9),
-          for (final p in ps) _cLine(Icons.check_rounded, _green, p.brand, _prosOf(p).first),
-          const SizedBox(height: 14),
-          Text('PARENTS ALSO NOTED', style: ppBody(10, color: ppBrown, w: FontWeight.w700).copyWith(letterSpacing: 0.8)),
-          const SizedBox(height: 9),
-          for (final p in ps) _cLine(Icons.info_outline, ppBrown, p.brand, _consOf(p).first),
-        ]),
-      );
-
-  Widget _cLine(IconData icon, Color color, String brand, String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text.rich(TextSpan(children: [
-              TextSpan(text: '$brand - ', style: ppBody(13, color: ppInk, w: FontWeight.w700, h: 1.5)),
-              TextSpan(text: text, style: ppBody(13, color: ppInk, h: 1.5)),
-            ])),
-          ),
         ]),
       );
 

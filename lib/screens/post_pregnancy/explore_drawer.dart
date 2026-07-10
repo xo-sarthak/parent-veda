@@ -22,6 +22,7 @@ import 'guides_tools_screen.dart';
 import 'health_home_screen.dart';
 import 'investments_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
+import 'leap_calendar_screen.dart';
 import 'masterclasses_screen.dart';
 import 'my_child_screen.dart';
 import 'nuskhe_screen.dart';
@@ -57,12 +58,19 @@ class ExploreDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 16),
                 children: [
+                  // My Child is the home now - this row simply returns there.
                   _section(context, Icons.child_care_outlined, 'My Child',
                       "Who Aarav is today - his whole story.", const MyChildScreen(),
-                      top: true),
+                      top: true, onTapOverride: () {
+                    final nav = Navigator.of(context);
+                    nav.pop();
+                    openPpTab(context, 0);
+                  }),
+                  _section(context, Icons.brightness_4_outlined, 'Leap Calendar',
+                      "Every Wonder-Weeks leap, on his timeline.", const LeapCalendarScreen()),
                   _section(context, Icons.play_circle_outline, 'Watch',
                       'Expert videos, chosen for his stage.', const WatchHomeScreen()),
-                  _section(context, Icons.emoji_objects_outlined, 'Development',
+                  _section(context, Icons.emoji_objects_outlined, 'Skill Development',
                       'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
                   // Replaced by the full Health ecosystem (the Health Guide lives
                   // inside it now). Old row kept, commented, for easy revert:
@@ -106,13 +114,14 @@ class ExploreDrawer extends StatelessWidget {
   }
 
   Widget _section(BuildContext context, IconData icon, String title, String desc, Widget screen,
-          {bool top = false}) =>
+          {bool top = false, VoidCallback? onTapOverride}) =>
       GestureDetector(
-        onTap: () {
-          final nav = Navigator.of(context);
-          nav.pop(); // close the drawer
-          nav.push(MaterialPageRoute<void>(builder: (_) => screen));
-        },
+        onTap: onTapOverride ??
+            () {
+              final nav = Navigator.of(context);
+              nav.pop(); // close the drawer
+              nav.push(MaterialPageRoute<void>(builder: (_) => screen));
+            },
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),

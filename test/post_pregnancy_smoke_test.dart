@@ -20,6 +20,21 @@ import 'package:parentveda/screens/post_pregnancy/community_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/course_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_activity_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_area_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/dev_stage_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/leap_calendar_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/leap_definition_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_leaps_data.dart';
+import 'package:parentveda/screens/post_pregnancy/name_astro_screens.dart';
+import 'package:parentveda/screens/post_pregnancy/feeding_tracker_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/sleep_tracker_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/baby_documents_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_reco_data.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_common.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_category_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_collection_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_search_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/reco_library_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_checkin_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_map_screen.dart';
@@ -108,7 +123,11 @@ import 'package:parentveda/screens/post_pregnancy/wonder_week_screen.dart';
 
 void main() {
   final screens = <String, Widget>{
-    'My Child home': const PostPregnancyHome(),
+    'My Child home': const MyChildScreen(home: true),
+    'Today (retired briefing)': const PostPregnancyHome(),
+    'Leap calendar': const LeapCalendarScreen(),
+    'Leap definition (Leap 4)': LeapDefinitionScreen(leap: leapByNumber(4)),
+    'Dev stage detail (skill)': DevStageDetailScreen(area: devAreaById('cognitive'), stage: devAreaById('cognitive').journey[2]),
     'AskVeda': const AskVedaScreen(),
     'Community': const CommunityScreen(),
     'Products home/categories': const ProductsDiscoveryScreen(),
@@ -165,6 +184,11 @@ void main() {
     'Course detail (Sleep Bootcamp)': CourseDetailScreen(course: courseById('sleep')),
     'Course lesson (Sleep · Module 2)': CourseLessonScreen(course: courseById('sleep'), index: 1),
     'Recommendations': const RecommendationsScreen(),
+    'Reco detail': RecoDetailScreen(item: recoById('bk_indianfaces')),
+    'Reco category (Books)': const RecoCategoryScreen(category: 'Books'),
+    'Reco collection (Sensory)': RecoCollectionScreen(collection: recoCollectionById('sensory')),
+    'Reco search': const RecoSearchScreen(),
+    'Reco library': const RecoLibraryScreen(),
     'Book detail': const BookDetailScreen(),
     'Problem Solver': const ProblemSolverScreen(),
     'Provider results': const ProviderResultsScreen(),
@@ -192,6 +216,8 @@ void main() {
     'Health records (medications)': const HealthRecordsScreen(category: 'medications'),
     'Health records (allergies)': const HealthRecordsScreen(category: 'allergies'),
     'Health records (visits)': const HealthRecordsScreen(category: 'visits'),
+    'Health records (prescriptions)': const HealthRecordsScreen(category: 'prescriptions'),
+    'Baby documents': const BabyDocumentsScreen(),
     'Name finder quiz': const NameFinderScreen(),
     'Name swipe deck': const NameSwipeScreen(),
     'Name detail': const NameDetailScreen(),
@@ -199,6 +225,10 @@ void main() {
     'Baby Naming front door (V2)': const BabyNamingHomeScreen(),
     'Name Journey feed': const NameJourneyFeedScreen(),
     'Name Journey detail': const NameJourneyDetailScreen(name: 'Aarav'),
+    'Name astrology': const NameAstrologyScreen(name: 'Aarav'),
+    'Name numerology': const NameNumerologyScreen(name: 'Aarav'),
+    'Feeding tracker': const FeedingTrackerScreen(),
+    'Sleep tracker': const SleepTrackerScreen(),
     'Name Journey shortlist': const NameJourneyShortlistScreen(),
     'Name list (browse)': const NameListScreen(),
     'Name compare (V2)': const NameCompareScreen(),
@@ -301,10 +331,10 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // The "My Child" living profile is a long single-scroll flow (Identity ->
-  // Snapshot -> Journey -> Growth -> Health -> Memories -> Looking Ahead). Let
-  // the reveal settle, then scroll it end-to-end so every section + rail builds
-  // without overflow.
+  // The new My Child home is a single-scroll, leap-first flow (Leap header ->
+  // Identity + Growth -> Daily tip -> Leap video + description -> Snapshot ->
+  // Milestones -> Journal -> Watch -> Learn -> Looking ahead). Scroll it
+  // end-to-end so every section + horizontal rail builds without overflow.
   testWidgets('My Child profile: all sections render', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
@@ -313,15 +343,80 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: MyChildScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('CURIOUS EXPLORER'), findsOneWidget); // AI personality (hero)
+    expect(find.text('LIVE NOW'), findsOneWidget); // leap header
+    expect(find.text('Aarav'), findsWidgets); // identity
 
     await tester.scrollUntilVisible(
-      find.text("What's coming for Aarav"),
+      find.text('LOOKING AHEAD'),
       400,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 60,
     );
-    expect(find.text("What's coming for Aarav"), findsOneWidget); // final section reached
+    expect(find.text('LOOKING AHEAD'), findsOneWidget); // final section reached
+    expect(tester.takeException(), isNull);
+  });
+
+  // The new home's inline growth "Edit" opens the profile/growth sheet (the
+  // edit is NOT behind the photo tap any more).
+  testWidgets('My Child home: growth Edit opens the profile sheet', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Edit').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit profile & growth'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // A Milestone row opens its detail (skill/milestone), data-driven from the
+  // child's current + emerging stages.
+  testWidgets('My Child home: a milestone opens its detail', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Rolling'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 40,
+    );
+    await tester.ensureVisible(find.text('Rolling'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rolling'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DevStageDetailScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // The Explore drawer (hamburger) carries the new Leap Calendar entry, which
+  // opens the calendar.
+  testWidgets('My Child home: Explore drawer opens the Leap Calendar', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('Leap Calendar'), findsOneWidget);
+
+    await tester.tap(find.text('Leap Calendar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(LeapCalendarScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -758,13 +853,31 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Help Aarav grow'), findsOneWidget);
-    await tester.ensureVisible(find.text('The Development Map'));
-    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('The Development Map'), 250,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('The Development Map'));
     await tester.pumpAndSettle();
 
     expect(find.byType(DevelopmentMapScreen), findsOneWidget);
     expect(find.text('YOU ARE HERE'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Recommendations: opening a pick shows the ParentVeda take (the whole point -
+  // a reason + what to consider, not marketing copy).
+  testWidgets('Recommendations: a pick opens its detail with the ParentVeda take', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: RecoCategoryScreen(category: 'Books')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(RecoRow).first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RecoDetailScreen), findsOneWidget);
+    expect(find.text('THINGS TO CONSIDER'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

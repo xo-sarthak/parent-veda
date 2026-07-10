@@ -16,6 +16,7 @@ import '../../data/community_data.dart';
 import '../../models/community_models.dart';
 import '../../services/community_store.dart';
 import 'pp_common.dart';
+import 'pp_section_extras.dart';
 
 // Auto-join the parenting stage communities once per app session (in-memory;
 // persists too when prefs are available). A module flag avoids re-adding after
@@ -31,6 +32,15 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen> {
   CommunityStore get _s => CommunityStore.instance;
+
+  final TextEditingController _searchCtl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -80,17 +90,32 @@ class _CommunityScreenState extends State<CommunityScreen> {
           child: AnimatedBuilder(
             animation: _s,
             builder: (context, _) {
-              final feed = _feed();
+              final q = _query.trim().toLowerCase();
+              final feed = q.isEmpty
+                  ? _feed()
+                  : _feed().where((p) => p.text.toLowerCase().contains(q) || p.author.toLowerCase().contains(q)).toList();
               return ListView(
                 padding: const EdgeInsets.only(top: 12, bottom: 120),
                 children: [
                   _pad(Text('Community', style: ppJakarta(24))),
                   const SizedBox(height: 4),
                   _pad(Text('Your rooms, already full - now for this stage.', style: ppBody(13))),
+                  const SizedBox(height: 16),
+                  _pad(ppSearchField(
+                    controller: _searchCtl,
+                    hint: 'Search posts by keyword or author…',
+                    onChanged: (v) => setState(() => _query = v),
+                  )),
                   const SizedBox(height: 18),
                   _rooms(),
                   const SizedBox(height: 8),
                   _pad(ppSectionDivider()),
+                  if (q.isNotEmpty && feed.isEmpty)
+                    _pad(Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Text('No posts match "$_query" yet.',
+                          textAlign: TextAlign.center, style: ppBody(13.5, color: ppMuted)),
+                    )),
                   for (final p in feed) ...[_pad(_postCard(p)), _pad(ppSectionDivider())],
                   _pad(_sponsored()),
                 ],
@@ -109,7 +134,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ),
         ),
-        Positioned(right: 20, bottom: 92, child: _composeFab()),
+        Positioned(right: 20, bottom: 164, child: _composeFab()),
+        const PpAskVedaFab(bottom: 96),
         const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 3)),
       ]),
     );

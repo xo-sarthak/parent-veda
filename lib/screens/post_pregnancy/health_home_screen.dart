@@ -11,6 +11,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'baby_documents_screen.dart';
 import 'health_doctor_visit_screen.dart';
 import 'health_emergency_screen.dart';
 import 'health_growth_screen.dart';
@@ -39,6 +40,17 @@ class HealthHomeScreen extends StatelessWidget {
     final current = kGrowth.last;
     return Scaffold(
       backgroundColor: ppBg,
+      floatingActionButton: GestureDetector(
+        onTap: () => openPpTab(context, 1),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
+          child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
+        ),
+      ),
       body: SafeArea(
         bottom: false,
         child: ListView(
@@ -238,28 +250,30 @@ class HealthHomeScreen extends StatelessWidget {
 
   // ---- medical history ----------------------------------------------------
   Widget _history(BuildContext context) {
-    const cats = <(IconData, String, String)>[
-      (Icons.medical_services_outlined, 'Doctor visits', 'visits'),
-      (Icons.medication_outlined, 'Medications', 'medications'),
-      (Icons.description_outlined, 'Reports', 'reports'),
-      (Icons.healing_outlined, 'Symptoms', 'symptoms'),
-      (Icons.shield_outlined, 'Allergies', 'allergies'),
+    final rows = <(IconData, String, VoidCallback)>[
+      (Icons.medical_services_outlined, 'Doctor visits', () => _push(context, const HealthRecordsScreen(category: 'visits'))),
+      (Icons.medication_outlined, 'Medications', () => _push(context, const HealthRecordsScreen(category: 'medications'))),
+      (Icons.receipt_long_outlined, 'Prescriptions', () => _push(context, const HealthRecordsScreen(category: 'prescriptions'))),
+      (Icons.description_outlined, 'Reports', () => _push(context, const HealthRecordsScreen(category: 'reports'))),
+      (Icons.healing_outlined, 'Symptoms', () => _push(context, const HealthRecordsScreen(category: 'symptoms'))),
+      (Icons.shield_outlined, 'Allergies', () => _push(context, const HealthRecordsScreen(category: 'allergies'))),
+      (Icons.folder_outlined, 'Baby documents', () => _push(context, const BabyDocumentsScreen())),
     ];
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
-        for (int i = 0; i < cats.length; i++)
+        for (int i = 0; i < rows.length; i++)
           GestureDetector(
-            onTap: () => _push(context, HealthRecordsScreen(category: cats[i].$3)),
+            onTap: rows[i].$3,
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-              decoration: BoxDecoration(border: Border(bottom: i == cats.length - 1 ? BorderSide.none : const BorderSide(color: ppHair))),
+              decoration: BoxDecoration(border: Border(bottom: i == rows.length - 1 ? BorderSide.none : const BorderSide(color: ppHair))),
               child: Row(children: [
-                Icon(cats[i].$1, size: 19, color: ppPurple),
+                Icon(rows[i].$1, size: 19, color: ppPurple),
                 const SizedBox(width: 14),
-                Expanded(child: Text(cats[i].$2, style: ppBody(14.5, color: ppInk, w: FontWeight.w600))),
+                Expanded(child: Text(rows[i].$2, style: ppBody(14.5, color: ppInk, w: FontWeight.w600))),
                 const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
               ]),
             ),

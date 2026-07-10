@@ -38,7 +38,10 @@ import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
 import '../services/scans_store.dart';
 import '../theme/app_theme.dart';
-import 'post_pregnancy/post_pregnancy_home.dart';
+// The parenting app now lands on the My Child home (the old "Today" briefing,
+// PostPregnancyHome, is retired from nav but kept for revert).
+// import 'post_pregnancy/post_pregnancy_home.dart';
+import 'post_pregnancy/my_child_screen.dart';
 import 'weekly_card_stack_screen.dart';
 import '../widgets/home/home_modules.dart';
 import '../widgets/home/trimester_chart_card.dart';
@@ -186,7 +189,7 @@ class HomeScreenB extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const PostPregnancyHome(),
+          builder: (_) => const MyChildScreen(home: true),
           settings: const RouteSettings(name: 'pp/my_child'),
         ),
       ),
