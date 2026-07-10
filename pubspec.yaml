@@ -55,6 +55,9 @@ dependencies:
   # Capturing photo memories from the camera.
   image_picker: ^1.1.2
 
+  # Attaching PDF/image files to health reports, prescriptions & baby documents.
+  file_picker: ^8.1.2
+
   # Local persistence (language pref, mute, fruit/baby toggle, journal, photos).
   shared_preferences: ^2.3.2
 
