@@ -488,28 +488,115 @@ Cohort? cohortById(String id) {
   return null;
 }
 
-// ---- prenatal yoga sessions -------------------------------------------------
+// ---- yoga sessions ----------------------------------------------------------
+//  Sessions are now month-tagged (month 1-9) so the Yoga screen can open on the
+//  mother's current month and offer Month 1-9 tabs. The original untagged
+//  five-session list is kept below (commented) for reference/revert.
 class YogaSession {
-  const YogaSession(this.id, this.title, this.duration, this.focus, this.blurb);
+  const YogaSession(this.id, this.title, this.duration, this.focus, this.blurb,
+      {this.month = 1});
   final String id;
   final String title;
   final String duration; // "18 min"
   final String focus; // "opening"
   final String blurb;
+  final int month; // 1-9, the pregnancy month this session is meant for
 }
 
+// // ---- original untagged list (pre month-tabs) -----------------------------
+// const List<YogaSession> kYogaSessions = [
+//   YogaSession('yg_hips', 'Hips & pelvis opener', '18 min', 'opening',
+//       'Gentle openers to ease tightness in the hips and pelvis and make room as baby grows.'),
+//   YogaSession('yg_back', 'Lower-back relief', '15 min', 'relief',
+//       'Slow, supported movement to unload a tired lower back at the end of the day.'),
+//   YogaSession('yg_breath', 'Breathing for labour', '12 min', 'breath',
+//       'Practise the calm, steady breath that will carry you through contractions.'),
+//   YogaSession('yg_evening', 'Gentle evening wind-down', '20 min', 'calm',
+//       'A soothing sequence to quiet the body and mind before sleep.'),
+//   YogaSession('yg_legsup', 'Legs-up restorative', '10 min', 'restore',
+//       'A restful, restorative pose to ease swelling and reset your nervous system.'),
+// ];
+
+// TODO: month grouping below is a sensible approximation - once sessions carry a
+// real trimester/week range from the content team, distribute them precisely.
 const List<YogaSession> kYogaSessions = [
-  YogaSession('yg_hips', 'Hips & pelvis opener', '18 min', 'opening',
-      'Gentle openers to ease tightness in the hips and pelvis and make room as baby grows.'),
-  YogaSession('yg_back', 'Lower-back relief', '15 min', 'relief',
-      'Slow, supported movement to unload a tired lower back at the end of the day.'),
-  YogaSession('yg_breath', 'Breathing for labour', '12 min', 'breath',
-      'Practise the calm, steady breath that will carry you through contractions.'),
-  YogaSession('yg_evening', 'Gentle evening wind-down', '20 min', 'calm',
-      'A soothing sequence to quiet the body and mind before sleep.'),
-  YogaSession('yg_legsup', 'Legs-up restorative', '10 min', 'restore',
-      'A restful, restorative pose to ease swelling and reset your nervous system.'),
+  // Month 1
+  YogaSession('yg_m1_settle', 'Settling-in gentle flow', '12 min', 'grounding',
+      'A soft, grounding sequence for the very first weeks - nothing strenuous, just breath and ease.',
+      month: 1),
+  YogaSession('yg_m1_breath', 'Breath awareness basics', '10 min', 'breath',
+      'Meet the calm, steady breath you will build on all pregnancy long.',
+      month: 1),
+  // Month 2
+  YogaSession('yg_m2_nausea', 'Ease for nausea days', '12 min', 'relief',
+      'Slow, low movements and breathing to settle a queasy first-trimester tummy.',
+      month: 2),
+  YogaSession('yg_m2_stretch', 'Gentle full-body stretch', '15 min', 'opening',
+      'Wake up stiff joints kindly, keeping everything within a safe early range.',
+      month: 2),
+  // Month 3
+  YogaSession('yg_m3_hipsfound', 'Hip-opener foundations', '16 min', 'opening',
+      'Begin the hip work that makes room as baby grows - built up slowly and safely.',
+      month: 3),
+  YogaSession('yg_m3_calm', 'Calm & steady wind-down', '14 min', 'calm',
+      'A soothing close to the first trimester to quiet body and mind.',
+      month: 3),
+  // Month 4
+  YogaSession('yg_m4_energy', 'Second-trimester energy flow', '18 min', 'strength',
+      'As energy returns, a gently strengthening flow to feel capable and strong.',
+      month: 4),
+  YogaSession('yg_m4_posture', 'Posture & alignment', '15 min', 'align',
+      'Simple work to carry a growing bump with an easy, supported posture.',
+      month: 4),
+  // Month 5
+  YogaSession('yg_m5_back', 'Back-care essentials', '15 min', 'relief',
+      'Supported movement to unload a tired lower back as your centre of gravity shifts.',
+      month: 5),
+  YogaSession('yg_m5_balance', 'Steady balance & core', '16 min', 'strength',
+      'Gentle balance and deep-core work, adapted for the mid-pregnancy body.',
+      month: 5),
+  // Month 6
+  YogaSession('yg_m6_hips', 'Hips & pelvis opener', '18 min', 'opening',
+      'Gentle openers to ease tightness in the hips and pelvis and make room as baby grows.',
+      month: 6),
+  YogaSession('yg_m6_evening', 'Gentle evening wind-down', '20 min', 'calm',
+      'A soothing sequence to quiet the body and mind before sleep.',
+      month: 6),
+  // Month 7
+  YogaSession('yg_m7_hips', 'Third-trimester hip release', '18 min', 'opening',
+      'Deeper, supported hip openers to ease the tightness that builds in the third trimester.',
+      month: 7),
+  YogaSession('yg_m7_back', 'Lower-back relief', '15 min', 'relief',
+      'Slow, supported movement to unload a tired lower back at the end of the day.',
+      month: 7),
+  YogaSession('yg_m7_breath', 'Breathing for labour', '12 min', 'breath',
+      'Practise the calm, steady breath that will carry you through contractions.',
+      month: 7),
+  // Month 8
+  YogaSession('yg_m8_legsup', 'Legs-up restorative', '10 min', 'restore',
+      'A restful, restorative pose to ease swelling and reset your nervous system.',
+      month: 8),
+  YogaSession('yg_m8_pelvic', 'Pelvic-floor & birth prep', '16 min', 'prepare',
+      'Gentle pelvic-floor awareness and opening to prepare your body for birth.',
+      month: 8),
+  YogaSession('yg_m8_evening', 'Gentle evening wind-down', '20 min', 'calm',
+      'A soothing sequence to quiet the body and mind before sleep.',
+      month: 8),
+  // Month 9
+  YogaSession('yg_m9_positions', 'Labour positions practice', '18 min', 'prepare',
+      'Rehearse the positions and swaying that help labour progress and ease pain.',
+      month: 9),
+  YogaSession('yg_m9_breath', 'Final breathing rehearsal', '12 min', 'breath',
+      'One more calm run-through of the breath that will carry you through the big day.',
+      month: 9),
+  YogaSession('yg_m9_restore', 'Deep rest & restore', '14 min', 'restore',
+      'A soft, restorative close for the final stretch - rest, release, and wait well.',
+      month: 9),
 ];
+
+/// Sessions for a given pregnancy month (1-9).
+List<YogaSession> yogaSessionsForMonth(int month) =>
+    kYogaSessions.where((y) => y.month == month).toList();
 
 // ---- birthing classes -------------------------------------------------------
 class BirthingClass {
@@ -540,3 +627,556 @@ const List<BirthingClass> kBirthingClasses = [
 // ---- helpers used by detail screens -----------------------------------------
 Color chipColorFor(bool coral) => coral ? kCoral : kPurple;
 Color chipBgFor(bool coral) => coral ? kCoralTint : kPanel;
+
+// =============================================================================
+//  Courses & Cohorts - unified "V2" learning model (mirrors the post-pregnancy
+//  merged "Courses & Masterclasses" experience, adapted to pregnancy data + the
+//  mother/purple theme). One `PrepProgram` list folds recorded courses, live
+//  cohorts and masterclasses into a single searchable/filterable catalogue with
+//  a shared rich detail page and business-logic CTA. It reuses the existing
+//  masterclass/cohort content (kMasterclasses / kCohorts) so nothing is
+//  duplicated by hand; the old standalone screens are kept for revert.
+// =============================================================================
+
+// accent palette for program thumbnails/details
+const Color _pViolet = kPurple;
+const Color _pRose = kCoral;
+const Color _pAmber = Color(0xFFC98A2B);
+const Color _pBlue = Color(0xFF3E6DA6);
+const Color _pTeal = Color(0xFF2E8B8B);
+const Color _pPlum = Color(0xFF8E4585);
+
+/// The three kinds a mother can learn from - the merge of the old tabs.
+enum PrepKind { course, cohort, masterclass }
+
+extension PrepKindX on PrepKind {
+  String get label => switch (this) {
+        PrepKind.course => 'Course',
+        PrepKind.cohort => 'Live cohort',
+        PrepKind.masterclass => 'Masterclass',
+      };
+  String get filterLabel => switch (this) {
+        PrepKind.course => 'Courses',
+        PrepKind.cohort => 'Cohorts',
+        PrepKind.masterclass => 'Masterclasses',
+      };
+}
+
+/// Where a program sits in its selling / delivery lifecycle. Drives the CTA.
+enum PrepStatus { reserveOpen, available, ongoing, completed }
+
+/// One self-paced lesson inside a recorded course.
+class PrepLesson {
+  const PrepLesson(this.title, this.minutes, {this.locked = false});
+  final String title;
+  final int minutes;
+  final bool locked;
+}
+
+/// One live block in a schedule (a cohort week / a masterclass evening).
+class PrepSession {
+  const PrepSession({required this.label, required this.title, this.when = '', this.points = const []});
+  final String label; // "Week 1" / "Live evening"
+  final String title;
+  final String when; // "Mon 21 & Thu 24 Jul · 8-9pm"
+  final List<String> points;
+}
+
+class PrepProgram {
+  const PrepProgram({
+    required this.id,
+    required this.kind,
+    required this.instructorName,
+    required this.instructorRole,
+    required this.instructorBio,
+    required this.title,
+    required this.subtitle,
+    required this.topics,
+    required this.accent,
+    required this.price,
+    required this.status,
+    this.priceNote = 'free on ParentVeda+',
+    this.isLiveScheduled = false,
+    this.startLabel,
+    this.sessionTimes = const [],
+    this.sessions = const [],
+    this.seatsLeft,
+    this.lessons = const [],
+    this.durationLabel = '',
+    this.about = '',
+    this.rating = 4.9,
+    this.reviewsLabel = '',
+    this.covers = const [],
+    this.takeaways = const [],
+    this.reviews = const [],
+    this.featured = false,
+    this.recency = 0,
+  });
+
+  final String id;
+  final PrepKind kind;
+  final String instructorName;
+  final String instructorRole;
+  final String instructorBio;
+  final String title;
+  final String subtitle;
+  final List<String> topics;
+  final Color accent;
+  final String price;
+  final String priceNote;
+  final PrepStatus status;
+  final bool isLiveScheduled;
+  final String? startLabel;
+  final List<String> sessionTimes;
+  final List<PrepSession> sessions;
+  final int? seatsLeft;
+  final List<PrepLesson> lessons;
+  final String durationLabel;
+  final String about;
+  final double rating;
+  final String reviewsLabel;
+  final List<String> covers;
+  final List<String> takeaways;
+  final List<Review> reviews;
+  final bool featured;
+  final int recency;
+
+  bool get isCohort => kind == PrepKind.cohort;
+  bool get isLive => kind == PrepKind.cohort || isLiveScheduled;
+
+  String get heroTag {
+    if (kind == PrepKind.cohort) return startLabel ?? 'Live cohort';
+    if (isLiveScheduled) return startLabel ?? 'Live';
+    return durationLabel.isNotEmpty ? durationLabel : 'Recorded';
+  }
+}
+
+/// The resolved primary action for a program, so no screen hand-rolls the rules.
+class PrepCta {
+  const PrepCta(this.label, {this.enabled = true, this.watch = false, this.note});
+  final String label;
+  final bool enabled;
+  final bool watch; // "Watch now" = play flow, not a pay sheet
+  final String? note;
+}
+
+/// The single source of truth for "what button does this program show".
+PrepCta ctaForPrep(PrepProgram p) {
+  switch (p.kind) {
+    case PrepKind.cohort:
+      switch (p.status) {
+        case PrepStatus.reserveOpen:
+          return const PrepCta('Join the next cohort', note: 'Small group · a real coach');
+        case PrepStatus.available:
+          return const PrepCta('Start', note: "You're in - your cohort has begun");
+        case PrepStatus.ongoing:
+          return const PrepCta('Cohort in progress', enabled: false, note: 'This run has started - reserve the next one');
+        case PrepStatus.completed:
+          return const PrepCta('View recordings', watch: true, note: 'Yours to keep');
+      }
+    case PrepKind.masterclass:
+      if (p.isLiveScheduled) {
+        switch (p.status) {
+          case PrepStatus.reserveOpen:
+            return const PrepCta('Reserve a seat', note: 'Live seat - the recording is yours forever');
+          case PrepStatus.available:
+          case PrepStatus.ongoing:
+            return const PrepCta('Join live', note: 'Recording lands in your library');
+          case PrepStatus.completed:
+            return const PrepCta('Buy recorded', note: 'Watch anytime, yours forever');
+        }
+      }
+      switch (p.status) {
+        case PrepStatus.reserveOpen:
+          return const PrepCta('Reserve', note: 'Pre-book before it opens');
+        case PrepStatus.available:
+        case PrepStatus.ongoing:
+        case PrepStatus.completed:
+          return const PrepCta('Buy', note: 'Recording lands in your library');
+      }
+    case PrepKind.course:
+      switch (p.status) {
+        case PrepStatus.reserveOpen:
+          return const PrepCta('Reserve', note: 'Notify me when it opens');
+        case PrepStatus.available:
+        case PrepStatus.ongoing:
+        case PrepStatus.completed:
+          return const PrepCta('Start watching', watch: true, note: 'Free with ParentVeda+ · lifetime access');
+      }
+  }
+}
+
+/// The common topic vocabulary backing the clickable filter chips.
+const List<String> kPrepTopics = [
+  'Birth & Labour',
+  'Breathing',
+  'Nutrition',
+  'Breastfeeding',
+  'Newborn',
+  'Fitness',
+  'Mind & Mood',
+  'First Trimester',
+];
+
+// ---- new recorded courses (authored) ----------------------------------------
+const List<PrepProgram> _kPrepCourses = [
+  PrepProgram(
+    id: 'course_pregnancy_guide',
+    kind: PrepKind.course,
+    instructorName: 'Dr. Ananya Rao',
+    instructorRole: 'Obstetrician · 15 yrs',
+    instructorBio:
+        "Senior obstetrician with 3,000+ deliveries. She scripts and hosts ParentVeda's flagship guide in calm, plain language.",
+    title: 'The Complete Pregnancy Guide',
+    subtitle: 'Week 1 to the first cry - every stage, taught properly, once.',
+    topics: ['First Trimester', 'Birth & Labour', 'Newborn'],
+    accent: _pViolet,
+    price: '₹2,999',
+    status: PrepStatus.available,
+    durationLabel: '80+ lessons',
+    about:
+        'A documentary-style course that unlocks as your pregnancy grows and stays yours for life. You only ever see the lessons for your current stage; earlier and later ones are a tap away. Told through ParentVeda\'s own animated guides, scripted from research and reviewed by obstetricians.',
+    rating: 4.9,
+    reviewsLabel: '1,240 mothers',
+    lessons: [
+      PrepLesson('Your third trimester, week by week', 16),
+      PrepLesson('Reading your body\'s labour signals', 18),
+      PrepLesson('Packing your hospital bag, calmly', 12),
+      PrepLesson('The first 48 hours with baby', 20, locked: true),
+    ],
+    covers: [
+      'A month-by-month map of your whole pregnancy.',
+      'What to expect - and prepare - at each stage.',
+      'The warning signs that genuinely need a call.',
+      'A gentle on-ramp into the newborn weeks.',
+    ],
+    reviews: [
+      Review('Sneha K.', '28 weeks', '"The one place that told me what to actually do, stage by stage."'),
+    ],
+    featured: true,
+    recency: 100,
+  ),
+  PrepProgram(
+    id: 'course_birthprep',
+    kind: PrepKind.course,
+    instructorName: 'Meera Nair',
+    instructorRole: 'Childbirth educator',
+    instructorBio: 'A certified, OB-reviewed childbirth educator who has prepared thousands of mothers for the big day.',
+    title: 'Birth Prep Essentials',
+    subtitle: 'A calm, self-paced walkthrough of everything the big day asks of you.',
+    topics: ['Birth & Labour', 'Breathing'],
+    accent: _pBlue,
+    price: '₹1,499',
+    status: PrepStatus.available,
+    durationLabel: '6 lessons · ~90 min',
+    about:
+        'The self-paced companion to our live Birthing Classes - the stages of labour, breathing and positions, pain-relief options and the golden hour, all in short lessons you can watch and rewatch at your own pace.',
+    rating: 4.8,
+    reviewsLabel: '910 mothers',
+    lessons: [
+      PrepLesson('The stages of labour, demystified', 22),
+      PrepLesson('Breathing & relaxation that works', 18),
+      PrepLesson('Positions & movement for an easier labour', 20),
+      PrepLesson('Pain relief - natural, epidural & C-section', 24, locked: true),
+    ],
+    covers: [
+      'A clear, unhurried picture of each stage of labour.',
+      'Breathing you can actually use through a contraction.',
+      'The honest pros and cons of every pain-relief option.',
+      'What really happens in the golden first hour.',
+    ],
+    recency: 92,
+  ),
+  PrepProgram(
+    id: 'course_trimester_fit',
+    kind: PrepKind.course,
+    instructorName: 'Sana Kapoor',
+    instructorRole: 'Certified prenatal instructor',
+    instructorBio: 'A certified prenatal fitness instructor whose sessions are scaled safely to every trimester.',
+    title: 'Trimester-Safe Fitness',
+    subtitle: 'Feel strong through pregnancy with movement scaled to your stage.',
+    topics: ['Fitness'],
+    accent: _pTeal,
+    price: '₹1,299',
+    status: PrepStatus.available,
+    durationLabel: '5 lessons · ~60 min',
+    about:
+        'A short, practical course on staying safely strong and mobile through pregnancy - what to do, what to skip, and how to scale everything to how you feel that day.',
+    rating: 4.8,
+    reviewsLabel: '540 mothers',
+    lessons: [
+      PrepLesson('Safe strength, trimester by trimester', 14),
+      PrepLesson('Mobility for a changing body', 12),
+      PrepLesson('Core & pelvic floor, done right', 16),
+      PrepLesson('Rest, recovery and warning signs', 10),
+    ],
+    covers: [
+      'What movement is safe - and what to skip - each trimester.',
+      'Core and pelvic-floor work that helps birth and recovery.',
+      'How to scale everything to your energy that day.',
+    ],
+    recency: 84,
+  ),
+];
+
+// ---- per-item mapping meta (topics/accent/status the old models don't carry) -
+const Map<String, ({List<String> topics, Color accent, PrepStatus status, bool live, int recency})> _mcMeta = {
+  'mc_birth': (topics: ['Birth & Labour', 'Breathing'], accent: _pRose, status: PrepStatus.reserveOpen, live: true, recency: 99),
+  'mc_first100': (topics: ['Newborn'], accent: _pAmber, status: PrepStatus.reserveOpen, live: true, recency: 82),
+  'mc_bf': (topics: ['Breastfeeding', 'Newborn'], accent: _pTeal, status: PrepStatus.reserveOpen, live: true, recency: 80),
+  'mc_playbook': (topics: ['First Trimester'], accent: _pViolet, status: PrepStatus.available, live: false, recency: 70),
+};
+
+const Map<String, ({List<String> topics, Color accent, PrepStatus status, int seatsLeft, int recency})> _chMeta = {
+  'ch_birthready': (topics: ['Birth & Labour', 'Breathing'], accent: _pBlue, status: PrepStatus.reserveOpen, seatsLeft: 32, recency: 98),
+  'ch_first_tri': (topics: ['First Trimester'], accent: _pAmber, status: PrepStatus.reserveOpen, seatsLeft: 14, recency: 74),
+  'ch_fit': (topics: ['Fitness'], accent: _pTeal, status: PrepStatus.reserveOpen, seatsLeft: 20, recency: 66),
+  'ch_fourth_tri': (topics: ['Newborn', 'Breastfeeding'], accent: _pPlum, status: PrepStatus.reserveOpen, seatsLeft: 18, recency: 60),
+};
+
+PrepProgram _fromMasterclass(Masterclass m) {
+  final meta = _mcMeta[m.id]!;
+  final coach = m.coaches.isNotEmpty ? m.coaches.first : const Coach('Your expert', 'ParentVeda expert', '');
+  final when = m.facts.length >= 2 ? '${m.facts[1].big} · ${m.facts[1].small}' : null;
+  final duration = m.facts.isNotEmpty ? '${m.facts.first.big} ${m.facts.first.small}' : '';
+  return PrepProgram(
+    id: 'prog_${m.id}',
+    kind: PrepKind.masterclass,
+    instructorName: coach.name,
+    instructorRole: coach.role,
+    instructorBio: coach.bio,
+    title: m.title,
+    subtitle: m.listDesc,
+    topics: meta.topics,
+    accent: meta.accent,
+    price: m.price,
+    status: meta.status,
+    isLiveScheduled: meta.live,
+    startLabel: meta.live && when != null ? 'LIVE · $when' : null,
+    sessionTimes: meta.live && when != null ? [when] : const [],
+    sessions: meta.live
+        ? [
+            PrepSession(
+              label: 'Live evening',
+              title: 'One focused sitting + live Q&A',
+              when: when ?? '',
+              points: m.learn.take(3).toList(),
+            ),
+          ]
+        : const [],
+    durationLabel: duration,
+    about: m.longDesc,
+    rating: 4.9,
+    reviewsLabel: '${(m.testimonials.length + 3) * 210} mothers',
+    covers: m.learn,
+    reviews: m.testimonials.map((t) => Review(t.who, t.when, t.quote)).toList(),
+    featured: m.featured,
+    recency: meta.recency,
+  );
+}
+
+PrepProgram _fromCohort(Cohort c) {
+  final meta = _chMeta[c.id]!;
+  return PrepProgram(
+    id: 'prog_${c.id}',
+    kind: PrepKind.cohort,
+    instructorName: c.coachName ?? 'Your coach',
+    instructorRole: 'Childbirth educator',
+    instructorBio: 'Leads every live session and the private group.',
+    title: c.name,
+    subtitle: c.desc,
+    topics: meta.topics,
+    accent: meta.accent,
+    price: c.price,
+    priceNote: 'or ParentVeda+',
+    status: meta.status,
+    startLabel: c.start ?? c.forWhen,
+    seatsLeft: meta.seatsLeft,
+    sessionTimes: const [],
+    sessions: [
+      for (int i = 0; i < c.schedule.length; i++)
+        PrepSession(label: 'Week ${i + 1}', title: c.schedule[i].replaceFirst(RegExp(r'^Week \d+ · '), '')),
+    ],
+    durationLabel: '${c.duration} · live',
+    about: c.desc,
+    rating: 4.9,
+    reviewsLabel: '${meta.seatsLeft * 20} mothers',
+    covers: c.whatsInside,
+    takeaways: c.whatsInside,
+    reviews: c.reviews,
+    featured: c.featured,
+    recency: meta.recency,
+  );
+}
+
+/// The full unified catalogue, built once from courses + masterclasses + cohorts.
+final List<PrepProgram> kPrepPrograms = <PrepProgram>[
+  ..._kPrepCourses,
+  for (final m in kMasterclasses)
+    if (_mcMeta.containsKey(m.id)) _fromMasterclass(m),
+  for (final c in kCohorts)
+    if (_chMeta.containsKey(c.id)) _fromCohort(c),
+];
+
+/// The catalogue in display order (featured first, then by recency).
+List<PrepProgram> prepCatalogue() {
+  final list = [...kPrepPrograms];
+  list.sort((a, b) {
+    if (a.featured != b.featured) return a.featured ? -1 : 1;
+    return b.recency.compareTo(a.recency);
+  });
+  return list;
+}
+
+/// Filter the catalogue by an optional kind, topic and free-text query.
+List<PrepProgram> filterPrograms({PrepKind? kind, String? topic, String? query}) {
+  final q = (query ?? '').trim().toLowerCase();
+  return prepCatalogue().where((p) {
+    if (kind != null && p.kind != kind) return false;
+    if (topic != null && !p.topics.contains(topic)) return false;
+    if (q.isNotEmpty) {
+      final hay = [p.title, p.subtitle, p.instructorName, ...p.topics].join(' ').toLowerCase();
+      if (!hay.contains(q)) return false;
+    }
+    return true;
+  }).toList();
+}
+
+PrepProgram? programById(String id) {
+  for (final p in kPrepPrograms) {
+    if (p.id == id) return p;
+  }
+  return null;
+}
+
+// =============================================================================
+//  Nutrition funnel - Assessment -> Recommended plans -> Trailer -> Book ->
+//  Expert Consultation -> Personalized Diet Plan. Data for the plan cards and
+//  the assessment options. Real plans/backends don't exist yet, so these are
+//  tasteful placeholders that make the whole click-through work end to end.
+// =============================================================================
+
+/// One assessment answer option (a selectable chip).
+class NutriOption {
+  const NutriOption(this.id, this.label);
+  final String id;
+  final String label;
+}
+
+const List<NutriOption> kNutriTrimesters = [
+  NutriOption('t1', 'First trimester'),
+  NutriOption('t2', 'Second trimester'),
+  NutriOption('t3', 'Third trimester'),
+];
+
+const List<NutriOption> kNutriGoals = [
+  NutriOption('nausea', 'Manage nausea'),
+  NutriOption('gd', 'Gestational diabetes'),
+  NutriOption('weight', 'Healthy weight gain'),
+  NutriOption('energy', 'More energy'),
+  NutriOption('growth', "Baby's growth"),
+];
+
+const List<NutriOption> kNutriDiets = [
+  NutriOption('veg', 'Vegetarian'),
+  NutriOption('nonveg', 'Non-vegetarian'),
+  NutriOption('egg', 'Eggetarian'),
+  NutriOption('vegan', 'Vegan'),
+];
+
+class NutritionPlan {
+  const NutritionPlan({
+    required this.id,
+    required this.name,
+    required this.tagline,
+    required this.forGoals,
+    required this.accent,
+    required this.weeks,
+    required this.highlights,
+    required this.sampleDay,
+    this.price = '₹1,499',
+    this.priceNote = 'free on ParentVeda+',
+  });
+
+  final String id;
+  final String name;
+  final String tagline;
+  final List<String> forGoals; // NutriOption goal ids this plan best suits
+  final Color accent;
+  final String weeks; // "4-week plan"
+  final List<String> highlights;
+  final List<({String meal, String food})> sampleDay;
+  final String price;
+  final String priceNote;
+}
+
+const List<NutritionPlan> kNutritionPlans = [
+  NutritionPlan(
+    id: 'plan_settle',
+    name: 'Settle & Nourish',
+    tagline: 'Gentle, tummy-friendly eating for queasy days.',
+    forGoals: ['nausea', 'energy'],
+    accent: _pAmber,
+    weeks: '4-week plan',
+    highlights: [
+      'Small, frequent meals that calm nausea',
+      'Iron and folate without the heaviness',
+      'Desi swaps for when nothing appeals',
+    ],
+    sampleDay: [
+      (meal: 'Early morning', food: 'Soaked almonds + a dry toast'),
+      (meal: 'Breakfast', food: 'Vegetable poha with lemon'),
+      (meal: 'Lunch', food: 'Khichdi with curd and a little ghee'),
+      (meal: 'Evening', food: 'Coconut water + roasted makhana'),
+      (meal: 'Dinner', food: 'Moong dal, soft rice, steamed veg'),
+    ],
+  ),
+  NutritionPlan(
+    id: 'plan_balance',
+    name: 'Balanced Bump',
+    tagline: 'Steady energy and healthy weight gain, Indian-first.',
+    forGoals: ['weight', 'energy', 'growth'],
+    accent: _pViolet,
+    weeks: '6-week plan',
+    highlights: [
+      'Balanced macros built around Indian meals',
+      'Protein at every meal for baby\'s growth',
+      'Smart snacks that keep energy even',
+    ],
+    sampleDay: [
+      (meal: 'Breakfast', food: 'Besan chilla + curd + fruit'),
+      (meal: 'Mid-morning', food: 'A fruit + a handful of nuts'),
+      (meal: 'Lunch', food: '2 rotis, dal, sabzi, salad, curd'),
+      (meal: 'Evening', food: 'Sprouts chaat or paneer tikka'),
+      (meal: 'Dinner', food: 'Rice/roti, rajma, greens'),
+    ],
+  ),
+  NutritionPlan(
+    id: 'plan_sugar',
+    name: 'Sugar-Smart',
+    tagline: 'Gestational-diabetes-friendly eating that still tastes like home.',
+    forGoals: ['gd', 'weight'],
+    accent: _pTeal,
+    weeks: '8-week plan',
+    highlights: [
+      'Low-GI meals that keep sugars steady',
+      'Portion and pairing rules made simple',
+      'Sweet cravings handled the smart way',
+    ],
+    sampleDay: [
+      (meal: 'Breakfast', food: 'Vegetable oats + boiled egg / paneer'),
+      (meal: 'Mid-morning', food: 'A small guava or apple'),
+      (meal: 'Lunch', food: 'Millet roti, dal, lots of sabzi, salad'),
+      (meal: 'Evening', food: 'Buttermilk + roasted chana'),
+      (meal: 'Dinner', food: 'Grilled paneer/chicken + veg, no rice'),
+    ],
+  ),
+];
+
+/// Recommend plans for the chosen goal (falls back to all). Simple placeholder
+/// scoring - a real engine would weigh trimester, diet and history too.
+List<NutritionPlan> recommendPlans({String? goalId}) {
+  if (goalId == null) return kNutritionPlans;
+  final matched = kNutritionPlans.where((p) => p.forGoals.contains(goalId)).toList();
+  return matched.isEmpty ? kNutritionPlans : matched;
+}

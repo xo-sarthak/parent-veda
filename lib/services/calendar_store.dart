@@ -15,10 +15,12 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/journey_milestones.dart';
+import '../data/prepare_data.dart';
 import '../localization/app_language.dart';
 import '../models/calendar_event.dart';
 import '../models/journey_node.dart';
 import 'journal_store.dart';
+import 'prepare_store.dart';
 import 'pregnancy_controller.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
@@ -229,6 +231,58 @@ class CalendarStore extends ChangeNotifier {
         category: CalEventCategory.personal,
         date: e.date,
         status: _dateStatus(e.date, today),
+        isSystemGenerated: false,
+      ));
+    }
+
+    // --- Programs (ENROLLED Prepare programs) → "Program" lane ---------------
+    //  Enrolled cohorts, 1:1 consultations (incl. nutrition) and the birthing
+    //  course, sourced from PrepareStore's booked ids and cross-referenced with
+    //  the Prepare catalogs (kCohorts / kSpecialists).
+    //
+    //  TODO(programs): PrepareStore persists only the enrolled *id*, not a real
+    //    schedule DateTime - so each program event is anchored to `today` (the
+    //    enrolment is active "now") and its human schedule label rides in the
+    //    description. When the commerce/backend stores a real start/session date
+    //    per booking, use that here instead of `today`. Prenatal Yoga has no
+    //    enrolment hook yet, so it contributes nothing until one exists.
+    final prep = PrepareStore.instance;
+    for (final c in kCohorts) {
+      if (!prep.isBooked(c.id)) continue;
+      final desc = (c.start != null && c.start!.trim().isNotEmpty)
+          ? '${c.duration} · ${c.start}'
+          : c.duration;
+      out.add(CalendarEvent(
+        id: 'cp_${c.id}',
+        title: c.name,
+        description: desc,
+        category: CalEventCategory.program,
+        date: today,
+        status: CalEventStatus.current,
+        isSystemGenerated: false,
+      ));
+    }
+    for (final sp in kSpecialists) {
+      if (!prep.isBooked(sp.id)) continue;
+      out.add(CalendarEvent(
+        id: 'cp_${sp.id}',
+        title: '${sp.role} · ${sp.name}',
+        description: '30-min video consultation',
+        category: CalEventCategory.program,
+        date: today,
+        status: CalEventStatus.current,
+        isSystemGenerated: false,
+      ));
+    }
+    // The birthing course is a single-id enrolment (see BirthingClassesScreen).
+    if (prep.isBooked('course_birthing')) {
+      out.add(CalendarEvent(
+        id: 'cp_course_birthing',
+        title: 'Complete Birthing Course',
+        description: '6 classes · self-paced + monthly live Q&A',
+        category: CalEventCategory.program,
+        date: today,
+        status: CalEventStatus.current,
         isSystemGenerated: false,
       ));
     }

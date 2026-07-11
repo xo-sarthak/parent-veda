@@ -1500,15 +1500,15 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   ),
 
   // ===========================================================================
-  //  OTHERS - Jainism & Buddhism
+  //  JAINISM  (split out of the former combined "Others" tradition)
   // ===========================================================================
   SpiritualTradition(
-    id: 'others',
-    name: 'Others',
-    symbol: '🪷',
-    blurb: 'Gentle reflections from Jainism and Buddhism.',
+    id: 'jain',
+    name: 'Jainism',
+    symbol: '🤲',
+    blurb: 'Ahimsa, gentleness and a calm, reflective heart.',
     sections: [
-      SpiritualSection(title: 'Jainism · Ahimsa & compassion', reads: [
+      SpiritualSection(title: 'Ahimsa & compassion', reads: [
         SpiritualRead(
             title: 'Gentleness toward all life',
             body:
@@ -1590,7 +1590,7 @@ const List<SpiritualTradition> kSpiritualTraditions = [
             body:
                 "Compassion is treated as a daily practice, returned to again and again. Each small kind choice strengthens it, and your child will feel that warmth."),
       ]),
-      SpiritualSection(title: 'Jainism · Calm reflections', reads: [
+      SpiritualSection(title: 'Calm reflections', reads: [
         SpiritualRead(
             title: 'Letting go lightly',
             body:
@@ -1672,7 +1672,19 @@ const List<SpiritualTradition> kSpiritualTraditions = [
             body:
                 "A settled heart is treated as the ground of a good life. Tending yours is among the kindest things you can do for your baby."),
       ]),
-      SpiritualSection(title: 'Buddhism · Mindfulness & calm', reads: [
+    ],
+  ),
+
+  // ===========================================================================
+  //  BUDDHISM  (split out of the former combined "Others" tradition)
+  // ===========================================================================
+  SpiritualTradition(
+    id: 'buddhist',
+    name: 'Buddhism',
+    symbol: '☸️',
+    blurb: 'Mindfulness, loving-kindness and gentle calm.',
+    sections: [
+      SpiritualSection(title: 'Mindfulness & calm', reads: [
         SpiritualRead(
             title: 'One breath at a time',
             body:
@@ -1754,7 +1766,7 @@ const List<SpiritualTradition> kSpiritualTraditions = [
             body:
                 "When the mind is busy, the breath is a quiet place to rest. A few slow breaths can settle a whole afternoon."),
       ]),
-      SpiritualSection(title: 'Buddhism · Loving-kindness', reads: [
+      SpiritualSection(title: 'Loving-kindness', reads: [
         SpiritualRead(
             title: 'Wishing yourself well',
             body:
@@ -1836,7 +1848,7 @@ const List<SpiritualTradition> kSpiritualTraditions = [
             body:
                 "Starting the day with one warm wish sets a gentle tone. A single kind thought, offered sincerely, is enough."),
       ]),
-      SpiritualSection(title: 'Buddhism · Stories, simply retold', reads: [
+      SpiritualSection(title: 'Stories, simply retold', reads: [
         SpiritualRead(
             title: 'The middle path',
             body:
@@ -1917,6 +1929,45 @@ const List<SpiritualTradition> kSpiritualTraditions = [
             title: 'Footprints on water',
             body:
                 "One reflection notes that troubles, like footprints on water, can close over and fade. Many of today's worries will quietly smooth away in time."),
+      ]),
+    ],
+  ),
+
+  // ===========================================================================
+  //  OTHERS - universal reflections that belong to no single tradition.
+  //  TODO: expand - seeded lightly; add more universal reflections over time.
+  // ===========================================================================
+  SpiritualTradition(
+    id: 'others',
+    name: 'Others',
+    symbol: '🕊️',
+    blurb: 'Universal, gentle reflections beyond any one tradition.',
+    sections: [
+      SpiritualSection(title: 'Calm for everyone', reads: [
+        SpiritualRead(
+            title: 'A quiet worth all its own',
+            body:
+                "Whatever you believe, or if you hold no faith at all, a few still minutes are their own gentle gift. Peace does not require a tradition; it only asks for a pause."),
+        SpiritualRead(
+            title: 'Kindness needs no label',
+            body:
+                "The wish to be gentle with yourself and your baby belongs to everyone. You can offer it freely, in your own words, without borrowing anyone's language."),
+        SpiritualRead(
+            title: 'Gratitude, plainly felt',
+            body:
+                "Noticing one good thing in a day is a comfort available to anyone. A warm cup, a small kick, a soft light: these are enough to be thankful for."),
+        SpiritualRead(
+            title: 'Held by the ordinary',
+            body:
+                "Sometimes steadiness comes not from anything grand but from the plain, reliable rhythm of a day. Let the ordinary hold you when the big questions feel heavy."),
+        SpiritualRead(
+            title: 'Your own gentle ritual',
+            body:
+                "You are free to make a small ritual entirely your own, a candle, a breath, a hand on your bump. What matters is the care you put into it, not where it came from."),
+        SpiritualRead(
+            title: 'Breathing is universal',
+            body:
+                "Across every tradition and none, the slow breath calms the body the same way. A few long, even breaths are a practice anyone can keep, anywhere."),
       ]),
     ],
   ),

@@ -10,9 +10,14 @@ import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 
 class ConsultationDetailScreen extends StatefulWidget {
-  const ConsultationDetailScreen({super.key, required this.specialist});
+  const ConsultationDetailScreen({super.key, required this.specialist, this.onBooked});
 
   final Specialist specialist;
+
+  /// Optional: when set, runs after a successful booking (once the confirmation
+  /// sheet is dismissed). The Nutrition funnel uses this to flow on from the
+  /// expert consult to the personalized diet plan.
+  final VoidCallback? onBooked;
 
   @override
   State<ConsultationDetailScreen> createState() => _ConsultationDetailScreenState();
@@ -128,6 +133,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
               whenLabel: 'Today, 8 Jul · ${s.slots[_slot]}',
               heading: 'Confirm your consult',
               cta: 'Confirm booking',
+              onConfirmed: widget.onBooked,
             ),
           ),
         ),

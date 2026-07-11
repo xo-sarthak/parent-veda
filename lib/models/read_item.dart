@@ -29,6 +29,17 @@ class ReadItem {
     this.why = '',
     this.rating = 0.0,
     this.ratingCount = 0,
+    // ---- Learn V2 reader blocks (additive, optional) --------------------
+    // Distinct, styled sections in the premium reader. Left empty here => the
+    // reader simply omits the block. All optional so every existing consumer
+    // (home DailyReadsHomeCard, father daily screen) keeps compiling unchanged.
+    this.whyThisMatters = '',
+    this.researchSimplified = '',
+    this.myth = '',
+    this.fact = '',
+    // Optional store link for a book summary's "Buy Book" CTA. Empty => the CTA
+    // falls back to a web search for the title + author.
+    this.buyUrl = '',
   });
 
   final String id;
@@ -52,7 +63,26 @@ class ReadItem {
   final double rating; // reader rating out of 5 (books)
   final int ratingCount; // number of ratings
 
+  // ---- Learn V2 reader blocks (optional, default empty) -------------------
+  /// "Why This Matters" - a deeper, styled block on the meaning/impact for
+  /// mother & baby (distinct from [reason], which is the week-timing hook).
+  final String whyThisMatters;
+
+  /// "Research Simplified" - the evidence, in plain, reassuring language.
+  final String researchSimplified;
+
+  /// Optional myth-vs-fact pair. Both must be non-empty for the block to show.
+  final String myth;
+  final String fact;
+
+  /// Optional purchase link for book summaries ("Buy Book").
+  final String buyUrl;
+
   bool relevantAt(int week) => week >= weekStart && week <= weekEnd;
   bool get isHigh => priority == 'high';
   bool get hasRating => rating > 0;
+
+  bool get hasWhyThisMatters => whyThisMatters.trim().isNotEmpty;
+  bool get hasResearchSimplified => researchSimplified.trim().isNotEmpty;
+  bool get hasMythFact => myth.trim().isNotEmpty && fact.trim().isNotEmpty;
 }

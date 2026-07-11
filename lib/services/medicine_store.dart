@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/medication.dart';
+import 'notification_service.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
@@ -46,6 +47,11 @@ class MedicineStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+
+    // Re-arm medication alarms over the rolling horizon (best-effort).
+    try {
+      await NotificationService.instance.syncMedicationAlarms(_meds);
+    } catch (_) {/* notifications not ready - alarms arm on next add/edit */}
 
     // 2) Then sync with the cloud (no-op if logged out).
     await _syncFromCloud();
@@ -169,6 +175,9 @@ class MedicineStore extends ChangeNotifier {
     _meds.add(m);
     notifyListeners();
     await _persistMeds();
+    try {
+      await NotificationService.instance.scheduleMedicationAlarms(m);
+    } catch (_) {}
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.insert('medications', _toMedRow(m));
@@ -182,6 +191,10 @@ class MedicineStore extends ChangeNotifier {
     _meds[i] = m;
     notifyListeners();
     await _persistMeds();
+    try {
+      // scheduleMedicationAlarms cancels then reschedules from scratch.
+      await NotificationService.instance.scheduleMedicationAlarms(m);
+    } catch (_) {}
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.upsert('medications', _toMedRow(m), onConflict: 'id');
@@ -195,6 +208,9 @@ class MedicineStore extends ChangeNotifier {
     notifyListeners();
     await _persistMeds();
     await _persistLogs();
+    try {
+      await NotificationService.instance.cancelMedicationAlarms(id);
+    } catch (_) {}
     if (SupabaseRepo.isLoggedIn) {
       try {
         await SupabaseRepo.delete('medications', id);

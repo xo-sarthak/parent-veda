@@ -303,6 +303,15 @@ class _Dashboard extends StatelessWidget {
                 ]),
         ),
         const SizedBox(height: 14),
+        // Weight gain (calm - small, not celebrated). Moved to sit directly
+        // above the "Your Body Supporting" card so the gain number is read
+        // alongside its reassurance (the two are kept adjacent).
+        if (gain != null)
+          _card(context, title: s.weightGainSince, child: Text(
+            '${gain >= 0 ? '+' : ''}${gain.toStringAsFixed(1)} ${s.kgUnit}',
+            style: text.titleLarge?.copyWith(color: AppTheme.neutral700),
+          )),
+        if (gain != null) const SizedBox(height: 14),
         // Supportive insight.
         _card(context, title: s.bodySupportingTitle, child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,13 +325,6 @@ class _Dashboard extends StatelessWidget {
           ],
         )),
         const SizedBox(height: 14),
-        // Weight gain (calm - small, not celebrated).
-        if (gain != null)
-          _card(context, title: s.weightGainSince, child: Text(
-            '${gain >= 0 ? '+' : ''}${gain.toStringAsFixed(1)} ${s.kgUnit}',
-            style: text.titleLarge?.copyWith(color: AppTheme.neutral700),
-          )),
-        if (gain != null) const SizedBox(height: 14),
         // Where weight comes from.
         _card(context, title: s.whereWeightComesFrom, child: _contributorsView(
           context, _contributors(week), s, text,
@@ -344,12 +346,15 @@ class _Dashboard extends StatelessWidget {
         _card(context, title: s.thisWeekLabel,
             child: Text(s.weeklyWeightInsight(week), style: text.bodyLarge)),
         const SizedBox(height: 14),
-        // Chart.
-        if (entries.isNotEmpty)
-          _card(context, title: s.weightChartTitle, child: _ChartView(
-            controller: controller,
-          )),
-        if (entries.isNotEmpty) const SizedBox(height: 14),
+        // Chart REMOVED per request - the plotted weight graph is hidden.
+        // Commented out (not deleted) so it can be reverted. The _ChartView /
+        // _WeightChartPainter classes below are also commented out to avoid
+        // unused-element warnings.
+        // if (entries.isNotEmpty)
+        //   _card(context, title: s.weightChartTitle, child: _ChartView(
+        //     controller: controller,
+        //   )),
+        // if (entries.isNotEmpty) const SizedBox(height: 14),
         // History - every entry, with column headings.
         if (entries.isNotEmpty)
           _card(context, title: s.weightHistoryTitle, child: Column(
@@ -672,8 +677,12 @@ Future<void> showAddWeight(
 
 // ---------------------------------------------------------------------------
 //  Weight chart: actual line (by date) over a soft recommended-range band.
+//  COMMENTED OUT per request - the plotted chart was removed from the dashboard.
+//  Kept here (not deleted) so it can be reverted; wrapped in a block comment so
+//  the unused classes don't trigger analyzer warnings.
 // ---------------------------------------------------------------------------
 
+/*
 class _ChartView extends StatelessWidget {
   const _ChartView({required this.controller});
   final PregnancyController controller;
@@ -811,3 +820,4 @@ class _WeightChartPainter extends CustomPainter {
       old.gainMin != gainMin ||
       old.gainMax != gainMax;
 }
+*/

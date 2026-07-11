@@ -24,7 +24,9 @@ import 'journal_screen.dart';
 import 'journey_map_screen.dart';
 import 'read_next_screen.dart';
 import 'reminders_screen.dart';
-import 'report_screen.dart';
+// Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
+// Kept commented for revert.
+// import 'report_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
@@ -33,8 +35,11 @@ import 'tools/hospital_bag_screen.dart';
 import 'tools/kegel_care_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 import 'tools/product_checklist_screen.dart';
-import 'tools/scans_appointments_screen.dart';
+// Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
+// commented for revert.
+// import 'tools/scans_appointments_screen.dart';
 import 'tools/spiritual_reading_screen.dart';
+import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
 import 'tools/weight_tracker_screen.dart';
 
@@ -92,14 +97,19 @@ class ToolsHubScreen extends StatelessWidget {
       _Tool(s.rmdTitle, Icons.notifications_active_rounded,
           const Color(0xFFE0921C),
           () => open(() => RemindersScreen(controller: controller))),
-      _Tool(s.rTitle, Icons.description_rounded, AppTheme.primary500,
-          () => open(() => ReportScreen(controller: controller))),
+      // Merged "Tests, Scans & Reports" (Section 16) replaces both the old
+      // "Understanding Your Report" and "Scans & Care" tiles.
+      _Tool(s.tsrTitle, Icons.fact_check_rounded, AppTheme.primary500,
+          () => open(() => TestsScansReportsScreen(controller: controller))),
+      // _Tool(s.rTitle, Icons.description_rounded, AppTheme.primary500,
+      //     () => open(() => ReportScreen(controller: controller))),
       _Tool(s.toolCanI, Icons.help_outline_rounded, AppTheme.secondary600,
           () => open(() => CanIScreen(controller: controller))),
       _Tool(s.symToolTitle, Icons.healing_rounded, const Color(0xFF4A7BC8),
           () => open(() => SymptomCompanionScreen(controller: controller))),
-      _Tool(s.scnToolTitle, Icons.event_note_rounded, const Color(0xFF2E9C8E),
-          () => open(() => ScansAppointmentsScreen(controller: controller))),
+      // Merged into "Tests, Scans & Reports" above. Kept commented for revert.
+      // _Tool(s.scnToolTitle, Icons.event_note_rounded, const Color(0xFF2E9C8E),
+      //     () => open(() => ScansAppointmentsScreen(controller: controller))),
       _Tool(s.ddcToolTitle, Icons.calendar_month_rounded, AppTheme.primary500,
           () => open(() => DueDateCalculatorScreen(controller: controller))),
       _Tool(s.vedaToolTitle, Icons.auto_awesome_rounded, AppTheme.primary600,

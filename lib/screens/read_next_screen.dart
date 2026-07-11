@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../data/read_next_data.dart';
 import '../localization/app_language.dart';
@@ -17,6 +18,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
+import 'read_reader_screen.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _gold = Color(0xFFE6A817);
@@ -25,8 +27,14 @@ const Color _green = Color(0xFF3FA56A);
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
 
+// Every read card now opens the premium "Learn V2" reader (progress bar, table
+// of contents, font-size + light/sepia/dark modes, Why-This-Matters + Research-
+// Simplified blocks, read-next chain). The old plain reader (ReadItemScreen,
+// below) is kept for reference / revert but no longer wired.
 void _openItem(BuildContext c, ReadItem item, PregnancyController ctrl) =>
-    _push(c, ReadItemScreen(item: item, controller: ctrl));
+    _push(c, ReadReaderScreen(item: item, controller: ctrl));
+// void _openItem(BuildContext c, ReadItem item, PregnancyController ctrl) =>
+//     _push(c, ReadItemScreen(item: item, controller: ctrl));
 
 Color _statusColor(String status) {
   switch (status) {
@@ -762,8 +770,11 @@ class DailyReadsHomeCard extends StatelessWidget {
     final week = controller.currentWeek;
     final day = controller.currentDay;
     final articles = dailyArticleReads(week, day);
+    final research = dailyResearchReads(day);
     final books = dailyBookReads(day);
-    if (articles.isEmpty && books.isEmpty) return const SizedBox.shrink();
+    if (articles.isEmpty && research.isEmpty && books.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -812,7 +823,25 @@ class DailyReadsHomeCard extends StatelessWidget {
             ],
           ),
         ),
-        // Books.
+        // Research Summaries.
+        if (research.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
+            child: _groupLabel(s.drResearch),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Column(
+              children: [
+                for (var i = 0; i < research.length; i++)
+                  _row(context, research[i],
+                      divider: i != research.length - 1),
+              ],
+            ),
+          ),
+        ],
+        // Book Summaries.
         if (books.isNotEmpty) ...[
           const SizedBox(height: 6),
           Padding(
@@ -940,8 +969,66 @@ class DailyReadsHomeCard extends StatelessWidget {
           _SaveHeart(id: r.id),
         ]),
       ),
+      // Book summaries get "Read summary" + "Buy Book" actions.
+      if (isBook) _bookActions(context, r),
       if (divider) const Divider(height: 1, color: AppTheme.outlineVariant),
     ]);
+  }
+
+  // Read-summary + Buy-Book actions shown under a book-summary row.
+  Widget _bookActions(BuildContext context, ReadItem r) {
+    final s = S(lang);
+    return Padding(
+      padding: const EdgeInsets.only(left: 66, bottom: 12),
+      child: Row(children: [
+        _miniBtn(Icons.menu_book_rounded, s.drReadSummary, filled: false,
+            () => _openItem(context, r, controller)),
+        const SizedBox(width: 8),
+        _miniBtn(Icons.shopping_bag_rounded, s.drBuyBook, filled: true,
+            () => _openBuy(context, r)),
+      ]),
+    );
+  }
+
+  Widget _miniBtn(IconData icon, String label, VoidCallback onTap,
+          {bool filled = false}) =>
+      Material(
+        color: filled ? _accent : AppTheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon,
+                  size: 15,
+                  color: filled ? Colors.white : AppTheme.primary700),
+              const SizedBox(width: 6),
+              Text(label,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: filled ? Colors.white : AppTheme.primary700)),
+            ]),
+          ),
+        ),
+      );
+
+  Future<void> _openBuy(BuildContext context, ReadItem r) async {
+    final query = Uri.encodeComponent(
+        '${r.title} ${r.author} book buy'.trim());
+    final url = r.buyUrl.trim().isNotEmpty
+        ? r.buyUrl.trim()
+        : 'https://www.google.com/search?q=$query';
+    final uri = Uri.parse(url);
+    final ok = await canLaunchUrl(uri);
+    if (ok) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(r.title)));
+    }
   }
 }
 

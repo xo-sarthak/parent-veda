@@ -13,11 +13,12 @@ import '../theme/app_theme.dart';
 
 enum CalEventCategory {
   milestone, // purple - pregnancy/system milestones
-  medical, // blue - scans, tests, vaccinations
+  medical, // blue - scans, tests, vaccinations (shown as "Tests & Scans")
   appointment, // green - doctor appointments
   journal, // pink - memories, photos, weight, kicks
   personal, // grey - mother-added events
   parentveda, // gold - feature unlocks, "days together"
+  program, // teal - enrolled Prepare programs (yoga, cohorts, consults, classes)
 }
 
 enum CalEventStatus { completed, current, upcoming }
@@ -84,6 +85,7 @@ const Color _cGreen = Color(0xFF4F7A52);
 const Color _cPink = Color(0xFFFF5A79);
 const Color _cGold = Color(0xFFE0921C);
 const Color _cGrey = Color(0xFF8A8590);
+const Color _cTeal = Color(0xFF2E9E9E);
 
 const Map<CalEventCategory, CalMeta> kCalMeta = {
   CalEventCategory.milestone:
@@ -94,6 +96,7 @@ const Map<CalEventCategory, CalMeta> kCalMeta = {
   CalEventCategory.journal: CalMeta(_cPink, Icons.auto_stories_rounded),
   CalEventCategory.personal: CalMeta(_cGrey, Icons.push_pin_rounded),
   CalEventCategory.parentveda: CalMeta(_cGold, Icons.spa_rounded),
+  CalEventCategory.program: CalMeta(_cTeal, Icons.school_rounded),
 };
 
 CalMeta calMeta(CalEventCategory c) =>

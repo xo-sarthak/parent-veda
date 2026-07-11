@@ -431,3 +431,54 @@ GarbhPractice kriyaForDay(int day) => kKriya[_dayIdx(day, kKriya.length)];
 /// A different nourishment focus each day.
 GarbhNutrition nutritionForDay(int day) =>
     _nutrition[_dayIdx(day, _nutrition.length)];
+
+// ===========================================================================
+//  v2.1 - Shravan month view + raga time-of-day badges (ADDITIVE)
+// -----------------------------------------------------------------------------
+//  The Shravan library is now browsed month-by-month (Month 1-9) instead of all
+//  at once. kShravan items are NOT month-tagged, so we distribute the library
+//  across the 9 pregnancy months here. Backward-compatible: kShravan, the daily
+//  pickers and lookups above are untouched.
+// ===========================================================================
+
+/// Which pregnancy month (1-9) a given [week] falls in. 40 weeks over 9 months
+/// (~4.4 weeks each), clamped to 1..9.
+int garbhMonth(int week) =>
+    ((week - 1) / 4.4).floor().clamp(0, 8) + 1;
+
+/// TODO: approximation - real per-month audio curation not yet available, so the
+/// existing 10 kShravan items are hand-distributed across the 9 months (some
+/// months share popular ragas). Replace with month-specific recordings later.
+const Map<int, List<String>> kShravanMonthIds = {
+  1: ['morning_raga', 'relax_raga'],
+  2: ['bonding_raga', 'forest'],
+  3: ['evening_raga', 'bells'],
+  4: ['relax_raga', 'rain'],
+  5: ['bonding_raga', 'ocean'],
+  6: ['morning_raga', 'forest', 'bells'],
+  7: ['sleep_raga', 'rain'],
+  8: ['evening_raga', 'bodyscan'],
+  9: ['sleep_raga', 'ocean', 'bodyscan'],
+};
+
+/// The listening sessions curated for pregnancy [month] (1-9).
+List<GarbhAudio> shravanForMonth(int month) {
+  final ids = kShravanMonthIds[month.clamp(1, 9)] ?? const <String>[];
+  return [for (final id in ids) shravanById(id)]
+      .whereType<GarbhAudio>()
+      .toList();
+}
+
+/// A gentle time-of-day badge for a listening item, derived from its existing
+/// title/subtitle/id hints. Falls back to 'Morning'. Returns 'Morning' or
+/// 'Evening' (English; the UI supplies its own bilingual label if needed).
+String ragaTimeBadge(GarbhAudio a) {
+  final hint = '${a.id} ${a.title} ${a.subtitle}'.toLowerCase();
+  const eveningHints = [
+    'evening', 'sleep', 'night', 'moon', 'unwind', 'rest', 'ocean', 'rain'
+  ];
+  for (final h in eveningHints) {
+    if (hint.contains(h)) return 'Evening';
+  }
+  return 'Morning';
+}

@@ -12,6 +12,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -219,7 +220,9 @@ class _EngageButton extends StatelessWidget {
 void _showPostMenu(BuildContext context, S s, CommunityPost post) {
   final ef = ExpertFollowStore.instance;
   final store = CommunityStore.instance;
-  final expert = _isExpertAuthor(post);
+  // Follow is now offered for ANY author (expert or member) - just not the
+  // user's own posts.
+  final canFollow = !post.isUser;
   final handle = '@${_handle(post.author)}';
   void done(String m) {
     Navigator.of(context).pop();
@@ -241,7 +244,7 @@ void _showPostMenu(BuildContext context, S s, CommunityPost post) {
                 color: AppTheme.outlineVariant,
                 borderRadius: BorderRadius.circular(2))),
         const SizedBox(height: 6),
-        if (expert)
+        if (canFollow)
           AnimatedBuilder(
             animation: ef,
             builder: (_, _) {
@@ -594,6 +597,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Expert (doctor-mode) filter: show only posts that asked to be verified.
   // Works in BOTH For You and Following so an expert can triage requests fast.
   bool _needsVerifyOnly = false;
+  // "Experts only" filter: show only posts authored by verified experts. Works
+  // in both For You and Following. Available to everyone (not just doctor mode).
+  bool _expertsOnly = false;
   // Community Pulse removed per request - fields kept commented for revert.
   // final PageController _pulseCtrl = PageController(viewportFraction: 0.84);
   // int _pulsePage = 0;
@@ -785,6 +791,41 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
+  /// "Experts only" filter chip. Tapping narrows the current feed to posts
+  /// authored by verified experts (available to every viewer).
+  Widget _expertsOnlyChip(S s) {
+    final on = _expertsOnly;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: GestureDetector(
+          onTap: () => setState(() => _expertsOnly = !_expertsOnly),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+            decoration: BoxDecoration(
+              color: on ? _proPurple : _proPurple.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                  color: _proPurple.withValues(alpha: on ? 0 : 0.3)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(on ? Icons.verified_rounded : Icons.verified_outlined,
+                  size: 15, color: on ? Colors.white : _proPurpleDeep),
+              const SizedBox(width: 6),
+              Text(s.cmExpertsOnly,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: on ? Colors.white : _proPurpleDeep)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Expert-only "Needs verification" filter chip (doctor mode). Tapping narrows
   /// the current feed to posts whose authors asked an expert to verify them.
   Widget _verifyFilterChip(S s) {
@@ -868,6 +909,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         ef.isFollowing(p.author))
                     : store.feed())
                 .where((p) => !store.isHidden(p.id))
+                // "Experts only" filter: keep just posts by verified experts.
+                .where((p) => !_expertsOnly || _isExpertAuthor(p))
                 // Expert "needs verification" filter (doctor mode only): keep just
                 // the posts that requested a verification and aren't verified yet.
                 .where((p) => !_needsVerifyOnly ||
@@ -1052,6 +1095,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 const SizedBox(height: 8),
                 // Feed tabs + feed
                 _feedTabs(s),
+                // Experts-only filter - available to every viewer.
+                _expertsOnlyChip(s),
                 // Expert triage filter - only while viewing as a doctor.
                 if (store.doctorMode) _verifyFilterChip(s),
                 const SizedBox(height: 8),
@@ -1671,14 +1716,15 @@ class CommunityPostCard extends StatelessWidget {
                                   fontSize: 11.5, color: AppTheme.neutral400)),
                         ),
                       const SizedBox(height: 6),
-                      // body
-                      Text(post.text,
-                          maxLines: detailed ? null : 6,
-                          overflow: detailed
-                              ? TextOverflow.visible
-                              : TextOverflow.ellipsis,
-                          style: text.bodyMedium?.copyWith(
-                              height: 1.45, fontSize: 14.5, color: _proInk)),
+                      // body - #hashtags are tappable (open a hashtag feed)
+                      _PostBodyText(
+                        text: post.text,
+                        controller: controller,
+                        lang: lang,
+                        detailed: detailed,
+                        baseStyle: text.bodyMedium?.copyWith(
+                            height: 1.45, fontSize: 14.5, color: _proInk),
+                      ),
                       if (post.imageUrls.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         _PostPhotos(paths: post.imageUrls),
@@ -1703,11 +1749,18 @@ class CommunityPostCard extends StatelessWidget {
                         const SizedBox(height: 10),
                         Wrap(spacing: 8, runSpacing: 4, children: [
                           for (final t in post.topics)
-                            Text('#${t.replaceAll(' ', '')}',
-                                style: GoogleFonts.manrope(
-                                    fontSize: 12.5,
-                                    color: _proPurpleDeep,
-                                    fontWeight: FontWeight.w600)),
+                            GestureDetector(
+                              onTap: () => _push(
+                                  context,
+                                  HashtagFeedScreen(
+                                      tag: t.replaceAll(' ', ''),
+                                      controller: controller)),
+                              child: Text('#${t.replaceAll(' ', '')}',
+                                  style: GoogleFonts.manrope(
+                                      fontSize: 12.5,
+                                      color: _proPurpleDeep,
+                                      fontWeight: FontWeight.w600)),
+                            ),
                         ]),
                       ],
                       const SizedBox(height: 10),
@@ -1792,6 +1845,138 @@ class CommunityPostCard extends StatelessWidget {
         ),
         const Divider(height: 1, thickness: 1, color: Color(0x12512D77)),
       ]),
+    );
+  }
+}
+
+/// Matches `#word` tokens (letters, digits, underscore) in post bodies.
+final RegExp _hashtagRe = RegExp(r'#(\w+)');
+
+/// Renders a post body with tappable #hashtags (X/Twitter-style): each hashtag
+/// is drawn in the brand purple and opens a [HashtagFeedScreen] on tap. A
+/// StatefulWidget so the [TapGestureRecognizer]s can be disposed (rebuilt each
+/// build - the previous frame's recognizers are torn down first).
+class _PostBodyText extends StatefulWidget {
+  const _PostBodyText({
+    required this.text,
+    required this.controller,
+    required this.lang,
+    required this.detailed,
+    required this.baseStyle,
+  });
+  final String text;
+  final PregnancyController controller;
+  final AppLanguage lang;
+  final bool detailed;
+  final TextStyle? baseStyle;
+
+  @override
+  State<_PostBodyText> createState() => _PostBodyTextState();
+}
+
+class _PostBodyTextState extends State<_PostBodyText> {
+  final List<TapGestureRecognizer> _recognizers = [];
+
+  void _disposeRecognizers() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
+
+  @override
+  void dispose() {
+    _disposeRecognizers();
+    super.dispose();
+  }
+
+  void _openHashtag(String tag) => _push(
+      context,
+      HashtagFeedScreen(tag: tag, controller: widget.controller));
+
+  @override
+  Widget build(BuildContext context) {
+    // Fresh recognizers each build; tear down the previous frame's first.
+    _disposeRecognizers();
+    final base = widget.baseStyle;
+    final linkStyle = (base ?? const TextStyle()).copyWith(
+        color: _proPurpleDeep, fontWeight: FontWeight.w700);
+
+    final spans = <InlineSpan>[];
+    var last = 0;
+    for (final m in _hashtagRe.allMatches(widget.text)) {
+      if (m.start > last) {
+        spans.add(TextSpan(text: widget.text.substring(last, m.start)));
+      }
+      final tag = m.group(1)!; // without the leading '#'
+      final rec = TapGestureRecognizer()..onTap = () => _openHashtag(tag);
+      _recognizers.add(rec);
+      spans.add(TextSpan(text: '#$tag', style: linkStyle, recognizer: rec));
+      last = m.end;
+    }
+    if (last < widget.text.length) {
+      spans.add(TextSpan(text: widget.text.substring(last)));
+    }
+
+    return Text.rich(
+      TextSpan(style: base, children: spans),
+      maxLines: widget.detailed ? null : 6,
+      overflow:
+          widget.detailed ? TextOverflow.visible : TextOverflow.ellipsis,
+    );
+  }
+}
+
+// ===========================================================================
+//  Hashtag feed - all posts containing a given #tag (X/Twitter-style)
+// ===========================================================================
+
+class HashtagFeedScreen extends StatelessWidget {
+  const HashtagFeedScreen(
+      {super.key, required this.tag, required this.controller});
+  final String tag; // without the leading '#'
+  final PregnancyController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = controller.language;
+    final s = S(lang);
+    final tagLower = tag.toLowerCase();
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(title: Text('#$tag')),
+      body: AnimatedBuilder(
+        animation: CommunityStore.instance,
+        builder: (context, _) {
+          final store = CommunityStore.instance;
+          // Match on the body text (#tag) OR the post's topic tags.
+          final posts = store.feed().where((p) {
+            final inText = _hashtagRe
+                .allMatches(p.text)
+                .any((m) => m.group(1)!.toLowerCase() == tagLower);
+            final inTopics = p.topics
+                .any((t) => t.replaceAll(' ', '').toLowerCase() == tagLower);
+            return inText || inTopics;
+          }).toList();
+          if (posts.isEmpty) {
+            return _emptyState(
+                context, Icons.tag_rounded, s.cmHashtagEmpty(tag));
+          }
+          return ListView(
+            padding: const EdgeInsets.only(top: 8, bottom: 28),
+            children: [
+              for (final p in posts)
+                CommunityPostCard(
+                  post: p,
+                  lang: lang,
+                  controller: controller,
+                  onTap: () => _push(context,
+                      PostDetailScreen(post: p, controller: controller)),
+                ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

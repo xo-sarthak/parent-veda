@@ -44,7 +44,9 @@ import '../theme/app_theme.dart';
 import 'post_pregnancy/my_child_screen.dart';
 import 'weekly_card_stack_screen.dart';
 import '../widgets/home/home_modules.dart';
-import '../widgets/home/trimester_chart_card.dart';
+// Trimester chart removed from the Today feed (kept for revert).
+// import '../widgets/home/trimester_chart_card.dart';
+import '../widgets/trimester_progress_bar.dart';
 import '../widgets/journal/journal_create.dart';
 import 'garbh_screen.dart';
 import 'journal_screen.dart';
@@ -55,7 +57,10 @@ import 'read_next_screen.dart';
 import 'saved_hub_screen.dart';
 import 'reminders_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
-import 'tools/scans_appointments_screen.dart';
+// Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
+// commented for revert.
+// import 'tools/scans_appointments_screen.dart';
+import 'tools/tests_scans_reports_screen.dart';
 import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
 
@@ -138,15 +143,16 @@ class HomeScreenB extends StatelessWidget {
               summary: weekSummary,
               greeting: s.greeting(DateTime.now().hour, pregnancy.motherName),
             ),
+            const SizedBox(height: 20),
+            // ===== TODAY'S PARENTING TIP - featured editorial, sits directly
+            // below the Weekly Snapshot (a highlighted read, not just a card). ==
+            GrowModule(day: day, lang: lang, home: home),
             const SizedBox(height: 24),
             // ===== TODAY'S JOURNEY - everything daily lives under this heading ==
             _todaysJourneyHeading(s),
             const SizedBox(height: 14),
             // Today's Video - the week's recommended Watch & Learn pick.
             TodaysVideoCard(controller: pregnancy),
-            const SizedBox(height: 20),
-            // Daily parenting tip.
-            GrowModule(day: day, lang: lang, home: home),
             const SizedBox(height: 16),
             // "Read to your baby" folded into Garbh Sanskar › Samvad (its content
             // + customization now live there). Card removed; kept for revert.
@@ -155,12 +161,13 @@ class HomeScreenB extends StatelessWidget {
             // Daily Garbh Sanskar.
             _garbhDailySection(context, lang),
             const SizedBox(height: 16),
-            // Scans & appointments due around now (above the Trimester chart).
-            _scansDailySection(context, lang),
-            const SizedBox(height: 16),
-            // Trimester chart - quick "where am I" reference (above My Journal).
-            TrimesterChartCard(controller: pregnancy),
-            const SizedBox(height: 16),
+            // Scans & Appointments + Trimester chart REMOVED from the Today feed
+            // per feedback (Scans live in the Calendar / Tests-Scans-Reports; the
+            // trimester progress now shows in the hero bar). Kept for revert:
+            // _scansDailySection(context, lang),
+            // const SizedBox(height: 16),
+            // TrimesterChartCard(controller: pregnancy),
+            // const SizedBox(height: 16),
             // Daily My Journal.
             _journalDailySection(context, lang),
             const SizedBox(height: 16),
@@ -374,7 +381,6 @@ class HomeScreenB extends StatelessWidget {
     required String summary,
     required String greeting,
   }) {
-    final pct = pregnancy.progress;
     final lang = pregnancy.language;
     // Tapping anywhere on the hero opens the weekly view (current week). The
     // weekly stack is now PUSHED (the Journey tab was replaced by "Prepare",
@@ -469,9 +475,16 @@ class HomeScreenB extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      _progressRing(pct, (40 - week).clamp(0, 40)),
                     ],
+                  ),
+                  // Horizontal TRIMESTER progress bar — replaces the old circular
+                  // ring + "%" readout (applied consistently across the app).
+                  const SizedBox(height: 18),
+                  TrimesterProgressBar(
+                    week: week,
+                    daysRemaining: pregnancy.daysRemaining,
+                    lang: lang,
+                    onDark: true,
                   ),
                   // Baby / Mother / What's next - now part of the hero itself.
                   const SizedBox(height: 16),
@@ -528,6 +541,9 @@ class HomeScreenB extends StatelessWidget {
         ),
       );
 
+  // Old circular progress ring — replaced by TrimesterProgressBar. Kept
+  // commented for an easy revert.
+  // ignore: unused_element
   Widget _progressRing(double pct, int weeksToGo) {
     return SizedBox(
       width: 74,
@@ -1352,11 +1368,12 @@ class HomeScreenB extends StatelessWidget {
   // Scans & appointments due AROUND NOW (anchor week ± 2) + any upcoming
   // appointments, each scan with an "Already done" tick. Future scans surface
   // when their week arrives; past/not-done ones live behind "view all scans".
+  // ignore: unused_element
   Widget _scansDailySection(BuildContext context, AppLanguage lang) {
     final s = S(lang);
     const teal = Color(0xFF2E9C8E);
     void openAll() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => ScansAppointmentsScreen(controller: pregnancy)));
+        builder: (_) => TestsScansReportsScreen(controller: pregnancy)));
     return AnimatedBuilder(
       animation: Listenable.merge([ScansStore.instance, pregnancy]),
       builder: (context, _) {
@@ -1402,6 +1419,7 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _scanDueRow(AppLanguage lang, S s, JourneyMilestone m, Color teal) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -1449,6 +1467,7 @@ class HomeScreenB extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _apptDueRow(S s, Appointment a, Color teal) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -1723,16 +1742,32 @@ class HomeScreenB extends StatelessWidget {
                   ]),
               ]),
             ]),
+            const SizedBox(height: 12),
+            // Short "what is Garbh Sanskar / why daily" intro before the rituals.
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.tertiary500.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                s.gsHomeIntro,
+                style: GoogleFonts.manrope(
+                    fontSize: 12, height: 1.5, color: AppTheme.neutral700),
+              ),
+            ),
             const SizedBox(height: 14),
             _garbhPillarRow(context, s.gsShravan, s.gsShravanTag,
                 shravanForDay(cd).title, '🎵', const Color(0xFFBE9C4E),
                 store.isDone('shravan'),
                 () => ShravanScreen(controller: pregnancy, daily: true)),
-            _garbhPillarRow(context, s.gsVichara, s.gsVicharaTag,
-                s.gsVicharaTodo, '📖', const Color(0xFF6E8C74),
-                store.isDone('vichara'),
-                () => VicharaScreen(controller: pregnancy, daily: true)),
-            _garbhPillarRow(context, s.gsSamvad, s.gsSamvadTag,
+            // Standalone Vichara removed — its reflection now lives inside
+            // "Samvad & Vichara" (row below). Kept commented for revert.
+            // _garbhPillarRow(context, s.gsVichara, s.gsVicharaTag,
+            //     s.gsVicharaTodo, '📖', const Color(0xFF6E8C74),
+            //     store.isDone('vichara'),
+            //     () => VicharaScreen(controller: pregnancy, daily: true)),
+            _garbhPillarRow(context, s.gsSamvadVichara, s.gsSamvadTag,
                 promptForDay(cd, garbhTrimester(pregnancy.currentWeek)).text,
                 '🎙️', const Color(0xFFB98A7E),
                 store.isDone('samvad'),

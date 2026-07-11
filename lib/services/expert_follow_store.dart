@@ -1,9 +1,13 @@
 // =============================================================================
-//  ExpertFollowStore - who the user follows (EXPERTS ONLY)
+//  ExpertFollowStore - who the user follows (experts AND members)
 // -----------------------------------------------------------------------------
-//  Twitter-style following, limited to verified experts (regular members can't
-//  be followed yet). A followed expert's posts show up in the "Following" feed,
-//  and the ⋯ menu / profile "Follow" button toggle this. Persisted locally.
+//  Twitter-style following. Originally experts-only; now ANY author (expert or
+//  regular member) can be followed - a followed name is a followed name, keyed
+//  by the author's display name. A followed author's posts show up in the
+//  "Following" feed, and the ⋯ menu / profile "Follow" button toggle this.
+//  Persisted locally. The member aliases below are additive and simply delegate
+//  to the same underlying set, so existing expert-follow call sites are
+//  unchanged.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -53,4 +57,11 @@ class ExpertFollowStore extends ChangeNotifier with CloudSyncedStore {
     _prefs?.setStringList(_key, _followed.toList());
     notifyListeners();
   }
+
+  // --- general member follow (additive) --------------------------------------
+  //  Members are stored in the SAME set as experts (a followed name is a
+  //  followed name). These aliases exist for call-site clarity; they don't
+  //  change any existing expert-follow behaviour or the "Following" feed.
+  bool isFollowingMember(String member) => _followed.contains(member);
+  void toggleFollowMember(String member) => toggleFollow(member);
 }

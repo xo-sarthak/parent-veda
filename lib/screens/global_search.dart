@@ -27,15 +27,20 @@ import 'journal_screen.dart';
 import 'journey_map_screen.dart';
 import 'products_screen.dart';
 import 'read_next_screen.dart';
-import 'report_screen.dart';
+// Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
+// Kept commented for revert.
+// import 'report_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/due_date_calculator_screen.dart';
 import 'tools/hospital_bag_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 import 'tools/product_checklist_screen.dart';
-import 'tools/scans_appointments_screen.dart';
+// Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
+// commented for revert.
+// import 'tools/scans_appointments_screen.dart';
 import 'tools/spiritual_reading_screen.dart';
+import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
 
 void showGlobalSearch(BuildContext context, PregnancyController controller) {
@@ -107,15 +112,15 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c)),
         _Dest(s.hbName, const ['hospital', 'bag', 'pack', 'labour'],
             Icons.luggage_rounded, (c) => HospitalBagScreen(controller: c)),
-        _Dest(s.scnToolTitle, const ['scan', 'appointment', 'ultrasound'],
-            Icons.event_note_rounded, (c) => ScansAppointmentsScreen(controller: c)),
+        _Dest(s.tsrTitle, const ['scan', 'ultrasound', 'nt', 'anomaly', 'growth', 'doppler'],
+            Icons.fact_check_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.ddcToolTitle, const ['due date', 'calculator', 'edd'],
             Icons.calendar_month_rounded,
             (c) => DueDateCalculatorScreen(controller: c)),
         _Dest(s.medTitle, const ['medicine', 'medication', 'supplement', 'pill'],
             Icons.medication_rounded, (c) => MedicineTrackerScreen(controller: c)),
-        _Dest(s.rTitle, const ['report', 'test', 'result', 'blood'],
-            Icons.description_rounded, (c) => ReportScreen(controller: c)),
+        _Dest(s.tsrTitle, const ['report', 'test', 'result', 'blood', 'finding', 'condition'],
+            Icons.description_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.tabCalendar, const ['calendar', 'date', 'event', 'reminder'],
             Icons.calendar_today_rounded, (c) => CalendarScreen(controller: c)),
         _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],

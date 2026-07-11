@@ -15,11 +15,14 @@ import 'community_screen.dart';
 import 'garbh_screen.dart';
 import 'journey_map_screen.dart';
 import 'products_screen.dart';
-import 'report_screen.dart';
+// Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
+// Kept commented for revert.
+// import 'report_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
 import 'tools/hospital_bag_screen.dart';
 import 'tools/kegel_care_screen.dart';
+import 'tools/tests_scans_reports_screen.dart';
 import 'tools/weight_tracker_screen.dart';
 
 class ToolsScreen extends StatelessWidget {
@@ -51,8 +54,11 @@ class ToolsScreen extends StatelessWidget {
               open(() => ContractionTrackerScreen(controller: controller))),
       _ToolInfo(s.hbName, Icons.luggage_rounded, AppTheme.tertiary500,
           onTap: () => open(() => HospitalBagScreen(controller: controller))),
-      _ToolInfo(s.rTitle, Icons.description_rounded, AppTheme.primary500,
-          onTap: () => open(() => ReportScreen(controller: controller))),
+      // Merged "Tests, Scans & Reports" (Section 16) replaces the old
+      // "Understanding Your Report" tile.
+      _ToolInfo(s.tsrTitle, Icons.fact_check_rounded, AppTheme.primary500,
+          onTap: () =>
+              open(() => TestsScansReportsScreen(controller: controller))),
       _ToolInfo(s.gsTitle, Icons.spa_rounded, AppTheme.tertiary500,
           onTap: () => open(() => GarbhScreen(controller: controller))),
       _ToolInfo(s.cmTitle, Icons.forum_rounded, AppTheme.secondary500,

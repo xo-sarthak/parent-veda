@@ -11,6 +11,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
@@ -48,16 +49,81 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   /// Layer-2 medical symptoms (defaults = all clear).
   ContractionSymptoms _symptoms = const ContractionSymptoms();
 
+  // ---- Voice guidance (Section 11) ------------------------------------------
+  //  Speaks the tracker's current interpretation aloud in a neutral voice so a
+  //  labouring mother needn't stare at the screen. Own FlutterTts (pitch 1.0)
+  //  rather than the baby voice, mirroring the setup in baby_voice_service.dart.
+  //  Default state is ON; a speaker toggle in the app bar mutes it.
+  final FlutterTts _tts = FlutterTts();
+  bool _ttsReady = false;
+  // Voice guidance is ON by default (so `_voiceMuted` starts false).
+  // TODO(persist): this screen keeps no simple prefs (only sessions via
+  //  ToolsStore), so the mute choice is in-memory for the session only.
+  bool _voiceMuted = false;
+  // The last interpretation we spoke - so we never repeat an unchanged sentence.
+  String? _lastSpoken;
+
   @override
   void initState() {
     super.initState();
     ToolsStore.instance.init();
+    _initTts();
   }
 
   @override
   void dispose() {
     _tick?.cancel();
+    // Stop any in-flight speech as the screen goes away.
+    unawaited(_tts.stop());
     super.dispose();
+  }
+
+  Future<void> _initTts() async {
+    try {
+      await _tts.setPitch(1.0);
+      await _tts.setSpeechRate(0.42);
+      await _tts.setVolume(1.0);
+      await _tts.awaitSpeakCompletion(true);
+      try {
+        await _tts.setLanguage(
+            widget.controller.language.isHinglish ? 'hi-IN' : 'en-IN');
+      } catch (_) {
+        await _tts.setLanguage('en-IN');
+      }
+    } catch (_) {
+      // TTS is an enhancement - never fatal.
+    }
+    _ttsReady = true;
+  }
+
+  /// Derive the current interpretation and speak it - but ONLY when it differs
+  /// from the last sentence we spoke (so a steady reading is never repeated).
+  Future<void> _speakInterpretation() async {
+    if (_voiceMuted) return;
+    final level = assessContractions(
+        _current, widget.controller.currentWeek, _symptoms);
+    final key = _levelKey(level);
+    final text = '${_s.assessTitle(key)}. ${_s.assessSummary(key)}';
+    if (text.trim().isEmpty || text == _lastSpoken) return;
+    _lastSpoken = text;
+    if (!_ttsReady) await _initTts();
+    try {
+      await _tts.stop();
+      await _tts.speak(text);
+    } catch (_) {
+      // Ignore - speech is best-effort.
+    }
+  }
+
+  void _toggleVoice() {
+    setState(() => _voiceMuted = !_voiceMuted);
+    if (_voiceMuted) {
+      unawaited(_tts.stop());
+    } else {
+      // On unmute, forget the last line so the current reading is spoken now.
+      _lastSpoken = null;
+      _speakInterpretation();
+    }
   }
 
   S get _s => S(widget.controller.language);
@@ -95,6 +161,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     setState(() => _phase = _Phase.rest);
     _ensureTick();
     _save();
+    // A new contraction may have shifted the interpretation - speak it if so.
+    _speakInterpretation();
     _maybePromptLabor();
   }
 
@@ -198,6 +266,15 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         appBar: AppBar(
           title: Text(s.contractionToolTitle),
           actions: [
+            IconButton(
+              tooltip: widget.controller.language.isHinglish
+                  ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                  : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
+              icon: Icon(_voiceMuted
+                  ? Icons.volume_off_rounded
+                  : Icons.volume_up_rounded),
+              onPressed: _toggleVoice,
+            ),
             IconButton(
               tooltip: s.safetyCheckTitle,
               icon: Icon(
@@ -569,6 +646,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                         onPressed: () {
                           setState(() => _symptoms = sym);
                           Navigator.of(ctx).pop();
+                          // Symptoms can override the reading (e.g. emergency).
+                          _speakInterpretation();
                         },
                         child: Text(s.doneWord),
                       ),

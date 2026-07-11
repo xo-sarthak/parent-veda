@@ -1,9 +1,10 @@
 // =============================================================================
 //  CommunityProfileScreen - an X/Twitter-style author profile
 // -----------------------------------------------------------------------------
-//  Tapping a post's avatar/name opens this. Experts get a Follow button + bio +
-//  stats; regular members get a simpler "Member" profile. Below the header, the
-//  author's own posts are rendered with the shared CommunityPostCard.
+//  Tapping a post's avatar/name opens this. EVERY author (expert or member) now
+//  gets a Follow button + stats (Posts · Videos · Followers · Following).
+//  Experts additionally get a credential chip + bio. Below the header a
+//  Posts / Videos toggle switches the list between all posts and media posts.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -30,11 +31,25 @@ String _handleOf(String author) {
 
 String _fmt(int n) => n >= 1000 ? '${(n / 1000).toStringAsFixed(1)}K' : '$n';
 
-class CommunityProfileScreen extends StatelessWidget {
+/// A post counts as a "video"/media post when it carries an attached photo or
+/// image stand-in (there is no separate video type in the prototype).
+bool _hasMedia(CommunityPost p) => p.imageUrls.isNotEmpty || p.image.isNotEmpty;
+
+class CommunityProfileScreen extends StatefulWidget {
   const CommunityProfileScreen(
       {super.key, required this.post, required this.controller});
   final CommunityPost post;
   final PregnancyController controller;
+
+  @override
+  State<CommunityProfileScreen> createState() => _CommunityProfileScreenState();
+}
+
+class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
+  int _tab = 0; // 0 = Posts, 1 = Videos
+
+  CommunityPost get post => widget.post;
+  PregnancyController get controller => widget.controller;
 
   bool get _isExpert => post.cred.isNotEmpty || post.type == PostType.expert;
 
@@ -45,7 +60,7 @@ class CommunityProfileScreen extends StatelessWidget {
     final author = post.author;
     final handle = _handleOf(author);
     final h = author.hashCode.abs();
-    final followers = _isExpert ? (3200 + h % 46000) : (40 + h % 900);
+    final baseFollowers = _isExpert ? (3200 + h % 46000) : (40 + h % 900);
     final followingN = 80 + h % 600;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
@@ -62,10 +77,14 @@ class CommunityProfileScreen extends StatelessWidget {
         builder: (context, _) {
           final store = CommunityStore.instance;
           final ef = ExpertFollowStore.instance;
-          final posts = [...store.createdPosts, ...kSeedPosts]
+          final allPosts = [...store.createdPosts, ...kSeedPosts]
               .where((p) => p.author == author)
               .toList();
+          final videoPosts = allPosts.where(_hasMedia).toList();
           final following = ef.isFollowing(author);
+          // Reflect the user's own follow in the count so it reads live.
+          final followers = baseFollowers + (following ? 1 : 0);
+          final shown = _tab == 0 ? allPosts : videoPosts;
           return ListView(
             padding: const EdgeInsets.only(bottom: 28),
             children: [
@@ -79,8 +98,8 @@ class CommunityProfileScreen extends StatelessWidget {
                           children: [
                             _avatar(72),
                             const Spacer(),
-                            if (_isExpert)
-                              _followButton(s, ef, author, following),
+                            // Follow button now shown for ALL authors.
+                            _followButton(s, ef, author, following),
                           ]),
                       const SizedBox(height: 12),
                       Row(children: [
@@ -138,26 +157,38 @@ class CommunityProfileScreen extends StatelessWidget {
                         ),
                       const SizedBox(height: 14),
                       Row(children: [
-                        _stat('${posts.length}', s.cmPostsCount),
-                        const SizedBox(width: 20),
+                        _stat('${allPosts.length}', s.cmPostsCount),
+                        const SizedBox(width: 18),
+                        _stat('${videoPosts.length}', s.cmVideos),
+                        const SizedBox(width: 18),
                         _stat(_fmt(followers), s.cmFollowers),
-                        const SizedBox(width: 20),
+                        const SizedBox(width: 18),
                         _stat(_fmt(followingN), s.cmFollowingCount),
                       ]),
                     ]),
               ),
+              // Posts / Videos toggle.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+                child: Row(children: [
+                  _tabChip(s.cmPostsCount, 0),
+                  const SizedBox(width: 10),
+                  _tabChip(s.cmVideos, 1),
+                ]),
+              ),
               const Divider(height: 1, color: Color(0x14512D77)),
-              if (posts.isEmpty)
+              if (shown.isEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(28, 40, 28, 40),
                   child: Center(
-                    child: Text(s.cmNoPostsYet,
+                    child: Text(
+                        _tab == 0 ? s.cmNoPostsYet : s.cmNoVideosYet,
                         style: GoogleFonts.manrope(
                             fontSize: 13.5, color: AppTheme.neutral500)),
                   ),
                 )
               else
-                for (final p in posts)
+                for (final p in shown)
                   CommunityPostCard(
                     post: p,
                     lang: lang,
@@ -169,6 +200,28 @@ class CommunityProfileScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _tabChip(String label, int index) {
+    final active = _tab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _tab = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? _proPurple : _proPurple.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(22),
+          border:
+              Border.all(color: _proPurple.withValues(alpha: active ? 0 : 0.3)),
+        ),
+        child: Text(label,
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: active ? Colors.white : _proPurpleDeep)),
       ),
     );
   }

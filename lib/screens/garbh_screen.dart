@@ -95,8 +95,18 @@ class GarbhScreen extends StatelessWidget {
     // the FULL repository of that pillar (daily == false).
     final pillars = <({String id, String name, String desc})>[
       (id: 'shravan', name: s.gsShravan, desc: s.gsShravanDesc),
-      (id: 'vichara', name: s.gsVichara, desc: s.gsVicharaDesc),
-      (id: 'samvad', name: s.gsSamvad, desc: s.gsSamvadDesc),
+      // Vichara pillar removed from the hub - its brain-fitness games now live
+      // inside Kriya (Brain Fitness) and its reflective reads move under Samvad.
+      // The daily Home Garbh section still uses VicharaScreen(daily:true), so the
+      // class + data stay. (Kept commented for revert.)
+      // (id: 'vichara', name: s.gsVichara, desc: s.gsVicharaDesc),
+      // Samvad renamed to "Samvad & Vichara" at the call site (inline, per the
+      // no-edit-app_language rule). Content inside SamvadScreen is unchanged.
+      (
+        id: 'samvad',
+        name: lang.isHinglish ? 'Samvad & Vichara' : 'Samvad & Vichara',
+        desc: s.gsSamvadDesc
+      ),
       (id: 'kriya', name: s.gsKriya, desc: s.gsKriyaDesc),
     ];
 
@@ -143,11 +153,14 @@ class GarbhScreen extends StatelessWidget {
       case 'shravan':
         _push(context, ShravanScreen(controller: controller));
         break;
-      case 'vichara':
-        _push(context, VicharaScreen(controller: controller));
-        break;
+      // Vichara pillar removed from the hub (see pillars list above). Kept for
+      // revert - VicharaScreen is still used by the daily Home Garbh section.
+      // case 'vichara':
+      //   _push(context, VicharaScreen(controller: controller));
+      //   break;
       case 'samvad':
-        _push(context, SamvadScreen(controller: controller));
+        _push(context,
+            SamvadScreen(controller: controller, hubTitle: 'Samvad & Vichara'));
         break;
       case 'kriya':
         _push(context, KriyaScreen(controller: controller));
@@ -548,41 +561,11 @@ class ShravanScreen extends StatelessWidget {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
 
-    // Tools library: ALL ragas in one place, each tappable; no mark-complete.
+    // Tools library: browse listening sessions month-by-month (opens on the
+    // current month), each tappable; no mark-complete. (Old flat "all ragas"
+    // list kept in git history / _ShravanDetailScreen for revert.)
     if (!daily) {
-      return _PillarScaffold(
-        title: s.gsShravan,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-          children: [
-            Text(s.gsBrowseAll,
-                style: text.bodyMedium?.copyWith(color: _muted)),
-            const SizedBox(height: 14),
-            for (final a in kShravan)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 46,
-                  height: 46,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: _accShravan.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(13)),
-                  child: Text(a.emoji, style: const TextStyle(fontSize: 24)),
-                ),
-                title: Text(a.title,
-                    style: text.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w700, color: _ink)),
-                subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
-                    style: text.labelSmall?.copyWith(color: _muted)),
-                trailing: const Icon(Icons.play_circle_outline_rounded,
-                    color: _accShravan),
-                onTap: () => _push(context,
-                    _ShravanDetailScreen(audio: a, controller: controller)),
-              ),
-          ],
-        ),
-      );
+      return _ShravanLibrary(controller: controller);
     }
 
     // Daily (Home): today's session + mark-complete.
@@ -671,6 +654,169 @@ class _ShravanDetailScreen extends StatelessWidget {
           Text(s.gsSampleAudio,
               textAlign: TextAlign.center,
               style: text.labelSmall?.copyWith(color: _muted)),
+        ],
+      ),
+    );
+  }
+}
+
+// A small Morning / Evening badge for a listening item.
+class _RagaTimeBadge extends StatelessWidget {
+  const _RagaTimeBadge({required this.audio});
+  final GarbhAudio audio;
+  @override
+  Widget build(BuildContext context) {
+    final evening = ragaTimeBadge(audio) == 'Evening';
+    final color = evening ? _accSamvad : _accShravan;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(
+            evening
+                ? Icons.nightlight_round
+                : Icons.wb_sunny_outlined,
+            size: 12,
+            color: color),
+        const SizedBox(width: 4),
+        Text(evening ? 'Evening' : 'Morning',
+            style: TextStyle(
+                fontSize: 10.5, fontWeight: FontWeight.w800, color: color)),
+      ]),
+    );
+  }
+}
+
+// Shravan Tools library - month selector (Month 1-9, opens on current month) +
+// that month's listening sessions with Morning/Evening badges.
+class _ShravanLibrary extends StatefulWidget {
+  const _ShravanLibrary({required this.controller});
+  final PregnancyController controller;
+  @override
+  State<_ShravanLibrary> createState() => _ShravanLibraryState();
+}
+
+class _ShravanLibraryState extends State<_ShravanLibrary> {
+  late int _month;
+
+  @override
+  void initState() {
+    super.initState();
+    _month = garbhMonth(widget.controller.currentWeek);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(widget.controller.language);
+    final text = Theme.of(context).textTheme;
+    final sessions = shravanForMonth(_month);
+    final currentMonth = garbhMonth(widget.controller.currentWeek);
+    return _PillarScaffold(
+      title: s.gsShravan,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+        children: [
+          Text(
+              widget.controller.language.isHinglish
+                  ? 'Har mahine ke liye chuni gayi listening sessions.'
+                  : 'Listening sessions gathered for each month.',
+              style: text.bodyMedium?.copyWith(color: _muted)),
+          const SizedBox(height: 14),
+          // Month selector (1-9).
+          SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 9,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, i) {
+                final m = i + 1;
+                final selected = m == _month;
+                final isCurrent = m == currentMonth;
+                return GestureDetector(
+                  onTap: () => setState(() => _month = m),
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? _accShravan
+                          : _accShravan.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: isCurrent && !selected
+                              ? _accShravan
+                              : Colors.transparent),
+                    ),
+                    child: Text(
+                      widget.controller.language.isHinglish
+                          ? 'Mahina $m'
+                          : 'Month $m',
+                      style: text.labelMedium?.copyWith(
+                          color: selected ? Colors.white : _accShravan,
+                          fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 6),
+          if (_month == currentMonth)
+            Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 2),
+              child: Text(
+                  widget.controller.language.isHinglish
+                      ? 'Aap abhi yahan hain'
+                      : 'You are here now',
+                  style: text.labelSmall?.copyWith(
+                      color: _accShravan, fontWeight: FontWeight.w800)),
+            ),
+          const SizedBox(height: 8),
+          if (sessions.isEmpty)
+            Text(
+                widget.controller.language.isHinglish
+                    ? 'Is mahine ke liye abhi koi session nahi.'
+                    : 'No sessions for this month yet.',
+                style: text.bodyMedium?.copyWith(color: _muted))
+          else
+            for (final a in sessions)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 46,
+                    height: 46,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: _accShravan.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(13)),
+                    child: Text(a.emoji, style: const TextStyle(fontSize: 24)),
+                  ),
+                  title: Row(children: [
+                    Flexible(
+                      child: Text(a.title,
+                          style: text.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700, color: _ink)),
+                    ),
+                    const SizedBox(width: 8),
+                    _RagaTimeBadge(audio: a),
+                  ]),
+                  subtitle: Text('${a.subtitle} · ${s.gsMinutes(a.minutes)}',
+                      style: text.labelSmall?.copyWith(color: _muted)),
+                  trailing: const Icon(Icons.play_circle_outline_rounded,
+                      color: _accShravan),
+                  onTap: () => _push(
+                      context,
+                      _ShravanDetailScreen(
+                          audio: a, controller: widget.controller)),
+                ),
+              ),
         ],
       ),
     );
@@ -943,12 +1089,16 @@ class _VicharaReader extends StatelessWidget {
 
 class SamvadScreen extends StatefulWidget {
   const SamvadScreen(
-      {super.key, required this.controller, this.daily = false});
+      {super.key, required this.controller, this.daily = false, this.hubTitle});
   final PregnancyController controller;
 
   /// Daily (Home): today's speaking card + mark-complete. Tools (daily=false):
   /// the full library of speaking cards, browsable, no mark-complete.
   final bool daily;
+
+  /// Optional app-bar title override (the Tools hub passes "Samvad & Vichara").
+  /// Content is unchanged; only the header label differs. Null = s.gsSamvad.
+  final String? hubTitle;
   @override
   State<SamvadScreen> createState() => _SamvadScreenState();
 }
@@ -985,7 +1135,7 @@ class _SamvadScreenState extends State<SamvadScreen>
         backgroundColor: _cream,
         elevation: 0,
         foregroundColor: _ink,
-        title: Text(s.gsSamvad),
+        title: Text(widget.hubTitle ?? s.gsSamvad),
         bottom: TabBar(
           controller: _tab,
           labelColor: _accSamvad,
@@ -1461,39 +1611,35 @@ class KriyaScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(controller.currentWeek);
 
-    // Tools library: ALL practices; each opens its detail; no mark-complete.
+    // Tools library: TWO sections in tabs -
+    //   1) Breathing & Meditation - kKriya practices as large cards.
+    //   2) Brain Fitness - the former Vichara brain-fitness games as a 2-column
+    //      grid (each: cover + description + tap-to-play).
     if (!daily) {
-      return _PillarScaffold(
-        title: s.gsKriya,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-          children: [
-            Text(s.gsBrowseAll,
-                style: text.bodyMedium?.copyWith(color: _muted)),
-            const SizedBox(height: 14),
-            for (final p in kKriya)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 46,
-                  height: 46,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: _accKriya.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(13)),
-                  child: Text(p.emoji, style: const TextStyle(fontSize: 24)),
-                ),
-                title: Text(p.title,
-                    style: text.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w700, color: _ink)),
-                subtitle: Text('${p.blurb} · ${s.gsMinutes(p.minutes)}',
-                    style: text.labelSmall?.copyWith(color: _muted)),
-                trailing:
-                    const Icon(Icons.chevron_right_rounded, color: _accKriya),
-                onTap: () => _push(context,
-                    _KriyaDetailScreen(practice: p, controller: controller)),
-              ),
-          ],
+      final hinglish = lang.isHinglish;
+      return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: _cream,
+          appBar: AppBar(
+            backgroundColor: _cream,
+            elevation: 0,
+            foregroundColor: _ink,
+            title: Text(s.gsKriya),
+            bottom: TabBar(
+              labelColor: _accKriya,
+              unselectedLabelColor: _muted,
+              indicatorColor: _accKriya,
+              tabs: [
+                Tab(text: hinglish ? 'Saans & Dhyan' : 'Breathing & Meditation'),
+                Tab(text: hinglish ? 'Brain Fitness' : 'Brain Fitness'),
+              ],
+            ),
+          ),
+          body: TabBarView(children: [
+            _KriyaBreathingList(controller: controller),
+            _KriyaBrainFitnessGrid(controller: controller),
+          ]),
         ),
       );
     }
@@ -1572,6 +1718,154 @@ class _KriyaDetailScreen extends StatelessWidget {
         children: _kriyaPracticeBody(context, s, text, t, practice, lang,
             daily: false),
       ),
+    );
+  }
+}
+
+// Kriya › Breathing & Meditation - kKriya practices as LARGE cards
+// (cover placeholder + title + description). Tap opens the practice detail.
+class _KriyaBreathingList extends StatelessWidget {
+  const _KriyaBreathingList({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(controller.language);
+    final text = Theme.of(context).textTheme;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
+      children: [
+        for (final p in kKriya)
+          GestureDetector(
+            onTap: () => _push(context,
+                _KriyaDetailScreen(practice: p, controller: controller)),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: _line),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                // Cover placeholder (emoji on a soft gradient).
+                Container(
+                  height: 120,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      _accKriya.withValues(alpha: 0.28),
+                      _accKriya.withValues(alpha: 0.10),
+                    ]),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(22)),
+                  ),
+                  child: Text(p.emoji, style: const TextStyle(fontSize: 54)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Expanded(
+                            child: Text(p.title,
+                                style: text.titleMedium?.copyWith(
+                                    color: _ink, fontWeight: FontWeight.w800)),
+                          ),
+                          Text(s.gsMinutes(p.minutes),
+                              style: text.labelSmall?.copyWith(color: _muted)),
+                        ]),
+                        const SizedBox(height: 4),
+                        Text(p.blurb,
+                            style: text.bodyMedium
+                                ?.copyWith(color: _muted, height: 1.4)),
+                      ]),
+                ),
+              ]),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// Kriya › Brain Fitness - the former Vichara brain-fitness games as a 2-column
+// grid. Each card = cover (emoji) + description + tap-to-play. Games open with
+// markComplete:false (Tools library play does not tick a daily ritual).
+class _KriyaBrainFitnessGrid extends StatelessWidget {
+  const _KriyaBrainFitnessGrid({required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final hinglish = controller.language.isHinglish;
+    return GridView.count(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
+      crossAxisCount: 2,
+      mainAxisSpacing: 14,
+      crossAxisSpacing: 14,
+      childAspectRatio: 0.82,
+      children: [
+        for (final p in kPuzzles)
+          GestureDetector(
+            onTap: () =>
+                _push(context, _gameFor(p, controller, markComplete: false)),
+            child: Container(
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _line),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cover.
+                    Container(
+                      height: 84,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          _accKriya.withValues(alpha: 0.24),
+                          _accKriya.withValues(alpha: 0.08),
+                        ]),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
+                      ),
+                      child: Text(p.emoji, style: const TextStyle(fontSize: 38)),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(p.title,
+                                  style: text.titleSmall?.copyWith(
+                                      color: _ink,
+                                      fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 3),
+                              Expanded(
+                                child: Text(p.blurb,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: text.labelSmall?.copyWith(
+                                        color: _muted, height: 1.35)),
+                              ),
+                              Row(children: [
+                                Icon(Icons.play_circle_outline_rounded,
+                                    size: 16, color: _accKriya),
+                                const SizedBox(width: 5),
+                                Text(hinglish ? 'Khelein' : 'Play',
+                                    style: text.labelSmall?.copyWith(
+                                        color: _accKriya,
+                                        fontWeight: FontWeight.w800)),
+                              ]),
+                            ]),
+                      ),
+                    ),
+                  ]),
+            ),
+          ),
+      ],
     );
   }
 }

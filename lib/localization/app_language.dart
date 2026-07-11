@@ -117,7 +117,7 @@ class S {
   String get garbhSanskar => 'Garbh Sanskar'; // proper noun, same in both
   String get bondingRitual => _p('Bonding ritual', 'Bonding ka pal');
   String get todaysAffirmation =>
-      _p("Today's affirmation", 'Aaj ka affirmation');
+      _p("Today's Affirmation", 'Aaj ka Affirmation');
   String ragaNamed(String raga) => _p('Raga $raga', 'Raag $raga');
   String get soothingRaga =>
       _p('Soothing prenatal raga', 'Sukoon dene wala raag');
@@ -749,7 +749,8 @@ class S {
   // ===========================================================================
   //  WATCH & LEARN - contextual videos
   // ===========================================================================
-  String get vidTodaysVideo => _p("Today's Video ❤", 'Aaj Ka Video ❤');
+  // Standardised "Today's" heading — decorative heart removed (design rule).
+  String get vidTodaysVideo => _p("Today's Video", "Aaj Ka Video");
   String get vidWhyNow =>
       _p('Why this matters now', 'Yeh abhi kyun maayne rakhta hai');
   String get vidWatch => _p('Watch', 'Dekhein');
@@ -881,6 +882,10 @@ class S {
   String get scnAlreadyDone => _p('Already done', 'Pehle se ho gaya');
   String get scnViewAll => _p('View all scans', 'Sabhi scans dekhein');
   String get scnToolTitle => _p('Scans & Care', 'Scans & Care');
+  // Merged "Tests, Scans & Reports" feature (Section 16) - replaces the old
+  // "Understanding Your Report" + "Scans & Care" tools.
+  String get tsrTitle =>
+      _p('Tests, Scans & Reports', 'Tests, Scans & Reports');
   String get scnTabUpcoming => _p('Upcoming', 'Aage');
   String get scnTabCompleted => _p('Completed', 'Poore');
   String get scnTabRoadmap => _p('Care roadmap', 'Care roadmap');
@@ -1262,6 +1267,17 @@ class S {
   String get snapshotTitle => _p('Weekly snapshot', 'Weekly snapshot');
   String get todaysJourney => _p("Today's journey", 'Aaj ka safar');
   String weeksLeftShort(int n) => _p('$n wks to go', '$n hafte baaki');
+  // ---- Trimester progress bar (replaces the circular ring app-wide) ---------
+  String trimesterLabel(int t) => _p('Trimester $t', 'Trimester $t');
+  String trimesterShort(int t) => _p('T$t', 'T$t');
+  /// "4 weeks 2 days to go" / "Baby's here!" — the calm remaining-time line.
+  String timeToGo(int weeks, int days) {
+    if (weeks <= 0 && days <= 0) return _p("Baby's almost here", 'Baby aane wala hai');
+    final w = weeks > 0 ? _p('$weeks ${weeks == 1 ? 'week' : 'weeks'}', '$weeks hafte') : '';
+    final d = days > 0 ? _p('$days ${days == 1 ? 'day' : 'days'}', '$days din') : '';
+    final joined = [w, d].where((e) => e.isNotEmpty).join(' ');
+    return _p('$joined to go', '$joined baaki');
+  }
   String get medManageCta => _p('Manage', 'Manage karein');
   String get prodSeeNow => _p('See now', 'Dekhein');
   String get wfTabThisWeek => _p('This week', 'Is hafte');
@@ -1293,7 +1309,7 @@ class S {
 
   // ---- Module eyebrows -----------------------------------------------------
   String get growEyebrow =>
-      _p('Daily parenting tip', 'Rozaana parenting tip');
+      _p("Today's Parenting Tip", 'Aaj ki parenting tip');
   String get readEyebrow => _p('Read To Your Baby', 'Apne Baby Ko Sunaayein');
   String get medDailyTitle => _p(
       'Daily medication and supplements', 'Rozaana dawai aur supplements');
@@ -2273,6 +2289,7 @@ class S {
   String get rmdOnce => _p('Once', 'Ek baar');
   String get rmdDaily => _p('Daily', 'Rozana');
   String get rmdWeekly => _p('Weekly', 'Saptahik');
+  String get rmdAddTime => _p('Add time', 'Samay jodein');
   String get rmdOnDay => _p('On', 'Din');
   String get rmdSave => _p('Save reminder', 'Reminder save karein');
   String get rmdDelete => _p('Delete reminder', 'Reminder hataayein');
@@ -2694,7 +2711,13 @@ class S {
   String get gsShravan => _p('Shravan', 'Shravan');
   String get gsShravanTag => _p('Sacred Listening', 'Pavitra Shravan');
   String get gsSamvad => _p('Samvad', 'Samvad');
+  // Vichara folded into Samvad — the daily/home ritual now reads "Samvad & Vichara".
+  String get gsSamvadVichara => _p('Samvad & Vichara', 'Samvad & Vichara');
   String get gsSamvadTag => _p('Womb Connection', 'Garbh Se Judaav');
+  // Short "what/why/daily" intro shown above the Today's Rituals list on Home.
+  String get gsHomeIntro => _p(
+      'Garbh Sanskar is the age-old practice of nurturing your baby in the womb — through sound, thought, connection and gentle movement. A few mindful minutes each day calm you and help your baby feel loved from the very start.',
+      'Garbh Sanskar aapke garbh mein pal rahe baby ko sound, vichar, judaav aur halki movement se poshit karne ki prachin parampara hai. Rozana kuch shaant minute aapko sukoon dete hain aur baby ko shuruaat se hi pyaar mehsoos karaate hain.');
   String get gsVichara => _p('Vichara', 'Vichara');
   String get gsVicharaTag => _p('Positive Contemplation', 'Sakaratmak Vichar');
   String get gsKriya => _p('Kriya', 'Kriya');
@@ -2765,7 +2788,7 @@ class S {
   String gsRitualsDone(int done, int goal) =>
       _p('$done / $goal rituals completed', '$done / $goal rituals poore');
   String gsDayStreak(int n) => _p('$n day streak', '$n din ki streak');
-  String get gsTodaysRituals => _p("Today's rituals", 'Aaj ke rituals');
+  String get gsTodaysRituals => _p("Today's Rituals", 'Aaj ke Rituals');
   String get gsVicharaTodo => _p('A reflection, a puzzle, or an uplifting read',
       'Ek vichaar, ek puzzle, ya ek prernadayi read');
   String gsDailyGoalLine(int goal) =>
@@ -2894,6 +2917,12 @@ class S {
   String get cmFollowers => _p('Followers', 'Followers');
   String get cmFollowingCount => _p('Following', 'Following');
   String get cmNoPostsYet => _p('No posts yet', 'Abhi koi post nahi');
+  // Profile Videos tab + Experts-only feed filter + hashtag feed.
+  String get cmVideos => _p('Videos', 'Videos');
+  String get cmNoVideosYet => _p('No videos yet', 'Abhi koi video nahi');
+  String get cmExpertsOnly => _p('Experts only', 'Sirf experts');
+  String cmHashtagEmpty(String tag) => _p(
+      'No posts with #$tag yet', 'Abhi #$tag wale koi post nahi');
   String cmMembers(int n) => _p('$n members', '$n members');
   String get cmCreatePost => _p('Create post', 'Post banayein');
   String get cmVote => _p('Vote', 'Vote');
@@ -3229,9 +3258,12 @@ class S {
   }
 
   // ---- Daily Reads (Home - above Read Next) --------------------------------
-  String get drTitle => _p('Daily Reads', 'Daily Reads');
+  String get drTitle => _p("Today's Read", 'Aaj Ka Read');
   String get drArticles => _p('Articles', 'Lekh');
-  String get drBooks => _p('Books', 'Kitaabein');
+  String get drResearch => _p('Research Summaries', 'Research Summaries');
+  String get drBooks => _p('Book Summaries', 'Book Summaries');
+  String get drReadSummary => _p('Read summary', 'Summary padhein');
+  String get drBuyBook => _p('Buy Book', 'Kitaab khareedein');
   String get drSeeAll => _p('See all', 'Sabhi dekhein');
 
   // ---- Read recommendations ❤️ (formerly "Read Next" / "Library") ----------

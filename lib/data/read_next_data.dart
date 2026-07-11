@@ -12,6 +12,13 @@ const List<ReadItem> kReadItems = [
   // ---- Articles ----
   ReadItem(
     id: 'managing_nausea',
+    whyThisMatters:
+        'Nausea can quietly wear you down and make eating feel impossible. Knowing it is common, usually harmless, and manageable protects both your comfort and your baby\'s steady nourishment through these early weeks.',
+    researchSimplified:
+        'Morning sickness is linked to the rapid rise of pregnancy hormones like hCG. Studies consistently find ginger and vitamin B6 ease mild-to-moderate nausea. It typically peaks around weeks 9–11 and settles by the second trimester for most mothers.',
+    myth: 'Morning sickness only happens in the morning.',
+    fact:
+        'It can strike at any time of day or night - many mothers feel most queasy in the evening. The name is simply misleading.',
     title: 'Managing Morning Sickness',
     type: ReadType.article,
     weekStart: 5,
@@ -28,6 +35,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'first_scan',
+    whyThisMatters:
+        'This scan turns an abstract idea into a real, beating heartbeat - and confirms your due date, which shapes every milestone ahead. Knowing what happens removes the nervousness of the unknown.',
+    researchSimplified:
+        'An early dating scan measures the baby crown-to-rump. Before about 13 weeks this size predicts gestational age more accurately than the date of your last period, which is why your due date may be gently adjusted.',
     title: 'Your First Scan, Explained',
     type: ReadType.article,
     weekStart: 7,
@@ -44,6 +55,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'first_trimester',
+    whyThisMatters:
+        'So much of the first trimester is invisible, which can make the exhaustion and worry feel unearned. Understanding the enormous work happening inside lets you rest without guilt.',
+    researchSimplified:
+        'By the end of the first trimester all major organs have begun forming and the heart is beating. This is also when the risk of miscarriage falls sharply, which is why many families wait until around 12 weeks to share their news.',
     title: 'Understanding the First Trimester',
     type: ReadType.article,
     weekStart: 4,
@@ -59,6 +74,13 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'halfway',
+    whyThisMatters:
+        'The halfway mark is a natural moment to pause, celebrate, and gently shift from surviving early symptoms to preparing. First kicks also begin a two-way bond.',
+    researchSimplified:
+        'Around week 20 the baby\'s hearing is developing and the detailed anomaly scan checks anatomy. Feeling movement (quickening) typically begins between weeks 18–24, often earlier in second pregnancies.',
+    myth: 'You should be "eating for two" by now.',
+    fact:
+        'Most mothers need only about 300 extra calories a day in the second trimester - roughly a glass of milk and a fruit. Quality matters far more than quantity.',
     title: 'You Are Halfway - What Changes Now',
     type: ReadType.article,
     weekStart: 18,
@@ -74,6 +96,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'anomaly_scan',
+    whyThisMatters:
+        'This is the most detailed look at your baby\'s development you will get. Knowing what is checked - and that most findings are reassuring - helps you go in calm rather than anxious.',
+    researchSimplified:
+        'The mid-pregnancy anatomy scan (weeks 18–22) systematically checks the brain, heart, spine, kidneys, limbs and the placenta\'s position. It can detect many structural conditions early enough to plan care.',
     title: 'Making the Most of the Anomaly Scan',
     type: ReadType.article,
     weekStart: 18,
@@ -89,6 +115,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'baby_sound',
+    whyThisMatters:
+        'Your voice is your baby\'s first familiar comfort. A few quiet minutes of talking or singing each day genuinely begins the bond that continues after birth.',
+    researchSimplified:
+        'The inner ear and hearing pathways mature around weeks 18–25. Studies show newborns prefer their mother\'s voice, and can even recognise songs or stories heard repeatedly in the womb.',
     title: 'How Babies Begin Responding to Sound',
     type: ReadType.article,
     weekStart: 20,
@@ -104,6 +134,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'talking_baby',
+    whyThisMatters:
+        'You don\'t need a script or a special time - simply sharing your day lowers your own stress and lays the first thread of connection your baby will recognise at birth.',
+    researchSimplified:
+        'Research on prenatal bonding links talking and reading aloud to lower maternal stress hormones, and to newborns\' clear preference for familiar voices soon after birth.',
     title: 'Talking to Your Baby Before Birth',
     type: ReadType.article,
     weekStart: 18,
@@ -119,6 +153,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'back_pain',
+    whyThisMatters:
+        'Back comfort shapes your sleep, mood and mobility. Small posture habits now stop the discomfort from taking over your day as the bump grows.',
+    researchSimplified:
+        'The hormone relaxin loosens your ligaments and the growing uterus shifts your centre of gravity, straining the lower back. Trials find gentle prenatal exercise and physiotherapy reduce pregnancy back pain safely.',
     title: 'Easing Back Pain in Pregnancy',
     type: ReadType.article,
     weekStart: 20,
@@ -134,6 +172,13 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'nutrition_t2',
+    whyThisMatters:
+        'With nausea easing, this is the window to build the iron, calcium and protein stores your baby draws on for rapid growth - nourishing you both.',
+    researchSimplified:
+        'Iron needs rise sharply in the second trimester to support the baby\'s blood supply, and adequate calcium protects your own bones. Balanced meals plus prescribed supplements meet these needs.',
+    myth: 'You need to eat twice as much now.',
+    fact:
+        'Quality outweighs quantity. A modest ~300 extra calories of nutrient-dense food supports your baby better than simply eating more.',
     title: 'Eating Well in the Second Trimester',
     type: ReadType.article,
     weekStart: 14,
@@ -149,6 +194,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'third_tri_prep',
+    whyThisMatters:
+        'A gentle heads-up lets you pace preparation calmly, rather than scrambling when energy dips and the bump slows you down.',
+    researchSimplified:
+        'In the third trimester the baby gains most of its birth weight and the lungs and brain mature rapidly. Growth scans and, if needed, birth planning usually begin around this stage.',
     title: 'Getting Ready for the Third Trimester',
     type: ReadType.article,
     weekStart: 24,
@@ -164,6 +213,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'movement_awareness',
+    whyThisMatters:
+        'Getting to know your baby\'s normal movement pattern now is the foundation for one of the simplest, most powerful ways to check on their wellbeing later.',
+    researchSimplified:
+        'There is no fixed "normal" number of kicks - what matters is your baby\'s individual pattern. Guidance advises getting to know it and reporting any clear reduction, rather than counting to a set target.',
     title: 'Preparing for Baby Movement Awareness',
     type: ReadType.article,
     weekStart: 24,
@@ -179,6 +232,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'partner_support',
+    whyThisMatters:
+        'Feeling supported measurably lowers stress and lifts wellbeing for both you and your baby. Sharing this helps your partner know exactly how to help.',
+    researchSimplified:
+        'Studies consistently link strong partner support in pregnancy with lower maternal stress, better mental health, and improved birth outcomes.',
     title: 'How Your Partner Can Support You Now',
     type: ReadType.article,
     weekStart: 12,
@@ -194,6 +251,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'hospital_bag',
+    whyThisMatters:
+        'Packing early trades last-minute panic for calm. When labour begins, everything you and your baby need is simply ready to go.',
+    researchSimplified:
+        'Labour can begin any time from around week 37 (full term). Having essentials ready by then is why antenatal guidance suggests packing in the mid-third trimester.',
     title: 'Preparing Your Hospital Bag',
     type: ReadType.article,
     weekStart: 32,
@@ -209,6 +270,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'labour_prep',
+    whyThisMatters:
+        'Fear of the unknown makes labour harder. Understanding the stages replaces dread with confidence, so you know what is happening and when to head in.',
+    researchSimplified:
+        'Labour unfolds in three stages - dilation, delivery of the baby, and delivery of the placenta. Evidence links continuous support and understanding of the process with calmer, more positive birth experiences.',
     title: 'Labour, Step by Step',
     type: ReadType.article,
     weekStart: 34,
@@ -224,6 +289,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'first_24h',
+    whyThisMatters:
+        'Knowing the first day is a blur of sleepy firsts sets gentle expectations, so you can rest and bond rather than worry that something is wrong.',
+    researchSimplified:
+        'Immediate skin-to-skin contact and early feeding support bonding, temperature regulation and breastfeeding. Newborns are often very sleepy in the first 24 hours, which is entirely normal.',
     title: 'The First 24 Hours After Birth',
     type: ReadType.article,
     weekStart: 36,
@@ -241,6 +310,10 @@ const List<ReadItem> kReadItems = [
   // ---- Research summaries ----
   ReadItem(
     id: 'res_voices',
+    whyThisMatters:
+        'It is a lovely, evidence-backed reason to talk and read aloud now - you are already building a comfort your newborn will reach for.',
+    researchSimplified:
+        'In the final months, babies can hear and begin recognising frequently-heard voices - especially the mother\'s. After birth, newborns turn toward and are soothed by these familiar voices.',
     title: 'Babies Recognise Familiar Voices Before Birth',
     type: ReadType.research,
     weekStart: 20,
@@ -256,6 +329,13 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'res_music',
+    whyThisMatters:
+        'It frees you from any pressure to find a "brain-boosting" playlist. What helps your baby is simply what helps you relax.',
+    researchSimplified:
+        'Reviews of music in pregnancy find the main benefit is maternal relaxation, which the baby shares. There is no evidence that any particular music makes babies smarter.',
+    myth: 'Playing classical music to your bump makes your baby smarter.',
+    fact:
+        'There is no good evidence for a "Mozart effect" in the womb. The real benefit is that calming music relaxes you, and that calm is shared with your baby.',
     title: 'What Research Says About Music and the Womb',
     type: ReadType.research,
     weekStart: 18,
@@ -271,6 +351,10 @@ const List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'res_stress',
+    whyThisMatters:
+        'You do not need to be perfectly serene - but small, repeated calming habits genuinely support both your wellbeing and your baby\'s.',
+    researchSimplified:
+        'Occasional stress is normal and harmless. Research links only high, sustained stress with pregnancy risks, and finds simple habits - rest, breathing, connection and support - effective at easing it.',
     title: 'Calm Matters: Stress and Pregnancy',
     type: ReadType.research,
     weekStart: 6,
@@ -459,6 +543,15 @@ List<ReadItem> dailyBookReads(int day, {int count = 3}) {
   final n = books.length;
   final start = day % n;
   return List.generate(count.clamp(0, n), (i) => books[(start + i) % n]);
+}
+
+/// Daily Reads - [count] research-summary picks, rotating by [day].
+List<ReadItem> dailyResearchReads(int day, {int count = 2}) {
+  final research = readByType(ReadType.research);
+  if (research.isEmpty) return const [];
+  final n = research.length;
+  final start = day % n;
+  return List.generate(count.clamp(0, n), (i) => research[(start + i) % n]);
 }
 
 List<ReadItem> readSearch(String query) {

@@ -1,8 +1,14 @@
 // =============================================================================
-//  PrenatalYogaScreen (S4) - Prepare › Prenatal Yoga (interactive)
-//  Trimester tabs switch the track; the safe (T3) track lists sessions that
-//  play into the placeholder video screen. Earlier trimesters show a locked
-//  explanation (their poses aren't safe at 30 weeks).
+//  PrenatalYogaScreen (S4) - Prepare › Yoga (interactive)
+// -----------------------------------------------------------------------------
+//  Renamed "Prenatal Yoga" -> "Yoga" in the UI. The screen now opens on the
+//  mother's CURRENT pregnancy month and offers Month 1-9 tabs; each month lists
+//  all of its sessions (see kYogaSessions, now month-tagged in prepare_data).
+//  Sessions play into the placeholder video screen. The Dart class name is kept
+//  (PrenatalYogaScreen) so existing imports/tests stay valid.
+//
+//  NOTE: the previous trimester-lock version (T1/T2 locked at 30 weeks) is
+//  superseded by month tabs; its intent lives on as the "current month" default.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -10,6 +16,10 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
+
+// TODO: derive the current pregnancy month from the saved due date / week.
+// 30 weeks ≈ month 7, matching the rest of the Prepare tab's "Priya · 30 weeks".
+const int _kCurrentMonth = 7;
 
 class PrenatalYogaScreen extends StatefulWidget {
   const PrenatalYogaScreen({super.key});
@@ -19,10 +29,29 @@ class PrenatalYogaScreen extends StatefulWidget {
 }
 
 class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
-  int _tri = 2; // 0,1 = earlier (locked at 30 weeks); 2 = current/safe
+  int _month = _kCurrentMonth;
+  final ScrollController _tabs = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Bring the current month into view once the strip is laid out.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_tabs.hasClients) return;
+      final target = ((_month - 1) * 92.0 - 40).clamp(0.0, _tabs.position.maxScrollExtent);
+      _tabs.animateTo(target, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final sessions = yogaSessionsForMonth(_month);
     return Scaffold(
       backgroundColor: kCanvas,
       body: SafeArea(
@@ -32,15 +61,16 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           children: [
             pvTopBar(context, backLabel: 'Prepare'),
             const SizedBox(height: 22),
-            pvEyebrow('Safe for your stage'),
+            pvEyebrow('Move with your month'),
             const SizedBox(height: 10),
-            Text('Prenatal Yoga', style: pvHeroStyle()),
+            Text('Yoga', style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('Trimester-safe movement to feel strong, calm, and ready.', style: pvSubStyle()),
-            pvBanner(icon: Icons.shield_outlined, spans: [
-              pvText("You're in your "),
-              pvBold('third trimester'),
-              pvText(" - here's your safe track. We hide anything that isn't right for 30 weeks."),
+            Text('Trimester-safe movement to feel strong, calm, and ready - matched to exactly where you are.',
+                style: pvSubStyle()),
+            pvBanner(icon: Icons.self_improvement_rounded, spans: [
+              pvText("You're in "),
+              pvBold('month $_kCurrentMonth'),
+              pvText(" - we've opened your yoga here. Every session is filtered safe for your stage."),
             ]),
 
             // program card
@@ -59,9 +89,10 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Prenatal Yoga Program', style: pvTitleStyle(18)),
+                    Text('Pregnancy Yoga Program', style: pvTitleStyle(18)),
                     const SizedBox(height: 6),
-                    Text('6 weeks · with Sana Kapoor, certified prenatal instructor', style: pvBody(kSoft, 13)),
+                    Text('9-month journey · with Sana Kapoor, certified prenatal instructor',
+                        style: pvBody(kSoft, 13)),
                     const SizedBox(height: 12),
                     Text.rich(
                       TextSpan(children: const [
@@ -78,90 +109,84 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
               ]),
             ),
 
-            // trimester tabs
+            // month tabs
             const SizedBox(height: 22),
-            Row(children: [
-              Expanded(flex: 10, child: _tab('Trimester 1', 0, locked: true)),
-              const SizedBox(width: 8),
-              Expanded(flex: 10, child: _tab('Trimester 2', 1, locked: true)),
-              const SizedBox(width: 8),
-              Expanded(flex: 13, child: _tab(_tri == 2 ? 'Trimester 3 · here' : 'Trimester 3', 2)),
-            ]),
+            Text('CHOOSE A MONTH',
+                style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 40,
+              child: ListView(
+                controller: _tabs,
+                scrollDirection: Axis.horizontal,
+                children: [for (int m = 1; m <= 9; m++) _monthTab(m)],
+              ),
+            ),
 
             const SizedBox(height: 20),
-            if (_tri == 2) ..._sessions() else _lockedTrack(),
+            Row(children: [
+              Text(_month == _kCurrentMonth ? 'This month for you' : 'Month $_month',
+                  style: pvTitleStyle(16)),
+              const Spacer(),
+              Text('${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'}',
+                  style: pvBody(kMuted, 12)),
+            ]),
+            const SizedBox(height: 6),
+
+            if (sessions.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text('Sessions for this month are coming soon.',
+                    style: pvBody(kSoft, 14).copyWith(fontStyle: FontStyle.italic)),
+              )
+            else
+              for (int i = 0; i < sessions.length; i++)
+                _session(sessions[i], bottom: i == sessions.length - 1),
 
             const SizedBox(height: 18),
-            Text("Earlier trimesters include poses that aren't safe now - that's why they're tucked away.",
+            Text('Every session is filtered for your month - nothing unsafe for where you are ever surfaces.',
                 style: pvBody(kSoft, 13).copyWith(fontStyle: FontStyle.italic, height: 1.6)),
-            pvFooterNote(
-                'Certified prenatal instructor. Every session filtered for your exact week - nothing unsafe ever surfaces.'),
+            pvFooterNote('Certified prenatal instructor. A calm, safe practice for all nine months.'),
           ],
         ),
       ),
     );
   }
 
-  Widget _tab(String label, int index, {bool locked = false}) {
-    final active = index == _tri;
+  Widget _monthTab(int m) {
+    final active = m == _month;
+    final isNow = m == _kCurrentMonth;
     return GestureDetector(
-      onTap: () => setState(() => _tri = index),
+      onTap: () => setState(() => _month = m),
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 6),
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: active ? kPurple : kLockBg,
-          borderRadius: BorderRadius.circular(12),
+          color: active ? kPurple : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: active ? kPurple : kBorder),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (locked) ...[
-              Icon(Icons.lock_outline_rounded, size: 11, color: active ? Colors.white : kMuted),
-              const SizedBox(width: 4),
-            ],
-            Flexible(
-              child: Text(label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvBody(active ? Colors.white : kMuted, 12)
-                      .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Text('Month $m',
+              style: pvBody(active ? Colors.white : kInk, 13)
+                  .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
+          if (isNow) ...[
+            const SizedBox(width: 6),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                  color: active ? Colors.white : kCoral, borderRadius: BorderRadius.circular(99)),
             ),
           ],
-        ),
+        ]),
       ),
     );
   }
 
-  List<Widget> _sessions() {
-    return [
-      for (int i = 0; i < kYogaSessions.length; i++)
-        _session(kYogaSessions[i], top: true, bottom: i == kYogaSessions.length - 1),
-    ];
-  }
-
-  Widget _lockedTrack() {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.lock_outline_rounded, size: 18, color: kMuted),
-          const SizedBox(width: 10),
-          Text('Trimester ${_tri + 1} track', style: pvTitleStyle(16)),
-        ]),
-        const SizedBox(height: 10),
-        Text(
-            "These sessions include poses that aren't safe at 30 weeks, so they're tucked away for now. Your Trimester 3 track is ready and waiting.",
-            style: pvBody(kSoft, 14).copyWith(height: 1.55)),
-        const SizedBox(height: 16),
-        pvPrimaryButton('Back to my safe track', () => setState(() => _tri = 2)),
-      ]),
-    );
-  }
-
-  Widget _session(YogaSession y, {bool top = false, bool bottom = false}) {
+  Widget _session(YogaSession y, {bool bottom = false}) {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => PrepareVideoScreen(

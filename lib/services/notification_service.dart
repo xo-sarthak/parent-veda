@@ -14,6 +14,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../models/medication.dart';
 import '../models/reminder.dart';
 
 class NotificationService {
@@ -150,6 +151,117 @@ class NotificationService {
         ),
         iOS: DarwinNotificationDetails(),
       );
+
+  // ===========================================================================
+  //  Medication & Supplement alarms (Section 13)
+  // ---------------------------------------------------------------------------
+  //  Each Medication carries a list of MedAlarm configs; each alarm can fire at
+  //  several times of day, on several weekdays, within an optional start/end
+  //  window. We materialise concrete dated occurrences over a rolling horizon
+  //  (so both start AND end dates are honoured exactly) and schedule them as
+  //  one-shots. Reschedule on every add/edit and on store init re-arms the
+  //  horizon. IDs are derived deterministically per (medication, index) so we
+  //  can cancel a medication's alarms without touching reminder notifications.
+  // ===========================================================================
+
+  // A louder, alarm-flavoured channel distinct from gentle reminders.
+  NotificationDetails get _medDetails => const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'medication_alarms',
+          'Medication & Supplement Alarms',
+          channelDescription:
+              'Reminders to take your medications and supplements',
+          importance: Importance.max,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.alarm,
+        ),
+        iOS: DarwinNotificationDetails(),
+      );
+
+  // How many occurrences we pre-schedule per medication (also the cancel span).
+  // 64 keeps us within iOS' 64 pending-notification budget per feature.
+  static const int _medMaxOcc = 64;
+
+  // Rolling horizon (days) over which we materialise recurring alarms.
+  static const int _medHorizonDays = 60;
+
+  int _medOccId(String medId, int index) =>
+      ('medalarm_$medId#$index').hashCode & 0x7fffffff;
+
+  DateTime? _dayOf(String? iso) {
+    if (iso == null || iso.isEmpty) return null;
+    final d = DateTime.tryParse(iso);
+    return d == null ? null : DateTime(d.year, d.month, d.day);
+  }
+
+  /// Cancel + (re)schedule every alarm on [m]. Disabled alarms are skipped.
+  Future<void> scheduleMedicationAlarms(Medication m) async {
+    if (!_ready) await init();
+    if (!_ready) return;
+    await cancelMedicationAlarms(m.id);
+
+    final now = tz.TZDateTime.now(tz.local);
+    final today = DateTime(now.year, now.month, now.day);
+    var index = 0;
+
+    for (final a in m.alarms) {
+      if (!a.enabled || a.times.isEmpty) continue;
+      final start = _dayOf(a.startDateIso);
+      final end = _dayOf(a.endDateIso);
+      final title = a.title.trim().isNotEmpty ? a.title.trim() : m.name;
+      final body = m.dose.trim().isNotEmpty
+          ? "It's time for your ${m.name} (${m.dose})"
+          : "It's time for your ${m.name}";
+
+      for (int d = 0; d <= _medHorizonDays && index < _medMaxOcc; d++) {
+        final day = today.add(Duration(days: d));
+        if (start != null && day.isBefore(start)) continue;
+        if (end != null && day.isAfter(end)) break;
+        // Daily fires every day; weekly/custom only on the selected weekdays.
+        if (a.repeat != MedAlarmRepeat.daily &&
+            !a.weekdays.contains(day.weekday)) {
+          continue;
+        }
+        final sortedTimes = a.times.toList()..sort();
+        for (final mins in sortedTimes) {
+          if (index >= _medMaxOcc) break;
+          final when = tz.TZDateTime(
+              tz.local, day.year, day.month, day.day, mins ~/ 60, mins % 60);
+          if (!when.isAfter(now)) continue;
+          try {
+            await _plugin.zonedSchedule(
+              _medOccId(m.id, index),
+              title,
+              body,
+              when,
+              _medDetails,
+              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+              uiLocalNotificationDateInterpretation:
+                  UILocalNotificationDateInterpretation.absoluteTime,
+            );
+          } catch (_) {/* best-effort */}
+          index++;
+        }
+      }
+    }
+    debugPrint('[medalarms] scheduled $index occurrence(s) for "${m.name}"');
+  }
+
+  /// Cancel all pending alarm occurrences for a medication id.
+  Future<void> cancelMedicationAlarms(String medId) async {
+    for (var i = 0; i < _medMaxOcc; i++) {
+      await cancel(_medOccId(medId, i));
+    }
+  }
+
+  /// Re-arm alarms for a batch of medications (call on store init).
+  Future<void> syncMedicationAlarms(List<Medication> meds) async {
+    if (!_ready) await init();
+    if (!_ready) return;
+    for (final m in meds) {
+      await scheduleMedicationAlarms(m);
+    }
+  }
 
   tz.TZDateTime _nextTime(int hour, int minute, {int? weekday}) {
     final now = tz.TZDateTime.now(tz.local);

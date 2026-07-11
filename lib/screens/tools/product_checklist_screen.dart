@@ -24,6 +24,19 @@ import '../products_screen.dart';
 
 const Color _accent = Color(0xFF3E9A8C);
 const Color _green = Color(0xFF3FA56A);
+const Color _star = Color(0xFFF5A623); // rating star glyph accent
+
+// Section 12 top filters (audience / stage). Shown ABOVE the existing
+// category-grouped browse in the product picker.
+const List<String> _kTopFilters = [
+  'Baby',
+  'Mom',
+  'Trimester 1',
+  'Trimester 2',
+  'Trimester 3',
+  'Post Birth',
+  'Hospital Bag / Essentials',
+];
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
@@ -42,6 +55,53 @@ String _itemName(ChecklistItem i) =>
     _itemProduct(i)?.name ?? (i.name.isEmpty ? 'Item' : i.name);
 String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
 String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
+
+// --- product card helpers (Section 12) --------------------------------------
+// The Product model has no explicit `brand` field, so we derive a sensible
+// stand-in from the first token of the name (e.g. "ComfyBump Full-Body
+// Pillow" -> "ComfyBump"). TODO: replace with a real Product.brand field.
+String _productBrand(Product p) {
+  final first = p.name.trim().split(RegExp(r'\s+')).first;
+  return first;
+}
+
+// Does [p] match the selected top filter? Empty filter = show all.
+// The model lacks explicit audience / trimester / "essentials" fields, so each
+// chip maps to the closest available signal (category id, category week window,
+// or postpartum label). TODOs mark the approximations.
+bool _productMatchesTopFilter(Product p, String filter) {
+  if (filter.isEmpty) return true;
+  final cat = productCategoryById(p.categoryId);
+  if (cat == null) return false;
+  switch (filter) {
+    case 'Baby':
+      // TODO: no audience field — approximate with baby-facing categories.
+      return const {'swaddle', 'breast_pump'}.contains(cat.id);
+    case 'Mom':
+      // TODO: no audience field — everything not baby-only is mom-facing.
+      return !const {'swaddle'}.contains(cat.id);
+    case 'Trimester 1': // weeks ~4-13
+      return cat.fromWeek <= 13 && cat.toWeek >= 4;
+    case 'Trimester 2': // weeks ~14-27
+      return cat.fromWeek <= 27 && cat.toWeek >= 14;
+    case 'Trimester 3': // weeks ~28-40
+      return cat.fromWeek <= 40 && cat.toWeek >= 28;
+    case 'Post Birth':
+      return cat.toLabel == 'Postpartum';
+    case 'Hospital Bag / Essentials':
+      // TODO: no "essentials" flag — approximate with the near-birth +
+      // newborn kit categories a mother typically packs.
+      return const {
+        'nursing_bra',
+        'breast_pump',
+        'swaddle',
+        'maternity_wear',
+        'compression_socks',
+      }.contains(cat.id);
+    default:
+      return true;
+  }
+}
 
 // ===========================================================================
 //  Shared dialogs
@@ -1031,6 +1091,7 @@ class _AddProductsScreen extends StatefulWidget {
 class _AddProductsScreenState extends State<_AddProductsScreen> {
   final _searchCtrl = TextEditingController();
   String _query = '';
+  String _topFilter = ''; // '' = All; one of _kTopFilters otherwise
 
   @override
   void dispose() {
@@ -1089,13 +1150,18 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
             ),
           ),
         ),
+        // Section 12: top filter chips (audience / stage) ABOVE the existing
+        // category-grouped browse below.
+        _topFilterChips(),
         Expanded(
           child: AnimatedBuilder(
             animation: ProductChecklistStore.instance,
             builder: (context, _) {
               final q = _query.trim();
               if (q.isNotEmpty) {
-                final results = productSearch(q);
+                final results = productSearch(q)
+                    .where((p) => _productMatchesTopFilter(p, _topFilter))
+                    .toList();
                 if (results.isEmpty) {
                   return Center(
                     child: Text(s.pclNoResults,
@@ -1104,24 +1170,38 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 }
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-                  children: [for (final p in results) _productRow(s, p)],
+                  children: [for (final p in results) _productCard(s, p)],
+                );
+              }
+              // Existing category filters (grouped browse), now honouring the
+              // selected top filter and skipping categories left empty by it.
+              final children = <Widget>[];
+              for (final cat in kProductCategories) {
+                final prods = productsForCategory(cat.id)
+                    .where((p) => _productMatchesTopFilter(p, _topFilter))
+                    .toList();
+                if (prods.isEmpty) continue;
+                children.add(Padding(
+                  padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
+                  child: Text('${cat.emoji}  ${cat.name}',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primary900)),
+                ));
+                for (final p in prods) {
+                  children.add(_productCard(s, p));
+                }
+              }
+              if (children.isEmpty) {
+                return Center(
+                  child: Text(s.pclNoResults,
+                      style: GoogleFonts.manrope(color: AppTheme.neutral500)),
                 );
               }
               return ListView(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-                children: [
-                  for (final cat in kProductCategories) ...[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
-                      child: Text('${cat.emoji}  ${cat.name}',
-                          style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.primary900)),
-                    ),
-                    for (final p in productsForCategory(cat.id)) _productRow(s, p),
-                  ],
-                ],
+                children: children,
               );
             },
           ),
@@ -1130,63 +1210,227 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     );
   }
 
-  Widget _productRow(S s, Product p) {
-    final store = ProductChecklistStore.instance;
-    final added = store.isInChecklist(widget.checklistId, p.id);
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Row(children: [
-        Text(p.emoji, style: const TextStyle(fontSize: 24)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(p.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13.5, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 2),
-            Text(p.price,
-                style: GoogleFonts.manrope(
-                    fontSize: 12, color: AppTheme.neutral500)),
-          ]),
+  // --- Top filter chips row (Section 12) ------------------------------------
+  Widget _topFilterChips() => SizedBox(
+        height: 42,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [for (final f in _kTopFilters) _chip(f)],
         ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () {
-            if (added) {
-              store.removeItem(widget.checklistId, p.id);
-            } else {
-              store.addItem(widget.checklistId, p.id);
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-            decoration: BoxDecoration(
-              color: added ? _accent.withValues(alpha: 0.12) : _accent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(added ? Icons.check_rounded : Icons.add_rounded,
-                  size: 16, color: added ? _accent : Colors.white),
-              const SizedBox(width: 4),
-              Text(added ? s.pclAdded : s.pclAdd,
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: added ? _accent : Colors.white)),
-            ]),
+      );
+
+  Widget _chip(String f) {
+    final sel = _topFilter == f;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () => setState(() => _topFilter = sel ? '' : f),
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: sel ? _accent : AppTheme.surface,
+            borderRadius: BorderRadius.circular(20),
+            border:
+                Border.all(color: sel ? _accent : AppTheme.outlineVariant),
           ),
+          child: Text(f,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: sel ? Colors.white : AppTheme.neutral600)),
         ),
-      ]),
+      ),
     );
   }
+
+  // Full product CARD (Section 12): image, brand, name, rating, review count,
+  // price + the add/remove toggle. Tapping the card opens the pregnancy-side
+  // ProductDetailScreen (reused from products_screen.dart).
+  Widget _productCard(S s, Product p) {
+    final store = ProductChecklistStore.instance;
+    final added = store.isInChecklist(widget.checklistId, p.id);
+    final reviewCount = p.reviews.length; // model has no count field; use list
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _push(
+          context,
+          ProductDetailScreen(
+              product: p, controller: widget.controller)),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+          ],
+        ),
+        child: Row(children: [
+          // Product photo (falls back to the emoji if the image fails/loads).
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.network(
+              productImageUrl(p),
+              width: 62,
+              height: 62,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _imgFallback(p),
+              loadingBuilder: (ctx, child, progress) =>
+                  progress == null ? child : _imgFallback(p),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_productBrand(p).toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.manrope(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                          color: AppTheme.neutral500)),
+                  const SizedBox(height: 1),
+                  Text(p.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary900)),
+                  const SizedBox(height: 5),
+                  Row(children: [
+                    const Icon(Icons.star_rounded, size: 14, color: _star),
+                    const SizedBox(width: 2),
+                    // score is the ParentVeda Score (x/10) — used as the rating.
+                    Text('${p.score.toStringAsFixed(1)}/10',
+                        style: GoogleFonts.manrope(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.neutral600)),
+                    if (reviewCount > 0) ...[
+                      const SizedBox(width: 4),
+                      Text('($reviewCount)',
+                          style: GoogleFonts.manrope(
+                              fontSize: 11, color: AppTheme.neutral400)),
+                    ],
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(p.price,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.manrope(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w800,
+                              color: _accent)),
+                    ),
+                  ]),
+                ]),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () {
+              if (added) {
+                store.removeItem(widget.checklistId, p.id);
+              } else {
+                store.addItem(widget.checklistId, p.id);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+              decoration: BoxDecoration(
+                color: added ? _accent.withValues(alpha: 0.12) : _accent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(added ? Icons.check_rounded : Icons.add_rounded,
+                    size: 16, color: added ? _accent : Colors.white),
+                const SizedBox(width: 4),
+                Text(added ? s.pclAdded : s.pclAdd,
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: added ? _accent : Colors.white)),
+              ]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _imgFallback(Product p) => Container(
+        width: 62,
+        height: 62,
+        alignment: Alignment.center,
+        color: AppTheme.surfaceContainer,
+        child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
+      );
+
+  // Old compact row, replaced by _productCard above. Kept for reference/revert.
+  // Widget _productRow(S s, Product p) {
+  //   final store = ProductChecklistStore.instance;
+  //   final added = store.isInChecklist(widget.checklistId, p.id);
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: 8),
+  //     padding: const EdgeInsets.all(10),
+  //     decoration: BoxDecoration(
+  //       color: AppTheme.surface,
+  //       borderRadius: BorderRadius.circular(14),
+  //       border: Border.all(color: AppTheme.outlineVariant),
+  //     ),
+  //     child: Row(children: [
+  //       Text(p.emoji, style: const TextStyle(fontSize: 24)),
+  //       const SizedBox(width: 12),
+  //       Expanded(
+  //         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  //           Text(p.name,
+  //               maxLines: 1,
+  //               overflow: TextOverflow.ellipsis,
+  //               style: GoogleFonts.plusJakartaSans(
+  //                   fontSize: 13.5, fontWeight: FontWeight.w700)),
+  //           const SizedBox(height: 2),
+  //           Text(p.price,
+  //               style: GoogleFonts.manrope(
+  //                   fontSize: 12, color: AppTheme.neutral500)),
+  //         ]),
+  //       ),
+  //       const SizedBox(width: 8),
+  //       GestureDetector(
+  //         onTap: () {
+  //           if (added) {
+  //             store.removeItem(widget.checklistId, p.id);
+  //           } else {
+  //             store.addItem(widget.checklistId, p.id);
+  //           }
+  //         },
+  //         child: Container(
+  //           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+  //           decoration: BoxDecoration(
+  //             color: added ? _accent.withValues(alpha: 0.12) : _accent,
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //           child: Row(mainAxisSize: MainAxisSize.min, children: [
+  //             Icon(added ? Icons.check_rounded : Icons.add_rounded,
+  //                 size: 16, color: added ? _accent : Colors.white),
+  //             const SizedBox(width: 4),
+  //             Text(added ? s.pclAdded : s.pclAdd,
+  //                 style: GoogleFonts.plusJakartaSans(
+  //                     fontSize: 12.5,
+  //                     fontWeight: FontWeight.w800,
+  //                     color: added ? _accent : Colors.white)),
+  //           ]),
+  //         ),
+  //       ),
+  //     ]),
+  //   );
+  // }
 
   // Finish-right-here bar: Save list (back to your lists) or Add to cart.
   Widget _pickerBottomBar(S s) => SafeArea(

@@ -126,6 +126,14 @@ class PregnancyController extends ChangeNotifier {
   /// Overall journey progress as a whole percentage (0–100).
   int get progressPercent => (progress * 100).round();
 
+  /// Which trimester the mother is in (1, 2 or 3), by completed days.
+  ///  T1 = up to day 91 (wk 13), T2 = 92–189 (wk 14–27), T3 = 190+ (wk 28–40).
+  int get currentTrimester {
+    if (currentDay <= 91) return 1;
+    if (currentDay <= 189) return 2;
+    return 3;
+  }
+
   /// All week numbers we have content for, ascending.
   List<int> get availableWeeks => _weeks.map((w) => w.week).toList();
 

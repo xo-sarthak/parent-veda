@@ -21,6 +21,7 @@ import '../services/bump_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
+import 'bump_book_screen.dart';
 
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
@@ -80,6 +81,8 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
               children: [
                 _progressCard(s, all),
+                const SizedBox(height: 14),
+                _bookEntry(s),
                 const SizedBox(height: 14),
                 _filters(s),
                 const SizedBox(height: 8),
@@ -167,6 +170,68 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  // Prominent entry into the animated flipbook keepsake.
+  Widget _bookEntry(S s) {
+    final en = p.language.isEnglish;
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => BumpBookScreen(lang: p.language),
+      )),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppTheme.primary600, AppTheme.secondary500],
+          ),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: _soft,
+        ),
+        child: Row(children: [
+          Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(14)),
+            child: const Icon(Icons.auto_stories_rounded,
+                color: Colors.white, size: 24),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  en ? 'My Bump Journey Book' : 'Meri Bump Journey Book',
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  en
+                      ? 'Flip through your weeks - view, download or print'
+                      : 'Apne hafte flip karein - view, download ya print',
+                  style: GoogleFonts.manrope(
+                      fontSize: 12,
+                      height: 1.3,
+                      color: Colors.white.withValues(alpha: 0.9)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right_rounded, color: Colors.white),
+        ]),
       ),
     );
   }

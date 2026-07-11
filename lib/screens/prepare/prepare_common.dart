@@ -154,6 +154,40 @@ Widget pvOutlineButton(String label, VoidCallback onTap) => Material(
       ),
     );
 
+// Rounded search field used by the Courses & Cohorts home.
+Widget pvSearchField({
+  required TextEditingController controller,
+  required String hint,
+  required ValueChanged<String> onChanged,
+}) =>
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: kBorder),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Row(children: [
+        const Icon(Icons.search_rounded, size: 19, color: kMuted),
+        const SizedBox(width: 10),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            onChanged: onChanged,
+            style: GoogleFonts.manrope(fontSize: 14, color: kInk),
+            cursorColor: kPurple,
+            decoration: InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              hintText: hint,
+              hintStyle: GoogleFonts.manrope(fontSize: 14, color: kMuted),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+      ]),
+    );
+
 // Diagonal-striped placeholder (stands in for imagery/video, as in the mock).
 class PvStriped extends StatelessWidget {
   const PvStriped({
@@ -245,6 +279,9 @@ Future<void> showPrepareBooking(
   String? whenLabel,
   String heading = 'Reserve your spot',
   String cta = 'Confirm',
+  // Optional: run after the sheet is dismissed on success. Used by the Nutrition
+  // funnel so booking the expert consult flows on to the personalized diet plan.
+  VoidCallback? onConfirmed,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -257,6 +294,7 @@ Future<void> showPrepareBooking(
       whenLabel: whenLabel,
       heading: heading,
       cta: cta,
+      onConfirmed: onConfirmed,
     ),
   );
 }
@@ -269,6 +307,7 @@ class _BookingSheet extends StatefulWidget {
     required this.heading,
     required this.cta,
     this.whenLabel,
+    this.onConfirmed,
   });
   final String id;
   final String title;
@@ -276,6 +315,7 @@ class _BookingSheet extends StatefulWidget {
   final String? whenLabel;
   final String heading;
   final String cta;
+  final VoidCallback? onConfirmed;
 
   @override
   State<_BookingSheet> createState() => _BookingSheetState();
@@ -385,7 +425,10 @@ class _BookingSheetState extends State<_BookingSheet> {
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTap: () => Navigator.of(context).maybePop(),
+            onTap: () {
+              Navigator.of(context).maybePop();
+              widget.onConfirmed?.call();
+            },
             child: Center(
               child: Text('Done',
                   style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),

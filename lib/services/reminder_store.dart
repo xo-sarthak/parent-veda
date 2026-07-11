@@ -47,6 +47,14 @@ class ReminderStore extends ChangeNotifier {
     await _syncFromCloud();
     await NotificationService.instance.init();
     await NotificationService.instance.syncAll(_items);
+    // syncAll schedules a customDays reminder at its FIRST time only; re-arm the
+    // extra per-time variants for any multi-time custom reminders.
+    for (final r in _items) {
+      if (r.enabled && _isMultiTimeCustom(r)) {
+        NotificationService.instance.cancelReminder(r); // drop the first-time occ
+        _scheduleOs(r); // re-arm all time × weekday variants
+      }
+    }
   }
 
   Future<void> _syncFromCloud() async {
@@ -138,6 +146,59 @@ class ReminderStore extends ChangeNotifier {
     return null;
   }
 
+  // ---------------------------------------------------------------------------
+  //  OS scheduling helpers
+  // ---------------------------------------------------------------------------
+  //  NotificationService.schedule() already fans a reminder out into its own
+  //  occurrences: a DAILY reminder fires at each of its [times], and a
+  //  customDays reminder fires on each of its [weekdays] (at the single primary
+  //  time). The one combination it can't express on its own is a customDays
+  //  reminder that ALSO has several times-of-day (time × weekday). Since we must
+  //  not edit NotificationService, we handle that here by calling its existing
+  //  weekly-style schedule once per time - each on a synthetic per-time id so the
+  //  OS notification ids don't collide.
+
+  bool _isMultiTimeCustom(Reminder r) =>
+      r.repeat == ReminderRepeat.customDays && r.effectiveTimes.length > 1;
+
+  /// A single-time clone of a customDays reminder, under a per-time id, so
+  /// NotificationService schedules its weekday-set at that one time.
+  Reminder _timeVariant(Reminder r, int index, int minutes) => Reminder(
+        id: '${r.id}~t$index',
+        title: r.title,
+        body: r.body,
+        hour: minutes ~/ 60,
+        minute: minutes % 60,
+        repeat: ReminderRepeat.customDays,
+        weekday: r.weekday,
+        enabled: r.enabled,
+        category: r.category,
+        times: const [],
+        dayOfMonth: r.dayOfMonth,
+        weekdays: r.weekdays,
+      );
+
+  /// Schedule every occurrence (time × recurrence-day) of [r].
+  void _scheduleOs(Reminder r) {
+    if (_isMultiTimeCustom(r)) {
+      final ts = r.effectiveTimes;
+      for (var i = 0; i < ts.length; i++) {
+        NotificationService.instance.schedule(_timeVariant(r, i, ts[i]));
+      }
+    } else {
+      NotificationService.instance.schedule(r);
+    }
+  }
+
+  /// Cancel [r] and any per-time custom variants a previous save may have armed.
+  void _cancelOs(Reminder r) {
+    NotificationService.instance.cancelReminder(r);
+    // Over-cancel a fixed window of possible per-time variants (id-only work).
+    for (var i = 0; i < 8; i++) {
+      NotificationService.instance.cancelReminder(_timeVariant(r, i, 0));
+    }
+  }
+
   /// Add a new reminder or replace an existing one (matched by id).
   void upsert(Reminder r) {
     final i = _items.indexWhere((x) => x.id == r.id);
@@ -146,11 +207,8 @@ class ReminderStore extends ChangeNotifier {
     } else {
       _items.insert(0, r);
     }
-    if (r.enabled) {
-      NotificationService.instance.schedule(r);
-    } else {
-      NotificationService.instance.cancelReminder(r);
-    }
+    _cancelOs(r); // clear any prior occurrences/variants before re-arming
+    if (r.enabled) _scheduleOs(r);
     _persistNotify();
     _cloudPush(r); // sync to cloud (fire-and-forget, like _persist)
   }
@@ -158,7 +216,7 @@ class ReminderStore extends ChangeNotifier {
   void remove(String id) {
     final r = byId(id);
     _items.removeWhere((x) => x.id == id);
-    if (r != null) NotificationService.instance.cancelReminder(r);
+    if (r != null) _cancelOs(r);
     _persistNotify();
     _cloudDelete(id); // remove from cloud too
   }
@@ -168,11 +226,8 @@ class ReminderStore extends ChangeNotifier {
     if (i < 0) return;
     final updated = _items[i].copyWith(enabled: !_items[i].enabled);
     _items[i] = updated;
-    if (updated.enabled) {
-      NotificationService.instance.schedule(updated);
-    } else {
-      NotificationService.instance.cancelReminder(updated);
-    }
+    _cancelOs(updated);
+    if (updated.enabled) _scheduleOs(updated);
     _persistNotify();
     _cloudPush(updated); // sync the toggled state to cloud
   }

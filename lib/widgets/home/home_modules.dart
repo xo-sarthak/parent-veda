@@ -483,7 +483,20 @@ class GrowModule extends StatelessWidget {
       accent: AppTheme.primary500,
       title: '“${g.title.of(lang)}”',
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(g.insight.of(lang), style: text.bodyLarge?.copyWith(height: 1.5)),
+        // One-line insight (the featured "hook").
+        Text(g.insight.of(lang),
+            style: text.bodyLarge
+                ?.copyWith(height: 1.5, fontWeight: FontWeight.w600)),
+        // Editorial 2–3 line preview of the fuller read, if present.
+        if (g.expanded.of(lang).trim().isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(
+            g.expanded.of(lang),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: text.bodyMedium?.copyWith(height: 1.5),
+          ),
+        ],
         const SizedBox(height: 16),
         HomePrimaryButton(
           label: s.readMore,

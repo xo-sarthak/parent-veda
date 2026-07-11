@@ -35,6 +35,9 @@ class _GameChrome extends StatelessWidget {
     required this.done,
     required this.onAgain,
     required this.child,
+    this.onReload,
+    this.onNewPuzzle,
+    this.onNext,
   });
   final String title;
   final PregnancyController controller;
@@ -42,9 +45,18 @@ class _GameChrome extends StatelessWidget {
   final VoidCallback onAgain;
   final Widget child;
 
+  /// In-game controls (shown as AppBar actions while playing):
+  ///   onReload    - restart the CURRENT puzzle (clears progress, same board).
+  ///   onNewPuzzle - generate a fresh RANDOM puzzle.
+  ///   onNext      - advance to the NEXT puzzle in sequence.
+  final VoidCallback? onReload;
+  final VoidCallback? onNewPuzzle;
+  final VoidCallback? onNext;
+
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
+    final hinglish = controller.language.isHinglish;
     return Scaffold(
       backgroundColor: _cream,
       appBar: AppBar(
@@ -53,6 +65,28 @@ class _GameChrome extends StatelessWidget {
         elevation: 0,
         title: Text(title,
             style: const TextStyle(fontWeight: FontWeight.w800, color: _ink)),
+        actions: done
+            ? null
+            : [
+                if (onReload != null)
+                  IconButton(
+                    tooltip: hinglish ? 'Dobara shuru' : 'Reload',
+                    icon: const Icon(Icons.refresh_rounded),
+                    onPressed: onReload,
+                  ),
+                if (onNewPuzzle != null)
+                  IconButton(
+                    tooltip: hinglish ? 'Naya puzzle' : 'New puzzle',
+                    icon: const Icon(Icons.casino_outlined),
+                    onPressed: onNewPuzzle,
+                  ),
+                if (onNext != null)
+                  IconButton(
+                    tooltip: hinglish ? 'Agla puzzle' : 'Next puzzle',
+                    icon: const Icon(Icons.skip_next_rounded),
+                    onPressed: onNext,
+                  ),
+              ],
       ),
       body: SafeArea(
         child: done ? _completion(context, s) : child,
@@ -143,21 +177,36 @@ class _WordSearchGameState extends State<WordSearchGame> {
   int? _first;
   bool _done = false;
 
+  int _rot = 0; // rotation offset for deterministic "next puzzle"
+
   @override
   void initState() {
     super.initState();
-    _reset();
+    _newPuzzle();
   }
 
-  void _reset() {
-    // Six words per round (max length 7 fits a 9-grid).
-    final pool = [..._wordPool]..shuffle(_rng);
-    _words = pool.take(6).toList();
+  // Re-place the CURRENT word set and clear progress (Reload).
+  void _reload() {
     _grid = _generate(_words, _n, _rng);
     _found.clear();
     _foundCells.clear();
     _first = null;
     setState(() => _done = false);
+  }
+
+  // Fresh RANDOM set of six words (New puzzle). Max length 7 fits a 9-grid.
+  void _newPuzzle() {
+    final pool = [..._wordPool]..shuffle(_rng);
+    _words = pool.take(6).toList();
+    _reload();
+  }
+
+  // The NEXT set of six words by rotating the pool (Next puzzle).
+  void _next() {
+    _rot = (_rot + 1) % _wordPool.length;
+    final rotated = [..._wordPool.sublist(_rot), ..._wordPool.sublist(0, _rot)];
+    _words = rotated.take(6).toList();
+    _reload();
   }
 
   // Place each word H/V at a non-conflicting spot, then fill with letters.
@@ -274,7 +323,10 @@ class _WordSearchGameState extends State<WordSearchGame> {
       title: 'Word Search',
       controller: widget.controller,
       done: _done,
-      onAgain: _reset,
+      onAgain: _newPuzzle,
+      onReload: _reload,
+      onNewPuzzle: _newPuzzle,
+      onNext: _next,
       child: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [
@@ -389,19 +441,26 @@ class _SudokuGameState extends State<SudokuGame> {
   int? _sel;
   bool _done = false;
 
+  int _pIndex = 0;
+
   @override
   void initState() {
     super.initState();
-    _reset();
+    _load(_rng.nextInt(_puzzles.length));
   }
 
-  void _reset() {
-    final p = _puzzles[_rng.nextInt(_puzzles.length)];
+  void _load(int i) {
+    _pIndex = i % _puzzles.length;
+    final p = _puzzles[_pIndex];
     _cells = [...p];
     _given = [for (final v in p) v != 0];
     _sel = null;
     setState(() => _done = false);
   }
+
+  void _reload() => _load(_pIndex); // restart current board
+  void _newPuzzle() => _load(_rng.nextInt(_puzzles.length)); // random board
+  void _next() => _load(_pIndex + 1); // next board in sequence
 
   bool _conflict(int idx) {
     final v = _cells[idx];
@@ -445,7 +504,10 @@ class _SudokuGameState extends State<SudokuGame> {
       title: 'Sudoku',
       controller: widget.controller,
       done: _done,
-      onAgain: _reset,
+      onAgain: _newPuzzle,
+      onReload: _reload,
+      onNewPuzzle: _newPuzzle,
+      onNext: _next,
       child: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [
@@ -573,14 +635,29 @@ class LogicGame extends StatefulWidget {
 }
 
 class _LogicGameState extends State<LogicGame> {
+  final Random _rng = Random();
   int _i = 0;
   bool _nudge = false;
   bool _done = false;
 
-  void _reset() {
+  // Reload: restart from the first question.
+  void _reload() {
     _i = 0;
     _nudge = false;
     setState(() => _done = false);
+  }
+
+  // New puzzle: start from a random question.
+  void _newPuzzle() {
+    _i = _rng.nextInt(_kLogic.length);
+    _nudge = false;
+    setState(() => _done = false);
+  }
+
+  // Next puzzle: skip to the next question.
+  void _next() {
+    _i = (_i + 1) % _kLogic.length;
+    setState(() => _nudge = false);
   }
 
   void _choose(int opt) {
@@ -608,7 +685,10 @@ class _LogicGameState extends State<LogicGame> {
       title: 'Logic Puzzle',
       controller: widget.controller,
       done: _done,
-      onAgain: _reset,
+      onAgain: _reload,
+      onReload: _reload,
+      onNewPuzzle: _newPuzzle,
+      onNext: _next,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 6, 20, 28),
         children: [
@@ -756,6 +836,10 @@ class _MemoryMatchGameState extends State<MemoryMatchGame> {
       controller: widget.controller,
       done: _done,
       onAgain: _reset,
+      // One calming face set, so every control simply reshuffles the board.
+      onReload: _reset,
+      onNewPuzzle: _reset,
+      onNext: _reset,
       child: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [

@@ -75,14 +75,19 @@ const List<_Fact> _babyScience = [
   _Fact(
       '🧠',
       Color(0xFFF2E9FB),
-      LocalizedText(en: 'My busy little brain', hi: 'Mera vyast nanha dimaag'),
+      // Titles rewritten as complete sentences (card shows heading only now).
+      LocalizedText(
+          en: 'My brain is growing at an astonishing pace',
+          hi: 'Mera dimaag gajab raftaar se badh raha hai'),
       LocalizedText(
           en: "I'm forming millions of new nerve connections every single day - my brain is working at an astonishing pace!",
           hi: 'Main har din laakhon naye nerve connections bana raha hoon - mera dimaag gajab raftaar se kaam kar raha hai!')),
   _Fact(
       '🤏',
       Color(0xFFFCE3E6),
-      LocalizedText(en: 'My tiny grip', hi: 'Meri nanhi pakad'),
+      LocalizedText(
+          en: 'I can already curl my tiny fingers',
+          hi: 'Main abhi se apni nanhi ungliyan mod sakta hoon'),
       LocalizedText(
           en: "I can curl my little fingers and sometimes grab the umbilical cord - I'm practising for our very first cuddles.",
           hi: 'Main apni nanhi ungliyan mod sakta hoon aur kabhi gard-naal pakad leta hoon - main hamari pehli cuddles ki practice kar raha hoon.')),
@@ -96,14 +101,18 @@ const List<_Fact> _babyScience = [
   _Fact(
       '🦶',
       Color(0xFFFDF0C4),
-      LocalizedText(en: 'My own prints', hi: 'Mere apne nishaan'),
+      LocalizedText(
+          en: 'My own fingerprints are forming right now',
+          hi: 'Mere apne fingerprints abhi ban rahe hain'),
       LocalizedText(
           en: "My very own fingerprints - and footprints - are forming right now, patterns that will be mine alone for life.",
           hi: 'Mere apne fingerprints - aur footprints - abhi ban rahe hain, jo zindagi bhar sirf mere honge.')),
   _Fact(
       '💗',
       Color(0xFFEAF1EA),
-      LocalizedText(en: 'My strong heartbeat', hi: 'Meri mazboot dhadkan'),
+      LocalizedText(
+          en: 'My heart is beating strong and steady',
+          hi: 'Mera dil mazboot aur sthir dhadak raha hai'),
       LocalizedText(
           en: "My heart is pumping hard, moving several litres of blood around my tiny body every single day.",
           hi: 'Mera dil zor se pump kar raha hai, har din kai litre khoon mere nanhe sharir mein ghumata hai.')),
@@ -1000,14 +1009,19 @@ const List<_Fact> _babyScienceFather = [
   _Fact(
       '🧠',
       Color(0xFFF2E9FB),
-      LocalizedText(en: 'A busy little brain', hi: 'Ek vyast nanha dimaag'),
+      // Titles rewritten as complete sentences (card shows heading only now).
+      LocalizedText(
+          en: "Baby's brain is growing at an astonishing pace",
+          hi: 'Baby ka dimaag gajab raftaar se badh raha hai'),
       LocalizedText(
           en: "Your baby is forming millions of new nerve connections every single day - that little brain is working at an astonishing pace!",
           hi: 'Aapka baby har din laakhon naye nerve connections bana raha hai - woh nanha dimaag gajab raftaar se kaam kar raha hai!')),
   _Fact(
       '🤏',
       Color(0xFFFCE3E6),
-      LocalizedText(en: 'A tiny grip', hi: 'Ek nanhi pakad'),
+      LocalizedText(
+          en: 'Baby can already curl those tiny fingers',
+          hi: 'Baby abhi se apni nanhi ungliyan mod sakta hai'),
       LocalizedText(
           en: "Baby can curl those little fingers and sometimes grabs the umbilical cord - practising for your very first cuddles.",
           hi: 'Baby apni nanhi ungliyan mod sakta hai aur kabhi gard-naal pakad leta hai - aapki pehli cuddles ki practice kar raha hai.')),
@@ -1021,21 +1035,27 @@ const List<_Fact> _babyScienceFather = [
   _Fact(
       '🦶',
       Color(0xFFFDF0C4),
-      LocalizedText(en: "Baby's own prints", hi: 'Baby ke apne nishaan'),
+      LocalizedText(
+          en: "Baby's own fingerprints are forming right now",
+          hi: 'Baby ke apne fingerprints abhi ban rahe hain'),
       LocalizedText(
           en: "Baby's very own fingerprints - and footprints - are forming right now, patterns that will be theirs alone for life.",
           hi: 'Baby ke apne fingerprints - aur footprints - abhi ban rahe hain, jo zindagi bhar sirf uske honge.')),
   _Fact(
       '💗',
       Color(0xFFEAF1EA),
-      LocalizedText(en: 'A strong heartbeat', hi: 'Ek mazboot dhadkan'),
+      LocalizedText(
+          en: "Baby's heart is beating strong and steady",
+          hi: 'Baby ka dil mazboot aur sthir dhadak raha hai'),
       LocalizedText(
           en: "Baby's heart is pumping hard, moving several litres of blood around that tiny body every single day.",
           hi: 'Baby ka dil zor se pump kar raha hai, har din kai litre khoon uske nanhe sharir mein ghumata hai.')),
   _Fact(
       '🌗',
       Color(0xFFEDEAF6),
-      LocalizedText(en: 'Baby senses light', hi: 'Baby roshni mehsoos karta hai'),
+      LocalizedText(
+          en: 'Baby can sense light through the bump',
+          hi: 'Baby bump se roshni mehsoos kar sakta hai'),
       LocalizedText(
           en: 'Shine a soft light on her bump and baby might turn towards it - those eyes are getting ready to see you both.',
           hi: 'Uske bump par halki roshni daalein to baby uski taraf mud sakta hai - woh aankhein aap dono ko dekhne ko taiyar ho rahi hain.')),
@@ -1284,6 +1304,35 @@ class WeekFlowView extends StatelessWidget {
               father: fatherSkin,
               onTap: () => _push(
                   context, _WhatsNextScreen(controller: controller, lang: lang)),
+              // Three shortcut icons - Baby, Mom, Scans - each opening its own
+              // detail. The card itself still opens the full What's next pop-up.
+              // Mother experience only (father's What's next is scans-only).
+              footer: fatherSkin
+                  ? null
+                  : Row(children: [
+                      _whatsNextShortcut(
+                          context,
+                          Icons.child_care_rounded,
+                          lang.isEnglish ? 'Baby' : 'Baby',
+                          AppTheme.primary500,
+                          () => openWeekBabyDetail(
+                              context, controller, w.week, lang)),
+                      const SizedBox(width: 10),
+                      _whatsNextShortcut(
+                          context,
+                          Icons.favorite_rounded,
+                          lang.isEnglish ? 'Mom' : 'Maa',
+                          AppTheme.secondary500,
+                          () => openWeekMotherDetail(
+                              context, controller, w.week, lang)),
+                      const SizedBox(width: 10),
+                      _whatsNextShortcut(
+                          context,
+                          Icons.event_note_rounded,
+                          lang.isEnglish ? 'Scans' : 'Scans',
+                          const Color(0xFF2E9C8E),
+                          () => openWeekScans(context, controller, lang)),
+                    ]),
             ),
             const SizedBox(height: 18),
             // Organic nudge - a clean, warm reminder, woven mid-flow (NOT at the
@@ -1306,6 +1355,10 @@ class WeekFlowView extends StatelessWidget {
             // for the mother to share her week WITH the father, so it's pointless
             // when you already are the father.
             if (!fatherSkin) _PartnerSection(w: w, lang: lang),
+            // Previous / next week navigation - loads the complete adjacent
+            // week (clamped to the available week bounds; ends hide the arrow).
+            const SizedBox(height: 18),
+            _WeekNav(controller: controller, lang: lang, father: fatherSkin),
             if (trailing != null) ...[
               const SizedBox(height: 18),
               trailing!,
@@ -1392,6 +1445,16 @@ void openWeekWhatsNext(
     {bool father = false}) {
   _push(context,
       _WhatsNextScreen(controller: controller, lang: lang, father: father));
+}
+
+/// Opens the "What's next" pop-up straight on the Scans tab (tab index 2 in the
+/// Baby · Mom · Scans order) - used by the What's next card's Scans shortcut.
+void openWeekScans(
+    BuildContext context, PregnancyController controller, AppLanguage lang) {
+  _push(
+      context,
+      _WhatsNextScreen(
+          controller: controller, lang: lang, initialTab: _wnTabScans));
 }
 
 /// Shared bottom overlay for swipeable pop-ups: a "swipe" hint pill (page 0
@@ -1562,6 +1625,7 @@ class _SectionBrief extends StatelessWidget {
     required this.cta,
     required this.onTap,
     this.father = false,
+    this.footer,
   });
   final IconData icon;
   final Color color;
@@ -1570,6 +1634,10 @@ class _SectionBrief extends StatelessWidget {
   final String cta;
   final VoidCallback onTap;
   final bool father; // Slate re-skin (week-20 Dad preview only)
+  // Optional footer row rendered below the CTA - used by the "What's next" card
+  // to host the Baby / Mom / Scans shortcut icons (additional tap targets that
+  // sit INSIDE the still-tappable card).
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -1629,10 +1697,44 @@ class _SectionBrief extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                   color: color)),
+          if (footer != null) ...[
+            const SizedBox(height: 14),
+            footer!,
+          ],
         ]),
       ),
     );
   }
+}
+
+/// A single Baby / Mom / Scans shortcut chip used on the "What's next" card.
+/// Its own tap handler wins the gesture arena over the parent card, so tapping
+/// a chip opens its detail while the rest of the card still opens the pop-up.
+Widget _whatsNextShortcut(
+    BuildContext context, IconData icon, String label, Color color,
+    VoidCallback onTap) {
+  return Expanded(
+    child: GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(height: 5),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
+        ]),
+      ),
+    ),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1760,20 +1862,23 @@ class _TrimesterTips extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Heading only now (a complete-sentence tip). The full
+                    // explanation stays in the tap-through pop-up (_showTip).
                     Text(t.title.of(lang),
                         style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
-                            height: 1.25,
+                            height: 1.3,
                             color: AppTheme.primary900)),
-                    const SizedBox(height: 4),
-                    Text(t.body.of(lang),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.manrope(
-                            fontSize: 12.5,
-                            height: 1.45,
-                            color: const Color(0xFF5B5070))),
+                    // Preview description removed from the card (kept in pop-up):
+                    // const SizedBox(height: 4),
+                    // Text(t.body.of(lang),
+                    //     maxLines: 2,
+                    //     overflow: TextOverflow.ellipsis,
+                    //     style: GoogleFonts.manrope(
+                    //         fontSize: 12.5,
+                    //         height: 1.45,
+                    //         color: const Color(0xFF5B5070))),
                   ]),
             ),
             const SizedBox(width: 6),
@@ -2078,19 +2183,23 @@ class _BabyDetailScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Heading only now (a complete-sentence fact). The full
+                    // fact text stays in the tap-through pop-up (_showFact).
                     Text(f.title.of(lang),
                         style: GoogleFonts.plusJakartaSans(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
+                            height: 1.3,
                             color: father ? _fInk : AppTheme.primary900)),
-                    const SizedBox(height: 3),
-                    Text(f.desc.of(lang),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.manrope(
-                            fontSize: 13,
-                            height: 1.4,
-                            color: father ? _fMuted : AppTheme.neutral600)),
+                    // Preview description removed from the card (kept in pop-up):
+                    // const SizedBox(height: 3),
+                    // Text(f.desc.of(lang),
+                    //     maxLines: 2,
+                    //     overflow: TextOverflow.ellipsis,
+                    //     style: GoogleFonts.manrope(
+                    //         fontSize: 13,
+                    //         height: 1.4,
+                    //         color: father ? _fMuted : AppTheme.neutral600)),
                     const SizedBox(height: 6),
                     Row(children: [
                       Text(s.wfTapToRead,
@@ -2851,22 +2960,33 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 // ---------------------------------------------------------------------------
 // Opens on a "what's next" read, then swipes to Upcoming milestones, then
 // Scans & appointments. Milestones and scans open a centered detail pop-up.
+// Tab indices for the What's next pop-up, in the Baby · Mom · Scans order.
+const int _wnTabBaby = 0;
+const int _wnTabMom = 1;
+const int _wnTabScans = 2;
+
 class _WhatsNextScreen extends StatefulWidget {
   const _WhatsNextScreen(
-      {required this.controller, required this.lang, this.father = false});
+      {required this.controller,
+      required this.lang,
+      this.father = false,
+      this.initialTab = _wnTabBaby});
   final PregnancyController controller;
   final AppLanguage lang;
 
   /// When true (the father's "What's next"), show Scans & appointments only,
   /// re-voiced for the partner - no milestones, no "for you" body section.
   final bool father;
+
+  /// Which tab to open on (Baby · Mom · Scans). Defaults to Baby.
+  final int initialTab;
   @override
   State<_WhatsNextScreen> createState() => _WhatsNextScreenState();
 }
 
 class _WhatsNextScreenState extends State<_WhatsNextScreen> {
-  // One page, three tabs (no swipe). Scans & appointments first (default).
-  int _tab = 0;
+  // One page, three tabs (no swipe): Baby · Mom · Scans. Opens on initialTab.
+  late int _tab = widget.initialTab;
 
   @override
   Widget build(BuildContext context) {
@@ -2895,17 +3015,21 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
         ),
         const SizedBox(height: 6),
         Expanded(
-          child: _tab == 0
-              ? _scansList(s, lang, cw)
-              : (_tab == 1
+          // Baby tab reuses the (baby-development) milestones list; Mom tab the
+          // "for you" forward look; Scans tab the scans & appointments list.
+          // Nothing lost in the Scans/You/Milestones -> Baby/Mom/Scans remap -
+          // the old Milestones content now lives under the Baby tab.
+          child: _tab == _wnTabBaby
+              ? _milestonesList(s, lang, cw)
+              : (_tab == _wnTabMom
                   ? _motherNextList(s, lang, cw)
-                  : _milestonesList(s, lang, cw)),
+                  : _scansList(s, lang, cw)),
         ),
       ]),
     );
   }
 
-  // The three-way tab row (Scans · For you · Milestones).
+  // The three-way tab row (Baby · Mom · Scans).
   Widget _whatsNextTabs(S s) {
     Widget seg(int i, IconData icon, String label) {
       final on = _tab == i;
@@ -2947,10 +3071,15 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: AppTheme.outlineVariant),
       ),
+      // Reordered + renamed to Baby · Mom · Scans (inline bilingual labels;
+      // app_language.dart untouched). Old labels: Scans / For you / Milestones.
       child: Row(children: [
-        seg(0, Icons.event_note_rounded, s.wfNextTabScans),
-        seg(1, Icons.favorite_rounded, s.wfNextTabYou),
-        seg(2, Icons.emoji_events_rounded, s.wfNextTabMilestones),
+        seg(_wnTabBaby, Icons.child_care_rounded,
+            widget.lang.isEnglish ? 'Baby' : 'Baby'),
+        seg(_wnTabMom, Icons.favorite_rounded,
+            widget.lang.isEnglish ? 'Mom' : 'Maa'),
+        seg(_wnTabScans, Icons.event_note_rounded,
+            widget.lang.isEnglish ? 'Scans' : 'Scans'),
       ]),
     );
   }
@@ -3678,6 +3807,8 @@ class _VideoFeed extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
         ),
+        _viewAllButton(context, s,
+            () => _push(context, _AllVideosScreen(lang: lang))),
       ]),
       const SizedBox(height: 12),
       // A horizontal reel/shorts-style feed - uniform 9:16 tiles.
@@ -3695,12 +3826,19 @@ class _VideoFeed extends StatelessWidget {
     ]);
   }
 
-  Widget _reel(BuildContext context, _Vid v, S s) {
-    return GestureDetector(
+  Widget _reel(BuildContext context, _Vid v, S s) =>
+      _videoReelTile(context, v, s, lang);
+}
+
+/// A single 9:16 reel tile (shared by the weekly carousel and the "View all"
+/// videos screen). Playback is still a mock (snackbar) until real videos land.
+Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
+    {double width = 141}) {
+  return GestureDetector(
       onTap: () => ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
       child: SizedBox(
-        width: 141, // ≈ 9:16 against the 250 height
+        width: width, // ≈ 9:16 against the 250 height
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
           child: Stack(fit: StackFit.expand, children: [
@@ -3789,7 +3927,6 @@ class _VideoFeed extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -3817,6 +3954,8 @@ class _ArticleFeed extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
         ),
+        _viewAllButton(context, s,
+            () => _push(context, _AllReadsScreen(lang: lang, week: week))),
       ]),
       const SizedBox(height: 12),
       SizedBox(
@@ -3929,6 +4068,142 @@ class _ArticleReader extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
+//  "View all" pill (section-header trailing action) + full-list screens for
+//  the weekly videos and reads carousels.
+// ---------------------------------------------------------------------------
+Widget _viewAllButton(BuildContext context, S s, VoidCallback onTap) {
+  return TextButton(
+    onPressed: onTap,
+    style: TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      minimumSize: Size.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    ),
+    child: Row(mainAxisSize: MainAxisSize.min, children: [
+      Text(s.lang.isEnglish ? 'View all' : 'Sab dekhein',
+          style: GoogleFonts.manrope(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.primary500)),
+      const Icon(Icons.chevron_right_rounded,
+          size: 16, color: AppTheme.primary500),
+    ]),
+  );
+}
+
+/// Full-screen list of all weekly videos (reuses the reel tiles + mock play).
+class _AllVideosScreen extends StatelessWidget {
+  const _AllVideosScreen({required this.lang});
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(
+        backgroundColor: AppTheme.scaffoldBackground,
+        elevation: 0,
+        foregroundColor: AppTheme.primary900,
+        title: Text(s.wfVideosSection,
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.primary900)),
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 9 / 16,
+        ),
+        itemCount: _weekVideos.length,
+        itemBuilder: (context, i) =>
+            _videoReelTile(context, _weekVideos[i], s, lang, width: 400),
+      ),
+    );
+  }
+}
+
+/// Full-screen list of all weekly reads (reuses the existing _ArticleReader).
+class _AllReadsScreen extends StatelessWidget {
+  const _AllReadsScreen({required this.lang, required this.week});
+  final AppLanguage lang;
+  final int week;
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    // Show this week's reads first, then the rest of the library beneath.
+    final thisWeek = weekArticlesFor(week);
+    final others =
+        kWeekArticles.where((a) => a.week != week).toList();
+    final all = [...thisWeek, ...others];
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(
+        backgroundColor: AppTheme.scaffoldBackground,
+        elevation: 0,
+        foregroundColor: AppTheme.primary900,
+        title: Text(s.wfArticlesSection,
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.primary900)),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        itemCount: all.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        itemBuilder: (context, i) {
+          final a = all[i];
+          return GestureDetector(
+            onTap: () => _push(context, _ArticleReader(article: a)),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppTheme.outlineVariant),
+              ),
+              child: Row(children: [
+                Text(a.emoji, style: const TextStyle(fontSize: 30)),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(a.title,
+                            style: GoogleFonts.plusJakartaSans(
+                                fontSize: 15,
+                                height: 1.3,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.primary900)),
+                        const SizedBox(height: 6),
+                        Row(children: [
+                          const Icon(Icons.schedule_rounded,
+                              size: 13, color: AppTheme.neutral500),
+                          const SizedBox(width: 4),
+                          Text('${a.readMins} min read · Week ${a.week}',
+                              style: GoogleFonts.manrope(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.neutral500)),
+                        ]),
+                      ]),
+                ),
+                const Icon(Icons.chevron_right_rounded,
+                    size: 20, color: AppTheme.neutral400),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 //  S7 - Share with partner (richer, segmented WhatsApp summary)
 // ---------------------------------------------------------------------------
 class _PartnerSection extends StatelessWidget {
@@ -4031,6 +4306,95 @@ class _PartnerSection extends StatelessWidget {
           ),
         ),
       ]),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Previous / next week navigation - loads the complete adjacent week via
+//  controller.selectWeek(). selectWeek notifies listeners, so both this flow
+//  and the parent week-stack rebuild for the new week automatically.
+// ---------------------------------------------------------------------------
+class _WeekNav extends StatelessWidget {
+  const _WeekNav(
+      {required this.controller, required this.lang, this.father = false});
+  final PregnancyController controller;
+  final AppLanguage lang;
+  final bool father;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S(lang);
+    // Available (seeded) weeks, sorted, give us the real bounds to clamp to.
+    final weeks = [...controller.availableWeeks]..sort();
+    final cw = controller.selectedWeek;
+    final idx = weeks.indexOf(cw);
+    final int? prevWk = idx > 0 ? weeks[idx - 1] : null;
+    final int? nextWk =
+        (idx >= 0 && idx < weeks.length - 1) ? weeks[idx + 1] : null;
+    // Nothing either side (single-week content) -> hide the whole row.
+    if (prevWk == null && nextWk == null) return const SizedBox.shrink();
+    return Row(children: [
+      Expanded(
+        child: prevWk == null
+            ? const SizedBox.shrink()
+            : _navButton(
+                context, s,
+                isPrev: true,
+                week: prevWk,
+                onTap: () => controller.selectWeek(prevWk)),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: nextWk == null
+            ? const SizedBox.shrink()
+            : _navButton(
+                context, s,
+                isPrev: false,
+                week: nextWk,
+                onTap: () => controller.selectWeek(nextWk)),
+      ),
+    ]);
+  }
+
+  Widget _navButton(BuildContext context, S s,
+      {required bool isPrev, required int week, required VoidCallback onTap}) {
+    final accent = father ? _fAccent : AppTheme.primary500;
+    final caption = isPrev
+        ? (lang.isEnglish ? 'Previous week' : 'Pichhla hafta')
+        : (lang.isEnglish ? 'Next week' : 'Agla hafta');
+    final label = isPrev
+        ? '← ${s.weekWord} $week'
+        : '${s.weekWord} $week →';
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+        decoration: BoxDecoration(
+          color: father ? _fBg : AppTheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: father ? _fLine : AppTheme.outlineVariant),
+        ),
+        child: Column(
+          crossAxisAlignment:
+              isPrev ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          children: [
+            Text(caption,
+                style: GoogleFonts.manrope(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: father ? _fMuted : AppTheme.neutral500)),
+            const SizedBox(height: 2),
+            Text(label,
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: accent)),
+          ],
+        ),
+      ),
     );
   }
 }

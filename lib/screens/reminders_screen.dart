@@ -285,7 +285,8 @@ String reminderSummary(S s, Reminder r, BuildContext context) {
     case ReminderRepeat.monthly:
       return '${s.rmdMonthly} · ${s.mrDayOfMonth} ${r.dayOfMonth} · ${fmt(r.hour * 60 + r.minute)}';
     case ReminderRepeat.customDays:
-      return '${r.effectiveWeekdays.map(s.rmdWeekdayShort).join(', ')} · ${fmt(r.hour * 60 + r.minute)}';
+      final ts = r.effectiveTimes;
+      return '${r.effectiveWeekdays.map(s.rmdWeekdayShort).join(', ')} · ${ts.map(fmt).join(', ')}';
   }
 }
 
@@ -339,9 +340,10 @@ class _ReminderEditor extends StatefulWidget {
 
 class _ReminderEditorState extends State<_ReminderEditor> {
   late final TextEditingController _titleCtrl;
-  late TimeOfDay _time;
+  late List<TimeOfDay> _times; // one or more times-of-day (daily & custom)
   late ReminderRepeat _repeat;
-  late int _weekday;
+  late int _weekday; // single weekday (weekly)
+  late Set<int> _weekdays; // multi-select weekdays (custom)
   late String _category;
 
   @override
@@ -350,14 +352,26 @@ class _ReminderEditorState extends State<_ReminderEditor> {
     final e = widget.existing;
     _titleCtrl =
         TextEditingController(text: e?.title ?? widget.seedTitle ?? '');
-    _time = TimeOfDay(
-      hour: e?.hour ?? widget.seedHour ?? 9,
-      minute: e?.minute ?? widget.seedMinute ?? 0,
-    );
+    final ts = (e?.effectiveTimes ??
+            [(widget.seedHour ?? 9) * 60 + (widget.seedMinute ?? 0)])
+        .map((m) => TimeOfDay(hour: m ~/ 60, minute: m % 60))
+        .toList();
+    _times = ts.isEmpty
+        ? [TimeOfDay(hour: widget.seedHour ?? 9, minute: widget.seedMinute ?? 0)]
+        : ts;
     _repeat = e?.repeat ?? ReminderRepeat.daily;
     _weekday = e?.weekday ?? DateTime.monday;
+    _weekdays = (e != null && e.weekdays.isNotEmpty)
+        ? e.weekdays.toSet()
+        : {DateTime.monday};
     _category = e?.category ?? widget.seedCategory ?? 'custom';
   }
+
+  /// Multiple times only make sense for cadences that fire repeatedly at each
+  /// time-of-day (daily & specific-days). Once/weekly fire at a single time.
+  bool get _multiTime =>
+      _repeat == ReminderRepeat.daily ||
+      _repeat == ReminderRepeat.customDays;
 
   @override
   void dispose() {
@@ -367,9 +381,17 @@ class _ReminderEditorState extends State<_ReminderEditor> {
 
   bool get _canSave => _titleCtrl.text.trim().isNotEmpty;
 
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _time);
-    if (picked != null) setState(() => _time = picked);
+  Future<void> _pickTimeAt(int i) async {
+    final picked =
+        await showTimePicker(context: context, initialTime: _times[i]);
+    if (picked != null) setState(() => _times[i] = picked);
+  }
+
+  void _addTime() =>
+      setState(() => _times.add(const TimeOfDay(hour: 18, minute: 0)));
+
+  void _removeTime(int i) {
+    if (_times.length > 1) setState(() => _times.removeAt(i));
   }
 
   void _save(S s) {
@@ -380,15 +402,24 @@ class _ReminderEditorState extends State<_ReminderEditor> {
     NotificationService.instance.requestPermission();
     final id = widget.existing?.id ??
         'rmd_${DateTime.now().microsecondsSinceEpoch}';
+    // Only daily & custom keep every time; once/weekly collapse to the first.
+    final useTimes = _multiTime ? _times : [_times.first];
+    final mins = useTimes.map((x) => x.hour * 60 + x.minute).toList();
+    final first = useTimes.first;
+    final weekdays =
+        (_weekdays.isEmpty ? {DateTime.monday} : _weekdays).toList()..sort();
     store.upsert(Reminder(
       id: id,
       title: t,
-      hour: _time.hour,
-      minute: _time.minute,
+      hour: first.hour,
+      minute: first.minute,
       repeat: _repeat,
       weekday: _weekday,
       enabled: widget.existing?.enabled ?? true,
       category: _category,
+      times: mins,
+      weekdays:
+          _repeat == ReminderRepeat.customDays ? weekdays : const [],
     ));
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context)
@@ -448,17 +479,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             ),
           ),
           const SizedBox(height: 16),
-          // Time
-          _row(
-            s.rmdTime,
-            OutlinedButton.icon(
-              onPressed: _pickTime,
-              icon: const Icon(Icons.schedule_rounded, size: 18),
-              label: Text(_time.format(context)),
-            ),
-          ),
-          const SizedBox(height: 14),
-          // Repeat
+          // Repeat (Once / Daily / Weekly / Custom-specific-days)
           Align(
             alignment: Alignment.centerLeft,
             child: Text(s.rmdRepeat,
@@ -466,11 +487,55 @@ class _ReminderEditorState extends State<_ReminderEditor> {
                     text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
           ),
           const SizedBox(height: 8),
-          Wrap(spacing: 8, children: [
+          Wrap(spacing: 8, runSpacing: 8, children: [
             _repeatChip(s.rmdOnce, ReminderRepeat.once),
             _repeatChip(s.rmdDaily, ReminderRepeat.daily),
             _repeatChip(s.rmdWeekly, ReminderRepeat.weekly),
+            _repeatChip(s.rmdCustomDays, ReminderRepeat.customDays),
           ]),
+          const SizedBox(height: 14),
+          // Time(s) - single for once/weekly; add/remove list for daily & custom.
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(_multiTime ? s.mrTimes : s.rmdTime,
+                style:
+                    text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+          ),
+          const SizedBox(height: 8),
+          for (var i = 0; i < (_multiTime ? _times.length : 1); i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _pickTimeAt(i),
+                    icon: const Icon(Icons.schedule_rounded, size: 18),
+                    label: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(_times[i].format(context)),
+                    ),
+                  ),
+                ),
+                if (_multiTime && _times.length > 1)
+                  IconButton(
+                    tooltip: MaterialLocalizations.of(context)
+                        .deleteButtonTooltip,
+                    icon: const Icon(Icons.close_rounded, size: 18),
+                    color: AppTheme.neutral500,
+                    onPressed: () => _removeTime(i),
+                  ),
+              ]),
+            ),
+          if (_multiTime)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: _addTime,
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(s.rmdAddTime),
+              ),
+            ),
+          // Single weekday (weekly)
           if (_repeat == ReminderRepeat.weekly) ...[
             const SizedBox(height: 12),
             Align(
@@ -486,6 +551,31 @@ class _ReminderEditorState extends State<_ReminderEditor> {
                   label: Text(s.rmdWeekdayShort(wd)),
                   selected: _weekday == wd,
                   onSelected: (_) => setState(() => _weekday = wd),
+                ),
+            ]),
+          ],
+          // Multi-select weekdays (custom / specific days)
+          if (_repeat == ReminderRepeat.customDays) ...[
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(s.mrOnDays,
+                  style:
+                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+            ),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (var wd = 1; wd <= 7; wd++)
+                FilterChip(
+                  label: Text(s.rmdWeekdayShort(wd)),
+                  selected: _weekdays.contains(wd),
+                  onSelected: (sel) => setState(() {
+                    if (sel) {
+                      _weekdays.add(wd);
+                    } else if (_weekdays.length > 1) {
+                      _weekdays.remove(wd);
+                    }
+                  }),
                 ),
             ]),
           ],
@@ -516,17 +606,19 @@ class _ReminderEditorState extends State<_ReminderEditor> {
     );
   }
 
-  Widget _row(String label, Widget trailing) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: GoogleFonts.plusJakartaSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.primary900)),
-          trailing,
-        ],
-      );
+  // Formerly used for the single Time row; the multi-time list is now inline.
+  // Kept (commented) in case a label+trailing row is needed again.
+  // Widget _row(String label, Widget trailing) => Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(label,
+  //             style: GoogleFonts.plusJakartaSans(
+  //                 fontSize: 14,
+  //                 fontWeight: FontWeight.w800,
+  //                 color: AppTheme.primary900)),
+  //         trailing,
+  //       ],
+  //     );
 
   Widget _repeatChip(String label, ReminderRepeat r) => ChoiceChip(
         label: Text(label),

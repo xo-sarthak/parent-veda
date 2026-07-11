@@ -16,10 +16,12 @@ import '../models/calendar_event.dart';
 import '../services/calendar_store.dart';
 import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/prepare_store.dart';
 import '../services/scans_store.dart';
 import '../services/tools_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/mic_dictation_button.dart';
+import '../widgets/trimester_progress_bar.dart';
 import 'journal_screen.dart';
 import 'weekly_card_stack_screen.dart';
 
@@ -41,6 +43,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? _selectedDay; // the day tapped in the grid (defaults to today)
   bool _legendOpen = false; // the collapsible colour-code legend
 
+  // Tap-a-date → scroll the ListView to that day's detail panel (Task 2).
+  final _scrollCtrl = ScrollController();
+  final _detailsKey = GlobalKey();
+
   PregnancyController get p => widget.controller;
 
   static const List<BoxShadow> _soft = [
@@ -58,7 +64,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void dispose() {
     _searchCtrl.dispose();
+    _scrollCtrl.dispose();
     super.dispose();
+  }
+
+  // Animate the ListView so the selected-day detail panel comes into view.
+  void _scrollToDetails() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _detailsKey.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+        alignment: 0.1,
+      );
+    });
   }
 
   @override
@@ -69,6 +90,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         JournalStore.instance,
         ToolsStore.instance,
         ScansStore.instance,
+        PrepareStore.instance, // enrolled programs feed the calendar
         p,
       ]),
       builder: (context, _) => _build(context),
@@ -77,6 +99,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   List<CalendarEvent> _filtered() {
     Iterable<CalendarEvent> ev = CalendarStore.instance.allEvents(p);
+    // Task 4: ParentVeda recommendations are excluded from the Timeline,
+    // Calendar and Upcoming views (this is the single choke point for all three).
+    ev = ev.where((e) => e.category != CalEventCategory.parentveda);
     if (_filter != null) ev = ev.where((e) => e.category == _filter);
     final q = _query.trim().toLowerCase();
     if (q.isNotEmpty) {
@@ -99,23 +124,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
             _header(s),
             Expanded(
               child: ListView(
+                controller: _scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 110),
                 children: [
+                  // Task 1: order is Trimester Progress → Calendar → Filters →
+                  // Details. Progress sits at the very top (above the tab bar).
                   _progressCard(s),
                   const SizedBox(height: 16),
                   _segmented(s),
                   const SizedBox(height: 12),
-                  _filters(s),
-                  const SizedBox(height: 6),
-                  if (_tab == 0) _timeline(s, events),
+                  if (_tab == 0) ...[
+                    _filters(s),
+                    const SizedBox(height: 6),
+                    _timeline(s, events),
+                  ],
                   if (_tab == 1) ...[
                     _calendar(s, events),
+                    const SizedBox(height: 12),
+                    _filters(s),
                     const SizedBox(height: 12),
                     _legend(s),
                     const SizedBox(height: 12),
                     _selectedDayPanel(s, events),
                   ],
-                  if (_tab == 2) _upcoming(s, events),
+                  if (_tab == 2) ...[
+                    _filters(s),
+                    const SizedBox(height: 6),
+                    _upcoming(s, events),
+                  ],
                 ],
               ),
             ),
@@ -169,7 +205,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
       );
 
   // --- progress card ---------------------------------------------------------
+  // Task 1: the top-of-screen progress now uses the shared TrimesterProgressBar
+  // (horizontal, no percentages) for consistency with the rest of the app.
   Widget _progressCard(S s) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: _soft,
+      ),
+      child: TrimesterProgressBar(
+        week: p.currentWeek,
+        daysRemaining: p.daysRemaining,
+        lang: p.language,
+      ),
+    );
+  }
+
+  // Old circular-ring progress card - superseded by TrimesterProgressBar above,
+  // kept for revert.
+  // ignore: unused_element
+  Widget _progressCardLegacy(S s) {
     final pct = p.progress;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
@@ -277,14 +334,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   // --- filters ---------------------------------------------------------------
   Widget _filters(S s) {
+    // Task 7: visible chips are exactly All · Milestones · Appointments ·
+    // Tests & Scans · Programs. Journal / Personal / ParentVeda are commented
+    // out (their enum values are kept for revert).
     final chips = <(CalEventCategory?, String)>[
       (null, s.calFilterAll),
       (CalEventCategory.milestone, s.calFilterMilestones),
-      (CalEventCategory.medical, s.calFilterMedical),
       (CalEventCategory.appointment, s.calFilterAppointments),
-      (CalEventCategory.journal, s.calFilterJournal),
-      (CalEventCategory.personal, s.calFilterPersonal),
-      (CalEventCategory.parentveda, s.calFilterParentveda),
+      // Task 3: "Medical" is displayed as "Tests & Scans" (enum stays `medical`).
+      (CalEventCategory.medical,
+          s.lang.isHinglish ? 'Tests & Scans' : 'Tests & Scans'),
+      (CalEventCategory.program,
+          s.lang.isHinglish ? 'Programs' : 'Programs'),
+      // (CalEventCategory.journal, s.calFilterJournal),
+      // (CalEventCategory.personal, s.calFilterPersonal),
+      // (CalEventCategory.parentveda, s.calFilterParentveda),
     ];
     return SizedBox(
       height: 40,
@@ -546,7 +610,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         (col == 6 ||
             _weekAt(date.add(const Duration(days: 1))) != p.currentWeek);
     return GestureDetector(
-      onTap: () => setState(() => _selectedDay = date),
+      onTap: () {
+        setState(() => _selectedDay = date);
+        // Task 2: if this date has events, scroll to its detail panel.
+        if (events.isNotEmpty) _scrollToDetails();
+      },
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -643,7 +711,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _upcoming(S s, List<CalendarEvent> events) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    // Task 6: Upcoming includes ONLY Milestones, Appointments, Tests & Scans
+    // (medical) and Programs - journal / personal / parentveda are excluded.
+    const upcomingCats = {
+      CalEventCategory.milestone,
+      CalEventCategory.appointment,
+      CalEventCategory.medical,
+      CalEventCategory.program,
+    };
     final future = events
+        .where((e) => upcomingCats.contains(e.category))
         .where((e) => !DateTime(e.date.year, e.date.month, e.date.day)
             .isBefore(today))
         .toList()
@@ -1059,6 +1136,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final dayEvents = events.where((e) => _sameDay(e.date, date)).toList()
       ..sort((a, b) => a.category.index.compareTo(b.category.index));
     return Container(
+      key: _detailsKey, // Task 2: scroll target for tap-a-date
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -1180,13 +1258,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // A collapsible "What the dots mean" card: colour swatch + name + meaning, so
   // the colour coding is explainable even before tapping a day.
   Widget _legend(S s) {
+    // Legend meanings. "Medical" reads as "Tests & Scans" (via _catName);
+    // Programs added; ParentVeda commented out (Task 3/4/5).
     final cats = <(CalEventCategory, String)>[
       (CalEventCategory.milestone, s.calMeanMilestone),
       (CalEventCategory.medical, s.calMeanMedical),
       (CalEventCategory.appointment, s.calMeanAppointment),
+      (CalEventCategory.program,
+          s.lang.isHinglish
+              ? 'Aapka enrolled program ya class'
+              : 'A program or class you enrolled in'),
       (CalEventCategory.journal, s.calMeanJournal),
       (CalEventCategory.personal, s.calMeanPersonal),
-      (CalEventCategory.parentveda, s.calMeanParentveda),
+      // (CalEventCategory.parentveda, s.calMeanParentveda),
     ];
     return Container(
       decoration: BoxDecoration(
@@ -1286,8 +1370,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   String _catName(S s, CalEventCategory c) => switch (c) {
         CalEventCategory.milestone => s.calFilterMilestones,
-        CalEventCategory.medical => s.calFilterMedical,
+        // Task 3: "Medical" displays as "Tests & Scans" (enum unchanged).
+        CalEventCategory.medical =>
+          s.lang.isHinglish ? 'Tests & Scans' : 'Tests & Scans',
         CalEventCategory.appointment => s.calFilterAppointments,
+        CalEventCategory.program =>
+          s.lang.isHinglish ? 'Programs' : 'Programs',
         CalEventCategory.journal => s.calFilterJournal,
         CalEventCategory.personal => s.calFilterPersonal,
         CalEventCategory.parentveda => s.calFilterParentveda,
@@ -1297,6 +1385,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         CalEventCategory.milestone => s.calMeanMilestone,
         CalEventCategory.medical => s.calMeanMedical,
         CalEventCategory.appointment => s.calMeanAppointment,
+        CalEventCategory.program => s.lang.isHinglish
+            ? 'Aapka enrolled program ya class'
+            : 'A program or class you enrolled in',
         CalEventCategory.journal => s.calMeanJournal,
         CalEventCategory.personal => s.calMeanPersonal,
         CalEventCategory.parentveda => s.calMeanParentveda,

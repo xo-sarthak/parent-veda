@@ -91,7 +91,10 @@ class KegelCareScreen extends StatefulWidget {
 class _KegelCareScreenState extends State<KegelCareScreen> {
   final _store = ToolsStore.instance;
   bool _whyExpanded = false;
-  bool _howExpanded = true; // "What is a Kegel" opens by default, at the top.
+  // The old single "What is a Kegel & how to do it" collapsible was replaced by
+  // three always-visible intro cards (see build). Field kept (commented) for a
+  // quick revert to the collapsible version.
+  // bool _howExpanded = true;
 
   @override
   void initState() {
@@ -128,12 +131,33 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             children: [
               // Hero ("Pelvic Floor Care") removed per request - its intro now
               // lives inside the "Why am I doing this?" collapsible below.
-              // What is a Kegel & how to do it - at the top, OPEN by default.
-              _Expandable(
-                title: s.kegelHowTitle,
+              // INTRODUCTION - split into three small titled cards (was a single
+              // collapsible "What is a Kegel & how to do it"):
+              //   1. What is Kegel?   2. Why should I do Kegel?   3. How to do Kegel?
+              // NOTE (i18n): section titles + the "How" step copy are literal
+              // English here because this screen-only change may not touch
+              // app_language.dart; the bodies reuse existing bilingual strings
+              // where they fit (kegelHowBody, whyAmIDoingThisBody).
+              _IntroCard(
+                title: 'What is Kegel?',
+                body:
+                    'A Kegel is a simple exercise that squeezes and lifts the '
+                    'pelvic-floor muscles - the sling of muscles supporting your '
+                    'bladder, bowel and uterus - and then fully relaxes them. '
+                    'During pregnancy these muscles carry extra weight, so keeping '
+                    'them working well matters.',
+              ),
+              const SizedBox(height: 12),
+              _IntroCard(
+                title: 'Why should I do Kegel?',
+                body: s.whyAmIDoingThisBody,
+              ),
+              const SizedBox(height: 12),
+              _IntroCard(
+                title: 'How to do Kegel?',
                 body: s.kegelHowBody,
-                expanded: _howExpanded,
-                onToggle: () => setState(() => _howExpanded = !_howExpanded),
+                // Placeholder for the animated instructional video (no asset yet).
+                footer: _videoPlaceholder(context, s),
               ),
               const SizedBox(height: 14),
               // Current routine - now contains the ℹ️ "Why this routine?", the
@@ -196,6 +220,70 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  /// Tappable 16:9 placeholder for the animated instructional video. There is no
+  /// video asset yet, so tapping shows a gentle "coming soon". Mirrors the
+  /// media-placeholder pattern used in the weekly reading flow (week_flow_screen).
+  Widget _videoPlaceholder(BuildContext context, S s) {
+    final text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: GestureDetector(
+        onTap: () => ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+              const SnackBar(content: Text('Animated guide - coming soon'))),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppTheme.secondary500.withValues(alpha: 0.16),
+                  AppTheme.secondary500.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                  color: AppTheme.secondary500.withValues(alpha: 0.16)),
+            ),
+            child: Stack(children: [
+              Center(
+                child: Container(
+                  width: 54,
+                  height: 54,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      shape: BoxShape.circle),
+                  child: Icon(Icons.play_arrow_rounded,
+                      size: 30, color: AppTheme.secondary600),
+                ),
+              ),
+              Positioned(
+                left: 10,
+                bottom: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.88),
+                      borderRadius: BorderRadius.circular(40)),
+                  child: Text('Animated guide - coming soon',
+                      style: text.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3,
+                          color: AppTheme.secondary600)),
+                ),
+              ),
+            ]),
+          ),
+        ),
       ),
     );
   }
@@ -509,16 +597,50 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
       );
 }
 
+/// A small, always-visible titled intro block/card (used for the three split
+/// Introduction sub-sections: What / Why / How). Optional [footer] hosts extra
+/// content such as the animated-video placeholder under "How to do Kegel?".
+class _IntroCard extends StatelessWidget {
+  const _IntroCard({required this.title, required this.body, this.footer});
+  final String title;
+  final String body;
+  final Widget? footer;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title,
+            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        Text(body, style: text.bodyMedium),
+        ?footer,
+      ]),
+    );
+  }
+}
+
 class _Expandable extends StatelessWidget {
   const _Expandable({
     required this.title,
-    this.body,
+    // `body` (a plain-text body) is no longer passed by any caller since the
+    // top intro moved to the always-visible _IntroCard blocks. Kept commented
+    // for a quick revert to a text-only collapsible.
+    // this.body,
     this.child,
     required this.expanded,
     required this.onToggle,
   });
   final String title;
-  final String? body; // simple text body
+  // final String? body; // simple text body
   final Widget? child; // OR a rich body (e.g. the pelvic-floor intro)
   final bool expanded;
   final VoidCallback onToggle;
@@ -545,7 +667,7 @@ class _Expandable extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: child ?? Text(body ?? '', style: text.bodyMedium),
+              child: child ?? const SizedBox.shrink(),
             ),
           ),
       ]),
@@ -579,6 +701,9 @@ class _SessionScreenState extends State<_SessionScreen>
   final FlutterTts _tts = FlutterTts();
   bool _holding = true; // hold phase vs relax
   int _rep = 1;
+  // Number of FULLY completed repetitions (a whole hold+relax cycle). Drives the
+  // history save rule below - a session is only recorded if this reaches 3+.
+  int _completedReps = 0;
   bool _done = false;
   bool _sound = true;
 
@@ -636,7 +761,11 @@ class _SessionScreenState extends State<_SessionScreen>
     if (_holding) {
       setState(() => _holding = false);
       _startPhase();
-    } else if (_rep >= widget.reps) {
+      return;
+    }
+    // The relax phase just ended -> one full hold+relax repetition is complete.
+    _completedReps++;
+    if (_rep >= widget.reps) {
       _finish();
     } else {
       setState(() {
@@ -669,10 +798,18 @@ class _SessionScreenState extends State<_SessionScreen>
   }
 
   Future<void> _saveFeedback(String feedback) async {
+    // HISTORY SAVE RULE: only persist a session to Care Journey history if the
+    // user actually completed at least 3 repetitions (full hold+relax cycles).
+    // Shorter attempts are discarded silently so history stays meaningful.
+    const kMinRepsToSave = 3;
+    if (_completedReps < kMinRepsToSave) {
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
     await ToolsStore.instance.recordKegelSession(
       holdSeconds: widget.hold,
       relaxSeconds: widget.relax,
-      repetitions: widget.reps,
+      repetitions: _completedReps, // record actual completed reps, not planned
       feedback: feedback,
     );
     if (mounted) Navigator.of(context).pop();

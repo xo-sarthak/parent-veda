@@ -13,8 +13,11 @@ import 'package:parentveda/screens/prepare/consultation_detail_screen.dart';
 import 'package:parentveda/screens/prepare/consultations_screen.dart';
 import 'package:parentveda/screens/prepare/masterclass_detail_screen.dart';
 import 'package:parentveda/screens/prepare/masterclasses_screen.dart';
+import 'package:parentveda/screens/prepare/courses_cohorts_screen.dart';
+import 'package:parentveda/screens/prepare/nutrition_screen.dart';
 import 'package:parentveda/screens/prepare/prenatal_yoga_screen.dart';
 import 'package:parentveda/screens/prepare/prepare_hub_screen.dart';
+import 'package:parentveda/screens/prepare/program_detail_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +33,12 @@ void main() {
     'masterclass detail': MasterclassDetailScreen(m: kMasterclasses.first),
     'consultation detail': ConsultationDetailScreen(specialist: kSpecialists.first),
     'cohort detail': CohortDetailScreen(cohort: kCohorts.first),
+    'courses & cohorts': const CoursesCohortsScreen(),
+    'program detail': ProgramDetailScreen(program: kPrepPrograms.first),
+    'nutrition': const NutritionScreen(),
+    'nutrition plans': const NutritionPlansScreen(goalId: 'gd'),
+    'nutrition trailer': NutritionTrailerScreen(plan: kNutritionPlans.first),
+    'nutrition diet plan': NutritionDietPlanScreen(plan: kNutritionPlans.first),
   };
 
   screens.forEach((name, screen) {

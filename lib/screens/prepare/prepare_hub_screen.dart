@@ -3,21 +3,33 @@
 // -----------------------------------------------------------------------------
 //  Landing for ParentVeda's guided/paid experiences. Sits under the real
 //  PvTabBar (rendered by MainScaffold), so it draws no nav of its own - just a
-//  generous bottom pad to clear the floating pill. Routes into the five section
-//  screens. Faithful replica of design S0 (Priya · 30 weeks).
+//  generous bottom pad to clear the floating pill.
+//
+//  Reworked (Section 4): the hub now surfaces four sections -
+//    1. Courses & Cohorts  (unified V2 - CoursesCohortsScreen)
+//    2. Birthing Classes   (kept as-is)
+//    3. Yoga               (renamed from Prenatal Yoga; month tabs)
+//    4. Nutrition          (Assessment -> plans -> trailer -> consult -> plan)
+//  The old standalone Masterclasses / 1:1 Consultations / Cohort Programs tiles
+//  are folded in (Masterclasses & Cohorts live inside Courses & Cohorts; the
+//  nutritionist consult is reached through the Nutrition funnel) and are kept
+//  commented below for revert. Their screens remain in the module.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
 import 'birthing_classes_screen.dart';
-import 'cohort_detail_screen.dart';
-import 'cohorts_screen.dart';
-import 'consultations_screen.dart';
-import 'masterclass_detail_screen.dart';
-import 'masterclasses_screen.dart';
+// import 'cohort_detail_screen.dart'; // retired from hub - see Courses & Cohorts
+// import 'cohorts_screen.dart';
+// import 'consultations_screen.dart';
+// import 'masterclass_detail_screen.dart';
+// import 'masterclasses_screen.dart';
+import 'courses_cohorts_screen.dart';
+import 'nutrition_screen.dart';
 import 'prenatal_yoga_screen.dart';
 import 'prepare_common.dart';
+import 'program_detail_screen.dart';
 
 class PrepareHubScreen extends StatelessWidget {
   const PrepareHubScreen({super.key});
@@ -28,6 +40,10 @@ class PrepareHubScreen extends StatelessWidget {
 
     void openSection(Widget s) =>
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => s));
+
+    // Featured programs for the recommended rail (from the unified catalogue).
+    final railMasterclass = programById('prog_mc_birth');
+    final railCohort = programById('prog_ch_birthready');
 
     return Scaffold(
       backgroundColor: kCanvas,
@@ -45,7 +61,7 @@ class PrepareHubScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text('Prepare for your baby,\none guided step at a time.', style: pvHeroStyle()),
               const SizedBox(height: 14),
-              Text('Live classes, expert sessions, and gentle movement - chosen for exactly where you are.',
+              Text('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.',
                   style: pvSubStyle()),
             ])),
 
@@ -61,42 +77,49 @@ class PrepareHubScreen extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
-                  _railCard(
-                    tag: 'Masterclass',
-                    tagColor: kPurple,
-                    title: 'Birth Confidence Masterclass',
-                    meta: '90 min live · ₹799',
-                    onTap: () =>
-                        openSection(MasterclassDetailScreen(m: kMasterclasses.firstWhere((m) => m.featured))),
-                  ),
+                  if (railMasterclass != null)
+                    _railCard(
+                      tag: 'Masterclass',
+                      tagColor: kPurple,
+                      title: railMasterclass.title,
+                      meta: '${railMasterclass.durationLabel} · ${railMasterclass.price}',
+                      onTap: () => openSection(ProgramDetailScreen(program: railMasterclass)),
+                    ),
                   const SizedBox(width: 14),
-                  _railCard(
-                    tag: 'Cohort · starts Mon',
-                    tagColor: kCoral,
-                    title: 'Birth-Ready Bootcamp',
-                    meta: '4 weeks · ₹6,999',
-                    onTap: () =>
-                        openSection(CohortDetailScreen(cohort: kCohorts.firstWhere((c) => c.featured))),
-                  ),
+                  if (railCohort != null)
+                    _railCard(
+                      tag: 'Cohort · starts Mon',
+                      tagColor: kCoral,
+                      title: railCohort.title,
+                      meta: '${railCohort.durationLabel} · ${railCohort.price}',
+                      onTap: () => openSection(ProgramDetailScreen(program: railCohort)),
+                    ),
                 ],
               ),
             ),
 
             const SizedBox(height: 28),
 
-            // category tiles
+            // category tiles - the four sections
             pad(Column(children: [
-              _tile(context, Icons.school_outlined, 'Masterclasses', 'Deep-dive live sessions with experts.',
-                  '4 sessions', top: true, onTap: () => openSection(const MasterclassesScreen())),
-              _tile(context, Icons.chat_bubble_outline_rounded, '1:1 Consultations', 'A private call with the right expert.',
-                  '5 specialists', onTap: () => openSection(const ConsultationsScreen())),
-              _tile(context, Icons.groups_outlined, 'Cohort Programs',
-                  'Small groups, a real coach, mums due when you are.', '4 programs',
-                  onTap: () => openSection(const CohortsScreen())),
-              _tile(context, Icons.self_improvement_rounded, 'Prenatal Yoga', 'Trimester-safe movement.', '6-week program',
-                  onTap: () => openSection(const PrenatalYogaScreen())),
-              _tile(context, Icons.child_friendly_outlined, 'Birthing Classes', 'Everything for the big day.', '6-class course',
-                  bottom: true, onTap: () => openSection(const BirthingClassesScreen())),
+              _tile(context, Icons.school_outlined, 'Courses & Cohorts',
+                  'Self-paced courses, live cohorts & masterclasses.', '${kPrepPrograms.length} programs',
+                  top: true, onTap: () => openSection(const CoursesCohortsScreen())),
+              _tile(context, Icons.child_friendly_outlined, 'Birthing Classes', 'Everything for the big day.',
+                  '6-class course', onTap: () => openSection(const BirthingClassesScreen())),
+              _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
+                  '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),
+              _tile(context, Icons.restaurant_outlined, 'Nutrition',
+                  'A plan built around you, made yours by an expert.', 'Plan + consult',
+                  bottom: true, onTap: () => openSection(const NutritionScreen())),
+              // --- retired standalone tiles (folded into the above) --------------
+              // _tile(context, Icons.school_outlined, 'Masterclasses', 'Deep-dive live sessions with experts.',
+              //     '4 sessions', onTap: () => openSection(const MasterclassesScreen())),
+              // _tile(context, Icons.chat_bubble_outline_rounded, '1:1 Consultations', 'A private call with the right expert.',
+              //     '5 specialists', onTap: () => openSection(const ConsultationsScreen())),
+              // _tile(context, Icons.groups_outlined, 'Cohort Programs',
+              //     'Small groups, a real coach, mums due when you are.', '4 programs',
+              //     onTap: () => openSection(const CohortsScreen())),
             ])),
 
             const SizedBox(height: 22),
@@ -155,7 +178,7 @@ class PrepareHubScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(title, style: pvTitleStyle(16), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 8),
-                Text(meta, style: pvBody(kSoft, 12)),
+                Text(meta, style: pvBody(kSoft, 12), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
           ),
