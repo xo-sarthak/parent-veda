@@ -33,6 +33,7 @@ import '../../services/samvad_pool.dart';
 import '../../services/scans_store.dart';
 import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
+import '../../widgets/trimester_progress_bar.dart';
 import '../profile_screen.dart';
 import '../week_flow_screen.dart';
 import 'father_journal_screen.dart';
@@ -141,7 +142,7 @@ const Map<String, _Detail> _kDetails = {
   ),
   'read': _Detail(
     id: 'read',
-    eyebrow: 'Daily read',
+    eyebrow: "Today's read",
     title: 'What your baby can hear at 20 weeks',
     meta: '4 min read · ParentVeda Reads',
     paras: [
@@ -565,7 +566,6 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _weeklySnapshot(_Pal p) {
     final hour = DateTime.now().hour;
     final part = hour < 12 ? 'morning' : (hour < 18 ? 'afternoon' : 'evening');
-    final pct = (_week / 40).clamp(0.04, 1.0);
     final lang = widget.controller.language;
     final summary = widget.controller
             .weekData(_week)
@@ -643,10 +643,17 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                                           ]),
                                     ]),
                               ),
-                              const SizedBox(width: 12),
-                              // Circular progress ring (mirrors the mother hero).
-                              _snapRing(p, pct, (40 - _week).clamp(0, 40)),
                             ]),
+                        // Horizontal TRIMESTER progress bar — the father-skin twin
+                        // of the mother hero's bar (replaces the ring + "%").
+                        const SizedBox(height: 18),
+                        TrimesterProgressBar(
+                          week: _week,
+                          daysRemaining: widget.controller.daysRemaining,
+                          lang: lang,
+                          onDark: true,
+                          onDarkDotBorder: const Color(0xFF1E3A47),
+                        ),
                         const SizedBox(height: 16),
                         Container(
                             height: 1,
@@ -670,7 +677,8 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     );
   }
 
-  // Circular percentage ring - the father-skin twin of the mother hero's ring.
+  // Circular percentage ring — replaced by TrimesterProgressBar. Kept for revert.
+  // ignore: unused_element
   Widget _snapRing(_Pal p, double pct, int weeksToGo) => SizedBox(
         width: 74,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -971,7 +979,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   _iconTileSm(
                       p, Icons.menu_book_rounded, p.accentSoft, p.accent),
                   const SizedBox(width: 8),
-                  Text('DAILY READ', style: _eyebrow(p.accent, 0.12)),
+                  Text("TODAY'S READ", style: _eyebrow(p.accent, 0.12)),
                 ]),
                 const SizedBox(height: 9),
                 Text(r.title,

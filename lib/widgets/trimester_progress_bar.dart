@@ -35,6 +35,7 @@ class TrimesterProgressBar extends StatelessWidget {
     this.onDark = false,
     this.showCaption = true,
     this.showLabels = true,
+    this.onDarkDotBorder,
   });
 
   /// Current gestational week (clamped 1–40 for the bar's sake).
@@ -53,6 +54,10 @@ class TrimesterProgressBar extends StatelessWidget {
 
   /// Show the T1 / T2 / T3 labels under the bar.
   final bool showLabels;
+
+  /// Ring around the "you are here" dot on the dark skin. Defaults to the brand
+  /// purple; pass the host hero's own dark accent (e.g. Father Slate) to match.
+  final Color? onDarkDotBorder;
 
   // Trimester spans, in completed days (280-day term).
   static const int _t1End = 91; // week 13
@@ -115,7 +120,9 @@ class TrimesterProgressBar extends StatelessWidget {
                     color: fill,
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: onDark ? AppTheme.primary700 : Colors.white,
+                        color: onDark
+                            ? (onDarkDotBorder ?? AppTheme.primary700)
+                            : Colors.white,
                         width: 2),
                   ),
                 ),
