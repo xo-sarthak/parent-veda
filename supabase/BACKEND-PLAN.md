@@ -89,6 +89,30 @@ paste). `0001` is already applied (profiles). Then we wire stores to
 ### `0008_bump.sql`
 - **bump_photos** ← `BumpStore` (`id text`). File: `image_url`. `week_number`, `date`, `caption`, `is_favorite`.
 
+### `0015_whatsapp.sql` (WhatsApp notifications — B1)
+- **profiles** (ALTER) — adds `phone`, `language`, `timezone`, `baby_dob`, `wa_opt_in`, `wa_marketing_opt_in`, `wa_consent_at`, `wa_consent_source`. Existing RLS (own + partner select) already covers them.
+- **wa_message_log** — one row per attempted send (`id uuid`). Server-written only (service_role); app reads own rows. `template_name`, `category`, `variables jsonb`, `status`, `provider`, `dedupe_key` (partial-unique per user → no double-send).
+- **wa_message_templates** — global registry of our Meta templates (`name` PK). `category`, `language`, `variables jsonb`, `body`, `meta_status`. Read-all RLS; seeded with `weekly_guide_en/hi` drafts.
+- Note: the send engine (scheduler + sender + webhook) is **server-side** (Edge Function / worker with service_role) — not in the Flutter client, which has no service_role key.
+
+### `0016_whatsapp_scheduler.sql` (WhatsApp notifications — B3, the "who's due" brain)
+- **`wa_pregnancy_week(due, as_of)`** — mirrors the app's `currentWeek` (`40 - floor((due-today)/7)`), so WhatsApp and app never disagree.
+- **`wa_enqueue_weekly_guide(as_of)`** — the daily brain: finds opted-in mothers (role=mother, phone set, due_date set, week 4–40), inserts one `queued` row per (mother, ISO week) into `wa_message_log`. `security definer`; idempotent via the `dedupe_key` partial-unique index (re-run = 0 new rows). **Enqueues only — does not send.**
+- Reconciles the `0015` template seeds to the 2-var MVP shape `["name","week"]` (fruit/rich content deferred; not duplicating the Week Stack).
+- Next: **B4** = the sender/drainer (mock first) that reads `queued` rows and marks them; **B5** = `pg_cron` calls `wa_enqueue_weekly_guide()` daily.
+
+### `0017_whatsapp_mock_sender.sql` (WhatsApp notifications — B4, the mock drainer)
+- **`wa_render(template, vars)`** — fills a template's `{{1}},{{2}}` from the variables object (position→name→value). Preview/mock only; the real MSG91 send passes values and Meta renders.
+- **`wa_message_preview`** (view) — joins log rows to recipient phone/name + rendered text, so you can SEE what would go out.
+- **`wa_send_mock()`** — drains all `queued` rows, marks them `mock` (nothing leaves the DB). Mirrors the real sender (B6), which will set `sent` after a successful MSG91 call. Returns count drained.
+- Proves enqueue→drain→mark end-to-end for free. Next: **B5** (pg_cron schedule), then **B6** (real sender = Edge Function → MSG91).
+
+### `0018_whatsapp_schedule.sql` (WhatsApp notifications — B5, the daily timer)
+- Enables `pg_cron` and schedules **`wa-weekly-guide-daily`** — runs `wa_enqueue_weekly_guide()` at 03:30 UTC (09:00 IST) daily. Named job = upsert (safe re-run).
+- Daily (not weekly) on purpose: ISO-week `dedupe_key` caps it at one guide/mother/week, so daily catches new opt-ins and self-heals missed days.
+- **Enqueues only** — the sender stays manual (mock) until B6, which gives the real Edge Function its own trigger. Until mothers are opted in, the daily run enqueues 0 rows (armed + waiting).
+- Inspect: `select * from cron.job;` / `cron.job_run_details`. Remove: `select cron.unschedule('wa-weekly-guide-daily');`
+
 ---
 
 ## Progress checklist

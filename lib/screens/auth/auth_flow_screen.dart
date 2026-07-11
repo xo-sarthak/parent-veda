@@ -20,6 +20,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
+import '../../services/whatsapp_prefs.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -86,6 +87,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   final _name = TextEditingController();
   final _confirm = TextEditingController();
   final _code = TextEditingController(); // partner pairing code (father path)
+  final _phone = TextEditingController(); // WhatsApp number (B2 opt-in)
+  bool _waOptIn = false; // WhatsApp opt-in toggle (onboarding)
   final _otp = List.generate(5, (_) => TextEditingController());
   final _otpNodes = List.generate(5, (_) => FocusNode());
   Timer? _pairTimer; // drives the "Pairing…" → "Paired!" auto-advance
@@ -105,7 +108,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   @override
   void dispose() {
     _pairTimer?.cancel();
-    for (final c in [_email, _password, _name, _confirm, _code, ..._otp]) {
+    for (final c in [_email, _password, _name, _confirm, _code, _phone, ..._otp]) {
       c.dispose();
     }
     for (final n in _otpNodes) {
@@ -202,6 +205,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               'name': _name.text.trim(),
               'role': 'mother',
               'due_date': _pickedDue?.toIso8601String().split('T').first,
+              // WhatsApp opt-in (B2) captured on this step - same columns the
+              // Profile card writes; source distinguishes where consent began.
+              ...WhatsAppPrefs.fieldsFor(
+                optIn: _waOptIn,
+                phone: _phone.text,
+                source: 'onboarding',
+              ),
             })
             .eq('id', userId)
             .select();
@@ -564,6 +574,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             _dateField("Due date / baby's birthday"),
             const SizedBox(height: 9),
             _calcDueLink(),
+            const SizedBox(height: 16),
+            _waOptInSection(),
             const SizedBox(height: 8),
             _primaryBtn('Finish setup', _saveProfile),
             const SizedBox(height: 12),
@@ -1298,6 +1310,41 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     ];
     return '${d.day} ${m[d.month - 1]} ${d.year}';
   }
+
+  // WhatsApp opt-in (B2) - optional; captured here at onboarding and mirrored
+  // on the Profile tab. _saveProfile persists it (source 'onboarding').
+  Widget _waOptInSection() =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('WhatsApp updates',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                          color: _ink)),
+                  const SizedBox(height: 2),
+                  Text('Get your weekly guide on WhatsApp. Optional.',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                          color: _muted2)),
+                ]),
+          ),
+          Switch(
+            value: _waOptIn,
+            activeThumbColor: _purple,
+            onChanged: (v) => setState(() => _waOptIn = v),
+          ),
+        ]),
+        if (_waOptIn) ...[
+          const SizedBox(height: 10),
+          _field(_phone, 'WhatsApp number', '+91 98765 43210',
+              keyboard: TextInputType.phone),
+        ],
+      ]);
 
   // "Don't know your due date?" link under the date field → opens the sheet.
   Widget _calcDueLink() => Align(

@@ -24,6 +24,7 @@ import '../services/read_next_store.dart';
 import '../services/read_to_baby_saved_store.dart';
 import '../services/scans_store.dart';
 import '../services/video_store.dart';
+import '../services/whatsapp_prefs.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
 import 'bump_journey_screen.dart';
@@ -234,6 +235,9 @@ class ProfileScreen extends StatelessWidget {
           ],
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
+          const SizedBox(height: 14),
+          // --- WhatsApp updates (B2 opt-in) -------------------------------
+          _WhatsAppCard(controller: controller),
           const SizedBox(height: 16),
           // --- Reset to Week 20 (testing) ---------------------------------
           // Clears any saved due date + the pregnancy-map data and snaps the app
@@ -518,6 +522,150 @@ class _VaultCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The WhatsApp opt-in card (B2). Shown to mother AND father (each is their own
+/// recipient). Toggling saves immediately; the phone field saves on submit.
+/// Writes the same `profiles` columns onboarding does, via [WhatsAppPrefs].
+class _WhatsAppCard extends StatefulWidget {
+  const _WhatsAppCard({required this.controller});
+
+  final PregnancyController controller;
+
+  @override
+  State<_WhatsAppCard> createState() => _WhatsAppCardState();
+}
+
+class _WhatsAppCardState extends State<_WhatsAppCard> {
+  bool _optIn = false;
+  bool _loading = true;
+  final _phone = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final p = await WhatsAppPrefs.load();
+    if (!mounted) return;
+    setState(() {
+      _optIn = p.optIn;
+      _phone.text = p.phone ?? '';
+      _loading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _phone.dispose();
+    super.dispose();
+  }
+
+  String get _lang => widget.controller.language.isEnglish ? 'en' : 'hi';
+
+  Future<void> _save({required bool optIn}) async {
+    final ok = await WhatsAppPrefs.save(
+      optIn: optIn,
+      phone: _phone.text,
+      language: _lang,
+      source: 'profile_screen',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        content: Text(ok
+            ? (optIn ? 'WhatsApp updates on' : 'WhatsApp updates off')
+            : 'Could not save - please try again'),
+        duration: const Duration(milliseconds: 1400),
+      ));
+  }
+
+  Future<void> _toggle(bool v) async {
+    setState(() => _optIn = v);
+    await _save(optIn: v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    const waGreen = Color(0xFF128C4B);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 12, 12, 14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 50,
+            height: 50,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: waGreen.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(Icons.chat_rounded, color: waGreen, size: 24),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('WhatsApp updates', style: text.titleMedium),
+                  const SizedBox(height: 2),
+                  Text('Weekly guide & reminders. Turn off anytime.',
+                      style:
+                          text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                ]),
+          ),
+          if (_loading)
+            const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2))
+          else
+            Switch(
+              value: _optIn,
+              activeThumbColor: waGreen,
+              onChanged: _toggle,
+            ),
+        ]),
+        if (_optIn && !_loading) ...[
+          const SizedBox(height: 12),
+          TextField(
+            controller: _phone,
+            keyboardType: TextInputType.phone,
+            onEditingComplete: () => _save(optIn: true),
+            onSubmitted: (_) => _save(optIn: true),
+            style: text.bodyMedium,
+            decoration: InputDecoration(
+              isDense: true,
+              prefixIcon: const Icon(Icons.phone_rounded, size: 18),
+              hintText: '+91 98765 43210',
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppTheme.outlineVariant),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: waGreen, width: 1.5),
+              ),
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text('We only message this number for updates you turn on.',
+              style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+        ],
+      ]),
     );
   }
 }
