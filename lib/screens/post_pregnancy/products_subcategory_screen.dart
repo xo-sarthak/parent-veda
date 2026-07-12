@@ -27,18 +27,18 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
   String _sort = 'Top rated'; // 'Top rated' | 'Price'
   bool _underK = false;
   bool _inApp = false;
+  bool _expanded = false; // "Browse all" reveals the full ranked list
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+
+  // The first N picks lead; the rest sit behind a "Browse all (N)" affordance.
+  static const int _previewCount = 4;
 
   String get _shortSub {
     final cat = categoryByName(widget.category);
     final match = cat.subs.where((s) => s.name == widget.sub);
     return match.isEmpty ? widget.sub : match.first.short;
   }
-
-  String get _intro => widget.sub == 'Soothers & white noise'
-      ? 'Steady white noise - not looping lullabies - masks the household sounds that pull a baby out of light sleep. Look for true continuous sound, an auto-off timer, and a volume you can keep gentle. Below, ranked by ParentVeda.'
-      : 'What to look for, and the picks worth your money - ranked by ParentVeda from expert review and verified-mother ratings.';
 
   List<PpProduct> get _all => productsInSub(widget.category, widget.sub);
 
@@ -66,14 +66,16 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
 
             const SizedBox(height: 16),
             _pad(Text(widget.sub, style: ppFraunces(28, h: 1.15))),
-            const SizedBox(height: 12),
-            _pad(Text(_intro, style: ppBody(15))),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             _pad(Wrap(spacing: 8, runSpacing: 8, children: [
               _infoPill(widget.category == 'Sleep' ? '✓ Safe-sleep checked' : '✓ ParentVeda-checked', ppPurple),
               _infoPill('0–12 months', ppSoft),
             ])),
+
+            // the 20-second buying guidance - education before the picks
+            const SizedBox(height: 16),
+            _pad(PpGuidanceCard(ppGuideFor(widget.category, widget.sub))),
 
             // brand filter
             const SizedBox(height: 22),
@@ -121,7 +123,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
                 child: Text('No matches - try loosening a filter.', style: ppBody(13, color: ppMuted)),
               ))
             else
-              _pad(_grid(items)),
+              _pad(_snapshotList(items)),
 
             const SizedBox(height: 24),
             _pad(Text('Ranked by ParentVeda from expert review and verified-mother ratings.',
@@ -205,18 +207,29 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
         ),
       );
 
-  Widget _grid(List<PpProduct> items) {
-    final rows = <Widget>[];
-    for (int i = 0; i < items.length; i += 2) {
-      rows.add(Padding(
-        padding: EdgeInsets.only(top: i == 0 ? 0 : 16),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(child: PpProductCard(items[i])),
-          const SizedBox(width: 14),
-          Expanded(child: i + 1 < items.length ? PpProductCard(items[i + 1]) : const SizedBox()),
-        ]),
-      ));
-    }
-    return Column(children: rows);
+  // One rich snapshot card per row. The first [_previewCount] lead; the rest
+  // sit behind a "Browse all (N)" affordance until the parent taps to reveal.
+  Widget _snapshotList(List<PpProduct> items) {
+    final showAll = _expanded || items.length <= _previewCount;
+    final visible = showAll ? items : items.take(_previewCount).toList();
+    return Column(children: [
+      for (final p in visible) PpProductSnapshotCard(p),
+      if (!showAll)
+        GestureDetector(
+          onTap: () => setState(() => _expanded = true),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('Browse all ${items.length} ${_shortSub.toLowerCase()}',
+                  style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+              const SizedBox(width: 6),
+              const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+            ]),
+          ),
+        ),
+    ]);
   }
 }

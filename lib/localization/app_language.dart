@@ -2789,6 +2789,8 @@ class S {
       _p('$done / $goal rituals completed', '$done / $goal rituals poore');
   String gsDayStreak(int n) => _p('$n day streak', '$n din ki streak');
   String get gsTodaysRituals => _p("Today's Rituals", 'Aaj ke Rituals');
+  String get gsTodaysGarbhSanskar =>
+      _p("Today's Garbh Sanskar", 'Aaj ka Garbh Sanskar');
   String get gsVicharaTodo => _p('A reflection, a puzzle, or an uplifting read',
       'Ek vichaar, ek puzzle, ya ek prernadayi read');
   String gsDailyGoalLine(int goal) =>

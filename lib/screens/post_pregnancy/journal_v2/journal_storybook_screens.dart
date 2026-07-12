@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'journal_email.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 
@@ -25,7 +26,21 @@ class StorybookScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.only(top: 58, bottom: 40),
         children: [
-          jvPad(jvTopBar(context, title: book.title)),
+          jvPad(jvTopBar(
+            context,
+            title: book.title,
+            trailing: GestureDetector(
+              onTap: () => emailMemoryToChild(context, _bookAsMemory(book)),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+                child: const Icon(Icons.mail_outline_rounded, size: 17, color: ppPurple),
+              ),
+            ),
+          )),
           const SizedBox(height: 26),
           Center(child: JvBookCover(width: 150, height: 200, title: book.title.toUpperCase(), since: jvBornSince)),
           const SizedBox(height: 22),
@@ -65,6 +80,18 @@ class StorybookScreen extends StatelessWidget {
 
   void _openReader(BuildContext context, int chapterIndex) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => StorybookReaderScreen(startPage: jvChapterPages[chapterIndex.clamp(0, jvChapterPages.length - 1)])));
+
+  // Synthesize a warm, emailable note about the whole storybook so it can reuse
+  // the same pre-filled mail composer used for individual memories.
+  JvMemory _bookAsMemory(JvStorybook b) => JvMemory(
+        title: b.title,
+        date: b.years,
+        age: b.detail,
+        body:
+            'I have been keeping "${b.title}" for you - ${b.detail} gathered across ${b.years}. One day this whole storybook is yours to read. Here is a little of it to begin.',
+        kind: JvKind.story,
+        seed: b.seed,
+      );
 }
 
 // ---- the immersive reader ---------------------------------------------------

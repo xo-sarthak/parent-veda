@@ -1,6 +1,11 @@
 // =============================================================================
 //  CohortCoursesScreen - Learn · Cohort Courses (parenting · S12)
 // -----------------------------------------------------------------------------
+//  RETIRED (superseded 2026-07) - folded into the merged "Courses &
+//  Masterclasses" section: see learning_home_screen.dart (LearningHomeScreen),
+//  where live cohorts are one of the three kinds. This landing page is detached
+//  from the Explore drawer; its code is kept intact for reference/revert.
+// -----------------------------------------------------------------------------
 //  "Guided, together" - a small group, a real coach, a set start and finish.
 //  A featured cohort with a join CTA plus other upcoming cohorts. Reached from
 //  the Explore drawer (design path: Products → Learn → Cohort Courses).

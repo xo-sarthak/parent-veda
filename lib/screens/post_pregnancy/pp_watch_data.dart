@@ -16,7 +16,8 @@ import 'package:flutter/material.dart';
 
 import 'pp_experts_data.dart';
 
-/// One learning video. `quick` splits the two modes; everything else is shared.
+/// One learning item. `quick` splits Deep vs Quick (Shorts) modes; `isPodcast`
+/// marks a listen-first episode (longer, audio-led). Everything else is shared.
 class WatchVideo {
   const WatchVideo({
     required this.id,
@@ -29,6 +30,8 @@ class WatchVideo {
     required this.quick,
     required this.why,
     required this.seed,
+    this.isPodcast = false,
+    this.videoUrl,
     this.relatedArticle,
     this.relatedActivity,
     this.relatedRecipe,
@@ -44,8 +47,15 @@ class WatchVideo {
   final String ageTag; // "3–6 mo"
   final int seconds;
   final bool quick;
+  final bool isPodcast; // a listen-first episode (channel Podcasts bucket)
   final String why; // "why this matters today" / the lesson in one line
   final int seed; // varies the placeholder thumbnail
+
+  // The URL that actually plays (an MP4/HLS on our own backend). Null on the
+  // seed catalog: in production it's filled from the authenticated backend
+  // (a signed URL), never hardcoded here. See video/pv_video_config.dart for
+  // how dev placeholders are resolved.
+  final String? videoUrl;
 
   // Ecosystem links (shown as "Learn next" + "related", never comments).
   final String? relatedArticle;
@@ -56,6 +66,9 @@ class WatchVideo {
 
   Expert get expert => expertById(expertId);
   String get durationLabel => quick ? '${seconds}s' : '${(seconds / 60).round()} min';
+
+  /// Short human label for the kind of item ("Short" / "Podcast" / "Video").
+  String get kindLabel => isPodcast ? 'Podcast' : (quick ? 'Short' : 'Video');
 }
 
 /// A curated learning collection (not a playlist - a path with a finish line).
@@ -332,6 +345,137 @@ const List<WatchVideo> kWatchVideos = [
     why: 'One slow breath in, a longer breath out. A tiny reset you can do while rocking the baby.',
     seed: 16,
   ),
+  WatchVideo(
+    id: 'q_burp',
+    title: 'The upright burping hold',
+    topic: 'Fewer post-feed tears',
+    category: 'Health',
+    expertId: 'neha',
+    ageTag: '0–6 mo',
+    seconds: 40,
+    quick: true,
+    why: 'Hold your baby upright against your chest and pat low on the back - trapped wind comes up faster.',
+    seed: 17,
+  ),
+  WatchVideo(
+    id: 'q_massage',
+    title: 'A 60-second leg massage',
+    topic: 'Wind-down touch',
+    category: 'Activities',
+    expertId: 'meher',
+    ageTag: '0–12 mo',
+    seconds: 60,
+    quick: true,
+    why: 'Slow strokes down the legs before a nap signal "we are winding down" - and it is lovely bonding.',
+    seed: 18,
+  ),
+  WatchVideo(
+    id: 'q_sing',
+    title: 'Why singing beats talking',
+    topic: 'Melody holds attention',
+    category: 'Language',
+    expertId: 'kabir',
+    ageTag: '3–6 mo',
+    seconds: 45,
+    quick: true,
+    why: 'The sing-song rise and fall of a nursery rhyme holds a baby\'s attention far longer than flat speech.',
+    seed: 19,
+  ),
+  WatchVideo(
+    id: 'q_sleepcue',
+    title: 'Spotting the first tired cue',
+    topic: 'Catch the window',
+    category: 'Sleep',
+    expertId: 'ananya',
+    ageTag: '0–6 mo',
+    seconds: 50,
+    quick: true,
+    why: 'A quick stare into the distance is the first tired cue - start the wind-down then, before the overtired cry.',
+    seed: 20,
+  ),
+  WatchVideo(
+    id: 'q_safe',
+    title: 'One drawer, one weekend',
+    topic: 'Start baby-proofing small',
+    category: 'Health',
+    expertId: 'meera',
+    ageTag: '6–12 mo',
+    seconds: 55,
+    quick: true,
+    why: 'Do not baby-proof the whole house at once. Secure one low drawer this weekend, then the next.',
+    seed: 15,
+  ),
+];
+
+// ---- podcasts (channel "Podcasts" bucket) -----------------------------------
+//  Longer, listen-first episodes led by the same experts. Reuses WatchVideo
+//  (isPodcast:true) so cards, saving, progress and the mock player all just work.
+const List<WatchVideo> kWatchPodcasts = [
+  WatchVideo(
+    id: 'pod_sleep',
+    title: 'The truth about baby sleep',
+    topic: 'A calm hour on the 4-month shift',
+    category: 'Sleep',
+    expertId: 'ananya',
+    ageTag: '0–12 mo',
+    seconds: 1560,
+    quick: false,
+    isPodcast: true,
+    why: 'Dr Ananya sits down for a longer, honest conversation about why sleep breaks at four months - and what genuinely helps.',
+    seed: 31,
+  ),
+  WatchVideo(
+    id: 'pod_leaps',
+    title: 'Inside the fussy leaps',
+    topic: 'The science of Wonder Weeks',
+    category: 'Brain Development',
+    expertId: 'kabir',
+    ageTag: '3–12 mo',
+    seconds: 1980,
+    quick: false,
+    isPodcast: true,
+    why: 'A relaxed deep-dive into what is happening in your baby\'s brain during each leap, and why the clinginess is progress.',
+    seed: 32,
+  ),
+  WatchVideo(
+    id: 'pod_solids',
+    title: 'Feeding without the fear',
+    topic: 'Solids, allergies and appetite',
+    category: 'Nutrition',
+    expertId: 'neha',
+    ageTag: '6–12 mo',
+    seconds: 1680,
+    quick: false,
+    isPodcast: true,
+    why: 'Dr Neha answers the questions parents actually ask about starting solids - gagging, allergies, and "is he eating enough?".',
+    seed: 33,
+  ),
+  WatchVideo(
+    id: 'pod_calm',
+    title: 'The crying conversation',
+    topic: 'Soothing without losing yourself',
+    category: 'Behaviour',
+    expertId: 'meher',
+    ageTag: '0–12 mo',
+    seconds: 1440,
+    quick: false,
+    isPodcast: true,
+    why: 'A warm, practical episode on reading a baby\'s cries and staying regulated yourself when it is 3am and nothing works.',
+    seed: 34,
+  ),
+  WatchVideo(
+    id: 'pod_mind',
+    title: 'The fourth trimester, for you',
+    topic: 'A parent\'s mental health',
+    category: 'Mental Wellness',
+    expertId: 'meera',
+    ageTag: 'All stages',
+    seconds: 1320,
+    quick: false,
+    isPodcast: true,
+    why: 'An unhurried, honest talk about the parent behind the baby - the identity shift, the guilt, and small ways back to yourself.',
+    seed: 35,
+  ),
 ];
 
 // ---- collections ------------------------------------------------------------
@@ -374,8 +518,12 @@ const List<WatchCollection> kWatchCollections = [
 ];
 
 // ---- lookups ----------------------------------------------------------------
+/// Every playable item across the catalog (videos, shorts and podcasts). Handy
+/// for id lookups so saving/progress works for podcasts too.
+List<WatchVideo> get kWatchAll => [...kWatchVideos, ...kWatchPodcasts];
+
 WatchVideo watchVideoById(String id) =>
-    kWatchVideos.firstWhere((v) => v.id == id, orElse: () => kWatchVideos.first);
+    kWatchAll.firstWhere((v) => v.id == id, orElse: () => kWatchVideos.first);
 WatchCollection watchCollectionById(String id) =>
     kWatchCollections.firstWhere((c) => c.id == id, orElse: () => kWatchCollections.first);
 List<WatchVideo> watchByCategory(String category) =>
@@ -465,11 +613,47 @@ class WatchStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ---- channel subscriptions ----------------------------------------------
+  // Subscribe (channels, YouTube-style) is the same relationship as Follow (the
+  // player) - one source of truth - so subscribing on a channel and following an
+  // expert stay in sync, and the existing Follow button keeps working unchanged.
+  bool isSubscribed(String expertId) => isFollowing(expertId);
+  void toggleSubscribe(String expertId) => toggleFollow(expertId);
+  int get subscribedCount => _following.length;
+  List<String> get subscribedExpertIds => _following.toList();
+
   double progressOf(String id) => _progress[id] ?? 0;
   void setProgress(String id, double p) {
     _progress[id] = p.clamp(0, 1);
     if (!_recent.contains(id)) _recent.insert(0, id);
     notifyListeners();
+  }
+
+  // ---- resume position + completion (real player) -------------------------
+  // The player reports exact seconds so playback resumes where the parent left
+  // off (the fraction above still powers continue-watching + progress bars).
+  // In-memory for now; the repository layer (video/pv_video_repository.dart)
+  // is where this syncs to the backend / Supabase later.
+  final Map<String, int> _lastSeconds = {};
+  final Set<String> _completed = {};
+
+  /// The second to resume from (0 if unseen or already finished).
+  int lastPositionOf(String id) => _lastSeconds[id] ?? 0;
+
+  /// Record the exact playback position. [total] keeps the 0..1 fraction (and
+  /// therefore continue-watching) in step without a second source of truth.
+  void setLastPosition(String id, int seconds, int total) {
+    _lastSeconds[id] = seconds < 0 ? 0 : seconds;
+    if (total > 0) setProgress(id, seconds / total); // notifies
+  }
+
+  bool isCompleted(String id) => _completed.contains(id) || progressOf(id) >= 0.98;
+
+  /// Mark a lesson finished: full progress, clear the resume point, remember it.
+  void markCompleted(String id) {
+    _completed.add(id);
+    _lastSeconds[id] = 0; // next open starts fresh, not at the very end
+    setProgress(id, 1); // notifies
   }
 
   /// Unfinished videos (Netflix-style continue watching), most-progressed first.

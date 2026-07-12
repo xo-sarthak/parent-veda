@@ -16,10 +16,12 @@ import 'package:flutter/material.dart';
 import 'article_reader_screen.dart';
 import 'development_area_screen.dart';
 import 'explore_drawer.dart';
-import 'food_home_screen.dart';
+import 'recipes_screen.dart';
 import 'food_recipe_screen.dart';
 import 'growth_activity_screen.dart';
+import 'leap_definition_screen.dart';
 import 'pp_development_data.dart';
+import 'pp_leaps_data.dart';
 import 'pp_food_data.dart';
 // The Health quick action now opens the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
@@ -39,7 +41,9 @@ import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
-import 'wonder_week_screen.dart';
+// "Looking ahead → Leap 5" now opens the full leap page; the standalone
+// WonderWeekScreen is kept for revert but no longer wired here.
+// import 'wonder_week_screen.dart';
 
 // section-icon tints
 const Color _tPurple = Color(0xFFEDEAF7);
@@ -293,11 +297,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
             _aheadCard('Tomorrow', 'A new sound', Icons.graphic_eq_rounded, () => _push(const GrowthActivityScreen(activity: kActNewSound))),
             const SizedBox(width: 12),
-            _aheadCard('in ~6 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(const WonderWeekScreen())),
+            _aheadCard('in ~6 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(LeapDefinitionScreen(leap: leapByNumber(5)))),
             const SizedBox(width: 12),
             _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxDetailScreen(visitId: 'mo6'))),
             const SizedBox(width: 12),
-            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const FoodHomeScreen())),
+            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const RecipesScreen())),
           ]),
         ),
       ]);

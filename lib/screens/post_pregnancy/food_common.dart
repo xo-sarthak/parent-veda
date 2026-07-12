@@ -54,13 +54,35 @@ Widget vegDot(bool veg) => Container(
       child: Center(child: Container(width: 5, height: 5, decoration: BoxDecoration(color: veg ? _veg : _nonVeg, shape: BoxShape.circle))),
     );
 
-/// time · age · veg · nutrition highlight.
+/// The 3-way India-style diet marker (ported from the old Recipes module onto
+/// the merged model): a bordered square with a filled circle (veg), a leaf
+/// (vegan) or a triangle (non-veg). Functional iconography, so the colours stay.
+Widget foodDietMark(String diet, {double size = 13}) {
+  final c = diet == 'nonveg' ? _nonVeg : _veg;
+  final Widget inner;
+  if (diet == 'vegan') {
+    inner = Icon(Icons.eco, size: size * 0.66, color: c);
+  } else if (diet == 'nonveg') {
+    inner = Icon(Icons.arrow_drop_up, size: size * 0.98, color: c);
+  } else {
+    inner = Container(width: size * 0.44, height: size * 0.44, decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+  }
+  return Container(
+    width: size,
+    height: size,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(3), border: Border.all(color: c, width: 1.4)),
+    child: inner,
+  );
+}
+
+/// time · age · diet · nutrition highlight.
 Widget foodMeta(FoodRecipe r) => Row(children: [
       Icon(Icons.schedule_rounded, size: 12.5, color: ppMuted),
       const SizedBox(width: 4),
       Text('${r.totalMin} min', style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
       const SizedBox(width: 8),
-      vegDot(r.veg),
+      foodDietMark(r.diet),
       const SizedBox(width: 6),
       Expanded(
         child: Text('${r.ageTag}  ·  ${r.highlight}',
@@ -106,11 +128,13 @@ class FoodRailCard extends StatelessWidget {
       );
 }
 
-/// A wide list card (thumb left, text right).
+/// A wide list card (thumb left, text right). [warm] tints the subtitle for the
+/// Sick-mode comfort meals.
 class FoodListCard extends StatelessWidget {
-  const FoodListCard({super.key, required this.recipe, required this.onTap});
+  const FoodListCard({super.key, required this.recipe, required this.onTap, this.warm = false});
   final FoodRecipe recipe;
   final VoidCallback onTap;
+  final bool warm;
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -125,7 +149,7 @@ class FoodListCard extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(recipe.title, style: ppJakarta(14.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text(recipe.subtitle, style: ppBody(12.5, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(recipe.subtitle, style: ppBody(12.5, color: warm ? ppPurple : ppSoft, w: warm ? FontWeight.w600 : FontWeight.w400), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 7),
                 foodMeta(recipe),
               ]),

@@ -120,6 +120,17 @@ import 'package:parentveda/screens/post_pregnancy/watch_quicklearn_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_watch_data.dart';
 import 'package:parentveda/screens/post_pregnancy/what_changed_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/wonder_week_screen.dart';
+// New sections from the parenting review batch:
+import 'package:parentveda/screens/post_pregnancy/yoga_home_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/yoga_class_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_yoga_data.dart';
+import 'package:parentveda/screens/post_pregnancy/learning_home_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/learning_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_learning_data.dart';
+import 'package:parentveda/screens/post_pregnancy/remedy_list_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_nuskhe_data.dart';
+import 'package:parentveda/screens/post_pregnancy/watch_channel_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/watch_shorts_screen.dart';
 
 void main() {
   final screens = <String, Widget>{
@@ -145,6 +156,17 @@ void main() {
     'Watch category': const WatchCategoryScreen(category: 'Sleep'),
     'Watch collection': WatchCollectionScreen(collection: watchCollectionById('firstyear')),
     'Watch library': const WatchLibraryScreen(),
+    'Watch channel (Ananya)': const WatchChannelScreen(expertId: 'ananya'),
+    'Watch shorts': const WatchShortsScreen(),
+    'Yoga home': const YogaHomeScreen(),
+    'Yoga class (live group)': YogaClassScreen(cls: yogaClassById('pn_group')),
+    'Yoga class (recorded)': YogaClassScreen(cls: yogaClassById('md_sleep_rec')),
+    'Courses & Masterclasses': const LearningHomeScreen(),
+    'Learning detail (cohort)': LearningDetailScreen(program: programById('co_sleep')),
+    'Learning detail (masterclass)': LearningDetailScreen(program: programById('mc_solids')),
+    'Learning detail (recorded course)': LearningDetailScreen(program: programById('rc_playbrain')),
+    'Remedy list (Cold & cough)': const RemedyListScreen(category: 'Cold & cough'),
+    'Remedy detail (data)': RemedyDetailScreen(remedy: remedyById('jaiphal_pinch')),
     'Food home': const FoodHomeScreen(),
     'Food recipe': FoodRecipeScreen(recipe: foodRecipeById('ragipancake')),
     'Food builder': const FoodBuilderScreen(),
@@ -637,10 +659,17 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: ReadingHomeScreen()));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Book Summaries'));
-    await tester.pumpAndSettle();
+    // the type filter now lives in the Collections section, below the editorial start
+    await tester.scrollUntilVisible(find.text('Book Summaries'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     await tester.tap(find.text('Book Summaries'));
     await tester.pumpAndSettle();
+
+    // jump back up, then scroll the narrowed list to the expected book summary
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.textContaining('Big feelings in a small body'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
 
     // a book-summary-tagged article appears once the filter is applied
     expect(find.textContaining('Big feelings in a small body'), findsWidgets);

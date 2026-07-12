@@ -52,8 +52,18 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                 _pad(Text('Baby documents', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
                 _pad(Text('Every important paper for your child, in one calm place - photos or PDFs, never a scramble when you need them.', style: ppBody(14, h: 1.5))),
-                const SizedBox(height: 18),
-                _pad(_addButton('Add document', _addSheet)),
+                const SizedBox(height: 20),
+                _pad(ppEyebrow('Add a card', color: ppPurple)),
+                const SizedBox(height: 12),
+                _pad(IntrinsicHeight(
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    _quickAdd(Icons.description_outlined, 'Birth certificate', () => _editSheet(null, null, presetCategory: 'Birth certificate', presetTitle: 'Birth certificate')),
+                    const SizedBox(width: 12),
+                    _quickAdd(Icons.badge_outlined, 'Aadhaar card', () => _editSheet(null, null, presetCategory: 'Aadhaar', presetTitle: 'Aadhaar card')),
+                  ]),
+                )),
+                const SizedBox(height: 12),
+                _pad(_addButton('Add another document', _addSheet)),
                 const SizedBox(height: 18),
                 if (docs.isEmpty)
                   _pad(_empty('No documents saved yet. Add the birth certificate, insurance and more so they are always to hand.'))
@@ -66,6 +76,31 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
       ),
     );
   }
+
+  // A prominent, first-class quick-add tile for a specific ID document. Opens
+  // the same add sheet, pre-selected to the right category with a suggested
+  // title, so a parent lands straight in the attachment flow.
+  Widget _quickAdd(IconData icon, String label, VoidCallback onTap) => Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair), boxShadow: ppCardShadow),
+            child: Column(children: [
+              Container(width: 44, height: 44, alignment: Alignment.center, decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(13)), child: Icon(icon, size: 21, color: ppPurple)),
+              const SizedBox(height: 10),
+              Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.add_rounded, size: 13, color: ppMuted),
+                const SizedBox(width: 3),
+                Text('ADD', style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.6)),
+              ]),
+              const SizedBox(height: 3),
+              Text(label, style: ppJakarta(13.5), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
+            ]),
+          ),
+        ),
+      );
 
   Widget _addButton(String label, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
@@ -185,10 +220,10 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
   // ---- add / edit ---------------------------------------------------------
   void _addSheet() => _editSheet(null, null);
 
-  void _editSheet(BabyDocument? existing, int? index) {
-    final title = TextEditingController(text: existing?.title ?? '');
+  void _editSheet(BabyDocument? existing, int? index, {String? presetCategory, String? presetTitle}) {
+    final title = TextEditingController(text: existing?.title ?? presetTitle ?? '');
     final notes = TextEditingController(text: existing?.notes ?? '');
-    String category = existing?.category ?? kBabyDocCategories.first;
+    String category = existing?.category ?? presetCategory ?? kBabyDocCategories.first;
     final List<Attachment> atts = [...?existing?.attachments];
 
     showModalBottomSheet<void>(
@@ -207,7 +242,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                 Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
                 const SizedBox(height: 16),
                 Row(children: [
-                  Expanded(child: Text(existing == null ? 'Add document' : 'Edit document', style: ppJakarta(18))),
+                  Expanded(child: Text(existing != null ? 'Edit document' : (presetTitle != null ? 'Add $presetTitle' : 'Add document'), style: ppJakarta(18))),
                   if (index != null)
                     GestureDetector(
                       onTap: () {

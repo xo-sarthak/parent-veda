@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'pp_common.dart';
 import 'pp_products_data.dart';
@@ -49,9 +50,30 @@ class ProductDetailScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Opening the store soon'), behavior: SnackBarBehavior.floating),
-      );
+  // Route the buy: an affiliate product (Amazon / FirstCry) opens its retailer's
+  // site; ParentVeda's own (in-app) product stays in the app (mock checkout).
+  Future<void> _buy(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (!ppIsAffiliate(product)) {
+      messenger.showSnackBar(SnackBar(
+        content: Text('Buying ${product.name} in-app - checkout opens soon.'),
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
+    bool ok;
+    try {
+      ok = await launchUrl(Uri.parse(ppBuyUrl(product)), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      ok = false;
+    }
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(
+        content: Text('Could not open ${product.retailer} - please try again.'),
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
+  }
 
   // The explicit "Add to Compare" toggle - mirrors the product-card rule, so a
   // cross-category or full attempt is explained, never silently dropped.
@@ -484,25 +506,34 @@ class ProductDetailScreen extends StatelessWidget {
               },
             )),
 
-            // buy
+            // buy - affiliate opens the retailer; in-app stays in ParentVeda
             const SizedBox(height: 22),
             _pad(GestureDetector(
-              onTap: () => _soon(context),
+              onTap: () => _buy(context),
+              behavior: HitTestBehavior.opaque,
               child: Container(
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
-                child: Text('Buy on ${product.retailer} · ${product.priceLabel}',
-                    style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  if (ppIsAffiliate(product)) ...[
+                    const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.white),
+                    const SizedBox(width: 8),
+                  ],
+                  Text('${ppBuyLabel(product)} · ${product.priceLabel}',
+                      style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                ]),
               ),
             )),
-            const SizedBox(height: 12),
-            _pad(Center(
-              child: Text.rich(TextSpan(children: [
-                const TextSpan(text: 'Also on '),
-                TextSpan(text: otherRetailer, style: ppBody(13, color: ppPurple, w: FontWeight.w600)),
-              ]), style: ppBody(13)),
-            )),
+            if (ppIsAffiliate(product)) ...[
+              const SizedBox(height: 12),
+              _pad(Center(
+                child: Text.rich(TextSpan(children: [
+                  const TextSpan(text: 'Also on '),
+                  TextSpan(text: otherRetailer, style: ppBody(13, color: ppPurple, w: FontWeight.w600)),
+                ]), style: ppBody(13)),
+              )),
+            ],
 
             const SizedBox(height: 20),
             _pad(Text('Reviews are from verified ParentVeda parents. No anonymous reviews, ever.',

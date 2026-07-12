@@ -1,11 +1,17 @@
 // =============================================================================
-//  Recipes - content model + data (normal + sick-day comfort meals)
+//  Recipes - LEGACY content model + data (RecipeItem)
 // -----------------------------------------------------------------------------
-//  Single source of truth for the Recipes flow (Recipes → recipe page, and
-//  Recipes → Sick-day meals). The Veggie Maggi recipe is a faithful build of
-//  Claude Design "post pregnancy app.dc.html" · S15·detail (full page); the rest
-//  carry the light fields the list + filters need, so veg/non-veg, category and
-//  sick-situation filtering all work. Isolated to the post_pregnancy module.
+//  After the Recipes+Food merge, the live unified Recipes section runs on the
+//  richer FoodRecipe / FoodStore model in pp_food_data.dart. This legacy model is
+//  KEPT LIVE (not deleted) because it still backs: the retired RecipePageScreen
+//  ('Recipe page' smoke test), Ask Veda recipe sourcing (parenting_veda iterates
+//  kRecipes), and the recipes-flow unit tests (normalRecipes / sickRecipes). Do
+//  not add new dishes here - add them to pp_food_data.dart's kFoodRecipes.
+//
+//  --- original doc -------------------------------------------------------------
+//  The Veggie Maggi recipe is a faithful build of Claude Design "post pregnancy
+//  app.dc.html" · S15·detail; the rest carry the light fields the list + filters
+//  need, so veg/non-veg, category and sick-situation filtering all work.
 // =============================================================================
 
 class RecipeItem {

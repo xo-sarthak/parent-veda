@@ -1,7 +1,14 @@
 // =============================================================================
-//  Recipes - shared widgets: the list row and the carousel card. Both open the
-//  recipe page for their RecipeItem. Warm-toned variant for sick-day comfort
-//  meals. Isolated to the post_pregnancy module.
+//  Recipes - RETIRED old-model shared widgets (RecipeItem list row + card).
+// -----------------------------------------------------------------------------
+//  After the Recipes+Food merge, the unified Recipes home and Sick-mode doorway
+//  render FoodRecipe cards from food_common.dart (FoodListCard / FoodRailCard +
+//  foodDietMark) instead of these. Kept compiling for reference/revert; no live
+//  screen imports this file any more.
+//
+//  --- original doc -------------------------------------------------------------
+//  Shared widgets: the list row and the carousel card. Both open the recipe page
+//  for their RecipeItem. Warm-toned variant for sick-day comfort meals.
 // =============================================================================
 
 import 'package:flutter/material.dart';

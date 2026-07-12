@@ -8,7 +8,6 @@
 //  to a single purple accent. Palette mirrors the Claude Design mock.
 // =============================================================================
 
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,6 +40,9 @@ const Color ppBrown = Color(0xFF7A4600);
 const Color ppPanelDiv = Color(0xFFE1D7EC);
 const Color ppStripeA = Color(0xFFEFE7F5);
 const Color ppStripeB = Color(0xFFF6F0FA);
+// Heading ink - matches the pregnancy app's primary900 (#2D144C), the dark
+// purple-black it uses for section & card titles (slightly warmer than ppInk).
+const Color ppTitleInk = Color(0xFF2D144C);
 
 // ---- text -------------------------------------------------------------------
 TextStyle ppFraunces(double size,
@@ -48,7 +50,7 @@ TextStyle ppFraunces(double size,
     GoogleFonts.fraunces(
         fontSize: size, fontWeight: w, height: h, letterSpacing: -0.4, color: color);
 
-TextStyle ppJakarta(double size, {FontWeight w = FontWeight.w700, Color color = ppInk}) =>
+TextStyle ppJakarta(double size, {FontWeight w = FontWeight.w700, Color color = ppTitleInk}) =>
     GoogleFonts.plusJakartaSans(fontSize: size, fontWeight: w, color: color);
 
 TextStyle ppBody(double size,
@@ -181,7 +183,16 @@ class PpBottomNav extends StatelessWidget {
   /// 0 = My Child · 1 = AskVeda · 2 = Tools · 3 = Community · 4 = Products
   final int active;
 
-  static const List<String> _labels = ['My Child', 'AskVeda', 'Tools', 'Community', 'Products'];
+  // Mirrors the pregnancy app's PvTabBar: a floating white pill where the active
+  // tab expands into a purple icon+label pill and the rest are icon + tiny label,
+  // so the two apps' bottom navs read as the same component.
+  static const List<(IconData, String)> _tabs = [
+    (Icons.child_care_rounded, 'My Child'),
+    (Icons.auto_awesome_rounded, 'AskVeda'),
+    (Icons.widgets_rounded, 'Tools'),
+    (Icons.groups_rounded, 'Community'),
+    (Icons.shopping_bag_rounded, 'Products'),
+  ];
 
   void _tap(BuildContext context, int i) {
     if (i == active) return;
@@ -190,46 +201,52 @@ class PpBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget tab(int i) {
-      final on = i == active;
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => _tap(context, i),
-          behavior: HitTestBehavior.opaque,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(color: on ? ppPurple : Colors.transparent, shape: BoxShape.circle),
-            ),
-            const SizedBox(height: 5),
-            Text(_labels[i],
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: ppBody(10.5, color: on ? ppPurple : ppMuted, w: on ? FontWeight.w700 : FontWeight.w600)),
-          ]),
-        ),
-      );
-    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: const [BoxShadow(color: Color(0x292D144C), blurRadius: 28, offset: Offset(0, 8))],
+      ),
+      child: Row(children: [for (int i = 0; i < _tabs.length; i++) _item(context, i)]),
+    );
+  }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 62,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFEFEAF4)),
-            boxShadow: const [BoxShadow(color: Color(0x1E6A30B6), blurRadius: 26, offset: Offset(0, 10))],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: Row(children: [tab(0), tab(1), tab(2), tab(3), tab(4)]),
+  Widget _item(BuildContext context, int i) {
+    final on = i == active;
+    final (icon, label) = _tabs[i];
+    final child = GestureDetector(
+      onTap: () => _tap(context, i),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
+        decoration: BoxDecoration(
+          color: on ? ppPurple : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
         ),
+        // Active = horizontal pill (icon + label). Inactive = icon + tiny label.
+        child: on
+            ? Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(icon, size: 21, color: Colors.white),
+                const SizedBox(width: 6),
+                Text(label, style: ppBody(12.5, color: Colors.white, w: FontWeight.w700)),
+              ])
+            : Column(mainAxisSize: MainAxisSize.min, children: [
+                Icon(icon, size: 20, color: ppMuted),
+                const SizedBox(height: 3),
+                Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: ppBody(8.5, color: ppMuted, w: FontWeight.w600)),
+              ]),
       ),
     );
+    // The active pill sizes to its content; the four inactive tabs share the rest
+    // evenly (Expanded) so the row can't overflow, even under the wide test font.
+    return on ? child : Expanded(child: child);
   }
 }
 

@@ -1,6 +1,14 @@
 // =============================================================================
 //  CoursesScreen - Learn · Documentary Courses (parenting · S14)
 // -----------------------------------------------------------------------------
+//  RETIRED (superseded 2026-07) - folded into the merged "Courses &
+//  Masterclasses" section: see learning_home_screen.dart (LearningHomeScreen).
+//  This landing page is no longer wired into the Explore drawer. The code is
+//  kept intact (not deleted) because pp_common.dart still references
+//  `CoursesScreen` as the ppDeeperRow fallback, and the focused-course flow lives
+//  on in CourseDetailScreen / CourseLessonScreen (now wrapped by a
+//  LearningProgram). Safe to remove once those references are repointed.
+// -----------------------------------------------------------------------------
 //  The flagship "Complete Parenting Guide" (pregnancy → age 12) that unlocks
 //  stage by stage, plus a second specialist course. You only see modules for
 //  the child's current stage; the rest are a tap away. Reached from the Explore

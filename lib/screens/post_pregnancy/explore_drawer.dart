@@ -11,11 +11,16 @@
 import 'package:flutter/material.dart';
 
 import 'astrology_screen.dart';
-import 'cohort_courses_screen.dart';
-import 'courses_screen.dart';
+// Merged into the unified "Courses & Masterclasses" section (LearningHomeScreen).
+// Kept (commented) for easy revert:
+// import 'cohort_courses_screen.dart';
+// import 'courses_screen.dart';
 import 'development_home_screen.dart';
-import 'food_home_screen.dart';
-import 'guides_tools_screen.dart';
+// Food is merged into Recipes; "Guides & Tools" retired. Kept for revert:
+// import 'food_home_screen.dart';
+// import 'guides_tools_screen.dart';
+import 'learning_home_screen.dart';
+import 'yoga_home_screen.dart';
 // The Health Guide is now reached from inside the Health ecosystem, not the
 // drawer directly. Kept (commented) in case we want the direct entry back.
 // import 'health_guide_screen.dart';
@@ -23,7 +28,7 @@ import 'health_home_screen.dart';
 import 'investments_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'leap_calendar_screen.dart';
-import 'masterclasses_screen.dart';
+// import 'masterclasses_screen.dart'; // merged into LearningHomeScreen
 import 'my_child_screen.dart';
 import 'nuskhe_screen.dart';
 import 'pp_common.dart';
@@ -78,22 +83,29 @@ class ExploreDrawer extends StatelessWidget {
                   //     "Aarav's health record & guidance.", const HealthGuideScreen()),
                   _section(context, Icons.monitor_heart_outlined, 'Health',
                       "Aarav's living health story, organised.", const HealthHomeScreen()),
-                  _section(context, Icons.ramen_dining_outlined, 'Food',
-                      "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
+                  // Food is merged into Recipes now (one unified food companion). Kept for revert:
+                  // _section(context, Icons.ramen_dining_outlined, 'Food',
+                  //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
                   _section(context, Icons.restaurant_menu_outlined, 'Recipes',
-                      'Age-tagged, healthier Indian food.', const RecipesScreen()),
+                      'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
                   _section(context, Icons.recommend_outlined, 'Recommendations',
                       'What to read, watch, play & do.', const RecommendationsScreen()),
-                  _section(context, Icons.auto_stories_outlined, 'Learn',
-                      'A premium reading experience for parents.', const ReadingHomeScreen()),
-                  _section(context, Icons.school_outlined, 'Masterclasses',
-                      'One evening with an expert.', const MasterclassesScreen()),
-                  _section(context, Icons.groups_outlined, 'Cohort Courses',
-                      'Guided, together - small groups.', const CohortCoursesScreen()),
-                  _section(context, Icons.article_outlined, 'Guides & Tools',
-                      'Downloads you keep forever.', const GuidesToolsScreen()),
-                  _section(context, Icons.video_library_outlined, 'Courses',
-                      'Documentary guides, stage by stage.', const CoursesScreen()),
+                  _section(context, Icons.auto_stories_outlined, 'READ',
+                      'Guided reads, collections and short videos.', const ReadingHomeScreen()),
+                  _section(context, Icons.school_outlined, 'Courses & Masterclasses',
+                      'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
+                  _section(context, Icons.self_improvement_outlined, 'Yoga & Classes',
+                      'Live & recorded classes for every stage.', const YogaHomeScreen()),
+                  // Masterclasses + Cohort Courses + Courses are now one section (above);
+                  // "Guides & Tools" is retired. All kept (commented) for easy revert:
+                  // _section(context, Icons.school_outlined, 'Masterclasses',
+                  //     'One evening with an expert.', const MasterclassesScreen()),
+                  // _section(context, Icons.groups_outlined, 'Cohort Courses',
+                  //     'Guided, together - small groups.', const CohortCoursesScreen()),
+                  // _section(context, Icons.article_outlined, 'Guides & Tools',
+                  //     'Downloads you keep forever.', const GuidesToolsScreen()),
+                  // _section(context, Icons.video_library_outlined, 'Courses',
+                  //     'Documentary guides, stage by stage.', const CoursesScreen()),
                   _section(context, Icons.handshake_outlined, 'Find help',
                       'Vetted local services near you.', const ProblemSolverScreen()),
                   _section(context, Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',

@@ -1714,14 +1714,13 @@ class HomeScreenB extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s.garbhSanskar,
+                      // Was "Garbh Sanskar" + "Today's Rituals" subtitle;
+                      // merged into a single "Today's Garbh Sanskar" heading.
+                      Text(s.gsTodaysGarbhSanskar,
                           style: GoogleFonts.plusJakartaSans(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary900)),
-                      Text(s.gsTodaysRituals,
-                          style: GoogleFonts.manrope(
-                              fontSize: 12, color: AppTheme.neutral600)),
                     ]),
               ),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [

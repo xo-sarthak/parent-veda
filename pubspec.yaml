@@ -71,6 +71,13 @@ dependencies:
   record: ^7.1.0
   url_launcher: ^6.3.0
 
+  # ParentVeda Watch video engine. Videos are hosted on our OWN backend
+  # (Supabase Storage now; a real video host like Bunny/Cloudflare later) and
+  # played NATIVELY via video_player - no third-party player chrome, fully
+  # ParentVeda-branded, plays MP4 and HLS. URLs come from the backend (see the
+  # video/ module); never hardcoded outside the dev config.
+  video_player: ^2.9.0
+
   # Customizable local reminders (Kegel, medication, daily reads, bag tasks…).
   # The reminder UI + store are wired now; NotificationService (the actual OS
   # scheduling) plugs into these once `flutter pub get` installs the packages.

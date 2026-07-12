@@ -36,7 +36,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, 'Food')),
+            _pad(ppBack(context, 'Recipes')),
             const SizedBox(height: 18),
             _pad(ppEyebrow('Meal plan', color: ppPurple)),
             const SizedBox(height: 8),

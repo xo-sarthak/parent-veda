@@ -68,6 +68,11 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 22),
             _pad(_snapshot()),
 
+            // ID & documents - kept high so a parent immediately sees where to
+            // add the birth certificate, Aadhaar and other papers.
+            const SizedBox(height: 12),
+            _pad(_bigCta(context, Icons.badge_outlined, ppPurple, 'ID & documents', 'Birth certificate, Aadhaar & more - add and keep them in one calm place.', () => _push(context, const BabyDocumentsScreen()))),
+
             // 2 - timeline preview
             const SizedBox(height: 30),
             _pad(_sectionHeader('Health timeline', 'Full timeline →', () => _push(context, const HealthTimelineScreen()))),

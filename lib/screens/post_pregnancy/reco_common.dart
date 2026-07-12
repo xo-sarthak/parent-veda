@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_deals_data.dart';
 import 'pp_reco_data.dart';
 
 /// Heart-toggle bound to the RecoStore.
@@ -166,3 +167,89 @@ Widget _catChip(String category) => Container(
         Text(category, style: ppBody(10, color: ppInk, w: FontWeight.w700)),
       ]),
     );
+
+// =============================================================================
+//  Deals of the day - a compact commerce rail shown at the bottom of each
+//  category view. Sourced from the self-contained pp_deals_data.dart, filtered
+//  to the category where possible (general baby-care offers fill the rest).
+// =============================================================================
+
+/// The full "Deals of the day" block (header + note + horizontal rail) for a
+/// category. Returns an empty box if there is nothing to show.
+Widget recoDealsSection(String category) {
+  final deals = dealsForCategory(category);
+  if (deals.isEmpty) return const SizedBox.shrink();
+  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(children: [
+        const Icon(Icons.local_offer_outlined, size: 18, color: ppPurple),
+        const SizedBox(width: 9),
+        Expanded(child: Text('Deals of the day', style: ppJakarta(17), maxLines: 1, overflow: TextOverflow.ellipsis)),
+      ]),
+    ),
+    const SizedBox(height: 5),
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Text('Handpicked offers for this section. Prices are indicative.', style: ppBody(12.5, color: ppMuted, h: 1.4)),
+    ),
+    const SizedBox(height: 14),
+    SizedBox(
+      height: 182,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: deals.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, i) => PpDealCard(deal: deals[i]),
+      ),
+    ),
+  ]);
+}
+
+/// A single compact deal card: discount, title, blurb, deal + struck old price,
+/// retailer. Display-only (prices are illustrative).
+class PpDealCard extends StatelessWidget {
+  const PpDealCard({super.key, required this.deal, this.width = 208});
+  final PpDeal deal;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: width,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(color: ppCoral.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+              child: Text('${deal.discountPercent}% off', style: ppBody(10.5, color: ppCoral, w: FontWeight.w800)),
+            ),
+            const Spacer(),
+            if (deal.tag != null)
+              Flexible(child: Text(deal.tag!.toUpperCase(), textAlign: TextAlign.right, style: ppBody(8.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.5), maxLines: 1, overflow: TextOverflow.ellipsis)),
+          ]),
+          const SizedBox(height: 11),
+          Text(deal.title, style: ppJakarta(13.5).copyWith(height: 1.24), maxLines: 2, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 6),
+          Text(deal.blurb, style: ppBody(11, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis),
+          const Spacer(),
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(deal.dealPriceLabel, style: ppJakarta(16).copyWith(color: ppPurple)),
+            const SizedBox(width: 6),
+            Flexible(child: Text(deal.oldPriceLabel, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(11.5, color: ppMuted).copyWith(decoration: TextDecoration.lineThrough))),
+          ]),
+          const SizedBox(height: 8),
+          Row(children: [
+            const Icon(Icons.storefront_outlined, size: 12, color: ppMuted),
+            const SizedBox(width: 5),
+            Expanded(child: Text(deal.retailer, style: ppBody(10.5, color: ppMuted, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            if (deal.indian) ...[
+              const SizedBox(width: 6),
+              Text('Indian', style: ppBody(9, color: ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.4)),
+            ],
+          ]),
+        ]),
+      );
+}

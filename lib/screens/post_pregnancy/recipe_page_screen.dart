@@ -1,12 +1,17 @@
 // =============================================================================
-//  RecipePageScreen - Recipe page (parenting · S15·detail v2)
+//  RecipePageScreen - RETIRED old-model recipe page (S15·detail v2)
 // -----------------------------------------------------------------------------
+//  Superseded by the data-driven FoodRecipeScreen after the Recipes+Food merge.
+//  The unified Recipes home and Sick-mode doorway now open FoodRecipeScreen (rich
+//  detail + functional Healthier-Version toggle) for every dish. This RecipeItem-
+//  based page (only 'maggi' fully built) is kept compiling for reference/revert
+//  and is still exercised by the smoke test's 'Recipe page' entry. Not wired into
+//  any live flow.
+//
+//  --- original doc -------------------------------------------------------------
 //  A full recipe with ParentVeda depth: video hero, nutrition per serving with
 //  key-nutrient RDAs, why-it's-good, ingredients + equipment, method, frequency
-//  + cautions, and a "customise for baby" block. Faithful build of Claude Design
-//  · S15·detail v2. The Veggie Maggi recipe carries the full designed page; other
-//  recipes show the header + nutrition (full treatment on the way). Reached from
-//  Recipes / Sick-day meals → any recipe.
+//  + cautions, and a "customise for baby" block.
 // =============================================================================
 
 import 'package:flutter/material.dart';

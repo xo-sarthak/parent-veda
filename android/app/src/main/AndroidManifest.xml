@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Watch video player streams over the network (video_player / ExoPlayer).
+         Debug builds inject this automatically; declared here so release does too. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Voice journaling: capture the mother's spoken note. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Customizable reminders (flutter_local_notifications). -->

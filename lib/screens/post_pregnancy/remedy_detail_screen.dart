@@ -1,21 +1,31 @@
 // =============================================================================
 //  RemedyDetailScreen - Nuskha · remedy detail (parenting · S19·detail)
 // -----------------------------------------------------------------------------
-//  A single validated home remedy: what it is, quick facts, what you'll need,
-//  how to make it, when to use it, and - the differentiator - a clear "when NOT
-//  to use, see a doctor instead" safety block, the reviewing panel, related
-//  shop/read links and a labelled sponsored slot. Faithful build of Claude
-//  Design "post pregnancy - content.dc.html" · S19·detail. Reached from Nuskhe.
+//  A single validated home remedy, now fully DATA-DRIVEN off a [Remedy]: what it
+//  is, quick facts, what you'll need, how to make it, when to use it, and - the
+//  differentiator - a clear "when NOT to use, see a doctor instead" safety block,
+//  the reviewing panel, related shop/read links and a labelled sponsored slot.
+//  When the remedy carries a demo (massage/preparation), a striped video slot is
+//  shown too. Layout is the faithful Claude Design "post pregnancy - content"
+//  · S19·detail; the content is populated live from pp_nuskhe_data. Reached from
+//  Nuskhe (landing search / popular rows) and the per-situation list.
+//
+//  Keeps a zero-arg constructor (nullable Remedy? → fallbackRemedy) so the smoke
+//  test's `const RemedyDetailScreen()` still builds.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_nuskhe_data.dart';
 import 'problem_solver_screen.dart';
 
 class RemedyDetailScreen extends StatelessWidget {
-  const RemedyDetailScreen({super.key, this.category = 'Cold & cough'});
-  final String category;
+  const RemedyDetailScreen({super.key, this.remedy});
+
+  /// Nullable so the test's zero-arg `const RemedyDetailScreen()` compiles; a
+  /// null remedy falls back to the signature ajwain-potli remedy.
+  final Remedy? remedy;
 
   static const Color _red = Color(0xFFC6295A);
 
@@ -31,6 +41,8 @@ class RemedyDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = remedy ?? fallbackRemedy;
+
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -47,18 +59,20 @@ class RemedyDetailScreen extends StatelessWidget {
               const SizedBox(width: 6),
               const Text('›', style: TextStyle(color: Color(0xFFC7BBD6))),
               const SizedBox(width: 6),
-              Flexible(child: Text(category, style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              Flexible(
+                  child: Text(r.category,
+                      style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
             ])),
 
             // hero
             const SizedBox(height: 16),
             _pad(ClipRRect(
               borderRadius: BorderRadius.circular(22),
-              child: const SizedBox(
+              child: SizedBox(
                 height: 200,
                 child: Stack(children: [
-                  PpStriped(height: 200, radius: 22, border: true),
-                  Positioned.fill(child: Center(child: Icon(Icons.eco_outlined, size: 46, color: ppPurple))),
+                  const PpStriped(height: 200, radius: 22, border: true),
+                  Positioned.fill(child: Center(child: Icon(r.icon, size: 46, color: ppPurple))),
                 ]),
               ),
             )),
@@ -75,37 +89,66 @@ class RemedyDetailScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   Flexible(
                       child: Text("Validated by ParentVeda's ayurvedic panel",
-                          style: ppBody(11, color: ppBrown, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          style: ppBody(11, color: ppBrown, w: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis)),
                 ]),
               ),
             )),
             const SizedBox(height: 12),
-            _pad(Text('Ajwain potli for a blocked nose', style: ppFraunces(29, h: 1.15))),
+            _pad(Text(r.name, style: ppFraunces(29, h: 1.15))),
+
+            // age-gate caution (only when the remedy is age-restricted)
+            if (r.isCaution) ...[
+              const SizedBox(height: 12),
+              _pad(Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                  decoration: BoxDecoration(color: ppCoralTint, borderRadius: BorderRadius.circular(999)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.warning_amber_rounded, size: 13, color: ppCoral),
+                    const SizedBox(width: 6),
+                    Flexible(
+                        child: Text(r.ageWarning!,
+                            style: ppBody(11, color: ppCoral, w: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis)),
+                  ]),
+                ),
+              )),
+            ],
+
             const SizedBox(height: 10),
-            _pad(Text(
-                'A warm carom-seed compress that eases congestion and helps a stuffy baby breathe and feed. Preventive and soothing - never applied to skin directly.',
-                style: ppBody(14, h: 1.6))),
+            _pad(Text(r.description, style: ppBody(14, h: 1.6))),
 
             // quick facts
             const SizedBox(height: 18),
             _pad(Row(children: [
-              _fact('0+ mo', 'age'),
+              _fact(r.age, 'age'),
               const SizedBox(width: 10),
-              _fact('2×/day', 'frequency'),
+              _fact(r.frequency, 'frequency'),
               const SizedBox(width: 10),
-              _fact('5 min', 'to make'),
+              _fact(r.prepTime, 'to make'),
             ])),
+
+            // optional demo video (massage / preparation) - striped placeholder
+            if (r.hasVideo) ...[
+              _div(),
+              _pad(Text('Watch how', style: ppJakarta(16))),
+              const SizedBox(height: 12),
+              _pad(_VideoSlot(note: r.videoNote ?? 'A short demo of this remedy', onTap: () => _soon(context))),
+            ],
 
             _div(),
 
             // ingredients
             _pad(Text("You'll need", style: ppJakarta(16))),
             const SizedBox(height: 12),
-            _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _bullet('2 tbsp ajwain (carom seeds)'),
-              _bullet('A clean, soft muslin cloth'),
-              _bullet('A flat tawa to dry-roast'),
-            ])),
+            _pad(Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [for (final it in r.ingredients) _bullet(it)],
+            )),
 
             _div(),
 
@@ -113,10 +156,8 @@ class RemedyDetailScreen extends StatelessWidget {
             _pad(Text('How to make it', style: ppJakarta(16))),
             const SizedBox(height: 6),
             _pad(Column(children: [
-              _step('01', 'Dry-roast the ajwain on a tawa until fragrant, 1–2 minutes.', top: true),
-              _step('02', 'Tie it into the muslin cloth to make a small potli.', top: true),
-              _step('03', "Test on your own wrist first, then rest it near (not on) baby's chest and feet.",
-                  top: true, bottom: true),
+              for (int i = 0; i < r.steps.length; i++)
+                _step((i + 1).toString().padLeft(2, '0'), r.steps[i], top: true, bottom: i == r.steps.length - 1),
             ])),
 
             _div(),
@@ -124,27 +165,26 @@ class RemedyDetailScreen extends StatelessWidget {
             // when to use
             _pad(Text('When to use it', style: ppJakarta(16))),
             const SizedBox(height: 10),
-            _pad(Text(
-                'At the first signs of a stuffy nose or mild cold, especially before naps and feeds when congestion makes it hardest for baby to settle.',
-                style: ppBody(14, color: ppInk, h: 1.6))),
+            _pad(Text(r.whenToUse, style: ppBody(14, color: ppInk, h: 1.6))),
 
             // when NOT to use (the differentiator)
             const SizedBox(height: 22),
             _pad(Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                  color: ppCoralTint, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFFFD9E1))),
+                  color: ppCoralTint,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFFFD9E1))),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   const Icon(Icons.warning_amber_rounded, size: 18, color: _red),
                   const SizedBox(width: 8),
-                  Flexible(child: Text('When NOT to use - see a doctor instead', style: ppJakarta(15, color: _red), maxLines: 2)),
+                  Flexible(
+                      child: Text('When NOT to use - see a doctor instead',
+                          style: ppJakarta(15, color: _red), maxLines: 2)),
                 ]),
                 const SizedBox(height: 12),
-                _dont('Fever above 100.4°F (38°C) in a baby under 3 months.'),
-                _dont('Fast, laboured, or wheezy breathing.'),
-                _dont('Never place the hot potli directly on skin - warm only.'),
-                _dont('Cold lasting beyond 5 days, or a baby refusing feeds.'),
+                for (final f in r.redFlags) _dont(f),
                 const SizedBox(height: 12),
                 GestureDetector(
                   onTap: () => Navigator.of(context)
@@ -175,49 +215,59 @@ class RemedyDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text.rich(TextSpan(children: [
-                      TextSpan(text: 'Dr. Kamala Iyer (BAMS)', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
-                      const TextSpan(text: ' & 4 practitioners, cross-checked by an MBBS paediatrician.'),
-                    ]), style: ppBody(13, color: ppInk, h: 1.5)),
+                    child: Text.rich(
+                        TextSpan(children: [
+                          TextSpan(text: r.reviewer.lead, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+                          TextSpan(text: r.reviewer.note),
+                        ]),
+                        style: ppBody(13, color: ppInk, h: 1.5)),
                   ),
                 ]),
               ]),
             )),
 
-            _div(),
+            // related (only when the remedy carries links)
+            if (r.related.isNotEmpty) ...[
+              _div(),
+              _pad(Text('Related', style: ppJakarta(16))),
+              const SizedBox(height: 14),
+              for (int i = 0; i < r.related.length; i++)
+                _pad(_related(context, r.related[i].tag, r.related[i].title,
+                    top: true, bottom: i == r.related.length - 1)),
+            ],
 
-            // related
-            _pad(Text('Related', style: ppJakarta(16))),
-            const SizedBox(height: 14),
-            _pad(_related(context, 'Shop', 'Buy organic ajwain - 24 Mantra', top: true)),
-            _pad(_related(context, 'Read', 'Baby colds: what actually helps', top: true, bottom: true)),
-
-            // sponsored
-            const SizedBox(height: 22),
-            _pad(Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFECE5F2))),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                ppEyebrow('Sponsored', color: ppMuted, spacing: 0.8),
-                const SizedBox(height: 12),
-                Row(children: [
-                  const PpStriped(height: 52, width: 52, radius: 16, border: true),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Organic India · whole-seed ajwain', style: ppJakarta(15).copyWith(height: 1.25)),
-                      const SizedBox(height: 3),
-                      Text('Single-origin, lab-tested purity.', style: ppBody(12)),
-                    ]),
-                  ),
+            // sponsored (only when the remedy carries a sponsor)
+            if (r.sponsor != null) ...[
+              const SizedBox(height: 22),
+              _pad(Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFECE5F2))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  ppEyebrow('Sponsored', color: ppMuted, spacing: 0.8),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    const PpStriped(height: 52, width: 52, radius: 16, border: true),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(r.sponsor!.title, style: ppJakarta(15).copyWith(height: 1.25)),
+                        const SizedBox(height: 3),
+                        Text(r.sponsor!.subtitle, style: ppBody(12)),
+                      ]),
+                    ),
+                  ]),
                 ]),
-              ]),
-            )),
+              )),
+            ],
 
             const SizedBox(height: 22),
-            _pad(Text('Traditional wisdom, checked for safety. A nuskha is never a substitute for a doctor when the red flags above appear.',
-                textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+            _pad(Text(
+                'Traditional wisdom, checked for safety - not medical advice. A nuskha is never a substitute for a doctor when the red flags above appear.',
+                textAlign: TextAlign.center,
+                style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),
       ),
@@ -309,6 +359,51 @@ class RemedyDetailScreen extends StatelessWidget {
             const SizedBox(width: 8),
             const Text('→', style: TextStyle(color: ppMuted)),
           ]),
+        ),
+      );
+}
+
+/// A demo-video seam: a striped placeholder with a play button. VIDEO ON HOLD -
+/// this is the single clean call-site; wire a real player here later.
+class _VideoSlot extends StatelessWidget {
+  const _VideoSlot({required this.note, required this.onTap});
+  final String note;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: SizedBox(
+            height: 168,
+            child: Stack(children: [
+              const PpStriped(height: 168, radius: 20, border: true),
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    width: 58,
+                    height: 58,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: Color(0x226A30B6), blurRadius: 18, offset: Offset(0, 8))],
+                    ),
+                    child: const Icon(Icons.play_arrow_rounded, size: 30, color: ppPurple),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                right: 14,
+                bottom: 12,
+                child: Text(note,
+                    style: ppBody(12, color: ppInk, w: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+              ),
+            ]),
+          ),
         ),
       );
 }

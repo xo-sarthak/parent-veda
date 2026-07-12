@@ -1,11 +1,13 @@
 // =============================================================================
-//  ReadingHomeScreen - ParentVeda "Learn" (the Reading Experience home)
+//  ReadingHomeScreen - ParentVeda "READ" (the Reading Experience home)
 // -----------------------------------------------------------------------------
-//  Answers "what should I learn today to be a more confident parent?" - one
+//  Answers "what should I read today to be a more confident parent?" - one
 //  carefully-chosen Today's Read (not ten), Continue Reading, a few personalised
-//  picks, and learning collections. A calm, magazine-like start, never a feed.
-//  A filter row (All / Articles / Book Summaries / Research Summaries) narrows the
-//  library to one kind. Reached from the Explore drawer ("Learn"). Pushed screen.
+//  picks, and a browsable Collections section. A calm, magazine-like start, never
+//  a feed. The Collections section carries a TWO-LEVEL filter: pick a Collection
+//  (topic), then narrow by content Type (Articles / Book Summaries / Research).
+//  A prominent search bar sits above it all. Reached from the Explore drawer
+//  ("READ"). Pushed screen.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -26,11 +28,15 @@ class ReadingHomeScreen extends StatefulWidget {
 }
 
 class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
-  // null = All; otherwise only that kind is shown.
-  ReadKind? _filter;
+  // Two-level Collections filter: level 1 = collection (topic), level 2 = type.
+  // null = "All" at either level.
+  String? _collectionFilter;
+  ReadKind? _typeFilter;
 
   final TextEditingController _searchCtl = TextEditingController();
   String _query = '';
+
+  bool get _filtering => _collectionFilter != null || _typeFilter != null;
 
   @override
   void dispose() {
@@ -82,29 +88,23 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
               children: [
                 _pad(ppBack(context, 'Explore')),
                 const SizedBox(height: 18),
-                _pad(ppEyebrow('ParentVeda Learn', color: ppPurple)),
+                _pad(ppEyebrow('ParentVeda READ', color: ppPurple)),
                 const SizedBox(height: 8),
-                _pad(Text('What to learn today', style: ppFraunces(30, h: 1.1))),
+                _pad(Text('What to read today', style: ppFraunces(30, h: 1.1))),
                 const SizedBox(height: 6),
                 _pad(Text('One good read, chosen for where you and Aarav are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 16),
                 _pad(ppSearchField(
                   controller: _searchCtl,
-                  hint: 'Search articles…',
+                  hint: 'Search reads…',
                   onChanged: (v) => setState(() => _query = v),
                 )),
 
                 if (_query.trim().isNotEmpty)
                   ..._searchView(store)
-                else ...[
-                  const SizedBox(height: 20),
-                  _filterRow(),
-                  if (_filter != null)
-                    ..._filteredView()
-                  else
-                    ..._fullView(context, store, continues, today),
-                ],
+                else
+                  ..._browse(context, store, continues, today),
               ],
             );
           },
@@ -115,67 +115,22 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
     );
   }
 
-  // ---- filter row ---------------------------------------------------------
-  Widget _filterRow() {
-    const options = <(String, ReadKind?)>[
-      ('All', null),
-      ('Articles', ReadKind.article),
-      ('Book Summaries', ReadKind.bookSummary),
-      ('Research Summaries', ReadKind.research),
-    ];
-    return SizedBox(
-      height: 36,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        itemCount: options.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (_, i) {
-          final on = _filter == options[i].$2;
-          return GestureDetector(
-            onTap: () => setState(() => _filter = options[i].$2),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: on ? ppPurple : Colors.white,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: on ? ppPurple : ppHair),
-              ),
-              child: Text(options[i].$1, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // ---- filtered view (one kind only) --------------------------------------
-  List<Widget> _filteredView() {
-    final items = articlesOfKind(_filter!);
+  // ---- browse (editorial default + the Collections section) ---------------
+  List<Widget> _browse(BuildContext context, ReadingStore store, List<ReadArticle> continues, ReadArticle today) {
     return [
-      const SizedBox(height: 22),
-      _pad(readSectionHeader(readKindLabel(_filter!))),
-      const SizedBox(height: 14),
-      if (items.isEmpty)
-        _pad(Text('Nothing here yet - check back soon.', style: ppBody(13, color: ppMuted)))
-      else
-        _pad(Column(children: [
-          for (final a in items)
-            ReadListCard(
-              article: a,
-              onTap: () => _open(a),
-              progress: ReadingStore.instance.isInProgress(a.id) ? ReadingStore.instance.progressOf(a.id) : null,
-            ),
-        ])),
+      // The calm editorial start is only shown when the reader hasn't filtered -
+      // once they narrow by collection/type, we focus on the results instead.
+      if (!_filtering) ..._editorial(context, store, continues, today),
+
+      const SizedBox(height: 30),
+      ..._collectionsSection(context, store),
+
       const SizedBox(height: 30),
       _pad(_savedLink()),
     ];
   }
 
-  // ---- full view (All) ----------------------------------------------------
-  List<Widget> _fullView(BuildContext context, ReadingStore store, List<ReadArticle> continues, ReadArticle today) {
+  List<Widget> _editorial(BuildContext context, ReadingStore store, List<ReadArticle> continues, ReadArticle today) {
     return [
       const SizedBox(height: 22),
       _pad(_todayHero(today)),
@@ -185,7 +140,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         _pad(readSectionHeader('Continue reading')),
         const SizedBox(height: 14),
         SizedBox(
-          height: 214,
+          height: 252,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -205,16 +160,166 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         for (final a in forYou().take(5))
           ReadListCard(article: a, onTap: () => _open(a), progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null),
       ])),
+    ];
+  }
+
+  // ---- Collections section (two-level filter) -----------------------------
+  List<Widget> _collectionsSection(BuildContext context, ReadingStore store) {
+    final results = filteredReads(collectionId: _collectionFilter, kind: _typeFilter);
+    return [
+      _pad(readSectionHeader('Collections')),
+      const SizedBox(height: 4),
+      _pad(Text(
+        _filtering
+            ? '${results.length} ${results.length == 1 ? 'read' : 'reads'} · ${_activeLabel()}'
+            : 'Browse by topic, then narrow by type.',
+        style: ppBody(12.5, color: _filtering ? ppPurple : ppMuted, w: _filtering ? FontWeight.w700 : FontWeight.w400),
+      )),
 
       const SizedBox(height: 14),
-      _pad(readSectionHeader('Learning collections')),
-      const SizedBox(height: 4),
-      _pad(Text('Short, finishable paths through a topic.', style: ppBody(12.5, color: ppMuted))),
-      const SizedBox(height: 16),
-      _collections(context),
+      _collectionChips(),
+      const SizedBox(height: 10),
+      _typeChips(),
 
-      const SizedBox(height: 30),
-      _pad(_savedLink()),
+      const SizedBox(height: 18),
+      if (!_filtering)
+        // No filter yet: the minimalistic collection cards to browse into.
+        _collectionCards(context)
+      else
+        ..._resultsList(store),
+    ];
+  }
+
+  String _activeLabel() {
+    final c = _collectionFilter != null ? readCollectionById(_collectionFilter!).title : 'All topics';
+    final k = _typeFilter != null ? readKindLabel(_typeFilter!) : 'All types';
+    return '$c · $k';
+  }
+
+  // level 1 - collection (topic)
+  Widget _collectionChips() {
+    final options = <(String, String?)>[
+      ('All', null),
+      for (final c in kReadCollections) (c.title, c.id),
+    ];
+    return SizedBox(
+      height: 34,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: options.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final on = _collectionFilter == options[i].$2;
+          return _chip(options[i].$1, on, () => setState(() => _collectionFilter = options[i].$2));
+        },
+      ),
+    );
+  }
+
+  // level 2 - content type
+  Widget _typeChips() {
+    const options = <(String, ReadKind?)>[
+      ('All', null),
+      ('Articles', ReadKind.article),
+      ('Book Summaries', ReadKind.bookSummary),
+      ('Research', ReadKind.research),
+    ];
+    return SizedBox(
+      height: 32,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: options.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, i) {
+          final on = _typeFilter == options[i].$2;
+          return _chip(options[i].$1, on, () => setState(() => _typeFilter = options[i].$2), subtle: true);
+        },
+      ),
+    );
+  }
+
+  Widget _chip(String label, bool on, VoidCallback onTap, {bool subtle = false}) {
+    final Color bg = on ? ppPurple : Colors.white;
+    final Color fg = on ? Colors.white : (subtle ? ppSoft : ppInk);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: subtle ? 13 : 14),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: on ? ppPurple : ppHair),
+        ),
+        child: Text(label, style: ppBody(subtle ? 12 : 12.5, color: fg, w: FontWeight.w700)),
+      ),
+    );
+  }
+
+  // no-filter default: the collection cards (tap opens the full collection path)
+  Widget _collectionCards(BuildContext context) => SizedBox(
+        height: 188,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: kReadCollections.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 14),
+          itemBuilder: (_, i) {
+            final c = kReadCollections[i];
+            final mins = c.articleIds.map(readArticleById).fold<int>(0, (a, x) => a + x.minutes);
+            final prog = ReadingStore.instance.collectionProgress(c);
+            return GestureDetector(
+              onTap: () => _push(ReadingCollectionScreen(collection: c)),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 208,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)), child: Icon(c.icon, size: 20, color: ppPurple)),
+                  const Spacer(),
+                  Text(c.title, style: ppJakarta(15).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 5),
+                  Text('${c.articleIds.length} reads · ~$mins min', style: ppBody(11.5, color: ppMuted)),
+                  const SizedBox(height: 3),
+                  Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Start', style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+
+  // filtered: the narrowed list + (when a whole collection is picked) a link in.
+  List<Widget> _resultsList(ReadingStore store) {
+    final results = filteredReads(collectionId: _collectionFilter, kind: _typeFilter);
+    return [
+      if (results.isEmpty)
+        _pad(Text('No reads here yet - try another type or topic.', style: ppBody(13, color: ppMuted)))
+      else
+        _pad(Column(children: [
+          for (final a in results)
+            ReadListCard(
+              article: a,
+              onTap: () => _open(a),
+              progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null,
+            ),
+        ])),
+      if (_collectionFilter != null) ...[
+        const SizedBox(height: 4),
+        _pad(GestureDetector(
+          onTap: () => _push(ReadingCollectionScreen(collection: readCollectionById(_collectionFilter!))),
+          behavior: HitTestBehavior.opaque,
+          child: Row(children: [
+            Text('Open the full ${readCollectionById(_collectionFilter!).title} path', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+            const SizedBox(width: 5),
+            const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+          ]),
+        )),
+      ],
     ];
   }
 
@@ -283,39 +388,6 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
       ),
     );
   }
-
-  Widget _collections(BuildContext context) => SizedBox(
-        height: 150,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: kReadCollections.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 14),
-          itemBuilder: (_, i) {
-            final c = kReadCollections[i];
-            final mins = c.articleIds.map(readArticleById).fold<int>(0, (a, x) => a + x.minutes);
-            final prog = ReadingStore.instance.collectionProgress(c);
-            return GestureDetector(
-              onTap: () => _push(ReadingCollectionScreen(collection: c)),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                width: 208,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)), child: Icon(c.icon, size: 20, color: ppPurple)),
-                  const Spacer(),
-                  Text(c.title, style: ppJakarta(15).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 5),
-                  Text('${c.articleIds.length} reads · ~$mins min', style: ppBody(11.5, color: ppMuted)),
-                  const SizedBox(height: 3),
-                  Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Start', style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
-                ]),
-              ),
-            );
-          },
-        ),
-      );
 
   Widget _savedLink() => GestureDetector(
         onTap: () => _push(const ReadingLibraryScreen()),

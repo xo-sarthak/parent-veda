@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_watch_data.dart';
 import 'provider_profile_screen.dart';
+import 'video/pv_video_player.dart';
 import 'watch_common.dart';
 import 'watch_quicklearn_screen.dart';
 
@@ -26,7 +27,10 @@ class WatchPlayerScreen extends StatefulWidget {
 }
 
 class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
-  bool _playing = false;
+  // Preserves the single video player when we swap the whole layout for
+  // fullscreen, so playback never restarts.
+  final GlobalKey _playerKey = GlobalKey();
+  bool _fullscreen = false;
 
   WatchVideo get v => widget.video;
 
@@ -48,8 +52,26 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
   void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
+  Widget _player() {
+    return PvVideoPlayer(
+      key: _playerKey,
+      video: v,
+      onFullscreenChanged: (fs) => setState(() => _fullscreen = fs),
+      onNext: _openNextLesson,
+    );
+  }
+
+  void _openNextLesson() {
+    final next = learnNextVideos(v);
+    if (next.isNotEmpty) _openVideo(next.first);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Fullscreen: give the same player the entire screen (GlobalKey preserves it).
+    if (_fullscreen) {
+      return Scaffold(backgroundColor: Colors.black, body: _player());
+    }
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -57,7 +79,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
         child: ListView(
           padding: const EdgeInsets.only(bottom: 40),
           children: [
-            _videoSurface(),
+            _player(),
             const SizedBox(height: 16),
             _pad(_actions()),
             const SizedBox(height: 18),
@@ -76,92 +98,6 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
       ),
     );
   }
-
-  // ---- mock video surface -------------------------------------------------
-  Widget _videoSurface() => AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Stack(children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
-                  const Color(0xFF3A2A55),
-                  ppPurple.withValues(alpha: 0.85),
-                ]),
-              ),
-            ),
-          ),
-          // top bar
-          Positioned(
-            top: 8,
-            left: 8,
-            right: 8,
-            child: Row(children: [
-              _round(Icons.arrow_back, () => Navigator.of(context).maybePop()),
-              const Spacer(),
-              _round(Icons.picture_in_picture_alt_outlined, () => _soon('Picture-in-picture coming soon')),
-              const SizedBox(width: 8),
-              _round(Icons.fullscreen_rounded, () => _soon('Full screen coming soon')),
-            ]),
-          ),
-          // centre play/pause
-          Center(
-            child: GestureDetector(
-              onTap: () => setState(() => _playing = !_playing),
-              child: Container(
-                width: 62,
-                height: 62,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle),
-                child: Icon(_playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: ppPurple, size: 34),
-              ),
-            ),
-          ),
-          // bottom control bar
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 10,
-            child: Row(children: [
-              Text(_fmt((WatchStore.instance.progressOf(v.id) * v.seconds).round()),
-                  style: ppBody(11, color: Colors.white, w: FontWeight.w600)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  height: 4,
-                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(999)),
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: WatchStore.instance.progressOf(v.id).clamp(0.02, 1.0),
-                    child: Container(decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(999))),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(_fmt(v.seconds), style: ppBody(11, color: Colors.white, w: FontWeight.w600)),
-              const SizedBox(width: 10),
-              GestureDetector(onTap: () => _soon('Captions coming soon'), child: const Icon(Icons.closed_caption_off_rounded, size: 18, color: Colors.white)),
-              const SizedBox(width: 10),
-              GestureDetector(
-                  onTap: () => _soon('Playback speed coming soon'),
-                  child: Text('1x', style: ppBody(12, color: Colors.white, w: FontWeight.w700))),
-            ]),
-          ),
-        ]),
-      );
-
-  Widget _round(IconData i, VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 34,
-          height: 34,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.28), shape: BoxShape.circle),
-          child: Icon(i, size: 18, color: Colors.white),
-        ),
-      );
-
-  String _fmt(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
 
   // ---- actions (learning-only) --------------------------------------------
   Widget _actions() => AnimatedBuilder(

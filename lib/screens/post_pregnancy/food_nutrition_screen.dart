@@ -31,7 +31,7 @@ class FoodNutritionScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, 'Food')),
+            _pad(ppBack(context, 'Recipes')),
             const SizedBox(height: 18),
             _pad(ppEyebrow('Nutrition focus', color: ppPurple)),
             const SizedBox(height: 8),

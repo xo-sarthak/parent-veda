@@ -51,6 +51,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             _pad(Text(r.title, style: ppFraunces(25, h: 1.15))),
             const SizedBox(height: 6),
             _pad(Text(r.subtitle, style: ppBody(14, h: 1.5))),
+            const SizedBox(height: 12),
+            _pad(_dietServesRow()),
             const SizedBox(height: 16),
             _pad(_statStrip()),
             const SizedBox(height: 20),
@@ -112,6 +114,27 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 8)]),
           child: Icon(i, size: 19, color: ppInk),
         ),
+      );
+
+  // ---- diet marker · serves · immunity ------------------------------------
+  Widget _dietServesRow() => Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Row(mainAxisSize: MainAxisSize.min, children: [
+            foodDietMark(r.diet, size: 15),
+            const SizedBox(width: 7),
+            Text(r.diet == 'vegan' ? 'Vegan' : (r.veg ? 'Veg' : 'Non-veg'), style: ppBody(12.5, color: ppSoft, w: FontWeight.w600)),
+          ]),
+          Text('Serves ${r.serves}', style: ppBody(12.5, color: ppSoft, w: FontWeight.w600)),
+          if (r.immunity)
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.shield_moon_outlined, size: 14, color: Color(0xFFC98A2B)),
+              const SizedBox(width: 5),
+              Text('Immunity', style: ppBody(12.5, color: const Color(0xFFC98A2B), w: FontWeight.w700)),
+            ]),
+        ],
       );
 
   // ---- stat strip ---------------------------------------------------------

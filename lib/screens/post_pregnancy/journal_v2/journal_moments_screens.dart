@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'journal_email.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 
@@ -67,10 +68,18 @@ class MemoryDetailScreen extends StatelessWidget {
                     ],
                   ]),
                 ],
-                const SizedBox(height: 24),
-                Row(children: [
+                const SizedBox(height: 26),
+                // Primary keepsake action: email this memory/letter to the child,
+                // pre-filled so she only enters an address (see journal_email.dart).
+                jvButton(
+                  isLetter ? 'Email this letter to $jvChild' : 'Email to $jvChild',
+                  () => emailMemoryToChild(context, memory),
+                  filled: false,
+                  trailing: Icons.mail_outline_rounded,
+                ),
+                const SizedBox(height: 18),
+                Wrap(spacing: 24, runSpacing: 12, children: [
                   _action(Icons.edit_outlined, 'Edit', () => _snack(context, 'Editing coming soon')),
-                  const SizedBox(width: 22),
                   _action(Icons.ios_share_rounded, 'Share', () => _snack(context, 'Share coming soon')),
                 ]),
               ]),

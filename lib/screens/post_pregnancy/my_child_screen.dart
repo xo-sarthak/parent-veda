@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'development_area_screen.dart';
 import 'dev_stage_detail_screen.dart';
 import 'explore_drawer.dart';
-import 'food_home_screen.dart';
+import 'recipes_screen.dart';
 import 'health_growth_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'journal_v2/journal_storybook_screens.dart';
@@ -319,7 +319,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ppEyebrow('The leap, in a video', color: ppPurple, spacing: 1.0),
               const SizedBox(height: 8),
-              Text(v.title, style: ppFraunces(19, h: 1.2)),
+              Text(v.title, style: ppJakarta(19)),
               const SizedBox(height: 6),
               Text('${v.durationLabel} · ${v.expert.name}', style: ppBody(12.5, color: ppMuted)),
             ]),
@@ -368,7 +368,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest, he pushes up - a first roll any day.', 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
       (Icons.chat_bubble_outline_rounded, 'Language', 'Musical babble', "Coos stretching into 'aah-goo', raspberries and squeals.", 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('language')))),
       (Icons.favorite_border, 'Emotional', 'Social joy', 'Beams at you across a room; a laugh now earns a laugh back.', 'Blossoming', () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
-      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months - a few weeks away yet.', 'On track', () => _push(const FoodHomeScreen())),
+      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months - a few weeks away yet.', 'On track', () => _push(const RecipesScreen())),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _pad(_header('Child snapshot', 'How ${_child.name} is doing', sub: 'Five windows into his development - where he is right now, not a scorecard. Tap any to go deeper.')),
@@ -593,7 +593,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     if (reads.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Expanded(child: _header('Learn', 'Reads for this leap')),
+        Expanded(child: _header('READ', 'Reads for this leap')),
         GestureDetector(onTap: () => _push(ReadingCollectionScreen(collection: readCollectionById(colId))), behavior: HitTestBehavior.opaque, child: ppSeeAll('View more')),
       ])),
       const SizedBox(height: 16),
@@ -659,7 +659,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
   Widget _header(String eyebrow, String title, {String? sub}) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ppEyebrow(eyebrow, color: ppPurple, spacing: 1.2),
         const SizedBox(height: 8),
-        Text(title, style: ppFraunces(24, h: 1.15)),
+        Text(title, style: ppJakarta(24)),
         if (sub != null) ...[
           const SizedBox(height: 8),
           Text(sub, style: ppBody(13.5, h: 1.55)),

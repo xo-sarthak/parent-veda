@@ -22,8 +22,13 @@ import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
+import 'leap_definition_screen.dart';
+import 'pp_leaps_data.dart';
 import 'what_changed_screen.dart';
-import 'wonder_week_screen.dart';
+// "Wonder Week Window" now opens the full leap page (LeapDefinitionScreen) for
+// the child's current leap — the standalone WonderWeekScreen is kept for revert
+// but no longer wired here.
+// import 'wonder_week_screen.dart';
 
 class ToolsHubScreen extends StatelessWidget {
   const ToolsHubScreen({super.key});
@@ -73,11 +78,11 @@ class ToolsHubScreen extends StatelessWidget {
               context,
               dark: false,
               icon: Icons.brightness_4_outlined,
-              tag: 'Live · Leap 4',
-              title: 'Wonder Week Window',
+              tag: 'Live · ${currentLeap().label}',
+              title: 'His Leap Window',
               desc: 'Where Aarav is in his leap, how long the storm lasts, and the calm on the other side.',
               cta: 'Open his window',
-              onTap: () => _push(context, const WonderWeekScreen()),
+              onTap: () => _push(context, LeapDefinitionScreen(leap: currentLeap())),
             )),
 
             // trackers

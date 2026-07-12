@@ -1,13 +1,14 @@
 // =============================================================================
-//  ParentVeda Reading Experience ("Learn") - content model, catalog + store
+//  ParentVeda Reading Experience ("READ") - content model, catalog + store
 // -----------------------------------------------------------------------------
 //  Internally "Articles", but designed as a premium reading EXPERIENCE (Kindle +
-//  Medium + Headway feel), not a blog. Answers "what should I learn today to be a
+//  Medium + Headway feel), not a blog. Answers "what should I read today to be a
 //  more confident parent?". So the model carries a teaser, a "why this matters
 //  today" line, structured sections with inline ParentVeda Tips + Myth-vs-Fact
-//  cards, reading time, a collection, and links onward (Read Next). Content is
-//  story/science/calm per the ParentVeda voice. Self-contained; the existing
-//  Articles archive/reader are left untouched. Scenario child: Aarav (4 mo).
+//  cards, reading time, a collection, links onward (Read Next) and video links
+//  (one embedded mid-article, more at the end). Story/science/calm, ParentVeda
+//  voice. Self-contained; the existing Articles archive/reader are left
+//  untouched. Video ids reference the Watch catalog (pp_watch_data). Child: Aarav.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class ReadSection {
   final bool image;
 }
 
-/// The kind of read, used by the Learn filters.
+/// The kind of read, used by the READ type filter.
 enum ReadKind { article, bookSummary, research }
 
 String readKindLabel(ReadKind k) => switch (k) {
@@ -69,6 +70,7 @@ class ReadArticle {
     this.evidence,
     this.relatedActivity,
     this.relatedVideoId,
+    this.relatedVideoIds = const [],
     this.relatedRecipeId,
     this.relatedProductId,
     this.relatedCommunity,
@@ -88,7 +90,8 @@ class ReadArticle {
   final ReadKind kind;
   final String? evidence; // a plain-language evidence note
   final String? relatedActivity;
-  final String? relatedVideoId;
+  final String? relatedVideoId; // the single video embedded mid-article
+  final List<String> relatedVideoIds; // the "Related videos" block at the end
   final String? relatedRecipeId;
   final String? relatedProductId;
   final String? relatedCommunity;
@@ -141,6 +144,7 @@ const List<ReadArticle> kReadArticles = [
     kind: ReadKind.research,
     evidence: 'Aligned with paediatric sleep research on the maturation of infant sleep architecture around 3–4 months.',
     relatedVideoId: 'sleep4mo',
+    relatedVideoIds: ['q_soothe', 'q_noise', 'mumwellness'],
     relatedProductId: 'dozy',
     relatedCommunity: 'Baby Sleep',
     sections: [
@@ -190,6 +194,7 @@ const List<ReadArticle> kReadArticles = [
     author: 'Dr. Ananya Rao',
     authorRole: 'Paediatrician',
     relatedVideoId: 'leap4brain',
+    relatedVideoIds: ['q_play', 'q_talk', 'babbling'],
     relatedActivity: 'Reach for the ring',
     relatedCommunity: '0–1 Year',
     sections: [
@@ -228,6 +233,7 @@ const List<ReadArticle> kReadArticles = [
     authorRole: 'Paediatrician',
     relatedRecipeId: 'ragipancake',
     relatedVideoId: 'solids101',
+    relatedVideoIds: ['q_iron', 'q_play', 'q_soothe'],
     relatedCommunity: 'Starting Solids',
     sections: [
       ReadSection(paragraphs: [
@@ -267,6 +273,8 @@ const List<ReadArticle> kReadArticles = [
     author: 'Dr. Tara Joshi',
     authorRole: 'Child Psychologist',
     kind: ReadKind.bookSummary,
+    relatedVideoId: 'q_soothe',
+    relatedVideoIds: ['q_breathe', 'parentstory'],
     relatedCommunity: '2 Year Olds',
     sections: [
       ReadSection(paragraphs: [
@@ -611,9 +619,19 @@ ReadArticle todaysRead() => readArticleById('sleepcycles');
 /// Personalised picks (seeded order stands in for the recommendation engine).
 List<ReadArticle> forYou() => ['leap4', 'solids', 'talking', 'tummytime', 'fever', 'matrescence'].map(readArticleById).toList();
 
-/// Articles of a given kind - for the Learn filters (All / Articles / Book
+/// Articles of a given kind - for the READ type filter (All / Articles / Book
 /// Summaries / Research Summaries).
 List<ReadArticle> articlesOfKind(ReadKind k) => kReadArticles.where((a) => a.kind == k).toList();
+
+/// Two-level filter for the READ home: a collection (topic) then a content type.
+/// Either level may be null (= "All"). Choosing a collection then a type narrows
+/// the library to reads that are in that collection AND of that kind.
+List<ReadArticle> filteredReads({String? collectionId, ReadKind? kind}) =>
+    kReadArticles
+        .where((a) =>
+            (collectionId == null || a.collection == collectionId) &&
+            (kind == null || a.kind == kind))
+        .toList();
 
 /// "Read next" - the next ARTICLES to keep reading (articles only, never mixed
 /// content). Prefers the same collection, then personalised picks, then catalog.

@@ -1,11 +1,19 @@
 // =============================================================================
-//  FoodHomeScreen - ParentVeda Food companion ("what to feed my child today?")
+//  FoodHomeScreen - RETIRED (superseded by the unified RecipesScreen)
 // -----------------------------------------------------------------------------
+//  The two food sections were merged into ONE "Recipes" section. This standalone
+//  Food home is no longer a front door - its surfaces (Today's Meals, Nutrition
+//  Focus, Smart Meal Builder, meal plans, shopping list, saved) now live inside
+//  recipes_screen.dart's RecipesScreen, on the same FoodRecipe / FoodStore model.
+//  Kept (compiling) for reference / revert; the "Food" drawer row is commented
+//  out, and its former entry points (My Child · Nutrition, Home · First solids)
+//  are rewired to RecipesScreen. Do not wire this back as a live screen.
+//
+//  --- original doc -------------------------------------------------------------
 //  Not a recipe list - a food companion. Opens on Today's Meals (the five-slot
 //  plan), a daily Nutrition Focus (the educational core), personalised
 //  recommendations, the Smart Meal Builder, dynamic meal plans, category browse,
-//  and the shopping list + saved. Reached from the Explore drawer. Recipes V2 -
-//  the existing Recipes module is left untouched.
+//  and the shopping list + saved.
 // =============================================================================
 
 import 'package:flutter/material.dart';

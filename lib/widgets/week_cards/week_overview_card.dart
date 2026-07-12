@@ -29,6 +29,7 @@ import '../../services/video_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/father_skin.dart';
 import '../cards/food_emoji.dart';
+import 'week_whatsapp_info_card.dart';
 
 const LinearGradient _pageGradient = LinearGradient(
   begin: Alignment.topCenter,
@@ -190,6 +191,24 @@ class WeekSizeHero extends StatelessWidget {
                   ]),
                 ),
               ),
+              // Info icon → "this week's update" (the WhatsApp weekly brief),
+              // floating at the top-right of the figure circle. Positioned
+              // within a 238-box so it hugs the ring like the milestone pill.
+              SizedBox(
+                width: 238,
+                height: 238,
+                child: Stack(children: [
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: _InfoDot(
+                      father: father,
+                      onTap: () => showWeekWhatsAppInfo(context,
+                          w: w, lang: lang, father: father),
+                    ),
+                  ),
+                ]),
+              ),
             ]),
           ),
           const SizedBox(height: 14),
@@ -231,6 +250,37 @@ class WeekSizeHero extends StatelessWidget {
         child: Text(foodEmojiForWeek(w.week),
             style: const TextStyle(fontSize: 84)),
       );
+}
+
+/// Small floating info button on the hero - opens this week's WhatsApp update.
+class _InfoDot extends StatelessWidget {
+  const _InfoDot({required this.onTap, this.father = false});
+  final VoidCallback onTap;
+  final bool father;
+  @override
+  Widget build(BuildContext context) {
+    final accent = father ? kFAccent : AppTheme.primary500;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 34,
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: father ? kFCard : AppTheme.surface,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: accent.withValues(alpha: 0.22),
+                blurRadius: 12,
+                offset: const Offset(0, 5)),
+          ],
+        ),
+        child: Icon(Icons.info_outline_rounded, size: 19, color: accent),
+      ),
+    );
+  }
 }
 
 class _RingPainter extends CustomPainter {

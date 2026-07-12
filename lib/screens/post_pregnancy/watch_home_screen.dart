@@ -1,25 +1,29 @@
 // =============================================================================
-//  WatchHomeScreen - ParentVeda Watch home ("what should I watch today?")
+//  WatchHomeScreen - ParentVeda Watch home (YouTube-style, learning-first)
 // -----------------------------------------------------------------------------
-//  The daily habit. One carefully-chosen Today's Video, Continue Watching,
-//  personalised picks, category feeds and expert collections - all learning-first
-//  (topic · age · expert · duration, never likes/views). A Quick Learn / Deep
-//  Learn toggle switches the hero + picks between 30–90s clips and 5–30 min
-//  sessions, sharing the same catalog, progress and collections. Reached from the
-//  Explore drawer. Pushed screen (back button, no bottom nav).
+//  The daily habit, now with a YouTube-shaped surface: search + a horizontal row
+//  of topic FILTERS at the top (plus a Shorts entry), one carefully-chosen
+//  Today's Video, Continue Watching, Expert Collections, and then an INFINITE
+//  learning feed that loops the catalog with "channel to explore" interstitials
+//  woven in (videos only). A Quick / Deep toggle switches hero + feed between
+//  30–90s clips and 5–30 min sessions over the same catalog, progress and saves.
+//  Still learning-first throughout (topic · age · expert · duration, never
+//  likes/views). Reached from the Explore drawer. Pushed screen (back, no nav).
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import 'pp_channels_data.dart';
 import 'pp_common.dart';
 import 'pp_section_extras.dart';
 import 'pp_watch_data.dart';
-import 'watch_category_screen.dart';
+import 'watch_channel_screen.dart';
 import 'watch_collection_screen.dart';
 import 'watch_common.dart';
 import 'watch_library_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import 'watch_shorts_screen.dart';
 
 class WatchHomeScreen extends StatefulWidget {
   const WatchHomeScreen({super.key});
@@ -30,9 +34,13 @@ class WatchHomeScreen extends StatefulWidget {
 
 class _WatchHomeScreenState extends State<WatchHomeScreen> {
   bool _quick = false; // false = Deep Learn, true = Quick Learn
+  String _topic = 'All'; // active topic filter (a category name, or 'All')
 
   final TextEditingController _searchCtl = TextEditingController();
   String _query = '';
+
+  // Feed cadence: this many video cards, then one "channel to explore" card.
+  static const int _feedGroup = 4;
 
   @override
   void dispose() {
@@ -45,27 +53,25 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
 
   void _open(WatchVideo v) => v.quick ? _push(QuickLearnScreen(startId: v.id)) : _push(WatchPlayerScreen(video: v));
 
-  // ---- search results (title contains query) ------------------------------
-  List<Widget> _searchView(WatchStore store) {
-    final q = _query.trim().toLowerCase();
-    final items = kWatchVideos.where((v) => v.title.toLowerCase().contains(q)).toList();
-    return [
-      const SizedBox(height: 26),
-      _pad(watchSectionHeader('Search results')),
-      const SizedBox(height: 14),
-      if (items.isEmpty)
-        _pad(Text('No matches for "$_query" - try another word.', style: ppBody(13, color: ppMuted)))
-      else
-        _pad(Column(children: [
-          for (final v in items)
-            WatchListCard(
-              video: v,
-              onTap: () => _open(v),
-              progress: store.progressOf(v.id) > 0.02 && store.progressOf(v.id) < 0.98 ? store.progressOf(v.id) : null,
-            ),
-        ])),
-    ];
+  double? _liveProgress(String id) {
+    final p = WatchStore.instance.progressOf(id);
+    return p > 0.02 && p < 0.98 ? p : null;
   }
+
+  // ---- the feed's base list (respecting mode + topic filter) ---------------
+  List<WatchVideo> _picksBase() {
+    final mode = _quick ? quickVideos : deepVideos;
+    if (_topic == 'All') return mode;
+    final filtered = mode.where((v) => v.category == _topic).toList();
+    if (filtered.isNotEmpty) return filtered;
+    final anyMode = kWatchVideos.where((v) => v.category == _topic && !v.isPodcast).toList();
+    return anyMode.isNotEmpty ? anyMode : mode;
+  }
+
+  String _picksTitle() => _topic != 'All' ? _topic : (_quick ? 'Quick lessons for you' : 'Chosen for you');
+  String _picksSubtitle() => _topic != 'All'
+      ? 'Expert ${_quick ? 'shorts' : 'videos'} on ${_topic.toLowerCase()} - keep scrolling for more.'
+      : 'Picked for his age and where he is right now - the feed keeps going.';
 
   @override
   Widget build(BuildContext context) {
@@ -73,81 +79,237 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       backgroundColor: ppBg,
       body: Stack(children: [
         SafeArea(
-        bottom: false,
-        child: AnimatedBuilder(
-          animation: WatchStore.instance,
-          builder: (context, _) {
-            final store = WatchStore.instance;
-            final continues = store.continueWatching;
-            final picks = (_quick ? quickVideos : deepVideos);
-            return ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
-              children: [
-                _pad(ppBack(context, 'Explore')),
-                const SizedBox(height: 18),
-                _pad(ppEyebrow('ParentVeda Watch', color: ppPurple)),
-                const SizedBox(height: 8),
-                _pad(Text('Learn something today', style: ppFraunces(30, h: 1.1))),
-                const SizedBox(height: 6),
-                _pad(Text('Five minutes here should make you a better parent today - not just pass the time.',
-                    style: ppBody(14, h: 1.5))),
-
-                const SizedBox(height: 16),
-                _pad(ppSearchField(
-                  controller: _searchCtl,
-                  hint: 'Search videos…',
-                  onChanged: (v) => setState(() => _query = v),
-                )),
-
-                if (_query.trim().isNotEmpty)
-                  ..._searchView(store)
-                else ...[
-                const SizedBox(height: 18),
-                _pad(_modeToggle()),
-
-                const SizedBox(height: 26),
-                _pad(watchSectionHeader('Today for Aarav')),
-                const SizedBox(height: 14),
-                _pad(_todaysHero()),
-
-                if (continues.isNotEmpty) ...[
-                  const SizedBox(height: 30),
-                  _pad(watchSectionHeader('Continue watching')),
-                  const SizedBox(height: 14),
-                  _rail(continues, (v) => store.progressOf(v.id)),
-                ],
-
-                const SizedBox(height: 30),
-                _pad(watchSectionHeader(_quick ? 'Quick lessons for you' : 'Chosen for you')),
-                const SizedBox(height: 4),
-                _pad(Text('Picked for his age and where he is right now - never random.', style: ppBody(12.5, color: ppMuted))),
-                const SizedBox(height: 16),
-                _pad(Column(children: [
-                  for (final v in picks.take(5)) WatchListCard(video: v, onTap: () => _open(v), progress: store.progressOf(v.id) > 0.02 && store.progressOf(v.id) < 0.98 ? store.progressOf(v.id) : null),
-                ])),
-
-                const SizedBox(height: 14),
-                _pad(watchSectionHeader('Explore by topic')),
-                const SizedBox(height: 14),
-                _pad(_categories()),
-
-                const SizedBox(height: 30),
-                _pad(watchSectionHeader('Expert collections')),
-                const SizedBox(height: 4),
-                _pad(Text('Short, finishable learning paths - not endless playlists.', style: ppBody(12.5, color: ppMuted))),
-                const SizedBox(height: 16),
-                _collectionsRail(),
-
-                const SizedBox(height: 30),
-                _pad(_libraryLink()),
-                ],
-              ],
-            );
-          },
+          bottom: false,
+          child: AnimatedBuilder(
+            animation: WatchStore.instance,
+            builder: (context, _) {
+              final store = WatchStore.instance;
+              if (_query.trim().isNotEmpty) return _searchListView(store);
+              return _feedListView(store);
+            },
+          ),
         ),
-      ),
-      const PpAskVedaFab(),
+        const PpAskVedaFab(),
       ]),
+    );
+  }
+
+  // ---- infinite feed ------------------------------------------------------
+  Widget _feedListView(WatchStore store) {
+    final header = _header(store);
+    final base = _picksBase();
+    final channels = allWatchChannels();
+    final interstitialsOn = !_quick && channels.isNotEmpty;
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 12, bottom: 48),
+      // No itemCount = an endless, lazily-built feed (YouTube-style). It loops the
+      // catalog; ListView.builder only builds what's on screen, so it's cheap and
+      // never spins an animation.
+      itemBuilder: (context, index) {
+        if (index < header.length) return header[index];
+        final j = index - header.length;
+
+        if (interstitialsOn) {
+          const period = _feedGroup + 1; // group of videos + 1 channel card
+          if (j % period == period - 1) {
+            final k = (j ~/ period) % channels.length;
+            return _pad(_channelInterstitial(channels[k]));
+          }
+          final videoIndex = (j ~/ period) * _feedGroup + (j % period);
+          return _pad(_feedCard(base[videoIndex % base.length]));
+        }
+        return _pad(_feedCard(base[j % base.length]));
+      },
+    );
+  }
+
+  Widget _feedCard(WatchVideo v) => WatchListCard(video: v, onTap: () => _open(v), progress: _liveProgress(v.id));
+
+  List<Widget> _header(WatchStore store) {
+    final continues = store.continueWatching;
+    final h = <Widget>[
+      _pad(ppBack(context, 'Explore')),
+      const SizedBox(height: 16),
+      _pad(ppEyebrow('ParentVeda Watch', color: ppPurple)),
+      const SizedBox(height: 8),
+      _pad(Text('Learn something today', style: ppFraunces(30, h: 1.1))),
+      const SizedBox(height: 6),
+      _pad(Text('Five minutes here should make you a better parent today - not just pass the time.',
+          style: ppBody(14, h: 1.5))),
+      const SizedBox(height: 16),
+      _pad(ppSearchField(
+        controller: _searchCtl,
+        hint: 'Search videos…',
+        onChanged: (v) => setState(() => _query = v),
+      )),
+      const SizedBox(height: 14),
+      _topicFilterRow(),
+      const SizedBox(height: 18),
+      _pad(_modeToggle()),
+      const SizedBox(height: 26),
+      _pad(watchSectionHeader('Today for Aarav')),
+      const SizedBox(height: 14),
+      _pad(_todaysHero()),
+    ];
+
+    if (continues.isNotEmpty) {
+      h.addAll([
+        const SizedBox(height: 30),
+        _pad(watchSectionHeader('Continue watching')),
+        const SizedBox(height: 14),
+        _rail(continues, (v) => store.progressOf(v.id)),
+      ]);
+    }
+
+    h.addAll([
+      const SizedBox(height: 30),
+      _pad(watchSectionHeader('Expert collections')),
+      const SizedBox(height: 4),
+      _pad(Text('Short, finishable learning paths - not endless playlists.', style: ppBody(12.5, color: ppMuted))),
+      const SizedBox(height: 16),
+      _collectionsRail(),
+      const SizedBox(height: 28),
+      _pad(_libraryLink()),
+      const SizedBox(height: 30),
+      _pad(watchSectionHeader(_picksTitle())),
+      const SizedBox(height: 4),
+      _pad(Text(_picksSubtitle(), style: ppBody(12.5, color: ppMuted))),
+      const SizedBox(height: 16),
+    ]);
+    return h;
+  }
+
+  // ---- search results (title/topic contains query) ------------------------
+  Widget _searchListView(WatchStore store) {
+    final q = _query.trim().toLowerCase();
+    final items = kWatchAll
+        .where((v) => v.title.toLowerCase().contains(q) || v.topic.toLowerCase().contains(q))
+        .toList();
+    return ListView(
+      padding: const EdgeInsets.only(top: 12, bottom: 40),
+      children: [
+        _pad(ppBack(context, 'Explore')),
+        const SizedBox(height: 16),
+        _pad(ppEyebrow('ParentVeda Watch', color: ppPurple)),
+        const SizedBox(height: 8),
+        _pad(Text('Learn something today', style: ppFraunces(30, h: 1.1))),
+        const SizedBox(height: 16),
+        _pad(ppSearchField(
+          controller: _searchCtl,
+          hint: 'Search videos…',
+          onChanged: (v) => setState(() => _query = v),
+        )),
+        const SizedBox(height: 24),
+        _pad(watchSectionHeader('Search results')),
+        const SizedBox(height: 14),
+        if (items.isEmpty)
+          _pad(Text('No matches for "$_query" - try another word.', style: ppBody(13, color: ppMuted)))
+        else
+          _pad(Column(children: [
+            for (final v in items) _feedCard(v),
+          ])),
+      ],
+    );
+  }
+
+  // ---- top topic filters (YouTube-style chips) ----------------------------
+  Widget _topicFilterRow() {
+    final items = <Widget>[
+      _filterChip('All', null, selected: _topic == 'All', onTap: () => setState(() => _topic = 'All')),
+      _filterChip('Shorts', Icons.bolt_rounded, selected: false, accent: true, onTap: () => _push(const WatchShortsScreen())),
+      for (final c in kWatchCategories)
+        _filterChip(c.$1, c.$2, selected: _topic == c.$1, onTap: () => setState(() => _topic = c.$1)),
+    ];
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 9),
+        itemBuilder: (_, i) => items[i],
+      ),
+    );
+  }
+
+  Widget _filterChip(String label, IconData? icon, {required bool selected, required VoidCallback onTap, bool accent = false}) {
+    final Color bg = selected ? ppPurple : Colors.white;
+    final Color fg = selected ? Colors.white : (accent ? ppPurple : ppInk);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: selected ? ppPurple : (accent ? ppPurple.withValues(alpha: 0.4) : ppHair)),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[
+            Icon(icon, size: 15, color: fg),
+            const SizedBox(width: 6),
+          ],
+          Text(label, style: ppBody(12.5, color: fg, w: FontWeight.w700)),
+        ]),
+      ),
+    );
+  }
+
+  // ---- channel interstitial (promotes a channel + Subscribe) --------------
+  Widget _channelInterstitial(WatchChannel channel) {
+    final e = channel.expert;
+    final subscribed = WatchStore.instance.isSubscribed(e.id);
+    return GestureDetector(
+      onTap: () => _push(WatchChannelScreen(expertId: e.id)),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(20)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.subscriptions_outlined, size: 15, color: ppPurple),
+            const SizedBox(width: 7),
+            Flexible(child: ppEyebrow('Channel to explore', color: ppPurple, spacing: 1.0)),
+          ]),
+          const SizedBox(height: 14),
+          Row(children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
+              clipBehavior: Clip.antiAlias,
+              child: const PpStriped(height: 52, colorA: ppBorder, colorB: ppStripeB),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(e.name, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 3),
+                Text(channel.statsLine, style: ppBody(12, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ]),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () => WatchStore.instance.toggleSubscribe(e.id),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+                decoration: BoxDecoration(
+                  color: subscribed ? Colors.transparent : ppPurple,
+                  borderRadius: BorderRadius.circular(999),
+                  border: subscribed ? Border.all(color: ppBorder) : null,
+                ),
+                child: Text(subscribed ? 'Subscribed' : 'Subscribe',
+                    style: ppBody(12, color: subscribed ? ppSoft : Colors.white, w: FontWeight.w800)),
+              ),
+            ),
+          ]),
+        ]),
+      ),
     );
   }
 
@@ -176,7 +338,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             child: Column(children: [
               Text(label, style: ppBody(13, color: on ? ppPurple : ppSoft, w: FontWeight.w700)),
               const SizedBox(height: 1),
-              Text(sub, style: ppBody(10, color: on ? ppMuted : ppMuted)),
+              Text(sub, style: ppBody(10, color: ppMuted)),
             ]),
           ),
         ),
@@ -240,60 +402,39 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         ),
       );
 
-  Widget _categories() => Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          for (final c in kWatchCategories)
-            GestureDetector(
-              onTap: () => _push(WatchCategoryScreen(category: c.$1)),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: ppHair)),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(c.$2, size: 15, color: ppPurple),
-                  const SizedBox(width: 7),
-                  Text(c.$1, style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
-                ]),
-              ),
-            ),
-        ],
-      );
-
   Widget _collectionsRail() {
     final cols = expertCollections();
     return SizedBox(
-        height: 216,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: cols.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 14),
-          itemBuilder: (_, i) {
-            final c = cols[i];
-            final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
-            final prog = WatchStore.instance.collectionProgress(c);
-            return GestureDetector(
-              onTap: () => _push(WatchCollectionScreen(collection: c)),
-              behavior: HitTestBehavior.opaque,
-              child: SizedBox(
-                width: 200,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  WatchThumb(seed: c.seed, height: 116, showPlay: false, progress: prog > 0 ? prog : null),
-                  const SizedBox(height: 10),
-                  Text(c.title, style: ppJakarta(14.5).copyWith(height: 1.2), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text('${c.videoIds.length} videos · ~$mins min', style: ppBody(11.5, color: ppMuted)),
-                  const SizedBox(height: 4),
-                  Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Not started',
-                      style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
-                ]),
-              ),
-            );
-          },
-        ),
-      );
+      height: 216,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: cols.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 14),
+        itemBuilder: (_, i) {
+          final c = cols[i];
+          final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
+          final prog = WatchStore.instance.collectionProgress(c);
+          return GestureDetector(
+            onTap: () => _push(WatchCollectionScreen(collection: c)),
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              width: 200,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                WatchThumb(seed: c.seed, height: 116, showPlay: false, progress: prog > 0 ? prog : null),
+                const SizedBox(height: 10),
+                Text(c.title, style: ppJakarta(14.5).copyWith(height: 1.2), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 4),
+                Text('${c.videoIds.length} videos · ~$mins min', style: ppBody(11.5, color: ppMuted)),
+                const SizedBox(height: 4),
+                Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Not started',
+                    style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _libraryLink() => GestureDetector(

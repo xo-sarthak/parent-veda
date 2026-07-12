@@ -1,17 +1,19 @@
 // =============================================================================
-//  SickDaysScreen - Recipes · Sick-day meals (parenting · S15·sick)
+//  SickDaysScreen - Recipes · Sick-day meals (the Sick-mode doorway)
 // -----------------------------------------------------------------------------
 //  Comfort meals for when the child is unwell - gentle, settling foods filtered
 //  by what's troubling him (constipation / loose motion / cough & cold / fever),
-//  with an ⓘ safety note (these support recovery, not medical remedies).
-//  Faithful build of Claude Design · S15·sick. Reached from Recipes → Sick mode.
+//  with an ⓘ safety note (these support recovery, not medical remedies). Now on
+//  the unified FoodRecipe model: each meal opens the data-driven FoodRecipeScreen.
+//  Reached from the unified Recipes home → Sick mode.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import 'food_common.dart';
+import 'food_recipe_screen.dart';
 import 'pp_common.dart';
-import 'pp_recipe_widgets.dart';
-import 'pp_recipes_data.dart';
+import 'pp_food_data.dart';
 
 class SickDaysScreen extends StatefulWidget {
   const SickDaysScreen({super.key});
@@ -25,6 +27,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
   String _situation = 'Constipation';
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+  void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
   static const Map<String, IconData> _icons = {
     'Constipation': Icons.eco_outlined,
@@ -35,7 +38,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final list = sickRecipes(_situation);
+    final list = sickFoodRecipes(_situation);
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -104,8 +107,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
               ))
             else
               _pad(Column(children: [
-                for (int i = 0; i < list.length; i++)
-                  PpRecipeRow(list[i], warm: true, top: i > 0, bottom: i == list.length - 1),
+                for (final r in list) FoodListCard(recipe: r, warm: true, onTap: () => _push(FoodRecipeScreen(recipe: r))),
               ])),
 
             const SizedBox(height: 26),

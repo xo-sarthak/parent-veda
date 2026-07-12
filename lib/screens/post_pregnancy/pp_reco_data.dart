@@ -10,6 +10,10 @@
 //  stage-fit + interest overlap, diversifies by category, and explains WHY each
 //  recommendation appears. In-memory; a real ML layer slots in behind the same
 //  API later. Nothing here depends on the pregnancy app.
+//
+//  Each item also carries category-appropriate FACETS (a small typed map, plus a
+//  human `subtype`) so every category screen can offer real filters + sub-filters
+//  that actually narrow the list. See RecoFacetGroup / _catFacets below.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -63,6 +67,8 @@ class RecoItem {
     this.price,
     this.collections = const [],
     this.tags = const [],
+    this.subtype,
+    this.facets = const {},
     this.relatedArticleId,
     this.relatedVideoId,
     this.relatedProductId,
@@ -87,6 +93,8 @@ class RecoItem {
   final String? price;
   final List<String> collections; // smart-collection ids this belongs to
   final List<String> tags; // search + relevance keywords
+  final String? subtype; // a short human "type" label, e.g. "Board book"
+  final Map<String, List<String>> facets; // typed filter dimensions -> values
   final String? relatedArticleId; // ReadArticle id
   final String? relatedVideoId; // WatchVideo id
   final String? relatedProductId; // PpProduct id
@@ -98,7 +106,125 @@ class RecoItem {
   }
 
   /// Everything searchable, lowercased.
-  String get haystack => '$title $summary $category ${tags.join(' ')} ${skills.join(' ')} ${collections.join(' ')} $bestFor'.toLowerCase();
+  String get haystack =>
+      '$title $summary $category ${tags.join(' ')} ${skills.join(' ')} ${collections.join(' ')} $bestFor ${subtype ?? ''} ${facets.values.expand((v) => v).join(' ')}'
+          .toLowerCase();
+}
+
+// =============================================================================
+//  Facets - category-appropriate filter dimensions + sub-filters.
+// -----------------------------------------------------------------------------
+//  Each category declares a set of RecoFacetGroups. Every group has a `dim`
+//  (the key into an item's `facets` map), a human `label`, and a list of
+//  (value, label) options. The category screen renders only the options that
+//  actually have items, and an item passes a group if it matches ANY selected
+//  value in that group (OR within a group, AND across groups). One universal
+//  "Age" group is derived from every item's age window.
+// =============================================================================
+class RecoFacetGroup {
+  const RecoFacetGroup(this.dim, this.label, this.options);
+  final String dim;
+  final String label;
+  final List<(String, String)> options; // (value, display label)
+}
+
+/// Universal age bands (min inclusive, max inclusive - overlap match).
+const List<(String, String, int, int)> kRecoAgeBands = [
+  ('nb', '0–6m', 0, 6),
+  ('baby', '6–12m', 6, 12),
+  ('tot', '1–2y', 12, 24),
+  ('big', '2y+', 24, 72),
+];
+
+final RecoFacetGroup _ageBandGroup =
+    RecoFacetGroup('age', 'Age', [for (final b in kRecoAgeBands) (b.$1, b.$2)]);
+
+const Map<String, List<RecoFacetGroup>> _catFacets = {
+  'Books': [
+    RecoFacetGroup('format', 'Format', [('board', 'Board'), ('picture', 'Picture'), ('story', 'Story'), ('activity', 'Activity'), ('cloth', 'Cloth')]),
+    RecoFacetGroup('language', 'Language', [('english', 'English'), ('hindi', 'Hindi'), ('bilingual', 'Bilingual'), ('wordless', 'Wordless')]),
+    RecoFacetGroup('theme', 'Theme', [('contrast', 'High-contrast'), ('faces', 'Faces'), ('emotions', 'Emotions'), ('animals', 'Animals'), ('bedtime', 'Bedtime'), ('firstwords', 'First words')]),
+  ],
+  'Activities': [
+    RecoFacetGroup('skill', 'Skill', [('sensory', 'Sensory'), ('motor', 'Motor'), ('cognitive', 'Thinking'), ('language', 'Language'), ('social', 'Social'), ('creative', 'Creative')]),
+    RecoFacetGroup('place', 'Where', [('indoor', 'Indoor'), ('outdoor', 'Outdoor')]),
+    RecoFacetGroup('mess', 'Mess level', [('none', 'No mess'), ('some', 'A little'), ('messy', 'Messy')]),
+  ],
+  'Toys': [
+    RecoFacetGroup('skill', 'Skill', [('motor', 'Motor'), ('cognitive', 'Thinking'), ('sensory', 'Sensory'), ('pretend', 'Pretend')]),
+    RecoFacetGroup('material', 'Material', [('wood', 'Wood'), ('cloth', 'Cloth'), ('silicone', 'Silicone'), ('plastic', 'Plastic')]),
+  ],
+  'Videos': [
+    RecoFacetGroup('type', 'Type', [('explainer', 'Explainer'), ('howto', 'How-to'), ('series', 'Series')]),
+    RecoFacetGroup('length', 'Length', [('short', 'Short'), ('medium', 'Medium'), ('long', 'Long')]),
+  ],
+  'Music': [
+    RecoFacetGroup('type', 'Type', [('lullaby', 'Lullaby'), ('rhyme', 'Rhyme'), ('action', 'Action song'), ('instrumental', 'Instrumental')]),
+    RecoFacetGroup('language', 'Language', [('hindi', 'Hindi'), ('english', 'English'), ('regional', 'Regional'), ('wordless', 'Wordless')]),
+  ],
+  'Outdoor': [
+    RecoFacetGroup('setting', 'Setting', [('walk', 'Walk'), ('park', 'Park'), ('garden', 'Garden'), ('water', 'Water'), ('nature', 'Nature')]),
+    RecoFacetGroup('energy', 'Pace', [('calm', 'Calm'), ('active', 'Active')]),
+  ],
+  'Experiences': [
+    RecoFacetGroup('type', 'Type', [('sensory', 'Sensory'), ('water', 'Water'), ('music', 'Music'), ('art', 'Art'), ('outing', 'Outing')]),
+    RecoFacetGroup('setting', 'Setting', [('indoor', 'Indoor'), ('outdoor', 'Outdoor')]),
+  ],
+  'Products': [
+    RecoFacetGroup('use', 'For', [('sleep', 'Sleep'), ('feeding', 'Feeding'), ('travel', 'Travel'), ('care', 'Care'), ('play', 'Play')]),
+  ],
+  'Parent Picks': [
+    RecoFacetGroup('kind', 'Kind', [('book', 'Book'), ('podcast', 'Podcast'), ('tool', 'Tool'), ('wellness', 'Wellness')]),
+    RecoFacetGroup('topic', 'Topic', [('development', 'Development'), ('sleep', 'Sleep'), ('wellbeing', 'Wellbeing'), ('feeding', 'Feeding')]),
+  ],
+  'Events': [
+    RecoFacetGroup('kind', 'Kind', [('storytime', 'Story-time'), ('festival', 'Festival'), ('workshop', 'Workshop'), ('meetup', 'Meet-up'), ('community', 'Community')]),
+    RecoFacetGroup('cost', 'Cost', [('free', 'Free'), ('paid', 'Paid')]),
+  ],
+  'Travel': [
+    RecoFacetGroup('kind', 'Kind', [('essentials', 'Essentials'), ('destination', 'Destination'), ('tips', 'Tips')]),
+    RecoFacetGroup('setting', 'Setting', [('hills', 'Hills'), ('beach', 'Beach'), ('city', 'City'), ('nature', 'Nature')]),
+  ],
+  'Restaurants': [
+    RecoFacetGroup('kind', 'Kind', [('cafe', 'Cafe'), ('family', 'Family'), ('outdoor', 'Outdoor')]),
+    RecoFacetGroup('feature', 'Good for', [('stroller', 'Stroller-friendly'), ('highchairs', 'High chairs'), ('play', 'Play area'), ('quiet', 'Quiet')]),
+  ],
+  'Birthday Ideas': [
+    RecoFacetGroup('kind', 'Kind', [('party', 'Party'), ('keepsake', 'Keepsake'), ('decor', 'Decor'), ('cake', 'Cake'), ('gifts', 'Return gifts')]),
+  ],
+  'Learning': [
+    RecoFacetGroup('kind', 'Focus', [('language', 'Language'), ('signing', 'Signing'), ('numbers', 'Numbers'), ('music', 'Music')]),
+    RecoFacetGroup('format', 'Format', [('habit', 'Daily habit'), ('flashcards', 'Flashcards'), ('routine', 'Routine'), ('app', 'App')]),
+  ],
+};
+
+/// The full facet groups a category could offer (age band first, then its own).
+List<RecoFacetGroup> recoFacetsFor(String category) => [
+      _ageBandGroup,
+      ...(_catFacets[category] ?? const <RecoFacetGroup>[]),
+    ];
+
+/// Does [it] match a single facet value on dimension [dim]? Age is derived from
+/// the item's window; every other dimension reads the item's `facets` map.
+bool recoMatchesFacet(RecoItem it, String dim, String value) {
+  if (dim == 'age') {
+    final band = kRecoAgeBands.firstWhere((b) => b.$1 == value, orElse: () => kRecoAgeBands.first);
+    return it.ageMin <= band.$4 && it.ageMax >= band.$3;
+  }
+  final vals = it.facets[dim];
+  return vals != null && vals.contains(value);
+}
+
+/// The facet groups worth showing for [category] given its [pool] of items -
+/// only options that actually have items, and only groups that meaningfully
+/// narrow (>= 2 live options).
+List<RecoFacetGroup> recoFacetGroupsFor(String category, List<RecoItem> pool) {
+  final out = <RecoFacetGroup>[];
+  for (final g in recoFacetsFor(category)) {
+    final opts = g.options.where((o) => pool.any((it) => recoMatchesFacet(it, g.dim, o.$1))).toList();
+    if (opts.length >= 2) out.add(RecoFacetGroup(g.dim, g.label, opts));
+  }
+  return out;
 }
 
 // ---- smart collections ------------------------------------------------------
@@ -131,6 +257,8 @@ RecoCollection recoCollectionById(String id) =>
 // =============================================================================
 //  Catalogue - curated, not exhaustive. Weighted for the 0-2y window (Aarav is
 //  ~4 months) but spanning ages so the engine has range. Warm ParentVeda voice.
+//  Every category carries at least a handful of picks so its filters have room
+//  to work.
 // =============================================================================
 const List<RecoItem> kReco = [
   // ---- Books ----------------------------------------------------------------
@@ -142,6 +270,7 @@ const List<RecoItem> kReco = [
     bestFor: 'The first few months of focused looking.',
     skills: ['Visual attention', 'Focus'], benefits: ['Visual tracking', 'Early attention'],
     collections: ['sensory', 'montessori'], tags: ['high contrast', 'newborn', 'visual', 'board book'],
+    subtype: 'Board book', facets: {'format': ['board'], 'language': ['english'], 'theme': ['contrast', 'faces']},
     relatedActivityId: 'highcontrast', relatedVideoId: 'q_play',
   ),
   RecoItem(
@@ -152,6 +281,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Tummy time and teething days.',
     skills: ['Cause & effect', 'Sensory exploration'], benefits: ['Fine motor', 'Auditory play'],
     collections: ['sensory'], tags: ['cloth', 'crinkle', 'teething', 'tummy time'],
+    subtype: 'Cloth book', facets: {'format': ['cloth'], 'language': ['wordless'], 'theme': ['contrast', 'animals']},
     relatedActivityId: 'texture',
   ),
   RecoItem(
@@ -162,6 +292,7 @@ const List<RecoItem> kReco = [
     bestFor: 'The dawn of peekaboo games.',
     skills: ['Object permanence', 'Social connection'], benefits: ['Social wiring', 'Self-recognition'],
     collections: ['indianbooks', 'sensory'], tags: ['peekaboo', 'mirror', 'faces', 'indian', 'flap'],
+    subtype: 'Lift-the-flap book', facets: {'format': ['board'], 'language': ['bilingual'], 'theme': ['faces']},
     relatedActivityId: 'peekaboo', relatedArticleId: 'leap4',
   ),
   RecoItem(
@@ -172,7 +303,30 @@ const List<RecoItem> kReco = [
     bestFor: 'Toddlers learning to name big feelings.',
     skills: ['Emotional literacy', 'Language'], benefits: ['Self-expression', 'Empathy'],
     collections: ['emotions', 'indianbooks'], tags: ['emotions', 'feelings', 'toddler'],
+    subtype: 'Picture book', facets: {'format': ['picture', 'story'], 'language': ['english'], 'theme': ['emotions']},
     relatedArticleId: 'tantrums',
+  ),
+  RecoItem(
+    id: 'bk_animals', category: 'Books', title: 'First Words: Animals', summary: 'Big, friendly animals and their names.',
+    ageMin: 6, ageMax: 24, seed: 32, pvRating: 4.6, communityLoves: 1290, indian: true, price: '₹299',
+    why: 'One clear picture and one clear word per page is exactly right for a baby learning that things have names. Point, name, pause - and watch him start to point back.',
+    consider: 'Keep it a naming game, not a quiz; the joy is in the back-and-forth, not "getting it right".',
+    bestFor: 'The first-words months.',
+    skills: ['Language', 'Vocabulary'], benefits: ['Language', 'Attention'],
+    collections: ['indianbooks'], tags: ['animals', 'first words', 'naming', 'indian'],
+    subtype: 'First-words board book', facets: {'format': ['board'], 'language': ['bilingual'], 'theme': ['animals', 'firstwords']},
+    relatedActivityId: 'narrate',
+  ),
+  RecoItem(
+    id: 'bk_bedtime', category: 'Books', title: 'Goodnight, Little Moon', summary: 'A calm, repetitive bedtime story.',
+    ageMin: 6, ageMax: 36, seed: 33, pvRating: 4.7, communityLoves: 1550, price: '₹379',
+    why: 'A soft, predictable "goodnight to everything" story becomes part of the wind-down ritual itself. The repetition soothes, and reading the same book nightly builds anticipation and calm.',
+    consider: 'He may want it every single night for months - that repetition is the point, not boredom.',
+    bestFor: 'The bedtime routine.',
+    skills: ['Language', 'Routine'], benefits: ['Soothing', 'Language rhythm'],
+    collections: ['music'], tags: ['bedtime', 'story', 'routine', 'sleep'],
+    subtype: 'Bedtime story', facets: {'format': ['story', 'picture'], 'language': ['english'], 'theme': ['bedtime']},
+    relatedArticleId: 'sleepcycles',
   ),
 
   // ---- Activities -----------------------------------------------------------
@@ -184,6 +338,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Right now - it is a Leap 4 favourite.',
     skills: ['Object permanence', 'Cause & effect', 'Social connection'], benefits: ['Cognitive', 'Bonding'],
     collections: ['rainyday'], tags: ['peekaboo', 'game', 'indoor', 'free', 'rainy'],
+    subtype: 'Connection game', facets: {'skill': ['cognitive', 'social'], 'place': ['indoor'], 'mess': ['none']},
     relatedActivityId: 'peekaboo',
   ),
   RecoItem(
@@ -194,6 +349,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Daily floor time.',
     skills: ['Neck & core strength', 'Visual tracking'], benefits: ['Gross motor'],
     collections: ['montessori'], tags: ['tummy time', 'motor', 'mirror', 'floor'],
+    subtype: 'Motor play', facets: {'skill': ['motor'], 'place': ['indoor'], 'mess': ['none']},
     relatedActivityId: 'tummy_play', relatedVideoId: 'tummytime',
   ),
   RecoItem(
@@ -204,7 +360,28 @@ const List<RecoItem> kReco = [
     bestFor: 'Rainy afternoons at home.',
     skills: ['Sensory exploration', 'Fine motor'], benefits: ['Curiosity', 'Tactile learning'],
     collections: ['sensory', 'rainyday', 'montessori'], tags: ['sensory', 'texture', 'rainy', 'indoor', 'free'],
+    subtype: 'Sensory play', facets: {'skill': ['sensory', 'motor'], 'place': ['indoor'], 'mess': ['some']},
     relatedActivityId: 'texture',
+  ),
+  RecoItem(
+    id: 'ac_ballroll', category: 'Activities', title: 'Roll the ball back and forth', summary: 'The first game of taking turns.',
+    ageMin: 6, ageMax: 18, seed: 35, pvRating: 4.6, communityLoves: 1180,
+    why: 'Sitting facing each other and rolling a soft ball is turn-taking in its simplest form - the give-and-take that underpins conversation, sharing and play for years to come.',
+    consider: 'He may just want to hold or mouth the ball at first; the turn-taking clicks in its own time.',
+    bestFor: 'Newly-sitting babies.',
+    skills: ['Turn-taking', 'Gross motor', 'Social connection'], benefits: ['Social', 'Motor'],
+    collections: ['rainyday'], tags: ['ball', 'turn taking', 'indoor', 'free'],
+    subtype: 'Social play', facets: {'skill': ['social', 'motor'], 'place': ['indoor'], 'mess': ['none']},
+  ),
+  RecoItem(
+    id: 'ac_fingerpaint', category: 'Activities', title: 'Edible finger painting', summary: 'Squish, smear and explore - safely.',
+    ageMin: 8, ageMax: 30, seed: 37, pvRating: 4.4, communityLoves: 980,
+    why: 'A little yoghurt tinted with beetroot or turmeric turns into safe, taste-proof paint. The mess is the learning: cause and effect, colour, texture and pure sensory joy.',
+    consider: 'It is genuinely messy - lay a sheet down, strip him to a nappy, and keep it short.',
+    bestFor: 'Warm days you can hose down after.',
+    skills: ['Sensory exploration', 'Creativity', 'Fine motor'], benefits: ['Creativity', 'Tactile learning'],
+    collections: ['sensory'], tags: ['painting', 'messy', 'art', 'sensory'],
+    subtype: 'Messy play', facets: {'skill': ['sensory', 'creative'], 'place': ['indoor', 'outdoor'], 'mess': ['messy']},
   ),
 
   // ---- Toys -----------------------------------------------------------------
@@ -216,6 +393,7 @@ const List<RecoItem> kReco = [
     bestFor: 'The reach-and-grasp stage.',
     skills: ['Reaching', 'Grasp', 'Hand-eye coordination'], benefits: ['Fine motor'],
     collections: ['openended', 'montessori'], tags: ['wooden', 'grasp', 'teether', 'open-ended', 'indian'],
+    subtype: 'Grasping toy', facets: {'skill': ['motor', 'sensory'], 'material': ['wood']},
     relatedActivityId: 'reach_ring', relatedProductId: 'dozy',
   ),
   RecoItem(
@@ -226,6 +404,7 @@ const List<RecoItem> kReco = [
     bestFor: 'From six months to the toddler years.',
     skills: ['Problem solving', 'Sequences', 'Fine motor'], benefits: ['Cognitive', 'Cause & effect'],
     collections: ['openended', 'montessori'], tags: ['stacking', 'cups', 'open-ended', 'bath'],
+    subtype: 'Stacking toy', facets: {'skill': ['cognitive', 'motor'], 'material': ['plastic']},
   ),
   RecoItem(
     id: 'ty_highcontrast', category: 'Toys', title: 'High-contrast soft rattle', summary: 'Bold patterns plus a gentle sound.',
@@ -235,7 +414,28 @@ const List<RecoItem> kReco = [
     bestFor: 'The newborn months.',
     skills: ['Visual attention', 'Cause & effect'], benefits: ['Visual', 'Auditory'],
     collections: ['sensory'], tags: ['rattle', 'high contrast', 'newborn'],
+    subtype: 'Rattle', facets: {'skill': ['sensory', 'motor'], 'material': ['cloth']},
     relatedActivityId: 'highcontrast',
+  ),
+  RecoItem(
+    id: 'ty_teether', category: 'Toys', title: 'Silicone fruit teether', summary: 'Soft on sore gums, easy to hold.',
+    ageMin: 3, ageMax: 12, seed: 38, pvRating: 4.5, communityLoves: 1360, indian: true, price: '₹249',
+    why: 'A soft, food-grade silicone teether with easy-grip shapes gives sore gums relief and busy hands something to explore - and the different textures are their own little sensory lesson.',
+    consider: 'Look for one-piece food-grade silicone with no detachable parts; wash it often.',
+    bestFor: 'The teething and mouthing months.',
+    skills: ['Grasp', 'Sensory exploration'], benefits: ['Fine motor', 'Soothing'],
+    collections: ['montessori'], tags: ['teether', 'silicone', 'teething', 'grasp', 'indian'],
+    subtype: 'Teether', facets: {'skill': ['sensory', 'motor'], 'material': ['silicone']},
+  ),
+  RecoItem(
+    id: 'ty_shapesorter', category: 'Toys', title: 'Wooden shape sorter', summary: 'Match the shape, solve the puzzle.',
+    ageMin: 12, ageMax: 36, seed: 39, pvRating: 4.7, communityLoves: 1470,
+    why: 'Working out which shape fits which hole is early problem-solving you can watch happen - trial, error, and the quiet triumph of getting it. It builds spatial thinking and patient focus.',
+    consider: 'Too advanced before about a year; start with two or three shapes, not the full set.',
+    bestFor: 'The determined toddler.',
+    skills: ['Problem solving', 'Shapes', 'Fine motor'], benefits: ['Cognitive', 'Spatial'],
+    collections: ['montessori', 'openended'], tags: ['shapes', 'sorter', 'wooden', 'puzzle'],
+    subtype: 'Puzzle toy', facets: {'skill': ['cognitive'], 'material': ['wood']},
   ),
 
   // ---- Videos (for parents / stage-appropriate) -----------------------------
@@ -247,6 +447,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Parents in the thick of the 4-month wobble.',
     skills: ['Understanding development'], benefits: ['Parent confidence'],
     collections: [], tags: ['leap', 'brain', 'parent', 'development'],
+    subtype: 'Parent explainer', facets: {'type': ['explainer'], 'length': ['short']},
     relatedVideoId: 'leap4brain', relatedArticleId: 'leap4',
   ),
   RecoItem(
@@ -257,7 +458,38 @@ const List<RecoItem> kReco = [
     bestFor: 'The regression weeks.',
     skills: ['Understanding development'], benefits: ['Parent confidence'],
     collections: [], tags: ['sleep', 'regression', 'parent'],
+    subtype: 'Parent explainer', facets: {'type': ['explainer'], 'length': ['medium']},
     relatedVideoId: 'sleep4mo', relatedArticleId: 'sleepcycles', relatedProductId: 'dozy',
+  ),
+  RecoItem(
+    id: 'vd_massage', category: 'Videos', title: 'How to: a calming baby massage', summary: 'A simple, step-by-step routine.',
+    ageMin: 0, ageMax: 12, seed: 41, pvRating: 4.7, communityLoves: 2010,
+    why: 'A short how-to you can follow along with, hands-on: gentle strokes that soothe, aid digestion and are a beautiful daily moment of connection - the oldest bonding ritual there is.',
+    consider: 'Watch once for the technique, then put the screen away and simply be with him.',
+    bestFor: 'A calm part of the evening routine.',
+    skills: ['Bonding', 'Regulation'], benefits: ['Bonding', 'Soothing'],
+    collections: [], tags: ['massage', 'how to', 'bonding', 'routine'],
+    subtype: 'How-to', facets: {'type': ['howto'], 'length': ['short']},
+  ),
+  RecoItem(
+    id: 'vd_signs', category: 'Videos', title: 'How-to: your first baby signs', summary: 'Milk, more, all done - shown clearly.',
+    ageMin: 6, ageMax: 18, seed: 42, pvRating: 4.5, communityLoves: 1240,
+    why: 'A clear demonstration of a handful of everyday signs, so you can start giving him a way to "tell" you what he needs before words arrive - easing a lot of pre-verbal frustration.',
+    consider: 'Consistency matters more than quantity; pick three signs and use them every day.',
+    bestFor: 'The pre-talking stretch.',
+    skills: ['Communication', 'Language'], benefits: ['Communication'],
+    collections: [], tags: ['signing', 'how to', 'communication'],
+    subtype: 'How-to', facets: {'type': ['howto'], 'length': ['medium']},
+  ),
+  RecoItem(
+    id: 'vd_rhymeseries', category: 'Videos', title: 'Sing-along rhyme series', summary: 'A gentle set of action rhymes.',
+    ageMin: 6, ageMax: 24, seed: 43, pvRating: 4.4, communityLoves: 1090, indian: true,
+    why: 'A calm, slow-paced series of Indian action rhymes to learn together - the value is you singing them off-screen afterwards, not the screen itself.',
+    consider: 'Use it as a songbook for you; keep his own screen time near zero at this age.',
+    bestFor: 'Building your own repertoire of rhymes.',
+    skills: ['Language', 'Rhythm'], benefits: ['Language', 'Bonding'],
+    collections: ['music'], tags: ['rhymes', 'series', 'songs', 'indian'],
+    subtype: 'Series', facets: {'type': ['series'], 'length': ['short']},
   ),
 
   // ---- Music ----------------------------------------------------------------
@@ -269,6 +501,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Wind-down and bedtime.',
     skills: ['Language', 'Emotional connection'], benefits: ['Soothing', 'Language rhythm'],
     collections: ['music', 'indianbooks'], tags: ['lullaby', 'music', 'sleep', 'indian', 'bedtime'],
+    subtype: 'Lullaby', facets: {'type': ['lullaby'], 'language': ['hindi']},
     relatedActivityId: 'song',
   ),
   RecoItem(
@@ -279,7 +512,38 @@ const List<RecoItem> kReco = [
     bestFor: 'Playful, connected minutes together.',
     skills: ['Anticipation', 'Language', 'Turn-taking'], benefits: ['Language', 'Bonding'],
     collections: ['music'], tags: ['rhymes', 'music', 'finger play', 'indian'],
+    subtype: 'Action rhyme', facets: {'type': ['action'], 'language': ['hindi']},
     relatedActivityId: 'song',
+  ),
+  RecoItem(
+    id: 'mu_classical', category: 'Music', title: 'Soft Indian classical for calm', summary: 'Gentle ragas for quiet moments.',
+    ageMin: 0, ageMax: 36, seed: 44, pvRating: 4.5, communityLoves: 1120, indian: true,
+    why: 'Slow instrumental ragas make a lovely, wordless backdrop for calm play or a settling-down evening - rich, patterned sound that is soothing without being stimulating.',
+    consider: 'Keep it low and in the background; it is an atmosphere, not a performance to focus on.',
+    bestFor: 'Quiet play and evenings.',
+    skills: ['Emotional connection'], benefits: ['Soothing', 'Calm'],
+    collections: ['music'], tags: ['classical', 'raga', 'instrumental', 'calm', 'indian'],
+    subtype: 'Instrumental', facets: {'type': ['instrumental'], 'language': ['wordless']},
+  ),
+  RecoItem(
+    id: 'mu_english', category: 'Music', title: 'Classic English nursery rhymes', summary: 'The old favourites, sung simply.',
+    ageMin: 4, ageMax: 36, seed: 45, pvRating: 4.4, communityLoves: 980,
+    why: 'The familiar rhymes are packed with rhyme, rhythm and repetition - exactly the patterns a language-building brain loves - and they give you a shared songbook to fall back on anywhere.',
+    consider: 'Sing them yourself as much as you play them; your voice is the real magic.',
+    bestFor: 'Everyday sing-alongs.',
+    skills: ['Language', 'Rhythm'], benefits: ['Language', 'Bonding'],
+    collections: ['music'], tags: ['rhymes', 'nursery', 'english', 'songs'],
+    subtype: 'Rhyme', facets: {'type': ['rhyme'], 'language': ['english']},
+  ),
+  RecoItem(
+    id: 'mu_regional', category: 'Music', title: 'Lullabies in your mother tongue', summary: 'The songs of your own childhood.',
+    ageMin: 0, ageMax: 24, seed: 46, pvRating: 4.6, communityLoves: 1040, indian: true,
+    why: 'A lullaby in your regional language carries your family, your accent and your memories - and hearing it wires him for the exact speech sounds of home.',
+    consider: 'Ask the grandparents for the ones they sang; those are the most precious of all.',
+    bestFor: 'Passing down what was sung to you.',
+    skills: ['Language', 'Emotional connection'], benefits: ['Soothing', 'Belonging'],
+    collections: ['music'], tags: ['lullaby', 'regional', 'mother tongue', 'indian'],
+    subtype: 'Lullaby', facets: {'type': ['lullaby'], 'language': ['regional']},
   ),
 
   // ---- Outdoor --------------------------------------------------------------
@@ -291,6 +555,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Most days, weather allowing.',
     skills: ['Sensory exploration'], benefits: ['Mood', 'Sleep rhythm'],
     collections: ['weekend'], tags: ['walk', 'outdoor', 'stroller', 'morning', 'weekend', 'free'],
+    subtype: 'Stroller walk', facets: {'setting': ['walk'], 'energy': ['calm']},
   ),
   RecoItem(
     id: 'od_park', category: 'Outdoor', title: 'Under-the-tree blanket time', summary: 'A shady patch of grass and sky.',
@@ -300,6 +565,37 @@ const List<RecoItem> kReco = [
     bestFor: 'Calm weekend mornings.',
     skills: ['Visual tracking', 'Sensory exploration'], benefits: ['Calm', 'Visual'],
     collections: ['weekend'], tags: ['park', 'outdoor', 'nature', 'weekend', 'free'],
+    subtype: 'Blanket time', facets: {'setting': ['park', 'nature'], 'energy': ['calm']},
+  ),
+  RecoItem(
+    id: 'od_garden', category: 'Outdoor', title: 'A patch of garden to explore', summary: 'Grass, leaves and safe things to touch.',
+    ageMin: 8, ageMax: 48, seed: 47, pvRating: 4.5, communityLoves: 990,
+    why: 'Letting a crawling or walking child explore a small, safe patch of garden - grass underfoot, a leaf to hold, a bug to watch - is unbeatable open-ended sensory learning.',
+    consider: 'Sweep for anything he could mouth or that could sting, and stay within arm\'s reach.',
+    bestFor: 'Curious crawlers and new walkers.',
+    skills: ['Sensory exploration', 'Gross motor'], benefits: ['Curiosity', 'Motor'],
+    collections: ['weekend'], tags: ['garden', 'nature', 'outdoor', 'explore'],
+    subtype: 'Nature play', facets: {'setting': ['garden', 'nature'], 'energy': ['active']},
+  ),
+  RecoItem(
+    id: 'od_water', category: 'Outdoor', title: 'Gentle water play outdoors', summary: 'A shallow tray on a warm day.',
+    ageMin: 6, ageMax: 36, seed: 48, pvRating: 4.4, communityLoves: 860,
+    why: 'A shallow tray of water with a cup and a sponge is pure delight and quietly teaches pouring, cause-and-effect and early physics - the "why does it splash?" of it all.',
+    consider: 'Never leave him alone near even a little water, not for a second; keep it shaded.',
+    bestFor: 'Hot afternoons in the shade.',
+    skills: ['Sensory exploration', 'Cause & effect'], benefits: ['Sensory', 'Motor'],
+    collections: [], tags: ['water', 'splash', 'outdoor', 'sensory'],
+    subtype: 'Water play', facets: {'setting': ['water'], 'energy': ['active']},
+  ),
+  RecoItem(
+    id: 'od_sunset', category: 'Outdoor', title: 'Evening sky-watching', summary: 'A calm end-of-day ritual outside.',
+    ageMin: 0, ageMax: 36, seed: 49, pvRating: 4.5, communityLoves: 720,
+    why: 'Stepping outside for the changing colours of the evening sky is a gentle way to close the day - the soft light and cooler air help settle an overstimulated little one before bed.',
+    consider: 'Keep it short as bedtime nears so it soothes rather than winds him up.',
+    bestFor: 'The witching-hour wind-down.',
+    skills: ['Sensory exploration'], benefits: ['Calm', 'Sleep rhythm'],
+    collections: [], tags: ['sky', 'evening', 'outdoor', 'calm'],
+    subtype: 'Calm ritual', facets: {'setting': ['nature'], 'energy': ['calm']},
   ),
 
   // ---- Experiences ----------------------------------------------------------
@@ -311,6 +607,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Parents wanting connection and routine.',
     skills: ['Sensory exploration', 'Social connection'], benefits: ['Sensory', 'Parent support'],
     collections: ['sensory'], tags: ['class', 'sensory', 'experience', 'community'],
+    subtype: 'Sensory class', facets: {'type': ['sensory', 'class'], 'setting': ['indoor']},
   ),
   RecoItem(
     id: 'ex_swim', category: 'Experiences', title: 'Parent-and-baby water time', summary: 'Warm water, close and calm.',
@@ -320,6 +617,37 @@ const List<RecoItem> kReco = [
     bestFor: 'Confident, water-loving families.',
     skills: ['Gross motor', 'Confidence'], benefits: ['Motor', 'Bonding'],
     collections: [], tags: ['swim', 'water', 'experience'],
+    subtype: 'Water class', facets: {'type': ['water'], 'setting': ['indoor']},
+  ),
+  RecoItem(
+    id: 'ex_music', category: 'Experiences', title: 'Parent-and-baby music circle', summary: 'Live songs, shakers and smiles.',
+    ageMin: 3, ageMax: 24, seed: 50, pvRating: 4.5, communityLoves: 820,
+    why: 'Live music with other babies - real instruments, simple shakers, songs with actions - is joyful and quietly builds rhythm, listening and turn-taking. And you will hum the songs at home for days.',
+    consider: 'Some babies just watch at first, and that is full participation at this age.',
+    bestFor: 'Families who love a singalong.',
+    skills: ['Rhythm', 'Language', 'Social connection'], benefits: ['Language', 'Community'],
+    collections: ['music'], tags: ['music', 'class', 'songs', 'experience'],
+    subtype: 'Music class', facets: {'type': ['music'], 'setting': ['indoor']},
+  ),
+  RecoItem(
+    id: 'ex_art', category: 'Experiences', title: 'A messy art playdate', summary: 'Paint, dough and no clean-up at home.',
+    ageMin: 12, ageMax: 48, seed: 51, pvRating: 4.3, communityLoves: 540,
+    why: 'A drop-in messy-play session lets a toddler squish, smear and create with all the mess and none of the home clean-up - rich sensory and creative play in a space built for it.',
+    consider: 'Dress him in clothes you do not mind staining; it is meant to get everywhere.',
+    bestFor: 'Toddlers who love to get stuck in.',
+    skills: ['Creativity', 'Sensory exploration'], benefits: ['Creativity', 'Sensory'],
+    collections: [], tags: ['art', 'messy', 'class', 'experience'],
+    subtype: 'Art session', facets: {'type': ['art'], 'setting': ['indoor']},
+  ),
+  RecoItem(
+    id: 'ex_farm', category: 'Experiences', title: 'A visit to a petting farm', summary: 'Real animals, up close and gentle.',
+    ageMin: 12, ageMax: 60, seed: 52, pvRating: 4.4, communityLoves: 610,
+    why: 'Seeing, hearing and (gently) touching real animals brings the animals from his books to life - wonderful for vocabulary, curiosity and awe, all in the fresh air.',
+    consider: 'Wash hands well after, watch for over-excited grabbing, and let him set the pace.',
+    bestFor: 'A memorable weekend outing.',
+    skills: ['Language', 'Sensory exploration'], benefits: ['Curiosity', 'Language'],
+    collections: ['weekend'], tags: ['farm', 'animals', 'outing', 'experience'],
+    subtype: 'Outing', facets: {'type': ['outing'], 'setting': ['outdoor']},
   ),
 
   // ---- Products (cross-linked to the real catalogue) ------------------------
@@ -331,6 +659,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Light-sleeping babies in noisy homes.',
     skills: [], benefits: ['Sleep'],
     collections: ['travel'], tags: ['sleep', 'white noise', 'soother', 'product'],
+    subtype: 'Sleep aid', facets: {'use': ['sleep']},
     relatedProductId: 'dozy', relatedArticleId: 'sleepcycles',
   ),
   RecoItem(
@@ -341,6 +670,37 @@ const List<RecoItem> kReco = [
     bestFor: 'Busy days and contact naps.',
     skills: [], benefits: ['Bonding', 'Regulation'],
     collections: ['travel'], tags: ['carrier', 'babywearing', 'product', 'travel'],
+    subtype: 'Babywearing', facets: {'use': ['travel', 'care']},
+  ),
+  RecoItem(
+    id: 'pr_monitor', category: 'Products', title: 'A simple video baby monitor', summary: 'Peace of mind, without the app overload.',
+    ageMin: 0, ageMax: 36, seed: 53, pvRating: 4.4, communityLoves: 1180, price: '₹4,499',
+    why: 'A straightforward monitor lets you step away and still keep an eye and ear on him - the reassurance to actually rest or eat while he naps. We favour a plain dedicated screen over one more phone app.',
+    consider: 'A monitor is a tool, not a sensor to fret over; a good sleep space matters more than fancy features.',
+    bestFor: 'Homes where his room is out of earshot.',
+    skills: [], benefits: ['Parent wellbeing'],
+    collections: [], tags: ['monitor', 'safety', 'product', 'sleep'],
+    subtype: 'Monitor', facets: {'use': ['care', 'sleep']},
+  ),
+  RecoItem(
+    id: 'pr_swaddle', category: 'Products', title: 'Breathable muslin swaddles', summary: 'Airy cotton for calmer newborn sleep.',
+    ageMin: 0, ageMax: 6, seed: 54, pvRating: 4.6, communityLoves: 1540, indian: true, price: '₹899',
+    why: 'A snug swaddle recreates the cosy containment of the womb and tames the startle reflex that wakes newborns. Light Indian muslin breathes well in the heat, which matters here.',
+    consider: 'Stop swaddling once he shows signs of rolling, and never swaddle too tightly around the hips.',
+    bestFor: 'The newborn weeks.',
+    skills: [], benefits: ['Sleep', 'Soothing'],
+    collections: ['travel'], tags: ['swaddle', 'muslin', 'sleep', 'newborn', 'indian'],
+    subtype: 'Swaddle', facets: {'use': ['sleep', 'care']},
+  ),
+  RecoItem(
+    id: 'pr_feeding', category: 'Products', title: 'Silicone bib & bowl set', summary: 'For the gloriously messy solids stage.',
+    ageMin: 6, ageMax: 36, seed: 55, pvRating: 4.5, communityLoves: 1210, price: '₹799',
+    why: 'A catch-all silicone bib and a suction bowl that stays put make starting solids far less stressful - less on the floor, more self-feeding, and a wipe-clean end to every meal.',
+    consider: 'A suction bowl buys you time, not a miracle; some flinging is simply how he learns.',
+    bestFor: 'Starting solids and baby-led weaning.',
+    skills: ['Self-feeding'], benefits: ['Independence'],
+    collections: [], tags: ['feeding', 'bib', 'bowl', 'solids', 'product'],
+    subtype: 'Feeding gear', facets: {'use': ['feeding']},
   ),
 
   // ---- Parent Picks ---------------------------------------------------------
@@ -352,6 +712,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Parents who like to understand the why.',
     skills: [], benefits: ['Parent confidence'],
     collections: [], tags: ['parent', 'book', 'wonder weeks', 'development'],
+    subtype: 'Book', facets: {'kind': ['book'], 'topic': ['development']},
   ),
   RecoItem(
     id: 'pp_selfcare', category: 'Parent Picks', title: 'Five minutes for you, too', summary: 'A tiny reset in the fourth-month fog.',
@@ -361,7 +722,38 @@ const List<RecoItem> kReco = [
     bestFor: 'Every tired parent.',
     skills: [], benefits: ['Parent wellbeing'],
     collections: [], tags: ['parent', 'wellness', 'selfcare'],
+    subtype: 'Wellness guide', facets: {'kind': ['wellness'], 'topic': ['wellbeing']},
     relatedVideoId: 'mumwellness', relatedArticleId: 'matrescence',
+  ),
+  RecoItem(
+    id: 'pp_podcast', category: 'Parent Picks', title: 'A calm parenting podcast', summary: 'Company for the 2am feeds.',
+    ageMin: 0, ageMax: 60, seed: 56, pvRating: 4.4, communityLoves: 990,
+    why: 'A warm, evidence-based podcast is perfect for tired eyes - listen during feeds or walks. The best ones leave you feeling steadier and less alone, not more anxious.',
+    consider: 'Skip any that trade in fear or rigid rules; you want reassurance, not pressure.',
+    bestFor: 'Long feeds and stroller walks.',
+    skills: [], benefits: ['Parent confidence'],
+    collections: [], tags: ['podcast', 'parent', 'listening', 'development'],
+    subtype: 'Podcast', facets: {'kind': ['podcast'], 'topic': ['development']},
+  ),
+  RecoItem(
+    id: 'pp_sleeptool', category: 'Parent Picks', title: 'A simple sleep-log habit', summary: 'See the pattern under the chaos.',
+    ageMin: 0, ageMax: 24, seed: 57, pvRating: 4.3, communityLoves: 760,
+    why: 'Jotting down naps and night wakings for a week often reveals a rhythm you could not feel in the fog - and a little pattern is the first step to gently shaping better sleep.',
+    consider: 'Track to understand, not to obsess; put it away once you have the picture.',
+    bestFor: 'The "why won\'t he sleep?" weeks.',
+    skills: [], benefits: ['Parent confidence'],
+    collections: [], tags: ['sleep', 'tracking', 'habit', 'parent'],
+    subtype: 'Tool', facets: {'kind': ['tool'], 'topic': ['sleep']},
+  ),
+  RecoItem(
+    id: 'pp_food', category: 'Parent Picks', title: 'First foods, without the fear', summary: 'A calm guide to starting solids.',
+    ageMin: 5, ageMax: 18, seed: 58, pvRating: 4.5, communityLoves: 1080, indian: true,
+    why: 'A reassuring, India-aware guide to starting solids - what to offer, how to spot readiness, and how to keep mealtimes joyful rather than a battle. It takes the anxiety out of a big milestone.',
+    consider: 'General guidance, not medical advice; check allergies and timing with your paediatrician.',
+    bestFor: 'The run-up to six months.',
+    skills: [], benefits: ['Parent confidence'],
+    collections: [], tags: ['solids', 'feeding', 'weaning', 'parent', 'indian'],
+    subtype: 'Book', facets: {'kind': ['book'], 'topic': ['feeding']},
   ),
 
   // ---- Events ---------------------------------------------------------------
@@ -373,6 +765,7 @@ const List<RecoItem> kReco = [
     bestFor: 'A low-key weekly ritual.',
     skills: ['Language', 'Social connection'], benefits: ['Language', 'Community'],
     collections: ['weekend'], tags: ['event', 'library', 'story time', 'free', 'weekend'],
+    subtype: 'Story-time', facets: {'kind': ['storytime'], 'cost': ['free']},
   ),
   RecoItem(
     id: 'ev_festival', category: 'Events', title: 'His first festival, gently', summary: 'Celebrate without overwhelming.',
@@ -382,6 +775,37 @@ const List<RecoItem> kReco = [
     bestFor: 'Family festival days.',
     skills: ['Social connection'], benefits: ['Belonging'],
     collections: [], tags: ['festival', 'event', 'indian', 'family'],
+    subtype: 'Festival', facets: {'kind': ['festival'], 'cost': ['free']},
+  ),
+  RecoItem(
+    id: 'ev_playgroup', category: 'Events', title: 'A neighbourhood playgroup', summary: 'Familiar faces, week after week.',
+    ageMin: 6, ageMax: 48, seed: 59, pvRating: 4.5, communityLoves: 830,
+    why: 'A regular, informal playgroup gives him gentle social exposure and gives you a lifeline of other parents at the same stage - the seeing-the-same-faces-weekly kind of belonging that carries you.',
+    consider: 'Parallel play (side by side, not together) is completely normal at this age; do not expect sharing yet.',
+    bestFor: 'Building a little village.',
+    skills: ['Social connection'], benefits: ['Community', 'Social'],
+    collections: ['weekend'], tags: ['playgroup', 'community', 'meetup', 'free'],
+    subtype: 'Meet-up', facets: {'kind': ['meetup'], 'cost': ['free']},
+  ),
+  RecoItem(
+    id: 'ev_workshop', category: 'Events', title: 'A baby-massage workshop', summary: 'Learn the strokes, hands-on.',
+    ageMin: 0, ageMax: 12, seed: 60, pvRating: 4.4, communityLoves: 620,
+    why: 'A guided workshop teaches you the gentle strokes that soothe and aid digestion, with an instructor to correct your technique - and you meet other new parents in the same tender weeks.',
+    consider: 'A one-off class is plenty; the value is learning something you then do at home for free.',
+    bestFor: 'New parents wanting a skill and a circle.',
+    skills: ['Bonding'], benefits: ['Bonding', 'Parent support'],
+    collections: [], tags: ['workshop', 'massage', 'class', 'paid'],
+    subtype: 'Workshop', facets: {'kind': ['workshop'], 'cost': ['paid']},
+  ),
+  RecoItem(
+    id: 'ev_museum', category: 'Events', title: 'A quiet museum morning', summary: 'Space, calm and things to see.',
+    ageMin: 12, ageMax: 60, seed: 61, pvRating: 4.2, communityLoves: 430,
+    why: 'A museum at opening time is spacious, calm and full of colour and form for little eyes - a lovely, low-key outing where he can look about from the carrier or toddle in the quiet.',
+    consider: 'Go right at opening before the crowds, and keep it short - one gallery is plenty.',
+    bestFor: 'A gentle rainy-day outing.',
+    skills: ['Sensory exploration'], benefits: ['Curiosity'],
+    collections: [], tags: ['museum', 'outing', 'community', 'paid'],
+    subtype: 'Community outing', facets: {'kind': ['community'], 'cost': ['paid']},
   ),
 
   // ---- Travel ---------------------------------------------------------------
@@ -393,6 +817,7 @@ const List<RecoItem> kReco = [
     bestFor: 'First trips away.',
     skills: [], benefits: ['Calmer travel'],
     collections: ['travel'], tags: ['travel', 'packing', 'essentials'],
+    subtype: 'Packing list', facets: {'kind': ['essentials']},
   ),
   RecoItem(
     id: 'tv_hillstation', category: 'Travel', title: 'A slow hill-station break', summary: 'Cool air, calm, no rush.',
@@ -402,6 +827,37 @@ const List<RecoItem> kReco = [
     bestFor: 'A first family holiday.',
     skills: [], benefits: ['Family time'],
     collections: ['travel'], tags: ['travel', 'holiday', 'hills', 'indian'],
+    subtype: 'Destination', facets: {'kind': ['destination'], 'setting': ['hills']},
+  ),
+  RecoItem(
+    id: 'tv_beach', category: 'Travel', title: 'A calm beach stay', summary: 'Shade, sea breeze and slow days.',
+    ageMin: 6, ageMax: 48, seed: 62, pvRating: 4.2, communityLoves: 480, indian: true,
+    why: 'A quiet stretch of coast, well out of the midday sun, is soothing for everyone - the sound of the waves, the open sky, and no itinerary to keep. Slow is the whole point.',
+    consider: 'Shade, a hat and gentle sun protection are non-negotiable; keep him cool and hydrated.',
+    bestFor: 'A restful winter escape.',
+    skills: [], benefits: ['Family time', 'Calm'],
+    collections: ['travel'], tags: ['travel', 'beach', 'holiday', 'indian'],
+    subtype: 'Destination', facets: {'kind': ['destination'], 'setting': ['beach']},
+  ),
+  RecoItem(
+    id: 'tv_carkit', category: 'Travel', title: 'The road-trip car kit', summary: 'Smoother miles with a baby aboard.',
+    ageMin: 0, ageMax: 36, seed: 63, pvRating: 4.4, communityLoves: 690,
+    why: 'A little planning - a well-fitted car seat, sunshades, a stash of snacks and a few quiet toys within reach - turns a dreaded drive into a doable one. Timing the drive around a nap is the real trick.',
+    consider: 'Stop often to feed and stretch; never take him out of the car seat while moving, ever.',
+    bestFor: 'Long drives to family.',
+    skills: [], benefits: ['Calmer travel'],
+    collections: ['travel'], tags: ['travel', 'car', 'road trip', 'tips'],
+    subtype: 'Travel tips', facets: {'kind': ['tips']},
+  ),
+  RecoItem(
+    id: 'tv_grandparents', category: 'Travel', title: 'A trip to the grandparents', summary: 'The most meaningful journey of all.',
+    ageMin: 0, ageMax: 60, seed: 64, pvRating: 4.7, communityLoves: 1120, indian: true,
+    why: 'Time with grandparents is priceless for him and a lifeline for you - extra loving hands, family stories, and roots. The familiarity of family, even in a new place, keeps him settled.',
+    consider: 'Agree gently on routines and rules in advance so love does not tip into too much.',
+    bestFor: 'Staying close to family.',
+    skills: ['Social connection'], benefits: ['Belonging', 'Parent support'],
+    collections: ['travel'], tags: ['travel', 'family', 'grandparents', 'city', 'indian'],
+    subtype: 'Destination', facets: {'kind': ['destination'], 'setting': ['city']},
   ),
 
   // ---- Restaurants ----------------------------------------------------------
@@ -413,6 +869,37 @@ const List<RecoItem> kReco = [
     bestFor: 'A short outing that suits you both.',
     skills: [], benefits: ['Parent wellbeing'],
     collections: ['weekend'], tags: ['restaurant', 'cafe', 'outing', 'weekend'],
+    subtype: 'Cafe', facets: {'kind': ['cafe'], 'feature': ['stroller', 'quiet']},
+  ),
+  RecoItem(
+    id: 'rs_family', category: 'Restaurants', title: 'A relaxed family restaurant', summary: 'High chairs and no side-eye.',
+    ageMin: 6, ageMax: 60, seed: 65, pvRating: 4.3, communityLoves: 560,
+    why: 'A genuinely family-friendly restaurant - high chairs on hand, unfussed staff, a bit of noise already in the air - lets you actually enjoy a meal out without bracing for every squeak.',
+    consider: 'Bring a couple of quiet toys and order early; a hungry wait is where outings unravel.',
+    bestFor: 'A proper meal out, together.',
+    skills: [], benefits: ['Parent wellbeing'],
+    collections: ['weekend'], tags: ['restaurant', 'family', 'outing', 'weekend'],
+    subtype: 'Family restaurant', facets: {'kind': ['family'], 'feature': ['highchairs']},
+  ),
+  RecoItem(
+    id: 'rs_outdoor', category: 'Restaurants', title: 'An open-air garden eatery', summary: 'Fresh air and room to roam.',
+    ageMin: 12, ageMax: 60, seed: 66, pvRating: 4.3, communityLoves: 480,
+    why: 'An outdoor spot with a bit of lawn means a toddler can toddle between bites and the open air softens the noise for everyone - far more forgiving than a hushed indoor room.',
+    consider: 'Check for shade and that the space is safely fenced from roads or water.',
+    bestFor: 'Restless toddlers who need to move.',
+    skills: [], benefits: ['Parent wellbeing'],
+    collections: ['weekend'], tags: ['restaurant', 'outdoor', 'garden', 'outing'],
+    subtype: 'Outdoor eatery', facets: {'kind': ['outdoor'], 'feature': ['play']},
+  ),
+  RecoItem(
+    id: 'rs_quietbrunch', category: 'Restaurants', title: 'A quiet weekday brunch spot', summary: 'Calm hours, gentle crowd.',
+    ageMin: 0, ageMax: 36, seed: 67, pvRating: 4.4, communityLoves: 510,
+    why: 'A calm cafe on a weekday morning - after the rush, before lunch - is about the easiest outing there is: space, quiet, and a good chance he naps in the carrier while you finally sit.',
+    consider: 'Weekday mid-morning is the sweet spot; weekends undo all the calm.',
+    bestFor: 'A gentle solo-parent outing.',
+    skills: [], benefits: ['Parent wellbeing'],
+    collections: [], tags: ['restaurant', 'brunch', 'quiet', 'cafe'],
+    subtype: 'Quiet cafe', facets: {'kind': ['cafe'], 'feature': ['quiet', 'stroller']},
   ),
 
   // ---- Birthday Ideas -------------------------------------------------------
@@ -424,6 +911,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Planning the first big day.',
     skills: ['Social connection'], benefits: ['Belonging'],
     collections: ['firstbday'], tags: ['birthday', 'first birthday', 'party', 'indian'],
+    subtype: 'Party plan', facets: {'kind': ['party']},
   ),
   RecoItem(
     id: 'bd_keepsake', category: 'Birthday Ideas', title: 'A first-year keepsake', summary: 'Capture the year, not just the day.',
@@ -433,6 +921,37 @@ const List<RecoItem> kReco = [
     bestFor: 'Sentimental parents.',
     skills: [], benefits: ['Memory keeping'],
     collections: ['firstbday'], tags: ['birthday', 'keepsake', 'journal', 'memory'],
+    subtype: 'Keepsake', facets: {'kind': ['keepsake']},
+  ),
+  RecoItem(
+    id: 'bd_decor', category: 'Birthday Ideas', title: 'Gentle DIY decor', summary: 'Soft, non-plastic, and personal.',
+    ageMin: 9, ageMax: 24, seed: 68, pvRating: 4.4, communityLoves: 620,
+    why: 'A few paper garlands, fresh flowers and a fabric backdrop feel warmer than a pile of balloons - and are kinder to the planet and to his lungs. Homemade always photographs with more heart, too.',
+    consider: 'Skip foil balloons and confetti near a baby who mouths everything; keep small pieces well out of reach.',
+    bestFor: 'A cosy at-home celebration.',
+    skills: [], benefits: ['Belonging'],
+    collections: ['firstbday'], tags: ['birthday', 'decor', 'diy', 'party'],
+    subtype: 'Decor', facets: {'kind': ['decor']},
+  ),
+  RecoItem(
+    id: 'bd_cake', category: 'Birthday Ideas', title: 'A mindful smash cake', summary: 'A first taste, not a sugar rush.',
+    ageMin: 9, ageMax: 15, seed: 69, pvRating: 4.3, communityLoves: 540,
+    why: 'A small, lightly-sweetened cake - or a fruit-and-yoghurt version - lets him have the joyful "smash" moment without a big sugar hit his system is not ready for. The photos are just as gorgeous.',
+    consider: 'Keep added sugar minimal under one year, and watch for any first-time ingredient reactions.',
+    bestFor: 'The cake-smash moment.',
+    skills: [], benefits: ['Joy'],
+    collections: ['firstbday'], tags: ['birthday', 'cake', 'smash cake', 'food'],
+    subtype: 'Cake', facets: {'kind': ['cake']},
+  ),
+  RecoItem(
+    id: 'bd_returngifts', category: 'Birthday Ideas', title: 'Meaningful return gifts', summary: 'Little things that are actually used.',
+    ageMin: 9, ageMax: 60, seed: 70, pvRating: 4.3, communityLoves: 470, indian: true,
+    why: 'A small plant, a story book or a packet of seeds beats another plastic trinket - a return gift that does not end up in the bin the next morning, and quietly models a gentler kind of celebration.',
+    consider: 'Match the gift to the guests\' ages; keep anything tiny away from the babies in the room.',
+    bestFor: 'Thoughtful party hosts.',
+    skills: [], benefits: ['Belonging'],
+    collections: ['firstbday'], tags: ['birthday', 'return gifts', 'party', 'indian'],
+    subtype: 'Return gifts', facets: {'kind': ['gifts']},
   ),
 
   // ---- Learning -------------------------------------------------------------
@@ -444,6 +963,7 @@ const List<RecoItem> kReco = [
     bestFor: 'Every single day.',
     skills: ['Language', 'Turn-taking'], benefits: ['Language', 'Bonding'],
     collections: ['montessori'], tags: ['language', 'talking', 'learning', 'free'],
+    subtype: 'Language habit', facets: {'kind': ['language'], 'format': ['habit']},
     relatedActivityId: 'narrate', relatedArticleId: 'talking', relatedVideoId: 'babbling',
   ),
   RecoItem(
@@ -454,6 +974,37 @@ const List<RecoItem> kReco = [
     bestFor: 'The pre-talking stretch.',
     skills: ['Communication', 'Language'], benefits: ['Communication'],
     collections: [], tags: ['signing', 'communication', 'learning'],
+    subtype: 'Signing', facets: {'kind': ['signing'], 'format': ['routine']},
+  ),
+  RecoItem(
+    id: 'ln_flashcards', category: 'Learning', title: 'First-words picture cards', summary: 'Everyday things, one clear image each.',
+    ageMin: 6, ageMax: 24, seed: 71, pvRating: 4.3, communityLoves: 890, indian: true,
+    why: 'A small set of bilingual picture cards - fruit, animals, home things - is a lovely naming game. Keep it playful and slow, and let him lead which cards he lingers on.',
+    consider: 'Cards are for shared play, not drilling; never test or push. Real objects beat pictures every time.',
+    bestFor: 'Playful naming games.',
+    skills: ['Language', 'Vocabulary'], benefits: ['Language'],
+    collections: [], tags: ['flashcards', 'first words', 'language', 'indian'],
+    subtype: 'Flashcards', facets: {'kind': ['language'], 'format': ['flashcards']},
+  ),
+  RecoItem(
+    id: 'ln_counting', category: 'Learning', title: 'Counting in everyday moments', summary: 'Numbers, woven into the day.',
+    ageMin: 12, ageMax: 36, seed: 72, pvRating: 4.4, communityLoves: 760,
+    why: 'Counting the stairs as you climb, or the grapes on his plate, plants the earliest sense of number in the most natural way - real, useful maths long before any worksheet.',
+    consider: 'It is about the rhythm and words of counting now, not "correct" answers; keep it light.',
+    bestFor: 'The busy toddler months.',
+    skills: ['Numeracy', 'Language'], benefits: ['Cognitive', 'Language'],
+    collections: ['montessori'], tags: ['counting', 'numbers', 'maths', 'learning', 'free'],
+    subtype: 'Number habit', facets: {'kind': ['numbers'], 'format': ['habit']},
+  ),
+  RecoItem(
+    id: 'ln_musiclearn', category: 'Learning', title: 'Learning through song', summary: 'The tune that teaches the words.',
+    ageMin: 0, ageMax: 24, seed: 73, pvRating: 4.5, communityLoves: 980,
+    why: 'Songs are how tiny children learn best - melody and rhyme make words stick, and the actions add memory and movement. A sung "clean-up" or "bath-time" turns a routine into learning.',
+    consider: 'Repeat the same few songs; the familiarity is exactly what makes them powerful.',
+    bestFor: 'Turning routines into rituals.',
+    skills: ['Language', 'Rhythm', 'Memory'], benefits: ['Language', 'Bonding'],
+    collections: ['music'], tags: ['song', 'music', 'learning', 'routine'],
+    subtype: 'Song routine', facets: {'kind': ['music'], 'format': ['routine']},
   ),
 ];
 

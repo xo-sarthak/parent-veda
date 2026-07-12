@@ -45,6 +45,16 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to the controller so a language toggle (or any profile edit)
+    // rebuilds THIS screen live. Without it the segmented toggle only flips
+    // after leaving and re-entering the screen — the tap looked like a no-op.
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
     final name = father ? controller.fatherName : controller.motherName;

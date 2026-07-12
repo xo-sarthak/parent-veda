@@ -1,6 +1,11 @@
 // =============================================================================
 //  MasterclassesScreen - Learn · Masterclasses (parenting · S11)
 // -----------------------------------------------------------------------------
+//  RETIRED (superseded 2026-07) - folded into the merged "Courses &
+//  Masterclasses" section: see learning_home_screen.dart (LearningHomeScreen),
+//  where masterclasses are one of the three kinds. This landing page is detached
+//  from the Explore drawer; its code is kept intact for reference/revert.
+// -----------------------------------------------------------------------------
 //  "One evening with an expert" - a featured live masterclass plus recorded
 //  ones to watch anytime. Reached from the Explore drawer (design path:
 //  Products → Learn → Masterclasses). Each class opens the full funnel page.

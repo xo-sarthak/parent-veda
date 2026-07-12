@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
+import 'pp_watch_data.dart';
 import 'reading_common.dart';
 
 class _RTheme {
@@ -118,7 +119,8 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               const SizedBox(height: 18),
               _pad(ReadCoverBar(seed: a.seed, height: 200)),
               const SizedBox(height: 24),
-              for (int i = 0; i < a.sections.length; i++) _section(t, i, a.sections[i]),
+              // Sections, with a single video embedded roughly in the middle.
+              ..._sectionsWithVideo(t),
               if (a.evidence != null) ...[const SizedBox(height: 8), _pad(_evidence(t))],
               const SizedBox(height: 24),
               _pad(_completeButton(t)),
@@ -126,6 +128,8 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               _pad(Divider(color: t.rule, height: 1)),
               const SizedBox(height: 22),
               _pad(_readNext(t)),
+              const SizedBox(height: 30),
+              _pad(_relatedVideos(t)),
             ],
           ),
         ),
@@ -196,6 +200,128 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
     if (s.mythFact != null) children.add(Padding(padding: const EdgeInsets.only(bottom: 20), child: _pad(_mythFact(t, s.mythFact!))));
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: children);
   }
+
+  // ---- sections + the single mid-article video ----------------------------
+  List<Widget> _sectionsWithVideo(_RTheme t) {
+    final out = <Widget>[];
+    // Place one embedded video roughly in the middle of the read (if one links).
+    final insertAfter = a.relatedVideoId == null ? -1 : (a.sections.length - 1) ~/ 2;
+    for (int i = 0; i < a.sections.length; i++) {
+      out.add(_section(t, i, a.sections[i]));
+      if (i == insertAfter && a.relatedVideoId != null) {
+        out.add(const SizedBox(height: 4));
+        out.add(_pad(_embeddedVideo(t, watchVideoById(a.relatedVideoId!))));
+        out.add(const SizedBox(height: 22));
+      }
+    }
+    return out;
+  }
+
+  // The one call-site seam for video playback. VIDEO IS ON HOLD, so every
+  // placeholder (the mid-article one and the related rail) routes through here;
+  // swap the body to open the Watch player when video ships.
+  void _playVideo(WatchVideo v) => _soon('“${v.title}” · video coming soon');
+
+  Widget _playButton(_RTheme t, {double size = 54}) => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: t.accent,
+          shape: BoxShape.circle,
+          boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3))],
+        ),
+        child: Icon(Icons.play_arrow_rounded, size: size * 0.55, color: Colors.white),
+      );
+
+  Widget _durationBadge(String label) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(7)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.play_arrow_rounded, size: 12, color: Colors.white),
+          const SizedBox(width: 3),
+          Text(label, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white)),
+        ]),
+      );
+
+  Widget _watchPill(_RTheme t) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        decoration: BoxDecoration(color: t.bg.withValues(alpha: 0.92), borderRadius: BorderRadius.circular(999)),
+        child: Text('WATCH', style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.9, color: t.accent)),
+      );
+
+  // ---- embedded mid-article video (single, striped placeholder + play) ----
+  Widget _embeddedVideo(_RTheme t, WatchVideo v) => GestureDetector(
+        onTap: () => _playVideo(v),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: t.rule)),
+          clipBehavior: Clip.antiAlias,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Stack(children: [
+              PpStriped(height: 190, colorA: t.panel, colorB: t.bg),
+              Positioned.fill(child: Center(child: _playButton(t))),
+              Positioned(left: 12, top: 12, child: _watchPill(t)),
+              Positioned(right: 12, bottom: 12, child: _durationBadge(v.durationLabel)),
+            ]),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('WATCH · ${v.durationLabel}', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+                const SizedBox(height: 6),
+                Text(v.title, style: GoogleFonts.fraunces(fontSize: 18 * _fs, height: 1.25, fontWeight: FontWeight.w600, color: t.ink)),
+                const SizedBox(height: 6),
+                Text(v.why, style: GoogleFonts.manrope(fontSize: 13, height: 1.55, color: t.soft), maxLines: 3, overflow: TextOverflow.ellipsis),
+              ]),
+            ),
+          ]),
+        ),
+      );
+
+  // ---- related videos at the end (multiple - shorts & more) ---------------
+  List<WatchVideo> _relatedVideoList() {
+    if (a.relatedVideoIds.isNotEmpty) return a.relatedVideoIds.map(watchVideoById).toList();
+    if (a.relatedVideoId != null) return learnNextVideos(watchVideoById(a.relatedVideoId!), limit: 4);
+    return quickVideos.take(4).toList();
+  }
+
+  Widget _relatedVideos(_RTheme t) {
+    final vids = _relatedVideoList();
+    if (vids.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Related videos', style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
+      const SizedBox(height: 4),
+      Text('Short lessons on this, for when you have a minute.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+      const SizedBox(height: 16),
+      SizedBox(
+        height: 166,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          itemCount: vids.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 14),
+          itemBuilder: (_, i) => _relatedVideoCard(t, vids[i]),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _relatedVideoCard(_RTheme t, WatchVideo v) => GestureDetector(
+        onTap: () => _playVideo(v),
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          width: 158,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Stack(children: [
+              ClipRRect(borderRadius: BorderRadius.circular(14), child: PpStriped(height: 96, width: 158, colorA: t.panel, colorB: t.bg)),
+              Positioned.fill(child: Center(child: _playButton(t, size: 40))),
+              Positioned(right: 8, bottom: 8, child: _durationBadge(v.durationLabel)),
+            ]),
+            const SizedBox(height: 8),
+            Text(v.title, style: GoogleFonts.manrope(fontSize: 13, height: 1.3, fontWeight: FontWeight.w600, color: t.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+      );
 
   // ---- expandable ParentVeda tip -----------------------------------------
   Widget _tipCard(_RTheme t, int index, ReadTip tip) {

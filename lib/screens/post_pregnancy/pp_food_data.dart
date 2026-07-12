@@ -47,6 +47,11 @@ class FoodRecipe {
     required this.healthierNote,
     required this.tags,
     required this.ingredientKeys,
+    this.vegan = false, // veg AND vegan (no dairy/egg); drives the 3-way diet mark
+    this.immunity = false, // immunity-booster tag/filter
+    this.serves = 2,
+    this.situations = const {}, // sick-day situations this dish helps with
+    this.comfortOnly = false, // a pure comfort/recovery meal (hidden from everyday browse)
     this.relatedArticle,
     this.relatedVideoId,
     this.relatedProductId,
@@ -76,6 +81,11 @@ class FoodRecipe {
   final String healthierNote; // what changed & why it's healthier
   final Set<String> tags; // search / nutrition tags
   final Set<String> ingredientKeys; // canonical keys for the Smart Meal Builder
+  final bool vegan;
+  final bool immunity;
+  final int serves;
+  final Set<String> situations; // sick-day situations (Constipation / Fever / …)
+  final bool comfortOnly;
   final String? relatedArticle;
   final String? relatedVideoId;
   final String? relatedProductId;
@@ -83,6 +93,9 @@ class FoodRecipe {
 
   int get totalMin => prepMin + cookMin;
   String get vegLabel => veg ? 'Veg' : 'Non-veg';
+
+  /// 'veg' | 'vegan' | 'nonveg' - drives the diet filter + the diet marker.
+  String get diet => vegan ? 'vegan' : (veg ? 'veg' : 'nonveg');
 }
 
 /// One "nutrition focus of the day" - the educational strength.
@@ -110,6 +123,25 @@ class NutritionFocus {
   final int seed;
   final String? article;
 }
+
+// ---- diet + sick axes (ported from the old Recipes module) ------------------
+/// The 3-way diet filter options (label, code) for the unified Recipes home.
+const List<(String, String)> kFoodDiets = [
+  ('All', 'All'),
+  ('Veg', 'veg'),
+  ('Vegan', 'vegan'),
+  ('Non-veg', 'nonveg'),
+];
+
+/// Category chips for the unified Recipes browse. Sick-Day Meals has its own
+/// doorway (SickDaysScreen), so it is deliberately not offered as a chip here.
+const List<String> kBrowseCategories = [
+  'All', 'First Foods', 'Finger Foods', 'Breakfast', 'Lunch', 'Dinner',
+  'Snacks', 'Smoothies', 'Soups', 'Travel Food', 'Toddler Meals', 'Healthy Desserts',
+];
+
+/// The sick-day situations offered in the Sick-mode doorway.
+const List<String> kSickSituations = ['Constipation', 'Loose motion', 'Cough & cold', 'Fever'];
 
 // ---- meal slots + categories ------------------------------------------------
 const List<String> kFoodSlots = ['Breakfast', 'Morning snack', 'Lunch', 'Evening snack', 'Dinner'];
@@ -184,6 +216,7 @@ const List<FoodRecipe> kFoodRecipes = [
     slot: 'Lunch',
     ageTag: '6+ mo',
     veg: true,
+    vegan: true,
     prepMin: 5,
     cookMin: 15,
     difficulty: 'Easy',
@@ -219,6 +252,8 @@ const List<FoodRecipe> kFoodRecipes = [
     slot: 'Lunch',
     ageTag: '6–12 mo',
     veg: true,
+    immunity: true,
+    situations: {'Constipation'},
     prepMin: 10,
     cookMin: 20,
     difficulty: 'Easy',
@@ -361,6 +396,7 @@ const List<FoodRecipe> kFoodRecipes = [
     slot: 'Lunch',
     ageTag: '8–12 mo',
     veg: true,
+    immunity: true,
     prepMin: 5,
     cookMin: 0,
     difficulty: 'Easy',
@@ -426,6 +462,7 @@ const List<FoodRecipe> kFoodRecipes = [
     slot: 'Morning snack',
     ageTag: '10–12 mo',
     veg: true,
+    immunity: true,
     prepMin: 5,
     cookMin: 5,
     difficulty: 'Easy',
@@ -460,6 +497,8 @@ const List<FoodRecipe> kFoodRecipes = [
     slot: 'Evening snack',
     ageTag: '8–12 mo',
     veg: true,
+    immunity: true,
+    situations: {'Cough & cold'},
     prepMin: 5,
     cookMin: 15,
     difficulty: 'Easy',
@@ -551,6 +590,374 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'dessert', 'iron', 'no sugar', 'dates', 'banana', 'milk'},
     ingredientKeys: {'dates', 'banana', 'milk'},
   ),
+
+  // -- merged in from the old Recipes catalog (deduped) ----------------------
+  FoodRecipe(
+    id: 'maggi',
+    title: 'Veggie Maggi, the smarter way',
+    subtitle: 'A comfort food that quietly does more',
+    category: 'Snacks',
+    slot: 'Evening snack',
+    ageTag: '10–12 mo',
+    veg: true,
+    prepMin: 5,
+    cookMin: 10,
+    difficulty: 'Easy',
+    seed: 13,
+    highlight: 'Fibre + vitamin A',
+    serves: 2,
+    why:
+        'Aarav is teething and moving to firmer finger foods, so soft noodles he can gum are perfect right now - and sneaking in carrots and peas turns a comfort food into a small nutrition win at exactly the stage his iron stores start needing a top-up. The veg boost adds fibre and vitamin A, and the ghee swap makes it gentler than the packet masala alone.',
+    nutrients: [
+      FoodNutrient('Vitamin A', 'from carrots', 'Builds his immunity and eyesight as he explores and mouths everything.'),
+      FoodNutrient('Iron', '12% RDA', 'His birth iron stores run low around now, and iron fuels these months of brain growth.'),
+      FoodNutrient('Fibre', 'peas + wheat', 'Keeps digestion gentle as he moves from purées to firmer foods.'),
+    ],
+    frequency: 'Once a week is plenty',
+    ingredients: ['1 pack whole-wheat noodles', '½ carrot, grated', '2 tbsp peas', '½ tsp ghee', 'Half the masala sachet'],
+    steps: [
+      'Sauté the grated carrot and peas in ghee for two minutes.',
+      'Add the noodles, water and half the masala; simmer.',
+      'Cook till soft, cool a little, and serve. For a younger baby, chop small or blend to a soft mash.',
+    ],
+    storage: ['Best fresh; noodles turn stodgy on standing.'],
+    mistakes: ['Using the whole masala sachet - it is still salty; half is plenty.', 'Serving long strands - chop or mash so there are no choking-length pieces.'],
+    substitutions: {'masala sachet': 'a pinch of jeera and the vegetables alone', 'whole-wheat noodles': 'millet or ragi noodles'},
+    healthierNote:
+        'The packet version is refined noodles and a full, salty masala. Ours halves the masala, folds in carrot and peas for fibre and vitamin A, and finishes with ghee instead of the sachet oil - the same comfort food, quietly doing more.',
+    tags: {'fibre', 'vitamin a', 'snack', 'noodles', 'vegetables', 'comfort food'},
+    ingredientKeys: {'vegetables'},
+    relatedVideoId: 'q_iron',
+    relatedCommunity: 'Comfort foods, made better',
+  ),
+  FoodRecipe(
+    id: 'vegpulao',
+    title: 'Soft veg pulao',
+    subtitle: 'A gentle one-pot, mild and easy to mash',
+    category: 'Lunch',
+    slot: 'Lunch',
+    ageTag: '10–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 10,
+    cookMin: 20,
+    difficulty: 'Easy',
+    seed: 14,
+    highlight: 'Fibre + energy',
+    serves: 2,
+    why:
+        'A soft, mildly spiced one-pot that hides plenty of vegetables in rice he already loves. Cooked without masala and mashed to his texture, it is filling, dairy-free and endlessly adaptable - a good way to widen his palate with new vegetables one at a time.',
+    nutrients: [
+      FoodNutrient('Carbohydrate', 'good', 'Warm, filling energy for a busy day.'),
+      FoodNutrient('Fibre', 'good', 'From the soft-cooked vegetables.'),
+      FoodNutrient('Vitamin A', 'moderate', 'From carrot and beans.'),
+    ],
+    frequency: '2–3 times a week',
+    ingredients: ['3 tbsp rice', 'Soft-cooked mixed vegetables (carrot, beans, peas)', 'Pinch of jeera', '½ tsp oil or ghee', 'Water to cook soft'],
+    steps: [
+      'Temper jeera in a little oil; add the chopped vegetables and soften.',
+      'Add rinsed rice and plenty of water; cook until very soft.',
+      'Mash lightly to the texture he manages; cool to just-warm.',
+    ],
+    storage: ['Fridge up to 24 hours; loosen with warm water when reheating.'],
+    mistakes: ['Adding garam masala or chilli - keep it mild with just jeera.'],
+    substitutions: {'rice': 'broken wheat (dalia) for older babies', 'vegetables': 'whatever is soft and in season'},
+    healthierNote: 'No masala, no salt-heavy stock - just soft rice, real vegetables and a little ghee for absorption. A mild pulao a baby can actually eat.',
+    tags: {'fibre', 'lunch', 'rice', 'vegetables', 'vegan', 'one-pot'},
+    ingredientKeys: {'rice', 'vegetables'},
+  ),
+  FoodRecipe(
+    id: 'chickensoup',
+    title: 'Clear chicken soup',
+    subtitle: 'A light, nourishing broth - gentle protein and warmth',
+    category: 'Soups',
+    slot: 'Lunch',
+    ageTag: '10–12 mo',
+    veg: false,
+    immunity: true,
+    prepMin: 10,
+    cookMin: 20,
+    difficulty: 'Easy',
+    seed: 15,
+    highlight: 'Protein + warmth',
+    serves: 2,
+    why:
+        'A clear, home-made chicken broth is warmth and easy protein in a cup - comforting on a cold or low-appetite day. Simmered gently with a little vegetable and no stock cubes, it delivers zinc and protein that support his immunity, in a form even a poorly tummy accepts.',
+    nutrients: [
+      FoodNutrient('Protein', 'good', 'Gentle, easy protein when appetite is low.'),
+      FoodNutrient('Zinc', 'good', 'Supports his immune system.'),
+      FoodNutrient('Hydration', 'good', 'Warm fluids for a stuffy day.'),
+    ],
+    frequency: 'A few times a week',
+    ingredients: ['A small piece of chicken (with bone for a richer broth)', '1 small carrot', 'A little water', 'Pinch of turmeric'],
+    steps: [
+      'Simmer the chicken with carrot, turmeric and water until fully cooked and soft.',
+      'Strain to a clear broth; shred a little soft chicken back in for older babies.',
+      'Cool to just-warm and serve as sips or with soft rice.',
+    ],
+    storage: ['Fridge up to 2 days; reheat until piping hot, then cool to just-warm.'],
+    mistakes: ['Using stock cubes or salt - the chicken and carrot are flavour enough.', 'Serving stringy pieces - shred finely or keep it a clear broth.'],
+    substitutions: {'chicken': 'for vegetarians, a moong dal + vegetable broth'},
+    healthierNote: 'A clear, home-simmered broth - no cream, no cubes, no salt. Just gentle protein and warmth the way it helps a recovering child.',
+    tags: {'protein', 'immunity', 'soup', 'non-veg', 'sick day', 'chicken'},
+    ingredientKeys: {'vegetables'},
+    relatedCommunity: 'Sick-day meals that worked',
+  ),
+
+  // -- sick-day comfort meals (hidden from everyday browse) ------------------
+  FoodRecipe(
+    id: 'prunepuree',
+    title: 'Stewed prune & apple purée',
+    subtitle: 'Natural fibre to get things moving',
+    category: 'Sick-Day Meals',
+    slot: 'Morning snack',
+    ageTag: '6–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 3,
+    cookMin: 10,
+    difficulty: 'Easy',
+    seed: 16,
+    highlight: 'Fibre + sorbitol',
+    situations: {'Constipation'},
+    comfortOnly: true,
+    why:
+        'Prunes are the gentlest natural laxative there is - their fibre and sorbitol draw water into the gut and ease things along, and stewed apple makes them mild and sweet. A small spoonful is often all it takes.',
+    nutrients: [
+      FoodNutrient('Fibre', 'excellent', 'Softens stools and keeps digestion moving.'),
+      FoodNutrient('Sorbitol', 'natural', 'The prune sugar that gently eases constipation.'),
+    ],
+    frequency: 'A small serving when he is blocked up',
+    ingredients: ['3–4 soft prunes, pitted', '½ apple, peeled', 'A little water'],
+    steps: ['Stew the prunes and apple in a little water until very soft.', 'Blend or mash smooth; loosen to a purée.', 'Cool to just-warm and offer a few spoonfuls.'],
+    storage: ['Fridge up to 2 days, or freeze in cubes for quick portions.'],
+    mistakes: ['Overdoing it - a little goes a long way; too much can loosen his tummy.'],
+    substitutions: {'prunes': 'soaked raisins or stewed pear'},
+    healthierNote: 'Just fruit, no added sugar - the sweetness and the fibre both come from the prunes and apple themselves.',
+    tags: {'fibre', 'constipation', 'sick day', 'prune', 'apple', 'vegan'},
+    ingredientKeys: {},
+  ),
+  FoodRecipe(
+    id: 'ragiporridge',
+    title: 'Ragi porridge, loose',
+    subtitle: 'Wholegrain fibre, easy to swallow',
+    category: 'Sick-Day Meals',
+    slot: 'Breakfast',
+    ageTag: '6–12 mo',
+    veg: true,
+    prepMin: 3,
+    cookMin: 8,
+    difficulty: 'Easy',
+    seed: 17,
+    highlight: 'Fibre + iron',
+    situations: {'Constipation'},
+    comfortOnly: true,
+    why:
+        'A loose, smooth ragi porridge is easy to swallow when he is off his food, and its wholegrain fibre gently helps a blocked-up tummy. Kept thin, it doubles as comfort and a soft nudge for digestion.',
+    nutrients: [
+      FoodNutrient('Fibre', 'good', 'Gently keeps things moving.'),
+      FoodNutrient('Iron', 'good', 'Ragi tops up iron even on low-appetite days.'),
+    ],
+    frequency: 'As a light, settling meal',
+    ingredients: ['1 tbsp ragi flour', '½ cup milk or water', 'A soft mashed date (optional)'],
+    steps: ['Cook the ragi flour in water 3–4 min to a smooth, loose paste.', 'Stir in milk to keep it thin and pourable.', 'Cool to just-warm; sweeten only with mashed date if needed.'],
+    storage: ['Best fresh - ragi thickens fast on standing; loosen with warm milk.'],
+    mistakes: ['Serving raw ragi flour - always cook it first.'],
+    substitutions: {'ragi flour': 'oat flour (less iron)'},
+    healthierNote: 'Kept loose and unsweetened (or sweetened only with a date) - a wholegrain porridge, not a sugary cereal.',
+    tags: {'fibre', 'iron', 'constipation', 'sick day', 'ragi'},
+    ingredientKeys: {'ragi', 'milk'},
+  ),
+  FoodRecipe(
+    id: 'bananarice',
+    title: 'Banana & rice mash',
+    subtitle: 'Binding and gentle',
+    category: 'Sick-Day Meals',
+    slot: 'Morning snack',
+    ageTag: '6–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 8,
+    cookMin: 0,
+    difficulty: 'Easy',
+    seed: 18,
+    highlight: 'Potassium + energy',
+    situations: {'Loose motion'},
+    comfortOnly: true,
+    why:
+        'Banana and rice are both binding and bland - the classic soothing pair when his tummy is upset. Banana also replaces the potassium lost with loose motions, and neither irritates a sensitive gut.',
+    nutrients: [
+      FoodNutrient('Potassium', 'good', 'Replaces what is lost with loose motions.'),
+      FoodNutrient('Carbohydrate', 'good', 'Gentle, easy energy.'),
+    ],
+    frequency: 'When his tummy is loose',
+    ingredients: ['3 tbsp soft-cooked rice', '½ ripe banana'],
+    steps: ['Mash the rice soft.', 'Fold in the mashed banana to a smooth, spoonable mash.', 'Serve at room temperature.'],
+    storage: ['Best fresh; banana browns quickly.'],
+    mistakes: ['Adding milk or curd during active loose motions - keep it simple and binding.'],
+    substitutions: {'banana': 'stewed apple (also binding)'},
+    healthierNote: 'No sugar, no dairy while his tummy settles - just two gentle, binding foods and nothing to irritate.',
+    tags: {'loose motion', 'sick day', 'banana', 'rice', 'vegan', 'binding'},
+    ingredientKeys: {'banana', 'rice'},
+  ),
+  FoodRecipe(
+    id: 'coconutwater',
+    title: 'Tender coconut water',
+    subtitle: 'Rehydrates gently',
+    category: 'Sick-Day Meals',
+    slot: 'Morning snack',
+    ageTag: '8–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 2,
+    cookMin: 0,
+    difficulty: 'Easy',
+    seed: 19,
+    highlight: 'Electrolytes',
+    situations: {'Loose motion'},
+    comfortOnly: true,
+    why:
+        'Tender coconut water is a natural, gentle source of electrolytes - keeping him hydrated during loose motions without the sugar of packaged drinks. Offer small, frequent sips rather than a big serving.',
+    nutrients: [
+      FoodNutrient('Electrolytes', 'natural', 'Potassium and minerals lost with dehydration.'),
+      FoodNutrient('Hydration', 'excellent', 'The priority when a tummy is loose.'),
+    ],
+    frequency: 'Small sips through the day when loose',
+    ingredients: ['Fresh tender coconut water'],
+    steps: ['Offer small sips of fresh coconut water, at room temperature.', 'Keep breast milk or formula going alongside.'],
+    storage: ['Fresh only; discard once it has stood.'],
+    mistakes: ['Replacing milk feeds entirely - fluids support them, not replace them.'],
+    substitutions: {'coconut water': 'a paediatrician-advised ORS if he is very dehydrated'},
+    healthierNote: 'Nature\'s electrolyte drink - no added sugar or colour, unlike bottled sports or glucose drinks.',
+    tags: {'loose motion', 'sick day', 'hydration', 'coconut', 'vegan'},
+    ingredientKeys: {},
+  ),
+  FoodRecipe(
+    id: 'rasam',
+    title: 'Soft tomato rasam',
+    subtitle: 'Warm and soothing',
+    category: 'Sick-Day Meals',
+    slot: 'Lunch',
+    ageTag: '10–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 5,
+    cookMin: 15,
+    difficulty: 'Easy',
+    seed: 20,
+    highlight: 'Vitamin C + warmth',
+    situations: {'Cough & cold'},
+    comfortOnly: true,
+    why:
+        'A warm, mildly spiced rasam is old wisdom for a blocked nose - the warmth and gentle pepper help him breathe easier, and the tomato brings vitamin C. Thin and strained, it is a comforting sip for an off-colour day.',
+    nutrients: [
+      FoodNutrient('Vitamin C', 'good', 'Supports immunity during a cold.'),
+      FoodNutrient('Hydration', 'good', 'Warm fluids soothe and thin mucus.'),
+    ],
+    frequency: 'A warm sip when he is congested',
+    ingredients: ['1 tomato', 'A tiny pinch of jeera and black pepper', 'Water', 'A drop of ghee (optional)'],
+    steps: ['Simmer the tomato with jeera, a hint of pepper and water until soft.', 'Strain to a thin, clear rasam.', 'Cool to just-warm and offer as sips.'],
+    storage: ['Fridge up to a day; reheat gently.'],
+    mistakes: ['Making it too peppery - the faintest hint only for a baby.'],
+    substitutions: {'black pepper': 'leave it out for younger babies'},
+    healthierNote: 'Mild and low-salt - the warmth and vitamin C do the soothing, not a heavy tempering.',
+    tags: {'cough', 'cold', 'sick day', 'tomato', 'vitamin c', 'vegan'},
+    ingredientKeys: {'tomato'},
+  ),
+  FoodRecipe(
+    id: 'turmericmilk',
+    title: 'Golden turmeric milk',
+    subtitle: 'Warm comfort at bedtime',
+    category: 'Sick-Day Meals',
+    slot: 'Dinner',
+    ageTag: '12 mo+',
+    veg: true,
+    prepMin: 3,
+    cookMin: 5,
+    difficulty: 'Easy',
+    seed: 21,
+    highlight: 'Calcium + warmth',
+    situations: {'Cough & cold'},
+    comfortOnly: true,
+    why:
+        'A warm cup of milk with a pinch of turmeric is a soothing bedtime ritual once he is over a year - comforting for a scratchy throat and an easy way to wind down. The turmeric is gentle and traditional; the warmth does most of the work.',
+    nutrients: [
+      FoodNutrient('Calcium', 'good', 'From the milk.'),
+      FoodNutrient('Warmth', 'soothing', 'Comforts a sore throat before sleep.'),
+    ],
+    frequency: 'A bedtime soother during a cold (from ~1 yr)',
+    ingredients: ['½ cup milk', 'A tiny pinch of turmeric'],
+    steps: ['Warm the milk gently with the pinch of turmeric.', 'Cool to a safe, comfortable warmth before offering.'],
+    storage: ['Make fresh each time.'],
+    mistakes: ['Giving cow-milk drinks as a main feed before 1 year.', 'Adding honey before 1 year - never.'],
+    substitutions: {'milk': 'his usual formula, warmed, for under-ones (skip the turmeric drink)'},
+    healthierNote: 'No sugar or honey - just warm milk and a hint of turmeric, the way the traditional soother is meant to be.',
+    tags: {'cough', 'cold', 'sick day', 'milk', 'turmeric', 'bedtime'},
+    ingredientKeys: {'milk'},
+  ),
+  FoodRecipe(
+    id: 'moongwater',
+    title: 'Moong dal water',
+    subtitle: 'Light, nourishing sips',
+    category: 'Sick-Day Meals',
+    slot: 'Lunch',
+    ageTag: '6–12 mo',
+    veg: true,
+    vegan: true,
+    prepMin: 5,
+    cookMin: 12,
+    difficulty: 'Easy',
+    seed: 22,
+    highlight: 'Light protein + fluids',
+    situations: {'Fever'},
+    comfortOnly: true,
+    why:
+        'When a fever kills his appetite, the strained water from cooked moong dal gives him gentle protein and fluids in the lightest possible form - easy to sip and easy to digest when solid food feels like too much.',
+    nutrients: [
+      FoodNutrient('Protein', 'light', 'A little nourishment when he can\'t manage a meal.'),
+      FoodNutrient('Hydration', 'good', 'Warm fluids matter most during a fever.'),
+    ],
+    frequency: 'Light sips while his appetite is low',
+    ingredients: ['1 tbsp moong dal', 'Water', 'Pinch of turmeric'],
+    steps: ['Cook the dal very soft with turmeric and plenty of water.', 'Strain off the thin, protein-rich water.', 'Cool to just-warm and offer as sips.'],
+    storage: ['Best fresh; keep any extra in the fridge for a few hours.'],
+    mistakes: ['Adding salt or heavy tempering - keep it plain and light.'],
+    substitutions: {'moong dal': 'toor dal water'},
+    healthierNote: 'The lightest, plainest form of nourishment - just strained dal water, no salt or oil, for when solids are too much.',
+    tags: {'fever', 'sick day', 'dal water', 'moong dal', 'vegan', 'hydration'},
+    ingredientKeys: {'moong dal'},
+  ),
+  FoodRecipe(
+    id: 'lightkhichdi',
+    title: 'Light khichdi, extra soft',
+    subtitle: 'Easy energy when appetite is low',
+    category: 'Sick-Day Meals',
+    slot: 'Lunch',
+    ageTag: '6–12 mo',
+    veg: true,
+    prepMin: 5,
+    cookMin: 18,
+    difficulty: 'Easy',
+    seed: 23,
+    highlight: 'Gentle energy + protein',
+    situations: {'Fever'},
+    comfortOnly: true,
+    why:
+        'An extra-soft, extra-mild khichdi is the friendliest solid food when he is running a fever and eating little - warm, easy energy and a little protein in a bowl he can manage even when off his food.',
+    nutrients: [
+      FoodNutrient('Carbohydrate', 'good', 'Gentle energy when he is not eating much.'),
+      FoodNutrient('Protein', 'moderate', 'A little from the dal.'),
+    ],
+    frequency: 'A soft, settling meal during a fever',
+    ingredients: ['2 tbsp rice', '1 tbsp moong dal', 'Extra water', 'Pinch of turmeric', 'A little ghee'],
+    steps: ['Cook the rice and dal with turmeric and extra water until very soft.', 'Mash thin - looser than usual for a poorly tummy.', 'Finish with a little ghee; cool to just-warm.'],
+    storage: ['Fridge up to 24 hours; loosen well when reheating.'],
+    mistakes: ['Making it thick or spicy - keep it thin and plain while he is unwell.'],
+    substitutions: {'moong dal': 'skip the dal for a plain rice porridge if he wants lighter'},
+    healthierNote: 'Made thinner, milder and lower-salt than the everyday khichdi - all the comfort, nothing to tax a poorly tummy.',
+    tags: {'fever', 'sick day', 'khichdi', 'rice', 'dal'},
+    ingredientKeys: {'rice', 'moong dal'},
+  ),
 ];
 
 // ---- nutrition focuses ------------------------------------------------------
@@ -623,11 +1030,57 @@ FoodRecipe foodRecipeById(String id) =>
     kFoodRecipes.firstWhere((r) => r.id == id, orElse: () => kFoodRecipes.first);
 NutritionFocus focusById(String id) =>
     kNutritionFocuses.firstWhere((f) => f.id == id, orElse: () => kNutritionFocuses.first);
-List<FoodRecipe> foodByCategory(String category) => kFoodRecipes
-    .where((r) => (r.category == category || r.tags.contains(category.toLowerCase())) && (!FoodStore.instance.vegOnly || r.veg))
-    .toList();
+List<FoodRecipe> foodByCategory(String category) {
+  // Only the Sick-Day Meals category surfaces the comfort-only recovery meals;
+  // every other kind hides them (they belong behind the Sick-mode doorway).
+  final wantSick = category == 'Sick-Day Meals';
+  return kFoodRecipes
+      .where((r) => r.category == category || r.tags.contains(category.toLowerCase()))
+      .where((r) => wantSick || !r.comfortOnly)
+      .where((r) => !FoodStore.instance.vegOnly || r.veg)
+      .toList();
+}
 List<FoodRecipe> get recommendedFood =>
-    kFoodRecipes.where((r) => !FoodStore.instance.vegOnly || r.veg).take(6).toList();
+    kFoodRecipes.where((r) => !r.comfortOnly && (!FoodStore.instance.vegOnly || r.veg)).take(6).toList();
+
+/// The unified Recipes home browse list: 3-way diet + category + immunity
+/// filters, always excluding the sick-day comfort meals (they live behind the
+/// Sick-mode doorway). Mirrors the old Recipes `normalRecipes` axes on the
+/// richer FoodRecipe model.
+List<FoodRecipe> browseRecipes({String diet = 'All', String category = 'All', bool immunity = false}) => kFoodRecipes
+    .where((r) => !r.comfortOnly)
+    .where((r) => diet == 'All' || r.diet == diet)
+    .where((r) => category == 'All' || r.category == category)
+    .where((r) => !immunity || r.immunity)
+    .where((r) => !FoodStore.instance.vegOnly || r.veg)
+    .toList();
+
+/// Everyday recipes whose title matches [query] (excludes comfort-only meals).
+List<FoodRecipe> searchEverydayRecipes(String query) {
+  final q = query.trim().toLowerCase();
+  return kFoodRecipes.where((r) => !r.comfortOnly && r.title.toLowerCase().contains(q)).toList();
+}
+
+/// Every dish that helps with a sick-day [situation] - the comfort-only recovery
+/// meals plus any everyday dish tagged for it - warm-styled in the Sick-mode
+/// doorway (SickDaysScreen).
+List<FoodRecipe> sickFoodRecipes(String situation) =>
+    kFoodRecipes.where((r) => r.situations.contains(situation)).toList();
+
+String sickBlurb(String situation) {
+  switch (situation) {
+    case 'Constipation':
+      return 'Fibre & fluids to get things moving gently.';
+    case 'Loose motion':
+      return 'Binding, bland and hydrating - gentle on an upset tummy.';
+    case 'Cough & cold':
+      return 'Warm, soothing foods to ease a blocked nose and throat.';
+    case 'Fever':
+      return 'Light, hydrating meals for when appetite drops.';
+    default:
+      return '';
+  }
+}
 
 /// The controlled ingredient library - every ingredient key used anywhere in the
 /// recipe database. The Smart Meal Builder offers only these (never arbitrary
@@ -657,8 +1110,8 @@ Map<String, FoodRecipe> todaysMeals() => {
 /// day index so "regenerate" can vary it without randomness in tests.
 Map<String, FoodRecipe> planForDay(int dayIndex) {
   FoodRecipe slot(String s, int offset) {
-    final pool = kFoodRecipes.where((r) => r.slot == s && (!FoodStore.instance.vegOnly || r.veg)).toList();
-    final list = pool.isEmpty ? kFoodRecipes : pool;
+    final pool = kFoodRecipes.where((r) => r.slot == s && !r.comfortOnly && (!FoodStore.instance.vegOnly || r.veg)).toList();
+    final list = pool.isEmpty ? kFoodRecipes.where((r) => !r.comfortOnly).toList() : pool;
     return list[(dayIndex + offset) % list.length];
   }
 
@@ -685,6 +1138,7 @@ List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, 
   final scored = <MealSuggestion>[];
   for (final r in kFoodRecipes) {
     if (r.slot != meal) continue;
+    if (r.comfortOnly) continue; // sick-day meals never surface in everyday planning
     if (r.totalMin > maxMinutes) continue;
     if (FoodStore.instance.vegOnly && !r.veg) continue;
     final matched = r.ingredientKeys.where(has.contains).length;

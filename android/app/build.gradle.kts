@@ -6,7 +6,11 @@ plugins {
 
 android {
     namespace = "com.example.parentveda"
-    compileSdk = flutter.compileSdkVersion
+    // Bumped to 36 (Flutter's default is 34) because file_picker's transitive
+    // dependency flutter_plugin_android_lifecycle now requires compiling against
+    // API 36. This is compile-time only - minSdk/targetSdk are unchanged, so it
+    // doesn't affect which devices can install or the app's runtime behaviour.
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

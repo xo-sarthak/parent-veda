@@ -23,6 +23,12 @@ void main() {
   testWidgets('Compare ticks products and caps at two', (tester) async {
     await pumpPhone(tester, const ProductsSubcategoryScreen()); // Sleep · Soothers (4 items, same category)
 
+    // The product cards sit below the buying-guidance card. Scroll to the unique
+    // hint line just above them so the (eager) card column builds into view.
+    await tester.scrollUntilVisible(
+        find.text('Tick Compare on two to see them side by side.'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+
     // Tick two. Each ticked card relabels to "Added", so always tap the first
     // remaining "Compare" chip.
     for (var i = 0; i < 2; i++) {
@@ -70,12 +76,15 @@ void main() {
   testWidgets('Brand filter narrows the grid', (tester) async {
     await pumpPhone(tester, const ProductsSubcategoryScreen());
 
-    expect(find.text('CloudTunes Soother'), findsOneWidget);
-    expect(find.text('Dozy White-Noise Soother'), findsOneWidget);
+    // The brand chips sit below the buying-guidance card - scroll to them first.
+    await tester.scrollUntilVisible(find.text('Dozy'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
+    await tester.tap(find.text('Dozy').first); // brand chip
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Dozy')); // brand chip
-    await tester.pump();
-
+    // only the Dozy soother remains; scroll the narrowed grid into view
+    await tester.scrollUntilVisible(find.text('Dozy White-Noise Soother'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 30);
     expect(find.text('Dozy White-Noise Soother'), findsOneWidget);
     expect(find.text('CloudTunes Soother'), findsNothing); // filtered out
   });

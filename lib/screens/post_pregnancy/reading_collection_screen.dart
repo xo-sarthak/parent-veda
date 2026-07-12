@@ -33,7 +33,7 @@ class ReadingCollectionScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 40),
               children: [
-                _pad(ppBack(context, 'Learn')),
+                _pad(ppBack(context, 'Read')),
                 const SizedBox(height: 16),
                 _pad(ReadCover(seed: collection.seed, height: 168, progress: prog > 0 ? prog : null)),
                 const SizedBox(height: 16),

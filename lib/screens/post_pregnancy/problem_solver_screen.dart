@@ -1,195 +1,128 @@
 // =============================================================================
-//  ProblemSolverScreen - Find the right help · local services (parenting · S18)
+//  ProblemSolverScreen - Find the right help (parenting · Explore entry)
 // -----------------------------------------------------------------------------
-//  "Trusted help, near you" - a ParentVeda top pick, browse-by-need categories
-//  routing to vetted partner platforms, and a labelled sponsored slot. Reached
-//  from the Explore drawer (design path: from My Child). "Paediatricians" opens
-//  the ranked results. Faithful build of Claude Design · S18.
+//  The find-help landing: a working search across every vetted expert, and a
+//  "Browse by need" list of the seven care needs. Each need opens the ranked,
+//  filterable results; a search hit opens that expert's profile. Reached from
+//  the Explore drawer.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'pp_section_extras.dart';
+import 'provider_profile_screen.dart';
 import 'provider_results_screen.dart';
 
-class ProblemSolverScreen extends StatelessWidget {
+class ProblemSolverScreen extends StatefulWidget {
   const ProblemSolverScreen({super.key});
+
+  @override
+  State<ProblemSolverScreen> createState() => _ProblemSolverScreenState();
+}
+
+class _ProblemSolverScreenState extends State<ProblemSolverScreen> {
+  final TextEditingController _search = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  List<Expert> get _matches {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return const [];
+    return kFindHelpExperts.where((e) {
+      return e.name.toLowerCase().contains(q) ||
+          e.category.toLowerCase().contains(q) ||
+          e.blurb.toLowerCase().contains(q) ||
+          e.credential.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  void _openNeed(FindHelpNeed need) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => ProviderResultsScreen(need: need)),
       );
 
-  void _openResults(BuildContext context) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const ProviderResultsScreen()),
+  void _openProfile(Expert e) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e)),
       );
 
   @override
   Widget build(BuildContext context) {
+    final searching = _query.trim().isNotEmpty;
+    final matches = _matches;
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
-          children: [
-            _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              ppBack(context, 'Explore'),
-              ppLocationPill('Delhi NCR'),
-            ])),
+        child: Stack(children: [
+          ListView(
+            padding: const EdgeInsets.only(top: 12, bottom: 96),
+            children: [
+              _pad(ppBack(context, 'Explore')),
 
-            const SizedBox(height: 22),
-            _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ppEyebrow('Trusted help, near you'),
-              const SizedBox(height: 10),
-              Text('Find the right help', style: ppFraunces(32, h: 1.12)),
-              const SizedBox(height: 12),
-              Text(
-                  'Paediatricians, therapists, nannies, daycare - we point you to vetted partners and add our own top picks for your city.',
-                  style: ppBody(15)),
-            ])),
+              const SizedBox(height: 22),
+              _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ppEyebrow('Vetted experts'),
+                const SizedBox(height: 10),
+                Text('Find the right help', style: ppFraunces(32, h: 1.12)),
+                const SizedBox(height: 12),
+                Text(
+                    'Paediatricians, therapists, lactation and more - each expert is vetted by ParentVeda. Search a name or a concern, or browse by need.',
+                    style: ppBody(15)),
+              ])),
 
-            // search
-            const SizedBox(height: 20),
-            _pad(GestureDetector(
-              onTap: () => _soon(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppBorder)),
-                child: Row(children: [
-                  const Icon(Icons.search_rounded, size: 18, color: ppMuted),
-                  const SizedBox(width: 10),
-                  Flexible(
-                      child: Text('What do you need help with?',
-                          style: ppBody(14, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                ]),
-              ),
-            )),
+              // working search
+              const SizedBox(height: 20),
+              _pad(ppSearchField(
+                controller: _search,
+                hint: 'Search experts - e.g. lactation, speech, skin',
+                onChanged: (v) => setState(() => _query = v),
+              )),
 
-            // top pick
-            const SizedBox(height: 22),
-            _pad(ppEyebrow("ParentVeda's top pick · Delhi NCR", color: ppBrown, spacing: 0.8)),
-            const SizedBox(height: 12),
-            _pad(Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: ppBorder),
-                boxShadow: ppCardShadow,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(18),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Container(
-                      width: 54,
-                      height: 54,
-                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
-                      clipBehavior: Clip.antiAlias,
-                      child: const PpStriped(height: 60, colorA: ppBorder, colorB: ppStripeB),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Dr. Neha Sharma', style: ppJakarta(16)),
-                        const SizedBox(height: 2),
-                        Text('Paediatrician · Greater Kailash', style: ppBody(12)),
-                        const SizedBox(height: 6),
-                        Row(children: [
-                          Text('★ 4.9', style: ppBody(12, color: ppCoral, w: FontWeight.w700)),
-                          const SizedBox(width: 8),
-                          Flexible(
-                              child: Text('312 mother reviews',
-                                  style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                        ]),
-                      ]),
-                    ),
-                  ]),
-                  const SizedBox(height: 14),
-                  Text('Curated from partner data, our research, and real parent reviews.', style: ppBody(13, h: 1.5)),
-                  const SizedBox(height: 14),
-                  Row(children: [
-                    Expanded(child: Text('Booking via Practo', style: ppBody(12, color: ppMuted))),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () => _soon(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-                        decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
-                        child: Text('Book', style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
-                      ),
-                    ),
-                  ]),
-                ]),
-              ),
-            )),
+              if (searching) ...[
+                const SizedBox(height: 20),
+                _pad(Text(matches.isEmpty ? 'No experts match "$_query"' : '${matches.length} matching experts',
+                    style: ppJakarta(16))),
+                const SizedBox(height: 6),
+                if (matches.isEmpty)
+                  _pad(Text('Try a need like "pediatrician", "speech" or "skin".', style: ppBody(13)))
+                else
+                  for (var i = 0; i < matches.length; i++)
+                    _pad(_expertRow(matches[i], top: i == 0, bottom: i == matches.length - 1)),
+              ] else ...[
+                // browse by need
+                const SizedBox(height: 28),
+                _pad(Text('Browse by need', style: ppJakarta(18))),
+                const SizedBox(height: 4),
+                _pad(Text('Vetted specialists for each stage of the early years.', style: ppBody(13))),
+                const SizedBox(height: 12),
+                for (var i = 0; i < kFindHelpNeeds.length; i++)
+                  _pad(_needRow(kFindHelpNeeds[i], top: i == 0, bottom: i == kFindHelpNeeds.length - 1)),
 
-            // categories
-            const SizedBox(height: 28),
-            _pad(Text('Browse by need', style: ppJakarta(18))),
-            const SizedBox(height: 4),
-            _pad(Text('Each routes you to a trusted partner platform.', style: ppBody(13))),
-            const SizedBox(height: 12),
-            _pad(_cat(context, Icons.medical_services_outlined, 'Paediatricians', 'via Practo · Apollo 24/7',
-                onTap: () => _openResults(context), top: true)),
-            _pad(_cat(context, Icons.record_voice_over_outlined, 'Speech therapists',
-                'via 1SpecialPlace · BabyChakra')),
-            _pad(_cat(context, Icons.spa_outlined, 'Child dermatologists', 'via Practo · Apollo 24/7')),
-            _pad(_cat(context, Icons.restaurant_outlined, 'Organic food suppliers', 'via BigBasket · Licious')),
-            _pad(_cat(context, Icons.child_care_outlined, 'Japa & nanny services', 'via Urban Company · Care.com')),
-            _pad(_cat(context, Icons.school_outlined, 'Daycare', 'via KLAY · Footprints · JustDial', bottom: true)),
-
-            // sponsored
-            const SizedBox(height: 24),
-            _pad(Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: ppBorder),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Stack(children: [
-                  const PpStriped(height: 120),
-                  Positioned(
-                    top: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                      decoration: BoxDecoration(color: ppInk.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(999)),
-                      child: Text('Sponsored by Urban Company', style: ppBody(10, color: Colors.white, w: FontWeight.w700)),
-                    ),
-                  ),
-                ]),
-                Container(
-                  color: Colors.white,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Trained japa maids, background-verified', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
-                    const SizedBox(height: 3),
-                    Text('Available across Delhi NCR this week.', style: ppBody(12)),
-                  ]),
-                ),
-              ]),
-            )),
-
-            const SizedBox(height: 22),
-            _pad(Text(
-                "ParentVeda routes you to trusted partners and adds its own top picks & mother reviews. Sponsored placements are always labelled. We don't run the vetting - the partner does.",
-                textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
-          ],
-        ),
+                const SizedBox(height: 22),
+                _pad(Text(
+                    'Every expert is vetted by ParentVeda from credentials, experience and real parent reviews. Booking is mock for now - no payment is taken.',
+                    textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
+              ],
+            ],
+          ),
+          const PpAskVedaFab(),
+        ]),
       ),
     );
   }
 
-  Widget _cat(BuildContext context, IconData icon, String name, String via,
-      {VoidCallback? onTap, bool top = false, bool bottom = false}) {
+  Widget _needRow(FindHelpNeed need, {bool top = false, bool bottom = false}) {
+    final count = expertsForNeed(need.category).length;
     return GestureDetector(
-      onTap: onTap ?? () => _soon(context),
+      onTap: () => _openNeed(need),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -205,14 +138,58 @@ class ProblemSolverScreen extends StatelessWidget {
             height: 42,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(13)),
-            child: Icon(icon, size: 20, color: ppPurple),
+            child: Icon(need.icon, size: 20, color: ppPurple),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(name, style: ppBody(15, color: ppInk, w: FontWeight.w700)),
+              Text(need.label, style: ppBody(15, color: ppInk, w: FontWeight.w700)),
               const SizedBox(height: 2),
-              Text(via, style: ppBody(12)),
+              Text('$count vetted ${count == 1 ? 'expert' : 'experts'}', style: ppBody(12)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          const Text('→', style: TextStyle(color: ppMuted)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _expertRow(Expert e, {bool top = false, bool bottom = false}) {
+    return GestureDetector(
+      onTap: () => _openProfile(e),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          border: Border(
+            top: top ? const BorderSide(color: ppHair) : BorderSide.none,
+            bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
+          ),
+        ),
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
+            clipBehavior: Clip.antiAlias,
+            child: const PpStriped(height: 54, colorA: ppBorder, colorB: ppStripeB),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(e.name, style: ppBody(15, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 2),
+              Text(e.category.isNotEmpty ? e.category : e.credential,
+                  style: ppBody(12), maxLines: 1, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 5),
+              Row(children: [
+                Text('★ ${e.ratingValue.toStringAsFixed(1)}', style: ppBody(12, color: ppCoral, w: FontWeight.w700)),
+                const SizedBox(width: 8),
+                Flexible(
+                    child: Text('₹${e.priceValue} · consult',
+                        style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              ]),
             ]),
           ),
           const SizedBox(width: 10),

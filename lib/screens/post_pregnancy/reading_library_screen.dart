@@ -35,7 +35,7 @@ class ReadingLibraryScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 40),
               children: [
-                _pad(ppBack(context, 'Learn')),
+                _pad(ppBack(context, 'Read')),
                 const SizedBox(height: 18),
                 _pad(ppEyebrow('Your library', color: ppPurple)),
                 const SizedBox(height: 8),
