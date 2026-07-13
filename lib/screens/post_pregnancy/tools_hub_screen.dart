@@ -11,12 +11,18 @@
 import 'package:flutter/material.dart';
 
 import 'baby_naming_home_screen.dart';
-import 'feeding_tracker_screen.dart';
+// The four "Journey" tools, rebuilt from the Claude Design prompts.
+import 'feeding_journey_screen.dart';
+import 'growth_journey_screen.dart';
+import 'milestone_journey_screen.dart';
+import 'sleep_journey_screen.dart';
+// Old lightweight trackers - replaced by the Journey tools above, kept for revert.
+// import 'feeding_tracker_screen.dart';
+// import 'sleep_tracker_screen.dart';
 // Was a direct entry to the V1 finder; the front door (baby_naming_home_screen)
 // now owns the V1|V2 toggle and imports NameFinderScreen itself.
 // import 'name_finder_screen.dart';
 import 'pp_common.dart';
-import 'sleep_tracker_screen.dart';
 import 'products_compare_screen.dart';
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
@@ -95,7 +101,7 @@ class ToolsHubScreen extends StatelessWidget {
             _pad(Text('Kept simple, so you never leave the app for them.', style: ppBody(13))),
             const SizedBox(height: 16),
             _pad(Column(children: [
-              _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth percentile', 'Weight, height, head', ppMuted, () => _soon(context, 'Growth percentile tracker - coming soon')),
+              _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth journey', 'Weight, height, head — on his curve', ppMuted, () => _push(context, const GrowthJourneyScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
                   () => _push(context, const ProductsCompareScreen())),
@@ -109,11 +115,11 @@ class ToolsHubScreen extends StatelessWidget {
               _tracker(context, Icons.badge_outlined, const Color(0xFFEDEAF7), 'Baby names', 'Two ways to choose - swipe or journey', ppPurple,
                   () => _push(context, const BabyNamingHomeScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding tracker', 'Last feed 2h ago', ppMuted, () => _push(context, const FeedingTrackerScreen())),
+              _tracker(context, Icons.local_drink_outlined, const Color(0xFFEAF4EE), 'Feeding journey', 'A rhythm you can see', ppMuted, () => _push(context, const FeedingJourneyScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep tracker', '11h yesterday', ppMuted, () => _push(context, const SleepTrackerScreen())),
+              _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep journey', 'Rest, gently understood', ppMuted, () => _push(context, const SleepJourneyScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Milestone checklist', '3 new this month', ppMuted, () => _soon(context, 'Milestone checklist - coming soon')),
+              _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Development journey', 'Milestones to celebrate', ppMuted, () => _push(context, const MilestoneJourneyScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.calendar_month_outlined, const Color(0xFFFBEAF0), 'Due date & ovulation', 'Plan the next', ppMuted, () => _soon(context, 'Due date & ovulation planner - coming soon')),
             ])),

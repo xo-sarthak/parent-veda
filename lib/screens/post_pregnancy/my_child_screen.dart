@@ -18,7 +18,9 @@ import 'development_area_screen.dart';
 import 'dev_stage_detail_screen.dart';
 import 'explore_drawer.dart';
 import 'recipes_screen.dart';
-import 'health_growth_screen.dart';
+// Old light growth screen retired in favour of the new Growth Journey tool
+// (kept for revert). import 'health_growth_screen.dart';
+import 'growth_journey_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'journal_v2/journal_storybook_screens.dart';
 import 'leap_definition_screen.dart';
@@ -245,7 +247,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       ])),
       const SizedBox(height: 14),
       _pad(GestureDetector(
-        onTap: () => _push(const HealthGrowthScreen()),
+        onTap: () => _push(const GrowthJourneyScreen()),
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
           Flexible(child: Text('View detailed growth chart', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),

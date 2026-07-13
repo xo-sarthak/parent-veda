@@ -14,7 +14,9 @@ import 'package:flutter/material.dart';
 import 'baby_documents_screen.dart';
 import 'health_doctor_visit_screen.dart';
 import 'health_emergency_screen.dart';
-import 'health_growth_screen.dart';
+// Old light growth screen retired in favour of the new Growth Journey tool
+// (kept for revert). import 'health_growth_screen.dart';
+import 'growth_journey_screen.dart';
 import 'health_guide_screen.dart';
 import 'health_records_screen.dart';
 import 'health_timeline_screen.dart';
@@ -83,7 +85,7 @@ class HealthHomeScreen extends StatelessWidget {
 
             // 3 - growth
             const SizedBox(height: 22),
-            _pad(_sectionHeader('Growth', 'Details →', () => _push(context, const HealthGrowthScreen()))),
+            _pad(_sectionHeader('Growth', 'Details →', () => _push(context, const GrowthJourneyScreen()))),
             const SizedBox(height: 14),
             _pad(_growthCard(context, current)),
 
@@ -191,7 +193,7 @@ class HealthHomeScreen extends StatelessWidget {
 
   // ---- growth -------------------------------------------------------------
   Widget _growthCard(BuildContext context, GrowthPoint g) => GestureDetector(
-        onTap: () => _push(context, const HealthGrowthScreen()),
+        onTap: () => _push(context, const GrowthJourneyScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.all(18),
