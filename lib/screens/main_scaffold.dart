@@ -18,6 +18,7 @@ import '../services/father_preview.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/launch_promo.dart';
 import '../widgets/pv_tab_bar.dart';
 import 'calendar_screen.dart';
 import 'community_screen.dart';
@@ -64,6 +65,11 @@ class _MainScaffoldState extends State<MainScaffold> {
     if (widget.isFather) FatherPreview.instance.on = true;
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
+    // On app open, show the big sponsored-brand promo once (after first frame,
+    // so a valid Navigator/context exists). No-ops on later rebuilds.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showLaunchPromo(context);
+    });
   }
 
   @override
