@@ -226,16 +226,16 @@
       },
       "size": {
         "fruit": {
-          "en": "a sesame seed",
-          "hi": "til ka daana"
+          "en": "Sesame seed",
+          "hi": "Til ka daana"
         },
         "length": {
-          "en": "about 2 mm",
-          "hi": "lagbhag 2 mm"
+          "en": "0.2 cm",
+          "hi": "0.2 cm"
         },
         "weight": {
-          "en": "too small to measure",
-          "hi": "maapne ke liye bahut chhota"
+          "en": "Too small to measure",
+          "hi": "Maapne ke liye bahut chhota"
         }
       },
       "reveal": {

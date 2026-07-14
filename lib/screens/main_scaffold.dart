@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_language.dart';
 import '../services/app_nav.dart';
+import '../services/article_store.dart';
 import '../services/baby_voice_service.dart';
 import '../services/father_content_controller.dart';
 import '../services/father_preview.dart';
@@ -55,7 +56,7 @@ class MainScaffold extends StatefulWidget {
   State<MainScaffold> createState() => _MainScaffoldState();
 }
 
-class _MainScaffoldState extends State<MainScaffold> {
+class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -65,6 +66,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     if (widget.isFather) FatherPreview.instance.on = true;
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
+    WidgetsBinding.instance.addObserver(this); // app-resume → refresh content
     // On app open, show the big sponsored-brand promo once (after first frame,
     // so a valid Navigator/context exists). No-ops on later rebuilds.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -76,7 +78,17 @@ class _MainScaffoldState extends State<MainScaffold> {
   void dispose() {
     AppNav.instance.removeListener(_onNav);
     FatherPreview.instance.removeListener(_onNav);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// When the app returns to the foreground, re-pull server-driven content so
+  /// freshly-published articles appear without a full relaunch.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ArticleStore.instance.refresh();
+    }
   }
 
   /// Applies a tab change requested anywhere (tab-bar tap or the Home "flow"

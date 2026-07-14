@@ -21,6 +21,7 @@ import '../widgets/cards/card_shell.dart';
 import '../widgets/locked_week_view.dart';
 import '../widgets/week_cards/celebration_card.dart';
 import '../widgets/week_cards/week_cards.dart';
+import 'week5_full_flow_screen.dart';
 import 'week_flow_screen.dart';
 
 class WeeklyCardStackScreen extends StatefulWidget {
@@ -38,6 +39,11 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
   /// Week-20 V2 flow preview toggle (Classic ⟷ New). Defaults to New.
   bool _v2 = true;
+
+  /// Week-5 ONLY: Standard (schema-driven V2 flow) ⟷ Full (the complete
+  /// content doc via Week5FullFlowView). A preview compare toggle; defaults
+  /// to Standard so nothing changes for other weeks.
+  bool _w5Full = false;
 
   /// Collapsing-header geometry: the compact info row (trimester + week + date +
   /// progress) is always pinned; the compact week bar below it collapses away.
@@ -122,6 +128,46 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           seg(s.wfClassic, !_v2, () => setState(() => _v2 = false)),
           seg(s.wfNew, _v2, () => setState(() => _v2 = true)),
+        ]),
+      ),
+    );
+  }
+
+  /// Week-5 Standard | Full compare toggle, shown above the flow on week 5 only.
+  Widget _w5ToggleBar() {
+    final father = FatherPreview.instance.on;
+    final active = father ? kFAccent : AppTheme.primary500;
+    Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+            decoration: BoxDecoration(
+              color: on ? active : Colors.transparent,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(label,
+                style: GoogleFonts.manrope(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: on
+                        ? Colors.white
+                        : (father ? kFMuted : AppTheme.neutral500))),
+          ),
+        );
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      alignment: Alignment.center,
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: father ? kFAccentSoft : AppTheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          seg('Standard', !_w5Full, () => setState(() => _w5Full = false)),
+          seg('Full', _w5Full, () => setState(() => _w5Full = true)),
         ]),
       ),
     );
@@ -271,7 +317,11 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     // The compact week bar (design): current week ±2 on one row, dots between.
     final strip = _WeekBar(controller: _c, father: father);
 
-    return NestedScrollView(
+    // Week 5 preview: "Full" flow renders the complete content doc; "Standard"
+    // keeps the schema-driven V2 flow. Other weeks are unaffected.
+    final bool w5 = selectedWeek == 5 && !_c.isLocked(selectedWeek);
+
+    final nested = NestedScrollView(
       headerSliverBuilder: (context, innerScrolled) => [
         SliverOverlapAbsorber(
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
@@ -296,17 +346,28 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
       // revert. Week 40 appends the celebration finale at the bottom of the flow.
       body: _c.isLocked(selectedWeek)
           ? _lockedBody(selectedWeek)
-          : WeekFlowView(
-              controller: _c,
-              trailing:
-                  selectedWeek == PregnancyController.lastContentWeek
-                      ? SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.8,
-                          child: _celebrationCard(),
-                        )
-                      : null,
-            ),
+          : (w5 && _w5Full)
+              ? Week5FullFlowView(controller: _c)
+              : WeekFlowView(
+                  controller: _c,
+                  trailing:
+                      selectedWeek == PregnancyController.lastContentWeek
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.8,
+                              child: _celebrationCard(),
+                            )
+                          : null,
+                ),
     );
+
+    // On week 5, sit a Standard|Full compare toggle above the scrolling flow.
+    if (w5) {
+      return Column(children: [
+        _w5ToggleBar(),
+        Expanded(child: nested),
+      ]);
+    }
+    return nested;
   }
 
   /// Locked weeks: a single non-scrolling panel that still sits under the header.

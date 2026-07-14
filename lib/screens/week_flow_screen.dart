@@ -20,7 +20,9 @@ import 'package:share_plus/share_plus.dart';
 import '../data/journey_milestones.dart';
 import '../data/symptom_data.dart';
 import '../data/trimester_tips.dart';
+import '../data/week5_full_data.dart';
 import '../data/week_articles_data.dart';
+import '../services/article_store.dart';
 import '../localization/app_language.dart';
 import '../models/journey_node.dart';
 import '../models/symptom.dart';
@@ -57,6 +59,86 @@ const Color _fAccent2 = Color(0xFFE0915B); // amber highlight
 TextStyle _fSerif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
     GoogleFonts.fraunces(
         fontSize: size, fontWeight: w, color: c, height: 1.18, letterSpacing: -0.2);
+
+// ---------------------------------------------------------------------------
+//  Week 5 — the FULL content doc, wired into the Standard weekly UI.
+// ---------------------------------------------------------------------------
+//  The Standard detail screens (Baby Science, Mother/Health/Diet, Trimester
+//  Tips, Share-with-partner) are otherwise hard-coded to the week-20 preview.
+//  These adapters map the complete Week 5 doc (week5_full_data.dart) into the
+//  Standard widgets' own types, so week 5 shows EVERY section of the document
+//  verbatim, in the finalized Standard layout. Every other week is unchanged.
+//  Not applied in the father (Slate) preview, which keeps its own voice.
+bool _isW5(int week) => week == 5;
+
+const List<Color> _w5Tints = [
+  Color(0xFFEDE7F6),
+  Color(0xFFFDE7EC),
+  Color(0xFFE6F4EA),
+  Color(0xFFEAF1FB),
+  Color(0xFFFFF3E0),
+  Color(0xFFF9E7F3),
+];
+
+List<_Fact> _w5Science() {
+  const emoji = ['🧠', '🫀', '🧬', '🌿', '🔗', '🙂'];
+  final sc = week5Full.science;
+  return [
+    for (var i = 0; i < sc.length; i++)
+      _Fact(emoji[i % emoji.length], _w5Tints[i % _w5Tints.length], sc[i].title, sc[i].body),
+  ];
+}
+
+List<_Article> _w5BabyArticle() {
+  final a = week5Full.about;
+  return [
+    _Article(const LocalizedText(en: 'In my words', hi: 'Meri zubaani'), a.opening),
+    _Article(const LocalizedText(en: 'How big am I', hi: 'Main kitna bada hoon'), a.howBig),
+    _Article(const LocalizedText(en: "What's happening this week", hi: 'Is hafte kya ho raha hai'), a.whatsHappening),
+  ];
+}
+
+List<_Article> _w5MotherArticle() {
+  final y = week5Full.you;
+  return [
+    _Article(const LocalizedText(en: 'How you might be feeling', hi: 'Tum kaisa mehsoos kar sakti ho'), y.feeling),
+    _Article(const LocalizedText(en: 'Your changing body', hi: 'Tumhara badalta body'), y.changingBody),
+    _Article(const LocalizedText(en: 'Be kind to yourself', hi: 'Apne saath naram raho'), y.beKind),
+  ];
+}
+
+List<_MotherTopic> _w5Topics() {
+  const emoji = ['🌊', '💗', '🤰', '🍽️'];
+  final h = week5Full.you.highlights;
+  return [
+    for (var i = 0; i < h.length; i++)
+      _MotherTopic(emoji[i % emoji.length], h[i].title, h[i].teaser, h[i].body),
+  ];
+}
+
+List<_Food> _w5Favour() {
+  const emoji = ['🥬', '🫘', '🍊', '🌾', '🥛', '🥜', '🍌'];
+  final f = week5Full.diet.favour;
+  return [
+    for (var i = 0; i < f.length; i++) _Food(emoji[i % emoji.length], f[i].title, f[i].body),
+  ];
+}
+
+List<_Food> _w5Avoid() {
+  const emoji = ['🥩', '🧀', '🐟', '☕', '🚫'];
+  final f = week5Full.diet.avoid;
+  return [
+    for (var i = 0; i < f.length; i++) _Food(emoji[i % emoji.length], f[i].title, f[i].body),
+  ];
+}
+
+Superfood _w5Superfood() {
+  final sf = week5Full.diet.superfood;
+  return Superfood(food: sf.food, benefit: sf.benefit, howToConsume: sf.tryAs);
+}
+
+List<TrimesterTip> _w5Tips() =>
+    [for (final x in week5Full.tips) TrimesterTip(title: x.oneLine, body: x.readMore)];
 
 // ---------------------------------------------------------------------------
 //  Curated week-20 content (bilingual). Other weeks fall back gracefully.
@@ -1275,7 +1357,9 @@ class WeekFlowView extends StatelessWidget {
               // Father FRAMING (title) on all weeks; the brief WORDING is the
               // week-20 re-voiced copy or the mother's per-week content.
               title: fatherSkin ? _fBabyTitle.of(lang) : s.wfBabySection,
-              brief: (fatherSkin ? _fBabyBriefFor(w) : w.development.whatImDoing)
+              brief: (fatherSkin
+                      ? _fBabyBriefFor(w)
+                      : (_isW5(w.week) ? week5Full.about.teaser : w.development.whatImDoing))
                   .of(lang),
               cta: s.wfTapExplore,
               father: fatherSkin,
@@ -1758,7 +1842,9 @@ class _TrimesterTips extends StatelessWidget {
     final s = S(lang);
     final tips = father
         ? (_fTrimesterTips[_tri] ?? const <TrimesterTip>[]).take(3).toList()
-        : (kTrimesterTipsV2[_tri] ?? const <TrimesterTip>[]).take(3).toList();
+        : _isW5(week)
+            ? _w5Tips()
+            : (kTrimesterTipsV2[_tri] ?? const <TrimesterTip>[]).take(3).toList();
     if (tips.isEmpty) return const SizedBox.shrink();
     final title = father ? _fTipsTitle.of(lang) : s.wfTipsTitle;
     final subtitle =
@@ -1788,8 +1874,9 @@ class _TrimesterTips extends StatelessWidget {
       ),
       for (final t in tips) _tipCard(context, s, t),
       // Action to-dos, merged in from the (removed) mother "Actions" tab.
-      // Hidden in father mode (they're mother-voiced) to keep it focused.
-      if (!father) for (final a in _toDos) _todoCard(a),
+      // Hidden in father mode (they're mother-voiced) to keep it focused, and on
+      // week 5 (its tips already carry the doc's full to-do guidance).
+      if (!father && !_isW5(week)) for (final a in _toDos) _todoCard(a),
     ]);
   }
 
@@ -2115,10 +2202,13 @@ class _BabyDetailScreen extends StatelessWidget {
     final fatherSkin = _fatherSkin(w.week);
     // Father: week-20 keeps its richer read; other weeks use the generic father
     // read; the mother keeps hers. Science is generic father-voiced on all weeks.
-    final article = father
-        ? _babyArticleFather
-        : (fatherSkin ? _babyArticleGen : _babyArticle);
-    final science = fatherSkin ? _babyScienceFather : _babyScience;
+    final w5 = _isW5(w.week) && !fatherSkin;
+    final article = w5
+        ? _w5BabyArticle()
+        : father
+            ? _babyArticleFather
+            : (fatherSkin ? _babyArticleGen : _babyArticle);
+    final science = w5 ? _w5Science() : (fatherSkin ? _babyScienceFather : _babyScience);
     return _PopupScaffold(
       father: fatherSkin,
       body: ListView(
@@ -2408,12 +2498,17 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     final m = w.mom;
     final father = _fatherWeek(w.week); // copy/wording (week 20)
     final fatherSkin = _fatherSkin(w.week); // colours/skin (all weeks)
-    final article = father
-        ? _motherArticleFather
-        : (fatherSkin ? _motherArticleGen : _motherArticle);
-    final topics = father
-        ? _motherTopicsFather
-        : (fatherSkin ? _motherTopicsGen : _motherTopics);
+    final w5 = _isW5(w.week) && !fatherSkin;
+    final article = w5
+        ? _w5MotherArticle()
+        : father
+            ? _motherArticleFather
+            : (fatherSkin ? _motherArticleGen : _motherArticle);
+    final topics = w5
+        ? _w5Topics()
+        : father
+            ? _motherTopicsFather
+            : (fatherSkin ? _motherTopicsGen : _motherTopics);
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
@@ -2424,7 +2519,9 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         const SizedBox(height: 4),
         _tintCard(
             fatherSkin ? _fHelpTitle.of(lang) : s.selfCare,
-            fatherSkin ? _fHelpBody.of(lang) : m.selfCareTip.of(lang),
+            fatherSkin
+                ? _fHelpBody.of(lang)
+                : (w5 ? week5Full.you.selfCare : m.selfCareTip).of(lang),
             fatherSkin ? _fAccent : const Color(0xFF4F7A52),
             Icons.spa_rounded,
             father: fatherSkin),
@@ -2639,6 +2736,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   // Toggle: Symptoms - common, normal things to notice now (tap → detail sheet).
   List<Widget> _symptomsContent(S s, AppLanguage lang) {
+    if (_isW5(widget.w.week)) return _w5SymptomsContent(s, lang);
     final syms = kSymptoms
         .where((x) => !x.urgent && x.commonInTrimester(2))
         .take(7)
@@ -2651,6 +2749,114 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       const SizedBox(height: 14),
       for (final x in syms) _symptomCard(s, x, lang),
     ];
+  }
+
+  // Week 5: the doc's own symptom cards (verbatim) in the Standard symptom UI.
+  List<Widget> _w5SymptomsContent(S s, AppLanguage lang) {
+    return [
+      Text(s.wfHealthIntro,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.manrope(
+              fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
+      const SizedBox(height: 14),
+      for (final x in week5Full.symptoms) _w5SymptomCard(s, x, lang),
+    ];
+  }
+
+  Widget _w5SymptomCard(S s, W5Symptom x, AppLanguage lang) {
+    const accent = AppTheme.secondary500;
+    return GestureDetector(
+      onTap: () => _showW5SymptomSheet(x, lang),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: AppTheme.surface, borderRadius: BorderRadius.circular(16)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12)),
+            child: const Icon(Icons.healing_rounded, size: 19, color: accent),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(x.name.of(lang),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 2),
+              Text(x.teaser.of(lang),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                      fontSize: 12.5, height: 1.4, color: AppTheme.neutral600)),
+              const SizedBox(height: 6),
+              Row(children: [
+                Text(s.wfTapToRead,
+                    style: GoogleFonts.manrope(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: accent)),
+                const Icon(Icons.chevron_right_rounded, size: 15, color: accent),
+              ]),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  void _showW5SymptomSheet(W5Symptom x, AppLanguage lang) {
+    final s = S(lang);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        maxChildSize: 0.92,
+        minChildSize: 0.4,
+        builder: (ctx, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: AppTheme.neutral300,
+                    borderRadius: BorderRadius.circular(99)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(x.name.of(lang),
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.primary900)),
+            const SizedBox(height: 6),
+            Text(x.teaser.of(lang),
+                style: GoogleFonts.manrope(
+                    fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
+            const SizedBox(height: 18),
+            _sheetSection(s.symHowCommon, x.howCommon.of(lang)),
+            _sheetSection(s.symWhy, x.why.of(lang)),
+            _sheetList(s.symWhatHelps, x.helps, lang),
+            _sheetSection(s.symWhenDoctor, x.whenDoctor.of(lang), warn: true),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _symptomCard(S s, Symptom x, AppLanguage lang) {
@@ -2811,6 +3017,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   // Toggle: Diet - Indian superfood of the week + foods to favour / to limit.
   List<Widget> _dietContent(S s, AppLanguage lang) {
+    if (_isW5(widget.w.week)) return _w5DietContent(s, lang);
     final n = widget.w.nutrition;
     return [
       // Indian superfood of the week - restored into the V2 diet section (it had
@@ -2838,6 +3045,35 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               color: AppTheme.secondary700)),
       const SizedBox(height: 10),
       for (final f in _avoidFoods) _foodCard(f, lang, AppTheme.secondary500),
+    ];
+  }
+
+  // Week 5: the doc's own superfood + foods-to-favour + what-to-avoid (verbatim,
+  // with descriptions) in the Standard diet UI.
+  List<Widget> _w5DietContent(S s, AppLanguage lang) {
+    final d = week5Full.diet;
+    return [
+      _superfoodCard(_w5Superfood(), s, lang),
+      const SizedBox(height: 16),
+      Text(d.superfood.note.of(lang),
+          style: GoogleFonts.manrope(
+              fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
+      const SizedBox(height: 16),
+      Text(s.foodsToFavour,
+          style: GoogleFonts.plusJakartaSans(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF4F7A52))),
+      const SizedBox(height: 10),
+      for (final f in _w5Favour()) _foodCard(f, lang, const Color(0xFF4F7A52)),
+      const SizedBox(height: 10),
+      Text(s.wfAvoid,
+          style: GoogleFonts.plusJakartaSans(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.secondary700)),
+      const SizedBox(height: 10),
+      for (final f in _w5Avoid()) _foodCard(f, lang, AppTheme.secondary500),
     ];
   }
 
@@ -3939,8 +4175,15 @@ class _ArticleFeed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final store = ArticleStore.instance..ensureLoaded();
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => _content(context, store.forWeek(week)),
+    );
+  }
+
+  Widget _content(BuildContext context, List<WeekArticle> articles) {
     final s = S(lang);
-    final articles = weekArticlesFor(week);
     if (articles.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
@@ -4133,11 +4376,19 @@ class _AllReadsScreen extends StatelessWidget {
   final int week;
   @override
   Widget build(BuildContext context) {
+    final store = ArticleStore.instance..ensureLoaded();
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => _content(context, store),
+    );
+  }
+
+  Widget _content(BuildContext context, ArticleStore store) {
     final s = S(lang);
     // Show this week's reads first, then the rest of the library beneath.
-    final thisWeek = weekArticlesFor(week);
+    final thisWeek = store.forWeek(week);
     final others =
-        kWeekArticles.where((a) => a.week != week).toList();
+        store.all.where((a) => a.week != week).toList();
     final all = [...thisWeek, ...others];
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
@@ -4151,7 +4402,10 @@ class _AllReadsScreen extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
       ),
-      body: ListView.separated(
+      body: RefreshIndicator(
+        onRefresh: () => store.refresh(),
+        child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         itemCount: all.length,
         separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -4198,6 +4452,7 @@ class _AllReadsScreen extends StatelessWidget {
             ),
           );
         },
+        ),
       ),
     );
   }
@@ -4213,6 +4468,19 @@ class _PartnerSection extends StatelessWidget {
 
   String _message(S s) {
     final week = w.week;
+    if (_isW5(week)) {
+      final p = week5Full.partner;
+      final scanLines = p.scans
+          .map((x) => '• ${x.name.of(lang)} (${x.window.of(lang)})')
+          .join('\n');
+      final helpLines = p.help.map((h) => '• ${h.of(lang)}').join('\n');
+      return '👶 ${s.wfPartnerHeader(week)}\n\n'
+          '🍼 ${s.ovBaby}: ${p.baby.of(lang)}\n\n'
+          '🌸 ${s.ovMother}: ${p.mother.of(lang)}\n\n'
+          '🩺 ${s.wfPartnerScansHeader}\n$scanLines\n\n'
+          '🤝 ${s.wfPartnerHelp}:\n$helpLines\n\n'
+          '${s.wfPartnerSignoff}\n- ParentVeda 💜';
+    }
     final baby = w.development.whatImDoing.of(lang);
     final mum = w.mom.emotionalState.of(lang);
     final scans = kJourneyMilestones
