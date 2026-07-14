@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 
 import 'astrology_screen.dart';
+import 'family_profile_screen.dart';
 // Merged into the unified "Courses & Masterclasses" section (LearningHomeScreen).
 // Kept (commented) for easy revert:
 // import 'cohort_courses_screen.dart';
@@ -71,6 +72,8 @@ class ExploreDrawer extends StatelessWidget {
                     nav.pop();
                     openPpTab(context, 0);
                   }),
+                  _section(context, Icons.tune_rounded, 'My Family Profile',
+                      'Personalise ParentVeda for your family.', const FamilyProfileScreen()),
                   _section(context, Icons.brightness_4_outlined, 'Leap Calendar',
                       "Every Wonder-Weeks leap, on his timeline.", const LeapCalendarScreen()),
                   _section(context, Icons.play_circle_outline, 'Watch',

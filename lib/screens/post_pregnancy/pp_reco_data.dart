@@ -19,6 +19,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import 'pp_family_profile.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
 import 'pp_products_data.dart';
@@ -1052,6 +1053,20 @@ class RecoContext {
     }
     for (final p in PpCompareStore.instance.selected) {
       addWords(p.category);
+    }
+
+    // Personalization engine (Level 2): the family's EXPLICIT priorities + health
+    // conditions count as interests, so matching items rank higher. This only
+    // re-orders/surfaces — nothing is ever hidden or removed.
+    final fp = FamilyProfileStore.instance;
+    for (final k in fp.recoBoosts().keys) {
+      addWords(k);
+    }
+    for (final c in fp.conditions) {
+      addWords(c.label);
+    }
+    for (final pr in fp.priorities) {
+      addWords(pr.label);
     }
 
     final stageWords = <String>{};

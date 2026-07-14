@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'screens/post_pregnancy/pp_child_profile.dart';
+import 'screens/post_pregnancy/pp_family_profile.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
 import 'services/bought_store.dart';
@@ -131,6 +133,13 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     ReadToBabySavedStore.instance.init();
     // Load edited "when did this happen" dates for journey-map milestones.
     JourneyDatesStore.instance.init();
+    // PARENTING: load the child profile(s). The keystone of the post-pregnancy
+    // side - every other parenting feature keys its rows to a child from here.
+    ChildProfileStore.instance.init();
+    // PARENTING: the Living Family Profile — the personalization engine's single
+    // source of truth (health/feeding/sleep/priorities/learning). Features read
+    // it to tailor content, recommendations and ordering (never navigation).
+    FamilyProfileStore.instance.init();
   }
 
   @override
