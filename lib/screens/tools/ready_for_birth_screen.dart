@@ -17,6 +17,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
@@ -126,6 +127,11 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
             tooltip: 'Personalise',
             icon: const Icon(Icons.tune_rounded),
             onPressed: _booting ? null : () => _openPersonalize(context, _ctx),
+          ),
+          IconButton(
+            tooltip: 'Start again',
+            icon: const Icon(Icons.refresh_rounded),
+            onPressed: _booting ? null : _confirmRestart,
           ),
         ],
       ),
@@ -386,6 +392,32 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
         ),
       );
 
+  void _confirmRestart() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Start again?'),
+        content: const Text(
+            'This clears everything — packed items, anything you set aside, and your product choices — and brings back the full default list. This can\'t be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.primary),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _bag.createBag(generateDefaultBag(_ctx.delivery), _ctx.delivery);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fresh start — the full list is back.')));
+              }
+            },
+            child: const Text('Start again'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _openPersonalize(BuildContext context, ReadyBirthContextStore ctx) =>
       showModalBottomSheet<void>(
         context: context,
@@ -400,16 +432,18 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
 //  Shared: an editorial item card (used by Category + Guided flows).
 // ===========================================================================
 class _ItemCard extends StatelessWidget {
-  const _ItemCard({required this.item, required this.lang, required this.onToggle, this.onNeedOne});
+  const _ItemCard({required this.item, required this.lang, required this.onToggle, this.onNeedOne, this.onNotNeeded});
   final BagItem item;
   final AppLanguage lang;
   final VoidCallback onToggle;
   final VoidCallback? onNeedOne;
+  final VoidCallback? onNotNeeded;
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final packed = item.packed;
+    final showActions = !packed && (onNeedOne != null || onNotNeeded != null);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -427,15 +461,23 @@ class _ItemCard extends StatelessWidget {
                     color: packed ? AppTheme.neutral500 : AppTheme.neutral900)),
             const SizedBox(height: 4),
             Text(whyPack(item), style: t.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.4)),
-            if (!packed && onNeedOne != null) ...[
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: onNeedOne,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Need one?', style: t.labelMedium?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.w700)),
-                  const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.primary),
-                ]),
-              ),
+            if (showActions) ...[
+              const SizedBox(height: 10),
+              Wrap(spacing: 16, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                if (onNeedOne != null)
+                  InkWell(
+                    onTap: onNeedOne,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('Need one?', style: t.labelMedium?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.w700)),
+                      const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.primary),
+                    ]),
+                  ),
+                if (onNotNeeded != null)
+                  InkWell(
+                    onTap: onNotNeeded,
+                    child: Text("I don't need this", style: t.labelMedium?.copyWith(color: AppTheme.neutral500, fontWeight: FontWeight.w600)),
+                  ),
+              ]),
             ],
           ]),
         ),
@@ -498,6 +540,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
           final provided = _bag.active
               .where((i) => readyCategoryOf(i) == widget.category && providedItemIds(_ctx.hospitalProvides).contains(i.id))
               .toList();
+          final notNeeded = _bag.maybeLater.where((i) => readyCategoryOf(i) == widget.category).toList();
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             children: [
@@ -524,8 +567,35 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                   item: i,
                   lang: widget.controller.language,
                   onToggle: () => _bag.togglePacked(i.id),
-                  onNeedOne: bagIsSellable(i.id, isCustom: i.isCustom) ? () => _needOne(i) : null,
+                  onNeedOne: bagIsSellable(i.id, isCustom: i.isCustom)
+                      ? () => _push(context, _BagOptionsScreen(controller: widget.controller, itemId: i.id))
+                      : null,
+                  onNotNeeded: () => _bag.moveToMaybeLater(i.id),
                 ),
+              if (notNeeded.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('Not for us', style: t.titleSmall?.copyWith(color: AppTheme.neutral600)),
+                const SizedBox(height: 2),
+                Text('Set aside and not counted. Tap to add back any time.',
+                    style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
+                const SizedBox(height: 10),
+                for (final i in notNeeded)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+                    decoration: BoxDecoration(color: AppTheme.surfaceContainer, borderRadius: BorderRadius.circular(14)),
+                    child: Row(children: [
+                      Expanded(child: Text(i.name.of(widget.controller.language),
+                          style: t.bodyMedium?.copyWith(color: AppTheme.neutral600))),
+                      TextButton(
+                        onPressed: () => _bag.restore(i.id),
+                        style: TextButton.styleFrom(foregroundColor: AppTheme.primary, visualDensity: VisualDensity.compact),
+                        child: const Text('Add back'),
+                      ),
+                    ]),
+                  ),
+                const SizedBox(height: 6),
+              ],
               if (provided.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text('Your hospital provides these — no need to pack',
@@ -557,59 +627,6 @@ class _CategoryScreenState extends State<_CategoryScreen> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  void _needOne(BagItem i) {
-    final best = bagBestProduct(i.id, isCustom: i.isCustom);
-    final t = Theme.of(context).textTheme;
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppTheme.scaffoldBackground,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(99)))),
-            const SizedBox(height: 16),
-            Text(i.name.of(widget.controller.language), style: t.titleLarge),
-            const SizedBox(height: 6),
-            Text(whyPack(i), style: t.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.4)),
-            const SizedBox(height: 16),
-            if (best != null)
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.outlineVariant)),
-                child: Row(children: [
-                  Text(best.emoji, style: const TextStyle(fontSize: 26)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(best.name, style: t.titleSmall),
-                      if (best.why.isNotEmpty)
-                        Text(best.why.first, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
-                    ]),
-                  ),
-                  Text('₹${best.price}', style: t.titleSmall?.copyWith(color: AppTheme.primary)),
-                ]),
-              ),
-            const SizedBox(height: 14),
-            FilledButton(
-              onPressed: () {
-                _bag.setStatus(i.id, BagItemStatus.have);
-                Navigator.of(ctx).pop();
-              },
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppTheme.primary),
-              child: const Text("I've got this one"),
-            ),
-            const SizedBox(height: 6),
-            Center(child: Text('Shopping links coming soon — for now, mark what you have.',
-                style: t.labelSmall?.copyWith(color: AppTheme.neutral500))),
-          ]),
-        ),
       ),
     );
   }
@@ -959,6 +976,184 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
       ),
     );
     return expand ? Expanded(child: chip) : chip;
+  }
+}
+
+// ===========================================================================
+//  "Need one?" — the full options page for a bag item (all choices, our-picks
+//  + also-elsewhere, with the ParentVeda why/consider trust layer). Mirrors the
+//  app's product page, scoped to one item (e.g. every water bottle option).
+// ===========================================================================
+class _BagOptionsScreen extends StatefulWidget {
+  const _BagOptionsScreen({required this.controller, required this.itemId});
+  final PregnancyController controller;
+  final String itemId;
+  @override
+  State<_BagOptionsScreen> createState() => _BagOptionsScreenState();
+}
+
+class _BagOptionsScreenState extends State<_BagOptionsScreen> {
+  final _bag = HospitalBagV2Store.instance;
+
+  AppLanguage get _lang => widget.controller.language;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final name = _bag.byId(widget.itemId)?.name.of(_lang) ?? 'Options';
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(title: Text(name)),
+      body: AnimatedBuilder(
+        animation: _bag,
+        builder: (context, _) {
+          final item = _bag.byId(widget.itemId);
+          if (item == null) return const SizedBox.shrink();
+          final products = bagProductsFor(item.id, isCustom: item.isCustom);
+          final picks = products.where((p) => !p.isAffiliate).toList();
+          final elsewhere = products.where((p) => p.isAffiliate).toList();
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            children: [
+              // how-to-choose intro
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppTheme.primary50, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.primary100)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('How to choose', style: t.labelLarge?.copyWith(color: AppTheme.primary700)),
+                  const SizedBox(height: 6),
+                  Text('${whyPack(item)} Our picks below balance comfort, safety and value — or grab one from a store you already trust.',
+                      style: t.bodyMedium?.copyWith(color: AppTheme.primary900, height: 1.5)),
+                ]),
+              ),
+              const SizedBox(height: 20),
+              if (picks.isNotEmpty) ...[
+                Text('Our picks', style: t.titleMedium),
+                const SizedBox(height: 12),
+                for (final p in picks) _optionCard(item, p),
+              ],
+              if (elsewhere.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Also available elsewhere', style: t.titleMedium),
+                const SizedBox(height: 4),
+                Text('Prefer a store you know? These open the shop directly.',
+                    style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
+                const SizedBox(height: 12),
+                for (final p in elsewhere) _optionCard(item, p),
+              ],
+              const SizedBox(height: 10),
+              const Divider(height: 1),
+              const SizedBox(height: 16),
+              FilledButton.tonal(
+                onPressed: () {
+                  _bag.setStatus(item.id, BagItemStatus.have);
+                  Navigator.of(context).pop();
+                },
+                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                child: const Text("I've already got one"),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  _bag.moveToMaybeLater(item.id);
+                  Navigator.of(context).pop();
+                },
+                style: TextButton.styleFrom(foregroundColor: AppTheme.neutral600),
+                child: const Text("I don't need this"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _optionCard(BagItem item, BagProduct p) {
+    final t = Theme.of(context).textTheme;
+    final affiliate = p.isAffiliate;
+    final selected = affiliate
+        ? (item.status == BagItemStatus.buyElse && item.store == p.store)
+        : (item.status == BagItemStatus.buyVeda && item.selectedProductId == p.id);
+    void onTap() {
+      if (affiliate) {
+        _bag.setBuyElse(item.id, store: p.store, link: p.link, price: p.price);
+        if (p.link.isNotEmpty) {
+          launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
+        }
+      } else {
+        _bag.chooseVedaProduct(item.id, productId: p.id, price: p.price);
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: selected ? AppTheme.primary50 : AppTheme.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: selected ? AppTheme.primary400 : AppTheme.outlineVariant, width: selected ? 1.6 : 1),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 56, height: 56, alignment: Alignment.center,
+                decoration: BoxDecoration(color: AppTheme.surfaceContainer, borderRadius: BorderRadius.circular(14)),
+                child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  if (affiliate)
+                    Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
+                  else if (p.topPick)
+                    Text('Best overall', style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
+                  Text(affiliate ? 'Buy on ${p.store}' : p.name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                ]),
+              ),
+              Icon(
+                affiliate ? Icons.open_in_new_rounded : (selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded),
+                color: affiliate ? AppTheme.secondary500 : (selected ? AppTheme.primary500 : AppTheme.neutral400),
+              ),
+            ]),
+            if (p.why.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              if (p.topPick)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text('Why we recommend it', style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
+                ),
+              for (final w in p.why)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('✓  ', style: TextStyle(color: AppTheme.tertiary600, fontSize: 13)),
+                    Expanded(child: Text(w, style: t.bodyMedium)),
+                  ]),
+                ),
+            ],
+            if (p.consider.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('Things to consider', style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              for (final c in p.consider)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('•  '),
+                    Expanded(child: Text(c, style: t.bodyMedium)),
+                  ]),
+                ),
+            ],
+          ]),
+        ),
+      ),
+    );
   }
 }
 
