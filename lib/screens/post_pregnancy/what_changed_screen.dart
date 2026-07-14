@@ -460,24 +460,43 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
 
   // ---- result ------------------------------------------------------------
   List<Widget> _result(BuildContext context) {
-    final r = widget.concern.result;
+    // The diagnosis now depends on the parent's answers (red flags route to
+    // urgent results); the concern's own result is the benign fallback.
+    final r = wcResultFor(widget.concern, _answers);
+    final urgent = r.tone == WcTone.urgent;
+    final caution = r.tone == WcTone.caution;
+    final accent = urgent
+        ? const Color(0xFFC6295A)
+        : (caution ? const Color(0xFFB26A00) : ppCoral);
+    final tint = urgent
+        ? const Color(0xFFFDECEF)
+        : (caution ? const Color(0xFFFBF1E2) : ppCoralTint);
+    final cardEnd = urgent
+        ? const Color(0xFFFDECEF)
+        : (caution ? const Color(0xFFFBF3E8) : const Color(0xFFF6F0FA));
+    final badge = urgent
+        ? 'SEE A DOCTOR NOW'
+        : (caution ? 'WORTH GETTING CHECKED' : 'MOST LIKELY CAUSE');
+    final badgeIcon = urgent
+        ? Icons.warning_amber_rounded
+        : (caution ? Icons.info_outline_rounded : Icons.auto_awesome);
     return [
       const SizedBox(height: 28),
       _pad(Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), boxShadow: const [BoxShadow(color: Color(0x736A30B6), blurRadius: 40, spreadRadius: -20, offset: Offset(0, 18))]),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: (urgent ? const Color(0xFFC6295A) : ppPurple).withValues(alpha: 0.32), blurRadius: 40, spreadRadius: -20, offset: const Offset(0, 18))]),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Container(
             padding: const EdgeInsets.all(22),
-            decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white, Color(0xFFF6F0FA)])),
+            decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white, cardEnd])),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: ppCoralTint, borderRadius: BorderRadius.circular(999)),
+                decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(999)),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.auto_awesome, size: 12, color: ppCoral),
+                  Icon(badgeIcon, size: 12, color: accent),
                   const SizedBox(width: 6),
-                  Text('MOST LIKELY CAUSE', style: ppBody(10, color: ppCoral, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+                  Text(badge, style: ppBody(10, color: accent, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
                 ]),
               ),
               const SizedBox(height: 14),
@@ -531,9 +550,9 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             const SizedBox(width: 13),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Still worried?', style: ppJakarta(14)),
+                Text(urgent ? _fill('Get {baby} seen now') : 'Still worried?', style: ppJakarta(14)),
                 const SizedBox(height: 1),
-                Text('Talk to a paediatrician near you', style: ppBody(12, color: const Color(0xFFC6295A))),
+                Text(urgent ? 'Find a paediatrician or urgent care' : 'Talk to a paediatrician near you', style: ppBody(12, color: const Color(0xFFC6295A))),
               ]),
             ),
             const Text('→', style: TextStyle(color: Color(0xFFC6295A))),

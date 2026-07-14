@@ -320,7 +320,7 @@ Widget ppTimeField(String label, TimeOfDay value, VoidCallback onTap) => Column(
             child: Row(children: [
               const Icon(Icons.schedule_rounded, size: 16, color: ppPurple),
               const SizedBox(width: 8),
-              Text(ppFmtTod(value), style: ppBody(14, color: ppInk, w: FontWeight.w600)),
+              Flexible(child: Text(ppFmtTod(value), style: ppBody(14, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
             ]),
           ),
         ),

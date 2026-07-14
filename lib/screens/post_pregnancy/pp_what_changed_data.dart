@@ -29,9 +29,20 @@ class WcQuestion {
   final List<String> options;
 }
 
+/// How urgent a result is — drives both the copy and the visual treatment.
+///   calm    = a normal, reassuring cause (the default).
+///   caution = worth getting checked / keeping an eye on.
+///   urgent  = a red flag; see a doctor now.
+enum WcTone { calm, caution, urgent }
+
 /// The likely-cause result a flow lands on.
 class WcResult {
-  const WcResult({required this.cause, required this.explanation, required this.todos});
+  const WcResult({
+    required this.cause,
+    required this.explanation,
+    required this.todos,
+    this.tone = WcTone.calm,
+  });
 
   /// Headline cause, e.g. 'The 4-month sleep regression'.
   final String cause;
@@ -41,6 +52,26 @@ class WcResult {
 
   /// 2–3 gentle "what to do" steps. May contain `{baby}`.
   final List<String> todos;
+
+  /// Urgency band for styling + wording.
+  final WcTone tone;
+}
+
+/// One condition on a single question: the chosen answer at [q] must be one of
+/// [anyOf] (option indices).
+class WcCond {
+  const WcCond(this.q, this.anyOf);
+  final int q;
+  final List<int> anyOf;
+}
+
+/// A branch: if EVERY [when] condition matches the parent's answers, the flow
+/// shows [result] instead of the concern's default. For "any red flag" (OR)
+/// semantics, list several single-condition rules — the first match wins.
+class WcRule {
+  const WcRule({required this.when, required this.result});
+  final List<WcCond> when;
+  final WcResult result;
 }
 
 /// A single searchable concern on the What Changed? hub.
@@ -878,6 +909,349 @@ const List<WcConcern> kWcConcerns = [
     ),
   ),
 ];
+
+// =============================================================================
+//  Answer-aware routing
+// -----------------------------------------------------------------------------
+//  Each concern's questions actually change the diagnosis. `kWcRules` maps a
+//  concern id to an ordered list of branches; the FIRST branch whose conditions
+//  all match the parent's answers wins. If none match, the concern's own
+//  `result` is the (benign, most-common) fallback. Red-flag branches come first
+//  and carry WcTone.urgent so the screen can escalate. Option indices below
+//  match the order of each question's options in kWcConcerns above.
+// =============================================================================
+const Map<String, List<WcRule>> kWcRules = {
+  // ---- Sleep ----
+  'wake_2h': [
+    WcRule(when: [WcCond(3, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A cold behind the broken nights',
+      explanation: 'A stuffy nose or cough makes lying flat and staying asleep harder. As the cold clears, nights usually settle again.',
+      todos: [
+        'Saline drops and a slightly raised cot-head can ease night congestion.',
+        'Keep the bedtime routine steady and offer calm comfort and fluids.',
+        'See a doctor for fast breathing, a high fever, or poor feeding.',
+      ])),
+    WcRule(when: [WcCond(3, [1])], result: WcResult(
+      cause: 'Teething stirring the nights',
+      explanation: 'Sore gums often flare at night. It comes and goes with each tooth and passes on its own.',
+      todos: [
+        'Offer a chilled (not frozen) teether before bed; comfort calmly at night.',
+        'Keep the routine identical so sleep rebuilds quickly.',
+        'A real fever isn\'t teething — check that separately.',
+      ])),
+    WcRule(when: [WcCond(0, [0, 1])], result: WcResult(
+      cause: 'A feeding change unsettling nights',
+      explanation: 'A new food or formula, or a dropped feed, can briefly disturb sleep while {baby}\'s tummy adjusts.',
+      todos: [
+        'Give any new food earlier in the day and watch for tummy signs.',
+        'Keep the wind-down steady; offer calm reassurance at night.',
+        'Re-introduce changes slowly if nights stay busy.',
+      ])),
+  ],
+  'new_night_wakings': [
+    WcRule(when: [WcCond(1, [0, 1])], result: WcResult(
+      cause: 'Teething reopening the nights',
+      explanation: 'A tooth on the move often wakes even a solid sleeper for a few nights, then settles.',
+      todos: [
+        'Offer a chilled teether before bed and comfort calmly at night.',
+        'Keep the bedtime routine identical and predictable.',
+        'Remember a true fever isn\'t teething — check it separately.',
+      ])),
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      cause: 'A new-carer or daycare adjustment',
+      explanation: 'A new setting or carer is a big change; nights can briefly reopen while {baby} adjusts and processes the day.',
+      todos: [
+        'Keep bedtime calm, familiar and predictable.',
+        'Add a little extra connection time in the evening.',
+        'Give it a week or two — it usually settles as the new normal beds in.',
+      ])),
+  ],
+  // ---- Feeding ----
+  'refusing_feeds': [
+    WcRule(when: [WcCond(0, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Possible oral thrush',
+      explanation: 'White patches inside the cheeks or on the tongue that don\'t wipe away can be thrush, which makes feeding sore. It\'s common and easily treated.',
+      todos: [
+        'Check for white patches that don\'t rub off (unlike a milk coating).',
+        'See a doctor — thrush usually needs an antifungal for {baby} (and sometimes you).',
+        'Keep offering calm, frequent feeds and watch nappies stay wet.',
+      ])),
+    WcRule(when: [WcCond(1, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A blocked nose putting {baby} off feeds',
+      explanation: 'A stuffy nose makes breathing and feeding at the same time hard, so feeds get cut short.',
+      todos: [
+        'Use saline drops and aspirate just before feeds.',
+        'Offer smaller, more frequent feeds and keep {baby} fairly upright.',
+        'See a doctor if feeding drops a lot or wet nappies reduce.',
+      ])),
+  ],
+  'eating_less_solids': [
+    WcRule(when: [WcCond(1, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Off food because a bit unwell',
+      explanation: 'Appetite dips when a cold or fever hits, then bounces back on recovery. Fluids matter more than food meanwhile.',
+      todos: [
+        'Prioritise milk/fluids; offer easy favourites without pressure.',
+        'Watch wet nappies and energy levels.',
+        'See a doctor for a high fever, few wet nappies, or a very lethargic baby.',
+      ])),
+  ],
+  'spitting_up': [
+    WcRule(when: [WcCond(0, [1]), WcCond(1, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Reflux worth reviewing',
+      explanation: 'Forceful spit-ups with arching and crying can be reflux that\'s genuinely bothering {baby} — not just laundry. It\'s very manageable, and worth a doctor\'s review.',
+      todos: [
+        'Keep {baby} upright 20–30 minutes after feeds; feed smaller and slower.',
+        'Note how often it hurts and any feed refusal to tell the doctor.',
+        'See a doctor for poor weight gain, blood, projectile vomiting, or a lot of distress.',
+      ])),
+    WcRule(when: [WcCond(1, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Spit-ups that bother {baby} a little',
+      explanation: 'Arching or fussing with spit-ups suggests it\'s uncomfortable, even if amounts are small. A few tweaks usually help.',
+      todos: [
+        'Hold upright after feeds and burp partway through.',
+        'Feed calmly and a touch less at a time, more often.',
+        'Review with a doctor if it worsens or feeds start being refused.',
+      ])),
+  ],
+  // ---- Tummy ----
+  'not_pooped': [
+    WcRule(when: [WcCond(0, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Constipation',
+      explanation: 'Hard, dry, pellet-like stools mean constipation, not just an infrequent pattern. It\'s common around diet changes and usually eases with fluids and fibre.',
+      todos: [
+        'Offer extra water (if on solids) and fibre-rich fruit/veg (pear, prune).',
+        'Gentle tummy massage and bicycle legs can help things move.',
+        'See a doctor for blood, a hard swollen belly, vomiting, or a very distressed baby.',
+      ])),
+    WcRule(when: [WcCond(0, [1])], result: WcResult(
+      cause: 'Infrequent, but healthy',
+      explanation: 'Soft stools when they come — even after a few days — are normal. Frequency varies hugely, especially around milk changes.',
+      todos: [
+        'No action needed while {baby} is comfortable and stools stay soft.',
+        'Keep milk and fluids as usual.',
+        'Only step in if stools turn hard or {baby} seems in pain.',
+      ])),
+  ],
+  'loose_stools': [
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.urgent,
+      cause: 'Watch closely for dehydration',
+      explanation: 'Loose stools are usually a passing upset — but fewer wet nappies is the sign to act on, because babies dehydrate quickly.',
+      todos: [
+        'Offer milk feeds often; add small sips of water or ORS if on solids.',
+        'See a doctor now for very few wet nappies, a floppy or drowsy baby, blood in the stool, or vomiting too.',
+        'Keep counting wet nappies over the next few hours.',
+      ])),
+  ],
+  // ---- Teething & illness ----
+  'drooling_chewing': [
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A real fever isn\'t teething',
+      explanation: 'Teething can nudge the temperature up a touch, but a clear fever points to an infection to check — don\'t put a true fever down to teeth.',
+      todos: [
+        'Treat it as an illness: offer fluids, dress {baby} lightly, and monitor.',
+        'See a doctor — especially if under 3 months, over 39°C, or other symptoms appear.',
+        'Soothe the gums separately with a chilled teether.',
+      ])),
+  ],
+  'low_fever': [
+    WcRule(when: [WcCond(1, [0])], result: _feverUrgent),
+    WcRule(when: [WcCond(0, [2])], result: _feverUrgent),
+    WcRule(when: [WcCond(2, [2])], result: _feverUrgent),
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A cold or ear infection is likely',
+      explanation: 'A fever alongside cold symptoms or ear-tugging is usually a viral illness or an ear infection — worth checking if it persists.',
+      todos: [
+        'Offer fluids, keep {baby} lightly dressed, and monitor the temperature.',
+        'See a doctor if it lasts beyond 48 hours, climbs, or {baby} worsens.',
+        'Return sooner for any red-flag sign (rash, drowsiness, refusing feeds).',
+      ])),
+  ],
+  'runny_nose': [
+    WcRule(when: [WcCond(1, [1])], result: _breathingUrgent),
+    WcRule(when: [WcCond(1, [2])], result: _breathingUrgent),
+    WcRule(when: [WcCond(2, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A high fever with the cold',
+      explanation: 'A snuffly cold is normal, but a high fever with it is worth a check — especially if it lingers or {baby} is very young.',
+      todos: [
+        'Offer fluids, dress lightly, and keep an eye on the temperature.',
+        'See a doctor if under 3 months, over 39°C, or the fever lasts.',
+        'Watch breathing and feeding closely alongside.',
+      ])),
+    WcRule(when: [WcCond(0, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A blocked nose stopping feeds',
+      explanation: 'When congestion stops {baby} feeding well, the priority is clearing the nose so feeds and fluids stay up.',
+      todos: [
+        'Saline drops and gentle aspiration just before feeds.',
+        'Offer smaller, more frequent feeds.',
+        'See a doctor if feeding drops a lot or wet nappies reduce.',
+      ])),
+  ],
+  'pulling_ears': [
+    WcRule(when: [WcCond(0, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Ear discharge — see a doctor',
+      explanation: 'Fluid coming from the ear needs a doctor to look — it can mean an infection behind the eardrum.',
+      todos: [
+        'Book a doctor to examine the ear properly.',
+        'Don\'t put anything inside the ear; keep the outside clean and dry.',
+        'Manage pain or fever as your doctor advises meanwhile.',
+      ])),
+    WcRule(when: [WcCond(0, [0]), WcCond(1, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Likely an ear infection',
+      explanation: 'Ear-pulling with a fever or recent cold, and pain that\'s worse lying down, often points to an ear infection worth checking.',
+      todos: [
+        'See a doctor to examine the ears.',
+        'A slightly raised cot-head can ease lying-down pain; offer comfort.',
+        'Ask about pain relief suitable for {baby}\'s age.',
+      ])),
+  ],
+  // ---- Skin ----
+  'new_rash': [
+    WcRule(when: [WcCond(1, [1])], result: _rashUrgent),
+    WcRule(when: [WcCond(0, [2]), WcCond(2, [2])], result: _rashUrgent),
+    WcRule(when: [WcCond(1, [2]), WcCond(2, [2])], result: _rashUrgent),
+    WcRule(when: [WcCond(0, [1])], result: WcResult(
+      cause: 'Likely dry skin or mild eczema',
+      explanation: 'Dry, itchy patches — often on cheeks and joints — are usually mild eczema, which is manageable and not dangerous.',
+      todos: [
+        'Moisturise generously with a fragrance-free emollient after short, warm baths.',
+        'Switch to gentle, fragrance-free soap and detergent.',
+        'See a doctor if it weeps, spreads, or clearly bothers {baby}.',
+      ])),
+  ],
+  'dry_patches': [
+    WcRule(when: [WcCond(1, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Eczema worth managing',
+      explanation: 'Very itchy patches that {baby} scratches are likely eczema — worth a proper routine, and a check if it weeps or spreads.',
+      todos: [
+        'Moisturise generously and often; keep baths short and warm, not hot.',
+        'Remove likely triggers (fragranced products, overheating, rough fabrics).',
+        'See a doctor if it weeps, looks infected, or disturbs sleep — a steroid cream may help.',
+      ])),
+  ],
+  'nappy_rash': [
+    WcRule(when: [WcCond(0, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Broken skin — get it checked',
+      explanation: 'Broken or bleeding skin can get infected and needs a doctor\'s eye and the right cream.',
+      todos: [
+        'See a doctor before it worsens.',
+        'Change often, clean very gently, and let the skin air-dry.',
+        'Use only what the doctor recommends on broken skin.',
+      ])),
+    WcRule(when: [WcCond(0, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Likely a thrush (yeast) nappy rash',
+      explanation: 'A bright-red rash with little spots at the edges is often a yeast rash, which needs an antifungal cream rather than a plain barrier.',
+      todos: [
+        'See a doctor for an antifungal cream — a barrier alone won\'t clear it.',
+        'Change often and let the area air-dry between changes.',
+        'Keep using gentle, fragrance-free wipes or just water.',
+      ])),
+    WcRule(when: [WcCond(2, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Not clearing — see a doctor',
+      explanation: 'A rash lasting over a week isn\'t settling with the usual care and should be checked for thrush or infection.',
+      todos: [
+        'Book a doctor to look at it.',
+        'Continue gentle cleaning, air time and a barrier cream meanwhile.',
+        'Note anything that seems to make it worse.',
+      ])),
+  ],
+  // ---- Development & behaviour ----
+  'gone_quiet': [
+    WcRule(when: [WcCond(2, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Worth a hearing & development check',
+      explanation: 'If {baby} is responding less than before — to sounds, their name, or your face — it\'s worth mentioning to your doctor to check hearing and development, just to be sure.',
+      todos: [
+        'Note what\'s changed (sounds, eye contact, response to name).',
+        'Book a check-up to review hearing and development.',
+        'Keep talking, singing and reading — and follow any advice given.',
+      ])),
+    WcRule(when: [WcCond(1, [0])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A cold or ear issue may be muffling sounds',
+      explanation: 'Fluid from a cold or ear issue can dull hearing and quieten babbling for a while, usually recovering as the ears clear.',
+      todos: [
+        'Have the ears checked if a cold lingers.',
+        'Keep narrating and singing close and clear.',
+        'Recheck babbling once the cold has cleared.',
+      ])),
+  ],
+  'head_banging': [
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Worth flagging at a check-up',
+      explanation: 'Rhythmic rocking or head-banging is usually harmless self-soothing — but paired with other developmental worries, it\'s worth mentioning so everything can be looked at together.',
+      todos: [
+        'Note the other things you\'ve noticed alongside it.',
+        'Book a developmental check-up to review it all together.',
+        'Keep {baby} safe and offer calm rhythm (rocking, music) meanwhile.',
+      ])),
+  ],
+};
+
+// Shared red-flag results (referenced by several concerns above).
+const WcResult _feverUrgent = WcResult(
+  tone: WcTone.urgent,
+  cause: 'This needs a doctor now',
+  explanation: 'A baby under 3 months with any fever, a temperature over 39°C, or a fever with a rash, drowsiness or refusing feeds needs to be seen without waiting — these can be serious.',
+  todos: [
+    'Call your doctor or a paediatric emergency line now — don\'t wait it out.',
+    'Keep {baby} lightly dressed and offer fluids on the way.',
+    'Get emergency care for a non-fading rash, a fit, a stiff neck, or trouble breathing.',
+  ],
+);
+
+const WcResult _breathingUrgent = WcResult(
+  tone: WcTone.urgent,
+  cause: 'Breathing that needs checking now',
+  explanation: 'A snuffly cold is normal — but fast, laboured or wheezy breathing in a baby is not, and needs to be seen quickly.',
+  todos: [
+    'Seek urgent care for fast breathing, the ribs sucking in, grunting, or wheeze.',
+    'Blue lips or long pauses in breathing — call emergency services now.',
+    'Meanwhile keep the nose clear with saline and keep feeds up.',
+  ],
+);
+
+const WcResult _rashUrgent = WcResult(
+  tone: WcTone.urgent,
+  cause: 'A rash to get checked urgently',
+  explanation: 'A rash that doesn\'t fade under a pressed glass — or spots with a fever in an unwell baby — can\'t wait. Most rashes are harmless, but this pattern needs urgent review.',
+  todos: [
+    'Press a clear glass firmly on the rash — if it stays visible, get emergency care now.',
+    'Trust your instinct; don\'t wait for more symptoms to appear.',
+    'Note when it started and any fever to tell the doctor.',
+  ],
+);
+
+/// The result to show for [c] given the parent's [answers] — the first matching
+/// branch in [kWcRules], else the concern's own default result.
+WcResult wcResultFor(WcConcern c, List<int?> answers) {
+  for (final rule in kWcRules[c.id] ?? const <WcRule>[]) {
+    final matched = rule.when.every((cond) {
+      final a = (cond.q >= 0 && cond.q < answers.length) ? answers[cond.q] : null;
+      return a != null && cond.anyOf.contains(a);
+    });
+    if (matched) return rule.result;
+  }
+  return c.result;
+}
 
 // -----------------------------------------------------------------------------
 //  Lookups + search
