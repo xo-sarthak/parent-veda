@@ -8,6 +8,7 @@ import 'package:parentveda/screens/product_guide/product_guide_chooser.dart';
 import 'package:parentveda/screens/product_guide/product_guide_data.dart';
 import 'package:parentveda/screens/product_guide/product_guide_hub_screen.dart';
 import 'package:parentveda/screens/product_guide/product_guide_screen.dart';
+import 'package:parentveda/screens/product_guide/product_guide_votes.dart';
 
 void main() {
   void bigView(WidgetTester tester) {
@@ -60,13 +61,46 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
     await tester.pumpAndSettle();
 
-    expect(find.text('Highly recommended'), findsOneWidget);
+    expect(find.text('STRONG BUY'), findsOneWidget); // at-a-glance signal band
     expect(find.text('BEST FOR'), findsOneWidget);
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('Ingredients explained'), 250, scrollable: scrollable, maxScrolls: 30);
     expect(find.text('Ingredients explained'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Specifications'), 250, scrollable: scrollable, maxScrolls: 30);
     expect(find.text('Specifications'), findsOneWidget);
+  });
+
+  testWidgets('At-a-glance buy signal shows and accepts the parent vote', (tester) async {
+    bigView(tester);
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpAndSettle();
+
+    // The glanceable band + score + consensus + your-take — all above the fold.
+    expect(find.text('STRONG BUY'), findsOneWidget);
+    expect(find.textContaining('/100'), findsWidgets);
+    expect(find.textContaining('parents like you'), findsOneWidget);
+    expect(find.text('YOUR TAKE'), findsOneWidget);
+
+    // Casting the parent's own vote persists (toggle-aware).
+    final before = ProductGuideVotes.instance.voteFor('baby_lotion');
+    await tester.tap(find.text('Recommend'));
+    await tester.pump();
+    final after = ProductGuideVotes.instance.voteFor('baby_lotion');
+    expect(after, before == PgVote.recommend ? PgVote.none : PgVote.recommend);
+  });
+
+  testWidgets('Research Corner is ingredient-specific + labels maker studies', (tester) async {
+    bigView(tester);
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpAndSettle();
+    final scrollable = find.byType(Scrollable).first;
+    // A study about an actual ingredient in the cream.
+    await tester.scrollUntilVisible(find.text('GLYCERIN'), 250, scrollable: scrollable, maxScrolls: 40);
+    expect(find.text('GLYCERIN'), findsOneWidget);
+    expect(find.text('CERAMIDES'), findsWidgets);
+    // The maker's own trial is present and clearly labelled.
+    expect(find.text("MAKER'S OWN"), findsWidgets);
+    expect(find.text('INDEPENDENT'), findsWidgets);
   });
 
   testWidgets('The chooser fires only for a product that has a guide', (tester) async {

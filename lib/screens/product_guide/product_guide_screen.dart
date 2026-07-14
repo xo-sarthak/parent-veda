@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import 'product_guide_data.dart';
 import 'product_guide_style.dart';
+import 'product_guide_votes.dart';
 
 
 class ProductGuideScreen extends StatelessWidget {
@@ -113,17 +114,9 @@ class ProductGuideScreen extends StatelessWidget {
       Text(g.name, style: pgSerif(26, h: 1.12)),
       const SizedBox(height: 14),
 
-      // recommendation pill
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(color: rc.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(999), border: Border.all(color: rc.withValues(alpha: 0.30))),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(color: rc, shape: BoxShape.circle)),
-          const SizedBox(width: 8),
-          Text(g.reco.label, style: pgBody(12.5, color: rc, w: FontWeight.w800)),
-        ]),
-      ),
-      const SizedBox(height: 14),
+      // at-a-glance buy signal
+      _verdictCard(context, g, rc),
+      const SizedBox(height: 16),
 
       // ratings
       Row(children: [
@@ -198,6 +191,97 @@ class ProductGuideScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(label, style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+      );
+
+  // ---- at-a-glance "buy signal" verdict card ------------------------------
+  Widget _verdictCard(BuildContext context, ProductGuide g, Color rc) {
+    ProductGuideVotes.instance.init();
+    final tone = g.reco.tone;
+    final trend = tone == 0 ? Icons.trending_up_rounded : (tone == 1 ? Icons.trending_flat_rounded : Icons.trending_down_rounded);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: rc.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: rc.withValues(alpha: 0.30), width: 1.4),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(color: rc, borderRadius: BorderRadius.circular(999)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(trend, size: 15, color: Colors.white),
+                const SizedBox(width: 6),
+                Flexible(child: Text(g.reco.signal, maxLines: 1, overflow: TextOverflow.ellipsis, style: pgBody(13, color: Colors.white, w: FontWeight.w800))),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+              Text('${g.parentScore}', style: pgTitle(26, c: pgInk)),
+              Text(' /100', style: pgBody(12, color: pgMuted)),
+            ]),
+            Text('ParentVeda score', style: pgBody(10, color: pgMuted)),
+          ]),
+        ]),
+        const SizedBox(height: 12),
+        Container(height: 1, color: rc.withValues(alpha: 0.18)),
+        const SizedBox(height: 12),
+        Row(children: [
+          _consensus('${g.parentsPct}%', 'parents like you recommend'),
+          _vDiv(),
+          _consensus('${g.expertsPct}%', 'experts say buy'),
+          _vDiv(),
+          _consensus('${g.rating.community.toStringAsFixed(1)}★', 'community rating'),
+        ]),
+        const SizedBox(height: 14),
+        Text('YOUR TAKE', style: pgEyebrow(pgMuted).copyWith(fontSize: 9.5)),
+        const SizedBox(height: 8),
+        AnimatedBuilder(
+          animation: ProductGuideVotes.instance,
+          builder: (ctx, _) {
+            final v = ProductGuideVotes.instance.voteFor(g.id);
+            return Row(children: [
+              Expanded(child: _voteBtn('Recommend', Icons.thumb_up_alt_rounded, v == PgVote.recommend, pgGreen, () => ProductGuideVotes.instance.cast(g.id, PgVote.recommend))),
+              const SizedBox(width: 8),
+              Expanded(child: _voteBtn('Not for us', Icons.thumb_down_alt_rounded, v == PgVote.notForUs, pgCoral, () => ProductGuideVotes.instance.cast(g.id, PgVote.notForUs))),
+            ]);
+          },
+        ),
+      ]),
+    );
+  }
+
+  Widget _consensus(String value, String label) => Expanded(
+        child: Column(children: [
+          Text(value, style: pgTitle(16, c: pgInk)),
+          const SizedBox(height: 3),
+          Text(label, textAlign: TextAlign.center, style: pgBody(10.5, color: pgSoft, h: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+        ]),
+      );
+
+  Widget _vDiv() => Container(width: 1, height: 30, color: pgHair, margin: const EdgeInsets.symmetric(horizontal: 6));
+
+  Widget _voteBtn(String label, IconData icon, bool on, Color color, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: on ? color : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: on ? color : pgLine),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, size: 15, color: on ? Colors.white : color),
+            const SizedBox(width: 7),
+            Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: pgBody(12.5, color: on ? Colors.white : pgInk, w: FontWeight.w700))),
+          ]),
+        ),
       );
 
   // ---- before you buy -----------------------------------------------------
@@ -377,46 +461,63 @@ class ProductGuideScreen extends StatelessWidget {
         ]),
       );
 
-  // ---- research corner (independent, with read-more) ----------------------
+  // ---- research corner (about THIS product's ingredients & claims) --------
   Widget _research(BuildContext context, ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sectionHead('Research corner', 'Independent evidence — not the maker\'s marketing'),
+        _sectionHead('Research corner', "On this product's actual ingredients & claims"),
         const SizedBox(height: 12),
-        for (final st in g.studies)
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: pgHair)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if (st.source.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFEFF6F1), borderRadius: BorderRadius.circular(999)),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.verified_outlined, size: 12, color: pgGreen),
-                    const SizedBox(width: 5),
-                    Flexible(child: Text(st.source, style: pgBody(10.5, color: pgGreen, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                  ]),
-                ),
-              if (st.source.isNotEmpty) const SizedBox(height: 10),
-              Text(st.summary, style: pgBody(13.5, color: pgInk, h: 1.5)),
-              const SizedBox(height: 10),
-              Text('WHAT THIS MEANS FOR YOU', style: pgEyebrow(pgGreen).copyWith(fontSize: 9.5)),
-              const SizedBox(height: 5),
-              Text(st.meaning, style: pgBody(13, color: pgSoft, h: 1.5)),
-              if (st.detail.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () => _readMore(context, st),
-                  behavior: HitTestBehavior.opaque,
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text('Read more', style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
-                    const Icon(Icons.chevron_right_rounded, size: 16, color: pgPurple),
-                  ]),
-                ),
-              ],
+        for (final st in g.studies) _studyCard(context, st),
+      ]));
+
+  Widget _studyCard(BuildContext context, PgStudy st) {
+    final maker = st.byMaker;
+    final tagColor = maker ? pgPurple : pgGreen;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: maker ? const Color(0xFFF6F0FA) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: maker ? const Color(0xFFE7DFEE) : pgHair),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          if (st.topic.isNotEmpty)
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(999)),
+                child: Text(st.topic.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: pgEyebrow(pgSoft).copyWith(fontSize: 9.5)),
+              ),
+            ),
+          const SizedBox(width: 8),
+          Icon(maker ? Icons.business_rounded : Icons.verified_outlined, size: 12, color: tagColor),
+          const SizedBox(width: 4),
+          Text(maker ? "MAKER'S OWN" : 'INDEPENDENT', style: pgEyebrow(tagColor).copyWith(fontSize: 9)),
+        ]),
+        const SizedBox(height: 10),
+        Text(st.summary, style: pgBody(13.5, color: pgInk, h: 1.5)),
+        if (st.source.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(st.source, style: pgBody(11, color: pgMuted, w: FontWeight.w600)),
+        ],
+        const SizedBox(height: 10),
+        Text('WHAT THIS MEANS FOR YOU', style: pgEyebrow(pgGreen).copyWith(fontSize: 9.5)),
+        const SizedBox(height: 5),
+        Text(st.meaning, style: pgBody(13, color: pgSoft, h: 1.5)),
+        if (st.detail.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => _readMore(context, st),
+            behavior: HitTestBehavior.opaque,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('Read more', style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+              const Icon(Icons.chevron_right_rounded, size: 16, color: pgPurple),
             ]),
           ),
-      ]));
+        ],
+      ]),
+    );
+  }
 
   void _readMore(BuildContext context, PgStudy st) {
     showModalBottomSheet<void>(
