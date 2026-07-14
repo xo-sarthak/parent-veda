@@ -33,7 +33,9 @@ import 'read_next_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/due_date_calculator_screen.dart';
-import 'tools/hospital_bag_screen.dart';
+// Hospital Bag retired in favour of the "Ready for Birth" redesign (kept for
+// revert). import 'tools/hospital_bag_screen.dart';
+import 'tools/ready_for_birth_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 import 'tools/product_checklist_screen.dart';
 // Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
@@ -111,7 +113,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         _Dest(s.babyMovementTracker, const ['kick', 'movement', 'counter'],
             Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c)),
         _Dest(s.hbName, const ['hospital', 'bag', 'pack', 'labour'],
-            Icons.luggage_rounded, (c) => HospitalBagScreen(controller: c)),
+            Icons.luggage_rounded, (c) => ReadyForBirthScreen(controller: c)),
         _Dest(s.tsrTitle, const ['scan', 'ultrasound', 'nt', 'anomaly', 'growth', 'doppler'],
             Icons.fact_check_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.ddcToolTitle, const ['due date', 'calculator', 'edd'],

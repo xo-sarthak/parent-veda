@@ -37,7 +37,9 @@ import '../read_next_screen.dart';
 import '../weekly_card_stack_screen.dart';
 import 'baby_movement_screen.dart';
 import 'contraction_tracker_screen.dart';
-import 'hospital_bag_screen.dart';
+// Hospital Bag retired in favour of the "Ready for Birth" redesign (kept for
+// revert). import 'hospital_bag_screen.dart';
+import 'ready_for_birth_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
 
@@ -168,7 +170,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     } else if (l.contains('movement') || l.contains('kick')) {
       _open(BabyMovementScreen(controller: p));
     } else if (l.contains('hospital')) {
-      _open(HospitalBagScreen(controller: p));
+      _open(ReadyForBirthScreen(controller: p));
     } else if (l.contains('weight')) {
       _open(WeightTrackerScreen(controller: p));
     } else if (l.contains('kegel') || l.contains('pelvic')) {

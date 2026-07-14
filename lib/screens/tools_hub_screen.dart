@@ -31,7 +31,9 @@ import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
 import 'tools/due_date_calculator_screen.dart';
-import 'tools/hospital_bag_screen.dart';
+// Hospital Bag retired in favour of the "Ready for Birth" redesign (kept for
+// revert). import 'tools/hospital_bag_screen.dart';
+import 'tools/ready_for_birth_screen.dart';
 import 'tools/kegel_care_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 import 'tools/product_checklist_screen.dart';
@@ -89,7 +91,7 @@ class ToolsHubScreen extends StatelessWidget {
       _Tool(s.toolContractionTitle, Icons.timer_rounded, AppTheme.primary400,
           () => open(() => ContractionTrackerScreen(controller: controller))),
       _Tool(s.hbName, Icons.luggage_rounded, AppTheme.tertiary400,
-          () => open(() => HospitalBagScreen(controller: controller))),
+          () => open(() => ReadyForBirthScreen(controller: controller))),
       _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
           () => open(() => ProductChecklistScreen(controller: controller))),
       _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
