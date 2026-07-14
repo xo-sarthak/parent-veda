@@ -50,27 +50,37 @@ class PgExpert {
   final String duration; // '2:10'
 }
 
-/// A useful, practical community experience (not a star dump).
+/// A useful, practical community experience — carries a star rating so the
+/// "see all" view can filter by good / critical / by-stars.
 class PgExperience {
-  const PgExperience({required this.text, required this.author, required this.context});
+  const PgExperience({required this.text, required this.author, required this.context, this.stars = 5});
   final String text;
   final String author;
   final String context; // 'Winter · 3-month-old', 'Summer · newborn'…
+  final int stars; // 1–5
+  bool get positive => stars >= 4;
+  bool get critical => stars <= 3;
 }
 
-/// One important ingredient, explained (never the full INCI dump).
+/// One important ingredient, explained (never the full INCI dump). Balanced:
+/// [note] = why it's good; [caution] = an honest con, ONLY when a real one
+/// exists (never fabricated — empty means "no caveat worth flagging").
 class PgIngredient {
-  const PgIngredient({required this.name, required this.purpose, required this.note});
+  const PgIngredient({required this.name, required this.purpose, required this.note, this.caution = ''});
   final String name;
   final String purpose;
-  final String note; // the ParentVeda note
+  final String note; // the good — why it's used
+  final String caution; // the honest con (may be empty)
 }
 
-/// A study, translated to plain language.
+/// A study, translated to plain language. Independent by design: [source] names
+/// where it's from (NOT the maker); [detail] powers "read more".
 class PgStudy {
-  const PgStudy({required this.summary, required this.meaning});
+  const PgStudy({required this.summary, required this.meaning, this.source = '', this.detail = ''});
   final String summary;
   final String meaning; // what this means for parents
+  final String source; // e.g. 'Cochrane review, 2021' — independent
+  final String detail; // longer plain-language explanation for "read more"
 }
 
 /// A single category-appropriate spec (fields differ per category by design).
@@ -156,17 +166,24 @@ const List<ProductGuide> kProductGuides = [
       PgExpert(role: 'Paediatrician', name: 'Dr. Vikram Sethi', hook: 'Reading a baby lotion label in 60 seconds', duration: '1:10'),
     ],
     experiences: [
-      PgExperience(text: 'Cleared my baby\'s dry winter cheeks in a few days.', author: 'Meera', context: 'Winter · 4-month-old'),
-      PgExperience(text: 'Felt a bit heavy in Delhi summer — we switched to a lighter one.', author: 'Sana', context: 'Summer · 8-month-old'),
-      PgExperience(text: 'No reaction at all on very sensitive skin — a relief.', author: 'Ritu', context: 'Newborn'),
+      PgExperience(text: 'Cleared my baby\'s dry winter cheeks in a few days.', author: 'Meera', context: 'Winter · 4-month-old', stars: 5),
+      PgExperience(text: 'No reaction at all on very sensitive skin — a relief.', author: 'Ritu', context: 'Newborn', stars: 5),
+      PgExperience(text: 'Good moisturiser, though the pump can clog if you don\'t wipe it.', author: 'Farah', context: '6-month-old', stars: 4),
+      PgExperience(text: 'Lovely in winter, but felt heavy in Delhi summer — we switched to a lighter one for now.', author: 'Sana', context: 'Summer · 8-month-old', stars: 3),
+      PgExperience(text: 'Didn\'t do much for my baby\'s eczema — our doctor moved us to a prescription cream.', author: 'Divya', context: 'Eczema · 5-month-old', stars: 2),
     ],
     ingredients: [
-      PgIngredient(name: 'Glycerin', purpose: 'Draws in and holds moisture.', note: 'A gentle, widely-used humectant — well tolerated by most babies.'),
+      PgIngredient(name: 'Glycerin', purpose: 'Draws in and holds moisture.', note: 'A gentle, widely-used humectant — well tolerated by most babies.', caution: 'In very dry, low-humidity air it can draw moisture from the skin instead — apply over slightly damp skin to seal it in.'),
       PgIngredient(name: 'Ceramides', purpose: 'Rebuild the skin barrier.', note: 'Especially helpful for dry or eczema-prone skin.'),
-      PgIngredient(name: 'Fragrance', purpose: 'Adds scent.', note: 'This product is fragrance-free — many parents prefer that for newborns.'),
+      PgIngredient(name: 'Fragrance', purpose: 'Adds scent.', note: 'This product is fragrance-free — many parents prefer that for newborns.', caution: 'If you ever try a scented variant, fragrance is a common irritant for sensitive baby skin.'),
     ],
     studies: [
-      PgStudy(summary: 'Daily moisturising in the first weeks reduced eczema risk in at-risk babies in several trials.', meaning: 'If eczema runs in your family, a gentle daily moisturiser may genuinely help — worth discussing with your doctor.'),
+      PgStudy(
+        source: 'Cochrane review + BEEP/PreventADALL trials',
+        summary: 'Large independent trials found daily whole-body moisturising did NOT reliably prevent eczema in at-risk babies — the earlier hopeful results did not hold up.',
+        meaning: 'Moisturising soothes dryness and is safe, but don\'t rely on it to prevent eczema. If eczema runs in your family, ask your doctor for a plan.',
+        detail: 'Early small studies suggested emollients from birth might lower eczema risk in high-risk infants. Larger, better-controlled trials since (BEEP, PreventADALL) found no significant preventive benefit, and a slight increase in skin infections in some groups. The consensus now: moisturisers are excellent for treating dryness and mild eczema, but are not a proven preventive. This summary draws on independent research, not lotion-brand funding.',
+      ),
     ],
     specs: [
       PgSpec('Texture', 'Light cream'),
@@ -248,7 +265,7 @@ const List<ProductGuide> kProductGuides = [
     watchOut: ['Costlier than standard wipes', 'Keep the pack sealed so they don\'t dry out'],
     ingredients: [
       PgIngredient(name: 'Purified water', purpose: 'Cleans gently.', note: 'Makes up ~99% — the closest thing to cotton and water.'),
-      PgIngredient(name: 'Fruit extract (trace)', purpose: 'Mild skin conditioner.', note: 'A tiny amount; the product stays fragrance-free.'),
+      PgIngredient(name: 'Fruit extract (trace)', purpose: 'Mild skin conditioner.', note: 'A tiny amount; the product stays fragrance-free.', caution: 'Even plant extracts can occasionally irritate very reactive skin — stop if you notice redness.'),
     ],
     specs: [
       PgSpec('Composition', '99% water'),
@@ -334,8 +351,10 @@ const List<ProductGuide> kProductGuides = [
       PgExpert(role: 'Nutritionist', name: 'Dr. Aarti Bal', hook: 'Reading a formula tin: what actually matters', duration: '2:05'),
     ],
     experiences: [
-      PgExperience(text: 'Settled easily with my baby when we combination-fed.', author: 'Pooja', context: 'Combination feeding'),
-      PgExperience(text: 'Doctor said any stage-1 is fine — this one mixed cleanest.', author: 'Simran', context: 'Supplementing'),
+      PgExperience(text: 'Settled easily with my baby when we combination-fed.', author: 'Pooja', context: 'Combination feeding', stars: 5),
+      PgExperience(text: 'Doctor said any stage-1 is fine — this one mixed cleanest for us.', author: 'Simran', context: 'Supplementing', stars: 4),
+      PgExperience(text: 'A bit pricey, and the scoop sizing confused me at first.', author: 'Neha', context: 'Formula feeding', stars: 3),
+      PgExperience(text: 'My baby was gassy on this one; we switched brands and it settled.', author: 'Ayesha', context: '2-month-old', stars: 2),
     ],
     ingredients: [
       PgIngredient(name: 'Whey/casein blend', purpose: 'The protein base.', note: 'First-stage blends are designed to be gentle on newborn digestion.'),
@@ -343,7 +362,12 @@ const List<ProductGuide> kProductGuides = [
       PgIngredient(name: 'Iron', purpose: 'Prevents iron deficiency.', note: 'Infant formulas are iron-fortified by regulation.'),
     ],
     studies: [
-      PgStudy(summary: 'Regulators set a common nutritional floor for stage-1 formula; head-to-head brand differences in outcomes are minimal.', meaning: 'Pick one that suits your budget and availability, and focus on safe, correct preparation.'),
+      PgStudy(
+        source: 'FSSAI / Codex standards + independent reviews',
+        summary: 'All stage-1 formulas sold in India must meet the same regulated nutritional standard; independent reviews find little outcome difference between compliant brands.',
+        meaning: 'Brand matters far less than choosing one and preparing it safely. Don\'t pay a big premium expecting better outcomes.',
+        detail: 'Infant formula composition is tightly regulated (FSSAI in India, aligned with Codex). Marketed extras — DHA/ARA, prebiotics, "gentle" proteins — get heavy promotion, but independent systematic reviews show minimal proven difference in growth or health outcomes between compliant brands. What genuinely matters: correct dilution (never over- or under-concentrate), hygienic preparation, and using it within the safe time window. If your baby seems to react, discuss a switch with your paediatrician rather than guessing.',
+      ),
     ],
     specs: [
       PgSpec('Stage', '1 (0–6 months)'),
@@ -371,8 +395,10 @@ const List<ProductGuide> kProductGuides = [
       PgExpert(role: 'Occupational therapist', name: 'Dr. Kabir Shah', hook: 'Hip-healthy carrying: the M-position explained', duration: '2:15'),
     ],
     experiences: [
-      PgExperience(text: 'The only thing that settled our witching-hour baby.', author: 'Neha', context: 'Fussy evenings · 6-week-old'),
-      PgExperience(text: 'Warm at midday, so we use it mornings and evenings.', author: 'Zoya', context: 'Summer · 3-month-old'),
+      PgExperience(text: 'The only thing that settled our witching-hour baby.', author: 'Neha', context: 'Fussy evenings · 6-week-old', stars: 5),
+      PgExperience(text: 'Takes a few tries to fit it snugly, but great once you do.', author: 'Ira', context: '2-month-old', stars: 4),
+      PgExperience(text: 'Warm at midday, so we only use it mornings and evenings.', author: 'Zoya', context: 'Summer · 3-month-old', stars: 3),
+      PgExperience(text: 'Hurt my back on longer walks — the straps didn\'t spread the weight well for me.', author: 'Meena', context: '5-month-old', stars: 2),
     ],
     specs: [
       PgSpec('Positions', 'Front-in, front-out, hip, back'),

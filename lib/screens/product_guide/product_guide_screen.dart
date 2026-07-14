@@ -40,7 +40,7 @@ class ProductGuideScreen extends StatelessWidget {
             const SizedBox(height: 14),
             _pad(_beforeYouBuy(g)),
             const SizedBox(height: 22),
-            _pad(_whyLike(g)),
+            _pad(_honestLook(g)),
             const SizedBox(height: 26),
 
             // progressive-disclosure marker
@@ -55,10 +55,10 @@ class ProductGuideScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             if (g.experts.isNotEmpty) ...[_experts(context, g), const SizedBox(height: 26)],
-            _community(g),
+            _community(context, g),
             const SizedBox(height: 26),
             if (g.ingredients.isNotEmpty) ...[_ingredients(g), const SizedBox(height: 26)],
-            if (g.studies.isNotEmpty) ...[_research(g), const SizedBox(height: 26)],
+            if (g.studies.isNotEmpty) ...[_research(context, g), const SizedBox(height: 26)],
             if (g.specs.isNotEmpty) ...[_specs(g), const SizedBox(height: 26)],
             if (g.relatedIds.isNotEmpty) ...[_related(context, g), const SizedBox(height: 20)],
 
@@ -142,31 +142,6 @@ class ProductGuideScreen extends StatelessWidget {
       const SizedBox(height: 8),
       Wrap(spacing: 8, runSpacing: 8, children: [for (final b in g.bestFor) _chip(b)]),
 
-      // watch out
-      if (g.watchOut.isNotEmpty) ...[
-        const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: const Color(0xFFFBF3E8), borderRadius: BorderRadius.circular(16)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              const Icon(Icons.info_outline_rounded, size: 15, color: pgAmber),
-              const SizedBox(width: 7),
-              Text('WATCH OUT FOR', style: pgEyebrow(pgAmber)),
-            ]),
-            const SizedBox(height: 8),
-            for (final w in g.watchOut)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('•  ', style: pgBody(13, color: pgAmber)),
-                  Expanded(child: Text(w, style: pgBody(13, color: pgInk, h: 1.45))),
-                ]),
-              ),
-          ]),
-        ),
-      ],
       const SizedBox(height: 18),
 
       // CTAs
@@ -247,19 +222,49 @@ class ProductGuideScreen extends StatelessWidget {
         ]),
       );
 
-  // ---- why we like it -----------------------------------------------------
-  Widget _whyLike(ProductGuide g) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Why we like it', style: pgTitle(17)),
-        const SizedBox(height: 12),
-        for (final w in g.whyLike)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.check_circle_rounded, size: 18, color: pgGreen),
-              const SizedBox(width: 10),
-              Expanded(child: Text(w, style: pgBody(14, color: pgInk, h: 1.5))),
-            ]),
-          ),
+  // ---- an honest look (balanced good vs not-so-good, never an ad) ---------
+  Widget _honestLook(ProductGuide g) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead('An honest look', 'The good and the not-so-good — no sales pitch'),
+        const SizedBox(height: 14),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(color: const Color(0xFFEFF6F1), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFD6E7DD))),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [const Icon(Icons.thumb_up_alt_outlined, size: 15, color: pgGreen), const SizedBox(width: 7), Text("WHAT'S GOOD", style: pgEyebrow(pgGreen))]),
+            const SizedBox(height: 10),
+            for (final w in g.whyLike)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Icon(Icons.check_rounded, size: 16, color: pgGreen),
+                  const SizedBox(width: 9),
+                  Expanded(child: Text(w, style: pgBody(13.5, color: pgInk, h: 1.45))),
+                ]),
+              ),
+          ]),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(color: const Color(0xFFFBF3E8), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFEEDFC7))),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [const Icon(Icons.info_outline_rounded, size: 15, color: pgAmber), const SizedBox(width: 7), Text('WORTH CONSIDERING', style: pgEyebrow(pgAmber))]),
+            const SizedBox(height: 10),
+            if (g.watchOut.isEmpty)
+              Text('No real downsides stood out for this one.', style: pgBody(13.5, color: pgInk, h: 1.45))
+            else
+              for (final w in g.watchOut)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('•  ', style: pgBody(14, color: pgAmber)),
+                    Expanded(child: Text(w, style: pgBody(13.5, color: pgInk, h: 1.45))),
+                  ]),
+                ),
+          ]),
+        ),
       ]);
 
   // ---- expert explains ----------------------------------------------------
@@ -308,38 +313,40 @@ class ProductGuideScreen extends StatelessWidget {
         ],
       );
 
-  // ---- community ----------------------------------------------------------
-  Widget _community(ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sectionHead('From the ParentVeda community', 'Real, practical experiences'),
-        const SizedBox(height: 12),
-        Row(children: [
-          const Icon(Icons.groups_rounded, size: 18, color: pgCoral),
-          const SizedBox(width: 8),
-          Text('${g.rating.community.toStringAsFixed(1)} average', style: pgTitle(14, c: pgInk)),
-          const SizedBox(width: 8),
-          Flexible(child: Text('· most helpful below', style: pgBody(12, color: pgMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
-        ]),
-        const SizedBox(height: 14),
-        for (final e in g.experiences)
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: pgHair)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('“${e.text}”', style: pgBody(14, color: pgInk, h: 1.5)),
-              const SizedBox(height: 8),
-              Row(children: [
-                Text(e.author, style: pgBody(12, color: pgInk, w: FontWeight.w700)),
-                const SizedBox(width: 8),
-                Flexible(child: Text('· ${e.context}', style: pgBody(11.5, color: pgMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              ]),
-            ]),
+  // ---- community (top few + See all with filters) -------------------------
+  Widget _community(BuildContext context, ProductGuide g) {
+    final shown = g.experiences.take(3).toList();
+    return _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _sectionHead('From the ParentVeda community', 'Real, practical experiences — not a star dump'),
+      const SizedBox(height: 12),
+      Row(children: [
+        const Icon(Icons.groups_rounded, size: 18, color: pgCoral),
+        const SizedBox(width: 8),
+        Text('${g.rating.community.toStringAsFixed(1)} average', style: pgTitle(14, c: pgInk)),
+        const SizedBox(width: 8),
+        pgStarsRow(g.rating.community.round(), pgCoral),
+      ]),
+      const SizedBox(height: 14),
+      for (final e in shown) pgExperienceCard(e),
+      if (g.experiences.length > shown.length) ...[
+        const SizedBox(height: 2),
+        GestureDetector(
+          onTap: () => _push(context, _CommunityAllScreen(guide: g)),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: pgHair)),
+            child: Text('See all ${g.experiences.length} ratings  →', style: pgBody(13.5, color: pgPurple, w: FontWeight.w700)),
           ),
-      ]));
+        ),
+      ],
+    ]));
+  }
 
-  // ---- ingredients --------------------------------------------------------
+  // ---- ingredients (each with the good AND an honest con) -----------------
   Widget _ingredients(ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sectionHead('Ingredients explained', 'Only the ones that matter'),
+        _sectionHead('Ingredients explained', 'Only the ones that matter — the good and the caveat'),
         const SizedBox(height: 12),
         for (final ing in g.ingredients)
           Container(
@@ -350,23 +357,29 @@ class ProductGuideScreen extends StatelessWidget {
               Text(ing.name, style: pgTitle(14.5)),
               const SizedBox(height: 3),
               Text(ing.purpose, style: pgBody(13, color: pgInk, h: 1.45)),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(10)),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Icon(Icons.spa_outlined, size: 14, color: pgPurple),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(ing.note, style: pgBody(12, color: pgSoft, h: 1.45))),
-                ]),
-              ),
+              const SizedBox(height: 8),
+              _ingLine(Icons.check_rounded, pgGreen, const Color(0xFFEFF6F1), ing.note),
+              if (ing.caution.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                _ingLine(Icons.info_outline_rounded, pgAmber, const Color(0xFFFBF3E8), ing.caution),
+              ],
             ]),
           ),
       ]));
 
-  // ---- research corner ----------------------------------------------------
-  Widget _research(ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sectionHead('Research corner', 'Studies, in plain language'),
+  Widget _ingLine(IconData icon, Color accent, Color bg, String text) => Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(icon, size: 14, color: accent),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: pgBody(12, color: pgInk, h: 1.45))),
+        ]),
+      );
+
+  // ---- research corner (independent, with read-more) ----------------------
+  Widget _research(BuildContext context, ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead('Research corner', 'Independent evidence — not the maker\'s marketing'),
         const SizedBox(height: 12),
         for (final st in g.studies)
           Container(
@@ -374,14 +387,69 @@ class ProductGuideScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: pgHair)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (st.source.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(color: const Color(0xFFEFF6F1), borderRadius: BorderRadius.circular(999)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.verified_outlined, size: 12, color: pgGreen),
+                    const SizedBox(width: 5),
+                    Flexible(child: Text(st.source, style: pgBody(10.5, color: pgGreen, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  ]),
+                ),
+              if (st.source.isNotEmpty) const SizedBox(height: 10),
               Text(st.summary, style: pgBody(13.5, color: pgInk, h: 1.5)),
               const SizedBox(height: 10),
               Text('WHAT THIS MEANS FOR YOU', style: pgEyebrow(pgGreen).copyWith(fontSize: 9.5)),
               const SizedBox(height: 5),
               Text(st.meaning, style: pgBody(13, color: pgSoft, h: 1.5)),
+              if (st.detail.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () => _readMore(context, st),
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text('Read more', style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+                    const Icon(Icons.chevron_right_rounded, size: 16, color: pgPurple),
+                  ]),
+                ),
+              ],
             ]),
           ),
       ]));
+
+  void _readMore(BuildContext context, PgStudy st) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (ctx, sc) => Container(
+          decoration: const BoxDecoration(color: pgBg, borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+          child: ListView(
+            controller: sc,
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
+            children: [
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: pgLine, borderRadius: BorderRadius.circular(99)))),
+              const SizedBox(height: 16),
+              if (st.source.isNotEmpty) Text(st.source, style: pgEyebrow(pgGreen)),
+              const SizedBox(height: 8),
+              Text(st.summary, style: pgSerif(19, h: 1.3)),
+              const SizedBox(height: 14),
+              Text(st.detail, style: pgBody(14, color: pgInk, h: 1.65)),
+              const SizedBox(height: 16),
+              Text('Summarised in plain language from independent sources. Always confirm anything important with your paediatrician.',
+                  style: pgBody(11.5, color: pgMuted, h: 1.5)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   // ---- specs (dynamic per category) ---------------------------------------
   Widget _specs(ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -446,4 +514,137 @@ class ProductGuideScreen extends StatelessWidget {
         const SizedBox(height: 3),
         Text(sub, style: pgBody(12.5, color: pgMuted)),
       ]);
+}
+
+// ---- shared community pieces ------------------------------------------------
+Widget pgStarsRow(int n, Color c) => Row(mainAxisSize: MainAxisSize.min, children: [
+      for (int i = 0; i < 5; i++)
+        Icon(i < n ? Icons.star_rounded : Icons.star_outline_rounded, size: 13, color: c),
+    ]);
+
+Widget pgExperienceCard(PgExperience e) => Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: pgHair)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          pgStarsRow(e.stars, e.positive ? pgGreen : pgAmber),
+          const Spacer(),
+          Text(e.positive ? 'Positive' : 'Critical',
+              style: pgBody(10.5, color: e.positive ? pgGreen : pgAmber, w: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 8),
+        Text('“${e.text}”', style: pgBody(14, color: pgInk, h: 1.5)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Text(e.author, style: pgBody(12, color: pgInk, w: FontWeight.w700)),
+          const SizedBox(width: 8),
+          Flexible(child: Text('· ${e.context}', style: pgBody(11.5, color: pgMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+        ]),
+      ]),
+    );
+
+// ---- "See all ratings" — filter by sentiment and by star level -------------
+class _CommunityAllScreen extends StatefulWidget {
+  const _CommunityAllScreen({required this.guide});
+  final ProductGuide guide;
+  @override
+  State<_CommunityAllScreen> createState() => _CommunityAllScreenState();
+}
+
+class _CommunityAllScreenState extends State<_CommunityAllScreen> {
+  String _filter = 'all'; // all | positive | critical | 5..1
+
+  List<PgExperience> get _shown {
+    final all = widget.guide.experiences;
+    switch (_filter) {
+      case 'positive':
+        return all.where((e) => e.positive).toList();
+      case 'critical':
+        return all.where((e) => e.critical).toList();
+      case '5':
+      case '4':
+      case '3':
+      case '2':
+      case '1':
+        final s = int.parse(_filter);
+        return all.where((e) => e.stars == s).toList();
+      default:
+        return all;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final g = widget.guide;
+    final shown = _shown;
+    return Scaffold(
+      backgroundColor: pgBg,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
+          children: [
+            Row(children: [
+              GestureDetector(
+                onTap: () => Navigator.of(context).maybePop(),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 34, height: 34, alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: pgPanel, shape: BoxShape.circle),
+                  child: const Icon(Icons.arrow_back, size: 16, color: pgInk),
+                ),
+              ),
+              Expanded(child: Center(child: Text('ALL RATINGS', style: pgEyebrow(pgMuted)))),
+              const SizedBox(width: 34),
+            ]),
+            const SizedBox(height: 18),
+            Text(g.name, style: pgSerif(22, h: 1.15)),
+            const SizedBox(height: 8),
+            Row(children: [
+              Text(g.rating.community.toStringAsFixed(1), style: pgTitle(20, c: pgInk)),
+              const SizedBox(width: 8),
+              pgStarsRow(g.rating.community.round(), pgCoral),
+              const SizedBox(width: 8),
+              Text('${g.experiences.length} ratings', style: pgBody(12.5, color: pgMuted)),
+            ]),
+            const SizedBox(height: 16),
+            // filters
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              _chipF('All', 'all'),
+              _chipF('Positive', 'positive'),
+              _chipF('Critical', 'critical'),
+              for (final s in [5, 4, 3, 2, 1]) _chipF('$s★', '$s'),
+            ]),
+            const SizedBox(height: 18),
+            if (shown.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(16)),
+                child: Text('No ratings match this filter yet.', textAlign: TextAlign.center, style: pgBody(13.5, color: pgInk)),
+              )
+            else
+              for (final e in shown) pgExperienceCard(e),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _chipF(String label, String value) {
+    final on = _filter == value;
+    return GestureDetector(
+      onTap: () => setState(() => _filter = value),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        decoration: BoxDecoration(
+          color: on ? pgPurple : Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: on ? pgPurple : pgLine),
+        ),
+        child: Text(label, style: pgBody(12.5, color: on ? Colors.white : pgInk, w: FontWeight.w600)),
+      ),
+    );
+  }
 }

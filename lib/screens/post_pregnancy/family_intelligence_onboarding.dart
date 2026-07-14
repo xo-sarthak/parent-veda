@@ -197,9 +197,9 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
           child: Row(children: [
             const Icon(Icons.calendar_today_outlined, size: 16, color: ppPurple),
             const SizedBox(width: 10),
-            Text('${_child.dob.day} ${_months[_child.dob.month - 1]} ${_child.dob.year}', style: ppBody(14.5, color: ppInk, w: FontWeight.w600)),
-            const Spacer(),
-            Text(_child.ageLabel, style: ppBody(12.5, color: ppMuted)),
+            Flexible(child: Text('${_child.dob.day} ${_months[_child.dob.month - 1]} ${_child.dob.year}', style: ppBody(14.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            const SizedBox(width: 8),
+            Text(_child.ageLabel, style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
           ]),
         ),
       )),

@@ -29,8 +29,30 @@ void main() {
     final guideScroll = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('BEFORE YOU BUY'), 250, scrollable: guideScroll, maxScrolls: 30);
     expect(find.text('BEFORE YOU BUY'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Why we like it'), 250, scrollable: guideScroll, maxScrolls: 30);
-    expect(find.text('Why we like it'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('An honest look'), 250, scrollable: guideScroll, maxScrolls: 30);
+    expect(find.text('An honest look'), findsOneWidget);
+    expect(find.text("WHAT'S GOOD"), findsOneWidget);
+    expect(find.text('WORTH CONSIDERING'), findsOneWidget);
+  });
+
+  testWidgets('Community See-all filters ratings by sentiment', (tester) async {
+    bigView(tester);
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpAndSettle();
+    final scrollable = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(find.textContaining('See all'), 250, scrollable: scrollable, maxScrolls: 40);
+    await tester.ensureVisible(find.textContaining('See all').first);
+    await tester.pump();
+    await tester.tap(find.textContaining('See all').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('ALL RATINGS'), findsOneWidget);
+    // Filter to Critical (the first 'Critical' is the filter chip) → the low-star
+    // eczema experience shows, a 5★ one doesn't.
+    await tester.tap(find.text('Critical').first);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('prescription cream'), findsOneWidget);
+    expect(find.textContaining('dry winter cheeks'), findsNothing);
   });
 
   testWidgets('A guide page shows the decision hero and deep-dive', (tester) async {
