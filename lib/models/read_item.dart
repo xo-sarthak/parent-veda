@@ -10,6 +10,44 @@ import 'package:flutter/foundation.dart';
 
 enum ReadType { article, book, research, expert, reflection }
 
+/// One of a book's "most important ideas" — the what / why / how triple that the
+/// companion renders as a styled card.
+@immutable
+class BookKeyIdea {
+  const BookKeyIdea({required this.title, required this.means, required this.matters, required this.inRealLife});
+  final String title;
+  final String means; // What the author means
+  final String matters; // Why it matters
+  final List<String> inRealLife; // In real life (bullets)
+}
+
+/// A rich "book companion" — the structured summary a book ReadItem can carry so
+/// the reader renders About / Core Philosophy / Key Ideas / ParentVeda Perspective
+/// / Chapter-by-chapter / Quotes instead of one flat blurb. All optional.
+@immutable
+class BookCompanion {
+  const BookCompanion({
+    this.recommendedFor = const [],
+    this.themes = const [],
+    this.about = '',
+    this.philosophy = '',
+    this.ideas = const [],
+    this.perspective = '',
+    this.chapters = const [],
+    this.quotes = const [],
+  });
+  final List<String> recommendedFor;
+  final List<String> themes;
+  final String about; // "What this book is about"
+  final String philosophy; // "Core Philosophy"
+  final List<BookKeyIdea> ideas; // "The book's most important ideas"
+  final String perspective; // "ParentVeda Perspective"
+  final List<(String title, String summary)> chapters; // chapter-by-chapter
+  final List<String> quotes; // memorable quotes
+
+  bool get isEmpty => about.isEmpty && ideas.isEmpty && chapters.isEmpty;
+}
+
 @immutable
 class ReadItem {
   const ReadItem({
@@ -40,6 +78,9 @@ class ReadItem {
     // Optional store link for a book summary's "Buy Book" CTA. Empty => the CTA
     // falls back to a web search for the title + author.
     this.buyUrl = '',
+    // Optional rich book companion (About / Philosophy / Key Ideas / Chapters /
+    // Quotes). When present, the reader renders it instead of a flat blurb.
+    this.companion,
   });
 
   final String id;
@@ -77,6 +118,11 @@ class ReadItem {
 
   /// Optional purchase link for book summaries ("Buy Book").
   final String buyUrl;
+
+  /// Optional rich book companion (see [BookCompanion]).
+  final BookCompanion? companion;
+
+  bool get hasCompanion => companion != null && !companion!.isEmpty;
 
   bool relevantAt(int week) => week >= weekStart && week <= weekEnd;
   bool get isHigh => priority == 'high';

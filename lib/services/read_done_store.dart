@@ -31,7 +31,11 @@ class ReadDoneStore extends ChangeNotifier with CloudSyncedStore {
       _done.addAll(prefs.getStringList(_key) ?? const []);
       notifyListeners();
     } catch (_) {/* start empty */}
-    await syncStateFromCloud();
+    // Defensive: a cloud/Supabase hiccup must never break the reader (also
+    // makes the store safe under the widget-test harness).
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
   }
 
   // --- cloud sync ------------------------------------------------------------

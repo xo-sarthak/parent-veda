@@ -371,6 +371,123 @@ const List<ReadItem> kReadItems = [
 
   // ---- Books ----
   ReadItem(
+    id: 'book_what_to_expect',
+    title: 'What to Expect When You\'re Expecting',
+    type: ReadType.book,
+    weekStart: 4,
+    weekEnd: 44,
+    reason:
+        'A calm, month-by-month reference for the 2 a.m. question every expectant parent asks — "is this normal?" — useful right through pregnancy and the fourth trimester.',
+    readingTime: '11 min',
+    category: 'Pregnancy Guide',
+    emoji: '📖',
+    author: 'Heidi Murkoff',
+    why:
+        'The classic month-by-month pregnancy reference — reassuring, practical, and honest about when to actually worry. Best used as a patient companion you consult by symptom and stage, not read cover to cover.',
+    rating: 4.6,
+    ratingCount: 15000,
+    companion: BookCompanion(
+      recommendedFor: [
+        'First-time expectant parents',
+        'Anxious pregnancy trackers',
+        'Anyone wanting a month-by-month reference',
+      ],
+      themes: ['Pregnancy', 'Nutrition', 'Prenatal health', 'Labour & delivery', 'Postpartum'],
+      about:
+          'Pregnancy floods parents with fear of the unknown — every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast — treating uncertainty itself as pregnancy\'s real enemy.',
+      philosophy:
+          'The changes themselves aren\'t what make pregnancy frightening — not knowing what\'s normal is. A strange cramp or an unfamiliar craving isn\'t inherently alarming; what turns it into 2 a.m. panic is the absence of a reliable answer. The method closes the gap between "something is happening to my body" and "someone can tell me whether that\'s expected" — which is why it\'s organised month-by-month, symptom-by-symptom, like a patient nurse who has heard every question before. The underlying belief is that information is a form of care: worry with no target tends to expand, while worry given a clear answer usually deflates. That\'s why nearly every reassurance is paired with a boundary — the rarer symptoms that do warrant a call. The goal isn\'t blanket calm, but calibrated calm: knowing exactly when concern is appropriate.',
+      ideas: [
+        BookKeyIdea(
+          title: 'Every pregnancy is its own story',
+          means:
+              'No two pregnancies unfold the same way — even across one woman\'s own children. Symptom timing, intensity, bump size and cravings vary enormously, and none of it predicts anything going wrong.',
+          matters:
+              'Comparison is one of the biggest sources of pregnancy anxiety. Expecting your experience to match a friend\'s, a sibling\'s, or an app\'s average sets you up to worry over ordinary variation rather than a real problem.',
+          inRealLife: [
+            'Skip trackers that imply your symptoms "should" look a certain way by week.',
+            'Treat differences from other parents as expected, not diagnostic.',
+            'Bring genuinely unusual or worsening symptoms to your provider — not to a comparison chat.',
+          ],
+        ),
+        BookKeyIdea(
+          title: 'Nutrition is about consistency, not perfection',
+          means:
+              'Pregnancy nutrition is steady, moderate habits — balanced meals, enough protein, key nutrients like folate and iron — not one "perfect" diet followed exactly every day.',
+          matters:
+              'Nutrient needs do rise, and some deficiencies carry real risks — but an all-or-nothing mindset backfires, especially alongside nausea that makes eating well genuinely hard some weeks.',
+          inRealLife: [
+            'Aim for a rough week of decent meals rather than one perfect day.',
+            'On nausea-heavy days, prioritise eating something over the "ideal" plate.',
+            'Keep one boring, reliable go-to meal ready for low-appetite stretches.',
+          ],
+        ),
+        BookKeyIdea(
+          title: 'Most symptoms have an ordinary explanation',
+          means:
+              'For nearly every strange symptom, the book supplies the underlying reason — hormonal shifts, blood-volume changes, a growing uterus pressing on organs — so it stops feeling mysterious.',
+          matters:
+              'An unexplained symptom recruits imagination, and imagination tends toward worst-case thinking. A named cause is far less frightening even when the sensation itself doesn\'t change.',
+          inRealLife: [
+            'When something new appears, look for the "why" before "is this bad".',
+            'Keep a short weekly symptom log — a pattern calms nerves faster than a single data point.',
+            'Use the explanation to decide whether to wait it out or call your provider.',
+          ],
+        ),
+        BookKeyIdea(
+          title: 'Preparation turns unknowns into checklists',
+          means:
+              'The month-by-month structure previews what\'s coming — fetal development, likely changes, and decisions like a birth plan or feeding choice — before you\'re in the middle of them.',
+          matters:
+              'Anticipated change is far easier to tolerate than surprise change. Knowing roughly what month six feels like before you\'re in it turns dread into a concrete to-do list.',
+          inRealLife: [
+            'Read a month or two ahead of where you are, not only the current chapter.',
+            'Turn upcoming decisions into a simple timeline instead of leaving them until urgent.',
+            'Build your hospital bag gradually across the third trimester.',
+          ],
+        ),
+        BookKeyIdea(
+          title: 'You\'re allowed to advocate for yourself',
+          means:
+              'The book encourages asking questions, seeking second opinions, and choosing a provider you trust — treating you as an active participant, not a passive patient.',
+          matters:
+              'Pregnant women are sometimes dismissed when reporting symptoms. A parent who expects to ask questions is more likely to walk away with a complete answer.',
+          inRealLife: [
+            'Write questions down before appointments so nerves don\'t erase them.',
+            'If a symptom is dismissed but keeps recurring, ask for it to be documented and revisited.',
+            'It\'s fine to seek a second opinion on something significant.',
+          ],
+        ),
+        BookKeyIdea(
+          title: 'The fourth trimester deserves as much attention as the first three',
+          means:
+              'The book extends meaningfully past delivery — physical recovery, mood changes, breastfeeding challenges and the emotional adjustment of early parenthood all get real space.',
+          matters:
+              'Attention tends to drop the moment the baby arrives — right when a parent\'s body and mind are undergoing some of the most intense changes of all.',
+          inRealLife: [
+            'Prepare postpartum supplies with the same care as the hospital bag.',
+            'Line up practical support for the first two weeks before the baby arrives.',
+            'Learn the warning signs of postpartum mood disorders before you need them.',
+          ],
+        ),
+      ],
+      perspective:
+          'Most of this book\'s guidance holds up well — self-advocacy and fourth-trimester awareness in particular remain as relevant as ever. Where it\'s aged less evenly is nutrition and weight gain: current guidance ties healthy gestational weight gain to a woman\'s pre-pregnancy BMI rather than one uniform target (ACOG suggests underweight women gain up to ~40 lb, average-weight 25–35 lb, and overweight or obese 11–25 lb). Treat any specific number the book offers as a starting point for a conversation with your own provider, not a fixed rule. Where the book is philosophical rather than clinical — like how much to "trust your instincts" — that\'s a reasonable but personal judgement call, not a settled fact.',
+      chapters: [
+        ('Before You Conceive', 'Preconception health — timing conception, starting prenatal vitamins, and adjusting habits before trying. Frames early planning as anxiety-reduction, not a strict prerequisite, and previews what the first prenatal visit involves.'),
+        ('First Trimester (Months 1–3)', 'Confirming pregnancy, early symptoms (nausea, fatigue, tenderness), first visits and early testing. Sets honest expectations that this is often the most symptom-heavy stretch, and explains why most early symptoms fade by month four.'),
+        ('Second Trimester (Months 4–6)', 'Often the "easier" stretch as energy returns. Shifts to fetal-development milestones, the anatomy scan, and early planning — announcing, nursery setup, and work considerations like leave and disclosure.'),
+        ('Third Trimester (Months 7–9)', 'Managing physical discomfort as the body prepares for birth, plus concrete prep: packing the hospital bag, choosing a paediatrician, and telling real labour from false alarms. Builds toward delivery-day readiness.'),
+        ('Labour, Delivery & Special Circumstances', 'The stages of labour, pain-management options, and common interventions like induction or caesarean. Multiples, high-risk pregnancies and pregnancy loss are addressed with the same directness, not as footnotes.'),
+        ('Postpartum & Beyond', 'Physical recovery in the weeks after birth, feeding decisions, and the emotional adjustment of early parenthood — with clear guidance on recognising postpartum mood disorders and when to seek help.'),
+      ],
+      quotes: [
+        '"You will want a copilot in whom you have complete faith." — on choosing a healthcare provider you trust.',
+        '"What you tell your doctor is confidential; no one else will know." — on being honest with your provider without fear of judgement.',
+      ],
+    ),
+  ),
+  ReadItem(
     id: 'book_whole_brain',
     title: 'The Whole-Brain Child',
     type: ReadType.book,

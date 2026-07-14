@@ -125,6 +125,16 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   // The blocks present on this read (for the table of contents), in order.
   List<(String, String)> _tocEntries() {
     final out = <(String, String)>[];
+    if (a.hasCompanion) {
+      final c = a.companion!;
+      if (c.about.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
+      if (c.philosophy.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
+      if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'Zaroori ideas')));
+      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda perspective', 'ParentVeda ka nazariya')));
+      if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'Chapter dar chapter')));
+      if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'Yaadgaar baatein')));
+      return out;
+    }
     out.add(('read',
         a.type == ReadType.book ? _tr('Why we recommend it', 'Kyun recommend karte hain') : _tr('The read', 'Padhein')));
     if (a.hasWhyThisMatters) out.add(('why', _tr('Why this matters', 'Yeh kyun zaroori hai')));
@@ -193,43 +203,49 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                 fontSize: 13, fontWeight: FontWeight.w700, color: t.accent))),
         const SizedBox(height: 16),
       ],
-      // Main body.
-      _anchor('read'),
-      for (final para in bodyText.split('\n\n'))
-        Padding(
-          padding: const EdgeInsets.only(bottom: 18),
-          child: _pad(Text(para.trim(), style: _bodyStyle(t))),
-        ),
-      // Book meta (rating) sits under the recommendation text.
-      if (isBook && a.hasRating) ...[
-        const SizedBox(height: 2),
-        _pad(_ratingRow(t)),
-        const SizedBox(height: 8),
-      ],
-      // ---- signature blocks -------------------------------------------------
-      if (a.hasWhyThisMatters) ...[
-        const SizedBox(height: 4),
-        _anchor('why'),
-        _pad(_infoBlock(t,
-            icon: Icons.favorite_border_rounded,
-            title: _tr('Why this matters', 'Yeh kyun zaroori hai'),
-            body: a.whyThisMatters,
-            tint: t.accent)),
-        const SizedBox(height: 20),
-      ],
-      if (a.hasResearchSimplified) ...[
-        _anchor('research'),
-        _pad(_infoBlock(t,
-            icon: Icons.science_outlined,
-            title: _tr('Research simplified', 'Research aasan bhaasha mein'),
-            body: a.researchSimplified,
-            tint: const Color(0xFF3FA56A))),
-        const SizedBox(height: 20),
-      ],
-      if (a.hasMythFact) ...[
-        _anchor('myth'),
-        _pad(_mythFact(t)),
-        const SizedBox(height: 20),
+      // A rich book companion renders its own sections; everything else uses the
+      // generic body + signature blocks.
+      if (a.hasCompanion)
+        ..._companionSections(t)
+      else ...[
+        // Main body.
+        _anchor('read'),
+        for (final para in bodyText.split('\n\n'))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: _pad(Text(para.trim(), style: _bodyStyle(t))),
+          ),
+        // Book meta (rating) sits under the recommendation text.
+        if (isBook && a.hasRating) ...[
+          const SizedBox(height: 2),
+          _pad(_ratingRow(t)),
+          const SizedBox(height: 8),
+        ],
+        // ---- signature blocks -----------------------------------------------
+        if (a.hasWhyThisMatters) ...[
+          const SizedBox(height: 4),
+          _anchor('why'),
+          _pad(_infoBlock(t,
+              icon: Icons.favorite_border_rounded,
+              title: _tr('Why this matters', 'Yeh kyun zaroori hai'),
+              body: a.whyThisMatters,
+              tint: t.accent)),
+          const SizedBox(height: 20),
+        ],
+        if (a.hasResearchSimplified) ...[
+          _anchor('research'),
+          _pad(_infoBlock(t,
+              icon: Icons.science_outlined,
+              title: _tr('Research simplified', 'Research aasan bhaasha mein'),
+              body: a.researchSimplified,
+              tint: const Color(0xFF3FA56A))),
+          const SizedBox(height: 20),
+        ],
+        if (a.hasMythFact) ...[
+          _anchor('myth'),
+          _pad(_mythFact(t)),
+          const SizedBox(height: 20),
+        ],
       ],
       const SizedBox(height: 6),
       _pad(_actions(t, s)),
@@ -420,6 +436,141 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             ]),
           ),
         ]),
+      );
+
+  // ---- book companion (About / Philosophy / Ideas / Perspective / Chapters) -
+  List<Widget> _companionSections(_RTheme t) {
+    final c = a.companion!;
+    return [
+      if (c.recommendedFor.isNotEmpty || c.themes.isNotEmpty) ...[
+        _pad(_companionMeta(t, c)),
+        const SizedBox(height: 20),
+      ],
+      if (a.hasRating) ...[_pad(_ratingRow(t)), const SizedBox(height: 18)],
+      if (c.about.isNotEmpty) ...[
+        _anchor('about'),
+        _pad(_secTitle(t, _tr('What this book is about', 'Yeh book kis baare mein hai'))),
+        const SizedBox(height: 10),
+        _pad(Text(c.about, style: _bodyStyle(t))),
+        const SizedBox(height: 22),
+      ],
+      if (c.philosophy.isNotEmpty) ...[
+        _anchor('philosophy'),
+        _pad(_infoBlock(t, icon: Icons.auto_awesome_outlined, title: _tr('Core philosophy', 'Mool vichaar'), body: c.philosophy, tint: t.accent)),
+        const SizedBox(height: 22),
+      ],
+      if (c.ideas.isNotEmpty) ...[
+        _anchor('ideas'),
+        _pad(_secTitle(t, _tr('The most important ideas', 'Sabse zaroori ideas'))),
+        const SizedBox(height: 14),
+        for (final idea in c.ideas) _pad(_ideaCard(t, idea)),
+        const SizedBox(height: 6),
+      ],
+      if (c.perspective.isNotEmpty) ...[
+        _anchor('perspective'),
+        _pad(_infoBlock(t, icon: Icons.verified_outlined, title: _tr('ParentVeda perspective', 'ParentVeda ka nazariya'), body: c.perspective, tint: const Color(0xFF3FA56A))),
+        const SizedBox(height: 22),
+      ],
+      if (c.chapters.isNotEmpty) ...[
+        _anchor('chapters'),
+        _pad(_secTitle(t, _tr('Chapter by chapter', 'Chapter dar chapter'))),
+        const SizedBox(height: 12),
+        for (final ch in c.chapters) _pad(_chapterRow(t, ch.$1, ch.$2)),
+        const SizedBox(height: 10),
+      ],
+      if (c.quotes.isNotEmpty) ...[
+        _anchor('quotes'),
+        _pad(_secTitle(t, _tr('Memorable lines', 'Yaadgaar baatein'))),
+        const SizedBox(height: 12),
+        for (final q in c.quotes) _pad(_quoteCard(t, q)),
+      ],
+    ];
+  }
+
+  Widget _secTitle(_RTheme t, String text) => Text(text,
+      style: GoogleFonts.fraunces(fontSize: 22 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink));
+
+  Widget _companionMeta(_RTheme t, BookCompanion c) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(15)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (c.recommendedFor.isNotEmpty) ...[
+            Text(_tr('BEST FOR', 'KISKE LIYE'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            const SizedBox(height: 8),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _metaChip(t, r, t.accent)]),
+          ],
+          if (c.recommendedFor.isNotEmpty && c.themes.isNotEmpty) const SizedBox(height: 14),
+          if (c.themes.isNotEmpty) ...[
+            Text(_tr('THEMES', 'VISHAY'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            const SizedBox(height: 8),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final th in c.themes) _metaChip(t, th, t.soft)]),
+          ],
+        ]),
+      );
+
+  Widget _metaChip(_RTheme t, String label, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(color: t.bg, borderRadius: BorderRadius.circular(999), border: Border.all(color: t.rule)),
+        child: Text(label, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+      );
+
+  Widget _ideaCard(_RTheme t, BookKeyIdea idea) => Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(16), border: Border.all(color: t.rule)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(idea.title, style: GoogleFonts.plusJakartaSans(fontSize: 16 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2)),
+          const SizedBox(height: 12),
+          _ideaPart(t, _tr('What it means', 'Iska matlab'), idea.means),
+          const SizedBox(height: 10),
+          _ideaPart(t, _tr('Why it matters', 'Yeh kyun zaroori hai'), idea.matters),
+          if (idea.inRealLife.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(_tr('IN REAL LIFE', 'ASAL ZINDAGI MEIN'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
+            const SizedBox(height: 6),
+            for (final b in idea.inRealLife)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
+                  const SizedBox(width: 9),
+                  Expanded(child: Text(b, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.ink))),
+                ]),
+              ),
+          ],
+        ]),
+      );
+
+  Widget _ideaPart(_RTheme t, String label, String body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: t.soft)),
+        const SizedBox(height: 3),
+        Text(body, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.ink)),
+      ]);
+
+  Widget _chapterRow(_RTheme t, String title, String summary) => Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(14)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink)),
+          const SizedBox(height: 5),
+          Text(summary, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
+        ]),
+      );
+
+  Widget _quoteCard(_RTheme t, String q) => Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        decoration: BoxDecoration(
+          color: t.accent.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(14),
+          border: Border(left: BorderSide(color: t.accent, width: 3)),
+        ),
+        child: Text(q, style: GoogleFonts.fraunces(fontSize: 15 * _fs, height: 1.5, fontStyle: FontStyle.italic, color: t.ink)),
       );
 
   // ---- actions: mark reading / mark done (same stores as the old reader) ----
