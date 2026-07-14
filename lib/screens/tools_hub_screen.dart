@@ -27,6 +27,7 @@ import 'reminders_screen.dart';
 // Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
 // Kept commented for revert.
 // import 'report_screen.dart';
+import 'product_guide/product_guide_hub_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
@@ -94,6 +95,8 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => ReadyForBirthScreen(controller: controller))),
       _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
           () => open(() => ProductChecklistScreen(controller: controller))),
+      _Tool('Product Guide', Icons.menu_book_outlined, AppTheme.primary400,
+          () => open(() => const ProductGuideHubScreen())),
       _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
           () => open(() => MedicineTrackerScreen(controller: controller))),
       _Tool(s.rmdTitle, Icons.notifications_active_rounded,

@@ -11,6 +11,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../product_guide/product_guide_chooser.dart';
+import '../product_guide/product_guide_data.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'products_compare_screen.dart';
@@ -279,6 +281,14 @@ class ProductDetailScreen extends StatelessWidget {
             // product shot
             const SizedBox(height: 16),
             _pad(const PpStriped(height: 230, radius: 22, border: true)),
+
+            // If this product has a ParentVeda Product Guide, offer it inline.
+            ...() {
+              final g = guideForProduct(id: product.id, name: product.name);
+              return g == null
+                  ? const <Widget>[]
+                  : [const SizedBox(height: 16), productGuideBanner(context, g, padding: const EdgeInsets.symmetric(horizontal: 24))];
+            }(),
 
             // badge + title
             const SizedBox(height: 18),

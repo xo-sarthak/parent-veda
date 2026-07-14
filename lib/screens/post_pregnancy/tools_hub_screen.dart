@@ -22,6 +22,7 @@ import 'sleep_journey_screen.dart';
 // Was a direct entry to the V1 finder; the front door (baby_naming_home_screen)
 // now owns the V1|V2 toggle and imports NameFinderScreen itself.
 // import 'name_finder_screen.dart';
+import '../product_guide/product_guide_hub_screen.dart';
 import 'pp_common.dart';
 import 'products_compare_screen.dart';
 import 'vax_tracker_screen.dart';
@@ -102,6 +103,9 @@ class ToolsHubScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _pad(Column(children: [
               _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth journey', 'Weight, height, head — on his curve', ppMuted, () => _push(context, const GrowthJourneyScreen())),
+              const SizedBox(height: 10),
+              _tracker(context, Icons.menu_book_outlined, const Color(0xFFEAF4EE), 'Product Guide', 'Is it right for your child?', ppMuted,
+                  () => _push(context, const ProductGuideHubScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
                   () => _push(context, const ProductsCompareScreen())),

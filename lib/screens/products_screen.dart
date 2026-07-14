@@ -18,6 +18,8 @@ import '../services/product_store.dart';
 import '../services/cart_store.dart';
 import '../theme/app_theme.dart';
 import 'cart_screen.dart';
+import 'product_guide/product_guide_chooser.dart';
+import 'product_guide/product_guide_data.dart';
 import 'tools/product_checklist_screen.dart';
 
 const Color _score = Color(0xFFE6A817); // warm gold for the score
@@ -728,6 +730,13 @@ class ProductDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          // If this product has a ParentVeda Product Guide, offer it up top.
+          ...() {
+            final g = guideForProduct(id: product.id, name: product.name);
+            return g == null
+                ? const <Widget>[]
+                : [productGuideBanner(context, g, padding: EdgeInsets.zero), const SizedBox(height: 14)];
+          }(),
           // Hero
           Container(
             width: double.infinity,

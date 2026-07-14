@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../ask_veda/veda_core.dart';
+import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
 import 'community_screen.dart';
 import 'parenting_veda.dart';
@@ -309,8 +310,19 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
   final shownTitle = product?.name ?? title;
   final shownPrice = product?.priceLabel ?? price;
   return GestureDetector(
-    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => product != null ? ProductDetailScreen(product: product) : const ProductsDiscoveryScreen())),
+    onTap: () {
+      if (product != null) {
+        // If this product has a ParentVeda Product Guide, ask which view;
+        // otherwise open the normal detail page with no friction.
+        openProductWithGuideCheck(context,
+            id: product.id,
+            name: product.name,
+            onOpenNormal: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: product))));
+      } else {
+        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ProductsDiscoveryScreen()));
+      }
+    },
     behavior: HitTestBehavior.opaque,
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 12),

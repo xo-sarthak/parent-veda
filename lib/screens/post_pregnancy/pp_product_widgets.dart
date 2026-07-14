@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../product_guide/product_guide_chooser.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
@@ -74,8 +75,11 @@ class PpProductCard extends StatelessWidget {
         final selected = PpCompareStore.instance.isSelected(product);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           GestureDetector(
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: product))),
+            onTap: () => openProductWithGuideCheck(context,
+                id: product.id,
+                name: product.name,
+                onOpenNormal: () => Navigator.of(context)
+                    .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: product)))),
             behavior: HitTestBehavior.opaque,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Stack(children: [
