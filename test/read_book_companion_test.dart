@@ -27,9 +27,27 @@ void main() {
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('The most important ideas'), 300, scrollable: scrollable, maxScrolls: 50);
     expect(find.text('The most important ideas'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Every pregnancy is its own story'), 300, scrollable: scrollable, maxScrolls: 50);
-    expect(find.text('Every pregnancy is its own story'), findsOneWidget);
+    // Key ideas render as numbered "milestone" bars.
+    await tester.scrollUntilVisible(find.text('1. Every pregnancy is its own story'), 300, scrollable: scrollable, maxScrolls: 50);
+    expect(find.text('1. Every pregnancy is its own story'), findsOneWidget);
+    expect(find.text('WHAT THE AUTHOR MEANS'), findsWidgets);
+
+    // Chapters are collapsed teasers; Read more reveals the Key Points.
     await tester.scrollUntilVisible(find.text('Chapter by chapter'), 300, scrollable: scrollable, maxScrolls: 50);
     expect(find.text('Chapter by chapter'), findsOneWidget);
+    expect(find.text('KEY POINTS COVERED'), findsNothing);
+
+    // Reveal the chapter cards (they build lazily below the heading).
+    for (var i = 0; i < 30 && find.text('Read more').evaluate().isEmpty; i++) {
+      await tester.drag(scrollable, const Offset(0, -260));
+      await tester.pump();
+    }
+    expect(find.text('Before You Conceive'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Read more').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Read more').first);
+    await tester.pumpAndSettle();
+    expect(find.text('KEY POINTS COVERED'), findsWidgets);
   });
 }

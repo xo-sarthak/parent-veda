@@ -378,7 +378,7 @@ const List<ReadItem> kReadItems = [
     weekEnd: 44,
     reason:
         'A calm, month-by-month reference for the 2 a.m. question every expectant parent asks — "is this normal?" — useful right through pregnancy and the fourth trimester.',
-    readingTime: '11 min',
+    readingTime: '10 min',
     category: 'Pregnancy Guide',
     emoji: '📖',
     author: 'Heidi Murkoff',
@@ -472,14 +472,68 @@ const List<ReadItem> kReadItems = [
         ),
       ],
       perspective:
-          'Most of this book\'s guidance holds up well — self-advocacy and fourth-trimester awareness in particular remain as relevant as ever. Where it\'s aged less evenly is nutrition and weight gain: current guidance ties healthy gestational weight gain to a woman\'s pre-pregnancy BMI rather than one uniform target (ACOG suggests underweight women gain up to ~40 lb, average-weight 25–35 lb, and overweight or obese 11–25 lb). Treat any specific number the book offers as a starting point for a conversation with your own provider, not a fixed rule. Where the book is philosophical rather than clinical — like how much to "trust your instincts" — that\'s a reasonable but personal judgement call, not a settled fact.',
+          'This is one of the steadiest, most reassuring books in the category — its real strength is calming panic with plain explanations, not pushing one parenting style. What\'s most worth borrowing: the mindset that most symptoms have an ordinary explanation, and the encouragement to advocate for yourself with your provider. Treat any specific number or diet detail in the book as a starting point for your own doctor conversation, not a rule to follow exactly.',
       chapters: [
-        ('Before You Conceive', 'Preconception health — timing conception, starting prenatal vitamins, and adjusting habits before trying. Frames early planning as anxiety-reduction, not a strict prerequisite, and previews what the first prenatal visit involves.'),
-        ('First Trimester (Months 1–3)', 'Confirming pregnancy, early symptoms (nausea, fatigue, tenderness), first visits and early testing. Sets honest expectations that this is often the most symptom-heavy stretch, and explains why most early symptoms fade by month four.'),
-        ('Second Trimester (Months 4–6)', 'Often the "easier" stretch as energy returns. Shifts to fetal-development milestones, the anatomy scan, and early planning — announcing, nursery setup, and work considerations like leave and disclosure.'),
-        ('Third Trimester (Months 7–9)', 'Managing physical discomfort as the body prepares for birth, plus concrete prep: packing the hospital bag, choosing a paediatrician, and telling real labour from false alarms. Builds toward delivery-day readiness.'),
-        ('Labour, Delivery & Special Circumstances', 'The stages of labour, pain-management options, and common interventions like induction or caesarean. Multiples, high-risk pregnancies and pregnancy loss are addressed with the same directness, not as footnotes.'),
-        ('Postpartum & Beyond', 'Physical recovery in the weeks after birth, feeding decisions, and the emotional adjustment of early parenthood — with clear guidance on recognising postpartum mood disorders and when to seek help.'),
+        BookChapter(
+          title: 'Before You Conceive',
+          summary: 'Preconception health — timing conception, starting prenatal vitamins, and adjusting lifestyle habits before trying. Frames early planning as a way to reduce anxiety later, and previews what the first prenatal visit will involve.',
+          keyPoints: [
+            'How long conception typically takes, and when a longer wait warrants a doctor visit',
+            'Folic acid and prenatal vitamin timing before conception, not just after',
+            'Lifestyle adjustments — alcohol, smoking, medications, caffeine — before trying',
+            'What actually happens at the very first prenatal appointment',
+          ],
+        ),
+        BookChapter(
+          title: 'First Trimester (Months 1–3)',
+          summary: 'Confirms pregnancy, introduces early symptoms like nausea and fatigue, and covers the first prenatal visits and early testing. Sets honest expectations that this is often the most symptom-heavy, emotionally uncertain stretch.',
+          keyPoints: [
+            'Why nausea and fatigue happen, and food/timing strategies that help',
+            'What each early test (bloodwork, dating scan, genetic screening) actually checks for',
+            'Miscarriage risk by week, and which symptoms genuinely warrant a call',
+            'When and how to share the news with family, friends, and employers',
+          ],
+        ),
+        BookChapter(
+          title: 'Second Trimester (Months 4–6)',
+          summary: 'Often the "easier" stretch as energy returns. Chapters shift toward fetal-development milestones, the anatomy scan, and early practical planning.',
+          keyPoints: [
+            'What the anatomy scan checks, and what "soft markers" mean if mentioned',
+            'Round ligament pain, back pain, and other new discomforts explained',
+            'Feeling first movements ("quickening") and what timing is normal',
+            'Maternity leave planning and disclosure timing at work',
+          ],
+        ),
+        BookChapter(
+          title: 'Third Trimester (Months 7–9)',
+          summary: 'Focuses on managing physical discomfort alongside concrete birth preparation — hospital bag, paediatrician choice, recognising real labour signs.',
+          keyPoints: [
+            'Braxton Hicks vs. real contractions, and how to tell the difference',
+            'What\'s actually essential in a hospital bag vs. optional',
+            'Signs of true labour onset vs. false alarms',
+            'Choosing a paediatrician before the baby arrives',
+          ],
+        ),
+        BookChapter(
+          title: 'Labour, Delivery & Special Circumstances',
+          summary: 'Walks through the stages of labour and common interventions, with dedicated sections for multiples, high-risk pregnancy, and pregnancy loss.',
+          keyPoints: [
+            'The three stages of labour and what happens in each',
+            'Pain-management options, from unmedicated approaches to epidurals',
+            'When induction or a C-section becomes medically necessary',
+            'Direct, non-footnoted guidance for multiples, high-risk pregnancy, and loss',
+          ],
+        ),
+        BookChapter(
+          title: 'Postpartum & Beyond',
+          summary: 'Covers physical recovery, feeding decisions, and the emotional adjustment of early parenthood, including recognising postpartum mood disorders.',
+          keyPoints: [
+            'Recovery timeline for vaginal birth vs. C-section',
+            'Breastfeeding, formula, and combination-feeding basics',
+            'Warning signs of postpartum depression and anxiety, and when to seek help',
+            'What\'s normal in the "baby blues" versus what isn\'t',
+          ],
+        ),
       ],
       quotes: [
         '"You will want a copilot in whom you have complete faith." — on choosing a healthcare provider you trust.',

@@ -21,9 +21,19 @@ class BookKeyIdea {
   final List<String> inRealLife; // In real life (bullets)
 }
 
+/// One chapter (or chapter group) of the book: a short teaser summary plus the
+/// concrete "Key Points Covered" revealed when the reader expands it.
+@immutable
+class BookChapter {
+  const BookChapter({required this.title, required this.summary, this.keyPoints = const []});
+  final String title;
+  final String summary;
+  final List<String> keyPoints;
+}
+
 /// A rich "book companion" — the structured summary a book ReadItem can carry so
-/// the reader renders About / Core Philosophy / Key Ideas / ParentVeda Perspective
-/// / Chapter-by-chapter / Quotes instead of one flat blurb. All optional.
+/// the reader renders About / Core Philosophy / Key Ideas / ParentVeda's Take /
+/// Chapter-by-chapter / Quotes instead of one flat blurb. All optional.
 @immutable
 class BookCompanion {
   const BookCompanion({
@@ -41,8 +51,8 @@ class BookCompanion {
   final String about; // "What this book is about"
   final String philosophy; // "Core Philosophy"
   final List<BookKeyIdea> ideas; // "The book's most important ideas"
-  final String perspective; // "ParentVeda Perspective"
-  final List<(String title, String summary)> chapters; // chapter-by-chapter
+  final String perspective; // "ParentVeda's Take"
+  final List<BookChapter> chapters; // chapter-by-chapter
   final List<String> quotes; // memorable quotes
 
   bool get isEmpty => about.isEmpty && ideas.isEmpty && chapters.isEmpty;

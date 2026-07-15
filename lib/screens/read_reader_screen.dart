@@ -69,7 +69,15 @@ class ReadReaderScreen extends StatefulWidget {
 class _ReadReaderScreenState extends State<ReadReaderScreen> {
   final ScrollController _sc = ScrollController();
   final Map<String, GlobalKey> _keys = {};
+  final Set<int> _expandedChapters = {}; // chapter cards the reader has opened
   double _progress = 0;
+
+  // A solid deep-purple bar for the Key-Ideas "milestone" markers — fixed so it
+  // stays a proper dark bar (white text) across light / sepia / dark modes.
+  static const Color _ideaBar = Color(0xFF54268C);
+
+  // The light "card" surface beneath a bar / for chapter cards.
+  Color get _companionCardBg => _prefs.mode == ReadReaderMode.light ? Colors.white : _t.panel;
 
   ReadItem get a => widget.item;
   AppLanguage get _lang => widget.controller.language;
@@ -130,7 +138,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       if (c.about.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
       if (c.philosophy.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
       if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'Zaroori ideas')));
-      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda perspective', 'ParentVeda ka nazariya')));
+      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
       if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'Chapter dar chapter')));
       if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'Yaadgaar baatein')));
       return out;
@@ -462,20 +470,26 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       if (c.ideas.isNotEmpty) ...[
         _anchor('ideas'),
         _pad(_secTitle(t, _tr('The most important ideas', 'Sabse zaroori ideas'))),
-        const SizedBox(height: 14),
-        for (final idea in c.ideas) _pad(_ideaCard(t, idea)),
+        const SizedBox(height: 4),
+        _pad(Text(_tr('Each idea is one milestone in how the book thinks.', 'Har idea kitaab ki soch ka ek padaav hai.'),
+            style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
+        const SizedBox(height: 16),
+        for (var i = 0; i < c.ideas.length; i++) _pad(_ideaCard(t, i, c.ideas[i])),
         const SizedBox(height: 6),
       ],
       if (c.perspective.isNotEmpty) ...[
         _anchor('perspective'),
-        _pad(_infoBlock(t, icon: Icons.verified_outlined, title: _tr('ParentVeda perspective', 'ParentVeda ka nazariya'), body: c.perspective, tint: const Color(0xFF3FA56A))),
+        _pad(_takeBlock(t, c.perspective)),
         const SizedBox(height: 22),
       ],
       if (c.chapters.isNotEmpty) ...[
         _anchor('chapters'),
         _pad(_secTitle(t, _tr('Chapter by chapter', 'Chapter dar chapter'))),
-        const SizedBox(height: 12),
-        for (final ch in c.chapters) _pad(_chapterRow(t, ch.$1, ch.$2)),
+        const SizedBox(height: 4),
+        _pad(Text(_tr('Tap any chapter to open its key points.', 'Kisi bhi chapter ko kholne ke liye tap karein.'),
+            style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
+        const SizedBox(height: 14),
+        for (var i = 0; i < c.chapters.length; i++) _pad(_chapterCard(t, i, c.chapters[i])),
         const SizedBox(height: 10),
       ],
       if (c.quotes.isNotEmpty) ...[
@@ -515,51 +529,147 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         child: Text(label, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
       );
 
-  Widget _ideaCard(_RTheme t, BookKeyIdea idea) => Container(
+  // A small uppercase label used for the blocks inside an idea milestone.
+  TextStyle _companionLabel(_RTheme t) => GoogleFonts.manrope(
+      fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: t.accent);
+
+  // Key idea as a "milestone" marker: a solid deep-purple bar (number + title)
+  // that opens, seamlessly, onto a light card holding the three labelled blocks.
+  Widget _ideaCard(_RTheme t, int index, BookKeyIdea idea) => Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(16), border: Border.all(color: t.rule)),
+        margin: const EdgeInsets.only(bottom: 18),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: t.rule),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 14, offset: const Offset(0, 6))],
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(idea.title, style: GoogleFonts.plusJakartaSans(fontSize: 16 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2)),
-          const SizedBox(height: 12),
-          _ideaPart(t, _tr('What it means', 'Iska matlab'), idea.means),
-          const SizedBox(height: 10),
-          _ideaPart(t, _tr('Why it matters', 'Yeh kyun zaroori hai'), idea.matters),
-          if (idea.inRealLife.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(_tr('IN REAL LIFE', 'ASAL ZINDAGI MEIN'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
-            const SizedBox(height: 6),
-            for (final b in idea.inRealLife)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
-                  const SizedBox(width: 9),
-                  Expanded(child: Text(b, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.ink))),
-                ]),
-              ),
-          ],
+          // the bar — one continuous object with the card below (top corners only)
+          Container(
+            width: double.infinity,
+            color: _ideaBar,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Text('${index + 1}. ${idea.title}',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 15.5 * _fs, fontWeight: FontWeight.w800, color: Colors.white, height: 1.25)),
+          ),
+          // the connected light card
+          Container(
+            width: double.infinity,
+            color: _companionCardBg,
+            padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _ideaBlock(t, _tr('WHAT THE AUTHOR MEANS', 'LEKHAK KA MATLAB'), idea.means),
+              const SizedBox(height: 14),
+              _ideaBlock(t, _tr('WHY IT MATTERS', 'YEH KYUN ZAROORI HAI'), idea.matters),
+              if (idea.inRealLife.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text(_tr('IN REAL LIFE', 'ASAL ZINDAGI MEIN'), style: _companionLabel(t)),
+                const SizedBox(height: 8),
+                for (var i = 0; i < idea.inRealLife.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 7),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('${i + 1}.',
+                          style: GoogleFonts.manrope(
+                              fontSize: 13.5 * _fs, fontWeight: FontWeight.w800, color: t.accent, height: 1.5)),
+                      const SizedBox(width: 9),
+                      Expanded(child: Text(idea.inRealLife[i], style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.ink))),
+                    ]),
+                  ),
+              ],
+            ]),
+          ),
         ]),
       );
 
-  Widget _ideaPart(_RTheme t, String label, String body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: t.soft)),
-        const SizedBox(height: 3),
-        Text(body, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.ink)),
+  Widget _ideaBlock(_RTheme t, String label, String body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: _companionLabel(t)),
+        const SizedBox(height: 4),
+        Text(body, style: GoogleFonts.manrope(fontSize: 14 * _fs, height: 1.55, color: t.ink)),
       ]);
 
-  Widget _chapterRow(_RTheme t, String title, String summary) => Container(
+  // ParentVeda's take — a calm, quiet closing note (softer than the idea bars).
+  Widget _takeBlock(_RTheme t, String body) => Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(14)),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(18)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink)),
-          const SizedBox(height: 5),
-          Text(summary, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
+          Row(children: [
+            Icon(Icons.spa_outlined, size: 16, color: t.accent),
+            const SizedBox(width: 8),
+            Text(_tr('PARENTVEDA\'S TAKE', 'PARENTVEDA KI RAAY'),
+                style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.accent)),
+          ]),
+          const SizedBox(height: 11),
+          Text(body, style: GoogleFonts.fraunces(fontSize: 15.5 * _fs, height: 1.62, color: t.ink)),
         ]),
       );
+
+  // Chapter card — lighter & clearly a different content type from the idea
+  // bars: a numbered badge, a truncated teaser, then Read more → full summary +
+  // "Key points covered".
+  Widget _chapterCard(_RTheme t, int index, BookChapter ch) {
+    final open = _expandedChapters.contains(index);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: _companionCardBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: t.rule),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: t.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(9)),
+            child: Text('${index + 1}',
+                style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w800, color: t.accent)),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+              child: Text(ch.title,
+                  style: GoogleFonts.plusJakartaSans(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2))),
+        ]),
+        const SizedBox(height: 10),
+        Text(ch.summary,
+            maxLines: open ? null : 2,
+            overflow: open ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
+        if (open && ch.keyPoints.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(_tr('KEY POINTS COVERED', 'MUKHYA BINDU'), style: _companionLabel(t)),
+          const SizedBox(height: 7),
+          for (final p in ch.keyPoints)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
+                const SizedBox(width: 10),
+                Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
+              ]),
+            ),
+        ],
+        const SizedBox(height: 11),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => open ? _expandedChapters.remove(index) : _expandedChapters.add(index)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(open ? _tr('Show less', 'Kam dikhayein') : _tr('Read more', 'Aur padhein'),
+                style: GoogleFonts.manrope(fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.accent)),
+            const SizedBox(width: 3),
+            Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: t.accent),
+          ]),
+        ),
+      ]),
+    );
+  }
 
   Widget _quoteCard(_RTheme t, String q) => Container(
         width: double.infinity,
@@ -609,12 +719,16 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               ReadNextStore.instance.clearStatus(a.id);
             }
           },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
             Icon(done ? Icons.check_circle_rounded : Icons.check_rounded, size: 18, color: Colors.white),
             const SizedBox(width: 8),
-            Text(done ? s.rnCompletedBadge : s.rnMarkDone,
-                style: GoogleFonts.manrope(
-                    fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
+            Flexible(
+              child: Text(done ? s.rnCompletedBadge : s.rnMarkDone,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                      fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
+            ),
           ]),
         ),
       ),
