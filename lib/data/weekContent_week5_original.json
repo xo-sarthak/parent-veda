@@ -1,0 +1,224 @@
+{
+  "_note": "COMMENTED OUT / ARCHIVED. This is the original Week 5 Standard content, replaced on 2026-07-15 by the Week 10 content doc because Week 5 is the finalised-UI preview week. Nothing loads this file (it is not registered in pubspec.yaml assets). To restore: copy the object below back over the week-5 entry in weekContent.json.",
+  "week5Original": {
+    "week": 5,
+    "phase": "discovery",
+    "babySnapshot": {
+      "milestone": {
+        "en": "The First Foundations",
+        "hi": "Pehli Neenv"
+      },
+      "weekHeadline": {
+        "en": "This week your baby's brain and spine begin to take shape, and the tiny heart may give its very first flutter.",
+        "hi": "Is hafte tumhare baby ke brain aur spine banna shuru hote hain, aur nanha dil apni pehli dhadkan de sakta hai."
+      },
+      "size": {
+        "fruit": {
+          "en": "Sesame seed",
+          "hi": "Til ka daana"
+        },
+        "length": {
+          "en": "0.2 cm",
+          "hi": "0.2 cm"
+        },
+        "weight": {
+          "en": "Too small to measure",
+          "hi": "Maapne ke liye bahut chhota"
+        }
+      },
+      "reveal": {
+        "en": "Maa, my brain and spine are just beginning to take shape.",
+        "hi": "Maa, mera brain aur spine abhi banna shuru ho rahe hain."
+      }
+    },
+    "babyDevelopment": {
+      "whatImDoing": {
+        "en": "My neural tube — the structure that becomes my brain, spinal cord and backbone — is closing over this week. My tiny heart tube may give its first flutter, my first blood vessels are appearing, and the cord that will connect us is beginning to form.",
+        "hi": "Meri neural tube — jo mera brain, spinal cord aur reedh ki haddi banti hai — is hafte band ho rahi hai. Mera nanha heart tube apni pehli dhadkan de sakta hai, mere pehle blood vessels ubhar rahe hain, aur woh cord jo humein jodegi banna shuru ho rahi hai."
+      }
+    },
+    "momJourney": {
+      "physicalChanges": {
+        "en": "On the outside almost nothing looks different, but inside a lot is in motion. hCG is climbing fast, progesterone is rising, and your breasts may feel fuller or tender.",
+        "hi": "Bahar se kuch khaas alag nahi dikhta, par andar bahut kuch ho raha hai. hCG tezi se badh raha hai, progesterone badh raha hai, aur tumhare breasts bhare ya narm mehsoos ho sakte hain."
+      },
+      "emotionalState": {
+        "en": "A positive test can stir up joy, disbelief and quiet worry all at once — sometimes within the same hour.",
+        "hi": "Ek positive test khushi, yakeen na hona aur halki fikr — sab ek saath jaga sakta hai, kabhi ek hi ghante mein."
+      },
+      "commonSymptoms": [
+        {
+          "en": "Nausea",
+          "hi": "Matli (Nausea)"
+        },
+        {
+          "en": "Fatigue",
+          "hi": "Thakaan"
+        },
+        {
+          "en": "Tender breasts",
+          "hi": "Breast mein narmi"
+        },
+        {
+          "en": "Frequent urination",
+          "hi": "Baar-baar peshaab"
+        },
+        {
+          "en": "Bloating",
+          "hi": "Pet mein bharipan (Bloating)"
+        }
+      ],
+      "selfCareTip": {
+        "en": "Book your first prenatal appointment, start (or continue) folic acid, and rest when you can.",
+        "hi": "Apni pehli prenatal appointment book karo, folic acid shuru (ya jaari) rakho, aur jab ho sake aaram karo."
+      },
+      "reassurance": {
+        "en": "There is no single way to feel at five weeks. Feeling tired or unsettled does not mean anything is wrong.",
+        "hi": "Paanch hafte mein mehsoos karne ka koi ek tareeka nahi. Thakaan ya bechaini iska matlab nahi ki kuch galat hai."
+      }
+    },
+    "nutrition": {
+      "nutritionTheme": {
+        "en": "Folate for Brain & Spine",
+        "hi": "Brain aur Spine ke liye Folate"
+      },
+      "focusNutrients": [
+        {
+          "en": "Folate",
+          "hi": "Folate"
+        },
+        {
+          "en": "Vitamin C",
+          "hi": "Vitamin C"
+        }
+      ],
+      "whyNow": {
+        "en": "In these early weeks folate matters most, while your baby's brain and spinal cord are taking shape.",
+        "hi": "In shuruaati hafton mein folate sabse zyada mayne rakhta hai, jab tumhare baby ka brain aur spinal cord aakaar le rahe hote hain."
+      },
+      "foods": [
+        {
+          "en": "Spinach & greens",
+          "hi": "Palak aur saag"
+        },
+        {
+          "en": "Dals & legumes",
+          "hi": "Dal aur phaliyan"
+        },
+        {
+          "en": "Amla & citrus",
+          "hi": "Amla aur khatte fal"
+        },
+        {
+          "en": "Whole grains",
+          "hi": "Saabut anaaj"
+        },
+        {
+          "en": "Curd",
+          "hi": "Dahi"
+        },
+        {
+          "en": "Nuts & seeds",
+          "hi": "Meve aur beej"
+        }
+      ],
+      "indianSuperfoodOfTheWeek": {
+        "food": {
+          "en": "Palak (Spinach)",
+          "hi": "Palak"
+        },
+        "benefit": {
+          "en": "Rich in folate, the key nutrient helping your baby's brain and spine form safely.",
+          "hi": "Folate se bharpoor — wahi khaas nutrient jo baby ke brain aur spine ko surakshit banne mein madad karta hai."
+        },
+        "howToConsume": {
+          "en": "Try it as palak dal or lightly sautéed saag.",
+          "hi": "Palak dal ya halki sautéed saag ke roop mein try karo."
+        }
+      },
+      "mealIdea": {
+        "en": "Palak dal with whole wheat roti and a side of curd.",
+        "hi": "Palak dal gehu ki roti aur dahi ke saath."
+      },
+      "tip": {
+        "en": "Pair citrus or amla with iron-rich foods — the vitamin C helps your body absorb iron.",
+        "hi": "Khatte fal ya amla ko iron waale khaane ke saath lo — vitamin C iron soakne mein madad karta hai."
+      }
+    },
+    "actionPlan": {
+      "doThisWeek": {
+        "en": "Book your first prenatal appointment, take folic acid daily, eat small frequent meals and stay hydrated.",
+        "hi": "Pehli prenatal appointment book karo, roz folic acid lo, chhote baar-baar meals khao aur paani peete raho."
+      },
+      "skipThisWeek": {
+        "en": "Raw or undercooked meat and eggs, unpasteurised dairy, high-mercury fish, excess caffeine and alcohol.",
+        "hi": "Kacha ya adhpaka meat aur ande, bina-pasteurised dairy, zyada-mercury machhli, zyada caffeine aur sharaab."
+      },
+      "redFlags": {
+        "en": "Call your doctor if you experience heavy bleeding, severe abdominal pain, persistent vomiting preventing fluids, fainting or severe dizziness.",
+        "hi": "Apne doctor ko call karo agar zyada bleeding, pet mein tez dard, lagataar ulti jisse paani bhi andar na ruke, behoshi ya tez chakkar ho."
+      },
+      "mythBuster": {
+        "myth": {
+          "en": "Morning sickness only happens in the morning.",
+          "hi": "Morning sickness sirf subah hi hoti hai."
+        },
+        "truth": {
+          "en": "Pregnancy nausea can occur at any time of the day or night.",
+          "hi": "Pregnancy ki matli din ya raat kisi bhi waqt ho sakti hai."
+        }
+      }
+    },
+    "garbhSanskar": {
+      "raga": "Bhupali",
+      "affirmation": {
+        "en": "Every day my baby grows stronger within me.",
+        "hi": "Har din mera baby mere andar aur mazboot hota ja raha hai."
+      },
+      "reflectionPrompt": {
+        "en": "What is your biggest hope for your baby?",
+        "hi": "Apne baby ke liye tumhari sabse badi umeed kya hai?"
+      },
+      "spokenLine": {
+        "hi": "Maa, mera chhota sa dil ban raha hai.",
+        "en": "Maa, my tiny heart is beginning to form."
+      }
+    },
+    "reflectAndRemember": {
+      "reflectionPrompt": {
+        "en": "What is your biggest hope for your baby right now?",
+        "hi": "Abhi apne baby ke liye tumhari sabse badi umeed kya hai?"
+      },
+      "journalPrompt": {
+        "en": "If you could send one message to your baby today, what would it be?",
+        "hi": "Agar aaj tum apne baby ko ek message bhej sakti, to woh kya hota?"
+      },
+      "voiceJournalEnabled": true,
+      "textJournalEnabled": true,
+      "photoPrompt": {
+        "en": "Take a photo of something that made you smile this week or represents your hopes for your baby.",
+        "hi": "Is week kisi cheez ki photo lo jisne tumhe muskurane par majboor kiya ho ya jo baby ke liye tumhari umeedon ko darshati ho."
+      },
+      "cameraEnabled": true
+    },
+    "partnerCorner": {
+      "whatSheMayFeel": {
+        "en": "She has likely just found out, and it may still feel unreal. She might be more tired than usual, or a little queasy as her body adjusts.",
+        "hi": "Use shayad abhi-abhi pata chala hai, aur yeh abhi bhi anokha lag sakta hai. Woh aam se zyada thaki, ya body dhalne ke saath thodi matli mehsoos kar sakti hai."
+      },
+      "whatYouCanDo": {
+        "en": "Take on more of the cooking and chores, keep snacks and water near her, and be patient with her tiredness and changing moods.",
+        "hi": "Khaana aur kaam ka zyada hissa lo, uske paas snacks aur paani rakho, aur uski thakaan tatha badalte moods ke saath sabr rakho."
+      },
+      "oneMission": {
+        "en": "Go with her to that first doctor's visit — or handle dinner tonight without being asked.",
+        "hi": "Us pehli doctor visit par uske saath jao — ya aaj bina kahe dinner sambhaal lo."
+      },
+      "shareMessage": {
+        "en": "This week our baby is the size of a sesame seed, and already the brain, spine and tiny heart are beginning to form.",
+        "hi": "Is hafte hamara baby til ke daane jitna hai, aur brain, spine tatha nanha dil abhi se banna shuru ho rahe hain."
+      }
+    },
+    "audioEnabled": true
+  }
+}

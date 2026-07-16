@@ -29,11 +29,16 @@ class W5About {
     required this.opening,
     required this.howBig,
     required this.whatsHappening,
+    this.behaviour = const [],
   });
   final LocalizedText teaser; // cover teaser (before tap)
   final LocalizedText opening;
   final LocalizedText howBig;
   final LocalizedText whatsHappening;
+
+  /// "Behavioural highlights" — rendered inline as a heading + description on
+  /// the expanded page, deliberately not a tappable card.
+  final List<W5Card> behaviour;
 }
 
 class W5Card {
@@ -153,77 +158,94 @@ class Week5Full {
 //  THE CONTENT
 // =============================================================================
 final Week5Full week5Full = Week5Full(
-  trimesterMonth: _t('Trimester 1 · Month 2', 'Trimester 1 · Month 2'),
+  trimesterMonth: _t('Trimester 1 · Month 3', 'Trimester 1 · Month 3'),
 
   // ---- 1 · Opening Snapshot -------------------------------------------------
   snapshot: W5Snapshot(
-    fruit: _t('Sesame seed', 'Til ka daana'),
-    length: _t('0.2 cm', '0.2 cm'),
-    weight: _t('Too small to measure', 'Maapne ke liye bahut chhota'),
+    fruit: _t('Strawberry', 'Strawberry'),
+    length: _t('3.1 to 3.2 cm', '3.1 se 3.2 cm'),
+    weight: _t('About 4 g', 'Lagbhag 4 g'),
   ),
 
   // ---- 2 · About Your Baby --------------------------------------------------
   about: W5About(
     teaser: _t(
-      'This is the week my brain and spine begin to take shape, from a small groove of cells quietly folding into something remarkable.',
-      'Yeh woh hafta hai jab mera brain aur spine banna shuru hote hain — cells ki ek chhoti si groove chupchaap kuch khaas mein badalne lagti hai.',
+      "This week my fingers and toes finally separate completely, and tiny nails begin to grow. I'm about the size of a strawberry now.",
+      'Is hafte meri ungliyan aur pairon ki ungliyan aakhirkaar poori tarah alag ho jaati hain, aur nanhe naakhun ugna shuru hote hain. Ab main lagbhag ek strawberry jitna hoon.',
     ),
     opening: _t(
-      "Right now I'm about the size of a sesame seed, but I'm busy in a way you can't yet see. The tube that will become my brain and spinal cord is forming along my back, and the cluster of cells that will one day beat as my heart is taking shape.",
-      'Abhi main lagbhag til ke daane jitna hoon, par main aise busy hoon jo tum abhi dekh nahi sakti. Jo tube mera brain aur spinal cord banegi woh meri peeth ke saath ban rahi hai, aur cells ka woh gucchha jo ek din mere dil ki tarah dhadkega, aakaar le raha hai.',
+      "I've grown to about the size of a strawberry this week, and I'm looking more like a tiny person every day. My fingers and toes have fully separated, and my head still makes up about half of my length.",
+      'Is hafte main badhkar lagbhag strawberry jitna ho gaya hoon, aur har din thoda aur ek nanhe insaan jaisa dikhne laga hoon. Meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, aur mera sar abhi bhi meri lambai ka lagbhag aadha hissa hai.',
     ),
     howBig: _t(
-      "I'm around 2 millimetres long, about a sesame seed. Far too small to feel, but growing a little more every single day.",
-      'Main lagbhag 2 millimetre lamba hoon, ek til ke daane jitna. Mehsoos karne ke liye bahut chhota, par har din thoda aur badh raha hoon.',
+      "I'm about 3.1 to 3.2 centimetres long now, roughly the size of a strawberry, and I weigh about 4 grams.",
+      'Ab main lagbhag 3.1 se 3.2 centimetre lamba hoon, motey taur par ek strawberry jitna, aur mera wazan lagbhag 4 gram hai.',
     ),
     whatsHappening: _t(
-      "This week my foundations are being laid. My neural tube is closing over, the structure that becomes my brain, spinal cord and backbone. My tiny heart tube may give its very first flutter around now, though it's far too soon for anyone to hear it. My own first blood vessels are appearing, and the cord that will connect us is beginning to form.",
-      'Is hafte meri neenv rakhi ja rahi hai. Meri neural tube band ho rahi hai — wahi structure jo mera brain, spinal cord aur reedh ki haddi banega. Mera nanha heart tube shayad abhi apni pehli dhadkan de, halaanki ise sunne ke liye abhi bahut jaldi hai. Mere apne pehle blood vessels ubhar rahe hain, aur woh cord jo humein jodegi, banna shuru ho rahi hai.',
+      "My fingers and toes have completely separated this week, with no more webbing, and tiny nails are just beginning to grow. My skeleton keeps turning from soft cartilage into bone, and my ears are taking their outer shape. I'm swallowing tiny sips of fluid and kicking my legs, simply practising movements I'll need later. My head still makes up about half of my length because my brain is growing so quickly.",
+      'Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, beech ki jaali ab nahi rahi, aur nanhe naakhun abhi ugna shuru hue hain. Mera skeleton naram cartilage se haddi mein badalta ja raha hai, aur mere kaan apna bahri aakaar le rahe hain. Main fluid ke nanhe ghoont nigal raha hoon aur apni taangein chala raha hoon, bas woh harkatein practice karta hua jo aage mujhe chahiye hongi. Mera sar abhi bhi meri lambai ka lagbhag aadha hai, kyunki mera brain itni tezi se badh raha hai.',
     ),
+    // Shown inline as a heading + description, not a tappable card.
+    behaviour: [
+      W5Card(
+        title: _t("I'm swallowing and kicking", 'Main nigal raha hoon aur laat maar raha hoon'),
+        body: _t(
+          "This week I'm becoming a little more active, swallowing tiny sips of the fluid around me and kicking my legs. These movements help my muscles, joints and nervous system develop, even though I don't need them for feeding or moving around just yet. You can't feel any of it, but if you had a scan now, you might just catch me in action.",
+          'Is hafte main thoda aur active ho raha hoon, apne aaspaas ke fluid ke nanhe ghoont nigalta hua aur apni taangein chalata hua. Yeh harkatein mere muscles, joints aur nervous system ko develop hone mein madad karti hain, halaanki abhi mujhe inki khaane ya ghoomne ke liye zaroorat nahi hai. Tum inmein se kuch bhi mehsoos nahi kar sakti, par agar abhi scan hota, to shayad tum mujhe action mein pakad leti.',
+        ),
+      ),
+    ],
   ),
 
   // ---- 3 · Baby Science -----------------------------------------------------
   science: [
     W5Card(
-      title: _t('My brain and spine are forming', 'Mera brain aur spine ban rahe hain'),
+      title: _t('My fingers and toes are free', 'Meri ungliyan aur pairon ki ungliyan aazaad hain'),
       body: _t(
-        "Long before I look anything like a baby, a tiny groove is running down my back, and this week that groove is closing into the tube that will become my brain and spinal cord. It's the beginning of my entire nervous system. It's also why folic acid matters so much right now. It helps this delicate closing happen safely.",
-        'Bahut pehle ki main baby jaisa dikhoon, meri peeth par ek chhoti si groove chal rahi hai, aur is hafte woh groove band hokar woh tube ban rahi hai jo mera brain aur spinal cord banegi. Yeh mere poore nervous system ki shuruaat hai. Isiliye folic acid abhi itna zaroori hai — woh is naazuk band hone ko surakshit tareeke se hone mein madad karta hai.',
+        "This week my fingers and toes have fully separated, with the webbing between them completely gone. My thumbs have rotated into place, ready for gripping and holding one day. For now, I'm simply getting used to having my own separate fingers and toes.",
+        'Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, aur unke beech ki jaali bilkul khatam ho gayi hai. Mere angoothe apni jagah par ghoom gaye hain, ek din pakadne aur thaamne ke liye taiyaar. Filhaal, main bas apni alag-alag ungliyon ka aadi ho raha hoon.',
       ),
     ),
     W5Card(
-      title: _t('My heart begins its first beats', 'Mera dil apni pehli dhadkan leta hai'),
+      title: _t('My nails are starting to grow', 'Mere naakhun ugna shuru ho rahe hain'),
       body: _t(
-        "Right now I don't have a heart the way you picture one. I have a tiny tube of cells. But around this week, that little tube may begin its first coordinated beats, the start of a rhythm it will keep for the rest of my life. It's far too early for anyone to hear it from the outside yet, but quietly, it's beginning.",
-        'Abhi mere paas waisa dil nahi jaisa tum sochti ho. Mere paas cells ki ek nanhi tube hai. Par is hafte ke aaspaas woh chhoti tube apni pehli dhadkanein le sakti hai — ek aisi rhythm jo main zindagi bhar rakhoonga. Ise bahar se sunne ke liye abhi bahut jaldi hai, par chupchaap, yeh shuru ho raha hai.',
+        "Tiny nails are just beginning to grow at the ends of my fingers and toes this week. They're barely there for now, more like the faintest suggestion of a nail than anything you'd recognise. Over the coming weeks and months, they'll keep growing, all the way until the day you first trim them.",
+        'Is hafte meri ungliyon aur pairon ki ungliyon ke siron par nanhe naakhun abhi ugna shuru hue hain. Filhaal woh mushkil se hain, kisi naakhun ki sabse halki jhalak jaise, na ki kuch aisa jise tum pehchaan sako. Aane waale hafton aur mahinon mein woh badhte rahenge, us din tak jab tum pehli baar unhe kaatogi.',
       ),
     ),
     W5Card(
-      title: _t("I'm built from three layers", 'Main teen layers se ban raha hoon'),
+      title: _t('My skeleton keeps turning to bone', 'Mera skeleton haddi mein badalta ja raha hai'),
       body: _t(
-        "Much of my body plan is being built from three remarkable layers of cells, and each one has a job. One will become my skin, brain and nerves. The middle one will build my heart, bones and muscles. The innermost will grow my lungs and digestive system. Every part of me is quietly mapped out in these layers, waiting to unfold.",
-        'Mere body ka zyada plan cells ki teen khaas layers se ban raha hai, aur har ek ka apna kaam hai. Ek meri skin, brain aur nerves banegi. Beech waali mera dil, haddiyan aur muscles banayegi. Sabse andar waali mere lungs aur digestive system ugayegi. Mera har hissa in layers mein chupchaap tay ho raha hai, khulne ka intezaar karta hua.',
+        "My skeleton keeps turning to bone this week, with ossification now underway in many more places than before. Bit by bit, the soft cartilage that has held my shape so far is being replaced by harder, stronger bone. It's a slow process that will continue quietly for months, long after I'm born.",
+        'Is hafte mera skeleton haddi mein badalta ja raha hai, aur ossification ab pehle se kai zyada jagahon par chal rahi hai. Thoda-thoda karke, jo naram cartilage ab tak mera aakaar sambhaale hue tha, uski jagah zyada sakht aur mazboot haddi le rahi hai. Yeh ek dheemi prakriya hai jo mahinon tak chupchaap chalti rahegi, mere paida hone ke bahut baad tak.',
       ),
     ),
     W5Card(
-      title: _t('My lifeline is being built', 'Meri lifeline ban rahi hai'),
+      title: _t('My ears are taking their outer shape', 'Mere kaan apna bahri aakaar le rahe hain'),
       body: _t(
-        "While I'm forming, something just as important is growing beside me, the placenta. Think of it as my kitchen, my lungs and my waste system all in one, before any of my own are ready. Tiny finger-like structures are growing into the wall of your womb as the placenta begins taking shape, getting ready to pass oxygen and nourishment from you to me, and carry my waste away.",
-        'Jabki main ban raha hoon, mere saath utni hi zaroori cheez badh rahi hai — placenta. Ise mera kitchen, mere lungs aur mera waste system samajh lo, ek hi mein, jab tak mere apne taiyaar na ho jayein. Nanhi ungliyon jaisi structures tumhare womb ki deewar mein badh rahi hain jab placenta aakaar le raha hai — taiyaar hota hua ki tumse mujh tak oxygen aur poshan pahunchaye, aur mera waste bahar le jaaye.',
+        "The outer shape of my ears is coming together this week, slowly moving into the familiar shell-like form you'll recognise. They still have some settling to do, gradually shifting into their final position on the sides of my head. One day soon, they'll be ready to catch every sound around them.",
+        'Is hafte mere kaanon ka bahri aakaar ban raha hai, dheere-dheere us jaani-pehchaani shell jaisi shakal mein aata hua. Unhe abhi thoda aur set hona hai, dheere-dheere mere sar ke kinaron par apni aakhri jagah par pahunchte hue. Ek din jald hi, woh aaspaas ki har aawaaz pakadne ke liye taiyaar honge.',
       ),
     ),
     W5Card(
-      title: _t('Our private supply line forms', 'Hamari niji supply line banti hai'),
+      title: _t('My kidneys are building their filters', 'Meri kidneys apne filters bana rahi hain'),
       body: _t(
-        "This week, the connection between us is becoming more organised. My first blood vessels are appearing, and the stalk that links me to the placenta is developing into what will become the umbilical cord, the private line that connects us for the whole journey. In time, everything I need will travel along it from you, long before I can do any of this for myself.",
-        'Is hafte, hamare beech ka connection aur vyavasthit ho raha hai. Mere pehle blood vessels ubhar rahe hain, aur woh dandi jo mujhe placenta se jodti hai umbilical cord ban rahi hai — woh niji line jo poori journey humein jodti hai. Waqt ke saath, jo bhi mujhe chahiye woh isi ke zariye tumse aayega, bahut pehle ki main yeh khud kar sakoon.',
+        "The tiny filtering units inside my kidneys are continuing to develop this week. They're not ready to do their real job yet, but this is important groundwork being laid. In time, these filters will help keep my blood clean and support the fluid around me.",
+        'Is hafte meri kidneys ke andar ke nanhe filtering units develop hote ja rahe hain. Woh abhi apna asli kaam karne ke liye taiyaar nahi hain, par yeh zaroori neenv rakhi ja rahi hai. Aage chalkar, yeh filters mera blood saaf rakhne aur mere aaspaas ke fluid ko support karne mein madad karenge.',
       ),
     ),
     W5Card(
-      title: _t('My face begins to take shape', 'Mera chehra aakaar lene lagta hai'),
+      title: _t('My organs are starting to work together', 'Mere organs saath kaam karna shuru kar rahe hain'),
       body: _t(
-        "It's early, but the very first foundations of my face are beginning to appear this week. Tiny clusters of cells that will become my eyes, ears and nose are just starting to form, like the faint pencil lines of a drawing before any details arrive. There's nothing to see from the outside yet, but the outline of the face you'll one day know is quietly beginning to emerge.",
-        'Abhi jaldi hai, par mere chehre ki sabse pehli neenv is hafte dikhne lagti hai. Cells ke nanhe gucche jo meri aankhein, kaan aur naak banenge abhi banna shuru ho rahe hain — jaise kisi drawing ki halki pencil lines, detail aane se pehle. Bahar se abhi kuch dikhne ko nahi hai, par jis chehre ko tum ek din pehchanogi uski roop-rekha chupchaap ubharne lagi hai.',
+        "By now, all of my major organs have formed, and this week they're beginning to work together as a team. None of them can do their full jobs on their own yet, but this teamwork is an important step. From here, it's less about building new parts and more about everything maturing together.",
+        'Ab tak mere sabhi bade organs ban chuke hain, aur is hafte woh ek team ki tarah saath kaam karna shuru kar rahe hain. Koi bhi abhi akela apna poora kaam nahi kar sakta, par yeh teamwork ek zaroori kadam hai. Yahan se, baat naye hisse banane se zyada sab kuch saath-saath pakne ki hai.',
+      ),
+    ),
+    W5Card(
+      title: _t('My brain is producing millions of nerve cells', 'Mera brain lakhon nerve cells bana raha hai'),
+      body: _t(
+        "My brain keeps producing new nerve cells at an incredible rate this week, roughly 250,000 every single minute. This pace will continue throughout the rest of pregnancy, eventually building the complex web of connections behind everything I'll one day think, feel and do.",
+        'Is hafte mera brain gazab ki raftaar se naye nerve cells banata ja raha hai, lagbhag 2,50,000 har ek minute. Yeh raftaar baaki pregnancy bhar jaari rahegi, aur aage chalkar connections ka woh pecheeda jaal banayegi jo mere har sochne, mehsoos karne aur karne ke peeche hoga.',
       ),
     ),
   ],
@@ -231,66 +253,55 @@ final Week5Full week5Full = Week5Full(
   // ---- 4 · You This Week ----------------------------------------------------
   you: W5You(
     feeling: _t(
-      "For many women, Week 5 is the week you find out. A missed period, a positive test, and suddenly everything feels different. The news can bring joy, disbelief and quiet worry all at once, sometimes within the same hour. Your body may already be giving you signals, more tiredness than usual, tender breasts, or waves of nausea, while some women feel completely normal and wonder if that's okay. It is. There is no single way to feel at five weeks. If you haven't already, this is a good week to confirm your pregnancy with your healthcare provider and think about booking your first prenatal appointment.",
-      'Bahut si mahilaon ke liye, Week 5 wahi hafta hai jab pata chalta hai. Period miss hona, ek positive test, aur achanak sab kuch alag lagne lagta hai. Yeh khabar khushi, yakeen na hona aur halki fikr — sab ek saath la sakti hai, kabhi ek hi ghante mein. Tumhara body pehle se signals de raha ho sakta hai — aam se zyada thakaan, breast mein narmi, ya matli ki leherein — jabki kuch mahilaayein bilkul normal mehsoos karti hain aur sochti hain ki kya yeh theek hai. Haan, theek hai. Paanch hafte mein mehsoos karne ka koi ek tareeka nahi hota. Agar abhi tak nahi kiya, to yeh apni pregnancy doctor se confirm karne aur pehli prenatal appointment book karne ka accha hafta hai.',
+      "Week 10 often marks a turning point, and for many women, symptoms start easing over the coming weeks as you near the end of the first trimester. Nausea, fatigue and headaches may still be strong right now, and some women notice new discomforts too, such as brief sharp twinges low in the belly as the uterus grows and the supporting tissues stretch. Others may already feel their symptoms beginning to lift. Whichever way it goes for you, it's completely normal. You're almost through the trickiest stretch, and many women start to feel more like themselves again very soon.",
+      'Week 10 aksar ek mod hota hai, aur bahut si mahilaon ke liye aane waale hafton mein symptoms halke padne lagte hain jab tum pehle trimester ke ant ke kareeb aati ho. Matli, thakaan aur sar dard abhi bhi tez ho sakte hain, aur kuch mahilaayein nayi takleefein bhi mehsoos karti hain, jaise pet ke neeche halki tez chubhan jab uterus badhta hai aur use sambhaalne waale tissues khinchte hain. Kuch ko apne symptoms pehle se halke hote mehsoos ho sakte hain. Tumhare saath jo bhi ho, woh bilkul normal hai. Tum sabse mushkil hisse se lagbhag nikal chuki ho, aur bahut si mahilaayein jald hi dobara khud jaisa mehsoos karne lagti hain.',
     ),
     changingBody: _t(
-      "On the outside, almost nothing looks different yet. There is no bump at five weeks, and there won't be for a while. But inside, a lot is already in motion. The hormone hCG is climbing quickly, which is what a pregnancy test picks up. Progesterone is rising too, helping maintain the lining of your womb and support this early pregnancy. Your breasts may feel fuller or tender as they respond to these hormones, and you might find yourself needing the bathroom more often. Small signals of a body already adapting.",
-      'Bahar se abhi kuch khaas alag nahi dikhta. Paanch hafte mein koi bump nahi hota, aur kuch waqt tak nahi hoga. Par andar, bahut kuch pehle se ho raha hai. Hormone hCG tezi se badh raha hai — wahi jo pregnancy test pakadta hai. Progesterone bhi badh raha hai, jo tumhare womb ki lining ko banaye rakhne aur is shuruaati pregnancy ko support karne mein madad karta hai. Tumhare breasts in hormones ke jawaab mein bhare ya narm mehsoos ho sakte hain, aur tum baar-baar bathroom jaane ki zaroorat mehsoos kar sakti ho. Ek dhalte hue body ke chhote signals.',
+      "You may notice your waist looking a little rounder, though for many women this is still mostly due to bloating and the growing uterus remaining within the pelvis. Veins on your breasts and tummy may look more visible as your blood volume keeps rising. Your skin might feel drier or spottier than usual, and some women begin to notice fine red thread-like lines called spider naevi, which are harmless and fade after birth. Small, steady signs that your body is working hard behind the scenes.",
+      'Tumhein apni kamar thodi gol lag sakti hai, halaanki bahut si mahilaon ke liye yeh abhi zyadatar bloating aur badhte uterus ki wajah se hai, jo abhi pelvis ke andar hi hai. Tumhare breasts aur pet par nasein zyada dikhne lag sakti hain, kyunki tumhara blood volume badhta ja raha hai. Tumhari skin aam se zyada rookhi ya daane waali lag sakti hai, aur kuch mahilaayein baareek laal dhaage jaisi lakeerein dekhna shuru karti hain jinhe spider naevi kehte hain, jo nuksaandeh nahi hain aur delivery ke baad fade ho jaati hain. Chhote, lagataar sanket ki tumhara body parde ke peeche mehnat kar raha hai.',
     ),
     beKind: _t(
-      "Be gentle with yourself this week. Your body is doing enormous, invisible work, and feeling tired or unsettled does not mean anything is wrong. Rest when you can, eat what stays down, and try not to measure yourself against how anyone else felt. This is your pregnancy, at your pace.",
-      'Is hafte apne saath naram raho. Tumhara body bahut bada, andekha kaam kar raha hai, aur thakaan ya bechaini mehsoos hona iska matlab nahi ki kuch galat hai. Jab ho sake aaram karo, jo andar tik jaaye woh khao, aur khud ko kisi aur ke experience se mat naapo. Yeh tumhari pregnancy hai, tumhari raftaar par.',
+      "If sharp twinges in your lower belly catch you off guard, it is often caused by your growing uterus and the tissues supporting it stretching, not a sign of anything wrong. Move a little slower when you stand up or sit down, rest when you need to, and be patient with your changing skin and body.",
+      'Agar pet ke neeche ki tez chubhan tumhein achanak pakad le, to yeh aksar tumhare badhte uterus aur use sambhaalne waale tissues ke khinchne se hoti hai, kisi gadbad ka sanket nahi. Uthte ya baithte waqt thoda dheere chalo, jab zaroorat ho aaram karo, aur apni badalti skin aur body ke saath sabr rakho.',
     ),
     highlights: [
       W5Highlight(
-        title: _t('Hormones', 'Hormones'),
+        title: _t('Round ligament twinges', 'Round ligament ki chubhan'),
         teaser: _t(
-          "The rising hormones behind almost everything you're feeling.",
-          'Badhte hormones — jo tumhare lagbhag har ehsaas ke peeche hain.',
+          'Sharp, quick twinges low in your belly as your womb stretches.',
+          'Womb ke khinchne par pet ke neeche tez, jhatpat chubhan.',
         ),
         body: _t(
-          "Two hormones are doing most of the work right now. hCG is the one a pregnancy test detects, and it climbs fast this week. Higher hCG is thought to add to early nausea, though the exact reason isn't fully understood. Progesterone is rising too, helping maintain the lining of your womb and support the pregnancy. Together they explain much of what you may notice: tiredness, tender breasts and changing moods. This is all your body doing just what it should.",
-          'Abhi do hormones sabse zyada kaam kar rahe hain. hCG wahi hai jise pregnancy test pakadta hai, aur is hafte yeh tezi se badhta hai. Maana jaata hai ki zyada hCG shuruaati matli badha sakta hai, halaanki iski theek wajah poori tarah samjhi nahi gayi. Progesterone bhi badh raha hai, jo womb ki lining banaye rakhne aur pregnancy ko support karne mein madad karta hai. Dono milkar bahut kuch samjhaate hain jo tum mehsoos karti ho: thakaan, breast narmi aur badalte moods. Yeh sab tumhara body wahi kar raha hai jo use karna chahiye.',
+          "As your womb grows, the ligaments supporting it stretch and tighten, sometimes causing a sudden, sharp twinge low in your belly or groin. It is often caused by your growing uterus and the tissues supporting it stretching quickly, triggered by movements like standing up, coughing or laughing. Moving a little more slowly, and resting when it happens, can help ease it.",
+          'Jaise-jaise tumhara womb badhta hai, use sambhaalne waale ligaments khinchte aur kasste hain, jisse kabhi pet ke neeche ya groin mein achanak tez chubhan hoti hai. Yeh aksar tumhare badhte uterus aur use sambhaalne waale tissues ke tezi se khinchne se hoti hai, aur uthne, khaansne ya hansne jaisi harkaton se shuru hoti hai. Thoda dheere chalna, aur jab yeh ho tab aaram karna, ise halka karne mein madad karta hai.',
         ),
       ),
       W5Highlight(
-        title: _t('Your emotions', 'Tumhari bhavnaayein'),
+        title: _t('Your visible veins', 'Tumhari dikhti nasein'),
         teaser: _t(
-          'A positive test can stir up every feeling at once.',
-          'Ek positive test har bhavna ko ek saath jaga sakta hai.',
+          'More visible veins on your breasts and belly are common now.',
+          'Breasts aur pet par nason ka zyada dikhna ab aam hai.',
         ),
         body: _t(
-          "Finding out you're pregnant can bring joy, nerves, and a flicker of 'is this really happening', sometimes all in the same hour. Rising hormones can make these feelings stronger, so if you are more tearful or on edge than usual, there is a reason. Feeling worried or a little overwhelmed is common in early pregnancy, and many women have moments of anxiety as they adjust to the news. Talking to someone you trust often takes the edge off.",
-          "Pata chalna ki tum pregnant ho — khushi, ghabraahat, aur 'kya sach mein ho raha hai' ki ek chamak la sakta hai, kabhi sab ek hi ghante mein. Badhte hormones in bhavnaon ko aur tez kar sakte hain, isliye agar tum aam se zyada roti ya chidchidi ho, to iski wajah hai. Fikr ya thoda overwhelmed mehsoos hona shuruaati pregnancy mein aam hai, aur bahut si mahilaayein khabar ko apnaate waqt anxiety ke pal mehsoos karti hain. Kisi bharose waale se baat karna aksar bojh halka kar deta hai.",
+          "As your blood volume keeps rising to support your pregnancy, veins on your breasts and abdomen may become more visible than before. This is simply extra blood flow doing its job, and it isn't a cause for concern. It usually becomes less noticeable again after you give birth.",
+          'Jaise-jaise tumhara blood volume pregnancy ko support karne ke liye badhta hai, tumhare breasts aur pet par nasein pehle se zyada dikhne lag sakti hain. Yeh bas extra blood flow apna kaam kar raha hai, aur yeh fikr ki baat nahi hai. Delivery ke baad yeh aksar dobara kam dikhne lagti hain.',
         ),
       ),
       W5Highlight(
-        title: _t('Your changing body', 'Tumhara badalta body'),
+        title: _t('Your changing skin', 'Tumhari badalti skin'),
         teaser: _t(
-          'No bump yet, but plenty already shifting inside.',
-          'Abhi bump nahi, par andar bahut kuch badal raha hai.',
+          'Dryness, spots, or fine red lines are all common right now.',
+          'Rookhapan, daane, ya baareek laal lakeerein, sab abhi aam hain.',
         ),
         body: _t(
-          "It is far too early for a bump, and you will look much the same to the outside world for weeks yet. But your body has already begun reshaping itself around this pregnancy. Your body is beginning to send more blood towards your womb and the developing placenta, and breast tissue is responding to the new hormones. You might feel these shifts as tenderness or fullness. Nothing needs to look different for a lot to be happening.",
-          'Bump ke liye abhi bahut jaldi hai, aur duniya ko tum kai hafton tak lagbhag waisi hi dikhogi. Par tumhara body pehle se is pregnancy ke aaspaas khud ko dhaalne laga hai. Tumhara body womb aur ban rahe placenta ki taraf zyada blood bhejne laga hai, aur breast tissue naye hormones ka jawaab de raha hai. In badlaavon ko tum narmi ya bharipan ki tarah mehsoos kar sakti ho. Bahut kuch hone ke liye zaroori nahi ki kuch alag dikhe.',
-        ),
-      ),
-      W5Highlight(
-        title: _t('Appetite & cravings', 'Bhookh aur cravings'),
-        teaser: _t(
-          'Foods you once loved may suddenly turn, or tempt you.',
-          'Jo khaana kabhi pasand tha woh achanak bura lag sakta hai, ya lubha sakta hai.',
-        ),
-        body: _t(
-          "Your relationship with food can shift early. Some women go off tea, coffee or favourite meals almost overnight, while others start craving specific things. Changing hormones are thought to play a big part, and they may make certain smells or tastes feel much stronger than usual. There is no need to force foods that do not appeal right now. Eat what feels easy, keep something plain nearby, and trust that most food dislikes ease as the weeks go on.",
-          'Khaane ke saath tumhara rishta jaldi badal sakta hai. Kuch mahilaayein chai, coffee ya favourite khaane se raat-o-raat door ho jaati hain, jabki kuch ko khaas cheezon ki craving hone lagti hai. Maana jaata hai ki badalte hormones badi bhoomika nibhaate hain, aur woh kuch smells ya taste ko aam se kai guna tez bana sakte hain. Jo cheez abhi accha na lage use zabardasti khaane ki zaroorat nahi. Jo aasaan lage woh khao, kuch simple paas rakho, aur bharosa rakho ki zyadatar khaane ki naapasand hafton ke saath kam ho jaati hai.',
+          "Rising hormones can affect your skin in different ways this week. Some women notice dryness or a few extra spots, while some begin to notice fine, thread-like red lines called spider naevi on their chest or arms, though these are usually more common a little later on. Both are harmless and usually fade on their own after your baby arrives.",
+          'Badhte hormones is hafte tumhari skin ko alag-alag tareeke se badal sakte hain. Kuch mahilaayein rookhapan ya kuch extra daane dekhti hain, jabki kuch apne seene ya baahon par baareek, dhaage jaisi laal lakeerein dekhna shuru karti hain jinhe spider naevi kehte hain, halaanki yeh aksar thoda baad mein zyada aam hoti hain. Dono nuksaandeh nahi hain aur baby ke aane ke baad aksar apne aap fade ho jaati hain.',
         ),
       ),
     ],
     selfCare: _t(
-      "This is a good week to book your first prenatal appointment, and to start folic acid if you haven't already, or continue it if you have. Rest when you can, because early tiredness is real.",
-      'Yeh apni pehli prenatal appointment book karne, aur agar abhi tak nahi liya to folic acid shuru karne (ya le rahi ho to jaari rakhne) ka accha hafta hai. Jab ho sake aaram karo, kyunki shuruaati thakaan sach mein hoti hai.',
+      "If your first prenatal visit hasn't happened yet, it's likely coming up very soon. Keep taking your prenatal vitamin, stay hydrated, and treat yourself gently as your body keeps changing.",
+      'Agar tumhari pehli prenatal visit abhi tak nahi hui, to woh shayad bahut jald aane waali hai. Apna prenatal vitamin lete raho, paani peete raho, aur jab tumhara body badalta rahe to khud ke saath naram raho.',
     ),
   ),
 
@@ -299,47 +310,47 @@ final Week5Full week5Full = Week5Full(
     W5Symptom(
       name: _t('Nausea', 'Matli (Nausea)'),
       teaser: _t(
-        'That queasy, off-colour feeling that can arrive at any time of day. It often begins around now as pregnancy hormones climb.',
-        'Woh ubkaai jaisa, ajeeb sa ehsaas jo din ke kisi bhi waqt aa sakta hai. Pregnancy hormones badhne ke saath aksar abhi shuru hota hai.',
+        'That queasy feeling that can come at any time of day. Many women begin noticing improvement from around this stage, though for others it continues into the second trimester.',
+        'Woh ubkai jaisa ehsaas jo din ke kisi bhi waqt aa sakta hai. Bahut si mahilaayein is stage ke aaspaas sudhaar dekhna shuru karti hain, halaanki kuch ke liye yeh doosre trimester tak chalta hai.',
       ),
       howCommon: _t(
-        'Very common. Many women notice it from around week five or six.',
-        'Bahut aam. Bahut si mahilaayein ise lagbhag paanch-chhah hafte se mehsoos karti hain.',
+        'Very common, though many women notice it beginning to ease this week.',
+        'Bahut aam, halaanki bahut si mahilaayein is hafte ise halka hota mehsoos karti hain.',
       ),
       why: _t(
-        "Rising pregnancy hormones, especially hCG, can unsettle your stomach. Despite the name, this queasiness can happen morning, noon or night, not just early in the day.",
-        'Badhte pregnancy hormones, khaaskar hCG, tumhara pet gadbada sakte hain. Naam ke bavajood, yeh ubkaai subah, dopahar ya raat — kisi bhi waqt ho sakti hai, sirf subah nahi.',
+        'Rising pregnancy hormones, especially hCG, have been behind the queasiness. As hCG eases past its peak, nausea often follows.',
+        'Badhte pregnancy hormones, khaaskar hCG, is ubkai ke peeche rahe hain. Jab hCG apne peak se neeche aata hai, matli bhi aksar peeche-peeche halki ho jaati hai.',
       ),
       helps: [
-        _t('Eat small, frequent meals through the day', 'Din bhar chhote, baar-baar meals khao'),
+        _t('Eat small, frequent meals through the day', 'Din bhar chhote-chhote, baar-baar meals khao'),
         _t('Keep plain snacks like crackers or toast nearby', 'Crackers ya toast jaise simple snacks paas rakho'),
-        _t('Sip ginger tea, lemon water or nimbu paani', 'Adrak ki chai, lemon water ya nimbu paani ghoont-ghoont piyo'),
-        _t('Cut back on caffeine, which can worsen nausea', 'Caffeine kam karo, jo matli badha sakta hai'),
+        _t('Sip ginger tea, lemon water or nimbu paani', 'Adrak ki chai, lemon water ya nimbu paani sip karo'),
+        _t('Avoid smells that set off your nausea', 'Jo smells matli badhaayein unse door raho'),
       ],
       whenDoctor: _t(
         'If you cannot keep food or fluids down, or are losing weight, call your doctor.',
-        'Agar khaana ya paani andar tik na rahe, ya weight gir raha ho, to doctor ko call karo.',
+        'Agar khaana ya paani andar nahi tik pa raha, ya wazan ghat raha hai, to doctor ko call karo.',
       ),
     ),
     W5Symptom(
-      name: _t('Fatigue', 'Thakaan'),
+      name: _t('Fatigue', 'Thakaan (Fatigue)'),
       teaser: _t(
-        'A heavy, bone-deep tiredness that can hit even after a full night\'s sleep. It is one of the earliest signs of pregnancy.',
-        'Ek bhaari, haddiyon tak ki thakaan jo poori raat ki neend ke baad bhi ho sakti hai. Yeh pregnancy ke sabse pehle sanketon mein se ek hai.',
+        'A heavy tiredness that can hit even after a full night\'s sleep. Common through this trimester.',
+        'Ek bhaari thakaan jo poori raat sone ke baad bhi aa sakti hai. Is trimester bhar aam hai.',
       ),
       howCommon: _t(
-        'Very common in early pregnancy, and often one of the first things you notice.',
-        'Shuruaati pregnancy mein bahut aam, aur aksar sabse pehle mehsoos hone waali cheezon mein se ek.',
+        'Very common, and still noticeable for many women at this stage.',
+        'Bahut aam, aur is stage par bahut si mahilaon ko abhi bhi mehsoos hoti hai.',
       ),
       why: _t(
-        "Rising progesterone has a naturally calming, sleep-inducing effect. At the same time, your body is working hard to build the placenta and support your growing baby.",
-        'Badhta progesterone kudrati taur par shaant karne aur neend laane waala hota hai. Saath hi, tumhara body placenta banane aur badhte baby ko support karne mein khoob mehnat kar raha hai.',
+        'Rising progesterone can make you feel sleepier, while your body uses extra energy to build the placenta and support your pregnancy.',
+        'Badhta progesterone tumhein zyada neend mein rakh sakta hai, jabki tumhara body placenta banane aur pregnancy ko support karne mein extra energy lagata hai.',
       ),
       helps: [
-        _t('Rest whenever you can, even short naps', 'Jab ho sake aaram karo, chhoti jhapki bhi'),
-        _t('Go to bed a little earlier than usual', 'Aam se thoda jaldi so jao'),
-        _t('Stay hydrated and eat regular, balanced meals', 'Paani peete raho aur niyamit, santulit meals khao'),
-        _t('Gentle movement like a short walk can lift energy', 'Halki movement jaise chhoti walk energy badha sakti hai'),
+        _t('Rest whenever you can, even short naps', 'Jab bhi ho sake aaram karo, chhoti jhapki bhi'),
+        _t('Go to bed a little earlier than usual', 'Aam se thoda pehle so jao'),
+        _t('Stay hydrated and eat regular, balanced meals', 'Paani peete raho aur regular, balanced meals khao'),
+        _t('Gentle movement like a short walk can help', 'Halki harkat, jaise chhoti walk, madad kar sakti hai'),
       ],
       whenDoctor: _t(
         'If tiredness feels extreme, or comes with breathlessness or dizziness, mention it to your doctor.',
@@ -347,78 +358,78 @@ final Week5Full week5Full = Week5Full(
       ),
     ),
     W5Symptom(
-      name: _t('Tender breasts', 'Breast mein narmi aur dard'),
+      name: _t('Tender breasts', 'Breast mein narmi'),
       teaser: _t(
-        'Sore, swollen or tingling breasts are often one of the very first signs of pregnancy, sometimes even before a missed period.',
-        'Dukhte, soojhe ya jhunjhunahat waale breasts aksar pregnancy ke sabse pehle sanketon mein se ek hote hain, kabhi period miss hone se bhi pehle.',
+        'Fuller, heavier breasts with more visible veins as blood flow increases.',
+        'Blood flow badhne ke saath bhare, bhaari breasts aur zyada dikhti nasein.',
       ),
       howCommon: _t(
-        'Very common, and often one of the earliest changes women notice.',
-        'Bahut aam, aur aksar sabse pehle mehsoos hone waale badlaavon mein se ek.',
+        'Very common, and many notice ongoing growth and sensitivity this week.',
+        'Bahut aam, aur bahut si mahilaayein is hafte lagataar badhotri aur sensitivity mehsoos karti hain.',
       ),
       why: _t(
-        "Rising hormones increase blood flow and begin preparing the milk-producing tissue in your breasts. This can make them feel fuller, heavier or more sensitive than usual.",
-        'Badhte hormones blood flow badhate hain aur breasts mein doodh banane waale tissue ko taiyaar karne lagte hain. Isse woh aam se zyada bhare, bhaari ya sensitive mehsoos ho sakte hain.',
+        'Rising hormones increase blood flow to your breasts, which can make them feel fuller and more sensitive, with veins more visible underneath the skin.',
+        'Badhte hormones tumhare breasts mein blood flow badhaate hain, jisse woh zyada bhare aur sensitive lag sakte hain, aur skin ke neeche nasein zyada dikhti hain.',
       ),
       helps: [
         _t('Wear a soft, well-fitting supportive bra', 'Naram, sahi fitting waali supportive bra pehno'),
         _t('Try a wireless or sleep bra at night', 'Raat mein wireless ya sleep bra try karo'),
         _t('Avoid tight clothing that presses on the area', 'Tight kapde jo us jagah dabaayein, unse bacho'),
-        _t('Warm or cool compresses can ease soreness', 'Garam ya thanda compress dard kam kar sakta hai'),
+        _t('Warm or cool compresses can ease soreness', 'Garam ya thanda compress dard halka kar sakta hai'),
       ],
       whenDoctor: _t(
         'If you feel a lump, or notice unusual discharge, have it checked by your doctor.',
-        'Agar koi gaanth mehsoos ho, ya asamaanya discharge dikhe, to doctor se jaanch karwao.',
+        'Agar koi gaanth mehsoos ho, ya asaadhaaran discharge dikhe, to doctor se check karwao.',
       ),
     ),
     W5Symptom(
-      name: _t('Frequent urination', 'Baar-baar peshaab'),
+      name: _t('Headaches', 'Sar dard'),
       teaser: _t(
-        'Needing to pee more often than usual, even this early. It is a common and harmless sign that your body is adapting.',
-        'Aam se zyada baar peshaab jaana, itni jaldi bhi. Yeh ek aam aur nuksaan-rahit sanket hai ki tumhara body dhal raha hai.',
+        'A dull ache in the head, often linked to hormones and blood flow. Common at this stage.',
+        'Sar mein halka dard, aksar hormones aur blood flow se juda. Is stage par aam hai.',
       ),
       howCommon: _t(
-        'Common from early pregnancy, and it tends to come and go throughout.',
-        'Shuruaati pregnancy se aam, aur poore samay aata-jaata rehta hai.',
+        'Common in the first trimester, and can continue until around week 12.',
+        'Pehle trimester mein aam, aur lagbhag week 12 tak chal sakta hai.',
       ),
       why: _t(
-        "Pregnancy increases blood flow, so your kidneys process more fluid and produce more urine. Rising hormones also make your bladder more sensitive than usual.",
-        'Pregnancy blood flow badhati hai, isliye tumhari kidneys zyada fluid process karke zyada peshaab banati hain. Badhte hormones bladder ko bhi aam se zyada sensitive bana dete hain.',
+        'Rising hormones, increased blood volume, hunger and dehydration can all trigger headaches at this stage of pregnancy.',
+        'Badhte hormones, badha hua blood volume, bhookh aur paani ki kami, sab pregnancy ke is stage par sar dard shuru kar sakte hain.',
       ),
       helps: [
-        _t('Keep drinking water; do not cut fluids', 'Paani peete raho; fluids kam mat karo'),
-        _t('Reduce drinks in the hour before bed', 'Sone se ek ghante pehle drinks kam karo'),
-        _t('Lean forward when you pee to empty fully', 'Peshaab karte waqt aage jhuko taaki bladder poora khaali ho'),
-        _t('Cut back on caffeine, which increases urination', 'Caffeine kam karo, jo peshaab badhata hai'),
+        _t('Drink water and eat small, regular meals', 'Paani piyo aur chhote, regular meals khao'),
+        _t('Rest in a cool, quiet, dark room', 'Thande, shaant, andhere kamre mein aaram karo'),
+        _t('Try a warm or cool compress on your head', 'Sar par garam ya thanda compress try karo'),
+        _t('Get enough sleep and manage stress where you can', 'Poori neend lo aur jahan ho sake stress kam karo'),
       ],
       whenDoctor: _t(
-        'If it stings or burns when you pee, or you feel feverish, call your doctor.',
-        'Agar peshaab mein jalan ho, ya bukhaar jaisa lage, to doctor ko call karo.',
+        'If a headache is severe, will not go away, or comes with vision changes, call your doctor.',
+        'Agar sar dard bahut tez ho, jaa hi na raha ho, ya nazar mein badlaav ke saath aaye, to doctor ko call karo.',
       ),
     ),
     W5Symptom(
-      name: _t('Bloating', 'Pet mein bharipan (Bloating)'),
+      name: _t('Increased discharge', 'Discharge ka badhna'),
       teaser: _t(
-        'A full, puffy or gassy feeling in your tummy, a little like the bloating some women get before a period.',
-        'Pet mein bhara, phoola ya gas jaisa ehsaas, thoda usi bloating jaisa jo kuch mahilaon ko period se pehle hota hai.',
+        'More vaginal discharge than usual. Very common and usually a healthy sign.',
+        'Aam se zyada vaginal discharge. Bahut aam, aur aksar ek healthy sanket.',
       ),
       howCommon: _t(
-        'Common in early pregnancy, and especially noticeable in the first trimester.',
-        'Shuruaati pregnancy mein aam, aur pehle trimester mein khaaskar mehsoos hota hai.',
+        'Very common, and normal for most women throughout pregnancy.',
+        'Bahut aam, aur zyadatar mahilaon ke liye poori pregnancy bhar normal.',
       ),
       why: _t(
-        "Rising progesterone relaxes the muscles of your digestive tract, which slows digestion. Food moves through more slowly, which can leave you feeling gassy or full.",
-        'Badhta progesterone tumhare digestive tract ki muscles ko dheela karta hai, jisse digestion dheema ho jaata hai. Khaana zyada dheere aage badhta hai, jisse gas ya bharipan mehsoos ho sakta hai.',
+        "Rising estrogen increases blood flow to the area, leading to more discharge, called leukorrhea. It's your body's normal protective response.",
+        'Badhta estrogen us jagah blood flow badhaata hai, jisse zyada discharge hota hai, jise leukorrhea kehte hain. Yeh tumhare body ka normal, bachaav waala jawaab hai.',
       ),
       helps: [
-        _t('Eat smaller meals more slowly through the day', 'Din bhar chhote meals dheere-dheere khao'),
-        _t('Stay hydrated with water through the day', 'Din bhar paani se hydrated raho'),
-        _t('Include fibre from fruit, vegetables and dals', 'Fruit, sabziyon aur daal se fibre lo'),
-        _t('Gentle movement helps digestion keep moving', 'Halki movement digestion ko chalta rakhti hai'),
+        _t('Wear a panty liner if it feels more comfortable', 'Agar zyada comfortable lage to panty liner pehno'),
+        _t('Wear breathable, cotton underwear', 'Saans lene waali, cotton underwear pehno'),
+        _t('Keep the area clean with water only', 'Us jagah ko sirf paani se saaf rakho'),
+        _t('Avoid scented soaps or douching', 'Khushbu waale soap ya douching se bacho'),
       ],
       whenDoctor: _t(
-        'If bloating comes with severe pain or will not settle, speak to your doctor.',
-        'Agar bloating tez dard ke saath aaye ya theek na ho, to doctor se baat karo.',
+        'If it smells strong, changes colour, or causes itching, tell your doctor.',
+        'Agar tez smell aaye, rang badle, ya khujli ho, to doctor ko bataao.',
       ),
     ),
   ],
@@ -426,105 +437,102 @@ final Week5Full week5Full = Week5Full(
   // ---- 6 · Health · Diet ----------------------------------------------------
   diet: W5Diet(
     superfood: W5Superfood(
-      food: _t('Palak (Spinach)', 'Palak'),
+      food: _t('Paneer (Cottage Cheese)', 'Paneer'),
       benefit: _t(
-        "Rich in folate, the key nutrient helping your baby's brain and spine form safely.",
-        'Folate se bharpoor — wahi khaas nutrient jo tumhare baby ke brain aur spine ko surakshit banne mein madad karta hai.',
+        "Rich in calcium and complete protein, supporting your baby's bones and your own health.",
+        'Calcium aur poore protein se bharpoor, jo tumhare baby ki haddiyon aur tumhari apni sehat ko support karta hai.',
       ),
-      tryAs: _t(
-        'Try it as: palak dal or lightly sautéed saag.',
-        'Aise try karo: palak dal ya halki sautéed saag.',
-      ),
+      tryAs: _t('Try it as: palak paneer or grilled paneer cubes.', 'Aise try karo: palak paneer ya grilled paneer cubes.'),
       note: _t(
-        "In these early weeks, folate matters most, while your baby's brain and spinal cord are taking shape.",
-        'In shuruaati hafton mein folate sabse zyada mayne rakhta hai, jab tumhare baby ka brain aur spinal cord aakaar le rahe hote hain.',
+        "Choose paneer made from pasteurised milk, and cook it well, especially if you're unsure how it was made.",
+        'Pasteurised doodh se bana paneer chuno, aur use acche se pakao, khaaskar agar tumhein pata na ho ki woh kaise bana hai.',
       ),
     ),
     favour: [
       W5Card(
-        title: _t('Spinach & leafy greens', 'Palak aur patte waali sabziyan'),
+        title: _t('Paneer & dairy', 'Paneer aur dairy'),
         body: _t(
-          "Palak, methi and mustard greens are packed with folate for your baby's developing nervous system.",
-          'Palak, methi aur sarson ka saag folate se bhare hain — tumhare baby ke ban rahe nervous system ke liye.',
+          "Rich in calcium and protein, good for your baby's bones and your own health.",
+          'Calcium aur protein se bharpoor, tumhare baby ki haddiyon aur tumhari sehat ke liye accha.',
         ),
       ),
       W5Card(
-        title: _t('Dals & legumes', 'Dal aur phaliyan'),
+        title: _t('Curd & buttermilk', 'Dahi aur chhaas'),
         body: _t(
-          'Moong, masoor and rajma bring folate, protein and iron, all vital in these early building weeks.',
-          'Moong, masoor aur rajma folate, protein aur iron dete hain — in shuruaati building hafton mein sabhi zaroori.',
+          'Cooling and easy on the stomach, with calcium and gentle probiotics for your gut.',
+          'Thanda aur pet par halka, calcium aur naram probiotics ke saath tumhare gut ke liye.',
         ),
       ),
       W5Card(
-        title: _t('Citrus & amla', 'Khatte fal aur amla'),
+        title: _t('Whole grains & oats', 'Sabut anaaj aur oats'),
         body: _t(
-          'Oranges, sweet lime and amla add folate and vitamin C, which helps your body absorb iron.',
-          'Santara, mosambi aur amla folate aur vitamin C dete hain, jo tumhare body ko iron soakne mein madad karta hai.',
+          'Steady, slow-release energy that helps with digestion and keeps hunger in check.',
+          'Sthir, dheere-dheere milne waali energy jo hazme mein madad karti hai aur bhookh ko kaabu mein rakhti hai.',
         ),
       ),
       W5Card(
-        title: _t('Whole grains', 'Saabut anaaj'),
+        title: _t('Citrus & amla', 'Khatte phal aur amla'),
         body: _t(
-          'Whole wheat roti, brown rice and oats give steady energy and gentle fibre for digestion.',
-          'Gehu ki roti, brown rice aur oats steady energy aur digestion ke liye halka fibre dete hain.',
+          'Vitamin C from oranges, sweet lime and amla helps your body absorb iron better.',
+          'Santra, mosambi aur amla se milne waala Vitamin C tumhare body ko iron behtar absorb karne mein madad karta hai.',
         ),
       ),
       W5Card(
-        title: _t('Curd & yoghurt', 'Dahi aur yoghurt'),
+        title: _t('Bananas & simple fruit', 'Kele aur simple phal'),
         body: _t(
-          'Cooling, easy on the stomach, and a good source of calcium and gentle probiotics.',
-          'Thanda, pet par aasaan, aur calcium tatha halke probiotics ka accha source.',
+          "A gentle, quick source of energy that's easy to manage on queasy days.",
+          'Energy ka ek naram, turant zariya jo matli waale dinon mein aasaan rehta hai.',
         ),
       ),
       W5Card(
-        title: _t('Nuts & seeds', 'Meve aur beej'),
+        title: _t('Nuts & seeds', 'Mewe aur beej'),
         body: _t(
-          'A handful of almonds, walnuts or peanuts adds folate, healthy fats and a protein boost.',
-          'Muththi bhar badaam, akhrot ya moongfali folate, healthy fats aur protein ka boost deti hai.',
+          'A small handful of almonds or walnuts adds healthy fats, folate and protein.',
+          'Badaam ya akhrot ki ek chhoti mutthi healthy fats, folate aur protein deti hai.',
         ),
       ),
       W5Card(
-        title: _t('Bananas & simple fruit', 'Kela aur simple fal'),
+        title: _t('Spinach & leafy greens', 'Palak aur hari sabziyan'),
         body: _t(
-          'Easy to keep down on queasy days, and a quick, gentle source of energy.',
-          'Matli waale din andar tikaana aasaan, aur quick, halki energy ka source.',
+          'Palak and methi provide folate, iron and other important nutrients.',
+          'Palak aur methi folate, iron aur doosre zaroori nutrients dete hain.',
         ),
       ),
     ],
     avoid: [
       W5Card(
-        title: _t('Raw or undercooked meat & eggs', 'Kacha ya adhpaka meat aur ande'),
+        title: _t('Raw or undercooked meat & eggs', 'Kaccha ya adhpaka meat aur ande'),
         body: _t(
           'Can carry bacteria like salmonella or listeria, so cook everything thoroughly before eating.',
-          'Salmonella ya listeria jaise bacteria ho sakte hain, isliye khaane se pehle sab kuch achhe se pakao.',
+          'Insme salmonella ya listeria jaise bacteria ho sakte hain, isliye khaane se pehle sab kuch acche se pakao.',
         ),
       ),
       W5Card(
-        title: _t('Unpasteurised milk & soft cheese', 'Bina-pasteurised doodh aur soft cheese'),
+        title: _t('Unpasteurised dairy', 'Bina pasteurise kiya dairy'),
         body: _t(
-          'May contain listeria bacteria, so choose pasteurised milk and hard cheeses instead.',
-          'Isme listeria bacteria ho sakte hain, isliye pasteurised doodh aur hard cheese chuno.',
+          'Avoid unpasteurised milk, paneer, and soft cheese, which may carry listeria bacteria; choose pasteurised options instead.',
+          'Bina pasteurise kiya doodh, paneer aur soft cheese se bacho, inmein listeria bacteria ho sakta hai; iske badle pasteurised options chuno.',
         ),
       ),
       W5Card(
-        title: _t('High-mercury fish', 'Zyada-mercury waali machhli'),
+        title: _t('High-mercury fish', 'Zyada mercury waali machhli'),
         body: _t(
           "Limit shark, swordfish and king mackerel, as mercury can affect your baby's developing brain.",
-          'Shark, swordfish aur king mackerel seemit karo, kyunki mercury tumhare baby ke ban rahe brain ko prabhaavit kar sakta hai.',
+          'Shark, swordfish aur king mackerel kam karo, kyunki mercury tumhare baby ke ban rahe brain ko nuksaan pahuncha sakta hai.',
         ),
       ),
       W5Card(
-        title: _t('Too much caffeine', 'Bahut zyada caffeine'),
+        title: _t('Too much caffeine', 'Zyada caffeine'),
         body: _t(
-          'Keep it under about 200 mg a day, roughly one cup of coffee.',
-          'Ise din mein lagbhag 200 mg ke neeche rakho, mote taur par ek cup coffee.',
+          'Keep caffeine below 200 mg a day, about one to two small cups of coffee.',
+          'Caffeine ek din mein 200 mg se kam rakho, lagbhag ek se do chhote cup coffee.',
         ),
       ),
       W5Card(
-        title: _t('Alcohol', 'Sharaab'),
+        title: _t('Alcohol', 'Alcohol'),
         body: _t(
           'No amount is considered safe in pregnancy, so it is best avoided completely.',
-          'Pregnancy mein koi bhi maatra surakshit nahi maani jaati, isliye ise poori tarah chhod dena behtar hai.',
+          'Pregnancy mein koi bhi maatra surakshit nahi maani jaati, isliye ise poori tarah chhod dena hi behtar hai.',
         ),
       ),
     ],
@@ -600,25 +608,28 @@ final Week5Full week5Full = Week5Full(
   // ---- 8 · Share With Partner -----------------------------------------------
   partner: W5Partner(
     baby: _t(
-      "This week I am about the size of a sesame seed, but a lot is happening inside me. My brain, spine and tiny heart are just beginning to form. You cannot feel me yet, but I am already growing a little more every single day.",
-      'Is hafte main lagbhag til ke daane jitna hoon, par mere andar bahut kuch ho raha hai. Mera brain, spine aur nanha dil abhi banna shuru ho rahe hain. Tum abhi mujhe mehsoos nahi kar sakte, par main pehle se har din thoda aur badh raha hoon.',
+      "This week my fingers and toes have fully separated, and tiny nails are just beginning to grow. I'm about the size of a strawberry now, and all my major organs have formed and are starting to work together as a team.",
+      'Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, aur nanhe naakhun abhi ugna shuru hue hain. Ab main lagbhag ek strawberry jitna hoon, aur mere sabhi bade organs ban chuke hain aur ek team ki tarah saath kaam karna shuru kar rahe hain.',
     ),
     mother: _t(
-      "She has likely just found out she is pregnant, and it may still feel wonderfully unreal. She might be more tired than usual, or feeling a little queasy as her body adjusts. Right now, small gestures of care and patience mean more to her than anything grand.",
-      'Use shayad abhi-abhi pata chala hai ki woh pregnant hai, aur yeh abhi bhi khoobsurat tareeke se anokha lag sakta hai. Woh aam se zyada thaki ho sakti hai, ya body ke dhalne ke saath thodi matli mehsoos kar sakti hai. Abhi, dekhbhaal aur sabr ke chhote ishaare uske liye kisi badi cheez se zyada mayne rakhte hain.',
+      "For many women, this is when the toughest symptoms start easing, though everyone's timeline is a little different. She may still be dealing with tiredness, headaches or nausea, alongside newer things like visible veins or sharp twinges as her body keeps changing. Small comforts and patience go a long way right now.",
+      'Bahut si mahilaon ke liye yahi woh waqt hai jab sabse mushkil symptoms halke padne lagte hain, halaanki har kisi ka timeline thoda alag hota hai. Woh abhi bhi thakaan, sar dard ya matli se jujh rahi ho sakti hai, saath hi nayi cheezein jaise dikhti nasein ya tez chubhan, jab uska body badalta ja raha hai. Chhoti sahoolatein aur sabr abhi bahut mayne rakhte hain.',
     ),
+    // Current week to week+4; scans whose window has already closed are dropped.
     scans: [
-      W5Scan(name: _t('First check-up', 'Pehla check-up'), window: _t('Week 6 to 8', 'Week 6 se 8')),
-      W5Scan(name: _t('Dating scan', 'Dating scan'), window: _t('Week 6 to 9', 'Week 6 se 9')),
-      W5Scan(name: _t('NT scan', 'NT scan'), window: _t('Week 11 to 13', 'Week 11 se 13')),
+      W5Scan(name: _t('NT scan', 'NT scan'), window: _t('Week 11 to 14', 'Week 11 se 14')),
+      W5Scan(
+        name: _t('Double marker test', 'Double marker test'),
+        window: _t('Week 11 to 14 · usually with the NT scan', 'Week 11 se 14 · aksar NT scan ke saath'),
+      ),
     ],
     help: [
-      _t('Take on more of the cooking and daily chores.', 'Khaana banane aur roz ke kaam ka zyada hissa apne upar lo.'),
-      _t('Keep simple snacks and water near her bed.', 'Uske bistar ke paas simple snacks aur paani rakho.'),
-      _t('Be patient with her tiredness and changing moods.', 'Uski thakaan aur badalte moods ke saath sabr rakho.'),
-      _t("Go with her to that first doctor's visit.", 'Us pehli doctor visit par uske saath jao.'),
-      _t('Listen when she wants to talk, without fixing.', 'Jab woh baat karna chahe to suno, theek karne ki koshish ke bina.'),
-      _t('Remind her gently to take her folic acid.', 'Use pyaar se folic acid lene ki yaad dilao.'),
+      _t('Be patient with any lingering symptoms.', 'Jo symptoms abhi bhi hain, unke saath sabr rakho.'),
+      _t('Take on more of the cooking and chores.', 'Khaana banane aur ghar ke kaam ka zyada hissa apne upar lo.'),
+      _t('Help her move slowly if twinges strike.', 'Agar chubhan ho to use dheere chalne mein madad karo.'),
+      _t('Keep supportive, comfortable clothing handy.', 'Supportive, comfortable kapde paas rakho.'),
+      _t('Ask about the upcoming NT scan together.', 'Aane waale NT scan ke baare mein saath mein poocho.'),
+      _t('Celebrate how close you are to trimester two.', 'Khushi manao ki tum trimester do ke kitne kareeb ho.'),
     ],
   ),
 );

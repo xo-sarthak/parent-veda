@@ -277,6 +277,11 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         _aboutBlock(_lang.isEnglish ? 'How big am I' : 'Main kitna bada hoon', _tr(w.about.howBig)),
         const SizedBox(height: 14),
         _aboutBlock(_lang.isEnglish ? "What's happening this week" : 'Is hafte kya ho raha hai', _tr(w.about.whatsHappening)),
+        // Behavioural highlights: inline heading + description, never a card.
+        for (final b in w.about.behaviour) ...[
+          const SizedBox(height: 14),
+          _aboutBlock(_tr(b.title), _tr(b.body)),
+        ],
       ]),
     );
   }
