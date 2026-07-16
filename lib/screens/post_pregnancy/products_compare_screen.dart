@@ -15,6 +15,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_models.dart';
+import '../../brand/needs_attention.dart';
+import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 
@@ -278,6 +281,7 @@ class ProductsCompareScreen extends StatelessWidget {
               // the differentiator: education BEFORE the comparison
               const SizedBox(height: 18),
               _pad(_beforeYouCompare(ps.first)),
+              _pad(_compareSponsor(ps)),
 
               // overview cards - rating up top, plus per-card remove / replace
               const SizedBox(height: 22),
@@ -496,6 +500,24 @@ class ProductsCompareScreen extends StatelessWidget {
   }
 
   // ---- before you compare (education first - the differentiator) ---------
+  /// FLAGGED: a sponsor on the most decision-shaping screen in the app. The
+  /// table above is untouched — no spec, no rating, no ordering — and a brand
+  /// can never sponsor a comparison it is one of the two products in.
+  Widget _compareSponsor(List<PpProduct> compared) {
+    final brands = compared.map((p) => p.brand.toLowerCase()).toSet();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      PresentedBy(
+        slot: BrandSlot.compareGuide,
+        stage: BrandStage.parenting,
+        // Hard rule: a brand cannot sponsor a comparison it is IN. A bogus key
+        // resolves to nothing, so the line simply does not render.
+        placementKey: brands.contains('tinytoes') ? 'self_blocked' : null,
+        padding: const EdgeInsets.only(top: 4),
+      ),
+      const NeedsAttentionFlag(flag: BrandFlag.compareSponsorship, padding: EdgeInsets.only(top: 8)),
+    ]);
+  }
+
   Widget _beforeYouCompare(PpProduct a) {
     final g = compareGuideFor(a.category);
     return Container(

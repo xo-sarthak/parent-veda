@@ -16,6 +16,8 @@
 //  commented below for revert. Their screens remain in the module.
 // =============================================================================
 
+import '../../brand/brand_models.dart';
+import '../../brand/presented_by.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
@@ -69,6 +71,16 @@ class PrepareHubScreen extends StatelessWidget {
             pad(Text('RECOMMENDED AT 30 WEEKS',
                 style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1))),
             const SizedBox(height: 14),
+
+            // Renders nothing unless the live sessions are sponsored. The
+            // experts stay independent — a brand funds the room, it does not
+            // choose the answers given in it.
+            pad(const PresentedBy(
+              slot: BrandSlot.liveSession,
+              stage: BrandStage.pregnancy,
+              placementKey: 'prepare_hub',
+              padding: EdgeInsets.only(bottom: 14),
+            )),
 
             // recommended rail
             SizedBox(

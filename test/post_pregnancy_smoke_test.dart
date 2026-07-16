@@ -581,10 +581,18 @@ void main() {
     expect(find.textContaining('now for this stage'), findsOneWidget); // subline
     expect(find.text('0–1 Year'), findsWidgets); // parenting room chip + post tag
 
-    // scroll the whole feed (building every post) to the labelled sponsored slot
-    await tester.scrollUntilVisible(find.text('Nunu - breathable muslin swaddles'), 300,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.text('Nunu - breathable muslin swaddles'), findsOneWidget);
+    // The feed's sponsored slot used to be a hardcoded brand card ("Nunu -
+    // breathable muslin swaddles") written straight into the build method. It
+    // now resolves through BrandStudio, which is inert under test — so the slot
+    // renders nothing and no brand name reaches the feed at all.
+    expect(find.text('Nunu - breathable muslin swaddles'), findsNothing);
+
+    // Still scroll the whole feed, building every post, to catch layout breaks.
+    final scrollable = find.byType(Scrollable).first;
+    for (var i = 0; i < 30; i++) {
+      await tester.drag(scrollable, const Offset(0, -400));
+      await tester.pump();
+    }
     expect(tester.takeException(), isNull);
   });
 

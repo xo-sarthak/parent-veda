@@ -522,7 +522,8 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         ),
       ),
       const SizedBox(height: 12),
-      _pad(Text('Sponsored & affiliate picks - always labelled, and never on your research pages.',
+      _pad(Text('Sponsored & affiliate picks - always labelled. A brand can fund what you read, '
+          'but never write it, and never change a rating or where a product ranks.',
           textAlign: TextAlign.center, style: ppBody(11, color: ppMuted, h: 1.5))),
     ]);
   }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'brand/brand_store.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
+import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'screens/post_pregnancy/pp_family_profile.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
@@ -140,6 +142,11 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // source of truth (health/feeding/sleep/priorities/learning). Features read
     // it to tailor content, recommendations and ordering (never navigation).
     FamilyProfileStore.instance.init();
+    // PARENTING: guided day-by-day journeys (enrolment + which days are read).
+    JourneyStore.instance.init();
+    // BRAND STUDIO: which campaigns this parent has already been shown. Loaded
+    // so frequency caps ("once per campaign") survive a restart or reinstall.
+    BrandStudioStore.instance.init();
   }
 
   @override

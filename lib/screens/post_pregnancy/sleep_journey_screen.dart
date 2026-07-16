@@ -13,6 +13,8 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import '../../brand/brand_models.dart';
+import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_sleep_data.dart';
 import 'pp_tools_kit.dart';
@@ -45,6 +47,14 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
                   title: 'Sleep journey',
                   subtitle: 'A picture of rest — patterns to understand, not a target to hit.',
                 ),
+                // Renders nothing unless this exact tool is sponsored. The
+                // sponsor gets a line; the tool stays entirely ours.
+                ppToolPad(const PresentedBy(
+                  slot: BrandSlot.sponsoredTool,
+                  stage: BrandStage.parenting,
+                  placementKey: 'sleep_journey',
+                  padding: EdgeInsets.only(top: 10),
+                )),
                 const SizedBox(height: 20),
                 ppToolPad(_hero()),
                 const SizedBox(height: 14),

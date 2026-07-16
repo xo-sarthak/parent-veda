@@ -27,6 +27,11 @@ import 'reminders_screen.dart';
 // Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
 // Kept commented for revert.
 // import 'report_screen.dart';
+import 'package:flutter/foundation.dart';
+
+import '../brand/brand_preview_screen.dart';
+import '../brand/brand_models.dart';
+import '../brand/launch_hub_screen.dart';
 import 'product_guide/product_guide_hub_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
@@ -97,6 +102,18 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => ProductChecklistScreen(controller: controller))),
       _Tool('Product Guide', Icons.menu_book_outlined, AppTheme.primary400,
           () => open(() => const ProductGuideHubScreen())),
+      // The Launch Hub's only front door. A destination is visited on purpose —
+      // it is never pushed at anyone. See docs/BRAND-STUDIO.md §3.
+      _Tool('Launches', Icons.auto_awesome_outlined, const Color(0xFF7A4600),
+          () => open(() => LaunchHubScreen(
+                stage: BrandStage.pregnancy,
+                pregnancyWeek: controller.currentWeek,
+              ))),
+      // Debug-only workbench. The Brand Studio's job is to show almost nothing,
+      // so this is the only way to see whether it is working at all.
+      if (kDebugMode)
+        _Tool('Brand Studio (debug)', Icons.science_outlined, const Color(0xFFD92D20),
+            () => open(() => BrandPreviewScreen(pregnancyWeek: controller.currentWeek))),
       _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
           () => open(() => MedicineTrackerScreen(controller: controller))),
       _Tool(s.rmdTitle, Icons.notifications_active_rounded,

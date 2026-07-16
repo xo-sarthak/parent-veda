@@ -22,6 +22,11 @@ import 'sleep_journey_screen.dart';
 // Was a direct entry to the V1 finder; the front door (baby_naming_home_screen)
 // now owns the V1|V2 toggle and imports NameFinderScreen itself.
 // import 'name_finder_screen.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../brand/brand_preview_screen.dart';
+import '../../brand/brand_models.dart';
+import '../../brand/launch_hub_screen.dart';
 import '../product_guide/product_guide_hub_screen.dart';
 import 'pp_common.dart';
 import 'products_compare_screen.dart';
@@ -106,6 +111,16 @@ class ToolsHubScreen extends StatelessWidget {
               const SizedBox(height: 10),
               _tracker(context, Icons.menu_book_outlined, const Color(0xFFEAF4EE), 'Product Guide', 'Is it right for your child?', ppMuted,
                   () => _push(context, const ProductGuideHubScreen())),
+              const SizedBox(height: 10),
+              // The Launch Hub's only front door. A destination is visited on
+              // purpose — it is never pushed at anyone. docs/BRAND-STUDIO.md §3.
+              _tracker(context, Icons.auto_awesome_outlined, const Color(0xFFF6EFE6), 'Launches', 'New, and worth knowing about', ppBrown,
+                  () => _push(context, const LaunchHubScreen(stage: BrandStage.parenting))),
+              const SizedBox(height: 10),
+              // Debug-only workbench — see every campaign and why it is blocked.
+              if (kDebugMode)
+                _tracker(context, Icons.science_outlined, const Color(0xFFFFF1F3), 'Brand Studio (debug)', 'Every campaign, and why it is blocked', const Color(0xFFD92D20),
+                    () => _push(context, const BrandPreviewScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
                   () => _push(context, const ProductsCompareScreen())),

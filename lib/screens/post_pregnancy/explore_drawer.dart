@@ -32,6 +32,7 @@ import 'leap_calendar_screen.dart';
 // import 'masterclasses_screen.dart'; // merged into LearningHomeScreen
 import 'my_child_screen.dart';
 import 'nuskhe_screen.dart';
+import 'journeys_screen.dart';
 import 'pp_common.dart';
 import 'reading_home_screen.dart';
 import 'watch_home_screen.dart';
@@ -74,6 +75,8 @@ class ExploreDrawer extends StatelessWidget {
                   }),
                   _section(context, Icons.tune_rounded, 'My Family Profile',
                       'Personalise ParentVeda for your family.', const FamilyProfileScreen()),
+                  _section(context, Icons.route_rounded, 'Guided journeys',
+                      'One short read a day, for the hard stretches.', const JourneysScreen()),
                   _section(context, Icons.brightness_4_outlined, 'Leap Calendar',
                       "Every Wonder-Weeks leap, on his timeline.", const LeapCalendarScreen()),
                   _section(context, Icons.play_circle_outline, 'Watch',

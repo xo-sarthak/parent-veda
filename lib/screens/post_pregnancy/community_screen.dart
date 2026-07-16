@@ -26,6 +26,7 @@ import '../../data/community_data.dart';
 import '../../models/community_models.dart';
 import '../../services/community_store.dart';
 import '../../services/expert_follow_store.dart';
+import '../../brand/sponsored_community_campaign.dart';
 import 'pp_common.dart';
 import 'pp_community_activity_screen.dart';
 import 'pp_community_detail_screen.dart';
@@ -1138,27 +1139,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
         ]),
       );
 
-  Widget _sponsored() =>
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ppEyebrow('Sponsored', color: ppMuted, spacing: 0.8),
-        const SizedBox(height: 10),
-        Row(children: [
-          const PpStriped(height: 64, width: 64, radius: 16, border: true),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Nunu - breathable muslin swaddles',
-                      style: ppJakarta(15),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text('New from an Indian parent brand.', style: ppBody(12)),
-                ]),
-          ),
-        ]),
-      ]);
+  /// A sponsored community campaign, resolved through the Brand Studio.
+  ///
+  /// This used to be a hardcoded brand ("Nunu - breathable muslin swaddles")
+  /// with hand-written "Sponsored" wording and no campaign, no targeting, no
+  /// schedule and no disclosure standard — live brand content routed around
+  /// BrandStudio.resolve(). That is precisely the drift the Studio exists to
+  /// prevent, so it now goes through the front door like everything else and
+  /// renders nothing at all when no campaign is live.
+  Widget _sponsored() => const SponsoredCommunityCampaign();
 
   Widget _composeFab() => GestureDetector(
         onTap: _openCompose,

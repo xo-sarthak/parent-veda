@@ -8,6 +8,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_models.dart';
+import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_reco_data.dart';
 import 'reco_common.dart';
@@ -50,6 +52,15 @@ class RecoCollectionScreen extends StatelessWidget {
                   ? 'This collection is being curated.'
                   : '${items.length} ${items.length == 1 ? 'pick' : 'picks'} in this collection',
               style: ppBody(12.5, color: ppPurple, w: FontWeight.w700),
+            )),
+            // Renders nothing unless this exact collection is sponsored. A
+            // brand can fund a curated theme existing; ParentVeda still chooses
+            // every pick in it, and the picks are unchanged either way.
+            _pad(PresentedBy(
+              slot: BrandSlot.sponsoredCollection,
+              stage: BrandStage.parenting,
+              placementKey: collection.id,
+              padding: const EdgeInsets.only(top: 12),
             )),
             const SizedBox(height: 22),
             if (items.isEmpty)

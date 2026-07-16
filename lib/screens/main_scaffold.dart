@@ -18,8 +18,12 @@ import '../services/father_content_controller.dart';
 import '../services/father_preview.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
+import '../brand/brand_models.dart';
+import '../brand/premiere_screen.dart';
 import '../theme/app_theme.dart';
-import '../widgets/launch_promo.dart';
+// Retired: the old sponsored-brand promo carousel, replaced by ParentVeda
+// Premiere (lib/brand/). Kept for revert — see docs/BRAND-STUDIO.md §12.
+// import '../widgets/launch_promo.dart';
 import '../widgets/pv_tab_bar.dart';
 import 'calendar_screen.dart';
 import 'community_screen.dart';
@@ -67,10 +71,17 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
     WidgetsBinding.instance.addObserver(this); // app-resume → refresh content
-    // On app open, show the big sponsored-brand promo once (after first frame,
-    // so a valid Navigator/context exists). No-ops on later rebuilds.
+    // Ask the Brand Studio whether a Premiere is live for this parent (after
+    // the first frame, so a valid Navigator/context exists). Almost always
+    // resolves to null — Premiere runs 3-6 times a year and only once per
+    // campaign — and null is the normal, correct answer.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) showLaunchPromo(context);
+      if (!mounted) return;
+      showPremiereIfAny(
+        context,
+        stage: BrandStage.pregnancy,
+        pregnancyWeek: widget.pregnancy.currentWeek,
+      );
     });
   }
 

@@ -13,6 +13,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_models.dart';
+import '../../brand/needs_attention.dart';
+import '../../brand/presented_by.dart';
 import 'product_guide_data.dart';
 import 'product_guide_style.dart';
 import 'product_guide_votes.dart';
@@ -356,6 +359,17 @@ class ProductGuideScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _pad(_sectionHead('Expert explains', 'Short, from people who know')),
+          // FLAGGED: a sponsor on a research page. See needs_attention.dart.
+          _pad(PresentedBy(
+            slot: BrandSlot.productGuideExpert,
+            stage: BrandStage.parenting,
+            placementKey: g.id,
+            padding: const EdgeInsets.only(top: 8),
+          )),
+          _pad(const NeedsAttentionFlag(
+            flag: BrandFlag.productGuideSponsorship,
+            padding: EdgeInsets.only(top: 8),
+          )),
           const SizedBox(height: 14),
           SizedBox(
             height: 158,
@@ -464,8 +478,23 @@ class ProductGuideScreen extends StatelessWidget {
   // ---- research corner (about THIS product's ingredients & claims) --------
   Widget _research(BuildContext context, ProductGuide g) => _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead('Research corner', "On this product's actual ingredients & claims"),
+        // FLAGGED: a sponsor on a research page. The studies are chosen by
+        // ParentVeda, and a maker's own work is still labelled and sorted below
+        // independent research — funding changes neither.
+        PresentedBy(
+          slot: BrandSlot.productGuideResearch,
+          stage: BrandStage.parenting,
+          placementKey: g.id,
+          padding: const EdgeInsets.only(top: 8),
+        ),
+        const NeedsAttentionFlag(
+          flag: BrandFlag.productGuideSponsorship,
+          padding: EdgeInsets.only(top: 8),
+        ),
         const SizedBox(height: 12),
-        for (final st in g.studies) _studyCard(context, st),
+        // Independent research leads, always. A maker's own study never does.
+        for (final st in [...g.studies.where((s) => !s.byMaker), ...g.studies.where((s) => s.byMaker)])
+          _studyCard(context, st),
       ]));
 
   Widget _studyCard(BuildContext context, PgStudy st) {

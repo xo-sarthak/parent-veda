@@ -7,6 +7,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_models.dart';
+import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
 import 'reading_common.dart';
@@ -49,6 +51,14 @@ class ReadingCollectionScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 _pad(Text('${reads.length} reads · ~$mins min · ${prog >= 1 ? 'completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'not started'}',
                     style: ppBody(12.5, color: ppPurple, w: FontWeight.w700))),
+                // Renders nothing unless this exact collection is sponsored.
+                // The reads themselves are ParentVeda's, sponsor or no sponsor.
+                _pad(PresentedBy(
+                  slot: BrandSlot.sponsoredEducation,
+                  stage: BrandStage.parenting,
+                  placementKey: collection.id,
+                  padding: const EdgeInsets.only(top: 12),
+                )),
                 const SizedBox(height: 22),
                 for (int i = 0; i < reads.length; i++) _pad(_row(context, i + 1, reads[i])),
               ],

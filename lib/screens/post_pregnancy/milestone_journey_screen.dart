@@ -14,6 +14,8 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import '../../brand/brand_models.dart';
+import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_milestones_data.dart';
 import 'pp_tools_kit.dart';
@@ -130,6 +132,14 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
         ppEyebrow(ChildProfileStore.instance.ageLabel, color: ppPurple),
         const SizedBox(height: 8),
         Text(_store.stageLabel, style: ppFraunces(24, h: 1.12)),
+        // Renders nothing unless sponsored. A milestone is never moved,
+        // reworded or gated by a sponsorship — only attributed.
+        const PresentedBy(
+          slot: BrandSlot.sponsoredMilestone,
+          stage: BrandStage.parenting,
+          placementKey: 'development_journey',
+          padding: EdgeInsets.only(top: 8),
+        ),
         const SizedBox(height: 14),
         Row(children: [
           _snap(Icons.celebration_outlined, 'Just celebrated', recent?.title ?? 'Your first memory awaits'),

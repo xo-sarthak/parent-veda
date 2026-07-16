@@ -19,6 +19,10 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import '../../brand/brand_context.dart';
+import '../../brand/brand_models.dart';
+import '../../brand/brand_studio.dart';
+import '../../brand/rank_floor.dart';
 import 'pp_family_profile.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
@@ -1135,6 +1139,40 @@ String recoReason(RecoItem it, RecoContext ctx) {
 //  Engine - the surfaces the screens read from.
 // =============================================================================
 
+// ---- Brand Product 5 · featured recommendations -----------------------------
+//
+// Note where this lives: AFTER _ranked, never inside _score. _score has no
+// commercial term and must never grow one — the moment money is an input to
+// merit, "better" and "paying" become the same word and no amount of labelling
+// repairs it. A sponsored item earns its slot at its real score; sponsorship
+// only buys the right to be CONSIDERED. See lib/brand/rank_floor.dart.
+
+/// The reco item a live campaign has featured, if any — and only if it clears
+/// the quality floor on its own merits.
+RecoItem? _featuredItem() {
+  try {
+    final c = BrandStudio.instance.resolve(
+      BrandSlot.recoFeatured,
+      captureBrandContext(stage: BrandStage.parenting),
+    );
+    if (c == null) return null;
+    final id = c.placementKey;
+    if (id == null) return null;
+    for (final r in kReco) {
+      // A product we would not recommend unpaid cannot be bought in at any
+      // price. Sponsorship buys consideration, not entry.
+      if (r.id == id) return clearsQualityFloor(r.pvRating) ? r : null;
+    }
+  } catch (_) {/* no feature */}
+  return null;
+}
+
+/// The id of the currently featured reco, for the UI to label. Null is normal.
+///
+/// Exposed so a card can render its SPONSORED tag on the item itself rather
+/// than in a legend somewhere above it.
+String? featuredRecoId() => _featuredItem()?.id;
+
 /// The hero: a handful of highly-relevant picks, diversified so it is never all
 /// one category. Answers "what is worth my time for my child today?".
 List<RecoItem> recommendedToday({int count = 7}) {
@@ -1148,7 +1186,15 @@ List<RecoItem> recommendedToday({int count = 7}) {
     perCat[it.category] = (perCat[it.category] ?? 0) + 1;
     if (out.length >= count) break;
   }
-  return out;
+
+  final promo = _featuredItem();
+  if (promo == null) return out;
+  return insertWithRankFloor<RecoItem>(
+    organic: out,
+    promo: promo,
+    scoreOf: (r) => _score(r, ctx),
+    isSame: (a, b) => a.id == b.id,
+  );
 }
 
 /// Age-ranked picks within one category.

@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_disclosure.dart';
 import 'pp_common.dart';
 import 'pp_deals_data.dart';
 import 'pp_reco_data.dart';
@@ -110,6 +111,13 @@ class RecoRailCard extends StatelessWidget {
             Row(children: [recoAgePill(item.ageLabel), const SizedBox(width: 8), recoRating(item.pvRating)]),
             const SizedBox(height: 6),
             Text(item.summary, style: ppBody(11.5, color: ppSoft, h: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+            // The label goes on the item, never in a legend above the list: a
+            // parent scrolling past should never have to remember which rail
+            // was the sponsored one.
+            if (item.id == featuredRecoId()) ...[
+              const SizedBox(height: 7),
+              const SponsoredTag(),
+            ],
             if (reason != null) ...[
               const SizedBox(height: 7),
               recoReasonChip(reason!),
