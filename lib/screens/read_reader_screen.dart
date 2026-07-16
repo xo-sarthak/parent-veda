@@ -25,6 +25,7 @@ import '../models/read_item.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
+import 'book_companion_screen.dart';
 
 // ---- reader preferences (session-scoped, mirrors PP ReadingStore font/mode) --
 enum ReadReaderMode { light, sepia, dark }
@@ -69,6 +70,7 @@ class ReadReaderScreen extends StatefulWidget {
 class _ReadReaderScreenState extends State<ReadReaderScreen> {
   final ScrollController _sc = ScrollController();
   final Map<String, GlobalKey> _keys = {};
+  final Set<int> _expandedIdeas = {}; // key ideas the reader has opened (collapsed by default)
   final Set<int> _expandedChapters = {}; // chapter cards the reader has opened
   double _progress = 0;
 
@@ -138,8 +140,8 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       if (c.about.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
       if (c.philosophy.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
       if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'Zaroori ideas')));
-      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
       if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'Chapter dar chapter')));
+      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
       if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'Yaadgaar baatein')));
       return out;
     }
@@ -471,17 +473,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         _anchor('ideas'),
         _pad(_secTitle(t, _tr('The most important ideas', 'Sabse zaroori ideas'))),
         const SizedBox(height: 4),
-        _pad(Text(_tr('Each idea is one milestone in how the book thinks.', 'Har idea kitaab ki soch ka ek padaav hai.'),
+        _pad(Text(_tr('Tap any idea to open it.', 'Kisi bhi idea ko kholne ke liye tap karein.'),
             style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         for (var i = 0; i < c.ideas.length; i++) _pad(_ideaCard(t, i, c.ideas[i])),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
       ],
-      if (c.perspective.isNotEmpty) ...[
-        _anchor('perspective'),
-        _pad(_takeBlock(t, c.perspective)),
-        const SizedBox(height: 22),
-      ],
+      // Chapters come before ParentVeda's take — the take is the closing note.
       if (c.chapters.isNotEmpty) ...[
         _anchor('chapters'),
         _pad(_secTitle(t, _tr('Chapter by chapter', 'Chapter dar chapter'))),
@@ -490,7 +488,12 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
         const SizedBox(height: 14),
         for (var i = 0; i < c.chapters.length; i++) _pad(_chapterCard(t, i, c.chapters[i])),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
+      ],
+      if (c.perspective.isNotEmpty) ...[
+        _anchor('perspective'),
+        _pad(_takeBlock(t, c.perspective)),
+        const SizedBox(height: 22),
       ],
       if (c.quotes.isNotEmpty) ...[
         _anchor('quotes'),
@@ -533,62 +536,71 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   TextStyle _companionLabel(_RTheme t) => GoogleFonts.manrope(
       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: t.accent);
 
-  // Key idea as a "milestone" marker: a solid deep-purple bar (number + title)
-  // that opens, seamlessly, onto a light card holding the three labelled blocks.
-  Widget _ideaCard(_RTheme t, int index, BookKeyIdea idea) => Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: t.rule),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 14, offset: const Offset(0, 6))],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // the bar — one continuous object with the card below (top corners only)
-          Container(
+  // Key idea: a solid deep-purple bar (number + title + chevron), collapsed by
+  // default so all five bars fit on roughly one screen. Tapping opens a
+  // connected light panel — one flowing paragraph, then a few dot pointers.
+  Widget _ideaCard(_RTheme t, int index, BookKeyIdea idea) {
+    final open = _expandedIdeas.contains(index);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12, offset: const Offset(0, 5))],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // The bar. Collapsed it reads as a standalone rounded bar; expanded it
+        // becomes the head of one continuous object with the panel below.
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => open ? _expandedIdeas.remove(index) : _expandedIdeas.add(index)),
+          child: Container(
             width: double.infinity,
             color: _ideaBar,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-            child: Text('${index + 1}. ${idea.title}',
-                style: GoogleFonts.plusJakartaSans(
-                    fontSize: 15.5 * _fs, fontWeight: FontWeight.w800, color: Colors.white, height: 1.25)),
+            padding: const EdgeInsets.fromLTRB(15, 13, 11, 13),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              Expanded(
+                child: Text('${index + 1}. ${idea.title}',
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15 * _fs, fontWeight: FontWeight.w800, color: Colors.white, height: 1.25)),
+              ),
+              const SizedBox(width: 8),
+              AnimatedRotation(
+                turns: open ? 0.5 : 0,
+                duration: const Duration(milliseconds: 160),
+                child: const Icon(Icons.keyboard_arrow_down_rounded, size: 22, color: Colors.white),
+              ),
+            ]),
           ),
-          // the connected light card
+        ),
+        if (open)
           Container(
             width: double.infinity,
             color: _companionCardBg,
-            padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+            padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _ideaBlock(t, _tr('WHAT THE AUTHOR MEANS', 'LEKHAK KA MATLAB'), idea.means),
-              const SizedBox(height: 14),
-              _ideaBlock(t, _tr('WHY IT MATTERS', 'YEH KYUN ZAROORI HAI'), idea.matters),
-              if (idea.inRealLife.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Text(_tr('IN REAL LIFE', 'ASAL ZINDAGI MEIN'), style: _companionLabel(t)),
-                const SizedBox(height: 8),
-                for (var i = 0; i < idea.inRealLife.length; i++)
+              Text(idea.body, style: GoogleFonts.manrope(fontSize: 14 * _fs, height: 1.6, color: t.ink)),
+              if (idea.pointers.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                for (final p in idea.pointers)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 7),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('${i + 1}.',
-                          style: GoogleFonts.manrope(
-                              fontSize: 13.5 * _fs, fontWeight: FontWeight.w800, color: t.accent, height: 1.5)),
-                      const SizedBox(width: 9),
-                      Expanded(child: Text(idea.inRealLife[i], style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.ink))),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Container(width: 4.5, height: 4.5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle)),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.soft))),
                     ]),
                   ),
               ],
             ]),
           ),
-        ]),
-      );
-
-  Widget _ideaBlock(_RTheme t, String label, String body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: _companionLabel(t)),
-        const SizedBox(height: 4),
-        Text(body, style: GoogleFonts.manrope(fontSize: 14 * _fs, height: 1.55, color: t.ink)),
-      ]);
+      ]),
+    );
+  }
 
   // ParentVeda's take — a calm, quiet closing note (softer than the idea bars).
   Widget _takeBlock(_RTheme t, String body) => Container(
@@ -613,6 +625,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   Widget _chapterCard(_RTheme t, int index, BookChapter ch) {
     final open = _expandedChapters.contains(index);
     return Container(
+      key: ValueKey('bookChapter$index'),
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
@@ -645,16 +658,29 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         if (open && ch.keyPoints.isNotEmpty) ...[
           const SizedBox(height: 14),
           Text(_tr('KEY POINTS COVERED', 'MUKHYA BINDU'), style: _companionLabel(t)),
-          const SizedBox(height: 7),
-          for (final p in ch.keyPoints)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
-                const SizedBox(width: 10),
-                Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
-              ]),
-            ),
+          const SizedBox(height: 8),
+          // Chapters with a natural sub-structure ("Baby's Development", the
+          // three stages of labour) group their points under a bold sub-label.
+          for (final g in ch.keyPoints) ...[
+            if (g.label.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Text(g.label,
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.ink, height: 1.3)),
+              ),
+            ],
+            for (final p in g.points)
+              Padding(
+                padding: EdgeInsets.only(bottom: 6, left: g.label.isEmpty ? 0 : 2),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
+                ]),
+              ),
+            const SizedBox(height: 4),
+          ],
         ],
         const SizedBox(height: 11),
         GestureDetector(
@@ -767,8 +793,14 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       const SizedBox(height: 16),
       for (final na in next)
         GestureDetector(
+          // Route the same way read_next_screen does: a book with a companion
+          // belongs in the Book Companion experience, however it was reached.
+          // Without this, the keep-reading chain was a back door into the old
+          // in-reader companion rendering.
           onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
-              builder: (_) => ReadReaderScreen(item: na, controller: widget.controller))),
+              builder: (_) => na.hasCompanion
+                  ? BookCompanionScreen(item: na, controller: widget.controller)
+                  : ReadReaderScreen(item: na, controller: widget.controller))),
           behavior: HitTestBehavior.opaque,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),

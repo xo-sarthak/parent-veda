@@ -10,15 +10,25 @@ import 'package:flutter/foundation.dart';
 
 enum ReadType { article, book, research, expert, reflection }
 
-/// One of a book's "most important ideas" — the what / why / how triple that the
-/// companion renders as a styled card.
+/// One of a book's "most important ideas": a single flowing paragraph in the
+/// author's voice plus 2-3 short, unlabelled pointer lines. Rendered as a
+/// collapsible bar + panel, collapsed by default.
 @immutable
 class BookKeyIdea {
-  const BookKeyIdea({required this.title, required this.means, required this.matters, required this.inRealLife});
+  const BookKeyIdea({required this.title, required this.body, this.pointers = const []});
   final String title;
-  final String means; // What the author means
-  final String matters; // Why it matters
-  final List<String> inRealLife; // In real life (bullets)
+  final String body; // one paragraph — no labelled sub-sections
+  final List<String> pointers; // 2-3 short dot lines
+}
+
+/// A run of "Key Points Covered" under an optional bolded sub-label. Chapters
+/// with a natural sub-structure ("Baby's Development", Labor's three stages)
+/// group their points; an empty [label] means plain, ungrouped bullets.
+@immutable
+class BookPointGroup {
+  const BookPointGroup({this.label = '', required this.points});
+  final String label;
+  final List<String> points;
 }
 
 /// One chapter (or chapter group) of the book: a short teaser summary plus the
@@ -28,7 +38,7 @@ class BookChapter {
   const BookChapter({required this.title, required this.summary, this.keyPoints = const []});
   final String title;
   final String summary;
-  final List<String> keyPoints;
+  final List<BookPointGroup> keyPoints;
 }
 
 /// A rich "book companion" — the structured summary a book ReadItem can carry so
@@ -39,6 +49,9 @@ class BookCompanion {
   const BookCompanion({
     this.recommendedFor = const [],
     this.themes = const [],
+    this.authorIntro = '',
+    this.otherBooks = const [],
+    this.parentVedaRating,
     this.about = '',
     this.philosophy = '',
     this.ideas = const [],
@@ -48,6 +61,20 @@ class BookCompanion {
   });
   final List<String> recommendedFor;
   final List<String> themes;
+
+  /// "About the author" — one compact line, never a biography.
+  final String authorIntro;
+
+  /// The author's other notable books, rendered as chips.
+  final List<String> otherBooks;
+
+  /// FUTURE READY, deliberately not rendered: a ParentVeda Rating for the book
+  /// itself. The hero keeps room for it so adding one later is a data change,
+  /// not a redesign. Do not surface a number until there is a real methodology
+  /// behind it — an invented score on a book we rate is exactly the kind of
+  /// thing the Product Guide work was careful to avoid.
+  final double? parentVedaRating;
+
   final String about; // "What this book is about"
   final String philosophy; // "Core Philosophy"
   final List<BookKeyIdea> ideas; // "The book's most important ideas"

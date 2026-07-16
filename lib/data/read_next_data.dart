@@ -378,7 +378,7 @@ const List<ReadItem> kReadItems = [
     weekEnd: 44,
     reason:
         'A calm, month-by-month reference for the 2 a.m. question every expectant parent asks — "is this normal?" — useful right through pregnancy and the fourth trimester.',
-    readingTime: '10 min',
+    readingTime: '8 min',
     category: 'Pregnancy Guide',
     emoji: '📖',
     author: 'Heidi Murkoff',
@@ -393,151 +393,172 @@ const List<ReadItem> kReadItems = [
         'Anyone wanting a month-by-month reference',
       ],
       themes: ['Pregnancy', 'Nutrition', 'Prenatal health', 'Labour & delivery', 'Postpartum'],
+      authorIntro:
+          'Heidi Murkoff created and leads the What to Expect franchise, one of the best-selling pregnancy guide series in publishing history.',
+      otherBooks: [
+        'What to Expect the First Year',
+        'What to Expect the Toddler Years',
+        "What to Expect Before You're Expecting",
+      ],
       about:
-          'Pregnancy floods parents with fear of the unknown — every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast — treating uncertainty itself as pregnancy\'s real enemy.',
+          'Pregnancy floods parents with fear of the unknown: every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast, treating uncertainty itself as pregnancy\'s real enemy.',
       philosophy:
-          'The changes themselves aren\'t what make pregnancy frightening — not knowing what\'s normal is. A strange cramp or an unfamiliar craving isn\'t inherently alarming; what turns it into 2 a.m. panic is the absence of a reliable answer. The method closes the gap between "something is happening to my body" and "someone can tell me whether that\'s expected" — which is why it\'s organised month-by-month, symptom-by-symptom, like a patient nurse who has heard every question before. The underlying belief is that information is a form of care: worry with no target tends to expand, while worry given a clear answer usually deflates. That\'s why nearly every reassurance is paired with a boundary — the rarer symptoms that do warrant a call. The goal isn\'t blanket calm, but calibrated calm: knowing exactly when concern is appropriate.',
+          'If a parent remembers only one idea from this book, it\'s this: the changes themselves aren\'t what make pregnancy frightening; not knowing what\'s normal is. A cramp or craving isn\'t alarming on its own. Not having an answer is what turns it into panic. Murkoff closes that gap with a month-by-month, symptom-by-symptom structure, meant to be consulted like a patient nurse who\'s heard every question before, pairing each reassurance with a clear boundary for when concern really is appropriate.',
+      // Five ideas, hard cap: one flowing paragraph in the author's voice plus
+      // 2-3 short unlabelled pointers. Collapsed by default in the reader.
       ideas: [
         BookKeyIdea(
-          title: 'Every pregnancy is its own story',
-          means:
-              'No two pregnancies unfold the same way — even across one woman\'s own children. Symptom timing, intensity, bump size and cravings vary enormously, and none of it predicts anything going wrong.',
-          matters:
-              'Comparison is one of the biggest sources of pregnancy anxiety. Expecting your experience to match a friend\'s, a sibling\'s, or an app\'s average sets you up to worry over ordinary variation rather than a real problem.',
-          inRealLife: [
-            'Skip trackers that imply your symptoms "should" look a certain way by week.',
-            'Treat differences from other parents as expected, not diagnostic.',
-            'Bring genuinely unusual or worsening symptoms to your provider — not to a comparison chat.',
+          title: 'Every Pregnancy Is Its Own Story',
+          body:
+              'No two pregnancies unfold the same way, even across a single woman\'s own children. Symptom timing, intensity, bump size, and cravings vary enormously between individuals, and none of it predicts anything going wrong. The book discourages comparing notes with other parents or matching an app\'s average timeline, since normal variation is often mistaken for a warning sign.',
+          pointers: [
+            'A missing symptom, like nausea, isn\'t a bad sign; some women simply don\'t experience it.',
+            'The only comparison worth acting on is a change from your own baseline, not someone else\'s.',
           ],
         ),
         BookKeyIdea(
-          title: 'Nutrition is about consistency, not perfection',
-          means:
-              'Pregnancy nutrition is steady, moderate habits — balanced meals, enough protein, key nutrients like folate and iron — not one "perfect" diet followed exactly every day.',
-          matters:
-              'Nutrient needs do rise, and some deficiencies carry real risks — but an all-or-nothing mindset backfires, especially alongside nausea that makes eating well genuinely hard some weeks.',
-          inRealLife: [
-            'Aim for a rough week of decent meals rather than one perfect day.',
-            'On nausea-heavy days, prioritise eating something over the "ideal" plate.',
-            'Keep one boring, reliable go-to meal ready for low-appetite stretches.',
+          title: 'Nutrition Is About Consistency, Not Perfection',
+          body:
+              'The book frames pregnancy nutrition as steady, moderate habits rather than a single perfect diet followed exactly every day. It emphasises balanced meals with adequate protein and key nutrients like folate and iron, while acknowledging that nausea can make eating well genuinely hard some weeks.',
+          pointers: [
+            'Folate, iron, and calcium are flagged as the nutrients most worth prioritising.',
+            'Small, frequent meals are recommended over three large ones, especially early on.',
           ],
         ),
         BookKeyIdea(
-          title: 'Most symptoms have an ordinary explanation',
-          means:
-              'For nearly every strange symptom, the book supplies the underlying reason — hormonal shifts, blood-volume changes, a growing uterus pressing on organs — so it stops feeling mysterious.',
-          matters:
-              'An unexplained symptom recruits imagination, and imagination tends toward worst-case thinking. A named cause is far less frightening even when the sensation itself doesn\'t change.',
-          inRealLife: [
-            'When something new appears, look for the "why" before "is this bad".',
-            'Keep a short weekly symptom log — a pattern calms nerves faster than a single data point.',
-            'Use the explanation to decide whether to wait it out or call your provider.',
+          title: 'Most Symptoms Have an Ordinary Explanation',
+          body:
+              'For nearly every uncomfortable symptom, the book supplies the underlying physiological reason: hormonal shifts, blood volume changes, a growing uterus pressing on organs. It pairs each explanation with a clear boundary, describing the rarer version of that same symptom that does warrant a call to the provider.',
+          pointers: [
+            'Round ligament pain and swelling are explained mechanically, not treated as alarming by default.',
+            'Bleeding, severe headaches, and reduced fetal movement are named as exceptions that warrant a same-day call.',
           ],
         ),
         BookKeyIdea(
-          title: 'Preparation turns unknowns into checklists',
-          means:
-              'The month-by-month structure previews what\'s coming — fetal development, likely changes, and decisions like a birth plan or feeding choice — before you\'re in the middle of them.',
-          matters:
-              'Anticipated change is far easier to tolerate than surprise change. Knowing roughly what month six feels like before you\'re in it turns dread into a concrete to-do list.',
-          inRealLife: [
-            'Read a month or two ahead of where you are, not only the current chapter.',
-            'Turn upcoming decisions into a simple timeline instead of leaving them until urgent.',
-            'Build your hospital bag gradually across the third trimester.',
+          title: 'You\'re Allowed to Advocate for Yourself',
+          body:
+              'The book repeatedly encourages readers to ask questions, seek second opinions, and choose a provider they trust. It treats the parent as an active participant in care decisions, not a passive patient, and insists no question is too small to ask.',
+          pointers: [
+            'What you discuss with your provider is confidential, to encourage full honesty.',
+            'A second opinion is framed as reasonable, not an insult to your first provider.',
           ],
         ),
         BookKeyIdea(
-          title: 'You\'re allowed to advocate for yourself',
-          means:
-              'The book encourages asking questions, seeking second opinions, and choosing a provider you trust — treating you as an active participant, not a passive patient.',
-          matters:
-              'Pregnant women are sometimes dismissed when reporting symptoms. A parent who expects to ask questions is more likely to walk away with a complete answer.',
-          inRealLife: [
-            'Write questions down before appointments so nerves don\'t erase them.',
-            'If a symptom is dismissed but keeps recurring, ask for it to be documented and revisited.',
-            'It\'s fine to seek a second opinion on something significant.',
-          ],
-        ),
-        BookKeyIdea(
-          title: 'The fourth trimester deserves as much attention as the first three',
-          means:
-              'The book extends meaningfully past delivery — physical recovery, mood changes, breastfeeding challenges and the emotional adjustment of early parenthood all get real space.',
-          matters:
-              'Attention tends to drop the moment the baby arrives — right when a parent\'s body and mind are undergoing some of the most intense changes of all.',
-          inRealLife: [
-            'Prepare postpartum supplies with the same care as the hospital bag.',
-            'Line up practical support for the first two weeks before the baby arrives.',
-            'Learn the warning signs of postpartum mood disorders before you need them.',
+          title: 'The Fourth Trimester Deserves as Much Attention as the First Three',
+          body:
+              'The book extends meaningfully past delivery. Physical recovery, mood changes, breastfeeding challenges, and the emotional adjustment of early parenthood all get dedicated space rather than a single closing chapter, with warning signs of postpartum depression and anxiety named explicitly.',
+          pointers: [
+            'Physical recovery is described separately for vaginal birth and C-section, since timelines differ.',
+            'The baby blues is distinguished from postpartum depression by duration and severity.',
           ],
         ),
       ],
-      perspective:
-          'This is one of the steadiest, most reassuring books in the category — its real strength is calming panic with plain explanations, not pushing one parenting style. What\'s most worth borrowing: the mindset that most symptoms have an ordinary explanation, and the encouragement to advocate for yourself with your provider. Treat any specific number or diet detail in the book as a starting point for your own doctor conversation, not a rule to follow exactly.',
       chapters: [
         BookChapter(
           title: 'Before You Conceive',
-          summary: 'Preconception health — timing conception, starting prenatal vitamins, and adjusting lifestyle habits before trying. Frames early planning as a way to reduce anxiety later, and previews what the first prenatal visit will involve.',
+          summary: 'Covers preconception health: timing, prenatal vitamins, and lifestyle adjustments before trying to get pregnant.',
           keyPoints: [
-            'How long conception typically takes, and when a longer wait warrants a doctor visit',
-            'Folic acid and prenatal vitamin timing before conception, not just after',
-            'Lifestyle adjustments — alcohol, smoking, medications, caffeine — before trying',
-            'What actually happens at the very first prenatal appointment',
+            BookPointGroup(points: [
+              'Most couples conceive within 6 to 12 months of trying; a fertility evaluation is generally suggested after a year, or 6 months for women over 35.',
+              'Folic acid (400 to 800 mcg) is recommended before conception, since neural tube development begins before many women know they\'re pregnant.',
+              'Cutting back alcohol, tobacco, and certain medications is advised in the months before trying, not just after a positive test.',
+              'The first prenatal visit typically includes a full health history, bloodwork, and calculating a due date from the last period.',
+            ]),
           ],
         ),
         BookChapter(
           title: 'First Trimester (Months 1–3)',
-          summary: 'Confirms pregnancy, introduces early symptoms like nausea and fatigue, and covers the first prenatal visits and early testing. Sets honest expectations that this is often the most symptom-heavy, emotionally uncertain stretch.',
+          summary: 'Confirms pregnancy and covers the most symptom-heavy, emotionally uncertain stretch, with early testing and the first prenatal visits.',
           keyPoints: [
-            'Why nausea and fatigue happen, and food/timing strategies that help',
-            'What each early test (bloodwork, dating scan, genetic screening) actually checks for',
-            'Miscarriage risk by week, and which symptoms genuinely warrant a call',
-            'When and how to share the news with family, friends, and employers',
+            BookPointGroup(label: 'Baby\'s Development', points: [
+              'By the end of month 3, major organs have formed and the fetus is roughly the size of a lime, with a heartbeat typically detectable by week 10 to 12.',
+            ]),
+            BookPointGroup(label: 'Your Body and Emotions', points: [
+              'Nausea is driven by rising hCG and oestrogen, usually peaking around week 9 and easing by week 14. Small, frequent, bland meals help most women manage it.',
+              'Fatigue is explained by rising progesterone and increased blood volume.',
+            ]),
+            BookPointGroup(label: 'Testing', points: [
+              'First-trimester screening combines bloodwork with a nuchal translucency scan to assess chromosomal risk. The result is a probability, not a diagnosis.',
+            ]),
+            BookPointGroup(points: [
+              'Miscarriage risk drops significantly once a heartbeat is confirmed around week 8, a fact the book uses directly to help calibrate anxiety.',
+            ]),
           ],
         ),
         BookChapter(
           title: 'Second Trimester (Months 4–6)',
-          summary: 'Often the "easier" stretch as energy returns. Chapters shift toward fetal-development milestones, the anatomy scan, and early practical planning.',
+          summary: 'Often the easier stretch as energy returns, with chapters shifting toward development milestones and early practical planning.',
           keyPoints: [
-            'What the anatomy scan checks, and what "soft markers" mean if mentioned',
-            'Round ligament pain, back pain, and other new discomforts explained',
-            'Feeling first movements ("quickening") and what timing is normal',
-            'Maternity leave planning and disclosure timing at work',
+            BookPointGroup(label: 'Baby\'s Development', points: [
+              'The anatomy scan around week 20 checks organ development and can reveal the baby\'s sex. Soft markers noted on the scan are usually normal variants, not diagnoses.',
+            ]),
+            BookPointGroup(label: 'Your Body', points: [
+              'Round ligament pain (sharp groin twinges from the uterus stretching) and mild back pain are explained mechanically rather than treated as concerning.',
+            ]),
+            BookPointGroup(points: [
+              'Quickening, or feeling first movements, typically occurs between weeks 16 to 22, often earlier in later pregnancies.',
+            ]),
+            BookPointGroup(label: 'Practical Planning', points: [
+              'This is the window the book suggests for announcing the pregnancy, discussing maternity leave, and starting nursery planning.',
+            ]),
           ],
         ),
         BookChapter(
           title: 'Third Trimester (Months 7–9)',
-          summary: 'Focuses on managing physical discomfort alongside concrete birth preparation — hospital bag, paediatrician choice, recognising real labour signs.',
+          summary: 'Focuses on managing physical discomfort while building toward concrete birth preparation.',
           keyPoints: [
-            'Braxton Hicks vs. real contractions, and how to tell the difference',
-            'What\'s actually essential in a hospital bag vs. optional',
-            'Signs of true labour onset vs. false alarms',
-            'Choosing a paediatrician before the baby arrives',
+            BookPointGroup(points: [
+              'Braxton Hicks contractions (irregular, non-progressing practice contractions) are distinguished clearly from true labour contractions, which grow closer, longer, and more intense over time.',
+              'Hospital bag essentials are narrowed to a short practical list: ID, insurance information, comfortable clothes, rather than everything possible.',
+              'True labour signs include regular strengthening contractions, water breaking, or losing the mucus plug, with explicit guidance on which one justifies calling the provider immediately versus waiting.',
+              'Choosing a paediatrician before delivery is recommended so the decision isn\'t rushed after birth.',
+            ]),
           ],
         ),
         BookChapter(
           title: 'Labour, Delivery & Special Circumstances',
-          summary: 'Walks through the stages of labour and common interventions, with dedicated sections for multiples, high-risk pregnancy, and pregnancy loss.',
+          summary: 'Walks through labour stage by stage, with dedicated sections for multiples, high-risk pregnancy, and pregnancy loss.',
           keyPoints: [
-            'The three stages of labour and what happens in each',
-            'Pain-management options, from unmedicated approaches to epidurals',
-            'When induction or a C-section becomes medically necessary',
-            'Direct, non-footnoted guidance for multiples, high-risk pregnancy, and loss',
+            BookPointGroup(label: 'Stage 1 — Early, Active and Transition Labour', points: [
+              'The longest stage, covering cervical dilation from 0 to 10 cm. Early labour can last hours to over a day, while transition (8 to 10 cm) is typically the shortest but most intense part.',
+            ]),
+            BookPointGroup(label: 'Stage 2 — Pushing and Birth', points: [
+              'Begins at full dilation and ends with delivery, lasting anywhere from minutes to a few hours, with pushing technique and positioning covered directly.',
+            ]),
+            BookPointGroup(label: 'Stage 3 — Delivering the Placenta', points: [
+              'Typically the shortest stage, usually complete within 5 to 30 minutes after birth.',
+            ]),
+            BookPointGroup(points: [
+              'Pain-management options are presented on a spectrum from unmedicated techniques to epidurals, without favouring one as universally better.',
+              'Multiples, high-risk pregnancy, and pregnancy loss are addressed directly, not as footnotes.',
+            ]),
           ],
         ),
         BookChapter(
           title: 'Postpartum & Beyond',
-          summary: 'Covers physical recovery, feeding decisions, and the emotional adjustment of early parenthood, including recognising postpartum mood disorders.',
+          summary: 'Covers physical recovery, feeding decisions, and the emotional adjustment of early parenthood.',
           keyPoints: [
-            'Recovery timeline for vaginal birth vs. C-section',
-            'Breastfeeding, formula, and combination-feeding basics',
-            'Warning signs of postpartum depression and anxiety, and when to seek help',
-            'What\'s normal in the "baby blues" versus what isn\'t',
+            BookPointGroup(label: 'Physical Recovery', points: [
+              'Vaginal birth recovery is generally faster in the first days. C-section recovery involves incision care and longer activity restrictions; both are given separate timelines.',
+            ]),
+            BookPointGroup(label: 'Feeding', points: [
+              'Breastfeeding, formula, and combination feeding are each covered with practical troubleshooting rather than one best method being pushed.',
+            ]),
+            BookPointGroup(label: 'Emotional Adjustment', points: [
+              'The baby blues (mood dips in the first two weeks) are distinguished from postpartum depression and anxiety by duration and severity. Symptoms lasting beyond two weeks, or intensifying, are flagged as warranting a call to a provider.',
+            ]),
+            BookPointGroup(points: [
+              'Readers are encouraged to line up practical support for the first two weeks before delivery, not after.',
+            ]),
           ],
         ),
       ],
+      // Closing note — deliberately after the chapters, never before.
+      perspective:
+          'This is one of the steadiest, most reassuring books in the category. Its real strength is calming panic with plain, physiological explanations rather than pushing one parenting philosophy. Where it holds up less well is specificity: some diet and weight-gain guidance reads as more rigid than current medical advice, which now varies more by individual factors than a single fixed target. Read it for the mindset (ordinary explanations, self-advocacy, real fourth-trimester attention) and treat exact numbers as a prompt to ask your own provider, not a rule.',
       quotes: [
-        '"You will want a copilot in whom you have complete faith." — on choosing a healthcare provider you trust.',
-        '"What you tell your doctor is confidential; no one else will know." — on being honest with your provider without fear of judgement.',
+        '"You will want a copilot in whom you have complete faith." (On choosing a healthcare provider you trust.)',
+        '"What you tell your doctor is confidential; no one else will know." (On being honest with your provider without fear of judgement.)',
       ],
     ),
   ),

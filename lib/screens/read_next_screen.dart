@@ -18,6 +18,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
+import 'book_companion_screen.dart';
 import 'read_reader_screen.dart';
 
 const Color _accent = AppTheme.primary500;
@@ -31,8 +32,16 @@ void _push(BuildContext c, Widget w) =>
 // of contents, font-size + light/sepia/dark modes, Why-This-Matters + Research-
 // Simplified blocks, read-next chain). The old plain reader (ReadItemScreen,
 // below) is kept for reference / revert but no longer wired.
-void _openItem(BuildContext c, ReadItem item, PregnancyController ctrl) =>
-    _push(c, ReadReaderScreen(item: item, controller: ctrl));
+// A book with a companion opens the dedicated Book Companion experience: a
+// hero, sticky section nav and reading progress are the shape of a BOOK, and
+// forcing them into the article reader would have made both worse. Everything
+// else still opens the generic Learn V2 reader, untouched.
+void _openItem(BuildContext c, ReadItem item, PregnancyController ctrl) => _push(
+      c,
+      item.hasCompanion
+          ? BookCompanionScreen(item: item, controller: ctrl)
+          : ReadReaderScreen(item: item, controller: ctrl),
+    );
 // void _openItem(BuildContext c, ReadItem item, PregnancyController ctrl) =>
 //     _push(c, ReadItemScreen(item: item, controller: ctrl));
 
