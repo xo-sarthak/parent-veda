@@ -217,117 +217,125 @@
     "phase": "discovery",
     "babySnapshot": {
       "milestone": {
-        "en": "Fingers, Toes and Tiny Nails",
-        "hi": "Ungliyan, Pairon ki Ungliyan aur Nanhe Naakhun"
+        "en": "Ears in Place, Tiny Hiccups",
+        "hi": "Kaan Apni Jagah, Nanhe Hichki"
       },
       "weekHeadline": {
-        "en": "This week your baby's fingers and toes separate completely, and tiny nails begin to grow.",
-        "hi": "Is hafte tumhare baby ki ungliyan aur pairon ki ungliyan poori tarah alag ho jaati hain, aur nanhe naakhun ugna shuru hote hain."
+        "en": "This week your baby's ears settle close to their final position, and silent hiccups may begin.",
+        "hi": "Is hafte tumhare baby ke kaan apni aakhri jagah ke kareeb aa jaate hain, aur khaamosh hichkiyan shuru ho sakti hain."
       },
       "size": {
         "fruit": {
-          "en": "Strawberry",
-          "hi": "Strawberry"
+          "en": "Apple",
+          "hi": "Seb (Apple)"
         },
         "length": {
-          "en": "3.1 to 3.2 cm",
-          "hi": "3.1 se 3.2 cm"
+          "en": "9.0 to 10.5 cm",
+          "hi": "9.0 se 10.5 cm"
         },
         "weight": {
-          "en": "About 4 g",
-          "hi": "Lagbhag 4 g"
+          "en": "About 70 g",
+          "hi": "Lagbhag 70 g"
         }
       },
       "reveal": {
-        "en": "Maa, my fingers and toes are finally free, and tiny nails are starting to grow.",
-        "hi": "Maa, meri ungliyan aur pairon ki ungliyan aakhirkaar aazaad hain, aur nanhe naakhun ugna shuru ho rahe hain."
+        "en": "Maa, my ears are settling into place, and I might even have silent hiccups now.",
+        "hi": "Maa, mere kaan apni jagah le rahe hain, aur ab mujhe khaamosh hichkiyan bhi aa sakti hain."
       }
     },
     "babyDevelopment": {
       "whatImDoing": {
-        "en": "My fingers and toes have completely separated this week, with no more webbing, and tiny nails are just beginning to grow. My skeleton keeps turning from soft cartilage into bone, and my ears are taking their outer shape. I'm swallowing tiny sips of fluid and kicking my legs, simply practising movements I'll need later.",
-        "hi": "Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, beech ki jaali ab nahi rahi, aur nanhe naakhun abhi ugna shuru hue hain. Mera skeleton naram cartilage se haddi mein badalta ja raha hai, aur mere kaan apna bahri aakaar le rahe hain. Main fluid ke nanhe ghoont nigal raha hoon aur apni taangein chala raha hoon, bas woh harkatein practice karta hua jo aage mujhe chahiye hongi."
+        "en": "My ears are now close to their final position on the sides of my head. My skin is still thin and see-through, so my blood vessels and skeleton are easy to spot underneath. Tiny hairs keep growing, including my eyebrows, eyelashes and the fine hair on my head. My legs have grown longer than my arms now, and I'm moving all my limbs and joints, wiggling my fingers and toes, and maybe practising silent hiccups too.",
+        "hi": "Mere kaan ab mere sar ke bagal mein apni aakhri jagah ke kareeb hain. Meri skin abhi bhi patli aur aar-paar dikhne waali hai, isliye mere neeche ki nasein aur skeleton aasani se dikh jaate hain. Nanhe baal ugte ja rahe hain, jaise meri bhauhein, palkein aur sar ke mahin baal. Meri taangein ab meri baahon se lambi ho gayi hain, aur main apne saare ang aur joints hila raha hoon, ungliyan aur pairon ki ungliyan matka raha hoon, aur shayad khaamosh hichkiyan bhi practice kar raha hoon."
       }
     },
     "momJourney": {
       "physicalChanges": {
-        "en": "Your waist may look a little rounder, though for many women this is still mostly bloating and a uterus still within the pelvis. Veins on your breasts and tummy may look more visible as your blood volume keeps rising, and your skin might feel drier or spottier than usual.",
-        "hi": "Tumhari kamar thodi gol lag sakti hai, halaanki bahut si mahilaon ke liye yeh abhi zyadatar bloating aur pelvis ke andar hi rehte uterus ki wajah se hai. Tumhare breasts aur pet par nasein zyada dikh sakti hain kyunki blood volume badhta ja raha hai, aur skin aam se zyada rookhi ya daane waali lag sakti hai."
+        "en": "Your uterus keeps rising out of your pelvis, and your bump may be getting steadily more visible. Your baby's movements are becoming stronger and more coordinated, even though you likely can't feel them yet unless this is a later pregnancy. Steady, healthy weight gain becomes more noticeable from this stage, supporting your baby's rapid growth.",
+        "hi": "Tumhara uterus pelvis se upar uthta ja raha hai, aur tumhara bump dheere-dheere zyada dikhne lag sakta hai. Tumhare baby ki harkatein zyada mazboot aur coordinated ho rahi hain, halaanki tum unhe abhi shayad mehsoos na kar pao, jab tak yeh baad ki pregnancy na ho. Is stage se sthir, healthy weight gain zyada dikhne lagta hai, jo tumhare baby ki tez growth ko support karta hai."
       },
       "emotionalState": {
-        "en": "Week 10 often marks a turning point. Nausea, fatigue and headaches may still be strong, while some women already feel their symptoms beginning to lift. Whichever way it goes for you, it's completely normal.",
-        "hi": "Week 10 aksar ek mod hota hai. Matli, thakaan aur sar dard abhi bhi tez ho sakte hain, jabki kuch mahilaayein apne symptoms pehle se halke hote mehsoos karti hain. Tumhare saath jo bhi ho, woh bilkul normal hai."
+        "en": "Many women describe a real sense of well-being around this stage, with energy holding steady and the worst of early pregnancy well behind them. If this isn't your first pregnancy, you might even notice the faintest flutters of movement soon, though first-time mothers usually feel this a little later.",
+        "hi": "Bahut si mahilaayein is stage par ek sachchi tandurusti mehsoos karti hain, jahaan energy sthir rehti hai aur shuruaati pregnancy ka sabse mushkil hissa peechhe chhoot chuka hota hai. Agar yeh tumhari pehli pregnancy nahi hai, to tum jald hi harkat ki halki si phadphadahat mehsoos kar sakti ho, halaanki pehli baar maa banne waali aksar ise thoda baad mein mehsoos karti hain."
       },
       "commonSymptoms": [
         {
-          "en": "Nausea",
-          "hi": "Matli (Nausea)"
+          "en": "Heartburn",
+          "hi": "Seene mein jalan"
         },
         {
-          "en": "Fatigue",
-          "hi": "Thakaan"
+          "en": "Constipation",
+          "hi": "Kabz"
         },
         {
           "en": "Tender breasts",
           "hi": "Breast mein narmi"
         },
         {
-          "en": "Headaches",
-          "hi": "Sar dard"
+          "en": "Varicose veins",
+          "hi": "Ubhri hui nasein"
         },
         {
-          "en": "Increased discharge",
-          "hi": "Discharge ka badhna"
+          "en": "Lingering nausea",
+          "hi": "Halki matli"
+        },
+        {
+          "en": "Dizziness",
+          "hi": "Chakkar aana"
         }
       ],
       "selfCareTip": {
-        "en": "If your first prenatal visit hasn't happened yet, it's likely coming up very soon. Keep taking your prenatal vitamin, stay hydrated, and treat yourself gently.",
-        "hi": "Agar tumhari pehli prenatal visit abhi tak nahi hui, to woh shayad bahut jald aane waali hai. Apna prenatal vitamin lete raho, paani peete raho, aur khud ke saath naram raho."
+        "en": "Comfortable, slightly roomier shoes can help if your feet start swelling by evening. Keep eating well, stay active with gentle movement, and enjoy the steadier energy this stretch often brings.",
+        "hi": "Aaraamdeh, thode khule joote madad kar sakte hain agar shaam tak tumhare pair soojhne lagein. Achha khaate raho, halke movement ke saath active raho, aur is daur ki zyada sthir energy ka aanand lo."
       },
       "reassurance": {
-        "en": "You're almost through the trickiest stretch, and many women start to feel more like themselves again very soon.",
-        "hi": "Tum sabse mushkil hisse se lagbhag nikal chuki ho, aur bahut si mahilaayein jald hi dobara khud jaisa mehsoos karne lagti hain."
+        "en": "If you haven't felt your baby move yet, that's completely normal — most first-time mothers don't notice movement until several weeks from now. Enjoy this steadier stretch, and trust that it's simply part of your own pregnancy journey.",
+        "hi": "Agar tumne abhi tak apne baby ko hilte mehsoos nahi kiya, to yeh bilkul normal hai, zyadatar pehli baar maa banne waali kuch hafton baad tak harkat mehsoos nahi karti. Is zyada sthir daur ka aanand lo, aur bharosa rakho ki yeh bas tumhari apni pregnancy ka hissa hai."
       }
     },
     "nutrition": {
       "nutritionTheme": {
-        "en": "Calcium & Protein for Growing Bones",
-        "hi": "Badhti Haddiyon ke liye Calcium aur Protein"
+        "en": "Iron, Fibre and Calcium",
+        "hi": "Iron, Fibre aur Calcium"
       },
       "focusNutrients": [
         {
-          "en": "Calcium",
-          "hi": "Calcium"
+          "en": "Iron",
+          "hi": "Iron"
         },
         {
-          "en": "Protein",
-          "hi": "Protein"
+          "en": "Fibre",
+          "hi": "Fibre"
+        },
+        {
+          "en": "Calcium",
+          "hi": "Calcium"
         }
       ],
       "whyNow": {
-        "en": "Your baby's skeleton keeps turning from soft cartilage into bone this week, so calcium and steady protein matter more than ever.",
-        "hi": "Is hafte tumhare baby ka skeleton naram cartilage se haddi mein badalta ja raha hai, isliye calcium aur lagataar protein pehle se kahin zyada mayne rakhte hain."
+        "en": "Your fibre and iron needs are both rising now, and your baby's bones keep hardening, so iron-rich, high-fibre foods and steady calcium all matter this week.",
+        "hi": "Tumhari fibre aur iron ki zaroorat dono ab badh rahi hain, aur tumhare baby ki haddiyan mazboot hoti ja rahi hain, isliye iron se bharpoor, high-fibre khaana aur lagataar calcium is hafte mayne rakhte hain."
       },
       "foods": [
         {
+          "en": "Bajra (Pearl millet)",
+          "hi": "Bajra"
+        },
+        {
+          "en": "Til (Sesame seeds)",
+          "hi": "Til"
+        },
+        {
           "en": "Paneer & dairy",
           "hi": "Paneer aur dairy"
-        },
-        {
-          "en": "Curd & buttermilk",
-          "hi": "Dahi aur chhaas"
-        },
-        {
-          "en": "Whole grains & oats",
-          "hi": "Sabut anaaj aur oats"
         },
         {
           "en": "Citrus & amla",
           "hi": "Khatte phal aur amla"
         },
         {
-          "en": "Bananas & simple fruit",
-          "hi": "Kele aur simple phal"
+          "en": "Whole grains & oats",
+          "hi": "Sabut anaaj aur oats"
         },
         {
           "en": "Nuts & seeds",
@@ -340,35 +348,35 @@
       ],
       "indianSuperfoodOfTheWeek": {
         "food": {
-          "en": "Paneer (Cottage Cheese)",
-          "hi": "Paneer"
+          "en": "Bajra (Pearl Millet)",
+          "hi": "Bajra"
         },
         "benefit": {
-          "en": "Rich in calcium and complete protein, supporting your baby's bones and your own health.",
-          "hi": "Calcium aur poore protein se bharpoor, jo tumhare baby ki haddiyon aur tumhari apni sehat ko support karta hai."
+          "en": "Rich in iron and fibre, and a gentle, filling way to support digestion this week.",
+          "hi": "Iron aur fibre se bharpoor, aur is hafte hazam ko sahara dene ka ek naram, pet bharne waala tareeka."
         },
         "howToConsume": {
-          "en": "Try it as palak paneer or grilled paneer cubes.",
-          "hi": "Ise palak paneer ya grilled paneer cubes ki tarah try karo."
+          "en": "Try it as bajra roti, bhakri, or a warm bowl of khichdi.",
+          "hi": "Ise bajra roti, bhakri, ya ek garam khichdi ke bowl ki tarah try karo."
         }
       },
       "mealIdea": {
-        "en": "Palak paneer with a whole-wheat roti, and a slice of orange or sweet lime after.",
-        "hi": "Palak paneer ke saath gehun ki roti, aur baad mein santre ya mosambi ka ek tukda."
+        "en": "A bajra roti with palak, curd on the side, and an orange or amla afterwards to help your body absorb the iron.",
+        "hi": "Palak ke saath ek bajra roti, saath mein dahi, aur baad mein ek santra ya amla taaki tumhara sharir iron sokh sake."
       },
       "tip": {
-        "en": "Choose paneer made from pasteurised milk, and cook it well, especially if you're unsure how it was made.",
-        "hi": "Pasteurised doodh se bana paneer chuno, aur use acche se pakao, khaaskar agar tumhein pata na ho ki woh kaise bana hai."
+        "en": "Pair iron-rich foods with vitamin C like amla, orange or nimbu paani, which helps your body absorb the iron much better.",
+        "hi": "Iron waale khaane ke saath vitamin C lo jaise amla, santra ya nimbu paani, jo tumhare sharir ko iron bahut behtar sokhne mein madad karta hai."
       }
     },
     "actionPlan": {
       "doThisWeek": {
-        "en": "Organize your medical reports, maintain healthy routines and continue taking prenatal vitamins.",
-        "hi": "Apne medical reports organize karein, healthy routine banaye rakhein aur prenatal vitamins lete rahein."
+        "en": "Start planning for your anomaly scan (Week 18 to 20), keep eating iron-rich meals, and stay gently active.",
+        "hi": "Apne anomaly scan (Week 18 se 20) ki planning shuru karo, iron waala khaana khaate raho, aur halke se active raho."
       },
       "skipThisWeek": {
-        "en": "Skipping supplements because symptoms have improved.",
-        "hi": "Symptoms theek ho gaye isliye supplements chhod dena."
+        "en": "Ignoring stress or pushing yourself to maintain your pre-pregnancy pace.",
+        "hi": "Stress ko nazarandaaz karna ya khud ko pre-pregnancy wali pace par chalne ke liye push karna."
       },
       "redFlags": {
         "en": "Contact your doctor if you have heavy bleeding, severe abdominal pain, fever, persistent vomiting that stops you keeping fluids down, or anything that doesn't feel right.",
@@ -376,63 +384,63 @@
       },
       "mythBuster": {
         "myth": {
-          "en": "Exercise during pregnancy is dangerous.",
-          "hi": "Pregnancy mein exercise karna khatarnaak hai."
+          "en": "Babies cannot benefit from hearing your voice before birth.",
+          "hi": "Babies birth se pehle aapki awaaz sunne ka faayda nahi le sakte."
         },
         "truth": {
-          "en": "Most healthy pregnancies benefit from doctor-approved physical activity.",
-          "hi": "Zyadatar healthy pregnancies ko doctor-approved physical activity se fayda hota hai."
+          "en": "Your baby is already developing the structures needed for hearing and will soon begin recognizing familiar sounds.",
+          "hi": "Aapka baby pehle se hi sunne ke liye zaroori structures develop kar raha hai aur jald hi jaane-pehchaane sounds pehchanne lagega."
         }
       }
     },
     "garbhSanskar": {
-      "raga": "Durga",
+      "raga": "Bageshree",
       "affirmation": {
-        "en": "I am creating a safe and loving home for my baby.",
-        "hi": "Main apne baby ke liye ek safe aur pyaar bhara ghar bana rahi hoon."
+        "en": "I am building a bond that will last a lifetime.",
+        "hi": "Main ek aisa bond bana rahi hoon jo zindagi bhar rahega."
       },
       "reflectionPrompt": {
-        "en": "What family value would you most like to pass on to your child?",
-        "hi": "Apne bachche ko aap sabse zyada kaun si family value dena chahengi?"
+        "en": "When do you feel closest to your baby?",
+        "hi": "Aap apne baby ke sabse kareeb kab mehsoos karti hain?"
       },
       "spokenLine": {
-        "hi": "Maa, meri chhoti ungliyan ban rahi hain.",
-        "en": "Maa, my tiny fingers are forming."
+        "hi": "Maa, meri duniya badh rahi hai.",
+        "en": "Maa, my world is expanding."
       }
     },
     "reflectAndRemember": {
       "reflectionPrompt": {
-        "en": "What family value would you most like to pass on?",
-        "hi": "Aap sabse zyada kaun si family value aage pahunchana chahengi?"
+        "en": "When do you feel closest to your baby?",
+        "hi": "Aap apne baby ke sabse kareeb kab mehsoos karti hain?"
       },
       "journalPrompt": {
-        "en": "Write about one lesson from your childhood that shaped who you are today.",
-        "hi": "Apne bachpan ki ek aisi seekh ke baare mein likhein jisne aapko aaj banaya hai."
+        "en": "Describe the moments when pregnancy feels most real to you.",
+        "hi": "Woh pal likhein jab pregnancy aapko sabse zyada real lagti hai."
       },
       "voiceJournalEnabled": true,
       "textJournalEnabled": true,
       "photoPrompt": {
-        "en": "Capture something meaningful from your childhood that you hope to share with your baby someday.",
-        "hi": "Apne bachpan ki koi aisi meaningful cheez capture karein jise aap kabhi apne baby ke saath share karna chahti hain."
+        "en": "Capture your favorite pregnancy moment from this week.",
+        "hi": "Is hafte ka apna favourite pregnancy moment capture karein."
       },
       "cameraEnabled": true
     },
     "partnerCorner": {
       "whatSheMayFeel": {
-        "en": "For many women this is when the toughest symptoms start easing, though everyone's timeline differs. She may still be dealing with tiredness, headaches or nausea, alongside newer things like visible veins or sharp twinges.",
-        "hi": "Bahut si mahilaon ke liye yahi woh waqt hai jab sabse mushkil symptoms halke padne lagte hain, halaanki har kisi ka timeline alag hota hai. Woh abhi bhi thakaan, sar dard ya matli se jujh rahi ho sakti hai, saath hi nayi cheezein jaise dikhti nasein ya tez chubhan."
+        "en": "She's likely feeling a real sense of well-being this week, with steady energy and a growing bump. If this isn't her first pregnancy, she might even notice the first faint flutters of movement soon.",
+        "hi": "Is hafte woh shayad ek sachchi tandurusti mehsoos kar rahi hai, sthir energy aur badhte bump ke saath. Agar yeh uski pehli pregnancy nahi hai, to woh jald hi harkat ki pehli halki phadphadahat mehsoos kar sakti hai."
       },
       "whatYouCanDo": {
-        "en": "Take on more of the cooking and chores, be patient with any lingering symptoms, help her move slowly if twinges strike, and keep comfortable clothing handy.",
-        "hi": "Khaana aur ghar ke kaam ka zyada hissa lo, jo symptoms abhi bhi hain unke saath sabr rakho, agar chubhan ho to use dheere chalne mein madad karo, aur comfortable kapde paas rakho."
+        "en": "Ask if she's felt any flutters yet, celebrate this steady, comfortable stretch together, encourage gentle movement and healthy meals, and be patient with any lingering symptoms.",
+        "hi": "Poochho ki use koi phadphadahat mehsoos hui ya nahi, is sthir aur aaraamdeh daur ka saath mein jashn manao, halke movement aur healthy khaane ke liye protsaahit karo, aur jo symptoms abhi bhi hain unke saath sabr rakho."
       },
       "oneMission": {
-        "en": "Ask about the upcoming NT scan together — and celebrate how close you are to trimester two.",
-        "hi": "Aane waale NT scan ke baare mein saath mein poocho — aur khushi manao ki tum trimester do ke kitne kareeb ho."
+        "en": "Start planning for the anomaly scan (Week 18 to 20) together, and enjoy this calmer chapter side by side.",
+        "hi": "Saath milkar anomaly scan (Week 18 se 20) ki planning shuru karo, aur is shaant daur ka kandhe se kandha milakar aanand lo."
       },
       "shareMessage": {
-        "en": "This week my fingers and toes have fully separated, and tiny nails are just beginning to grow. I'm about the size of a strawberry now, and all my major organs have formed and are starting to work together as a team.",
-        "hi": "Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, aur nanhe naakhun abhi ugna shuru hue hain. Ab main lagbhag ek strawberry jitna hoon, aur mere sabhi bade organs ban chuke hain aur ek team ki tarah saath kaam karna shuru kar rahe hain."
+        "en": "This week my ears are settling into their final position, and my legs have grown longer than my arms. I'm about the size of an apple now, and I might even have silent hiccups.",
+        "hi": "Is hafte mere kaan apni aakhri jagah le rahe hain, aur meri taangein meri baahon se lambi ho gayi hain. Ab main lagbhag ek seb jitna hoon, aur mujhe khaamosh hichkiyan bhi aa sakti hain."
       }
     },
     "audioEnabled": true
