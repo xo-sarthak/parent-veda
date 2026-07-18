@@ -844,9 +844,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     const SizedBox(height: 12),
                     _pad(_doctorBanner()),
                   ],
-                  // Your communities
-                  if (joined.isNotEmpty) ...[
-                    _label('Your communities'),
+                  // Your communities. Like Recommended below, this ALWAYS
+                  // renders (header + either the list or a note): hiding it from
+                  // someone who hasn't joined anything would hide the very idea
+                  // that joining exists.
+                  _label('Your communities'),
+                  if (joined.isNotEmpty)
                     SizedBox(
                       height: 136,
                       child: ListView.separated(
@@ -864,8 +867,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           onLong: () => _communitySheet(joined[i]),
                         ),
                       ),
-                    ),
-                  ],
+                    )
+                  else
+                    _ppEmptyNote(Icons.groups_outlined,
+                        "You haven't joined any communities yet - pick one below and its posts land in your feed."),
                   // Recommended communities (always renders header + fallback)
                   _label('Recommended communities'),
                   if (recommended.isNotEmpty)
@@ -886,24 +891,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       ),
                     )
                   else
-                    _pad(Container(
-                      width: double.infinity,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: ppBorder)),
-                      child: Row(children: [
-                        const Icon(Icons.celebration_outlined,
-                            size: 20, color: ppPurple),
-                        const SizedBox(width: 10),
-                        Expanded(
-                            child: Text(
-                                'You\'ve joined them all - your feed is fully personalised.',
-                                style: ppBody(13, color: ppInk, h: 1.4))),
-                      ]),
-                    )),
+                    _ppEmptyNote(Icons.celebration_outlined,
+                        "You've joined them all - your feed is fully personalised."),
                   const SizedBox(height: 18),
                   _pad(_feedTabs()),
                   if (_s.doctorMode) _pad(_verifyFilterChip()),
@@ -1017,6 +1006,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
         padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
         child: Text(t, style: ppJakarta(17)),
       );
+
+  // What a section shows INSTEAD of vanishing when it has nothing to list, so
+  // the feature stays visible (and learnable) to someone who has never used it.
+  Widget _ppEmptyNote(IconData icon, String text) => _pad(Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: ppBorder)),
+        child: Row(children: [
+          Icon(icon, size: 20, color: ppPurple),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: ppBody(13, color: ppInk, h: 1.4))),
+        ]),
+      ));
 
   Widget _doctorBanner() => Container(
         padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),

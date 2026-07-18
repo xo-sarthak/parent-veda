@@ -1,18 +1,21 @@
 // =============================================================================
 //  RecoLibraryScreen - everything the parent has kept, in one calm place
 // -----------------------------------------------------------------------------
-//  Three quiet sections, each hiding when empty: "Continue exploring" (a rail of
-//  recently-opened picks), "Saved" (hearted picks) and "Your lists" (named
-//  wishlists, each opening an inline list view). A warm empty state when there
-//  is nothing yet. Reads live from the RecoStore.
+//  Three quiet sections: "Continue exploring" (a rail of recently-opened picks),
+//  "Saved" (hearted picks) and "Your lists" (named wishlists, each opening an
+//  inline list view). None of them hide when empty - each renders its header, a
+//  warm note, and a way through to browse - so wishlists and saving stay
+//  discoverable to someone who has never used them. Reads live from RecoStore.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_reco_data.dart';
+import 'pp_tools_kit.dart';
 import 'reco_common.dart';
 import 'reco_detail_screen.dart';
+import 'recommendations_screen.dart';
 
 class RecoLibraryScreen extends StatelessWidget {
   const RecoLibraryScreen({super.key});
@@ -36,7 +39,7 @@ class RecoLibraryScreen extends StatelessWidget {
             final continueEx = store.continueExploring;
             final saved = store.saved;
             final lists = store.listNames;
-            final nothing = continueEx.isEmpty && saved.isEmpty && lists.isEmpty;
+            // final nothing = continueEx.isEmpty && saved.isEmpty && lists.isEmpty;
 
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 40),
@@ -51,9 +54,25 @@ class RecoLibraryScreen extends StatelessWidget {
                     style: ppBody(13.5, h: 1.5))),
                 const SizedBox(height: 24),
 
-                if (nothing) _pad(_recoLibraryEmpty()),
+                // NOTE: the whole-screen "nothing here" card is retired - all
+                // three sections now render their own header, note and way
+                // through, which teaches what the library is for far better
+                // than one generic message did. Kept commented for revert.
+                // if (nothing) _pad(_recoLibraryEmpty()),
 
                 // ---- Continue exploring (rail) ----
+                // When there is nothing to continue, the section still renders -
+                // but as an invitation to start exploring rather than a dead
+                // "nothing here". An empty state has to offer the way in.
+                if (continueEx.isEmpty) ...[
+                  _pad(_sectionHead('Continue exploring', 'Start somewhere and pick it up later')),
+                  const SizedBox(height: 14),
+                  _pad(ppEmptyCard(Icons.explore_outlined,
+                      'Nothing in progress yet. Browse recommendations and anything you open will wait for you here.')),
+                  const SizedBox(height: 12),
+                  _pad(_exploreCta(context)),
+                  const SizedBox(height: 26),
+                ],
                 if (continueEx.isNotEmpty) ...[
                   _pad(_sectionHead('Continue exploring', 'Pick up where you left off')),
                   const SizedBox(height: 14),
@@ -70,24 +89,32 @@ class RecoLibraryScreen extends StatelessWidget {
                   const SizedBox(height: 26),
                 ],
 
-                // ---- Saved ----
-                if (saved.isNotEmpty) ...[
-                  _pad(_sectionHead('Saved', '${saved.length} ${saved.length == 1 ? 'pick' : 'picks'} you have hearted')),
-                  const SizedBox(height: 14),
+                // ---- Saved (always renders) ----
+                _pad(_sectionHead('Saved', saved.isEmpty ? 'Picks you heart are kept here' : '${saved.length} ${saved.length == 1 ? 'pick' : 'picks'} you have hearted')),
+                const SizedBox(height: 14),
+                if (saved.isEmpty) ...[
+                  _pad(ppEmptyCard(Icons.favorite_border_rounded,
+                      'Nothing saved yet. Tap the heart on any recommendation and it will wait for you here.')),
+                  const SizedBox(height: 12),
+                  _pad(_exploreCta(context)),
+                ] else
                   _pad(Column(children: [
                     for (final r in saved) RecoRow(item: r, onTap: () => _open(context, r)),
                   ])),
-                  const SizedBox(height: 12),
-                ],
+                const SizedBox(height: 12),
 
-                // ---- Your lists ----
-                if (lists.isNotEmpty) ...[
-                  _pad(_sectionHead('Your lists', 'Wishlists to revisit and share')),
-                  const SizedBox(height: 14),
+                // ---- Your lists (always renders) ----
+                _pad(_sectionHead('Your lists', 'Wishlists to revisit and share')),
+                const SizedBox(height: 14),
+                if (lists.isEmpty) ...[
+                  _pad(ppEmptyCard(Icons.playlist_add_rounded,
+                      'No lists yet. Group saved picks into a wishlist to revisit later or share with family.')),
+                  const SizedBox(height: 12),
+                  _pad(_exploreCta(context)),
+                ] else
                   _pad(Column(children: [
                     for (final name in lists) _listRow(context, name, store.listCount(name)),
                   ])),
-                ],
               ],
             );
           },
@@ -95,6 +122,21 @@ class RecoLibraryScreen extends StatelessWidget {
       ),
     );
   }
+
+  // The way OUT of an empty section. An empty state that only describes itself
+  // is dead space; this gives her somewhere to go from every one of them.
+  Widget _exploreCta(BuildContext context) => GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const RecommendationsScreen()),
+        ),
+        behavior: HitTestBehavior.opaque,
+        child: Row(children: [
+          Text('Browse recommendations',
+              style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
+          const SizedBox(width: 4),
+          const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+        ]),
+      );
 
   Widget _sectionHead(String title, String sub) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -194,6 +236,8 @@ class RecoListScreen extends StatelessWidget {
   }
 }
 
+// RETIRED with the whole-screen empty branch above. Kept for revert.
+// ignore: unused_element
 Widget _recoLibraryEmpty() => Container(
       padding: const EdgeInsets.symmetric(vertical: 44),
       alignment: Alignment.center,

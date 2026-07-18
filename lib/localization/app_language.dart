@@ -783,6 +783,19 @@ class S {
   String get shEmpty => _p(
       "Nothing saved yet. Tap the bookmark on a read, a video or a read-to-baby piece and it'll show up here.",
       'Abhi kuch save nahi hua. Kisi read, video ya read-to-baby piece par bookmark dabayein - woh yahan dikhega.');
+  // Per-section empty notes. Each saved section renders its header even when it
+  // has nothing in it, so she learns that read-to-baby pieces, reads AND videos
+  // are all savable - not just the one kind she happens to have used.
+  String get shReadToBabyEmpty => _p(
+      'Nothing saved yet - tap the bookmark on any read-to-baby piece to keep it here.',
+      'Abhi kuch save nahi hua - kisi bhi read-to-baby piece par bookmark dabayein.');
+  String get shReadsEmpty => _p(
+      'Nothing saved yet - tap the bookmark on any read to keep it here.',
+      'Abhi kuch save nahi hua - kisi bhi read par bookmark dabayein.');
+  String get shVideosEmpty => _p(
+      'Nothing saved yet - tap the bookmark on any video to watch it later.',
+      'Abhi kuch save nahi hua - kisi bhi video par bookmark dabayein.');
+  String get shBrowseRtb => _p('Browse read-to-baby', 'Read-to-baby dekhein');
   String get rtbSave => _p('Save', 'Save karein');
 
   // ===========================================================================
@@ -1618,6 +1631,11 @@ class S {
   // ===========================================================================
   String get movementToolTitle => _p('Baby Movement', 'Baby Movement');
   String get historyLabel => _p('History', 'History');
+  // The History section renders even before the first session, so she knows her
+  // sessions will be kept and can see the streak build.
+  String get historyEmptyNote => _p(
+      'No sessions logged yet - each one you complete will appear here.',
+      'Abhi koi session log nahi hua - aap jo bhi poora karengi woh yahan dikhega.');
   String get movementDisclaimer => _p(
       'Most babies move several times a day and that is perfectly normal. Use this tracker only if your doctor has asked you to monitor movements.',
       'Zyadatar babies din mein kai baar move karte hain aur yeh bilkul normal hai. Is tracker ka istemal sirf tab karein jab aapke doctor ne movements monitor karne ko kaha ho.');
@@ -2862,6 +2880,11 @@ class S {
   String get cmRecommendedEmpty => _p(
       "You've joined every community 🎉 - they're all up in 'Your communities'.",
       "Aapne saari communities join kar li 🎉 - wo sab 'Aapki communities' mein hain.");
+  // Shown when she hasn't joined anything yet. The section still renders, so she
+  // learns that joining exists at all (a feature is never hidden for being empty).
+  String get cmJoinedEmpty => _p(
+      "You haven't joined any communities yet - join one below and its posts arrive in your feed.",
+      "Aapne abhi tak koi community join nahi ki - neeche se ek join karein aur uske posts aapke feed mein aayenge.");
   String get cmPulse => _p('Community Pulse', 'Community Pulse');
   String get cmFeed => _p('For you', 'Aapke liye');
   String get cmWalkingTogether => _p('Walking together', 'Saath chalte hain');

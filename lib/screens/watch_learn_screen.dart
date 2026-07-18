@@ -319,15 +319,55 @@ class WatchLearnScreen extends StatelessWidget {
           _section(context, s, lang, s.vidSecBirth, cat(VideoCategory.birth)),
           _section(
               context, s, lang, s.vidSecNewborn, cat(VideoCategory.newborn)),
-          _section(context, s, lang, s.vidSecSaved, saved),
+          // Saved is the only rail that can be empty (the rest are catalog
+          // lists). It still renders its heading, so the bookmark feature stays
+          // discoverable to someone who has never saved a video.
+          _section(context, s, lang, s.vidSecSaved, saved,
+              emptyNote: s.shVideosEmpty),
         ],
       ),
     );
   }
 
   Widget _section(BuildContext context, S s, AppLanguage lang, String title,
-      List<PvVideo> videos) {
-    if (videos.isEmpty) return const SizedBox.shrink();
+      List<PvVideo> videos, {String? emptyNote}) {
+    // A section with no note is a catalog rail that is never empty in practice;
+    // one WITH a note is user-data driven and must stay visible when empty.
+    final note = emptyNote;
+    if (videos.isEmpty) {
+      if (note == null) return const SizedBox.shrink();
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+          child: Text(title,
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.primary900)),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 4),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(children: [
+              const Icon(Icons.bookmark_border_rounded,
+                  size: 18, color: AppTheme.neutral500),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(note,
+                    style: GoogleFonts.manrope(
+                        fontSize: 13, height: 1.45, color: AppTheme.neutral500)),
+              ),
+            ]),
+          ),
+        ),
+      ]);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -709,6 +709,34 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 fontSize: 18, fontWeight: FontWeight.w600, color: _proInk)),
       );
 
+  // The note a section shows INSTEAD of vanishing when it has nothing to list.
+  // Sections always render their header; this fills the space below it, so the
+  // feature stays visible (and learnable) even for someone who has never used it.
+  Widget _emptyNote(String text, IconData icon) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _proPurple.withValues(alpha: 0.16)),
+          ),
+          child: Row(children: [
+            Icon(icon, size: 20, color: _proPurple),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(text,
+                  style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      height: 1.4,
+                      fontWeight: FontWeight.w600,
+                      color: _proInk)),
+            ),
+          ]),
+        ),
+      );
+
   // Slim banner shown while testing the doctor experience.
   Widget _doctorModeBanner(S s) => Container(
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -975,9 +1003,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ),
                 _header(s),
                 if (store.doctorMode) _doctorModeBanner(s),
-                // Your communities - premium mono-badge cards
-                if (joined.isNotEmpty) ...[
-                  _label(s.cmJoinedSection),
+                // Your communities - premium mono-badge cards. Like the
+                // Recommended section below, this ALWAYS renders (header +
+                // either the list or a clear note). Hiding it from someone who
+                // hasn't joined anything would hide the very idea that joining
+                // exists - a feature is never hidden for being empty.
+                _label(s.cmJoinedSection),
+                if (joined.isNotEmpty)
                   SizedBox(
                     height: 138,
                     child: ListView.separated(
@@ -998,8 +1030,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             _communitySheet(context, joined[i], s, joined: true),
                       ),
                     ),
-                  ),
-                ],
+                  )
+                else
+                  _emptyNote(s.cmJoinedEmpty, Icons.groups_rounded),
                 // Recommended for you - communities you haven't joined yet. The
                 // section now ALWAYS renders (header + either the list or a clear
                 // note) so it can never silently disappear when you've joined all.
@@ -1025,33 +1058,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     ),
                   )
                 else
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                            color: _proPurple.withValues(alpha: 0.16)),
-                      ),
-                      child: Row(children: [
-                        const Icon(Icons.celebration_rounded,
-                            size: 20, color: _proPurple),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(s.cmRecommendedEmpty,
-                              style: GoogleFonts.manrope(
-                                  fontSize: 13,
-                                  height: 1.4,
-                                  fontWeight: FontWeight.w600,
-                                  color: _proInk)),
-                        ),
-                      ]),
-                    ),
-                  ),
+                  _emptyNote(s.cmRecommendedEmpty, Icons.celebration_rounded),
                 // Community Pulse REMOVED per request - kept commented for revert.
                 /*
                 _label(s.cmPulse),

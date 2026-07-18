@@ -980,12 +980,16 @@ class _CareJourneyScreen extends StatelessWidget {
               _stat(text, s.lastCompletedLabel,
                   last != null ? s.formatLongDate(last) : s.neverWord),
               const SizedBox(height: 20),
-              if (store.kegelHistory.isNotEmpty) ...[
-                Text(s.historyLabel, style: text.headlineSmall),
-                const SizedBox(height: 10),
+              // History always renders its heading, even before the first
+              // session - otherwise a new user never learns sessions are kept.
+              Text(s.historyLabel, style: text.headlineSmall),
+              const SizedBox(height: 10),
+              if (store.kegelHistory.isEmpty)
+                Text(s.historyEmptyNote,
+                    style: text.bodyMedium?.copyWith(color: AppTheme.neutral500))
+              else
                 for (final rec in store.kegelHistory)
                   _historyRow(context, rec, s, text),
-              ],
             ],
           );
         },

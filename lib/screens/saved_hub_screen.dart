@@ -4,8 +4,10 @@
 //  Opened from Profile › Saved. Groups her saved things - Read-to-baby pieces,
 //  Daily reads, and Videos - newest-saved first within each group, with the
 //  save date. The saved content is the priority; a light "discover more" sits
-//  below. Empty groups are hidden; a friendly empty state shows when nothing's
-//  saved yet.
+//  below. Every group ALWAYS renders its header - an empty one shows a tappable
+//  note leading to where you'd save that kind of thing - so a mother who has
+//  only ever saved videos still learns reads and read-to-baby pieces are savable
+//  too. A feature is never hidden for being empty.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ import '../services/read_next_store.dart';
 import '../services/read_to_baby_saved_store.dart';
 import '../services/video_store.dart';
 import '../theme/app_theme.dart';
+import 'garbh_screen.dart';
 import 'read_next_screen.dart';
 import 'watch_learn_screen.dart';
 
@@ -71,16 +74,19 @@ class SavedHubScreen extends StatelessWidget {
               .whereType<PvVideo>()
               .toList();
 
-          if (rtb.isEmpty && reads.isEmpty && videos.isEmpty) {
-            return _empty(context, s);
-          }
-
+          // Every section renders its header whether or not it has anything in
+          // it. Previously each one vanished independently, so someone who had
+          // saved a video never discovered that reads and read-to-baby pieces
+          // were savable at all - a feature is never hidden for being empty.
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
             children: [
               // Read-to-baby.
-              if (rtb.isNotEmpty) ...[
-                _header(s.shReadToBaby),
+              _header(s.shReadToBaby),
+              if (rtb.isEmpty)
+                _emptyNote(s.shReadToBabyEmpty, s.shBrowseRtb,
+                    () => _push(context, SamvadScreen(controller: controller)))
+              else
                 for (final p in rtb)
                   _tile(
                     leadingIcon: Icons.menu_book_rounded,
@@ -91,10 +97,12 @@ class SavedHubScreen extends StatelessWidget {
                     onTap: () => _push(
                         context, _SavedRtbReadScreen(controller: controller, piece: p)),
                   ),
-              ],
               // Daily reads.
-              if (reads.isNotEmpty) ...[
-                _header(s.shReads),
+              _header(s.shReads),
+              if (reads.isEmpty)
+                _emptyNote(s.shReadsEmpty, s.shRead,
+                    () => _push(context, ReadNextScreen(controller: controller)))
+              else
                 for (final r in reads)
                   _tile(
                     emoji: r.emoji,
@@ -105,10 +113,12 @@ class SavedHubScreen extends StatelessWidget {
                     onTap: () => _push(context,
                         ReadItemScreen(item: r, controller: controller)),
                   ),
-              ],
               // Videos.
-              if (videos.isNotEmpty) ...[
-                _header(s.vidSecSaved),
+              _header(s.vidSecSaved),
+              if (videos.isEmpty)
+                _emptyNote(s.shVideosEmpty, s.shWatch,
+                    () => _push(context, WatchLearnScreen(controller: controller)))
+              else
                 for (final v in videos)
                   _tile(
                     leadingIcon: videoMeta(v.category).icon,
@@ -119,7 +129,6 @@ class SavedHubScreen extends StatelessWidget {
                     onTap: () => _push(
                         context, WatchLearnScreen(controller: controller)),
                   ),
-              ],
               const SizedBox(height: 18),
               // Light "discover more".
               _discover(context, s),
@@ -137,6 +146,53 @@ class SavedHubScreen extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
+      );
+
+  // Sits under a section header when that section has nothing saved, so the
+  // section (and the fact that this kind of thing can be saved) stays visible.
+  // It is TAPPABLE and carries a CTA: an empty state that only explains itself
+  // is still dead space - it has to offer the way in, not just describe it.
+  Widget _emptyNote(String text, String cta, VoidCallback onTap) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(children: [
+              const Icon(Icons.bookmark_border_rounded,
+                  size: 18, color: AppTheme.neutral500),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(text,
+                          style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              height: 1.45,
+                              color: AppTheme.neutral500)),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Text(cta,
+                            style: GoogleFonts.manrope(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.primary600)),
+                        const SizedBox(width: 3),
+                        const Icon(Icons.arrow_forward_rounded,
+                            size: 14, color: AppTheme.primary600),
+                      ]),
+                    ]),
+              ),
+            ]),
+          ),
+        ),
       );
 
   Widget _tile({
@@ -188,6 +244,10 @@ class SavedHubScreen extends StatelessWidget {
         ),
       );
 
+  // RETIRED - the whole-screen empty state. All three sections now render their
+  // own headers and empty notes, which teaches what is savable far better than
+  // one generic message did. Kept for revert.
+  // ignore: unused_element
   Widget _empty(BuildContext context, S s) => Center(
         child: Padding(
           padding: const EdgeInsets.all(36),
