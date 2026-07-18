@@ -365,8 +365,12 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: MyChildScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('LIVE NOW'), findsOneWidget); // leap header
+    // The hero was slimmed: "LIVE NOW", the "Curious Explorer" character line
+    // and the day/night-looking progress bar were removed as noise. What the
+    // hero must still carry is the child, the leap and growth.
     expect(find.text('Aarav'), findsWidgets); // identity
+    expect(find.text('GROWTH'), findsOneWidget); // growth folded into the hero
+    expect(find.text('LIVE NOW'), findsNothing);
 
     await tester.scrollUntilVisible(
       find.text('LOOKING AHEAD'),

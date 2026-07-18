@@ -133,7 +133,7 @@ const List<ReadArticle> kReadArticles = [
   ReadArticle(
     id: 'sleepcycles',
     title: 'Why your baby’s sleep changes at 4 months',
-    teaser: 'The famous “regression” is really a leap forward - here’s what’s happening.',
+    teaser: 'The famous “regression” is really a leap forward, here’s what’s happening.',
     whyToday: 'Aarav is right in the middle of the 4-month sleep shift. Understanding it is the difference between panic and patience tonight.',
     collection: 'sleep',
     ageTag: '3–6 mo',
@@ -150,34 +150,34 @@ const List<ReadArticle> kReadArticles = [
     sections: [
       ReadSection(
         paragraphs: [
-          'For twelve blissful weeks, your newborn slept like - well, a newborn: long, deep stretches that could happen anywhere. Then, seemingly overnight, the nights fell apart. Waking every two hours. Fighting naps. If it feels like a step backwards, take a breath: it is precisely the opposite.',
+          'For twelve blissful weeks, your newborn slept like, well, a newborn: long, deep stretches that could happen anywhere. Then, seemingly overnight, the nights fell apart. Waking every two hours. Fighting naps. If it feels like a step backwards, take a breath: it is precisely the opposite.',
         ],
       ),
       ReadSection(
         heading: 'What’s actually changing',
         paragraphs: [
-          'Around four months, your baby’s sleep matures from the simple newborn pattern into the cycled, adult-like structure they’ll keep for life. Sleep now moves through lighter and deeper phases - and at the end of each cycle, there’s a brief surfacing to near-waking.',
+          'Around four months, your baby’s sleep matures from the simple newborn pattern into the cycled, adult-like structure they’ll keep for life. Sleep now moves through lighter and deeper phases, and at the end of each cycle, there’s a brief surfacing to near-waking.',
           'A baby who hasn’t yet learned to drift back down on their own will fully wake at each of those moments. Hence the two-hourly wake-ups. It isn’t a habit gone wrong; it’s a brain growing up.',
         ],
         mythFact: MythFact(
           'My baby has become a “bad sleeper” and we’ve created bad habits.',
-          'This is neurological maturation, not a habit. Nearly every baby goes through it, and it settles as they learn to link sleep cycles - usually within 2–6 weeks.',
+          'This is neurological maturation, not a habit. Nearly every baby goes through it, and it settles as they learn to link sleep cycles, usually within 2–6 weeks.',
         ),
       ),
       ReadSection(
         heading: 'What genuinely helps',
         paragraphs: [
-          'You can’t rush the brain, but you can make the nights easier. Keep a calm, consistent wind-down so the body learns the cues for sleep. Offer a moment to resettle before rushing in - sometimes they find their way back. Keep the room dark and boring at night, and protect daytime naps, because an overtired baby sleeps worse, not better.',
+          'You can’t rush the brain, but you can make the nights easier. Keep a calm, consistent wind-down so the body learns the cues for sleep. Offer a moment to resettle before rushing in, sometimes they find their way back. Keep the room dark and boring at night, and protect daytime naps, because an overtired baby sleeps worse, not better.',
         ],
         tip: ReadTip(
           'The two-minute pause',
-          'When he stirs at night, wait a slow two minutes before going in. Many babies are simply surfacing between cycles and will resettle - going in too fast can wake them fully.',
+          'When he stirs at night, wait a slow two minutes before going in. Many babies are simply surfacing between cycles and will resettle, going in too fast can wake them fully.',
         ),
       ),
       ReadSection(
         heading: 'When to simply hold on',
         paragraphs: [
-          'There is no cry-it-out required here, and no fixing needed - only weathering. If the waking ever comes with fever, poor feeding or seems like pain, that’s a different story and worth a call to your paediatrician. Otherwise, this passes. You are not doing anything wrong.',
+          'There is no cry-it-out required here, and no fixing needed, only weathering. If the waking ever comes with fever, poor feeding or seems like pain, that’s a different story and worth a call to your paediatrician. Otherwise, this passes. You are not doing anything wrong.',
         ],
       ),
     ],
@@ -199,19 +199,19 @@ const List<ReadArticle> kReadArticles = [
     relatedCommunity: '0–1 Year',
     sections: [
       ReadSection(paragraphs: [
-        'Some weeks, your baby seems to come undone - extra clingy, extra fussy, feeding and sleeping all over the place, for no reason you can name. Before you worry, consider the loveliest explanation: his brain is about to do something new.',
+        'Some weeks, your baby seems to come undone, extra clingy, extra fussy, feeding and sleeping all over the place, for no reason you can name. Before you worry, consider the loveliest explanation: his brain is about to do something new.',
       ]),
       ReadSection(
         heading: 'The world of events',
         paragraphs: [
-          'Around four months, babies enter what’s often called Leap 4 - “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
-          'It sounds small. It is enormous. The whole world suddenly has a logic to it - and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
+          'Around four months, babies enter what’s often called Leap 4, “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
+          'It sounds small. It is enormous. The whole world suddenly has a logic to it, and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
         ],
       ),
       ReadSection(
         heading: 'How to walk through it together',
         paragraphs: [
-          'Leaps pass, and a new skill usually appears on the far side - a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play - “here comes the ball… and it rolls” - gives his new understanding something to chew on.',
+          'Leaps pass, and a new skill usually appears on the far side, a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play, “here comes the ball… and it rolls”, gives his new understanding something to chew on.',
         ],
         tip: ReadTip(
           'Narrate the cause and effect',
@@ -224,7 +224,7 @@ const List<ReadArticle> kReadArticles = [
     id: 'solids',
     title: 'Starting solids without the stress',
     teaser: 'It’s less about nutrition at first, and more about learning to eat.',
-    whyToday: 'Solids are a few weeks away for Aarav - knowing the signs and the first foods now means calm, not scramble, later.',
+    whyToday: 'Solids are a few weeks away for Aarav, knowing the signs and the first foods now means calm, not scramble, later.',
     collection: 'feeding',
     ageTag: '6+ mo',
     minutes: 6,
@@ -242,17 +242,17 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'The real signs of readiness',
         paragraphs: [
-          'Forget the calendar for a moment and watch your baby. Readiness - usually around six months - looks like this: he can sit with support and hold his head steady, he’s eyeing your food with real interest, and he’s lost the reflex that pushes food back out with his tongue.',
+          'Forget the calendar for a moment and watch your baby. Readiness, usually around six months, looks like this: he can sit with support and hold his head steady, he’s eyeing your food with real interest, and he’s lost the reflex that pushes food back out with his tongue.',
         ],
         mythFact: MythFact(
           'Start with rice cereal, and start by four months to help him sleep.',
-          'Current guidance is to wait for readiness (around six months) and there’s no need to begin with bland cereal. Iron-rich foods matter more - and food doesn’t reliably improve sleep.',
+          'Current guidance is to wait for readiness (around six months) and there’s no need to begin with bland cereal. Iron-rich foods matter more, and food doesn’t reliably improve sleep.',
         ),
       ),
       ReadSection(
         heading: 'First foods worth offering',
         paragraphs: [
-          'Begin with single, soft foods and introduce one at a time, so any reaction is easy to spot. Iron is the nutrient to be intentional about now - ragi, well-cooked dal, soft greens - because his birth stores are running low. Let him be messy. Playing with food is how he learns it.',
+          'Begin with single, soft foods and introduce one at a time, so any reaction is easy to spot. Iron is the nutrient to be intentional about now, ragi, well-cooked dal, soft greens, because his birth stores are running low. Let him be messy. Playing with food is how he learns it.',
         ],
         tip: ReadTip(
           'One food, a few days',
@@ -265,7 +265,7 @@ const List<ReadArticle> kReadArticles = [
     id: 'tantrums',
     title: 'Big feelings in a small body',
     teaser: 'A tantrum isn’t bad behaviour. It’s a brain that hasn’t finished building.',
-    whyToday: 'A read-ahead for the toddler months - understanding tantrums now makes them far less frightening when they arrive.',
+    whyToday: 'A read-ahead for the toddler months, understanding tantrums now makes them far less frightening when they arrive.',
     collection: 'behaviour',
     ageTag: '1–3 yr',
     minutes: 5,
@@ -283,17 +283,17 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'The unfinished brain',
         paragraphs: [
-          'The part of the brain that manages big emotions - the thinking, calming, self-controlling part - is years from being built. A toddler feels enormous feelings with none of the tools to manage them. A tantrum isn’t manipulation; it’s a genuine flood, and your child is as overwhelmed by it as you are.',
+          'The part of the brain that manages big emotions, the thinking, calming, self-controlling part, is years from being built. A toddler feels enormous feelings with none of the tools to manage them. A tantrum isn’t manipulation; it’s a genuine flood, and your child is as overwhelmed by it as you are.',
         ],
         mythFact: MythFact(
           'Giving attention to a tantrum rewards it and makes it worse.',
-          'Young children can’t calm alone - they borrow ours. Calm, connected presence (not giving in to the demand) is how they learn regulation over time.',
+          'Young children can’t calm alone, they borrow ours. Calm, connected presence (not giving in to the demand) is how they learn regulation over time.',
         ),
       ),
       ReadSection(
         heading: 'Co-regulation, not control',
         paragraphs: [
-          'You can’t reason a flooded toddler back to calm, but you can lend yours. Get low, stay steady, name the feeling - “you’re so frustrated” - and wait it out with them. You’re not spoiling; you’re teaching, one storm at a time, that big feelings are survivable.',
+          'You can’t reason a flooded toddler back to calm, but you can lend yours. Get low, stay steady, name the feeling, “you’re so frustrated”, and wait it out with them. You’re not spoiling; you’re teaching, one storm at a time, that big feelings are survivable.',
         ],
         tip: ReadTip(
           'Name it to tame it',
@@ -318,16 +318,16 @@ const List<ReadArticle> kReadArticles = [
     relatedCommunity: 'Delhi Parents',
     sections: [
       ReadSection(paragraphs: [
-        'A hot little forehead can send any parent’s heart racing. But fever itself isn’t the enemy - it’s a sign the body is doing its job, mounting a defence. What matters most isn’t the exact number on the thermometer; it’s how your baby seems.',
+        'A hot little forehead can send any parent’s heart racing. But fever itself isn’t the enemy, it’s a sign the body is doing its job, mounting a defence. What matters most isn’t the exact number on the thermometer; it’s how your baby seems.',
       ]),
       ReadSection(
         heading: 'What the number means',
         paragraphs: [
-          'For a baby, 38°C (100.4°F) or above is a fever. Keep him comfortable and well-hydrated with more frequent feeds, dress him lightly, and use paracetamol only at the dose your paediatrician advises for his weight. A child who is drinking, weeing and has moments of playfulness - even with a temperature - is usually weathering it well.',
+          'For a baby, 38°C (100.4°F) or above is a fever. Keep him comfortable and well-hydrated with more frequent feeds, dress him lightly, and use paracetamol only at the dose your paediatrician advises for his weight. A child who is drinking, weeing and has moments of playfulness, even with a temperature, is usually weathering it well.',
         ],
         mythFact: MythFact(
           'Teething causes high fever.',
-          'Teething may raise the temperature very slightly, but a genuine fever is caused by something else. Don’t blame teeth for a real fever - treat it as illness.',
+          'Teething may raise the temperature very slightly, but a genuine fever is caused by something else. Don’t blame teeth for a real fever, treat it as illness.',
         ),
       ),
       ReadSection(
@@ -362,17 +362,17 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'Serve and return',
         paragraphs: [
-          'Language grows through back-and-forth - what researchers call “serve and return”. He babbles; you answer as if it meant something; he lights up and tries again. These tiny exchanges, thousands of them, wire the brain for conversation long before real words arrive.',
+          'Language grows through back-and-forth, what researchers call “serve and return”. He babbles; you answer as if it meant something; he lights up and tries again. These tiny exchanges, thousands of them, wire the brain for conversation long before real words arrive.',
         ],
       ),
       ReadSection(
         heading: 'How to have the conversation',
         paragraphs: [
-          'You don’t need flashcards. Narrate the ordinary - “now we’re pouring the water” - sing the songs you love, and pause after you speak, as if leaving room for his reply. Read simple books not for the story but for the closeness and the music of your voice. It all counts.',
+          'You don’t need flashcards. Narrate the ordinary, “now we’re pouring the water”, sing the songs you love, and pause after you speak, as if leaving room for his reply. Read simple books not for the story but for the closeness and the music of your voice. It all counts.',
         ],
         tip: ReadTip(
           'Pause for the reply',
-          'After you say something, wait. That silence invites him to “take his turn” with a coo or a look - and teaches him the rhythm of conversation.',
+          'After you say something, wait. That silence invites him to “take his turn” with a coo or a look, and teaches him the rhythm of conversation.',
         ),
       ),
     ],
@@ -392,7 +392,7 @@ const List<ReadArticle> kReadArticles = [
     relatedVideoId: 'tummytime',
     sections: [
       ReadSection(paragraphs: [
-        'Tummy time has a reputation for tears. But behind those grumbles, something important is being built - and it doesn’t take much to make it a game he tolerates, even enjoys.',
+        'Tummy time has a reputation for tears. But behind those grumbles, something important is being built, and it doesn’t take much to make it a game he tolerates, even enjoys.',
       ]),
       ReadSection(
         heading: 'Why it matters',
@@ -403,7 +403,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'Making it happy',
         paragraphs: [
-          'Go short and frequent rather than long - a few minutes, several times a day, building up as he tolerates it. Get down to his eye level, use a mirror or a favourite toy, and always stop before the grumbles turn to real upset, so it stays a good memory. On the tough days, lying chest-to-chest on you counts, too.',
+          'Go short and frequent rather than long, a few minutes, several times a day, building up as he tolerates it. Get down to his eye level, use a mirror or a favourite toy, and always stop before the grumbles turn to real upset, so it stays a good memory. On the tough days, lying chest-to-chest on you counts, too.',
         ],
         tip: ReadTip(
           'End on a high',
@@ -415,7 +415,7 @@ const List<ReadArticle> kReadArticles = [
   ReadArticle(
     id: 'drowsy',
     title: 'Drowsy but awake: the hardest skill',
-    teaser: 'The gentlest sleep skill of all - and why it takes patience.',
+    teaser: 'The gentlest sleep skill of all, and why it takes patience.',
     whyToday: 'If you’re rocking to sleep every time, this is the small, kind shift that can slowly change your nights.',
     collection: 'sleep',
     ageTag: '3–6 mo',
@@ -427,22 +427,22 @@ const List<ReadArticle> kReadArticles = [
     relatedCommunity: 'Baby Sleep',
     sections: [
       ReadSection(paragraphs: [
-        'You’ll hear the advice everywhere: “put them down drowsy but awake.” It sounds simple, and it’s quietly one of the hardest - and gentlest - sleep skills to teach.',
+        'You’ll hear the advice everywhere: “put them down drowsy but awake.” It sounds simple, and it’s quietly one of the hardest, and gentlest, sleep skills to teach.',
       ]),
       ReadSection(
         heading: 'Why it helps',
         paragraphs: [
-          'A baby who always falls asleep being rocked or fed learns that this is how sleep happens. So when he surfaces between cycles at night, he needs the same thing again to go back down. Learning to fall asleep in his own bed, a little awake, means he can find his own way back at 3am - without calling for you.',
+          'A baby who always falls asleep being rocked or fed learns that this is how sleep happens. So when he surfaces between cycles at night, he needs the same thing again to go back down. Learning to fall asleep in his own bed, a little awake, means he can find his own way back at 3am, without calling for you.',
         ],
         mythFact: MythFact(
           'This means letting him cry it out.',
-          'Not at all. Drowsy-but-awake is gradual and gentle - you can stay, soothe and help. It’s about shifting the very last moment of falling asleep from your arms to his bed, slowly.',
+          'Not at all. Drowsy-but-awake is gradual and gentle, you can stay, soothe and help. It’s about shifting the very last moment of falling asleep from your arms to his bed, slowly.',
         ),
       ),
       ReadSection(
         heading: 'Going gently',
         paragraphs: [
-          'Start with just one sleep a day - often the first nap or bedtime, when he’s most primed for sleep. Do your calm wind-down, then lay him down sleepy but not gone. If he protests, pick him up, soothe, and try again. Some nights it works; some it doesn’t. Over weeks, not days, it adds up.',
+          'Start with just one sleep a day, often the first nap or bedtime, when he’s most primed for sleep. Do your calm wind-down, then lay him down sleepy but not gone. If he protests, pick him up, soothe, and try again. Some nights it works; some it doesn’t. Over weeks, not days, it adds up.',
         ],
       ),
     ],
@@ -450,7 +450,7 @@ const List<ReadArticle> kReadArticles = [
   ReadArticle(
     id: 'matrescence',
     title: 'Matrescence: the birth of a mother',
-    teaser: 'A baby is born - and so is a whole new you.',
+    teaser: 'A baby is born, and so is a whole new you.',
     whyToday: 'Amid all the baby content, this one’s for you. Because how you’re doing matters, deeply.',
     collection: 'parent',
     ageTag: 'All stages',
@@ -463,26 +463,26 @@ const List<ReadArticle> kReadArticles = [
     relatedCommunity: 'Working Parents',
     sections: [
       ReadSection(paragraphs: [
-        'Everyone asks about the baby. Fewer people ask about you - and yet something enormous has happened to you, too. There’s a word for it: matrescence, the profound becoming of a mother. Like adolescence, it’s a whole identity remaking itself, hormones and all.',
+        'Everyone asks about the baby. Fewer people ask about you, and yet something enormous has happened to you, too. There’s a word for it: matrescence, the profound becoming of a mother. Like adolescence, it’s a whole identity remaking itself, hormones and all.',
       ]),
       ReadSection(
         heading: 'The in-between',
         paragraphs: [
-          'You may feel fierce love and flat exhaustion in the same hour. You may grieve your old freedom while adoring your new life. This isn’t failure or ingratitude - it’s the messy, normal in-between of becoming someone new. Two true things can live side by side.',
+          'You may feel fierce love and flat exhaustion in the same hour. You may grieve your old freedom while adoring your new life. This isn’t failure or ingratitude, it’s the messy, normal in-between of becoming someone new. Two true things can live side by side.',
         ],
         mythFact: MythFact(
           'A good mother feels instant, uncomplicated bliss.',
-          'Love often grows gradually, through the ordinary care of long days and nights. Mixed feelings are common and human - persistent hopelessness or dread, though, deserves support: please reach out.',
+          'Love often grows gradually, through the ordinary care of long days and nights. Mixed feelings are common and human, persistent hopelessness or dread, though, deserves support: please reach out.',
         ),
       ),
       ReadSection(
         heading: 'Be as kind to you',
         paragraphs: [
-          'You can’t pour from an empty cup, and you are not meant to do this alone. Accept the help. Lower the bar on everything that isn’t the baby or you. Protect small pockets of rest without guilt. Looking after yourself isn’t stealing from your child - it’s the very thing that lets you show up for them.',
+          'You can’t pour from an empty cup, and you are not meant to do this alone. Accept the help. Lower the bar on everything that isn’t the baby or you. Protect small pockets of rest without guilt. Looking after yourself isn’t stealing from your child, it’s the very thing that lets you show up for them.',
         ],
         tip: ReadTip(
           'One small thing',
-          'Each day, do one small thing that’s only for you - a hot drink while it’s still hot, five minutes outside, a message to a friend. Tiny, but it keeps you tethered to yourself.',
+          'Each day, do one small thing that’s only for you, a hot drink while it’s still hot, five minutes outside, a message to a friend. Tiny, but it keeps you tethered to yourself.',
         ),
       ),
     ],
@@ -490,15 +490,15 @@ const List<ReadArticle> kReadArticles = [
   ReadArticle(
     id: 'csection',
     title: 'C-section recovery: the full picture',
-    teaser: 'Major surgery, and a recovery that deserves as much attention as the birth - here’s what the weeks afterward really involve.',
-    whyToday: 'Whether you’re still deciding, have a date fixed, or are already home with your baby, this is the clear picture of recovery few people give you - in body and in heart.',
+    teaser: 'Major surgery, and a recovery that deserves as much attention as the birth, here’s what the weeks afterward really involve.',
+    whyToday: 'Whether you’re still deciding, have a date fixed, or are already home with your baby, this is the clear picture of recovery few people give you, in body and in heart.',
     collection: 'parent',
     ageTag: 'All stages',
     minutes: 9,
     seed: 10,
     author: 'Dr. Anjali Verma',
     authorRole: 'Obstetrician & Gynaecologist',
-    evidence: 'Aligned with standard obstetric guidance on caesarean recovery, wound healing and VBAC. General information for understanding, not a diagnosis - your own doctor knows your situation and your incision best.',
+    evidence: 'Aligned with standard obstetric guidance on caesarean recovery, wound healing and VBAC. General information for understanding, not a diagnosis, your own doctor knows your situation and your incision best.',
     sections: [
       ReadSection(paragraphs: [
         'A C-section is major surgery, and the recovery deserves as much attention as the birth itself. Yet it is the part least talked about. Whether a mother is still deciding, has a date fixed, or is already home with her baby, this is a clear picture of what the weeks afterward involve, and what genuinely helps, in body and in heart.',
@@ -529,7 +529,7 @@ const List<ReadArticle> kReadArticles = [
         heading: 'The first few days',
         paragraphs: [
           'The early days hold most of the surprises. In hospital, a mother can usually expect:',
-          '•  Gentle walking, early. It feels hard at first, but it lowers the risk of clots and helps the gut wake up.\n•  A catheter for the first day or so, usually removed the next morning.\n•  Firm pressure on the belly from a nurse, to help the womb contract. Uncomfortable, but it limits bleeding.\n•  Afterpains - cramps as the womb shrinks, often stronger during breastfeeding.\n•  Trapped gas, which can be surprisingly uncomfortable. Walking, warm fluids, and a stool softener help.',
+          '•  Gentle walking, early. It feels hard at first, but it lowers the risk of clots and helps the gut wake up.\n•  A catheter for the first day or so, usually removed the next morning.\n•  Firm pressure on the belly from a nurse, to help the womb contract. Uncomfortable, but it limits bleeding.\n•  Afterpains, cramps as the womb shrinks, often stronger during breastfeeding.\n•  Trapped gas, which can be surprisingly uncomfortable. Walking, warm fluids, and a stool softener help.',
           'The first bowel movement is often awaited with worry, and is usually far easier than expected.',
         ],
       ),
@@ -538,7 +538,7 @@ const List<ReadArticle> kReadArticles = [
         paragraphs: [
           'Few worries feel as tender as wondering whether there is enough milk. So it helps to know how normal a slow start is.',
           'After a C-section, milk often comes in a little later. The fuller feeling many expect around day three can take longer, and research finds this happens to about one in three mothers, more so after a first baby. It is not a sign that something is wrong, or that there will not be enough.',
-          'In those first days, the body is already making colostrum - the concentrated early milk, which is exactly what a newborn needs in tiny amounts. What helps the fuller milk arrive is gentle and simple: feeding or expressing often, so the body receives the signal to make more; skin-to-skin contact, which calms both mother and baby and supports let-down; and a lactation consultant’s support if feeding feels hard.',
+          'In those first days, the body is already making colostrum, the concentrated early milk, which is exactly what a newborn needs in tiny amounts. What helps the fuller milk arrive is gentle and simple: feeding or expressing often, so the body receives the signal to make more; skin-to-skin contact, which calms both mother and baby and supports let-down; and a lactation consultant’s support if feeding feels hard.',
           'The delay is common, temporary, and no one’s fault.',
         ],
       ),
@@ -547,7 +547,7 @@ const List<ReadArticle> kReadArticles = [
         paragraphs: [
           'A C-section recovery is unusual, in that the patient is also the round-the-clock carer. A few practical habits make that kinder on a healing body.',
           'Feeding positions that keep weight off the scar: the rugby (football) hold, with the baby along the mother’s side and nothing resting on the incision; side-lying, mother and baby facing each other, ideal for night feeds; and laid-back, reclining slightly with a pillow across the lap as a cushion between baby and incision.',
-          'Moving with less strain: get up by rolling onto one side first, then push up with the arms rather than the stomach. Take pain relief on the schedule a doctor advises, rather than waiting for the pain to peak. Keep water, snacks and baby essentials within reach of the feeding spot. Lift nothing heavier than the baby in the first weeks. And accept help - it is part of recovery, not a failure of it.',
+          'Moving with less strain: get up by rolling onto one side first, then push up with the arms rather than the stomach. Take pain relief on the schedule a doctor advises, rather than waiting for the pain to peak. Keep water, snacks and baby essentials within reach of the feeding spot. Lift nothing heavier than the baby in the first weeks. And accept help, it is part of recovery, not a failure of it.',
         ],
         tip: ReadTip(
           'Splint before you cough',
@@ -557,7 +557,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'About the belly',
         paragraphs: [
-          '“How to reduce the belly” is one of the most common questions after a C-section, and the honest answer is reassuring. In the early weeks, the rounded tummy is mostly swelling, a still-shrinking womb, and muscles that separated during pregnancy - not fat.',
+          '“How to reduce the belly” is one of the most common questions after a C-section, and the honest answer is reassuring. In the early weeks, the rounded tummy is mostly swelling, a still-shrinking womb, and muscles that separated during pregnancy, not fat.',
           'So it is not something to attack with crash diets or hard workouts, especially while the body is healing and making milk. The gentler path works better: eating well rather than eating less, and, once a doctor gives clearance, rebuilding from the inside with breathing and pelvic-floor work before any sit-ups. A support binder can feel comforting, though it supports rather than slims. The shape returns with time.',
         ],
       ),
@@ -567,13 +567,13 @@ const List<ReadArticle> kReadArticles = [
           'Recovery after a C-section is as much emotional as physical, and this side receives far less attention than it deserves.',
           'Feelings about the birth. A planned C-section can feel settled, or not, and either is fine. After an emergency, or a birth that unfolded differently than hoped, a mother may feel disappointment, or a sense that her body fell short. It did not. A C-section is not a lesser birth, and not a failing of effort or will. It is often the reason mother and baby came through safely.',
           'Bonding that takes time. Love does not always arrive like a thunderbolt, and that is normal. After surgery, pain and broken sleep, connection often builds slowly, over days and weeks of holding and feeding. A mother who feels no instant rush has done nothing wrong. Attachment grows in its own time.',
-          'When to reach out. Tearfulness and feeling overwhelmed in the first couple of weeks are common - the “baby blues” - and usually settle on their own. What deserves attention is low mood, anxiety, or a sense of distance from the baby that lingers beyond that or deepens. Postpartum depression and anxiety are common and very treatable. A doctor or counsellor can help, and reaching out early is a quiet act of strength.',
+          'When to reach out. Tearfulness and feeling overwhelmed in the first couple of weeks are common, the “baby blues”, and usually settle on their own. What deserves attention is low mood, anxiety, or a sense of distance from the baby that lingers beyond that or deepens. Postpartum depression and anxiety are common and very treatable. A doctor or counsellor can help, and reaching out early is a quiet act of strength.',
         ],
       ),
       ReadSection(
         heading: 'Once a C-section, always? Not necessarily',
         paragraphs: [
-          'This belief is widely repeated, and for many mothers it is untrue. Whether a future vaginal birth fits depends on why the first C-section happened, the type of cut on the womb, and the gap before the next pregnancy - all of which a doctor can weigh.',
+          'This belief is widely repeated, and for many mothers it is untrue. Whether a future vaginal birth fits depends on why the first C-section happened, the type of cut on the womb, and the gap before the next pregnancy, all of which a doctor can weigh.',
           'In India, only about one in ten eligible mothers even attempt it, often because no one told them it was possible. Knowing it is an option is where a real choice begins.',
         ],
         mythFact: MythFact(
@@ -585,19 +585,19 @@ const List<ReadArticle> kReadArticles = [
         heading: 'When to see a doctor',
         paragraphs: [
           'General information, not medical advice. It is worth contacting a doctor promptly for:',
-          '•  A wound that grows redder, more swollen or warm, or leaks fluid or pus.\n•  An incision that opens, or pain that worsens instead of easing.\n•  Fever, or heavy bleeding that soaks a pad in an hour or passes large clots.\n•  Pain, redness or swelling in a leg, or any breathlessness - which need urgent care.\n•  A low mood that will not lift, or a sense of distance from the baby - which deserve support, not silence.',
+          '•  A wound that grows redder, more swollen or warm, or leaks fluid or pus.\n•  An incision that opens, or pain that worsens instead of easing.\n•  Fever, or heavy bleeding that soaks a pad in an hour or passes large clots.\n•  Pain, redness or swelling in a leg, or any breathlessness, which need urgent care.\n•  A low mood that will not lift, or a sense of distance from the baby, which deserve support, not silence.',
         ],
       ),
       ReadSection(
         heading: 'ParentVeda Insight',
         paragraphs: [
-          'Recovery is usually measured by how quickly a mother “bounces back” - the flat belly, the faded scar, the day she looks like she never had surgery. Her body is measuring something quieter: layers reconnecting, nerves regrowing a millimetre a month, a womb returning to size, milk arriving in its own time, love growing at its own pace. Bouncing back was never the real goal. Healing, in body and in heart, at her own pace, is.',
+          'Recovery is usually measured by how quickly a mother “bounces back”, the flat belly, the faded scar, the day she looks like she never had surgery. Her body is measuring something quieter: layers reconnecting, nerves regrowing a millimetre a month, a womb returning to size, milk arriving in its own time, love growing at its own pace. Bouncing back was never the real goal. Healing, in body and in heart, at her own pace, is.',
         ],
       ),
       ReadSection(
         heading: 'Looking ahead',
         paragraphs: [
-          'Most C-section recoveries unfold gently and fully, even if slower than expected. The scar fades, sensation returns, milk settles into a rhythm, bonding deepens, and the cautious early days become a memory. Whatever led to the surgery, the body did something remarkable - and it is doing something equally remarkable now, quietly, layer by layer.',
+          'Most C-section recoveries unfold gently and fully, even if slower than expected. The scar fades, sensation returns, milk settles into a rhythm, bonding deepens, and the cautious early days become a memory. Whatever led to the surgery, the body did something remarkable, and it is doing something equally remarkable now, quietly, layer by layer.',
         ],
       ),
     ],

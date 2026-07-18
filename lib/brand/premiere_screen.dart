@@ -47,6 +47,7 @@ Future<void> showPremiereIfAny(
 
     await Navigator.of(context, rootNavigator: true).push(
       PageRouteBuilder<void>(
+        settings: const RouteSettings(name: 'premiere'),
         opaque: false,
         barrierColor: Colors.black54,
         transitionDuration: const Duration(milliseconds: 420),

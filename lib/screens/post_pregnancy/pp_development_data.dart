@@ -144,8 +144,8 @@ const List<DevArea> kDevAreas = [
     word: DevWord.growing,
     stage: 'Cause & effect',
     summary: 'Working out that one thing makes another happen.',
-    todayTip: 'Show him a simple cause and effect - shake a rattle, then pause, and let him take it in.',
-    brainNote: 'His brain is wiring the idea that his actions change the world - the seed of all problem-solving.',
+    todayTip: 'Show him a simple cause and effect, shake a rattle, then pause, and let him take it in.',
+    brainNote: 'His brain is wiring the idea that his actions change the world, the seed of all problem-solving.',
     seed: 1,
     about: [
       'Thinking begins with a simple, astonishing discovery: that one thing makes another happen. Right now your baby is working out that his own hand reaching is what makes the toy move — cause, meet effect. It is the foundation every future bit of problem-solving is built on.',
@@ -157,7 +157,7 @@ const List<DevArea> kDevAreas = [
     journey: [
       DevStage('Notices contrast', 'mastered', 'Fixes on bold patterns and faces.', 'The very first attention-building.'),
       DevStage('Follows a moving toy', 'mastered', 'Tracks something across his view.', 'Visual attention and prediction.'),
-      DevStage('Cause & effect', 'current', 'Grasps that his hand makes the toy move.', 'The heart of Leap 4 - thinking begins.', activities: ['peekaboo', 'highcontrast']),
+      DevStage('Cause & effect', 'current', 'Grasps that his hand makes the toy move.', 'The heart of Leap 4, thinking begins.', activities: ['peekaboo', 'highcontrast']),
       DevStage('Object permanence', 'next', 'Begins to sense things exist when hidden.', 'Why peekaboo becomes magic.', activities: ['peekaboo']),
       DevStage('Simple problem solving', 'future', 'Reaches around a barrier for a toy.', 'Early planning and persistence.'),
     ],
@@ -170,7 +170,7 @@ const List<DevArea> kDevAreas = [
     word: DevWord.emerging,
     stage: 'Musical babble',
     summary: 'Coos stretching into “aah-goo”, squeals and raspberries.',
-    todayTip: 'Have a “conversation”: say something, then pause and wait for his coo - and answer it back.',
+    todayTip: 'Have a “conversation”: say something, then pause and wait for his coo, and answer it back.',
     brainNote: 'Long before words, his brain is mapping the rhythm and melody of your voice.',
     seed: 2,
     about: [
@@ -182,7 +182,7 @@ const List<DevArea> kDevAreas = [
     relatedArticle: 'Talking to your baby before they can talk',
     relatedVideoId: 'babbling',
     journey: [
-      DevStage('Cooing', 'mastered', 'Soft vowel sounds - aah, ooh.', 'The first voice play.'),
+      DevStage('Cooing', 'mastered', 'Soft vowel sounds, aah, ooh.', 'The first voice play.'),
       DevStage('Musical babble', 'current', 'Squeals, raspberries, sing-song sounds.', 'Rehearsing conversation’s music.', activities: ['narrate', 'song']),
       DevStage('Turn-taking', 'next', 'Waits, then “answers” you.', 'The back-and-forth of real talk.', activities: ['narrate']),
       DevStage('Babble with consonants', 'future', '“Ba-ba”, “da-da” appear.', 'Building blocks of first words.'),
@@ -196,8 +196,8 @@ const List<DevArea> kDevAreas = [
     accent: _amber,
     word: DevWord.practicing,
     stage: 'Rolling',
-    summary: 'Pushing up strong on the floor, rocking - a first roll is near.',
-    todayTip: 'A little tummy time with a toy just out of reach - it builds the strength to roll.',
+    summary: 'Pushing up strong on the floor, rocking, a first roll is near.',
+    todayTip: 'A little tummy time with a toy just out of reach, it builds the strength to roll.',
     brainNote: 'Each push-up wires the neck, core and coordination he’ll build every future move on.',
     seed: 3,
     about: [
@@ -225,7 +225,7 @@ const List<DevArea> kDevAreas = [
     stage: 'Reaching & grasping',
     summary: 'Hands find each other; he swipes and grabs at dangling toys.',
     todayTip: 'Offer a light, easy-to-hold toy at his midline and let him reach and grasp.',
-    brainNote: 'Hand-eye coordination is being wired - every grab is his brain aiming and adjusting.',
+    brainNote: 'Hand-eye coordination is being wired, every grab is his brain aiming and adjusting.',
     seed: 4,
     nextActivityId: 'reach_ring',
     relatedVideoId: 'leap4brain',
@@ -244,8 +244,8 @@ const List<DevArea> kDevAreas = [
     word: DevWord.growing,
     stage: 'Borrowing your calm',
     summary: 'Beams with joy, and settles fastest in your steady arms.',
-    todayTip: 'When he fusses, slow your own breathing and voice - he tunes to your calm.',
-    brainNote: 'He can’t regulate emotions alone yet - he literally borrows yours. That’s co-regulation.',
+    todayTip: 'When he fusses, slow your own breathing and voice, he tunes to your calm.',
+    brainNote: 'He can’t regulate emotions alone yet, he literally borrows yours. That’s co-regulation.',
     seed: 5,
     about: [
       'Your baby feels big feelings, but he has none of the tools to manage them yet — so he borrows yours. When he settles fastest in your steady arms, that is not a habit to break; it is exactly how emotional development is meant to work at this age.',
@@ -269,7 +269,7 @@ const List<DevArea> kDevAreas = [
     stage: 'You are his world',
     summary: 'Your face is the best thing in the room; a laugh earns a laugh.',
     todayTip: 'Play face-to-face: exaggerate your expressions and watch him copy and respond.',
-    brainNote: 'He’s learning that people are special and responsive - the root of all relationships.',
+    brainNote: 'He’s learning that people are special and responsive, the root of all relationships.',
     seed: 6,
     nextActivityId: 'peekaboo',
     journey: [
@@ -286,8 +286,8 @@ const List<DevArea> kDevAreas = [
     accent: Color(0xFFFF5A79),
     word: DevWord.emerging,
     stage: 'Exploring the senses',
-    summary: 'Fascinated by texture, contrast and sound - his first “art”.',
-    todayTip: 'Offer safe things with different textures to touch - soft, crinkly, smooth.',
+    summary: 'Fascinated by texture, contrast and sound, his first “art”.',
+    todayTip: 'Offer safe things with different textures to touch, soft, crinkly, smooth.',
     brainNote: 'Rich sensory input now builds the pathways later imagination and creativity will use.',
     seed: 7,
     nextActivityId: 'texture',
@@ -305,8 +305,8 @@ const List<DevArea> kDevAreas = [
     word: DevWord.emerging,
     stage: 'First self-soothing',
     summary: 'Brings hands to his mouth and finds small ways to settle himself.',
-    todayTip: 'Let him have safe moments to settle himself before you step in - a beat of patience helps.',
-    brainNote: 'The first flickers of independence - small self-soothing that grows into big self-reliance.',
+    todayTip: 'Let him have safe moments to settle himself before you step in, a beat of patience helps.',
+    brainNote: 'The first flickers of independence, small self-soothing that grows into big self-reliance.',
     seed: 8,
     journey: [
       DevStage('Hands to mouth', 'current', 'Finds and mouths his own hands.', 'The very first self-soothing.'),
@@ -328,8 +328,8 @@ const List<DevActivity> kDevActivities = [
     materials: ['Just your hands (or a light cloth)'],
     skills: ['Object permanence', 'Social connection', 'Cause & effect'],
     safety: ['Keep any cloth light and away from his face', 'Stop if he seems overwhelmed'],
-    benefit: 'Plants the first seed of object permanence - the idea that things (and you) still exist when out of sight.',
-    steps: ['Hide your face behind your hands.', 'Pause a beat - let the anticipation build.', 'Reveal with a warm “peekaboo!”.', 'Watch his reaction, and follow his lead on the pace.'],
+    benefit: 'Plants the first seed of object permanence, the idea that things (and you) still exist when out of sight.',
+    steps: ['Hide your face behind your hands.', 'Pause a beat, let the anticipation build.', 'Reveal with a warm “peekaboo!”.', 'Watch his reaction, and follow his lead on the pace.'],
     seed: 11,
   ),
   DevActivity(
@@ -341,9 +341,9 @@ const List<DevActivity> kDevActivities = [
     ageTag: '3–12 mo',
     materials: ['Nothing at all'],
     skills: ['Language', 'Turn-taking', 'Attention'],
-    safety: ['None - just your voice'],
+    safety: ['None, just your voice'],
     benefit: 'Builds his ear for language and the back-and-forth rhythm of conversation, long before words.',
-    steps: ['Describe what you’re doing - “now we’re pouring the water”.', 'Pause, as if leaving room for his reply.', 'When he coos, answer as if it meant something.', 'Keep the loop going - it’s a real conversation.'],
+    steps: ['Describe what you’re doing, “now we’re pouring the water”.', 'Pause, as if leaving room for his reply.', 'When he coos, answer as if it meant something.', 'Keep the loop going, it’s a real conversation.'],
     seed: 12,
   ),
   DevActivity(
@@ -395,11 +395,11 @@ const List<DevActivity> kDevActivities = [
     minutes: 6,
     difficulty: 'Easy',
     ageTag: '3–8 mo',
-    materials: ['A few safe items - silk, a wooden spoon, a crinkly cloth'],
+    materials: ['A few safe items, silk, a wooden spoon, a crinkly cloth'],
     skills: ['Sensory exploration', 'Fine motor', 'Curiosity'],
     safety: ['Everything larger than his mouth', 'Supervise closely'],
     benefit: 'Feeds his senses and builds the neural pathways that curiosity and creativity grow from.',
-    steps: ['Gather 3–4 safe items with different textures.', 'Offer one at a time to touch and hold.', 'Name each feeling - “soft”, “crinkly”.', 'Follow his interest; there’s no wrong way.'],
+    steps: ['Gather 3–4 safe items with different textures.', 'Offer one at a time to touch and hold.', 'Name each feeling, “soft”, “crinkly”.', 'Follow his interest; there’s no wrong way.'],
     seed: 16,
   ),
   DevActivity(
@@ -412,7 +412,7 @@ const List<DevActivity> kDevActivities = [
     materials: ['A high-contrast card or book'],
     skills: ['Visual attention', 'Focus'],
     safety: ['None'],
-    benefit: 'Bold contrast is easiest for young eyes - holding his gaze builds visual attention.',
+    benefit: 'Bold contrast is easiest for young eyes, holding his gaze builds visual attention.',
     steps: ['Hold a high-contrast image about 30 cm away.', 'Let his eyes settle and study it.', 'Slowly move it side to side so he tracks.', 'Stop when his attention drifts.'],
     seed: 17,
   ),
@@ -426,8 +426,8 @@ const List<DevActivity> kDevActivities = [
     materials: ['A song you love'],
     skills: ['Language', 'Emotional connection', 'Anticipation'],
     safety: ['None'],
-    benefit: 'Melody and repetition are gifts to a developing brain - and the pauses invite him to join in.',
-    steps: ['Sing a simple, repetitive song.', 'Pause before the last word or a tickle.', 'Watch him anticipate what’s coming.', 'Repeat - babies adore the familiar.'],
+    benefit: 'Melody and repetition are gifts to a developing brain, and the pauses invite him to join in.',
+    steps: ['Sing a simple, repetitive song.', 'Pause before the last word or a tickle.', 'Watch him anticipate what’s coming.', 'Repeat, babies adore the familiar.'],
     seed: 18,
   ),
 ];
@@ -438,17 +438,17 @@ const String kBrainThisWeek =
 
 const List<BrainTopic> kBrainTopics = [
   BrainTopic('Recognising familiar faces', 'He now knows your face from a stranger’s, and lights up for it. This is memory and social wiring, together.', 'Lots of face-to-face time and warm eye contact strengthens it.'),
-  BrainTopic('Cause and effect', 'He’s grasping that his own actions make things happen - the foundation of thinking and problem-solving.', 'Give him simple “I did that!” moments, like a rattle that sounds when he moves it.'),
-  BrainTopic('The music of language', 'His brain is mapping the rhythm and melody of speech long before he understands words.', 'Talk, sing and pause for his reply - narration is brain food.'),
-  BrainTopic('Borrowing calm', 'The part that manages big feelings is years from ready - for now, he regulates by tuning into you.', 'Your steady voice and slow breathing literally settle his nervous system.'),
+  BrainTopic('Cause and effect', 'He’s grasping that his own actions make things happen, the foundation of thinking and problem-solving.', 'Give him simple “I did that!” moments, like a rattle that sounds when he moves it.'),
+  BrainTopic('The music of language', 'His brain is mapping the rhythm and melody of speech long before he understands words.', 'Talk, sing and pause for his reply, narration is brain food.'),
+  BrainTopic('Borrowing calm', 'The part that manages big feelings is years from ready, for now, he regulates by tuning into you.', 'Your steady voice and slow breathing literally settle his nervous system.'),
 ];
 
 // ---- looking ahead ----------------------------------------------------------
 const List<LookAhead> kLookAhead = [
-  LookAhead(Icons.directions_run_rounded, 'A first roll - and then both ways', 'Over the coming weeks, many babies begin rolling tummy-to-back, then back-to-tummy. Plenty of floor time is the best invitation.'),
+  LookAhead(Icons.directions_run_rounded, 'A first roll, and then both ways', 'Over the coming weeks, many babies begin rolling tummy-to-back, then back-to-tummy. Plenty of floor time is the best invitation.'),
   LookAhead(Icons.pan_tool_alt_outlined, 'Reaching becomes grabbing', 'Swiping at toys turns into confident grabbing, and soon passing a toy from hand to hand.'),
-  LookAhead(Icons.restaurant_outlined, 'The world of first foods', 'Around six months, many babies show they’re ready to explore solids - a whole new kind of learning.'),
-  LookAhead(Icons.record_voice_over_outlined, 'Consonants join the babble', 'Over time, “aah-goo” grows into “ba-ba” and “da-da” - the building blocks of first words.'),
+  LookAhead(Icons.restaurant_outlined, 'The world of first foods', 'Around six months, many babies show they’re ready to explore solids, a whole new kind of learning.'),
+  LookAhead(Icons.record_voice_over_outlined, 'Consonants join the babble', 'Over time, “aah-goo” grows into “ba-ba” and “da-da”, the building blocks of first words.'),
 ];
 
 const List<(String, String)> kLookAheadPicks = [

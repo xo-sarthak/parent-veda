@@ -38,6 +38,7 @@ import 'services/tools_store.dart';
 import 'services/video_store.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
+import 'widgets/global_ask_fab.dart';
 
 Future<void> main() async {
   // Flutter must be ready before we do async work like connecting to Supabase.
@@ -165,6 +166,15 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light,
+      // Root navigator key + observer power the global "Ask Veda" FAB.
+      navigatorKey: appNavigatorKey,
+      navigatorObservers: [fabRouteObserver],
+      // Inject one Ask-Veda FAB above every route in both apps. It hides itself
+      // over sheets / the Premiere / the splash — see GlobalAskFab.
+      builder: (context, child) => Stack(children: [
+        if (child != null) Positioned.fill(child: child),
+        GlobalAskFab(pregnancy: _controller),
+      ]),
       // Launch into the splash screen; it cross-fades into MainScaffold.
       home: SplashScreen(pregnancy: _controller, home: _home, father: _father),
     );

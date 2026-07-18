@@ -24,6 +24,7 @@ import '../theme/app_theme.dart';
 // Retired: the old sponsored-brand promo carousel, replaced by ParentVeda
 // Premiere (lib/brand/). Kept for revert — see docs/BRAND-STUDIO.md §12.
 // import '../widgets/launch_promo.dart';
+import '../widgets/global_ask_fab.dart';
 import '../widgets/pv_tab_bar.dart';
 import 'calendar_screen.dart';
 import 'community_screen.dart';
@@ -68,6 +69,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     // skin - the nav pill, the weekly stack, the week pop-ups - fires too. Set
     // before wiring the listener so it doesn't bounce a setState during init.
     if (widget.isFather) FatherPreview.instance.on = true;
+    // The shell is up (not the splash) — let the global Ask-Veda FAB appear.
+    FabState.instance.markAppLive();
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
     WidgetsBinding.instance.addObserver(this); // app-resume → refresh content

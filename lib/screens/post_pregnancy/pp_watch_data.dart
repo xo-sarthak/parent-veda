@@ -145,7 +145,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 600,
     quick: false,
     why:
-        'The clinginess and broken naps aren’t a step back - they’re a leap forward. See what your baby is working out about cause and effect right now.',
+        'The clinginess and broken naps aren’t a step back, they’re a leap forward. See what your baby is working out about cause and effect right now.',
     seed: 2,
     relatedArticle: 'Leap 4, decoded',
     relatedActivity: 'Reach-for-the-ring',
@@ -191,7 +191,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 540,
     quick: false,
     why:
-        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep Aarav comfortable - so vaccine day feels calm, not scary.',
+        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep Aarav comfortable, so vaccine day feels calm, not scary.',
     seed: 5,
     relatedArticle: 'The 4-month vaccines, explained calmly',
     relatedCommunity: 'Vaccine-day tips',
@@ -221,7 +221,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 660,
     quick: false,
     why:
-        'A clear, calm guide to baby fever - what’s normal, what helps, and the red flags that mean call the doctor now.',
+        'A clear, calm guide to baby fever, what’s normal, what helps, and the red flags that mean call the doctor now.',
     seed: 7,
     relatedRecipe: 'Moong dal water',
     relatedCommunity: 'When did you call the doctor?',
@@ -251,7 +251,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 360,
     quick: false,
     why:
-        'One mother’s honest account of the fourth month - the hard nights, the first belly laugh, and what she’d tell herself again.',
+        'One mother’s honest account of the fourth month, the hard nights, the first belly laugh, and what she’d tell herself again.',
     seed: 9,
     relatedCommunity: 'Share your fourth-month story',
   ),
@@ -266,7 +266,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '3–6 mo',
     seconds: 45,
     quick: true,
-    why: 'A rolled towel under the chest makes tummy time comfier - and buys you a few more happy minutes.',
+    why: 'A rolled towel under the chest makes tummy time comfier, and buys you a few more happy minutes.',
     seed: 10,
     relatedActivity: 'Chest-to-chest tummy time',
   ),
@@ -279,7 +279,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 60,
     quick: true,
-    why: 'Steady white noise recreates the constant whoosh of the womb - familiar, and genuinely soothing for sleep.',
+    why: 'Steady white noise recreates the constant whoosh of the womb, familiar, and genuinely soothing for sleep.',
     seed: 11,
     relatedProductId: 'dozy',
   ),
@@ -292,7 +292,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '6–12 mo',
     seconds: 50,
     quick: true,
-    why: 'Ragi, well-cooked dal and soft greens - three easy, iron-rich firsts for when your baby is ready to eat.',
+    why: 'Ragi, well-cooked dal and soft greens, three easy, iron-rich firsts for when your baby is ready to eat.',
     seed: 12,
     relatedRecipe: 'Ragi & banana smoothie',
   ),
@@ -317,7 +317,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '3–6 mo',
     seconds: 55,
     quick: true,
-    why: '“Now we’re pouring the water…” - talking through the ordinary is how your baby learns the music of speech.',
+    why: '“Now we’re pouring the water…”, talking through the ordinary is how your baby learns the music of speech.',
     seed: 14,
     relatedActivity: 'Narrate your day',
   ),
@@ -330,7 +330,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 45,
     quick: true,
-    why: 'Young eyes see bold contrast best - a simple black-and-white card can hold real fascination.',
+    why: 'Young eyes see bold contrast best, a simple black-and-white card can hold real fascination.',
     seed: 15,
   ),
   WatchVideo(
@@ -354,7 +354,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 40,
     quick: true,
-    why: 'Hold your baby upright against your chest and pat low on the back - trapped wind comes up faster.',
+    why: 'Hold your baby upright against your chest and pat low on the back, trapped wind comes up faster.',
     seed: 17,
   ),
   WatchVideo(
@@ -366,7 +366,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–12 mo',
     seconds: 60,
     quick: true,
-    why: 'Slow strokes down the legs before a nap signal "we are winding down" - and it is lovely bonding.',
+    why: 'Slow strokes down the legs before a nap signal "we are winding down", and it is lovely bonding.',
     seed: 18,
   ),
   WatchVideo(
@@ -390,7 +390,7 @@ const List<WatchVideo> kWatchVideos = [
     ageTag: '0–6 mo',
     seconds: 50,
     quick: true,
-    why: 'A quick stare into the distance is the first tired cue - start the wind-down then, before the overtired cry.',
+    why: 'A quick stare into the distance is the first tired cue, start the wind-down then, before the overtired cry.',
     seed: 20,
   ),
   WatchVideo(
@@ -421,7 +421,7 @@ const List<WatchVideo> kWatchPodcasts = [
     seconds: 1560,
     quick: false,
     isPodcast: true,
-    why: 'Dr Ananya sits down for a longer, honest conversation about why sleep breaks at four months - and what genuinely helps.',
+    why: 'Dr Ananya sits down for a longer, honest conversation about why sleep breaks at four months, and what genuinely helps.',
     seed: 31,
   ),
   WatchVideo(
@@ -447,7 +447,7 @@ const List<WatchVideo> kWatchPodcasts = [
     seconds: 1680,
     quick: false,
     isPodcast: true,
-    why: 'Dr Neha answers the questions parents actually ask about starting solids - gagging, allergies, and "is he eating enough?".',
+    why: 'Dr Neha answers the questions parents actually ask about starting solids, gagging, allergies, and "is he eating enough?".',
     seed: 33,
   ),
   WatchVideo(
@@ -473,7 +473,7 @@ const List<WatchVideo> kWatchPodcasts = [
     seconds: 1320,
     quick: false,
     isPodcast: true,
-    why: 'An unhurried, honest talk about the parent behind the baby - the identity shift, the guilt, and small ways back to yourself.',
+    why: 'An unhurried, honest talk about the parent behind the baby, the identity shift, the guilt, and small ways back to yourself.',
     seed: 35,
   ),
 ];
@@ -490,7 +490,7 @@ const List<WatchCollection> kWatchCollections = [
   WatchCollection(
     id: 'understandingsleep',
     title: 'Understanding Sleep',
-    subtitle: 'Why it changes, and how to work with it - gently.',
+    subtitle: 'Why it changes, and how to work with it, gently.',
     videoIds: ['sleep4mo', 'q_noise', 'tummytime'],
     seed: 22,
   ),

@@ -450,9 +450,217 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
     );
 
 // Soft purple card shadow.
+// =============================================================================
+//  Card language — shared with the pregnancy app
+// -----------------------------------------------------------------------------
+//  The two apps already share a palette exactly (ppPurple == AppTheme.primary500,
+//  ppBg == scaffoldBackground, and so on — they are the same hexes, declared
+//  twice). What made them feel like different products was FORM, and mostly this:
+//  parenting cards floated on a purple glow with a negative spread, while
+//  pregnancy cards sit on a quiet ink lift. Side by side, that reads as two
+//  design teams.
+//
+//  These constants adopt the pregnancy convention (home_modules.dart HomeCard:
+//  radius 26, hairline outline, primary900 @5% / blur 22 / spread 0 / y+10).
+//  Nothing here imports AppTheme — the two apps stay code-isolated; only the
+//  values agree.
+// =============================================================================
+
+/// The dominant card radius on the pregnancy home. Parenting radii had drifted
+/// across 16/17/18/20/22/24/26 because every card hand-rolled its decoration.
+const double ppCardRadius = 26;
+
+/// The pregnancy app's card lift: ink-tinted, no spread, a soft drop.
 const List<BoxShadow> ppCardShadow = [
-  BoxShadow(color: Color(0x266A30B6), blurRadius: 26, spreadRadius: -12, offset: Offset(0, 14)),
+  BoxShadow(color: Color(0x0D2D144C), blurRadius: 22, offset: Offset(0, 10)),
 ];
+
+// The old parenting-only shadow: a purple glow that lifted cards off the page
+// with a negative spread. Kept for revert — this was the single biggest visual
+// tell that the two apps were not the same product.
+// const List<BoxShadow> ppCardShadow = [
+//   BoxShadow(color: Color(0x266A30B6), blurRadius: 26, spreadRadius: -12, offset: Offset(0, 14)),
+// ];
+
+/// One card shell for the whole parenting app, so radius/border/shadow can
+/// never drift apart again. [tinted] gives the faint accent wash the pregnancy
+/// HomeCard uses for a highlighted module.
+BoxDecoration ppCardDecoration({
+  double radius = ppCardRadius,
+  Color? accent,
+  bool tinted = false,
+  Color background = Colors.white,
+}) =>
+    BoxDecoration(
+      color: tinted ? null : background,
+      gradient: tinted && accent != null
+          ? LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [accent.withValues(alpha: 0.07), background],
+            )
+          : null,
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: tinted && accent != null ? accent.withValues(alpha: 0.20) : ppLine,
+      ),
+      boxShadow: ppCardShadow,
+    );
+
+/// The card itself. Prefer this over hand-rolling a Container: it is what keeps
+/// the parenting app looking like the pregnancy app a tap away.
+Widget ppCard({
+  required Widget child,
+  EdgeInsets padding = const EdgeInsets.fromLTRB(20, 18, 20, 20),
+  double radius = ppCardRadius,
+  Color? accent,
+  bool tinted = false,
+  VoidCallback? onTap,
+}) {
+  final card = Container(
+    width: double.infinity,
+    padding: padding,
+    decoration: ppCardDecoration(radius: radius, accent: accent, tinted: tinted),
+    child: child,
+  );
+  if (onTap == null) return card;
+  return GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: card);
+}
+
+/// A section eyebrow in the pregnancy app's voice: uppercase Manrope, tight and
+/// small, in primary. Parenting sections announced themselves with a plain
+/// Jakarta 18 title and no eyebrow, which is why its pages read flatter.
+Widget ppSectionEyebrow(String text, {Color color = ppPurple}) => Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 2),
+      child: Text(
+        text.toUpperCase(),
+        style: GoogleFonts.manrope(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.0,
+          color: color,
+        ),
+      ),
+    );
+
+/// A whole section as one card, with its heading on top — the pregnancy home's
+/// HomeCard, ported. Every section on that home (Weekly Snapshot, Today's Tip,
+/// Today's Read…) is a card; the parenting home left its sections as bare text
+/// on the background, which is most of why the two felt like different apps.
+///
+/// Items inside should be flat rows separated by hairlines, NOT nested cards —
+/// a card of cards reads as clutter. Use [ppRowDivider] between them.
+Widget ppSectionCard({
+  required String eyebrow,
+  required IconData icon,
+  required Widget child,
+  Color accent = ppPurple,
+  String? title,
+  Widget? trailing,
+  bool tinted = false,
+  EdgeInsets padding = const EdgeInsets.fromLTRB(18, 16, 18, 18),
+}) =>
+    ppCard(
+      padding: padding,
+      accent: accent,
+      tinted: tinted,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, size: 15, color: accent),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+              eyebrow.toUpperCase(),
+              style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: accent),
+            ),
+          ),
+          ?trailing,
+        ]),
+        if (title != null) ...[
+          const SizedBox(height: 9),
+          Text(title, style: ppJakarta(18)),
+        ],
+        const SizedBox(height: 14),
+        child,
+      ]),
+    );
+
+/// A hairline between rows inside a [ppSectionCard].
+Widget ppRowDivider() => Container(height: 1, color: ppHair, margin: const EdgeInsets.symmetric(vertical: 4));
+
+/// A horizontal carousel with an integrated gradient header band — the exact
+/// shape of the pregnancy home's "Today's recommended products" rail, which
+/// packs a title, a See-all and a scroller into far less height than a plain
+/// eyebrow + title + loose rail did on the parenting side.
+Widget ppCarousel({
+  required Color accent,
+  required String title,
+  required double railHeight,
+  required List<Widget> items,
+  String seeAll = 'See all',
+  VoidCallback? onSeeAll,
+  IconData? icon,
+}) =>
+    Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: ppCardDecoration(),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(18, 13, 12, 13),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [accent, Color.lerp(accent, const Color(0xFF2D144C), 0.30)!],
+            ),
+          ),
+          child: Row(children: [
+            if (icon != null) ...[Icon(icon, size: 17, color: Colors.white), const SizedBox(width: 9)],
+            Expanded(
+              child: Text(title,
+                  style: ppFraunces(19, color: Colors.white, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+            if (onSeeAll != null)
+              GestureDetector(
+                onTap: onSeeAll,
+                behavior: HitTestBehavior.opaque,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(seeAll, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
+                  const Icon(Icons.chevron_right_rounded, size: 17, color: Colors.white),
+                ]),
+              ),
+          ]),
+        ),
+        SizedBox(
+          height: railHeight,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+            itemCount: items.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, i) => items[i],
+          ),
+        ),
+      ]),
+    );
+
+/// A small "eyebrow + heading" lead that sits ABOVE a card on the page (not
+/// inside it) — the pregnancy home's "WEEKLY SNAPSHOT" + "Today's journey"
+/// device, used to introduce the hero and the video, which had no heading and
+/// so ran into each other.
+Widget ppLead(String eyebrow, String title, {IconData? icon, Color accent = ppCoral}) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(eyebrow.toUpperCase(),
+            style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: ppPurple)),
+        const SizedBox(height: 5),
+        Row(children: [
+          if (icon != null) ...[Icon(icon, size: 19, color: accent), const SizedBox(width: 8)],
+          Flexible(child: Text(title, style: ppJakarta(20), maxLines: 1, overflow: TextOverflow.ellipsis)),
+        ]),
+      ],
+    );
 
 // Commerce trust row (iMumz-style): money-back · pay-later · pause · EMI.
 // Used on the paid funnel pages to make the offer feel real.
