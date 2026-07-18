@@ -26,6 +26,10 @@ import '../services/scans_store.dart';
 import '../services/video_store.dart';
 import '../services/whatsapp_prefs.dart';
 import '../theme/app_theme.dart';
+import '../services/family_profile.dart';
+import 'pregnancy_profile_screen.dart';
+import 'profile_analytics_screen.dart';
+import '../services/profile_analytics.dart';
 import 'auth/auth_flow_screen.dart';
 import 'bump_journey_screen.dart';
 import '../services/father_preview.dart';
@@ -243,6 +247,55 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           ],
+          // --- Personalization: the Living Family Profile ------------------
+          // The engine has always existed but was only reachable from the
+          // parenting Explore drawer, so a pregnant mother could never tell it
+          // anything about herself. This is that door. It changes nothing about
+          // the app's structure - only what gets surfaced first inside it.
+          AnimatedBuilder(
+            animation: FamilyProfileStore.instance,
+            builder: (context, _) {
+              final p = FamilyProfileStore.instance;
+              final pct = p.completenessPercent;
+              return _VaultCard(
+                title: 'Personalise ParentVeda',
+                subtitle: pct == 0
+                    ? 'Tell us a little about your pregnancy and we will surface what matters to you first.'
+                    : 'Your profile is $pct% complete - the more we know, the more useful ParentVeda gets.',
+                trailing: pct > 0 ? '$pct%' : '',
+                icon: Icons.auto_awesome_rounded,
+                accent: AppTheme.primary600,
+                accentBg: AppTheme.surfaceContainer,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PregnancyProfileScreen(),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+          // --- Personalization analytics (development toggle) --------------
+          // Built now and shipped OFF, so reaching testers is a switch flip
+          // rather than a build under time pressure. Remove this row and the
+          // screen when it goes live for real testers.
+          AnimatedBuilder(
+            animation: ProfileAnalytics.instance,
+            builder: (context, _) => _VaultCard(
+              title: 'Personalization analytics',
+              subtitle:
+                  'How the ask strips are doing - which questions land, and where.',
+              trailing: '${ProfileAnalytics.instance.recent.length}',
+              icon: Icons.insights_rounded,
+              accent: AppTheme.tertiary500,
+              accentBg: AppTheme.surfaceContainer,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => const ProfileAnalyticsScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
           const SizedBox(height: 14),

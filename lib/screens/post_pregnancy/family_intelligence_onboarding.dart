@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_family_profile.dart';
+import '../../services/family_profile.dart';
 
 const List<String> _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

@@ -12,6 +12,7 @@ import '../data/symptom_data.dart';
 import '../localization/app_language.dart';
 import '../models/symptom.dart';
 import 'medicine_store.dart';
+import 'family_profile.dart';
 import 'pregnancy_controller.dart';
 import 'symptom_store.dart';
 
@@ -30,12 +31,23 @@ class VedaContext {
     required this.trimester,
     required this.symptoms,
     required this.medications,
+    this.conditions = const [],
+    this.diet,
+    this.firstBaby,
   });
 
   final int week;
   final int trimester;
   final List<LoggedSymptomCtx> symptoms;
   final List<String> medications;
+
+  // ---- declared signals from the Living Family Profile ---------------------
+  //  Everything above is DERIVED from her data; these are things she TOLD us,
+  //  so Ask Veda never re-asks what she has already said. Content only: they
+  //  change what an answer mentions, never the app's structure.
+  final List<String> conditions; // e.g. "gestational diabetes"
+  final String? diet; // e.g. "vegetarian"
+  final bool? firstBaby;
 
   static const int _termWeeks = 40;
 
@@ -69,8 +81,30 @@ class VedaContext {
         .where((n) => n.trim().isNotEmpty)
         .toList();
 
+    // The Living Family Profile — what she has TOLD us, as opposed to what we
+    // derived above. Defensive like every other read here: a store that has not
+    // loaded, or throws under the test harness, degrades to no signals rather
+    // than breaking an answer.
+    var conditions = const <String>[];
+    String? diet;
+    bool? firstBaby;
+    try {
+      final fp = FamilyProfileStore.instance;
+      conditions =
+          fp.pregConditions.map((c) => c.label.toLowerCase()).toList();
+      diet = fp.diet?.label.toLowerCase();
+      firstBaby = fp.parity == null ? null : fp.parity == Parity.first;
+    } catch (_) {/* no declared signals */}
+
     return VedaContext(
-        week: week, trimester: tri, symptoms: symptoms, medications: meds);
+      week: week,
+      trimester: tri,
+      symptoms: symptoms,
+      medications: meds,
+      conditions: conditions,
+      diet: diet,
+      firstBaby: firstBaby,
+    );
   }
 
   static Symptom? _symptomById(String id) {
@@ -135,6 +169,30 @@ class VedaContext {
             : "Aap $m track kar rahi hain - koi nayi cheez iske saath doctor se confirm kar lein.");
         break;
       }
+    }
+
+    // A condition she told us about, relevant to the question. Ranked after the
+    // logged symptom because a symptom she recorded this week is more immediate
+    // than a standing condition - but it matters more than diet, so it comes
+    // first of the declared signals.
+    for (final c in conditions) {
+      if (c.length >= 4 && q.contains(c.split(' ').first)) {
+        parts.add(en
+            ? "You've told us about $c - it's worth reading this with that in mind, and checking anything new with your doctor."
+            : "Aapne $c ke baare mein bataya tha - ise dhyan mein rakhkar padhein, aur koi nayi cheez doctor se confirm karein.");
+        break;
+      }
+    }
+
+    // Diet, but only when the question is actually about food. Mentioning it
+    // anywhere else would be the app showing off that it remembered, which is
+    // the opposite of personalization feeling invisible.
+    final foodish = ['eat', 'food', 'diet', 'recipe', 'khana', 'khaana', 'nutrition', 'protein', 'iron', 'calcium']
+        .any((t) => q.contains(t));
+    if (foodish && diet != null) {
+      parts.add(en
+          ? "You eat $diet, so we've kept that in mind here."
+          : "Aap $diet khaati hain, isliye humne wahi dhyan mein rakha hai.");
     }
 
     if (parts.isEmpty) return null;

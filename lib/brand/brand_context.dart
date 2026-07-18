@@ -6,11 +6,11 @@
 //
 //  Targeting READS the profile. It never gates navigation, hides a feature, or
 //  renames a section — the Personalization Engine's guardrail
-//  (pp_family_profile.dart:7-11) applies here unchanged.
+//  (services/family_profile.dart:7-11) applies here unchanged.
 // =============================================================================
 
 import '../screens/post_pregnancy/pp_child_profile.dart';
-import '../screens/post_pregnancy/pp_family_profile.dart';
+import '../services/family_profile.dart';
 import 'brand_models.dart';
 
 /// Build a [BrandContext] from live app state.

@@ -17,6 +17,7 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/profile_ask_strip.dart';
 
 class WeightTrackerScreen extends StatefulWidget {
   const WeightTrackerScreen({super.key, required this.controller});
@@ -277,6 +278,11 @@ class _Dashboard extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
+        // Gestational diabetes and thyroid change how weight should be
+        // read, so this is a relevant moment to ask. It sits on the
+        // DASHBOARD rather than the one-time setup flow - a strip that
+        // asks once, ever, is wasted on a screen she visits once.
+        pregHealthStrip('weight_tracker'),
         // Hero: current weight (or empty state).
         Container(
           padding: const EdgeInsets.all(22),

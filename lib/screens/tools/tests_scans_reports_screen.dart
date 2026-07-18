@@ -26,6 +26,7 @@ import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/profile_ask_strip.dart';
 
 const Color _accent = Color(0xFF2E9C8E); // calm teal (matches Scans / Journal)
 const List<BoxShadow> _soft = [
@@ -65,6 +66,8 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          // The natural home for "what has your doctor said". Asks once, ever.
+          pregHealthStrip('tests_scans_reports'),
           Text(
             'A calm library of the tests, scans and findings you may meet in '
             'pregnancy - what each one means, and how to read your report.',

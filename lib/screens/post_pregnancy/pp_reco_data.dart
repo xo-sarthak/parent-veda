@@ -23,7 +23,7 @@ import '../../brand/brand_context.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/brand_studio.dart';
 import '../../brand/rank_floor.dart';
-import 'pp_family_profile.dart';
+import '../../services/family_profile.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
 import 'pp_products_data.dart';

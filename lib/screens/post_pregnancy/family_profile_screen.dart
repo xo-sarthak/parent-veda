@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'family_intelligence_onboarding.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_family_profile.dart';
+import '../../services/family_profile.dart';
 
 class FamilyProfileScreen extends StatelessWidget {
   const FamilyProfileScreen({super.key});

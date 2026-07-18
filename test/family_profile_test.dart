@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/post_pregnancy/family_intelligence_onboarding.dart';
 import 'package:parentveda/screens/post_pregnancy/family_profile_screen.dart';
-import 'package:parentveda/screens/post_pregnancy/pp_family_profile.dart';
+import 'package:parentveda/services/family_profile.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -11,8 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
+import '../services/family_profile.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/profile_ask_strip.dart';
 import 'bump_journey_screen.dart';
 import 'can_i_screen.dart';
 import 'father/father_journal_screen.dart';
@@ -61,8 +63,10 @@ class ToolsHubScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Listens to the profile as well as the controller, so re-ordering takes
+    // effect the moment she changes what she wants help with.
     return AnimatedBuilder(
-      animation: controller,
+      animation: Listenable.merge([controller, FamilyProfileStore.instance]),
       builder: (context, _) => _build(context),
     );
   }
@@ -75,12 +79,12 @@ class ToolsHubScreen extends StatelessWidget {
 
     final tools = <_Tool>[
       _Tool(s.garbhToolTitle, Icons.spa_rounded, const Color(0xFFBE9C4E),
-          () => open(() => GarbhScreen(controller: controller))),
+          () => open(() => GarbhScreen(controller: controller)), priority: PregPriority.anxiety),
       _Tool(s.sprToolTitle, Icons.auto_stories_rounded, const Color(0xFF9A7BB5),
-          () => open(() => SpiritualReadingScreen(controller: controller))),
+          () => open(() => SpiritualReadingScreen(controller: controller)), priority: PregPriority.anxiety),
       _Tool(s.babyMovementTracker, Icons.favorite_rounded,
           AppTheme.secondary500,
-          () => open(() => BabyMovementScreen(controller: controller))),
+          () => open(() => BabyMovementScreen(controller: controller)), priority: PregPriority.babyDevelopment),
       _Tool(s.bumpTitle, Icons.pregnant_woman_rounded,
           const Color(0xFFCB6F94),
           () => open(() => BumpJourneyScreen(controller: controller))),
@@ -90,16 +94,16 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => ReadNextScreen(controller: controller))),
       _Tool(s.toolWeightTitle, Icons.monitor_weight_rounded,
           AppTheme.tertiary500,
-          () => open(() => WeightTrackerScreen(controller: controller))),
+          () => open(() => WeightTrackerScreen(controller: controller)), priority: PregPriority.nutrition),
       _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
           AppTheme.secondary400,
-          () => open(() => KegelCareScreen(controller: controller))),
+          () => open(() => KegelCareScreen(controller: controller)), priority: PregPriority.fitness),
       _Tool(s.toolContractionTitle, Icons.timer_rounded, AppTheme.primary400,
-          () => open(() => ContractionTrackerScreen(controller: controller))),
+          () => open(() => ContractionTrackerScreen(controller: controller)), priority: PregPriority.birthPrep),
       _Tool(s.hbName, Icons.luggage_rounded, AppTheme.tertiary400,
-          () => open(() => ReadyForBirthScreen(controller: controller))),
+          () => open(() => ReadyForBirthScreen(controller: controller)), priority: PregPriority.birthPrep),
       _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
-          () => open(() => ProductChecklistScreen(controller: controller))),
+          () => open(() => ProductChecklistScreen(controller: controller)), priority: PregPriority.birthPrep),
       _Tool('Product Guide', Icons.menu_book_outlined, AppTheme.primary400,
           () => open(() => const ProductGuideHubScreen())),
       // The Launch Hub's only front door. A destination is visited on purpose —
@@ -115,20 +119,20 @@ class ToolsHubScreen extends StatelessWidget {
         _Tool('Brand Studio (debug)', Icons.science_outlined, const Color(0xFFD92D20),
             () => open(() => BrandPreviewScreen(pregnancyWeek: controller.currentWeek))),
       _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
-          () => open(() => MedicineTrackerScreen(controller: controller))),
+          () => open(() => MedicineTrackerScreen(controller: controller)), priority: PregPriority.symptoms),
       _Tool(s.rmdTitle, Icons.notifications_active_rounded,
           const Color(0xFFE0921C),
           () => open(() => RemindersScreen(controller: controller))),
       // Merged "Tests, Scans & Reports" (Section 16) replaces both the old
       // "Understanding Your Report" and "Scans & Care" tiles.
       _Tool(s.tsrTitle, Icons.fact_check_rounded, AppTheme.primary500,
-          () => open(() => TestsScansReportsScreen(controller: controller))),
+          () => open(() => TestsScansReportsScreen(controller: controller)), priority: PregPriority.symptoms),
       // _Tool(s.rTitle, Icons.description_rounded, AppTheme.primary500,
       //     () => open(() => ReportScreen(controller: controller))),
       _Tool(s.toolCanI, Icons.help_outline_rounded, AppTheme.secondary600,
           () => open(() => CanIScreen(controller: controller))),
       _Tool(s.symToolTitle, Icons.healing_rounded, const Color(0xFF4A7BC8),
-          () => open(() => SymptomCompanionScreen(controller: controller))),
+          () => open(() => SymptomCompanionScreen(controller: controller)), priority: PregPriority.symptoms),
       // Merged into "Tests, Scans & Reports" above. Kept commented for revert.
       // _Tool(s.scnToolTitle, Icons.event_note_rounded, const Color(0xFF2E9C8E),
       //     () => open(() => ScansAppointmentsScreen(controller: controller))),
@@ -163,6 +167,10 @@ class ToolsHubScreen extends StatelessWidget {
                     fontSize: 13, color: AppTheme.neutral600)),
             const SizedBox(height: 18),
             _journeyHero(context, s),
+            // Progressive profiling, asked exactly where the answer pays off:
+            // whatever she picks here re-sorts the grid directly below, so the
+            // benefit is visible in the same breath as the question.
+            pregPrioritiesStrip('tools_hub'),
             const SizedBox(height: 16),
             LayoutBuilder(builder: (context, c) {
               const gap = 12.0;
@@ -171,7 +179,13 @@ class ToolsHubScreen extends StatelessWidget {
                 spacing: gap,
                 runSpacing: gap,
                 children: [
-                  for (final t in tools)
+                  // LEVEL 3 personalization. A stable sort that returns EVERY
+                  // tile: tools serving a priority she chose come first, the
+                  // rest keep their original order behind them. Nothing is
+                  // hidden, renamed, or moved to another screen - she still
+                  // learns one Tools tab with the same 22 things in it.
+                  for (final t in FamilyProfileStore.instance
+                      .orderByPregPriority(tools, (t) => t.priority))
                     SizedBox(width: w, child: _tile(s, t)),
                 ],
               );
@@ -298,9 +312,15 @@ class ToolsHubScreen extends StatelessWidget {
 }
 
 class _Tool {
-  const _Tool(this.title, this.icon, this.color, this.onTap);
+  const _Tool(this.title, this.icon, this.color, this.onTap, {this.priority});
   final String title;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+
+  /// Which parenting priority this tool serves, if any. Used ONLY to float a
+  /// tool she asked for help with nearer the top. Tools with no priority, and
+  /// tools whose priority she did not choose, keep their original order behind
+  /// the boosted ones - nothing is ever removed or moved to another screen.
+  final PregPriority? priority;
 }

@@ -16,6 +16,7 @@ import '../../models/symptom.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/symptom_store.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/profile_ask_strip.dart';
 
 const List<BoxShadow> _soft = [
   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
@@ -99,6 +100,10 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
+          // Progressive profiling: she is already thinking about her body here,
+          // so this is the natural place to ask what her doctor has flagged.
+          // Asks once, ever - inline, dismissible, never blocking.
+          pregHealthStrip('symptom_companion'),
           // search
           Container(
             decoration: BoxDecoration(
