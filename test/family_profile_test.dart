@@ -48,14 +48,16 @@ void main() {
     expect(p.completenessPercent, greaterThan(before));
   });
 
-  testWidgets('My Family Profile page renders and a chip toggles', (tester) async {
+  // Renamed to "<child>'s profile" (18 Jul review): everything on the page is
+  // about the child, so calling it a family profile set the wrong expectation.
+  testWidgets("The child's profile page renders and a chip toggles", (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(const MaterialApp(home: FamilyProfileScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('My Family Profile'), findsOneWidget);
+    expect(find.textContaining("'s profile"), findsWidgets);
     expect(find.textContaining('personalised'), findsOneWidget); // completeness meter
     // toggle a priority chip
     final scrollable = find.byType(Scrollable).first;

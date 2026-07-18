@@ -34,8 +34,9 @@ import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
-import 'leap_definition_screen.dart';
-import 'pp_leaps_data.dart';
+// Retired with the leap-window hero. Kept for revert.
+// import 'leap_definition_screen.dart';
+// import 'pp_leaps_data.dart';
 import 'what_changed_screen.dart';
 // "Wonder Week Window" now opens the full leap page (LeapDefinitionScreen) for
 // the child's current leap — the standalone WonderWeekScreen is kept for revert
@@ -70,32 +71,18 @@ class ToolsHubScreen extends StatelessWidget {
               TextSpan(text: 'in one calm place.', style: ppFraunces(38, color: ppPurple, h: 1.08).copyWith(fontStyle: FontStyle.italic)),
             ]), style: ppFraunces(38, h: 1.08))),
             const SizedBox(height: 14),
-            _pad(Text('Two ParentVeda originals that think with you - and the everyday trackers, quietly kept.',
+            _pad(Text('Everything that helps you understand him - and the everyday trackers, quietly kept.',
                 style: ppBody(15))),
 
-            // hero: What Changed
-            const SizedBox(height: 26),
-            _pad(_hero(
-              context,
-              dark: true,
-              icon: Icons.search_rounded,
-              tag: 'Guided diagnostic',
-              title: 'What Changed?',
-              desc: "Something suddenly different with Aarav? A few gentle questions, and we'll find the likely cause.",
-              cta: 'Begin',
-              onTap: () => _push(context, const WhatChangedScreen()),
-            )),
-            const SizedBox(height: 14),
-            _pad(_hero(
-              context,
-              dark: false,
-              icon: Icons.brightness_4_outlined,
-              tag: 'Live · ${currentLeap().label}',
-              title: 'His Leap Window',
-              desc: 'Where Aarav is in his leap, how long the storm lasts, and the calm on the other side.',
-              cta: 'Open his window',
-              onTap: () => _push(context, LeapDefinitionScreen(leap: currentLeap())),
-            )),
+            // "His Leap Window" REMOVED from Tools (17-18 July review): the leap
+            // already leads the My Child home, and a second front door to the
+            // same page made Tools look like it was padding. Kept for revert.
+            // _pad(_hero(context, dark: false, icon: Icons.brightness_4_outlined,
+            //   tag: 'Live · ${currentLeap().label}', title: 'His Leap Window', ...)),
+            //
+            // "What Changed?" now sits with the other tools rather than as a
+            // full-width hero - it is a tool, and dressing one of them up as a
+            // banner made the rest look like an afterthought.
 
             // trackers
             const SizedBox(height: 30),
@@ -107,6 +94,9 @@ class ToolsHubScreen extends StatelessWidget {
             _pad(Text('Kept simple, so you never leave the app for them.', style: ppBody(13))),
             const SizedBox(height: 16),
             _pad(Column(children: [
+              _tracker(context, Icons.search_rounded, const Color(0xFFEFEAF8), 'What Changed?', 'Something suddenly different? Find the likely cause', ppMuted,
+                  () => _push(context, const WhatChangedScreen())),
+              const SizedBox(height: 10),
               _tracker(context, Icons.show_chart_rounded, const Color(0xFFEAF1FB), 'Growth journey', 'Weight, height, head — on his curve', ppMuted, () => _push(context, const GrowthJourneyScreen())),
               const SizedBox(height: 10),
               _tracker(context, Icons.menu_book_outlined, const Color(0xFFEAF4EE), 'Product Guide', 'Is it right for your child?', ppMuted,
@@ -163,6 +153,8 @@ class ToolsHubScreen extends StatelessWidget {
     );
   }
 
+  // RETIRED with the two hero cards. Kept for revert.
+  // ignore: unused_element
   Widget _hero(BuildContext context,
       {required bool dark,
       required IconData icon,

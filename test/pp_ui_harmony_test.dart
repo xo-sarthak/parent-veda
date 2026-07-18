@@ -21,6 +21,8 @@ import 'package:parentveda/screens/post_pregnancy/pp_common.dart';
 import 'package:parentveda/theme/app_theme.dart';
 
 void main() {
+  julyReviewTests();
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() => SharedPreferences.setMockInitialValues(<String, Object>{}));
@@ -117,5 +119,79 @@ void main() {
     if (!store.children.any((c) => c.name == 'Meher')) {
       expect(find.text('Meher'), findsNothing, reason: 'a hard-coded child came back');
     }
+  });
+}
+
+// =============================================================================
+//  17-18 July review — the reworked My Child home
+// -----------------------------------------------------------------------------
+//  Presence tests, deliberately. The sections below replaced things that were
+//  confusing or duplicated, and a rework that quietly fails to render looks
+//  identical to one that was never asked for.
+// =============================================================================
+void julyReviewTests() {
+  testWidgets('My Child home: the tip sits ABOVE the leap video', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    final tip = tester.getTopLeft(find.text("TODAY'S PARENTING TIP")).dy;
+    final video = tester.getTopLeft(find.text('The leap, in a video')).dy;
+    expect(tip, lessThan(video),
+        reason: 'the tip was moved above the video in the 17-18 July review');
+  });
+
+  testWidgets('My Child home: milestones became "preparing for next"', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.textContaining('preparing for next'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 40,
+    );
+    expect(find.textContaining('preparing for next'), findsOneWidget);
+    // The old duplicate-of-the-snapshot framing is gone.
+    expect(find.text('Milestones'), findsNothing);
+  });
+
+  testWidgets('My Child home: FAQs render and expand', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('About this leap'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 40,
+    );
+    expect(find.text('About this leap'), findsOneWidget);
+    // And the way out to Ask Veda for anything the three do not cover.
+    expect(find.text('Ask Veda anything else'), findsOneWidget);
+  });
+
+  testWidgets('My Child home: the timelines are gone', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+    await tester.pumpAndSettle();
+
+    // Removed per the review - the home is about now, not a scroll through
+    // history. Both live on in Journal and Health.
+    expect(find.text('Timelines'), findsNothing);
   });
 }

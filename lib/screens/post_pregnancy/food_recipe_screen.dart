@@ -30,7 +30,8 @@ class FoodRecipeScreen extends StatefulWidget {
 }
 
 class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
-  bool _healthier = true; // false = "everyday" framing, true = ParentVeda
+  // ignore: unused_field
+  bool _healthier = true; // retired with _healthierCard; kept for revert
 
   FoodRecipe get r => widget.recipe;
 
@@ -54,10 +55,18 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             const SizedBox(height: 12),
             _pad(_dietServesRow()),
             const SizedBox(height: 16),
+            // WHY first, timings second. A parent decides whether to cook it on
+            // the strength of what it does for the baby - the 15-minute block
+            // only matters once she has decided.
+            _pad(_why()),
+            const SizedBox(height: 18),
             _pad(_statStrip()),
-            const SizedBox(height: 20),
-            _pad(_healthierCard()),
             const SizedBox(height: 22),
+            // Healthier-version toggle RETIRED: one recipe, already the good
+            // version. Offering an "everyday" alternative undercut the whole
+            // point of the page. Kept commented for revert.
+            // _pad(_healthierCard()),
+            // const SizedBox(height: 22),
             _pad(_ingredients()),
             const SizedBox(height: 22),
             _pad(_steps()),
@@ -66,8 +75,6 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             const SizedBox(height: 8),
             _pad(ppSectionDivider()),
             _pad(_nutrition()),
-            const SizedBox(height: 22),
-            _pad(_why()),
             const SizedBox(height: 22),
             _pad(_bulletsSection('Good to know', [
               ('How often', r.frequency),
@@ -163,6 +170,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   Widget _div() => Container(width: 1, height: 26, color: ppLine);
 
   // ---- healthier version (signature) --------------------------------------
+  // RETIRED - see the build order above. Kept for revert.
+  // ignore: unused_element
   Widget _healthierCard() => Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -210,20 +219,66 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         ),
       );
 
-  // ---- ingredients + steps ------------------------------------------------
-  Widget _ingredients() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Ingredients', style: ppJakarta(17)),
-        const SizedBox(height: 12),
-        for (final ing in r.ingredients)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 9),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(margin: const EdgeInsets.only(top: 7), width: 6, height: 6, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle)),
-              const SizedBox(width: 12),
-              Expanded(child: Text(ing, style: ppBody(14, color: ppInk, h: 1.4))),
-            ]),
-          ),
+  // ---- ingredients + equipment, side by side ------------------------------
+  //  Ingredients left, kit right. Finding out you needed a blender halfway
+  //  through is what turns a recipe into an abandoned mess, so the equipment
+  //  is called out before the first step, not buried inside one.
+  Widget _ingredients() => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+          flex: 3,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Ingredients', style: ppJakarta(17)),
+            const SizedBox(height: 12),
+            for (final ing in r.ingredients)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Container(margin: const EdgeInsets.only(top: 7), width: 6, height: 6, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle)),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(ing, style: ppBody(13.5, color: ppInk, h: 1.4))),
+                ]),
+              ),
+          ]),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('You will need', style: ppJakarta(17)),
+            const SizedBox(height: 12),
+            for (final eq in _equipmentFor(r))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Icon(Icons.check_rounded, size: 14, color: ppPurple),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(eq, style: ppBody(13.5, color: ppInk, h: 1.4))),
+                ]),
+              ),
+          ]),
+        ),
       ]);
+
+  /// The two or three things that actually decide whether this recipe is
+  /// possible tonight. Authored per-recipe where we have it; otherwise inferred
+  /// from the steps, since "spoon and plate" is not worth listing.
+  List<String> _equipmentFor(FoodRecipe r) {
+    if (r.equipment.isNotEmpty) return r.equipment;
+    final text = '${r.steps.join(' ')} ${r.title}'.toLowerCase();
+    final out = <String>[];
+    void add(String label, List<String> cues) {
+      if (cues.any(text.contains) && !out.contains(label)) out.add(label);
+    }
+    add('Blender or mixie', ['blend', 'puree', 'purée', 'grind', 'smooth paste']);
+    add('Pressure cooker', ['pressure cook', 'cooker', 'whistle']);
+    add('Steamer', ['steam']);
+    add('Grater', ['grate']);
+    add('Sieve or strainer', ['sieve', 'strain']);
+    add('Non-stick pan', ['pan', 'sauté', 'saute', 'roast', 'tawa']);
+    add('Saucepan', ['boil', 'simmer']);
+    if (out.isEmpty) out.add('Just a bowl and spoon');
+    return out.take(3).toList();
+  }
 
   Widget _steps() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('How to make it', style: ppJakarta(17)),

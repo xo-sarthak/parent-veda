@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
 import 'pp_section_extras.dart';
+import 'pp_experts_data.dart';
 import 'pp_watch_data.dart';
 import 'watch_channel_screen.dart';
 import 'watch_collection_screen.dart';
@@ -110,6 +111,22 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         if (index < header.length) return header[index];
         final j = index - header.length;
 
+        // QUICK LEARN reads as shorts, so it looks like shorts: two per row,
+        // portrait thumbnails, the description underneath. A 30-second clip in
+        // a full-width landscape row was claiming the space of a lesson.
+        if (_quick) {
+          final a = base[(j * 2) % base.length];
+          final b = base[(j * 2 + 1) % base.length];
+          return _pad(Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: _shortCard(a)),
+              const SizedBox(width: 12),
+              Expanded(child: _shortCard(b)),
+            ]),
+          ));
+        }
+
         if (interstitialsOn) {
           const period = _feedGroup + 1; // group of videos + 1 channel card
           if (j % period == period - 1) {
@@ -123,6 +140,23 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       },
     );
   }
+
+  /// One short in the 2-up grid: a tall thumbnail, title, then who it is from.
+  Widget _shortCard(WatchVideo v) => GestureDetector(
+        onTap: () => _open(v),
+        behavior: HitTestBehavior.opaque,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          AspectRatio(
+            aspectRatio: 9 / 14,
+            child: WatchThumb(seed: v.seed, height: 999, showPlay: true, progress: _liveProgress(v.id)),
+          ),
+          const SizedBox(height: 8),
+          Text(v.title, style: ppJakarta(13).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 4),
+          Text('${v.expert.name} · ${v.seconds}s',
+              style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]),
+      );
 
   Widget _feedCard(WatchVideo v) => WatchListCard(video: v, onTap: () => _open(v), progress: _liveProgress(v.id));
 
@@ -147,11 +181,42 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       _topicFilterRow(),
       const SizedBox(height: 18),
       _pad(_modeToggle()),
+    ];
+
+    // A TOPIC IS SELECTED: the page becomes that topic. Previously picking
+    // "Nutrition" left the hero, Continue watching and Expert collections
+    // exactly as they were and only changed a list far below the fold - so
+    // from the user's seat, tapping a filter did nothing. Now the generic
+    // browse sections stand down and the filtered results lead. Clearing the
+    // filter brings everything straight back; nothing is lost, only deferred.
+    if (_topic != 'All') {
+      h.addAll([
+        const SizedBox(height: 22),
+        _pad(Row(children: [
+          Expanded(child: watchSectionHeader(_picksTitle())),
+          GestureDetector(
+            onTap: () => setState(() => _topic = 'All'),
+            behavior: HitTestBehavior.opaque,
+            child: Row(children: [
+              Text('Clear', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+              const SizedBox(width: 3),
+              const Icon(Icons.close_rounded, size: 15, color: ppPurple),
+            ]),
+          ),
+        ])),
+        const SizedBox(height: 4),
+        _pad(Text(_picksSubtitle(), style: ppBody(12.5, color: ppMuted))),
+        const SizedBox(height: 16),
+      ]);
+      return h;
+    }
+
+    h.addAll([
       const SizedBox(height: 26),
       _pad(watchSectionHeader('Today for Aarav')),
       const SizedBox(height: 14),
       _pad(_todaysHero()),
-    ];
+    ]);
 
     if (continues.isNotEmpty) {
       h.addAll([
@@ -221,16 +286,11 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       for (final c in kWatchCategories)
         _filterChip(c.$1, c.$2, selected: _topic == c.$1, onTap: () => setState(() => _topic = c.$1)),
     ];
-    return SizedBox(
-      height: 38,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 9),
-        itemBuilder: (_, i) => items[i],
-      ),
-    );
+    // A single horizontal strip meant scrolling sideways through a dozen
+    // categories to find one - and whatever sat past the fold was effectively
+    // invisible. Wrapping to two or three short lines shows the whole set at
+    // once, which is the only way to scan it.
+    return _pad(Wrap(spacing: 9, runSpacing: 9, children: items));
   }
 
   Widget _filterChip(String label, IconData? icon, {required bool selected, required VoidCallback onTap, bool accent = false}) {
@@ -318,8 +378,10 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Row(children: [
-          _seg('Deep Learn', '5–30 min', !_quick, () => setState(() => _quick = false)),
+          // Quick sits LEFT, Deep RIGHT: shortest-first reads as the natural
+          // order, and it was the wrong way round.
           _seg('Quick Learn', '30–90 sec', _quick, () => setState(() => _quick = true)),
+          _seg('Deep Learn', '5–30 min', !_quick, () => setState(() => _quick = false)),
         ]),
       );
 
@@ -402,10 +464,64 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         ),
       );
 
+  /// The doctor behind a collection, in enough depth to decide whether to
+  /// trust them. Credentials are only worth showing if you can check them.
+  void _openExpert(Expert e) => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: ppBg,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (_) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 14, 24, 28),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 18),
+              Text(e.name, style: ppFraunces(24, h: 1.15)),
+              const SizedBox(height: 5),
+              Text(e.credential, style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(e.backLabel, style: ppBody(12.5, color: ppMuted)),
+              const SizedBox(height: 14),
+              Row(children: [
+                const Icon(Icons.star_rounded, size: 15, color: Color(0xFFC98A2B)),
+                const SizedBox(width: 4),
+                Text(e.rating.toString(), style: ppBody(13, color: ppInk, w: FontWeight.w700)),
+                const SizedBox(width: 6),
+                Flexible(child: Text('from ${e.reviewsCount} parents', style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              ]),
+              const SizedBox(height: 16),
+              Text(e.whyHeading, style: ppJakarta(15)),
+              const SizedBox(height: 7),
+              Text(e.why, style: ppBody(13.5, color: ppInk, h: 1.6)),
+              if (e.reviews.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                Text('What parents say', style: ppJakarta(15)),
+                const SizedBox(height: 9),
+                for (final r in e.reviews.take(2))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(r.$3, style: ppBody(12.5, color: ppInk, h: 1.5)),
+                        const SizedBox(height: 6),
+                        Text('${r.$1} · ${r.$2}', style: ppBody(11.5, color: ppMuted)),
+                      ]),
+                    ),
+                  ),
+              ],
+            ]),
+          ),
+        ),
+      );
+
   Widget _collectionsRail() {
     final cols = expertCollections();
     return SizedBox(
-      height: 216,
+      height: 268,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -415,6 +531,8 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           final c = cols[i];
           final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
           final prog = WatchStore.instance.collectionProgress(c);
+          // The expert behind the collection = whoever teaches its first video.
+          final lead = c.videoIds.isEmpty ? null : watchVideoById(c.videoIds.first).expert;
           return GestureDetector(
             onTap: () => _push(WatchCollectionScreen(collection: c)),
             behavior: HitTestBehavior.opaque,
@@ -426,7 +544,36 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 Text(c.title, style: ppJakarta(14.5).copyWith(height: 1.2), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text('${c.videoIds.length} videos · ~$mins min', style: ppBody(11.5, color: ppMuted)),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
+                // Who it is from, and what other parents made of it. A learning
+                // path is worth trusting on the strength of the person teaching
+                // it - the "i" opens their background rather than making you
+                // take "paediatrician" on faith.
+                if (lead != null)
+                  GestureDetector(
+                    onTap: () => _openExpert(lead),
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(children: [
+                      Flexible(
+                        child: Text(lead.name,
+                            style: ppBody(11.5, color: ppInk, w: FontWeight.w700),
+                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.info_outline_rounded, size: 12, color: ppPurple),
+                    ]),
+                  ),
+                const SizedBox(height: 3),
+                if (lead != null)
+                  Row(children: [
+                    const Icon(Icons.star_rounded, size: 12, color: Color(0xFFC98A2B)),
+                    const SizedBox(width: 3),
+                    Flexible(
+                      child: Text('${lead.rating} · ${lead.reviewsCount} parents',
+                          style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ),
+                  ]),
+                const SizedBox(height: 3),
                 Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Not started',
                     style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
               ]),

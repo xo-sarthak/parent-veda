@@ -160,6 +160,21 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         for (final a in forYou().take(5))
           ReadListCard(article: a, onTap: () => _open(a), progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null),
       ])),
+      // Five picks is a taster, not a library. This is the way through to the
+      // rest rather than leaving it looking like all there is.
+      const SizedBox(height: 6),
+      _pad(GestureDetector(
+        onTap: () => setState(() {
+          _collectionFilter = null;
+          _typeFilter = null;
+        }),
+        behavior: HitTestBehavior.opaque,
+        child: Row(children: [
+          Text('Explore more reads', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
+          const SizedBox(width: 5),
+          const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+        ]),
+      )),
     ];
   }
 
@@ -299,6 +314,48 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
     return [
       if (results.isEmpty)
         _pad(Text('No reads here yet - try another type or topic.', style: ppBody(13, color: ppMuted)))
+      // NO TYPE CHOSEN: group by type rather than pouring everything into one
+      // undifferentiated list. Articles, then book summaries, then research -
+      // each with its own heading and a few entries, so "All" is browsable
+      // rather than a wall. Vertical throughout: horizontal rails are wrong
+      // for reading, where you scan down a list of titles.
+      else if (_typeFilter == null) ...[
+        for (final kind in ReadKind.values)
+          if (results.where((a) => a.kind == kind).isNotEmpty) ...[
+            _pad(Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
+              child: Text(readKindLabel(kind).toUpperCase(),
+                  style: ppBody(10, color: ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.8)),
+            )),
+            _pad(Column(children: [
+              for (final a in results.where((a) => a.kind == kind).take(4))
+                ReadListCard(
+                  article: a,
+                  onTap: () => _open(a),
+                  progress: store.isInProgress(a.id) ? store.progressOf(a.id) : null,
+                ),
+            ])),
+            if (results.where((a) => a.kind == kind).length > 4)
+              _pad(GestureDetector(
+                onTap: () => setState(() => _typeFilter = kind),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 18),
+                  child: Row(children: [
+                    Text('View more ${readKindLabel(kind).toLowerCase()}',
+                        style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                    const SizedBox(width: 5),
+                    const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+                  ]),
+                ),
+              ))
+            else
+              const SizedBox(height: 12),
+          ],
+      ]
       else
         _pad(Column(children: [
           for (final a in results)

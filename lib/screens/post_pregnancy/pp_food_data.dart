@@ -41,6 +41,10 @@ class FoodRecipe {
     required this.frequency,
     required this.ingredients,
     required this.steps,
+    // What you need in the kitchen beyond a spoon and a plate. Called out
+    // separately because discovering you need a blender halfway through is the
+    // difference between cooking this and abandoning it.
+    this.equipment = const [],
     required this.storage,
     required this.mistakes,
     required this.substitutions,
@@ -74,6 +78,7 @@ class FoodRecipe {
   final List<FoodNutrient> nutrients;
   final String frequency; // 'A few times a week'
   final List<String> ingredients;
+  final List<String> equipment;
   final List<String> steps;
   final List<String> storage;
   final List<String> mistakes;
@@ -351,6 +356,191 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'protein', 'calcium', 'finger food', 'snack', 'paneer', 'vegetables'},
     ingredientKeys: {'paneer', 'vegetables'},
     relatedProductId: 'clothbook',
+  ),
+  // ---- dinners -------------------------------------------------------------
+  //  Added 18 Jul: the weekly meal plan repeated because only two dinners were
+  //  authored, so a 7-day plan could only alternate between them. These five are
+  //  deliberately one-pot and quick - dinner is cooked by a tired parent at the
+  //  worst hour of the day, and a recipe that ignores that will not get made.
+  FoodRecipe(
+    id: 'vegkhichdi',
+    title: 'Soft vegetable khichdi',
+    subtitle: 'The one-pot dinner that never fails',
+    category: 'Dinner',
+    slot: 'Dinner',
+    ageTag: '7-12 mo',
+    veg: true,
+    prepMin: 8,
+    cookMin: 18,
+    difficulty: 'Easy',
+    seed: 21,
+    highlight: 'Complete protein',
+    why:
+        'Rice and dal together make a complete protein, which neither manages alone - the oldest piece of nutrition science in the Indian kitchen. Soft, mild and warm, it is the dinner most babies accept even on a bad evening.',
+    nutrients: [
+      FoodNutrient('Protein', 'good', 'Rice and dal combined.'),
+      FoodNutrient('Iron', 'moderate', 'From the dal, helped along by the ghee.'),
+      FoodNutrient('Fibre', 'moderate', 'From the vegetables.'),
+    ],
+    frequency: 'Two or three times a week',
+    ingredients: ['2 tbsp rice', '1 tbsp moong dal', 'Carrot and bottle gourd, finely chopped', 'Pinch of turmeric', 'Quarter tsp ghee'],
+    equipment: ['Pressure cooker', 'Masher'],
+    steps: [
+      'Rinse the rice and dal together.',
+      'Pressure cook with the vegetables, turmeric and three times the water - about three whistles.',
+      'Mash to the texture he manages: smooth at seven months, lumpier by ten.',
+      'Stir the ghee in at the end, off the heat.',
+    ],
+    storage: ['Fridge up to 24 hours; loosen with warm water when reheating.'],
+    mistakes: ['Skipping the ghee - the fat matters more than the calories suggest.', 'Adding salt before one year.'],
+    substitutions: {'bottle gourd': 'pumpkin or beans', 'moong dal': 'toor dal'},
+    healthierNote: 'No salt, no tempering, and the ghee goes in off the heat so it is never overheated.',
+    tags: {'protein', 'iron', 'dinner', 'one pot', 'khichdi', 'rice', 'dal'},
+    ingredientKeys: {'rice', 'moong dal', 'vegetables'},
+  ),
+  FoodRecipe(
+    id: 'ragiveg',
+    title: 'Ragi and vegetable porridge',
+    subtitle: 'Calcium-rich, ready in minutes',
+    category: 'Dinner',
+    slot: 'Dinner',
+    ageTag: '6-10 mo',
+    veg: true,
+    prepMin: 5,
+    cookMin: 10,
+    difficulty: 'Easy',
+    seed: 22,
+    highlight: 'Calcium + iron',
+    why:
+        'Ragi carries more calcium than almost anything else in an Indian pantry, and useful iron alongside it - exactly the two things a baby needs most as milk begins making way for food.',
+    nutrients: [
+      FoodNutrient('Calcium', 'good', 'Ragi is unusually rich in it.'),
+      FoodNutrient('Iron', 'good', 'Better absorbed alongside a vitamin-C food.'),
+      FoodNutrient('Fibre', 'moderate', 'Gentle on a young gut.'),
+    ],
+    frequency: 'Two or three times a week',
+    ingredients: ['2 tbsp ragi flour', 'Grated carrot or pumpkin', '1 cup water', 'Quarter tsp ghee'],
+    equipment: ['Saucepan', 'Whisk', 'Grater'],
+    steps: [
+      'Whisk the ragi flour into COLD water first - lumps are impossible to fix later.',
+      'Add the grated vegetable and cook on low, stirring, for eight to ten minutes.',
+      'It should coat the back of a spoon, not hold its shape.',
+      'Stir in the ghee off the heat and cool to warm.',
+    ],
+    storage: ['Best fresh - it sets hard in the fridge.'],
+    mistakes: ['Adding flour to hot water - it seizes into lumps instantly.', 'Serving it too thick for a young baby.'],
+    substitutions: {'carrot': 'pumpkin, sweet potato or beetroot'},
+    healthierNote: 'No sugar and no jaggery - ragi and a sweet vegetable are sweet enough, and early sugar sets preferences that last for years.',
+    tags: {'calcium', 'iron', 'ragi', 'dinner', 'porridge'},
+    ingredientKeys: {'ragi', 'vegetables'},
+  ),
+  FoodRecipe(
+    id: 'daliaveg',
+    title: 'Dalia with soft vegetables',
+    subtitle: 'Broken wheat, gentle and filling',
+    category: 'Dinner',
+    slot: 'Dinner',
+    ageTag: '8-14 mo',
+    veg: true,
+    prepMin: 7,
+    cookMin: 15,
+    difficulty: 'Easy',
+    seed: 23,
+    highlight: 'Slow-release energy',
+    why:
+        'Dalia digests slowly, which is exactly what you want at night - it holds him through a longer stretch without sitting heavily. The texture is also a useful step up from purees.',
+    nutrients: [
+      FoodNutrient('Fibre', 'good', 'Whole broken wheat.'),
+      FoodNutrient('Protein', 'moderate', 'More again with a spoon of dal added.'),
+      FoodNutrient('B vitamins', 'moderate', 'From the whole grain.'),
+    ],
+    frequency: 'Twice a week',
+    ingredients: ['2 tbsp dalia', '1 tbsp moong dal (optional)', 'Carrot, peas and beans, finely chopped', 'Pinch of turmeric', 'Quarter tsp ghee'],
+    equipment: ['Pressure cooker'],
+    steps: [
+      'Dry roast the dalia for a minute until it smells nutty - this is what stops it turning gluey.',
+      'Pressure cook with the dal, vegetables, turmeric and four times the water.',
+      'Mash lightly; leave a little texture for babies past nine months.',
+      'Finish with ghee.',
+    ],
+    storage: ['Fridge up to a day; add warm water when reheating.'],
+    mistakes: ['Skipping the dry roast - it is the difference between fluffy and paste.'],
+    substitutions: {'dalia': 'quinoa or samai', 'peas': 'any soft vegetable'},
+    healthierNote: 'Whole broken wheat rather than refined suji, so the fibre and B vitamins survive.',
+    tags: {'fibre', 'dinner', 'dalia', 'one pot', 'texture'},
+    ingredientKeys: {'dalia', 'moong dal', 'vegetables'},
+  ),
+  FoodRecipe(
+    id: 'paneerpulao',
+    title: 'Soft paneer pulao',
+    subtitle: 'Protein and calcium in one bowl',
+    category: 'Dinner',
+    slot: 'Dinner',
+    ageTag: '9-14 mo',
+    veg: true,
+    prepMin: 8,
+    cookMin: 15,
+    difficulty: 'Easy',
+    seed: 24,
+    highlight: 'Protein + calcium',
+    why:
+        'Paneer is one of the easiest ways to get both protein and calcium into a baby who has started refusing milk feeds - and crumbled into rice, it disappears into something he already likes.',
+    nutrients: [
+      FoodNutrient('Protein', 'good', 'Paneer is close to complete.'),
+      FoodNutrient('Calcium', 'good', 'For bones hardening quickly now.'),
+      FoodNutrient('Fat', 'good', 'Full-fat paneer, as it should be.'),
+    ],
+    frequency: 'Twice a week',
+    ingredients: ['2 tbsp rice', '2 tbsp paneer, crumbled', 'Carrot and peas, finely chopped', 'Pinch of jeera', 'Quarter tsp ghee'],
+    equipment: ['Pressure cooker', 'Non-stick pan'],
+    steps: [
+      'Cook the rice soft with the vegetables.',
+      'Warm the ghee, add the jeera, and toss the crumbled paneer through for a minute - no browning.',
+      'Fold the paneer into the rice.',
+      'Mash lightly if he is still learning texture.',
+    ],
+    storage: ['Best fresh - paneer turns rubbery reheated.'],
+    mistakes: ['Frying the paneer hard, which makes it chewy and difficult to gum.', 'Using low-fat paneer - babies need the fat.'],
+    substitutions: {'paneer': 'crumbled tofu or well-cooked egg'},
+    healthierNote: 'Full-fat paneer, barely warmed rather than fried, and no salt.',
+    tags: {'protein', 'calcium', 'paneer', 'dinner', 'rice'},
+    ingredientKeys: {'paneer', 'rice', 'vegetables'},
+  ),
+  FoodRecipe(
+    id: 'moongchilla',
+    title: 'Moong dal chilla fingers',
+    subtitle: 'Something he can hold',
+    category: 'Dinner',
+    slot: 'Dinner',
+    ageTag: '10-18 mo',
+    veg: true,
+    prepMin: 10,
+    cookMin: 10,
+    difficulty: 'Easy',
+    seed: 25,
+    highlight: 'Iron + self-feeding',
+    why:
+        'A dinner he feeds himself is worth more than a neater one you spoon in. Cut into fingers, chilla is soft enough to gum and firm enough to hold - and moong dal brings real iron with it.',
+    nutrients: [
+      FoodNutrient('Iron', 'good', 'Plant iron from the dal.'),
+      FoodNutrient('Protein', 'good', 'Moong is protein-dense.'),
+      FoodNutrient('Fat', 'moderate', 'From the ghee it cooks in.'),
+    ],
+    frequency: 'Twice a week',
+    ingredients: ['Quarter cup moong dal, soaked 3 hours', 'Grated carrot', 'Pinch of turmeric', 'Ghee for the pan'],
+    equipment: ['Blender or mixie', 'Non-stick pan'],
+    steps: [
+      'Blend the soaked dal with a little water to a smooth, pourable batter.',
+      'Stir in the grated carrot and turmeric.',
+      'Cook thin on a lightly greased pan, about two minutes a side, until it lifts cleanly.',
+      'Cool, then cut into finger-width strips he can grip.',
+    ],
+    storage: ['Fridge up to a day; warm briefly before serving.'],
+    mistakes: ['Making it thick - a thick chilla stays doughy in the middle.', 'Serving it straight from the pan; always check the temperature first.'],
+    substitutions: {'moong dal': 'chana dal for older babies', 'carrot': 'grated bottle gourd or spinach'},
+    healthierNote: 'Cooked in a little ghee on a non-stick pan, so it needs almost no fat and no salt at all.',
+    tags: {'iron', 'protein', 'finger food', 'dinner', 'self feeding', 'chilla'},
+    ingredientKeys: {'moong dal', 'vegetables'},
   ),
   FoodRecipe(
     id: 'palakdal',
@@ -1108,19 +1298,50 @@ Map<String, FoodRecipe> todaysMeals() => {
 
 /// A meal plan for [days] days (each day = the five slots). Deterministic per
 /// day index so "regenerate" can vary it without randomness in tests.
+/// Slots a thin pool can honestly borrow from. A baby's lunch and dinner are
+/// interchangeable, and the two snack slots are the same kind of food - so a
+/// slot with only a couple of recipes tops itself up rather than repeating.
+const Map<String, List<String>> _slotNeighbours = {
+  'Breakfast': ['Morning snack'],
+  'Morning snack': ['Evening snack', 'Breakfast'],
+  'Lunch': ['Dinner'],
+  'Evening snack': ['Morning snack'],
+  'Dinner': ['Lunch'],
+};
+
 Map<String, FoodRecipe> planForDay(int dayIndex) {
-  FoodRecipe slot(String s, int offset) {
-    final pool = kFoodRecipes.where((r) => r.slot == s && !r.comfortOnly && (!FoodStore.instance.vegOnly || r.veg)).toList();
-    final list = pool.isEmpty ? kFoodRecipes.where((r) => !r.comfortOnly).toList() : pool;
-    return list[(dayIndex + offset) % list.length];
+  final vegOnly = FoodStore.instance.vegOnly;
+
+  List<FoodRecipe> poolFor(String s) {
+    bool ok(FoodRecipe r) => !r.comfortOnly && (!vegOnly || r.veg);
+    final own = kFoodRecipes.where((r) => r.slot == s && ok(r)).toList();
+    // A WEEKLY plan drawn from a pool of two is the same dinner four times, so
+    // top up thin slots from their neighbours. Dinner currently has only two
+    // recipes authored - this keeps the plan varied until more are written.
+    if (own.length >= 4) return own;
+    final extra = <FoodRecipe>[];
+    for (final n in _slotNeighbours[s] ?? const <String>[]) {
+      extra.addAll(kFoodRecipes.where((r) => r.slot == n && ok(r)));
+    }
+    final merged = [...own, ...extra];
+    if (merged.isNotEmpty) return merged;
+    return kFoodRecipes.where(ok).toList();
+  }
+
+  // Each slot walks its pool at a DIFFERENT stride, so Tuesday is not simply
+  // Monday shifted by one across the board.
+  FoodRecipe slot(String s, int stride) {
+    final list = poolFor(s);
+    if (list.isEmpty) return kFoodRecipes.first;
+    return list[((dayIndex * stride) + stride) % list.length];
   }
 
   return {
-    'Breakfast': slot('Breakfast', 0),
-    'Morning snack': slot('Morning snack', 1),
-    'Lunch': slot('Lunch', 0),
-    'Evening snack': slot('Evening snack', 1),
-    'Dinner': slot('Dinner', 0),
+    'Breakfast': slot('Breakfast', 1),
+    'Morning snack': slot('Morning snack', 2),
+    'Lunch': slot('Lunch', 1),
+    'Evening snack': slot('Evening snack', 3),
+    'Dinner': slot('Dinner', 2),
   };
 }
 

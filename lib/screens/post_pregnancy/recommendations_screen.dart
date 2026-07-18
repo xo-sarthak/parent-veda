@@ -72,26 +72,26 @@ class RecommendationsScreen extends StatelessWidget {
 
                   // HERO - recommended today
                   const SizedBox(height: 26),
-                  _pad(_sectionHead(Icons.star_rounded, 'Recommended for ${child.name} today', sub: 'A few things worth your time - and why each one is here.')),
+                  _pad(_sectionHead(Icons.star_rounded, 'Recommended for ${child.name} today', sub: 'A few things worth your time - and why each one is here.', onMore: () => _openAll(context, 'Recommended today', today))),
                   const SizedBox(height: 14),
                   _rail(context, today, ctx: ctx, width: 226),
 
                   // continue exploring
                   if (cont.isNotEmpty) ...[
                     const SizedBox(height: 30),
-                    _pad(_sectionHead(Icons.history_rounded, 'Continue exploring')),
+                    _pad(_sectionHead(Icons.history_rounded, 'Continue exploring', onMore: () => _push(context, const RecoLibraryScreen()))),
                     const SizedBox(height: 14),
                     _rail(context, cont),
                   ],
 
                   // ParentVeda Originals
                   const SizedBox(height: 30),
-                  _pad(_sectionHead(Icons.eco_outlined, 'Growing this month', sub: 'What ${child.ageInMonths}-month-olds are learning right now.')),
+                  _pad(_sectionHead(Icons.eco_outlined, 'Growing this month', sub: 'What ${child.ageInMonths}-month-olds are learning right now.', onMore: () => _openAll(context, 'Growing this month', growingThisMonth()))),
                   const SizedBox(height: 14),
                   _rail(context, growingThisMonth(), ctx: ctx),
 
                   const SizedBox(height: 30),
-                  _pad(_sectionHead(Icons.weekend_outlined, 'Weekend with your child', sub: 'Books, activities and outings for the two days ahead.')),
+                  _pad(_sectionHead(Icons.weekend_outlined, 'Weekend with your child', sub: 'Books, activities and outings for the two days ahead.', onMore: () => _openAll(context, 'Weekend with your child', weekendPicks()))),
                   const SizedBox(height: 14),
                   _rail(context, weekendPicks()),
 
@@ -101,12 +101,12 @@ class RecommendationsScreen extends StatelessWidget {
                   _rail(context, beforeTheyGrowOut(), ctx: ctx),
 
                   const SizedBox(height: 30),
-                  _pad(_sectionHead(Icons.temple_hindu_outlined, 'Hidden Indian gems', sub: 'Thoughtful, homegrown discovery.')),
+                  _pad(_sectionHead(Icons.temple_hindu_outlined, 'Hidden Indian gems', sub: 'Thoughtful, homegrown discovery.', onMore: () => _openAll(context, 'Hidden Indian gems', hiddenIndianGems()))),
                   const SizedBox(height: 14),
                   _rail(context, hiddenIndianGems()),
 
                   const SizedBox(height: 30),
-                  _pad(_sectionHead(Icons.favorite_border, 'ParentVeda community loves', sub: 'Most-saved by parents - age-weighted, never a popularity contest.')),
+                  _pad(_sectionHead(Icons.favorite_border, 'ParentVeda community loves', sub: 'Most-saved by parents - age-weighted, never a popularity contest.', onMore: () => _openAll(context, 'Community loves', communityLoves()))),
                   const SizedBox(height: 14),
                   _rail(context, communityLoves()),
 
@@ -159,11 +159,29 @@ class RecommendationsScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _sectionHead(IconData icon, String title, {String? sub}) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  //  Every rail gets a way through to the whole set. A horizontal rail showing
+  //  six of forty items, with no exit, quietly tells a parent that six is all
+  //  there is.
+  /// The whole set behind a rail, as a plain vertical list. Deliberately not a
+  /// new browsing experience - just the same picks, all of them, scrollable.
+  void _openAll(BuildContext context, String title, List<RecoItem> items) =>
+      _push(context, _RecoAllScreen(title: title, items: items));
+
+  Widget _sectionHead(IconData icon, String title, {String? sub, VoidCallback? onMore}) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Icon(icon, size: 18, color: ppPurple),
           const SizedBox(width: 9),
           Expanded(child: Text(title, style: ppJakarta(17), maxLines: 2, overflow: TextOverflow.ellipsis)),
+          if (onMore != null)
+            GestureDetector(
+              onTap: onMore,
+              behavior: HitTestBehavior.opaque,
+              child: Row(children: [
+                Text('View more', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+                const SizedBox(width: 2),
+                const Icon(Icons.chevron_right_rounded, size: 17, color: ppPurple),
+              ]),
+            ),
         ]),
         if (sub != null) ...[
           const SizedBox(height: 5),
@@ -237,4 +255,47 @@ class RecommendationsScreen extends StatelessWidget {
           ]),
         ),
       );
+}
+
+/// Every item behind a rail, in one vertical list.
+class _RecoAllScreen extends StatelessWidget {
+  const _RecoAllScreen({required this.title, required this.items});
+  final String title;
+  final List<RecoItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ppBg,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          children: [
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: ppBack(context, 'Recommendations')),
+            const SizedBox(height: 16),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: Text(title, style: ppFraunces(28, h: 1.12))),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text('${items.length} ${items.length == 1 ? 'pick' : 'picks'}', style: ppBody(12.5, color: ppMuted)),
+            ),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(children: [
+                for (final r in items)
+                  RecoRow(
+                    item: r,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (_) => RecoDetailScreen(item: r)),
+                    ),
+                  ),
+              ]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -347,6 +347,50 @@ class HealthStore extends ChangeNotifier {
   // timeline (read-only); these are ones the parent records themselves.
   final List<HealthEvent> _visits = [];
 
+  // ---- entered-vs-seeded ----------------------------------------------------
+  //  The snapshot, growth and vaccination figures above are SEED data - they are
+  //  the same constants for everyone, so today the app cannot tell a parent who
+  //  has logged nothing from one who has logged everything. That is how "Overall:
+  //  good" ends up shown to someone who has never entered a thing.
+  //
+  //  These flags are the front end of the fix. They are false until the parent
+  //  actually enters something, so every health section can render its
+  //  not-yet-entered state now. When the backend lands, the only change needed
+  //  is for these to be derived from real rows instead of local writes - no
+  //  screen has to change. See docs/PERSONALIZATION.md section 3 for why the
+  //  empty state is an invitation and never a hidden section.
+  bool _growthEntered = false;
+  bool _vaxEntered = false;
+
+  bool get growthEntered => _growthEntered;
+  bool get vaxEntered => _vaxEntered;
+
+  /// True once she has told us ANYTHING - the cue for the snapshot to be
+  /// meaningful rather than a restatement of our own seed data.
+  bool get hasAnyEntry =>
+      _growthEntered || _vaxEntered || _visits.isNotEmpty || _reports.isNotEmpty;
+
+  void markGrowthEntered() {
+    if (_growthEntered) return;
+    _growthEntered = true;
+    notifyListeners();
+  }
+
+  /// Test-only: the store is a singleton, so a test that flips a flag has to
+  /// put it back or it leaks into whatever runs next.
+  @visibleForTesting
+  void resetEnteredForTest() {
+    _growthEntered = false;
+    _vaxEntered = false;
+    notifyListeners();
+  }
+
+  void markVaxEntered() {
+    if (_vaxEntered) return;
+    _vaxEntered = true;
+    notifyListeners();
+  }
+
   // ---- doctor-visit questions ----
   List<String> get questions => List.unmodifiable(_questions);
   void addQuestion(String q) {

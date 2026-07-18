@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_health_data.dart';
 import 'pp_growth_data.dart';
 import 'pp_tools_kit.dart';
 
@@ -352,6 +353,9 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
           return;
         }
         _store.log(date: date, weightKg: w, heightCm: h, headCm: double.tryParse(head.text.trim()), note: note.text.trim().isEmpty ? null : note.text.trim());
+        // Tells Health this parent has actually entered growth, so its section
+        // stops showing the invitation and starts showing her figures.
+        HealthStore.instance.markGrowthEntered();
       },
     );
   }

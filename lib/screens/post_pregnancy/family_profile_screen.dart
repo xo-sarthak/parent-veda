@@ -1,5 +1,5 @@
 // =============================================================================
-//  My Family Profile — the Living Family Profile, editable
+//  Aarav's profile — the Living Family Profile, editable
 // -----------------------------------------------------------------------------
 //  The settings home for the ParentVeda Personalization Engine. Everything is
 //  editable, nothing hidden; a completeness meter invites (never forces) the
@@ -50,7 +50,9 @@ class FamilyProfileScreen extends StatelessWidget {
                 const SizedBox(width: 34),
               ])),
               const SizedBox(height: 20),
-              _pad(Text('My Family Profile', style: ppFraunces(30, h: 1.1))),
+              // Renamed: everything below is about the CHILD, so calling it a family
+              // profile set the wrong expectation about what was being asked.
+              _pad(Text("${_child.name}'s profile", style: ppFraunces(30, h: 1.1))),
               const SizedBox(height: 8),
               _pad(Text('The more ${_child.name} and your family are known, the more ParentVeda quietly tailors what you see — articles, videos, recipes, products and your daily focus. It never changes where things live.',
                   style: ppBody(14, h: 1.55))),
@@ -62,39 +64,45 @@ class FamilyProfileScreen extends StatelessWidget {
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final c in HealthCondition.values)
                   _chip(c.label, _p.hasCondition(c), () { _p.toggleCondition(c); _p.markAsked(ProfileField.health); }),
+                _otherChip(context, 'health'),
               ])),
 
               const SizedBox(height: 24),
               _section('Feeding', 'How ${_child.name} is fed right now.'),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final f in FeedingMethod.values)
-                  _chip(f.label, _p.feeding == f, () => _p.setFeeding(_p.feeding == f ? null : f)),
+                  _chip(f.label, _p.feedings.contains(f), () => _p.toggleFeeding(f)),
+                _otherChip(context, 'feeding'),
               ])),
 
               const SizedBox(height: 24),
               _section('Sleep', "How ${_child.name}'s sleep is going."),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final s in SleepPattern.values)
-                  _chip(s.label, _p.sleep == s, () => _p.setSleep(_p.sleep == s ? null : s)),
+                  _chip(s.label, _p.sleeps.contains(s), () => _p.toggleSleep(s)),
+                _otherChip(context, 'sleep'),
               ])),
 
               const SizedBox(height: 24),
               _section('What you want help with', 'This gently surfaces the most relevant guidance first.'),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final pr in Priority.values) _chip(pr.label, _p.wants(pr), () => _p.togglePriority(pr)),
+                _otherChip(context, 'priorities'),
               ])),
 
               const SizedBox(height: 24),
               _section('How you like to learn', 'We match articles, videos and Ask Veda to your style.'),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final l in LearningStyle.values)
-                  _chip(l.label, _p.learning == l, () => _p.setLearning(_p.learning == l ? null : l)),
+                  _chip(l.label, _p.learnings.contains(l), () => _p.toggleLearning(l)),
+                _otherChip(context, 'learning'),
               ])),
 
               const SizedBox(height: 24),
               _section('Gentle reminders', 'Only what you choose — never noise.'),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final n in NotifyTopic.values) _chip(n.label, _p.notify.contains(n), () => _p.toggleNotify(n)),
+                _otherChip(context, 'notify'),
               ])),
 
               const SizedBox(height: 28),
@@ -151,6 +159,55 @@ class FamilyProfileScreen extends StatelessWidget {
           const SizedBox(height: 12),
         ]),
       );
+
+  /// "Other", with somewhere to actually type it. No option list ever covers a
+  /// real family, and a profile that cannot accept "none of these" quietly
+  /// teaches a parent the app is not listening. Shows what she wrote once set.
+  Widget _otherChip(BuildContext context, String field) {
+    final existing = _p.otherFor(field);
+    final has = existing != null && existing.isNotEmpty;
+    return _chip(has ? existing : 'Other…', has, () => _askOther(context, field, existing));
+  }
+
+  Future<void> _askOther(BuildContext context, String field, String? existing) async {
+    final ctl = TextEditingController(text: existing ?? '');
+    final saved = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ppBg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Tell us in your words', style: ppJakarta(17)),
+        content: TextField(
+          controller: ctl,
+          autofocus: true,
+          maxLines: 2,
+          style: ppBody(14, color: ppInk),
+          decoration: InputDecoration(
+            hintText: 'Anything the options above missed',
+            hintStyle: ppBody(14, color: ppMuted),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+        actions: [
+          if (existing != null && existing.isNotEmpty)
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(''),
+              child: Text('Remove', style: ppBody(13.5, color: ppMuted, w: FontWeight.w700)),
+            ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel', style: ppBody(13.5, color: ppMuted, w: FontWeight.w700)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(ctl.text),
+            child: Text('Save', style: ppBody(13.5, color: ppPurple, w: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    ctl.dispose();
+    if (saved != null) _p.setOther(field, saved);
+  }
 
   Widget _chip(String label, bool on, VoidCallback onTap) => GestureDetector(
         onTap: onTap,

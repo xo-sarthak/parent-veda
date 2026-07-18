@@ -9,6 +9,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'pp_products_data.dart';
+import 'product_detail_screen.dart';
 import 'development_activity_screen.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
@@ -40,6 +42,10 @@ class DevStageDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final acts = stage.activities.map(devActivityById).toList();
+    final products = kPpProducts
+        .where((p) => p.category == productCategoryForArea(area.id))
+        .take(6)
+        .toList();
     final (tagLabel, tagColor) = _statusTag;
     return Scaffold(
       backgroundColor: ppBg,
@@ -88,11 +94,31 @@ class DevStageDetailScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Text('Ways to help it along', style: ppJakarta(17))),
             const SizedBox(height: 6),
-            _pad(Text(acts.isEmpty
-                ? 'The best support is simple: notice it, make gentle room for it, and follow his lead — there is nothing to drill.'
-                : 'A few small, playful things that gently encourage it. No pressure, no schedule.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('What actually helps, in the order it matters. No drills, no schedule.',
+                style: ppBody(12.5, color: ppMuted))),
+            // Actionable POINTERS, not a paragraph. A parent reading this at 9pm
+            // wants to know what to do in the next ten minutes.
+            const SizedBox(height: 14),
+            _pad(Column(children: [
+              for (final b in helpBulletsFor(area, stage))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 11),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(top: 7),
+                      decoration: BoxDecoration(color: _a, shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 11),
+                    Expanded(child: Text(b, style: ppBody(13.5, color: ppInk, h: 1.55))),
+                  ]),
+                ),
+            ])),
             if (acts.isNotEmpty) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 8),
+              _pad(Text('Activities that encourage it', style: ppJakarta(15))),
+              const SizedBox(height: 12),
               _pad(Column(children: [
                 for (final act in acts)
                   GestureDetector(
@@ -117,6 +143,47 @@ class DevStageDetailScreen extends StatelessWidget {
                     ),
                   ),
               ])),
+            ],
+
+            // Products last, and only ones tied to this area - a milestone page
+            // that opens with shopping would be the wrong product entirely.
+            if (products.isNotEmpty) ...[
+              _pad(ppSectionDivider()),
+              _pad(Text('Things that can help', style: ppJakarta(17))),
+              const SizedBox(height: 4),
+              _pad(Text('Nothing here is needed. These are simply what tends to be useful for this kind of skill.',
+                  style: ppBody(12.5, color: ppMuted))),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 150,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemCount: products.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 12),
+                  itemBuilder: (_, i) {
+                    final pr = products[i];
+                    return GestureDetector(
+                      onTap: () => _push(context, ProductDetailScreen(product: pr)),
+                      behavior: HitTestBehavior.opaque,
+                      child: SizedBox(
+                        width: 160,
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Container(
+                            height: 78,
+                            decoration: BoxDecoration(color: _a.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(12)),
+                            child: Icon(Icons.card_giftcard_rounded, size: 24, color: _a),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(pr.name, style: ppJakarta(13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 3),
+                          Expanded(child: Text(pr.sub, style: ppBody(11.5, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis)),
+                        ]),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
 
             const SizedBox(height: 18),

@@ -546,3 +546,54 @@ class DevStore extends ChangeNotifier {
 
   int get checkInsAnswered => _checkIns.length;
 }
+
+// =============================================================================
+//  "Ways to help it along" — actionable pointers
+// -----------------------------------------------------------------------------
+//  A one-line "notice it and follow his lead" is true but useless at 9pm when a
+//  parent wants to know what to actually DO. These are the concrete moves, per
+//  developmental area, written so each one is a thing you could do in the next
+//  ten minutes without buying anything.
+//
+//  Kept per-AREA rather than per-stage on purpose: the honest advice for
+//  encouraging any gross-motor skill is broadly the same, and inventing a
+//  different list for ninety-odd stages would produce filler, not guidance.
+// =============================================================================
+List<String> helpBulletsFor(DevArea area, DevStage stage) {
+  switch (area.id) {
+    case 'gross_motor':
+      return const [
+        'Floor time beats any equipment. A firm blanket and space to push against does more than a seat or a bouncer.',
+        'Put one favourite toy just past his reach — close enough to be worth it, far enough to need the stretch.',
+        'Let him work at it before you rescue him. The wobble IS the exercise; steadying him too soon removes the very thing building the strength.',
+        'Short and often beats long and once. A few minutes several times a day, always stopping while he is still happy.',
+      ];
+    case 'cognitive':
+      return const [
+        'Pause after you respond. He needs a beat of quiet to notice that HIS action caused YOUR reaction — that gap is where the learning happens.',
+        'Repeat the same game far past your own boredom. Repetition is how a hunch becomes a rule for him.',
+        'Narrate the cause out loud: "you shook it, and it rattled". Words attach to the pattern he is already sensing.',
+        'Give him things that respond honestly — a rattle, a crinkly page, a lid. Toys that do everything by themselves teach him nothing about his own effect.',
+      ];
+    case 'language':
+      return const [
+        'Leave a gap after you speak, as though waiting for an answer. Turn-taking is learned long before words arrive.',
+        'Answer his sounds as if they were sentences. Copying his coo back is a conversation to him.',
+        'Narrate what you are doing while you do it — changing, cooking, walking. Ordinary commentary is the richest input there is.',
+        'Face him when you talk. He is reading your mouth as much as hearing you.',
+      ];
+    case 'emotional':
+      return const [
+        'Respond to the small bids, not only the crying. A look held and returned is the whole skill in miniature.',
+        'Let him set the pace with new people. Being passed around teaches him his signals do not count.',
+        'Name what he seems to feel — "that was a surprise, wasn\'t it". Long before he understands the words he learns the feeling has a shape.',
+        'Repair after the hard moments. Babies do not need parents who never get it wrong, only ones who come back.',
+      ];
+    default:
+      return [
+        'Follow his lead — interest is the engine, and ${stage.name.toLowerCase()} arrives faster when he is enjoying it.',
+        'Keep it short and stop while he is still content. Ending on a good moment makes the next one easier.',
+        'Repeat it often. What looks like the same game to you is a fresh rehearsal to him.',
+      ];
+  }
+}

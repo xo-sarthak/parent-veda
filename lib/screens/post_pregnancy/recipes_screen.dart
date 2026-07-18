@@ -73,7 +73,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        ppEyebrow('Indian food, for Indian kids'),
+                        // Tagline removed per 17-18 July review - it was
+                        // saying nothing the page did not already show.
+                        // ppEyebrow('Indian food, for Indian kids'),
                         const SizedBox(height: 10),
                         Text('Recipes', style: ppFraunces(33, h: 1.12)),
                       ]),
@@ -82,7 +84,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     _sickButton(context),
                   ])),
                   const SizedBox(height: 12),
-                  _pad(Text('What to cook, why it is good, and how it helps him grow - every dish age-tagged, with a healthier twist built in.',
+                  _pad(Text('What to cook, why it is good, and how it helps him grow - every dish age-tagged.',
                       style: ppBody(15))),
 
                   // search (recipe title)

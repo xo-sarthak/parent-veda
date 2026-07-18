@@ -89,7 +89,16 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
             ])),
 
             // filters (these genuinely re-sort and override the default)
+            // These re-ORDER the list, they do not narrow it - so they say so.
+            // Unlabelled they read as filters, and a parent could reasonably
+            // think tapping "Price" was hiding the expensive practitioners.
             const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text('SORT BY',
+                  style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.8)),
+            ),
+            const SizedBox(height: 9),
             SizedBox(
               height: 36,
               child: ListView(

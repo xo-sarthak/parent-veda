@@ -12,6 +12,7 @@
 //  redesign that replaces the old vaccination_screen (kept, commented, for revert).
 // =============================================================================
 
+import 'pp_health_data.dart';
 import 'package:flutter/foundation.dart';
 
 // Reassuring status language - "due" means recommended now, never "missed".
@@ -372,6 +373,9 @@ class VaxStore extends ChangeNotifier {
   bool isDone(String visitId) => _done.contains(visitId);
   void markDone(String visitId) {
     _done.add(visitId);
+    // Health's vaccination section shows an invitation until a real dose is
+    // marked; this is what flips it to her actual schedule.
+    HealthStore.instance.markVaxEntered();
     notifyListeners();
   }
 

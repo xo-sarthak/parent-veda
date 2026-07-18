@@ -19,7 +19,9 @@ import 'development_area_screen.dart';
 import 'dev_stage_detail_screen.dart';
 import 'explore_drawer.dart';
 import 'family_profile_screen.dart';
-import 'recipes_screen.dart';
+// Nutrition now opens NutritionScreen (nutrition-led) rather than Recipes.
+// Kept for revert.
+// import 'recipes_screen.dart';
 // Old light growth screen retired in favour of the new Growth Journey tool
 // (kept for revert). import 'health_growth_screen.dart';
 import 'growth_journey_screen.dart';
@@ -38,6 +40,12 @@ import 'pp_leaps_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
 import 'reading_collection_screen.dart';
+import 'pp_leap_faqs.dart';
+import 'recommendations_screen.dart';
+import 'reco_detail_screen.dart';
+import 'pp_reco_data.dart';
+import 'askveda_screen.dart';
+import 'nutrition_screen.dart';
 import 'reco_search_screen.dart';
 import 'reading_reader_screen.dart';
 import 'watch_category_screen.dart';
@@ -57,6 +65,8 @@ class MyChildScreen extends StatefulWidget {
 class _MyChildScreenState extends State<MyChildScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _leapExpanded = false;
+  /// Which FAQ is open (-1 = none). One at a time keeps the card short.
+  int _faqOpen = -1;
 
   ChildProfileStore get _child => ChildProfileStore.instance;
 
@@ -94,20 +104,19 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   // sits inside its card), saving the whole page-level lead that
                   // used to sit above. The video still keeps its own lead below.
                   _leapHero(leap),
-                  const SizedBox(height: 26),
-                  // Video sits right under the hero. It carries its own header
-                  // inside the card now (like the pregnancy "Today's Video"),
-                  // so it no longer needs a page-level lead above it.
+                  const SizedBox(height: 22),
+                  // Today's Parenting Tip now sits ABOVE the video: a narrow,
+                  // centred card (70% width, two lines, "Read more") so it
+                  // reads as a quick thought rather than a section.
+                  _dailyTip(),
+                  const SizedBox(height: 22),
+                  // Video follows the tip. It carries its own header inside the
+                  // card (like the pregnancy "Today's Video"), so it needs no
+                  // page-level lead above it.
                   if (leap.videoId != null) ...[
                     _leapVideo(leap),
                     const SizedBox(height: 26),
                   ],
-                  // Today's Parenting Tip — the pregnancy home's GrowModule
-                  // card, replicated: its "TODAY'S PARENTING TIP" eyebrow lives
-                  // inside the card (like the pregnancy one), so there is no
-                  // separate page lead above it.
-                  _dailyTip(),
-                  const SizedBox(height: 26),
                   _leapDescription(leap),
                   // Section beat tightened 34 -> 26. The pregnancy home runs a
                   // 16 beat with 20/24 at major breaks; 34 was a big part of
@@ -123,12 +132,23 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   const SizedBox(height: 26),
                   _leapLearn(leap),
                   const SizedBox(height: 26),
-                  _lookingAhead(),
+                  // Products land AFTER the watch/read rails, mixing picks from
+                  // across the leap's milestones and domains rather than one
+                  // narrow category.
+                  _leapProducts(leap),
                   const SizedBox(height: 26),
-                  // The two timelines the early My Child page carried (before it
-                  // became the home): the Memory timeline (journal) and the
-                  // Health timeline. Restored here, at the bottom of the home.
-                  _timelines(),
+                  // Top 3 questions for this leap, rotating each app open, with
+                  // a way through to Ask Veda for anything else. Sits before
+                  // "what's coming next" so the current leap finishes first.
+                  _faqs(leap),
+                  const SizedBox(height: 26),
+                  _lookingAhead(),
+                  // REMOVED per 17-18 July review: the Memory + Health
+                  // timelines that briefly sat at the bottom of this page. The
+                  // home is about now, not a scroll through history; both live
+                  // on in Journal and Health. Kept commented for revert.
+                  // const SizedBox(height: 26),
+                  // _timelines(),
                 ],
               );
             },
@@ -304,24 +324,36 @@ class _MyChildScreenState extends State<MyChildScreen> {
         _leapJourney(leap),
 
         // ---- growth, folded into the hero ------------------------------------
-        const SizedBox(height: 15),
-        Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
-        const SizedBox(height: 13),
-        Row(children: [
-          Text('GROWTH', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
-          const Spacer(),
-          _heroAction(Icons.edit_outlined, 'Edit', _openGrowthEdit),
-          const SizedBox(width: 14),
-          _heroAction(Icons.show_chart_rounded, 'Chart', () => _push(const GrowthJourneyScreen())),
-        ]),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: _heroStat('Weight', _child.weightKg.toStringAsFixed(1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
-          Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
-          Expanded(child: _heroStat('Height', _child.heightCm.toStringAsFixed(0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
-          Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
-          Expanded(child: _heroStat('Head', _child.headCm.toStringAsFixed(0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
-        ]),
+        // REVISED 18 Jul: growth stays INSIDE the hero card but reads as its own
+        // thing rather than more of the same wash — a darker inset panel with
+        // its own rounded edge. Same box, visibly a different register, so the
+        // numbers do not blur into the leap copy above them.
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Text('GROWTH', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+              const Spacer(),
+              _heroAction(Icons.edit_outlined, 'Edit', _openGrowthEdit),
+              const SizedBox(width: 14),
+              _heroAction(Icons.show_chart_rounded, 'Chart', () => _push(const GrowthJourneyScreen())),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(child: _heroStat('Weight', _child.weightKg.toStringAsFixed(1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
+              Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
+              Expanded(child: _heroStat('Height', _child.heightCm.toStringAsFixed(0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
+              Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
+              Expanded(child: _heroStat('Head', _child.headCm.toStringAsFixed(0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
+            ]),
+          ]),
+        ),
           ]),
         ),
       ]),
@@ -748,41 +780,49 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  the tip title in quotes, the body as the one-line hook, and a full-width
   //  "Read more" button. It must read, unmistakably, as *today's tip*.
   //  Content unchanged: still whatever dailyTip() returns.
+  //  REVISED 18 Jul: it now sits ABOVE the video as a narrow, centred card —
+  //  70% of the width, everything centre-aligned, the tip clamped to two lines
+  //  with a quiet "Read more" underneath. It is a passing thought, not a
+  //  section, so it should take as little vertical space as it can.
   Widget _dailyTip() {
     final t = dailyTip();
-    return _pad(ppCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.eco_rounded, size: 16, color: ppPurple),
-          const SizedBox(width: 7),
-          Expanded(
-            child: Text('TODAY\'S PARENTING TIP',
-                style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: ppPurple)),
-          ),
-        ]),
-        const SizedBox(height: 10),
-        Text('“${t.title}”', style: ppJakarta(20)),
-        const SizedBox(height: 12),
-        Text(t.body, style: ppBody(15, color: ppInk, h: 1.55, w: FontWeight.w500), maxLines: 3, overflow: TextOverflow.ellipsis),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: ppPurple,
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            onPressed: () => _openTipSheet(t),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('Read more', style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+    return Center(
+      child: FractionallySizedBox(
+        widthFactor: 0.7,
+        child: ppCard(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.eco_rounded, size: 14, color: ppPurple),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text('TODAY\'S PARENTING TIP',
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: ppPurple)),
+              ),
             ]),
-          ),
+            const SizedBox(height: 8),
+            Text(t.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: ppBody(13.5, color: ppTitleInk, h: 1.4, w: FontWeight.w700)),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _openTipSheet(t),
+              behavior: HitTestBehavior.opaque,
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('Read more', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: ppPurple)),
+                const SizedBox(width: 3),
+                const Icon(Icons.arrow_forward_rounded, size: 13, color: ppPurple),
+              ]),
+            ),
+          ]),
         ),
-      ]),
-    ));
+      ),
+    );
   }
 
   void _openTipSheet(DailyTip t) => showModalBottomSheet<void>(
@@ -916,7 +956,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       (Icons.child_care_outlined, 'Physical', 'Rolling & reaching', 'Hands clasp at his chest and he pushes up. A first roll any day now.', 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('gross_motor')))),
       (Icons.chat_bubble_outline_rounded, 'Language', 'Musical babble', "Coos stretching into 'aah-goo', raspberries and squeals.", 'Emerging', () => _push(DevelopmentAreaScreen(area: devAreaById('language')))),
       (Icons.favorite_border, 'Emotional', 'Social joy', 'Beams at you across a room; a laugh now earns a laugh back.', 'Blossoming', () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
-      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months, a few weeks away yet.', 'On track', () => _push(const RecipesScreen())),
+      (Icons.restaurant_outlined, 'Nutrition', 'Milk is everything', 'Solids open up around 6 months, a few weeks away yet.', 'On track', () => _push(const NutritionScreen())),
     ];
     return _pad(ppSectionCard(
       eyebrow: 'Child snapshot',
@@ -954,6 +994,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
             ]),
             const SizedBox(height: 9),
             Text(insight, style: ppBody(12.5, h: 1.5)),
+            // The rows always opened a domain page, but nothing said so. This
+            // is the quietest affordance that still reads as tappable: a small
+            // muted "Explore <domain> ›" under the insight. Deliberately not a
+            // button - it should whisper, not compete with the content.
+            const SizedBox(height: 7),
+            Row(children: [
+              Text('Explore $domain', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
+              const SizedBox(width: 3),
+              const Icon(Icons.chevron_right_rounded, size: 15, color: ppPurple),
+            ]),
           ]),
         ),
       );
@@ -986,22 +1036,38 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // =========================================================================
   //  Milestones (current + emerging, each opens its detail)
   // =========================================================================
+  //  REFRAMED 18 Jul. This used to be "Milestones", showing both what he is
+  //  doing NOW and what is next — which made it near-indistinguishable from the
+  //  Child snapshot directly above it. Two sections answering the same question
+  //  is one section too many.
+  //
+  //  It now answers a question nothing else does: WHAT IS COMING, and how do I
+  //  help him get there. Only 'next' stages appear; the "now" story belongs to
+  //  the snapshot. Each row opens the milestone detail, where the preparation
+  //  actually lives.
   Widget _milestones() {
     final areas = ['gross_motor', 'cognitive', 'language', 'emotional'].map(devAreaById).toList();
     final rows = <(DevArea, DevStage)>[];
     for (final area in areas) {
-      for (final s in activeStages(area)) {
+      for (final s in area.journey.where((s) => s.status == 'next')) {
         rows.add((area, s));
       }
     }
     return _pad(ppSectionCard(
-      eyebrow: 'Milestones',
-      icon: Icons.flag_outlined,
+      eyebrow: 'Coming up',
+      icon: Icons.trending_up_rounded,
       accent: ppCoral,
-      title: "What ${_child.name} is working on",
+      title: "What ${_child.name} is preparing for next",
       child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            'None of this is due yet. Knowing what is around the corner is how you help him get there — open any one for ways to prepare.',
+            style: ppBody(12.5, color: ppSoft, h: 1.5),
+          ),
+        ),
         for (final r in rows) ...[
-          if (r != rows.first) ppRowDivider(),
+          ppRowDivider(),
           _milestoneRow(r.$1, r.$2),
         ],
       ]),
@@ -1024,7 +1090,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
               Row(children: [
                 Flexible(child: Text(s.name, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 8),
-                Text(now ? 'NOW' : 'NEXT', style: ppBody(9, color: now ? ppCoral : const Color(0xFFC98A2B), w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
+                // The section is now "what's next" only, so a NOW/NEXT tag says
+                // nothing. The area name is the useful label - it tells her
+                // WHICH part of him this belongs to. Flexible + ellipsis: under
+                // a wide accessibility font this and the skill name compete.
+                Flexible(
+                  child: Text(area.name.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ppBody(9, color: now ? ppCoral : const Color(0xFFC98A2B), w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
+                ),
               ]),
               const SizedBox(height: 2),
               Text(s.meaning, style: ppBody(12.5, color: ppSoft, h: 1.4), maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -1032,6 +1107,124 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
           const SizedBox(width: 10),
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+        ]),
+      ),
+    );
+  }
+
+  // =========================================================================
+  //  Products for this leap (after the watch/read rails)
+  // =========================================================================
+  //  Deliberately a MIX rather than one category: picks that suit his age and
+  //  what he is working on, drawn from across the catalogue. The rails above
+  //  are about understanding; this is the one place on the page that is about
+  //  buying, and it sits last for that reason.
+  Widget _leapProducts(Leap leap) {
+    final picks = recommendedToday(count: 8);
+    if (picks.isEmpty) return const SizedBox.shrink();
+    return _pad(ppCarousel(
+      accent: leap.accent,
+      icon: Icons.shopping_bag_outlined,
+      title: 'Picks for this leap',
+      seeAll: 'View more',
+      onSeeAll: () => _push(const RecommendationsScreen()),
+      railHeight: 176,
+      items: [
+        for (final r in picks)
+          GestureDetector(
+            onTap: () => _push(RecoDetailScreen(item: r)),
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              width: 152,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  height: 80,
+                  decoration: BoxDecoration(color: leap.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+                  child: Center(child: Icon(Icons.card_giftcard_rounded, size: 26, color: leap.accent)),
+                ),
+                const SizedBox(height: 8),
+                Text(r.title, style: ppJakarta(13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 3),
+                Expanded(
+                  child: Text(r.why, style: ppBody(11.5, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ),
+              ]),
+            ),
+          ),
+      ],
+    ));
+  }
+
+  // =========================================================================
+  //  FAQs for this leap
+  // =========================================================================
+  //  Three questions, rotating each app launch so a daily visitor meets the
+  //  whole pool over a week. Ask Veda closes it off for anything not covered —
+  //  the honest admission that three answers will not cover a real 3am worry.
+  Widget _faqs(Leap leap) {
+    final faqs = leapFaqs(leap.number);
+    if (faqs.isEmpty) return const SizedBox.shrink();
+    return _pad(ppSectionCard(
+      eyebrow: 'Questions parents ask',
+      icon: Icons.help_outline_rounded,
+      title: 'About this leap',
+      child: Column(children: [
+        for (var i = 0; i < faqs.length; i++) ...[
+          if (i > 0) ppRowDivider(),
+          _faqRow(faqs[i], i),
+        ],
+        ppRowDivider(),
+        GestureDetector(
+          onTap: () => _push(const AskVedaScreen()),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Row(children: [
+              Container(
+                width: 34,
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(11)),
+                child: const Icon(Icons.auto_awesome_rounded, size: 17, color: ppPurple),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text('Ask Veda anything else',
+                    style: ppBody(13.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
+            ]),
+          ),
+        ),
+      ]),
+    ));
+  }
+
+  Widget _faqRow(LeapFaq f, int i) {
+    final open = _faqOpen == i;
+    return GestureDetector(
+      onTap: () => setState(() => _faqOpen = open ? -1 : i),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(f.question, style: ppJakarta(14))),
+            const SizedBox(width: 10),
+            Icon(open ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 20, color: ppMuted),
+          ]),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 160),
+            alignment: Alignment.topCenter,
+            // Conditional child, not a cross-fade: a collapsed answer that is
+            // still in the tree gets read aloud by screen readers.
+            child: open
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(f.answer, style: ppBody(12.5, h: 1.55)),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
         ]),
       ),
     );
@@ -1076,7 +1269,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: Row(children: [
               const Icon(Icons.auto_stories_outlined, size: 19, color: ppPurple),
               const SizedBox(width: 12),
-              Expanded(child: Text("View ${_child.name}'s Storybook", style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+              Expanded(child: Text("Preview ${_child.name}'s storybook…", style: ppBody(14, color: ppInk, w: FontWeight.w600))),
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
@@ -1203,7 +1396,10 @@ class _MyChildScreenState extends State<MyChildScreen> {
 
   // =========================================================================
   //  Timelines — Memory (journal) + Health, at the bottom of the home
+  //  RETIRED 18 Jul: the home is about now, not a scroll through history. Both
+  //  timelines live on in Journal and Health. Kept for revert.
   // =========================================================================
+  // ignore: unused_element
   Widget _timelines() => _pad(ppSectionCard(
         eyebrow: 'Timelines',
         icon: Icons.timeline_rounded,

@@ -30,10 +30,65 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
 
   static const List<int> _times = [10, 15, 20, 30];
 
+  /// Free-text answers for the "Other" chip on each step. No fixed list covers
+  /// a real kitchen, and a builder that cannot accept "I have poha" is a
+  /// builder that quietly ignores half of what people actually cook with.
+  String? _otherMeal;
+  String? _otherTime;
+  final Set<String> _otherHas = {};
+
+  /// Veg / non-veg / vegan. Filtering the suggestions to what she would
+  /// actually serve matters more here than anywhere else in the app.
+  String _diet = 'Any';
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
-  void _build() => setState(() => _results = buildMeals(meal: _meal, maxMinutes: _minutes, has: _has));
+  void _build() => setState(() {
+        final all = buildMeals(meal: _meal, maxMinutes: _minutes, has: _has);
+        _results = switch (_diet) {
+          'Veg' => all.where((m) => m.recipe.veg).toList(),
+          'Vegan' => all.where((m) => m.recipe.vegan).toList(),
+          'Non-veg' => all.where((m) => !m.recipe.veg).toList(),
+          _ => all,
+        };
+      });
+
+  /// "Other", with somewhere to type it. Every step offers it, because a fixed
+  /// list of meals, times and ingredients never matches a real kitchen.
+  Future<void> _askOther(String what, void Function(String) onSaved) async {
+    final ctl = TextEditingController();
+    final saved = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ppBg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Add your own', style: ppJakarta(17)),
+        content: TextField(
+          controller: ctl,
+          autofocus: true,
+          style: ppBody(14, color: ppInk),
+          decoration: InputDecoration(
+            hintText: what == 'minutes' ? 'e.g. 45 min' : 'e.g. $what',
+            hintStyle: ppBody(14, color: ppMuted),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel', style: ppBody(13.5, color: ppMuted, w: FontWeight.w700)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(ctl.text.trim()),
+            child: Text('Add', style: ppBody(13.5, color: ppPurple, w: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    ctl.dispose();
+    if (saved != null && saved.isNotEmpty) onSaved(saved);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,17 +113,48 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
             const SizedBox(height: 22),
             _pad(_label('1 · Which meal?')),
             const SizedBox(height: 10),
-            _pad(_chips(kFoodSlots, (s) => _meal == s, (s) => setState(() => _meal = s))),
+            _pad(_chips([...kFoodSlots, ?_otherMeal, 'Other…'],
+                (s) => _meal == s,
+                (s) => s == 'Other…'
+                    ? _askOther('meal', (v) => setState(() { _otherMeal = v; _meal = v; }))
+                    : setState(() => _meal = s))),
 
             const SizedBox(height: 22),
             _pad(_label('2 · How much time?')),
             const SizedBox(height: 10),
-            _pad(_chips(_times.map((t) => '$t min').toList(), (s) => '$_minutes min' == s, (s) => setState(() => _minutes = int.parse(s.split(' ').first)))),
+            _pad(_chips([..._times.map((t) => '$t min'), ?_otherTime, 'Other…'],
+                (s) => '$_minutes min' == s || s == _otherTime,
+                (s) {
+                  if (s == 'Other…') {
+                    _askOther('minutes', (v) => setState(() {
+                          _otherTime = v;
+                          final n = int.tryParse(RegExp(r'\d+').firstMatch(v)?.group(0) ?? '');
+                          if (n != null) _minutes = n;
+                        }));
+                  } else {
+                    setState(() => _minutes = int.parse(s.split(' ').first));
+                  }
+                })),
 
             const SizedBox(height: 22),
             _pad(_label('3 · What’s in the kitchen?')),
             const SizedBox(height: 10),
-            _pad(_chips(foodIngredientLibrary(), _has.contains, (s) => setState(() => _has.contains(s) ? _has.remove(s) : _has.add(s)))),
+            _pad(_chips([...foodIngredientLibrary(), ..._otherHas, 'Other…'],
+                _has.contains,
+                (s) => s == 'Other…'
+                    ? _askOther('ingredient', (v) => setState(() {
+                          _otherHas.add(v);
+                          _has.add(v);
+                        }))
+                    : setState(() => _has.contains(s) ? _has.remove(s) : _has.add(s)))),
+
+            // 4 - what she would actually serve. Suggesting a chicken khichdi
+            // to a vegetarian family is worse than suggesting nothing.
+            const SizedBox(height: 22),
+            _pad(_label('4 · Veg, non-veg or vegan?')),
+            const SizedBox(height: 10),
+            _pad(_chips(const ['Any', 'Veg', 'Non-veg', 'Vegan'],
+                (s) => _diet == s, (s) => setState(() => _diet = s))),
 
             const SizedBox(height: 24),
             _pad(GestureDetector(

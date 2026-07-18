@@ -307,7 +307,43 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
               )),
             const SizedBox(height: 12),
-            _pad(Text(product.name, style: ppFraunces(29, h: 1.15))),
+            // Compare belongs at the TOP, on the product itself. Comparing is
+            // the primary reason a parent opens two of these pages - burying
+            // the entry point at the bottom meant scrolling past everything
+            // you wanted to compare in order to start comparing.
+            _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Text(product.name, style: ppFraunces(29, h: 1.15))),
+              const SizedBox(width: 12),
+              AnimatedBuilder(
+                animation: PpCompareStore.instance,
+                builder: (context, _) {
+                  final inList = PpCompareStore.instance.selected.any((x) => x.id == product.id);
+                  return GestureDetector(
+                    onTap: () {
+                      _ensureIn(context);
+                      Navigator.of(context).push(
+                          MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen()));
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: inList ? ppPurple : ppPurple.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(inList ? Icons.check_rounded : Icons.add_rounded,
+                            size: 15, color: inList ? Colors.white : ppPurple),
+                        const SizedBox(width: 5),
+                        Text('Compare',
+                            style: ppBody(12.5,
+                                color: inList ? Colors.white : ppPurple, w: FontWeight.w800)),
+                      ]),
+                    ),
+                  );
+                },
+              ),
+            ])),
             const SizedBox(height: 10),
             _pad(Row(children: [
               Text(product.ratingLabel, style: ppBody(13, color: ppCoral, w: FontWeight.w700)),

@@ -14,7 +14,9 @@
 import 'package:flutter/material.dart';
 
 import 'dev_stage_detail_screen.dart';
-import 'development_common.dart';
+import 'development_activity_screen.dart';
+// devWordPill retired with the confusing "Growing" tag. Kept for revert.
+// import 'development_common.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_products_data.dart';
@@ -44,6 +46,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
     final reads = articlesInCollection(collectionId);
     final productCat = productCategoryForArea(area.id);
     final products = kPpProducts.where((p) => p.category == productCat).toList();
+    final activities = activitiesForArea(area.id);
 
     return Scaffold(
       backgroundColor: ppBg,
@@ -52,7 +55,9 @@ class DevelopmentAreaScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, 'Development')),
+            // The back title used to read "Development", so tapping Brain landed you on
+            // a page headed with a word you did not tap. It now names what you opened.
+            _pad(ppBack(context, area.name)),
             const SizedBox(height: 16),
             _pad(Row(children: [
               Container(width: 48, height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: _a.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(15)), child: Icon(area.icon, size: 24, color: _a)),
@@ -60,7 +65,13 @@ class DevelopmentAreaScreen extends StatelessWidget {
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(area.name, style: ppFraunces(24, h: 1.1)),
                 const SizedBox(height: 4),
-                Row(children: [devWordPill(area.word, _a), const SizedBox(width: 8), Flexible(child: Text(area.stage, style: ppBody(12.5, color: _a, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis))]),
+                // Was a "Growing" pill next to the stage name, which read as two
+              // competing labels - it was unclear whether "Growing" was a tag,
+              // a toggle, or a different thing from "Cause & effect". One plain
+              // line instead, saying what is actually happening right now.
+              Text('This week: ${area.stage}',
+                  style: ppBody(12.5, color: _a, w: FontWeight.w700),
+                  maxLines: 2, overflow: TextOverflow.ellipsis),
               ])),
             ])),
 
@@ -85,9 +96,9 @@ class DevelopmentAreaScreen extends StatelessWidget {
 
             // skills as clickable boxes
             const SizedBox(height: 26),
-            _pad(Text('Skills', style: ppJakarta(18))),
+            _pad(Text('${area.name} skills timeline', style: ppJakarta(18))),
             const SizedBox(height: 4),
-            _pad(Text('Where he is on this path - tap any skill to understand it, and how to help.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Mastered, practising now, and what is coming - tap any skill to understand it and how to help.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [
               for (final s in area.journey) _skillBox(context, s),
@@ -97,7 +108,18 @@ class DevelopmentAreaScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Text('Go deeper', style: ppJakarta(18))),
 
+            // Activities lead "Go deeper": watching and reading are useful, but
+            // the thing a parent can DO with the baby this afternoon is what
+            // actually moves a skill along.
             const SizedBox(height: 18),
+            _railHeader(context, 'Try together', null),
+            const SizedBox(height: 12),
+            if (activities.isEmpty)
+              _pad(_emptyRail('Activities for this area are on the way.'))
+            else
+              _activityRail(context, activities),
+
+            const SizedBox(height: 24),
             _railHeader(context, 'Watch', videos.isEmpty ? null : () => _push(context, WatchCategoryScreen(category: watchCategoryForArea(area.id)))),
             const SizedBox(height: 12),
             if (videos.isEmpty) _pad(_emptyRail('Videos for this area are on the way.')) else _watchRail(context, videos),
@@ -119,11 +141,18 @@ class DevelopmentAreaScreen extends StatelessWidget {
 
   // ---- skill box ----------------------------------------------------------
   Widget _skillBox(BuildContext context, DevStage s) {
-    final (label, color) = switch (s.status) {
-      'mastered' => ('Mastered', _a),
-      'current' => ('Practising now', _a),
-      'next' => ('Coming next', _a),
-      _ => ('Further ahead', ppMuted),
+    // Colour carries the timeline, so the path is readable at a glance without
+    // reading a word: settled green behind him, warm amber for what he is
+    // working on now, muted for what has not arrived yet.
+    const done = Color(0xFF3E7A52);
+    const doneBg = Color(0xFFEDF5EE);
+    const nowInk = Color(0xFF9A6B12);
+    const nowBg = Color(0xFFFDF4E3);
+    final (label, color, bg, border) = switch (s.status) {
+      'mastered' => ('Mastered', done, doneBg, done.withValues(alpha: 0.28)),
+      'current' => ('Practising now', nowInk, nowBg, nowInk.withValues(alpha: 0.42)),
+      'next' => ('Coming next', ppSoft, Colors.white, ppHair),
+      _ => ('Further ahead', ppMuted, Colors.white, ppHair),
     };
     return GestureDetector(
       onTap: () => _push(context, DevStageDetailScreen(area: area, stage: s, kindLabel: 'Skill')),
@@ -132,9 +161,9 @@ class DevelopmentAreaScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: s.status == 'current' ? _a.withValues(alpha: 0.07) : Colors.white,
+          color: bg,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: s.status == 'current' ? _a.withValues(alpha: 0.4) : ppHair),
+          border: Border.all(color: border, width: s.status == 'current' ? 1.4 : 1),
         ),
         child: Row(children: [
           Expanded(
@@ -241,6 +270,35 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   Text(a.title, style: ppJakarta(13.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),
                   Text(a.author, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+
+  Widget _activityRail(BuildContext context, List<DevActivity> items) => SizedBox(
+        height: 150,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) {
+            final a = items[i];
+            return GestureDetector(
+              onTap: () => _push(context, DevelopmentActivityScreen(activity: a)),
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 168,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _railThumb(Icons.toys_outlined, badge: '${a.minutes} min'),
+                  const SizedBox(height: 8),
+                  Text(a.title, style: ppJakarta(13.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 3),
+                  Expanded(
+                    child: Text(a.benefit, style: ppBody(11.5, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  ),
                 ]),
               ),
             );

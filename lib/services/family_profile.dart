@@ -217,6 +217,20 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   bool _multiple = false;
   bool _onboarded = false;
   // ---- pregnancy-side signals (same engine, different vocabulary) ----
+  // MULTI-SELECT (18 Jul review). Feeding, sleep and learning style were all
+  // single-choice, but real families are mixed - breast AND formula, short naps
+  // AND early waking. These sets hold everything she picks; the original
+  // single-value getters below return the FIRST pick so every existing consumer
+  // (recoBoosts, aiContext, the reco engine) keeps working untouched.
+  final Set<FeedingMethod> _feedings = {};
+  final Set<SleepPattern> _sleeps = {};
+  final Set<LearningStyle> _learnings = {};
+
+  /// Free text for the "Other" chip, keyed by field name. There is never a
+  /// complete list of options for a real family, and a profile that cannot
+  /// accept "none of these" quietly teaches her the app is not listening.
+  final Map<String, String> _other = {};
+
   final Set<PregCondition> _pregConditions = {};
   final Set<PregPriority> _pregPriorities = {};
   DietPreference? _diet;
@@ -228,10 +242,16 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
 
   // ---- reads --------------------------------------------------------------
   Set<HealthCondition> get conditions => Set.unmodifiable(_conditions);
-  FeedingMethod? get feeding => _feeding;
-  SleepPattern? get sleep => _sleep;
+  FeedingMethod? get feeding => _feedings.isNotEmpty ? _feedings.first : _feeding;
+  Set<FeedingMethod> get feedings => Set.unmodifiable(_feedings);
+  SleepPattern? get sleep => _sleeps.isNotEmpty ? _sleeps.first : _sleep;
+  Set<SleepPattern> get sleeps => Set.unmodifiable(_sleeps);
   Set<Priority> get priorities => Set.unmodifiable(_priorities);
-  LearningStyle? get learning => _learning;
+  LearningStyle? get learning => _learnings.isNotEmpty ? _learnings.first : _learning;
+  Set<LearningStyle> get learnings => Set.unmodifiable(_learnings);
+
+  /// The free-text answer for a field, if she gave one.
+  String? otherFor(String field) => _other[field];
   Set<NotifyTopic> get notify => Set.unmodifiable(_notify);
   bool get premature => _premature;
   bool get nicu => _nicu;
@@ -487,6 +507,31 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _save(field: 'priorities', value: p.name);
   }
 
+  void toggleFeeding(FeedingMethod f) {
+    if (!_feedings.add(f)) _feedings.remove(f);
+    _save(field: 'feeding', value: f.name);
+  }
+
+  void toggleSleep(SleepPattern sp) {
+    if (!_sleeps.add(sp)) _sleeps.remove(sp);
+    _save(field: 'sleep', value: sp.name);
+  }
+
+  void toggleLearning(LearningStyle l) {
+    if (!_learnings.add(l)) _learnings.remove(l);
+    _save(field: 'learning', value: l.name);
+  }
+
+  void setOther(String field, String text) {
+    final t = text.trim();
+    if (t.isEmpty) {
+      _other.remove(field);
+    } else {
+      _other[field] = t;
+    }
+    _save(field: '$field.other', value: t.isEmpty ? null : 'set');
+  }
+
   void setLearning(LearningStyle? l) {
     _learning = l;
     _save(field: 'learning', value: l?.name);
@@ -578,6 +623,19 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _nicu = m['nicu'] == true;
     _multiple = m['multiple'] == true;
     _onboarded = m['onboarded'] == true;
+    _feedings
+      ..clear()
+      ..addAll(_decode(m['feedings'], FeedingMethod.values));
+    _sleeps
+      ..clear()
+      ..addAll(_decode(m['sleeps'], SleepPattern.values));
+    _learnings
+      ..clear()
+      ..addAll(_decode(m['learnings'], LearningStyle.values));
+    _other
+      ..clear()
+      ..addAll(Map<String, String>.from(
+          (m['other'] as Map?)?.map((k, v) => MapEntry('$k', '$v')) ?? const {}));
     _pregConditions
       ..clear()
       ..addAll(_decode(m['pregConditions'], PregCondition.values));
@@ -625,6 +683,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'multiple': _multiple,
         'onboarded': _onboarded,
         'asked': _asked.map((e) => e.name).toList(),
+        'feedings': _feedings.map((e) => e.name).toList(),
+        'sleeps': _sleeps.map((e) => e.name).toList(),
+        'learnings': _learnings.map((e) => e.name).toList(),
+        'other': _other,
         'pregConditions': _pregConditions.map((e) => e.name).toList(),
         'pregPriorities': _pregPriorities.map((e) => e.name).toList(),
         'diet': _diet?.name,

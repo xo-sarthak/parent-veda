@@ -37,8 +37,10 @@ class HealthHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeline = healthTimelineSorted();
-    final latest = timeline.where((e) => !e.upcoming).take(3).toList();
+    // Timeline now read inside _bucketedTimeline. Kept for revert.
+    // final timeline = healthTimelineSorted();
+    // 'latest' retired - the preview is bucketed now. Kept for revert.
+    // final latest = timeline.where((e) => !e.upcoming).take(3).toList();
     final current = kGrowth.last;
     return Scaffold(
       backgroundColor: ppBg,
@@ -53,9 +55,13 @@ class HealthHomeScreen extends StatelessWidget {
           child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
         ),
       ),
+      // Listens to HealthStore so the moment she enters a measurement or marks a
+      // dose, the not-yet-entered states swap for the real thing.
       body: SafeArea(
         bottom: false,
-        child: ListView(
+        child: AnimatedBuilder(
+          animation: HealthStore.instance,
+          builder: (context, _) => ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
             _pad(ppBack(context, 'Explore')),
@@ -66,72 +72,194 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 6),
             _pad(Text('Not a folder of reports - the living story of his health, understood.', style: ppBody(14, h: 1.5))),
 
-            // 1 - snapshot
-            const SizedBox(height: 22),
-            _pad(_snapshot()),
+            // 1 - snapshot, now compact. It was a 2x2 grid of tiles plus an
+            // upcoming strip, which spent most of a screen saying "fine".
+            const SizedBox(height: 20),
+            _pad(_snapshot(context)),
 
-            // ID & documents - kept high so a parent immediately sees where to
-            // add the birth certificate, Aadhaar and other papers.
-            const SizedBox(height: 12),
-            _pad(_bigCta(context, Icons.badge_outlined, ppPurple, 'ID & documents', 'Birth certificate, Aadhaar & more - add and keep them in one calm place.', () => _push(context, const BabyDocumentsScreen()))),
+            // 2 - TOOLS. Four things a parent DOES here, in one row at the top,
+            // instead of three full-width CTAs scattered down the page. ID &
+            // documents, the visit companion, the emergency card and the health
+            // guide are all the same kind of thing - a tool - and now look it.
+            const SizedBox(height: 16),
+            _toolsRow(context),
 
-            // 2 - timeline preview
+            // 3 - timeline preview, BUCKETED. Mixed rows read as noise ("4-month
+            // well-baby check, 14-week vaccination, mild cold") - the full
+            // timeline already separates doctor visits from vaccinations from
+            // illness, and this now matches it.
             const SizedBox(height: 30),
             _pad(_sectionHeader('Health timeline', 'Full timeline →', () => _push(context, const HealthTimelineScreen()))),
             const SizedBox(height: 6),
-            _pad(Text('Everything that’s happened, as a story - not folders to dig through.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Grouped the way you would look for it - visits, vaccinations, illness.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
-            _pad(Column(children: [for (final e in latest) _timelineRow(context, e)])),
+            _pad(_bucketedTimeline(context)),
 
-            // 3 - growth
+            // 3 - growth. Two states: what she has entered, or an invitation to
+            // enter it. The section NEVER disappears - a parent who has logged
+            // nothing must still learn growth can be tracked here.
             const SizedBox(height: 22),
             _pad(_sectionHeader('Growth', 'Details →', () => _push(context, const GrowthJourneyScreen()))),
             const SizedBox(height: 14),
-            _pad(_growthCard(context, current)),
+            if (HealthStore.instance.growthEntered)
+              _pad(_growthCard(context, current))
+            else
+              _pad(_notEnteredYet(
+                context,
+                Icons.show_chart_rounded,
+                'No measurements yet',
+                'Add his weight, height and head and we will place them on the curve for you - no charts to read yourself.',
+                'Add measurements',
+                () => _push(context, const GrowthJourneyScreen()),
+              )),
 
-            // 4 - vaccination summary (existing module)
+            // 4 - vaccination summary (existing module), same two states
             const SizedBox(height: 30),
             _pad(_sectionHeader('Vaccinations')),
             const SizedBox(height: 14),
-            _pad(_vaxCard(context)),
+            if (HealthStore.instance.vaxEntered)
+              _pad(_vaxCard(context))
+            else
+              _pad(_notEnteredYet(
+                context,
+                Icons.vaccines_outlined,
+                'Nothing marked yet',
+                'Mark the doses he has had and we will keep the schedule, flag what is due, and remind you before it is.',
+                'Open the tracker',
+                () => _push(context, const VaxTrackerScreen()),
+              )),
 
-            // 5 - medical history
+            // 5 - what we ASK HER to enter. Renamed from "Medical history",
+            // which described a folder; this is a request. Baby documents left
+            // for the tools row above - it is a tool, not a thing to log.
             const SizedBox(height: 30),
-            _pad(_sectionHeader('Medical history')),
+            _pad(_sectionHeader('Add & view records')),
             const SizedBox(height: 4),
-            _pad(Text('Organised for you - never a pile of PDFs.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('The more you log, the more his health story can tell you.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(_history(context)),
 
-            // 6 - AI insights
+            // 6 - "What we noticed" LAST, and only when there is genuinely
+            // something to say. An insights card that always fires has nothing
+            // to be trusted with.
             const SizedBox(height: 30),
             _pad(_insights(context)),
-
-            // Doctor Visit Companion + Emergency
-            const SizedBox(height: 24),
-            _pad(_bigCta(context, Icons.summarize_outlined, ppPurple, 'Doctor Visit Companion', 'Generate a ready-to-share summary before your next appointment.', () => _push(context, const HealthDoctorVisitScreen()))),
-            const SizedBox(height: 12),
-            _pad(_bigCta(context, Icons.emergency_outlined, ppCoral, 'Emergency Card', 'Blood group, allergies, contacts - ready offline, in seconds.', () => _push(context, const HealthEmergencyScreen()))),
-            const SizedBox(height: 12),
-            _pad(_healthGuideLink(context)),
           ],
+          ),
         ),
       ),
     );
   }
 
+  // ---- tools row ----------------------------------------------------------
+  //  Four icons, one horizontal row, right under the snapshot. These were three
+  //  full-width CTAs strung down the page plus a text link at the very bottom -
+  //  all the same KIND of thing, none of them looking like it.
+  Widget _toolsRow(BuildContext context) {
+    final tools = <(IconData, String, Color, VoidCallback)>[
+      (Icons.badge_outlined, 'ID &\ndocuments', ppPurple, () => _push(context, const BabyDocumentsScreen())),
+      (Icons.summarize_outlined, 'Doctor visit\ncompanion', ppPurple, () => _push(context, const HealthDoctorVisitScreen())),
+      (Icons.emergency_outlined, 'Emergency\ncard', ppCoral, () => _push(context, const HealthEmergencyScreen())),
+      (Icons.menu_book_outlined, 'Health\nguide', const Color(0xFF3E9A8C), () => _push(context, const HealthGuideScreen())),
+    ];
+    return _pad(Row(children: [
+      for (final t in tools) ...[
+        if (t != tools.first) const SizedBox(width: 10),
+        Expanded(
+          child: GestureDetector(
+            onTap: t.$4,
+            behavior: HitTestBehavior.opaque,
+            child: Column(children: [
+              Container(
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: t.$3.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(16)),
+                child: Icon(t.$1, size: 22, color: t.$3),
+              ),
+              const SizedBox(height: 7),
+              Text(t.$2,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: ppBody(10.5, color: ppInk, w: FontWeight.w700, h: 1.25)),
+            ]),
+          ),
+        ),
+      ],
+    ]));
+  }
+
+  // ---- bucketed timeline --------------------------------------------------
+  //  Doctor visits, vaccinations and illness kept apart, each showing its most
+  //  recent entry, so the preview matches how the full timeline is organised.
+  Widget _bucketedTimeline(BuildContext context) {
+    final all = healthTimelineSorted().where((e) => !e.upcoming).toList();
+    final buckets = <(String, List<HealthEventType>)>[
+      ('Doctor visits', [HealthEventType.doctorVisit, HealthEventType.assessment]),
+      ('Vaccinations', [HealthEventType.vaccination]),
+      ('Illness & symptoms', [HealthEventType.illness, HealthEventType.allergy]),
+    ];
+    return Column(children: [
+      for (final b in buckets) ...[
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8, top: 4),
+          child: Row(children: [
+            Text(b.$1.toUpperCase(),
+                style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.7)),
+          ]),
+        ),
+        // Empty buckets still show their heading and an invitation - a parent
+        // who has logged no illness should still learn she can.
+        if (all.where((e) => b.$2.contains(e.type)).isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
+              child: Text('Nothing logged yet.', style: ppBody(12.5, color: ppMuted)),
+            ),
+          )
+        else
+          for (final e in all.where((e) => b.$2.contains(e.type)).take(2))
+            _timelineRow(context, e),
+        const SizedBox(height: 6),
+      ],
+    ]);
+  }
+
   // ---- snapshot -----------------------------------------------------------
-  Widget _snapshot() => Container(
+  Widget _snapshot(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(22), border: Border.all(color: ppHair), boxShadow: ppCardShadow),
         child: Column(children: [
-          Row(children: [
-            for (int i = 0; i < 2; i++) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: _statTile(kHealthSnapshot[i]))],
-          ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            for (int i = 2; i < 4; i++) ...[if (i > 2) const SizedBox(width: 12), Expanded(child: _statTile(kHealthSnapshot[i]))],
-          ]),
+          // One row of four, not a 2x2 grid. This block used to spend most of a
+          // screen to say "fine". Tapping explains where each verdict comes
+          // from - "overall good" is worthless if a parent cannot see what it
+          // is reading, and worse than worthless if she assumes we know more
+          // than we do.
+          GestureDetector(
+            onTap: () => _explainSnapshot(context),
+            behavior: HitTestBehavior.opaque,
+            child: Column(children: [
+              Row(children: [
+                for (int i = 0; i < kHealthSnapshot.length && i < 4; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  Expanded(child: _statTile(kHealthSnapshot[i])),
+                ],
+              ]),
+              const SizedBox(height: 10),
+              Row(children: [
+                const Icon(Icons.info_outline_rounded, size: 13, color: ppPurple),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text('How we work this out',
+                      style: ppBody(11.5, color: ppPurple, w: FontWeight.w700),
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
+                ),
+              ]),
+            ]),
+          ),
           const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -151,8 +279,58 @@ class HealthHomeScreen extends StatelessWidget {
         ]),
       );
 
+  /// Where each verdict comes from, and — just as importantly — what it does
+  /// NOT know. A parent who reads "overall good" and assumes we have seen a
+  /// doctor's report has been misled by our own summary.
+  void _explainSnapshot(BuildContext context) => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: ppBg,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (_) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 14, 24, 28),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 18),
+              Text('How we work this out', style: ppFraunces(23, h: 1.15)),
+              const SizedBox(height: 10),
+              Text('Each line reads only what you have entered in ParentVeda. Nothing here comes from a clinic, and none of it is a medical assessment.',
+                  style: ppBody(13.5, color: ppInk, h: 1.6)),
+              const SizedBox(height: 18),
+              for (final row in const [
+                ('Overall', 'A plain roll-up of the three below. It says "good" when none of them need attention — never that a doctor has checked him.'),
+                ('Growth', 'Your logged weight, height and head measurements, placed against the WHO reference band for his age.'),
+                ('Vaccinations', 'The national schedule for his age, against the doses you have marked done.'),
+                ('Allergies', 'Only what you have recorded yourself. An empty list means nothing has been entered, not that none exist.'),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 13),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(row.$1.toUpperCase(),
+                        style: ppBody(9.5, color: ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.7)),
+                    const SizedBox(height: 4),
+                    Text(row.$2, style: ppBody(13, color: ppInk, h: 1.55)),
+                  ]),
+                ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Icon(Icons.favorite_border, size: 16, color: ppCoral),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text('If anything here worries you, your paediatrician is the right call — not this page.',
+                      style: ppBody(12.5, color: ppInk, h: 1.5))),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      );
+
   Widget _statTile(HealthStat s) => Container(
-        padding: const EdgeInsets.all(13),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(color: ppBg, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(s.label.toUpperCase(), style: ppBody(9, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.5)),
@@ -160,7 +338,7 @@ class HealthHomeScreen extends StatelessWidget {
           Row(children: [
             Container(width: 7, height: 7, decoration: BoxDecoration(color: statusColor(s.status), shape: BoxShape.circle)),
             const SizedBox(width: 7),
-            Expanded(child: Text(s.value, style: ppJakarta(13.5), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(s.value, style: ppJakarta(11.5), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
         ]),
       );
@@ -218,25 +396,82 @@ class HealthHomeScreen extends StatelessWidget {
       ]);
 
   // ---- vaccination summary ------------------------------------------------
+  /// The not-yet-entered state for a health section. An invitation, never a
+  /// hidden section: a parent who has logged nothing must still learn the
+  /// feature exists. See docs/PERSONALIZATION.md section 3.
+  Widget _notEnteredYet(BuildContext context, IconData icon, String title,
+          String body, String cta, VoidCallback onTap) =>
+      GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            color: ppPanel,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: ppHair),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(icon, size: 17, color: ppPurple),
+              const SizedBox(width: 9),
+              Expanded(child: Text(title, style: ppJakarta(15))),
+            ]),
+            const SizedBox(height: 8),
+            Text(body, style: ppBody(13, color: ppSoft, h: 1.55)),
+            const SizedBox(height: 12),
+            Row(children: [
+              Text(cta, style: ppBody(13, color: ppPurple, w: FontWeight.w800)),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+            ]),
+          ]),
+        ),
+      );
+
+  Widget _vaxPointer(IconData icon, Color color, String text) => Row(children: [
+        Icon(icon, size: 15, color: color),
+        const SizedBox(width: 9),
+        Expanded(child: Text(text, style: ppBody(12.5, color: ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
+      ]);
+
   Widget _vaxCard(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Container(width: 42, height: 42, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.vaccines_outlined, size: 20, color: ppPurple)),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Container(width: 7, height: 7, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle)),
-                  const SizedBox(width: 7),
-                  Text(kVaxStatus, style: ppJakarta(15)),
-                ]),
-                const SizedBox(height: 3),
-                Text('$kVaxCompleted of $kVaxTotalDue milestones done · next: $kVaxNext', style: ppBody(12.5), maxLines: 2, overflow: TextOverflow.ellipsis),
-              ]),
+          // "Up to date" is the headline and it looks like one: a green tick
+          // block, not a bullet in a list. What is done and what is next then
+          // read as two plain pointers - "7 of 8 milestones done, next due in
+          // one night" was a sentence nobody could parse at a glance.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDF5EE),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF3E7A52).withValues(alpha: 0.28)),
             ),
-          ]),
+            child: Row(children: [
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(color: Color(0xFF3E7A52), shape: BoxShape.circle),
+                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(kVaxStatus,
+                    style: ppJakarta(15).copyWith(color: const Color(0xFF2F5C3E)),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 12),
+          _vaxPointer(Icons.check_circle_outline_rounded, const Color(0xFF3E7A52),
+              '$kVaxCompleted of $kVaxTotalDue milestones done'),
+          const SizedBox(height: 7),
+          _vaxPointer(Icons.schedule_rounded, const Color(0xFFC98A2B), 'Next up: $kVaxNext'),
           const SizedBox(height: 14),
           GestureDetector(
             onTap: () => _push(context, const VaxTrackerScreen()),
@@ -264,7 +499,9 @@ class HealthHomeScreen extends StatelessWidget {
       (Icons.description_outlined, 'Reports', () => _push(context, const HealthRecordsScreen(category: 'reports'))),
       (Icons.healing_outlined, 'Symptoms', () => _push(context, const HealthRecordsScreen(category: 'symptoms'))),
       (Icons.shield_outlined, 'Allergies', () => _push(context, const HealthRecordsScreen(category: 'allergies'))),
-      (Icons.folder_outlined, 'Baby documents', () => _push(context, const BabyDocumentsScreen())),
+      // Baby documents moved OUT - it lives in the tools row now. It is
+      // something you keep, not something you log alongside symptoms.
+      // (Icons.folder_outlined, 'Baby documents', () => _push(context, const BabyDocumentsScreen())),
     ];
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
@@ -290,7 +527,19 @@ class HealthHomeScreen extends StatelessWidget {
   }
 
   // ---- AI insights --------------------------------------------------------
-  Widget _insights(BuildContext context) => Container(
+  /// DYNAMIC: it only appears when there is genuinely something to say. A
+  /// "what we noticed" card that fires whether or not anything was noticed
+  /// teaches a parent to stop reading it — which costs us the one moment it
+  /// might actually matter.
+  Widget _insights(BuildContext context) {
+    // Nothing of HERS to notice yet means we have nothing to say - and saying
+    // it anyway, from seed data, would be inventing an observation.
+    if (!HealthStore.instance.hasAnyEntry) return const SizedBox.shrink();
+    if (kHealthInsights.isEmpty) return const SizedBox.shrink();
+    return _insightsCard(context);
+  }
+
+  Widget _insightsCard(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF1EAF8), Color(0xFFF6ECEF)]),
@@ -328,6 +577,8 @@ class HealthHomeScreen extends StatelessWidget {
       );
 
   // ---- CTAs ---------------------------------------------------------------
+  // RETIRED - these became the tools row. Kept for revert.
+  // ignore: unused_element
   Widget _bigCta(BuildContext context, IconData icon, Color accent, String title, String sub, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -350,6 +601,8 @@ class HealthHomeScreen extends StatelessWidget {
         ),
       );
 
+  // RETIRED - the health guide is now the fourth tool. Kept for revert.
+  // ignore: unused_element
   Widget _healthGuideLink(BuildContext context) => GestureDetector(
         onTap: () => _push(context, const HealthGuideScreen()),
         behavior: HitTestBehavior.opaque,

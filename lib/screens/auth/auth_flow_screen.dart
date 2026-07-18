@@ -577,9 +577,22 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const SizedBox(height: 16),
             _waOptInSection(),
             const SizedBox(height: 8),
-            _primaryBtn('Finish setup', _saveProfile),
-            const SizedBox(height: 12),
-            Center(child: _link('Skip for now', _saveProfile, color: _label)),
+            // The due date / birthday is MANDATORY. Everything in the app is
+            // keyed to it - the week, the leap, the content, the whole point -
+            // and a profile without one lands on a placeholder week that
+            // quietly misleads. "Skip for now" is gone for that reason: there
+            // is nothing useful on the other side of skipping it.
+            _primaryBtn('Finish setup', _pickedDue == null ? _nudgeForDate : _saveProfile),
+            if (_pickedDue == null) ...[
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  'Add the date above to continue — everything else is built around it.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12.5, height: 1.45, color: _label),
+                ),
+              ),
+            ],
           ]),
         ),
       ]);
@@ -1170,6 +1183,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         child: child,
       );
+
+  /// Nudges rather than silently doing nothing: a dead button teaches the user
+  /// the app is broken, where a message teaches them what to do next.
+  void _nudgeForDate() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please add the due date or birthday first.')),
+    );
+  }
 
   Widget _primaryBtn(String label, VoidCallback onTap) => SizedBox(
         width: double.infinity,

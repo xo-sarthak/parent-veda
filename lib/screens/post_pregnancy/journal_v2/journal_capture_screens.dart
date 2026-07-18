@@ -195,9 +195,16 @@ class QuickCaptureScreen extends StatelessWidget {
               ]),
               const SizedBox(height: 8),
               TextField(
+                // autofocus so the cursor is blinking on the prompt the moment
+                // the screen opens. Without it the page reads as something to
+                // look at rather than somewhere to type - there was nothing
+                // telling you where the words were meant to go.
+                autofocus: true,
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 style: ppFraunces(22, h: 1.2),
+                cursorColor: ppPurple,
+                cursorWidth: 2.2,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: false,

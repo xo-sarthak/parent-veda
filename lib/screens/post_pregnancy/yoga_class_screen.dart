@@ -82,6 +82,8 @@ class YogaClassScreen extends StatelessWidget {
                   // instructor
                   const SizedBox(height: 20),
                   _pad(_instructorRow()),
+                  const SizedBox(height: 14),
+                  _pad(_instructorAbout(context)),
 
                   // quick facts
                   const SizedBox(height: 20),
@@ -191,6 +193,70 @@ class YogaClassScreen extends StatelessWidget {
       const SizedBox(width: 10),
       const Icon(Icons.verified_outlined, size: 20, color: ppPurple),
     ]);
+  }
+
+  /// Who the trainer is, in enough depth to book them. For a one-to-one this
+  /// matters more than the class description does - the session is only as
+  /// good as the person running it.
+  Widget _instructorAbout(BuildContext context) {
+    final others = classesByInstructor(cls.instructorName, excludeId: cls.id);
+    if (cls.instructorBio.isEmpty && others.isEmpty) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: ppBorder),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('About ${cls.instructorName}', style: ppJakarta(15.5)),
+        if (cls.instructorBio.isNotEmpty) ...[
+          const SizedBox(height: 9),
+          Text(cls.instructorBio, style: ppBody(13.5, color: ppInk, h: 1.6)),
+        ],
+        if (cls.instructorFocus.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text('WORKS MOST WITH',
+              style: ppBody(9, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.7)),
+          const SizedBox(height: 7),
+          Wrap(spacing: 7, runSpacing: 7, children: [
+            for (final f in cls.instructorFocus)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
+                child: Text(f, style: ppBody(11.5, color: ppInk, w: FontWeight.w600)),
+              ),
+          ]),
+        ],
+        if (others.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text('ALSO TEACHES',
+              style: ppBody(9, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.7)),
+          const SizedBox(height: 8),
+          for (final o in others.take(3))
+            GestureDetector(
+              onTap: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: o)),
+              ),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(children: [
+                  const Icon(Icons.self_improvement_rounded, size: 16, color: ppPurple),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(o.title,
+                        style: ppBody(13, color: ppInk, w: FontWeight.w600),
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+                ]),
+              ),
+            ),
+        ],
+      ]),
+    );
   }
 
   // ---- quick facts --------------------------------------------------------

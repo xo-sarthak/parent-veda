@@ -90,7 +90,9 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: JourneysScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('30 days of breastfeeding'), findsOneWidget);
+    // Retitled 18 Jul: "days" implied a schedule to fall behind on. It is 30
+    // PARTS, read at whatever pace suits.
+    expect(find.text('Breastfeeding, in 30 parts'), findsOneWidget);
     expect(find.textContaining('Presented by'), findsNothing);
   });
 

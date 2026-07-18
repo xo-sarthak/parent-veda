@@ -133,6 +133,8 @@ import 'package:parentveda/screens/post_pregnancy/watch_channel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_shorts_screen.dart';
 
 void main() {
+  healthTwoStateTests();
+
   final screens = <String, Widget>{
     'My Child home': const MyChildScreen(home: true),
     'Today (retired briefing)': const PostPregnancyHome(),
@@ -403,7 +405,11 @@ void main() {
 
   // A Milestone row opens its detail (skill/milestone), data-driven from the
   // child's current + emerging stages.
-  testWidgets('My Child home: a milestone opens its detail', (tester) async {
+  // The old "Milestones" section listed what he is doing NOW alongside what is
+  // next, which made it near-indistinguishable from the Child snapshot above
+  // it. It is now "What <name> is preparing for next" and lists ONLY upcoming
+  // stages - so this asserts a 'next' milestone, not a current one.
+  testWidgets('My Child home: an upcoming milestone opens its detail', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -412,14 +418,14 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(
-      find.text('Rolling'),
+      find.text('Sitting with support'),
       300,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 40,
     );
-    await tester.ensureVisible(find.text('Rolling'));
+    await tester.ensureVisible(find.text('Sitting with support'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Rolling'));
+    await tester.tap(find.text('Sitting with support'));
     await tester.pumpAndSettle();
 
     expect(find.byType(DevStageDetailScreen), findsOneWidget);
@@ -503,6 +509,16 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: WatchHomeScreen()));
     await tester.pumpAndSettle();
 
+    // The topic filters now WRAP onto two or three lines instead of scrolling
+    // sideways (so the whole set is scannable), which pushes the hero below
+    // the fold. The feed is a lazy ListView.builder, so scroll it into
+    // existence rather than expecting it pre-built.
+    await tester.scrollUntilVisible(
+      find.text('Today for Aarav'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 20,
+    );
     expect(find.text('Today for Aarav'), findsOneWidget);
     await tester.ensureVisible(find.text('Watch now'));
     await tester.pumpAndSettle();
@@ -531,8 +547,11 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // Food: the recipe page's signature Healthier Version toggle flips the framing.
-  testWidgets('Food: recipe Healthier Version toggle switches framing', (tester) async {
+  // Food: the Healthier-Version toggle was RETIRED (17-18 July review) - one
+  // recipe, already the good version. Offering an "everyday" alternative
+  // undercut the point of the page. This now asserts the toggle is GONE and
+  // that what replaced it leads: why it is good for him, above the timings.
+  testWidgets('Food: the recipe leads with why it is good, not a version toggle', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -540,12 +559,18 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: FoodRecipeScreen(recipe: foodRecipeById('ragipancake'))));
     await tester.pumpAndSettle();
 
-    expect(find.text('HEALTHIER VERSION'), findsOneWidget); // eyebrow (uppercased)
-    await tester.ensureVisible(find.text('Everyday'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Everyday'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('usually made'), findsOneWidget);
+    expect(find.text('HEALTHIER VERSION'), findsNothing);
+    expect(find.text('Everyday'), findsNothing);
+    // The replacement is present and reachable.
+    expect(find.text('WHY THIS IS GOOD FOR HIM'), findsOneWidget);
+    // And the equipment call-out lands with the ingredients.
+    await tester.scrollUntilVisible(
+      find.text('You will need'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 20,
+    );
+    expect(find.text('You will need'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -625,6 +650,12 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
+    // The vaccination SUMMARY only renders once a real dose has been marked -
+    // before that the section shows an invitation instead. Enter that state
+    // deliberately, and put the singleton back afterwards.
+    HealthStore.instance.markVaxEntered();
+    addTearDown(() => HealthStore.instance.resetEnteredForTest());
+
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
 
@@ -635,9 +666,12 @@ void main() {
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('Open Vaccination Tracker'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('Emergency Card'), 300,
+    // The Emergency Card is now one of four TOOLS in a row under the snapshot
+    // (with ID & documents, the visit companion and the health guide) rather
+    // than a full-width CTA near the bottom - so it is reached by scrolling UP.
+    await tester.scrollUntilVisible(find.text('Emergency\ncard'), -300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    await tester.tap(find.text('Emergency Card'));
+    await tester.tap(find.text('Emergency\ncard'));
     await tester.pumpAndSettle();
     expect(find.byType(HealthEmergencyScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -934,6 +968,63 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('astro-toggle')));
     await tester.pump();
     expect(find.text("Aarav's cosmic notes"), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+// =============================================================================
+//  Health: the two states — entered, and not yet entered
+// -----------------------------------------------------------------------------
+//  The snapshot, growth and vaccination figures are seed constants, so the app
+//  could not tell a parent who had logged nothing from one who had logged
+//  everything. These assert BOTH states render, and that the not-yet-entered
+//  one is an invitation rather than a hidden section.
+// =============================================================================
+void healthTwoStateTests() {
+  testWidgets('Health: growth and vaccinations invite entry before anything is logged',
+      (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    expect(HealthStore.instance.growthEntered, isFalse,
+        reason: 'precondition - nothing entered in a fresh session');
+
+    await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('No measurements yet'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    // The section is PRESENT, not hidden - it just has nothing of hers in it.
+    expect(find.text('Growth'), findsOneWidget);
+    expect(find.text('No measurements yet'), findsOneWidget);
+    expect(find.text('Add measurements'), findsOneWidget);
+
+    // Scrolling on to the vaccination section disposes the growth heading above
+    // it (lazy ListView), so assert the invitation itself rather than a heading
+    // that has legitimately left the tree.
+    await tester.scrollUntilVisible(find.text('Nothing marked yet'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    expect(find.text('Nothing marked yet'), findsOneWidget);
+    expect(find.text('Open the tracker'), findsOneWidget);
+  });
+
+  testWidgets('Health: entering growth swaps the invitation for her figures',
+      (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    HealthStore.instance.markGrowthEntered();
+    addTearDown(() => HealthStore.instance.resetEnteredForTest());
+
+    await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Growth'), 300,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+    expect(find.text('No measurements yet'), findsNothing,
+        reason: 'her real figures replace the invitation');
     expect(tester.takeException(), isNull);
   });
 }

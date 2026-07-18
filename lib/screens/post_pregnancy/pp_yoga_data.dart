@@ -46,6 +46,11 @@ class YogaClass {
     required this.category,
     required this.instructorName,
     required this.instructorCredential,
+    // Who this person actually is. For a 1:1 session the trainer IS the
+    // product - booking one on a name and a credential alone asks a parent to
+    // spend money on a stranger.
+    this.instructorBio = '',
+    this.instructorFocus = const [],
     required this.rating,
     required this.reviewsCount,
     required this.mode,
@@ -64,6 +69,8 @@ class YogaClass {
   final String category; // -> YogaCategory.id
   final String instructorName;
   final String instructorCredential;
+  final String instructorBio;
+  final List<String> instructorFocus;
   final double rating; // out of 5
   final int reviewsCount;
   final YogaMode mode;
@@ -149,6 +156,9 @@ const List<YogaClass> kYogaClasses = [
     category: 'yoga',
     instructorName: 'Aditi Verma',
     instructorCredential: 'Certified Yoga Acharya · 15 yrs',
+    instructorBio:
+        'Aditi trained in Mysore and has spent fifteen years working almost entirely with pregnant and postpartum women. She is unusually careful about diastasis recti and pelvic-floor recovery, and will slow a session down rather than push a pose that is not ready.',
+    instructorFocus: ['Postpartum recovery', 'Pelvic floor', 'Diastasis recti', 'Gentle prenatal'],
     rating: 4.9,
     reviewsCount: 214,
     mode: YogaMode.liveGroup,
@@ -813,3 +823,9 @@ class YogaStore extends ChangeNotifier {
 
   List<YogaClass> get booked => _booked.map(yogaClassById).toList();
 }
+
+/// Everything else this instructor teaches. A parent deciding on a 1:1 session
+/// is really deciding on a person, and seeing their other classes is the
+/// cheapest way to judge whether they are the right one.
+List<YogaClass> classesByInstructor(String name, {String? excludeId}) =>
+    kYogaClasses.where((c) => c.instructorName == name && c.id != excludeId).toList();

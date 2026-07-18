@@ -96,6 +96,19 @@ class RemedyDetailScreen extends StatelessWidget {
               ),
             )),
             const SizedBox(height: 12),
+            // Which concern this remedy is FOR, right beside its name. Scroll a
+            // little way into a nuskha and it is easy to lose track of what you
+            // opened it for in the first place.
+            _pad(Row(children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
+                child: Text('For ${r.category}',
+                    style: ppBody(11, color: ppPurple, w: FontWeight.w700),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ])),
+            const SizedBox(height: 9),
             _pad(Text(r.name, style: ppFraunces(29, h: 1.15))),
 
             // age-gate caution (only when the remedy is age-restricted)

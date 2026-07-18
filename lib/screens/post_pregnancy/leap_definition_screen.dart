@@ -27,6 +27,24 @@ class LeapDefinitionScreen extends StatelessWidget {
   const LeapDefinitionScreen({super.key, required this.leap});
   final Leap leap;
 
+  /// The "how to walk through it together" section is advice for the PARENT,
+  /// not description of the child - it earns its own visual treatment.
+  static bool _isParentAdvice(String heading) {
+    final h = heading.toLowerCase();
+    return h.contains('walk through it together') ||
+        h.contains('how to help') ||
+        h.contains('what you can do');
+  }
+
+  /// Shown in place of a rail that has no content yet, so the page keeps the
+  /// same shape for every leap instead of silently losing a section.
+  Widget _soonNote(String msg) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
+        child: Text(msg, style: ppBody(12.5, color: ppMuted, h: 1.45)),
+      );
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
@@ -127,22 +145,52 @@ class LeapDefinitionScreen extends StatelessWidget {
               ]),
             )),
 
-            // full description
+            // full description. The "how to walk through it together" section is
+            // a different KIND of thing from the rest - everything else explains
+            // what is happening to him, that one tells her what SHE can do. It
+            // gets its own card so the shift in register is visible.
             for (final s in leap.sections) ...[
-              const SizedBox(height: 24),
-              _pad(Text(s.heading, style: ppJakarta(17))),
-              const SizedBox(height: 10),
-              for (final p in s.paragraphs) ...[
-                _pad(Text(p, style: ppBody(14.5, color: ppInk, h: 1.65))),
-                const SizedBox(height: 12),
+              if (_isParentAdvice(s.heading)) ...[
+                const SizedBox(height: 24),
+                _pad(Container(
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 6),
+                  decoration: BoxDecoration(
+                    color: leap.accent.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: leap.accent.withValues(alpha: 0.22)),
+                  ),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Icon(Icons.volunteer_activism_outlined, size: 17, color: leap.accent),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(s.heading, style: ppJakarta(16))),
+                    ]),
+                    const SizedBox(height: 4),
+                    Text('What you can do', style: ppBody(11.5, color: leap.accent, w: FontWeight.w700)),
+                    const SizedBox(height: 12),
+                    for (final p in s.paragraphs) ...[
+                      Text(p, style: ppBody(14, color: ppInk, h: 1.6)),
+                      const SizedBox(height: 12),
+                    ],
+                  ]),
+                )),
+              ] else ...[
+                const SizedBox(height: 24),
+                _pad(Text(s.heading, style: ppJakarta(17))),
+                const SizedBox(height: 10),
+                for (final p in s.paragraphs) ...[
+                  _pad(Text(p, style: ppBody(14.5, color: ppInk, h: 1.65))),
+                  const SizedBox(height: 12),
+                ],
               ],
             ],
 
             // leap video
+            _pad(ppSectionDivider()),
+            _pad(Text('Watch', style: ppJakarta(17))),
+            const SizedBox(height: 12),
+            if (video == null) _pad(_soonNote('A video for this leap is coming.')),
             if (video != null) ...[
-              _pad(ppSectionDivider()),
-              _pad(Text('Watch', style: ppJakarta(17))),
-              const SizedBox(height: 12),
               _pad(GestureDetector(
                 onTap: () => _push(context, WatchPlayerScreen(video: video)),
                 behavior: HitTestBehavior.opaque,
@@ -163,10 +211,15 @@ class LeapDefinitionScreen extends StatelessWidget {
               )),
             ],
 
-            // reads
+            // reads. Renders whether or not this leap has any yet, so every
+            // leap page has the same shape - a section that appears for leap 4
+            // and vanishes for leap 7 reads as a broken page, not a lean one.
+            const SizedBox(height: 22),
+            _pad(Text('Read more', style: ppJakarta(17))),
+            const SizedBox(height: 12),
+            if (articles.isEmpty)
+              _pad(_soonNote('Reads for this leap are being written.')),
             if (articles.isNotEmpty) ...[
-              const SizedBox(height: 22),
-              _pad(Text('Read more', style: ppJakarta(17))),
               const SizedBox(height: 12),
               for (final a in articles)
                 _pad(GestureDetector(
@@ -191,9 +244,12 @@ class LeapDefinitionScreen extends StatelessWidget {
             ],
 
             // products
+            const SizedBox(height: 22),
+            _pad(Text('Might help', style: ppJakarta(17))),
+            const SizedBox(height: 12),
+            if (products.isEmpty)
+              _pad(_soonNote('Picks for this leap are on the way.')),
             if (products.isNotEmpty) ...[
-              const SizedBox(height: 22),
-              _pad(Text('Might help', style: ppJakarta(17))),
               const SizedBox(height: 12),
               for (final p in products)
                 _pad(GestureDetector(

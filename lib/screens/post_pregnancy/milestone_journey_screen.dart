@@ -53,6 +53,12 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 const SizedBox(height: 20),
                 ppToolPad(_hero()),
 
+                // A way straight in, at the top. Most parents arrive because
+                // they just SAW something - waiting for them to scroll the
+                // whole map to find it makes them give up before logging it.
+                const SizedBox(height: 14),
+                ppToolPad(_quickLog()),
+
                 const SizedBox(height: 26),
                 ppToolPad(ppSectionHead('Explore by area')),
                 const SizedBox(height: 4),
@@ -118,6 +124,111 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   }
 
   // ---- hero: development snapshot -----------------------------------------
+  /// "He just did something" — a direct entry that searches every milestone by
+  /// name, so a parent can log what she saw without scrolling the whole map.
+  Widget _quickLog() => GestureDetector(
+        onTap: _openQuickLog,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: ppPurple,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [BoxShadow(color: Color(0x336A30B6), blurRadius: 18, spreadRadius: -6, offset: Offset(0, 8))],
+          ),
+          child: Row(children: [
+            const Icon(Icons.add_circle_outline_rounded, size: 19, color: Colors.white),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Text('He just did something — find it',
+                  style: ppBody(14, color: Colors.white, w: FontWeight.w700),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+            const Icon(Icons.search_rounded, size: 18, color: Colors.white),
+          ]),
+        ),
+      );
+
+  void _openQuickLog() {
+    final ctl = TextEditingController();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ppBg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          final q = ctl.text.trim().toLowerCase();
+          final hits = q.isEmpty
+              ? const <Milestone>[]
+              : kMilestones
+                  .where((m) => m.title.toLowerCase().contains(q) || m.desc.toLowerCase().contains(q))
+                  .take(12)
+                  .toList();
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 14, 24, 20),
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(2)))),
+                  const SizedBox(height: 16),
+                  Text('What did you see?', style: ppFraunces(22, h: 1.15)),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: ctl,
+                    autofocus: true,
+                    onChanged: (_) => setSheet(() {}),
+                    style: ppBody(14.5, color: ppInk),
+                    decoration: InputDecoration(
+                      hintText: 'rolled over, smiled, grabbed…',
+                      hintStyle: ppBody(14.5, color: ppMuted),
+                      prefixIcon: const Icon(Icons.search_rounded, size: 19, color: ppMuted),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (q.isEmpty)
+                    Text('Type what he did and we will find the milestone it belongs to.',
+                        style: ppBody(13, color: ppMuted, h: 1.5))
+                  else if (hits.isEmpty)
+                    Text('Nothing matches that yet — it may not be a tracked milestone, which does not make it any less lovely.',
+                        style: ppBody(13, color: ppMuted, h: 1.5))
+                  else
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          for (final m in hits)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(ctx).pop();
+                                _openDetail(m);
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(children: [
+                                  Icon(kDomainMeta[m.domain]!.icon, size: 17, color: kDomainMeta[m.domain]!.ink),
+                                  const SizedBox(width: 11),
+                                  Expanded(child: Text(m.title, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+                                  const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
+                                ]),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                ]),
+              ),
+            ),
+          );
+        },
+      ),
+    ).whenComplete(ctl.dispose);
+  }
+
   Widget _hero() {
     final recent = _store.recentlyAchieved;
     return Container(

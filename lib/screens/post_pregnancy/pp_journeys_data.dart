@@ -76,8 +76,8 @@ class Journey {
 // =============================================================================
 const Journey kBreastfeedingJourney = Journey(
   id: 'jrn_breastfeeding_30',
-  title: '30 days of breastfeeding',
-  subtitle: 'One short read a day, through the month that decides most of it.',
+  title: 'Breastfeeding, in 30 parts',
+  subtitle: 'One short read at a time, through the stretch that decides most of it.',
   about:
       'Most breastfeeding difficulty happens in the first month, and most of it is ordinary and fixable. This is thirty short reads — one a day — covering what actually happens, in the order it usually happens. It is self-paced: miss a week and nothing is lost, because there is nothing here to fail.',
   expertName: 'Priya Nair',

@@ -156,6 +156,48 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
               // grid
               if (results.isEmpty)
                 _pad(_emptyState())
+              // NO KIND CHOSEN: group by kind rather than pouring live cohorts,
+              // recorded courses and masterclasses into one undifferentiated
+              // run. Three per section with a way through to the rest, so "All"
+              // is browsable instead of a wall you scroll past.
+              else if (_kind == null) ...[
+                for (final k in LearningKind.values)
+                  if (results.where((p) => p.kind == k).isNotEmpty) ...[
+                    _pad(Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
+                      child: Row(children: [
+                        Expanded(
+                          child: Text(k.filterLabel.toUpperCase(),
+                              style: ppBody(10, color: ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.8)),
+                        ),
+                        Text('${results.where((p) => p.kind == k).length}',
+                            style: ppBody(11, color: ppMuted, w: FontWeight.w700)),
+                      ]),
+                    )),
+                    _pad(Column(children: [
+                      for (final p in results.where((p) => p.kind == k).take(3)) _card(p),
+                    ])),
+                    if (results.where((p) => p.kind == k).length > 3)
+                      _pad(GestureDetector(
+                        onTap: () => setState(() => _kind = k),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Row(children: [
+                            Text('View more ${k.filterLabel.toLowerCase()}',
+                                style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                            const SizedBox(width: 5),
+                            const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+                          ]),
+                        ),
+                      ))
+                    else
+                      const SizedBox(height: 14),
+                  ],
+              ]
               else
                 _pad(Column(children: [for (final p in results) _card(p)])),
 
