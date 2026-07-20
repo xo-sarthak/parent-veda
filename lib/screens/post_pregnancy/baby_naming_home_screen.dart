@@ -1,7 +1,9 @@
 // =============================================================================
-//  BabyNamingHomeScreen - the naming tool's front door (V1 | V2 header toggle)
+//  BabyNamingHomeScreen - the naming tool's front door
 // -----------------------------------------------------------------------------
-//  A single entry that lets us flip between the two naming experiences:
+//  V2 (the Baby Naming Journey) IS the tool. The V1|V2 toggle was a reviewing
+//  convenience that shipped; it and the classic Finder are retired below, kept
+//  commented for revert. The two experiences were:
 //    • Version 1 - the classic Baby Name Finder (quiz -> swipe deck -> detail ->
 //      matches). Untouched; opened as-is.
 //    • Version 2 - the new Baby Naming Journey (curated collections -> taste quiz
@@ -34,22 +36,18 @@ class BabyNamingHomeScreen extends StatelessWidget {
       body: Stack(children: [
         SafeArea(
         bottom: false,
-        child: AnimatedBuilder(
-          animation: NameVersionStore.instance,
-          builder: (context, _) {
-            final v2 = NameVersionStore.instance.isV2;
-            return ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
-              children: [
-                _pad(Row(children: [
-                  Expanded(child: ppBack(context, 'Tools')),
-                  _versionToggle(),
-                ])),
-                const SizedBox(height: 20),
-                if (v2) ..._v2Home(context) else ..._v1Home(context),
-              ],
-            );
-          },
+        // V2 IS THE TOOL NOW. The V1|V2 toggle was a reviewing convenience -
+        // a way to flip between the two builds side by side while deciding -
+        // and it shipped. A real parent does not benefit from a "try our older
+        // version" switch, so V1 and the toggle are retired together. Both are
+        // kept commented rather than deleted, per the house rule.
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          children: [
+            _pad(ppBack(context, 'Tools')),
+            const SizedBox(height: 20),
+            ..._v2Home(context),
+          ],
         ),
       ),
       const PpAskVedaFab(),
@@ -57,7 +55,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
     );
   }
 
-  // ---- the V1 | V2 header toggle ------------------------------------------
+  // ---- the V1 | V2 header toggle — RETIRED (kept for revert) ---------------
+  // ignore: unused_element
   Widget _versionToggle() {
     final store = NameVersionStore.instance;
     Widget seg(String label, NameVersion v) {
@@ -87,6 +86,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
   // =========================================================================
   //  Version 1 - the classic Finder (opened as-is)
   // =========================================================================
+  // RETIRED with the toggle: the classic Name Finder. Kept for revert.
+  // ignore: unused_element
   List<Widget> _v1Home(BuildContext context) => [
         _pad(ppEyebrow('Version 1 · Baby Name Finder', color: ppMuted)),
         const SizedBox(height: 10),
@@ -166,7 +167,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text('Take the taste quiz, then start swiping', style: ppFraunces(20, h: 1.25)),
             const SizedBox(height: 8),
-            Text('You each swipe privately - only the names you both love appear. Every match is a small, happy moment.', style: ppBody(13.5, h: 1.55)),
+            Text('Swipe through names at your own pace - the ones you love gather in your shortlist.', style: ppBody(13.5, h: 1.55)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
@@ -196,9 +197,9 @@ class BabyNamingHomeScreen extends StatelessWidget {
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Names we both love', style: ppJakarta(15)),
+                  Text('Names you love', style: ppJakarta(15)),
                   const SizedBox(height: 2),
-                  Text('${NameMatchStore.instance.matchedCount} matched · shortlist, compare & choose', style: ppBody(12)),
+                  Text('${NameMatchStore.instance.likedCount} liked · shortlist, compare & choose', style: ppBody(12)),
                 ]),
               ),
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),

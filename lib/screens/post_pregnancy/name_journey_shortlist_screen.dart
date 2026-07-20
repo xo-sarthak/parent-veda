@@ -43,11 +43,11 @@ class NameJourneyShortlistScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 nameJourneyRibbon(active: 3),
                 const SizedBox(height: 22),
-                _pad(ppEyebrow('Names we both love', color: ppPurple)),
+                _pad(ppEyebrow('Names you love', color: ppPurple)),
                 const SizedBox(height: 10),
-                _pad(Text('Your shared shortlist', style: ppFraunces(28, h: 1.12))),
+                _pad(Text('Your shortlist', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('Every name you both swiped right on gathers here - no manual saving. Compare them, then choose together.', style: ppBody(14, h: 1.55))),
+                _pad(Text('Every name you swiped right on gathers here - no manual saving. Compare them, then choose.', style: ppBody(14, h: 1.55))),
 
                 const SizedBox(height: 22),
                 if (names.isEmpty)
@@ -85,9 +85,9 @@ class NameJourneyShortlistScreen extends StatelessWidget {
         child: Column(children: [
           const Icon(Icons.favorite_border, size: 28, color: ppPurple),
           const SizedBox(height: 12),
-          Text('No matches yet', style: ppJakarta(16)),
+          Text('Nothing here yet', style: ppJakarta(16)),
           const SizedBox(height: 6),
-          Text('Head back and swipe a few names you love - the ones you both like will appear here.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
+          Text('Head back and swipe a few names you love - the ones you like will appear here.', textAlign: TextAlign.center, style: ppBody(13, h: 1.5)),
         ]),
       );
 

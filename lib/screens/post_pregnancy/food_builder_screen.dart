@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'food_common.dart';
 import 'food_recipe_screen.dart';
@@ -196,7 +197,11 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
           const SizedBox(width: 7),
-          Text('Aarav · from 6 months', style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
+          Flexible(
+            child: Text('${ChildProfileStore.instance.name} · from 6 months',
+                style: ppBody(12.5, color: ppInk, w: FontWeight.w600),
+                maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
         ]),
       );
 
@@ -246,7 +251,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
           ]),
         ),
         const SizedBox(height: 12),
-        Text('Why it fits: ${r.why}', style: ppBody(12.5, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
+        Text('Why it fits: ${ppFill(r.why)}', style: ppBody(12.5, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 10),
         Row(children: [
           const Icon(Icons.check_circle_outline_rounded, size: 15, color: ppPurple),

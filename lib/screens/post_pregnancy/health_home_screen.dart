@@ -20,8 +20,11 @@ import 'growth_journey_screen.dart';
 import 'health_guide_screen.dart';
 import 'health_records_screen.dart';
 import 'health_timeline_screen.dart';
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
+import 'pp_vaccine_data.dart';
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
@@ -41,7 +44,9 @@ class HealthHomeScreen extends StatelessWidget {
     // final timeline = healthTimelineSorted();
     // 'latest' retired - the preview is bucketed now. Kept for revert.
     // final latest = timeline.where((e) => !e.upcoming).take(3).toList();
-    final current = kGrowth.last;
+    final growth = GrowthStore.instance;
+    final child = ChildProfileStore.instance;
+    final current = growth.latest;
     return Scaffold(
       backgroundColor: ppBg,
       floatingActionButton: GestureDetector(
@@ -60,7 +65,15 @@ class HealthHomeScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: HealthStore.instance,
+          // Merged: the page now reads growth, vaccinations and the child
+          // profile too, so a measurement logged or a dose marked anywhere
+          // swaps the not-yet-entered states here immediately.
+          animation: Listenable.merge([
+            HealthStore.instance,
+            GrowthStore.instance,
+            VaxStore.instance,
+            ChildProfileStore.instance,
+          ]),
           builder: (context, _) => ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
@@ -68,9 +81,9 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 18),
             _pad(ppEyebrow('ParentVeda Health', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('Aarav’s health', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('${child.name}’s health', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Not a folder of reports - the living story of his health, understood.', style: ppBody(14, h: 1.5))),
+            _pad(Text('Not a folder of reports - the living story of ${child.their} health, understood.', style: ppBody(14, h: 1.5))),
 
             // 1 - snapshot, now compact. It was a 2x2 grid of tiles plus an
             // upcoming strip, which spent most of a screen saying "fine".
@@ -101,14 +114,14 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 22),
             _pad(_sectionHeader('Growth', 'Details →', () => _push(context, const GrowthJourneyScreen()))),
             const SizedBox(height: 14),
-            if (HealthStore.instance.growthEntered)
+            if (HealthStore.instance.growthEntered && current != null)
               _pad(_growthCard(context, current))
             else
               _pad(_notEnteredYet(
                 context,
                 Icons.show_chart_rounded,
                 'No measurements yet',
-                'Add his weight, height and head and we will place them on the curve for you - no charts to read yourself.',
+                'Add ${child.their} weight, height and head and we will place them on the curve for you - no charts to read yourself.',
                 'Add measurements',
                 () => _push(context, const GrowthJourneyScreen()),
               )),
@@ -124,7 +137,7 @@ class HealthHomeScreen extends StatelessWidget {
                 context,
                 Icons.vaccines_outlined,
                 'Nothing marked yet',
-                'Mark the doses he has had and we will keep the schedule, flag what is due, and remind you before it is.',
+                'Mark the doses ${child.they} has had and we will keep the schedule, flag what is due, and remind you before it is.',
                 'Open the tracker',
                 () => _push(context, const VaxTrackerScreen()),
               )),
@@ -135,7 +148,7 @@ class HealthHomeScreen extends StatelessWidget {
             const SizedBox(height: 30),
             _pad(_sectionHeader('Add & view records')),
             const SizedBox(height: 4),
-            _pad(Text('The more you log, the more his health story can tell you.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('The more you log, the more ${child.their} health story can tell you.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(_history(context)),
 
@@ -243,9 +256,9 @@ class HealthHomeScreen extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Column(children: [
               Row(children: [
-                for (int i = 0; i < kHealthSnapshot.length && i < 4; i++) ...[
+                for (int i = 0; i < _snapshotStats().length && i < 4; i++) ...[
                   if (i > 0) const SizedBox(width: 8),
-                  Expanded(child: _statTile(kHealthSnapshot[i])),
+                  Expanded(child: _statTile(_snapshotStats()[i])),
                 ],
               ]),
               const SizedBox(height: 10),
@@ -271,7 +284,9 @@ class HealthHomeScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('UPCOMING', style: ppBody(9, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.6)),
                   const SizedBox(height: 2),
-                  Text(kUpcomingHealth, style: ppBody(12.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  // Was the const 'PCV dose 3 · due 22 Jul' - a date from our
+                  // demo child. Now the real next visit, or nothing pending.
+                  Text(_upcoming(), style: ppBody(12.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
             ]),
@@ -329,6 +344,49 @@ class HealthHomeScreen extends StatelessWidget {
         ),
       );
 
+  /// The next thing actually coming up, from the real schedule.
+  String _upcoming() {
+    final vax = VaxStore.instance;
+    final next = vax.dueVisit ?? vax.nextVisit;
+    if (next == null) return 'Nothing scheduled right now';
+    return '${next.lead.shortName} · ${next.ageLabel}';
+  }
+
+  /// The four snapshot tiles, DERIVED from what she has actually recorded.
+  ///
+  /// These were the const kHealthSnapshot: "Overall: Healthy", "Growth: On
+  /// track", "Vaccinations: Up to date", "Allergies: None recorded" - four
+  /// confident verdicts about a child we knew nothing about. A parent who had
+  /// entered nothing was still told her baby was healthy and up to date. Now an
+  /// unknown reads as "Not recorded", which is both true and an invitation.
+  List<HealthStat> _snapshotStats() {
+    final health = HealthStore.instance;
+    final growth = GrowthStore.instance;
+    final vax = VaxStore.instance;
+
+    final hasGrowth = growth.latest != null;
+    final dosesDone = kVaxVisits.where((v) => vax.statusOf(v) == VaxStatus.done).length;
+    final due = vax.dueVisit;
+
+    return [
+      // "Overall" is only meaningful once there is something to summarise.
+      HealthStat('Overall', health.hasAnyEntry ? 'On track' : 'Not recorded',
+          health.hasAnyEntry ? 'good' : 'neutral'),
+      HealthStat('Growth', hasGrowth ? 'On track' : 'Not recorded',
+          hasGrowth ? 'good' : 'neutral'),
+      HealthStat(
+          'Vaccinations',
+          dosesDone == 0
+              ? 'Not recorded'
+              : (due == null ? 'Up to date' : 'One due'),
+          dosesDone == 0 ? 'neutral' : (due == null ? 'good' : 'watch')),
+      // "None recorded" is honest either way here - but say it plainly.
+      HealthStat('Allergies',
+          health.allergies.isEmpty ? 'None recorded' : '${health.allergies.length} recorded',
+          'neutral'),
+    ];
+  }
+
   Widget _statTile(HealthStat s) => Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(color: ppBg, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
@@ -370,24 +428,34 @@ class HealthHomeScreen extends StatelessWidget {
       );
 
   // ---- growth -------------------------------------------------------------
-  Widget _growthCard(BuildContext context, GrowthPoint g) => GestureDetector(
-        onTap: () => _push(context, const GrowthJourneyScreen()),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: _measure('Weight', '${g.weightKg} kg')),
-              Expanded(child: _measure('Length', '${g.heightCm.toInt()} cm')),
-              Expanded(child: _measure('Head', '${g.headCm.toInt()} cm')),
-              Expanded(child: _measure('Centile', '${g.weightPct}th')),
-            ]),
-            const SizedBox(height: 14),
-            Text(kGrowthInterpretation, style: ppBody(13, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
+  /// Her own latest measurement. Was `kGrowth.last` + `kGrowthInterpretation`,
+  /// a const row of figures and a sentence naming Aarav - shown to everyone.
+  Widget _growthCard(BuildContext context, GrowthMeasurement g) {
+    final store = GrowthStore.instance;
+    final child = ChildProfileStore.instance;
+    final pct = store.latestPercentilePhrase(GrowthMetric.weight);
+    return GestureDetector(
+      onTap: () => _push(context, const GrowthJourneyScreen()),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: _measure('Weight', '${_trim(g.weightKg)} kg')),
+            Expanded(child: _measure('Length', '${_trim(g.heightCm)} cm')),
+            Expanded(child: _measure('Head', g.headCm == null ? '—' : '${_trim(g.headCm!)} cm')),
+            Expanded(child: _measure('Centile', pct ?? '—')),
           ]),
-        ),
-      );
+          const SizedBox(height: 14),
+          Text(child.growthNote, style: ppBody(13, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
+        ]),
+      ),
+    );
+  }
+
+  static String _trim(double v) =>
+      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
 
   Widget _measure(String label, String value) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label.toUpperCase(), style: ppBody(9, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.4), maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -436,42 +504,57 @@ class HealthHomeScreen extends StatelessWidget {
         Expanded(child: Text(text, style: ppBody(12.5, color: ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
       ]);
 
-  Widget _vaxCard(BuildContext context) => Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // "Up to date" is the headline and it looks like one: a green tick
-          // block, not a bullet in a list. What is done and what is next then
-          // read as two plain pointers - "7 of 8 milestones done, next due in
-          // one night" was a sentence nobody could parse at a glance.
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEDF5EE),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF3E7A52).withValues(alpha: 0.28)),
-            ),
-            child: Row(children: [
-              Container(
-                width: 26,
-                height: 26,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(color: Color(0xFF3E7A52), shape: BoxShape.circle),
-                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Text(kVaxStatus,
-                    style: ppJakarta(15).copyWith(color: const Color(0xFF2F5C3E)),
-                    maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ]),
+  /// Reads what SHE has marked. The status line, the "7 of 8" count and the
+  /// "next up" date were all consts - so a parent who had marked one dose was
+  /// still told she was "Up to date", with a next-due date from our demo data.
+  Widget _vaxCard(BuildContext context) {
+    final vax = VaxStore.instance;
+    final done = kVaxVisits.where((v) => vax.statusOf(v) == VaxStatus.done).length;
+    final due = vax.dueVisit;
+    final next = due ?? vax.nextVisit;
+    // "Up to date" only when nothing is actually waiting.
+    final upToDate = due == null;
+    final headline = upToDate ? 'Up to date' : 'One is due now';
+    final tint = upToDate ? const Color(0xFF3E7A52) : const Color(0xFFC98A2B);
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // The headline looks like one: a tick block, not a bullet in a list.
+        // What is done and what is next then read as two plain pointers.
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: upToDate ? const Color(0xFFEDF5EE) : const Color(0xFFFBF3E6),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: tint.withValues(alpha: 0.28)),
           ),
-          const SizedBox(height: 12),
-          _vaxPointer(Icons.check_circle_outline_rounded, const Color(0xFF3E7A52),
-              '$kVaxCompleted of $kVaxTotalDue milestones done'),
+          child: Row(children: [
+            Container(
+              width: 26,
+              height: 26,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
+              child: Icon(upToDate ? Icons.check_rounded : Icons.schedule_rounded,
+                  size: 16, color: Colors.white),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Text(headline,
+                  style: ppJakarta(15).copyWith(
+                      color: upToDate ? const Color(0xFF2F5C3E) : const Color(0xFF7A5518)),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 12),
+        _vaxPointer(Icons.check_circle_outline_rounded, const Color(0xFF3E7A52),
+            '$done of ${kVaxVisits.length} visits marked done'),
+        if (next != null) ...[
           const SizedBox(height: 7),
-          _vaxPointer(Icons.schedule_rounded, const Color(0xFFC98A2B), 'Next up: $kVaxNext'),
+          _vaxPointer(Icons.schedule_rounded, const Color(0xFFC98A2B),
+              'Next up: ${next.lead.shortName} · ${next.ageLabel}'),
+        ],
           const SizedBox(height: 14),
           GestureDetector(
             onTap: () => _push(context, const VaxTrackerScreen()),
@@ -488,7 +571,8 @@ class HealthHomeScreen extends StatelessWidget {
             ),
           ),
         ]),
-      );
+    );
+  }
 
   // ---- medical history ----------------------------------------------------
   Widget _history(BuildContext context) {
@@ -535,9 +619,20 @@ class HealthHomeScreen extends StatelessWidget {
     // Nothing of HERS to notice yet means we have nothing to say - and saying
     // it anyway, from seed data, would be inventing an observation.
     if (!HealthStore.instance.hasAnyEntry) return const SizedBox.shrink();
-    if (kHealthInsights.isEmpty) return const SizedBox.shrink();
+    // HIDDEN ENTIRELY until the insights are derived. kHealthInsights is a
+    // const list of observations about our demo child ("growing steadily",
+    // "settled well after the 14-week vaccines"). Gating on hasAnyEntry stopped
+    // it firing for a parent who had entered nothing, but the moment she
+    // entered ANYTHING she was shown conclusions drawn from somebody else's
+    // baby - dressed as "What we notice". A real engine replaces this; until
+    // then saying nothing is the honest option.
+    if (_derivedInsights().isEmpty) return const SizedBox.shrink();
     return _insightsCard(context);
   }
+
+  /// Observations we can actually stand behind, derived from her records.
+  /// Empty until there is a real insight engine - deliberately.
+  List<String> _derivedInsights() => const [];
 
   Widget _insightsCard(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
@@ -552,7 +647,7 @@ class HealthHomeScreen extends StatelessWidget {
             ppEyebrow('What we notice', color: ppPurple, spacing: 1.0),
           ]),
           const SizedBox(height: 12),
-          for (final s in kHealthInsights)
+          for (final s in _derivedInsights())
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

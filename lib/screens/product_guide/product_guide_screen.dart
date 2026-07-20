@@ -16,6 +16,14 @@ import 'package:flutter/material.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/needs_attention.dart';
 import '../../brand/presented_by.dart';
+import '../../services/family_profile.dart';
+import '../post_pregnancy/askveda_screen.dart';
+import '../post_pregnancy/pp_child_profile.dart';
+import '../post_pregnancy/pp_products_data.dart';
+import '../post_pregnancy/pp_watch_data.dart';
+import '../post_pregnancy/products_compare_screen.dart';
+import '../post_pregnancy/watch_player_screen.dart';
+import '../post_pregnancy/watch_quicklearn_screen.dart';
 import 'product_guide_data.dart';
 import 'product_guide_style.dart';
 import 'product_guide_votes.dart';
@@ -65,6 +73,12 @@ class ProductGuideScreen extends StatelessWidget {
             if (g.studies.isNotEmpty) ...[_research(context, g), const SizedBox(height: 26)],
             if (g.specs.isNotEmpty) ...[_specs(g), const SizedBox(height: 26)],
             if (g.relatedIds.isNotEmpty) ...[_related(context, g), const SizedBox(height: 20)],
+
+            // Ask Veda closes the page. Three bullets and a research corner will
+            // not cover every worry a parent arrives with, and pretending
+            // otherwise is how a "trustworthy" page loses trust.
+            _pad(_askVedaRow(context, g)),
+            const SizedBox(height: 22),
 
             _pad(Text('Guidance to help you decide — always follow your doctor\'s advice for your child.',
                 textAlign: TextAlign.center, style: pgBody(11.5, color: pgMuted, h: 1.55))),
@@ -136,7 +150,14 @@ class ProductGuideScreen extends StatelessWidget {
       // best-for chips
       Text('BEST FOR', style: pgEyebrow(pgMuted)),
       const SizedBox(height: 8),
-      Wrap(spacing: 8, runSpacing: 8, children: [for (final b in g.bestFor) _chip(b)]),
+      // LEVEL 1 personalization. A chip that matches something she has actually
+      // told us about her child is marked - so "Dry skin" carries weight for a
+      // parent who logged eczema, and reads as ordinary for everyone else.
+      // Content emphasis ONLY: nothing is reordered, nothing is hidden, and the
+      // full list shows either way. See docs/PERSONALIZATION.md.
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        for (final b in g.bestFor) _chip(b, matches: _matchesThisChild(b)),
+      ]),
 
       const SizedBox(height: 18),
 
@@ -144,7 +165,9 @@ class ProductGuideScreen extends StatelessWidget {
       Row(children: [
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () => _soon(context, 'Compare — coming soon'),
+            // The Compare tool is real and already holds a selection - this
+            // used to be a snackbar sitting next to a working feature.
+            onPressed: () => _openCompare(context, g),
             icon: const Icon(Icons.compare_arrows_rounded, size: 18),
             label: const Text('Compare'),
             style: OutlinedButton.styleFrom(
@@ -190,10 +213,43 @@ class ProductGuideScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _chip(String label) => Container(
+  /// Does this "Best for" chip match something she has told us about her child?
+  /// Defensive throughout: an unloaded store, or a parent who has told us
+  /// nothing, degrades to "no match" - never to a crash and never to a guess.
+  bool _matchesThisChild(String chip) {
+    try {
+      final p = FamilyProfileStore.instance;
+      final c = chip.toLowerCase();
+      for (final cond in p.conditions) {
+        if (c.contains(cond.label.toLowerCase()) || cond.label.toLowerCase().contains(c)) {
+          return true;
+        }
+      }
+      // A few plain-language bridges between chip wording and profile signals.
+      if (c.contains('sensitive') || c.contains('dry skin')) {
+        return p.hasCondition(HealthCondition.eczema);
+      }
+      if (c.contains('breastfeeding')) return p.feeding == FeedingMethod.breastfeeding;
+      if (c.contains('formula')) return p.feeding == FeedingMethod.formula;
+      if (c.contains('newborn')) return ChildProfileStore.instance.ageInMonths <= 3;
+    } catch (_) {/* no signals */}
+    return false;
+  }
+
+  Widget _chip(String label, {bool matches = false}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(999)),
-        child: Text(label, style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+        decoration: BoxDecoration(
+          color: matches ? pgPurple.withValues(alpha: 0.14) : pgPanel,
+          borderRadius: BorderRadius.circular(999),
+          border: matches ? Border.all(color: pgPurple.withValues(alpha: 0.42)) : null,
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (matches) ...[
+            const Icon(Icons.check_rounded, size: 13, color: pgPurple),
+            const SizedBox(width: 4),
+          ],
+          Text(label, style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+        ]),
       );
 
   // ---- at-a-glance "buy signal" verdict card ------------------------------
@@ -355,6 +411,89 @@ class ProductGuideScreen extends StatelessWidget {
       ]);
 
   // ---- expert explains ----------------------------------------------------
+  /// Opens the expert's video in the real player. Experts without one say so
+  /// plainly rather than pretending to be tappable.
+  void _openExpertVideo(BuildContext context, PgExpert e) {
+    final id = e.videoId;
+    if (id == null) {
+      _soon(context, 'This explainer is still being filmed.');
+      return;
+    }
+    final v = watchVideoById(id);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v),
+    ));
+  }
+
+  /// Adds this product to the Compare tray (if we can match it to a catalogue
+  /// product) and opens Compare. Comparing is the whole reason a parent opens
+  /// two of these pages.
+  void _openCompare(BuildContext context, ProductGuide g) {
+    // A guide names a product TYPE ("Fragrance-free baby lotion"); the
+    // catalogue names SKUs ("Soothe Baby Lotion"). Matching whole names found
+    // nothing, so Compare opened an untouched tray - a test caught it. Match on
+    // the meaningful noun instead. toggle() would REMOVE an item already in the
+    // tray, which is the opposite of "compare this", so only add when absent.
+    for (final m in _catalogueMatchesFor(g).take(2)) {
+      if (!PpCompareStore.instance.isSelected(m) && PpCompareStore.instance.canAdd(m)) {
+        PpCompareStore.instance.toggle(m);
+      }
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen()),
+    );
+  }
+
+  /// Catalogue products this guide is about. Keyed on the meaningful noun in
+  /// the guide's name rather than the whole string, because the guide names a
+  /// TYPE and the catalogue names a BRAND. Kept in step with the assertion in
+  /// test/product_guide_wiring_test.dart.
+  List<PpProduct> _catalogueMatchesFor(ProductGuide g) {
+    const nouns = [
+      'lotion', 'wash', 'wipe', 'diaper', 'nappy', 'sterilis', 'steriliz',
+      'pump', 'formula', 'carrier', 'stroller', 'bottle', 'cream', 'sunscreen',
+    ];
+    final gn = g.name.toLowerCase();
+    final noun = nouns.where(gn.contains).toList();
+    if (noun.isEmpty) return const [];
+    return kPpProducts
+        .where((p) => noun.any((n) => p.name.toLowerCase().contains(n)))
+        .toList();
+  }
+
+  /// Ask Veda, pre-loaded with this product as the question. The rest of the
+  /// app funnels unanswered questions here; a product page should too.
+  void _askVeda(BuildContext context, ProductGuide g) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()),
+      );
+
+  Widget _askVedaRow(BuildContext context, ProductGuide g) => GestureDetector(
+        onTap: () => _askVeda(context, g),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: pgPurple.withValues(alpha: 0.07),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: pgPurple.withValues(alpha: 0.20)),
+          ),
+          child: Row(children: [
+            const Icon(Icons.auto_awesome_rounded, size: 18, color: pgPurple),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Still deciding?', style: pgSerif(16, c: pgInk, h: 1.2)),
+                const SizedBox(height: 3),
+                Text('Ask Veda anything about ${g.category.toLowerCase()} for your child.',
+                    style: pgBody(12.5, color: pgMuted, h: 1.45)),
+              ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: pgPurple),
+          ]),
+        ),
+      );
+
   Widget _experts(BuildContext context, ProductGuide g) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -379,7 +518,10 @@ class ProductGuideScreen extends StatelessWidget {
               children: [
                 for (final e in g.experts)
                   GestureDetector(
-                    onTap: () => _soon(context, 'Expert video — coming soon'),
+                    // Opens the real video when the expert has one. The Brand
+                    // Studio sponsors this exact surface, so a dead tap here
+                    // meant live commercial inventory sitting on nothing.
+                    onTap: () => _openExpertVideo(context, e),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
                       width: 230,

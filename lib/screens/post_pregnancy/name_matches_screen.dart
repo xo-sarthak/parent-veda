@@ -33,8 +33,15 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final crowned = babyNameByName(_store.crowned);
+    // Nothing is crowned until SHE crowns something. babyNameByName('') falls
+    // back to the first name in the catalogue, so the old code showed a
+    // stranger's name under "Your favourite" to every parent who had not
+    // chosen one yet.
+    final hasCrown = _store.crowned.isNotEmpty;
+    final crowned = hasCrown ? babyNameByName(_store.crowned) : null;
     final others = _store.liked.where((n) => n != _store.crowned).toList();
+    // Real matches now - both parents liked these. See 0027_pp_name_votes.sql.
+    final matches = _store.matches;
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [
@@ -67,13 +74,31 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
 
             // header
             const SizedBox(height: 22),
-            _pad(ppEyebrow('You & Ravi', color: ppMuted, spacing: 1.4)),
+            // Was 'You & Ravi' - a partner we invented, shown to everyone.
+            _pad(ppEyebrow('Your names', color: ppMuted, spacing: 1.4)),
             const SizedBox(height: 8),
-            _pad(Text('Names you both love', style: ppFraunces(31, h: 1.12))),
+            _pad(Text('Names you love', style: ppFraunces(31, h: 1.12))),
             const SizedBox(height: 12),
-            _pad(Text("${_store.matchedCount} names you've both said yes to. Ready to crown your favourite?", style: ppBody(14))),
+            _pad(Text("${_store.likedCount} names you've said yes to. Ready to crown your favourite?", style: ppBody(14))),
+
+            // Matches - the one place the "both" language is TRUE, because it
+            // comes from public.pp_name_matches(): names each parent liked
+            // independently, without seeing the other's votes.
+            if (matches.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              _pad(Text('You both love'.toUpperCase(),
+                  style: ppBody(11, color: ppPurple, w: FontWeight.w700).copyWith(letterSpacing: 1.0))),
+              const SizedBox(height: 10),
+              _pad(Column(children: [
+                for (var i = 0; i < matches.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 10),
+                  _lovedRow(babyNameByName(matches[i])),
+                ],
+              ])),
+            ],
 
             // crowned card
+            if (hasCrown) ...[
             const SizedBox(height: 22),
             _pad(Container(
               padding: const EdgeInsets.all(22),
@@ -88,11 +113,12 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                 Text('Your favourite'.toUpperCase(),
                     style: ppBody(10, color: const Color(0xFFC7B2E0), w: FontWeight.w700).copyWith(letterSpacing: 1.4)),
                 const SizedBox(height: 6),
-                Text(crowned.name, textAlign: TextAlign.center, style: ppFraunces(40, color: Colors.white, h: 1.02)),
+                Text(crowned!.name, textAlign: TextAlign.center, style: ppFraunces(40, color: Colors.white, h: 1.02)),
                 const SizedBox(height: 4),
                 Text('“${crowned.meaningShort}”', textAlign: TextAlign.center, style: ppBody(13, color: const Color(0xFFCFC7DA))),
               ]),
             )),
+            ],
 
             // also loved
             const SizedBox(height: 24),
@@ -106,7 +132,8 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
               ],
             ])),
 
-            // begin the story
+            // Begin the story - only meaningful once a name is crowned.
+            if (hasCrown) ...[
             const SizedBox(height: 26),
             _pad(Container(
               padding: const EdgeInsets.all(22),
@@ -117,7 +144,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
               child: Column(children: [
                 Text('A beautiful name deserves a beautiful story.', textAlign: TextAlign.center, style: ppFraunces(18, h: 1.4)),
                 const SizedBox(height: 4),
-                Text("Let's begin ${crowned.name}'s journey together.", textAlign: TextAlign.center, style: ppBody(13, h: 1.55)),
+                Text("Let's begin ${crowned!.name}'s journey together.", textAlign: TextAlign.center, style: ppBody(13, h: 1.55)),
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () => _snack('${crowned.name} set as the chosen name'),
@@ -146,6 +173,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                 ),
               ]),
             )),
+            ],
 
             const SizedBox(height: 20),
             _pad(Text('Next, plan the Namkaran - muhurat, invitations & a celebration checklist.',

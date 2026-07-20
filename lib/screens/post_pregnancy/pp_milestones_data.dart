@@ -12,7 +12,14 @@
 //  no persistence/backend. Nothing here touches the pregnancy app.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
 
 import 'pp_child_profile.dart';
 
@@ -231,12 +238,91 @@ const List<Milestone> kMilestones = [
 
 // ---- store ------------------------------------------------------------------
 class MilestoneStore extends ChangeNotifier {
-  MilestoneStore._() {
-    _seed();
-  }
+  // _seed() is deliberately NOT called. It writes somebody else's memories -
+  // "First real smile at Papa - melted us" - and this store now syncs, so those
+  // would appear in a real parent's keepsake record as if they were hers. Kept
+  // for demos (BACKEND-PARENTING-BRIEF §5).
+  MilestoneStore._();
   static final MilestoneStore instance = MilestoneStore._();
 
   final Map<String, MilestoneObs> _observed = {};
+
+  bool _loaded = false;
+  static const _prefsKey = 'pp_milestones';
+  static const _table = 'pp_milestone_observations';
+
+  String? get _childId => ChildProfileStore.instance.activeChildId;
+
+  // ---- persistence (local-first, then cloud) -------------------------------
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) {
+        final j = Map<String, dynamic>.from(jsonDecode(raw));
+        j.forEach((id, v) {
+          final m = Map<String, dynamic>.from(v);
+          _observed[id] = MilestoneObs(
+            date: SupabaseRepo.parseDbTime(m['date']),
+            note: m['note']?.toString(),
+          );
+        });
+      }
+    } catch (_) {/* start empty */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await _syncFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    final childId = _childId;
+    if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final rows = await SupabaseRepo.fetchByChild(_table, childId);
+      final cloudIds = <String>{};
+      for (final r in rows) {
+        final id = (r['milestone_id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        cloudIds.add(id);
+        _observed[id] = MilestoneObs(
+          date: SupabaseRepo.parseDbTime(r['observed_on']),
+          note: r['note']?.toString(),
+        );
+      }
+      for (final entry in _observed.entries) {
+        if (cloudIds.contains(entry.key)) continue;
+        await _push(entry.key, entry.value);
+      }
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _push(String id, MilestoneObs obs) => ChildSync.pushKeyed(
+        _table,
+        _childId,
+        {
+          'milestone_id': id,
+          'observed_on': SupabaseRepo.dbTime(obs.date),
+          'note': obs.note,
+        },
+        onConflict: 'child_id,milestone_id',
+      );
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _prefsKey,
+        jsonEncode(_observed.map((id, o) => MapEntry(
+            id, {'date': SupabaseRepo.dbTime(o.date), 'note': o.note}))),
+      );
+    } catch (_) {}
+  }
 
   int get _ageMonths => ChildProfileStore.instance.ageInMonths;
   String get name => ChildProfileStore.instance.name;
@@ -301,15 +387,22 @@ class MilestoneStore extends ChangeNotifier {
 
   // ---- writes -------------------------------------------------------------
   void markObserved(String id, {DateTime? date, String? note}) {
-    _observed[id] = MilestoneObs(date: date ?? DateTime.now(), note: note);
+    final obs = MilestoneObs(date: date ?? DateTime.now(), note: note);
+    _observed[id] = obs;
     notifyListeners();
+    _persist();
+    _push(id, obs);
   }
 
   void unobserve(String id) {
     _observed.remove(id);
     notifyListeners();
+    _persist();
+    ChildSync.removeKeyed(_table, _childId, 'milestone_id', id);
   }
 
+  /// Demo observations. Deliberately NOT called - see the constructor note.
+  // ignore: unused_element
   void _seed() {
     // A couple already lovingly noticed, so the journey looks lived-in.
     _observed['soc_smile'] = MilestoneObs(date: DateTime.now().subtract(const Duration(days: 62)), note: 'First real smile at Papa — melted us');

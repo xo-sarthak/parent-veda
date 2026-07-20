@@ -39,7 +39,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
     ],
     [
       'Is this cry-it-out?',
-      'No. Everything Dr. Rao teaches is gentle, responsive settling - never leaving Aarav to cry it out.',
+      'No. Everything Dr. Rao teaches is gentle, responsive settling - never leaving {child} to cry it out.',
     ],
     [
       'In Hindi or English?',
@@ -102,7 +102,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
               _pad(Text('The 4-Month Sleep Regression, Solved', style: ppFraunces(30, h: 1.15))),
               const SizedBox(height: 12),
               _pad(Text(
-                  "Why it happens, why it's temporary, and exactly what to do tonight. One focused evening that gives you a plan for Aarav's upside-down sleep.",
+                  "Why it happens, why it's temporary, and exactly what to do tonight. One focused evening that gives you a plan for {child}'s upside-down sleep.",
                   style: ppBody(15))),
 
               // quick facts
@@ -121,7 +121,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
               const SizedBox(height: 6),
               _pad(Column(children: [
                 _covers('Why sleep cycles mature at 4 months - the science, simply.', top: true),
-                _covers('The link between Leap 4 and the sleep regression.'),
+                _covers('The link between the 4-month brain change and the sleep regression.'),
                 _covers('Building a wind-down routine that actually sticks.'),
                 _covers('Drowsy-but-awake, and gentle no-cry-it-out settling.'),
                 _covers('Night wakings and naps in Indian joint-family homes.'),
@@ -207,7 +207,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
               _pad(Text('Common questions', style: ppJakarta(18))),
               const SizedBox(height: 6),
               _pad(Column(children: [
-                for (int i = 0; i < _faqs.length; i++) _faq(i, _faqs[i][0], _faqs[i][1]),
+                for (int i = 0; i < _faqs.length; i++) _faq(i, _faqs[i][0], ppFill(_faqs[i][1])),
               ])),
 
               const SizedBox(height: 22),

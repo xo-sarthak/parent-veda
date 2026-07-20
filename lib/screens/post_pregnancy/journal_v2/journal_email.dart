@@ -25,7 +25,7 @@ String jvEmailBody(JvMemory m) {
   final isLetter = m.kind == JvKind.letter;
   final header = '${m.title}\n${m.date} · ${m.age}\n\n';
   final closing = isLetter ? '' : '\n\nWith all my love,\n$jvParent';
-  return '$header${m.body}$closing';
+  return '$header${ppFill(m.body)}$closing';
 }
 
 /// Builds the mailto: URI with an (optional) recipient and the pre-filled
@@ -128,7 +128,7 @@ class _EmailSheetState extends State<_EmailSheet> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(jvEmailSubject(m), style: ppBody(13, color: ppInk, w: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
-                  Text(m.body, style: ppFraunces(13, color: ppSoft, h: 1.6).copyWith(fontStyle: FontStyle.italic), maxLines: 3, overflow: TextOverflow.ellipsis),
+                  Text(ppFill(m.body), style: ppFraunces(13, color: ppSoft, h: 1.6).copyWith(fontStyle: FontStyle.italic), maxLines: 3, overflow: TextOverflow.ellipsis),
                 ]),
               ),
               const SizedBox(height: 16),

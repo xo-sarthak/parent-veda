@@ -57,7 +57,7 @@ const List<Course> kCourses = [
     ageTag: '3–6 months',
     accent: _violet,
     lessons: [
-      CourseLesson('Leap 4 activities', 12),
+      CourseLesson('4-month activities', 12),
       CourseLesson('Reaching & hand skills', 10),
       CourseLesson('Sound & listening', 9),
       CourseLesson('High-contrast play', 8),
@@ -116,7 +116,7 @@ const List<Course> kCourses = [
 
 Course courseById(String id) => kCourses.firstWhere((c) => c.id == id, orElse: () => kCourses.first);
 
-/// Match a "Go deeper · Course" row text ("Play & Brain · Leap 4 activities") to
+/// Match a "Go deeper · Course" row text ("Play & Brain · 4-month activities") to
 /// a course. Uses the part before the "·" as the course name. Null if unmatched.
 Course? courseByDeeperText(String text) {
   final head = text.split('·').first.trim().toLowerCase();
@@ -128,7 +128,7 @@ Course? courseByDeeperText(String text) {
   return null;
 }
 
-/// The lesson index a Go-Deeper text points at ("· Leap 4 activities" / "· Module
+/// The lesson index a Go-Deeper text points at ("· 4-month activities" / "· Module
 /// 2"), so the detail can mark it "Start here". Returns -1 if not found.
 int lessonIndexForDeeperText(Course course, String text) {
   final parts = text.split('·');

@@ -6,6 +6,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../pp_child_profile.dart';
 
 // A captured memory: a moment, a written story, or a guided milestone.
 enum JvKind { moment, story, letter, guided }
@@ -61,7 +62,9 @@ class JvMilestone {
 }
 
 // ---- the child / parent -----------------------------------------------------
-const String jvChild = 'Aarav';
+/// The active child's name. A getter, not a const, so every "Letter to X"
+/// and "X's Story" across the journal follows the real child.
+String get jvChild => ChildProfileStore.instance.name;
 const String jvParent = 'Priya';
 const String jvChildAge = '2 years, 4 months old';
 const String jvBornSince = 'Since 18 Jan 2023';
@@ -117,7 +120,7 @@ const List<JvMemory> jvMemories = [
 
 // ---- letters ----------------------------------------------------------------
 const String jvLetterBody =
-    'Dear Aarav,\n\nOne day, when you read this letter, I hope you know how much love and joy you bring to our lives - every single day.\n\nThe way you laugh, the way you reach for us in the morning, the way you see wonder in the smallest things - it changes everything.\n\nWhatever you grow up to be, know that you were loved from the very first moment.\n\nLove,\nMom';
+    'Dear {child},\n\nOne day, when you read this letter, I hope you know how much love and joy you bring to our lives - every single day.\n\nThe way you laugh, the way you reach for us in the morning, the way you see wonder in the smallest things - it changes everything.\n\nWhatever you grow up to be, know that you were loved from the very first moment.\n\nLove,\nMom';
 
 const List<JvMemory> jvLetters = [
   JvMemory(
@@ -133,7 +136,7 @@ const List<JvMemory> jvLetters = [
     date: '12 May 2025',
     age: '2 years 2 months',
     body:
-        'Dear Aarav,\n\nToday you learned you could feed yourself. It was messy and magnificent, and I never want to forget the look on your face.\n\nLove,\nMom',
+        'Dear {child},\n\nToday you learned you could feed yourself. It was messy and magnificent, and I never want to forget the look on your face.\n\nLove,\nMom',
     kind: JvKind.letter,
     seed: 5,
   ),
@@ -164,7 +167,7 @@ const JvStorybook jvOurStory = JvStorybook('Our Story', '2023 – 2025', '248 me
 const List<JvStorybook> jvStorybooks = [
   jvOurStory,
   JvStorybook('Year One', '2023', '120 memories', 5),
-  JvStorybook('Letters to Aarav', 'Ongoing', '18 letters', 0),
+  JvStorybook('Letters to {child}', 'Ongoing', '18 letters', 0),
 ];
 
 const List<JvMilestone> jvMilestones = [

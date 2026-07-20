@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_leaps_data.dart';
+import 'pp_phases_data.dart';
 
 /// Present the switcher as a modal bottom sheet.
 Future<void> showMultiChildSheet(BuildContext context) => showModalBottomSheet<void>(
@@ -33,30 +33,146 @@ class MultiChildSheet extends StatelessWidget {
 
   ChildProfileStore get _store => ChildProfileStore.instance;
 
-  void _soon(BuildContext context, [String m = 'Coming soon']) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(m), behavior: SnackBarBehavior.floating),
-      );
+  /// Add a child. ChildProfileStore.addChild() has been complete (and
+  /// cloud-writing) for a while; only this form was missing, so the button sat
+  /// on a "coming soon" snackbar while the data layer was ready.
+  ///
+  /// Name and date of birth ONLY. No weight or height here: those are
+  /// measurements, and a measurement belongs in the growth record where it is
+  /// dated - not guessed at sign-up.
+  Future<void> _addChild(BuildContext context) async {
+    final nameCtl = TextEditingController();
+    var isBoy = true;
+    DateTime? dob;
 
-  /// "4 months · Leap 4 · The World of Events" for a baby in a leap window,
-  /// "2 years 6 months · Toddler" once leaps are behind them.
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: ppBg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.fromLTRB(
+              22, 18, 22, MediaQuery.of(ctx).viewInsets.bottom + 22),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(
+                  color: ppHair, borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 18),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Add a child', style: ppFraunces(24, h: 1.1)),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameCtl,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(children: [
+              Expanded(
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: true, label: Text('Boy')),
+                    ButtonSegment(value: false, label: Text('Girl')),
+                  ],
+                  selected: {isBoy},
+                  onSelectionChanged: (v) => setSheet(() => isBoy = v.first),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 14),
+            GestureDetector(
+              onTap: () async {
+                final now = DateTime.now();
+                final picked = await showDatePicker(
+                  context: ctx,
+                  initialDate: dob ?? now,
+                  firstDate: DateTime(now.year - 18),
+                  lastDate: now,
+                );
+                if (picked != null) setSheet(() => dob = picked);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                decoration: BoxDecoration(
+                    border: Border.all(color: ppHair),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Row(children: [
+                  const Icon(Icons.cake_outlined, size: 18, color: ppMuted),
+                  const SizedBox(width: 10),
+                  Text(
+                    dob == null
+                        ? 'Date of birth'
+                        : '${dob!.day}/${dob!.month}/${dob!.year}',
+                    style: ppBody(14,
+                        color: dob == null ? ppMuted : ppInk),
+                  ),
+                ]),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                if (nameCtl.text.trim().isEmpty || dob == null) return;
+                Navigator.of(ctx).pop(true);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                child: Text('Save',
+                    style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+
+    if (saved != true || dob == null) return;
+    await _store.addChild(
+        name: nameCtl.text.trim(), isBoy: isBoy, dob: dob!);
+    if (!context.mounted) return;
+    Navigator.of(context).maybePop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text('${nameCtl.text.trim()} added'),
+          behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  /// "4 months · Reaching out" — the child's age and the phase they are in.
+  /// Previously named a Wonder Weeks leap ("Leap 4 · The World of Events"),
+  /// which stopped meaning anything past 20 months and told every parent the
+  /// same thing at the same week.
   Widget _subtitle(Child c, bool active) {
     final weeks = _ageInWeeks(c);
     final months = (weeks / 4.345).floor();
     final age = _ageLabel(months);
-    final leap = kLeaps[currentLeapIndex(weeks)];
-    // Past the last leap window a child is simply a toddler — naming a leap
-    // they finished a year ago would be worse than saying nothing.
-    final inLeap = weeks <= leap.endWeek;
+    final phase = kPhases[phaseIndexForMonths(months.toDouble())];
+    // Phases run to five years, so unlike leaps there is no "past the end"
+    // case to handle before then.
+    final inPhase = months < 60;
 
-    if (!inLeap) {
+    if (!inPhase) {
       return Text('$age · ${months >= 12 ? 'Toddler' : 'Baby'}', style: ppBody(12));
     }
     return Text.rich(
       TextSpan(children: [
         TextSpan(text: '$age · '),
         TextSpan(
-          text: 'Leap ${leap.number} · ${leap.name}',
+          text: phase.name,
           style: const TextStyle(color: ppCoral, fontWeight: FontWeight.w600),
         ),
       ]),
@@ -118,7 +234,7 @@ class MultiChildSheet extends StatelessWidget {
                 // add a child
                 const SizedBox(height: 6),
                 GestureDetector(
-                  onTap: () => _soon(context, 'Adding a child - coming soon'),
+                  onTap: () => _addChild(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),

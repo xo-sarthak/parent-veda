@@ -12,7 +12,8 @@ import 'package:parentveda/screens/post_pregnancy/name_journey_detail_screen.dar
 import 'package:parentveda/screens/post_pregnancy/name_journey_feed_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/name_journey_shortlist_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/name_list_screen.dart';
-import 'package:parentveda/screens/post_pregnancy/pp_names_v2_data.dart';
+// NameVersionStore retired with the V1|V2 toggle.
+// import 'package:parentveda/screens/post_pregnancy/pp_names_v2_data.dart';
 import 'package:parentveda/screens/post_pregnancy/book_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_courses_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/cohort_funnel_screen.dart';
@@ -21,9 +22,12 @@ import 'package:parentveda/screens/post_pregnancy/course_funnel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_activity_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/development_area_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/dev_stage_detail_screen.dart';
-import 'package:parentveda/screens/post_pregnancy/leap_calendar_screen.dart';
-import 'package:parentveda/screens/post_pregnancy/leap_definition_screen.dart';
-import 'package:parentveda/screens/post_pregnancy/pp_leaps_data.dart';
+import 'package:parentveda/screens/post_pregnancy/phase_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/phase_map_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_phases_data.dart';
+// Leap screens retired with the Wonder Weeks framework.
+// import 'package:parentveda/screens/post_pregnancy/leap_definition_screen.dart';
+// import 'package:parentveda/screens/post_pregnancy/pp_leaps_data.dart';
 import 'package:parentveda/screens/post_pregnancy/name_astro_screens.dart';
 import 'package:parentveda/screens/post_pregnancy/feeding_tracker_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_tracker_screen.dart';
@@ -64,6 +68,8 @@ import 'package:parentveda/screens/post_pregnancy/health_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_records_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_timeline_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_health_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_growth_data.dart';
 import 'package:parentveda/screens/post_pregnancy/investments_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/journal_capture_screens.dart';
@@ -138,8 +144,10 @@ void main() {
   final screens = <String, Widget>{
     'My Child home': const MyChildScreen(home: true),
     'Today (retired briefing)': const PostPregnancyHome(),
-    'Leap calendar': const LeapCalendarScreen(),
-    'Leap definition (Leap 4)': LeapDefinitionScreen(leap: leapByNumber(4)),
+    // The leap screens were replaced by the phase map + phase detail when the
+    // app moved off the Wonder Weeks framework.
+    'Phase map': const PhaseMapScreen(),
+    'Phase detail': PhaseDetailScreen(phase: kPhases[6]),
     'Dev stage detail (skill)': DevStageDetailScreen(area: devAreaById('cognitive'), stage: devAreaById('cognitive').journey[2]),
     'AskVeda': const AskVedaScreen(),
     'Community': const CommunityScreen(),
@@ -349,9 +357,11 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('child-photo')));
     await tester.pumpAndSettle();
 
-    expect(find.text("Aarav's details"), findsOneWidget);
+    expect(find.text("${ChildProfileStore.instance.name}'s details"), findsOneWidget);
     expect(find.text('Date of birth'), findsOneWidget);
-    expect(find.text('8 March 2026'), findsOneWidget);
+    // The sheet reads the real profile now, so it must not assert a fixed date:
+    // an unrecorded measurement shows "Not recorded" rather than a made-up one.
+    expect(find.text('Not recorded'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -370,7 +380,7 @@ void main() {
     // The hero was slimmed: "LIVE NOW", the "Curious Explorer" character line
     // and the day/night-looking progress bar were removed as noise. What the
     // hero must still carry is the child, the leap and growth.
-    expect(find.text('Aarav'), findsWidgets); // identity
+    expect(find.text(ChildProfileStore.instance.name), findsWidgets); // identity
     expect(find.text('GROWTH'), findsOneWidget); // growth folded into the hero
     expect(find.text('LIVE NOW'), findsNothing);
 
@@ -434,7 +444,10 @@ void main() {
 
   // The Explore drawer (hamburger) carries the new Leap Calendar entry, which
   // opens the calendar.
-  testWidgets('My Child home: Explore drawer opens the Leap Calendar', (tester) async {
+  // The Leap Calendar became the Phase Map when the app moved off the Wonder
+  // Weeks framework: twenty AAP-aligned age phases instead of ten fixed-week
+  // leaps. Asserts the new route works AND the old label is genuinely gone.
+  testWidgets('My Child home: Explore drawer opens the phase map', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -444,11 +457,12 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.menu_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('Leap Calendar'), findsOneWidget);
+    expect(find.text('His journey'), findsOneWidget);
+    expect(find.text('Leap Calendar'), findsNothing);
 
-    await tester.tap(find.text('Leap Calendar'));
+    await tester.tap(find.text('His journey'));
     await tester.pumpAndSettle();
-    expect(find.byType(LeapCalendarScreen), findsOneWidget);
+    expect(find.byType(PhaseMapScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -514,12 +528,12 @@ void main() {
     // the fold. The feed is a lazy ListView.builder, so scroll it into
     // existence rather than expecting it pre-built.
     await tester.scrollUntilVisible(
-      find.text('Today for Aarav'),
+      find.text('Today for ${ChildProfileStore.instance.name}'),
       250,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 20,
     );
-    expect(find.text('Today for Aarav'), findsOneWidget);
+    expect(find.text('Today for ${ChildProfileStore.instance.name}'), findsOneWidget);
     await tester.ensureVisible(find.text('Watch now'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Watch now'));
@@ -659,7 +673,10 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Healthy'), findsWidgets); // snapshot
+    // The snapshot is DERIVED now, not a const verdict. With only a vaccine
+    // dose marked and nothing else entered, growth is honestly "Not recorded" -
+    // it used to say "Healthy" to every parent regardless.
+    expect(find.text('Not recorded'), findsWidgets); // snapshot, honestly
 
     // the integrated Vaccination module appears as a summary on the way down
     await tester.scrollUntilVisible(find.text('Open Vaccination Tracker'), 300,
@@ -732,6 +749,11 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: VaccinationScreen()));
     await tester.pumpAndSettle();
 
+    // NOTE: this exercises the RETIRED VaccinationScreen, which is kept only
+    // for revert and is not reachable in the app (VaxTrackerScreen is the live
+    // entry). It renders its own hardcoded list, so it is unaffected by the
+    // VaxStore change - and still shows demo data. Flagged, not fixed: editing
+    // dead code would only put the revert path at risk.
     await tester.scrollUntilVisible(find.text('13 completed'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     await tester.tap(find.text('13 completed'));
@@ -752,13 +774,14 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: VaxTrackerScreen()));
     await tester.pumpAndSettle();
 
-    // the Due-Today card spotlights PCV at 14 weeks
-    expect(find.text('PCV · 14 weeks'), findsWidgets);
-    await tester.tap(find.text('PCV · 14 weeks').first);
+    // Nothing is pre-marked any more, so the spotlight falls on the earliest
+    // visit she has not recorded - honest, and the thing to act on first.
+    expect(find.text('BCG · At birth'), findsWidgets);
+    await tester.tap(find.text('BCG · At birth').first);
     await tester.pumpAndSettle();
 
-    // the PCV detail (Learn Why + After-Care) opens
-    expect(find.text('Pneumococcal (PCV)'), findsWidgets);
+    // its detail (Learn Why + After-Care) opens
+    expect(find.text('BCG'), findsWidgets);
     await tester.scrollUntilVisible(find.text('After the shot'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('After the shot'), findsOneWidget);
@@ -813,9 +836,9 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: GrowthActivityScreen()));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Play & Brain · Leap 4 activities'), 250,
+    await tester.scrollUntilVisible(find.text('Play & Brain · 4-month activities'), 250,
         scrollable: find.byType(Scrollable).first, maxScrolls: 30);
-    await tester.tap(find.text('Play & Brain · Leap 4 activities'));
+    await tester.tap(find.text('Play & Brain · 4-month activities'));
     await tester.pumpAndSettle();
 
     // opens the matching course, with the named lesson marked "Start here"
@@ -849,25 +872,22 @@ void main() {
   });
 
   // Baby names: the V1|V2 header toggle switches the whole experience.
-  testWidgets('Baby names: the V1|V2 toggle switches versions', (tester) async {
+  // The V1|V2 toggle was a reviewing convenience that shipped. V2 (the Naming
+  // Journey) is the tool now; V1 and the toggle are retired. This asserts BOTH
+  // halves - the journey is present, and the old switch is genuinely gone -
+  // because an absence-only test would not notice if V2 stopped rendering.
+  testWidgets('Baby names: the Naming Journey is the only path', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
-    addTearDown(() => NameVersionStore.instance.setVersion(NameVersion.v2));
 
     await tester.pumpWidget(const MaterialApp(home: BabyNamingHomeScreen()));
     await tester.pumpAndSettle();
 
-    // defaults to V2 - the Journey
     expect(find.text('Begin the journey'), findsOneWidget);
-
-    await tester.tap(find.text('V1'));
-    await tester.pumpAndSettle();
-    expect(find.text('Open the Name Finder'), findsOneWidget);
-
-    await tester.tap(find.text('V2'));
-    await tester.pumpAndSettle();
-    expect(find.text('Begin the journey'), findsOneWidget);
+    expect(find.text('V1'), findsNothing);
+    expect(find.text('V2'), findsNothing);
+    expect(find.text('Open the Name Finder'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -927,7 +947,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: DevelopmentHomeScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Help Aarav grow'), findsOneWidget);
+    expect(find.text('Help ${ChildProfileStore.instance.name} grow'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('The Development Map'), 250,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('The Development Map'));
@@ -967,7 +987,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('astro-toggle')));
     await tester.pump();
-    expect(find.text("Aarav's cosmic notes"), findsOneWidget);
+    expect(find.text("${ChildProfileStore.instance.name}'s cosmic notes"), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
@@ -1015,8 +1035,19 @@ void healthTwoStateTests() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    HealthStore.instance.markGrowthEntered();
-    addTearDown(() => HealthStore.instance.resetEnteredForTest());
+    // A REAL measurement, not just the flag: the card renders her own figures,
+    // so without a row there is nothing honest to show and the invitation stays.
+    GrowthStore.instance.log(
+        date: DateTime.now(), weightKg: 6.4, heightCm: 63, headCm: 41);
+    // Full cleanup: logging a measurement ALSO writes the child's latest figures
+    // and promotes the seeded placeholder into a real child, so a half-reset
+    // leaks a 6.4 kg baby into every test that runs after this one. Synchronous
+    // resets - an async teardown that touches persistence is worse than none.
+    addTearDown(() {
+      GrowthStore.instance.resetForTest();
+      ChildProfileStore.instance.resetForTest();
+      HealthStore.instance.resetEnteredForTest();
+    });
 
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
@@ -1025,6 +1056,8 @@ void healthTwoStateTests() {
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('No measurements yet'), findsNothing,
         reason: 'her real figures replace the invitation');
+    expect(find.text('6.4 kg'), findsWidgets,
+        reason: 'the figures shown are the ones she entered');
     expect(tester.takeException(), isNull);
   });
 }

@@ -14,6 +14,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import '../../brand/brand_models.dart';
 import '../../brand/needs_attention.dart';
@@ -273,7 +274,7 @@ class ProductsCompareScreen extends StatelessWidget {
                 const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Comparing ${ps.length} $noun for Aarav · 4 months - tuned to his stage.',
+                  child: Text('Comparing ${ps.length} $noun for ${ChildProfileStore.instance.name} · 4 months - tuned to his stage.',
                       style: ppBody(12.5, color: ppSoft, h: 1.4)),
                 ),
               ])),

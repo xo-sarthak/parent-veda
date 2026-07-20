@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../ask_veda/veda_core.dart';
 import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
+import 'pp_child_profile.dart';
 import 'community_screen.dart';
 import 'parenting_veda.dart';
 import 'course_detail_screen.dart';
@@ -704,3 +705,30 @@ Widget ppSwitch(bool on) => Container(
         ),
       ),
     );
+
+// =============================================================================
+//  ppFill - put the real child into our written content
+// -----------------------------------------------------------------------------
+//  Bundled copy (recipe notes, activity explanations, reading blurbs, health
+//  interpretations) is `const`, so it cannot interpolate. It used to hardcode
+//  "Aarav" and "his" - so a parent of a daughter read about somebody else's son,
+//  and every parent read a name that was not their child's.
+//
+//  Content now carries placeholders and this fills them at render time:
+//      {child}  -> the active child's name
+//      {they}   -> he / she          {They}  -> He / She
+//      {their}  -> his / her         {them}  -> him / her
+//
+//  Wrap any bundled string that talks about the child: Text(ppFill(a.why)).
+//  Strings without a placeholder pass straight through, so it is always safe.
+// =============================================================================
+String ppFill(String s) {
+  if (!s.contains('{')) return s; // fast path - most copy has no placeholder
+  final c = ChildProfileStore.instance;
+  return s
+      .replaceAll('{child}', c.name)
+      .replaceAll('{they}', c.they)
+      .replaceAll('{They}', c.theyCap)
+      .replaceAll('{their}', c.their)
+      .replaceAll('{them}', c.them);
+}

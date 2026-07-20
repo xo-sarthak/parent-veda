@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import '../../services/notification_service.dart';
 import 'askveda_screen.dart';
@@ -207,8 +208,8 @@ class VaccineDetailScreen extends StatelessWidget {
         id: 700003,
         title: 'Vaccine reminder - PCV dose 3',
         body: daysBefore == 0
-            ? "Aarav's PCV dose 3 is due today (22 Jul)."
-            : "Aarav's PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - 22 Jul.",
+            ? "${ChildProfileStore.instance.name}'s PCV dose 3 is due today (22 Jul)."
+            : "${ChildProfileStore.instance.name}'s PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - 22 Jul.",
         when: due.subtract(Duration(days: daysBefore)),
       );
       messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));

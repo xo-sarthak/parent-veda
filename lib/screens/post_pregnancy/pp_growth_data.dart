@@ -12,11 +12,17 @@
 //  Reference table covers 0–12 months (older ages clamp to 12 for now).
 // =============================================================================
 
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
 import 'pp_child_profile.dart';
+import 'pp_health_data.dart';
 
 /// The metrics we chart. Head circumference is optional per measurement.
 enum GrowthMetric { weight, height, head }
@@ -59,6 +65,20 @@ class GrowthMeasurement {
   /// Age (in months) at the time of this measurement, from the child's DOB.
   double ageMonthsAt(DateTime dob) => date.difference(dob).inDays / 30.4375;
 
+  /// "4 months", "6 weeks", "At birth" - the age when this was measured, in the
+  /// same warm phrasing ChildProfileStore uses for the child's current age.
+  /// Replaces the hardcoded `ageLabel` that came off the const kGrowth list.
+  String ageLabelAt(DateTime dob) {
+    final days = date.difference(dob).inDays;
+    if (days <= 3) return 'At birth';
+    final months = ageMonthsAt(dob).floor();
+    if (months < 1) {
+      final w = (days / 7).floor();
+      return '$w ${w == 1 ? 'week' : 'weeks'}';
+    }
+    return '$months ${months == 1 ? 'month' : 'months'}';
+  }
+
   double? value(GrowthMetric m) => switch (m) {
         GrowthMetric.weight => weightKg,
         GrowthMetric.height => heightCm,
@@ -67,14 +87,90 @@ class GrowthMeasurement {
 }
 
 class GrowthStore extends ChangeNotifier {
-  GrowthStore._() {
-    _seed();
-  }
+  // _seed() is deliberately NOT called: it invents four well-baby measurements
+  // for a fictional child, and now that this store syncs, those would be
+  // written into every real account as genuine clinical records. The method is
+  // kept for demos/reference (see BACKEND-PARENTING-BRIEF §5). A parent who has
+  // logged nothing now correctly sees the empty/invitation state.
+  GrowthStore._();
   static final GrowthStore instance = GrowthStore._();
 
   final List<GrowthMeasurement> _items = [];
   int _seq = 0;
   String _id() => 'grow_${DateTime.now().microsecondsSinceEpoch}_${_seq++}';
+
+  bool _loaded = false;
+  static const _prefsKey = 'pp_growth';
+  static const _table = 'pp_growth_measurements';
+
+  String? get _childId => ChildProfileStore.instance.activeChildId;
+
+  // ---- persistence (local-first, then cloud) -------------------------------
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) {
+        for (final e in (jsonDecode(raw) as List)) {
+          _items.add(_fromRow(Map<String, dynamic>.from(e)));
+        }
+      }
+    } catch (_) {/* start empty */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await _syncFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    final childId = _childId;
+    if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final merged = await ChildSync.merge<GrowthMeasurement>(
+        table: _table,
+        childId: childId,
+        local: _items,
+        idOf: (m) => m.id,
+        toRow: _toRow,
+        fromRow: _fromRow,
+        orderBy: 'date',
+      );
+      _items
+        ..clear()
+        ..addAll(merged);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          _prefsKey, jsonEncode(_items.map(_toRow).toList()));
+    } catch (_) {}
+  }
+
+  static Map<String, dynamic> _toRow(GrowthMeasurement m) => {
+        'id': m.id,
+        'date': SupabaseRepo.dbTime(m.date),
+        'weight_kg': m.weightKg,
+        'height_cm': m.heightCm,
+        'head_cm': m.headCm,
+        'note': m.note,
+      };
+
+  static GrowthMeasurement _fromRow(Map<String, dynamic> r) => GrowthMeasurement(
+        id: (r['id'] ?? '').toString(),
+        date: SupabaseRepo.parseDbTime(r['date']),
+        weightKg: (r['weight_kg'] as num?)?.toDouble() ?? 0,
+        heightCm: (r['height_cm'] as num?)?.toDouble() ?? 0,
+        headCm: (r['head_cm'] as num?)?.toDouble(),
+        note: r['note']?.toString(),
+      );
 
   ChildProfileStore get _child => ChildProfileStore.instance;
   String get name => _child.name;
@@ -190,13 +286,25 @@ class GrowthStore extends ChangeNotifier {
     return out;
   }
 
+  /// Test-only: clear the measurements without touching persistence or cloud.
+  @visibleForTesting
+  void resetForTest() {
+    _items.clear();
+    notifyListeners();
+  }
+
   // ---- writes -------------------------------------------------------------
   void add(GrowthMeasurement m) {
     _items.add(m);
     // Keep the child profile's "latest" figures in step with the newest entry.
     final newest = all.first;
     _child.update(weightKg: newest.weightKg, heightCm: newest.heightCm, headCm: newest.headCm ?? _child.headCm);
+    // A logged measurement is what flips Health's growth section from an
+    // invitation to her real figures.
+    HealthStore.instance.markGrowthEntered();
     notifyListeners();
+    _persist();
+    ChildSync.push(_table, _childId, m.id, _toRow(m));
   }
 
   void log({required DateTime date, required double weightKg, required double heightCm, double? headCm, String? note}) {
@@ -206,6 +314,8 @@ class GrowthStore extends ChangeNotifier {
   void remove(String id) {
     _items.removeWhere((m) => m.id == id);
     notifyListeners();
+    _persist();
+    ChildSync.remove(_table, id);
   }
 
   // ---- helpers ------------------------------------------------------------
@@ -239,6 +349,10 @@ class GrowthStore extends ChangeNotifier {
     return '${v}th percentile';
   }
 
+  /// Demo measurements for a fictional child. Deliberately NOT called - see the
+  /// note on the constructor. Kept (not deleted) so a demo build or a future
+  /// "try it with sample data" affordance can call it.
+  // ignore: unused_element
   void _seed() {
     final dob = _child.dob;
     _items.addAll([

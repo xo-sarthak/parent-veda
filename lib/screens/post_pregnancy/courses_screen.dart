@@ -16,6 +16,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'course_detail_screen.dart';
 import 'course_funnel_screen.dart';
@@ -53,7 +54,7 @@ class CoursesScreen extends StatelessWidget {
               Text('Courses', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  "Deep, documentary-style guides that unlock stage by stage - you only see what's relevant to Aarav right now, with everything else a tap away.",
+                  "Deep, documentary-style guides that unlock stage by stage - you only see what's relevant to ${ChildProfileStore.instance.name} right now, with everything else a tap away.",
                   style: ppBody(15)),
             ])),
 
@@ -128,7 +129,7 @@ class CoursesScreen extends StatelessWidget {
               decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(20)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  ppEyebrow('Unlocked for Aarav now', color: ppBrown, spacing: 0.8),
+                  ppEyebrow('Unlocked for ${ChildProfileStore.instance.name} now', color: ppBrown, spacing: 0.8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
@@ -139,7 +140,7 @@ class CoursesScreen extends StatelessWidget {
                 Text('You see this stage. Earlier and later modules are always a tap away.',
                     style: ppBody(13, h: 1.5)),
                 const SizedBox(height: 6),
-                _module(context, Icons.play_arrow_rounded, 'Leap 4 & the 4-month brain',
+                _module(context, Icons.play_arrow_rounded, 'The 4-month brain',
                     '18 min · playing now for you',
                     top: true),
                 _module(context, Icons.play_arrow_rounded, 'Surviving the sleep regression', '22 min'),

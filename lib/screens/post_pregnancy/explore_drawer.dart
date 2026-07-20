@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'astrology_screen.dart';
 import 'family_profile_screen.dart';
@@ -28,7 +29,7 @@ import 'yoga_home_screen.dart';
 import 'health_home_screen.dart';
 import 'investments_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
-import 'leap_calendar_screen.dart';
+import 'phase_map_screen.dart';
 // import 'masterclasses_screen.dart'; // merged into LearningHomeScreen
 import 'my_child_screen.dart';
 import 'nuskhe_screen.dart';
@@ -67,7 +68,7 @@ class ExploreDrawer extends StatelessWidget {
                 children: [
                   // My Child is the home now - this row simply returns there.
                   _section(context, Icons.child_care_outlined, 'My Child',
-                      "Who Aarav is today - his whole story.", const MyChildScreen(),
+                      "Who ${ChildProfileStore.instance.name} is today - his whole story.", const MyChildScreen(),
                       top: true, onTapOverride: () {
                     final nav = Navigator.of(context);
                     nav.pop();
@@ -77,8 +78,8 @@ class ExploreDrawer extends StatelessWidget {
                       'Personalise ParentVeda for your family.', const FamilyProfileScreen()),
                   _section(context, Icons.route_rounded, 'Guided journeys',
                       'One short read at a time, for the hard stretches.', const JourneysScreen()),
-                  _section(context, Icons.brightness_4_outlined, 'Leap Calendar',
-                      "Every Wonder-Weeks leap, on his timeline.", const LeapCalendarScreen()),
+                  _section(context, Icons.timeline_rounded, 'His journey',
+                      "Every phase from birth to five, on his timeline.", const PhaseMapScreen()),
                   _section(context, Icons.play_circle_outline, 'Watch',
                       'Expert videos, chosen for his stage.', const WatchHomeScreen()),
                   _section(context, Icons.emoji_objects_outlined, 'Skill Development',
@@ -88,7 +89,7 @@ class ExploreDrawer extends StatelessWidget {
                   // _section(context, Icons.monitor_heart_outlined, 'Health Guide',
                   //     "Aarav's health record & guidance.", const HealthGuideScreen()),
                   _section(context, Icons.monitor_heart_outlined, 'Health',
-                      "Aarav's living health story, organised.", const HealthHomeScreen()),
+                      "${ChildProfileStore.instance.name}'s living health story, organised.", const HealthHomeScreen()),
                   // Food is merged into Recipes now (one unified food companion). Kept for revert:
                   // _section(context, Icons.ramen_dining_outlined, 'Food',
                   //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),

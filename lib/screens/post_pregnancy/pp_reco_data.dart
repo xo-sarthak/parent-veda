@@ -5,7 +5,7 @@
 //  worth my time for my child today?". Every item carries the ParentVeda take
 //  (why we recommend it + what to consider), an age window, the skills it
 //  supports and cross-links into the rest of the app. The engine builds a live
-//  personalisation context from the child's age + current leap and from what the
+//  personalisation context from the child's age + current phase and from what the
 //  parent has already saved/watched/read/compared, scores items by age-fit +
 //  stage-fit + interest overlap, diversifies by category, and explains WHY each
 //  recommendation appears. In-memory; a real ML layer slots in behind the same
@@ -16,7 +16,12 @@
 //  that actually narrow the list. See RecoFacetGroup / _catFacets below.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 
 import 'pp_child_profile.dart';
 import '../../brand/brand_context.dart';
@@ -25,7 +30,7 @@ import '../../brand/brand_studio.dart';
 import '../../brand/rank_floor.dart';
 import '../../services/family_profile.dart';
 import 'pp_development_data.dart';
-import 'pp_leaps_data.dart';
+import 'pp_phases_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
@@ -340,7 +345,7 @@ const List<RecoItem> kReco = [
     ageMin: 3, ageMax: 12, seed: 5, pvRating: 4.9, communityLoves: 3010,
     why: 'Behind the giggles, peekaboo is teaching him that things (and you) still exist when out of sight - the foundation of object permanence and a secure sense that you always come back.',
     consider: 'Follow his lead on pace; too fast and it overwhelms rather than delights.',
-    bestFor: 'Right now - it is a Leap 4 favourite.',
+    bestFor: 'Right now - a favourite at this age.',
     skills: ['Object permanence', 'Cause & effect', 'Social connection'], benefits: ['Cognitive', 'Bonding'],
     collections: ['rainyday'], tags: ['peekaboo', 'game', 'indoor', 'free', 'rainy'],
     subtype: 'Connection game', facets: {'skill': ['cognitive', 'social'], 'place': ['indoor'], 'mess': ['none']},
@@ -445,13 +450,13 @@ const List<RecoItem> kReco = [
 
   // ---- Videos (for parents / stage-appropriate) -----------------------------
   RecoItem(
-    id: 'vd_leap4', category: 'Videos', title: 'Inside Leap 4: the world of events', summary: 'What the fussiness really means.',
+    id: 'vd_leap4', category: 'Videos', title: 'Cause and effect: what the fussiness means', summary: 'What the fussiness really means.',
     ageMin: 3, ageMax: 6, seed: 11, pvRating: 4.9, communityLoves: 3320,
-    why: 'A short, calming watch for YOU, not him - it explains exactly what his brain is working out right now, so the clingy days feel like a leap forward instead of a step back.',
+    why: 'A short, calming watch for YOU, not him - it explains what his brain is working out right now, so the clingy days feel like progress instead of a step back.',
     consider: 'This is parent viewing; at 4 months, screens are not for him yet.',
     bestFor: 'Parents in the thick of the 4-month wobble.',
     skills: ['Understanding development'], benefits: ['Parent confidence'],
-    collections: [], tags: ['leap', 'brain', 'parent', 'development'],
+    collections: [], tags: ['fussy', 'brain', 'parent', 'development'],
     subtype: 'Parent explainer', facets: {'type': ['explainer'], 'length': ['short']},
     relatedVideoId: 'leap4brain', relatedArticleId: 'leap4',
   ),
@@ -710,14 +715,29 @@ const List<RecoItem> kReco = [
 
   // ---- Parent Picks ---------------------------------------------------------
   RecoItem(
-    id: 'pp_book', category: 'Parent Picks', title: 'The Wonder Weeks (for parents)', summary: 'Make sense of the fussy leaps.',
-    ageMin: 0, ageMax: 20, seed: 21, pvRating: 4.6, communityLoves: 1720,
-    why: 'The framework behind the leaps in this app - it turns "why is he suddenly so fussy?" into "ah, his brain is doing something new." A calming read for the hard weeks.',
-    consider: 'Treat the exact week-charts loosely; every baby varies by a week or two.',
+    // REPLACED 20 Jul. This slot recommended The Wonder Weeks, and its "why"
+    // line called it "the framework behind the leaps in this app". That is no
+    // longer true, and it was never a good enough reason to recommend a book.
+    //
+    // We moved off that framework because it failed replication — Plooij's own
+    // PhD student could not reproduce the leaps — so an app cannot reject it as
+    // unsupported and go on selling it in the same breath. The old entry is
+    // recorded here rather than deleted, so the decision stays visible:
+    //
+    //   title:  'The Wonder Weeks (for parents)'
+    //   why:    'The framework behind the leaps in this app…'
+    //   tags:   ['parent', 'book', 'wonder weeks', 'development']
+    //
+    // What replaces it points at the CDC's own free milestone tracker, which is
+    // the framework we DO stand behind and costs a parent nothing.
+    id: 'pp_book', category: 'Parent Picks', title: 'The CDC Milestone Tracker', summary: 'The checklist your paediatrician uses.',
+    ageMin: 0, ageMax: 60, seed: 21, pvRating: 4.6, communityLoves: 1720,
+    why: 'The same evidence-informed milestone checklists ParentVeda\'s age phases are built on, straight from the source and free. Useful to have on your phone before a well-child visit.',
+    consider: 'Written for US schedules, so vaccination timings differ from the Indian NIS. The developmental milestones themselves apply everywhere.',
     bestFor: 'Parents who like to understand the why.',
     skills: [], benefits: ['Parent confidence'],
-    collections: [], tags: ['parent', 'book', 'wonder weeks', 'development'],
-    subtype: 'Book', facets: {'kind': ['book'], 'topic': ['development']},
+    collections: [], tags: ['parent', 'milestones', 'development', 'free'],
+    subtype: 'App', facets: {'kind': ['app'], 'topic': ['development']},
   ),
   RecoItem(
     id: 'pp_selfcare', category: 'Parent Picks', title: 'Five minutes for you, too', summary: 'A tiny reset in the fourth-month fog.',
@@ -1022,16 +1042,19 @@ List<RecoItem> recoByCategory(String category) => kReco.where((r) => r.category 
 //  signals across the app. This is the "understand the child first" step.
 // =============================================================================
 class RecoContext {
-  RecoContext({required this.ageMonths, required this.interests, required this.stageWords, required this.viewed, required this.leapLabel});
+  RecoContext({required this.ageMonths, required this.interests, required this.stageWords, required this.viewed, required this.phaseLabel});
   final int ageMonths;
   final Set<String> interests; // keywords from saved/watched/read/compared
-  final Set<String> stageWords; // keywords from the current leap's "working on"
+  final Set<String> stageWords; // keywords from the phase's "working on"
   final Set<String> viewed; // reco ids already opened
-  final String leapLabel; // e.g. "Leap 4"
+  /// e.g. "6 months" — the age phase, not a leap number. Used in the
+  /// "why this is here" line, so it has to read like something a parent would
+  /// actually say about their own child.
+  final String phaseLabel;
 
   static RecoContext build() {
     final child = ChildProfileStore.instance;
-    final leap = currentLeap(child);
+    final phase = currentPhase(child);
     final interests = <String>{};
     void addWords(String s) {
       for (final w in s.toLowerCase().split(RegExp(r'[^a-z]+'))) {
@@ -1074,7 +1097,7 @@ class RecoContext {
     }
 
     final stageWords = <String>{};
-    for (final w in leap.workingOn) {
+    for (final w in phase.workingOn) {
       for (final t in w.toLowerCase().split(RegExp(r'[^a-z]+'))) {
         if (t.length >= 4) stageWords.add(t);
       }
@@ -1085,7 +1108,7 @@ class RecoContext {
       interests: interests,
       stageWords: stageWords,
       viewed: RecoStore.instance.viewedIds,
-      leapLabel: leap.label,
+      phaseLabel: phase.ageLabel,
     );
   }
 }
@@ -1128,7 +1151,7 @@ String recoReason(RecoItem it, RecoContext ctx) {
   final closing = m >= it.ageMin && it.ageMax - m >= 0 && it.ageMax - m <= 2;
   final hay = it.haystack;
   if (closing) return 'A lovely age for this - the window won\'t stay open long.';
-  if (ctx.stageWords.any(hay.contains)) return 'Supports what he\'s working on in ${ctx.leapLabel} right now.';
+  if (ctx.stageWords.any(hay.contains)) return 'Supports what he\'s working on at ${ctx.phaseLabel}.';
   if (ctx.interests.any(hay.contains)) return 'Because you\'ve been exploring similar things.';
   if (m >= it.ageMin && m <= it.ageMax) return 'Right for his $m-month stage.';
   if (m < it.ageMin) return 'Worth knowing - one to look forward to.';
@@ -1287,7 +1310,7 @@ List<RecoItem> relatedReco(RecoItem it, {int count = 4}) {
 // =============================================================================
 //  RecoStore - saved bookmarks, viewed history (Continue Exploring) + wishlists.
 // =============================================================================
-class RecoStore extends ChangeNotifier {
+class RecoStore extends ChangeNotifier with CloudSyncedStore {
   RecoStore._();
   static final RecoStore instance = RecoStore._();
 
@@ -1301,6 +1324,65 @@ class RecoStore extends ChangeNotifier {
     'Travel Ideas': {},
     'Activities to Try': {'ac_tummy'},
   };
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_reco';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  @override
+  Object cloudData() => {
+        'saved': _saved.toList(),
+        'viewed': _viewed,
+        'lists': _lists.map((k, v) => MapEntry(k, v.toList())),
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    final s = data['saved'];
+    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    final v = data['viewed'];
+    if (v is List) _viewed..clear()..addAll(v.map((e) => e.toString()));
+    final l = data['lists'];
+    if (l is Map) {
+      _lists
+        ..clear()
+        ..addAll(l.map((k, val) => MapEntry(
+            k.toString(),
+            (val as List? ?? []).map((e) => e.toString()).toSet())));
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation already calls notifyListeners(), so one override covers them all.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
 
   // ---- saved / bookmarks ----
   bool isSaved(String id) => _saved.contains(id);

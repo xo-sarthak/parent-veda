@@ -893,7 +893,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   else
                     _ppEmptyNote(Icons.celebration_outlined,
                         "You've joined them all - your feed is fully personalised."),
+                  // BRAND PRODUCT 11 - a sponsored community challenge, sitting
+                  // between the communities and the feed. It renders NOTHING
+                  // unless a campaign resolves for this parent, and the
+                  // participation is the point: the brand funds it, is named
+                  // for it, and never sees who took part.
                   const SizedBox(height: 18),
+                  _pad(const SponsoredCommunityCampaign()),
+
                   _pad(_feedTabs()),
                   if (_s.doctorMode) _pad(_verifyFilterChip()),
                   const SizedBox(height: 6),

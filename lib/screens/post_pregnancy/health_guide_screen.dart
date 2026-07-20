@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
@@ -62,11 +63,11 @@ class HealthGuideScreen extends StatelessWidget {
             // header
             const SizedBox(height: 22),
             _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ppEyebrow("Aarav's health record"),
+              ppEyebrow("${ChildProfileStore.instance.name}'s health record"),
               const SizedBox(height: 10),
               Text('Health Guide', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
-              Text("A private, growing memory of Aarav's health - so the next cough, rash or fever isn't a mystery.",
+              Text("A private, growing memory of ${ChildProfileStore.instance.name}'s health - so the next cough, rash or fever isn't a mystery.",
                   style: ppBody(15)),
             ])),
 
@@ -90,7 +91,7 @@ class HealthGuideScreen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
                 Text(
-                    'Last winter Aarav caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
+                    'Last winter ${ChildProfileStore.instance.name} caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
                     style: ppBody(15, color: ppInk, h: 1.55)),
                 const SizedBox(height: 12),
                 GestureDetector(

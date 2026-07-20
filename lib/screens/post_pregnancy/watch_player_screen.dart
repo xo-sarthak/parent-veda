@@ -89,7 +89,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             const SizedBox(height: 16),
             _pad(_expertRow()),
             const SizedBox(height: 18),
-            _pad(Text(v.why, style: ppBody(14.5, color: ppInk, h: 1.6))),
+            _pad(Text(ppFill(v.why), style: ppBody(14.5, color: ppInk, h: 1.6))),
             const SizedBox(height: 8),
             _pad(ppSectionDivider()),
             _pad(_learnNext()),

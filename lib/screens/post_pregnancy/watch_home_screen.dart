@@ -12,6 +12,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
@@ -213,7 +214,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
 
     h.addAll([
       const SizedBox(height: 26),
-      _pad(watchSectionHeader('Today for Aarav')),
+      _pad(watchSectionHeader('Today for ${ChildProfileStore.instance.name}')),
       const SizedBox(height: 14),
       _pad(_todaysHero()),
     ]);
@@ -428,7 +429,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               const SizedBox(height: 12),
               Text(v.title, style: ppFraunces(21, h: 1.2)),
               const SizedBox(height: 8),
-              Text(v.why, style: ppBody(13.5, h: 1.55)),
+              Text(ppFill(v.why), style: ppBody(13.5, h: 1.55)),
               const SizedBox(height: 12),
               watchMeta(v, color: ppSoft),
               const SizedBox(height: 16),
@@ -493,7 +494,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               const SizedBox(height: 16),
               Text(e.whyHeading, style: ppJakarta(15)),
               const SizedBox(height: 7),
-              Text(e.why, style: ppBody(13.5, color: ppInk, h: 1.6)),
+              Text(ppFill(e.why), style: ppBody(13.5, color: ppInk, h: 1.6)),
               if (e.reviews.isNotEmpty) ...[
                 const SizedBox(height: 18),
                 Text('What parents say', style: ppJakarta(15)),

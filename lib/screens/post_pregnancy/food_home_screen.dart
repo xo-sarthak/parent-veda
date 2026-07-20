@@ -17,6 +17,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'food_builder_screen.dart';
 import 'food_category_screen.dart';
@@ -90,7 +91,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             const SizedBox(height: 18),
             _pad(ppEyebrow('ParentVeda Food', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('What to feed Aarav today', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('What to feed ${ChildProfileStore.instance.name} today', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
             _pad(Text('Not just recipes - what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
 
@@ -227,7 +228,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             const SizedBox(height: 4),
             Text(f.oneLine, style: ppBody(13.5, color: ppSoft, w: FontWeight.w600)),
             const SizedBox(height: 10),
-            Text(f.why, style: ppBody(13.5, h: 1.55), maxLines: 3, overflow: TextOverflow.ellipsis),
+            Text(ppFill(f.why), style: ppBody(13.5, h: 1.55), maxLines: 3, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 14),
             Row(children: [
               Text('Learn about ${f.nutrient.toLowerCase()}', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),

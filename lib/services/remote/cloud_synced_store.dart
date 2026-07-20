@@ -18,6 +18,8 @@
 //  / [persistLocalCache], and awaiting [syncStateFromCloud] at the end of init.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'supabase_repo.dart';
@@ -28,6 +30,18 @@ mixin CloudSyncedStore on ChangeNotifier {
   // the notifyListeners() calls fired while LOADING the local cache don't push
   // stale/empty local state up and clobber the cloud before we've read it.
   bool _cloudReady = false;
+
+  Timer? _pushTimer;
+
+  /// How long to coalesce rapid changes before pushing one blob up.
+  ///
+  /// Defaults to ZERO - push on every change, exactly as before - so every
+  /// existing store keeps its current behaviour untouched. Override it in a
+  /// store whose state changes many times a second: WatchStore records the
+  /// playback position on every tick, and without this each tick would be its
+  /// own Supabase write (network + battery for a value that is only read when
+  /// the video is next opened).
+  Duration get cloudPushDebounce => Duration.zero;
 
   /// The per-store key this blob lives under in the user_state table.
   String get cloudKey;
@@ -46,10 +60,27 @@ mixin CloudSyncedStore on ChangeNotifier {
   @override
   void notifyListeners() {
     super.notifyListeners();
-    if (_cloudReady && SupabaseRepo.isLoggedIn) {
-      // Fire-and-forget; never let a network hiccup break the UI.
-      SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
+    if (!_cloudReady || !SupabaseRepo.isLoggedIn) return;
+    final wait = cloudPushDebounce;
+    if (wait == Duration.zero) {
+      _pushNow();
+      return;
     }
+    // Coalesce a burst into one write. The local cache is already up to date,
+    // so a push lost to an app close is recovered on the next sync.
+    _pushTimer?.cancel();
+    _pushTimer = Timer(wait, _pushNow);
+  }
+
+  void _pushNow() {
+    // Fire-and-forget; never let a network hiccup break the UI.
+    SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
+  }
+
+  @override
+  void dispose() {
+    _pushTimer?.cancel();
+    super.dispose();
   }
 
   /// Run once at startup, after the local cache has been loaded.

@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'dart:math' as math;
+import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 
@@ -59,7 +60,7 @@ class VaxTrackerScreen extends StatelessWidget {
               _pad(ppCircleBack(context, eyebrow: 'Vaccinations')),
 
               const SizedBox(height: 22),
-              _pad(ppEyebrow('Aarav · 4 months', color: ppMuted, spacing: 1.4)),
+              _pad(ppEyebrow('${ChildProfileStore.instance.name} · 4 months', color: ppMuted, spacing: 1.4)),
               const SizedBox(height: 8),
               _pad(Text.rich(TextSpan(children: [
                 const TextSpan(text: 'On track, '),
@@ -157,7 +158,7 @@ class VaxTrackerScreen extends StatelessWidget {
           const SizedBox(width: 18),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text("Aarav's had $done of his first-year vaccines.", style: ppBody(14, color: ppInk, w: FontWeight.w600, h: 1.5)),
+              Text("${ChildProfileStore.instance.name}'s had $done of his first-year vaccines.", style: ppBody(14, color: ppInk, w: FontWeight.w600, h: 1.5)),
               const SizedBox(height: 6),
               Wrap(spacing: 8, runSpacing: 6, children: [
                 _statChip('${due != null ? 1 : 0} due', ppPurple),
@@ -278,8 +279,8 @@ class VaxTrackerScreen extends StatelessWidget {
         id: (v.id.hashCode & 0x7fffffff),
         title: 'Vaccine reminder - ${lead.shortName}',
         body: daysBefore == 0
-            ? "Aarav's ${lead.shortName} (${v.ageLabel}) is due today."
-            : "Aarav's ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${v.date}.",
+            ? "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due today."
+            : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${v.date}.",
         when: base.subtract(Duration(days: daysBefore)),
       );
       messenger.showSnackBar(SnackBar(content: Text('Alarm set - $label'), behavior: SnackBarBehavior.floating));

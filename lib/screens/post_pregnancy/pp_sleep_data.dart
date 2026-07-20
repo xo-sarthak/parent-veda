@@ -10,7 +10,14 @@
 //  child's age from ChildProfileStore; nothing here touches the pregnancy app.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
 
 import 'pp_child_profile.dart';
 
@@ -51,14 +58,90 @@ class SleepAgeContext {
 }
 
 class SleepStore extends ChangeNotifier {
-  SleepStore._() {
-    _seed();
-  }
+  // _seed() is deliberately NOT called - see FeedingStore for the reasoning
+  // (demo nights for a fictional child must not reach a real record).
+  SleepStore._();
   static final SleepStore instance = SleepStore._();
 
   final List<SleepLog> _logs = [];
   int _seq = 0;
   String _id() => 'sleep_${DateTime.now().microsecondsSinceEpoch}_${_seq++}';
+
+  bool _loaded = false;
+  static const _prefsKey = 'pp_sleeps';
+  static const _table = 'pp_sleep_logs';
+
+  String? get _childId => ChildProfileStore.instance.activeChildId;
+
+  // ---- persistence (local-first, then cloud) -------------------------------
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) {
+        for (final e in (jsonDecode(raw) as List)) {
+          _logs.add(_fromRow(Map<String, dynamic>.from(e)));
+        }
+      }
+    } catch (_) {/* start empty */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await _syncFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    final childId = _childId;
+    if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final merged = await ChildSync.merge<SleepLog>(
+        table: _table,
+        childId: childId,
+        local: _logs,
+        idOf: (s) => s.id,
+        toRow: _toRow,
+        fromRow: _fromRow,
+        orderBy: 'start_at',
+      );
+      _logs
+        ..clear()
+        ..addAll(merged);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(_logs.map(_toRow).toList()));
+    } catch (_) {}
+  }
+
+  static Map<String, dynamic> _toRow(SleepLog s) => {
+        'id': s.id,
+        'start_at': SupabaseRepo.dbTime(s.start),
+        'end_at': SupabaseRepo.dbTime(s.end),
+        'kind': s.kind.name,
+        'note': s.note,
+      };
+
+  static SleepLog _fromRow(Map<String, dynamic> r) {
+    SleepKind kind = SleepKind.nap;
+    for (final k in SleepKind.values) {
+      if (k.name == r['kind']) kind = k;
+    }
+    return SleepLog(
+      id: (r['id'] ?? '').toString(),
+      start: SupabaseRepo.parseDbTime(r['start_at']),
+      end: SupabaseRepo.parseDbTime(r['end_at']),
+      kind: kind,
+      note: r['note']?.toString(),
+    );
+  }
 
   // ---- reads --------------------------------------------------------------
   List<SleepLog> get all {
@@ -159,6 +242,8 @@ class SleepStore extends ChangeNotifier {
   // ---- writes -------------------------------------------------------------
   void add(SleepLog e) {
     _logs.add(e);
+    _persist();
+    ChildSync.push(_table, _childId, e.id, _toRow(e));
     notifyListeners();
   }
 
@@ -168,6 +253,8 @@ class SleepStore extends ChangeNotifier {
 
   void remove(String id) {
     _logs.removeWhere((s) => s.id == id);
+    _persist();
+    ChildSync.remove(_table, id);
     notifyListeners();
   }
 
@@ -187,6 +274,8 @@ class SleepStore extends ChangeNotifier {
 
   static String _plural(int n, String one, String many) => '$n ${n == 1 ? one : many}';
 
+  /// Demo nights. Deliberately NOT called - see the constructor note.
+  // ignore: unused_element
   void _seed() {
     final now = DateTime.now();
     _logs.addAll([

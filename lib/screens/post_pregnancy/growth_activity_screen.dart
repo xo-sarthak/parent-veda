@@ -42,7 +42,7 @@ const GrowthActivity kActPeekaboo = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Peekaboo, slow and silly',
   why:
-      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches Aarav that you still exist when you vanish - the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
+      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches {child} that you still exist when you vanish - the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
   steps: [
     'Cover your face with your hands, or a light muslin cloth.',
     'Pause a beat - let him wonder where you went.',
@@ -56,7 +56,7 @@ const GrowthActivity kActPeekaboo = GrowthActivity(
   ],
   deeper: [
     ('FAQ', 'When does object permanence develop?'),
-    ('Course', 'Play & Brain · Leap 4 activities'),
+    ('Course', 'Play & Brain · 4-month activities'),
     ('Room', 'Boy moms · favourite 4-month games'),
   ],
 );
@@ -65,7 +65,7 @@ const GrowthActivity kActReachRing = GrowthActivity(
   eyebrow: 'Grow · 4 min',
   title: 'Reach for the ring',
   why:
-      "At four months, reaching becomes intentional - hand and eye start working as a team. Holding a light ring just within reach invites Aarav to plan a movement, stretch and grasp: the groundwork for every skill that needs two coordinated hands.",
+      "At four months, reaching becomes intentional - hand and eye start working as a team. Holding a light ring just within reach invites {child} to plan a movement, stretch and grasp: the groundwork for every skill that needs two coordinated hands.",
   steps: [
     'Sit him propped, or lay him on his back, well supported.',
     'Hold a light ring or rattle a hand-span above his chest.',
@@ -88,7 +88,7 @@ const GrowthActivity kActNewSound = GrowthActivity(
   eyebrow: 'Grow · 3 min',
   title: 'Introduce a new sound',
   why:
-      "Aarav is mapping the world by ear now. A gentle new sound - a shaker, a spoon on a cup, your humming - makes him still, search and connect what he hears to where it comes from. That listening-and-locating is the very root of language and attention.",
+      "{child} is mapping the world by ear now. A gentle new sound - a shaker, a spoon on a cup, your humming - makes him still, search and connect what he hears to where it comes from. That listening-and-locating is the very root of language and attention.",
   steps: [
     'Choose one soft, clear sound - a rattle, a spoon on a cup, a hum.',
     'Out of his sight, make the sound to one side and pause.',
@@ -134,7 +134,7 @@ const GrowthActivity kActNarrate = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Narrate your day',
   why:
-      "Long before his first word, Aarav is building the ear for language. When you narrate - 'now we pour the water' - and pause as if for his reply, you hand him the rhythm of conversation and thousands of words a day to soak in.",
+      "Long before his first word, {child} is building the ear for language. When you narrate - 'now we pour the water' - and pause as if for his reply, you hand him the rhythm of conversation and thousands of words a day to soak in.",
   steps: [
     'Pick an everyday moment - a nappy change, cooking, a walk.',
     'Say what you are doing, simply and warmly.',
@@ -192,7 +192,7 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ppEyebrow('Why it works', color: ppPurple, spacing: 0.8),
                 const SizedBox(height: 8),
-                Text(a.why, style: ppBody(14, color: ppInk, h: 1.6)),
+                Text(ppFill(a.why), style: ppBody(14, color: ppInk, h: 1.6)),
               ]),
             )),
 

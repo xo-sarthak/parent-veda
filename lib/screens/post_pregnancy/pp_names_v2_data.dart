@@ -21,6 +21,9 @@ enum NameVersion { v1, v2 }
 /// Which naming experience is active. A ChangeNotifier singleton (same pattern as
 /// the app's other stores); session-persistent. Defaults to V2 so the new
 /// Journey is what opens - flip to V1 in the header to see the classic Finder.
+/// RETIRED 19 Jul. Held which naming experience to show while V1 and V2 were
+/// being compared side by side. V2 is now the only path, so nothing reads this.
+/// Kept for revert; delete once V1 is genuinely gone.
 class NameVersionStore extends ChangeNotifier {
   NameVersionStore._();
   static final NameVersionStore instance = NameVersionStore._();

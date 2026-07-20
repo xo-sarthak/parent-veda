@@ -281,7 +281,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   const Icon(Icons.favorite, size: 13, color: ppPurple),
                   const SizedBox(width: 5),
-                  Text('${_store.matchedCount} matched', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+                  Text('${_store.likedCount} liked', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
                 ]),
               ),
             ]),
@@ -433,7 +433,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
           const SizedBox(height: 14),
           Text("That's every name for now", textAlign: TextAlign.center, style: ppFraunces(24, h: 1.15)),
           const SizedBox(height: 8),
-          Text('${_store.matchedCount} names are waiting in your shared list.', textAlign: TextAlign.center, style: ppBody(14)),
+          Text('${_store.likedCount} names are waiting in your list.', textAlign: TextAlign.center, style: ppBody(14)),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: _openList,
@@ -529,10 +529,10 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   const Icon(Icons.favorite, size: 34, color: ppPurple),
                   const SizedBox(height: 10),
-                  Text("It's a match!", textAlign: TextAlign.center, style: ppFraunces(26, h: 1.05)),
+                  Text('Added to your list', textAlign: TextAlign.center, style: ppFraunces(26, h: 1.05)),
                   const SizedBox(height: 8),
                   Text.rich(TextSpan(children: [
-                    TextSpan(text: 'You both love ', style: ppBody(14, h: 1.55)),
+                    TextSpan(text: 'You love ', style: ppBody(14, h: 1.55)),
                     TextSpan(text: n.name, style: ppBody(14, color: ppPurple, w: FontWeight.w700, h: 1.55)),
                     TextSpan(text: ' - “${n.meaningShort}”', style: ppBody(14, h: 1.55)),
                   ]), textAlign: TextAlign.center),

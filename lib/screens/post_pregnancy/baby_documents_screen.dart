@@ -384,7 +384,11 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
           GestureDetector(
             onTap: () async {
               final picked = await showAttachmentPicker(context);
-              if (picked.isNotEmpty) setSheet(() => atts.addAll(picked));
+              if (picked.isEmpty) return;
+              // Straight to Storage: the picker hands back a temp path the OS
+              // will delete, so the bytes have to be copied out now.
+              final stored = await uploadAttachments(picked, 'documents');
+              setSheet(() => atts.addAll(stored));
             },
             behavior: HitTestBehavior.opaque,
             child: Container(

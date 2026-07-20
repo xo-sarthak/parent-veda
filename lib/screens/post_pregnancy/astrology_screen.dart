@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 
@@ -41,7 +42,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
           const SizedBox(height: 10),
           _pad(Text('Astrology & Numerology', style: ppFraunces(30, h: 1.12))),
           const SizedBox(height: 8),
-          _pad(Text("Off by default. Turn it on to add cosmic notes to Aarav's world - you can switch it off anytime.",
+          _pad(Text("Off by default. Turn it on to add cosmic notes to ${ChildProfileStore.instance.name}'s world - you can switch it off anytime.",
               style: ppBody(15))),
 
           // toggle card
@@ -64,7 +65,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Astrology & Numerology', style: ppJakarta(15)),
                       const SizedBox(height: 2),
-                      Text("AI readings for Aarav, if you'd like them.", style: ppBody(12)),
+                      Text("AI readings for ${ChildProfileStore.instance.name}, if you'd like them.", style: ppBody(12)),
                     ]),
                   ),
                   const SizedBox(width: 12),
@@ -79,7 +80,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                 padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Off by default. Turn on to add an Astrology tab to Aarav\'s profile. You can switch it off anytime.',
+                  child: Text('Off by default. Turn on to add an Astrology tab to ${ChildProfileStore.instance.name}\'s profile. You can switch it off anytime.',
                       style: ppBody(12, color: ppMuted, h: 1.55)),
                 ),
               ),
@@ -108,7 +109,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
 
             _pad(ppEyebrow('Astrology & Numerology', color: ppBrown, spacing: 1.2)),
             const SizedBox(height: 10),
-            _pad(Text("Aarav's cosmic notes", style: ppFraunces(30, h: 1.14))),
+            _pad(Text("${ChildProfileStore.instance.name}'s cosmic notes", style: ppFraunces(30, h: 1.14))),
             const SizedBox(height: 8),
             _pad(Text('Born 8 March 2026 · 6:42 am · New Delhi', style: ppBody(13))),
 

@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 
@@ -35,7 +36,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.arrow_back, size: 20, color: ppSoft),
                 const SizedBox(width: 12),
-                Flexible(child: Text('Aarav · Snapshot of Today', style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Flexible(child: Text('${ChildProfileStore.instance.name} · Snapshot of Today', style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
             )),
 
@@ -71,7 +72,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
                         gradient: LinearGradient(
                             begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Color(0x802F2C30)]),
                       ),
-                      child: Text('Aarav this month - a guide to Leap 4', style: ppBody(13, color: Colors.white, w: FontWeight.w600)),
+                      child: Text('${ChildProfileStore.instance.name} this month - a guide to Leap 4', style: ppBody(13, color: Colors.white, w: FontWeight.w600)),
                     ),
                   ),
                 ]),
@@ -79,7 +80,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
             )),
 
             const SizedBox(height: 22),
-            _pad(Text('Where Aarav is right now', style: ppFraunces(30, h: 1.15))),
+            _pad(Text('Where ${ChildProfileStore.instance.name} is right now', style: ppFraunces(30, h: 1.15))),
             const SizedBox(height: 10),
             _pad(Text(
                 'Four windows into a 4-month-old, mid-Leap 4. Every baby moves at his own pace - these are what to look for, not a scorecard.',
@@ -113,7 +114,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
 
             // details
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("Aarav's details", style: ppJakarta(18)),
+              Text("${ChildProfileStore.instance.name}'s details", style: ppJakarta(18)),
               GestureDetector(onTap: () => _soon(context), child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
             ])),
             const SizedBox(height: 16),
@@ -141,7 +142,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Aarav', style: ppJakarta(20)),
+                  Text(ChildProfileStore.instance.name, style: ppJakarta(20)),
                   const SizedBox(height: 2),
                   Text('Born 8 Mar 2026 · Boy · Delhi NCR', style: ppBody(13)),
                 ]),

@@ -8,64 +8,131 @@
 
 import 'package:flutter/material.dart';
 
+import 'growth_journey_screen.dart';
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_health_data.dart';
+import 'pp_growth_data.dart';
 
 class HealthGrowthScreen extends StatelessWidget {
   const HealthGrowthScreen({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  /// "6.4" not "6.40".
+  static String _trim(double v) =>
+      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+
   @override
   Widget build(BuildContext context) {
-    final now = kGrowth.last;
-    final labels = kGrowth.map((g) => g.ageLabel).toList();
+    // Reads the real GrowthStore. This screen used to render the const kGrowth
+    // list plus hardcoded "48th"/"52nd" centiles and copy naming Aarav - so it
+    // showed a fictional child's chart to every parent, and never changed when
+    // she logged a measurement.
+    final store = GrowthStore.instance;
+    final child = ChildProfileStore.instance;
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
-          children: [
-            _pad(ppBack(context, 'Health')),
-            const SizedBox(height: 18),
-            _pad(ppEyebrow('Growth', color: ppPurple)),
-            const SizedBox(height: 8),
-            _pad(Text('Growing at his own pace', style: ppFraunces(28, h: 1.12))),
-            const SizedBox(height: 18),
+        child: AnimatedBuilder(
+          animation: Listenable.merge([store, child]),
+          builder: (context, _) {
+            final series = store.chronological;
+            final now = store.latest;
+            final labels =
+                series.map((m) => m.ageLabelAt(child.dob)).toList();
+            return ListView(
+              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              children: [
+                _pad(ppBack(context, 'Health')),
+                const SizedBox(height: 18),
+                _pad(ppEyebrow('Growth', color: ppPurple)),
+                const SizedBox(height: 8),
+                _pad(Text('Growing at ${child.their} own pace', style: ppFraunces(28, h: 1.12))),
+                const SizedBox(height: 18),
 
-            _pad(Row(children: [
-              Expanded(child: _statCard('Weight', '${now.weightKg} kg', '${now.weightPct}th centile')),
-              const SizedBox(width: 12),
-              Expanded(child: _statCard('Length', '${now.heightCm.toInt()} cm', '48th centile')),
-              const SizedBox(width: 12),
-              Expanded(child: _statCard('Head', '${now.headCm.toInt()} cm', '52nd centile')),
-            ])),
+                if (now == null)
+                  _pad(_empty(context))
+                else ...[
+                  _pad(Row(children: [
+                    Expanded(
+                        child: _statCard('Weight', '${_trim(now.weightKg)} kg',
+                            store.latestPercentilePhrase(GrowthMetric.weight))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: _statCard('Length', '${_trim(now.heightCm)} cm',
+                            store.latestPercentilePhrase(GrowthMetric.height))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: _statCard(
+                            'Head',
+                            now.headCm == null ? '—' : '${_trim(now.headCm!)} cm',
+                            now.headCm == null
+                                ? 'Not measured'
+                                : store.latestPercentilePhrase(GrowthMetric.head))),
+                  ])),
 
-            const SizedBox(height: 22),
-            _pad(_chartCard('Weight', 'kg', kGrowth.map((g) => g.weightKg).toList(), labels, ppPurple)),
-            const SizedBox(height: 14),
-            _pad(_chartCard('Length', 'cm', kGrowth.map((g) => g.heightCm).toList(), labels, ppCoral)),
+                  // One point is a dot, not a trend - only chart a real series.
+                  if (series.length >= 2) ...[
+                    const SizedBox(height: 22),
+                    _pad(_chartCard('Weight', 'kg',
+                        series.map((m) => m.weightKg).toList(), labels, ppPurple)),
+                    const SizedBox(height: 14),
+                    _pad(_chartCard('Length', 'cm',
+                        series.map((m) => m.heightCm).toList(), labels, ppCoral)),
+                  ],
 
-            const SizedBox(height: 20),
-            _pad(Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Icon(Icons.trending_up_rounded, size: 18, color: ppPurple),
-                const SizedBox(width: 12),
-                Expanded(child: Text(kGrowthInterpretation, style: ppBody(13.5, color: ppInk, h: 1.55))),
-              ]),
-            )),
-            const SizedBox(height: 12),
-            _pad(Text('Following his OWN curve over time matters far more than any single number or comparison.', style: ppBody(11.5, color: ppMuted, h: 1.5))),
-          ],
+                  const SizedBox(height: 20),
+                  _pad(Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Icon(Icons.trending_up_rounded, size: 18, color: ppPurple),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(child.growthNote, style: ppBody(13.5, color: ppInk, h: 1.55))),
+                    ]),
+                  )),
+                  const SizedBox(height: 12),
+                  _pad(Text('Following ${child.their} OWN curve over time matters far more than any single number or comparison.',
+                      style: ppBody(11.5, color: ppMuted, h: 1.5))),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _statCard(String label, String value, String sub) => Container(
+  /// Never a blank screen: an invitation, with the way to act on it.
+  Widget _empty(BuildContext context) => Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(18)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('No measurements yet', style: ppJakarta(16)),
+          const SizedBox(height: 6),
+          Text('Add a weight and length from your next check-up and the curve builds itself from there.',
+              style: ppBody(13, color: ppMuted, h: 1.5)),
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const GrowthJourneyScreen())),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
+              child: Text('Add a measurement',
+                  style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
+            ),
+          ),
+        ]),
+      );
+
+  // `sub` is nullable: a centile is an ESTIMATE we can only make once there is
+  // a real measurement, so when there isn't one we say nothing rather than
+  // printing a number that came from nowhere.
+  Widget _statCard(String label, String value, String? sub) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -73,7 +140,7 @@ class HealthGrowthScreen extends StatelessWidget {
           const SizedBox(height: 7),
           Text(value, style: ppJakarta(16), maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 3),
-          Text(sub, style: ppBody(10.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(sub ?? '', style: ppBody(10.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
       );
 

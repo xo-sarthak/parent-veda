@@ -11,7 +11,12 @@
 //  (pp_recipes_data.dart). Scenario child: Aarav (first foods from ~6 months).
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 
 /// One key nutrient line for the Nutrition Breakdown.
 class FoodNutrient {
@@ -797,7 +802,7 @@ const List<FoodRecipe> kFoodRecipes = [
     highlight: 'Fibre + vitamin A',
     serves: 2,
     why:
-        'Aarav is teething and moving to firmer finger foods, so soft noodles he can gum are perfect right now - and sneaking in carrots and peas turns a comfort food into a small nutrition win at exactly the stage his iron stores start needing a top-up. The veg boost adds fibre and vitamin A, and the ghee swap makes it gentler than the packet masala alone.',
+        '{child} is teething and moving to firmer finger foods, so soft noodles he can gum are perfect right now - and sneaking in carrots and peas turns a comfort food into a small nutrition win at exactly the stage his iron stores start needing a top-up. The veg boost adds fibre and vitamin A, and the ghee swap makes it gentler than the packet masala alone.',
     nutrients: [
       FoodNutrient('Vitamin A', 'from carrots', 'Builds his immunity and eyesight as he explores and mouths everything.'),
       FoodNutrient('Iron', '12% RDA', 'His birth iron stores run low around now, and iron fuels these months of brain growth.'),
@@ -1376,7 +1381,7 @@ List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, 
 // =============================================================================
 //  FoodStore - saved recipes + the shopping list (ingredient -> purchased).
 // =============================================================================
-class FoodStore extends ChangeNotifier {
+class FoodStore extends ChangeNotifier with CloudSyncedStore {
   FoodStore._();
   static final FoodStore instance = FoodStore._();
 
@@ -1384,6 +1389,66 @@ class FoodStore extends ChangeNotifier {
   final Map<String, bool> _shopping = {}; // ingredient line -> purchased
   final List<String> _cooked = ['moongkhichdi', 'sweetpotatomash'];
   bool _vegOnly = false;
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_food';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  @override
+  Object cloudData() => {
+        'saved': _saved.toList(),
+        'shopping': _shopping,
+        'cooked': _cooked,
+        'vegOnly': _vegOnly,
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    final s = data['saved'];
+    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    final c = data['cooked'];
+    if (c is List) _cooked..clear()..addAll(c.map((e) => e.toString()));
+    final sh = data['shopping'];
+    if (sh is Map) {
+      _shopping
+        ..clear()
+        ..addAll(sh.map((k, v) => MapEntry(k.toString(), v == true)));
+    }
+    _vegOnly = data['vegOnly'] == true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation already calls notifyListeners(), so one override covers them all.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {

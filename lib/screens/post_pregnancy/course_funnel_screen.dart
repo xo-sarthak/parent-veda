@@ -42,7 +42,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreen> {
   static const List<(String, String, String, bool, List<(String, String, bool)>)> _sections = [
     ('03', 'Pregnancy & newborn · 0–3 months', '18 modules · 3h 20m', false, []),
     ('46', '4–6 months', '22 modules · 4h 05m', true, [
-      ('Leap 4 & the 4-month brain', '18 min · playing now', false),
+      ('The 4-month brain', '18 min · playing now', false),
       ('Surviving the sleep regression', '22 min', false),
       ('Reaching, rolling and first grasps', '15 min', false),
       ('First solids - a preview', 'Unlocks at 6 months · open anyway', true),

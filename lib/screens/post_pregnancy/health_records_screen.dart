@@ -168,14 +168,14 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         return _allergies();
       case 'visits':
       default:
-        final added = _store.visits; // parent-added, editable
-        final timeline = kHealthTimeline.where((e) => e.type == HealthEventType.doctorVisit || e.type == HealthEventType.growthCheck).toList()
-          ..sort((a, b) => b.sortKey.compareTo(a.sortKey)); // seeded, read-only
+        // Her visits only. This used to append kHealthTimeline as a
+        // "seeded, read-only" history - a 4-month well-baby check and a growth
+        // check that belonged to our demo child, listed among her own records
+        // and indistinguishable from them.
+        final added = _store.visits;
         final cards = <Widget>[
           for (int i = 0; i < added.length; i++)
             if (_match('${added[i].title} ${added[i].summary} ${added[i].doctor ?? ''}')) _visitCard(added[i], index: i),
-          for (final e in timeline)
-            if (_match('${e.title} ${e.summary} ${e.doctor ?? ''}')) _visitCard(e),
         ];
         return _list(cards, 'No visits recorded yet.');
     }
@@ -770,7 +770,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           GestureDetector(
             onTap: () async {
               final picked = await showAttachmentPicker(context);
-              if (picked.isNotEmpty) setSheet(() => atts.addAll(picked));
+              if (picked.isEmpty) return;
+              // Straight to Storage: the picker hands back a temp path the OS
+              // will delete, so the bytes have to be copied out now.
+              final stored = await uploadAttachments(picked, 'health');
+              setSheet(() => atts.addAll(stored));
             },
             behavior: HitTestBehavior.opaque,
             child: Container(

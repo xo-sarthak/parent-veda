@@ -12,10 +12,9 @@
 import 'package:flutter/material.dart';
 
 import 'community_screen.dart';
-import 'leap_definition_screen.dart';
+import 'phase_map_screen.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_leaps_data.dart';
 import 'pp_what_changed_data.dart';
 import 'problem_solver_screen.dart';
 
@@ -527,9 +526,9 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           children: [
-            _railCard(context, Icons.brightness_4_outlined, 'Leap window',
+            _railCard(context, Icons.timeline_rounded, 'His phase',
                 _fill('Where {baby} is right now'), _lav,
-                dark: true, onTap: () => _push(context, LeapDefinitionScreen(leap: currentLeap()))),
+                dark: true, onTap: () => _push(context, const PhaseMapScreen())),
             _railCard(context, Icons.forum_outlined, 'Community', 'Parents going through this too', ppPurple,
                 onTap: () => _push(context, const CommunityScreen())),
             _railCard(context, Icons.medical_services_outlined, 'Ask an expert', 'Talk it through with a paediatrician', ppCoral,

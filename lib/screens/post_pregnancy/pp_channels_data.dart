@@ -105,7 +105,7 @@ const Map<String, List<ChannelCourse>> _channelExtras = {
     ChannelCourse(id: 'm_sleepnight', title: 'The 4-Month Sleep Masterclass', subtitle: 'Live · her most-attended session', lessons: 90, seed: 42, masterclass: true),
   ],
   'kabir': [
-    ChannelCourse(id: 'c_leaps', title: 'Understanding the Leaps', subtitle: 'Wonder Weeks, decoded leap by leap', lessons: 10, seed: 43),
+    ChannelCourse(id: 'c_leaps', title: 'Understanding fussy stretches', subtitle: 'Why a hard week often comes before a new skill', lessons: 10, seed: 43),
     ChannelCourse(id: 'm_fussy', title: 'Demystifying the Fussy Phases', subtitle: 'Live masterclass · Q&A included', lessons: 75, seed: 44, masterclass: true),
   ],
   'neha': [

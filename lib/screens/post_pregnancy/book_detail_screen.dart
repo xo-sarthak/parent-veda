@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 
@@ -81,7 +82,7 @@ class BookDetailScreen extends StatelessWidget {
             _pad(Text('The ParentVeda take', style: ppJakarta(18))),
             const SizedBox(height: 8),
             _pad(Text(
-                "One of the best first books you can own. The high-contrast pages hold a 4-month-old's gaze, and the textured patches give little hands their first reason to reach and explore - exactly the Leap 4 skill Aarav's building now. Sturdy enough to survive being chewed.",
+                "One of the best first books you can own. The high-contrast pages hold a 4-month-old's gaze, and the textured patches give little hands their first reason to reach and explore - exactly the reaching-and-grasping skill ${ChildProfileStore.instance.name}'s building now. Sturdy enough to survive being chewed.",
                 style: ppBody(15, h: 1.6))),
 
             // what's good / consider

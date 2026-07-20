@@ -10,7 +10,12 @@
 //  depends on the pregnancy app.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 
 /// How a class is delivered. The home's toggles map straight onto these three.
 enum YogaMode { liveOneToOne, liveGroup, recorded }
@@ -797,12 +802,61 @@ List<YogaClass> yogaSearch(String query) {
 //  YogaStore - saved + booked classes (in-memory seed). A ChangeNotifier
 //  singleton, matching the app's other stores. Booking/payment is mocked.
 // =============================================================================
-class YogaStore extends ChangeNotifier {
+class YogaStore extends ChangeNotifier with CloudSyncedStore {
   YogaStore._();
   static final YogaStore instance = YogaStore._();
 
   final Set<String> _saved = {'pn_group', 'md_sleep_rec'};
   final Set<String> _booked = {};
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_yoga';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  @override
+  Object cloudData() =>
+      {'saved': _saved.toList(), 'booked': _booked.toList()};
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    final s = data['saved'];
+    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    final b = data['booked'];
+    if (b is List) _booked..clear()..addAll(b.map((e) => e.toString()));
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation already calls notifyListeners(), so one override covers them all.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {

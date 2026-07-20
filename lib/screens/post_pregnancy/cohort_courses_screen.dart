@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'cohort_funnel_screen.dart';
 import 'pp_common.dart';
@@ -89,7 +90,7 @@ class CohortCoursesScreen extends StatelessWidget {
                   Text('2 weeks · led by a paediatric sleep consultant', style: ppBody(13)),
                   const SizedBox(height: 16),
                   _check('Two live group calls each week'),
-                  _check('A plan built around Aarav, not a template'),
+                  _check('A plan built around ${ChildProfileStore.instance.name}, not a template'),
                   _check('A private group that stays with you after'),
                   const SizedBox(height: 16),
                   Text.rich(TextSpan(children: [

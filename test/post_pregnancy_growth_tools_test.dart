@@ -72,6 +72,10 @@ void main() {
     // sheet; confirm its "Why it matters" section renders.
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('Rolling over'), 220, scrollable: scrollable, maxScrolls: 30);
+    // ensureVisible: nothing is pre-observed now, so the emerging list sits
+    // differently and the card can be only partly on screen when tapped.
+    await tester.ensureVisible(find.text('Rolling over'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Rolling over'));
     await tester.pumpAndSettle();
     expect(find.text('Why it matters'), findsOneWidget);

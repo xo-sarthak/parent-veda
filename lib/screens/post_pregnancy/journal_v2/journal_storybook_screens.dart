@@ -28,7 +28,7 @@ class StorybookScreen extends StatelessWidget {
         children: [
           jvPad(jvTopBar(
             context,
-            title: book.title,
+            title: ppFill(book.title),
             trailing: GestureDetector(
               onTap: () => emailMemoryToChild(context, _bookAsMemory(book)),
               behavior: HitTestBehavior.opaque,
@@ -42,7 +42,7 @@ class StorybookScreen extends StatelessWidget {
             ),
           )),
           const SizedBox(height: 26),
-          Center(child: JvBookCover(width: 150, height: 200, title: book.title.toUpperCase(), since: jvBornSince)),
+          Center(child: JvBookCover(width: 150, height: 200, title: ppFill(book.title).toUpperCase(), since: jvBornSince)),
           const SizedBox(height: 22),
           Center(child: Text('$jvBornSince · ${book.detail} · ${jvChapters.length} chapters', style: ppBody(12, color: ppMuted))),
           const SizedBox(height: 20),

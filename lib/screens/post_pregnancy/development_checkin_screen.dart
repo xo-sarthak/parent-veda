@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_development_data.dart';
@@ -38,7 +39,7 @@ class DevelopmentCheckinScreen extends StatelessWidget {
                 const SizedBox(height: 18),
                 _pad(ppEyebrow('A gentle check-in', color: ppCoral)),
                 const SizedBox(height: 8),
-                _pad(Text('Let’s see how Aarav is doing', style: ppFraunces(28, h: 1.12))),
+                _pad(Text('Let’s see how ${ChildProfileStore.instance.name} is doing', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
                 _pad(Text('A few soft questions - just to understand where he is. There are no right answers, no scores, and no comparing.', style: ppBody(14, h: 1.5))),
 
@@ -108,8 +109,8 @@ class DevelopmentCheckinScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           allYes
-              ? 'Lovely - Aarav is doing so much of what we’d hope for right now, and clearly delighting in you along the way. Keep offering the everyday moments of play and closeness; they’re doing exactly what they should.'
-              : 'Aarav is showing lots of lovely, emerging skills. A few “not yet”s are completely normal - every baby walks this path at their own pace, and these can bloom any week now. Keep gently offering chances to practise, and enjoy where he is.',
+              ? 'Lovely - ${ChildProfileStore.instance.name} is doing so much of what we’d hope for right now, and clearly delighting in you along the way. Keep offering the everyday moments of play and closeness; they’re doing exactly what they should.'
+              : '${ChildProfileStore.instance.name} is showing lots of lovely, emerging skills. A few “not yet”s are completely normal - every baby walks this path at their own pace, and these can bloom any week now. Keep gently offering chances to practise, and enjoy where he is.',
           style: ppBody(14, color: ppInk, h: 1.6),
         ),
         if (!allYes) ...[

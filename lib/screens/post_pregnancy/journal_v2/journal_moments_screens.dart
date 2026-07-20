@@ -56,7 +56,7 @@ class MemoryDetailScreen extends StatelessWidget {
                   Flexible(child: Text(memory.age, style: ppBody(13, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ]),
                 const SizedBox(height: 16),
-                Text(memory.body, style: ppBody(15, h: 1.7).copyWith(fontStyle: isLetter ? FontStyle.italic : FontStyle.normal)),
+                Text(ppFill(memory.body), style: ppBody(15, h: 1.7).copyWith(fontStyle: isLetter ? FontStyle.italic : FontStyle.normal)),
                 if (!isLetter && memory.mediaCount > 1) ...[
                   const SizedBox(height: 24),
                   Text('Media', style: ppJakarta(14)),
@@ -180,7 +180,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   const SizedBox(height: 3),
                   Text(m.title, style: ppJakarta(15)),
                   const SizedBox(height: 2),
-                  Text(m.body, style: ppBody(12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(ppFill(m.body), style: ppBody(12), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
             ),

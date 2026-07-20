@@ -8,7 +8,14 @@
 //  that every screen reads real data - nothing on these screens is static.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
 
 /// One baby name and everything the detail/swipe/match screens show for it.
 class BabyName {
@@ -482,29 +489,180 @@ NumProfile numProfile(int n) => kNumerology[((n - 1) % 9) + 1] ?? kNumerology[1]
 //  with the mock's "you both love" set so the matches screen always reads right;
 //  liking a name in the swipe deck adds to it, and tapping a name in the list
 //  crowns it. In-memory only - no persistence wired yet.
-class NameMatchStore extends ChangeNotifier {
+class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   NameMatchStore._();
   static final NameMatchStore instance = NameMatchStore._();
 
-  final List<String> _liked = ['Aarav', 'Vihaan', 'Reyansh', 'Kabir', 'Ishaan', 'Arjun'];
-  String _crowned = 'Aarav';
+  // EMPTY, not seeded. This used to start as six liked names and a crowned
+  // "Aarav". Harmless while likes were private - actively wrong now that both
+  // parents' votes are compared: two accounts starting from the SAME six seeded
+  // likes would "match" on all six before either parent had swiped once, and
+  // the one moment this feature exists for would be a fake.
+  final List<String> _liked = [];
+  String _crowned = '';
+
+  /// Names BOTH parents have liked, from public.pp_name_matches(). Derived
+  /// server-side and never stored - see 0027_pp_name_votes.sql.
+  final List<String> _matches = [];
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_names';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  // Only the crown rides in the KV blob. LIKES are votes now: they live in
+  // pp_name_votes, one row per parent per name, because the partner's side has
+  // to be able to count them. Keeping a second copy here would let the two
+  // drift, and a match computed from stale likes is worse than no match.
+  @override
+  Object cloudData() => {'crowned': _crowned};
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    _crowned = (data['crowned'] ?? _crowned).toString();
+    // Back-compat: a blob written before votes existed still carries 'liked'.
+    // Adopt it once so nobody loses a shortlist; _syncVotes then pushes it up.
+    final l = data['liked'];
+    if (l is List && _liked.isEmpty) {
+      _liked.addAll(l.map((e) => e.toString()));
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation already calls notifyListeners(), so one override covers them all.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+    try {
+      await _syncVotes();
+    } catch (_) {/* stay local */}
+  }
+
+  // ---- votes + matches -----------------------------------------------------
+  static const _votesTable = 'pp_name_votes';
+
+  /// Adopt my votes from the cloud, push up anything only this device has, then
+  /// refresh the matches. Registered so it re-runs after a login.
+  Future<void> _syncVotes() async {
+    SyncRegistry.register(_syncVotes);
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Own rows only - RLS forbids reading the partner's, by design.
+      final rows = await SupabaseRepo.fetch(_votesTable, orderBy: 'created_at');
+      final cloud = <String>{
+        for (final r in rows)
+          if (r['liked'] == true) (r['name'] ?? '').toString(),
+      };
+      for (final n in _liked) {
+        if (n.isEmpty || cloud.contains(n)) continue;
+        cloud.add(n);
+        await _pushVote(n, true);
+      }
+      _liked
+        ..clear()
+        ..addAll(cloud);
+      await _refreshMatches();
+      await persistLocalCache();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _pushVote(String name, bool liked) async {
+    if (name.isEmpty || !SupabaseRepo.isLoggedIn) return;
+    try {
+      await SupabaseRepo.upsert(
+        _votesTable,
+        {'name': name, 'liked': liked},
+        onConflict: 'user_id,name',
+      );
+    } catch (_) {/* offline - pushed up on the next sync */}
+  }
+
+  /// Ask the database for the intersection. We cannot compute this ourselves:
+  /// the partner's votes are unreadable to us, which is the point.
+  Future<void> _refreshMatches() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final rows = await SupabaseRepo.callFunction('pp_name_matches');
+      _matches
+        ..clear()
+        ..addAll(rows.map((e) => e.toString()));
+    } catch (_) {/* leave the last known matches */}
+  }
 
   List<String> get liked => List.unmodifiable(_liked);
-  int get matchedCount => _liked.length;
+
+  /// Names both parents liked. Empty when unpaired, or when nothing overlaps.
+  List<String> get matches => List.unmodifiable(_matches);
+
+  /// How many names the two of them AGREE on - the real thing, at last.
+  int get matchedCount => _matches.length;
+
+  bool isMatch(String name) => _matches.contains(name);
+  /// How many names SHE has liked.
+  ///
+  /// Named `matchedCount` until 19 July 2026, which is how the UI came to say
+  /// "3 names you've BOTH said yes to" while counting one person's likes -
+  /// there is no partner concept in this store at all. A mother who liked six
+  /// names alone was told her partner had liked all six, and a couple
+  /// comparing screens would have found out immediately.
+  ///
+  /// A real match needs both parents' votes (name_votes, per
+  /// docs/BACKEND-COUPLE-NAMING-BRIEF.md §4) and is DERIVED from the
+  /// intersection, never stored. Until that lands, the copy says "you like".
+  /// When it does, add a separate `matchedCount` reading from the intersection
+  /// and restore the "both" language then - do not point it back at this list.
+  int get likedCount => _liked.length;
   String get crowned => _crowned;
 
   bool isLiked(String name) => _liked.contains(name);
 
   void like(String name) {
-    if (!_liked.contains(name)) {
-      _liked.add(name);
-      notifyListeners();
-    }
+    if (_liked.contains(name)) return;
+    _liked.add(name);
+    notifyListeners();
+    _pushVote(name, true).then((_) => _refreshMatches()).then((_) {
+      if (_matches.isNotEmpty) notifyListeners();
+    });
+  }
+
+  /// An explicit "not for me". Recorded (liked = false) so the name is not
+  /// offered again, and so a later un-skip is an upsert rather than a new row.
+  void skip(String name) {
+    if (_liked.remove(name)) notifyListeners();
+    _pushVote(name, false);
   }
 
   void crown(String name) {
     _crowned = name;
-    if (!_liked.contains(name)) _liked.add(name);
+    if (!_liked.contains(name)) {
+      _liked.add(name);
+      _pushVote(name, true);
+    }
     notifyListeners();
   }
 }

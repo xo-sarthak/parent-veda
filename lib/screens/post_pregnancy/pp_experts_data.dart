@@ -181,7 +181,7 @@ final List<Expert> kExperts = [
     fee: ('₹2,499', 'per class'),
     whyHeading: 'Why ParentVeda picks him',
     why:
-        'Translates the science of the Wonder Weeks into plain, reassuring language. Gentle, evidence-first, and brilliant at demystifying the fussy leaps.',
+        'Translates infant brain development into plain, reassuring language. Gentle, evidence-first, and brilliant at demystifying the fussy stretches.',
     tags: ['Hindi', 'English', 'Bengali', 'Child development', 'Behaviour'],
     reviews: [
       ('Nisha', 'mother of Aarav (4 mo)', '“I stopped panicking about every fussy phase after his class.”'),

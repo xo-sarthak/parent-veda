@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'dart:math' as math;
+import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 
@@ -104,12 +105,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           _pad(ppBack(context, 'Explore')),
 
           const SizedBox(height: 22),
-          _pad(ppEyebrow('Plan ahead for Aarav', color: ppBrown, spacing: 1.4)),
+          _pad(ppEyebrow('Plan ahead for ${ChildProfileStore.instance.name}', color: ppBrown, spacing: 1.4)),
           const SizedBox(height: 10),
           _pad(Text('Start small, for a big day.', style: ppFraunces(32, h: 1.12))),
           const SizedBox(height: 12),
           _pad(Text(
-              "Set a goal for Aarav's future and we'll explain the ways to get there - in plain language, with vetted partners. You stay in control of every rupee.",
+              "Set a goal for ${ChildProfileStore.instance.name}'s future and we'll explain the ways to get there - in plain language, with vetted partners. You stay in control of every rupee.",
               style: ppBody(15))),
 
           // goal-led entry (dark card)
@@ -201,7 +202,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             children: [
               Text('I want ', style: ppFraunces(20, color: Colors.white, h: 1.5)),
               _fill(_amounts[_amount].$1, () => setState(() => _amount = (_amount + 1) % _amounts.length)),
-              Text(" for Aarav's ", style: ppFraunces(20, color: Colors.white, h: 1.5)),
+              Text(" for ${ChildProfileStore.instance.name}'s ", style: ppFraunces(20, color: Colors.white, h: 1.5)),
               _fill(_goals[_goal].$3, () => setState(() => _goal = (_goal + 1) % _goals.length)),
               Text(' in ', style: ppFraunces(20, color: Colors.white, h: 1.5)),
               _fill(_horizons[_horizon].$1, () => setState(() => _horizon = (_horizon + 1) % _horizons.length)),

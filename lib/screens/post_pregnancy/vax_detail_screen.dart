@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import '../../services/notification_service.dart';
 import 'askveda_screen.dart';
@@ -313,8 +314,8 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
         id: (_visit.id.hashCode & 0x7fffffff),
         title: 'Vaccine reminder - ${_vax.shortName}',
         body: daysBefore == 0
-            ? "Aarav's ${_vax.shortName} (${_visit.ageLabel}) is due today."
-            : "Aarav's ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${_visit.date}.",
+            ? "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due today."
+            : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${_visit.date}.",
         when: when.subtract(Duration(days: daysBefore)),
       );
       messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));

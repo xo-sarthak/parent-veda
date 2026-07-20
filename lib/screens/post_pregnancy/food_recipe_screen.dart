@@ -17,6 +17,7 @@ import 'pp_common.dart';
 import 'pp_food_data.dart';
 import 'pp_products_data.dart';
 import 'pp_watch_data.dart';
+import '../product_guide/product_guide_chooser.dart';
 import 'product_detail_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
@@ -51,7 +52,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             const SizedBox(height: 18),
             _pad(Text(r.title, style: ppFraunces(25, h: 1.15))),
             const SizedBox(height: 6),
-            _pad(Text(r.subtitle, style: ppBody(14, h: 1.5))),
+            _pad(Text(ppFill(r.subtitle), style: ppBody(14, h: 1.5))),
             const SizedBox(height: 12),
             _pad(_dietServesRow()),
             const SizedBox(height: 16),
@@ -359,7 +360,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ppEyebrow('Why this is good for him', color: ppPurple, spacing: 0.8),
           const SizedBox(height: 10),
-          Text(r.why, style: ppBody(14, color: ppInk, h: 1.6)),
+          Text(ppFill(r.why), style: ppBody(14, color: ppInk, h: 1.6)),
         ]),
       );
 
@@ -418,7 +419,23 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           final v = watchVideoById(r.relatedVideoId!);
           _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
         }),
-      if (r.relatedProductId != null) (Icons.shopping_bag_outlined, 'Product', productById(r.relatedProductId!).name, () => _push(ProductDetailScreen(product: productById(r.relatedProductId!)))),
+      // NATIVE DISCOVERY (BrandSlot.nativeDiscovery): a product named inside
+      // content routes through the guide check, so a parent who taps it lands
+      // on the trusted in-depth Guide when one exists rather than straight on a
+      // buy page. Never dressed as an advertisement - it is the product the
+      // recipe already mentions.
+      if (r.relatedProductId != null)
+        (
+          Icons.shopping_bag_outlined,
+          'Product',
+          productById(r.relatedProductId!).name,
+          () => openProductWithGuideCheck(
+                context,
+                id: productById(r.relatedProductId!).id,
+                name: productById(r.relatedProductId!).name,
+                onOpenNormal: () => _push(ProductDetailScreen(product: productById(r.relatedProductId!))),
+              )
+        ),
       if (r.relatedCommunity != null) (Icons.groups_outlined, 'Community', r.relatedCommunity!, () => openPpTab(context, 3)),
       (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${r.ageTag}', () => openPpTab(context, 1)),
     ];

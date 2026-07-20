@@ -79,7 +79,7 @@ class _NameListScreenState extends State<NameListScreen> {
                     child: Row(children: [
                       const Icon(Icons.favorite, size: 15, color: ppPurple),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('${NameMatchStore.instance.matchedCount} in your shortlist', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      Expanded(child: Text('${NameMatchStore.instance.likedCount} in your shortlist', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                       const SizedBox(width: 10),
                       Text('View & compare →', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ]),

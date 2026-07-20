@@ -12,8 +12,16 @@
 //  redesign that replaces the old vaccination_screen (kept, commented, for revert).
 // =============================================================================
 
-import 'pp_health_data.dart';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
+import 'pp_child_profile.dart';
+import 'pp_health_data.dart';
 
 // Reassuring status language - "due" means recommended now, never "missed".
 enum VaxStatus { done, due, upcoming }
@@ -366,9 +374,93 @@ class VaxStore extends ChangeNotifier {
   VaxStore._();
   static final VaxStore instance = VaxStore._();
 
-  // Seeded from the schedule's status; parents can mark the due one done.
-  final Set<String> _done = {for (final v in kVaxVisits) if (v.status == VaxStatus.done) v.id};
+  // EMPTY, not seeded. This used to start as {every visit the SCHEDULE calls
+  // done}, so a parent who had recorded nothing opened the tracker to find
+  // three doses already ticked - our demo child's history presented as hers.
+  // A dose is "done" only when SHE marks it. See statusOf() for how the
+  // schedule's own status is now read honestly.
+  final Set<String> _done = {};
   final Set<String> _reminders = {};
+
+  bool _loaded = false;
+  static const _prefsKey = 'pp_vax';
+  static const _table = 'pp_vaccine_doses';
+
+  String? get _childId => ChildProfileStore.instance.activeChildId;
+
+  // ---- persistence (local-first, then cloud) -------------------------------
+  // Everything in _done / _reminders is now parent-entered by construction
+  // (nothing seeds them), so it all syncs - no seed-guard needed.
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) {
+        final j = Map<String, dynamic>.from(jsonDecode(raw));
+        for (final e in (j['done'] as List? ?? [])) {
+          _done.add(e.toString());
+        }
+        for (final e in (j['reminders'] as List? ?? [])) {
+          _reminders.add(e.toString());
+        }
+      }
+    } catch (_) {/* keep the schedule defaults */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await _syncFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    final childId = _childId;
+    if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final rows = await SupabaseRepo.fetchByChild(_table, childId);
+      for (final r in rows) {
+        final id = (r['vaccine_id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        if (r['done'] == true) _done.add(id);
+        if (r['reminder'] == true) _reminders.add(id);
+      }
+      // Push up anything only this device knows (parent-marked doses only).
+      final cloudIds = {for (final r in rows) (r['vaccine_id'] ?? '').toString()};
+      for (final id in {..._done, ..._reminders}) {
+        if (cloudIds.contains(id)) continue;
+        await _pushDose(id);
+      }
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _pushDose(String visitId) async {
+    await ChildSync.pushKeyed(
+      _table,
+      _childId,
+      {
+        'vaccine_id': visitId,
+        'done': _done.contains(visitId),
+        'reminder': _reminders.contains(visitId),
+      },
+      onConflict: 'child_id,vaccine_id',
+    );
+  }
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _prefsKey,
+        jsonEncode({
+          'done': _done.toList(),
+          'reminders': _reminders.toList(),
+        }),
+      );
+    } catch (_) {}
+  }
 
   bool isDone(String visitId) => _done.contains(visitId);
   void markDone(String visitId) {
@@ -377,6 +469,8 @@ class VaxStore extends ChangeNotifier {
     // marked; this is what flips it to her actual schedule.
     HealthStore.instance.markVaxEntered();
     notifyListeners();
+    _persist();
+    _pushDose(visitId);
   }
 
   void markNotDone(String visitId) {
@@ -384,6 +478,13 @@ class VaxStore extends ChangeNotifier {
     if (kVaxVisits.firstWhere((v) => v.id == visitId).status != VaxStatus.done) {
       _done.remove(visitId);
       notifyListeners();
+      _persist();
+      // Still has a reminder? keep the row and just clear `done`.
+      if (_reminders.contains(visitId)) {
+        _pushDose(visitId);
+      } else {
+        ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
+      }
     }
   }
 
@@ -391,10 +492,30 @@ class VaxStore extends ChangeNotifier {
   void setReminder(String visitId, bool on) {
     on ? _reminders.add(visitId) : _reminders.remove(visitId);
     notifyListeners();
+    _persist();
+    // Persisting this closes the second half of flag #4: the reminder armed a
+    // real OS notification that survived a restart while the store forgot it,
+    // so the app and the phone disagreed about what was scheduled.
+    if (on || _done.contains(visitId)) {
+      _pushDose(visitId);
+    } else {
+      ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
+    }
   }
 
   /// A visit's live status (respecting anything the parent has marked done).
-  VaxStatus statusOf(VaxVisit v) => _done.contains(v.id) ? VaxStatus.done : v.status;
+  /// A visit's live status.
+  ///
+  /// `done` comes ONLY from what the parent has marked. The schedule's own
+  /// `status` field still supplies `due` / `upcoming` (both are honest - they
+  /// derive from the child's age), but a schedule entry that claims `done`
+  /// is our demo history, so for a real parent it reads as `due`: the dose is
+  /// in the past and she has not recorded it yet. That is true, and it invites
+  /// her to record it instead of telling her it already happened.
+  VaxStatus statusOf(VaxVisit v) {
+    if (_done.contains(v.id)) return VaxStatus.done;
+    return v.status == VaxStatus.done ? VaxStatus.due : v.status;
+  }
 
   // ---- snapshot ----
   int get completedVaccineCount =>

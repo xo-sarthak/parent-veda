@@ -8,10 +8,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'pp_common.dart';
+import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
+import 'pp_vaccine_data.dart';
 
 class HealthDoctorVisitScreen extends StatefulWidget {
   const HealthDoctorVisitScreen({super.key});
@@ -26,16 +29,68 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  String _shareText(GrowthPoint g) {
+  // Every line below is HER record. This screen used to print a fictional
+  // child - "4 months (born 8 Mar 2026) · Boy", a const growth measurement,
+  // "Up to date", "Vitamin D drops", "Mild cold (early Jun)" - and hand it to a
+  // doctor via the Share button. Same fix as the Doctor-ready record.
+  static const List<String> _months = [
+    'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',
+  ];
+  static String _trim(double v) =>
+      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+
+  String _childLine() {
+    final c = ChildProfileStore.instance;
+    final d = c.dob;
+    return '${c.name} · ${c.ageLabel} '
+        '(born ${d.day} ${_months[d.month - 1]} ${d.year}) · '
+        '${c.isBoy ? 'Boy' : 'Girl'}';
+  }
+
+  String _growthLine() {
+    final m = GrowthStore.instance.latest;
+    if (m == null) return 'No measurements recorded yet';
+    final pct = GrowthStore.instance.latestPercentilePhrase(GrowthMetric.weight);
+    return '${_trim(m.weightKg)} kg${pct != null ? ' ($pct)' : ''} · '
+        '${_trim(m.heightCm)} cm'
+        '${m.headCm != null ? ' · head ${_trim(m.headCm!)} cm' : ''}';
+  }
+
+  String _vaxLine() {
+    final v = VaxStore.instance;
+    final done = kVaxVisits.where((x) => v.statusOf(x) == VaxStatus.done).length;
+    if (done == 0) return 'None marked yet';
+    final next = v.dueVisit ?? v.nextVisit;
+    return '$done of ${kVaxVisits.length} visits marked'
+        '${next != null ? ' · next: ${next.lead.shortName} (${next.ageLabel})' : ''}';
+  }
+
+  String _medsLine() => _s.medications.isEmpty
+      ? 'None recorded'
+      : _s.medications.map((m) => '${m.name} (${m.dosage})').join(' · ');
+
+  String _allergyLine() => _s.allergies.isEmpty
+      ? 'None recorded'
+      : _s.allergies.map((a) => a.name).join(' · ');
+
+  String _historyLine() => _s.symptoms.isEmpty
+      ? 'None recorded'
+      : _s.symptoms.take(3).map((x) => '${x.name} (${x.date})').join(' · ');
+
+  String _reportsLine() => _s.reports.isEmpty
+      ? 'None recorded'
+      : _s.reports.take(3).map((r) => '${r.name} (${r.date})').join(' · ');
+
+  String _shareText() {
     final b = StringBuffer()
-      ..writeln('VISIT SUMMARY - Aarav')
-      ..writeln('Child: Aarav · 4 months (born 8 Mar 2026) · Boy')
-      ..writeln('Growth: ${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm - on track')
-      ..writeln('Vaccinations: Up to date · next: $kVaxNext')
-      ..writeln('Medications: Vitamin D drops (routine daily)')
-      ..writeln('Allergies: None recorded')
-      ..writeln('Recent history: Mild cold (early Jun) · brief fever after 14-week vaccines')
-      ..writeln('Recent reports: 4-month growth summary (12 Jun) - all normal')
+      ..writeln('VISIT SUMMARY - ${ChildProfileStore.instance.name}')
+      ..writeln('Child: ${_childLine()}')
+      ..writeln('Growth: ${_growthLine()}')
+      ..writeln('Vaccinations: ${_vaxLine()}')
+      ..writeln('Medications: ${_medsLine()}')
+      ..writeln('Allergies: ${_allergyLine()}')
+      ..writeln('Recent history: ${_historyLine()}')
+      ..writeln('Recent reports: ${_reportsLine()}')
       ..writeln('')
       ..writeln('QUESTIONS TO ASK');
     for (final q in _s.questions) {
@@ -52,7 +107,6 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final g = kGrowth.last;
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -84,13 +138,13 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                     Text('Prepared today', style: ppBody(11, color: ppMuted)),
                   ]),
                   const SizedBox(height: 14),
-                  _line('Child', 'Aarav · 4 months (born 8 Mar 2026) · Boy'),
-                  _line('Growth', '${g.weightKg} kg (${g.weightPct}th) · ${g.heightCm.toInt()} cm · head ${g.headCm.toInt()} cm - on track'),
-                  _line('Vaccinations', 'Up to date · next: $kVaxNext'),
-                  _line('Medications', 'Vitamin D drops (routine daily)'),
-                  _line('Allergies', 'None recorded'),
-                  _line('Recent history', 'Mild cold (early Jun) · brief fever after 14-week vaccines'),
-                  _line('Recent reports', '4-month growth summary (12 Jun) - all normal', last: true),
+                  _line('Child', _childLine()),
+                  _line('Growth', _growthLine()),
+                  _line('Vaccinations', _vaxLine()),
+                  _line('Medications', _medsLine()),
+                  _line('Allergies', _allergyLine()),
+                  _line('Recent history', _historyLine()),
+                  _line('Recent reports', _reportsLine(), last: true),
                 ]),
               )),
 
@@ -105,7 +159,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
 
               const SizedBox(height: 24),
               _pad(GestureDetector(
-                onTap: () => Share.share(_shareText(g)),
+                onTap: () => Share.share(_shareText()),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 15),

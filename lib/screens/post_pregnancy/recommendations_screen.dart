@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
-import 'pp_leaps_data.dart';
+import 'pp_phases_data.dart';
 import 'pp_reco_data.dart';
 import 'pp_section_extras.dart';
 import 'reco_category_screen.dart';
@@ -67,7 +67,7 @@ class RecommendationsScreen extends StatelessWidget {
                   const SizedBox(height: 14),
                   _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                     _ctxPill(Icons.cake_outlined, '${child.ageInMonths} months'),
-                    _ctxPill(Icons.auto_awesome, currentLeap(child).label),
+                    _ctxPill(Icons.auto_awesome, currentPhase(child).name),
                   ])),
 
                   // HERO - recommended today

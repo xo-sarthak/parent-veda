@@ -96,7 +96,7 @@ class GuidesToolsScreen extends StatelessWidget {
             // grid
             const SizedBox(height: 20),
             _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(child: _card(context, 'Leap-by-Leap guide', '₹999')),
+              Expanded(child: _card(context, 'Phase-by-phase guide', '₹999')),
               const SizedBox(width: 14),
               Expanded(child: _card(context, 'Feed & sleep tracker', '₹299')),
             ])),

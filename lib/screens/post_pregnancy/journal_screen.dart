@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 
@@ -32,10 +33,10 @@ class MyChildJournalScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, 'Aarav')),
+            _pad(ppBack(context, ChildProfileStore.instance.name)),
 
             const SizedBox(height: 22),
-            _pad(Text("Aarav's journal", style: ppFraunces(30, h: 1.15))),
+            _pad(Text("${ChildProfileStore.instance.name}'s journal", style: ppFraunces(30, h: 1.15))),
             const SizedBox(height: 4),
             _pad(Text('Just for you. 34 moments saved.', style: ppBody(13))),
 
@@ -121,7 +122,7 @@ class MyChildJournalScreen extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('First half-roll', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text("Milestone added to Aarav's timeline.", style: ppBody(12)),
+                    Text("Milestone added to ${ChildProfileStore.instance.name}'s timeline.", style: ppBody(12)),
                   ]),
                 ),
               ]),

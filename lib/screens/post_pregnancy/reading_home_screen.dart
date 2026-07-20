@@ -11,6 +11,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
@@ -92,7 +93,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                 const SizedBox(height: 8),
                 _pad(Text('What to read today', style: ppFraunces(30, h: 1.1))),
                 const SizedBox(height: 6),
-                _pad(Text('One good read, chosen for where you and Aarav are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
+                _pad(Text('One good read, chosen for where you and ${ChildProfileStore.instance.name} are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 16),
                 _pad(ppSearchField(
@@ -409,7 +410,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Icon(Icons.wb_sunny_outlined, size: 16, color: ppPurple),
                     const SizedBox(width: 10),
-                    Expanded(child: Text(a.whyToday, style: ppBody(12.5, color: ppInk, h: 1.5))),
+                    Expanded(child: Text(ppFill(a.whyToday), style: ppBody(12.5, color: ppInk, h: 1.5))),
                   ]),
                 ),
                 const SizedBox(height: 16),

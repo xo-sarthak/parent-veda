@@ -128,7 +128,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
             const SizedBox(height: 8),
             Text(channel.statsLine, style: ppBody(12.5, color: ppSoft, w: FontWeight.w600)),
             const SizedBox(height: 14),
-            Text(e.why, style: ppBody(13.5, h: 1.55), maxLines: 4, overflow: TextOverflow.ellipsis),
+            Text(ppFill(e.why), style: ppBody(13.5, h: 1.55), maxLines: 4, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 16),
             Row(children: [
               Expanded(flex: 3, child: _subscribeButton(e, subscribed)),

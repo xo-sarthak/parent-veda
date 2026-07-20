@@ -113,4 +113,99 @@ right-sized.
 - 2026-07-14: **Phase 1 DONE (migration run).** `0019_articles.sql` = articles table + `domain` tag + public-read RLS + 6 pregnancy articles seeded. `ContentRepo` + `ArticleStore` (cache/offline, bundled fallback). Pregnancy weekly-reads carousel now reads from the DB. Parenting "Learn" not wired yet (later phase).
 - 2026-07-14: **Phase 2 DONE — Directus LIVE.** Self-hosted Directus (Core/free) on Render (free tier, image `directus/directus:latest`), connected to Supabase via Session-pooler env vars. `articles` registered as a collection; editing title/body → app shows it. Admin at `https://parentveda-cms.onrender.com/admin`. (Gotcha: blank admin in normal browser = ad-block extension; use incognito or whitelist.)
 - 2026-07-14: **Refresh added** — `ArticleStore.refresh()` → pull-to-refresh (View-all reads) + app-resume (MainScaffold lifecycle), so edits appear without a relaunch.
-- Next: recipes / videos content types · parenting "Learn" wiring (`domain='parenting'`) · images → R2.
+- 2026-07-14: **Web content tables added** — `0020_web_content.sql` = `content_categories` (5 seeded) + `content_posts` (SEO-rich; modeled 1:1 on the website's `src/lib/guides.ts`; body/recipe/source/book_meta stored as jsonb so the site's renderer is unchanged; + verdict/trimester/week_tag/og_image/meta_title SEO fields). Public-read RLS. For the ParentVeda WEBSITE (Next.js, separate repo `C:\parentveda-web`, Tailwind/App-Router/static-export → moving to Vercel + ISR). Same Supabase, same Directus. App `articles` and web `content_posts` are SEPARATE tables in one project.
+- 2026-07-14: **Web content wired in Directus** — `content_posts` + `content_categories` registered as collections; `body` recreated as a **Markdown** field (was jsonb → column altered to `text`, migration 0020 updated to match); a test blog published OK. Deferred: a clean field-polish pass (proper category/status dropdowns — snagged live on text-vs-string type + RLS/FK deps).
+- 2026-07-14: **Website wiring handed off** — website terminal (`C:\parentveda-web`) wiring Next.js to read `content_posts`/`content_categories` live from Supabase, body → markdown renderer, remove `output:'export'` → **Vercel + ISR** (`revalidate`, `dynamicParams=true`), migrate the 10 sample `guides.ts` posts in. Old GitHub Pages deploy workflow disabled (kept for revert). User does the Vercel deploy (guided from here).
+- 2026-07-14: **AskVeda RAG chatbot handed off** — separate terminal building a FastAPI RAG service (Groq/Together open-LLM, bge/MiniLM embeddings, Chroma, Supabase+pgvector `veda_cache`, Directus content as the knowledge base, app + inbound-WhatsApp channels reusing the MSG91 number). Ingests from `articles` + `content_posts`.
+
+## Parallel workstreams (2026-07-14) — 4 terminals, one shared Supabase + one shared Directus
+
+1. **This terminal — content-system hub.** Owns migrations `0019` (articles) + `0020` (web content). App content backend + Directus + web content tables DONE. Guides the Vercel deploy.
+2. **Website terminal** (`C:\parentveda-web`, Next.js) — wiring the site to read content live from Supabase, Vercel + ISR.
+3. **Parenting-backend terminal** (app repo) — Supabase persistence for post-pregnancy **USER DATA** (child profile / health / vaccinations / trackers), migrations `0021+`. This is user data, NOT admin-panel content. (Parenting *content* — articles/recipes/videos — is separate and rides the same `articles` table via `domain='parenting'` + Directus.)
+4. **AskVeda/WhatsApp terminal** (own repo) — the RAG chatbot backend; reads the shared content.
+
+Migration-number reservation: `0019` articles, `0020` web content (this terminal); parenting starts at **`0021`**; AskVeda's `veda_cache` is a uniquely-named table in its own repo (no number clash).
+
+**Key insight:** one Directus → feeds the app, the website, AND the chatbot. Publish once, everywhere reads it.
+
+---
+
+## AskVeda — the RAG chatbot backend (architecture & learning)
+
+> Added 2026-07-16. AskVeda is being rebuilt from the offline retrieval engine into an **AI chatbot** that answers pregnancy/parenting questions **grounded in this project's own content**, on **two channels: the app and WhatsApp**. It's a NEW, standalone service (own repo `C:\Projects\parentveda-askveda`) that shares only the Supabase DB + Directus — it never touches the app/website code.
+>
+> **Deep, build-along learning notes (phase by phase) live in the AskVeda repo: `parentveda-askveda/askveda.md`.** This section is the brief; that file is the detail.
+>
+> **Build progress:** Phase 0 DONE (2026-07-16) — FastAPI skeleton + typed config + `/health` (verified 200 locally). Next: Phase 1 = pgvector tables (`veda_setup.sql`).
+
+### The core idea: one brain, two doors
+AskVeda's logic lives in **exactly one place — an always-on server**. The app and WhatsApp are just two **doors** into that same brain; neither client contains any RAG logic.
+- **App door** = ~30 lines of Dart: a chat screen that POSTs the question and shows the answer.
+- **WhatsApp door** = zero app code: user texts the number → MSG91 forwards it to the service's webhook → the service replies via MSG91.
+- **The service** = 100% of the intelligence (embeddings, retrieval, prompt, LLM, cache, guardrails).
+
+A **Message Gateway** normalizes both channels into one internal format so they run the **exact same code path** — identical functionality, two entry points.
+
+### Why a separate repo + an always-on server (the "why live")
+A static site can be served half-asleep (just files). AskVeda must **do work in the moment, per question** (embed → search → LLM → format) *and* **receive pushes** (WhatsApp shoves an inbound message at the webhook at any second — something must be listening 24/7) *and* hold **secrets** (Groq key, Supabase service_role) that can't ship in an app binary. A laptop can't be the public always-on host; a server can. Hence: its own repo, deployed to an always-on server.
+
+### Render vs Directus — software vs host (the money question)
+- **Directus** = admin-panel *software* (open-source). Self-hosting is **free forever**. It runs *on* a host.
+- **Render** = the *host* (the machine). This is the only thing with free/paid tiers; one Render account runs multiple services.
+
+| Service on Render | Tier | Why |
+|---|---|---|
+| **Directus** | **FREE** | Only *editors* use it, and the app/site/AskVeda read content from **Supabase**, not Directus — so if Directus sleeps, users feel nothing (only the editor logging in waits ~40s). |
+| **AskVeda** | **PAID (~$7/mo ≈ ₹600)** | *Users* hit it live; a cold-start (sleep → 30–50s wake) breaks chat and drops WhatsApp webhooks. The ₹600 buys "no cold starts." |
+
+So you pay for **one** always-on service (AskVeda). Directus stays free.
+
+### The RAG flow
+**Ingestion (offline/batch — not in the request path):**
+`articles` + `content_posts` (published) → chunk → embed (bge/MiniLM, self-hosted CPU, free) → store vectors in **Supabase pgvector**. Re-index fires on a **Directus webhook** at publish (+ a manual full re-index script).
+
+**Live request (per question):**
+```
+app | whatsapp → GATEWAY (normalize)
+   → guardrails (scope · red-flag · rate limit · spend cap)
+   → CACHE (pgvector: exact → semantic ≥0.95)  ── hit → return, no LLM (₹0)
+   → RETRIEVE (embed Q → pgvector top-3 chunks)
+   → PROMPT (chunks + Q + "answer ONLY from this")
+   → LLM (Groq, open model)
+   → RESPOND (format → cache it → route back to the door)
+```
+The LLM does **reading-comprehension + phrasing**, never fact-recall — every fact comes from our reviewed content.
+
+### The three answer cases
+- **A — we have it:** retrieval scores high → grounded answer in our voice. ~$0.00012 ≈ **₹0.01**.
+- **B — we don't have it:** scores low → skip the LLM, honest "I don't have that answer," **log the gap**. ~₹0.
+- **C — hybrid (the enhancement):** a genuine pregnancy/parenting question we lack → search a **whitelist of trusted sources** (NHS/ACOG/WHO/Mayo/AAP + Indian NHP/ICMR/FOGSI) → answer from *those*, labelled honestly, with a gentle doctor note. ~$0.003–0.005 ≈ **₹0.25–0.45**, rare, and self-extinguishing (see flywheel).
+
+### The content flywheel (self-improving)
+Case C doesn't just answer — it **grows the content pool**:
+1. **Log every gap** → a ranked, demand-driven content backlog ("41 mothers asked X, we have nothing").
+2. **Auto-draft into Directus** as `status=draft` "AI-drafted, needs review" — **never auto-publish medical content**; an editor reviews → publishes.
+3. Once published, that question becomes a **Case A** next time (cheap, grounded, ours). So the expensive web path **shrinks over time by design.**
+
+### Safety (health domain)
+- Grounded-only; "I don't have that" instead of inventing.
+- **Gentle red-flag routing** (bleeding, severe pain, reduced movement) → skip RAG, calm "please check with your doctor" — **no alarm styling; don't scare users.**
+- The `verdict` field (`yes|moderation|avoid-some|avoid`) surfaced explicitly for "Can I…?" questions.
+- **Cache safety:** answers are **week/trimester-sensitive** ("X at week 8" ≠ "week 30" but they embed alike) → threshold 0.95 + week/trimester folded into the cache key + verdict/dosage = exact-match only.
+
+### Cost model (the whole thing in one line)
+```
+monthly = (messages × cache-MISS-rate × ₹0.01) + ₹600 Render + (rare web-fallback)
+```
+The LLM is **a paisa an answer** (an 8B open model is ~50–100× cheaper than a frontier model), so the bill is driven by **volume × cache hit rate**, not model choice. The real risks are **abuse** (→ 20/day per-user limit + global daily spend cap / circuit-breaker) and cache-hit-rate (instrumented from day one). Whole-stack fixed cost: Supabase/Directus/website **free**; only AskVeda's Render (~$7 ≈ ₹600/mo) is paid.
+
+### Locked decisions
+Own repo `C:\Projects\parentveda-askveda` · **pgvector for both** index + cache (Chroma dropped — Render's disk is ephemeral) · **Groq** (Together = config swap) · benchmark Qwen-7B vs Llama-8B · Directus-webhook re-index · **app door first** (built + tested locally, free) with the **WhatsApp webhook scaffolded** until MSG91/Meta is live · gentle safety · 20/day + global cap.
+
+### Status
+Planned, nothing built yet. **Development is 100% free/local** (Supabase service_role key is free from the dashboard; Groq has a free tier; the laptop is the dev server). The three paid/external things — **Render paid, MSG91 key, Meta verification** — are needed only at **go-live**, at the end.
+
+## Next (this terminal)
+- Guide the **Vercel deploy** once the website terminal finishes.
+- Then, app content when wanted: recipes / videos content types · parenting "Learn" wiring (`domain='parenting'`) · images → Cloudflare R2 · the deferred Directus field-polish pass.

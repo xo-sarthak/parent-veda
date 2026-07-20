@@ -15,6 +15,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_recipes_data.dart';
@@ -87,7 +88,7 @@ class RecipePageScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
-                child: Text("Right for Aarav's stage", style: ppBody(11, color: ppPurple, w: FontWeight.w700)),
+                child: Text("Right for ${ChildProfileStore.instance.name}'s stage", style: ppBody(11, color: ppPurple, w: FontWeight.w700)),
               ),
               const SizedBox(width: 8),
               Flexible(
@@ -287,7 +288,7 @@ class RecipePageScreen extends StatelessWidget {
             Flexible(child: Text('Customise for baby', style: ppJakarta(17), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
           const SizedBox(height: 6),
-          Text('Make the same dish safe and easy for a younger one - Aarav will be ready around 8 months.',
+          Text('Make the same dish safe and easy for a younger one - ${ChildProfileStore.instance.name} will be ready around 8 months.',
               style: ppBody(13, h: 1.55)),
           const SizedBox(height: 16),
           _cust('Form', 'Chop noodles small or blend to a soft mash - no long strands.'),

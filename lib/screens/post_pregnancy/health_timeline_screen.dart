@@ -7,6 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_health_data.dart';
@@ -30,7 +31,7 @@ class HealthTimelineScreen extends StatelessWidget {
             const SizedBox(height: 18),
             _pad(ppEyebrow('Health timeline', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('Aarav’s health story', style: ppFraunces(28, h: 1.12))),
+            _pad(Text('${ChildProfileStore.instance.name}’s health story', style: ppFraunces(28, h: 1.12))),
             const SizedBox(height: 6),
             _pad(Text('${events.where((e) => !e.upcoming).length} events so far - the whole journey in one place.', style: ppBody(13))),
             const SizedBox(height: 22),

@@ -75,7 +75,7 @@ const List<(String, String)> kRecipeDiets = [
 
 const List<String> kSickSituations = ['Constipation', 'Loose motion', 'Cough & cold', 'Fever'];
 
-const String _stage = "Right for Aarav's stage";
+const String _stage = "Right for {child}'s stage";
 
 const List<RecipeItem> kRecipes = [
   // -- normal recipes --
@@ -94,7 +94,7 @@ const List<RecipeItem> kRecipes = [
     recommended: true,
     hasVideo: true,
     description:
-        'Aarav is teething and moving to firmer finger foods, so soft noodles he can gum are perfect right now - and sneaking in carrots and peas turns a comfort food into a small nutrition win at exactly the stage his iron stores start needing a top-up.',
+        '{child} is teething and moving to firmer finger foods, so soft noodles he can gum are perfect right now - and sneaking in carrots and peas turns a comfort food into a small nutrition win at exactly the stage his iron stores start needing a top-up.',
   ),
   RecipeItem(id: 'ragipancake', title: 'Ragi & banana pancakes', subtitle: _stage, minutes: 10, meal: 'Breakfast', category: 'Breakfast', veg: true, kcal: 150, protein: 5, fibre: 3, healthier: true, recommended: true, description: 'Iron-rich ragi and naturally sweet banana - soft enough to gum, sturdy enough to self-feed.'),
   RecipeItem(id: 'curdrice', title: 'Curd rice, travel-friendly', subtitle: _stage, minutes: 5, meal: 'Lunch', category: 'Travel', veg: true, kcal: 160, protein: 5, fibre: 1, recommended: true, immunity: true, description: 'Cooling, probiotic and no-cook - the easiest thing to carry for a day out.'),

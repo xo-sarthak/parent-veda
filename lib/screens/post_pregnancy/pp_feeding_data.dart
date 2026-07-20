@@ -11,7 +11,14 @@
 //  pregnancy app.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/remote/sync_registry.dart';
 
 import 'pp_child_profile.dart';
 
@@ -60,14 +67,103 @@ class FeedLog {
 }
 
 class FeedingStore extends ChangeNotifier {
-  FeedingStore._() {
-    _seed();
-  }
+  // _seed() is deliberately NOT called - it invents a day of feeds for a
+  // fictional child, and this store now syncs, so those would land in a real
+  // parent's record. Kept for demos (BACKEND-PARENTING-BRIEF §5).
+  FeedingStore._();
   static final FeedingStore instance = FeedingStore._();
 
   final List<FeedLog> _logs = [];
   int _seq = 0;
   String _id() => 'feed_${DateTime.now().microsecondsSinceEpoch}_${_seq++}';
+
+  bool _loaded = false;
+  static const _prefsKey = 'pp_feeds';
+  static const _table = 'pp_feed_logs';
+
+  String? get _childId => ChildProfileStore.instance.activeChildId;
+
+  // ---- persistence (local-first, then cloud) -------------------------------
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) {
+        for (final e in (jsonDecode(raw) as List)) {
+          _logs.add(_fromRow(Map<String, dynamic>.from(e)));
+        }
+      }
+    } catch (_) {/* start empty */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await _syncFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    final childId = _childId;
+    if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final merged = await ChildSync.merge<FeedLog>(
+        table: _table,
+        childId: childId,
+        local: _logs,
+        idOf: (f) => f.id,
+        toRow: _toRow,
+        fromRow: _fromRow,
+        orderBy: 'time',
+      );
+      _logs
+        ..clear()
+        ..addAll(merged);
+      await _persist();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(_logs.map(_toRow).toList()));
+    } catch (_) {}
+  }
+
+  static Map<String, dynamic> _toRow(FeedLog f) => {
+        'id': f.id,
+        'time': SupabaseRepo.dbTime(f.time),
+        'kind': f.kind.name,
+        'side': f.side?.name,
+        'duration_min': f.durationMin,
+        'milk': f.milk?.name,
+        'amount_ml': f.amountMl,
+        'food': f.food,
+        'take': f.take?.name,
+        'note': f.note,
+      };
+
+  static T? _enumOf<T extends Enum>(List<T> values, Object? v) {
+    if (v == null) return null;
+    for (final e in values) {
+      if (e.name == v.toString()) return e;
+    }
+    return null;
+  }
+
+  static FeedLog _fromRow(Map<String, dynamic> r) => FeedLog(
+        id: (r['id'] ?? '').toString(),
+        time: SupabaseRepo.parseDbTime(r['time']),
+        kind: _enumOf(FeedKind.values, r['kind']) ?? FeedKind.breast,
+        side: _enumOf(FeedSideX.values, r['side']),
+        durationMin: (r['duration_min'] as num?)?.toInt(),
+        milk: _enumOf(BottleMilk.values, r['milk']),
+        amountMl: (r['amount_ml'] as num?)?.toInt(),
+        food: r['food']?.toString(),
+        take: _enumOf(SolidTake.values, r['take']),
+        note: r['note']?.toString(),
+      );
 
   // ---- reads --------------------------------------------------------------
   /// Every feed, newest first.
@@ -172,6 +268,8 @@ class FeedingStore extends ChangeNotifier {
   // ---- writes -------------------------------------------------------------
   void add(FeedLog e) {
     _logs.add(e);
+    _persist();
+    ChildSync.push(_table, _childId, e.id, _toRow(e));
     notifyListeners();
   }
 
@@ -202,6 +300,8 @@ class FeedingStore extends ChangeNotifier {
 
   void remove(String id) {
     _logs.removeWhere((f) => f.id == id);
+    _persist();
+    ChildSync.remove(_table, id);
     notifyListeners();
   }
 
@@ -219,6 +319,8 @@ class FeedingStore extends ChangeNotifier {
     return d.year == now.year && d.month == now.month && d.day == now.day;
   }
 
+  /// Demo feeds. Deliberately NOT called - see the constructor note.
+  // ignore: unused_element
   void _seed() {
     final now = DateTime.now();
     _logs.addAll([

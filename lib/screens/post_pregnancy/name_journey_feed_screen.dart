@@ -487,14 +487,14 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               child: Container(width: 34, height: 34, alignment: Alignment.center, decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle), child: const Icon(Icons.arrow_back, size: 17, color: ppInk)),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text(widget.collection?.title ?? 'For you both', style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(widget.collection?.title ?? 'For you', style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
             GestureDetector(
               onTap: _openList,
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.favorite, size: 13, color: ppPurple),
                 const SizedBox(width: 5),
-                Text('${_store.matchedCount}', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+                Text('${_store.likedCount}', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
               ]),
             ),
           ]),
@@ -685,7 +685,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           const SizedBox(height: 14),
           Text("That's every name for now", textAlign: TextAlign.center, style: ppFraunces(24, h: 1.15)),
           const SizedBox(height: 8),
-          Text('${_store.matchedCount} names are waiting in the ones you both love. Skipped names are never gone; find them anytime in Browse.', textAlign: TextAlign.center, style: ppBody(14, h: 1.5)),
+          Text('${_store.likedCount} names are waiting in the ones you love. Skipped names are never gone; find them anytime in Browse.', textAlign: TextAlign.center, style: ppBody(14, h: 1.5)),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: _openList,
@@ -797,7 +797,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   const Icon(Icons.favorite, size: 34, color: ppCoral),
                   const SizedBox(height: 12),
-                  Text('You both loved', style: ppBody(13, color: ppSoft, w: FontWeight.w700)),
+                  Text('You loved', style: ppBody(13, color: ppSoft, w: FontWeight.w700)),
                   const SizedBox(height: 4),
                   Text(n.name, textAlign: TextAlign.center, style: ppFraunces(34, h: 1.02)),
                   const SizedBox(height: 8),

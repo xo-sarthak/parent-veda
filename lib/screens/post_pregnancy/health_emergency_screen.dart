@@ -104,7 +104,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(e.name, style: ppFraunces(24, h: 1.05)),
+                    Text(ppFill(e.name), style: ppFraunces(24, h: 1.05)),
                     const SizedBox(height: 3),
                     Text('Born ${e.dob}  ·  ${e.weight}', style: ppBody(12.5, color: ppSoft)),
                   ]),
@@ -177,7 +177,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
       ];
 
   String _shareText(EmergencyProfile e) => [
-        'EMERGENCY CARD - ${e.name}',
+        'EMERGENCY CARD - ${ppFill(e.name)}',
         'Born ${e.dob} · ${e.weight}',
         'Blood group: ${e.bloodGroup}',
         'Allergies: ${e.allergies}',

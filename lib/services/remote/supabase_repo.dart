@@ -25,7 +25,21 @@ class SupabaseRepo {
   static SupabaseClient get _client => Supabase.instance.client;
 
   /// The current user's id, or null if not logged in.
-  static String? get userId => _client.auth.currentUser?.id;
+  ///
+  /// Also null when Supabase has not been initialised at all. Touching
+  /// `Supabase.instance` before `Supabase.initialize()` THROWS an assertion,
+  /// and this getter is the gate every store checks before a cloud call - so
+  /// without this guard an uninitialised backend turns "sync is unavailable"
+  /// into a crash, breaking the rule that a cloud failure must always degrade
+  /// to local-only. That happens in widget tests (which never initialise
+  /// Supabase) and would happen in the app if `initialize` ever failed.
+  static String? get userId {
+    try {
+      return _client.auth.currentUser?.id;
+    } catch (_) {
+      return null; // not initialised - behave exactly like "logged out"
+    }
+  }
 
   /// True when someone is logged in (so cloud calls are possible).
   static bool get isLoggedIn => userId != null;
@@ -64,6 +78,100 @@ class SupabaseRepo {
         .eq('user_id', otherUserId)
         .order(orderBy, ascending: ascending);
     return List<Map<String, dynamic>>.from(rows);
+  }
+
+  // === Co-parented reads/writes (the PARENTING side) =======================
+  // The pregnancy methods above all pin `.eq('user_id', uid)`, because there a
+  // row belongs to the parent who wrote it and the partner may only READ it.
+  //
+  // Parenting data is different: it belongs to the CHILD, and both paired
+  // parents share the same screens for the same baby, so either may read AND
+  // write it (see 0021_children.sql). `user_id` there means "who logged this",
+  // not "who may touch this" — so the own-user filter would wrongly HIDE the
+  // partner's rows. These variants drop that filter and let RLS do the scoping
+  // server-side (own child or partner's child, via public.my_child_ids()).
+  //
+  // Use these ONLY for child-scoped tables. Everything on the pregnancy side —
+  // and every user_state/KV store — keeps using the own-user methods above.
+
+  /// Load every row of [table] this user may see (own + partner's), scoped by
+  /// RLS rather than by a user_id filter. [] if logged out.
+  static Future<List<Map<String, dynamic>>> fetchShared(
+    String table, {
+    String orderBy = 'created_at',
+    bool ascending = false,
+  }) async {
+    if (userId == null) return [];
+    final rows =
+        await _client.from(table).select().order(orderBy, ascending: ascending);
+    return List<Map<String, dynamic>>.from(rows);
+  }
+
+  /// Load every row of [table] belonging to ONE child (own or partner's).
+  /// The workhorse read for parenting features. [] if logged out.
+  static Future<List<Map<String, dynamic>>> fetchByChild(
+    String table,
+    String childId, {
+    String orderBy = 'created_at',
+    bool ascending = false,
+  }) async {
+    if (userId == null) return [];
+    final rows = await _client
+        .from(table)
+        .select()
+        .eq('child_id', childId)
+        .order(orderBy, ascending: ascending);
+    return List<Map<String, dynamic>>.from(rows);
+  }
+
+  /// Update row [id] in a co-parented [table] — NO user_id filter, so a parent
+  /// can correct an entry their partner logged. RLS still blocks any row whose
+  /// child isn't theirs. No-op if logged out.
+  static Future<void> updateShared(
+    String table,
+    String id,
+    Map<String, dynamic> changes,
+  ) async {
+    if (userId == null) return;
+    await _client.from(table).update(changes).eq('id', id);
+  }
+
+  /// Delete row [id] from a co-parented [table] (see [updateShared]).
+  static Future<void> deleteShared(String table, String id) async {
+    if (userId == null) return;
+    await _client.from(table).delete().eq('id', id);
+  }
+
+  /// Delete from a composite-key child table, matched on [column] == [value]
+  /// for [childId]. For tables keyed by (child_id, something) rather than an
+  /// `id` column - vaccine doses, milestone observations.
+  static Future<void> deleteChildRow(
+    String table,
+    String childId,
+    String column,
+    Object value,
+  ) async {
+    if (userId == null) return;
+    await _client
+        .from(table)
+        .delete()
+        .eq('child_id', childId)
+        .eq(column, value);
+  }
+
+  /// Call a Postgres function and return its rows as a list.
+  ///
+  /// Used where the ANSWER must be computed server-side rather than assembled
+  /// from raw rows the client is allowed to read - baby-name matches being the
+  /// case in point: the votes themselves are private to each parent, and only
+  /// the intersection is exposed (see 0027_pp_name_votes.sql). [] if logged out.
+  static Future<List<dynamic>> callFunction(
+    String fn, [
+    Map<String, dynamic>? params,
+  ]) async {
+    if (userId == null) return [];
+    final res = await _client.rpc(fn, params: params);
+    return res is List ? res : (res == null ? [] : [res]);
   }
 
   /// The current user's paired partner id, or null (unpaired / logged out).

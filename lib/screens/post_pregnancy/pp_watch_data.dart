@@ -12,8 +12,12 @@
 //  the post_pregnancy module - nothing here depends on the pregnancy app.
 // =============================================================================
 
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 import 'pp_experts_data.dart';
 
 /// One learning item. `quick` splits Deep vs Quick (Shorts) modes; `isPodcast`
@@ -128,7 +132,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 720,
     quick: false,
     why:
-        'Aarav is right in the middle of the 4-month sleep shift. Dr Ananya explains what’s happening in his brain and the calm, no-cry changes that actually help.',
+        '{child} is right in the middle of the 4-month sleep shift. Dr Ananya explains what’s happening in his brain and the calm, no-cry changes that actually help.',
     seed: 1,
     relatedArticle: 'The 4-month regression, night by night',
     relatedActivity: 'A gentle wind-down routine',
@@ -161,7 +165,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 900,
     quick: false,
     why:
-        'A little ahead for Aarav, but worth knowing: how to spot readiness, the safest first foods, and why milk still leads for the first year.',
+        'A little ahead for {child}, but worth knowing: how to spot readiness, the safest first foods, and why milk still leads for the first year.',
     seed: 3,
     relatedArticle: 'Distracted feeds: is he getting enough?',
     relatedRecipe: 'Ragi & banana pancakes',
@@ -176,7 +180,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 480,
     quick: false,
     why:
-        'Short, happy sessions build the neck and core strength Aarav needs to roll. Dr Meher shows how to keep it a game, not a battle.',
+        'Short, happy sessions build the neck and core strength {child} needs to roll. Dr Meher shows how to keep it a game, not a battle.',
     seed: 4,
     relatedActivity: 'Chest-to-chest tummy time',
     relatedArticle: 'Drowsy but awake: the hardest skill',
@@ -191,7 +195,7 @@ const List<WatchVideo> kWatchVideos = [
     seconds: 540,
     quick: false,
     why:
-        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep Aarav comfortable, so vaccine day feels calm, not scary.',
+        'Exactly what’s due at this visit, what’s normal afterwards, and how to keep {child} comfortable, so vaccine day feels calm, not scary.',
     seed: 5,
     relatedArticle: 'The 4-month vaccines, explained calmly',
     relatedCommunity: 'Vaccine-day tips',
@@ -585,9 +589,107 @@ List<WatchCollection> expertCollections() {
 //  WatchStore - saved, following + continue-watching progress (in-memory seed).
 //  A ChangeNotifier singleton, matching the app's other stores.
 // =============================================================================
-class WatchStore extends ChangeNotifier {
+class WatchStore extends ChangeNotifier with CloudSyncedStore {
   WatchStore._();
   static final WatchStore instance = WatchStore._();
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_watch';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  /// Playback position updates arrive on every tick, so coalesce them.
+  @override
+  Duration get cloudPushDebounce => const Duration(seconds: 5);
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  @override
+  Object cloudData() => {
+        'saved': _saved.toList(),
+        'following': _following.toList(),
+        'progress': _progress,
+        'recent': _recent,
+        'lastSeconds': _lastSeconds,
+        'completed': _completed.toList(),
+        'collections': _userCollections
+            .map((c) => {'id': c.id, 'name': c.name, 'videoIds': c.videoIds})
+            .toList(),
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    void strs(String key, Set<String> into) {
+      final v = data[key];
+      if (v is List) into..clear()..addAll(v.map((e) => e.toString()));
+    }
+
+    strs('saved', _saved);
+    strs('following', _following);
+    strs('completed', _completed);
+    final p = data['progress'];
+    if (p is Map) {
+      _progress
+        ..clear()
+        ..addAll(p.map((k, v) => MapEntry(k.toString(), (v as num).toDouble())));
+    }
+    final r = data['recent'];
+    if (r is List) {
+      _recent
+        ..clear()
+        ..addAll(r.map((e) => e.toString()));
+    }
+    final ls = data['lastSeconds'];
+    if (ls is Map) {
+      _lastSeconds
+        ..clear()
+        ..addAll(ls.map((k, v) => MapEntry(k.toString(), (v as num).toInt())));
+    }
+    final cs = data['collections'];
+    if (cs is List) {
+      _userCollections
+        ..clear()
+        ..addAll(cs.map((e) {
+          final m = Map<String, dynamic>.from(e);
+          return UserWatchCollection(
+            id: (m['id'] ?? '').toString(),
+            name: (m['name'] ?? '').toString(),
+            videoIds:
+                (m['videoIds'] as List? ?? []).map((x) => x.toString()).toList(),
+          );
+        }));
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation in this store already calls notifyListeners(), so one override
+  // covers them all - no mutation site changes.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
 
   final Set<String> _saved = {'tummytime', 'q_iron'};
   final Set<String> _following = {'ananya'};

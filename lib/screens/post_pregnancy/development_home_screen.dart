@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'development_activity_screen.dart';
 import 'development_area_screen.dart';
@@ -39,9 +40,9 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const SizedBox(height: 18),
             _pad(ppEyebrow('Skill Development', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('Help Aarav grow', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('Help ${ChildProfileStore.instance.name} grow', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 8),
-            _pad(Text('This is where you nurture how Aarav is growing - his thinking, his body, his words and his feelings. Not a checklist to tick off, but a gentle companion: what he is learning right now, and the small, joyful things that help it along.', style: ppBody(14, h: 1.55))),
+            _pad(Text('This is where you nurture how ${ChildProfileStore.instance.name} is growing - his thinking, his body, his words and his feelings. Not a checklist to tick off, but a gentle companion: what he is learning right now, and the small, joyful things that help it along.', style: ppBody(14, h: 1.55))),
 
             // 1 - today's focus
             const SizedBox(height: 24),

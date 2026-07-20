@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'food_common.dart';
 import 'food_recipe_screen.dart';
@@ -67,7 +68,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
               ),
             ])),
             const SizedBox(height: 12),
-            _pad(Text("Gentle, settling foods for when Aarav's under the weather - soft, mild, and easy on a poorly tummy. Pick what's troubling him.",
+            _pad(Text("Gentle, settling foods for when ${ChildProfileStore.instance.name}'s under the weather - soft, mild, and easy on a poorly tummy. Pick what's troubling him.",
                 style: ppBody(15))),
 
             if (_noteOpen) ...[
@@ -77,7 +78,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
                 decoration: BoxDecoration(
                     color: const Color(0xFFF6F4F9), borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
                 child: Text(
-                    "These are wholesome meals to support Aarav's recovery, not medical remedies. Keep offering fluids, and check with your paediatrician if you're unsure. Reviewed by a paediatric nutritionist and always age-appropriate for him.",
+                    "These are wholesome meals to support ${ChildProfileStore.instance.name}'s recovery, not medical remedies. Keep offering fluids, and check with your paediatrician if you're unsure. Reviewed by a paediatric nutritionist and always age-appropriate for him.",
                     style: ppBody(13, h: 1.6)),
               )),
             ],
@@ -111,7 +112,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
               ])),
 
             const SizedBox(height: 26),
-            _pad(Text('Reviewed by a paediatric nutritionist. Always age-appropriate for Aarav.',
+            _pad(Text('Reviewed by a paediatric nutritionist. Always age-appropriate for ${ChildProfileStore.instance.name}.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

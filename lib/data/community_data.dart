@@ -643,7 +643,7 @@ const List<CommunityPost> kParentingPosts = [
     communityId: 'infants_0_1',
     author: 'ParentVeda',
     authorEmoji: '',
-    text: 'Leap 5 is around the corner. Here’s what the next developmental leap looks like - and why the fussiness is a good sign.',
+    text: 'A new phase is around the corner. Here’s what changes next - and why a fussy stretch beforehand is usually a good sign.',
     type: PostType.parentVeda,
     topics: ['Development'],
     stage: 'Parenting',

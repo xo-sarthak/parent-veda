@@ -12,6 +12,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
+import 'pp_growth_data.dart';
 
 import 'article_reader_screen.dart';
 import 'development_area_screen.dart';
@@ -19,9 +21,11 @@ import 'explore_drawer.dart';
 import 'recipes_screen.dart';
 import 'food_recipe_screen.dart';
 import 'growth_activity_screen.dart';
-import 'leap_definition_screen.dart';
+import 'phase_detail_screen.dart';
+import 'pp_phases_data.dart';
 import 'pp_development_data.dart';
-import 'pp_leaps_data.dart';
+// Retired with the leap framework. Kept for revert.
+// import 'pp_leaps_data.dart';
 import 'pp_food_data.dart';
 // The Health quick action now opens the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
@@ -195,11 +199,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                 Row(children: [
                   Container(width: 6, height: 6, decoration: const BoxDecoration(color: ppCoral, shape: BoxShape.circle)),
                   const SizedBox(width: 7),
-                  Flexible(child: ppEyebrow("Today · Aarav is 4 months", color: ppPurple, spacing: 1.2)),
+                  Flexible(child: ppEyebrow("Today · ${ChildProfileStore.instance.name} is 4 months", color: ppPurple, spacing: 1.2)),
                 ]),
                 const SizedBox(height: 16),
                 Text(
-                  "Today, Aarav is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder - a little slow, narrated play and plenty of eye contact goes a long way.",
+                  "Today, ${ChildProfileStore.instance.name} is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder - a little slow, narrated play and plenty of eye contact goes a long way.",
                   style: ppFraunces(19, h: 1.45),
                 ),
                 const SizedBox(height: 20),
@@ -297,7 +301,8 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
             _aheadCard('Tomorrow', 'A new sound', Icons.graphic_eq_rounded, () => _push(const GrowthActivityScreen(activity: kActNewSound))),
             const SizedBox(width: 12),
-            _aheadCard('in ~6 weeks', 'Leap 5 begins', Icons.brightness_4_rounded, () => _push(LeapDefinitionScreen(leap: leapByNumber(5)))),
+            _aheadCard('Coming up', nextPhase()?.name ?? 'The next phase', Icons.brightness_4_rounded,
+                () => _push(PhaseDetailScreen(phase: nextPhase() ?? currentPhase()))),
             const SizedBox(width: 12),
             _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxDetailScreen(visitId: 'mo6'))),
             const SizedBox(width: 12),
@@ -504,7 +509,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Deals for the day', style: ppJakarta(18)),
             const SizedBox(height: 2),
-            Text("Handpicked for Aarav's stage - affiliate & ParentVeda picks.", style: ppBody(12)),
+            Text("Handpicked for ${ChildProfileStore.instance.name}'s stage - affiliate & ParentVeda picks.", style: ppBody(12)),
           ]),
         ),
         const SizedBox(width: 10),
@@ -590,7 +595,12 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
               Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
               const SizedBox(height: 14),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text("Aarav's details", style: ppJakarta(18)),
+                // Flexible: the title carries the child's NAME, so its width
+                // depends on the parent's data, not on our sample "Aarav".
+                Flexible(
+                  child: Text("${ChildProfileStore.instance.name}'s details",
+                      style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ),
                 GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
@@ -615,15 +625,26 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                   ]),
                 ),
                 const SizedBox(width: 16),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Aarav', style: ppJakarta(20)), const SizedBox(height: 2), Text('4 months 1 week', style: ppBody(13))])),
+                // Real child, real age. Flexible because a name is not a fixed
+                // length - "Aarav" fitted, a longer one did not.
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(ChildProfileStore.instance.name, style: ppJakarta(20), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 2),
+                  Text(ChildProfileStore.instance.ageLabel, style: ppBody(13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ])),
                 GestureDetector(onTap: _soon, behavior: HitTestBehavior.opaque, child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
               ]),
               const SizedBox(height: 10),
-              _detailRow('Date of birth', const [TextSpan(text: '8 March 2026')], top: true),
-              _detailRow('Sex', const [TextSpan(text: 'Boy')], top: true),
-              _detailRow('Weight', [const TextSpan(text: '6.4 kg'), TextSpan(text: ' · 50th', style: ppBody(14, color: ppMuted))], top: true),
-              _detailRow('Height', [const TextSpan(text: '63 cm'), TextSpan(text: ' · 48th', style: ppBody(14, color: ppMuted))], top: true),
-              _detailRow('Head', [const TextSpan(text: '41 cm'), TextSpan(text: ' · 52nd', style: ppBody(14, color: ppMuted))], top: true, bottom: true),
+              // These were hardcoded: "8 March 2026", "Boy", "6.4 kg · 50th",
+              // "63 cm · 48th", "41 cm · 52nd" - a whole child's identity and
+              // body, centiles included, identical for every family. They read
+              // the real profile now, and an unrecorded measurement says so
+              // rather than inventing a figure.
+              _detailRow('Date of birth', [TextSpan(text: _dobLabel(ChildProfileStore.instance.dob))], top: true),
+              _detailRow('Sex', [TextSpan(text: ChildProfileStore.instance.isBoy ? 'Boy' : 'Girl')], top: true),
+              _detailRow('Weight', _measureSpans(ChildProfileStore.instance.weightKg, 1, 'kg', GrowthMetric.weight), top: true),
+              _detailRow('Height', _measureSpans(ChildProfileStore.instance.heightCm, 0, 'cm', GrowthMetric.height), top: true),
+              _detailRow('Head', _measureSpans(ChildProfileStore.instance.headCm, 0, 'cm', GrowthMetric.head), top: true, bottom: true),
             ]),
           ),
         ),
@@ -631,13 +652,40 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
     );
   }
 
+  static const List<String> _monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  static String _dobLabel(DateTime d) =>
+      '${d.day} ${_monthNames[d.month - 1]} ${d.year}';
+
+  /// A measurement plus its centile - or "Not recorded", because a figure we
+  /// were never given is not a figure we may show.
+  List<InlineSpan> _measureSpans(double v, int dp, String unit, GrowthMetric m) {
+    if (!ChildProfileStore.hasValue(v)) {
+      return [TextSpan(text: 'Not recorded', style: ppBody(14, color: ppMuted))];
+    }
+    final pct = GrowthStore.instance.latestPercentilePhrase(m);
+    return [
+      TextSpan(text: '${v.toStringAsFixed(dp)} $unit'),
+      if (pct != null) TextSpan(text: ' · $pct', style: ppBody(14, color: ppMuted)),
+    ];
+  }
+
   Widget _detailRow(String label, List<InlineSpan> value, {bool top = false, bool bottom = false}) => Container(
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(border: Border(top: top ? const BorderSide(color: ppHair) : BorderSide.none, bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none)),
         child: Row(children: [
-          Expanded(child: Text(label, style: ppBody(13, color: ppSoft))),
+          // Both sides flex: the label was Expanded but the VALUE was not, so a
+          // longer value (a full date, "Not recorded") pushed the row over.
+          Expanded(child: Text(label, style: ppBody(13, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 12),
-          Text.rich(TextSpan(children: value), style: ppBody(14, color: ppInk, w: FontWeight.w600)),
+          Flexible(
+            child: Text.rich(TextSpan(children: value),
+                style: ppBody(14, color: ppInk, w: FontWeight.w600),
+                textAlign: TextAlign.end, maxLines: 2),
+          ),
         ]),
       );
 }

@@ -90,7 +90,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Icon(Icons.psychology_outlined, size: 17, color: _a),
                 const SizedBox(width: 11),
-                Expanded(child: Text(area.brainNote, style: ppBody(13, color: ppInk, h: 1.55))),
+                Expanded(child: Text(ppFill(area.brainNote), style: ppBody(13, color: ppInk, h: 1.55))),
               ]),
             )),
 

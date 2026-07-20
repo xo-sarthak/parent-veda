@@ -26,7 +26,7 @@ class DevelopmentMapScreen extends StatelessWidget {
     ('4–5 years', 'Ready for the world', 'Rich stories, real conversations, and school-ready skills.', ['Complex talk', 'Cooperative play', 'Early letters', 'Self-reliance']),
   ];
 
-  static const int _current = 1; // Aarav ~4 months → the 3–6 band
+  static const int _current = 1; // ${ChildProfileStore.instance.name} ~4 months → the 3–6 band
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 

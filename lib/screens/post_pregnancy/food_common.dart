@@ -149,7 +149,7 @@ class FoodListCard extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(recipe.title, style: ppJakarta(14.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text(recipe.subtitle, style: ppBody(12.5, color: warm ? ppPurple : ppSoft, w: warm ? FontWeight.w600 : FontWeight.w400), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(ppFill(recipe.subtitle), style: ppBody(12.5, color: warm ? ppPurple : ppSoft, w: warm ? FontWeight.w600 : FontWeight.w400), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 7),
                 foodMeta(recipe),
               ]),

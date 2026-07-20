@@ -599,11 +599,67 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
       if (raw != null) _apply(jsonDecode(raw) as Map);
     } catch (_) {/* defaults */}
     _loaded = true;
+    // Swap the child-specific answers whenever the active child changes, so
+    // switching children switches whose reflux/naps/feeding the engine reads.
+    ChildProfileStore.instance.addListener(_onChildSwitched);
     notifyListeners();
     // Defensive: a cloud/Supabase hiccup must never break init (also test-safe).
     try {
       await syncStateFromCloud();
     } catch (_) {/* stay local */}
+  }
+
+  // ---- per-child partitioning ---------------------------------------------
+  //  Some of this profile describes the PARENT (priorities, notification
+  //  topics, pregnancy answers) and some describes a CHILD (their conditions,
+  //  how they feed, how they sleep, how they learn). It was all one blob per
+  //  account, which was fine while there was one child - but multi-child is
+  //  live now, so a second baby's reflux and short naps would overwrite the
+  //  first's, and the reco engine would quietly personalise for the wrong one.
+  //
+  //  The in-memory fields still hold the ACTIVE child's answers, so every
+  //  getter, boost and query below is untouched. Only storage is partitioned:
+  //  each child's answers live in their own bucket, swapped on switch.
+  final Map<String, Map<String, dynamic>> _perChild = {};
+
+  /// Bucket id for the active child; '_none' before a real child is saved (so
+  /// answers given during onboarding are not lost, and move across on save).
+  String get _bucketId => ChildProfileStore.instance.activeChildId ?? '_none';
+  String _loadedBucket = '_none';
+
+  Map<String, dynamic> _childBucket() => {
+        'conditions': _conditions.map((e) => e.name).toList(),
+        'feedings': _feedings.map((e) => e.name).toList(),
+        'sleeps': _sleeps.map((e) => e.name).toList(),
+        'learnings': _learnings.map((e) => e.name).toList(),
+        'premature': _premature,
+        'nicu': _nicu,
+        'multiple': _multiple,
+      };
+
+  void _applyChildBucket(Map m) {
+    _conditions..clear()..addAll(_decode(m['conditions'], HealthCondition.values));
+    _feedings..clear()..addAll(_decode(m['feedings'], FeedingMethod.values));
+    _sleeps..clear()..addAll(_decode(m['sleeps'], SleepPattern.values));
+    _learnings..clear()..addAll(_decode(m['learnings'], LearningStyle.values));
+    _premature = m['premature'] == true;
+    _nicu = m['nicu'] == true;
+    _multiple = m['multiple'] == true;
+    // Keep the legacy single-value fields in step with the sets they replaced.
+    _feeding = _feedings.isEmpty ? null : _feedings.first;
+    _sleep = _sleeps.isEmpty ? null : _sleeps.first;
+    _learning = _learnings.isEmpty ? null : _learnings.first;
+  }
+
+  /// Called when the active child changes: stash what is on screen under the
+  /// child it belongs to, then load the newly-active child's answers.
+  void _onChildSwitched() {
+    final now = _bucketId;
+    if (now == _loadedBucket) return;
+    _perChild[_loadedBucket] = _childBucket();
+    _applyChildBucket(_perChild[now] ?? const {});
+    _loadedBucket = now;
+    notifyListeners();
   }
 
   void _apply(Map m) {
@@ -648,6 +704,22 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _asked
       ..clear()
       ..addAll(_decode(m['asked'], ProfileField.values));
+
+    // Per-child buckets. A profile saved before partitioning has none, so the
+    // flat values just read above become that child's bucket (no data lost).
+    _perChild.clear();
+    final raw = m['perChild'];
+    if (raw is Map) {
+      raw.forEach((k, v) {
+        if (v is Map) _perChild['$k'] = Map<String, dynamic>.from(v);
+      });
+    }
+    _loadedBucket = _bucketId;
+    if (_perChild.containsKey(_loadedBucket)) {
+      _applyChildBucket(_perChild[_loadedBucket]!);
+    } else {
+      _perChild[_loadedBucket] = _childBucket(); // migrate the flat values
+    }
   }
 
   static Iterable<T> _decode<T extends Enum>(Object? raw, List<T> values) sync* {
@@ -692,6 +764,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'diet': _diet?.name,
         'parity': _parity?.name,
         'stage': _declaredStage?.name,
+        'perChild': {..._perChild, _bucketId: _childBucket()},
       };
 
   /// [field]/[value] are for analytics only. Firing from HERE rather than from

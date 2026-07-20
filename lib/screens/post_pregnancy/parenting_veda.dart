@@ -46,22 +46,30 @@ VedaDoc _pdoc({
 //  Hand-authored parenting knowledge - the "here's a real answer" layer, so a
 //  question like "he wakes every 2 hours at night" lands on guidance, not just a
 //  card title. Original, warm, and always with the "call your paediatrician"
-//  safety net baked into the guidance. Scenario voice: Aarav / Leap 4.
+//  safety net baked into the guidance. Scenario voice: Aarav at four months.
 // ---------------------------------------------------------------------------
 const List<(String, VedaKind, String, String, List<String>)> _kKnowledge = [
   (
     'sleep_regression',
     VedaKind.health,
     'The 4-month sleep regression',
-    "If your baby was sleeping in long stretches and has suddenly started waking every couple of hours, this is almost always the 4-month sleep regression - a normal, temporary part of development (it lines up with Leap 4). His sleep is maturing into adult-like cycles with lighter phases he briefly surfaces from. It usually settles in 2–6 weeks. Hold a calm, consistent wind-down, offer a chance to resettle before rushing in, and keep nights boring and dark. It's a sign of development, not a step back. If the waking comes with fever, poor feeding or seems like pain, check with your paediatrician.",
+    "If your baby was sleeping in long stretches and has suddenly started waking every couple of hours, this is almost always the 4-month sleep regression - a normal, temporary part of development (it lines up with the four-month sleep change). His sleep is maturing into adult-like cycles with lighter phases he briefly surfaces from. It usually settles in 2–6 weeks. Hold a calm, consistent wind-down, offer a chance to resettle before rushing in, and keep nights boring and dark. It's a sign of development, not a step back. If the waking comes with fever, poor feeding or seems like pain, check with your paediatrician.",
     ['sleep', 'regression', 'waking', 'wakes', 'night', 'nights', '4 month', 'four month', 'leap', 'nap', 'settle', 'resettle'],
   ),
   (
-    'wonder_weeks_leaps',
+    // REWRITTEN 20 Jul. This used to teach the Wonder Weeks framework as fact -
+    // "your baby may be in a developmental leap", "Leap 4 opens up the world of
+    // events". We moved the app off that framework because it failed
+    // replication, so Ask Veda cannot go on teaching it. The honest answer keeps
+    // the one insight that IS supported (fussy patches often precede a new
+    // skill) and drops the fixed-week structure and the branded labels. The
+    // 'wonder week' keywords stay so a parent who asks in those words still
+    // gets an answer - just an accurate one.
+    'fussy_before_skills',
     VedaKind.health,
-    'Wonder Weeks & developmental leaps',
-    "Fussy, clingy, feeding and sleeping all over the place for no obvious reason? Your baby may be in a developmental leap (a Wonder Week) - a burst of brain growth where the world suddenly feels different to him. Leap 4, around 4 months, opens up 'the world of events': he starts to grasp that one thing leads to another. Leaps often bring extra fussiness, but they pass, and a new skill usually appears on the other side. Extra closeness, patience and slow narrated play help him through.",
-    ['leap', 'leaps', 'wonder week', 'wonder weeks', 'fussy', 'clingy', 'development', 'developmental', 'milestone', 'brain'],
+    'Fussy patches before a new skill',
+    "Fussy, clingy, feeding and sleeping all over the place for no obvious reason? Babies often do have a difficult few days shortly before a new skill shows up - it is one of the more reliable patterns parents notice, and it passes. What is NOT reliable is the idea that this happens in every baby at fixed weeks. You may have seen 'Wonder Weeks' leap charts with exact week numbers; researchers have repeatedly failed to reproduce those, including the original author's own PhD student. So treat a fussy stretch as real, and the calendar as noise. Extra closeness, patience and slow narrated play help him through. Fussiness with fever, poor feeding or unusual listlessness is a different thing - call your paediatrician.",
+    ['leap', 'leaps', 'wonder week', 'wonder weeks', 'fussy', 'clingy', 'development', 'developmental', 'milestone', 'brain', 'regression'],
   ),
   (
     'tummy_time',

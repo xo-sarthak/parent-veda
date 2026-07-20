@@ -40,7 +40,7 @@ class FoodNutritionScreen extends StatelessWidget {
             _pad(Text(focus.oneLine, style: ppBody(14.5, color: ppSoft, w: FontWeight.w600))),
 
             const SizedBox(height: 20),
-            _pad(Text(focus.why, style: ppBody(15, color: ppInk, h: 1.6))),
+            _pad(Text(ppFill(focus.why), style: ppBody(15, color: ppInk, h: 1.6))),
 
             const SizedBox(height: 24),
             _pad(Text('Where to get it', style: ppJakarta(17))),

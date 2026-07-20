@@ -37,10 +37,13 @@ import 'pp_common.dart';
 import 'pp_daily_tips.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
+import 'phase_detail_screen.dart';
+import 'phase_map_screen.dart';
+import 'pp_phases_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
 import 'reading_collection_screen.dart';
-import 'pp_leap_faqs.dart';
+import 'pp_phase_faqs.dart';
 import 'recommendations_screen.dart';
 import 'reco_detail_screen.dart';
 import 'pp_reco_data.dart';
@@ -89,7 +92,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
           AnimatedBuilder(
             animation: _child,
             builder: (context, _) {
-              final leap = currentLeap(_child);
+              // The whole home runs on age phases now. Nothing below reads a
+              // leap any more; the retired widgets keep their own.
+              final phase = currentPhase(_child);
               return ListView(
                 padding: EdgeInsets.only(top: 12, bottom: widget.home ? 100 : 40),
                 children: [
@@ -103,7 +108,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   // as a greeting line (like the pregnancy hero's "Good morning"
                   // sits inside its card), saving the whole page-level lead that
                   // used to sit above. The video still keeps its own lead below.
-                  _leapHero(leap),
+                  _leapHero(phase),
                   const SizedBox(height: 22),
                   // Today's Parenting Tip now sits ABOVE the video: a narrow,
                   // centred card (70% width, two lines, "Read more") so it
@@ -113,11 +118,12 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   // Video follows the tip. It carries its own header inside the
                   // card (like the pregnancy "Today's Video"), so it needs no
                   // page-level lead above it.
-                  if (leap.videoId != null) ...[
-                    _leapVideo(leap),
-                    const SizedBox(height: 26),
-                  ],
-                  _leapDescription(leap),
+                  // Always renders now: the video comes from the phase's Watch
+                  // category rather than a hardcoded id, so there is no "this
+                  // phase has no video" case left to guard against.
+                  _leapVideo(phase),
+                  const SizedBox(height: 26),
+                  _leapDescription(phase),
                   // Section beat tightened 34 -> 26. The pregnancy home runs a
                   // 16 beat with 20/24 at major breaks; 34 was a big part of
                   // why the parenting pages felt like a different product.
@@ -128,19 +134,19 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   const SizedBox(height: 26),
                   _journal(),
                   const SizedBox(height: 26),
-                  _leapWatch(leap),
+                  _leapWatch(phase),
                   const SizedBox(height: 26),
-                  _leapLearn(leap),
+                  _leapLearn(phase),
                   const SizedBox(height: 26),
                   // Products land AFTER the watch/read rails, mixing picks from
                   // across the leap's milestones and domains rather than one
                   // narrow category.
-                  _leapProducts(leap),
+                  _leapProducts(phase),
                   const SizedBox(height: 26),
-                  // Top 3 questions for this leap, rotating each app open, with
+                  // Top 3 questions for this age, rotating each app open, with
                   // a way through to Ask Veda for anything else. Sits before
-                  // "what's coming next" so the current leap finishes first.
-                  _faqs(leap),
+                  // "what's coming next" so the current phase finishes first.
+                  _faqs(phase),
                   const SizedBox(height: 26),
                   _lookingAhead(),
                   // REMOVED per 17-18 July review: the Memory + Health
@@ -209,8 +215,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  MultiChildSheet's own header always described ("tap Aarav ▾") and which
   //  had gone missing from the app entirely.
   // =========================================================================
-  Widget _leapHero(Leap leap) {
-    final a = leap.accent;
+  Widget _leapHero(AgePhase phase) {
+    final a = phase.accent;
     final e = _child.expected;
     const w70 = Color(0xB3FFFFFF); // white @70%, for hairlines / secondary text
     return _pad(Container(
@@ -289,7 +295,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 ]),
               ),
               const SizedBox(height: 3),
-              Text('${leap.label} · ${leap.name}',
+              Text('${phase.ageLabel} · ${phase.name}',
                   style: ppBody(12, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
@@ -300,13 +306,13 @@ class _MyChildScreenState extends State<MyChildScreen> {
           // whole card being one tap target (the card holds interactive growth
           // controls now, so a card-wide tap would fight them).
           GestureDetector(
-            onTap: () => _push(LeapDefinitionScreen(leap: leap)),
+            onTap: () => _push(PhaseDetailScreen(phase: phase)),
             behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(999)),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('The leap', style: ppBody(11, color: Colors.white, w: FontWeight.w700)),
+                Text('This phase', style: ppBody(11, color: Colors.white, w: FontWeight.w700)),
                 const SizedBox(width: 3),
                 const Icon(Icons.arrow_forward, size: 12, color: Colors.white),
               ]),
@@ -321,7 +327,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         // one thing a Wonder-Weeks parent cares about most — fussy leap now, or
         // a calm stretch between leaps.
         const SizedBox(height: 15),
-        _leapJourney(leap),
+        _phaseJourney(phase),
 
         // ---- growth, folded into the hero ------------------------------------
         // REVISED 18 Jul: growth stays INSIDE the hero card but reads as its own
@@ -346,11 +352,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
             ]),
             const SizedBox(height: 12),
             Row(children: [
-              Expanded(child: _heroStat('Weight', _child.weightKg.toStringAsFixed(1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
+              Expanded(child: _heroStat('Weight', _m(_child.weightKg, 1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
               Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
-              Expanded(child: _heroStat('Height', _child.heightCm.toStringAsFixed(0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
+              Expanded(child: _heroStat('Height', _m(_child.heightCm, 0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
               Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
-              Expanded(child: _heroStat('Head', _child.headCm.toStringAsFixed(0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
+              Expanded(child: _heroStat('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
             ]),
           ]),
         ),
@@ -453,7 +459,113 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // the whole bar opens the Leap Calendar (the full "view timeline"); the
   // "Leap N of 10 ›" chevron is the affordance. The below-hero alternative,
   // _leapJourneyStrip, is the commented one.
+  //  THE PHASE JOURNEY BAR — a continuous 0–5 year track.
+  //
+  //  It replaced a 10-dot "Leap 4 of 10" strip. Dots could not survive the move
+  //  to age phases: the phases are deliberately uneven (one month early on,
+  //  twelve months at the end), so equal-sized dots would tell a parent that a
+  //  newborn month and a whole preschool year are the same distance. A
+  //  continuous bar is the honest shape — it shows WHERE he is on the road,
+  //  not which numbered stop he is standing at.
+  //
+  //  Tapping opens the full phase map.
+  Widget _phaseJourney(AgePhase phase) {
+    const w70 = Color(0xB3FFFFFF);
+    final progress = journeyProgress(_child);
+    final next = nextPhase(_child);
+
+    final String status;
+    if (next != null) {
+      status = 'Next: ${next.name.toLowerCase()}, around ${next.ageLabel}.';
+    } else {
+      status = 'The last stretch before school.';
+    }
+
+    return GestureDetector(
+      onTap: () => _push(const PhaseMapScreen()),
+      behavior: HitTestBehavior.opaque,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text('HIS JOURNEY', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          const Spacer(),
+          Flexible(
+            child: Text(phase.ageLabel,
+                style: ppBody(10.5, color: Colors.white, w: FontWeight.w800),
+                maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 2),
+          const Icon(Icons.chevron_right_rounded, size: 15, color: w70),
+        ]),
+        const SizedBox(height: 11),
+        // The track. Birth on the left, five years on the right, a marker where
+        // he actually is.
+        LayoutBuilder(builder: (context, c) {
+          final x = (c.maxWidth - 14) * progress;
+          return SizedBox(
+            height: 14,
+            child: Stack(clipBehavior: Clip.none, children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 6,
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                top: 6,
+                child: Container(
+                  width: x + 7,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: x,
+                top: 0,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: phase.accent, width: 3),
+                  ),
+                ),
+              ),
+            ]),
+          );
+        }),
+        const SizedBox(height: 7),
+        Row(children: [
+          Text('Birth', style: ppBody(9, color: w70, w: FontWeight.w700)),
+          const Spacer(),
+          Text('5 years', style: ppBody(9, color: w70, w: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 9),
+        Row(children: [
+          Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(status, style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.9)), maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
+        ]),
+      ]),
+    );
+  }
+
+  // RETIRED with the leap framework — the 10-dot strip. Kept for revert.
+  // ignore: unused_element
   Widget _leapJourney(Leap leap) {
+
     const total = 10; // kLeaps.length
     const w70 = Color(0xB3FFFFFF);
     const fussy = Color(0xFFFFC24B); // amber — a fussy leap window
@@ -679,11 +791,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
         ]),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(child: _growthStat('Weight', _child.weightKg.toStringAsFixed(1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
+          Expanded(child: _growthStat('Weight', _m(_child.weightKg, 1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
           _statDivider(),
-          Expanded(child: _growthStat('Height', _child.heightCm.toStringAsFixed(0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
+          Expanded(child: _growthStat('Height', _m(_child.heightCm, 0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
           _statDivider(),
-          Expanded(child: _growthStat('Head', _child.headCm.toStringAsFixed(0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
+          Expanded(child: _growthStat('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
         ]),
       ]),
     ));
@@ -732,11 +844,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
       _pad(Text('His measurements, with the typical figure for a ${_child.ageInMonths}-month-old alongside.', style: ppBody(12.5, color: ppMuted))),
       const SizedBox(height: 14),
       _pad(Row(children: [
-        Expanded(child: _growthCard('Weight', _child.weightKg.toStringAsFixed(1), 'kg', '~${e.weightKg.toStringAsFixed(1)} kg')),
+        Expanded(child: _growthCard('Weight', _m(_child.weightKg, 1), 'kg', '~${e.weightKg.toStringAsFixed(1)} kg')),
         const SizedBox(width: 12),
-        Expanded(child: _growthCard('Height', _child.heightCm.toStringAsFixed(0), 'cm', '~${e.heightCm.toStringAsFixed(0)} cm')),
+        Expanded(child: _growthCard('Height', _m(_child.heightCm, 0), 'cm', '~${e.heightCm.toStringAsFixed(0)} cm')),
         const SizedBox(width: 12),
-        Expanded(child: _growthCard('Head', _child.headCm.toStringAsFixed(0), 'cm', '~${e.headCm.toStringAsFixed(0)} cm')),
+        Expanded(child: _growthCard('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)} cm')),
       ])),
       const SizedBox(height: 14),
       _pad(GestureDetector(
@@ -852,11 +964,17 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // =========================================================================
   //  Modelled on the pregnancy home's "Today's Video" card: a header row inside
   //  the card (title + "More videos"), then the thumbnail, title, a why-line
-  //  and a Watch button. No content change — same leap video, duration, expert.
-  Widget _leapVideo(Leap leap) {
-    final v = watchVideoById(leap.videoId!);
-    final a = leap.accent;
-    final cat = leap.watchCategory ?? 'Brain Development';
+  //  and a Watch button.
+  //
+  //  The video is now chosen from the PHASE's Watch category rather than from a
+  //  hardcoded id on each leap — ten hand-picked ids do not survive becoming
+  //  twenty phases, and picking by category keeps it in step with the catalogue.
+  Widget _leapVideo(AgePhase phase) {
+    final cat = watchCategoryForPhase(phase);
+    final pool = watchByCategory(cat);
+    if (pool.isEmpty) return const SizedBox.shrink();
+    final v = pool.first;
+    final a = phase.accent;
     void open() => _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
     return _pad(Container(
       decoration: ppCardDecoration(),
@@ -918,14 +1036,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // =========================================================================
   //  Leap description (expandable)
   // =========================================================================
-  Widget _leapDescription(Leap leap) => _pad(ppSectionCard(
-        eyebrow: 'The leap explained',
+  Widget _leapDescription(AgePhase phase) => _pad(ppSectionCard(
+        eyebrow: 'This phase explained',
         icon: Icons.auto_awesome_outlined,
-        title: 'What Leap ${leap.number} means',
+        title: 'What ${phase.ageLabel} looks like',
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(leap.summary, style: ppBody(14.5, color: ppInk, h: 1.65)),
+          Text(phase.summary, style: ppBody(14.5, color: ppInk, h: 1.65)),
           if (_leapExpanded)
-            for (final s in leap.sections) ...[
+            for (final s in phase.sections) ...[
               const SizedBox(height: 16),
               Text(s.heading, style: ppJakarta(15)),
               const SizedBox(height: 8),
@@ -1119,11 +1237,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  what he is working on, drawn from across the catalogue. The rails above
   //  are about understanding; this is the one place on the page that is about
   //  buying, and it sits last for that reason.
-  Widget _leapProducts(Leap leap) {
+  Widget _leapProducts(AgePhase phase) {
     final picks = recommendedToday(count: 8);
     if (picks.isEmpty) return const SizedBox.shrink();
     return _pad(ppCarousel(
-      accent: leap.accent,
+      accent: phase.accent,
       icon: Icons.shopping_bag_outlined,
       title: 'Picks for this leap',
       seeAll: 'View more',
@@ -1139,8 +1257,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Container(
                   height: 80,
-                  decoration: BoxDecoration(color: leap.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
-                  child: Center(child: Icon(Icons.card_giftcard_rounded, size: 26, color: leap.accent)),
+                  decoration: BoxDecoration(color: phase.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+                  child: Center(child: Icon(Icons.card_giftcard_rounded, size: 26, color: phase.accent)),
                 ),
                 const SizedBox(height: 8),
                 Text(r.title, style: ppJakarta(13), maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -1161,8 +1279,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  Three questions, rotating each app launch so a daily visitor meets the
   //  whole pool over a week. Ask Veda closes it off for anything not covered —
   //  the honest admission that three answers will not cover a real 3am worry.
-  Widget _faqs(Leap leap) {
-    final faqs = leapFaqs(leap.number);
+  Widget _faqs(AgePhase phase) {
+    final faqs = phaseFaqs(phase.number);
     if (faqs.isEmpty) return const SizedBox.shrink();
     return _pad(ppSectionCard(
       eyebrow: 'Questions parents ask',
@@ -1200,7 +1318,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     ));
   }
 
-  Widget _faqRow(LeapFaq f, int i) {
+  Widget _faqRow(PhaseFaq f, int i) {
     final open = _faqOpen == i;
     return GestureDetector(
       onTap: () => setState(() => _faqOpen = open ? -1 : i),
@@ -1297,15 +1415,15 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // =========================================================================
   //  Leap-related Watch rail
   // =========================================================================
-  Widget _leapWatch(Leap leap) {
-    final cat = leap.watchCategory ?? 'Brain Development';
+  Widget _leapWatch(AgePhase phase) {
+    final cat = watchCategoryForPhase(phase);
     final videos = watchByCategory(cat);
     if (videos.isEmpty) return const SizedBox.shrink();
     // The pregnancy home's product-carousel shape: a gradient header band +
     // a compact rail, which packs the same content into much less height than
     // the loose eyebrow + title + rail the parenting side had.
     return _pad(ppCarousel(
-      accent: leap.accent,
+      accent: phase.accent,
       icon: Icons.play_circle_outline_rounded,
       title: 'Videos for this leap',
       seeAll: 'View more',
@@ -1319,7 +1437,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: SizedBox(
               width: 160,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(height: 84, decoration: BoxDecoration(color: leap.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Center(child: Icon(Icons.play_circle_outline, size: 28, color: leap.accent))),
+                Container(height: 84, decoration: BoxDecoration(color: phase.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Center(child: Icon(Icons.play_circle_outline, size: 28, color: phase.accent))),
                 const SizedBox(height: 8),
                 Text(v.title, style: ppJakarta(13).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
@@ -1334,8 +1452,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // =========================================================================
   //  Leap-related Learn rail
   // =========================================================================
-  Widget _leapLearn(Leap leap) {
-    final colId = leap.readCollection ?? 'brain';
+  Widget _leapLearn(AgePhase phase) {
+    final colId = readCollectionForPhase(phase);
     final reads = articlesInCollection(colId);
     if (reads.isEmpty) return const SizedBox.shrink();
     return _pad(ppCarousel(
@@ -1369,10 +1487,10 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  Looking ahead (one line → next leap)
   // =========================================================================
   Widget _lookingAhead() {
-    final next = nextLeap(_child);
+    final next = nextPhase(_child);
     if (next == null) return const SizedBox.shrink();
     return _pad(GestureDetector(
-      onTap: () => _push(LeapDefinitionScreen(leap: next)),
+      onTap: () => _push(PhaseDetailScreen(phase: next)),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -1384,7 +1502,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('LOOKING AHEAD', style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
               const SizedBox(height: 3),
-              Text('${next.label} · ${next.name}', style: ppBody(13.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('${next.ageLabel} · ${next.name}', style: ppBody(13.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),
           const SizedBox(width: 10),
@@ -1454,12 +1572,21 @@ class _MyChildScreenState extends State<MyChildScreen> {
         ],
       ]);
 
+  // A measurement of 0 means NOT RECORDED, not "zero kilos". Display shows a
+  // dash so we never assert a figure the parent has not given us; the edit
+  // fields show a blank so she is typing into an empty box, not over a fake
+  // number. (The seeded child used to carry 6.4 kg / 63 cm / 41 cm.)
+  static String _m(double v, int dp) =>
+      ChildProfileStore.hasValue(v) ? v.toStringAsFixed(dp) : '—';
+  static String _edit(double v, int dp) =>
+      ChildProfileStore.hasValue(v) ? v.toStringAsFixed(dp) : '';
+
   // ---- growth / profile edit sheet ----------------------------------------
   Future<void> _openGrowthEdit() async {
     final nameCtl = TextEditingController(text: _child.name);
-    final wCtl = TextEditingController(text: _child.weightKg.toStringAsFixed(1));
-    final hCtl = TextEditingController(text: _child.heightCm.toStringAsFixed(0));
-    final headCtl = TextEditingController(text: _child.headCm.toStringAsFixed(0));
+    final wCtl = TextEditingController(text: _edit(_child.weightKg, 1));
+    final hCtl = TextEditingController(text: _edit(_child.heightCm, 0));
+    final headCtl = TextEditingController(text: _edit(_child.headCm, 0));
     DateTime dob = _child.dob;
 
     await showModalBottomSheet<void>(

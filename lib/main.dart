@@ -3,6 +3,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'brand/brand_store.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
+import 'screens/post_pregnancy/pp_development_data.dart';
+import 'screens/post_pregnancy/pp_documents_data.dart';
+import 'screens/post_pregnancy/pp_food_data.dart';
+import 'screens/post_pregnancy/pp_names_data.dart';
+import 'screens/post_pregnancy/pp_reading_data.dart';
+import 'screens/post_pregnancy/pp_reco_data.dart';
+import 'screens/post_pregnancy/pp_watch_data.dart';
+import 'screens/post_pregnancy/pp_yoga_data.dart';
+import 'screens/post_pregnancy/pp_feeding_data.dart';
+import 'screens/post_pregnancy/pp_growth_data.dart';
+import 'screens/post_pregnancy/pp_health_data.dart';
+import 'screens/post_pregnancy/pp_milestones_data.dart';
+import 'screens/post_pregnancy/pp_sleep_data.dart';
+import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
@@ -140,6 +154,29 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // PARENTING: load the child profile(s). The keystone of the post-pregnancy
     // side - every other parenting feature keys its rows to a child from here.
     ChildProfileStore.instance.init();
+    // PARENTING: the child's health record (medications, prescriptions,
+    // allergies, symptoms, reports, doctor visits). Child-scoped and
+    // co-parented - both paired parents read and write the same rows.
+    HealthStore.instance.init();
+    // PARENTING: growth measurements, vaccination doses, feed + sleep logs,
+    // milestones observed and the document wallet. All child-scoped and
+    // co-parented - one shared record per baby, either parent may write.
+    GrowthStore.instance.init();
+    VaxStore.instance.init();
+    FeedingStore.instance.init();
+    SleepStore.instance.init();
+    MilestoneStore.instance.init();
+    BabyDocumentsStore.instance.init();
+    // PARENTING (light): saved lists, progress and preferences. These sync one
+    // JSON blob each into user_state, where own-only RLS is exactly right - a
+    // saved recipe or reading position is personal, not shared with a partner.
+    DevStore.instance.init();
+    FoodStore.instance.init();
+    WatchStore.instance.init();
+    ReadingStore.instance.init();
+    RecoStore.instance.init();
+    YogaStore.instance.init();
+    NameMatchStore.instance.init();
     // PARENTING: the Living Family Profile — the personalization engine's single
     // source of truth (health/feeding/sleep/priorities/learning). Features read
     // it to tailor content, recommendations and ordering (never navigation).

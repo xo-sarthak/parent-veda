@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'dart:math';
+import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -81,7 +82,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     ('Development', Icons.psychology_outlined, [
       'Is he on track at 4 months?',
       'How can I encourage rolling?',
-      'What is Leap 4?',
+      'Why is he suddenly so fussy?',
       'How do I support his language?',
     ]),
     ('Health', Icons.monitor_heart_outlined, [
@@ -255,7 +256,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             cursorWidth: 2,
             style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk),
             decoration: InputDecoration(
-              hintText: 'Ask Veda about Aarav…',
+              hintText: 'Ask Veda about ${ChildProfileStore.instance.name}…',
               filled: false,
               isDense: true,
               border: InputBorder.none,
@@ -388,7 +389,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             const Icon(Icons.child_care_rounded, size: 14, color: _vPurple),
             const SizedBox(width: 6),
-            Text('Aarav · 4 months', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: _vPurple)),
+            // Real age, not a hardcoded "4 months" - and flexible, because a
+            // child's name is not a fixed length.
+            Flexible(
+              child: Text(
+                  '${ChildProfileStore.instance.name} · ${ChildProfileStore.instance.ageLabel}',
+                  style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: _vPurple),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
           ]),
         ),
       );

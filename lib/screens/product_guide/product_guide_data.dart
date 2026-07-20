@@ -52,7 +52,19 @@ class PgRating {
 
 /// A short expert video (placeholder playback — the module is prototype-shaped).
 class PgExpert {
-  const PgExpert({required this.role, required this.name, required this.hook, required this.duration});
+  const PgExpert({
+    required this.role,
+    required this.name,
+    required this.hook,
+    required this.duration,
+    this.videoId,
+  });
+
+  /// A real id from the Watch catalogue. When present the card opens the actual
+  /// video; when null it says so plainly rather than pretending to be tappable.
+  /// The Brand Studio sponsors THIS surface (BrandSlot.productGuideExpert), so
+  /// a stub here means live commercial inventory sitting on top of nothing.
+  final String? videoId;
   final String role; // 'Paediatrician', 'Dermatologist', 'Lactation consultant'…
   final String name;
   final String hook; // one line: what they explain
@@ -131,6 +143,16 @@ class ProductGuide {
     this.studies = const [],
     this.specs = const [],
     this.buyLabel = 'See buying options',
+    // Real product photography, when we have it. Until then the category icon
+    // carries the hero - an honest placeholder beats a broken image, and a
+    // parent recognising the bottle on a shelf is worth doing properly rather
+    // than filling with stock art.
+    this.imageAsset,
+    // Which family signals make this product MORE relevant. Read against the
+    // Living Family Profile so a "Best For: dry skin" chip can be marked for a
+    // child who actually has eczema. Content emphasis only - it never reorders
+    // or hides a guide. See docs/PERSONALIZATION.md.
+    this.relevantWhen = const {},
     this.relatedIds = const [],
   });
 
@@ -161,6 +183,8 @@ class ProductGuide {
   final List<PgSpec> specs;
 
   final String buyLabel;
+  final String? imageAsset;
+  final Set<String> relevantWhen;
   final List<String> relatedIds;
 
   // ---- at-a-glance "buy signal" (derived, so no extra seed data) -----------
@@ -202,8 +226,8 @@ const List<ProductGuide> kProductGuides = [
     whyLike: ['Rich, lasting hydration', 'Spreads easily, absorbs fast', 'Fragrance- and dye-free'],
     watchOut: ['Can feel heavy on already-oily skin', 'A little pricier than basic lotions'],
     experts: [
-      PgExpert(role: 'Dermatologist', name: 'Dr. Anaya Rao', hook: 'How to moisturise newborn skin — and when you don\'t need to', duration: '2:20'),
-      PgExpert(role: 'Paediatrician', name: 'Dr. Vikram Sethi', hook: 'Reading a baby lotion label in 60 seconds', duration: '1:10'),
+      PgExpert(role: 'Dermatologist', name: 'Dr. Anaya Rao', hook: 'How to moisturise newborn skin — and when you don\'t need to', duration: '2:20', videoId: 'q_massage'),
+      PgExpert(role: 'Paediatrician', name: 'Dr. Vikram Sethi', hook: 'Reading a baby lotion label in 60 seconds', duration: '1:10', videoId: 'q_burp'),
     ],
     experiences: [
       PgExperience(text: 'Cleared my baby\'s dry winter cheeks in a few days.', author: 'Meera', context: 'Winter · 4-month-old', stars: 5),
@@ -271,7 +295,7 @@ const List<ProductGuide> kProductGuides = [
     whyLike: ['Genuinely tear-free', 'One bottle for hair and body', 'Rinses clean, no residue'],
     watchOut: ['Not a moisturiser — pair with lotion if skin is dry'],
     experts: [
-      PgExpert(role: 'Paediatrician', name: 'Dr. Vikram Sethi', hook: 'How often does a baby actually need washing?', duration: '1:40'),
+      PgExpert(role: 'Paediatrician', name: 'Dr. Vikram Sethi', hook: 'How often does a baby actually need washing?', duration: '1:40', videoId: 'q_massage'),
     ],
     experiences: [
       PgExperience(text: 'No stinging eyes even when it runs down — finally.', author: 'Priya', context: '6-month-old'),
@@ -362,7 +386,7 @@ const List<ProductGuide> kProductGuides = [
     whyLike: ['Sterilises a full set in ~8 minutes', 'Holds bottles, pump parts and teats', 'Simple one-button use'],
     watchOut: ['Takes counter space', 'Not needed if you rarely use bottles'],
     experts: [
-      PgExpert(role: 'Paediatrician', name: 'Dr. Nandini Iyer', hook: 'Do you really need to sterilise — and for how long?', duration: '2:45'),
+      PgExpert(role: 'Paediatrician', name: 'Dr. Nandini Iyer', hook: 'Do you really need to sterilise — and for how long?', duration: '2:45', videoId: 'fevercalm'),
     ],
     experiences: [
       PgExperience(text: 'A lifesaver with twins and endless bottles.', author: 'Rhea', context: 'Twins · newborn'),
@@ -390,7 +414,7 @@ const List<ProductGuide> kProductGuides = [
     whyLike: ['Quiet motor', 'Adjustable, comfortable suction', 'Few parts — quick to clean'],
     watchOut: ['Single pump is slow for exclusive pumping', 'Check flange size for comfort'],
     experts: [
-      PgExpert(role: 'Lactation consultant', name: 'Dr. Leena Menon', hook: 'Getting a comfortable latch — and the right flange size', duration: '3:00'),
+      PgExpert(role: 'Lactation consultant', name: 'Dr. Leena Menon', hook: 'Getting a comfortable latch — and the right flange size', duration: '3:00', videoId: 'solids101'),
       PgExpert(role: 'Lactation consultant', name: 'Dr. Leena Menon', hook: 'Single vs double: which pump for your situation', duration: '1:50'),
     ],
     experiences: [

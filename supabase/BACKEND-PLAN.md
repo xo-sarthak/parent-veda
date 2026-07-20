@@ -115,6 +115,279 @@ paste). `0001` is already applied (profiles). Then we wire stores to
 
 ---
 
+## The PARENTING (post-pregnancy) side — from `0021`
+
+> Status: **`0021`–`0026` APPLIED (19 July 2026).** All 14 parenting tables
+> exist with RLS, grants and 4 policies each; `public.my_child_ids()` is live.
+> Client wiring is in and compile-clean (359 tests). **Not yet exercised against
+> the real database** — see "Verifying" below for the order things must happen
+> in (sign in → save a child → everything else keys to it).
+
+Everything above is the pregnancy side. The parenting side starts at `0021` and
+follows the same rules with **one deliberate deviation**, below.
+
+### `0021_children.sql` — the keystone
+- **children** ← `ChildProfileStore` (`id text`). `name`, `is_boy`, `dob`, plus
+  flagged mirror columns `weight_kg`/`height_cm`/`head_cm`.
+- **`public.my_child_ids()`** — every child the caller may touch (own +
+  partner's). THE access key for every child-scoped parenting table:
+  `using (child_id in (select public.my_child_ids()))`.
+
+### Deviation: CO-PARENTING (decided 2026-07-14)
+Pregnancy rule: a row is yours; your partner may only **read** it
+(`0012_share_scans.sql`). That fits — the parents use different interfaces and
+the data is personal ("my symptoms", "my journal").
+
+Parenting rule: the app shows **both parents the same screens for the same
+baby**, so **either parent may read AND write** the child's data. Therefore:
+
+- **`user_id` on a parenting table is ATTRIBUTION** ("Dad logged this"), *not*
+  the access key. Access runs through the **child**.
+- **One child row per baby, not one per parent.** If each parent had their own
+  row, their `child_id`s would differ and every feed/vaccine/measurement would
+  fragment into two sets that never join.
+- `SupabaseRepo` gained co-parented variants — `fetchShared`, `fetchByChild`,
+  `updateShared`, `deleteShared` — which drop the `.eq('user_id', uid)` filter
+  and let RLS scope the rows. **Child-scoped tables only.** Pregnancy tables and
+  all `user_state`/KV stores keep the own-user methods.
+- **KV/preference stores stay own-only.** Saved lists and prefs are personal.
+
+### `0022_pp_health.sql` — the child's health record
+Seven child-scoped, co-parented tables ← `HealthStore`: `pp_medications`,
+`pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`,
+`pp_doctor_visits`, `pp_doctor_questions`. All gate on
+`public.my_child_ids()`. Medication reminder fields are persisted (fixes half
+of flag #4). `report_values`, not `values` — the latter is a reserved keyword.
+
+**SEED DATA DECISION (18 July 2026).** The health collections used to start as
+copies of `kMedications` / `kAllergies` / `kReports` / `kPrescriptions` /
+`kSymptoms`, so persisting them naively would have written **a fictional
+child's medications and allergies into every real account** as genuine medical
+records — exactly the failure BACKEND-PARENTING-BRIEF §5 warns about. Resolved
+with the **empty-id rule**: seed rows carry `id == ''` and are never uploaded;
+a parent's row gets a real client-generated id. The store's lists now start
+EMPTY, so a parent who has entered nothing sees the invitation state
+(`health_records_screen.dart:185` renders an "Add …" CTA — the never-hidden
+invariant holds). The seed constants stay in the file as demo/reference.
+
+Side effect: **`hasAnyEntry` now works.** It was true at launch for everyone,
+because `_reports` was seeded non-empty — so the flag meant to detect "has she
+entered anything" always answered yes. The AI-insights card it gates
+(`health_home_screen.dart:537`) correctly stays hidden until there is something
+real to comment on, which is what its own comment always claimed it did.
+
+### `0023_pp_growth_vax.sql`
+- **pp_growth_measurements** ← `GrowthStore`. The intended single source of
+  truth for growth (flag #1).
+- **pp_vaccine_doses** ← `VaxStore`. Composite PK `(child_id, vaccine_id)`;
+  carries both `done` and `reminder`, so marking is an idempotent upsert.
+  Persisting `reminder` closes flag #4.
+
+### `0024_pp_feed_sleep.sql`
+- **pp_feed_logs** / **pp_sleep_logs** ← `FeedingStore` / `SleepStore` (the
+  Journey tools). Highest-write tables in the app. `PpTrackerStore` gets NO
+  table — its screens are retired and unreferenced; two tables for one event
+  would fork the history.
+
+### `0025_pp_milestones.sql`
+- **pp_milestone_observations** ← `MilestoneStore`. Composite PK
+  `(child_id, milestone_id)`. Keepsake data — `note` holds the memory.
+
+### `0026_pp_documents.sql`
+- **pp_documents** ← `BabyDocumentsStore`. Rows sync; **files do not yet**
+  (flag #5) — `attachments[].path` is still a device temp path until
+  StorageService is wired in.
+
+### `0027_pp_name_votes.sql` — baby-name matching between paired parents
+One row per (parent, name), `liked` false = an explicit skip. PK
+`(user_id, name)` so a re-swipe upserts.
+
+**COUPLE-scoped, not child-scoped** — a deliberate change from
+BACKEND-COUPLE-NAMING-BRIEF §4. Its `child_id uuid references children(id)`
+would fail outright (`children.id` is TEXT), but the deeper reason is that the
+name generator has nothing to do with the child record: it is a standalone
+tool that also runs on the pregnancy side, where no child exists. Child-scoping
+would have made it silently do nothing for the couples most likely to use it.
+The chosen name never writes to `children.name`.
+
+**RLS is own-rows-only in every direction, including SELECT** — stricter than
+§4, which widens SELECT to the partner. That would hand the client exactly what
+§5 forbids: the partner's individual votes. Matches instead come from
+`public.pp_name_matches()`, a `security definer` function returning only the
+intersection. The independence the feature depends on is enforced by Postgres,
+not by client discipline — there is no query that answers "what did my partner
+like?" for an unmatched name. Unpaired → no partner → empty result, and solo
+use keeps working.
+
+Client: `NameMatchStore` likes are votes now (the KV blob keeps only the crown,
+with a one-time adopt of any pre-existing `liked` so no shortlist is lost);
+`matchedCount` finally reads the intersection rather than her own list.
+
+**Seeded likes removed.** The store shipped six liked names and a crowned
+"Aarav" — harmless while likes were private, actively wrong once votes are
+compared: two accounts starting from the same six seeds would "match" on all
+six before either parent swiped. Also fixed: `babyNameByName('')` falls back to
+the first catalogue entry, so an uncrowned parent was shown a stranger's name
+under "Your favourite", and the header read "You & Ravi" — an invented partner.
+
+### Light (Tier 2) stores — NO migration needed
+`DevStore`, `FoodStore`, `WatchStore`, `ReadingStore`, `RecoStore`,
+`YogaStore`, `NameMatchStore` now use `CloudSyncedStore` over the existing
+`user_state` table (0011), where own-only RLS is correct: a saved recipe or a
+reading position is personal, not shared with a partner.
+
+`CloudSyncedStore` gained an opt-in `cloudPushDebounce` (defaults to
+`Duration.zero`, so every existing pregnancy store is unchanged). `WatchStore`
+sets 5s: it records playback position on every tick, which would otherwise be
+one Supabase write per tick.
+
+### ⚠️ New flag — Tier-2 seed state
+The light stores are also seeded (`_saved = {'tummytime', 'q_iron'}`, six liked
+names, pre-filled wishlists). Unlike health this is low-stakes — starter
+content, not fabricated medical records — so it is synced as-is rather than
+emptied. Worth a product call on whether a new parent should start with
+pre-saved items she never chose.
+
+### Other decisions
+- **Journey stores are the real ones.** `FeedingStore`/`SleepStore` (Tools →
+  Feeding/Sleep journey) get tables. `PpTrackerStore` backs the retired
+  `FeedingTrackerScreen`/`SleepTrackerScreen`, which nothing links to any more →
+  **no backend**.
+- **Journals stay separate.** Pregnancy journals are untouched; the parenting
+  journal is a NEW shared book from birth, co-editable, with an **author column**
+  (cheap now, unrecoverable later — otherwise the storybook can never say "Dad
+  wrote this").
+- **Seeded "Aarav" is never written to the DB** — it's a placeholder until a
+  parent saves real details, mirroring the week-20 no-due-date default.
+
+### The no-invented-data rule (19 July 2026)
+
+**Data about the child comes from the parent, and only from the parent.** If she
+has not entered something, the app says so and invites her to — it never shows
+our demo child's figures as if they were hers.
+
+Done in this pass:
+- **Doctor Record** — was the worst case: a fictional name, birth date, **blood
+  group**, "13 of 18 vaccines given", a const growth measurement and a seeded
+  illness list, on a screen called "Doctor-ready record" and a Share button.
+  Now reads the real child, real marked doses, real measurements, her own logged
+  symptoms; empty sections say "None recorded". Blood group shows only if she
+  entered one.
+- **Vaccinations** — `VaxStore._done` no longer seeds from the schedule's own
+  `status`. A dose is done only when SHE marks it; a schedule entry that claims
+  "done" now reads as **due** for her (true, and an invitation to record it).
+- **Health snapshot** — the four tiles were const verdicts ("Overall: Healthy",
+  "Up to date"). Derived now; unknown reads "Not recorded".
+- **Growth screens** — read `GrowthStore`, not `const kGrowth`. Charts need ≥2
+  real points; centiles appear only with a real measurement.
+- **The child's name and gender** — `Aarav` and `his` were hardcoded in ~90
+  places. Screens interpolate the active child; bundled `const` content uses
+  placeholders (`{child}`, `{they}`, `{their}`, `{them}`) filled by **`ppFill`**
+  in `pp_common.dart`. Pronouns live on `ChildProfileStore`.
+
+Deliberately NOT changed: baby-name catalogues (there "Aarav" is a *name being
+browsed*), and reviewer testimonials ("Priya, mother of Aarav") — a different
+problem, see flag #8.
+
+Two real bugs surfaced by this work:
+- `SupabaseRepo.userId` **threw** when Supabase was uninitialised, so an
+  uninitialised backend crashed instead of degrading to local-only. Now returns
+  null, i.e. behaves as logged out.
+- A long section title overflowed the Doctor Record header row — invisible until
+  empty states made sections short enough for the lazy `ListView` to lay it out.
+
+### Content vs customization (the line, decided 19 July 2026)
+
+Not all hardcoded text is the same, and the split is what decides whether to
+replace it:
+
+- **CONTENT — keep.** Recipes, articles, book summaries, videos, courses, yoga,
+  the milestone catalogue, the vaccine schedule, product listings. This is our
+  editorial work; real versions are being written. The app should NOT look empty
+  because this is present, and removing it would make the product worse.
+- **CUSTOMIZATION — replace.** Anything asserting a fact about ONE specific
+  child: weight, height, head, date of birth, sex, blood group, which vaccines
+  were given, what a doctor said. We cannot ship a prefixed baby weight. It comes
+  from the parent or it is not shown.
+
+Where content mentions the child it uses placeholders, not fixed text — the copy
+stays, only the child is filled in (`ppFill`).
+
+Completed under that line:
+- **The seeded child's measurements** (6.4 kg / 63 cm / 41 cm) are gone; 0 now
+  means "not recorded" and the UI says so. Name/DOB remain as a placeholder only
+  so the app has an age to work from until she saves real details.
+- **The child-details sheet** (`post_pregnancy_home`) hardcoded the whole child —
+  "8 March 2026", "Boy", "6.4 kg · 50th", "63 cm · 48th", "41 cm · 52nd",
+  centiles included. Reads the real profile now.
+- **The Emergency Card** was seeded with a blood group, a paediatrician's phone
+  and two parents' numbers. It starts empty and is persisted once she fills it
+  in — the screen already had the invitation state. This was the most dangerous
+  fabricated data in the app.
+- **The health timeline** was eleven invented events; it is now built from her
+  doctor visits, the doses she marked, and the symptoms she logged.
+- **"Add a child"** is real (name + date of birth only — a measurement belongs in
+  the dated growth record, not guessed at sign-up). `addChild()` had been
+  complete and cloud-writing the whole time; only the form was missing.
+- **Attachments upload to Storage** (`uploadAttachments`) on pick, so a
+  photographed birth certificate stops living on a temp path the OS deletes.
+- **`FamilyProfileStore` is partitioned per child.** Conditions, feeding, sleep
+  and learning style describe a CHILD, and enabling multi-child made the bleed
+  reachable — a second baby's reflux would have overwritten the first's. The
+  in-memory fields still hold the active child's answers, so every getter and
+  the reco engine are untouched; only storage is bucketed, swapped on switch.
+
+Layout note: several rows sized themselves around the 5-character "Aarav" and
+overflowed once names varied. Those are now Flexible + ellipsis — real names are
+not a fixed length, so this was a latent bug, not a new one.
+
+### ⚠️ Parenting flags — status as of 20 July 2026
+
+**STILL OPEN:**
+1. **Growth mirror columns not collapsed.** The screens now read `GrowthStore`
+   (Doctor Record, health growth, My Child details all fixed), so the *display*
+   is consistent. But the `children.weight_kg/height_cm/head_cm` mirror columns
+   still exist and are still written by `ChildProfileStore.update`. The intended
+   end state — latest growth row is the only truth, mirror columns dropped — is
+   not done. Low urgency now that display is correct; finish before relying on
+   `children.*` for anything.
+2. **`profiles.baby_dob` mirror not wired.** Decision stands (`children` is
+   truth, `baby_dob` mirrors the FIRST child for the WhatsApp pg_cron), but **no
+   Dart writes `baby_dob`**, so a post-birth WhatsApp trigger can't fire yet.
+3. **Duplicate child after late pairing.** Save-before-pairing on both sides →
+   two child rows for one baby. Deliberately not auto-merged (could be twins).
+   Needs a product call + a resolve-in-UI affordance.
+8. **Fake testimonials.** "Priya, mother of Aarav (4 mo)" in `pp_experts_data`,
+   `book_detail_screen`, `product_detail_screen`. Left as placeholder CONTENT,
+   but invented social proof is legally riskier than invented child data — must
+   not ship as-is.
+   Tier-2 starter seeds (pre-saved recipes, six liked names, watch progress,
+   wishlists) also remain — harmless-ish, a product call on whether a new parent
+   starts with items she never chose.
+
+**RESOLVED since first written (kept here so the history reads straight):**
+- ~~4. Reminders don't persist~~ → med reminders persist (0022), vax
+  done+reminder persist (0023).
+- ~~5. Attachments on temp paths~~ → `uploadAttachments` routes bytes to the
+  `media` bucket on pick (documents + health records).
+- ~~6. "Add a child" is a stub~~ → real name+DOB form in `multichild_sheet`.
+- ~~7. FamilyProfileStore not child-keyed~~ → partitioned per child, swapped on
+  child switch; getters/reco-engine untouched.
+- ~~9. Retired `VaccinationScreen` seeds~~ → dead code, unreachable; V1 naming
+  fully retired by the other terminal. Left for revert only.
+- ~~10. Seeded health content shown as hers~~ → timeline derived from her
+  records; `kUpcomingHealth`/`kVaxStatus`/`kHealthSnapshot` now computed;
+  `kHealthInsights` hidden until a real engine exists.
+
+### Guardrails
+`test/pp_no_fabricated_child_data_test.dart` locks the rule in: a fresh child has
+no measurements, nothing about the child is pre-filled (health, growth, vaccines,
+emergency card, timeline), no seeded name likes/crown, a like alone is not a
+match, `ppFill` resolves every token, and — by walking the source — no screen can
+render a `{child}` placeholder without calling `ppFill`.
+
+---
+
 ## Progress checklist
 
 Legend: ⬜ todo · 🟦 table created (SQL run) · ✅ wired to SupabaseRepo + tested

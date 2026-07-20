@@ -77,7 +77,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 ppToolPad(Text('Skills that often blossom around ${ChildProfileStore.instance.ageLabel}.', style: ppBody(13))),
                 const SizedBox(height: 14),
                 if (emerging.isEmpty)
-                  ppToolPad(ppEmptyCard(Icons.spa_outlined, 'A quiet stretch between leaps — a lovely time to simply enjoy each other. New skills will surface soon.'))
+                  ppToolPad(ppEmptyCard(Icons.spa_outlined, 'A quiet stretch — a lovely time to simply enjoy each other. New skills will surface soon.'))
                 else
                   ppToolPad(Column(children: [for (final m in emerging) _card(m)])),
 

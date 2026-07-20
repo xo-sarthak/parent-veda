@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pp_child_profile.dart';
 
 import 'community_screen.dart';
 import 'growth_activity_screen.dart';
@@ -207,7 +208,7 @@ class WonderWeekScreen extends StatelessWidget {
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     const Icon(Icons.ios_share_rounded, size: 16, color: Colors.white),
                     const SizedBox(width: 8),
-                    Flexible(child: Text("Share “Aarav's in Leap 4”", style: ppBody(14, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    Flexible(child: Text("Share “${ChildProfileStore.instance.name}'s in Leap 4”", style: ppBody(14, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
                 ),
               ),

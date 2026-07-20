@@ -3,14 +3,27 @@
 // -----------------------------------------------------------------------------
 //  One place for "attach a photo or a PDF" across the parenting app: health
 //  reports, prescriptions, and baby documents. Photos come from image_picker
-//  (camera or gallery, multi-select); PDFs from file_picker. Attachments are
-//  local file paths only (no upload/backend yet). Keep it small and reusable.
+//  (camera or gallery, multi-select); PDFs from file_picker.
+//
+//  FILES GO TO STORAGE. A picked file's `path` is an image_picker/file_picker
+//  TEMP path, and the OS reaps those directories on its own schedule - so a
+//  photographed birth certificate used to rot on the device even before you
+//  changed phones. uploadAttachments() copies the bytes into the private
+//  `media` bucket and swaps `path` for the returned storage object path, which
+//  is what gets persisted. StorageService.resolve() turns that back into a
+//  local file for display, downloading once and caching; because the
+//  partner-read policy (0014) already exists, the other parent's files resolve
+//  with no extra work.
+//
+//  Logged out or offline, upload() returns the original local path, so the app
+//  keeps working and the file can be backfilled later.
 // =============================================================================
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../services/remote/storage_service.dart';
 import 'pp_common.dart';
 
 enum AttachKind { image, pdf }
@@ -141,4 +154,26 @@ Widget attachmentSummary(List<Attachment> items) {
     const SizedBox(width: 5),
     Text(parts.join(' · '), style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
   ]);
+}
+
+/// Upload freshly-picked attachments and return copies pointing at Storage.
+///
+/// [type] is the folder under the user's space: `media/<uid>/<type>/<file>`.
+/// Anything that fails to upload keeps its local path, so the parent never
+/// loses the reference - it just is not durable yet.
+Future<List<Attachment>> uploadAttachments(
+  List<Attachment> items,
+  String type,
+) async {
+  if (items.isEmpty) return items;
+  final out = <Attachment>[];
+  for (final a in items) {
+    try {
+      final ref = await StorageService.upload(a.path, type);
+      out.add(Attachment(a.kind, ref, a.name));
+    } catch (_) {
+      out.add(a); // keep it local rather than dropping it
+    }
+  }
+  return out;
 }

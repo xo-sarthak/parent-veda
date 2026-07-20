@@ -9,7 +9,12 @@
 //  - no points, streaks or badges. Nothing here depends on the pregnancy app.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 
 /// Supportive progress words - never percentages, never grades.
 enum DevWord { emerging, practicing, growing, confident, mastered }
@@ -157,7 +162,7 @@ const List<DevArea> kDevAreas = [
     journey: [
       DevStage('Notices contrast', 'mastered', 'Fixes on bold patterns and faces.', 'The very first attention-building.'),
       DevStage('Follows a moving toy', 'mastered', 'Tracks something across his view.', 'Visual attention and prediction.'),
-      DevStage('Cause & effect', 'current', 'Grasps that his hand makes the toy move.', 'The heart of Leap 4, thinking begins.', activities: ['peekaboo', 'highcontrast']),
+      DevStage('Cause & effect', 'current', 'Grasps that his hand makes the toy move.', 'Where thinking begins.', activities: ['peekaboo', 'highcontrast']),
       DevStage('Object permanence', 'next', 'Begins to sense things exist when hidden.', 'Why peekaboo becomes magic.', activities: ['peekaboo']),
       DevStage('Simple problem solving', 'future', 'Reaches around a barrier for a toy.', 'Early planning and persistence.'),
     ],
@@ -434,7 +439,7 @@ const List<DevActivity> kDevActivities = [
 
 // ---- brain development ------------------------------------------------------
 const String kBrainThisWeek =
-    'This month, Aarav’s brain is becoming far better at connecting cause and effect, and at recognising the faces he loves. Every bit of eye contact, narrated play and “conversation” you share is physically strengthening these fast-growing connections.';
+    'This month, {child}’s brain is becoming far better at connecting cause and effect, and at recognising the faces he loves. Every bit of eye contact, narrated play and “conversation” you share is physically strengthening these fast-growing connections.';
 
 const List<BrainTopic> kBrainTopics = [
   BrainTopic('Recognising familiar faces', 'He now knows your face from a stranger’s, and lights up for it. This is memory and social wiring, together.', 'Lots of face-to-face time and warm eye contact strengthens it.'),
@@ -516,13 +521,67 @@ List<DevStage> activeStages(DevArea area) =>
 // =============================================================================
 //  DevStore - saved & completed activities + gentle check-in answers.
 // =============================================================================
-class DevStore extends ChangeNotifier {
+class DevStore extends ChangeNotifier with CloudSyncedStore {
   DevStore._();
   static final DevStore instance = DevStore._();
 
   final Set<String> _saved = {'peekaboo'};
   final Set<String> _completed = {'tummy_play'};
   final Map<String, bool> _checkIns = {}; // question text -> yes/no
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_development';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  @override
+  Object cloudData() => {
+        'saved': _saved.toList(),
+        'completed': _completed.toList(),
+        'checkIns': _checkIns,
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    final s = data['saved'];
+    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    final c = data['completed'];
+    if (c is List) _completed..clear()..addAll(c.map((e) => e.toString()));
+    final k = data['checkIns'];
+    if (k is Map) {
+      _checkIns
+        ..clear()
+        ..addAll(k.map((key, v) => MapEntry(key.toString(), v == true)));
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {

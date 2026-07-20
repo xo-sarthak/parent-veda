@@ -11,7 +11,12 @@
 //  untouched. Video ids reference the Watch catalog (pp_watch_data). Child: Aarav.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/remote/cloud_synced_store.dart';
 
 /// An expandable "ParentVeda tip" shown inline in the reader.
 class ReadTip {
@@ -134,7 +139,7 @@ const List<ReadArticle> kReadArticles = [
     id: 'sleepcycles',
     title: 'Why your baby’s sleep changes at 4 months',
     teaser: 'The famous “regression” is really a leap forward, here’s what’s happening.',
-    whyToday: 'Aarav is right in the middle of the 4-month sleep shift. Understanding it is the difference between panic and patience tonight.',
+    whyToday: '{child} is right in the middle of the 4-month sleep shift. Understanding it is the difference between panic and patience tonight.',
     collection: 'sleep',
     ageTag: '3–6 mo',
     minutes: 6,
@@ -224,7 +229,7 @@ const List<ReadArticle> kReadArticles = [
     id: 'solids',
     title: 'Starting solids without the stress',
     teaser: 'It’s less about nutrition at first, and more about learning to eat.',
-    whyToday: 'Solids are a few weeks away for Aarav, knowing the signs and the first foods now means calm, not scramble, later.',
+    whyToday: 'Solids are a few weeks away for {child}, knowing the signs and the first foods now means calm, not scramble, later.',
     collection: 'feeding',
     ageTag: '6+ mo',
     minutes: 6,
@@ -656,7 +661,7 @@ List<ReadArticle> readNextArticles(ReadArticle article, {int limit = 4}) {
 // =============================================================================
 enum ReadMode { light, sepia, dark }
 
-class ReadingStore extends ChangeNotifier {
+class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   ReadingStore._();
   static final ReadingStore instance = ReadingStore._();
 
@@ -664,6 +669,67 @@ class ReadingStore extends ChangeNotifier {
   final Map<String, double> _progress = {'sleepcycles': 0.35, 'solids': 0.65};
   double _fontScale = 1.0;
   ReadMode _mode = ReadMode.light;
+
+  // ---- persistence (user_state KV; own-only, a personal preference) --------
+  static const _prefsKey = 'pp_reading';
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  @override
+  Object cloudData() => {
+        'saved': _saved.toList(),
+        'progress': _progress,
+        'fontScale': _fontScale,
+        'mode': _mode.name,
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    final s = data['saved'];
+    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    final p = data['progress'];
+    if (p is Map) {
+      _progress
+        ..clear()
+        ..addAll(p.map((k, v) => MapEntry(k.toString(), (v as num).toDouble())));
+    }
+    _fontScale = (data['fontScale'] as num?)?.toDouble() ?? _fontScale;
+    for (final m in ReadMode.values) {
+      if (m.name == data['mode']) _mode = m;
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+    } catch (_) {}
+  }
+
+  // The mixin's override pushes to the cloud; this keeps the LOCAL cache
+  // current too, so an offline/logged-out user still gets persistence. Every
+  // mutation already calls notifyListeners(), so one override covers them all.
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudData(jsonDecode(raw));
+    } catch (_) {/* keep the starter state */}
+    notifyListeners();
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {
