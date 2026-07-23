@@ -15,7 +15,7 @@ import 'package:parentveda/screens/prepare/masterclass_detail_screen.dart';
 import 'package:parentveda/screens/prepare/masterclasses_screen.dart';
 import 'package:parentveda/screens/prepare/courses_cohorts_screen.dart';
 import 'package:parentveda/screens/prepare/nutrition_screen.dart';
-import 'package:parentveda/screens/prepare/prenatal_yoga_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/yoga_home_screen.dart';
 import 'package:parentveda/screens/prepare/prepare_hub_screen.dart';
 import 'package:parentveda/screens/prepare/program_detail_screen.dart';
 
@@ -28,7 +28,8 @@ void main() {
     'masterclasses': const MasterclassesScreen(),
     'consultations': const ConsultationsScreen(),
     'cohorts': const CohortsScreen(),
-    'yoga': const PrenatalYogaScreen(),
+    // Yoga now uses the shared cult.fit screen, filtered to pregnancy categories.
+    'yoga': const YogaHomeScreen(categoryFilter: kPregnancyYogaCategories),
     'birthing': const BirthingClassesScreen(),
     'masterclass detail': MasterclassDetailScreen(m: kMasterclasses.first),
     'consultation detail': ConsultationDetailScreen(specialist: kSpecialists.first),

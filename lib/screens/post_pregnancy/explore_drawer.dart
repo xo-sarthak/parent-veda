@@ -22,6 +22,7 @@ import 'development_home_screen.dart';
 // import 'food_home_screen.dart';
 // import 'guides_tools_screen.dart';
 import 'learning_home_screen.dart';
+import 'my_bookings_screen.dart';
 import 'yoga_home_screen.dart';
 // The Health Guide is now reached from inside the Health ecosystem, not the
 // drawer directly. Kept (commented) in case we want the direct entry back.
@@ -103,6 +104,8 @@ class ExploreDrawer extends StatelessWidget {
                       'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
                   _section(context, Icons.self_improvement_outlined, 'Yoga & Classes',
                       'Live & recorded classes for every stage.', const YogaHomeScreen()),
+                  _section(context, Icons.event_available_outlined, 'My Bookings',
+                      'Your classes & sessions, all in one place.', const MyBookingsScreen()),
                   // Masterclasses + Cohort Courses + Courses are now one section (above);
                   // "Guides & Tools" is retired. All kept (commented) for easy revert:
                   // _section(context, Icons.school_outlined, 'Masterclasses',

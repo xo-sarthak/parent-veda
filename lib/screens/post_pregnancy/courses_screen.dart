@@ -22,7 +22,6 @@ import 'course_detail_screen.dart';
 import 'course_funnel_screen.dart';
 import 'pp_common.dart';
 import 'pp_courses_data.dart';
-import 'pp_section_extras.dart';
 
 class CoursesScreen extends StatelessWidget {
   const CoursesScreen({super.key});
@@ -215,7 +214,6 @@ class CoursesScreen extends StatelessWidget {
           ],
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

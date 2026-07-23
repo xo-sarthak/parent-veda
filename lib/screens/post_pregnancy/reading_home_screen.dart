@@ -111,7 +111,6 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
           },
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

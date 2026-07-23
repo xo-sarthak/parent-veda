@@ -182,7 +182,6 @@ class _NuskheScreenState extends State<NuskheScreen> {
             ],
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }

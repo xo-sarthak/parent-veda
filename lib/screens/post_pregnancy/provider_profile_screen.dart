@@ -12,6 +12,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_catalog.dart';
+import 'booking_sheet.dart';
 import 'learning_detail_screen.dart';
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
@@ -204,7 +206,16 @@ class ProviderProfileScreen extends StatelessWidget {
                   ),
                 ),
                 child: GestureDetector(
-                  onTap: () => showProviderBookingSheet(context, e),
+                  // In-app consult via the booking engine (calendar case). Falls
+                  // back to the old sheet only for an expert not yet bridged.
+                  onTap: () {
+                    final o = BookingCatalog.instance.offeringForCatalog(e.id);
+                    if (o != null) {
+                      showBookingSheet(context, o);
+                    } else {
+                      showProviderBookingSheet(context, e);
+                    }
+                  },
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     height: 54,

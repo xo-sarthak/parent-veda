@@ -17,7 +17,6 @@ import 'pp_child_profile.dart';
 
 import 'cohort_funnel_screen.dart';
 import 'pp_common.dart';
-import 'pp_section_extras.dart';
 
 class CohortCoursesScreen extends StatelessWidget {
   const CohortCoursesScreen({super.key});
@@ -128,7 +127,6 @@ class CohortCoursesScreen extends StatelessWidget {
           ],
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

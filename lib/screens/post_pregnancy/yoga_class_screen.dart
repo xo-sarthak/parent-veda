@@ -10,9 +10,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_catalog.dart';
+import 'booking_sheet.dart';
 import 'pp_common.dart';
 import 'pp_yoga_data.dart';
 import 'yoga_common.dart';
+import 'yoga_instructor_screen.dart';
 
 class YogaClassScreen extends StatelessWidget {
   const YogaClassScreen({super.key, required this.cls});
@@ -81,7 +84,7 @@ class YogaClassScreen extends StatelessWidget {
 
                   // instructor
                   const SizedBox(height: 20),
-                  _pad(_instructorRow()),
+                  _pad(_instructorRow(context)),
                   const SizedBox(height: 14),
                   _pad(_instructorAbout(context)),
 
@@ -172,27 +175,35 @@ class YogaClassScreen extends StatelessWidget {
   }
 
   // ---- instructor ---------------------------------------------------------
-  Widget _instructorRow() {
+  // Tappable now — opens the teacher's profile. For a class (and especially a
+  // 1:1) you are booking the person, so being able to open who they are matters.
+  Widget _instructorRow(BuildContext context) {
     final tint = yogaTint(cls.seed + 2);
-    return Row(children: [
-      Container(
-        width: 54,
-        height: 54,
-        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
-        clipBehavior: Clip.antiAlias,
-        child: PpStriped(height: 58, colorA: tint.$1, colorB: tint.$2),
-      ),
-      const SizedBox(width: 14),
-      Expanded(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(cls.instructorName, style: ppJakarta(16), maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 2),
-          Text(cls.instructorCredential, style: ppBody(12.5), maxLines: 2, overflow: TextOverflow.ellipsis),
-        ]),
-      ),
-      const SizedBox(width: 10),
-      const Icon(Icons.verified_outlined, size: 20, color: ppPurple),
-    ]);
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => YogaInstructorScreen(source: cls))),
+      behavior: HitTestBehavior.opaque,
+      child: Row(children: [
+        Container(
+          width: 54,
+          height: 54,
+          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ppBorder)),
+          clipBehavior: Clip.antiAlias,
+          child: PpStriped(height: 58, colorA: tint.$1, colorB: tint.$2),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(cls.instructorName, style: ppJakarta(16), maxLines: 1, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 2),
+            Text('${cls.instructorCredential}  ·  View profile',
+                style: ppBody(12.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+        const SizedBox(width: 10),
+        const Icon(Icons.chevron_right_rounded, size: 22, color: ppPurple),
+      ]),
+    );
   }
 
   /// Who the trainer is, in enough depth to book them. For a one-to-one this
@@ -360,6 +371,14 @@ class YogaClassScreen extends StatelessWidget {
       );
 
   // ---- sticky CTA + confirmation ------------------------------------------
+  // Split "₹399 / class · free on ParentVeda+" into the amount and the note so
+  // both stay visible in the compact CTA bar.
+  String get _priceAmount => cls.price.split('·').first.trim();
+  String? get _priceNote {
+    final parts = cls.price.split('·');
+    return parts.length > 1 ? parts.sublist(1).join('·').trim() : null;
+  }
+
   Widget _ctaBar(BuildContext context, YogaStore store) {
     final booked = store.isBooked(cls.id);
     return Container(
@@ -370,8 +389,11 @@ class YogaClassScreen extends StatelessWidget {
       child: Row(children: [
         Flexible(
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(cls.price, style: ppBody(15, color: ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
-            Text(cls.isLive ? 'Cancel free · reschedule anytime' : 'Yours to keep, forever',
+            // The price string bundles the amount and a note ("₹399 / class ·
+            // free on ParentVeda+"); on one ellipsized line the note got cut, so
+            // "free on ParentVeda+" was never visible. Split it across two lines.
+            Text(_priceAmount, style: ppBody(15, color: ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(_priceNote ?? (cls.isLive ? 'Cancel free · reschedule anytime' : 'Yours to keep, forever'),
                 style: ppBody(11, color: ppPurple, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
           ]),
         ),
@@ -402,6 +424,14 @@ class YogaClassScreen extends StatelessWidget {
   }
 
   void _confirm(BuildContext context, YogaStore store) {
+    // If this class has been bridged to the booking engine, run the real
+    // buy -> pick a slot -> booked flow. Otherwise fall back to the original
+    // mock (a booked-id in YogaStore) until its offering exists.
+    final offering = BookingCatalog.instance.offeringForCatalog(cls.id);
+    if (offering != null) {
+      showBookingSheet(context, offering);
+      return;
+    }
     store.book(cls.id);
     final isLive = cls.isLive;
     showModalBottomSheet<void>(

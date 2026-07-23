@@ -12,6 +12,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_catalog.dart';
+import 'booking_sheet.dart';
 import 'course_lesson_screen.dart';
 import 'pp_common.dart';
 import 'pp_courses_data.dart';
@@ -60,6 +62,13 @@ class _LearningDetailScreenState extends State<LearningDetailScreen> {
       } else {
         _snack('Opening your player - the film is in production for now.');
       }
+      return;
+    }
+    // If this program is bridged to the booking engine, run the real
+    // buy -> reserve flow; otherwise fall back to the mock paysheet.
+    final offering = BookingCatalog.instance.offeringForCatalog(p.id);
+    if (offering != null) {
+      showBookingSheet(context, offering);
       return;
     }
     _paysheet(cta.label);

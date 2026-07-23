@@ -16,7 +16,6 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
 import 'pp_reco_data.dart';
-import 'pp_section_extras.dart';
 import 'reco_category_screen.dart';
 import 'reco_collection_screen.dart';
 import 'reco_common.dart';
@@ -132,7 +131,6 @@ class RecommendationsScreen extends StatelessWidget {
             },
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }

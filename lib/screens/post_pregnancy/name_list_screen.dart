@@ -96,7 +96,6 @@ class _NameListScreenState extends State<NameListScreen> {
           },
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

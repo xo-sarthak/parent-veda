@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'masterclass_funnel_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
-import 'pp_section_extras.dart';
 import 'provider_profile_screen.dart';
 
 class MasterclassesScreen extends StatelessWidget {
@@ -160,7 +159,6 @@ class MasterclassesScreen extends StatelessWidget {
           ],
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

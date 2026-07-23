@@ -29,7 +29,8 @@ import 'birthing_classes_screen.dart';
 // import 'masterclasses_screen.dart';
 import 'courses_cohorts_screen.dart';
 import 'nutrition_screen.dart';
-import 'prenatal_yoga_screen.dart';
+import '../post_pregnancy/yoga_home_screen.dart';
+// import 'prenatal_yoga_screen.dart'; // retired — replaced by YogaHomeScreen
 import 'prepare_common.dart';
 import 'program_detail_screen.dart';
 
@@ -119,8 +120,20 @@ class PrepareHubScreen extends StatelessWidget {
                   top: true, onTap: () => openSection(const CoursesCohortsScreen())),
               _tile(context, Icons.child_friendly_outlined, 'Birthing Classes', 'Everything for the big day.',
                   '6-class course', onTap: () => openSection(const BirthingClassesScreen())),
-              _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
-                  '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),
+              // Yoga now uses the SAME cult.fit screen as the parenting side,
+              // filtered to pregnancy categories — one UI both tabs. The old
+              // month-tabbed PrenatalYogaScreen is retired (kept for revert).
+              _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe classes, live or recorded.',
+                  'Prenatal & breath', onTap: () => openSection(const YogaHomeScreen(
+                        categoryFilter: kPregnancyYogaCategories,
+                        backLabel: 'Prepare',
+                        eyebrow: 'ParentVeda Yoga',
+                        heroTitle: 'Prenatal yoga & classes',
+                        intro:
+                            'Trimester-safe movement, labour breathing and calm - live with a teacher, or on your own time.',
+                      ))),
+              // _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
+              //     '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),
               _tile(context, Icons.restaurant_outlined, 'Nutrition',
                   'A plan built around you, made yours by an expert.', 'Plan + consult',
                   bottom: true, onTap: () => openSection(const NutritionScreen())),

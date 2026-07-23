@@ -19,11 +19,39 @@ import 'yoga_class_screen.dart';
 import 'yoga_common.dart';
 
 class YogaHomeScreen extends StatefulWidget {
-  const YogaHomeScreen({super.key});
+  const YogaHomeScreen({
+    super.key,
+    this.categoryFilter,
+    this.backLabel = 'Explore',
+    this.eyebrow = 'ParentVeda Yoga',
+    this.heroTitle = 'Yoga & parenting classes',
+    this.intro =
+        'Expert-led classes for every stage - pregnancy, recovery, IVF, breath and calm. Live with a teacher, or on your own time.',
+  });
+
+  /// If set, only these category ids are shown — how the SAME cult.fit screen
+  /// serves the pregnancy Prepare tab (prenatal/breathing/…) and the parenting
+  /// Explore tab (everything). Null = show all (the parenting default, kept
+  /// exactly as it was).
+  final Set<String>? categoryFilter;
+  final String backLabel;
+  final String eyebrow;
+  final String heroTitle;
+  final String intro;
 
   @override
   State<YogaHomeScreen> createState() => _YogaHomeScreenState();
 }
+
+/// The pregnancy Prepare tab uses this SAME screen, limited to the categories a
+/// pregnant mother wants — the content is already tagged, so it is a filter, not
+/// a new screen.
+const Set<String> kPregnancyYogaCategories = {
+  'prenatal',
+  'breathing',
+  'meditation',
+  'yoga',
+};
 
 class _YogaHomeScreenState extends State<YogaHomeScreen> {
   bool _live = true; // Live vs Recorded (top toggle)
@@ -59,14 +87,13 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
               return ListView(
                 padding: const EdgeInsets.only(top: 12, bottom: 40),
                 children: [
-                  _pad(ppBack(context, 'Explore')),
+                  _pad(ppBack(context, widget.backLabel)),
                   const SizedBox(height: 18),
-                  _pad(ppEyebrow('ParentVeda Yoga', color: ppPurple)),
+                  _pad(ppEyebrow(widget.eyebrow, color: ppPurple)),
                   const SizedBox(height: 8),
-                  _pad(Text('Yoga & parenting classes', style: ppFraunces(30, h: 1.1))),
+                  _pad(Text(widget.heroTitle, style: ppFraunces(30, h: 1.1))),
                   const SizedBox(height: 6),
-                  _pad(Text('Expert-led classes for every stage - pregnancy, recovery, IVF, breath and calm. Live with a teacher, or on your own time.',
-                      style: ppBody(14, h: 1.5))),
+                  _pad(Text(widget.intro, style: ppBody(14, h: 1.5))),
 
                   const SizedBox(height: 16),
                   _pad(ppSearchField(
@@ -92,14 +119,14 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
             },
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }
 
   // ---- search results (mode-agnostic) -------------------------------------
   List<Widget> _searchView() {
-    final items = yogaSearch(_query);
+    final items =
+        yogaSearch(_query).where((c) => _allowed(c.category)).toList();
     return [
       const SizedBox(height: 26),
       _pad(Text('Search results', style: ppJakarta(18))),
@@ -115,8 +142,14 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
   }
 
   // ---- cult.fit-style category sections -----------------------------------
+  // Honour the stage filter: on the pregnancy side only pregnancy-relevant
+  // categories are shown; parenting (no filter) shows all, unchanged.
+  bool _allowed(String catId) =>
+      widget.categoryFilter == null || widget.categoryFilter!.contains(catId);
+
   List<Widget> _categorySections() {
-    final cats = yogaCategoriesWithClasses(_mode);
+    final cats =
+        yogaCategoriesWithClasses(_mode).where((c) => _allowed(c.id)).toList();
     final store = YogaStore.instance;
     if (cats.isEmpty) {
       return [
@@ -155,41 +188,77 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
   }
 
   // ---- toggles ------------------------------------------------------------
-  Widget _liveRecordedToggle() => Container(
+  // The two mode toggles. REBUILT 21 Jul: was two stacked rows of TWO-LINE
+  // segments (label + caption) whose highlight cross-faded in place — tall, and
+  // the selection did not visibly move. Now each is a single-line sliding
+  // segmented control: half the height (the captions moved into the intro copy
+  // above), and one white pill that GLIDES left/right on tap. Same two choices,
+  // far less vertical space, and a transition you can follow.
+  Widget _liveRecordedToggle() => _slideToggle(
+        left: 'Live',
+        right: 'Recorded',
+        leftOn: _live,
+        onLeft: () => setState(() => _live = true),
+        onRight: () => setState(() => _live = false),
+      );
+
+  Widget _groupOneToOneToggle() => _slideToggle(
+        left: 'Group',
+        right: '1:1',
+        leftOn: _group,
+        onLeft: () => setState(() => _group = true),
+        onRight: () => setState(() => _group = false),
+      );
+
+  /// A two-option pill toggle whose white highlight slides between the halves.
+  Widget _slideToggle({
+    required String left,
+    required String right,
+    required bool leftOn,
+    required VoidCallback onLeft,
+    required VoidCallback onRight,
+  }) =>
+      Container(
+        height: 42,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
-        child: Row(children: [
-          _seg('Live', 'with a teacher', _live, () => setState(() => _live = true)),
-          _seg('Recorded', 'on your own time', !_live, () => setState(() => _live = false)),
+        child: Stack(children: [
+          // The gliding highlight — half-width, animated to the chosen side.
+          AnimatedAlign(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            alignment: leftOn ? Alignment.centerLeft : Alignment.centerRight,
+            child: FractionallySizedBox(
+              widthFactor: 0.5,
+              heightFactor: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x146A30B6), blurRadius: 10, offset: Offset(0, 3)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Row(children: [
+            _segLabel(left, leftOn, onLeft),
+            _segLabel(right, !leftOn, onRight),
+          ]),
         ]),
       );
 
-  Widget _groupOneToOneToggle() => Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)),
-        child: Row(children: [
-          _seg('Group', 'join a class', _group, () => setState(() => _group = true)),
-          _seg('1:1', 'private session', !_group, () => setState(() => _group = false)),
-        ]),
-      );
-
-  Widget _seg(String label, String sub, bool on, VoidCallback onTap) => Expanded(
+  Widget _segLabel(String label, bool on, VoidCallback onTap) => Expanded(
         child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            decoration: BoxDecoration(
-              color: on ? Colors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: on ? const [BoxShadow(color: Color(0x146A30B6), blurRadius: 10, offset: Offset(0, 3))] : null,
+          child: Center(
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 240),
+              style: ppBody(13, color: on ? ppPurple : ppSoft, w: FontWeight.w700),
+              child: Text(label),
             ),
-            child: Column(children: [
-              Text(label, style: ppBody(13, color: on ? ppPurple : ppSoft, w: FontWeight.w700)),
-              const SizedBox(height: 1),
-              Text(sub, style: ppBody(10, color: ppMuted)),
-            ]),
           ),
         ),
       );

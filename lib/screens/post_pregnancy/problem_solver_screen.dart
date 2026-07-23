@@ -113,7 +113,6 @@ class _ProblemSolverScreenState extends State<ProblemSolverScreen> {
               ],
             ],
           ),
-          const PpAskVedaFab(),
         ]),
       ),
     );

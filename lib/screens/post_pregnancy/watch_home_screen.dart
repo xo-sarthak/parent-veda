@@ -91,7 +91,6 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             },
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }

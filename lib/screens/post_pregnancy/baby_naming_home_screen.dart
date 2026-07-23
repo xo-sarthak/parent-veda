@@ -21,7 +21,6 @@ import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
-import 'pp_section_extras.dart';
 
 class BabyNamingHomeScreen extends StatelessWidget {
   const BabyNamingHomeScreen({super.key});
@@ -50,7 +49,6 @@ class BabyNamingHomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

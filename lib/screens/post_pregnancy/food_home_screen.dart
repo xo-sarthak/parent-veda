@@ -165,7 +165,6 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
           },
         ),
       ),
-      const PpAskVedaFab(),
       ]),
     );
   }

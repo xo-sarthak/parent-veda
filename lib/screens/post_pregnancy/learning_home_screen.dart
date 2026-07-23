@@ -207,7 +207,6 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
             ],
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }

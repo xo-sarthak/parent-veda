@@ -105,7 +105,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
             },
           ),
         ),
-        const PpAskVedaFab(),
       ]),
     );
   }

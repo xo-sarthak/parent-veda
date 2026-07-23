@@ -15,7 +15,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../booking/booking_catalog.dart';
 import '../../services/prepare_store.dart';
+import '../post_pregnancy/booking_sheet.dart';
 
 // ---- palette (mirrors the design's hexes; AppTheme holds the same base) -----
 const Color kCanvas = Color(0xFFFBF9FE);
@@ -283,6 +285,14 @@ Future<void> showPrepareBooking(
   // funnel so booking the expert consult flows on to the personalized diet plan.
   VoidCallback? onConfirmed,
 }) {
+  // If this item is bridged to the booking engine, run the real buy -> pick a
+  // slot -> booked flow (one history across both stages). Every Prepare booking
+  // funnels through here, so this one interception wires the whole tab. Anything
+  // not yet bridged (a recorded course, a light item) keeps the mock below.
+  final offering = BookingCatalog.instance.offeringForCatalog(id);
+  if (offering != null) {
+    return showBookingSheet(context, offering);
+  }
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

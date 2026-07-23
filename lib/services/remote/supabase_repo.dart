@@ -319,4 +319,77 @@ class SupabaseRepo {
         .select()
         .single();
   }
+
+  // ---- booking engine (0029) ------------------------------------------------
+
+  /// Claim a seat atomically via the book_slot() function. Returns true if the
+  /// seat was granted, false if it was refused (slot full / already booked) OR
+  /// we are offline / logged out — the caller treats false as "not confirmed
+  /// on the server" and, offline, falls back to a local optimistic booking.
+  ///
+  /// The booking id is minted by the caller so the local row and the server row
+  /// share an identity.
+  static Future<bool> bookSlot({
+    required String bookingId,
+    required String slotId,
+    required String offeringId,
+    required String expertId,
+    required DateTime startsUtc,
+    required int durationMin,
+    required int capacity,
+    required String stage,
+    required String title,
+    String? joinUrl,
+  }) async {
+    if (userId == null) return false;
+    try {
+      await _client.rpc('book_slot', params: {
+        'p_booking_id': bookingId,
+        'p_slot_id': slotId,
+        'p_offering_id': offeringId,
+        'p_expert_id': expertId,
+        'p_starts_utc': startsUtc.toUtc().toIso8601String(),
+        'p_duration_min': durationMin,
+        'p_capacity': capacity,
+        'p_stage': stage,
+        'p_title': title,
+        'p_join_url': joinUrl,
+      });
+      return true;
+    } catch (_) {
+      // A raise ('slot full' / 'already booked') or a network error both mean
+      // "the server did not grant this seat".
+      return false;
+    }
+  }
+
+  /// Free a seat via cancel_booking(). Best-effort: a failure here is not worth
+  /// blocking the UI over — the local cancel still stands, and the ledger is
+  /// reconciled on the next server round-trip.
+  static Future<void> cancelBooking(String bookingId) async {
+    if (userId == null) return;
+    try {
+      await _client.rpc('cancel_booking', params: {'p_booking_id': bookingId});
+    } catch (_) {/* best-effort */}
+  }
+
+  /// Invoke a Supabase EDGE function (Deno), used for the Razorpay order +
+  /// signature-verify flow — the Key Secret lives in the function's env, never
+  /// here. Returns the decoded JSON map, or null on any failure (offline, the
+  /// function not deployed, an error status) so the caller can fall back to the
+  /// no-charge preview instead of stranding the user.
+  static Future<Map<String, dynamic>?> invokeEdge(
+    String name,
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final res = await _client.functions.invoke(name, body: body);
+      if (res.status >= 400) return null;
+      final data = res.data;
+      if (data is Map) return Map<String, dynamic>.from(data);
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }
