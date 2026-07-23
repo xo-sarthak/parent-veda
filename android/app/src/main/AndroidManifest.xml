@@ -44,6 +44,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- DELIVERS a scheduled reminder when its alarm fires. Required by
+             flutter_local_notifications: the plugin's own manifest declares
+             permissions ONLY, no receivers, so the app must declare these or
+             AlarmManager broadcasts into a class Android has never heard of and
+             drops it silently. Symptom when missing: zonedSchedule() reports
+             success, the notification never arrives, and no error surfaces
+             anywhere - while show() keeps working, because the immediate path
+             never touches this receiver. Do not remove. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <!-- Reschedule reminders after a reboot (flutter_local_notifications). -->
         <receiver
             android:exported="false"

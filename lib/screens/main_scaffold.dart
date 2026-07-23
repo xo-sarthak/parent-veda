@@ -70,7 +70,12 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     // before wiring the listener so it doesn't bounce a setState during init.
     if (widget.isFather) FatherPreview.instance.on = true;
     // The shell is up (not the splash) — let the global Ask-Veda FAB appear.
-    FabState.instance.markAppLive();
+    // AFTER the first frame: the FAB is mounted by MaterialApp.builder, ABOVE
+    // this shell in the tree, so notifying it from initState marks an ancestor
+    // dirty mid-build — "setState() called during build", thrown on every cold
+    // start. Deferring one frame lets this build finish before the FAB rebuilds.
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => FabState.instance.markAppLive());
     AppNav.instance.addListener(_onNav);
     FatherPreview.instance.addListener(_onNav); // testing-only mode switch
     WidgetsBinding.instance.addObserver(this); // app-resume → refresh content

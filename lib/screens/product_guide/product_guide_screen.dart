@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 
 import '../../brand/brand_models.dart';
+import '../../brand/outbound.dart';
 import '../../brand/needs_attention.dart';
 import '../../brand/presented_by.dart';
 import '../../services/family_profile.dart';
@@ -181,7 +182,7 @@ class ProductGuideScreen extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton.icon(
-            onPressed: () => _soon(context, 'Buying options — coming soon'),
+            onPressed: () => _openBuySheet(context, g),
             icon: const Icon(Icons.shopping_bag_outlined, size: 18),
             label: const Text('Buy now'),
             style: FilledButton.styleFrom(
@@ -460,6 +461,79 @@ class ProductGuideScreen extends StatelessWidget {
         .where((p) => noun.any((n) => p.name.toLowerCase().contains(n)))
         .toList();
   }
+
+  /// The retailer URL for this guide — a real deep link if one is authored,
+  /// otherwise an Amazon search for the product name. openOutbound adds the
+  /// Amazon partner tag; the search form means every guide has a working Buy
+  /// path today, before per-product affiliate links exist.
+  String _buyUrl(ProductGuide g) {
+    if (g.buyUrl != null && g.buyUrl!.trim().isNotEmpty) return g.buyUrl!;
+    final q = Uri.encodeQueryComponent('${g.brand} ${g.name}');
+    return 'https://www.amazon.in/s?k=$q';
+  }
+
+  /// The interstitial. "Do not make shopping the focus" (the prompt) means a
+  /// parent leaves through a calm, honest door, not a hard sell: we say plainly
+  /// that it is an affiliate link, that we may earn a small commission at no
+  /// cost to them, and — the line that matters most — that it never changes
+  /// what we recommend or how we rate a product. THAT sentence is the whole
+  /// reason a trust-first page is allowed to carry a Buy button at all.
+  void _openBuySheet(BuildContext context, ProductGuide g) => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: pgBg,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (ctx) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 14, 24, 28),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: pgLine, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 18),
+              Row(children: [
+                const Icon(Icons.shopping_bag_outlined, size: 20, color: pgPurple),
+                const SizedBox(width: 9),
+                Expanded(child: Text('Heading to Amazon', style: pgSerif(22, h: 1.15))),
+              ]),
+              const SizedBox(height: 12),
+              Text('${g.brand} ${g.name}', style: pgBody(14.5, color: pgInk, w: FontWeight.w700)),
+              const SizedBox(height: 16),
+              _buyPoint(Icons.link_rounded, 'This is an affiliate link. If you buy, ParentVeda may earn a small commission — at no extra cost to you.'),
+              const SizedBox(height: 12),
+              _buyPoint(Icons.verified_outlined, 'It never changes what we recommend, or how we rate a product. Our verdict is written before any of this.'),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    openOutbound(_buyUrl(g), productId: g.id);
+                  },
+                  icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                  label: const Text('Continue to Amazon'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: pgPurple,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text('Stay here', style: pgBody(13.5, color: pgMuted, w: FontWeight.w700)),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      );
+
+  Widget _buyPoint(IconData icon, String text) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(icon, size: 16, color: pgPurple),
+        const SizedBox(width: 11),
+        Expanded(child: Text(text, style: pgBody(13, color: pgInk, h: 1.55))),
+      ]);
 
   /// Ask Veda, pre-loaded with this product as the question. The rest of the
   /// app funnels unanswered questions here; a product page should too.

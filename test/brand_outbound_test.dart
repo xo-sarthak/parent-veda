@@ -7,11 +7,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/brand/outbound.dart';
 
 void main() {
-  test('an untagged retailer goes out exactly as it came in', () {
-    // kPartnerTags is empty until real affiliate accounts exist, so this is
-    // today's behaviour: nothing is added, nothing changes, no surprises.
+  test('Amazon links now carry the partner tag', () {
+    // The Amazon tag was switched on for the Buy-now flow (a placeholder value
+    // until the real associate account exists). An amazon.in link must now go
+    // out tagged — that is the whole point of turning it on.
     final uri = Uri.parse('https://www.amazon.in/s?k=baby+lotion');
+    expect(tagged(uri).queryParameters['tag'], isNotNull,
+        reason: 'attribution is on for Amazon now');
+    expect(retailerOf(uri), 'amazon.in');
+  });
+
+  test('a retailer we have no deal with goes out exactly as it came in', () {
+    // FirstCry is still commented out in kPartnerTags, so it is the honest
+    // "untagged retailer" case now: nothing added, nothing changed.
+    final uri = Uri.parse('https://www.firstcry.com/search?q=baby+lotion');
     expect(tagged(uri).toString(), uri.toString());
+    expect(retailerOf(uri), isNull);
   });
 
   test('an unknown host is never touched', () {

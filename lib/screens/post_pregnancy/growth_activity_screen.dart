@@ -42,7 +42,7 @@ const GrowthActivity kActPeekaboo = GrowthActivity(
   eyebrow: 'Grow · 5 min',
   title: 'Peekaboo, slow and silly',
   why:
-      "Leap 4 is all about cause and effect. Hiding your face and reappearing teaches {child} that you still exist when you vanish - the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
+      "This phase is all about cause and effect. Hiding your face and reappearing teaches {child} that you still exist when you vanish - the very first seed of object permanence, and a gentle antidote to this month's clinginess.",
   steps: [
     'Cover your face with your hands, or a light muslin cloth.',
     'Pause a beat - let him wonder where you went.',

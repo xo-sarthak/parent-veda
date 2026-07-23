@@ -113,7 +113,12 @@ extension BrandSlotX on BrandSlot {
         BrandSlot.nativeDiscovery ||
         BrandSlot.productSampling =>
           true,
-        BrandSlot.sponsoredNotification => false, // needs the notification seam
+        // The notification seam exists now (NotificationService), and delivery
+        // runs through BrandNotifications with a configurable minimum gap
+        // between any two sponsored notifications. Still the most restrained
+        // slot in the system: pushed, frequency-capped, and only ever sent to a
+        // parent it is genuinely relevant to.
+        BrandSlot.sponsoredNotification => true,
       };
 }
 

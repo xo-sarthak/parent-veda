@@ -87,12 +87,31 @@ void main() {
     expect(BrandStudio.instance.resolve(BrandSlot.launchHub, _ctx()), isNull);
   });
 
-  test('a campaign targeting an unbuilt slot never resolves', () {
-    // Sold-but-unbuilt placements must not render a half-finished surface.
-    // sponsoredNotification has no host yet (the notification seam is Phase 4).
-    BrandStudio.instance.setCampaigns([_campaign(slot: BrandSlot.sponsoredNotification)]);
-    expect(BrandStudio.instance.resolve(BrandSlot.sponsoredNotification, _ctx()), isNull);
-    expect(BrandSlot.sponsoredNotification.isLive, isFalse);
+  test('the sponsored-notification slot is live and targets correctly', () {
+    // Was the last unbuilt slot; now built (BrandNotifications + the demo
+    // campaign). Being LIVE does not mean being loose: a pushed notification
+    // must still reach only a parent it targets.
+    expect(BrandSlot.sponsoredNotification.isLive, isTrue);
+
+    // Targeted at breastfeeding — resolves for a matching parent...
+    BrandStudio.instance.setCampaigns([
+      _campaign(
+        slot: BrandSlot.sponsoredNotification,
+        audience: const BrandAudience(anySignal: {'breastfeeding'}),
+      ),
+    ]);
+    expect(
+      BrandStudio.instance.resolve(BrandSlot.sponsoredNotification,
+          _ctx(signals: {'breastfeeding'})),
+      isNotNull,
+    );
+    // ...and NOT for a parent who never said so.
+    expect(
+      BrandStudio.instance.resolve(BrandSlot.sponsoredNotification, _ctx()),
+      isNull,
+      reason: 'a pushed notification to an untargeted parent is exactly the '
+          'thing this slot must never do',
+    );
   });
 
   test('the research surfaces are live, and their hard rules still hold', () {
@@ -163,10 +182,8 @@ void main() {
     BrandStudio.instance.enabled = false;
     expect(BrandStudio.instance.resolve(BrandSlot.premiere, _ctx()), isNull);
     BrandStudio.instance.enabled = true;
-
-    // ...nor an unbuilt surface.
-    BrandStudio.instance.setCampaigns([_campaign(slot: BrandSlot.sponsoredNotification)]);
-    expect(BrandStudio.instance.resolve(BrandSlot.sponsoredNotification, _ctx()), isNull);
+    // (The old "nor an unbuilt surface" check retired here — every slot is
+    // built now, so there is no unbuilt surface left to demo-reveal.)
   });
 
   test('every blocked campaign explains itself in a sentence', () {

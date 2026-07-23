@@ -156,7 +156,7 @@ class MyChildJournalScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: Colors.white, border: Border.all(color: const Color(0xFFECE5F2)), borderRadius: BorderRadius.circular(20)),
               child: Text(
-                  "Third night waking again at 2am. Reminding myself: it's the leap, not us. Writing it down so future-me remembers we got through it.",
+                  "Third night waking again at 2am. Reminding myself: it's the phase, not us. Writing it down so future-me remembers we got through it.",
                   style: ppBody(14, color: ppInk, h: 1.6)),
             )),
           ],

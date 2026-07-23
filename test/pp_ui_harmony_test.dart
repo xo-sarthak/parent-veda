@@ -130,8 +130,13 @@ void main() {
 //  identical to one that was never asked for.
 // =============================================================================
 void julyReviewTests() {
-  testWidgets('My Child home: the tip sits ABOVE the leap video', (tester) async {
-    tester.view.physicalSize = const Size(1170, 2532);
+  testWidgets('My Child home: the tip sits ABOVE the phase video', (tester) async {
+    // A TALL viewport (2000 logical px), not a phone-sized one. This is an
+    // ordering assertion, and in a ListView only what is on screen is built —
+    // on a 844pt screen the tip and the video cannot both be laid out, so
+    // scrolling to one drops the other out of the tree. Height here is a test
+    // fixture, not a claim about any real device.
+    tester.view.physicalSize = const Size(1170, 6000);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
@@ -139,7 +144,7 @@ void julyReviewTests() {
     await tester.pumpAndSettle();
 
     final tip = tester.getTopLeft(find.text("TODAY'S PARENTING TIP")).dy;
-    final video = tester.getTopLeft(find.text('The leap, in a video')).dy;
+    final video = tester.getTopLeft(find.text('This phase, in a video')).dy;
     expect(tip, lessThan(video),
         reason: 'the tip was moved above the video in the 17-18 July review');
   });
@@ -172,12 +177,12 @@ void julyReviewTests() {
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(
-      find.text('About this leap'),
+      find.text('About this phase'),
       300,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 40,
     );
-    expect(find.text('About this leap'), findsOneWidget);
+    expect(find.text('About this phase'), findsOneWidget);
     // And the way out to Ask Veda for anything the three do not cover.
     expect(find.text('Ask Veda anything else'), findsOneWidget);
   });

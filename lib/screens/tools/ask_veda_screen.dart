@@ -42,6 +42,8 @@ import 'contraction_tracker_screen.dart';
 import 'ready_for_birth_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
+import '../../ask_veda_config.dart';
+import '../../services/remote/ask_veda_service.dart';
 
 // ---- design palette (the "Ask Veda Results" mock - our brand purple/coral) ----
 const _vBgTop = Color(0xFFF8F4FD);
@@ -87,6 +89,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   // (suggestions) view with the search pill at the bottom.
   String? _query;
   VedaResult? _result;
+  String? _ragAnswer; // grounded answer from the AskVeda backend (if confident)
 
   // A fresh, shuffled subset of each section's suggestions per visit.
   final _rng = Random();
@@ -129,18 +132,36 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     FocusScope.of(context).unfocus();
     setState(() {
       _query = t;
-      _result = vedaAnswer(t, p);
+      _result = vedaAnswer(t, p); // offline: instant, all 7 sections
+      _ragAnswer = null; // drop any previous grounded answer
       _ctrl.clear();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) _scroll.jumpTo(0);
     });
+    _fetchRag(t); // async: swap in the grounded backend answer when it arrives
+  }
+
+  // Ask the AskVeda RAG backend in the background. The offline answer already
+  // shows instantly; if the backend returns a CONFIDENT answer we swap it into
+  // the "Veda Answer" section. On any failure / low-confidence we keep offline.
+  Future<void> _fetchRag(String q) async {
+    if (!AskVedaConfig.enabled) return;
+    // NO domain gating — she may ask about anything. Her week goes along as
+    // CONTEXT so the answer is framed in the right tense (past for what's behind
+    // her, future for what's still ahead).
+    final res = await AskVedaService.ask(q, week: p.currentWeek);
+    if (!mounted || _query != q) return; // ignore stale / superseded replies
+    if (res != null && res.isConfident) {
+      setState(() => _ragAnswer = res.answer);
+    }
   }
 
   void _clearQuery() {
     setState(() {
       _query = null;
       _result = null;
+      _ragAnswer = null;
       _ctrl.clear();
     });
   }
@@ -550,6 +571,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     } else {
       // The honest "I don't have a confident answer yet" case.
       children = [_plainAnswerCard(r.answer, s), _disclaimer(s)];
+    }
+    // AskVeda RAG: a confident grounded answer takes the S1 slot. In every path
+    // above, children[0] is the "Veda Answer" card — so we swap only that one,
+    // leaving the offline supporting sections (S2–S6) untouched beneath it.
+    if (_ragAnswer != null) {
+      children[0] = _plainAnswerCard(_ragAnswer!, s, grounded: true);
     }
     return ListView(
       key: const ValueKey('result'),
@@ -1455,7 +1482,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // ---- non-showcase fallback: plain Veda answer + source cards --------------
-  Widget _plainAnswerCard(String answer, S s) => _card(
+  Widget _plainAnswerCard(String answer, S s, {bool grounded = false}) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
         gradient: const LinearGradient(
@@ -1470,6 +1497,13 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 style: GoogleFonts.manrope(
                     fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
+            // A small verified tick when this answer came (grounded) from the
+            // AskVeda backend rather than the offline engine.
+            if (grounded)
+              const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: Icon(Icons.verified_rounded, size: 16, color: _vPurple2),
+              ),
             _speakerButton(s),
           ]),
           const SizedBox(height: 13),

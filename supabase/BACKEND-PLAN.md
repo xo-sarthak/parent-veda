@@ -230,6 +230,26 @@ six before either parent swiped. Also fixed: `babyNameByName('')` falls back to
 the first catalogue entry, so an uncrowned parent was shown a stranger's name
 under "Your favourite", and the header read "You & Ravi" — an invented partner.
 
+### `0028_profile_events.sql` — the analytics sink (write-only)
+Behavioural events from the progressive-profiling strips on BOTH sides of the
+app. A NEW RLS shape: **insert-only, never readable.**
+- **No `user_id`** — keyed to an anonymous `install_id` (pre-auth); join to a
+  real user server-side later.
+- **INSERT** granted to `anon` AND `authenticated` (the strips run logged-out).
+- **SELECT/UPDATE/DELETE**: no policy at all → RLS denies them. Reads happen
+  only from the dashboard under `service_role` (bypasses RLS).
+- Two gotchas that would fail at runtime: `bigserial` needs `grant usage on
+  sequence …_id_seq` or the insert's `nextval()` is denied; and the client must
+  NOT chain `.select()` (uses `return=minimal`), else PostgREST needs SELECT and
+  the insert-only contract breaks the call.
+
+Client: seam already existed. `SupabaseProfileSink`
+(`lib/services/remote/supabase_profile_sink.dart`) implements the backend-blind
+`ProfileAnalyticsSink`; `SupabaseRepo.fireEvent` is a fire-and-forget insert
+with no `user_id` and no row read-back; wired in `main.dart` with one
+`setSink(const SupabaseProfileSink())`. `meta` is stripped (no such column;
+enum labels only, so no free text leaks).
+
 ### Light (Tier 2) stores — NO migration needed
 `DevStore`, `FoodStore`, `WatchStore`, `ReadingStore`, `RecoStore`,
 `YogaStore`, `NameMatchStore` now use `CloudSyncedStore` over the existing

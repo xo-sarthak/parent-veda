@@ -159,6 +159,22 @@ class SupabaseRepo {
         .eq(column, value);
   }
 
+  /// Fire-and-forget insert for a WRITE-ONLY table, with NO `user_id` attached
+  /// and NO row read back. For the analytics sink (`profile_events`, 0028):
+  ///   * the table has no user_id - it is keyed to an anonymous install_id;
+  ///   * it must accept inserts while logged OUT (the anon role), so this does
+  ///     not gate on `isLoggedIn` the way [insert] does;
+  ///   * it never chains `.select()`, so the insert uses `return=minimal` and
+  ///     doesn't try to read the new row back (which the insert-only RLS would
+  ///     refuse anyway - see 0028).
+  /// Returns immediately; the write happens in the background and every error,
+  /// sync or async, is swallowed. Analytics must never block or break a session.
+  static void fireEvent(String table, Map<String, dynamic> row) {
+    try {
+      _client.from(table).insert(row).then((_) {}, onError: (_) {});
+    } catch (_) {/* Supabase not ready / offline - drop the event silently */}
+  }
+
   /// Call a Postgres function and return its rows as a list.
   ///
   /// Used where the ANSWER must be computed server-side rather than assembled

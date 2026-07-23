@@ -36,6 +36,9 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
   /// Demo mode — relaxes targeting + caps so every placement is visible.
   /// Persisted so it survives a restart while someone is evaluating the app.
   bool _demoMode = false;
+  /// When the last sponsored NOTIFICATION was sent, across all campaigns. The
+  /// global frequency gap keys off this — see BrandNotifications. Null = never.
+  DateTime? _lastNotificationAt;
   bool get demoMode => _demoMode;
   set demoMode(bool v) {
     if (_demoMode == v) return;
@@ -64,6 +67,7 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
   int impressions(String campaignId) => _impressions[campaignId] ?? 0;
   bool completed(String campaignId) => _completed.contains(campaignId);
   bool dismissed(String campaignId) => _dismissed.contains(campaignId);
+  DateTime? get lastNotificationAt => _lastNotificationAt;
 
   // ---- writes ---------------------------------------------------------------
   void recordImpression(String campaignId) {
@@ -79,6 +83,12 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
     if (_dismissed.add(campaignId)) _save();
   }
 
+  /// Stamp a sponsored notification as just sent — starts the global gap.
+  void markNotificationSent(DateTime at) {
+    _lastNotificationAt = at;
+    _save();
+  }
+
   /// Test/debug only — lets a QA build replay a campaign.
   @visibleForTesting
   void resetAll() {
@@ -86,6 +96,7 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
     _completed.clear();
     _dismissed.clear();
     _demoMode = false;
+    _lastNotificationAt = null;
     _save();
   }
 
@@ -104,6 +115,7 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
         'completed': _completed.toList(),
         'dismissed': _dismissed.toList(),
         'demoMode': _demoMode,
+        'lastNotificationAt': _lastNotificationAt?.toIso8601String(),
       };
 
   void _apply(Map j) {
@@ -117,6 +129,8 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
       ..clear()
       ..addAll(((j['dismissed'] as List?) ?? const []).map((e) => '$e'));
     _demoMode = (j['demoMode'] as bool?) ?? false;
+    final ln = j['lastNotificationAt'] as String?;
+    _lastNotificationAt = ln == null ? null : DateTime.tryParse(ln);
   }
 
   Future<void> _save() async {

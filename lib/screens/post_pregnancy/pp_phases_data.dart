@@ -37,6 +37,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import 'pp_common.dart'; // ppPurple - the one brand colour every phase uses
 
 /// The five developmental domains AAP/CDC organise milestones under. We use the
 /// same five so our content maps cleanly onto the clinical checklists.
@@ -162,11 +163,28 @@ class AgePhase {
       milestones.where((m) => m.domain == d).toList();
 }
 
-const Color _c1 = Color(0xFF7A5AA8);
-const Color _c2 = Color(0xFF4A7BC8);
-const Color _c3 = Color(0xFF3E9A8C);
-const Color _c4 = Color(0xFFC98A2B);
-const Color _c5 = Color(0xFFCB6F94);
+// PHASE ACCENTS - all ParentVeda purple, on purpose.
+//
+// A five-step palette that shifted the app's colour as the child grew was
+// trialled here (purple -> blue -> teal -> amber -> rose, kept below). It was
+// rejected: the parenting app is purple, and a hero card turning blue at three
+// months reads as a bug, not as a new chapter. Brand colour is not content, so
+// it is not something a phase gets to personalise.
+//
+// Every phase now points at ppPurple. The `accent` field stays because screens
+// consume it; changing these five constants is how the palette comes back.
+const Color _c1 = ppPurple;
+const Color _c2 = ppPurple;
+const Color _c3 = ppPurple;
+const Color _c4 = ppPurple;
+const Color _c5 = ppPurple;
+
+// The rejected growing-child palette, kept for revert:
+// const Color _c1 = Color(0xFF7A5AA8);  // purple
+// const Color _c2 = Color(0xFF4A7BC8);  // blue
+// const Color _c3 = Color(0xFF3E9A8C);  // teal
+// const Color _c4 = Color(0xFFC98A2B);  // amber
+// const Color _c5 = Color(0xFFCB6F94);  // rose
 
 const List<AgePhase> kPhases = [
   // ---- 1 ------------------------------------------------------------------

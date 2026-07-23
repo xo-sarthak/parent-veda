@@ -24,6 +24,8 @@ import 'parenting_veda.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
+import '../../ask_veda_config.dart';
+import '../../services/remote/ask_veda_service.dart';
 
 // ---- design palette (identical to the pregnancy Ask Veda) --------------------
 const _vBgTop = Color(0xFFF8F4FD);
@@ -63,6 +65,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   String? _query;
   VedaAnswerView? _answer;
+  String? _ragAnswer;       // the grounded answer from the AskVeda backend (if any)
+  bool _ragLoading = false; // true while /ask is in flight
   final Map<String, List<String>> _picked = {};
 
   // Stage-wise suggestions (icons, not emojis).
@@ -129,17 +133,42 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     FocusScope.of(context).unfocus();
     setState(() {
       _query = t;
-      _answer = parentingVedaAnswer(t);
+      _answer = parentingVedaAnswer(t); // offline: instant, all 7 sections
+      _ragAnswer = null; // drop any previous grounded answer
+      _ragLoading = AskVedaConfig.enabled; // subtle "thinking" until /ask replies
       _ctrl.clear();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) _scroll.jumpTo(0);
+    });
+    _fetchRag(t); // async: swap in the grounded backend answer when it arrives
+  }
+
+  // Ask the AskVeda RAG backend in the background. The offline answer already
+  // shows instantly; if the backend returns a CONFIDENT answer we swap it in.
+  // On any failure (or a low-confidence reply) we simply keep the offline one.
+  Future<void> _fetchRag(String q) async {
+    if (!AskVedaConfig.enabled) return;
+    // NO domain gating — one mother, one journey. She may ask about anything,
+    // including her pregnancy. We send her child's age as CONTEXT so the answer
+    // is framed in the right tense ("during your pregnancy…" rather than talking
+    // as if she were still expecting).
+    final res = await AskVedaService.ask(
+      q,
+      childAgeMonths: ChildProfileStore.instance.ageInMonths,
+    );
+    if (!mounted || _query != q) return; // ignore stale / superseded replies
+    setState(() {
+      _ragLoading = false;
+      if (res != null && res.isConfident) _ragAnswer = res.answer;
     });
   }
 
   void _clearQuery() => setState(() {
         _query = null;
         _answer = null;
+        _ragAnswer = null;
+        _ragLoading = false;
         _ctrl.clear();
       });
 
@@ -349,7 +378,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       controller: _scroll,
       padding: const EdgeInsets.fromLTRB(18, 78, 18, 112),
       children: [
-        _answerCard(v.answer),
+        _answerCard(_ragAnswer ?? v.answer, grounded: _ragAnswer != null, loading: _ragLoading),
         _meaning(v),
         if (v.actions.isNotEmpty) _actions(v),
         if (v.content.isNotEmpty) _content(v),
@@ -407,7 +436,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // S1 - Veda Answer
-  Widget _answerCard(String answer) => _card(
+  Widget _answerCard(String answer, {bool grounded = false, bool loading = false}) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
         gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFFCFAFF)]),
@@ -417,6 +446,18 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const SizedBox(width: 9),
             Text('Veda Answer', style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
+            // While the backend is answering: a subtle spinner. Once a grounded
+            // answer has swapped in: a small verified tick.
+            if (loading)
+              const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
+              )
+            else if (grounded)
+              const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: Icon(Icons.verified_rounded, size: 16, color: _vPurple2),
+              ),
             _speakerButton(),
           ]),
           const SizedBox(height: 13),

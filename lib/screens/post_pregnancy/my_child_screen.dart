@@ -39,6 +39,8 @@ import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
 import 'phase_detail_screen.dart';
 import 'phase_map_screen.dart';
+import '../../brand/brand_models.dart';
+import '../../brand/brand_notifications.dart';
 import 'pp_phases_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
@@ -68,6 +70,21 @@ class MyChildScreen extends StatefulWidget {
 class _MyChildScreenState extends State<MyChildScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _leapExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Opening the parenting home is a natural moment to consider a sponsored
+    // notification. maybeSend does all the deciding — targeting, the frequency
+    // gap, the cap — and sends nothing far more often than it sends. Only from
+    // the real home (home: true), never a pushed sub-view, and never in a test
+    // (the widget tests pump this screen constantly).
+    if (widget.home) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        BrandNotifications.instance.maybeSend(stage: BrandStage.parenting);
+      });
+    }
+  }
   /// Which FAQ is open (-1 = none). One at a time keeps the card short.
   int _faqOpen = -1;
 
@@ -76,6 +93,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
   // 18px side padding, matching the pregnancy home (fromLTRB(18,…,18,…)). The
   // parenting home used 24, which made its cards visibly narrower side by side.
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: c);
+
+  // Hero gradient end + warm bloom, both lifted from the pregnancy hero so the
+  // two cards read as one product: AppTheme.primary700 and secondary300.
+  static const Color _heroDeep = Color(0xFF502489);
+  static const Color _heroWarm = Color(0xFFFF9CAF);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
   @override
@@ -104,10 +126,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   // Explore icons, exactly like the pregnancy home.
                   _pad(_brandHeader()),
                   const SizedBox(height: 16),
-                  // The "How <name> is today" heading now lives INSIDE the hero
-                  // as a greeting line (like the pregnancy hero's "Good morning"
-                  // sits inside its card), saving the whole page-level lead that
-                  // used to sit above. The video still keeps its own lead below.
+                  // "HOW <NAME> IS TODAY" labels the hero from OUTSIDE the card,
+                  // exactly as "WEEKLY SNAPSHOT" does on the pregnancy home
+                  // (home_screen_b.dart) — same eyebrow, same 8px gap, same
+                  // uppercase purple. It was briefly folded inside the card as a
+                  // greeting line; out here it reads as a section label, and the
+                  // uppercasing also solves the unnamed case, where the name
+                  // falls back to "Your baby" and produced "How Your baby is
+                  // today" with a stray capital mid-sentence.
+                  _pad(_heroEyebrow()),
+                  const SizedBox(height: 8),
                   _leapHero(phase),
                   const SizedBox(height: 22),
                   // Today's Parenting Tip now sits ABOVE the video: a narrow,
@@ -179,7 +207,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // wordmark always shows in full rather than sharing free space with the
       // Spacer and truncating. The smaller icons opposite leave room for it.
       Text('ParentVeda',
-          style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+          style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
       const Spacer(),
       _headerIcon(Icons.search_rounded, () => _push(const RecoSearchScreen())),
       const SizedBox(width: 8),
@@ -215,7 +243,261 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  MultiChildSheet's own header always described ("tap Aarav ▾") and which
   //  had gone missing from the app entirely.
   // =========================================================================
+  // ===========================================================================
+  //  Hero — rebuilt 21 Jul against the pregnancy hero (_heroCard, home_screen_b)
+  // ---------------------------------------------------------------------------
+  //  Fixes the three faults called out on the old one (kept below as
+  //  _leapHeroLegacy):
+  //
+  //  1. THE PHASE NAME NOW HAS ONE HOME. It used to trail the age line ("3
+  //     months · Hands discovered") and repeat on the journey row. Here the
+  //     identity line carries the AGE ONLY, and the phase owns the block below
+  //     it — number, name, tagline — so it is stated once, properly.
+  //
+  //  2. THE JOURNEY BAR SAYS WHAT IT IS. A lone dot on a Birth→5 years track
+  //     answered "how far" but never "through what". It now names the phase, its
+  //     position ("Phase 4 of 20"), and what the phase means (phase.tagline) —
+  //     and the track carries a tick per phase, so the road has stops on it
+  //     rather than being a bare line.
+  //
+  //  3. IT IS LIGHTER. The gradient no longer darkens the accent toward black
+  //     (which muddied the purple); it runs ppPurple → _heroDeep, the same
+  //     primary500 → primary700 move the pregnancy hero makes. A warm pink
+  //     bloom is borrowed from that hero too — it is what stops a purple block
+  //     reading as flat. Growth is separated by a HAIRLINE instead of a black
+  //     inset panel, which is what made the card feel bottom-heavy.
+  // ===========================================================================
   Widget _leapHero(AgePhase phase) {
+    final e = _child.expected;
+    const w70 = Color(0xB3FFFFFF);
+    return _pad(Container(
+      decoration: BoxDecoration(
+        // Purple → deeper purple. No black: mixing toward black greys a
+        // saturated purple out, which is exactly how the old card went muddy.
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [ppPurple, _heroDeep],
+        ),
+        borderRadius: BorderRadius.circular(ppCardRadius),
+        boxShadow: ppCardShadow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(children: [
+        Positioned(
+          right: -36,
+          top: -36,
+          child: _bloom(150, Colors.white.withValues(alpha: 0.10)),
+        ),
+        // The warm one. Straight from the pregnancy hero (secondary300 @ 25%),
+        // and the single biggest reason that card looks alive and this one did
+        // not — a purple block lit only by white blooms stays flat.
+        Positioned(
+          right: 26,
+          bottom: -42,
+          child: _bloom(104, _heroWarm.withValues(alpha: 0.24)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // ---- identity: photo, name, AGE ONLY ---------------------------
+            Row(children: [
+              GestureDetector(
+                onTap: () => showMultiChildSheet(context),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 2),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: const PpStriped(height: 56),
+                ),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  GestureDetector(
+                    onTap: () => showMultiChildSheet(context),
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Flexible(
+                        child: Text(_child.name,
+                            style: ppFraunces(25, color: Colors.white, h: 1.05),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: w70),
+                    ]),
+                  ),
+                  const SizedBox(height: 3),
+                  // Age only. The phase moved to its own block below.
+                  Text(phase.ageLabel,
+                      style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ]),
+              ),
+            ]),
+
+            const SizedBox(height: 18),
+            _phaseJourney(phase),
+
+            // ---- growth, separated by a hairline (was a black inset panel) --
+            const SizedBox(height: 16),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
+            const SizedBox(height: 14),
+            Row(children: [
+              Text('GROWTH', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+              const Spacer(),
+              _heroAction(Icons.edit_outlined, 'Edit', _openGrowthEdit),
+              const SizedBox(width: 14),
+              _heroAction(Icons.show_chart_rounded, 'Chart', () => _push(const GrowthJourneyScreen())),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(child: _heroStat('Weight', _m(_child.weightKg, 1), 'kg', '~${e.weightKg.toStringAsFixed(1)}')),
+              Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
+              Expanded(child: _heroStat('Height', _m(_child.heightCm, 0), 'cm', '~${e.heightCm.toStringAsFixed(0)}')),
+              Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
+              Expanded(child: _heroStat('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
+            ]),
+          ]),
+        ),
+      ]),
+    ));
+  }
+
+  Widget _bloom(double d, Color c) =>
+      Container(width: d, height: d, decoration: BoxDecoration(shape: BoxShape.circle, color: c));
+
+  // ===========================================================================
+  //  Phase journey — the phase, where it sits, and what it means
+  // ---------------------------------------------------------------------------
+  //  The old bar (kept as _phaseJourneyLegacy) drew a dot on an unmarked track.
+  //  This one answers the three questions a parent actually has: which phase is
+  //  he in, how far through the whole road is that, and what does this phase
+  //  mean. The tagline is the part that was missing entirely — every AgePhase
+  //  has carried one all along ("The world gets interesting") and nothing on
+  //  this screen ever showed it.
+  // ===========================================================================
+  Widget _phaseJourney(AgePhase phase) {
+    const w70 = Color(0xB3FFFFFF);
+    final progress = journeyProgress(_child);
+    final next = nextPhase(_child);
+    final idx = kPhases.indexWhere((p) => p.number == phase.number);
+
+    return GestureDetector(
+      onTap: () => _push(const PhaseMapScreen()),
+      behavior: HitTestBehavior.opaque,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text('PHASE ${idx + 1} OF ${kPhases.length}',
+              style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          const Spacer(),
+          Text('Phase map', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+          const Icon(Icons.chevron_right_rounded, size: 15, color: w70),
+        ]),
+        const SizedBox(height: 6),
+        // The phase, stated once, at a size that says it matters.
+        Text(phase.name,
+            style: ppJakarta(16, color: Colors.white),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis),
+        const SizedBox(height: 3),
+        Text(phase.tagline,
+            style: ppBody(12, color: Colors.white.withValues(alpha: 0.82), h: 1.35),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis),
+        const SizedBox(height: 13),
+        // The track, now with a tick per phase — the road has stops on it.
+        LayoutBuilder(builder: (context, c) {
+          final x = (c.maxWidth - 14) * progress;
+          return SizedBox(
+            height: 14,
+            child: Stack(clipBehavior: Clip.none, children: [
+              Positioned(
+                left: 0, right: 0, top: 6,
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(999)),
+                ),
+              ),
+              // One faint tick per phase, so the bar reads as twenty stages
+              // rather than an unmarked five-year smear.
+              for (var i = 0; i < kPhases.length; i++)
+                Positioned(
+                  left: 7 + (c.maxWidth - 14) * (i / (kPhases.length - 1)) - 0.5,
+                  top: 4,
+                  child: Container(width: 1, height: 7, color: Colors.white.withValues(alpha: 0.30)),
+                ),
+              Positioned(
+                left: 0, top: 6,
+                child: Container(
+                  width: x + 7,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(999)),
+                ),
+              ),
+              Positioned(
+                left: x,
+                top: 0,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: ppPurple, width: 3)),
+                ),
+              ),
+            ]),
+          );
+        }),
+        const SizedBox(height: 7),
+        Row(children: [
+          Text('Birth', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+          const Spacer(),
+          Text('5 years', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 9),
+        Row(children: [
+          Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+                next != null
+                    ? 'Next: ${next.name.toLowerCase()}, around ${next.ageLabel}.'
+                    : 'The last stretch before school.',
+                style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.9)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
+        ]),
+      ]),
+    );
+  }
+
+  // SUPERSEDED 21 Jul by the _leapHero below. Kept, unmounted, for revert.
+  // Three things were wrong with it, all visible on screen:
+  //   1. the phase name had no home — it sat as a suffix on the age line AND
+  //      again on the journey row, so it read as scattered rather than stated;
+  //   2. the journey bar showed a dot on a Birth→5 years track with no sense of
+  //      which phase, of how many, or what the phase actually means;
+  //   3. it looked heavy: the gradient darkened the accent toward BLACK, and
+  //      the growth block was a black 16% panel inset into it. The pregnancy
+  //      hero goes purple→purple (primary500→primary700), adds a warm pink
+  //      bloom for lift, and separates its sections with a hairline instead of
+  //      a dark box. Same brand, two different moods.
+  // ignore: unused_element
+  Widget _leapHeroLegacy(AgePhase phase) {
     final a = phase.accent;
     final e = _child.expected;
     const w70 = Color(0xB3FFFFFF); // white @70%, for hairlines / secondary text
@@ -246,19 +528,10 @@ class _MyChildScreenState extends State<MyChildScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 15, 18, 16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Greeting line — the old page-level "How <name> is today" heading,
-        // folded in here to save space (the pregnancy hero greets the same way).
-        Row(children: [
-          const Icon(Icons.wb_sunny_rounded, size: 14, color: Colors.white),
-          const SizedBox(width: 7),
-          Expanded(
-            child: Text('How ${_child.name} is today',
-                style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.88), w: FontWeight.w700),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis),
-          ),
-        ]),
-        const SizedBox(height: 13),
+        // The "How <name> is today" line moved OUT of this card and above it,
+        // as a page-level eyebrow — see _heroEyebrow(). It matches the pregnancy
+        // home, where "WEEKLY SNAPSHOT" labels the hero from outside rather than
+        // greeting from within.
         // ---- identity + leap (removed: "LIVE NOW", the "Curious Explorer"
         //      character line, the storm→sun progress bar and its status
         //      sentence — none carried real information) ---------------------
@@ -296,7 +569,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               ),
               const SizedBox(height: 3),
               Text('${phase.ageLabel} · ${phase.name}',
-                  style: ppBody(12, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w600),
+                  style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
             ]),
@@ -327,7 +600,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         // one thing a Wonder-Weeks parent cares about most — fussy leap now, or
         // a calm stretch between leaps.
         const SizedBox(height: 15),
-        _phaseJourney(phase),
+        _phaseJourneyLegacy(phase),
 
         // ---- growth, folded into the hero ------------------------------------
         // REVISED 18 Jul: growth stays INSIDE the hero card but reads as its own
@@ -344,7 +617,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Text('GROWTH', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+              Text('GROWTH', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
               const Spacer(),
               _heroAction(Icons.edit_outlined, 'Edit', _openGrowthEdit),
               const SizedBox(width: 14),
@@ -405,7 +678,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       onTap: () => _push(const LeapCalendarScreen()),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('LEAP JOURNEY', style: ppBody(9.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          Text('LEAP JOURNEY', style: ppBody(10.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
           Text('Leap ${leap.number} of $total', style: ppBody(11, color: ppPurple, w: FontWeight.w800)),
         ]),
@@ -422,7 +695,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           Container(width: 6, height: 6, decoration: BoxDecoration(color: state, shape: BoxShape.circle)),
           const SizedBox(width: 7),
           Expanded(
-            child: Text(status, style: ppBody(12, color: ppSoft, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+            child: Text(status, style: ppBody(12.5, color: ppSoft, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
           const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
         ]),
@@ -469,7 +742,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  not which numbered stop he is standing at.
   //
   //  Tapping opens the full phase map.
-  Widget _phaseJourney(AgePhase phase) {
+  // SUPERSEDED 21 Jul by the _phaseJourney below. Kept, unmounted, for revert.
+  // ignore: unused_element
+  Widget _phaseJourneyLegacy(AgePhase phase) {
     const w70 = Color(0xB3FFFFFF);
     final progress = journeyProgress(_child);
     final next = nextPhase(_child);
@@ -486,10 +761,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('HIS JOURNEY', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          Text('HIS JOURNEY', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
+          // The PHASE, not the age. The identity row above already carries
+          // "<age> · <phase>", so repeating ageLabel here said "3 months" twice
+          // in one card and never named the phase in full. This bar tracks
+          // progress through the phases, so the phase is what should label it.
           Flexible(
-            child: Text(phase.ageLabel,
+            child: Text(phase.name,
                 style: ppBody(10.5, color: Colors.white, w: FontWeight.w800),
                 maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
@@ -546,9 +825,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
         }),
         const SizedBox(height: 7),
         Row(children: [
-          Text('Birth', style: ppBody(9, color: w70, w: FontWeight.w700)),
+          Text('Birth', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
           const Spacer(),
-          Text('5 years', style: ppBody(9, color: w70, w: FontWeight.w700)),
+          Text('5 years', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
         ]),
         const SizedBox(height: 9),
         Row(children: [
@@ -590,7 +869,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('LEAP JOURNEY', style: ppBody(9, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          Text('LEAP JOURNEY', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
           Text('Leap ${leap.number} of $total', style: ppBody(10.5, color: Colors.white, w: FontWeight.w800)),
           // Makes it evident the whole bar is tappable — opens the full timeline.
@@ -648,7 +927,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(label.toUpperCase(),
-              style: ppBody(8.5, color: Colors.white.withValues(alpha: 0.7), w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+              style: ppBody(10.5, color: Colors.white.withValues(alpha: 0.7), w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
           const SizedBox(height: 5),
           Text.rich(
             TextSpan(children: [
@@ -659,7 +938,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
-          Text('exp $expected', style: ppBody(9.5, color: Colors.white.withValues(alpha: 0.65)), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('exp $expected', style: ppBody(10.5, color: Colors.white.withValues(alpha: 0.65)), maxLines: 1, overflow: TextOverflow.ellipsis),
         ],
       );
 
@@ -685,7 +964,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           Row(children: [
             Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Text('LIVE NOW', style: ppBody(9.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w700).copyWith(letterSpacing: 1.0)),
+            Text('LIVE NOW', style: ppBody(10.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w700).copyWith(letterSpacing: 1.0)),
             Expanded(
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Flexible(child: Text('Read about this leap', style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
@@ -808,18 +1087,18 @@ class _MyChildScreenState extends State<MyChildScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(label.toUpperCase(),
-              style: ppBody(8.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+              style: ppBody(10.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
           const SizedBox(height: 5),
           Text.rich(
             TextSpan(children: [
-              TextSpan(text: value, style: ppJakarta(18)),
+              TextSpan(text: value, style: ppJakarta(19)),
               TextSpan(text: ' $unit', style: ppBody(10.5, color: ppSoft, w: FontWeight.w600)),
             ]),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
-          Text('exp $expected', style: ppBody(9.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('exp $expected', style: ppBody(10.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
         ],
       );
 
@@ -829,7 +1108,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     final e = _child.expected;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _pad(Row(children: [
-        Expanded(child: Text('Growth', style: ppJakarta(17))),
+        Expanded(child: Text('Growth', style: ppJakarta(16))),
         GestureDetector(
           onTap: _openGrowthEdit,
           behavior: HitTestBehavior.opaque,
@@ -867,7 +1146,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 14),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label.toUpperCase(), style: ppBody(9, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+          Text(label.toUpperCase(), style: ppBody(10.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
           const SizedBox(height: 8),
           Text.rich(
             TextSpan(children: [
@@ -883,6 +1162,26 @@ class _MyChildScreenState extends State<MyChildScreen> {
       );
 
   // =========================================================================
+  //  Hero eyebrow — the pregnancy home's "WEEKLY SNAPSHOT" treatment
+  // =========================================================================
+  //  Mirrors _sectionEyebrow in home_screen_b.dart exactly: Manrope 11.5 / w800
+  //  / 1.0 letter-spacing / uppercase / brand purple, nudged 4px in and 2px off
+  //  the card below it. Keeping the numbers identical is the point — this is the
+  //  one label both apps use to introduce their hero, so it must look like one
+  //  label, not two that happen to rhyme.
+  Widget _heroEyebrow() => Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 2),
+        child: Text('How ${_child.name} is today'.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.manrope(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+                color: ppPurple)),
+      );
+
+  // =========================================================================
   //  Daily tip
   // =========================================================================
   //  Tinted rather than white, the way the pregnancy HomeCard marks a
@@ -892,49 +1191,64 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  the tip title in quotes, the body as the one-line hook, and a full-width
   //  "Read more" button. It must read, unmistakably, as *today's tip*.
   //  Content unchanged: still whatever dailyTip() returns.
-  //  REVISED 18 Jul: it now sits ABOVE the video as a narrow, centred card —
-  //  70% of the width, everything centre-aligned, the tip clamped to two lines
-  //  with a quiet "Read more" underneath. It is a passing thought, not a
-  //  section, so it should take as little vertical space as it can.
+  //  REVISED 21 Jul: rebuilt as a FAITHFUL MATCH of the pregnancy home's
+  //  GrowModule (widgets/home/home_modules.dart), which carries the identical
+  //  "TODAY'S PARENTING TIP" eyebrow on that side. Every number below is copied
+  //  from HomeCard + GrowModule rather than approximated:
+  //
+  //    padding   20/18/20/20        (HomeCard)
+  //    eyebrow   icon 16 + 7 gap, labelSmall 11 / w800 / 1.1 tracking, accent
+  //    title     10 gap, headlineSmall = Jakarta 20 / w600, wrapped in quotes
+  //    body      12 gap, bodyLarge = Manrope 16 / w600 / 1.5 height
+  //    button    16 gap, FULL-WIDTH primary with trailing arrow
+  //
+  //  Two earlier versions were wrong in opposite directions: first 70% wide and
+  //  centred (adrift, and empty inside), then full-width but shrunk to 14.5/12.5
+  //  with a bare text link — still a footnote next to pregnancy's featured read.
+  //  The pregnancy card treats the daily tip as editorial. This is the same
+  //  content in the same role, so it gets the same weight.
   Widget _dailyTip() {
     final t = dailyTip();
-    return Center(
-      child: FractionallySizedBox(
-        widthFactor: 0.7,
-        child: ppCard(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Icon(Icons.eco_rounded, size: 14, color: ppPurple),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text('TODAY\'S PARENTING TIP',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: ppPurple)),
-              ),
-            ]),
-            const SizedBox(height: 8),
-            Text(t.title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
+    return _pad(ppCard(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.eco_rounded, size: 16, color: ppPurple),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text("TODAY'S PARENTING TIP",
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: ppBody(13.5, color: ppTitleInk, h: 1.4, w: FontWeight.w700)),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () => _openTipSheet(t),
-              behavior: HitTestBehavior.opaque,
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Read more', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: ppPurple)),
-                const SizedBox(width: 3),
-                const Icon(Icons.arrow_forward_rounded, size: 13, color: ppPurple),
-              ]),
-            ),
-          ]),
+                style: GoogleFonts.manrope(
+                    fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: ppPurple)),
+          ),
+        ]),
+        const SizedBox(height: 10),
+        // Quoted, exactly as GrowModule quotes its title.
+        Text('“${t.title}”', style: ppJakarta(20, w: FontWeight.w600)),
+        const SizedBox(height: 12),
+        Text(t.body, style: ppBody(16, color: ppInk, h: 1.5, w: FontWeight.w600)),
+        const SizedBox(height: 16),
+        // Full-width primary action — the pregnancy HomePrimaryButton, in pp
+        // purple. A quiet text link was the main reason this card read as minor.
+        GestureDetector(
+          onTap: () => _openTipSheet(t),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: double.infinity,
+            height: 48,
+            decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Read more',
+                  style: GoogleFonts.manrope(
+                      fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 0.2, color: Colors.white)),
+              const SizedBox(width: 7),
+              const Icon(Icons.arrow_forward_rounded, size: 17, color: Colors.white),
+            ]),
+          ),
         ),
-      ),
-    );
+      ]),
+    ));
   }
 
   void _openTipSheet(DailyTip t) => showModalBottomSheet<void>(
@@ -985,11 +1299,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
           child: Row(children: [
             const Icon(Icons.play_circle_outline_rounded, size: 16, color: ppPurple),
             const SizedBox(width: 7),
-            Expanded(child: Text('The leap, in a video', style: ppJakarta(16))),
+            Expanded(child: Text('This phase, in a video', style: ppJakarta(16))),
             GestureDetector(
               onTap: () => _push(WatchCategoryScreen(category: cat)),
               behavior: HitTestBehavior.opaque,
-              child: Text('More videos', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+              child: Text('More videos', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
             ),
           ]),
         ),
@@ -1009,7 +1323,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(v.title, style: ppJakarta(15.5)),
+              Text(v.title, style: ppJakarta(16)),
               const SizedBox(height: 6),
               Text('${v.durationLabel} · ${v.expert.name}', style: ppBody(12.5, color: ppMuted, h: 1.4)),
               const SizedBox(height: 12),
@@ -1102,9 +1416,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(domain.toUpperCase(), style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+                  Text(domain.toUpperCase(), style: ppBody(10.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
                   const SizedBox(height: 2),
-                  Text(stage, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(stage, style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
               const SizedBox(width: 10),
@@ -1206,7 +1520,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Flexible(child: Text(s.name, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Flexible(child: Text(s.name, style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 8),
                 // The section is now "what's next" only, so a NOW/NEXT tag says
                 // nothing. The area name is the useful label - it tells her
@@ -1216,7 +1530,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   child: Text(area.name.toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: ppBody(9, color: now ? ppCoral : const Color(0xFFC98A2B), w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
+                      style: ppBody(10.5, color: now ? ppCoral : const Color(0xFFC98A2B), w: FontWeight.w800).copyWith(letterSpacing: 0.5)),
                 ),
               ]),
               const SizedBox(height: 2),
@@ -1243,7 +1557,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return _pad(ppCarousel(
       accent: phase.accent,
       icon: Icons.shopping_bag_outlined,
-      title: 'Picks for this leap',
+      title: 'Picks for this phase',
       seeAll: 'View more',
       onSeeAll: () => _push(const RecommendationsScreen()),
       railHeight: 176,
@@ -1285,7 +1599,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return _pad(ppSectionCard(
       eyebrow: 'Questions parents ask',
       icon: Icons.help_outline_rounded,
-      title: 'About this leap',
+      title: 'About this phase',
       child: Column(children: [
         for (var i = 0; i < faqs.length; i++) ...[
           if (i > 0) ppRowDivider(),
@@ -1308,7 +1622,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text('Ask Veda anything else',
-                    style: ppBody(13.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
             ]),
@@ -1327,7 +1641,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         padding: const EdgeInsets.symmetric(vertical: 11),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Expanded(child: Text(f.question, style: ppJakarta(14))),
+            Expanded(child: Text(f.question, style: ppJakarta(15))),
             const SizedBox(width: 10),
             Icon(open ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 20, color: ppMuted),
           ]),
@@ -1425,7 +1739,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return _pad(ppCarousel(
       accent: phase.accent,
       icon: Icons.play_circle_outline_rounded,
-      title: 'Videos for this leap',
+      title: 'Videos for this phase',
       seeAll: 'View more',
       onSeeAll: () => _push(WatchCategoryScreen(category: cat)),
       railHeight: 180,
@@ -1457,9 +1771,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
     final reads = articlesInCollection(colId);
     if (reads.isEmpty) return const SizedBox.shrink();
     return _pad(ppCarousel(
-      accent: ppPurple,
+      accent: phase.accent,
       icon: Icons.menu_book_outlined,
-      title: 'Reads for this leap',
+      title: 'Reads for this phase',
       seeAll: 'View more',
       onSeeAll: () => _push(ReadingCollectionScreen(collection: readCollectionById(colId))),
       railHeight: 180,
@@ -1500,9 +1814,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('LOOKING AHEAD', style: ppBody(9.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
+              Text('LOOKING AHEAD', style: ppBody(10.5, color: ppMuted, w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
               const SizedBox(height: 3),
-              Text('${next.ageLabel} · ${next.name}', style: ppBody(13.5, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('${next.ageLabel} · ${next.name}', style: ppBody(13, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),
           const SizedBox(width: 10),
@@ -1547,7 +1861,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: ppJakarta(14.5)),
+                Text(title, style: ppJakarta(15)),
                 const SizedBox(height: 2),
                 Text(sub, style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
@@ -1604,7 +1918,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
                 const SizedBox(height: 16),
-                Text('Edit profile & growth', style: ppJakarta(18)),
+                Text('Edit profile & growth', style: ppJakarta(19)),
                 const SizedBox(height: 18),
                 _field('Name', nameCtl),
                 const SizedBox(height: 14),
@@ -1627,7 +1941,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                       const Icon(Icons.cake_outlined, size: 18, color: ppPurple),
                       const SizedBox(width: 12),
                       Expanded(child: Text('Date of birth', style: ppBody(14, color: ppInk, w: FontWeight.w600))),
-                      Text('${dob.day} ${_monthsShort[dob.month - 1]} ${dob.year}', style: ppBody(13.5, color: ppSoft)),
+                      Text('${dob.day} ${_monthsShort[dob.month - 1]} ${dob.year}', style: ppBody(13, color: ppSoft)),
                     ]),
                   ),
                 ),

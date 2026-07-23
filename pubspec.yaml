@@ -89,6 +89,10 @@ dependencies:
   flutter_svg: ^2.0.10+1
   supabase_flutter: ^2.15.0
 
+  # AskVeda RAG chatbot backend — the app's Ask Veda screen POSTs a question to
+  # the AskVeda service (/ask) and shows the grounded answer. Plain REST over http.
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

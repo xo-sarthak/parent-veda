@@ -51,7 +51,7 @@ Color articleCategoryColor(String category) {
 
 const List<Article> kArticles = [
   Article(id: 'sleepcycles', title: 'Why baby sleep cycles change at 4 months', category: 'Sleep', age: '3–6 mo', readMin: 6, featured: true),
-  Article(id: 'leap4', title: 'Leap 4, decoded: what the fussiness means', category: 'Development', age: '3–6 mo', readMin: 5),
+  Article(id: 'leap4', title: 'The 4-month shift, decoded: what the fussiness means', category: 'Development', age: '3–6 mo', readMin: 5),
   Article(id: 'distractedfeeds', title: 'Distracted feeds: is he getting enough?', category: 'Feeding', age: '3–6 mo', readMin: 3),
   Article(id: 'drowsy', title: 'Drowsy but awake: the hardest skill', category: 'Sleep', age: '3–6 mo', readMin: 5),
   Article(id: 'vaccines', title: 'The 4-month vaccines, explained calmly', category: 'Health', age: '3–6 mo', readMin: 4),

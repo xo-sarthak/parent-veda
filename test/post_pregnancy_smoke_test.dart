@@ -965,6 +965,14 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
+    // Recommendations are age-filtered, so this test needs a child of a stated
+    // age. It used to lean on a placeholder that invented four months; with the
+    // seed now honestly at zero there are no Books picks to tap, which is the
+    // correct behaviour and was hidden while the age was fabricated.
+    // 18 weeks = 4 months (ageInMonths floors 18/4.345 to 4).
+    ChildProfileStore.instance
+        .debugSetDob(DateTime.now().subtract(const Duration(days: 7 * 18)));
+
     await tester.pumpWidget(const MaterialApp(home: RecoCategoryScreen(category: 'Books')));
     await tester.pumpAndSettle();
 

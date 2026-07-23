@@ -141,7 +141,7 @@ const List<WatchVideo> kWatchVideos = [
   ),
   WatchVideo(
     id: 'leap4brain',
-    title: 'Inside Leap 4: the world of events',
+    title: 'Inside the 4-month shift: the world of events',
     topic: 'What the fussiness means',
     category: 'Brain Development',
     expertId: 'ananya',

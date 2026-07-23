@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:parentveda/screens/post_pregnancy/feeding_journey_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/growth_journey_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/milestone_journey_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_journey_screen.dart';
@@ -62,6 +63,13 @@ void main() {
 
   testWidgets('Development journey opens and a milestone detail sheet appears', (tester) async {
     bigView(tester);
+    // State the age this test needs. It used to inherit it from a placeholder
+    // child that claimed to be four months old — so the test only passed while
+    // the app was inventing a birthday, and would have gone green forever on a
+    // fabrication. "Rolling over" is emerging at ~4 months, so say so here.
+    // 18 weeks = 4 months (ageInMonths floors 18/4.345 to 4).
+    ChildProfileStore.instance
+        .debugSetDob(DateTime.now().subtract(const Duration(days: 7 * 18)));
     await tester.pumpWidget(const MaterialApp(home: MilestoneJourneyScreen()));
     await tester.pumpAndSettle();
 

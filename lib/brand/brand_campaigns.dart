@@ -504,6 +504,38 @@ final BrandCampaign _sampling = BrandCampaign(
 //  The catalogue
 // =============================================================================
 
+/// Product 15 — a sponsored notification. The single most restrained placement
+/// in the system, and the demo shows exactly why: it is PUSHED (arrives
+/// unasked), so it is frequency-capped both per-campaign (maxImpressions) and
+/// globally (BrandNotifications enforces a minimum gap between ANY two), and it
+/// only ever reaches a parent it genuinely fits.
+///
+/// This is the prompt's own example — "a new breast pump launch for
+/// breastfeeding mothers" — targeted so a mother who has not told us she
+/// breastfeeds never receives it. maxImpressions: 1 means it is sent once, ever.
+final BrandCampaign _pumpNotification = BrandCampaign(
+  id: 'notif_mamabloom_pump',
+  brand: kMamaBloom,
+  slot: BrandSlot.sponsoredNotification,
+  maxImpressions: 1,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: const BrandAudience(
+    stage: BrandStage.parenting,
+    anySignal: {'breastfeeding', 'expressed', 'mixed'},
+    childAgeMonthsMax: 12,
+  ),
+  creative: const BrandCreative(
+    eyebrow: 'From MamaBloom',
+    // The notification TITLE and BODY come from headline + subline; the story
+    // and CTA are unused for this slot (there is no landing screen yet — the
+    // notification is the whole experience).
+    headline: 'A quieter night pump',
+    subline: 'MamaBloom’s new hospital-grade pump runs at library volume. Worth a look while you are up.',
+    story: '',
+    cta: '',
+  ),
+);
+
 /// Every campaign in the ecosystem. Read ONLY by BrandStudio — never import
 /// this from a screen.
 final List<BrandCampaign> kBrandCampaigns = [
@@ -529,4 +561,6 @@ final List<BrandCampaign> kBrandCampaigns = [
   _compareNote,
   // Sampling — flagged, no fulfilment behind it
   _sampling,
+  // Notification — one demo campaign, so the mechanism can be seen working
+  _pumpNotification,
 ];

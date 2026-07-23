@@ -143,6 +143,10 @@ class ProductGuide {
     this.studies = const [],
     this.specs = const [],
     this.buyLabel = 'See buying options',
+    // A retailer URL for "Buy now". Optional: when absent, the screen builds an
+    // Amazon search for the product name, so the flow works for every guide
+    // today and a real per-product affiliate deep link drops in later.
+    this.buyUrl,
     // Real product photography, when we have it. Until then the category icon
     // carries the hero - an honest placeholder beats a broken image, and a
     // parent recognising the bottle on a shelf is worth doing properly rather
@@ -183,6 +187,7 @@ class ProductGuide {
   final List<PgSpec> specs;
 
   final String buyLabel;
+  final String? buyUrl;
   final String? imageAsset;
   final Set<String> relevantWhen;
   final List<String> relatedIds;

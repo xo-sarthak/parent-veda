@@ -29,7 +29,12 @@ import 'brand_models.dart';
 /// changes nothing until there is a real tag to add. Filling in one entry
 /// switches on attribution for that retailer everywhere in the app at once.
 const Map<String, Map<String, String>> kPartnerTags = {
-  // 'amazon.in': {'tag': 'parentveda-21'},
+  // PLACEHOLDER TAG. 'parentveda-21' is the Amazon-Associates format, not a real
+  // account yet — swap it for the real associate tag the day the account exists,
+  // and attribution switches on everywhere at once. Left ACTIVE (not commented)
+  // so the Buy-now flow is testable end to end now; a placeholder tag on a real
+  // Amazon link still opens Amazon, it just does not yet earn.
+  'amazon.in': {'tag': 'parentveda-21'},
   // 'firstcry.com': {'aff': 'parentveda'},
 };
 

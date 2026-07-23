@@ -92,9 +92,28 @@ class NotificationService {
   }
 
   /// Diagnostic: schedule a real EXACT notification ~1 minute out, through the
-  /// same path reminders use, logging where it lands (or the error).
-  Future<void> scheduleTestIn1Min() async {
+  /// same path reminders use. Returns a HUMAN-READABLE result so the screen can
+  /// show it — a scheduling failure used to vanish into debugPrint, invisible on
+  /// a real phone, which is exactly how "my reminders don't work" goes
+  /// undiagnosed. Now the failure (or the success time) is on screen.
+  Future<String> scheduleTestIn1Min() async {
     if (!_ready) await init();
+    if (!_ready) return 'Notifications are not ready on this device.';
+
+    // Whether the OS will actually honour an EXACT alarm. On Android 12+ this
+    // can be off even with the manifest permission — it is a per-app toggle in
+    // Settings ▸ Apps ▸ ParentVeda ▸ Alarms & reminders, and Samsung in
+    // particular defaults it off. If it is off, an exact alarm is silently
+    // downgraded or dropped, which is the single most common cause here.
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    bool? canExact;
+    if (android != null) {
+      try {
+        canExact = await android.canScheduleExactNotifications();
+      } catch (_) {/* older Android — exact is always allowed */}
+    }
+
     final when = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 1));
     try {
       await _plugin.zonedSchedule(
@@ -109,10 +128,19 @@ class NotificationService {
       );
       debugPrint('[reminders] TEST scheduled for $when '
           '(now=${tz.TZDateTime.now(tz.local)}, tz=${tz.local.name})');
+      final gap = canExact == false
+          ? ' — but exact alarms are OFF for this app, so it may be delayed or '
+              'dropped. Turn on "Alarms & reminders" in the app settings.'
+          : '';
+      return 'Scheduled for ${_hhmm(when)}. Lock the phone and wait a minute.$gap';
     } catch (e) {
       debugPrint('[reminders] TEST schedule FAILED: $e');
+      return 'Scheduling FAILED: $e';
     }
   }
+
+  String _hhmm(tz.TZDateTime d) =>
+      '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 
   /// Schedule a ONE-OFF notification at an absolute date/time - used for
   /// vaccine-due reminders (e.g. "1 day before"). Best-effort: no-ops if the

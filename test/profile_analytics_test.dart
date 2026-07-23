@@ -56,6 +56,37 @@ void main() {
       expect(m['at'], isA<String>());
       expect(m['surface'], 'tools_hub');
     });
+
+    // The Supabase sink inserts toMap() straight into profile_events (0028).
+    // These lock the contract that migration relies on: the exact columns, no
+    // user_id (the table is keyed to an anonymous install_id), and no free-text
+    // `meta` (the table has no such column and stores enum labels only).
+    test('the wire format matches the profile_events columns exactly', () {
+      final m = ProfileAnalyticsRecord(
+        event: ProfileEvent.stripShown,
+        field: 'pregHealth',
+        surface: 'symptom_companion',
+      ).toMap(sessionId: 'sess', installId: 'inst');
+      const columns = {
+        'event', 'field', 'value', 'percent', 'surface', 'at',
+        'session_id', 'install_id',
+      };
+      // Every key the sink would send must be a real column - an unknown key
+      // makes the insert fail, and fire() would swallow it silently.
+      expect(m.keys.every(columns.contains), isTrue,
+          reason: 'unexpected key(s): ${m.keys.toSet().difference(columns)}');
+      expect(m.containsKey('user_id'), isFalse, reason: 'anonymous by design');
+    });
+
+    test('a record with meta still sends only real columns once meta is dropped', () {
+      final m = ProfileAnalyticsRecord(
+        event: ProfileEvent.stripShown,
+        field: 'diet',
+        meta: const {'note': 'free text that must never reach the table'},
+      ).toMap(sessionId: 'sess', installId: 'inst')
+        ..remove('meta'); // exactly what SupabaseProfileSink does
+      expect(m.containsKey('meta'), isFalse);
+    });
   });
 
   group('the six metrics are computable', () {

@@ -294,7 +294,60 @@ match itself, by design).
 
 ---
 
-## 8. Reading list, in order
+## 8. A fourth ownership shape: write-only (analytics)
+
+§3 gave three shapes for data you *own*. Analytics is a fourth: data **nobody
+reads back into the app at all.** `profile_events` (`0028`) records which
+profiling questions were shown and answered, to judge the questions — it feeds a
+dashboard, never a screen.
+
+That flips the usual worry. Normally we ask "who may *read* this?" Here reading
+is the whole risk: the table is a behavioural log, and if a client could pull it
+you'd leak everyone's activity. So the shape is **insert-only, never readable**:
+
+```sql
+grant insert on public.profile_events to anon, authenticated;   -- write, both roles
+grant usage  on sequence public.profile_events_id_seq to anon, authenticated;
+alter table public.profile_events enable row level security;
+
+create policy "profile_events insert only" on public.profile_events for insert
+  to anon, authenticated
+  with check (true);
+-- and NO select/update/delete policy: RLS then denies all three.
+```
+
+Four things here are easy to get wrong and each is load-bearing:
+
+- **`to anon, authenticated`** — the strips run *before login*, so the anonymous
+  role must be able to insert. Most tables only grant to `authenticated`.
+- **No `user_id`** — the row is keyed to a random `install_id`, not an account.
+  Analytics shouldn't force an identity the feature didn't need; the join to a
+  real user can happen server-side later. So there's nothing to check ownership
+  against, and `with check (true)` is correct (the worst abuse is junk rows, not
+  a leak).
+- **The absent policies ARE the security.** With RLS on, a verb with no policy
+  is denied. Writing no select policy is not an oversight — it's how "nobody
+  reads this" is enforced. The dashboard still reads it, because `service_role`
+  bypasses RLS entirely.
+- **The sequence grant.** `bigserial` auto-fills `id` via `nextval()` on a
+  sequence, and that needs its own `grant usage on sequence` — the table grant
+  doesn't cover it. Miss it and every insert fails with "permission denied for
+  sequence", which looks baffling because the table grant is obviously present.
+
+**One client-side pairing that completes the contract:** the insert must not
+read the new row back. Supabase's `.insert(row)` without `.select()` sends
+`Prefer: return=minimal`, so no read happens. If a client *did* `.select()` the
+inserted row, PostgREST would need SELECT — which we deliberately denied — and
+the whole call would fail. So "write-only" is enforced on both ends: the DB
+refuses reads, and the client is built never to ask for one
+(`SupabaseRepo.fireEvent`).
+
+**Reference:** `0028_profile_events.sql`,
+`lib/services/remote/supabase_profile_sink.dart`. Contrast with §7: there the
+rows are private but a computed *answer* is exposed; here nothing is exposed to
+the app at all.
+
+## 9. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -302,5 +355,6 @@ match itself, by design).
 4. `0021_children.sql` — `my_child_ids`, co-parenting.
 5. `0022_pp_health.sql` — the co-parent pattern applied at scale.
 6. `0027_pp_name_votes.sql` — privacy past the limit of RLS.
-7. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
+7. `0028_profile_events.sql` — the write-only shape (deny reads on purpose).
+8. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
    client half of everything above.

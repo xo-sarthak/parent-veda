@@ -188,11 +188,20 @@ class ChildProfileStore extends ChangeNotifier {
   /// and height already filled in for a baby that was not hers. A measurement
   /// is a fact about one specific child: it can only come from the parent (or
   /// from a growth measurement she logs), never from us.
+  ///
+  /// The DATE OF BIRTH is today, i.e. age zero, for exactly the same reason.
+  /// It used to be `now - 120 days`, which invented a four-month-old: My Child
+  /// opened claiming "3 months", sat the journey bar a twentieth of the way
+  /// along, and served phase content for a baby whose birthday nobody had
+  /// entered. An age is a fact about one specific child, no different from a
+  /// weight - the measurements were fixed for this reason and the date of birth
+  /// was missed. At zero the journey starts at the beginning, which is the
+  /// honest position for a child we know nothing about yet.
   static final Child _seed = Child(
     id: '',
     name: 'Your baby',
     isBoy: true,
-    dob: DateTime.now().subtract(const Duration(days: 120)),
+    dob: DateTime.now(),
     weightKg: 0,
     heightCm: 0,
     headCm: 0,
@@ -238,6 +247,26 @@ class ChildProfileStore extends ChangeNotifier {
     _activeId = childId;
     notifyListeners();
     await _persist();
+  }
+
+  /// Set the active child's date of birth WITHOUT persisting — tests only.
+  ///
+  /// [update] is the real path, but it awaits SharedPreferences, which never
+  /// answers under flutter_test: a test that called it simply hung until the
+  /// ten-minute timeout. Tests that need a child of a given age (milestones and
+  /// recommendations are both age-filtered) state it through here instead of
+  /// leaning on whatever the placeholder happens to claim — which is how two of
+  /// them ended up silently depending on an invented four-month-old.
+  @visibleForTesting
+  void debugSetDob(DateTime dob) {
+    final promoting = _children.isEmpty;
+    final c = promoting ? _seed.copyWith(id: 'child_test') : active;
+    c.dob = dob;
+    if (promoting) {
+      _children.add(c);
+      _activeId = c.id;
+    }
+    notifyListeners();
   }
 
   /// Add a second/third child and make them active.
@@ -370,11 +399,19 @@ class ChildProfileStore extends ChangeNotifier {
 
   // If the device clock puts the child in the future (bad clock / demo machine),
   // fall back to ~4 months so the app still shows a sensible, seeded stage.
-  static const double _fallbackWeeks = 18;
-
+  /// Age straight from the date of birth. NO FALLBACK, deliberately.
+  ///
+  /// This used to read `return w >= 1 ? w : 18;` — any child under a week old
+  /// was reported as eighteen weeks. That did not just affect the placeholder:
+  /// a mother entering her three-day-old's real birthday was told he was four
+  /// months, and served four-month phases, milestones and growth expectations.
+  /// The newborns, where getting it right matters most, were the ones it broke.
+  ///
+  /// A newborn is zero weeks old. That is a real answer, and the app has a
+  /// fourth-trimester phase built precisely for it.
   double get ageInWeeks {
     final w = DateTime.now().difference(dob).inDays / 7.0;
-    return w >= 1 ? w : _fallbackWeeks;
+    return w > 0 ? w : 0;
   }
 
   int get ageInDays => (ageInWeeks * 7).round();

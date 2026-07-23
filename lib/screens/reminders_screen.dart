@@ -90,13 +90,17 @@ class RemindersScreen extends StatelessWidget {
             icon: const Icon(Icons.alarm_add_outlined),
             onPressed: () async {
               await NotificationService.instance.requestPermission();
-              await NotificationService.instance.scheduleTestIn1Min();
+              // Show what ACTUALLY happened — the scheduled time, or the real
+              // error / the "exact alarms are off" warning. A silent failure is
+              // how a broken reminder goes unnoticed.
+              final result =
+                  await NotificationService.instance.scheduleTestIn1Min();
               if (context.mounted) {
                 ScaffoldMessenger.of(context)
                   ..clearSnackBars()
-                  ..showSnackBar(const SnackBar(
-                      content: Text(
-                          'Scheduled a test for ~1 min - lock the phone and wait')));
+                  ..showSnackBar(SnackBar(
+                      duration: const Duration(seconds: 8),
+                      content: Text(result)));
               }
             },
           ),

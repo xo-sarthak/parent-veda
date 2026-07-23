@@ -222,13 +222,27 @@ class ProfileAnalytics extends ChangeNotifier {
   }
 
   void fire(ProfileAnalyticsRecord record) {
+    // Always feed the in-memory buffer, even when a real sink is attached, so
+    // the in-app viewer keeps working as a live "is this recording?" check. It
+    // is a bounded 200-item buffer that is never shown outside the dev screen,
+    // so the cost is nil. Previously a real sink bypassed it and the viewer
+    // went dark the moment analytics started actually shipping — the opposite
+    // of what a testing aid should do.
     try {
-      (_sink ?? _debugSink)
-          .record(record, sessionId: sessionId, installId: _installId);
-      notifyListeners(); // so an open viewer updates live
-    } catch (_) {
-      // Analytics must never break a mother's session.
+      _debugSink.record(record, sessionId: sessionId, installId: _installId);
+    } catch (_) {/* the buffer can never fail, but never let it try to */}
+
+    // The durable sink (Supabase in production) — wrapped so a sink that throws
+    // still cannot cost a mother her session.
+    final sink = _sink;
+    if (sink != null) {
+      try {
+        sink.record(record, sessionId: sessionId, installId: _installId);
+      } catch (_) {
+        // Analytics must never break a mother's session.
+      }
     }
+    notifyListeners(); // so an open viewer updates live
   }
 
   // ---- convenience, so call sites stay one line ---------------------------

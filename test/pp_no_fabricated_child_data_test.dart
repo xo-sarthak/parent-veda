@@ -14,6 +14,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_common.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_growth_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_health_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_names_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_phases_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_vaccine_data.dart';
 
 void main() {
@@ -23,6 +24,24 @@ void main() {
         reason: 'a prefixed baby weight is exactly what we must never ship');
     expect(ChildProfileStore.hasValue(c.heightCm), isFalse);
     expect(ChildProfileStore.hasValue(c.headCm), isFalse);
+  });
+
+  // An AGE is a fact about one specific child, exactly like a weight. The seed
+  // used to carry `now - 120 days`, so a parent who had entered nothing opened
+  // My Child to "3 months", a journey bar already underway, and phase content
+  // for a four-month-old. The measurement test above existed the whole time and
+  // did not catch it — it asserted the three fields it knew about rather than
+  // the rule, so the one invented field nobody had listed sailed through.
+  test('a fresh child has no age we invented', () {
+    final c = ChildProfileStore.instance;
+    expect(c.hasRealChild, isFalse,
+        reason: 'this test is about the seeded placeholder, not a saved child');
+    expect(c.ageInWeeks, 0,
+        reason: 'an age nobody entered is invented data, same as a weight');
+    expect(journeyProgress(c), 0.0,
+        reason: 'the journey starts at the beginning until she tells us otherwise');
+    expect(currentPhase(c).number, kPhases.first.number,
+        reason: 'phase content must not run ahead of a birthday we were never given');
   });
 
   test('nothing about the child is pre-filled', () {
