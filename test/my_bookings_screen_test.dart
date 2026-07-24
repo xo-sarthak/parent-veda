@@ -11,8 +11,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/screens/post_pregnancy/my_bookings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  // Mock prefs so the store's async _save() resolves cleanly instead of throwing
+  // a MissingPluginException that can bleed into a later test under the runner.
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues(<String, Object>{});
+
   final store = BookingStore.instance;
 
   // Reset before AND after: the store is a process-wide singleton and the test

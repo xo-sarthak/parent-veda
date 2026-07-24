@@ -21,6 +21,7 @@ import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/payment_service.dart';
+import '../../doctor/doctor_availability.dart';
 import 'my_bookings_screen.dart';
 import 'pp_common.dart';
 
@@ -49,6 +50,16 @@ class _BookingSheetState extends State<_BookingSheet> {
 
   Offering get o => widget.offering;
 
+  @override
+  void initState() {
+    super.initState();
+    // For a consult, pull the doctor's real availability so the slots shown are
+    // the times THEY set, not the generated fallback. Rebuilds when it lands.
+    if (o.kind == OfferingKind.consult) {
+      DoctorAvailability.instance.syncFromServer();
+    }
+  }
+
   /// Buy → Razorpay checkout (order + pay + verify) → mint the entitlement.
   /// A free offering skips payment; if the payment backend is not reachable it
   /// falls back to the no-charge preview so the flow is never a dead end.
@@ -75,7 +86,8 @@ class _BookingSheetState extends State<_BookingSheet> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: BookingStore.instance,
+      animation: Listenable.merge(
+          [BookingStore.instance, DoctorAvailability.instance]),
       builder: (context, _) {
         return SafeArea(
           top: false,

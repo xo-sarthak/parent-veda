@@ -363,6 +363,43 @@ class SupabaseRepo {
     }
   }
 
+  // ---- raw table helpers (for tables NOT keyed by user_id) ------------------
+
+  /// Select every row of a public-read table (no user_id filter) — for shared
+  /// catalogue-style tables like doctor_availability. Empty on any failure.
+  static Future<List<Map<String, dynamic>>> selectAll(String table) async {
+    try {
+      final rows = await _client.from(table).select();
+      return List<Map<String, dynamic>>.from(rows);
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Upsert a raw row (no user_id injected) into a table with its own key.
+  /// RLS still gates the write. Best-effort.
+  static Future<void> upsertRow(
+    String table,
+    Map<String, dynamic> data, {
+    String? onConflict,
+  }) async {
+    if (userId == null) return;
+    try {
+      await _client.from(table).upsert(data, onConflict: onConflict);
+    } catch (_) {/* best-effort */}
+  }
+
+  /// Delete rows matching every column in [filters] (no user_id). RLS gates it.
+  static Future<void> deleteMatch(
+    String table,
+    Map<String, Object> filters,
+  ) async {
+    if (userId == null) return;
+    try {
+      await _client.from(table).delete().match(filters);
+    } catch (_) {/* best-effort */}
+  }
+
   /// Free a seat via cancel_booking(). Best-effort: a failure here is not worth
   /// blocking the UI over — the local cancel still stands, and the ledger is
   /// reconciled on the next server round-trip.

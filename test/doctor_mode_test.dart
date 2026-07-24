@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_store.dart';
+import 'package:parentveda/doctor/doctor_availability.dart';
 import 'package:parentveda/doctor/doctor_roster.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
 import 'package:parentveda/screens/doctor/doctor_scaffold.dart';
@@ -51,5 +52,27 @@ void main() {
     store.book(BookingCatalog.instance.slotsFor(o.id).first);
     expect(DoctorRoster.instance.upcomingConsults('neha'), isNotEmpty,
         reason: 'the doctor should see the call booked with them');
+  });
+
+  test("the doctor's availability becomes the parent's consult slots", () {
+    final o = BookingCatalog.instance.offeringForCatalog('neha')!;
+    final avail = DoctorAvailability.instance;
+    // Mark Dr. Neha free Mon & Wed at 10:00.
+    avail.toggle('neha', const AvailWindow(DateTime.monday, 10, 0));
+    avail.toggle('neha', const AvailWindow(DateTime.wednesday, 10, 0));
+
+    final slots = BookingCatalog.instance.slotsFor(o.id);
+    expect(slots, isNotEmpty);
+    // Every generated slot falls on one of the days/times she set.
+    for (final s in slots) {
+      final d = s.startsUtc.toLocal();
+      expect(d.hour, 10);
+      expect([DateTime.monday, DateTime.wednesday], contains(d.weekday));
+      expect(s.capacity, 1);
+    }
+
+    // Clean up so other tests see the generated fallback.
+    avail.toggle('neha', const AvailWindow(DateTime.monday, 10, 0));
+    avail.toggle('neha', const AvailWindow(DateTime.wednesday, 10, 0));
   });
 }

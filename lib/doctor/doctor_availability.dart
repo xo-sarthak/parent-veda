@@ -12,6 +12,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/supabase_repo.dart';
+
 /// A bookable window on a given weekday, e.g. Mon 17:00 for 50 min.
 @immutable
 class AvailWindow {
@@ -59,10 +61,56 @@ class DoctorAvailability extends ChangeNotifier {
 
   bool isOn(String expertId, AvailWindow w) => _keys(expertId).contains(w.key);
 
+  /// Every window this expert is free — what the booking engine turns into real
+  /// upcoming slots.
+  List<AvailWindow> windows(String expertId) {
+    final w = _byExpert[expertId];
+    if (w == null) return const [];
+    return w.map((k) {
+      final p = k.split('-').map(int.parse).toList();
+      return AvailWindow(p[0], p[1], p[2]);
+    }).toList();
+  }
+
   void toggle(String expertId, AvailWindow w) {
     final keys = _keys(expertId);
-    if (!keys.add(w.key)) keys.remove(w.key);
+    final adding = keys.add(w.key);
+    if (!adding) keys.remove(w.key);
     _save();
+    notifyListeners();
+    // Mirror to the server so parents on other devices see this doctor's real
+    // availability. Best-effort — local already reflects the change.
+    if (adding) {
+      SupabaseRepo.upsertRow('doctor_availability', {
+        'expert_id': expertId,
+        'weekday': w.weekday,
+        'hour': w.hour,
+        'minute': w.minute,
+      }, onConflict: 'expert_id,weekday,hour,minute');
+    } else {
+      SupabaseRepo.deleteMatch('doctor_availability', {
+        'expert_id': expertId,
+        'weekday': w.weekday,
+        'hour': w.hour,
+        'minute': w.minute,
+      });
+    }
+  }
+
+  /// Load every doctor's availability from the server into the cache, so the
+  /// booking engine can generate real slots for any expert. Best-effort.
+  Future<void> syncFromServer() async {
+    final rows = await SupabaseRepo.selectAll('doctor_availability');
+    if (rows.isEmpty) return;
+    for (final r in rows) {
+      final expertId = (r['expert_id'] ?? '').toString();
+      final w = AvailWindow(
+        (r['weekday'] as num).toInt(),
+        (r['hour'] as num).toInt(),
+        (r['minute'] as num?)?.toInt() ?? 0,
+      );
+      _keys(expertId).add(w.key);
+    }
     notifyListeners();
   }
 

@@ -27,6 +27,7 @@
 // =============================================================================
 
 import '../data/prepare_data.dart';
+import '../doctor/doctor_availability.dart';
 import '../screens/post_pregnancy/pp_experts_data.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import '../screens/post_pregnancy/pp_yoga_data.dart';
@@ -256,7 +257,12 @@ class BookingCatalog {
             capacity: 18 + seed % 8,
             count: 9);
       case OfferingKind.consult:
-        return _calendar(at, o, seed); // the calendar case
+        // If the doctor has set real availability, those windows ARE the slots.
+        // Otherwise fall back to the generated calendar so nothing is empty.
+        final wins = DoctorAvailability.instance.windows(o.expertId);
+        return wins.isNotEmpty
+            ? _fromAvailability(at, o, wins)
+            : _calendar(at, o, seed);
       case OfferingKind.masterclass:
         return _oneOff(at, o,
             daysAhead: 5 + seed % 4,
@@ -340,6 +346,41 @@ class BookingCatalog {
           durationMin: 50,
           capacity: 1,
           booked: (seed + idx) % 4 == 0 ? 1 : 0, // ~1 in 4 already taken
+        ));
+        idx++;
+      }
+    }
+    return out;
+  }
+
+  /// Turn a doctor's weekly availability into concrete upcoming slots — the
+  /// next few occurrences of each window they marked free. Capacity 1 (a 1:1).
+  static List<Slot> _fromAvailability(
+      DateTime from, Offering o, List<AvailWindow> wins) {
+    final local = from.toLocal();
+    final byDay = <int, List<AvailWindow>>{};
+    for (final w in wins) {
+      (byDay[w.weekday] ??= []).add(w);
+    }
+    final out = <Slot>[];
+    var day = DateTime(local.year, local.month, local.day);
+    var guard = 0, idx = 0;
+    while (out.length < 24 && guard < 28) {
+      guard++;
+      day = day.add(const Duration(days: 1));
+      final ws = byDay[day.weekday];
+      if (ws == null) continue;
+      for (final w in ws) {
+        final start = DateTime(day.year, day.month, day.day, w.hour, w.minute);
+        if (start.isBefore(local)) continue;
+        out.add(Slot(
+          id: '${o.id}_a$idx',
+          offeringId: o.id,
+          expertId: o.expertId,
+          startsUtc: start.toUtc(),
+          durationMin: 50,
+          capacity: 1,
+          booked: 0,
         ));
         idx++;
       }

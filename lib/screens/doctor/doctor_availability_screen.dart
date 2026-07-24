@@ -46,6 +46,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   void initState() {
     super.initState();
     DoctorAvailability.instance.init();
+    DoctorAvailability.instance.syncFromServer();
   }
 
   @override
