@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../doctor/doctor_session.dart';
 import '../localization/app_language.dart';
 import '../services/father_content_controller.dart';
 import '../services/home_content_controller.dart';
@@ -78,7 +79,18 @@ class _SplashScreenState extends State<SplashScreen>
       return;
     }
     nav.pushReplacement(MaterialPageRoute(
-      builder: (_) => AuthFlowScreen(onDone: (due, isFather) async {
+      builder: (_) => AuthFlowScreen(
+        // "I'm a doctor" → mark auth done and enter doctor mode. The MaterialApp
+        // builder swaps the whole app to the doctor dashboard, so no navigation
+        // is needed here.
+        onDoctor: (expertId) async {
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool(kAuthCompletedKey, true);
+          } catch (_) {/* best-effort */}
+          DoctorSession.instance.enter(expertId);
+        },
+        onDone: (due, isFather) async {
         try {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool(kAuthCompletedKey, true);

@@ -19,8 +19,10 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/call_screen.dart';
+import '../../booking/prescription.dart';
 import '../../services/notification_service.dart';
 import 'pp_common.dart';
+import 'prescription_view_screen.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   const MyBookingsScreen({super.key});
@@ -37,6 +39,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     // notification id each time — derived from the booking id — so re-entering
     // the screen re-arms rather than duplicates.
     WidgetsBinding.instance.addPostFrameCallback((_) => _scheduleReminders());
+    // Pull any prescriptions the doctor has written for these consults.
+    PrescriptionStore.instance.refresh();
   }
 
   void _scheduleReminders() {
@@ -65,7 +69,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: BookingStore.instance,
+          animation: Listenable.merge(
+              [BookingStore.instance, PrescriptionStore.instance]),
           builder: (context, _) {
             final store = BookingStore.instance;
             final credits = store
@@ -240,6 +245,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _pastRow(Booking b) {
     final cancelled = b.status == BookingStatus.cancelled;
+    final rx = PrescriptionStore.instance.forBooking(b.id);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -248,20 +254,47 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: ppHair),
       ),
-      child: Row(children: [
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(b.title,
-                style: ppBody(13.5, color: ppInk, w: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            Text(_dateLabel(b.startsUtc), style: ppBody(11.5, color: ppMuted)),
-          ]),
-        ),
-        Text(cancelled ? 'Cancelled' : 'Attended',
-            style: ppBody(11.5,
-                color: cancelled ? ppMuted : ppPurple, w: FontWeight.w700)),
+      child: Column(children: [
+        Row(children: [
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(b.title,
+                  style: ppBody(13.5, color: ppInk, w: FontWeight.w600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 2),
+              Text(_dateLabel(b.startsUtc), style: ppBody(11.5, color: ppMuted)),
+            ]),
+          ),
+          Text(cancelled ? 'Cancelled' : 'Attended',
+              style: ppBody(11.5,
+                  color: cancelled ? ppMuted : ppPurple, w: FontWeight.w700)),
+        ]),
+        if (rx != null) ...[
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) =>
+                    PrescriptionViewScreen(prescription: rx, title: b.title))),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              decoration: BoxDecoration(
+                  color: ppPurple.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(10)),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.description_outlined,
+                    size: 15, color: ppPurple),
+                const SizedBox(width: 6),
+                Text('View prescription',
+                    style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+              ]),
+            ),
+          ),
+        ],
       ]),
     );
   }

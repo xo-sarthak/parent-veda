@@ -7,16 +7,16 @@
 
 import 'package:flutter/material.dart';
 
+import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
-import '../post_pregnancy/pp_experts_data.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final e = expertById(DoctorSession.instance.expertId ?? '');
+    final e = doctorInfoById(DoctorSession.instance.expertId ?? '');
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
       children: [

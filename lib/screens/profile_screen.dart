@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -326,7 +327,7 @@ class ProfileScreen extends StatelessWidget {
           // Dr. Neha Sharma (a bookable consult doctor); later this becomes a
           // real doctor sign-in from the login screen. Remove/gate before launch.
           OutlinedButton.icon(
-            onPressed: () => DoctorSession.instance.enter('neha'),
+            onPressed: () => _pickDoctor(context),
             icon: const Icon(Icons.medical_services_outlined, size: 18),
             label: const Text('Enter doctor mode · testing'),
             style: OutlinedButton.styleFrom(
@@ -360,6 +361,79 @@ class ProfileScreen extends StatelessWidget {
       ),
       ),
     );
+  }
+
+  /// Testing: pick WHICH doctor to log in as, then enter doctor mode. A live
+  /// build would not ask a parent to choose a doctor — this is only so the
+  /// doctor experience can be seen. Lists the experts who take consults.
+  void _pickDoctor(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.75),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: AppTheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2))),
+              ),
+              const SizedBox(height: 16),
+              const Text('Log in as which doctor?',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              _docGroup(ctx, 'Pregnancy side', DoctorStage.pregnancy),
+              _docGroup(ctx, 'Parenting side', DoctorStage.parenting),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _docGroup(BuildContext ctx, String label, DoctorStage stage) {
+    final docs = doctorsForStage(stage);
+    if (docs.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 14),
+      Text(label.toUpperCase(),
+          style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: AppTheme.neutral500)),
+      const SizedBox(height: 4),
+      for (final d in docs)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: AppTheme.primary500,
+            child: Text(
+                d.name.replaceAll(RegExp(r'^Dr\.?\s*'), '').characters.first
+                    .toUpperCase(),
+                style: const TextStyle(color: Colors.white)),
+          ),
+          title:
+              Text(d.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text(d.credential,
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+          onTap: () {
+            Navigator.of(ctx).pop();
+            DoctorSession.instance.enter(d.id);
+          },
+        ),
+    ]);
   }
 
   /// Testing reset - clear the due date + pregnancy-map data, snap back to the

@@ -21,6 +21,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
 import '../../services/whatsapp_prefs.dart';
+import '../../doctor/doctor_directory.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -65,12 +66,16 @@ const String kAuthCompletedKey = 'auth_completed';
 const String kUserRoleKey = 'user_role';
 
 class AuthFlowScreen extends StatefulWidget {
-  const AuthFlowScreen({super.key, required this.onDone});
+  const AuthFlowScreen({super.key, required this.onDone, this.onDoctor});
 
   /// Fired when auth completes, with the due date the mother optionally picked
   /// on the Profile step (null if skipped / father), and [isFather] = true when
   /// the user paired in via a partner code. The caller routes the right home.
   final void Function(DateTime? dueDate, bool isFather) onDone;
+
+  /// Fired when the "I'm a doctor" role is chosen (with the picked expert id).
+  /// The caller marks auth done and enters doctor mode.
+  final void Function(String expertId)? onDoctor;
 
   @override
   State<AuthFlowScreen> createState() => _AuthFlowScreenState();
@@ -661,7 +666,82 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           accentBg: const Color(0x1A1F9E86),
           onTap: () => _go('pairCode'),
         ),
+        const SizedBox(height: 13),
+        // Third role — the expert. For testing it asks WHICH doctor; a live
+        // build would recognise a verified doctor account instead.
+        _roleCard(
+          title: "I'm a doctor",
+          subtitle: 'Manage my consults & sessions',
+          icon: Icons.medical_services_rounded,
+          accent: _purple,
+          accentBg: const Color(0x1A7C3FC4),
+          onTap: _pickDoctorRole,
+        ),
       ]);
+
+  /// Testing: choose which doctor to sign in as, then enter the doctor app.
+  /// Lists doctors from BOTH sides (pregnancy specialists + parenting experts).
+  void _pickDoctorRole() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.75),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            shrinkWrap: true,
+            children: [
+              const Text('Sign in as which doctor?',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              _docGroup(ctx, 'Pregnancy side', DoctorStage.pregnancy),
+              _docGroup(ctx, 'Parenting side', DoctorStage.parenting),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _docGroup(BuildContext ctx, String label, DoctorStage stage) {
+    final docs = doctorsForStage(stage);
+    if (docs.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 14),
+      Text(label.toUpperCase(),
+          style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: Color(0xFFA99CBB))),
+      const SizedBox(height: 4),
+      for (final d in docs)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: _purple,
+            child: Text(
+                d.name.replaceAll(RegExp(r'^Dr\.?\s*'), '').characters.first
+                    .toUpperCase(),
+                style: const TextStyle(color: Colors.white)),
+          ),
+          title: Text(d.name,
+              style: const TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text(d.credential,
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+          onTap: () {
+            Navigator.of(ctx).pop();
+            widget.onDoctor?.call(d.id);
+          },
+        ),
+    ]);
+  }
 
   Widget _roleCard({
     required String title,

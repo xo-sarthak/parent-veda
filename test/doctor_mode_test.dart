@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/doctor/doctor_availability.dart';
+import 'package:parentveda/doctor/doctor_directory.dart';
 import 'package:parentveda/doctor/doctor_roster.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
 import 'package:parentveda/screens/doctor/doctor_scaffold.dart';
@@ -52,6 +53,20 @@ void main() {
     store.book(BookingCatalog.instance.slotsFor(o.id).first);
     expect(DoctorRoster.instance.upcomingConsults('neha'), isNotEmpty,
         reason: 'the doctor should see the call booked with them');
+  });
+
+  test('doctors exist on BOTH sides — a pregnancy specialist is bookable', () {
+    // sp_ob is a pregnancy specialist (not in kExperts).
+    final info = doctorInfoById('sp_ob');
+    expect(info.stage, DoctorStage.pregnancy);
+    expect(doctorsForStage(DoctorStage.pregnancy), isNotEmpty);
+    expect(doctorsForStage(DoctorStage.parenting), isNotEmpty);
+
+    final o = BookingCatalog.instance.offeringForCatalog('sp_ob')!;
+    store.purchase(o);
+    store.book(BookingCatalog.instance.slotsFor(o.id).first);
+    expect(DoctorRoster.instance.upcomingConsults('sp_ob'), isNotEmpty,
+        reason: 'a pregnancy-side doctor sees their pregnancy consults');
   });
 
   test("the doctor's availability becomes the parent's consult slots", () {

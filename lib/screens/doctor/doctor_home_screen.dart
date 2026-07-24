@@ -11,11 +11,12 @@ import 'package:flutter/material.dart';
 
 import '../../booking/booking_models.dart';
 import '../../booking/call_screen.dart';
+import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
-import '../post_pregnancy/pp_experts_data.dart';
 import 'doctor_availability_screen.dart';
+import 'doctor_prescription_screen.dart';
 
 class DoctorHomeScreen extends StatelessWidget {
   const DoctorHomeScreen({super.key});
@@ -29,13 +30,15 @@ class DoctorHomeScreen extends StatelessWidget {
       animation:
           Listenable.merge([DoctorSession.instance, DoctorRoster.instance]),
       builder: (context, _) {
-        final e = expertById(DoctorSession.instance.expertId ?? '');
+        final e = doctorInfoById(DoctorSession.instance.expertId ?? '');
         final calls = DoctorRoster.instance.upcomingConsults(e.id);
         final sessions = DoctorRoster.instance.sessionsBy(e.id);
         return ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 40),
           children: [
             _pad(_header(e)),
+            const SizedBox(height: 16),
+            _pad(_stageToggle(e.stage)),
             const SizedBox(height: 20),
             _pad(_statRow(calls.length, sessions.length)),
             const SizedBox(height: 24),
@@ -70,7 +73,55 @@ class DoctorHomeScreen extends StatelessWidget {
 
   // ---- header ---------------------------------------------------------------
 
-  Widget _header(Expert e) => Row(children: [
+  // TESTING: flip between a pregnancy-side and a parenting-side doctor, to see
+  // both flows without logging out. A real doctor is one or the other.
+  Widget _stageToggle(DoctorStage current) {
+    Widget seg(String label, DoctorStage stage) {
+      final on = current == stage;
+      return Expanded(
+        child: GestureDetector(
+          onTap: on
+              ? null
+              : () {
+                  final d = firstDoctorOf(stage);
+                  if (d != null) DoctorSession.instance.enter(d.id);
+                },
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 34,
+            alignment: Alignment.center,
+            margin: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: on ? Colors.white : Colors.transparent,
+              borderRadius: BorderRadius.circular(999),
+              boxShadow: on
+                  ? const [
+                      BoxShadow(
+                          color: Color(0x146A30B6),
+                          blurRadius: 8,
+                          offset: Offset(0, 2))
+                    ]
+                  : null,
+            ),
+            child: Text(label,
+                style: ppBody(12.5,
+                    color: on ? ppPurple : ppSoft, w: FontWeight.w700)),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+          color: ppPanel, borderRadius: BorderRadius.circular(999)),
+      child: Row(children: [
+        seg('Pregnancy', DoctorStage.pregnancy),
+        seg('Parenting', DoctorStage.parenting),
+      ]),
+    );
+  }
+
+  Widget _header(DoctorInfo e) => Row(children: [
         Container(
           width: 54,
           height: 54,
@@ -152,24 +203,54 @@ class DoctorHomeScreen extends StatelessWidget {
                 style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
           ]),
           const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) =>
-                    CallScreen(bookingId: b.id, title: b.title))),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              height: 44,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: ppPurple, borderRadius: BorderRadius.circular(12)),
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Icon(Icons.videocam_rounded, size: 17, color: Colors.white),
-                const SizedBox(width: 8),
-                Text('Start consultation',
-                    style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
-              ]),
+          Row(children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    builder: (_) => CallScreen(bookingId: b.id, title: b.title))),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: ppPurple, borderRadius: BorderRadius.circular(12)),
+                  child:
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    const Icon(Icons.videocam_rounded,
+                        size: 17, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text('Start',
+                        style:
+                            ppBody(14, color: Colors.white, w: FontWeight.w700)),
+                  ]),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    builder: (_) => DoctorPrescriptionScreen(
+                        bookingId: b.id, title: b.title))),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: ppPanel,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child:
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    const Icon(Icons.edit_note_rounded, size: 18, color: ppPurple),
+                    const SizedBox(width: 6),
+                    Text('Prescribe',
+                        style: ppBody(13.5, color: ppInk, w: FontWeight.w700)),
+                  ]),
+                ),
+              ),
+            ),
+          ]),
         ]),
       );
 

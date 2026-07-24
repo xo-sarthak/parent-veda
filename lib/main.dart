@@ -221,22 +221,37 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
       // Root navigator key + observer power the global "Ask Veda" FAB.
       navigatorKey: appNavigatorKey,
       navigatorObservers: [fabRouteObserver],
-      // Inject one Ask-Veda FAB above every route in both apps. It hides itself
-      // over sheets / the Premiere / the splash — see GlobalAskFab.
-      builder: (context, child) => Stack(children: [
-        if (child != null) Positioned.fill(child: child),
-        GlobalAskFab(pregnancy: _controller),
-      ]),
-      // Doctor mode swaps the WHOLE app to the expert experience, exactly as
-      // FatherPreview flips mother/father — a doctor logs in and sees their
-      // dashboard, not the parent app. Otherwise, the normal splash → parent app.
-      home: AnimatedBuilder(
+      // Two things wrap every route here:
+      //   * the global Ask-Veda FAB (parent app only), and
+      //   * the doctor swap — when a doctor logs in, the WHOLE app becomes their
+      //     dashboard, exactly as FatherPreview flips mother/father. Done in the
+      //     builder (not home) so it holds across every navigation, and the
+      //     parent app is kept OFFSTAGE (state preserved) so exiting returns
+      //     right where they were. The doctor app gets its own Navigator so its
+      //     pushes (availability, prescription, call) work.
+      builder: (context, child) => AnimatedBuilder(
         animation: DoctorSession.instance,
-        builder: (context, _) => DoctorSession.instance.active
-            ? const DoctorScaffold()
-            : SplashScreen(
-                pregnancy: _controller, home: _home, father: _father),
+        builder: (context, _) {
+          final doctor = DoctorSession.instance.active;
+          return Stack(children: [
+            Offstage(
+              offstage: doctor,
+              child: Stack(children: [
+                if (child != null) Positioned.fill(child: child),
+                GlobalAskFab(pregnancy: _controller),
+              ]),
+            ),
+            if (doctor)
+              Positioned.fill(
+                child: Navigator(
+                  onGenerateRoute: (_) => MaterialPageRoute<void>(
+                      builder: (_) => const DoctorScaffold()),
+                ),
+              ),
+          ]);
+        },
       ),
+      home: SplashScreen(pregnancy: _controller, home: _home, father: _father),
     );
   }
 }
