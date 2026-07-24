@@ -15,16 +15,13 @@ import 'pp_child_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../ask_veda/veda_core.dart';
 import '../../localization/app_language.dart';
 import '../../widgets/mic_dictation_button.dart';
 // My Child is reached via the bottom-nav home tab (openPpTab 0) now.
 // import 'my_child_screen.dart';
-import 'parenting_veda.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
-import '../../ask_veda_config.dart';
 import '../../services/remote/ask_veda_service.dart';
 
 // ---- design palette (identical to the pregnancy Ask Veda) --------------------
@@ -64,9 +61,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   final _rng = Random();
 
   String? _query;
-  VedaAnswerView? _answer;
-  String? _ragAnswer;       // the grounded answer from the AskVeda backend (if any)
-  bool _ragLoading = false; // true while /ask is in flight
+  AskVedaResult? _feed;   // the backend's full 7-section response
+  bool _loading = false;  // /ask is in flight
+  bool _failed = false;   // backend unreachable → "connect to the internet"
   final Map<String, List<String>> _picked = {};
 
   // Stage-wise suggestions (icons, not emojis).
@@ -127,48 +124,44 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     super.dispose();
   }
 
-  void _send(String text) {
+  // The answer comes from the RAG backend now (the offline engine is retired from
+  // the answer path). NO domain gating — one mother, one journey; her child's age
+  // rides along as CONTEXT so pregnancy questions come back in the past tense.
+  Future<void> _send(String text) async {
     final t = text.trim();
     if (t.isEmpty) return;
     FocusScope.of(context).unfocus();
     setState(() {
       _query = t;
-      _answer = parentingVedaAnswer(t); // offline: instant, all 7 sections
-      _ragAnswer = null; // drop any previous grounded answer
-      _ragLoading = AskVedaConfig.enabled; // subtle "thinking" until /ask replies
+      _feed = null;
+      _failed = false;
+      _loading = true;
       _ctrl.clear();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) _scroll.jumpTo(0);
     });
-    _fetchRag(t); // async: swap in the grounded backend answer when it arrives
-  }
 
-  // Ask the AskVeda RAG backend in the background. The offline answer already
-  // shows instantly; if the backend returns a CONFIDENT answer we swap it in.
-  // On any failure (or a low-confidence reply) we simply keep the offline one.
-  Future<void> _fetchRag(String q) async {
-    if (!AskVedaConfig.enabled) return;
-    // NO domain gating — one mother, one journey. She may ask about anything,
-    // including her pregnancy. We send her child's age as CONTEXT so the answer
-    // is framed in the right tense ("during your pregnancy…" rather than talking
-    // as if she were still expecting).
     final res = await AskVedaService.ask(
-      q,
+      t,
       childAgeMonths: ChildProfileStore.instance.ageInMonths,
     );
-    if (!mounted || _query != q) return; // ignore stale / superseded replies
+    if (!mounted || _query != t) return; // ignore stale / superseded replies
     setState(() {
-      _ragLoading = false;
-      if (res != null && res.isConfident) _ragAnswer = res.answer;
+      _loading = false;
+      if (res != null) {
+        _feed = res;
+      } else {
+        _failed = true; // offline / server down → connect-to-internet state
+      }
     });
   }
 
   void _clearQuery() => setState(() {
         _query = null;
-        _answer = null;
-        _ragAnswer = null;
-        _ragLoading = false;
+        _feed = null;
+        _loading = false;
+        _failed = false;
         _ctrl.clear();
       });
 
@@ -370,24 +363,72 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
       );
 
-  // ---- result view : the fixed 7 sections -----------------------------------
-  Widget _resultScroll() {
-    final v = _answer!;
-    return ListView(
-      key: const ValueKey('result'),
-      controller: _scroll,
-      padding: const EdgeInsets.fromLTRB(18, 78, 18, 112),
-      children: [
-        _answerCard(_ragAnswer ?? v.answer, grounded: _ragAnswer != null, loading: _ragLoading),
-        _meaning(v),
-        if (v.actions.isNotEmpty) _actions(v),
-        if (v.content.isNotEmpty) _content(v),
-        if (v.community != null) _communitySection(v.community!),
-        if (v.products.isNotEmpty) _productsSection(v),
+  // ---- result view : the fixed 7 sections, all from the backend feed --------
+  Widget _resultScroll() => ListView(
+        key: const ValueKey('result'),
+        controller: _scroll,
+        padding: const EdgeInsets.fromLTRB(18, 78, 18, 112),
+        children: _loading
+            ? [_loadingCard()]
+            : (_failed || _feed == null)
+                ? [_offlineCard()]
+                : _feedSections(_feed!),
+      );
+
+  // The 7 sections. 1-3 from the LLM; 4/6/7 (+ videos, community) always render —
+  // an empty section shows "Coming soon" so the format never collapses.
+  List<Widget> _feedSections(AskVedaResult f) => [
+        _answerCard(f.answer),
+        if (f.meaning.isNotEmpty) _meaning(f.meaning),
+        if (f.actions.isNotEmpty) _actions(f.actions),
+        _moreInfo(f),
+        _communityComingSoon(),
+        _productsFeed(f),
+        _servicesFeed(f),
         _disclaimer(),
-      ],
-    );
-  }
+      ];
+
+  Widget _loadingCard() => _card(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+        child: Row(children: [
+          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
+          const SizedBox(width: 14),
+          Text('Asking Veda…', style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
+        ]),
+      );
+
+  Widget _offlineCard() => _card(
+        radius: 22,
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.wifi_off_rounded, size: 20, color: _vCoral),
+            const SizedBox(width: 9),
+            Expanded(child: Text('Connect to the internet', style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk))),
+          ]),
+          const SizedBox(height: 10),
+          Text('Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.',
+              style: GoogleFonts.manrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () { if (_query != null) _send(_query!); },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
+              decoration: BoxDecoration(color: _vPurple, borderRadius: BorderRadius.circular(99)),
+              child: Text('Retry', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
+            ),
+          ),
+        ]),
+      );
+
+  Widget _comingSoon(String label) => _card(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+        child: Row(children: [
+          const Icon(Icons.hourglass_empty_rounded, size: 17, color: Color(0xFFB6A9CC)),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w600, color: _vMuted2))),
+        ]),
+      );
 
   Widget _card({required Widget child, EdgeInsets? padding, double radius = 18, Gradient? gradient}) => Container(
         padding: padding ?? const EdgeInsets.all(16),
@@ -436,7 +477,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // S1 - Veda Answer
-  Widget _answerCard(String answer, {bool grounded = false, bool loading = false}) => _card(
+  Widget _answerCard(String answer) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
         gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFFCFAFF)]),
@@ -446,18 +487,6 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const SizedBox(width: 9),
             Text('Veda Answer', style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
-            // While the backend is answering: a subtle spinner. Once a grounded
-            // answer has swapped in: a small verified tick.
-            if (loading)
-              const Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
-              )
-            else if (grounded)
-              const Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.verified_rounded, size: 16, color: _vPurple2),
-              ),
             _speakerButton(),
           ]),
           const SizedBox(height: 13),
@@ -468,19 +497,16 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // S2 - What this means for you
-  Widget _meaning(VedaAnswerView v) {
-    if (v.meaning.trim().isEmpty) return const SizedBox.shrink();
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _sectionHead(Icons.favorite_rounded, 'What this means for you'),
-      _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(v.meaning, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
-    ]);
-  }
+  Widget _meaning(String meaning) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead(Icons.favorite_rounded, 'What this means for you'),
+        _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(meaning, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
+      ]);
 
   // S3 - Recommended next actions
-  Widget _actions(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget _actions(List<String> actions) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.task_alt_rounded, 'Recommended next actions'),
         _card(padding: EdgeInsets.zero, child: Column(children: [
-          for (int i = 0; i < v.actions.length; i++) _actionRow(v.actions[i], last: i == v.actions.length - 1),
+          for (int i = 0; i < actions.length; i++) _actionRow(actions[i], last: i == actions.length - 1),
         ])),
       ]);
 
@@ -514,30 +540,49 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S4 - More information
-  Widget _content(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  // S4 - More information (articles/reads) + a Videos sub-section
+  Widget _moreInfo(AskVedaResult f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.library_books_rounded, 'More information'),
-        for (final c in v.content) _contentCard(c),
+        if (f.content.isEmpty)
+          _comingSoon('More articles on this are coming soon')
+        else
+          for (final it in f.content) _feedItemCard(it),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(2, 20, 2, 12),
+          child: Row(children: [
+            const Icon(Icons.play_circle_outline_rounded, size: 19, color: _vPurple2),
+            const SizedBox(width: 9),
+            Text('Videos', style: GoogleFonts.fraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
+          ]),
+        ),
+        if (f.videos.isEmpty)
+          _comingSoon('Videos for this are coming soon')
+        else
+          for (final it in f.videos) _feedItemCard(it),
       ]);
 
-  Widget _contentCard(VedaContentRef ref) {
-    final c = _kindColor(ref.kind);
+  // A tappable pointer card — deep-links to the exact content on top of Ask Veda.
+  Widget _feedItemCard(VedaFeedItem it) {
+    final c = _kindColorStr(it.kind);
+    final snippet = (it.snippet ?? '').trim();
     return GestureDetector(
-      onTap: () => _openContent(ref),
+      onTap: () => _openItem(it),
       child: Container(
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.all(13),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: _vCardBorder), boxShadow: _vCardShadow),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 56, height: 56, alignment: Alignment.center, decoration: BoxDecoration(color: c.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Icon(_kindIcon(ref.kind), size: 24, color: c)),
+          Container(width: 56, height: 56, alignment: Alignment.center, decoration: BoxDecoration(color: c.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Icon(_kindIconStr(it.kind), size: 24, color: c)),
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(ref.typeLabel.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: _vPurple2)),
+              Text(_kindLabel(it.kind), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: _vPurple2)),
               const SizedBox(height: 4),
-              Text(ref.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
-              const SizedBox(height: 3),
-              Text(ref.snippet, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 12, height: 1.35, color: _vMuted)),
+              Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
+              if (snippet.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(snippet, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 12, height: 1.35, color: _vMuted)),
+              ],
             ]),
           ),
           const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD))),
@@ -546,50 +591,37 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // S5 - Community insights
-  Widget _communitySection(String text) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  // S5 - Community insights (on hold — needs its own build)
+  Widget _communityComingSoon() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.forum_rounded, 'Community insights'),
-        GestureDetector(
-          onTap: () => openPpTab(context, 3),
-          behavior: HitTestBehavior.opaque,
-          child: _card(padding: const EdgeInsets.fromLTRB(16, 16, 18, 16), child: Row(children: [
-            _avatarStack(),
-            const SizedBox(width: 12),
-            Expanded(child: Text(text, style: GoogleFonts.manrope(fontSize: 13.5, height: 1.5, color: _vBody2))),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD)),
-          ])),
-        ),
+        _comingSoon('Community insights are coming soon'),
       ]);
 
-  Widget _avatarStack() => SizedBox(
-        width: 64,
-        height: 28,
-        child: Stack(children: [
-          _miniAvatar(0, const [Color(0xFFF0476A), Color(0xFFFF8AA0)]),
-          _miniAvatar(18, const [Color(0xFF7C3AED), Color(0xFFB08BF0)]),
-          _miniAvatar(36, const [Color(0xFFF0A046), Color(0xFFFFD08A)]),
-        ]),
-      );
-
-  Widget _miniAvatar(double left, List<Color> colors) => Positioned(
-        left: left,
-        child: Container(width: 28, height: 28, decoration: BoxDecoration(gradient: LinearGradient(colors: colors), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
-      );
-
   // S6 - Products
-  Widget _productsSection(VedaAnswerView v) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget _productsFeed(AskVedaResult f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.redeem_rounded, 'Products', top: 28),
-        Padding(padding: const EdgeInsets.only(left: 30, bottom: 13), child: Text('Suggested for your question', style: GoogleFonts.manrope(fontSize: 12, color: _vMuted2))),
-        SizedBox(
-          height: 188,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.zero,
-            itemCount: v.products.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 13),
-            itemBuilder: (_, i) => _productCard(v.products[i]),
+        if (f.products.isEmpty)
+          _comingSoon('Relevant products are coming soon')
+        else
+          SizedBox(
+            height: 188,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: f.products.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 13),
+              itemBuilder: (_, i) => _productPointerCard(f.products[i]),
+            ),
           ),
-        ),
+      ]);
+
+  // S7 - Services
+  Widget _servicesFeed(AskVedaResult f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead(Icons.verified_user_rounded, 'Services'),
+        if (f.services.isEmpty)
+          _comingSoon('Relevant services are coming soon')
+        else
+          for (final it in f.services) _feedItemCard(it),
       ]);
 
   PpProduct? _matchProduct(String label) {
@@ -601,8 +633,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     return null;
   }
 
-  Widget _productCard(String label) {
-    final prod = _matchProduct(label);
+  Widget _productPointerCard(VedaFeedItem it) {
+    final prod = _matchProduct(it.title);
     return GestureDetector(
       onTap: () => prod != null ? _open(ProductDetailScreen(product: prod)) : openPpTab(context, 4),
       child: Container(
@@ -619,7 +651,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(11, 11, 13, 13),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(prod?.name ?? label, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
+              Text(prod?.name ?? it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
               const SizedBox(height: 8),
               Text(prod?.priceLabel ?? 'View in Products', style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: _vPurple)),
             ]),
@@ -638,9 +670,33 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  // ---- content-ref sheet + kind styling -------------------------------------
-  void _openContent(VedaContentRef ref) {
-    final c = _kindColor(ref.kind);
+  // ---- deep-linking : open the exact content on TOP of Ask Veda -------------
+  void _openItem(VedaFeedItem it) {
+    final kind = (it.kind ?? '').toLowerCase();
+    if (kind == 'product') {
+      final prod = _matchProduct(it.title);
+      if (prod != null) {
+        _open(ProductDetailScreen(product: prod));
+      } else {
+        openPpTab(context, 4); // Products tab
+      }
+      return;
+    }
+    if (kind == 'video') {
+      _snack('This video is coming soon'); // wired in a later job
+      return;
+    }
+    // articles / reads / guides / experts → the reader, pushed over Ask Veda.
+    _openReader(it);
+  }
+
+  // A reader sheet showing the real content (full body). Dismissing returns to
+  // Ask Veda — she never leaves the chat.
+  void _openReader(VedaFeedItem it) {
+    final c = _kindColorStr(it.kind);
+    final text = (it.body?.trim().isNotEmpty ?? false)
+        ? it.body!.trim()
+        : (it.snippet?.trim() ?? '');
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -662,15 +718,15 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(color: c.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(99)),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(_kindIcon(ref.kind), size: 13, color: c),
+                  Icon(_kindIconStr(it.kind), size: 13, color: c),
                   const SizedBox(width: 5),
-                  Text(ref.typeLabel, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: c)),
+                  Text(_kindLabel(it.kind), style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: c)),
                 ]),
               ),
               const SizedBox(height: 12),
-              Text(ref.title, style: GoogleFonts.fraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: _vInk2)),
+              Text(it.title, style: GoogleFonts.fraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: _vInk2)),
               const SizedBox(height: 12),
-              Text(ref.body.trim(), style: GoogleFonts.manrope(fontSize: 14.5, height: 1.6, color: _vBody)),
+              Text(text, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.6, color: _vBody)),
               const SizedBox(height: 18),
               Text('This is general guidance for your child’s stage - please confirm anything important with your paediatrician.', style: GoogleFonts.manrope(fontSize: 11.5, height: 1.5, color: _vMuted2)),
             ],
@@ -680,43 +736,70 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  Color _kindColor(VedaKind k) {
-    switch (k) {
-      case VedaKind.read:
-        return const Color(0xFF4A7BC8);
-      case VedaKind.product:
-        return const Color(0xFF3E9A8C);
-      case VedaKind.community:
-        return _vPurple;
-      case VedaKind.recipe:
-        return _vCoral;
-      case VedaKind.expert:
-        return _vPurple2;
-      case VedaKind.activity:
-        return const Color(0xFFC98A2B);
-      case VedaKind.health:
-        return const Color(0xFF3E6DA6);
+  // ---- kind → label / colour / icon (the backend sends `kind` as a string) --
+  String _kindLabel(String? k) {
+    switch ((k ?? '').toLowerCase()) {
+      case 'product':
+        return 'PRODUCT';
+      case 'expert':
+        return 'EXPERT';
+      case 'video':
+        return 'VIDEO';
+      case 'recipe':
+        return 'RECIPE';
+      case 'cani':
+        return 'CAN I…';
+      case 'scan':
+        return 'SCAN GUIDE';
+      case 'health':
+        return 'HEALTH';
+      case 'garbh':
+      case 'spiritual':
+        return 'GARBH SANSKAR';
+      case 'symptom':
+        return 'SYMPTOM';
       default:
-        return _vPurple2;
+        return 'READING';
     }
   }
 
-  IconData _kindIcon(VedaKind k) {
-    switch (k) {
-      case VedaKind.read:
-        return Icons.menu_book_rounded;
-      case VedaKind.product:
+  Color _kindColorStr(String? k) {
+    switch ((k ?? '').toLowerCase()) {
+      case 'product':
+        return const Color(0xFF3E9A8C);
+      case 'expert':
+        return _vPurple2;
+      case 'recipe':
+        return _vCoral;
+      case 'health':
+      case 'scan':
+        return const Color(0xFF3E6DA6);
+      case 'video':
+        return const Color(0xFFC0392B);
+      case 'garbh':
+      case 'spiritual':
+        return _vPurple;
+      default:
+        return const Color(0xFF4A7BC8);
+    }
+  }
+
+  IconData _kindIconStr(String? k) {
+    switch ((k ?? '').toLowerCase()) {
+      case 'product':
         return Icons.shopping_bag_rounded;
-      case VedaKind.community:
-        return Icons.groups_rounded;
-      case VedaKind.recipe:
-        return Icons.restaurant_menu_rounded;
-      case VedaKind.expert:
+      case 'expert':
         return Icons.verified_user_rounded;
-      case VedaKind.activity:
-        return Icons.extension_rounded;
-      case VedaKind.health:
+      case 'recipe':
+        return Icons.restaurant_menu_rounded;
+      case 'health':
+      case 'scan':
         return Icons.monitor_heart_rounded;
+      case 'video':
+        return Icons.play_circle_fill_rounded;
+      case 'garbh':
+      case 'spiritual':
+        return Icons.self_improvement_rounded;
       default:
         return Icons.menu_book_rounded;
     }

@@ -492,10 +492,11 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // The parenting Ask Veda is now a REAL search on the shared engine (not the
-  // old static mock): entering a question renders the shared 7-section
-  // VedaResultView with a grounded answer from the parenting corpus.
-  testWidgets('Ask Veda (parenting): a question renders a real answer', (tester) async {
+  // Ask Veda now answers from the RAG backend (the offline engine was retired
+  // from the answer path). With no backend reachable in a test, submitting a
+  // question shows the graceful "connect to the internet" state — proving the
+  // screen never shows a misleading offline answer and never crashes.
+  testWidgets('Ask Veda (parenting): no backend shows the offline state', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -508,8 +509,8 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    // the pregnancy-style result page renders with the 'Veda Answer' card
-    expect(find.text('Veda Answer'), findsOneWidget);
+    // no server in tests → the calm "connect to the internet" card, no crash
+    expect(find.text('Connect to the internet'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
