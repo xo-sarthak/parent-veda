@@ -26,7 +26,12 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(const MaterialApp(home: MyBookingsScreen()));
-    await tester.pumpAndSettle();
+    // Explicit pumps rather than pumpAndSettle: the screen kicks off async
+    // reminder-scheduling in a post-frame callback, and pumpAndSettle can race
+    // with that background work under the parallel test runner. Two pumps are
+    // enough to run the post-frame callback and settle the rebuild.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
   }
 
   testWidgets('empty state shows when nothing is booked', (tester) async {

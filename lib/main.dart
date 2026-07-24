@@ -21,6 +21,8 @@ import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
 import 'services/remote/supabase_profile_sink.dart';
+import 'doctor/doctor_session.dart';
+import 'screens/doctor/doctor_scaffold.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
 import 'services/bought_store.dart';
@@ -225,8 +227,16 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
         if (child != null) Positioned.fill(child: child),
         GlobalAskFab(pregnancy: _controller),
       ]),
-      // Launch into the splash screen; it cross-fades into MainScaffold.
-      home: SplashScreen(pregnancy: _controller, home: _home, father: _father),
+      // Doctor mode swaps the WHOLE app to the expert experience, exactly as
+      // FatherPreview flips mother/father — a doctor logs in and sees their
+      // dashboard, not the parent app. Otherwise, the normal splash → parent app.
+      home: AnimatedBuilder(
+        animation: DoctorSession.instance,
+        builder: (context, _) => DoctorSession.instance.active
+            ? const DoctorScaffold()
+            : SplashScreen(
+                pregnancy: _controller, home: _home, father: _father),
+      ),
     );
   }
 }

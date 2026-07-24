@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/call_screen.dart';
 import '../../services/notification_service.dart';
 import 'pp_common.dart';
 
@@ -157,8 +158,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // ---- upcoming -------------------------------------------------------------
 
   Widget _upcomingCard(Booking b) {
-    final now = DateTime.now();
-    final joinable = b.joinableAt(now);
+    // Any upcoming booking can be joined (a "waiting room" model) — friendlier
+    // than a strict 10-min gate, and it makes the call testable before a slot's
+    // real time. Tighten to b.joinableAt(now) later if you want a hard window.
+    final joinable = b.isUpcoming;
     return ppCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -198,38 +201,40 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   }
 
   Widget _joinButton(Booking b, bool joinable) {
-    // joinUrl is null until the live-call provider is settled. Be honest about
-    // it rather than showing a button that does nothing.
-    final hasLink = (b.joinUrl ?? '').isNotEmpty;
-    final live = joinable && hasLink;
-    final label = live
-        ? 'Join now'
-        : joinable
-            ? 'Link coming'
-            : 'Reminder set';
-    final icon = live
+    // "Join now" is live in the join window — the LiveKit room is derived from
+    // the booking server-side, so no link is needed. Outside the window it's a
+    // quiet "Reminder set".
+    final label = joinable ? 'Join now' : 'Reminder set';
+    final icon = joinable
         ? Icons.videocam_rounded
-        : joinable
-            ? Icons.hourglass_top_rounded
-            : Icons.notifications_active_outlined;
-    return Opacity(
-      opacity: live ? 1 : 0.75,
-      child: Container(
-        height: 42,
-        decoration: BoxDecoration(
-          color: live ? ppPurple : ppPanel,
-          borderRadius: BorderRadius.circular(12),
+        : Icons.notifications_active_outlined;
+    return GestureDetector(
+      onTap: joinable ? () => _openCall(b) : null,
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: joinable ? 1 : 0.75,
+        child: Container(
+          height: 42,
+          decoration: BoxDecoration(
+            color: joinable ? ppPurple : ppPanel,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, size: 15, color: joinable ? Colors.white : ppSoft),
+            const SizedBox(width: 7),
+            Text(label,
+                style: ppBody(13,
+                    color: joinable ? Colors.white : ppSoft, w: FontWeight.w700)),
+          ]),
         ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(icon, size: 15, color: live ? Colors.white : ppSoft),
-          const SizedBox(width: 7),
-          Text(label,
-              style: ppBody(13,
-                  color: live ? Colors.white : ppSoft, w: FontWeight.w700)),
-        ]),
       ),
     );
   }
+
+  void _openCall(Booking b) => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+            builder: (_) => CallScreen(bookingId: b.id, title: b.title)),
+      );
 
   // ---- past -----------------------------------------------------------------
 

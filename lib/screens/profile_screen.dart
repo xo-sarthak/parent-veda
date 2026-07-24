@@ -9,6 +9,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../doctor/doctor_session.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -316,6 +318,23 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 13),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // --- Enter doctor mode (testing) --------------------------------
+          // Swaps the whole app to the expert dashboard. For now it enters as
+          // Dr. Neha Sharma (a bookable consult doctor); later this becomes a
+          // real doctor sign-in from the login screen. Remove/gate before launch.
+          OutlinedButton.icon(
+            onPressed: () => DoctorSession.instance.enter('neha'),
+            icon: const Icon(Icons.medical_services_outlined, size: 18),
+            label: const Text('Enter doctor mode · testing'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.primary600,
+              side: BorderSide(color: AppTheme.primary500.withValues(alpha: 0.35)),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
           ),
           const SizedBox(height: 10),

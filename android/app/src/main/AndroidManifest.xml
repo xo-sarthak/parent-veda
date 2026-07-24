@@ -2,8 +2,14 @@
     <!-- Watch video player streams over the network (video_player / ExoPlayer).
          Debug builds inject this automatically; declared here so release does too. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Voice journaling: capture the mother's spoken note. -->
+    <!-- Voice journaling: capture the mother's spoken note. Also used by the
+         LiveKit video call (mic). -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Live video consults/classes (LiveKit / WebRTC): camera + audio routing. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <!-- Customizable reminders (flutter_local_notifications). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
