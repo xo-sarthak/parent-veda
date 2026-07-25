@@ -17,8 +17,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../brand/outbound.dart';
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
 import '../../data/ready_for_birth_data.dart';
@@ -28,6 +28,7 @@ import '../../services/hospital_bag_v2_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/ready_birth_context_store.dart';
 import '../../theme/app_theme.dart';
+import '../product_guide/product_guide_chooser.dart';
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -1078,7 +1079,22 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
       if (affiliate) {
         _bag.setBuyElse(item.id, store: p.store, link: p.link, price: p.price);
         if (p.link.isNotEmpty) {
-          launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
+          // NATIVE DISCOVERY (Brand Product 14) + Commerce Integration.
+          //
+          // This used to launchUrl() straight to the retailer, which broke two
+          // rules at once: a product named inside ParentVeda content should
+          // reach its Product GUIDE first where one exists (education before
+          // commerce), and every outbound click should go through openOutbound
+          // so it is tagged and attributed rather than leaving untracked.
+          //
+          // Old line kept for revert:
+          // launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
+          openProductWithGuideCheck(
+            context,
+            id: p.id,
+            name: p.name,
+            onOpenNormal: () => openOutbound(p.link, productId: p.id),
+          );
         }
       } else {
         _bag.chooseVedaProduct(item.id, productId: p.id, price: p.price);

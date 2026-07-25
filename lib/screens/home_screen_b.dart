@@ -18,6 +18,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../brand/brand_models.dart';
+import '../brand/launch_spotlight.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
@@ -148,6 +151,15 @@ class HomeScreenB extends StatelessWidget {
             // below the Weekly Snapshot (a highlighted read, not just a card). ==
             GrowModule(day: day, lang: lang, home: home),
             const SizedBox(height: 24),
+            // LAUNCH SPOTLIGHT (Brand Product 2) — the Launch Hub's front door.
+            // Renders NOTHING unless a launch is live for this mother, which is
+            // the usual case. A door to editorial, never an offer, and always
+            // labelled. See docs/BRAND-STUDIO.md §3.
+            LaunchSpotlight(
+              stage: BrandStage.pregnancy,
+              pregnancyWeek: week,
+              padding: const EdgeInsets.only(bottom: 24),
+            ),
             // ===== TODAY'S JOURNEY - everything daily lives under this heading ==
             _todaysJourneyHeading(s),
             const SizedBox(height: 14),

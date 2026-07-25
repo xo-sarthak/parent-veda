@@ -370,8 +370,8 @@ void main() {
     final toldHub = BrandStudio.instance.archiveFor(BrandSlot.launchHub, told);
 
     expect(toldHub.length, greaterThan(quietHub.length));
-    expect(quietHub.any((c) => c.id == 'launch_mamabloom_nursing'), isFalse);
-    expect(toldHub.any((c) => c.id == 'launch_mamabloom_nursing'), isTrue);
+    expect(quietHub.any((c) => c.id == 'launch_philips_avent_nursing'), isFalse);
+    expect(toldHub.any((c) => c.id == 'launch_philips_avent_nursing'), isTrue);
   });
 
   test('every audience field only ever narrows', () {

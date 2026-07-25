@@ -32,6 +32,7 @@ import 'reminders_screen.dart';
 import 'package:flutter/foundation.dart';
 
 import '../brand/brand_preview_screen.dart';
+import 'brand_showcase_screen.dart';
 import '../brand/brand_models.dart';
 import '../brand/launch_hub_screen.dart';
 import 'product_guide/product_guide_hub_screen.dart';
@@ -113,6 +114,10 @@ class ToolsHubScreen extends StatelessWidget {
                 stage: BrandStage.pregnancy,
                 pregnancyWeek: controller.currentWeek,
               ))),
+      // The guided tour of all 15 brand products. NOT debug-gated on purpose:
+      // a monetization architecture nobody can see may as well not exist.
+      _Tool('Brand Studio', Icons.workspace_premium_outlined, const Color(0xFF6A30B6),
+          () => open(() => BrandShowcaseScreen(pregnancyWeek: controller.currentWeek))),
       // Debug-only workbench. The Brand Studio's job is to show almost nothing,
       // so this is the only way to see whether it is working at all.
       if (kDebugMode)

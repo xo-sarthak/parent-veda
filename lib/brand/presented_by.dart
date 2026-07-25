@@ -19,6 +19,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'brand_analytics.dart';
 import 'brand_context.dart';
 import 'brand_disclosure.dart';
+import 'brand_mark.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
 
@@ -70,6 +71,44 @@ class _PresentedByState extends State<PresentedBy> {
   Widget build(BuildContext context) {
     final c = _campaign;
     if (c == null) return const SizedBox.shrink();
+    // The ORIGINAL line: a 5px dot and 11px grey text. Architecturally correct
+    // and effectively invisible - a reviewer opening the app could not tell the
+    // Brand Studio existed at all. Kept for easy revert:
+    //
+    // return Padding(
+    //   padding: widget.padding,
+    //   child: GestureDetector(
+    //     behavior: HitTestBehavior.opaque,
+    //     onTap: () {
+    //       BrandAnalytics.instance.event(c, BrandEvent.opened);
+    //       showSponsorSheet(context, c);
+    //     },
+    //     child: Row(mainAxisSize: MainAxisSize.min, children: [
+    //       Container(
+    //         width: 5,
+    //         height: 5,
+    //         decoration: BoxDecoration(color: c.brand.colour, shape: BoxShape.circle),
+    //       ),
+    //       const SizedBox(width: 7),
+    //       Text(
+    //         c.disclosure,
+    //         style: GoogleFonts.manrope(
+    //           fontSize: 11,
+    //           fontWeight: FontWeight.w700,
+    //           color: widget.color ?? const Color(0xFF69636C),
+    //         ),
+    //       ),
+    //       const SizedBox(width: 3),
+    //       Icon(Icons.info_outline_rounded, size: 12, color: widget.color ?? const Color(0xFFA99CBB)),
+    //     ]),
+    //   ),
+    // );
+    //
+    // What replaces it is still QUIET - no banner, no colour block, nothing that
+    // competes with the content it funds - but it now carries the brand's mark
+    // and sits on a soft tint, so it reads as an attribution rather than as
+    // incidental grey text. Tapping still opens the disclosure sheet.
+    final tint = widget.color == null;
     return Padding(
       padding: widget.padding,
       child: GestureDetector(
@@ -78,24 +117,35 @@ class _PresentedByState extends State<PresentedBy> {
           BrandAnalytics.instance.event(c, BrandEvent.opened);
           showSponsorSheet(context, c);
         },
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration: BoxDecoration(color: c.brand.colour, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 7),
-          Text(
-            c.disclosure,
-            style: GoogleFonts.manrope(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: widget.color ?? const Color(0xFF69636C),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(8, 6, 10, 6),
+          decoration: tint
+              ? BoxDecoration(
+                  color: c.brand.colour.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: c.brand.colour.withValues(alpha: 0.16)),
+                )
+              : null,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            BrandMark(brand: c.brand, size: 20),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                c.disclosure,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.manrope(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.1,
+                  color: widget.color ?? const Color(0xFF4A4550),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: 3),
-          Icon(Icons.info_outline_rounded, size: 12, color: widget.color ?? const Color(0xFFA99CBB)),
-        ]),
+            const SizedBox(width: 5),
+            Icon(Icons.info_outline_rounded,
+                size: 13, color: widget.color ?? const Color(0xFF8E86A0)),
+          ]),
+        ),
       ),
     );
   }

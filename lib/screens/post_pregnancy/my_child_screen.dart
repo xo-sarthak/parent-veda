@@ -41,6 +41,8 @@ import 'phase_detail_screen.dart';
 import 'phase_map_screen.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/brand_notifications.dart';
+import '../../brand/launch_spotlight.dart';
+import '../../brand/premiere_screen.dart';
 import 'pp_phases_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
@@ -82,6 +84,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
     if (widget.home) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         BrandNotifications.instance.maybeSend(stage: BrandStage.parenting);
+      });
+      // PREMIERE (Brand Product 1). Until now the ONLY trigger in the whole app
+      // was the pregnancy shell, so the flagship product could never fire on
+      // the parenting side at all — half the app could not show the one
+      // placement that most obviously reads as "sponsorship exists". Resolves
+      // to null almost always (3–6 campaigns a year, once each), and null is
+      // the correct, normal answer.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showPremiereIfAny(context, stage: BrandStage.parenting);
       });
     }
   }
@@ -156,6 +168,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   // 16 beat with 20/24 at major breaks; 34 was a big part of
                   // why the parenting pages felt like a different product.
                   const SizedBox(height: 26),
+                  // LAUNCH SPOTLIGHT (Brand Product 2). Renders NOTHING unless a
+                  // launch is genuinely live for this parent, which is the usual
+                  // case. It is a door to editorial - story, expert, resources -
+                  // never an offer, and it is labelled as sponsored.
+                  _pad(LaunchSpotlight(
+                    stage: BrandStage.parenting,
+                    padding: const EdgeInsets.only(bottom: 26),
+                  )),
                   _snapshot(),
                   const SizedBox(height: 26),
                   _milestones(),

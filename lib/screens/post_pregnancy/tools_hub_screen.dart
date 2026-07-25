@@ -25,6 +25,7 @@ import 'sleep_journey_screen.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../brand/brand_preview_screen.dart';
+import '../brand_showcase_screen.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/launch_hub_screen.dart';
 import '../product_guide/product_guide_hub_screen.dart';
@@ -106,6 +107,12 @@ class ToolsHubScreen extends StatelessWidget {
               // purpose — it is never pushed at anyone. docs/BRAND-STUDIO.md §3.
               _tracker(context, Icons.auto_awesome_outlined, const Color(0xFFF6EFE6), 'Launches', 'New, and worth knowing about', ppBrown,
                   () => _push(context, const LaunchHubScreen(stage: BrandStage.parenting))),
+              const SizedBox(height: 10),
+              // The guided tour of all 15 brand products. NOT debug-gated: the
+              // whole point is that someone can be handed the app and shown the
+              // monetization architecture working, in context.
+              _tracker(context, Icons.workspace_premium_outlined, const Color(0xFFF3EEF7), 'Brand Studio', 'All 15 brand products, walk them end to end', ppPurple,
+                  () => _push(context, const BrandShowcaseScreen())),
               const SizedBox(height: 10),
               // Debug-only workbench — see every campaign and why it is blocked.
               if (kDebugMode)

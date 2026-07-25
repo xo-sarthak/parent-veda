@@ -12,6 +12,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../brand/brand_models.dart';
+import '../../brand/sampling_card.dart';
+
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
@@ -69,6 +72,17 @@ class RecommendationsScreen extends StatelessWidget {
                     _ctxPill(Icons.auto_awesome, currentPhase(child).name),
                   ])),
 
+                  // PRODUCT SAMPLING (Brand Product 12). Renders nothing unless
+                  // a sampling campaign is live for this parent. Sits ABOVE the
+                  // picks because it is a distinct kind of thing - something to
+                  // claim, not something to read - and it is clearly labelled
+                  // as sponsored so it can never be mistaken for a pick.
+                  const SizedBox(height: 22),
+                  _pad(SamplingCard(
+                    stage: BrandStage.parenting,
+                    padding: EdgeInsets.zero,
+                  )),
+
                   // HERO - recommended today
                   const SizedBox(height: 26),
                   _pad(_sectionHead(Icons.star_rounded, 'Recommended for ${child.name} today', sub: 'A few things worth your time - and why each one is here.', onMore: () => _openAll(context, 'Recommended today', today))),
@@ -124,7 +138,14 @@ class RecommendationsScreen extends StatelessWidget {
                   ])),
 
                   const SizedBox(height: 24),
-                  _pad(Text('Every recommendation is curated by ParentVeda editors and tuned to ${child.name} - balanced, evidence-first, never sponsored.',
+                  // NOTE: this used to end "never sponsored". That stopped being
+                  // true the moment featured recommendations and the sampling
+                  // card landed on this screen, and a promise the page quietly
+                  // breaks is worse than no promise. What is actually true - and
+                  // enforced in rank_floor.dart - is that sponsorship never buys
+                  // RANK. Old line kept for revert:
+                  // 'Every recommendation is curated by ParentVeda editors and tuned to ${child.name} - balanced, evidence-first, never sponsored.'
+                  _pad(Text('Every recommendation is curated by ParentVeda editors and tuned to ${child.name} - balanced and evidence-first. Anything a brand has paid for is labelled, and paying never moves a pick up this page.',
                       textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
                 ],
               );
