@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Android WINDOW background sitting behind Flutter's surface. Must
+         match the app's scaffold background (AppTheme.scaffoldBackground /
+         ppBg == 0xFFFBF9FE) so that any moment the Flutter surface is not
+         painting - launch, resume, activity resize, and especially hybrid
+         composition when a platform view (LiveKit/WebRTC, video_player) is on
+         screen - shows the app's own colour instead of a black hole. -->
+    <color name="pv_window_background">#FFFBF9FE</color>
+</resources>

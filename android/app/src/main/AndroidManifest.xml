@@ -8,6 +8,10 @@
     <!-- Live video consults/classes (LiveKit / WebRTC): camera + audio routing. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- Saving a Memory card to the gallery on Android 9 and below (gal). API 29+
+         uses scoped storage and needs no permission. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <!-- Customizable reminders (flutter_local_notifications). -->
@@ -50,6 +54,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Fall back to the Skia renderer instead of Impeller (Vulkan). On some
+             Android devices/drivers (seen on Galaxy S21 FE, Android 16) Impeller
+             paints modal bottom sheets & dialogs as a solid BLACK overlay while
+             the real content sits underneath. Skia renders them correctly.
+             Revisit once Impeller stabilises on these devices. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
         <!-- DELIVERS a scheduled reminder when its alarm fires. Required by
              flutter_local_notifications: the plugin's own manifest declares
              permissions ONLY, no receivers, so the app must declare these or

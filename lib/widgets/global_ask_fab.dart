@@ -133,7 +133,16 @@ class GlobalAskFab extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([FabState.instance, FatherPreview.instance, AppNav.instance]),
       builder: (context, _) {
-        if (!FabState.instance.visible) return const SizedBox.shrink();
+        // Hidden state MUST stay a Positioned child. A bare SizedBox.shrink()
+        // here is a zero-sized NON-positioned child, which collapses an
+        // enclosing loose Stack to 0x0 - and since this FAB is stacked over the
+        // whole app in MaterialApp.builder, that rendered the entire app at zero
+        // size (a black screen) every time the FAB hid itself: over Ask Veda,
+        // over the Premiere takeover, and over every modal sheet and dialog.
+        if (!FabState.instance.visible) {
+          return const Positioned(
+              left: 0, top: 0, width: 0, height: 0, child: SizedBox.shrink());
+        }
 
         // Clear the bottom chrome. On the pregnancy Today tab a Mom|Dad dev
         // pill floats at bottom:96, so sit above it there; otherwise clear the

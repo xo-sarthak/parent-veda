@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
+    <!-- Was ?android:colorBackground, which resolves to BLACK when the phone's
+         system dark mode is on - a black launch flash on a light-only app.
+         Pinned to the app's own background colour instead. -->
+    <item android:drawable="@color/pv_window_background" />
 
     <!-- You can insert your own image assets here -->
     <!-- <item>
