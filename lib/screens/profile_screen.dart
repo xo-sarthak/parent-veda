@@ -10,8 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
 import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
+import 'memories/memories_home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -303,6 +306,42 @@ class ProfileScreen extends StatelessWidget {
           _LanguageCard(controller: controller),
           const SizedBox(height: 14),
           // --- WhatsApp updates (B2 opt-in) -------------------------------
+          // Memories — make a keepsake card for the big milestones.
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => const MemoriesHomeScreen())),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                    colors: [Color(0xFFF7E2E8), Color(0xFFDCEAF4)]),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(children: [
+                const Icon(Icons.auto_awesome_outlined,
+                    size: 22, color: Color(0xFF5A4A6B)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Memories',
+                            style: GoogleFonts.fraunces(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF3A352E))),
+                        Text('Announce your pregnancy or baby, beautifully.',
+                            style: GoogleFonts.manrope(
+                                fontSize: 12, color: const Color(0xFF6B6154))),
+                      ]),
+                ),
+                const Icon(Icons.arrow_forward_rounded,
+                    size: 20, color: Color(0xFF5A4A6B)),
+              ]),
+            ),
+          ),
           _WhatsAppCard(controller: controller),
           const SizedBox(height: 16),
           // --- Reset to Week 20 (testing) ---------------------------------

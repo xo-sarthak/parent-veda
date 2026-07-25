@@ -22,6 +22,7 @@ import 'development_home_screen.dart';
 // import 'food_home_screen.dart';
 // import 'guides_tools_screen.dart';
 import 'learning_home_screen.dart';
+import '../memories/memories_home_screen.dart';
 import 'my_bookings_screen.dart';
 import 'yoga_home_screen.dart';
 // The Health Guide is now reached from inside the Health ecosystem, not the
@@ -106,6 +107,8 @@ class ExploreDrawer extends StatelessWidget {
                       'Live & recorded classes for every stage.', const YogaHomeScreen()),
                   _section(context, Icons.event_available_outlined, 'My Bookings',
                       'Your classes & sessions, all in one place.', const MyBookingsScreen()),
+                  _section(context, Icons.auto_awesome_outlined, 'Memories',
+                      'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
                   // Masterclasses + Cohort Courses + Courses are now one section (above);
                   // "Guides & Tools" is retired. All kept (commented) for easy revert:
                   // _section(context, Icons.school_outlined, 'Masterclasses',

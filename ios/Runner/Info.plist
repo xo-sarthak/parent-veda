@@ -10,6 +10,8 @@
 	<string>ParentVeda uses speech recognition to turn your spoken words into journal text.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>ParentVeda lets you add photos to your journal memories.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>ParentVeda saves your Memory cards to your photo gallery.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>ParentVeda lets you capture photo memories for your journal.</string>
 	<key>CFBundleDevelopmentRegion</key>

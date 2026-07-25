@@ -39,8 +39,11 @@ dependencies:
   # runtime dependency), not under dev_dependencies.
   google_fonts: ^6.2.1
 
-  # Share sheet for the "Forward to Partner via WhatsApp" CTA.
+  # Share sheet for the "Forward to Partner via WhatsApp" CTA + Memories share.
   share_plus: ^10.1.4
+
+  # Save a generated Memory card to the device photo gallery.
+  gal: ^2.3.0
 
   # Audio playback for the Garbh Sanskar raga / affirmations player.
   audioplayers: ^6.1.0
@@ -107,6 +110,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Lets a test swap in a fake documents directory (memories_test stubs it to
+  # prove a picked photo is copied out of the picker's purgeable cache).
+  path_provider_platform_interface: ^2.1.3
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -133,6 +140,7 @@ flutter:
     - assets/audio/raga_drone.wav
     - assets/baby/
     - assets/brand/
+    - assets/brand/partners/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
