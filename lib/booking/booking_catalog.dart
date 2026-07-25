@@ -27,11 +27,14 @@
 // =============================================================================
 
 import '../data/prepare_data.dart';
-import '../doctor/doctor_availability.dart';
+import '../doctor/doctor_availability.dart'; // retired, kept for revert
+import '../doctor/doctor_schedule.dart';
+import '../doctor/doctor_schedule_store.dart';
 import '../screens/post_pregnancy/pp_experts_data.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import '../screens/post_pregnancy/pp_yoga_data.dart';
 import 'booking_models.dart';
+import 'booking_store.dart';
 
 class BookingCatalog {
   BookingCatalog._();
@@ -257,12 +260,19 @@ class BookingCatalog {
             capacity: 18 + seed % 8,
             count: 9);
       case OfferingKind.consult:
-        // If the doctor has set real availability, those windows ARE the slots.
-        // Otherwise fall back to the generated calendar so nothing is empty.
-        final wins = DoctorAvailability.instance.windows(o.expertId);
-        return wins.isNotEmpty
-            ? _fromAvailability(at, o, wins)
-            : _calendar(at, o, seed);
+        // PHASE 3: the doctor's schedule IS the slot list. What they set in
+        // Availability is what a parent sees - same engine, same rules, no
+        // second source of truth to drift.
+        //
+        // The fallback calendar stays for a doctor who has genuinely set
+        // nothing: an empty booking screen reads as "broken app" rather than
+        // "this doctor has not opened their diary". Once a doctor has saved a
+        // schedule, their schedule is the ONLY thing consulted - including when
+        // it says they are unavailable.
+        if (DoctorScheduleStore.instance.hasSetUp(o.expertId)) {
+          return _fromSchedule(at, o);
+        }
+        return _calendar(at, o, seed);
       case OfferingKind.masterclass:
         return _oneOff(at, o,
             daysAhead: 5 + seed % 4,
@@ -353,8 +363,61 @@ class BookingCatalog {
     return out;
   }
 
-  /// Turn a doctor's weekly availability into concrete upcoming slots — the
-  /// next few occurrences of each window they marked free. Capacity 1 (a 1:1).
+  /// A doctor's schedule turned into the slots a parent may book.
+  ///
+  /// Everything that decides whether a time is offered - sessions, duration,
+  /// buffers, per-day and consecutive caps, notice, advance window, time off,
+  /// date overrides, pause - lives in generateSlots(). This function only
+  /// dresses the result as booking-engine Slots. That split is the point: the
+  /// doctor's preview and the parent's list are literally the same computation.
+  static List<Slot> _fromSchedule(DateTime from, Offering o) {
+    final schedule = DoctorScheduleStore.instance.scheduleFor(o.expertId);
+    final now = from.toLocal();
+
+    // Times already taken, so nothing is offered twice. Matched on offeringId:
+    // a consult offering is one-per-doctor (off_exp_<id>), so this is exactly
+    // "this doctor's booked times". Local, because the schedule works in local
+    // wall-clock (IST).
+    //
+    // NOTE this is the LOCAL view. The authoritative guard against two parents
+    // taking the same minute stays the server: book_slot in 0029 locks the row.
+    // This only stops us OFFERING something we already know is gone.
+    final booked = BookingStore.instance
+        .bookings()
+        .where((b) =>
+            b.offeringId == o.id && b.status != BookingStatus.cancelled)
+        .map((b) => b.startsUtc.toLocal())
+        .toSet();
+
+    final generated = generateSlots(
+      schedule,
+      from: now,
+      days: schedule.rules.advanceWindowDays,
+      booked: booked,
+      now: now,
+    );
+
+    return [
+      for (var i = 0; i < generated.length; i++)
+        Slot(
+          // Stable across rebuilds: the same minute always yields the same id,
+          // so a slot a parent is looking at does not change identity under
+          // them mid-booking.
+          id: '${o.id}_s${generated[i].start.millisecondsSinceEpoch}',
+          offeringId: o.id,
+          expertId: o.expertId,
+          startsUtc: generated[i].start.toUtc(),
+          durationMin: generated[i].durationMin,
+          capacity: 1, // a 1:1 consultation is one seat, by definition
+          booked: 0,
+        ),
+    ];
+  }
+
+  /// RETIRED (Phase 3): the old weekday+hour windows, fixed at 50 minutes and
+  /// blind to buffers, caps, notice, time off and pause. Superseded by
+  /// _fromSchedule. Kept for revert alongside doctor_availability.dart.
+  // ignore: unused_element
   static List<Slot> _fromAvailability(
       DateTime from, Offering o, List<AvailWindow> wins) {
     final local = from.toLocal();

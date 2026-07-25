@@ -20,6 +20,9 @@ import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
+import 'doctor/doctor_schedule_store.dart';
+import 'memories/memory_analytics.dart';
+import 'services/remote/supabase_memory_sink.dart';
 import 'services/remote/supabase_profile_sink.dart';
 import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_scaffold.dart';
@@ -113,6 +116,12 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     ToolsStore.instance.init();
     // Load My Hospital Bag persistence.
     HospitalBagStore.instance.init();
+    // Doctors' real availability (0033). The PARENT side needs this, not just
+    // the doctor app: it is what makes a consult's bookable times the doctor's
+    // actual hours instead of generated ones. Local first, then the server.
+    DoctorScheduleStore.instance
+        .init()
+        .then((_) => DoctorScheduleStore.instance.syncFromServer());
     // Load Can I? saved-questions persistence.
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).
@@ -195,6 +204,11 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
       ProfileAnalytics.instance
           .completeness(FamilyProfileStore.instance.completenessPercent);
     });
+    // MEMORIES: the share-card funnel (started -> template -> photo -> preview
+    // -> saved -> shared) into the SAME profile_events table, tagged
+    // surface='memories'. Reuses ProfileAnalytics' install/session ids, so it
+    // must be set after that sink above.
+    MemoryAnalytics.instance.setSink(const SupabaseMemorySink());
     // PARENTING: guided day-by-day journeys (enrolment + which days are read).
     JourneyStore.instance.init();
     // BRAND STUDIO: which campaigns this parent has already been shown. Loaded
@@ -233,11 +247,26 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
         animation: DoctorSession.instance,
         builder: (context, _) {
           final doctor = DoctorSession.instance.active;
-          return Stack(children: [
+          return Stack(fit: StackFit.expand, children: [
             Offstage(
               offstage: doctor,
-              child: Stack(children: [
-                if (child != null) Positioned.fill(child: child),
+              // fit: StackFit.expand is load-bearing. This Stack is a
+              // non-positioned child of the outer Stack, so it is laid out with
+              // LOOSE constraints (min 0x0). A Stack with no non-positioned
+              // child takes constraints.biggest - fine - but the moment its only
+              // non-positioned child is zero-sized it collapses to 0x0 and
+              // everything inside, i.e. THE ENTIRE APP, renders at zero size:
+              // a totally black screen.
+              //
+              // That is exactly what happened whenever GlobalAskFab hid itself
+              // (it returned a bare SizedBox.shrink): over the Ask Veda screen,
+              // over the Premiere takeover, and over EVERY modal bottom sheet
+              // and dialog, because the FAB suppresses itself on any PopupRoute.
+              // Hence "black screens all over the app" that no renderer flag
+              // could fix - it was never Impeller, it was layout. Expanding
+              // pins this Stack to the full screen whatever the FAB returns.
+              child: Stack(fit: StackFit.expand, children: [
+                ?child,
                 GlobalAskFab(pregnancy: _controller),
               ]),
             ),

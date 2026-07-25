@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_timezone
   flutter_tts
   flutter_webrtc
+  gal
   livekit_client
   passkeys_windows
   printing

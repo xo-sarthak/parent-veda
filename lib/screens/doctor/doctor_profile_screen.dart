@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import 'doctor_onboarding_screen.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
@@ -21,6 +22,39 @@ class DoctorProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
       children: [
         const SizedBox(height: 8),
+        // Practice setup: profile, qualifications, council registration,
+        // documents and payout details. Every step can be skipped while we are
+        // testing - the point today is that the screens exist and can be walked.
+        GestureDetector(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const DoctorOnboardingScreen())),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: ppBorder),
+            ),
+            child: Row(children: [
+              const Icon(Icons.verified_user_outlined, size: 20, color: ppPurple),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Complete your practice setup', style: ppJakarta(13.5)),
+                      const SizedBox(height: 2),
+                      Text(
+                          'Qualifications, council registration, documents and payouts.',
+                          style: ppBody(11.5, h: 1.4)),
+                    ]),
+              ),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+            ]),
+          ),
+        ),
         Row(children: [
           Container(
             width: 62,

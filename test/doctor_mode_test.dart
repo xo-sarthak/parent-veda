@@ -10,7 +10,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/doctor/doctor_availability.dart';
+import 'package:parentveda/doctor/doctor_schedule.dart';
+import 'package:parentveda/doctor/doctor_schedule_store.dart';
 import 'package:parentveda/doctor/doctor_directory.dart';
+import 'package:parentveda/doctor/doctor_earnings.dart';
 import 'package:parentveda/doctor/doctor_roster.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
 import 'package:parentveda/screens/doctor/doctor_scaffold.dart';
@@ -69,16 +72,45 @@ void main() {
         reason: 'a pregnancy-side doctor sees their pregnancy consults');
   });
 
-  test("the doctor's availability becomes the parent's consult slots", () {
+  test('a doctor earns their share of a booked consult', () {
     final o = BookingCatalog.instance.offeringForCatalog('neha')!;
-    final avail = DoctorAvailability.instance;
-    // Mark Dr. Neha free Mon & Wed at 10:00.
-    avail.toggle('neha', const AvailWindow(DateTime.monday, 10, 0));
-    avail.toggle('neha', const AvailWindow(DateTime.wednesday, 10, 0));
+    store.purchase(o);
+    store.book(BookingCatalog.instance.slotsFor(o.id).first);
+
+    final s = DoctorEarnings.summary('neha');
+    expect(s.items, isNotEmpty);
+    expect(s.grossMinor, o.priceMinor, reason: 'the parent paid the full price');
+    // The slot is upcoming, so the share sits in "upcoming", not yet "earned".
+    expect(s.upcomingMinor, (o.priceMinor * kDoctorSharePct).round());
+    expect(s.earnedMinor, 0);
+  });
+
+  test("the doctor's availability becomes the parent's consult slots", () {
+    // PORTED (Phase 3): this used to drive DoctorAvailability's weekday+hour
+    // windows. That path is retired; the same guarantee now runs through
+    // DoctorScheduleStore, so the test follows the mechanism rather than being
+    // deleted - the behaviour it protects is exactly as important as before.
+    final o = BookingCatalog.instance.offeringForCatalog('neha')!;
+    final store = DoctorScheduleStore.instance;
+
+    // Dr. Neha works Mon & Wed, 10:00-11:00 only.
+    store.save(
+      o.expertId,
+      DoctorSchedule(
+        byWeekday: {
+          DateTime.monday: const DaySchedule([Session(10 * 60, 11 * 60)]),
+          DateTime.wednesday: const DaySchedule([Session(10 * 60, 11 * 60)]),
+        },
+        rules: const ConsultRules(
+            slotMinutes: 60,
+            bufferAfterMin: 0,
+            minNoticeMinutes: 0,
+            maxConsecutive: 0),
+      ),
+    );
 
     final slots = BookingCatalog.instance.slotsFor(o.id);
     expect(slots, isNotEmpty);
-    // Every generated slot falls on one of the days/times she set.
     for (final s in slots) {
       final d = s.startsUtc.toLocal();
       expect(d.hour, 10);
@@ -87,7 +119,6 @@ void main() {
     }
 
     // Clean up so other tests see the generated fallback.
-    avail.toggle('neha', const AvailWindow(DateTime.monday, 10, 0));
-    avail.toggle('neha', const AvailWindow(DateTime.wednesday, 10, 0));
+    store.resetAll();
   });
 }

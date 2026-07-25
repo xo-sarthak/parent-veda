@@ -9,10 +9,19 @@
 
 import 'package:flutter/material.dart';
 
-import '../../doctor/doctor_availability.dart';
+import '../../doctor/doctor_reminders.dart';
 import '../../doctor/doctor_roster.dart';
+import '../../doctor/doctor_session.dart';
+import '../../doctor/doctor_schedule_store.dart';
 import '../post_pregnancy/pp_common.dart';
-import 'doctor_availability_screen.dart';
+// Retired: the old 7x6 grid of six hardcoded times, in which a doctor working
+// 10:30-13:00 could not describe their own day. Replaced by
+// DoctorScheduleScreen. Kept (with doctor_availability.dart) for easy revert.
+// import '../../doctor/doctor_availability.dart';
+// import 'doctor_availability_screen.dart';
+import 'doctor_schedule_screen.dart';
+import 'doctor_appointments_screen.dart';
+import 'doctor_earnings_screen.dart';
 import 'doctor_home_screen.dart';
 import 'doctor_profile_screen.dart';
 
@@ -31,13 +40,25 @@ class _DoctorScaffoldState extends State<DoctorScaffold> {
     super.initState();
     // Pull the server roster (bookings other parents made with this expert) and
     // load saved availability the moment the doctor app opens.
-    DoctorRoster.instance.refresh();
-    DoctorAvailability.instance.init();
+    DoctorRoster.instance.refresh().then((_) {
+      // A missed consultation is the worst outcome in the product - the parent
+      // waited, paid, and nobody came. Re-arming on every open is safe: the
+      // notification ids are derived from the booking id, so repeats overwrite
+      // rather than stack up.
+      final id = DoctorSession.instance.expertId;
+      if (id != null) {
+        DoctorReminders.instance
+            .syncAll(DoctorRoster.instance.upcomingConsults(id));
+      }
+    });
+    DoctorScheduleStore.instance.init();
   }
 
   static const _tabs = [
     (Icons.dashboard_outlined, Icons.dashboard_rounded, 'Home'),
+    (Icons.event_note_outlined, Icons.event_note_rounded, 'Appointments'),
     (Icons.schedule_outlined, Icons.schedule_rounded, 'Availability'),
+    (Icons.payments_outlined, Icons.payments_rounded, 'Earnings'),
     (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
   ];
 
@@ -45,7 +66,9 @@ class _DoctorScaffoldState extends State<DoctorScaffold> {
   Widget build(BuildContext context) {
     final body = switch (_tab) {
       0 => const DoctorHomeScreen(),
-      1 => const DoctorAvailabilityScreen(),
+      1 => const DoctorAppointmentsScreen(),
+      2 => const DoctorScheduleScreen(),
+      3 => const DoctorEarningsScreen(),
       _ => const DoctorProfileScreen(),
     };
     return Scaffold(
