@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.parentveda"
+    namespace = "com.parentveda.app"
     // Bumped to 36 (Flutter's default is 34) because file_picker's transitive
     // dependency flutter_plugin_android_lifecycle now requires compiling against
     // API 36. This is compile-time only - minSdk/targetSdk are unchanged, so it
@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.parentveda"
+        applicationId = "com.parentveda.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
