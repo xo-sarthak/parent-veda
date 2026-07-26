@@ -14,6 +14,9 @@ import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 
+import '../../care_partner/care_visibility.dart';
+import '../care_partner/care_partner_slot.dart';
+
 import '../../services/notification_service.dart';
 import 'doctor_record_screen.dart';
 import 'pp_common.dart';
@@ -70,6 +73,15 @@ class VaxTrackerScreen extends StatelessWidget {
               // snapshot hero
               const SizedBox(height: 22),
               _pad(_snapshot(context, done, total, due, next)),
+
+              // The paediatrician who brought this family here, if there is
+              // one. Silent otherwise.
+              _pad(const CarePartnerSlot(
+                surface: CareSurface.topic,
+                topic: CareTopic.vaccination,
+                stage: 'parenting',
+                padding: EdgeInsets.only(top: 18),
+              )),
 
               // next vaccination
               if (due != null) ...[

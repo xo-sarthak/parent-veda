@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/child_scoped_store.dart';
+import '../../care_partner/care_journey.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import 'pp_child_profile.dart';
@@ -468,6 +469,7 @@ class VaxStore extends ChangeNotifier {
     // Health's vaccination section shows an invitation until a real dose is
     // marked; this is what flips it to her actual schedule.
     HealthStore.instance.markVaxEntered();
+    CareJourney.vaccinationDone();
     notifyListeners();
     _persist();
     _pushDose(visitId);

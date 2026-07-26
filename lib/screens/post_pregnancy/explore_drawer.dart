@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../care_partner/care_circle_screen.dart';
 import 'pp_child_profile.dart';
 
 import 'astrology_screen.dart';
@@ -110,6 +111,9 @@ class ExploreDrawer extends StatelessWidget {
                       'Your classes & sessions, all in one place.', const MyBookingsScreen()),
                   _section(context, Icons.card_giftcard_outlined, 'Invite a friend',
                       'You both get a free consultation.', const InviteFriendsScreen()),
+                  _section(context, Icons.diversity_1_outlined, 'Your Care Circle',
+                      'The people supporting you through this.',
+                      const CareCircleScreen()),
                   _section(context, Icons.auto_awesome_outlined, 'Memories',
                       'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
                   // Masterclasses + Cohort Courses + Courses are now one section (above);

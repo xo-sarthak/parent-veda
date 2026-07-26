@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/cloud_synced_store.dart';
+import '../../care_partner/care_journey.dart';
 
 /// An expandable "ParentVeda tip" shown inline in the reader.
 class ReadTip {
@@ -744,7 +745,10 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
     final v = p.clamp(0.0, 1.0);
     // never let progress go backwards on a re-read
     if (v > (_progress[id] ?? 0)) {
+      final wasDone = (_progress[id] ?? 0) >= 0.95;
       _progress[id] = v;
+      // Crossing the finish line once, not on every scroll event past it.
+      if (!wasDone && v >= 0.95) CareJourney.guideRead();
       notifyListeners();
     }
   }

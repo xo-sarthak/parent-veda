@@ -21,8 +21,8 @@ import '../post_pregnancy/pp_common.dart';
 // import 'doctor_availability_screen.dart';
 import 'doctor_schedule_screen.dart';
 import 'doctor_appointments_screen.dart';
-import 'doctor_earnings_screen.dart';
 import 'doctor_home_screen.dart';
+import 'doctor_impact_tab.dart';
 import 'doctor_profile_screen.dart';
 
 class DoctorScaffold extends StatefulWidget {
@@ -58,7 +58,9 @@ class _DoctorScaffoldState extends State<DoctorScaffold> {
     (Icons.dashboard_outlined, Icons.dashboard_rounded, 'Home'),
     (Icons.event_note_outlined, Icons.event_note_rounded, 'Appointments'),
     (Icons.schedule_outlined, Icons.schedule_rounded, 'Availability'),
-    (Icons.payments_outlined, Icons.payments_rounded, 'Earnings'),
+    // Was 'Earnings'. The Partner Journey Dashboard absorbed it: impact first,
+    // earnings one tap inside. See DoctorImpactTab for why they stay separate.
+    (Icons.insights_outlined, Icons.insights_rounded, 'Impact'),
     (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
   ];
 
@@ -68,7 +70,7 @@ class _DoctorScaffoldState extends State<DoctorScaffold> {
       0 => const DoctorHomeScreen(),
       1 => const DoctorAppointmentsScreen(),
       2 => const DoctorScheduleScreen(),
-      3 => const DoctorEarningsScreen(),
+      3 => const DoctorImpactTab(),
       _ => const DoctorProfileScreen(),
     };
     return Scaffold(

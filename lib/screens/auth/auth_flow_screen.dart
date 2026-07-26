@@ -13,6 +13,10 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import '../../care_partner/care_journey.dart';
+import '../../care_partner/care_partner_store.dart';
+import '../care_partner/care_welcome_sheet.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -312,6 +316,18 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       final granted = await ReferralStore.instance.claimQualification();
       if (granted) ReferralAnalytics.qualified();
     } catch (_) {/* a referral must never block a mother getting into the app */}
+    // A CARE PARTNER token (a QR in a clinic) binds here for the same reason a
+    // referral code does: there was no account to attach it to when she
+    // scanned it. Separate call, separate system - a doctor's introduction and
+    // a friend's invite are not the same thing and never share a code space.
+    try {
+      await CarePartnerStore.instance.applyPending();
+      // Attribution has bound by now, so this milestone lands against the right
+      // partner. A pregnancy is only "supported" once she has told us there is
+      // one - no due date, no count.
+      if (due != null) CareJourney.pregnancyStarted();
+      if (mounted) await showCareWelcome(context);
+    } catch (_) {/* likewise, never block her */}
     if (!mounted) return;
     widget.onDone(due, false);
   }

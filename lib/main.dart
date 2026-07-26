@@ -22,6 +22,9 @@ import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
 import 'doctor/doctor_schedule_store.dart';
 import 'memories/memory_analytics.dart';
+import 'care_partner/care_config.dart';
+import 'care_partner/care_partner_store.dart';
+import 'care_partner/care_presence_store.dart';
 import 'referral/install_referrer.dart';
 import 'referral/referral_analytics.dart';
 import 'referral/referral_links.dart';
@@ -224,7 +227,19 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
       // Campaign terms first (0036): everything below reads config, and a
       // stale reward label on the invite screen is a promise we did not make.
       await ReferralStore.instance.loadConfig();
+      // Care Partner state is restored BEFORE the install referrer runs, not
+      // after: checkOnce() can hold a partner token, and a load that landed
+      // afterwards would overwrite it with what was on disk a moment earlier.
+      // (CarePartnerStore.init also refuses to clobber a token already held in
+      // memory, because a deep link can arrive at any point.)
+      await CarePartnerStore.instance.init();
+      await CarePresenceStore.instance.init();
       await InstallReferrerService.instance.checkOnce();
+      // Care Partner attribution: a QR scanned before signup is held until
+      // there is an account to bind it to, then applied here.
+      await CareConfig.instance.load();
+      await CarePartnerStore.instance.applyPending();
+      await CarePartnerStore.instance.refreshFromServer();
       await ReferralStore.instance.syncToServer();
     });
     // Listen for invite links from the OS. Covers the cold-start case too (the

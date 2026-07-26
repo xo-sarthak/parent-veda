@@ -12,6 +12,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../care_partner/care_visibility.dart';
+import '../care_partner/care_partner_slot.dart';
+
 import 'pp_common.dart';
 import 'pp_feeding_data.dart';
 import 'pp_tools_kit.dart';
@@ -50,6 +53,16 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
                 ppToolPad(ppLogButton('Log a feed', _openLogSheet)),
                 const SizedBox(height: 18),
                 ppToolPad(ppInsightCard(_store.growthAwareInsight, tag: 'Growth-aware')),
+
+                // If a lactation consultant introduced this family to
+                // ParentVeda, this is where she belongs. Renders nothing
+                // otherwise.
+                ppToolPad(const CarePartnerSlot(
+                  surface: CareSurface.topic,
+                  topic: CareTopic.breastfeeding,
+                  stage: 'parenting',
+                  padding: EdgeInsets.only(top: 14),
+                )),
 
                 const SizedBox(height: 26),
                 ppToolPad(ppSectionHead("Today's feeds", trailing: today.isEmpty ? null : '${today.length} logged')),

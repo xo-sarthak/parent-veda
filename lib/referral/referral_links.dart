@@ -26,6 +26,8 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 
+import '../care_partner/care_partner_engine.dart';
+import '../care_partner/care_partner_store.dart';
 import 'referral_analytics.dart';
 import 'referral_engine.dart';
 import 'referral_store.dart';
@@ -67,6 +69,20 @@ class ReferralLinks {
   /// apply; does NOT redeem immediately, because redeeming needs an account and
   /// the friend may not have signed in yet.
   static void handleLink(Uri uri) {
+    // A CARE PARTNER link (/care/<TOKEN>) is a different system entirely - a
+    // doctor's QR, not a mother's invite. Hand it over and stop, so the two can
+    // never resolve each other's links and credit the wrong person.
+    final partnerToken = CarePartnerEngine.tokenFromUri(uri);
+    if (partnerToken != null) {
+      CarePartnerStore.instance.holdToken(
+        partnerToken,
+        channel: CarePartnerEngine.channelFromUri(uri),
+        campaignId: CarePartnerEngine.campaignFromUri(uri),
+      );
+      if (kDebugMode) debugPrint('[care] link carried token $partnerToken');
+      return;
+    }
+
     final code = codeFromUri(uri);
     if (code == null) return;
     _pending = code;

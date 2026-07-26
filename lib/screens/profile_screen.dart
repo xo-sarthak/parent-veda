@@ -16,6 +16,9 @@ import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
 import 'memories/memories_home_screen.dart';
 import 'referral/invite_friends_screen.dart';
+import '../care_partner/care_visibility.dart';
+import 'care_partner/care_partner_card.dart';
+import 'care_partner/care_partner_slot.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -349,6 +352,14 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
+          // CARE CIRCLE. Renders nothing at all unless a doctor or hospital
+          // actually introduced her to ParentVeda — see CarePartnerSlot.
+          const CarePartnerSlot(
+            surface: CareSurface.profile,
+            stage: 'pregnancy',
+            shape: CarePartnerCardShape.full,
+            padding: EdgeInsets.only(bottom: 14),
+          ),
           // --- WhatsApp updates (B2 opt-in) -------------------------------
           // Memories — make a keepsake card for the big milestones.
           GestureDetector(

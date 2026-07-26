@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/supabase_repo.dart';
+import '../../care_partner/care_journey.dart';
 import '../../services/remote/sync_registry.dart';
 
 /// Expected 50th-centile figures for a given age, used as a gentle reference
@@ -265,6 +266,9 @@ class ChildProfileStore extends ChangeNotifier {
     if (promoting) {
       _children.add(c);
       _activeId = c.id;
+      // A baby joined the family. Counted (never named) on the referring
+      // doctor's impact dashboard.
+      CareJourney.childBorn();
     }
     notifyListeners();
   }

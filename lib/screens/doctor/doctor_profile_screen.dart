@@ -11,6 +11,7 @@ import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_onboarding_screen.dart';
+import 'doctor_referral_kit_screen.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
@@ -48,6 +49,38 @@ class DoctorProfileScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                           'Qualifications, council registration, documents and payouts.',
+                          style: ppBody(11.5, h: 1.4)),
+                    ]),
+              ),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+            ]),
+          ),
+        ),
+        // The QR/link a doctor puts on their wall. This is the entry point to
+        // the whole Care Partner platform - without it nothing downstream ever
+        // fires.
+        GestureDetector(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const DoctorReferralKitScreen())),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: ppBorder),
+            ),
+            child: Row(children: [
+              const Icon(Icons.qr_code_2_rounded, size: 20, color: ppPurple),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Your referral kit', style: ppJakarta(13.5)),
+                      const SizedBox(height: 2),
+                      Text('QR code, link and a message for your patients.',
                           style: ppBody(11.5, h: 1.4)),
                     ]),
               ),

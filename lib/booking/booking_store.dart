@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/cloud_synced_store.dart';
 import '../services/remote/supabase_repo.dart';
+import '../care_partner/care_journey.dart';
 import 'booking_catalog.dart';
 import 'booking_models.dart';
 
@@ -195,6 +196,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     );
     _entitlements[e.id] = e;
     _save();
+    CareJourney.purchased();
     return e;
   }
 
@@ -225,6 +227,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     _bookings[b.id] = b;
     _entitlements[ent.id] = ent.copyWith(creditsUsed: ent.creditsUsed + 1);
     _save();
+    CareJourney.consultationBookedNow();
     return b;
   }
 
@@ -321,6 +324,14 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       if (b.status == BookingStatus.upcoming && b.endsUtc.isBefore(now)) {
         _bookings[entry.key] = b.copyWith(status: BookingStatus.attended);
         changed = true;
+        // Exactly-once by construction: a booking crosses upcoming -> attended
+        // one time and never goes back, so the Care Partner's count cannot
+        // drift upward on every app launch. Consults only - a yoga class is
+        // not a consultation, whatever the tile is called.
+        if (BookingCatalog.instance.offeringById(b.offeringId)?.kind ==
+            OfferingKind.consult) {
+          CareJourney.consultationDone();
+        }
       }
     }
     if (changed) _save();

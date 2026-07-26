@@ -15,6 +15,20 @@
 //                  &referrer=<url-encoded>
 //      we receive  utm_source=invite&utm_medium=referral&utm_content=ABCD234
 //
+//  A CARE PARTNER poster goes through the SAME Play install, and must not be
+//  lost there — a QR on a clinic wall is scanned by a phone that does not have
+//  the app yet, which is the entire point of it. Same mechanism, different
+//  source:
+//
+//      share URL   https://parentveda.in/care/<TOKEN>?ch=qr
+//      we receive  utm_source=care&utm_medium=partner&utm_content=<TOKEN>
+//                  [&utm_campaign=<CAMPAIGN>&utm_term=<CHANNEL>]
+//
+//  The two are told apart by utm_source, NOT by guessing from the code length.
+//  A 7-character parent code and a 10-character partner token would be
+//  distinguishable today and would stop being so the moment either length
+//  changes, and the failure mode — crediting the wrong person — is silent.
+//
 //  utm_content carries the code. It is PARSED AS A QUERY STRING, never
 //  substring-matched, because the website may add keys later and a
 //  substring match would break the day it does.
@@ -31,6 +45,9 @@ import 'package:flutter/foundation.dart';
 import 'package:play_install_referrer/play_install_referrer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../care_partner/care_partner_engine.dart';
+import '../care_partner/care_partner_models.dart';
+import '../care_partner/care_partner_store.dart';
 import 'referral_analytics.dart';
 import 'referral_engine.dart';
 import 'referral_store.dart';
@@ -41,8 +58,13 @@ class InstallReferrerService {
 
   static const _checkedKey = 'install_referrer_checked_v1';
 
-  /// The key the website sends the code under.
+  /// The key the website sends the code under — the same for both systems.
   static const String codeParam = 'utm_content';
+
+  /// utm_source values. This is the ONLY thing that decides which system a
+  /// referrer belongs to.
+  static const String parentSource = 'invite';
+  static const String partnerSource = 'care';
 
   /// Pull the code out of a Play referrer string.
   ///
@@ -50,15 +72,58 @@ class InstallReferrerService {
   /// is `utm_source=invite&utm_medium=referral&utm_content=ABCD234`, and more
   /// keys may be added.
   static String? codeFromReferrer(String? referrer) {
+    final p = _params(referrer);
+    if (p == null) return null;
+    // A partner poster is not a parent invite. Refuse rather than fall
+    // through, so a care token can never be redeemed as a friend's code.
+    if (p['utm_source'] == partnerSource) return null;
+    final raw = p[codeParam];
+    if (raw == null || raw.isEmpty) return null;
+    final code = ReferralEngine.normalise(raw);
+    return ReferralEngine.isWellFormed(code) ? code : null;
+  }
+
+  /// The Care Partner token a Play referrer carried, or null.
+  ///
+  /// Requires utm_source=care. A referrer with no source is treated as the
+  /// parent system, because that is what the website sent before partners
+  /// existed and old links are still in circulation.
+  static String? partnerTokenFromReferrer(String? referrer) {
+    final p = _params(referrer);
+    if (p == null) return null;
+    if (p['utm_source'] != partnerSource) return null;
+    final raw = p[codeParam];
+    if (raw == null || raw.isEmpty) return null;
+    final token = CarePartnerEngine.normalise(raw);
+    return CarePartnerEngine.isWellFormed(token) ? token : null;
+  }
+
+  /// Which surface the partner link was used on, for the channel analytics the
+  /// spec asks for.
+  ///
+  /// The website is expected to forward the link's `?ch=` into `utm_term`. When
+  /// it has not, QR is the default rather than the generic `link`: a referrer
+  /// that survived a Play install came from a phone that did not have the app,
+  /// and the channel built for exactly that case is the printed poster.
+  /// A wrong-but-plausible default is a real cost — it is a REQUIREMENT on the
+  /// website, noted in docs/ADMIN-PANEL.md, not something to paper over here.
+  static ReferralChannel partnerChannelFromReferrer(String? referrer) {
+    final term = _params(referrer)?['utm_term'];
+    if (term == null || term.isEmpty) return ReferralChannel.qr;
+    return ReferralChannelX.parse(term);
+  }
+
+  static String? partnerCampaignFromReferrer(String? referrer) {
+    final c = _params(referrer)?['utm_campaign'];
+    return (c == null || c.isEmpty) ? null : c;
+  }
+
+  static Map<String, String>? _params(String? referrer) {
     if (referrer == null || referrer.trim().isEmpty) return null;
     try {
       // Uri.splitQueryString handles the percent-decoding the Play API has
       // already partly done, and copes with keys in any order.
-      final params = Uri.splitQueryString(referrer.trim());
-      final raw = params[codeParam];
-      if (raw == null || raw.isEmpty) return null;
-      final code = ReferralEngine.normalise(raw);
-      return ReferralEngine.isWellFormed(code) ? code : null;
+      return Uri.splitQueryString(referrer.trim());
     } catch (_) {
       return null;
     }
@@ -86,11 +151,13 @@ class InstallReferrerService {
     }
 
     String? code;
+    String? raw;
     try {
       final details = await PlayInstallReferrer.installReferrer;
-      code = codeFromReferrer(details.installReferrer);
+      raw = details.installReferrer;
+      code = codeFromReferrer(raw);
       if (kDebugMode) {
-        debugPrint('[referral] install referrer: ${details.installReferrer}');
+        debugPrint('[referral] install referrer: $raw');
       }
     } catch (_) {
       // No Play Store, an OEM store that drops the referrer, a sideload, or
@@ -104,6 +171,24 @@ class InstallReferrerService {
     try {
       await prefs.setBool(_checkedKey, true);
     } catch (_) {/* best effort */}
+
+    // A CARE PARTNER token is held, not redeemed: binding needs an account and
+    // she has just installed the app. holdToken persists it, so it survives
+    // until she finishes onboarding — which is the whole reason a poster in a
+    // clinic works at all.
+    final partnerToken = partnerTokenFromReferrer(raw);
+    if (partnerToken != null) {
+      CarePartnerStore.instance.holdToken(
+        partnerToken,
+        channel: partnerChannelFromReferrer(raw),
+        campaignId: partnerCampaignFromReferrer(raw),
+      );
+      if (kDebugMode) {
+        debugPrint('[care] install referrer carried token $partnerToken');
+      }
+      // A referrer carries one or the other, never both.
+      return null;
+    }
 
     if (code == null) return null;
 
