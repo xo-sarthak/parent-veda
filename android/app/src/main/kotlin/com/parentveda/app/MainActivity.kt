@@ -1,4 +1,4 @@
-package com.example.parentveda
+package com.parentveda.app
 
 import io.flutter.embedding.android.FlutterActivity
 

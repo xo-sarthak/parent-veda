@@ -70,6 +70,14 @@
                 <data android:scheme="https"
                       android:host="parentveda.in"
                       android:pathPrefix="/invite" />
+                <!-- CARE PARTNER referrals: a doctor's QR, poster or
+                     prescription link. Same verified domain, deliberately a
+                     DIFFERENT path from /invite so a partner referral can
+                     never be resolved as a parent invite (that would credit a
+                     mother instead of the doctor, silently). -->
+                <data android:scheme="https"
+                      android:host="parentveda.in"
+                      android:pathPrefix="/care" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
