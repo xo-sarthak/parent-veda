@@ -3074,7 +3074,11 @@ class _CommunitySearchDelegate extends SearchDelegate<void> {
     final q = query.trim().toLowerCase();
     final text = Theme.of(context).textTheme;
     if (q.isEmpty) return const SizedBox.shrink();
-    final comms = kCommunities
+    // allCommunities, not kCommunities: a derived birth-club room (any due
+    // month that was never hand-seeded) must be FINDABLE, not only visible
+    // after she has been joined to it.
+    final comms = allCommunities(
+            dueDate: controller.isDueDateSet ? controller.dueDate : null)
         .where((c) =>
             c.name.toLowerCase().contains(q) ||
             c.topics.any((t) => t.toLowerCase().contains(q)))

@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 
 import '../brand/brand_models.dart';
 import '../brand/launch_spotlight.dart';
+import 'referral/invite_nudge_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
@@ -160,6 +161,9 @@ class HomeScreenB extends StatelessWidget {
               pregnancyWeek: week,
               padding: const EdgeInsets.only(bottom: 24),
             ),
+            // REFERRAL. Hides itself when the campaign is off or she has hit
+            // her cap, so it never offers something that would be refused.
+            const InviteNudgeCard(padding: EdgeInsets.only(bottom: 24)),
             // ===== TODAY'S JOURNEY - everything daily lives under this heading ==
             _todaysJourneyHeading(s),
             const SizedBox(height: 14),

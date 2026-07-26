@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/cloud_synced_store.dart';
 import '../services/remote/supabase_repo.dart';
+import 'booking_catalog.dart';
 import 'booking_models.dart';
 
 class BookingStore extends ChangeNotifier with CloudSyncedStore {
@@ -75,13 +76,27 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     return all;
   }
 
-  /// The active entitlement for an offering that still has credits, if any.
-  Entitlement? activeEntitlementFor(String offeringId) {
+  /// An entitlement bought FOR this specific offering, if any.
+  Entitlement? _exactEntitlementFor(String offeringId) {
     final matches = _entitlements.values
         .where((e) => e.offeringId == offeringId && e.canBook)
         .toList()
       ..sort((a, b) => a.purchasedUtc.compareTo(b.purchasedUtc)); // spend oldest first
     return matches.isEmpty ? null : matches.first;
+  }
+
+  Entitlement? activeEntitlementFor(String offeringId) {
+    final exact = _exactEntitlementFor(offeringId);
+    if (exact != null) return exact;
+
+    // FLOATING CREDITS. A referral reward is "a free consultation", not a free
+    // consultation with one particular doctor - so it is minted against
+    // [kAnyConsultOffering] and spends on any consult. Bought credits are
+    // preferred (checked first) so a parent's own purchase is used before the
+    // gift they were given, which is the order that leaves them better off.
+    final offering = BookingCatalog.instance.offeringById(offeringId);
+    if (offering?.kind != OfferingKind.consult) return null;
+    return _exactEntitlementFor(kAnyConsultOffering);
   }
 
   bool ownsRecording(String offeringId) => _entitlements.values.any(
@@ -124,6 +139,40 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
           b.slotId == slotId && b.status != BookingStatus.cancelled);
 
   // ---- writes ---------------------------------------------------------------
+
+  /// Grant a floating consultation credit — a REWARD, not a purchase.
+  ///
+  /// [sourceId] makes this idempotent: the entitlement id is derived from it,
+  /// so re-syncing the same referral reward from the server overwrites the same
+  /// row instead of minting a second free consultation. Getting this wrong is
+  /// how a referral system quietly gives away unlimited credit.
+  Entitlement grantFloatingCredit({
+    required String sourceId,
+    required String title,
+    int credits = 1,
+    Duration? validFor = const Duration(days: 90),
+    DateTime? at,
+  }) {
+    final id = 'ent_gift_$sourceId';
+    final existing = _entitlements[id];
+    if (existing != null) return existing; // already granted — never twice
+
+    final now = (at ?? DateTime.now()).toUtc();
+    final e = Entitlement(
+      id: id,
+      offeringId: kAnyConsultOffering,
+      stage: ServiceStage.pregnancy,
+      title: title,
+      creditsTotal: credits,
+      creditsUsed: 0,
+      purchasedUtc: now,
+      expiresUtc: validFor == null ? null : now.add(validFor),
+    );
+    _entitlements[id] = e;
+    _save();
+    notifyListeners();
+    return e;
+  }
 
   /// Record a purchase. Mints an entitlement from the offering's grant. (The
   /// real charge happens before this once payments are live; for now it is the

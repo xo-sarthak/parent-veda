@@ -184,8 +184,17 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   List<CommunityPost> get commentedPosts =>
       _allPosts.where((p) => _userComments[p.id]?.isNotEmpty ?? false).toList();
 
-  List<Community> get joinedCommunities =>
-      kCommunities.where((c) => _joined.contains(c.id) && !_muted.contains(c.id)).toList();
+  /// Joined rooms, INCLUDING a derived birth-club cohort room.
+  ///
+  /// Resolved through communityById rather than filtering kCommunities: a
+  /// cohort room for a month nobody hand-wrote is not in that list, and
+  /// filtering it would silently drop the room she was just joined to.
+  List<Community> get joinedCommunities => _joined
+      .where((id) => !_muted.contains(id))
+      .map(communityById)
+      .whereType<Community>()
+      .toList();
+
   List<Community> get recommendedCommunities =>
       kCommunities.where((c) => !_joined.contains(c.id)).toList();
 

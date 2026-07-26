@@ -223,6 +223,11 @@ class Slot {
 /// The parent's OWN record of a purchase and how much of it is left. This is
 /// user-owned state, synced as part of her booking blob — the seat counts it
 /// does NOT touch live on the shared slots.
+/// The offering id a FLOATING consultation credit is minted against — a credit
+/// that may be spent on any consult rather than one particular doctor. Referral
+/// rewards use it: "a free consultation" is not a promise about who with.
+const String kAnyConsultOffering = '*any_consult';
+
 @immutable
 class Entitlement {
   const Entitlement({

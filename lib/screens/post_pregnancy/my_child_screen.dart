@@ -42,6 +42,7 @@ import 'phase_map_screen.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/brand_notifications.dart';
 import '../../brand/launch_spotlight.dart';
+import '../referral/invite_nudge_card.dart';
 import '../../brand/premiere_screen.dart';
 import 'pp_phases_data.dart';
 import 'pp_reading_data.dart';
@@ -176,6 +177,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
                     stage: BrandStage.parenting,
                     padding: const EdgeInsets.only(bottom: 26),
                   )),
+                  _pad(const InviteNudgeCard(
+                      padding: EdgeInsets.only(bottom: 26))),
                   _snapshot(),
                   const SizedBox(height: 26),
                   _milestones(),

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.parentveda.app",
+      "sha256_cert_fingerprints": [
+        "EA:27:CB:1B:89:DE:62:E6:82:87:31:59:1B:3F:AB:A3:68:F1:E4:31:2B:D2:26:0B:BF:90:4F:30:AB:19:E2:41"
+      ]
+    }
+  }
+]

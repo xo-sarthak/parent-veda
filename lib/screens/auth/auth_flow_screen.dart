@@ -17,6 +17,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../referral/referral_store.dart';
+import '../../referral/referral_links.dart';
+import '../../referral/referral_engine.dart';
+import '../../referral/referral_analytics.dart';
+import '../referral/enter_code_sheet.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
@@ -287,6 +292,30 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // Marks the current account as the father, then enters the app. (The real
   // partner link - pairing code → mother - is a separate step; for now this
   // records the role so routing + father content work.)
+  /// End of mother onboarding — the moment the referral spec calls
+  /// "qualification". Everything the rules require has now happened
+  /// (registered, verified, onboarding finished, due date given), so this is
+  /// where a referral is finally worth something to both parents.
+  ///
+  /// Two things happen first, in order:
+  ///   1. a code entered BEFORE signing in is applied now, because there was no
+  ///      account to attach it to at the time;
+  ///   2. a code carried in by a deep link is applied for the same reason.
+  /// Then the server is asked to grant. It can refuse - caps, self-referral,
+  /// an already-credited invite - and refusing is a normal outcome, so nothing
+  /// here treats failure as an error worth interrupting her for.
+  Future<void> _finishMother() async {
+    final due = _pickedDue;
+    try {
+      await ReferralLinks.applyPending(
+          dueMonth: due == null ? null : ReferralEngine.birthClubFor(due));
+      final granted = await ReferralStore.instance.claimQualification();
+      if (granted) ReferralAnalytics.qualified();
+    } catch (_) {/* a referral must never block a mother getting into the app */}
+    if (!mounted) return;
+    widget.onDone(due, false);
+  }
+
   Future<void> _finishFather() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid != null) {
@@ -1200,11 +1229,41 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       color: _muted),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 22),
+              // THE DEFERRED-LINK DOOR. A friend who installed from the store
+              // arrives with no code attached - carrying one through an install
+              // is what Firebase Dynamic Links used to do and no longer does.
+              // So we ask, once, at the only moment it is natural: just before
+              // she starts. Hidden once a code is already applied.
+              if (!ReferralStore.instance.hasRedeemed &&
+                  !ReferralLinks.hasPending)
+                GestureDetector(
+                  onTap: () async {
+                    final due = _pickedDue;
+                    final ok = await showEnterCodeSheet(
+                      context,
+                      dueMonth:
+                          due == null ? null : ReferralEngine.birthClubFor(due),
+                    );
+                    if (ok && mounted) setState(() {});
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      'Have an invite code?',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: _purple,
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
               SizedBox(
                 width: 200,
-                child: _primaryBtn(
-                    'Get started', () => widget.onDone(_pickedDue, false)),
+                child: _primaryBtn('Get started', _finishMother),
               ),
             ],
           ),

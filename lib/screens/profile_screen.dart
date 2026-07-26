@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
 import 'memories/memories_home_screen.dart';
+import 'referral/invite_friends_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -304,6 +305,49 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 14),
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
+          const SizedBox(height: 14),
+          // REFERRAL. A mother who finds ParentVeda useful is the cheapest and
+          // most credible way another mother hears about it.
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => InviteFriendsScreen(controller: controller))),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 15, 14, 15),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xFF6A30B6), Color(0xFF8B5CD6)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(children: [
+                const Icon(Icons.card_giftcard_rounded,
+                    size: 22, color: Colors.white),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Invite a friend',
+                            style: GoogleFonts.manrope(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white)),
+                        const SizedBox(height: 2),
+                        Text('You both get a free consultation.',
+                            style: GoogleFonts.manrope(
+                                fontSize: 12,
+                                height: 1.4,
+                                color: Colors.white70)),
+                      ]),
+                ),
+                const Icon(Icons.arrow_forward_rounded,
+                    size: 18, color: Colors.white),
+              ]),
+            ),
+          ),
           const SizedBox(height: 14),
           // --- WhatsApp updates (B2 opt-in) -------------------------------
           // Memories — make a keepsake card for the big milestones.

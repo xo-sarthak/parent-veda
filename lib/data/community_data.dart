@@ -451,9 +451,79 @@ const List<PulseCard> kPulse = [
   ),
 ];
 
+// ---------------------------------------------------------------------------
+//  BIRTH CLUBS — the due-month cohort rooms
+// ---------------------------------------------------------------------------
+//  Only ONE cohort room was ever seeded here ('nov2026'), so a mother due any
+//  other month had no club to be put in. The Birth Club referral mechanic then
+//  "joined" her to an id that existed nowhere in this list, which meant she was
+//  recorded as a member of a room that never rendered anywhere. Invisible, not
+//  empty - a worse failure, because the app believed it had done something.
+//
+//  So a cohort room is now DERIVED for whatever month she is due, using the same
+//  id convention the seeded one already used ('nov2026'). Content fills in as
+//  her club posts; the room itself always exists.
+
+const List<String> _monthSlugs = [
+  '', 'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+  'jul', 'aug', 'sep', 'oct', 'nov', 'dec'
+];
+const List<String> _monthNames = [
+  '', 'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+/// 'nov2026' for a due date in November 2026 — matching the seeded room's id
+/// so the generated one and the hand-written one are the same room.
+String birthClubCommunityId(int year, int month) {
+  if (month < 1 || month > 12) return '';
+  return '${_monthSlugs[month]}$year';
+}
+
+/// The cohort room for a due month, generated if it is not one of the seeded
+/// ones. Never null for a valid month, so the caller has no empty case.
+Community birthClubCommunity(int year, int month) {
+  final id = birthClubCommunityId(year, month);
+  for (final c in kCommunities) {
+    if (c.id == id) return c;
+  }
+  return Community(
+    id: id,
+    name: '${_monthNames[month]} $year Moms',
+    emoji: '🤰',
+    description:
+        'Mothers due in ${_monthNames[month]} $year, going through it together '
+        '- week by week.',
+    // Honest: a freshly derived club has nobody in it but her. Inventing a
+    // member count would be the kind of small lie that makes everything else
+    // in the app suspect.
+    members: 0,
+    auto: true,
+    topics: const ['Pregnancy Symptoms', 'Labor', 'Nutrition'],
+  );
+}
+
+/// Every community, including the cohort room for [dueDate] when there is one.
+/// Deduplicated by id, so a seeded month is never listed twice.
+List<Community> allCommunities({DateTime? dueDate}) {
+  if (dueDate == null) return kCommunities;
+  final club = birthClubCommunity(dueDate.year, dueDate.month);
+  if (club.id.isEmpty) return kCommunities;
+  if (kCommunities.any((c) => c.id == club.id)) return kCommunities;
+  return [club, ...kCommunities];
+}
+
 Community? communityById(String id) {
   for (final c in kCommunities) {
     if (c.id == id) return c;
+  }
+  // A derived cohort room: reconstruct it from its own id rather than returning
+  // null, or a joined birth club would render as a blank tile.
+  final m = RegExp(r'^([a-z]{3})(\d{4})$').firstMatch(id);
+  if (m != null) {
+    final month = _monthSlugs.indexOf(m.group(1)!);
+    final year = int.tryParse(m.group(2)!);
+    if (month > 0 && year != null) return birthClubCommunity(year, month);
   }
   return null;
 }

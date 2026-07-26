@@ -22,6 +22,10 @@ import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
 import 'doctor/doctor_schedule_store.dart';
 import 'memories/memory_analytics.dart';
+import 'referral/install_referrer.dart';
+import 'referral/referral_analytics.dart';
+import 'referral/referral_links.dart';
+import 'referral/referral_store.dart';
 import 'services/remote/supabase_memory_sink.dart';
 import 'services/remote/supabase_profile_sink.dart';
 import 'doctor/doctor_session.dart';
@@ -209,6 +213,23 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // surface='memories'. Reuses ProfileAnalytics' install/session ids, so it
     // must be set after that sink above.
     MemoryAnalytics.instance.setSink(const SupabaseMemorySink());
+    // REFERRAL: the growth funnel into the SAME profile_events table, tagged
+    // surface='referral'. Anonymous by inheritance - no user_id, and never the
+    // referral code, which identifies a person.
+    ReferralAnalytics.setSink(const SupabaseReferralSink());
+    ReferralStore.instance.init().then((_) async {
+      // Play Install Referrer FIRST: a friend who installed from a shared link
+      // arrives with the code attached, and it should be applied before we
+      // sync anything up. Once ever, Android only, silent when there is none.
+      // Campaign terms first (0036): everything below reads config, and a
+      // stale reward label on the invite screen is a promise we did not make.
+      await ReferralStore.instance.loadConfig();
+      await InstallReferrerService.instance.checkOnce();
+      await ReferralStore.instance.syncToServer();
+    });
+    // Listen for invite links from the OS. Covers the cold-start case too (the
+    // app launched BY the link), which is the one that silently loses codes.
+    ReferralLinks.startListening();
     // PARENTING: guided day-by-day journeys (enrolment + which days are read).
     JourneyStore.instance.init();
     // BRAND STUDIO: which campaigns this parent has already been shown. Loaded

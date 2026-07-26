@@ -23,6 +23,7 @@ import 'development_home_screen.dart';
 // import 'guides_tools_screen.dart';
 import 'learning_home_screen.dart';
 import '../memories/memories_home_screen.dart';
+import '../referral/invite_friends_screen.dart';
 import 'my_bookings_screen.dart';
 import 'yoga_home_screen.dart';
 // The Health Guide is now reached from inside the Health ecosystem, not the
@@ -107,6 +108,8 @@ class ExploreDrawer extends StatelessWidget {
                       'Live & recorded classes for every stage.', const YogaHomeScreen()),
                   _section(context, Icons.event_available_outlined, 'My Bookings',
                       'Your classes & sessions, all in one place.', const MyBookingsScreen()),
+                  _section(context, Icons.card_giftcard_outlined, 'Invite a friend',
+                      'You both get a free consultation.', const InviteFriendsScreen()),
                   _section(context, Icons.auto_awesome_outlined, 'Memories',
                       'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
                   // Masterclasses + Cohort Courses + Courses are now one section (above);
