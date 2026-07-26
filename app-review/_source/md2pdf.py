@@ -325,6 +325,8 @@ def main():
     ap.add_argument("--title", default=None)
     ap.add_argument("--subtitle", default=None)
     ap.add_argument("--part", default="")
+    # Optional footer override. Omit to keep the default pregnancy-app footer.
+    ap.add_argument("--footer", default="")
     ap.add_argument("--desc", default="")
     ap.add_argument("inputs", nargs="+")
     args = ap.parse_args()
@@ -345,7 +347,9 @@ def main():
         all_lines.append("")
 
     cover_title = cover_title or "ParentVeda Pregnancy App"
-    if args.part:
+    if args.footer:
+        FOOTER_LEFT = args.footer
+    elif args.part:
         FOOTER_LEFT = "ParentVeda - Pregnancy App  -  " + args.part
 
     story = []

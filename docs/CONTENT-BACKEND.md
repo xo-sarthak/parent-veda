@@ -206,6 +206,54 @@ Own repo `C:\Projects\parentveda-askveda` · **pgvector for both** index + cache
 ### Status
 Planned, nothing built yet. **Development is 100% free/local** (Supabase service_role key is free from the dashboard; Groq has a free tier; the laptop is the dev server). The three paid/external things — **Render paid, MSG91 key, Meta verification** — are needed only at **go-live**, at the end.
 
+- 2026-07-26: **Images → Cloudflare R2 LIVE.** Bucket `parentveda-media` (Standard class, public access enabled), public URL `https://pub-4fb3649b7fe84e9186e1d79d440b5217.r2.dev`. Account API token (Object Read & Write, scoped to that bucket, no expiry) wired into Directus on Render via env: `STORAGE_LOCATIONS=r2`, `STORAGE_R2_DRIVER=s3`, `STORAGE_R2_KEY/SECRET`, `STORAGE_R2_BUCKET=parentveda-media`, `STORAGE_R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com`, **`STORAGE_R2_REGION=auto`**. Verified: upload in Directus → file lands in R2 (original + auto-generated thumbnail).
+  - **Gotcha:** without `STORAGE_R2_REGION=auto` uploads fail with `[SERVICE_UNAVAILABLE] Service "files" is unavailable` — the real cause shows in Render logs as `Error: Region is missing` (the AWS S3 SDK requires a region even though R2 has none).
+  - **Why R2 was needed, not just cheaper:** Render's free tier has an *ephemeral* disk — files uploaded to local storage vanish on every restart/redeploy/sleep-wake. External storage is what makes uploads persist at all.
+  - **Rule:** always upload through **Directus** (it records the file in the DB + makes thumbnails); never drop files straight into the R2 dashboard (orphan blobs Directus can't attach to content).
+  - Free tier: 10 GB storage, 1M Class-A / 10M Class-B ops per month, **zero egress fees**. Content images (~150-200 KB each) → ~5,000 images ≈ 1 GB. Effectively free.
+  - Later (optional, for production): attach a custom domain (e.g. `media.parentveda.app`) — the `pub-*.r2.dev` URL is rate-limited and dev-oriented.
+
+## DEFERRED — the "Directus setup pass" (do as one batch, later)
+
+A meaningful chunk of Directus work is queued up. The user's plan: **do it as one
+deliberate pass**, once the other terminals' features have landed — several of
+them will need their own Directus collections/fields, so batching avoids
+repeating the click-through and the type-mismatch snags we hit doing it live.
+
+Known items so far:
+1. **Field polish on existing collections** — `content_posts.category` + `.status`
+   are typed text boxes, not dropdowns (they were created as long `text` columns;
+   Directus only offers Dropdown for short `string`). Needs a deliberate pass:
+   recreate as string + rebuild the dependent RLS policy (status) / FK (category).
+   Cosmetic only — the FK already rejects invalid categories.
+2. **Image fields → real File pickers** — `hero_image` / `og_image` are plain text
+   (paste-a-URL). Convert to Directus File fields so uploads go straight to R2 and
+   are pickable. Note recommended sizes per slot (hero ~1200x630, thumb smaller).
+   Trigger: when there is actual image content to place. *A field = a named slot;
+   the app/website code decides where each slot renders.*
+3. **New content types** as they're needed — `recipes` (planned, never built),
+   `videos` (+ Bunny Stream setup; row stores `video_host` + `video_ref`, not the
+   file). Follow the 4-step add-a-type recipe.
+   - **Bunny Stream is PARKED (2026-07-26)** — account created, but the video
+     library was deliberately NOT set up: Bunny has a **$1/mo (~₹85) minimum**, so
+     there's no point paying while there are no videos. (The 14-day $20 trial was
+     let go for the same reason.) Set it up **when real videos are ready to push**.
+   - Pricing when it starts: storage ~$0.005/GB/mo (trivial); **delivery is the
+     real cost, ~$0.03/GB for India** (~1 GB ≈ 1 hour watched at 720p). Practical:
+     ~$1/mo (~₹85) while testing, ~$15/mo (~₹1,275) at ~1,000 users watching
+     ~30 min/mo. Encode 720p not 1080p to roughly halve delivery.
+4. **Collections for features built by the OTHER terminals** — as parenting /
+   AskVeda / website work lands, each new content-bearing table needs registering
+   + field setup in the same Directus. Collect these and do them together.
+5. **Parenting "Learn" wiring** (app code, not Directus) — the `articles` table
+   already carries `domain='parenting'`, but the parenting Learn screen still uses
+   hardcoded data, so parenting articles published in Directus don't reach the app
+   yet.
+
+None are blocking. Triggers: (1) when typing bugs you or a non-dev gets the panel,
+(2) when images exist, (3)/(4) when that content exists, (5) when parenting
+content should go live.
+
 ## Next (this terminal)
 - Guide the **Vercel deploy** once the website terminal finishes.
 - Then, app content when wanted: recipes / videos content types · parenting "Learn" wiring (`domain='parenting'`) · images → Cloudflare R2 · the deferred Directus field-polish pass.
