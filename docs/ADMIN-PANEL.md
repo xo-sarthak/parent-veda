@@ -221,6 +221,49 @@ reference only. Fixed weekly content stays bundled in the app.
 
 See `ParentVeda-Content-Brief.pdf` for the full inventory of what needs writing.
 
+## 5a. Content currently has TWO write paths, and they can drift
+
+*Raised 2026-07-27 while ingesting the TTC corpus. Nothing is broken today — but
+this is the thing to settle before an editor is let loose on the panel.*
+
+The same knowledge lives in two places, written two different ways:
+
+| Path | Where it lands | What reads it |
+|---|---|---|
+| **A — a developer edits Dart** (`lib/ttc/*.dart`, `lib/data/*.dart`, `pp_*_data.dart`) | bundled in the app binary | **the app's own screens** (TTC pages, Can-I, tests, products, recipes…) |
+| **B — an editor uses Directus** | Supabase (`articles`, `content_posts`, `veda_knowledge`) | **Ask Veda** (the RAG service), and `articles` also feeds the app's weekly-reads carousel via `ContentRepo` |
+
+Ask Veda is already fully path-B: it *only* reads Supabase, so a Directus publish
+plus `POST /reindex` makes it answerable with no app release. That half is done.
+
+**The gap is the app's own screens.** They still render from the bundled Dart. So
+today:
+
+* An editor adds a TTC insight in Directus → it appears **in Ask Veda's answers**
+  but **not** on the TTC screens.
+* A developer adds one in Dart → it appears **on the screens** but is invisible to
+  Ask Veda until `tool/export_ttc_corpus.dart` (or `export_veda_corpus.dart`) is
+  re-run and re-ingested.
+
+The export tools keep B in sync *from* A. Nothing syncs the other way.
+
+**What to decide when we build the panel** (not now):
+
+1. **Which content types become editor-owned**, and therefore must move to
+   Supabase-first with the app fetching them. `articles` already works this way —
+   `ContentRepo` / `ArticleStore` (cache + bundled fallback) is the pattern to copy.
+2. **Which stay bundled on purpose.** Fixed weekly content is already a deliberate
+   "stays in the app" decision; the same may be right for TTC chapter copy, which
+   is closer to product design than to editorial.
+3. **Retire the export tools for anything that becomes Supabase-first** — once a
+   type is editor-owned, re-exporting it from Dart would overwrite an editor's
+   work. Until then the export is the source of truth and must be re-run whenever
+   the Dart data changes.
+
+Until (1)–(3) are settled, the honest rule is: **Dart is the source, Supabase is a
+published copy for Ask Veda.** An editor's Directus edit reaches Ask Veda but not
+the screens — so don't promise editors otherwise.
+
 ---
 
 # 6. Referral, parent-to-parent (built, table-driven)
