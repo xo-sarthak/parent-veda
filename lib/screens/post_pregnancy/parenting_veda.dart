@@ -164,13 +164,20 @@ List<VedaDoc> parentingCorpus() {
   }
 
   // --- Products ---
-  for (final pr in kPpProducts) {
+  for (final pr in productCatalog) {
     docs.add(_pdoc(
       id: 'ppprod_${pr.id}',
       kind: VedaKind.product,
       sourceLabel: 'Product',
       title: pr.name,
-      body: '${pr.summary.isEmpty ? pr.name : pr.summary} ${pr.category} · ${pr.sub}. ${pr.pros.join('. ')}',
+      // THE HONESTY HALF. `cons` carries the same weight as `pros`, matching
+      // the rule already stated in tool/export_ttc_corpus.dart for TTC
+      // products. Grounding an answer on the good half only turns Ask Veda
+      // into an advert for whatever it retrieves — and a parent asking about a
+      // product is precisely the moment the caveats matter most.
+      body: '${pr.summary.isEmpty ? pr.name : pr.summary} ${pr.category} · ${pr.sub}. '
+          '${pr.pros.join('. ')}'
+          '${pr.cons.isEmpty ? '' : ' Worth knowing: ${pr.cons.join('. ')}'}',
       keywords: [pr.category, pr.sub, pr.brand],
     ));
   }

@@ -45,7 +45,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
     final collectionId = readCollectionForArea(area.id);
     final reads = articlesInCollection(collectionId);
     final productCat = productCategoryForArea(area.id);
-    final products = kPpProducts.where((p) => p.category == productCat).toList();
+    final products = productCatalog.where((p) => p.category == productCat).toList();
     final activities = activitiesForArea(area.id);
 
     return Scaffold(

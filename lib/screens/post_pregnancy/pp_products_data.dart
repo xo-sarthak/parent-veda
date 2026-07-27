@@ -11,6 +11,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/product_catalog_store.dart';
+
 // ---- model ------------------------------------------------------------------
 class PpSub {
   const PpSub(this.name, this.short);
@@ -719,11 +721,30 @@ const List<PpProduct> kPpProducts = [
       ]),
 ];
 
+// ---- the live catalogue -----------------------------------------------------
+/// Every product to offer right now: served from Supabase once the content
+/// backend has answered, and the bundled [kPpProducts] otherwise.
+///
+/// This is the type that most needs to be editable without a release — a price,
+/// a retailer or a product being discontinued all go stale on their own, with
+/// nobody having edited anything.
+///
+/// Falls back to the bundle when empty, like the other catalogues, so
+/// [productById] always resolves. Unpublishing ONE product behaves normally.
+List<PpProduct> get productCatalog {
+  final live = ProductCatalogStore.instance.all;
+  return live.isEmpty ? kPpProducts : live;
+}
+
+/// Listen to this wherever products are rendered, so a corrected price or a
+/// newly listed product appears without a relaunch.
+Listenable get productListenable => ProductCatalogStore.instance;
+
 // ---- queries ----------------------------------------------------------------
 PpCategory categoryByName(String name) =>
     kPpCategories.firstWhere((c) => c.name == name, orElse: () => kPpCategories.first);
 
-PpProduct productById(String id) => kPpProducts.firstWhere((p) => p.id == id, orElse: () => kPpProducts.first);
+PpProduct productById(String id) => productCatalog.firstWhere((p) => p.id == id, orElse: () => productCatalog.first);
 
 // ---- discovery filters (per the Products brief) ------------------------------
 // Problem / concern-based entry points → the categories that address them.
@@ -748,10 +769,10 @@ const List<(String, Set<String>)> kPpStages = [
 ];
 
 /// Distinct brands across the catalog, sorted - for the brand filter.
-List<String> ppBrands() => kPpProducts.map((p) => p.brand).toSet().toList()..sort();
+List<String> ppBrands() => productCatalog.map((p) => p.brand).toSet().toList()..sort();
 
 List<PpProduct> productsInSub(String category, String subName) =>
-    kPpProducts.where((p) => p.category == category && p.sub == subName).toList();
+    productCatalog.where((p) => p.category == category && p.sub == subName).toList();
 
 // ---- per-subcategory buying guidance (the education layer) -------------------
 //  The "20-second" guidance that leads each subcategory page - a one-liner plus
@@ -1138,7 +1159,7 @@ class PpCompareStore extends ChangeNotifier {
   List<PpProduct> suggestions() {
     if (_selected.isEmpty) return const [];
     final cat = _selected.first.category;
-    return kPpProducts.where((p) => p.category == cat && !isSelected(p)).toList()
+    return productCatalog.where((p) => p.category == cat && !isSelected(p)).toList()
       ..sort((a, b) => b.rating.compareTo(a.rating));
   }
 

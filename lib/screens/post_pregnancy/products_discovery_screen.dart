@@ -75,7 +75,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
 
   // Apply the discovery filters, then sort.
   List<PpProduct> _results() {
-    var list = kPpProducts.toList();
+    var list = productCatalog.toList();
     final q = _query.trim().toLowerCase();
     if (q.isNotEmpty) {
       list = list.where((p) => p.name.toLowerCase().contains(q) || p.brand.toLowerCase().contains(q)).toList();
@@ -109,7 +109,16 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      // Rebuilds when the catalogue refreshes, so a corrected price or a newly
+      // published product appears without leaving the screen. The filter state
+      // lives in setState as before; this only adds the content signal.
+      AnimatedBuilder(
+        animation: productListenable,
+        builder: (context, _) => _build(context),
+      );
+
+  Widget _build(BuildContext context) {
     final searching = _query.trim().isNotEmpty;
     final showResults = _active || searching;
     final results = showResults ? _results() : const <PpProduct>[];
@@ -478,7 +487,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
   }
 
   int _previewCount(Set<String> concerns, String? stage, Set<String> cats, Set<String> brands, int? priceMax, double minRating) {
-    var list = kPpProducts.toList();
+    var list = productCatalog.toList();
     if (concerns.isNotEmpty) {
       final cs = <String>{for (final c in kPpConcerns) if (concerns.contains(c.$1)) ...c.$3};
       list = list.where((p) => cs.contains(p.category)).toList();

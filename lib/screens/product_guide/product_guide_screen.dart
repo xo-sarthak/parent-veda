@@ -457,7 +457,7 @@ class ProductGuideScreen extends StatelessWidget {
     final gn = g.name.toLowerCase();
     final noun = nouns.where(gn.contains).toList();
     if (noun.isEmpty) return const [];
-    return kPpProducts
+    return productCatalog
         .where((p) => noun.any((n) => p.name.toLowerCase().contains(n)))
         .toList();
   }

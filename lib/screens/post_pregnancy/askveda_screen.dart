@@ -626,7 +626,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   PpProduct? _matchProduct(String label) {
     final l = label.toLowerCase();
-    for (final pr in kPpProducts) {
+    for (final pr in productCatalog) {
       final n = pr.name.toLowerCase();
       if (l.contains(n) || n.contains(l)) return pr;
     }

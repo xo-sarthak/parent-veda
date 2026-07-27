@@ -42,7 +42,7 @@ class DevStageDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final acts = stage.activities.map(devActivityById).toList();
-    final products = kPpProducts
+    final products = productCatalog
         .where((p) => p.category == productCategoryForArea(area.id))
         .take(6)
         .toList();
