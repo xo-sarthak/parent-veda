@@ -559,6 +559,54 @@ white card. Brand Studio should render identically in both.
 
 ---
 
+## A-75. The home screen — the headline uniformity item
+
+Pregnancy and parenting are **two independent data points that agree**, which
+makes their shared shape the house standard rather than one stage's opinion. TTC
+breaks it in the same three places on the screen everyone opens daily.
+
+| | Pregnancy | Parenting | TTC |
+|---|---|---|---|
+| Header actions | bookmark · search · **avatar** | search · **person** · hamburger | **none** — logo only |
+| Eyebrow above hero | "WEEKLY SNAPSHOT" | "HOW YOUR BABY IS TODAY" | **none** |
+| Position | "Week 40, Day 7" | "PHASE 1 OF 20" | chapter name only |
+| Progress | segmented **T1 / T2 / T3**, labelled | tick-marked rail, **Birth → 5 years** | flat unlabelled bar at 0% |
+| Forward link | **"View week ›"** | **"Phase map ›"** | none |
+| What's coming | *"Baby's almost here"* | *"Next: the peak, and the first smile, around 1 month."* | none |
+| Tip card CTA | full-width **"Read More →"** | full-width **"Read more →"** | no button — tap the card |
+
+### The three things both stages do and TTC does not
+
+1. **State position inside a numbered, bounded structure.** "Week 40 of 40",
+   "Phase 1 of 20", "Birth → 5 years". TTC says "Preparing Together" with a bar
+   at zero and no denominator, so there is no sense of a journey with a shape.
+2. **Name what is next, and roughly when.** Parenting's *"Next: the peak, and
+   the first smile, around 1 month"* is one line and it does all the work.
+3. **Link to the whole map from the hero.** "View week ›" and "Phase map ›" are
+   both one tap from the top of the screen.
+
+**This is the precise diagnosis of A-17 (stagnation).** It is not that TTC's
+chapter lasts 28 days — pregnancy weeks and parenting phases last a while too.
+It is that TTC never says *how far through*, *what is next*, or *where this
+sits in the whole*. The other two stages answer all three above the fold.
+
+TTC already has the words. `Chapter → What's next` says *"it needs nothing from
+you except logging the first day of your period when it arrives"*, and the
+Journey Map says *"chapters two to four come round again with each cycle."*
+Both belong in the hero.
+
+### Also worth noting
+
+* **AskVeda is a nav tab in parenting**, a FAB in the other two. Three stages,
+  two navigation models for the same feature.
+* **Parenting has a hamburger** (the Explore drawer) — a third header pattern
+  again. Whatever is chosen, all three should agree.
+* Parenting's hero carries **inline data entry** — GROWTH with *Edit* and
+  *Chart* actions. TTC's hero has no equivalent, though "Log a new period" is
+  exactly that kind of action and currently sits in a card below.
+
+---
+
 ## Found on the pregnancy side, outside this audit's scope
 
 **Today says "Week 40, Day 7". Prepare says "30 WEEKS · THIRD TRIMESTER"** and
@@ -584,6 +632,11 @@ same app — the divergences above are depth, not identity.
 
 Cheapest first, and each one lands independently.
 
+0. **The home hero** (A-75) — do this first, not last. Position in a numbered
+   structure, a "next, and roughly when" line, a forward link to the Journey
+   Map, and header actions. It is the most-seen screen in the stage, it is where
+   the stagnation is felt, and the copy it needs is already written two taps
+   away.
 1. **Back button** → bare arrow, drop the circular chip (A-69). One shared
    widget, every inner screen.
 2. **Explicit affordances** → "Open →" on Tools tiles, a "Read more" button on
