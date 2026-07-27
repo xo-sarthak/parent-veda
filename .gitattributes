@@ -1,0 +1,39 @@
+# Binary files must never have line endings rewritten.
+#
+# Without this, Git on Windows treats any file it cannot prove is binary as
+# text and applies LF -> CRLF on checkout. ParentVeda-Content-Brief.pdf was
+# committed as "334 insertions" — Git diffed a PDF as 334 lines of text — and
+# a fresh clone would have rewritten every one of those bytes, producing a file
+# that no longer opens.
+#
+# The failure is invisible on the machine that made the commit, because its
+# working copy is never touched. It only appears for the next person to clone.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.ico   binary
+*.ttf   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
+*.mp3   binary
+*.mp4   binary
+*.m4a   binary
+*.wav   binary
+*.zip   binary
+*.jks   binary
+*.keystore binary
+
+# Source stays LF in the repo and is checked out however the platform wants.
+*.dart  text
+*.sql   text
+*.md    text
+*.yaml  text
+*.yml   text
+*.json  text
+
+# Shell scripts and Gradle wrappers break with CRLF, whatever the platform.
+*.sh          text eol=lf
+gradlew       text eol=lf
