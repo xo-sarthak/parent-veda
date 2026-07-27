@@ -961,6 +961,14 @@ class S {
       _p('I know my due date', 'Mujhe meri due date pata hai');
   String get ddcLmpDate => _p('First day of your last period',
       'Aapke pichhle period ka pehla din');
+
+  /// Shown when the date is one WE calculated. A dating scan is more accurate
+  /// than counting from a last period, and the clinic owns the scan - so we say
+  /// so at the moment she is choosing, rather than quietly holding a number
+  /// that may already disagree with her doctor.
+  String get ddcScanWins => _p(
+      'If a scan has already given you a date, use that instead. A dating scan is more accurate than counting from a period, and your clinic\'s date is the one that counts.',
+      'Agar scan se aapko date mil chuki hai toh wahi use karein. Dating scan period se ginne se zyada sahi hota hai, aur aapki clinic ki date hi maayne rakhti hai.');
   String get ddcCycle => _p('Cycle length', 'Cycle ki lambai');
   String get ddcDays => _p('days', 'din');
   String get ddcDaysLabel => _p('Days', 'Din');

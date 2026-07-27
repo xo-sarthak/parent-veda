@@ -46,6 +46,29 @@ DateTime? ddcComputeEdd({
   }
 }
 
+/// Which of these dates a clinic owns.
+///
+/// The calculator has always asked how she arrived at the date; it just never
+/// recorded the answer. Three of the five come from a clinic - a scan they
+/// performed, a transfer they scheduled, or a date they told her - and those
+/// outrank anything ParentVeda counts. The other two are our own arithmetic.
+/// Public because the pairing is a rule, not a detail — a test pins it, so a
+/// sixth method cannot be added without someone deciding who owns it.
+DueDateSource ddcSourceFor(DdcMethod m) {
+  switch (m) {
+    case DdcMethod.lmp:
+      return DueDateSource.lastPeriod;
+    case DdcMethod.conception:
+      return DueDateSource.conception;
+    case DdcMethod.ivf:
+      return DueDateSource.ivfTransfer;
+    case DdcMethod.ultrasound:
+      return DueDateSource.scan;
+    case DdcMethod.known:
+      return DueDateSource.clinician;
+  }
+}
+
 class DueDateCalculatorScreen extends StatefulWidget {
   const DueDateCalculatorScreen({super.key, required this.controller});
   final PregnancyController controller;
@@ -719,12 +742,33 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               ]),
           ],
         ),
+        // Said here, not later: this is the moment she is choosing between a
+        // date we work out and a date her clinic measured.
+        if (!ddcSourceFor(_method).clinicOwned) ...[
+          const SizedBox(height: 14),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.info_outline_rounded,
+                size: 15, color: AppTheme.primary500),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(s.ddcScanWins,
+                  style: GoogleFonts.manrope(
+                      fontSize: 11.5,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primary800)),
+            ),
+          ]),
+        ],
         const SizedBox(height: 18),
         SizedBox(
           width: double.infinity,
           child: FilledButton(
             onPressed: () async {
-              await p.setDueDate(edd);
+              // The method she picked already says who owns this date. It was
+              // being thrown away; now it travels with the date, because a scan
+              // outranks anything we counted.
+              await p.setDueDate(edd, source: ddcSourceFor(_method));
               if (!mounted) return;
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(s.ddcStarted)));

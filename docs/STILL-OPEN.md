@@ -242,6 +242,14 @@ Coming later and already noted there: the **HR / corporate panel** for when
 ParentVeda is sold to companies. `corporate` and `insurance` are already Care
 Partner types so that model does not need rebuilding.
 
+Also noted there (**§5a**, raised 2026-07-27): content currently has **two write
+paths** — a developer editing bundled Dart, and an editor publishing to Supabase
+via Directus. Ask Veda already reads only Supabase, but the app's own screens
+still render from the bundled Dart, so a Directus edit reaches Ask Veda's answers
+and not the screens. Which types become editor-owned (and therefore
+Supabase-first, `ContentRepo`-style) is a decision to settle before editors are
+given the panel.
+
 ---
 
 # 8. Website ↔ app contract
@@ -272,12 +280,208 @@ Partner · Supported by · Provided by.
 
 ---
 
-# 9. Closed
+# 9. Trying to Conceive
+
+Full record in `docs/TTC-SPEC.md` (§6 what was built, §7 what was not).
+Repeated here because this file is the one place open points are findable.
+
+## 9.0 The due-date SOURCE does not sync
+
+`DueDateSource` lives in `shared_preferences` only. The cloud profile carries
+`due_date` but no column saying where it came from, so a second device restores
+the date and reads the source as `unknown` — which counts as **ours**, so it is
+safe, but the flag does not travel.
+
+Blocks nothing today, because no pregnancy screen consults the flag yet. It
+becomes real the moment one does: her phone would defer to the scan and his
+would not. One nullable `due_date_source` column on `profiles` when that day
+comes.
+
+## 9.1 TTC sync has never run against the live database
+
+`0041` and `0042` are **applied** (2026-07-27), and the Dart↔SQL contract is
+enforced by `ttc_schema_contract_test.dart` — 48 assertions covering every
+column, order-by, upsert conflict target and NOT NULL the client relies on.
+
+What has *not* happened is a single real round-trip. Nothing has ever been
+written to `ttc_cycles` by a signed-in user.
+
+That matters more than it sounds, because **every TTC cloud write is
+fire-and-forget** (`.catchError((_) {})`) so a network hiccup never reaches the
+UI. The cost is that an RLS refusal looks identical to success from inside the
+app: the local half works perfectly and the table simply stays empty. No test
+can catch that — only a live session can.
+
+**Plan agreed:** the user signs in, Claude drives the UI, and we check
+`select * from ttc_cycles` together. Ten minutes. Until then, sync is
+proven-by-contract, not proven-live.
+
+## 9.1b The inference boundary is named but not yet enforced everywhere
+
+`lib/services/journey_state.dart` now answers, for any stage: *what may
+ParentVeda infer, and what must come from a clinician?* It is default-deny, so a
+new `Inferable` is safe until somebody permits it in code.
+
+**`Inferable.gestationalAge` now has a writer** (2026-07-27). `DueDateSource`
+records how the date was arrived at, the Due Date Calculator supplies it from the
+method she already picks, and `PregnancyController.dueDateFromClinic` reports it.
+A scan, an IVF transfer and "my doctor told me" are the clinic's; a last period
+and a conception date are ours.
+
+**What is not done:** no pregnancy *screen* consults it yet. Nothing today shows
+a competing number, so there is no live defect — the app stores one date and
+derives from it. The gap is that a woman who set her date by last period and
+later had a scan keeps the old number silently. The calculator now tells her a
+scan should replace it; it does not yet prompt her after the fact.
+
+Also still unread: `Inferable.growthExpectation` / `developmentalStage` —
+parenting is currently permitted both. Worth a clinician's view on whether a
+paediatrician's own assessment should ever override ours.
+
+Blocks nothing. The value is that the next one of these gets found by asking the
+question rather than by shipping it.
+
+## 9.2 Ask Veda videos are still "coming soon"
+
+Deep-linking now lands on the item (§10). Videos remain the exception: the
+section renders and says so, because there is no hosted video content to ingest
+yet. Same wait the other two stages are in — Bunny Stream is parked until real
+videos exist.
+
+## 9.3 Clinical seed copy has not been medically reviewed
+
+**The brief is written: `docs/TTC-IVF-REVIEW.md`.** Hand it to a fertility
+specialist — ~30 minutes, every question answerable in a line. It covers the
+IVF/treatment decisions plus the eleven clinically loaded claims in the wider
+library (AMH, TSH thresholds, semen analysis, HSG, the ectopic warning).
+
+**Status 2026-07-27:** the brief has been through a **product review**, not a
+clinical one, and the reviewer said so explicitly. Their answers are recorded in
+`§7` of the brief. Q1 is no longer the worry it was — ovulation induction is now
+split by whether a clinic is monitoring, not by drug name, and the reviewer
+estimated 90–95% of patients can answer that. What remains genuinely open is
+listed in §9.4.
+
+Below is what the entry originally said, kept because it is still true until
+someone answers.
+
+The engine's arithmetic is conventional and defensible (luteal-phase
+subtraction, a 5-day-before to 1-day-after window). The *content* explaining
+AMH, PCOS, IVF and test interpretation is authored seed copy and should be read
+by a doctor before launch. Same standing as §5.1's verification gap.
+
+## 9.4 Three clinical statements held back on purpose
+
+A product review proposed adding these. They are the only recommendations from
+that pass that **add** a clinical claim rather than softening one, so they are
+written into `docs/TTC-IVF-REVIEW.md §7` for the specialist and deliberately
+**not** in the product:
+
+| # | Statement | Why held |
+|---|---|---|
+| P1 | Trigger hCG detectable ~10–14 days | A specific window we have no basis to state, however hedged. |
+| P2 | OHSS risk roughly trigger → 1–2 weeks after | Same; plus a stated window risks her dismissing symptoms outside it. |
+| P3 | Adding *severe abdominal pain*, *reduced urine output*, *persistent vomiting* to the OHSS urgent list | We lean toward adding — a longer list of reasons to call a clinic errs the right way — but it is a clinician's call. |
+
+Everything else from that review **is** implemented, because it moved toward
+less certainty: fasting instructions deferred to the clinic, no numbers on
+trigger drift, TSH not stated as a universal target, HSG no longer promising
+improved fertility, AMH clarified as ovarian response rather than egg quality.
+
+The pathway wording is **resolved and shipped**. Both questions asked about
+clinical *events* — scans, a trigger injection — which are proxies: a
+natural-cycle FET has neither and the clinic still owns the timing, and a fully
+medicated transfer has no trigger at all. They now ask the principle, with the
+events demoted to examples underneath:
+
+> **1.** Is your fertility clinic deciding the important dates for this cycle?
+> *Scans or blood tests · a trigger injection · IUI timing · egg retrieval ·
+> embryo transfer*
+>
+> **2.** Has medication taken over WHEN ovulation or transfer happens — an
+> injection that sets the hour, or a fully medicated schedule?
+> *If your own body still decides the day, answer no.*
+
+What remains open is whether they hold for pathways we have not thought of.
+That is now a question in the brief rather than a wording note.
+
+---
+
+# 10. Content
+
+## 10.1 Father Mode weekly copy is a working draft
+
+37 weeks of `father_insight` are written and shipped, one per week
+(`lib/data/father/journey_week_NN.json`). They have the right shape and voice
+but **they are mine, not yours** — replace them when real copy is written.
+
+Dropping in real copy needs no code change. Adding `supporting_partner`,
+`connecting_with_baby` or `mission` to a week's JSON overrides the derivation
+for that section only; `father_week_content_test.dart` asserts the override
+list is exactly `[22, 28]`, so it will fail the moment a new one lands and make
+the change deliberate.
+
+Two specific things a human should look at:
+
+* **The Hindi is transliterated Hinglish**, matching the existing house style
+  across the app. It wants a native read before launch — not a translation
+  check, a *does-a-father-actually-talk-like-this* check.
+* **The missions read correctly but were written for a "partner"**, not
+  specifically a father — they derive from `partnerCorner.oneMission`. Nothing
+  is wrong in them; the question is whether the voice is his.
+
+## 10.2 Father DAILY content is still one prototype day
+
+Separate from the weekly, and **not fixed by this work.**
+`lib/data/father/fatherDailyContent.json` holds **one entry: day 143, week 20**.
+The loader expects `week_04.json … week_40.json` and none exist, so `dayFor()`
+falls back to the nearest authored day — which is always day 143.
+
+So the Daily Moment shows the same content every day of the pregnancy, exactly
+the way the weekly did before. It has no derivation path because there is no
+per-day mother content to derive from, so this one genuinely needs writing:
+roughly 259 days, or a decision to author it per week rather than per day.
+
+The weekly fix does **not** cover this. It is the same class of silent failure,
+still live.
+
+## 10.3 Content brief is a snapshot, not an inventory
+
+`ParentVeda-Content-Brief.pdf` lists every content slot as of 25 July. Work
+since then — the parenting Learn/Watch/Food expansions, Care Partner trust
+copy, these father weeks — is not in it. Regenerate rather than patch when it
+drifts far enough to mislead; the source is `app-review/_source/`, which
+belongs to the other terminal.
+
+---
+
+# 11. Closed
 
 Kept so the reasoning survives.
 
 | Item | Outcome | When |
 |---|---|---|
+| Migrations `0043_ttc_treatment.sql` and `0044_ttc_care_pathway.sql` were written but not applied | Both applied. `0043` means treatment dates reach his phone too — a retrieval date is not one person's. `0044` is the one that mattered most: until it ran, her two pathway answers stayed device-local, so **his** app fell back to the pathway default. On an unmonitored letrozole cycle her side correctly gave the fertile window back and his still behaved as though a clinic owned the timing — the exact defect the care-pathway work existed to fix, live on the partner's device | 2026-07-27 |
+| **The app could not tell a due date it calculated from one a clinic gave** | The pregnancy version of the IVF window, and the stage with real users. The Due Date Calculator has always asked *how* she got the date — last period, conception, IVF transfer, ultrasound, "my doctor told me" — and then threw the answer away. Now `DueDateSource` travels with it: three of the five are the clinic's, and when one of those is the source, gestational age is theirs. Where she used a last period, the calculator says plainly that a scan date should replace it. `unknown` counts as **ours**, because assuming a clinic gave a date we cannot account for would silence our estimate on no evidence | 2026-07-27 |
+| Both pathway questions asked about clinical **events**, not the principle | "Is your clinic tracking this with scans?" and "are you on medication that controls ovulation?" are proxies. A natural-cycle FET has no scan-and-trigger and the clinic still owns the timing; a fully medicated transfer has no trigger at all; letrozole is medication and is about ovulation, so an unmonitored patient could answer yes and lose the window she should have kept. They now ask *is your clinic deciding the important dates* and *has medication taken over when it happens*, with the events demoted to an examples line so she does not have to translate her cycle into our vocabulary | 2026-07-27 |
+| **Clinical ownership was implied but never stated** | The truth hierarchy says whose answer wins when two conflict. It does not say what we may do when there is no conflict at all. Written down as the companion rule: where a clinician owns a decision we may **explain** it, **remind** about it and help her **prepare** for it — never recreate, reinterpret or compete with it. Explaining what a dating scan measures is help; recalculating gestational age after one is not | 2026-07-27 |
+| **Nothing said which source wins when two disagree** | The rule had been written three times, one case at a time, none aware of the others: an LH strip beats the calendar, a temperature shift beats the calendar, clinic dates beat everything. Named once as `TruthSource` (`lib/services/truth_hierarchy.dart`): clinician → lab → imaging → verified medication → her own observation → device → **ParentVeda's calculation** → population estimate. Ours is second from bottom deliberately, and a test asserts it stays there. Orthogonal to the other two rules, not a replacement: `Inferable` says *which fact*, `TimingOwnership` says *may we generate a value*, this says *which value wins* | 2026-07-27 |
+| The confidence phrase appeared on **clinic paths** | Small but incoherent: the Cycle Companion said "based on your cycles so far" one screen away from a page promising we defer to the clinic. Prediction language now renders only where we predict | 2026-07-27 |
+| A single trigger reminder, two hours out, with no way to say it was done | Two reminders now — four hours (be somewhere you can do this, get the injection ready) and fifteen minutes (it is now). The second is only safe because of the **Taken** tick that silences both: an exact-minute alert to someone who already did it is alarm dressed as help. Rescheduling the trigger un-ticks it, since the clinic moved the appointment | 2026-07-27 |
+| Confidence ignored evidence it already held | Lowered now when the current cycle has run past its own history, or when a recorded gap is long enough to be a missed log or an anovulatory cycle. A product review suggested six screening questions instead (PCOS, postpartum, breastfeeding, perimenopause, recent contraception, recent loss) — declined, because *derive, never ask*: those would have traded her time for our comfort. A signal logged this cycle still overrides the doubt | 2026-07-27 |
+| The next-milestone card had no day count | Added, deliberately **second and smaller**. Leading with a countdown makes the screen something to endure; leading with the milestone makes it an appointment she has. Leaving the number out entirely is worse — she counts it herself. "in 9 days", not "9 days remaining" | 2026-07-27 |
+| No rule on showing conception or IVF success rates | Written down: **never a probability attached to this family** — no "your chance this month", nothing computed from her profile. Population statistics stay allowed where they reduce pressure rather than set a target. Enforced by a test that scans the source rather than the seed lists, and which also asserts the statistics did not simply get deleted | 2026-07-27 |
+| "Who owns this clinical decision?" existed only inside TTC | Generalised into `JourneyState` (`lib/services/journey_state.dart`) — one place answering stage, pathway, clinical ownership, next milestone, and **what may be inferred versus what must come from a clinician**, across all three stages. Built as a pure read model that owns no state, deliberately **not** an engine that drives screens: per-stage screen composition would be personalising structure, which the product forbids. A test asserts the boundary and the TTC engine can never disagree | 2026-07-27 |
+| **Treatment type was the wrong thing to branch on** | The first IVF fix keyed off `TtcPath` and treated everything except "natural" as clinic-run. Unmonitored letrozole and monitored-letrozole-with-a-trigger are both "ovulation induction" and need opposite behaviour, so it over-corrected — withholding the fertile window from people whose own bodies still decided the timing. Replaced with **`TimingOwnership`** (parentveda / clinicGuided / clinicControlled), derived from the pathway **plus two questions she can answer**: is a clinic tracking this cycle, and does medication decide when. Seven clinically-motivated flags, in versioned code — deliberately not a 28-flag profile, not a database table and not CMS-editable, because a clinical safety rule should not acquire a network dependency or a dropdown. The middle tier is the gain: on a natural-cycle FET her LH surge is exactly what the clinic times around, so we stop predicting but keep listening | 2026-07-27 |
+| The two-week wait counted toward her **period** on a medicated cycle | Real defect. Progesterone support usually delays the period, so the app was telling IVF couples theirs was "late" — which means nothing on a treatment cycle and reads as hope. Now counts to the **beta hCG blood test** on the date the clinic gave, and the "expected period" calendar marker is suppressed on clinic paths | 2026-07-27 |
+| Suppressing the IVF window left the tools honest but useless | Replaced with a **treatment cycle**: she enters the dates her clinic gave her (stim start, trigger, retrieval, transfer, beta), Today shows the next milestone, the Calendar plots them, and the trigger gets a reminder two hours before — the one moment where being precise clinically matters. The app stopped competing with the clinic and started carrying what it said | 2026-07-27 |
+| An **IVF couple was shown a calendar fertility window** | Real defect, and the worst kind — it could contradict their clinic. `TtcFertilityWindowScreen` shipped in Phase 3 with no reference to `TtcPath` at all, so a medicated cycle got the same "Peak / High" reading as a natural one. Now suppressed **in the engine** (`TtcJourneyState.clinicLed`), so no surface can render one however it asks; the three cycle tools show a clinic-led card instead, and the Ovulation Companion stops asking for LH strips it would ignore | 2026-07-27 |
+| TTC was reachable only via a card on the **pregnancy** home | **Decided: the stage chosen at signup is the stage you land in.** Whichever card is tapped on the auth Profile step — Trying / Pregnant / New parent — becomes `LifeStageStore` and the splash boots that shell from then on. Reads the pref directly, because the store loads async and would still be null at splash. `TtcPage` marks the app live so the Ask Veda FAB still appears for a user who never passes through `MainScaffold`. **The preview door on the pregnancy home stays** — it is how an existing account reaches TTC without signing up again, which is also why testing is unaffected | 2026-07-27 |
+| TTC community could be read but not written to | `writeTtcPost` goes through the shared `CommunityStore.addPost`, with anonymity offered — the stage where people write about a loss or a diagnosis needs it | 2026-07-27 |
+| Ask Veda pointers opened the whole library | `focusId` on the tests, Can I…? and products screens: the item expands and scrolls into view, a "for him" test flips the segment, and the rest of the library stays on screen | 2026-07-27 |
+| TTC migrations `0041` + `0042` were written but not applied | Applied to the project. Schema/client agreement pinned by `ttc_schema_contract_test.dart` (48 assertions) — a renamed column would otherwise have failed silently, because every sync write is fire-and-forget | 2026-07-27 |
+| Inside TTC the Ask Veda FAB opened the **pregnancy** Ask Veda | Real defect — it routed on "is parenting on the stack?", so a trying-to-conceive question came back framed for a pregnant woman with a meaningless `week`. Now a three-way branch on `ttc/today`, pinned by `ttc_askveda_test.dart` | 2026-07-27 |
+| Ask Veda had no TTC door, context or corpus | `TtcAskVedaScreen` + `stage/chapter/ttc_path/months_trying` as additive framing (never a filter), TTC red flags incl. ectopic and OHSS, and 324 bilingual docs ingested (index 927 → 1251 chunks). Partner door sends `chapter` and never `cycle_day`, so his device cannot route around the own-row `ttc_cycles` rule | 2026-07-27 |
 | `/invite/<CODE>` returned 404 | Page built and live; renders the code | 2026-07-26 |
 | `/care/<TOKEN>` did not exist | Built, verified against the spec byte-for-byte | 2026-07-27 |
 | Doctor's QR token was **derived** in the app while the website resolved it from `partner_referrals` | Real defect — a missing row produced a QR that scanned, looked right and credited nobody. `0040` makes the database mint tokens; the app only reads them, and prints nothing when there is no row | 2026-07-26 |
