@@ -56,6 +56,26 @@ const _sky = MemoryPalette(
   accent: Color(0xFF6FA8CF), panel: Color(0xFFFFFFFF),
 );
 
+// Added for the reference-inspired set. Ivory/gold is the announcement-card
+// default across every sample: warm paper, one metallic line, nothing else.
+const _ivory = MemoryPalette(
+  bg: [Color(0xFFFCFAF6)],
+  ink: Color(0xFF2E2A24), soft: Color(0xFF8A8175),
+  accent: Color(0xFFC0A268), panel: Color(0xFFFFFFFF),
+);
+// Porcelain: the engraved-toile look — one ink colour on unbleached paper.
+const _porcelain = MemoryPalette(
+  bg: [Color(0xFFF7F4EC)],
+  ink: Color(0xFF2F4A63), soft: Color(0xFF7C93A8),
+  accent: Color(0xFF5B7FA3), panel: Color(0xFFFFFFFF),
+);
+// Powder: the sky/cloud card. Two blues and nothing sharp.
+const _powder = MemoryPalette(
+  bg: [Color(0xFFE9F2FA), Color(0xFFCFE3F3)],
+  ink: Color(0xFF1F3A57), soft: Color(0xFF5E7C99),
+  accent: Color(0xFF7FB2DA), panel: Color(0xFFFFFFFF),
+);
+
 // ---------------------------------------------------------------------------
 //  Per-type copy
 // ---------------------------------------------------------------------------
@@ -99,6 +119,57 @@ TextStyle _serif(double s, Color c, {FontWeight w = FontWeight.w500, double h = 
 
 TextStyle _sans(double s, Color c, {FontWeight w = FontWeight.w500, double ls = 0}) =>
     GoogleFonts.manrope(fontSize: s, color: c, fontWeight: w, letterSpacing: ls);
+
+/// Calligraphy. Every announcement card in the reference set leans on a script
+/// for exactly one phrase — the name, or "Coming Soon" — and sets everything
+/// else in small caps. Used the same way here: one script line per card, never
+/// two, because two scripts on one card is where a keepsake starts to look like
+/// a template.
+TextStyle _script(double s, Color c, {double h = 1.0}) =>
+    GoogleFonts.parisienne(fontSize: s, color: c, height: h);
+
+/// The script version of the title. Falls back to the serif when the name is
+/// long enough that calligraphy stops being readable — a nine-letter name in
+/// Parisienne is beautiful, a twenty-eight character couple line is not.
+Widget _scriptTitle(MemoryData d, MemoryPalette p, double size, {Color? color}) {
+  final t = _title(d);
+  final long = t.length > 18;
+  return Text(
+    t,
+    textAlign: TextAlign.center,
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+    style: long
+        ? _serif(size * 0.62, color ?? p.ink, w: FontWeight.w500)
+        : _script(size, color ?? p.ink, h: 1.15),
+  );
+}
+
+/// A small-caps line with a hairline either side. The reference cards use this
+/// to carry the date without letting it compete with the name.
+Widget _ruledLine(String text, MemoryPalette p, {Color? color, double gap = 10}) {
+  if (text.trim().isEmpty) return const SizedBox.shrink();
+  final c = color ?? p.soft;
+  Widget rule() => Expanded(
+      child: Container(height: 0.8, color: c.withValues(alpha: 0.45)));
+  return Row(children: [
+    rule(),
+    // Flexible, not a bare Padding: "12 December 2026 · 6:40 AM" in tracked-out
+    // caps is wider than the card, and two Expanded rules either side leave the
+    // centre nothing to give. Unconstrained it overflowed by 21px to the right.
+    Flexible(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: gap),
+        child: Text(text.toUpperCase(),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: _sans(9.5, c, w: FontWeight.w700, ls: 2.2)),
+      ),
+    ),
+    rule(),
+  ]);
+}
 
 Widget _eyebrowText(MemoryData d, MemoryPalette p, {Color? color}) => Text(
       _eyebrow(d),
@@ -278,6 +349,207 @@ class _ArchMotif extends CustomPainter {
       canvas.drawLine(
           Offset(cx, 70), Offset(cx + 40 * math.cos(a), 70 + 40 * math.sin(a)), p);
     }
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+class _RibbonBow extends CustomPainter {
+  _RibbonBow(this.color);
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final cx = size.width / 2;
+    const top = 34.0;
+
+    // Two loops and a knot.
+    void loop(double dir) {
+      canvas.drawPath(
+        Path()
+          ..moveTo(cx, top)
+          ..cubicTo(cx + 46 * dir, top - 30, cx + 74 * dir, top + 6,
+              cx + 34 * dir, top + 20)
+          ..cubicTo(cx + 22 * dir, top + 26, cx + 8 * dir, top + 14, cx, top),
+        p,
+      );
+    }
+
+    loop(1);
+    loop(-1);
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, top + 6), width: 13, height: 10), p);
+
+    // Tails that fall away and become the side borders — this is what makes
+    // the card read as one ribbon rather than a bow with a box under it.
+    void tail(double dir) {
+      final endY = size.height - 46;
+      canvas.drawPath(
+        Path()
+          ..moveTo(cx + 4 * dir, top + 14)
+          ..cubicTo(cx + 60 * dir, top + 60, cx + 118 * dir, size.height * 0.34,
+              cx + 128 * dir, size.height * 0.62)
+          ..cubicTo(cx + 134 * dir, size.height * 0.82, cx + 96 * dir, endY,
+              cx + 54 * dir, endY + 6),
+        p,
+      );
+    }
+
+    tail(1);
+    tail(-1);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+/// An arch window with a sprig at its foot — the shape almost every printed
+/// announcement in the reference set is built on.
+class _ArchWindow extends CustomPainter {
+  _ArchWindow(this.color, this.fill);
+  final Color color;
+  final Color fill;
+  @override
+  void paint(Canvas canvas, Size size) {
+    const m = 22.0;
+    final w = size.width - m * 2, h = size.height - m * 2;
+    final r = w / 2;
+    final path = Path()
+      ..moveTo(m, m + h)
+      ..lineTo(m, m + r)
+      ..arcToPoint(Offset(m + w, m + r), radius: Radius.circular(r))
+      ..lineTo(m + w, m + h)
+      ..close();
+    canvas.drawPath(path, Paint()..color = fill);
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = color.withValues(alpha: 0.5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1);
+
+    // Two sprigs at the foot of the arch.
+    final sp = Paint()
+      ..color = color.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+    void sprig(double x, double dir) {
+      final base = size.height - m - 14;
+      canvas.drawPath(
+          Path()
+            ..moveTo(x, base)
+            ..relativeQuadraticBezierTo(14 * dir, -10, 26 * dir, -26),
+          sp);
+      for (var i = 1; i <= 3; i++) {
+        final t = i / 4;
+        final bx = x + 26 * dir * t, by = base - 26 * t * t - 6 * t;
+        canvas.drawOval(
+            Rect.fromCenter(
+                center: Offset(bx + 5 * dir, by - 4), width: 8, height: 4.5),
+            sp);
+        canvas.drawOval(
+            Rect.fromCenter(
+                center: Offset(bx - 4 * dir, by + 4), width: 8, height: 4.5),
+            sp);
+      }
+    }
+
+    sprig(m + 26, 1);
+    sprig(size.width - m - 26, -1);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+/// An engraved double rule with corner leaves. One ink colour, like a printed
+/// plate — the formal end of the range.
+class _ToileBorder extends CustomPainter {
+  _ToileBorder(this.color);
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    final outer = Rect.fromLTWH(16, 16, size.width - 32, size.height - 32);
+    final inner = Rect.fromLTWH(21, 21, size.width - 42, size.height - 42);
+    canvas.drawRect(outer, p);
+    canvas.drawRect(inner, p..strokeWidth = 0.6);
+
+    // Corner leaves, drawn inward.
+    final lp = Paint()
+      ..color = color.withValues(alpha: 0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+    void corner(double x, double y, double dx, double dy) {
+      for (var i = 0; i < 4; i++) {
+        final o = 9.0 + i * 8;
+        canvas.drawOval(
+            Rect.fromCenter(
+                center: Offset(x + dx * o, y + dy * o), width: 11, height: 5),
+            lp);
+      }
+    }
+
+    corner(28, 28, 1, 1);
+    corner(size.width - 28, 28, -1, 1);
+    corner(28, size.height - 28, 1, -1);
+    corner(size.width - 28, size.height - 28, -1, -1);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+/// Soft clouds and a scatter of stars.
+class _Clouds extends CustomPainter {
+  _Clouds(this.color);
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Paint()..color = Colors.white.withValues(alpha: 0.55);
+    void cloud(double x, double y, double s) {
+      canvas.drawCircle(Offset(x, y), 17 * s, c);
+      canvas.drawCircle(Offset(x + 18 * s, y + 4 * s), 13 * s, c);
+      canvas.drawCircle(Offset(x - 18 * s, y + 5 * s), 12 * s, c);
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(
+              Rect.fromLTWH(x - 26 * s, y + 4 * s, 52 * s, 13 * s),
+              Radius.circular(7 * s)),
+          c);
+    }
+
+    cloud(size.width * 0.18, size.height * 0.14, 1.0);
+    cloud(size.width * 0.84, size.height * 0.24, 0.8);
+    cloud(size.width * 0.30, size.height * 0.88, 1.15);
+    cloud(size.width * 0.80, size.height * 0.80, 0.9);
+
+    final sp = Paint()..color = color.withValues(alpha: 0.55);
+    void star(double x, double y, double r) {
+      final path = Path();
+      for (var i = 0; i < 8; i++) {
+        final a = i * math.pi / 4;
+        final rad = i.isEven ? r : r * 0.34;
+        final px = x + rad * math.cos(a), py = y + rad * math.sin(a);
+        i == 0 ? path.moveTo(px, py) : path.lineTo(px, py);
+      }
+      canvas.drawPath(path..close(), sp);
+    }
+
+    star(size.width * 0.86, size.height * 0.10, 7);
+    star(size.width * 0.10, size.height * 0.36, 5);
+    star(size.width * 0.92, size.height * 0.52, 4.5);
+    star(size.width * 0.16, size.height * 0.66, 6);
   }
 
   @override
@@ -501,6 +773,196 @@ Widget _archIndian(MemoryTemplate t, MemoryData d) {
 }
 
 // ---------------------------------------------------------------------------
+//  Reference-inspired archetypes
+// ---------------------------------------------------------------------------
+//  Drawn from the announcement cards people actually post. Four things recur in
+//  every one of them and are carried through here:
+//
+//   * ONE script line, never two. The name is the calligraphy; everything else
+//     is small caps. Two scripts on a card is where a keepsake starts to look
+//     like a template.
+//   * The date is RULED, not centred loose — a hairline either side keeps it
+//     from competing with the name.
+//   * Ornament frames the card, it does not fill it. The middle stays empty.
+//   * Parents are named at the foot, small. The card is about the baby.
+//
+//  All five go through _cardBody, so they inherit the overflow fix rather than
+//  each one having to remember it.
+
+/// A drawn bow whose tails fall away and become the side border. The most
+/// copied announcement shape there is, and the calmest.
+Widget _archRibbon(MemoryTemplate t, MemoryData d) {
+  final p = t.palette;
+  final details = _details(d);
+  return _bg(p, t.format,
+      _cardBody(
+        padding: const EdgeInsets.fromLTRB(52, 96, 52, 26),
+        innerWidth: t.format.size.width - 104,
+        align: Alignment.center,
+        footer: _footer(d, p),
+        content: [
+          _eyebrowText(d, p),
+          const SizedBox(height: 22),
+          _scriptTitle(d, p, 46),
+          const SizedBox(height: 20),
+          if (details.isNotEmpty) _ruledLine(details.first, p),
+          if (details.length > 1) ...[
+            const SizedBox(height: 8),
+            Text(details[1],
+                textAlign: TextAlign.center,
+                style: _sans(10, p.soft, w: FontWeight.w600, ls: 1.2)),
+          ],
+          const SizedBox(height: 16),
+          _messageText(d, p),
+        ],
+      ),
+      deco: _RibbonBow(p.accent));
+}
+
+/// An arch window on a coloured mat, sprigs at its foot. The printed-card
+/// shape: the mat does the framing so the type can stay small.
+Widget _archArchWindow(MemoryTemplate t, MemoryData d) {
+  final p = t.palette;
+  final details = _details(d);
+  final inset = t.format == MemoryFormat.portrait ? 46.0 : 40.0;
+  return _bg(p, t.format,
+      _cardBody(
+        padding: EdgeInsets.fromLTRB(inset, inset + 26, inset, 22),
+        innerWidth: t.format.size.width - inset * 2,
+        align: Alignment.center,
+        footer: _footer(d, p),
+        content: [
+          if (t.usesPhoto && d.photo != null) ...[
+            _photo(d.photo, w: 104, h: 104, circle: true, ring: p.panel),
+            const SizedBox(height: 18),
+          ],
+          Text(_eyebrow(d),
+              textAlign: TextAlign.center,
+              style: _sans(9.5, p.soft, w: FontWeight.w700, ls: 2.6)),
+          const SizedBox(height: 12),
+          _scriptTitle(d, p, 42),
+          const SizedBox(height: 16),
+          if (details.isNotEmpty) _ruledLine(details.first, p, gap: 8),
+          const SizedBox(height: 14),
+          _messageText(d, p),
+        ],
+      ),
+      deco: _ArchWindow(p.accent, p.panel));
+}
+
+/// Photo on top, a colour panel beneath it carrying every word. The layout for
+/// a card that is mostly a photograph and still has to say four things.
+Widget _archSplit(MemoryTemplate t, MemoryData d) {
+  final p = t.palette;
+  final w = t.format.size.width;
+  final photoH = t.format == MemoryFormat.portrait ? 300.0 : 168.0;
+  final details = _details(d);
+  return _bg(p, t.format,
+      Column(children: [
+        SizedBox(
+          height: photoH,
+          width: w,
+          child: d.photo != null
+              ? _photo(d.photo, w: w, h: photoH)
+              // No photo yet: a calm panel rather than a grey hole, so the
+              // template still reads as a design in the picker.
+              : DecoratedBox(decoration: BoxDecoration(color: p.panel)),
+        ),
+        Expanded(
+          child: Container(
+            width: w,
+            color: p.bg.first,
+            child: _cardBody(
+              padding: const EdgeInsets.fromLTRB(28, 22, 28, 20),
+              innerWidth: w - 56,
+              align: Alignment.center,
+              footer: _footer(d, p),
+              content: [
+                _eyebrowText(d, p),
+                const SizedBox(height: 12),
+                _scriptTitle(d, p, 36),
+                const SizedBox(height: 14),
+                for (final line in details)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Text(line.toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: _sans(9.5, p.soft, w: FontWeight.w700, ls: 1.8)),
+                  ),
+                const SizedBox(height: 8),
+                _messageText(d, p),
+              ],
+            ),
+          ),
+        ),
+      ]));
+}
+
+/// An engraved double rule with corner leaves, and the date set as a large
+/// numeral between hairlines. The formal end of the range.
+Widget _archToile(MemoryTemplate t, MemoryData d) {
+  final p = t.palette;
+  final details = _details(d);
+  return _bg(p, t.format,
+      _cardBody(
+        padding: const EdgeInsets.fromLTRB(44, 52, 44, 26),
+        innerWidth: t.format.size.width - 88,
+        align: Alignment.center,
+        footer: _footer(d, p),
+        content: [
+          Text(_eyebrow(d),
+              textAlign: TextAlign.center,
+              style: _sans(9.5, p.soft, w: FontWeight.w700, ls: 3.4)),
+          const SizedBox(height: 20),
+          Text(_title(d).toUpperCase(),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: _serif(27, p.ink, w: FontWeight.w600, h: 1.16)
+                  .copyWith(letterSpacing: 1.6)),
+          const SizedBox(height: 20),
+          if (details.isNotEmpty) _ruledLine(details.first, p, gap: 12),
+          if (details.length > 1) ...[
+            const SizedBox(height: 10),
+            Text(details[1],
+                textAlign: TextAlign.center,
+                style: _sans(9.5, p.soft, w: FontWeight.w600, ls: 1.6)),
+          ],
+          const SizedBox(height: 18),
+          _messageText(d, p),
+        ],
+      ),
+      deco: _ToileBorder(p.accent));
+}
+
+/// Clouds, stars, and one word of the message set in script. The soft one —
+/// and the only template where the parent's own words carry the card.
+Widget _archSky(MemoryTemplate t, MemoryData d) {
+  final p = t.palette;
+  final details = _details(d);
+  return _bg(p, t.format,
+      _cardBody(
+        padding: const EdgeInsets.fromLTRB(38, 54, 38, 24),
+        innerWidth: t.format.size.width - 76,
+        align: Alignment.center,
+        footer: _footer(d, p),
+        content: [
+          _eyebrowText(d, p),
+          const SizedBox(height: 18),
+          _scriptTitle(d, p, 44),
+          const SizedBox(height: 16),
+          if (details.isNotEmpty)
+            Text(details.first.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: _sans(10, p.soft, w: FontWeight.w700, ls: 2.2)),
+          const SizedBox(height: 16),
+          _messageText(d, p),
+        ],
+      ),
+      deco: _Clouds(p.accent));
+}
+
+// ---------------------------------------------------------------------------
 //  The registry — ~16 templates across both milestones
 // ---------------------------------------------------------------------------
 
@@ -531,6 +993,21 @@ final List<MemoryTemplate> kMemoryTemplates = [
   _t('wb_lav_floral', MemoryType.welcomeBaby, MemoryStyle.floral, 'Lavender Bloom', MemoryFormat.square, _lavender, true, _archFloral),
   _t('wb_midnight', MemoryType.welcomeBaby, MemoryStyle.modern, 'Midnight', MemoryFormat.square, _midnight, true, _archMinimal),
   _t('wb_cream_min', MemoryType.welcomeBaby, MemoryStyle.neutral, 'Cream', MemoryFormat.square, _cream, false, _archMinimal),
+
+  // ---- The reference set: ten cards drawn from real announcements ----------
+  // Five per milestone, one per archetype, so both types get the full range
+  // rather than the expecting side quietly getting the good ones.
+  _t('exp_ribbon_ivory', MemoryType.expecting, MemoryStyle.elegant, 'Ribbon', MemoryFormat.portrait, _ivory, false, _archRibbon),
+  _t('exp_arch_sage', MemoryType.expecting, MemoryStyle.floral, 'Arch', MemoryFormat.portrait, _sage, false, _archArchWindow),
+  _t('exp_toile_porcelain', MemoryType.expecting, MemoryStyle.elegant, 'Engraved', MemoryFormat.portrait, _porcelain, false, _archToile),
+  _t('exp_sky_powder', MemoryType.expecting, MemoryStyle.watercolour, 'Clouds', MemoryFormat.square, _powder, false, _archSky),
+  _t('exp_split_blush', MemoryType.expecting, MemoryStyle.modern, 'Split', MemoryFormat.portrait, _blush, true, _archSplit),
+
+  _t('wb_ribbon_ivory', MemoryType.welcomeBaby, MemoryStyle.elegant, 'Ribbon', MemoryFormat.portrait, _ivory, false, _archRibbon),
+  _t('wb_arch_lav', MemoryType.welcomeBaby, MemoryStyle.floral, 'Arch', MemoryFormat.portrait, _lavender, true, _archArchWindow),
+  _t('wb_toile_porcelain', MemoryType.welcomeBaby, MemoryStyle.elegant, 'Engraved', MemoryFormat.portrait, _porcelain, false, _archToile),
+  _t('wb_sky_powder', MemoryType.welcomeBaby, MemoryStyle.watercolour, 'Clouds', MemoryFormat.square, _powder, false, _archSky),
+  _t('wb_split_cream', MemoryType.welcomeBaby, MemoryStyle.modern, 'Split', MemoryFormat.portrait, _cream, true, _archSplit),
 ];
 
 List<MemoryTemplate> templatesFor(MemoryType type) =>
