@@ -207,4 +207,5 @@ source for exactly this reason.
 | `docs/BACKEND-PATTERNS.md` | RLS shapes, co-parenting, sync patterns |
 | `docs/CONTENT-BACKEND.md` | Content pipeline and Ask Veda |
 | `docs/ADMIN-PANEL.md` | Everything waiting on Directus |
+| `docs/DIRECTUS-SETUP.md` | The panel runbook — collections, roles, the publish webhooks, and the two cross-repo handoffs |
 | `docs/PERSONALIZATION.md` | The personalisation engine's three layers |

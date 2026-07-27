@@ -295,7 +295,13 @@ Care Partner types.
 
 ---
 
-## Sibling file
+## Sibling files
+
+`docs/DIRECTUS-SETUP.md` is the runbook for actually configuring the panel —
+which collections to register, the field interfaces and why each guess Directus
+makes is wrong, the three roles, the two publish webhooks, and the cross-repo
+handoffs to the website and Ask Veda. This file says what is needed; that one
+says how to set it up.
 
 `docs/STILL-OPEN.md` holds every parked item across the whole product — launch
 blockers, decisions waiting on the user, half-built areas. Where something needs
