@@ -60,9 +60,13 @@ Every content table shares a common "spine"; each type adds its own fields.
    text unique` column holding the bundled Dart item's id.
 2. **Grant the CMS role** — `grant select, insert, update, delete on <table> to
    directus_cms;` plus a `for all to directus_cms using (true) with check
-   (true)` policy. Skip this and the collection simply will not appear in
-   Directus. (0045 made the grant explicit on purpose; that friction is the
-   point.)
+   (true)` policy. Skip the grant and the collection simply will not appear in
+   Directus; skip the *policy* and it appears, works, and hides the editor's own
+   drafts — which looks like a broken save button. (0045 made the grant explicit
+   on purpose; that friction is the point.)
+   **`test/content_migrations_test.dart` enforces both**, for every table in
+   `ContentRegistry` — and fails in the other direction too, if the CMS role is
+   granted a table that is not reviewed content.
 3. **Seed from the current Dart** with `insert ... on conflict (source_key) do
    nothing`, so a re-run can never overwrite an editor and day one looks
    identical to today.
