@@ -87,7 +87,10 @@ class _FatherHomeScreenState extends State<FatherHomeScreen> {
     }
 
     final hour = DateTime.now().hour;
-    final weekData = father.weekFor(week);
+    // Her week is passed in so his three factual sections derive from the
+    // content she is reading, rather than being written twice and drifting.
+    final weekData =
+        father.weekFor(week, mother: widget.pregnancy.weekData(week));
 
     return SafeArea(
       bottom: false,

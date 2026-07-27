@@ -19,6 +19,8 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/father_day.dart';
 import '../models/father_week.dart';
+import '../models/father_week_derive.dart';
+import '../models/week_content.dart';
 
 /// The three modules that make up a complete Father daily moment.
 enum FatherModule { learn, talk, mission }
@@ -136,19 +138,28 @@ class FatherContentController extends ChangeNotifier {
     return nearest;
   }
 
-  /// The Weekly Journey for [week] (4–40). Prefers an exact match, else the
-  /// nearest authored week (so the prototype shows while the rollout grows).
-  /// Null if no weekly content is loaded yet.
-  FatherWeek? weekFor(int week) {
-    if (_weeks.isEmpty) return null;
+  /// The Weekly Journey for [week] (4–40), filled out from her matching week.
+  ///
+  /// THE NEAREST-WEEK FALLBACK IS GONE, and that is the point of this method.
+  /// It used to return the closest authored week when [week] had no file — with
+  /// only week 20 written, that meant every father from week 4 to week 40 read
+  /// week 20: the anomaly scan, "your baby can hear you now", all of it, months
+  /// early or months late. Nothing errored. Nothing looked wrong.
+  ///
+  /// Now a week with no file (or a file that failed to parse — the loader
+  /// cannot tell those apart) is built from HER week instead, which exists for
+  /// all 37. The father gets content that is correct for the week he is
+  /// actually in, minus the one section that is genuinely his.
+  ///
+  /// Pass [mother] from PregnancyController.weekData(week).
+  FatherWeek? weekFor(int week, {WeekContent? mother}) {
     for (final w in _weeks) {
-      if (w.week == week) return w;
+      if (w.week == week) return w.filledFrom(mother);
     }
-    FatherWeek nearest = _weeks.first;
-    for (final w in _weeks) {
-      if ((w.week - week).abs() < (nearest.week - week).abs()) nearest = w;
-    }
-    return nearest;
+    // No authored file for this week. Derive rather than substitute someone
+    // else's week.
+    if (mother != null) return fatherWeekFromMother(mother);
+    return null;
   }
 
   // --- engagement ------------------------------------------------------------

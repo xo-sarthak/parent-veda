@@ -1,0 +1,24 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 28,
+ "father_insight": {
+  "title": {
+   "en": "Ask what she is afraid of",
+   "hi": "Poochiye use kis baat ka dar hai"
+  },
+  "body": {
+   "en": "Not whether she is. She is. Asking what specifically makes it something the two of you can look at together instead of something she carries alone at night.",
+   "hi": "Yeh nahi ki dar hai ya nahi. Hai. Yeh poochna ki theek kis baat ka, use aisi cheez bana deta hai jise aap dono saath dekh sakte hain, bajaye iske ki woh raat ko akeli jhele."
+  }
+ },
+ "connecting_with_baby": {
+  "title": {
+   "en": "I can open and close my eyes, blink and respond to light. My brain is developing rapidly and my lungs continue preparing for life outside the womb.",
+   "hi": "Main apni aankhein khol aur band kar sakta hoon, blink kar sakta hoon aur roshni par react kar sakta hoon. Mera brain tezi se develop ho raha hai aur mere lungs womb ke bahar ki zindagi ke liye taiyaar ho rahe hain."
+  },
+  "body": {
+   "en": "If a bright light shines on her bump, I may actually turn toward it.",
+   "hi": "Agar uske pet par tej roshni padti hai, to main sach mein uski taraf mud sakta hoon."
+  }
+ }
+}

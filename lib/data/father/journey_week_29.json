@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 29,
+ "father_insight": {
+  "title": {
+   "en": "Your leave, in writing",
+   "hi": "Aapki chhutti, likhit mein"
+  },
+  "body": {
+   "en": "Whatever you can take, arrange it now and get it confirmed. Fathers who leave this late usually end up taking less than they meant to, and regret it for years.",
+   "hi": "Jitni bhi le sakte hain, abhi tay kijiye aur confirm karwaiye. Jo pita ise taalte hain woh aksar soche se kam chhutti le paate hain, aur saalon pachhtate hain."
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 6,
+ "father_insight": {
+  "title": {
+   "en": "A heartbeat, and a person",
+   "hi": "Ek dhadkan, aur ek insaan"
+  },
+  "body": {
+   "en": "There is a heartbeat this week. Many fathers describe this as the moment it stopped being news and started being a person. Let yourself react to it however you actually do.",
+   "hi": "Is hafte ek dhadkan hai. Bahut se pita kehte hain ki yahi woh pal tha jab yeh khabar se badal kar ek insaan ban gaya. Aap jaisa sach mein mehsoos karte hain, waisa hi react karne dein khud ko."
+  }
+ }
+}

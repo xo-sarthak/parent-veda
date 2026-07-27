@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 11,
+ "father_insight": {
+  "title": {
+   "en": "Who have you told?",
+   "hi": "Aapne kise bataya hai?"
+  },
+  "body": {
+   "en": "Fathers often have nobody to talk to about this. She has doctors, family, other mothers. Pick one person this week and actually tell them what this feels like for you.",
+   "hi": "Pita ke paas aksar is baare mein baat karne wala koi nahi hota. Uske paas doctor hain, parivaar hai, doosri mothers hain. Is hafte ek insaan chuniye aur unhe sach mein bataiye ki aapko yeh kaisa lag raha hai."
+  }
+ }
+}

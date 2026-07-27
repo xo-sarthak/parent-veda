@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 5,
+ "father_insight": {
+  "title": {
+   "en": "The waiting is the hard part",
+   "hi": "Intezaar hi mushkil hissa hai"
+  },
+  "body": {
+   "en": "Nothing looks different yet, and there is very little you can do. Sitting with that discomfort instead of filling it with plans is itself a skill you will need often as a father.",
+   "hi": "Abhi kuch alag nahi dikhta, aur karne ko bahut kam hai. Us bechaini ko plans se bharne ke bajaye uske saath baithna, yeh khud ek hunar hai jo aapko pita banne par baar baar chahiye hoga."
+  }
+ }
+}

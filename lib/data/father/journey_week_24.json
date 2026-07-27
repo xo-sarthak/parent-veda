@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 24,
+ "father_insight": {
+  "title": {
+   "en": "Protect her sleep now",
+   "hi": "Ab uski neend bachaiye"
+  },
+  "body": {
+   "en": "Sleep gets harder from here and does not get easier for a long time. Taking the early morning, or the noise, or the dog, is worth more than most gestures.",
+   "hi": "Yahan se neend mushkil hoti jaati hai aur lambe samay tak aasaan nahi hoti. Subah jaldi uthna, ya shor sambhalna, ya kutte ko dekhna, yeh zyadatar gestures se zyada keemti hai."
+  }
+ }
+}

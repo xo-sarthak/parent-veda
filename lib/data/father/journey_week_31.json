@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 31,
+ "father_insight": {
+  "title": {
+   "en": "Who else will she need?",
+   "hi": "Use aur kaun chahiye hoga?"
+  },
+  "body": {
+   "en": "You cannot be all of it, and trying is how fathers burn out by month two. Work out now who else is genuinely coming, and what they are actually going to do.",
+   "hi": "Aap sab kuch nahi ho sakte, aur koshish karna hi wajah hai ki pita doosre maheene tak thak jaate hain. Abhi tay kijiye ki aur kaun sach mein aayega, aur woh asal mein karega kya."
+  }
+ }
+}

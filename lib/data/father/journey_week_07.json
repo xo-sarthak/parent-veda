@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 7,
+ "father_insight": {
+  "title": {
+   "en": "You are allowed to be scared",
+   "hi": "Darna aapka haq hai"
+  },
+  "body": {
+   "en": "Money, space, whether you will be any good at this. Fathers rarely say these out loud because it feels selfish next to what she is carrying. Saying one of them to her this week is not a burden. It is the beginning of doing this together.",
+   "hi": "Paisa, jagah, kya aap ismein achhe honge. Pita yeh baatein kam hi kehte hain kyunki jo woh jhel rahi hai uske saamne yeh selfish lagta hai. Is hafte unmein se ek baat usse keh dena bojh nahi hai. Yeh saath mein karne ki shuruaat hai."
+  }
+ }
+}

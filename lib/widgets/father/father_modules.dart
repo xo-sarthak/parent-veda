@@ -547,9 +547,14 @@ class FatherWeeklyView extends StatelessWidget {
       Text(s.fatherWeeklyIntro,
           style: text.bodyMedium?.copyWith(color: AppTheme.neutral600)),
       const SizedBox(height: 14),
-      _section(context, s.fatherSecInsight, Icons.lightbulb_rounded, _slate,
-          week.insight),
-      const SizedBox(height: 14),
+      // Insight is the only section that is never derived from her week — if
+      // nobody has written it, the card is skipped rather than rendered empty.
+      // The other three always have content, so the screen is never bare.
+      if (_has(week.insight)) ...[
+        _section(context, s.fatherSecInsight, Icons.lightbulb_rounded, _slate,
+            week.insight),
+        const SizedBox(height: 14),
+      ],
       _section(context, s.fatherSecSupport, Icons.volunteer_activism_rounded,
           _coral, week.support),
       const SizedBox(height: 14),
@@ -560,6 +565,9 @@ class FatherWeeklyView extends StatelessWidget {
           week.mission),
     ]);
   }
+
+  static bool _has(FatherWeekSection s) =>
+      s.title.en.trim().isNotEmpty || s.title.hi.trim().isNotEmpty;
 
   Widget _section(BuildContext context, String label, IconData icon, Color accent,
       FatherWeekSection sec) {

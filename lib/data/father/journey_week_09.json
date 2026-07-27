@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 9,
+ "father_insight": {
+  "title": {
+   "en": "Notice what she stopped doing",
+   "hi": "Dekhiye usne kya chhoda hai"
+  },
+  "body": {
+   "en": "She has probably given up things quietly. Coffee, a medicine, a way of sleeping. Naming one of them out loud tells her the cost is being seen, which is different from being thanked.",
+   "hi": "Usne shayad chupchaap kuch cheezein chhod di hain. Coffee, koi dawa, sone ka tareeka. Unmein se ek ka zikr kar dena use batata hai ki uski keemat dikh rahi hai, jo shukriya kehne se alag baat hai."
+  }
+ }
+}

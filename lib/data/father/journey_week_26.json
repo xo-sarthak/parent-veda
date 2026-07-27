@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 26,
+ "father_insight": {
+  "title": {
+   "en": "Talk about the birth before it is urgent",
+   "hi": "Birth par baat kijiye, urgency se pehle"
+  },
+  "body": {
+   "en": "What she wants, what frightens her, what she wants you to do if a decision has to be made fast. This conversation is calm now and impossible later.",
+   "hi": "Woh kya chahti hai, use kis se dar lagta hai, aur agar tezi se faisla lena pade toh woh aapse kya chahti hai. Yeh baat abhi shaant hai aur baad mein namumkin."
+  }
+ }
+}

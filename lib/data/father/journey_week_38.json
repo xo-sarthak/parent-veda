@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 38,
+ "father_insight": {
+  "title": {
+   "en": "You will not feel ready",
+   "hi": "Aapko taiyaar nahi lagega"
+  },
+  "body": {
+   "en": "Nobody does. Readiness is not a feeling that arrives before the birth. It builds afterwards, out of showing up repeatedly when you have no idea what you are doing.",
+   "hi": "Kisi ko nahi lagta. Taiyaari koi ehsaas nahi hai jo janm se pehle aa jaaye. Yeh baad mein banti hai, baar baar haazir hone se, tab bhi jab aapko kuch samajh na aa raha ho."
+  }
+ }
+}

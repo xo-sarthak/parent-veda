@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 4,
+ "father_insight": {
+  "title": {
+   "en": "You found out. Now what?",
+   "hi": "Aapko pata chal gaya. Ab aage kya?"
+  },
+  "body": {
+   "en": "Most fathers feel less than they expected to at this moment, and quietly worry about that. Nothing is wrong with you. For her it is already physical; for you it is still an idea. It becomes real later, and that is normal.",
+   "hi": "Zyadatar pita is pal par utna mehsoos nahi karte jitna unhone socha tha, aur chupke se pareshan hote hain. Aap mein kuch galat nahi hai. Uske liye yeh abhi se physical hai; aapke liye abhi bhi ek khayal hai. Yeh baad mein asli lagta hai, aur yeh normal hai."
+  }
+ }
+}

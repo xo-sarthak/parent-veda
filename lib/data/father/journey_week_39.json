@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 39,
+ "father_insight": {
+  "title": {
+   "en": "Your job on the day",
+   "hi": "Us din aapka kaam"
+  },
+  "body": {
+   "en": "You are not the patient and you are not the doctor. You are the one who knows what she wanted, keeps the room calm, and asks the question she is too tired to ask.",
+   "hi": "Aap na mareez hain na doctor. Aap woh hain jise pata hai ki usne kya chaaha tha, jo kamre ko shaant rakhta hai, aur woh sawaal poochta hai jo poochne ki taakat us mein nahi bachi."
+  }
+ }
+}

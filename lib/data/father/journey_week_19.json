@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 19,
+ "father_insight": {
+  "title": {
+   "en": "What kind of father, exactly?",
+   "hi": "Kaise pita, theek theek?"
+  },
+  "body": {
+   "en": "Not a good one. That is too vague to act on. Patient? Present in the evenings? The one who does bedtime? Pick one and it becomes something you can practise.",
+   "hi": "Achhe nahi. Yeh itna dhundhla hai ki us par kaam nahi ho sakta. Sabr wale? Shaam ko maujood? Jo sulaate hain? Ek chuniye, aur woh abhyaas karne layak ban jaata hai."
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 33,
+ "father_insight": {
+  "title": {
+   "en": "Say the thing you keep not saying",
+   "hi": "Woh baat kahiye jo aap keh nahi paa rahe"
+  },
+  "body": {
+   "en": "Most fathers are carrying one worry they have decided not to mention. It does not get smaller by month nine. Say it this week, plainly, and let her carry half.",
+   "hi": "Zyadatar pita ek fikr apne andar rakhte hain jise unhone na kehne ka faisla kiya hai. Woh nauve maheene tak chhoti nahi hoti. Is hafte seedhe kahiye, aur aadha use uthane dijiye."
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 25,
+ "father_insight": {
+  "title": {
+   "en": "They know your voice",
+   "hi": "Woh aapki awaaz pehchaante hain"
+  },
+  "body": {
+   "en": "By now they respond to familiar voices. If you have been reading or talking, they already know yours. That head start is real, and it is the whole reason to keep going.",
+   "hi": "Ab tak woh jaani pehchaani awaazon par react karte hain. Agar aap padh rahe the ya baat kar rahe the, toh woh aapki awaaz pehchaante hain. Yeh shuruaati badhat asli hai, aur isi liye lage rehna chahiye."
+  }
+ }
+}

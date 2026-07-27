@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 21,
+ "father_insight": {
+  "title": {
+   "en": "The comparison trap",
+   "hi": "Tulna ka jaal"
+  },
+  "body": {
+   "en": "Someone will tell you what their pregnancy was like, what their baby did, what you should buy. Almost none of it applies to you. Nod, and let it go.",
+   "hi": "Koi aapko batayega ki unki pregnancy kaisi thi, unka baby kya karta tha, aapko kya khareedna chahiye. Uska lagbhag kuch bhi aap par laagu nahi hota. Sar hilaiye, aur chhod dijiye."
+  }
+ }
+}

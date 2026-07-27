@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 10,
+ "father_insight": {
+  "title": {
+   "en": "Your job is not to fix",
+   "hi": "Aapka kaam theek karna nahi hai"
+  },
+  "body": {
+   "en": "When she says she feels awful, the instinct is to solve it. Usually there is nothing to solve. Saying that sounds really hard does more than a suggestion, and takes less from both of you.",
+   "hi": "Jab woh kehti hai ki use bura lag raha hai, mann karta hai use theek kar dein. Aksar theek karne ko kuch hota hi nahi. Yeh kehna ki yeh sach mein mushkil lag raha hai, kisi salah se zyada kaam karta hai aur dono par kam bojh daalta hai."
+  }
+ }
+}

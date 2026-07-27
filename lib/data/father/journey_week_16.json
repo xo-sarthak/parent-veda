@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 16,
+ "father_insight": {
+  "title": {
+   "en": "Your voice starts to matter",
+   "hi": "Aapki awaaz maayne rakhne lagti hai"
+  },
+  "body": {
+   "en": "Hearing begins around now. Your voice is lower than hers and carries further into the womb. This is the first thing that is yours to give and nobody else's.",
+   "hi": "Sunna ab shuru hota hai. Aapki awaaz uski awaaz se gehri hai aur womb ke andar door tak jaati hai. Yeh pehli cheez hai jo sirf aap de sakte hain, koi aur nahi."
+  }
+ }
+}

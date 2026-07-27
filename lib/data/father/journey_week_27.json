@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 27,
+ "father_insight": {
+  "title": {
+   "en": "Third trimester, real weight",
+   "hi": "Teesra trimester, asli bhaar"
+  },
+  "body": {
+   "en": "The last stretch begins. Things you have been meaning to do stop being optional around now. Pick the one you have avoided longest.",
+   "hi": "Aakhri daur shuru. Jo kaam aap taal rahe the, ab woh optional nahi rahe. Jise sabse zyada taala hai, wahi chuniye."
+  }
+ }
+}

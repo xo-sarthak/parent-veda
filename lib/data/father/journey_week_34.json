@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 34,
+ "father_insight": {
+  "title": {
+   "en": "Know the route, know the signs",
+   "hi": "Raasta jaaniye, sanket jaaniye"
+  },
+  "body": {
+   "en": "Where you are going, how you get there at night, what actually means go now. Not so you can be calm, but so she does not have to be the one who knows.",
+   "hi": "Kahan jaana hai, raat mein kaise pahunchna hai, aur asal mein kya matlab hai ki ab chalna hai. Isliye nahi ki aap shaant rahein, balki isliye ki use hi sab pata rakhna na pade."
+  }
+ }
+}

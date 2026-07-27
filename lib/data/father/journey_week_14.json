@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 14,
+ "father_insight": {
+  "title": {
+   "en": "Start showing up to appointments",
+   "hi": "Appointments par aana shuru kijiye"
+  },
+  "body": {
+   "en": "If you have been skipping them because work is hard to move, this is the trimester to change that. What you learn matters less than her not walking in alone.",
+   "hi": "Agar aap kaam ki wajah se inhe chhod rahe the, toh yeh trimester badalne ka hai. Aap kya seekhte hain woh kam maayne rakhta hai. Maayne yeh rakhta hai ki woh akeli andar na jaaye."
+  }
+ }
+}

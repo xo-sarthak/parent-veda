@@ -1,0 +1,24 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 22,
+ "father_insight": {
+  "title": {
+   "en": "Kicks you can feel",
+   "hi": "Aise kicks jo aap mehsoos kar sakte hain"
+  },
+  "body": {
+   "en": "You can probably feel movement from the outside now. Put your hand there and wait, more than once. It is the closest you get to meeting them early.",
+   "hi": "Ab shayad aap bahar se movement mehsoos kar sakte hain. Haath rakhiye aur intezaar kijiye, ek se zyada baar. Unse jaldi milne ke sabse kareeb yahi hai."
+  }
+ },
+ "connecting_with_baby": {
+  "title": {
+   "en": "My hearing is developing rapidly. I can pick out her heartbeat, your voice, and noises from outside the womb. My brain is learning from all of it.",
+   "hi": "Meri hearing tezi se develop ho rahi hai. Main uske dil ki dhadkan, aapki awaaz, aur womb ke bahar ki aawaazein pehchaan sakta hoon. Mera brain in sab se seekh raha hai."
+  },
+  "body": {
+   "en": "Babies recognise voices they heard in the womb after they are born. A good reason to be one of them.",
+   "hi": "Babies janm ke baad un awaazon ko pehchaante hain jo unhone womb mein suni thi. Unmein se ek hone ki achhi wajah."
+  }
+ }
+}

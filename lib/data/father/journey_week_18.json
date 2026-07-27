@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 18,
+ "father_insight": {
+  "title": {
+   "en": "She is not the pregnancy",
+   "hi": "Woh pregnancy nahi hai"
+  },
+  "body": {
+   "en": "Ask her about something that has nothing to do with the baby this week. Her work, an argument she had, a film. She was a whole person before this and still is.",
+   "hi": "Is hafte usse kuch aisa poochiye jiska baby se koi lena dena na ho. Uska kaam, koi behes, koi film. Woh iske pehle bhi ek poori insaan thi aur ab bhi hai."
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 12,
+ "father_insight": {
+  "title": {
+   "en": "The first stretch is behind you",
+   "hi": "Pehla daur peechhe reh gaya"
+  },
+  "body": {
+   "en": "Twelve weeks. Many couples start telling people now. Before the news belongs to everyone, take an evening where it still belongs only to the two of you.",
+   "hi": "Baarah hafte. Bahut se couples ab logon ko batana shuru karte hain. Khabar sab ki hone se pehle, ek shaam aisi rakhiye jab yeh sirf aap dono ki ho."
+  }
+ }
+}

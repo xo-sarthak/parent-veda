@@ -1,0 +1,14 @@
+{
+ "_note": "Only father_insight is authored. supporting_partner, connecting_with_baby and mission are omitted on purpose so they derive from the matching mother week (partnerCorner + babyDevelopment), which is already written and reviewed for all 37 weeks. See lib/models/father_week_derive.dart. Adding one of those keys here overrides the derivation for that section only.",
+ "week": 40,
+ "father_insight": {
+  "title": {
+   "en": "Whenever it happens, it happens right",
+   "hi": "Jab bhi ho, theek hi hota hai"
+  },
+  "body": {
+   "en": "Early, late, planned, changed at the last minute. None of it is a verdict on either of you. The only thing being asked of you now is to be there.",
+   "hi": "Jaldi, der se, socha hua, aakhri pal par badla hua. Inmein se kuch bhi aap dono par faisla nahi hai. Ab aapse sirf itna maanga ja raha hai ki aap wahan hon."
+  }
+ }
+}
