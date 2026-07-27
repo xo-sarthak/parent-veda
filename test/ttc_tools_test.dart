@@ -52,8 +52,35 @@ void main() {
 
   // ===========================================================================
   group('the hub lists every tool from day one', () {
-    test('twenty-two tiles, as the master document names', () {
-      expect(TtcToolsScreen.toolCount, 22);
+    test('every tool the master document names is still findable', () {
+      // This used to assert `toolCount == 22`, which counted TILES when the
+      // promise is about TOOLS. Medication and Reports were separate tiles that
+      // opened the Supplements and Records screens - deliberately, so there is
+      // one list rather than two that disagree, but nothing on screen said so
+      // and it read as broken routing. They are now named inside the tiles they
+      // always opened.
+      //
+      // Counting tiles would have blocked that merge; what actually matters is
+      // that no capability stopped being findable by the word she looks for.
+      final names = [
+        for (final g in ttcToolGroups)
+          for (final t in g.tools) '${t.nameEn} ${t.nameHi}'
+      ].join(' ').toLowerCase();
+
+      for (final capability in [
+        'cycle', 'ovulation', 'fertility', 'symptom', 'weight', 'sleep',
+        'partner', 'mood', 'stress', 'lifestyle', 'journal',
+        'supplement', 'medication', 'test', 'report', 'record', 'appointment',
+        'movement', 'nutrition', 'journey', 'can i', 'worth knowing',
+      ]) {
+        expect(names, contains(capability),
+            reason: '"$capability" is no longer findable in the hub');
+      }
+    });
+
+    test('and every tile still leads somewhere distinct enough to matter', () {
+      // The merge removed two tiles. It must not have removed a destination.
+      expect(TtcToolsScreen.toolCount, 20);
     });
 
     test('every tile has a unique id', () {

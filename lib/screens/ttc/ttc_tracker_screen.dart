@@ -204,31 +204,46 @@ class _ChoiceInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     final options = field.choices(hi);
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+
+    // A single row that divides the width, rather than a Wrap.
+    //
+    // Wrapping put "None / A little / Some / A lot" on one line and dropped
+    // "Severe" onto its own - for every symptom on the screen. Eight orphaned
+    // chips, and a scale that no longer looked like a scale, which matters
+    // here: these options are ORDERED, and a wrapped last item reads as a
+    // separate thing rather than the far end of the same line.
+    return Row(
       children: [
-        for (var i = 0; i < options.length; i++)
-          GestureDetector(
-            onTap: () =>
-                TtcLogStore.instance.log(tracker.id, field.id, i.toDouble()),
-            behavior: HitTestBehavior.opaque,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-              decoration: BoxDecoration(
-                color: current?.value.round() == i ? ttcPurple : ttcPanel,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(options[i],
-                  style: ttcBody(12.5,
+        for (var i = 0; i < options.length; i++) ...[
+          if (i > 0) const SizedBox(width: 6),
+          Expanded(
+            child: GestureDetector(
+              onTap: () =>
+                  TtcLogStore.instance.log(tracker.id, field.id, i.toDouble()),
+              behavior: HitTestBehavior.opaque,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: current?.value.round() == i ? ttcPurple : ttcPanel,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  options[i],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: ttcBody(11.5,
                       color: current?.value.round() == i
                           ? Colors.white
                           : ttcSoft,
-                      w: FontWeight.w700)),
+                      w: FontWeight.w700),
+                ),
+              ),
             ),
           ),
+        ],
       ],
     );
   }

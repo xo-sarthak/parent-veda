@@ -41,6 +41,8 @@ class TtcTool {
     required this.nameEn,
     required this.nameHi,
     required this.open,
+    this.descEn = '',
+    this.descHi = '',
     this.built = true,
   });
 
@@ -48,6 +50,17 @@ class TtcTool {
   final IconData icon;
   final String nameEn;
   final String nameHi;
+
+  /// Three or four words on what the tool is for.
+  ///
+  /// Bare labels left the hub unreadable: nothing distinguished Mood from
+  /// Stress from Lifestyle, and the whitespace for a line of explanation was
+  /// already sitting there unused. Shown only until the tile has something of
+  /// hers in it - after that the state line is the more useful thing to say.
+  final String descEn;
+  final String descHi;
+
+  String desc(bool hi) => hi ? descHi : descEn;
 
   /// What tapping it does. Never null - a tile that does nothing reads as a bug.
   final void Function(BuildContext) open;
@@ -85,6 +98,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.favorite_outline_rounded,
         nameEn: 'Cycle Companion',
         nameHi: 'Cycle Companion',
+        descEn: 'Your periods, and what they say',
+        descHi: 'Aapke periods, aur unka matlab',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcCycleScreen(),
             settings: const RouteSettings(name: 'ttc/cycle'))),
@@ -94,6 +109,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.egg_outlined,
         nameEn: 'Ovulation Companion',
         nameHi: 'Ovulation Companion',
+        descEn: 'Signs your body gives',
+        descHi: 'Body ke ishaare',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcOvulationScreen(),
             settings: const RouteSettings(name: 'ttc/ovulation'))),
@@ -103,6 +120,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.wb_twilight_rounded,
         nameEn: 'Fertility Window',
         nameHi: 'Fertility Window',
+        descEn: 'The days that matter most',
+        descHi: 'Sabse ahem din',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcFertilityWindowScreen(),
             settings: const RouteSettings(name: 'ttc/window'))),
@@ -112,6 +131,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.healing_outlined,
         nameEn: 'Symptom Companion',
         nameHi: 'Symptom Companion',
+        descEn: 'Notice patterns, never diagnose',
+        descHi: 'Pattern dekhein, diagnose nahi',
         open: (c) => openTtcTracker(c, 'symptoms'),
       ),
       TtcTool(
@@ -119,6 +140,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.monitor_weight_outlined,
         nameEn: 'Weight',
         nameHi: 'Wazan',
+        descEn: 'A number, not a verdict',
+        descHi: 'Ek number, faisla nahi',
         open: (c) => openTtcTracker(c, 'weight'),
       ),
       TtcTool(
@@ -126,6 +149,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.bedtime_outlined,
         nameEn: 'Sleep',
         nameHi: 'Neend',
+        descEn: 'Hours, and how they felt',
+        descHi: 'Ghante, aur kaisa laga',
         open: (c) => openTtcTracker(c, 'sleep'),
       ),
     ],
@@ -139,6 +164,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.male_rounded,
         nameEn: 'Partner Health',
         nameHi: 'Partner ki sehat',
+        descEn: 'His half of this',
+        descHi: 'Unka aadha hissa',
         open: (c) => openTtcTracker(c, 'partner_health'),
       ),
       TtcTool(
@@ -146,6 +173,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.mood_outlined,
         nameEn: 'Mood',
         nameHi: 'Mood',
+        descEn: 'How the day actually felt',
+        descHi: 'Din asal mein kaisa tha',
         open: (c) => openTtcTracker(c, 'mood'),
       ),
       TtcTool(
@@ -153,6 +182,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.spa_outlined,
         nameEn: 'Stress',
         nameHi: 'Stress',
+        descEn: 'What is weighing on you',
+        descHi: 'Kya bojh mehsoos ho raha',
         open: (c) => openTtcTracker(c, 'stress'),
       ),
       TtcTool(
@@ -160,6 +191,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.wb_sunny_outlined,
         nameEn: 'Lifestyle',
         nameHi: 'Lifestyle',
+        descEn: 'Habits worth a small change',
+        descHi: 'Aadatein jinme chhota badlaav',
         open: (c) => openTtcTracker(c, 'lifestyle'),
       ),
       TtcTool(
@@ -167,6 +200,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.edit_note_rounded,
         nameEn: 'Journal',
         nameHi: 'Journal',
+        descEn: 'Both of you can write here',
+        descHi: 'Aap dono yahan likh sakte hain',
         open: openTtcJournal,
       ),
     ],
@@ -178,8 +213,10 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'supplements',
         icon: Icons.medication_outlined,
-        nameEn: 'Supplements',
-        nameHi: 'Supplements',
+        nameEn: 'Supplements & medication',
+        nameHi: 'Supplements aur dawaiyan',
+        descEn: 'One list of what you take',
+        descHi: 'Jo aap lete hain, ek list',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcSupplementsScreen(),
             settings: const RouteSettings(name: 'ttc/supplements'))),
@@ -189,36 +226,19 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.biotech_outlined,
         nameEn: 'Medical Tests',
         nameHi: 'Medical Tests',
+        descEn: 'What each one tells you',
+        descHi: 'Har test kya batata hai',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcTestsScreen(),
             settings: const RouteSettings(name: 'ttc/tests'))),
       ),
       TtcTool(
-        id: 'medication',
-        icon: Icons.local_pharmacy_outlined,
-        nameEn: 'Medication',
-        nameHi: 'Dawaiyan',
-        // Medication shares the supplements record - one list of what they
-        // take, rather than two lists that disagree.
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcSupplementsScreen(),
-            settings: const RouteSettings(name: 'ttc/supplements'))),
-      ),
-      TtcTool(
-        id: 'reports',
-        icon: Icons.description_outlined,
-        nameEn: 'Reports',
-        nameHi: 'Reports',
-        // The same folder as Health Records, filtered to results from the test
-        // library. Two folders that must agree with each other is how records
-        // rot, so there is only one.
-        open: (c) => openTtcRecords(c, resultsOnly: true),
-      ),
-      TtcTool(
         id: 'records',
         icon: Icons.folder_shared_outlined,
-        nameEn: 'Health Records',
-        nameHi: 'Health Records',
+        nameEn: 'Records & reports',
+        nameHi: 'Records aur reports',
+        descEn: 'Both of your results, one place',
+        descHi: 'Dono ke results, ek jagah',
         open: openTtcRecords,
       ),
       TtcTool(
@@ -226,6 +246,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.event_note_outlined,
         nameEn: 'Appointments',
         nameHi: 'Appointments',
+        descEn: 'Visits, and what to ask',
+        descHi: 'Visits, aur kya poochhna hai',
         open: openTtcAppointments,
       ),
     ],
@@ -239,6 +261,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.directions_walk_rounded,
         nameEn: 'Movement',
         nameHi: 'Movement',
+        descEn: 'Movement that helps',
+        descHi: 'Jo movement madad kare',
         open: (c) => openTtcTracker(c, 'exercise'),
       ),
       TtcTool(
@@ -246,6 +270,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.restaurant_outlined,
         nameEn: 'Nutrition Planner',
         nameHi: 'Nutrition Planner',
+        descEn: 'A week of ideas, not a plan',
+        descHi: 'Hafte bhar ke ideas, plan nahi',
         open: openTtcNutrition,
       ),
       TtcTool(
@@ -253,6 +279,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.map_outlined,
         nameEn: 'Journey Map',
         nameHi: 'Journey Map',
+        descEn: 'The whole journey, at a glance',
+        descHi: 'Poora safar, ek nazar mein',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcJourneyMapScreen(),
             settings: const RouteSettings(name: 'ttc/map'))),
@@ -262,13 +290,17 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.help_outline_rounded,
         nameEn: 'Can I...?',
         nameHi: 'Kya main...?',
+        descEn: 'The everyday worries, settled',
+        descHi: 'Rozmarra ki chinta, hal',
         open: openTtcCanI,
       ),
       TtcTool(
         id: 'guide',
         icon: Icons.verified_outlined,
-        nameEn: 'Product Guide',
-        nameHi: 'Product Guide',
+        nameEn: 'Worth knowing about',
+        nameHi: 'Jaanne layak',
+        descEn: 'Research first, buy second',
+        descHi: 'Pehle research, phir kharid',
         open: openTtcProducts,
       ),
     ],
@@ -314,11 +346,11 @@ class TtcToolsScreen extends StatelessWidget {
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(child: _tile(context, group.tools[i], hi)),
+                        Expanded(child: _tile(context, group.tools[i], hi, t)),
                         const SizedBox(width: 11),
                         Expanded(
                           child: i + 1 < group.tools.length
-                              ? _tile(context, group.tools[i + 1], hi)
+                              ? _tile(context, group.tools[i + 1], hi, t)
                               : const SizedBox(),
                         ),
                       ]),
@@ -333,10 +365,14 @@ class TtcToolsScreen extends StatelessWidget {
     );
   }
 
-  Widget _tile(BuildContext context, TtcTool tool, bool hi) {
+  Widget _tile(BuildContext context, TtcTool tool, bool hi, TtcS t) {
     // A quiet marker of what has been logged, so an opened tool feels different
     // from an untouched one - without ever becoming a score.
     final subtitle = _subtitleFor(tool, hi);
+    // A tile she has used says what is in it; one she has not says what it is
+    // for. Both beat a bare label with empty space under it.
+    final under = subtitle ?? (tool.desc(hi).isEmpty ? null : tool.desc(hi));
+
     return TtcCard(
       onTap: () => tool.open(context),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
@@ -344,19 +380,41 @@ class TtcToolsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(tool.icon, size: 21, color: ttcPurple),
+            // The icon sits in a tinted chip, the way the pregnancy hub does
+            // it. A bare glyph on white gave every tool the same weight and
+            // made the grid read as a list of words.
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: ttcPanel,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(tool.icon, size: 20, color: ttcPurple),
+            ),
             const SizedBox(height: 11),
             Text(tool.name(hi),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: ttcJakarta(13.5)),
-            if (subtitle != null) ...[
+            if (under != null) ...[
               const SizedBox(height: 4),
-              Text(subtitle,
-                  maxLines: 1,
+              Text(under,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: ttcBody(10.5, color: ttcMuted, w: FontWeight.w600)),
+                  style: ttcBody(10.5, color: ttcMuted, w: FontWeight.w600, h: 1.35)),
             ],
+            const SizedBox(height: 10),
+            // An explicit action, like pregnancy's "Open →". The whole card was
+            // already tappable; nothing on it said so.
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(t.openTool,
+                  style: ttcBody(11, color: ttcPurple, w: FontWeight.w800)),
+              const SizedBox(width: 2),
+              const Icon(Icons.arrow_forward_rounded,
+                  size: 13, color: ttcPurple),
+            ]),
           ]),
     );
   }

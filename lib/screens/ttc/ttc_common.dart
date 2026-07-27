@@ -704,19 +704,23 @@ class TtcBackBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A bare arrow, not a chip.
+    //
+    // TTC had invented a circular grey puck that appears nowhere else: the
+    // pregnancy Journey, Profile and reader all use a plain arrow with the
+    // title beside it. Ask Veda inside TTC already did too, which read as the
+    // odd one out when it was in fact the only screen matching the rest of the
+    // app.
     return Row(children: [
       GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 34,
-          height: 34,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
-          child: const Icon(Icons.arrow_back, size: 17, color: ttcInk),
+        child: const Padding(
+          // Keeps a comfortable touch target now the circle is gone.
+          padding: EdgeInsets.fromLTRB(2, 8, 14, 8),
+          child: Icon(Icons.arrow_back, size: 22, color: ttcTitleInk),
         ),
       ),
-      const SizedBox(width: 12),
       Expanded(child: Text(title, style: ttcJakarta(17))),
       ?trailing,
     ]);

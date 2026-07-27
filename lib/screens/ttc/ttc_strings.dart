@@ -747,6 +747,10 @@ class TtcS {
   String get comingSoon => _p('Coming soon', 'Jald aa raha hai');
   String get openTools => _p('Open Tools', 'Tools kholein');
 
+  /// On every Tools tile. The card was already tappable and nothing said so -
+  /// the pregnancy hub has carried an explicit "Open →" all along.
+  String get openTool => _p('Open', 'Kholein');
+
   /// Used by every section that is genuinely not built yet. Honest wording -
   /// "we are building this", never a dead button pretending to work.
   String get beingBuilt => _p('We are building this', 'Hum ise bana rahe hain');

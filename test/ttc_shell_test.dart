@@ -100,8 +100,11 @@ void main() {
         (tester) async {
       await tester.pumpWidget(const MaterialApp(home: TtcToolsScreen()));
       await tester.pump();
-      expect(TtcToolsScreen.toolCount, 22,
-          reason: 'the master document names 22 tools');
+      // Tile count, not tool count - Medication and Reports were folded into
+      // the tiles they already opened. Coverage of the master document's tools
+      // is asserted by name in ttc_tools_test.dart, which is the promise that
+      // actually matters.
+      expect(TtcToolsScreen.toolCount, 20);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {
