@@ -41,6 +41,8 @@ void main() {
     'articles': 'the first content type (0019), predates the registry',
     'content_posts': "the website's articles",
     'content_categories': "the website's taxonomy",
+    'content_authors': 'author profiles — public credentials only; the private '
+        'paperwork stays in care_partner_verification',
     'referral_config': 'config — select+update only',
     'care_visibility_rules': 'config — select+update only',
     'care_trust_messages': 'config — select+update only',
@@ -53,6 +55,10 @@ void main() {
     'admin_audit_log': 'a VIEW, read only — never the admin_audit table',
     'veda_drafts': "Ask Veda's editorial inbox",
     'veda_content_gaps': 'the what-to-write-next board',
+    'programmes': 'ParentVeda owns one-to-many products; experts only deliver',
+    'programme_sessions': 'the schedule, authored with the programme',
+    'programme_experts': 'assignment is an admin act; ACCEPTANCE is the expert\'s',
+    'programme_coupons': 'discounts — not public-read, validated via a function',
   };
 
   group('every registered content table is fully wired', () {

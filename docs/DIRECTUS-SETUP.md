@@ -45,6 +45,7 @@ Settings → Data Model → the tables appear as "uncontrolled". Register only t
 |---|---|
 | `articles` | already registered |
 | `content_posts`, `content_categories` | already registered — the website's |
+| `content_authors` | new (0053) — author profiles. See §2 for the relation |
 | `recipes` | new |
 | `reads` | new |
 | `products` | new |
@@ -97,6 +98,29 @@ into the English fields they make every form twice as long.
   their own. **No migration needed** — this is purely an interface choice.
 * `body` → Markdown (already set).
 * `og_image_file` → File; `og_image` read-only.
+* `author_slug` → **Many to One** on `content_authors`, display `{{name}}`.
+  This replaces resolving the byline by matching the `author` text against a
+  hardcoded array — where a missing full stop meant the profile silently didn't
+  resolve and the byline went bare. Keep the old `author` free-text field for
+  posts bylined "Team ParentVeda", which have no profile and should render as
+  plain unlinked text.
+
+### `content_authors`
+
+* `bio` → Repeater of text (one entry per paragraph).
+* `qualifications` → Repeater: `degree`, `institution`, `year`.
+* `specialties`, `memberships`, `languages` → Tags.
+* `photo_file` → File; `photo` read-only, derived.
+* `partner_id` → Many to One on `care_partners`, **optional**. Fill it when the
+  author is also an approved Care Partner — it makes the trust chain traceable
+  rather than two records that happen to share a name.
+* `registration` → plain input. This one **is** public and already shows on the
+  site: a council number is what makes "Dr." verifiable. Do not confuse it with
+  `care_partner_verification`, which is private paperwork.
+* `byline_consent_at` → date. Articles are AI-drafted and credited to a
+  reviewing clinician, so this records when they agreed to be named. Not
+  enforced — but if a byline is ever questioned, a date is a much better answer
+  than a belief.
 
 ### `recipes`
 

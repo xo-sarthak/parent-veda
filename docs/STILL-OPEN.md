@@ -177,6 +177,37 @@ agreed to or what it checked first — which is the question anyone actually ask
 afterwards. The panel reads it through the `admin_audit_log` view, never the
 table, so there is no path to editing the record of your own actions.
 
+### 4.4a Refused admin actions are NOT audited — confirmed 2026-07-27
+
+**Fix this before wiring any Directus Flow.** Verified against the live database
+by `supabase/seed/verify_admin_gates.sql`: 17 checks pass, 1 fails.
+
+Every gate in `0051`/`0054` does `perform _audit(...)` and then
+`raise exception`. The raise aborts the transaction, which rolls back the audit
+insert made a line earlier. So **successes are logged and refusals are not** —
+backwards, since the blocked attempts are the rows the log exists for. Today
+`admin_audit` records "who approved this doctor" but nothing about who tried and
+was stopped.
+
+Nothing is broken in the gates themselves: all five refusal paths on
+`approve_care_partner`, plus rotation confirmation, campaign-for-a-pending-
+partner and all five on `publish_programme`, refuse correctly.
+
+**The fix:** the gates should RETURN a refusal rather than raise one —
+`jsonb {ok, code, message}` — so the audit row survives the call. The Directus
+Flow then branches on `ok` instead of relying on a PostgREST error.
+
+The trade-off is real and worth stating: a raise makes a careless Flow fail
+loudly, whereas a returned `{ok:false}` will read as HTTP 200 and a Flow that
+ignores the body will report success. But that is a *Flow* bug, fixable in the
+Flow; losing the audit row is a *design* bug that no Flow can compensate for.
+`docs/DIRECTUS-SETUP.md` §5d already says the Flow must assert on the response.
+
+Touches `approve_care_partner`, `deactivate_care_partner`,
+`create_partner_campaign`, `rotate_partner_tokens`, `remove_demo_partners`,
+`assign_programme_expert`, `publish_programme`, and the expectations in
+`test/admin_actions_test.dart`.
+
 **Brand colour deserves a decision, not just deferral:** letting a partner tint
 app surfaces cuts directly against "never promotional".
 
