@@ -26,6 +26,7 @@ import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
 import 'ttc_community_screen.dart';
 import 'ttc_prepare_screen.dart';
+import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart';
 import 'ttc_tools_screen.dart';
@@ -621,10 +622,19 @@ class _TtcPageState extends State<TtcPage> {
 
 /// The standard header: mark, wordmark, then the utility row. Mirrors the
 /// pregnancy Home's brand header so the two never read as different apps.
+///
+/// The utility row was documented from the start and left empty, which is how
+/// the stage ended up with no way to reach a language control or a sign-out.
+/// The profile entry is now part of the header itself rather than something
+/// each tab remembers to pass, so no tab can be the one that forgets.
 class TtcHeader extends StatelessWidget {
-  const TtcHeader({super.key, this.trailing});
+  const TtcHeader({super.key, this.trailing, this.showProfile = true});
 
   final Widget? trailing;
+
+  /// Off only where a profile door would be wrong - the partner's view, which
+  /// is not his account.
+  final bool showProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -642,6 +652,22 @@ class TtcHeader extends StatelessWidget {
       ),
       const Spacer(),
       ?trailing,
+      if (showProfile) ...[
+        if (trailing != null) const SizedBox(width: 10),
+        GestureDetector(
+          onTap: () => openTtcProfile(context),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+                color: ttcPanel, shape: BoxShape.circle),
+            child: const Icon(Icons.person_outline_rounded,
+                size: 19, color: ttcPurple),
+          ),
+        ),
+      ],
     ]);
   }
 }

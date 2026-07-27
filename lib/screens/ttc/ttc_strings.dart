@@ -22,6 +22,7 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Whether the TTC stage is running in the PARTNER's experience.
 ///
@@ -44,8 +45,18 @@ class TtcPartnerMode extends ChangeNotifier {
 }
 
 class TtcLang extends ChangeNotifier {
-  TtcLang._();
+  TtcLang._() {
+    _load();
+  }
   static final TtcLang instance = TtcLang._();
+
+  /// Persisted, because it was not.
+  ///
+  /// This used to be memory-only, and the only thing that ever SET it was the
+  /// door on the pregnancy home. A family who signed up as trying-to-conceive
+  /// therefore had no way to reach Hinglish at all - every `_p(en, hi)` string
+  /// in the stage was written for an audience that could not get to it.
+  static const String kKey = 'ttc_hinglish';
 
   bool _hinglish = false;
   bool get hinglish => _hinglish;
@@ -53,7 +64,25 @@ class TtcLang extends ChangeNotifier {
   set hinglish(bool v) {
     if (_hinglish == v) return;
     _hinglish = v;
+    _persist();
     notifyListeners();
+  }
+
+  Future<void> _load() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getBool(kKey);
+      if (saved != null && saved != _hinglish) {
+        _hinglish = saved;
+        notifyListeners();
+      }
+    } catch (_) {/* keep the default */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      await (await SharedPreferences.getInstance()).setBool(kKey, _hinglish);
+    } catch (_) {/* best-effort, same as every other TTC store */}
   }
 }
 
@@ -625,6 +654,33 @@ class TtcS {
   String get pathwayAnswerBody => _p(
       'It takes a moment, and it may turn your fertile window back on.',
       'Ek pal lagega, aur ho sakta hai aapki fertile window wapas aa jaye.');
+
+  // ---- profile --------------------------------------------------------------
+  String get profileTitle => _p('Profile', 'Profile');
+  String get profileLanguage => _p('Language', 'Bhasha');
+  String get profileEnglish => _p('English', 'English');
+  String get profileHinglish => _p('Hinglish', 'Hinglish');
+  String get profileSignOut => _p('Sign out', 'Sign out');
+  String get profileSignOutBody => _p(
+      'You will be asked to sign in again. Nothing you have logged is deleted.',
+      'Aapko dobara sign in karna hoga. Aapka logged data delete nahi hota.');
+
+  /// The partner half, named honestly. Pairing is not built yet, so this says
+  /// what is true rather than offering a button that does nothing.
+  String get profilePartner => _p('Your partner', 'Aapka partner');
+  String get profilePartnerSoon => _p(
+      'Pairing his phone to this journey is being built. For now the Her / Him switch on Today shows you both sides.',
+      'Unke phone ko is journey se jodna abhi ban raha hai. Filhaal Today par Her / Him switch se dono taraf dikhti hai.');
+
+  /// Testing only, and labelled so - exactly like the pregnancy Profile's
+  /// "Reset to Week 20 - testing" and "Enter doctor mode - testing".
+  String get profileStageSwitch =>
+      _p('Switch stage · testing', 'Stage badlein · testing');
+  String get profileStageSwitchBody => _p(
+      'Moves the app to the pregnancy shell. Real families move by recording a positive test, never by a switch.',
+      'App ko pregnancy shell par le jaata hai. Asli families positive test record karke aage badhti hain, switch se nahi.');
+  String get profileGoPregnancy =>
+      _p('Go to pregnancy', 'Pregnancy par jaayein');
 
   // ---- shared chrome --------------------------------------------------------
   String get seeAll => _p('See all', 'Sab dekhein');
