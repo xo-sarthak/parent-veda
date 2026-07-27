@@ -254,7 +254,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   /// A few recipes suited to his age. Links out — this page is not a cookbook.
   Widget _recipeRail(int months) {
-    final picks = kFoodRecipes.where((r) => !r.comfortOnly).take(8).toList();
+    final picks = foodCatalog.where((r) => !r.comfortOnly).take(8).toList();
     if (picks.isEmpty) return const SizedBox.shrink();
     return SizedBox(
       height: 158,

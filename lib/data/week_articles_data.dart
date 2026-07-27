@@ -12,6 +12,8 @@ class WeekArticle {
     required this.title,
     required this.readMins,
     required this.body, // paragraphs separated by a blank line (\n\n)
+    this.titleHi,
+    this.bodyHi,
   });
 
   final int week;
@@ -19,6 +21,15 @@ class WeekArticle {
   final String title;
   final int readMins;
   final String body;
+
+  // The `articles` table has carried title_hi / body_hi since 0019. They are
+  // held here — and cached — so that the store never silently drops a language
+  // it was given: a cache that keeps only English means a language toggle
+  // offline shows English, with nothing to explain why. The weekly-reads
+  // carousel does not render these yet; when it does, the data is already
+  // arriving. Null = not translated (see the has_hi worklist in 0046).
+  final String? titleHi;
+  final String? bodyHi;
 }
 
 const List<WeekArticle> kWeekArticles = [

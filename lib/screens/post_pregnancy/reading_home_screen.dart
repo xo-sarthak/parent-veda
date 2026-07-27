@@ -52,7 +52,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
   // ---- search results (title contains query) ------------------------------
   List<Widget> _searchView(ReadingStore store) {
     final q = _query.trim().toLowerCase();
-    final items = kReadArticles.where((a) => a.title.toLowerCase().contains(q)).toList();
+    final items = readCatalog.where((a) => a.title.toLowerCase().contains(q)).toList();
     return [
       const SizedBox(height: 22),
       _pad(readSectionHeader('Search results')),
@@ -79,7 +79,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: ReadingStore.instance,
+          animation: readListenable,
           builder: (context, _) {
             final store = ReadingStore.instance;
             final continues = store.continueReading;

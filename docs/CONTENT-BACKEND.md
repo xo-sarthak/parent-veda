@@ -50,9 +50,42 @@ Every content table shares a common "spine"; each type adds its own fields.
 - **recipes** + `ingredients` (jsonb), `steps` (jsonb), `prep_mins`, `cook_mins`, `veg`, `nutrition` (jsonb)
 - **videos** + `video_host`, `video_ref`, `duration_secs`, `kind` (short|long), `thumbnail`
 
-**Adding a new type later (extensibility):** 4-step recipe, ~1hr each —
-1. create the table (spine + type fields), 2. add published-read RLS,
-3. Directus auto-detects it, 4. app: add fetch + store + screen.
+**Adding a new type later (extensibility):** ~1 hour each. The engine is built
+(`lib/services/content_store.dart`), so a new type is a migration, a seed and a
+~40-line subclass.
+
+1. **Migration** — table with the spine + type fields, `enable row level
+   security`, one policy `for select ... using (status='published')`, `grant
+   select to anon, authenticated`, and **no write policy**. Add a `source_key
+   text unique` column holding the bundled Dart item's id.
+2. **Grant the CMS role** — `grant select, insert, update, delete on <table> to
+   directus_cms;` plus a `for all to directus_cms using (true) with check
+   (true)` policy. Skip this and the collection simply will not appear in
+   Directus. (0045 made the grant explicit on purpose; that friction is the
+   point.)
+3. **Seed from the current Dart** with `insert ... on conflict (source_key) do
+   nothing`, so a re-run can never overwrite an editor and day one looks
+   identical to today.
+4. **App** — subclass `ContentStore<T>`, implement `fromMap` and `toCacheMap`
+   (cache BOTH languages), register it in `lib/services/content_registry.dart`,
+   and call `ensureLoaded()` from the screen. The bundled list stays as the
+   constructor seed forever.
+5. **Directus** — register the collection, set field interfaces, add it to the
+   publish Flow (→ AskVeda `/reindex`, → website revalidate).
+6. **Flip the ratchet** — three things in ONE window, or none:
+   `ContentOwnership` entry → `editor`; add the table to `SOURCE_SPECS` in
+   AskVeda's `ingest/ingest.py`; **delete that type's old `veda_knowledge` rows
+   by `doc_id` prefix**. Skipping the third leaves two copies of the same
+   knowledge in retrieval — one live, one frozen — and Ask Veda answers from
+   whichever scores higher.
+
+**Trap when flipping a type that had a Hinglish twin.** `export_ttc_corpus.dart`
+deliberately emits each item twice (an `_hi` doc) because AskVeda's `ingest.py`
+embeds only the `body` column. A live table read through the standard
+`SOURCE_SPECS` path emits ONE chunk set, from `body` — so Hinglish retrieval
+stops working with no error anywhere and no test that catches it. Fixing it
+needs a second pass over `body_hi` and a `lang` dimension in the
+`(source_table, source_id, chunk_index)` upsert key. **Two-repo change.**
 
 ---
 
@@ -116,6 +149,14 @@ right-sized.
 - 2026-07-14: **Web content tables added** — `0020_web_content.sql` = `content_categories` (5 seeded) + `content_posts` (SEO-rich; modeled 1:1 on the website's `src/lib/guides.ts`; body/recipe/source/book_meta stored as jsonb so the site's renderer is unchanged; + verdict/trimester/week_tag/og_image/meta_title SEO fields). Public-read RLS. For the ParentVeda WEBSITE (Next.js, separate repo `C:\parentveda-web`, Tailwind/App-Router/static-export → moving to Vercel + ISR). Same Supabase, same Directus. App `articles` and web `content_posts` are SEPARATE tables in one project.
 - 2026-07-14: **Web content wired in Directus** — `content_posts` + `content_categories` registered as collections; `body` recreated as a **Markdown** field (was jsonb → column altered to `text`, migration 0020 updated to match); a test blog published OK. Deferred: a clean field-polish pass (proper category/status dropdowns — snagged live on text-vs-string type + RLS/FK deps).
 - 2026-07-14: **Website wiring handed off** — website terminal (`C:\parentveda-web`) wiring Next.js to read `content_posts`/`content_categories` live from Supabase, body → markdown renderer, remove `output:'export'` → **Vercel + ISR** (`revalidate`, `dynamicParams=true`), migrate the 10 sample `guides.ts` posts in. Old GitHub Pages deploy workflow disabled (kept for revert). User does the Vercel deploy (guided from here).
+- 2026-07-27: **Admin-panel build started — Phase 0, the database lockdown.** `0045_cms_role_and_grants.sql` creates a restricted `directus_cms` Postgres role and repoints Directus at it. Until now Directus connected with a broadly-privileged pooler user, which was acceptable while the owner was the only login and stops being acceptable the moment a content editor gets an account: Directus's permission screens are rows in its own admin UI, not a boundary. The boundary now lives in Postgres grants — content tables get full CRUD, the six config tables get select+update, `care_partners`/`partner_referrals` get select only (writes stay in the `0040` security-definer functions), and the ~65 user-data tables get **no grant at all**, so they should not even appear in Directus's "register a collection" list. Each granted table also needs an explicit RLS policy for the role, or Directus would connect fine and show an editor everything **except their own drafts**. Companion file `supabase/seed/care_partner_demo_cleanup.sql` removes the nine fictional partners still live in production (incl. "Dr Meera Rao" at `parentveda.in/care/MK8UQT96NH`) — destructive, look-before-you-delete, run by hand.
+- 2026-07-27: **Phase 1 (field polish) written** — `0046_content_field_polish.sql`. `status` becomes `varchar(32)` + CHECK (`draft|published|archived`) so Directus can render a Dropdown; today a typo'd status means the row never publishes and nothing says why. Deliberately NOT converting `content_posts.category`: it already has an FK, so Directus can present a Many-to-One picker, which is better than a dropdown and needs no PK/FK surgery. Image pickers land as `hero_file uuid` + a Postgres trigger that derives the **R2/CDN** URL into the existing `hero_image` text column — the app must never be pointed at `<directus>/assets/...`, because that would make the sleeping free-tier Render box a user-facing CDN and break the "Directus never faces users" pillar. Set `public.cms_media_base()` to the R2 origin to switch the sync on; until then it no-ops rather than overwriting hand-entered URLs. Plus `articles.has_hi` generated column → a "Missing Hinglish" filter preset.
+- 2026-07-27: **Phase 2 DONE — the generic content engine.** `ContentStore<T>` (`lib/services/content_store.dart`) is now the build-once engine; `ArticleStore` was refitted onto it as the first subclass (generalising against a live shipping type, rather than against an imagined one). New: `ContentRepo.fetchPublished(table, domain:, order:)` with **ordering as a parameter** — the old hardcoded `.order('week')` would have been a silent 400 for any table without a `week` column; `ContentRegistry` so app-resume and pull-to-refresh call sites never change again when a type is added; `ContentOwnership` — the compile-time map naming Dart or Supabase as each type's source of truth, consulted by both export tools so a re-export can no longer overwrite an editor's published work. Three defects fixed in the process: (a) a *successful* fetch returning zero rows was discarded, so **unpublishing could never remove content from the app** — now honoured, but only once the backend has been seen to serve rows, so an unseeded table cannot blank a screen; (b) the cache stored English only, which would show English offline the moment `_hi` columns were used; (c) no refresh throttle, so twelve stores would have meant twelve round trips per alt-tab. 1326 tests pass; new `test/content_ownership_test.dart` scans the export tools' source (a guard nobody calls is not a guard) and `test/content_store_test.dart` holds the structural invariants.
+- 2026-07-27: **Phase 3 / recipes — app side DONE, steps 1-4 of 6.** `0047_recipes.sql` + `RecipeStore` + `tool/export_content_seed.dart` (generates `build/seed_recipes.sql` from `kFoodRecipes`) + `test/recipes_seed_test.dart`. The interesting part was drawing the line inside `pp_food_data.dart`: the **28 dishes** are editorial and moved; the **meal-planning engine** (`browseRecipes`/`planForDay`/`buildMeals`/`todaysMeals`) stayed in Dart, because which dish is offered for Tuesday lunch is product behaviour and behaviour does not move to Directus; `FoodStore` (saved dishes, shopping list) is user data and was untouched. Every helper now reads a new `foodCatalog` getter instead of the const list, so a published dish reaches browse, search, the planner, the Smart Meal Builder and the sick-day doorway — not just the one screen someone remembered to rewire. `foodListenable` (FoodStore ⊕ RecipeStore) drives the rebuilds. **Deliberate deviation from the base store's rule:** an entirely empty catalogue falls back to the bundle, because `foodRecipeById`/`planForDay` must always resolve and "what should I feed my child today?" answering with nothing is a broken screen, not an empty state; unpublishing ONE dish — the real editorial act — works normally. Columns hold what the app filters on, jsonb holds what an editor authors. **Steps 5-6 (flip `ContentOwnership` → editor, add to AskVeda `SOURCE_SPECS`, delete the matching `veda_knowledge` rows, shrink the Dart) wait until the seed has actually been run** — a test asserts recipes is still `bundled` so the flip cannot happen by halves. 1330 tests pass.
+- 2026-07-27: **Phase 3 / reads — app side DONE, and the scope was CORRECTED.** `0048_reads.sql` + `ReadStore` + seed generator + `test/reads_seed_test.dart`. The plan said one `reads` type would absorb three files; reading the models showed that was wrong. `ReadArticle` (parenting: collection + age + nested sections with inline tips and myth-vs-fact cards), `ReadItem` (pregnancy: week-targeted, typed, priority, rating) and `SpiritualTradition` (nested two deep) are genuinely different shapes — one table would mean ~50 columns where every consumer uses half, which is the "expresses more states than the product has" bug surface CLAUDE.md warns about. **So `reads` is the PARENTING reading experience only**; the other two become their own types when they earn it, which the engine makes ~1 hour each. Line drawn inside the file: the 10 articles are editorial and moved; `kReadCollections` stays in Dart (7 collections carrying an `IconData` — code, not content — and a new collection is a new shelf in the UI, not a new article on an existing shelf); `ReadingStore` (positions, completions) is user data and untouched. An editor files an article under a collection **by id, offered as a dropdown** — a free-text box would file an article nowhere while it still looked published. 1333 tests pass.
+- 2026-07-27: **Discovery that changes the recipes flip.** Ask Veda's recipe knowledge comes from `kRecipes` in `pp_recipes_data.dart` (the LEGACY list, already marked "do not add new dishes here"), **not** from `kFoodRecipes` — confirmed at `parenting_veda.dart:152`. So step 5 for recipes is not a straight swap: flipping ownership stops the export emitting the legacy docs, and the new `recipes` table must be added to AskVeda's `SOURCE_SPECS` in the same window or Ask Veda loses every dish it knows and gains nothing. The upside is real though — it retires a shim that exists only to feed the RAG, and upgrades Ask Veda from 149 lines of thin legacy data to 28 dishes carrying `why`, nutrients, storage and common mistakes.
+- 2026-07-27: **Phase 3 / products — app side DONE. Shortlist complete.** `0049_products.sql` + `ProductCatalogStore` + seed + `test/products_seed_test.dart`. Parenting only, narrowed for the same reason as reads (`PpProduct` carries brand/retailer/star-ratings/compare-specs; the pregnancy `Product` carries a ParentVeda Score, review summaries and an affiliate flag — one table would be a row that has to explain which half of itself is meaningful). Naming mattered here: **`ProductStore` was already taken** by the user's saved-products store, so the catalogue is `ProductCatalogStore` — matching the FoodStore/RecipeStore and ReadingStore/ReadStore pairings, where the private list and the published content it points at are deliberately separate stores. `price_inr` is **whole rupees**, matching the Dart so the flip is invisible, and named for its unit so it can never be confused with the booking engine's `price_paise` (nothing is charged here; these are display prices linking out to a retailer). Compare specs stay **three-valued** — null is "not checked", false is "does not have it", and collapsing them would claim a product lacks a safety feature nobody verified.
+- 2026-07-27: **Bug found and fixed while flipping products: Ask Veda was grounding parenting product answers on `pros` alone.** `tool/export_ttc_corpus.dart` states the rule — "THE HONESTY HALF: for products, `watchOut` is exported with the SAME weight" — and TTC honours it, but `parenting_veda.dart` built each product body from `pr.pros.join('. ')` and never included `cons`. So the RAG could tell a parent what was good about a product and never what was worth knowing. Fixed; `cons` now carry equal weight. The bundled data always had them, so nothing needed writing — only the export was dropping them. `test/products_seed_test.dart` now fails if any product ships pros without cons, so the rule is checked rather than remembered.
 - 2026-07-14: **AskVeda RAG chatbot handed off** — separate terminal building a FastAPI RAG service (Groq/Together open-LLM, bge/MiniLM embeddings, Chroma, Supabase+pgvector `veda_cache`, Directus content as the knowledge base, app + inbound-WhatsApp channels reusing the MSG91 number). Ingests from `articles` + `content_posts`.
 
 ## Parallel workstreams (2026-07-14) — 4 terminals, one shared Supabase + one shared Directus
@@ -126,6 +167,25 @@ right-sized.
 4. **AskVeda/WhatsApp terminal** (own repo) — the RAG chatbot backend; reads the shared content.
 
 Migration-number reservation: `0019` articles, `0020` web content (this terminal); parenting starts at **`0021`**; AskVeda's `veda_cache` is a uniquely-named table in its own repo (no number clash).
+
+### Migration numbers reserved for the admin-panel build (2026-07-27)
+
+The admin-panel terminal has claimed **`0045`–`0054`**. Other terminals must
+start at `0055`. A collision here is silent — two files with the same number
+apply in whatever order the runner sorts them, and the loser is simply never run.
+
+| # | File | Phase |
+|---|---|---|
+| `0045` | `cms_role_and_grants.sql` — the restricted `directus_cms` role | 0 (written) |
+| `0046` | `content_field_polish.sql` — dropdowns, R2 file fields, `has_hi` | 1 |
+| `0047` | `recipes.sql` | 3 |
+| `0048` | `reads.sql` | 3 |
+| `0049` | `products.sql` | 3 |
+| `0050` | *(spare — held for the TTC daily flip when TTC settles)* | 3, deferred |
+| `0051` | `admin_audit.sql` — workflow columns + the admin action log | 4 |
+| `0052` | `admin_actions.sql` — approve/rotate/campaign/certify functions | 5 |
+| `0053` | `programmes.sql` | 6 |
+| `0054` | `programme_scheduling.sql` | 6 |
 
 **Key insight:** one Directus → feeds the app, the website, AND the chatbot. Publish once, everywhere reads it.
 

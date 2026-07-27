@@ -29,7 +29,7 @@ class ReadingCollectionScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: ReadingStore.instance,
+          animation: readListenable,
           builder: (context, _) {
             final prog = ReadingStore.instance.collectionProgress(collection);
             return ListView(

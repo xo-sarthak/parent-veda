@@ -25,6 +25,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/services/content_ownership.dart';
 import 'package:parentveda/ttc/ttc_can_i_data.dart';
 import 'package:parentveda/ttc/ttc_chapter_data.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
@@ -37,6 +38,7 @@ import 'package:parentveda/ttc/ttc_trackers_data.dart';
 void main() {
   test('export the TTC corpus to build/ttc_corpus.json', () {
     final out = <Map<String, dynamic>>[];
+    final skipped = <String, int>{};
 
     /// Emit one item as TWO docs (English + Hinglish) so both are embedded.
     void add({
@@ -51,6 +53,13 @@ void main() {
     }) {
       String clean(String s) => s.trim();
       if (clean(bodyEn).isEmpty || clean(titleEn).isEmpty) return;
+      // THE RATCHET — see lib/services/content_ownership.dart. An editor-owned
+      // type's truth is the Supabase table; re-exporting it from Dart would
+      // overwrite published work with an older bundled copy.
+      if (ContentOwnership.isKindEditorOwned(kind)) {
+        skipped[kind] = (skipped[kind] ?? 0) + 1;
+        return;
+      }
       out.add(<String, dynamic>{
         'doc_id': docId,
         'kind': kind,
@@ -309,6 +318,10 @@ void main() {
     }
     // ignore: avoid_print
     print('\nEXPORTED ${out.length} TTC docs (En + Hinglish) -> build/ttc_corpus.json');
+    if (skipped.isNotEmpty) {
+      // ignore: avoid_print
+      print('SKIPPED (editor-owned, served from Supabase): $skipped');
+    }
     final kinds = byKind.keys.toList()..sort();
     for (final k in kinds) {
       // ignore: avoid_print

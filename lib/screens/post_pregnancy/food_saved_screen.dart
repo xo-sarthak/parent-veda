@@ -25,7 +25,7 @@ class FoodSavedScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: FoodStore.instance,
+          animation: foodListenable,
           builder: (context, _) {
             final store = FoodStore.instance;
             final saved = store.saved;

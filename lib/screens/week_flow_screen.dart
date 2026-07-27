@@ -4403,7 +4403,9 @@ class _AllReadsScreen extends StatelessWidget {
                 color: AppTheme.primary900)),
       ),
       body: RefreshIndicator(
-        onRefresh: () => store.refresh(),
+        // force: an explicit pull-to-refresh should never be swallowed by the
+        // store's resume throttle — the gesture means "check now".
+        onRefresh: () => store.refresh(force: true),
         child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),

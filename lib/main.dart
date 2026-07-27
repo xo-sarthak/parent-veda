@@ -35,6 +35,9 @@ import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_scaffold.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
+import 'services/product_catalog_store.dart';
+import 'services/read_store.dart';
+import 'services/recipe_store.dart';
 import 'services/bought_store.dart';
 import 'services/bump_store.dart';
 import 'services/calendar_store.dart';
@@ -191,6 +194,14 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // saved recipe or reading position is personal, not shared with a partner.
     DevStore.instance.init();
     FoodStore.instance.init();
+    // The dish CATALOGUE, as opposed to FoodStore's saved list — editor-owned
+    // content read from Supabase. Loaded here rather than lazily from a screen
+    // because the meal planner and the ingredient library are read by helper
+    // functions all over the parenting side, not by one widget with a build
+    // method to hang ensureLoaded() off. Cheap: cache first, network after.
+    RecipeStore.instance.ensureLoaded();
+    ReadStore.instance.ensureLoaded();
+    ProductCatalogStore.instance.ensureLoaded();
     WatchStore.instance.init();
     ReadingStore.instance.init();
     RecoStore.instance.init();

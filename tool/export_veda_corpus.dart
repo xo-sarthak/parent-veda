@@ -23,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/veda_showcase.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/screens/post_pregnancy/parenting_veda.dart';
+import 'package:parentveda/services/content_ownership.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/veda_index.dart';
 
@@ -40,8 +41,17 @@ void main() {
     final parenting = parentingCorpus();
 
     final out = <Map<String, dynamic>>[];
+    final skipped = <String, int>{};
 
     void add(VedaDoc d, {String? titleHi, String? bodyHi}) {
+      // THE RATCHET. Once a content type is editor-owned, its truth lives in
+      // Supabase and this tool must not touch it — re-exporting would overwrite
+      // whatever an editor published, silently, with an older bundled copy.
+      // See lib/services/content_ownership.dart.
+      if (ContentOwnership.isKindEditorOwned(d.kind.name)) {
+        skipped[d.kind.name] = (skipped[d.kind.name] ?? 0) + 1;
+        return;
+      }
       out.add(<String, dynamic>{
         'doc_id': d.id,
         'kind': d.kind.name,
@@ -97,6 +107,12 @@ void main() {
     }
     // ignore: avoid_print
     print('\nEXPORTED ${out.length} docs -> build/veda_corpus.json');
+    if (skipped.isNotEmpty) {
+      // Never silent. A type vanishing from the corpus without explanation is
+      // exactly how "why did Ask Veda stop knowing about recipes?" starts.
+      // ignore: avoid_print
+      print('SKIPPED (editor-owned, served from Supabase): $skipped');
+    }
     // ignore: avoid_print
     print('WITH HINGLISH: $withHi');
     // ignore: avoid_print

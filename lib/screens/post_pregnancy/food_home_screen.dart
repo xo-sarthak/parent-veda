@@ -54,7 +54,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
   // ---- search results (recipe title contains query) -----------------------
   List<Widget> _foodSearchResults(BuildContext context) {
     final q = _query.trim().toLowerCase();
-    final items = kFoodRecipes.where((r) => r.title.toLowerCase().contains(q)).toList();
+    final items = foodCatalog.where((r) => r.title.toLowerCase().contains(q)).toList();
     return [
       const SizedBox(height: 16),
       if (items.isEmpty)
@@ -79,7 +79,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
         SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: FoodStore.instance,
+          animation: foodListenable,
           builder: (context, _) {
             final store = FoodStore.instance;
             final meals = todaysMeals();
@@ -290,7 +290,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
       );
 
   Widget _shoppingLink(BuildContext context) => AnimatedBuilder(
-        animation: FoodStore.instance,
+        animation: foodListenable,
         builder: (context, _) {
           final left = FoodStore.instance.shoppingLeft;
           return GestureDetector(

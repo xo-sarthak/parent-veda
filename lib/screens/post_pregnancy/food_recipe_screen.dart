@@ -104,7 +104,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           top: 8,
           right: 12,
           child: AnimatedBuilder(
-            animation: FoodStore.instance,
+            animation: foodListenable,
             builder: (context, _) {
               final saved = FoodStore.instance.isSaved(r.id);
               return _round(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, () => FoodStore.instance.toggleSave(r.id));

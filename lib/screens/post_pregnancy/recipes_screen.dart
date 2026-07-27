@@ -58,7 +58,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
         SafeArea(
           bottom: false,
           child: AnimatedBuilder(
-            animation: FoodStore.instance,
+            animation: foodListenable,
             builder: (context, _) {
               final q = _query.trim();
               return ListView(

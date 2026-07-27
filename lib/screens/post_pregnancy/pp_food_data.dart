@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/recipe_store.dart';
 import '../../services/remote/cloud_synced_store.dart';
 
 /// One key nutrient line for the Nutrition Breakdown.
@@ -1220,29 +1221,57 @@ const List<NutritionFocus> kNutritionFocuses = [
   ),
 ];
 
+// ---- the live catalogue -----------------------------------------------------
+/// Every dish the app should show right now: served from Supabase when the
+/// content backend has answered, and the bundled [kFoodRecipes] otherwise
+/// (first launch, offline, or before the first fetch returns).
+///
+/// Everything below reads THIS, never the const list, so an editor publishing
+/// a dish in Directus reaches the whole Food companion — browse, search, the
+/// meal planner, the Smart Meal Builder and the sick-day doorway — rather than
+/// only the one screen someone remembered to rewire.
+///
+/// THE EMPTY CASE. `RecipeStore` will honour a genuinely empty backend once it
+/// has seen content, which is right for a carousel that can simply show fewer
+/// cards. It is not right here: `foodRecipeById` and `planForDay` must always
+/// resolve to a dish, and "what should I feed my child today?" answering with
+/// nothing is a broken screen rather than an empty state. So a completely empty
+/// catalogue falls back to the bundle. Unpublishing ONE dish — the actual
+/// editorial act — works exactly as expected; only unpublishing every dish is
+/// treated as a mistake rather than an instruction.
+List<FoodRecipe> get foodCatalog {
+  final live = RecipeStore.instance.all;
+  return live.isEmpty ? kFoodRecipes : live;
+}
+
+/// Listen to this wherever dishes are rendered: it fires both when the user
+/// changes a preference (veg-only) and when freshly published content arrives.
+Listenable get foodListenable =>
+    Listenable.merge([FoodStore.instance, RecipeStore.instance]);
+
 // ---- lookups + engine -------------------------------------------------------
 FoodRecipe foodRecipeById(String id) =>
-    kFoodRecipes.firstWhere((r) => r.id == id, orElse: () => kFoodRecipes.first);
+    foodCatalog.firstWhere((r) => r.id == id, orElse: () => foodCatalog.first);
 NutritionFocus focusById(String id) =>
     kNutritionFocuses.firstWhere((f) => f.id == id, orElse: () => kNutritionFocuses.first);
 List<FoodRecipe> foodByCategory(String category) {
   // Only the Sick-Day Meals category surfaces the comfort-only recovery meals;
   // every other kind hides them (they belong behind the Sick-mode doorway).
   final wantSick = category == 'Sick-Day Meals';
-  return kFoodRecipes
+  return foodCatalog
       .where((r) => r.category == category || r.tags.contains(category.toLowerCase()))
       .where((r) => wantSick || !r.comfortOnly)
       .where((r) => !FoodStore.instance.vegOnly || r.veg)
       .toList();
 }
 List<FoodRecipe> get recommendedFood =>
-    kFoodRecipes.where((r) => !r.comfortOnly && (!FoodStore.instance.vegOnly || r.veg)).take(6).toList();
+    foodCatalog.where((r) => !r.comfortOnly && (!FoodStore.instance.vegOnly || r.veg)).take(6).toList();
 
 /// The unified Recipes home browse list: 3-way diet + category + immunity
 /// filters, always excluding the sick-day comfort meals (they live behind the
 /// Sick-mode doorway). Mirrors the old Recipes `normalRecipes` axes on the
 /// richer FoodRecipe model.
-List<FoodRecipe> browseRecipes({String diet = 'All', String category = 'All', bool immunity = false}) => kFoodRecipes
+List<FoodRecipe> browseRecipes({String diet = 'All', String category = 'All', bool immunity = false}) => foodCatalog
     .where((r) => !r.comfortOnly)
     .where((r) => diet == 'All' || r.diet == diet)
     .where((r) => category == 'All' || r.category == category)
@@ -1253,14 +1282,14 @@ List<FoodRecipe> browseRecipes({String diet = 'All', String category = 'All', bo
 /// Everyday recipes whose title matches [query] (excludes comfort-only meals).
 List<FoodRecipe> searchEverydayRecipes(String query) {
   final q = query.trim().toLowerCase();
-  return kFoodRecipes.where((r) => !r.comfortOnly && r.title.toLowerCase().contains(q)).toList();
+  return foodCatalog.where((r) => !r.comfortOnly && r.title.toLowerCase().contains(q)).toList();
 }
 
 /// Every dish that helps with a sick-day [situation] - the comfort-only recovery
 /// meals plus any everyday dish tagged for it - warm-styled in the Sick-mode
 /// doorway (SickDaysScreen).
 List<FoodRecipe> sickFoodRecipes(String situation) =>
-    kFoodRecipes.where((r) => r.situations.contains(situation)).toList();
+    foodCatalog.where((r) => r.situations.contains(situation)).toList();
 
 String sickBlurb(String situation) {
   switch (situation) {
@@ -1282,7 +1311,7 @@ String sickBlurb(String situation) {
 /// items), so a chosen ingredient always maps to real, matchable recipes.
 List<String> foodIngredientLibrary() {
   final set = <String>{};
-  for (final r in kFoodRecipes) {
+  for (final r in foodCatalog) {
     set.addAll(r.ingredientKeys);
   }
   return set.toList()..sort();
@@ -1319,25 +1348,25 @@ Map<String, FoodRecipe> planForDay(int dayIndex) {
 
   List<FoodRecipe> poolFor(String s) {
     bool ok(FoodRecipe r) => !r.comfortOnly && (!vegOnly || r.veg);
-    final own = kFoodRecipes.where((r) => r.slot == s && ok(r)).toList();
+    final own = foodCatalog.where((r) => r.slot == s && ok(r)).toList();
     // A WEEKLY plan drawn from a pool of two is the same dinner four times, so
     // top up thin slots from their neighbours. Dinner currently has only two
     // recipes authored - this keeps the plan varied until more are written.
     if (own.length >= 4) return own;
     final extra = <FoodRecipe>[];
     for (final n in _slotNeighbours[s] ?? const <String>[]) {
-      extra.addAll(kFoodRecipes.where((r) => r.slot == n && ok(r)));
+      extra.addAll(foodCatalog.where((r) => r.slot == n && ok(r)));
     }
     final merged = [...own, ...extra];
     if (merged.isNotEmpty) return merged;
-    return kFoodRecipes.where(ok).toList();
+    return foodCatalog.where(ok).toList();
   }
 
   // Each slot walks its pool at a DIFFERENT stride, so Tuesday is not simply
   // Monday shifted by one across the board.
   FoodRecipe slot(String s, int stride) {
     final list = poolFor(s);
-    if (list.isEmpty) return kFoodRecipes.first;
+    if (list.isEmpty) return foodCatalog.first;
     return list[((dayIndex * stride) + stride) % list.length];
   }
 
@@ -1362,7 +1391,7 @@ class MealSuggestion {
 
 List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, required Set<String> has}) {
   final scored = <MealSuggestion>[];
-  for (final r in kFoodRecipes) {
+  for (final r in foodCatalog) {
     if (r.slot != meal) continue;
     if (r.comfortOnly) continue; // sick-day meals never surface in everyday planning
     if (r.totalMin > maxMinutes) continue;

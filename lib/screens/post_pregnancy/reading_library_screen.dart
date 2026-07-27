@@ -26,12 +26,12 @@ class ReadingLibraryScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: ReadingStore.instance,
+          animation: readListenable,
           builder: (context, _) {
             final store = ReadingStore.instance;
             final cont = store.continueReading;
             final saved = store.saved;
-            final completed = kReadArticles.where((a) => store.isCompleted(a.id)).toList();
+            final completed = readCatalog.where((a) => store.isCompleted(a.id)).toList();
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 40),
               children: [

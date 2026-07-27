@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_language.dart';
 import '../services/app_nav.dart';
-import '../services/article_store.dart';
+import '../services/content_registry.dart';
 import '../services/baby_voice_service.dart';
 import '../services/father_content_controller.dart';
 import '../services/father_preview.dart';
@@ -102,11 +102,15 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   }
 
   /// When the app returns to the foreground, re-pull server-driven content so
-  /// freshly-published articles appear without a full relaunch.
+  /// freshly-published content appears without a full relaunch.
+  ///
+  /// Goes through the registry rather than naming stores: a new content type
+  /// registers itself once and this call site never changes again. Each store
+  /// throttles itself, so alt-tabbing does not mean a round trip per type.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ArticleStore.instance.refresh();
+      ContentRegistry.refreshAll();
     }
   }
 

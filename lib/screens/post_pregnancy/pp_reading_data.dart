@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/read_store.dart';
 import '../../services/remote/cloud_synced_store.dart';
 import '../../care_partner/care_journey.dart';
 
@@ -610,13 +611,35 @@ const List<ReadArticle> kReadArticles = [
   ),
 ];
 
+// ---- the live catalogue -----------------------------------------------------
+/// Every article the reader should offer right now: served from Supabase once
+/// the content backend has answered, and the bundled [kReadArticles] otherwise.
+///
+/// Everything below reads THIS, so a newly published article reaches the home
+/// rails, search, collections, the type filters and "read next" together —
+/// rather than only the screen someone remembered to rewire.
+///
+/// Falls back to the bundle when empty, for the same reason the Food companion
+/// does: [readArticleById] and [todaysRead] must always resolve to something.
+/// Unpublishing ONE article behaves normally; only unpublishing every article
+/// is read as a mistake rather than an instruction.
+List<ReadArticle> get readCatalog {
+  final live = ReadStore.instance.all;
+  return live.isEmpty ? kReadArticles : live;
+}
+
+/// Listen to this wherever articles are rendered — it fires on reading-progress
+/// changes AND when freshly published articles arrive.
+Listenable get readListenable =>
+    Listenable.merge([ReadingStore.instance, ReadStore.instance]);
+
 // ---- lookups + engine -------------------------------------------------------
 ReadArticle readArticleById(String id) =>
-    kReadArticles.firstWhere((a) => a.id == id, orElse: () => kReadArticles.first);
+    readCatalog.firstWhere((a) => a.id == id, orElse: () => readCatalog.first);
 ReadCollection readCollectionById(String id) =>
     kReadCollections.firstWhere((c) => c.id == id, orElse: () => kReadCollections.first);
 List<ReadArticle> articlesInCollection(String collectionId) =>
-    kReadArticles.where((a) => a.collection == collectionId).toList();
+    readCatalog.where((a) => a.collection == collectionId).toList();
 
 /// Today's one carefully-chosen read (a real engine would personalise; iron/
 /// sleep leads for a 4-month-old mid-regression).
@@ -627,13 +650,13 @@ List<ReadArticle> forYou() => ['leap4', 'solids', 'talking', 'tummytime', 'fever
 
 /// Articles of a given kind - for the READ type filter (All / Articles / Book
 /// Summaries / Research Summaries).
-List<ReadArticle> articlesOfKind(ReadKind k) => kReadArticles.where((a) => a.kind == k).toList();
+List<ReadArticle> articlesOfKind(ReadKind k) => readCatalog.where((a) => a.kind == k).toList();
 
 /// Two-level filter for the READ home: a collection (topic) then a content type.
 /// Either level may be null (= "All"). Choosing a collection then a type narrows
 /// the library to reads that are in that collection AND of that kind.
 List<ReadArticle> filteredReads({String? collectionId, ReadKind? kind}) =>
-    kReadArticles
+    readCatalog
         .where((a) =>
             (collectionId == null || a.collection == collectionId) &&
             (kind == null || a.kind == kind))
@@ -651,9 +674,9 @@ List<ReadArticle> readNextArticles(ReadArticle article, {int limit = 4}) {
     }
   }
 
-  add(kReadArticles.where((a) => a.collection == article.collection));
+  add(readCatalog.where((a) => a.collection == article.collection));
   add(forYou());
-  add(kReadArticles);
+  add(readCatalog);
   return out.take(limit).toList();
 }
 
