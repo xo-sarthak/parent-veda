@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../doctor/doctor_session.dart';
 import '../localization/app_language.dart';
 import '../services/father_content_controller.dart';
+import '../services/life_stage_store.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/remote/sync_registry.dart';
@@ -25,6 +26,8 @@ import 'auth/auth_flow_screen.dart';
 // MainScaffold (father mode), not the standalone Father Daily screen.
 // import 'father/father_daily_screen.dart';
 import 'main_scaffold.dart';
+import 'ttc/ttc_common.dart' show ttcHomeRoute;
+import 'ttc/ttc_today_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -68,13 +71,27 @@ class _SplashScreenState extends State<SplashScreen>
     // skip straight to the app on later launches.
     var authed = false;
     var role = 'mother';
+    String? stage;
     try {
       final prefs = await SharedPreferences.getInstance();
       authed = prefs.getBool(kAuthCompletedKey) ?? false;
       role = prefs.getString(kUserRoleKey) ?? 'mother';
+      // Read from prefs rather than LifeStageStore: the store loads
+      // asynchronously from its constructor, so at splash time its `stage` may
+      // still be null and we would send her to the wrong home.
+      stage = prefs.getString(LifeStageStore.kLifeStageKey);
     } catch (_) {/* default to showing auth */}
     if (!mounted) return;
     if (authed) {
+      // A couple who declared "trying" boots straight into their own stage
+      // rather than through a pregnancy home that is not about them.
+      //
+      // The father branch wins first: a paired partner has his own shell, and
+      // his TTC experience is reached inside it.
+      if (role != 'father' && stage == LifeStage.tryingToConceive.id) {
+        nav.pushReplacement(_ttcRoute());
+        return;
+      }
       nav.pushReplacement(role == 'father' ? _fatherRoute() : _mainRoute());
       return;
     }
@@ -117,6 +134,25 @@ class _SplashScreenState extends State<SplashScreen>
           home: widget.home,
           father: widget.father,
         ),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
+      );
+
+  // A trying-to-conceive user lands in her OWN stage, not through the pregnancy
+  // home. The route is named `ttcHomeRoute` so the Ask Veda FAB knows which
+  // stage it is standing in - without the name it would open the pregnancy Ask
+  // Veda and answer her with a week number.
+  //
+  // Note this is the FIRST route, so the TTC tab bar's popUntil(r.isFirst) still
+  // works and the back button exits the app, which is correct for a home.
+  //
+  // When she records a positive test the Transition Engine flips her life stage,
+  // so the next launch lands on the pregnancy shell. Within that session she
+  // stays in TTC on "A New Beginning", which is the right content for the day.
+  Route<void> _ttcRoute() => PageRouteBuilder(
+        settings: const RouteSettings(name: ttcHomeRoute),
+        transitionDuration: const Duration(milliseconds: 450),
+        pageBuilder: (_, _, _) => const TtcTodayScreen(),
         transitionsBuilder: (_, anim, _, child) =>
             FadeTransition(opacity: anim, child: child),
       );

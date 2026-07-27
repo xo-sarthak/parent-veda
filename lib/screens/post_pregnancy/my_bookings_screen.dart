@@ -302,7 +302,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // ---- bits -----------------------------------------------------------------
 
   Widget _stageChip(ServiceStage s) {
-    final label = s == ServiceStage.pregnancy ? 'Pregnancy' : 'Parenting';
+    // A switch rather than a ternary: with three stages a two-way test silently
+    // mislabels the third, and this chip is the only thing telling a parent
+    // which part of their journey a booking came from.
+    final label = switch (s) {
+      ServiceStage.tryingToConceive => 'Trying to conceive',
+      ServiceStage.pregnancy => 'Pregnancy',
+      ServiceStage.parenting => 'Parenting',
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(

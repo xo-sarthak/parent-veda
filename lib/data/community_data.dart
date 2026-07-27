@@ -557,6 +557,212 @@ List<String> inferTopics(String text) {
 }
 
 // ===========================================================================
+//  TRYING-TO-CONCEIVE communities (pre-pregnancy). Same arrangement the
+//  parenting side uses: their own lists, so the pregnancy feed above is
+//  untouched, while every interaction (join / like / save / vote / comment)
+//  reuses the SAME CommunityStore, which is keyed by id. One social layer,
+//  three stages - a room joined here is still joined after a positive test.
+//
+//  Two things are deliberate and specific to this stage:
+//
+//   * A "Loss & Recovery" room exists. A product that only holds hope is not
+//     honest about trying to conceive.
+//   * There is a Partner Lounge, and male fertility is a room rather than a
+//     footnote - which is the same correction the whole stage makes.
+//
+//  `emoji` is blank: the TTC UI renders monogram avatars, never emojis.
+// ===========================================================================
+const List<Community> kTtcCommunities = [
+  // --- Auto-joined: where almost everyone starts ---
+  Community(id: 'ttc_naturally', name: 'Trying Naturally', emoji: '', description: 'The largest room, and the quietest. Months one to many - no advice unless it is asked for.', members: 18600, auto: true, topics: ['Cycles', 'Emotional']),
+  Community(id: 'ttc_first_month', name: 'First Month', emoji: '', description: 'Just started. Everything is new, and nobody here will tell you to relax.', members: 5200, auto: true, topics: ['Cycles']),
+  // --- Conditions ---
+  Community(id: 'ttc_pcos', name: 'PCOS', emoji: '', description: 'Cycles, weight, medication and what actually helps - from people living it.', members: 13400, topics: ['PCOS', 'Nutrition']),
+  Community(id: 'ttc_endo', name: 'Endometriosis', emoji: '', description: 'Pain, diagnosis, and the long road to being believed.', members: 6900, topics: ['Endometriosis']),
+  Community(id: 'ttc_male', name: 'Male Fertility', emoji: '', description: 'Half the picture, and rarely talked about. Semen analyses, lifestyle, and what changed.', members: 4800, topics: ['Male fertility']),
+  // --- Treatment ---
+  Community(id: 'ttc_ivf', name: 'IVF', emoji: '', description: 'Preparing, cycles, transfers, waiting - and the costs nobody quotes upfront.', members: 11700, topics: ['IVF']),
+  Community(id: 'ttc_iui', name: 'IUI', emoji: '', description: 'A gentler first step. What to expect, and what it actually felt like.', members: 5100, topics: ['IUI']),
+  // --- The hard rooms ---
+  Community(id: 'ttc_loss', name: 'Loss & Recovery', emoji: '', description: 'Held gently. No timelines, no silver linings, no advice unless it is asked for.', members: 7400, topics: ['Loss', 'Emotional']),
+  Community(id: 'ttc_emotional', name: 'Emotional Support', emoji: '', description: 'For the days that are simply hard, and the family gatherings that make them harder.', members: 9300, topics: ['Emotional']),
+  // --- Living well ---
+  Community(id: 'ttc_nutrition', name: 'Nutrition', emoji: '', description: 'Indian kitchens, real food, no diet culture and no miracle powders.', members: 8100, topics: ['Nutrition']),
+  Community(id: 'ttc_partners', name: 'Partner Lounge', emoji: '', description: 'For partners, in their own words. Not a support group for supporting her.', members: 3600, topics: ['Partner']),
+  Community(id: 'ttc_ask_doctor', name: 'Ask the Doctor', emoji: '', description: 'Verified specialists answer, publicly, so the answer helps more than one person.', members: 15200, topics: ['Medical']),
+];
+
+const Set<String> kTtcCommunityIds = {
+  'ttc_naturally', 'ttc_first_month', 'ttc_pcos', 'ttc_endo', 'ttc_male',
+  'ttc_ivf', 'ttc_iui', 'ttc_loss', 'ttc_emotional', 'ttc_nutrition',
+  'ttc_partners', 'ttc_ask_doctor',
+};
+
+/// Specialties a couple can ask for when requesting expert verification.
+const List<String> kTtcVerifySpecialties = [
+  'all',
+  'fertility',
+  'gynae',
+  'andrology',
+  'nutrition',
+  'mental',
+];
+
+/// Fictional placeholder experts until real doctor accounts exist.
+const List<CommunityExpert> kTtcExperts = [
+  (name: 'Dr. Anjali Menon', cred: 'MD, Reproductive Medicine', specialty: 'Fertility'),
+  (name: 'Dr. Sandeep Rao', cred: 'MS, Andrology', specialty: 'Male Fertility'),
+  (name: 'Dr. Kavya Nair', cred: 'MD, Obstetrics & Gynaecology', specialty: 'PCOS'),
+  (name: 'Dr. Ishita Bose', cred: 'Clinical Psychologist', specialty: 'Fertility Counselling'),
+  (name: 'Dr. Rhea Kulkarni', cred: 'Fertility Nutritionist', specialty: 'Nutrition'),
+  (name: 'Dr. Tanvi Shah', cred: 'MD, Reproductive Endocrinology', specialty: 'IVF'),
+];
+
+const List<CommunityPost> kTtcPosts = [
+  CommunityPost(
+    id: 'ttcp1',
+    communityId: 'ttc_naturally',
+    author: 'Shruti',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.experience,
+    topics: ['Emotional'],
+    text: 'Month nine. What finally helped was deciding, together, that we would talk about it on Sunday walks and not the rest of the week. It did not make it easier to wait. It did make the house feel like a home again.',
+    likes: 412,
+    comments: 63,
+    saves: 88,
+  ),
+  CommunityPost(
+    id: 'ttcp2',
+    communityId: 'ttc_ask_doctor',
+    author: 'Dr. Anjali Menon',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.expert,
+    cred: 'MD, Reproductive Medicine',
+    topics: ['Medical'],
+    text: 'The most common thing I correct in clinic: an AMH result is a planning number, not a fertility score. It estimates how many eggs remain, says very little about their quality, and on its own predicts natural conception poorly. Ask what it changes about your plan. If the answer is nothing, it changes nothing.',
+    likes: 890,
+    comments: 104,
+    saves: 320,
+    upvotes: 22,
+    expertEndorseCount: 4,
+  ),
+  CommunityPost(
+    id: 'ttcp3',
+    communityId: 'ttc_male',
+    author: 'Rohit',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.experience,
+    topics: ['Male fertility'],
+    text: 'Took me eight months to book a semen analysis. It cost ₹600 and took twenty minutes. Meanwhile my wife had already had four blood tests and a scan. If you are reading this and have not done yours - go first. It is the easiest thing either of you will do.',
+    likes: 1240,
+    comments: 187,
+    saves: 402,
+  ),
+  CommunityPost(
+    id: 'ttcp4',
+    communityId: 'ttc_pcos',
+    author: 'Fatima',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.question,
+    topics: ['PCOS'],
+    text: 'Ovulation strips have been positive on and off all month with PCOS. Is anyone else finding them more confusing than useful? What did your doctor suggest instead?',
+    likes: 156,
+    comments: 94,
+    saves: 61,
+  ),
+  CommunityPost(
+    id: 'ttcp5',
+    communityId: 'ttc_loss',
+    author: 'Anonymous',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.experience,
+    topics: ['Loss'],
+    text: 'Six weeks since the miscarriage. Nobody at work knows, and the ones at home who do keep telling me it was for the best. It was not for the best. Thank you to this room for being the one place I do not have to explain that.',
+    likes: 2100,
+    comments: 240,
+    saves: 190,
+  ),
+  CommunityPost(
+    id: 'ttcp6',
+    communityId: 'ttc_ivf',
+    author: 'Divya',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.experience,
+    topics: ['IVF'],
+    text: 'Things I wish someone had itemised before our first IVF cycle: the medications are a separate bill from the procedure, the freezing is a separate bill again, and the annual storage renews quietly. Ask for the whole number in writing before you start.',
+    likes: 738,
+    comments: 121,
+    saves: 512,
+  ),
+  CommunityPost(
+    id: 'ttcp7',
+    communityId: 'ttc_partners',
+    author: 'Karthik',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.experience,
+    topics: ['Partner'],
+    text: 'Nobody asks the husband how he is doing. They ask how she is doing, through you. I am not saying that is wrong - it is her body. I am saying this room is the only place anyone has asked me directly, and it turns out I had things to say.',
+    likes: 634,
+    comments: 98,
+    saves: 143,
+  ),
+  CommunityPost(
+    id: 'ttcp8',
+    communityId: 'ttc_emotional',
+    author: 'Priya',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.poll,
+    topics: ['Emotional'],
+    text: 'What is the line you use at family functions when the question comes?',
+    pollOptions: [
+      'We will tell you first when there is news',
+      'Change the subject entirely',
+      'Answer honestly',
+      'I still have not found one',
+    ],
+    likes: 388,
+    comments: 152,
+  ),
+  CommunityPost(
+    id: 'ttcp9',
+    communityId: 'ttc_nutrition',
+    author: 'Dr. Rhea Kulkarni',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.expert,
+    cred: 'Fertility Nutritionist',
+    topics: ['Nutrition'],
+    text: 'There is no fertility superfood, and anything sold as one is selling hope. What the evidence supports is a pattern: whole grains instead of refined, dal and plant protein, plenty of vegetables, and less ultra-processed food. A normal thali is already most of the way there.',
+    likes: 705,
+    comments: 77,
+    saves: 288,
+    upvotes: 15,
+    expertEndorseCount: 3,
+  ),
+  CommunityPost(
+    id: 'ttcp10',
+    communityId: 'ttc_first_month',
+    author: 'Neha',
+    authorEmoji: '',
+    stage: 'Trying',
+    type: PostType.question,
+    topics: ['Cycles'],
+    text: 'First month of properly trying. How long did everyone wait before seeing someone? I keep reading a year but I am 36 and that feels like a long time to wait and see.',
+    likes: 201,
+    comments: 118,
+    saves: 44,
+  ),
+];
+
+// ===========================================================================
 //  PARENTING-STAGE communities (post-birth). Kept as their OWN lists so the
 //  pre-birth (pregnancy) feed above stays exactly as it was - the parenting
 //  Community screen (post_pregnancy) reads these; interactions (join/like/save/

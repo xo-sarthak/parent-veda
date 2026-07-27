@@ -33,6 +33,7 @@ import '../doctor/doctor_schedule_store.dart';
 import '../screens/post_pregnancy/pp_experts_data.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import '../screens/post_pregnancy/pp_yoga_data.dart';
+import '../ttc/ttc_prepare_data.dart';
 import 'booking_models.dart';
 import 'booking_store.dart';
 
@@ -66,6 +67,12 @@ class BookingCatalog {
     }
     for (final s in kSpecialists) {
       list.add(_fromSpecialist(s));
+    }
+    // TRYING-TO-CONCEIVE side — the Prepare tab of the stage before pregnancy.
+    // Same engine again, so a fertility consult booked while trying and a
+    // birthing class booked eight months later sit in ONE history.
+    for (final o in ttcOfferings) {
+      list.add(_fromTtc(o));
     }
     return _cache = list;
   }
@@ -233,6 +240,40 @@ class BookingCatalog {
   }
 
   /// Pregnancy specialist -> in-app 1:1 consult (the calendar case).
+  /// A Trying-to-Conceive catalogue entry becomes a real Offering, filed under
+  /// [ServiceStage.tryingToConceive] so it lands in the same history as every
+  /// other stage rather than in a parallel one.
+  static Offering _fromTtc(TtcOffering o) {
+    final kind = switch (o.kind) {
+      'consult' => OfferingKind.consult,
+      'cohort' => OfferingKind.cohort,
+      'classPack' => OfferingKind.classPack,
+      _ => OfferingKind.masterclass,
+    };
+    return Offering(
+      id: o.id,
+      stage: ServiceStage.tryingToConceive,
+      kind: kind,
+      // A consult is 1:1; everything else here is taught live to a small group.
+      format: kind == OfferingKind.consult
+          ? SessionFormat.liveOneToOne
+          : SessionFormat.liveGroup,
+      catalogId: o.id,
+      title: o.titleEn,
+      expertId: o.expertId,
+      priceMinor: o.priceMinor,
+      grant: EntitlementGrant(
+        credits: o.sessions,
+        // A class pack is the "redeem any time" case; the rest are dated.
+        validFor: kind == OfferingKind.classPack
+            ? const Duration(days: 60)
+            : null,
+        recordingAccess: kind == OfferingKind.masterclass,
+        discussionThread: kind == OfferingKind.cohort,
+      ),
+    );
+  }
+
   static Offering _fromSpecialist(Specialist s) => Offering(
         id: 'off_pg_${s.id}',
         stage: ServiceStage.pregnancy,

@@ -99,6 +99,28 @@ class AskVedaService {
     int? week,
     String? trimester,
     int? childAgeMonths,
+    // --- trying to conceive (all framing-only, never a filter) ---
+    String? stage, // trying | pregnancy | parenting
+    String? chapter, // preparingTogether … aNewBeginning
+    /// PRIVACY: her cycle day must NEVER be sent from the PARTNER's account.
+    /// The data model deliberately keeps ttc_cycles own-row so he cannot read
+    /// her cycle; sending it from his device would route around that rule on
+    /// the client side. From his account pass [chapter] only.
+    int? cycleDay,
+    String? ttcPath, // natural | ovulationInduction | iui | ivf | …
+
+    /// WHO owns the timing of this cycle: parentveda | clinic_guided |
+    /// clinic_controlled. More decisive than [ttcPath] and the field the
+    /// service should branch its framing on — the same treatment behaves in
+    /// opposite ways depending on whether a clinic is monitoring it, so
+    /// "she is on IVF" is a weaker signal than "her clinic owns the timing".
+    ///
+    /// Still framing, never a filter: she can ask anything from any pathway.
+    String? timingOwnership,
+    int? monthsTrying,
+    /// 'en' | 'hi' — which language's content cards to show (bilingual content
+    /// is stored as an English doc plus a Hinglish twin).
+    String? lang,
     String? domain, // optional retrieval hint; normally left null (no gating)
     String? userKey,
   }) async {
@@ -119,6 +141,13 @@ class AskVedaService {
               if (week != null) 'week': week,
               if (trimester != null) 'trimester': trimester,
               if (childAgeMonths != null) 'child_age_months': childAgeMonths,
+              if (stage != null) 'stage': stage,
+              if (chapter != null) 'chapter': chapter,
+              if (cycleDay != null) 'cycle_day': cycleDay,
+              if (ttcPath != null) 'ttc_path': ttcPath,
+              if (timingOwnership != null) 'timing_ownership': timingOwnership,
+              if (monthsTrying != null) 'months_trying': monthsTrying,
+              if (lang != null) 'lang': lang,
               if (domain != null) 'domain': domain,
             }),
           )

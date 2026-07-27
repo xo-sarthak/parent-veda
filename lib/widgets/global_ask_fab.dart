@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/post_pregnancy/askveda_screen.dart' as pp;
 import '../screens/tools/ask_veda_screen.dart' as preg;
+import '../screens/ttc/ttc_askveda_screen.dart' as ttc_av;
 import '../services/app_nav.dart';
 import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
@@ -26,6 +27,12 @@ final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 /// The route name the parenting doorway uses; also how we know we're "in" the
 /// parenting app.
 const String kParentingRootRoute = 'pp/my_child';
+
+/// Same idea for the trying-to-conceive stage (mirrors `ttcHomeRoute` in
+/// screens/ttc/ttc_common.dart). Without this the FAB opened the PREGNANCY Ask
+/// Veda inside TTC — answering a trying-to-conceive question with pregnancy
+/// framing and a week number that means nothing to a couple who aren't pregnant.
+const String kTtcRootRoute = 'ttc/today';
 
 /// The route name given to the Premiere takeover + the Ask Veda screens, so the
 /// FAB can suppress itself over them.
@@ -39,10 +46,12 @@ class FabState extends ChangeNotifier {
 
   bool _appLive = false; // false during splash, before the shell mounts
   bool _inParenting = false;
+  bool _inTtc = false;
   bool _suppressed = false; // over a sheet / dialog / premiere / ask screen
 
   bool get visible => _appLive && !_suppressed;
   bool get inParenting => _inParenting;
+  bool get inTtc => _inTtc;
 
   /// Called from the app shell's initState — the FAB only shows once a real
   /// screen (not the splash) is up.
@@ -52,10 +61,14 @@ class FabState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _update({bool? inParenting, bool? suppressed}) {
+  void _update({bool? inParenting, bool? inTtc, bool? suppressed}) {
     var changed = false;
     if (inParenting != null && inParenting != _inParenting) {
       _inParenting = inParenting;
+      changed = true;
+    }
+    if (inTtc != null && inTtc != _inTtc) {
+      _inTtc = inTtc;
       changed = true;
     }
     if (suppressed != null && suppressed != _suppressed) {
@@ -72,12 +85,14 @@ class FabRouteObserver extends NavigatorObserver {
 
   void _recompute() {
     final inParenting = _stack.any((r) => r.settings.name == kParentingRootRoute);
+    final inTtc = _stack.any((r) => r.settings.name == kTtcRootRoute);
     final top = _stack.isEmpty ? null : _stack.last;
     final suppressed = top != null &&
         (top is PopupRoute || // modal sheets, dialogs, menus
             top.settings.name == kPremiereRoute ||
             top.settings.name == kAskVedaRoute);
-    FabState.instance._update(inParenting: inParenting, suppressed: suppressed);
+    FabState.instance
+        ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
   }
 
   @override
@@ -121,10 +136,17 @@ class GlobalAskFab extends StatelessWidget {
   void _open() {
     final nav = appNavigatorKey.currentState;
     if (nav == null) return;
+    // Three-way: TTC first (it is the innermost stage stack), then parenting,
+    // then pregnancy as the default.
+    final ttc = FabState.instance.inTtc;
     final parenting = FabState.instance.inParenting;
     nav.push(MaterialPageRoute<void>(
       settings: const RouteSettings(name: kAskVedaRoute),
-      builder: (_) => parenting ? const pp.AskVedaScreen() : preg.AskVedaScreen(controller: pregnancy),
+      builder: (_) => ttc
+          ? const ttc_av.TtcAskVedaScreen()
+          : parenting
+              ? const pp.AskVedaScreen()
+              : preg.AskVedaScreen(controller: pregnancy),
     ));
   }
 

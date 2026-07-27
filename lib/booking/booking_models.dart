@@ -37,7 +37,17 @@ import 'package:flutter/foundation.dart';
 
 /// The tag that lets one history span pregnancy AND parenting. Mirrors the
 /// existing BrandStage split so the whole app talks about stage the same way.
-enum ServiceStage { pregnancy, parenting }
+/// Which life stage an offering belongs to.
+///
+/// `tryingToConceive` is appended rather than placed first on purpose: the
+/// stage is persisted by NAME (see `_stageFrom`), but appending also means no
+/// stored `.index` anywhere could shift meaning. Journey order lives in
+/// LifeStage, not here.
+///
+/// One engine serves all three, so a fertility consult booked while trying, a
+/// birthing class during pregnancy and a postnatal yoga pack two years later
+/// appear in ONE history - which is the whole reason there is one engine.
+enum ServiceStage { pregnancy, parenting, tryingToConceive }
 
 /// What KIND of thing is being booked. Drives the entitlement shape and the
 /// booking UX — a consult spends one credit on one slot from an expert's

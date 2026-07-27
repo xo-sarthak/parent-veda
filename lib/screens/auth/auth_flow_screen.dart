@@ -29,6 +29,7 @@ import '../referral/enter_code_sheet.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
+import '../../services/life_stage_store.dart';
 import '../../services/whatsapp_prefs.dart';
 import '../../doctor/doctor_directory.dart';
 
@@ -197,6 +198,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   Future<void> _saveProfile() async {
     if (_busy) return;
     setState(() => _busy = true);
+
+    // The "I AM CURRENTLY: Trying / Pregnant / New parent" selector has existed
+    // on this screen for a long time and its answer was thrown away. It is now
+    // the entry point for the Trying-to-Conceive stage, so record it - locally
+    // and BEFORE the network call, because a mother who declared her stage must
+    // keep it even if the profile write fails. The matching `life_stage` column
+    // lands with the TTC migrations in Phase 8; until then this is device-local.
+    LifeStageStore.instance.setStageId(_stage);
 
     final client = Supabase.instance.client;
     final userId = client.auth.currentUser?.id;

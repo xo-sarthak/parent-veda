@@ -21,6 +21,44 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../localization/app_language.dart';
 import '../models/week_content.dart';
 
+/// How the due date was arrived at.
+///
+/// The split that matters is [clinicOwned] versus the rest: everything a clinic
+/// measured or decided outranks anything we calculated, so once one of those is
+/// recorded the app stops treating its own arithmetic as an equal answer.
+enum DueDateSource {
+  /// Restored from an older install, or set before we recorded this. Treated as
+  /// ours - assuming a clinic gave it would be the exact wrong way to be wrong.
+  unknown,
+
+  /// Counted forward from a last menstrual period. Ours.
+  lastPeriod,
+
+  /// Counted from a conception date she gave us. Ours.
+  conception,
+
+  /// An IVF transfer date. The clinic's - they scheduled it and recorded it.
+  ivfTransfer,
+
+  /// A dating scan. The clinic's, and the most accurate answer there is.
+  scan,
+
+  /// A date her doctor simply told her. The clinic's, however they got it.
+  clinician,
+}
+
+extension DueDateSourceOwnership on DueDateSource {
+  /// True when a clinic measured or decided this date.
+  ///
+  /// The app must not then show a competing number of its own - "your app says
+  /// 9w2d, your doctor says 8w5d" is the failure this is here to prevent, and
+  /// the trust it costs is not recoverable by being right.
+  bool get clinicOwned =>
+      this == DueDateSource.scan ||
+      this == DueDateSource.clinician ||
+      this == DueDateSource.ivfTransfer;
+}
+
 class PregnancyController extends ChangeNotifier {
   PregnancyController({DateTime? dueDate, DateTime? now})
       : _now = now ?? DateTime.now(),
@@ -29,7 +67,17 @@ class PregnancyController extends ChangeNotifier {
   static const String _assetPath = 'lib/data/weekContent.json';
 
   /// Persisted real due date once the mother uses the Due Date Calculator.
-  static const String _dueDateKey = 'pregnancy_due_date';
+  ///
+  /// Public because the TTC Transition Engine writes it too: when a positive
+  /// test is recorded, the due date is derived from her last period and stored
+  /// here so the pregnancy app simply picks it up on next load. This controller
+  /// is constructed in main.dart rather than exposed as a singleton, so the key
+  /// is the only seam available - and sharing the constant means there is still
+  /// exactly one name for it.
+  static const String kDueDateKey = 'pregnancy_due_date';
+
+  /// Where the saved due date came from. Same seam, same reason.
+  static const String kDueDateSourceKey = 'pregnancy_due_date_source';
 
   /// Content runs from week 4 to week 40.
   static const int firstContentWeek = 4;
@@ -47,6 +95,19 @@ class PregnancyController extends ChangeNotifier {
   /// placeholder, so the calculator opens on its input form rather than a saved
   /// roadmap.
   bool _dueDateIsSet = false;
+
+  /// Where the due date came from.
+  ///
+  /// This is the difference between a date WE worked out and a date a clinic
+  /// gave her, and it is the whole reason the field exists: a dating scan is
+  /// more accurate than counting from a last period, and the clinic owns the
+  /// scan. Once a scan-derived date is in play, ours is not a second opinion -
+  /// so the app must be able to tell the two apart, which until now it could
+  /// not.
+  ///
+  /// See `Inferable.gestationalAge` in `lib/services/journey_state.dart`, and
+  /// the truth hierarchy it belongs to.
+  DueDateSource _dueDateSource = DueDateSource.unknown;
 
   AppLanguage _language = AppLanguage.english;
 
@@ -76,6 +137,12 @@ class PregnancyController extends ChangeNotifier {
 
   /// Whether the mother has set her real due date (vs the week-20 placeholder).
   bool get isDueDateSet => _dueDateIsSet;
+
+  DueDateSource get dueDateSource => _dueDateSource;
+
+  /// True when a clinic measured or decided the due date, so gestational age is
+  /// theirs and ours is not a second opinion.
+  bool get dueDateFromClinic => _dueDateSource.clinicOwned;
 
   /// The mother's name - the logged-in user's own name in mother mode, or the
   /// paired mother's name in father mode. Falls back to a placeholder.
@@ -210,11 +277,16 @@ class PregnancyController extends ChangeNotifier {
       // of truth and overrides this when present.
       try {
         final prefs = await SharedPreferences.getInstance();
-        final saved = prefs.getString(_dueDateKey);
+        final saved = prefs.getString(kDueDateKey);
         final d = saved == null ? null : DateTime.tryParse(saved);
         if (d != null) {
           _dueDate = _dateOnly(d);
           _dueDateIsSet = true;
+          final src = prefs.getString(kDueDateSourceKey);
+          _dueDateSource = DueDateSource.values
+                  .where((s) => s.name == src)
+                  .firstOrNull ??
+              DueDateSource.unknown;
         }
       } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
@@ -272,7 +344,7 @@ class PregnancyController extends ChangeNotifier {
           _selectedWeek = currentWeek;
           try {
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
+            await prefs.setString(kDueDateKey, _dueDate.toIso8601String());
           } catch (_) {/* best-effort */}
         }
       }
@@ -310,14 +382,17 @@ class PregnancyController extends ChangeNotifier {
 
   /// Persisted due date set from the Due Date Calculator - drives the whole app
   /// (current week/day everywhere). Survives restarts.
-  Future<void> setDueDate(DateTime dueDate) async {
+  Future<void> setDueDate(DateTime dueDate,
+      {DueDateSource source = DueDateSource.unknown}) async {
     _dueDate = _dateOnly(dueDate);
     _dueDateIsSet = true;
+    _dueDateSource = source;
     _selectedWeek = currentWeek;
     notifyListeners();
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_dueDateKey, _dueDate.toIso8601String());
+      await prefs.setString(kDueDateKey, _dueDate.toIso8601String());
+      await prefs.setString(kDueDateSourceKey, source.name);
     } catch (_) {/* best-effort */}
     // Keep the cloud profile in sync (source of truth across devices).
     try {
@@ -336,11 +411,13 @@ class PregnancyController extends ChangeNotifier {
   Future<void> resetForTesting() async {
     _dueDate = _placeholderDueDate(_now);
     _dueDateIsSet = false;
+    _dueDateSource = DueDateSource.unknown;
     _selectedWeek = currentWeek;
     notifyListeners();
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_dueDateKey);
+      await prefs.remove(kDueDateKey);
+      await prefs.remove(kDueDateSourceKey);
     } catch (_) {/* best-effort */}
     // Also clear it in the cloud so the reset isn't undone on the next sync.
     try {

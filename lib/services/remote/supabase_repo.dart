@@ -203,6 +203,36 @@ class SupabaseRepo {
     return row?['partner_id'] as String?;
   }
 
+  // ---- the profile row ------------------------------------------------------
+  // `profiles` is keyed by `id`, not `user_id`, so the generic helpers above do
+  // not fit it. These two exist so nothing outside this file has to know that.
+
+  /// Read [columns] from the current user's profile row. Null if logged out or
+  /// on any failure - callers treat that exactly like "not set".
+  static Future<Map<String, dynamic>?> fetchMyProfile(String columns) async {
+    final uid = userId;
+    if (uid == null) return null;
+    try {
+      final row = await _client
+          .from('profiles')
+          .select(columns)
+          .eq('id', uid)
+          .maybeSingle();
+      return row == null ? null : Map<String, dynamic>.from(row);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Update columns on the current user's profile row. Best-effort.
+  static Future<void> updateMyProfile(Map<String, dynamic> changes) async {
+    final uid = userId;
+    if (uid == null) return;
+    try {
+      await _client.from('profiles').update(changes).eq('id', uid);
+    } catch (_) {/* offline - the local cache still holds the value */}
+  }
+
   /// Fetch the current user's SINGLE row from [table] (for one-row-per-user
   /// tables like weight_profile / kegel_state). Returns null if none / logged out.
   static Future<Map<String, dynamic>?> fetchOne(String table) async {

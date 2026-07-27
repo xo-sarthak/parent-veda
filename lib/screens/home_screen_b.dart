@@ -46,6 +46,8 @@ import '../theme/app_theme.dart';
 // PostPregnancyHome, is retired from nav but kept for revert).
 // import 'post_pregnancy/post_pregnancy_home.dart';
 import 'post_pregnancy/my_child_screen.dart';
+import 'ttc/ttc_common.dart';
+import 'ttc/ttc_strings.dart';
 import 'weekly_card_stack_screen.dart';
 import '../widgets/home/home_modules.dart';
 // Trimester chart removed from the Today feed (kept for revert).
@@ -135,6 +137,10 @@ class HomeScreenB extends StatelessWidget {
             const SizedBox(height: 12),
             // Temporary doorway into the new (isolated) post-pregnancy app.
             _postPregnancyDoorway(context),
+            const SizedBox(height: 10),
+            // ...and directly below it, the doorway into the stage that comes
+            // BEFORE pregnancy. The two read as siblings on purpose.
+            _ttcDoorway(context),
             const SizedBox(height: 14),
             // ===== WEEKLY SNAPSHOT - the hero + quick shortcuts as one unit ====
             _sectionEyebrow(s.snapshotTitle),
@@ -254,6 +260,74 @@ class HomeScreenB extends StatelessWidget {
             ]),
           ),
           const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+        ]),
+      ),
+    );
+  }
+
+  // --- Trying-to-Conceive doorway --------------------------------------------
+  // Entry into the TTC stage - the chapter BEFORE pregnancy. Sits directly
+  // under the parenting doorway and deliberately shares its shape and height,
+  // so the two read as two doors on one shelf rather than two different ideas.
+  // The gradient is the calmer, lighter sibling of the parenting one.
+  //
+  // The stage is isolated exactly like the parenting app: this pushes a named
+  // route ('ttc/today') and imports only the TTC module's own entry point.
+  Widget _ttcDoorway(BuildContext context) {
+    final t = TtcS(pregnancy.language.isHinglish);
+    return GestureDetector(
+      onTap: () {
+        // TtcLang mirrors the app language into the TTC module, whose tabs are
+        // separate pushed routes and so cannot read an InheritedWidget here.
+        TtcLang.instance.hinglish = pregnancy.language.isHinglish;
+        openTtc(context);
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFF7B4BC4), Color(0xFFB88CE0)],
+          ),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x2E6A30B6), blurRadius: 18, offset: Offset(0, 8)),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.favorite_rounded,
+                color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.doorTitle,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white)),
+                  const SizedBox(height: 2),
+                  Text(t.doorBody,
+                      style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.9))),
+                ]),
+          ),
+          const Icon(Icons.arrow_forward_rounded,
+              color: Colors.white, size: 20),
         ]),
       ),
     );
