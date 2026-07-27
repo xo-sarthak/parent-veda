@@ -480,6 +480,41 @@ extension TtcChapterCopy on TtcChapter {
     }
   }
 
+  /// What comes after this chapter, and what brings it - the hero's "next" line.
+  ///
+  /// Both shipped stages answer this above the fold: pregnancy with "Baby's
+  /// almost here", parenting with "Next: the peak, and the first smile, around
+  /// 1 month." TTC answered it nowhere, which is why a chapter that lasts
+  /// twenty-eight days read as the app having stopped.
+  ///
+  /// Deliberately names a TRIGGER rather than a date. Chapters 2-4 turn with
+  /// the cycle, and the honest answer to "when" is "when your period arrives",
+  /// not a countdown we would then have to be wrong about.
+  String nextUp(bool hinglish) {
+    switch (this) {
+      case TtcChapter.preparingTogether:
+        return hinglish
+            ? 'Aage: Apni rhythm samajhna - jaise hi aapka agla period shuru ho, use log karein'
+            : 'Next: Knowing Your Rhythm — from the day you log your next period';
+      case TtcChapter.knowingYourRhythm:
+        return hinglish
+            ? 'Aage: Saath mein koshish - jab aapke fertile din paas aayenge'
+            : 'Next: Trying Together — as your fertile days come round';
+      case TtcChapter.tryingTogether:
+        return hinglish
+            ? 'Aage: Intezaar ke din - ovulation ke baad'
+            : 'Next: The Waiting Days — after ovulation passes';
+      case TtcChapter.theWaitingDays:
+        return hinglish
+            ? 'Aage: ya toh ek nayi shuruaat, ya agla cycle. Dono theek hain.'
+            : 'Next: either a new beginning, or the next cycle. Both are fine.';
+      case TtcChapter.aNewBeginning:
+        return hinglish
+            ? 'Aage: pregnancy ka safar, jab aap taiyaar hon'
+            : 'Next: the pregnancy journey, whenever you are ready';
+    }
+  }
+
   /// What this chapter is asking of them - the hero's "Current Focus".
   String focus(bool hinglish) {
     switch (this) {

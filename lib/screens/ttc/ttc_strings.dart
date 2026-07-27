@@ -655,6 +655,28 @@ class TtcS {
       'It takes a moment, and it may turn your fertile window back on.',
       'Ek pal lagega, aur ho sakta hai aapki fertile window wapas aa jaye.');
 
+  /// The one disclaimer, in one place.
+  ///
+  /// It used to live privately inside the cycle tools, which meant the screen
+  /// with the most traffic and the least reliable number - Today - carried no
+  /// caveat at all.
+  String get estimatesDisclaimer => _p(
+      'These are estimates, never guarantees. If your cycles change, stop, or you are worried, talk to a doctor.',
+      'Ye andaaze hain, guarantee nahi. Agar aapke cycles badalte hain, periods band hain ya aap chinta mein hain, toh doctor se baat karein.');
+
+  // ---- the hero's position line ---------------------------------------------
+  /// "Day 3 of 28" - position WITHIN the chapter, never "chapter 1 of 5".
+  /// A denominator across the whole stage would promise a finish line that
+  /// chapters 2-4 do not have, since they come round with every cycle.
+  String dayOfChapter(int day, int length) => hinglish
+      ? 'Is chapter ka din $day / $length'
+      : 'Day $day of $length in this chapter';
+
+  String get journeyMapLink => _p('Journey map', 'Journey map');
+
+  /// The way out of the rhythm card, which used to route nowhere.
+  String get understandThis => _p('Understand this', 'Ye samjhein');
+
   // ---- profile --------------------------------------------------------------
   String get profileTitle => _p('Profile', 'Profile');
   String get profileLanguage => _p('Language', 'Bhasha');

@@ -32,7 +32,9 @@ import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_screens.dart';
 import 'ttc_insight_screen.dart';
+import 'ttc_journey_map_screen.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_partner_screen.dart';
 import 'ttc_products_screen.dart';
@@ -98,6 +100,11 @@ class TtcTodayScreen extends StatelessWidget {
             // The door out of this stage. Always present, understated, and
             // never phrased as a prompt to test.
             TtcRecordTestCard(t: t),
+            const SizedBox(height: 20),
+            // Every tool carried this and the busiest screen did not - which
+            // is precisely backwards, since Today is where an estimate is read
+            // fastest and questioned least.
+            TtcDisclaimer(t: t),
           ],
         );
       },
@@ -175,7 +182,48 @@ class _Hero extends StatelessWidget {
         // Progress WITHIN this chapter only. Never a global 1→5 bar: chapters
         // 2-4 ride the cycle and repeat, and a bar that slid backwards every
         // month would read as failure.
+        //
+        // The bar was correct and unreadable: a sliver of white with nothing
+        // saying what it measured or what lay past it. Both shipped stages
+        // label their progress ("Trimester 3", "Phase 1 of 20") and name what
+        // comes next; this one said nothing for twenty-eight days, which is
+        // what made the stage feel stopped.
+        Row(children: [
+          Expanded(
+            child: Text(t.dayOfChapter(today.daysIntoChapter, today.chapterLength),
+                style: ttcBody(11,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    w: FontWeight.w700)),
+          ),
+          // The forward link both other stages carry - "View week ›" and
+          // "Phase map ›". The Journey Map holds the sentence that answers
+          // "does this repeat mean I am going backwards", so it should be one
+          // tap from here rather than three.
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const TtcJourneyMapScreen(),
+              settings: const RouteSettings(name: 'ttc/map'),
+            )),
+            behavior: HitTestBehavior.opaque,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(t.journeyMapLink,
+                  style: ttcBody(11,
+                      color: Colors.white, w: FontWeight.w800)),
+              const SizedBox(width: 3),
+              const Icon(Icons.chevron_right_rounded,
+                  size: 15, color: Colors.white),
+            ]),
+          ),
+        ]),
+        const SizedBox(height: 7),
         TtcProgressBar(value: today.chapterProgress),
+        const SizedBox(height: 10),
+
+        // What is coming, and what brings it. The one line the other two
+        // stages have and this one did not.
+        Text(chapter.nextUp(hi),
+            style: ttcBody(11.5,
+                color: Colors.white.withValues(alpha: 0.88), h: 1.45)),
         const SizedBox(height: 14),
 
         Row(children: [
@@ -328,17 +376,43 @@ class _RhythmCard extends StatelessWidget {
         const SizedBox(height: 14),
         ttcDivider(),
         const SizedBox(height: 12),
-        GestureDetector(
-          onTap: () => logTtcPeriod(context),
-          behavior: HitTestBehavior.opaque,
-          child: Row(children: [
-            const Icon(Icons.add_circle_outline_rounded,
-                size: 17, color: ttcPurple),
-            const SizedBox(width: 7),
-            Text(t.logNewPeriod,
-                style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
-          ]),
-        ),
+
+        // Two doors, not one. This card was a dead end: it raised the only
+        // question on the screen a newcomer cannot answer - what is a cycle
+        // day, what is ovulation, why is this "low" - and routed nowhere,
+        // while the three screens that explain it sat in Tools.
+        Row(children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => logTtcPeriod(context),
+              behavior: HitTestBehavior.opaque,
+              child: Row(children: [
+                const Icon(Icons.add_circle_outline_rounded,
+                    size: 17, color: ttcPurple),
+                const SizedBox(width: 7),
+                Flexible(
+                  child: Text(t.logNewPeriod,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+                ),
+              ]),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const TtcCycleScreen(),
+              settings: const RouteSettings(name: 'ttc/cycle'),
+            )),
+            behavior: HitTestBehavior.opaque,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(t.understandThis,
+                  style: ttcBody(13, color: ttcSoft, w: FontWeight.w800)),
+              const Icon(Icons.chevron_right_rounded,
+                  size: 17, color: ttcSoft),
+            ]),
+          ),
+        ]),
       ]),
     );
   }

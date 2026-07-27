@@ -672,6 +672,29 @@ class TtcHeader extends StatelessWidget {
   }
 }
 
+/// The one estimates disclaimer, shared.
+///
+/// It lived privately inside the cycle tools, which is how Today - the screen
+/// with the most traffic and the least reliable number - ended up carrying no
+/// caveat at all. One widget and one string means that cannot happen again.
+class TtcDisclaimer extends StatelessWidget {
+  const TtcDisclaimer({super.key, required this.t});
+
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Icon(Icons.info_outline_rounded, size: 15, color: ttcMuted),
+      const SizedBox(width: 9),
+      Expanded(
+        child: Text(t.estimatesDisclaimer,
+            style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
+      ),
+    ]);
+  }
+}
+
 /// A back bar for pages pushed on top of a tab.
 class TtcBackBar extends StatelessWidget {
   const TtcBackBar({super.key, required this.title, this.trailing});

@@ -35,7 +35,6 @@ class TtcCycleScreen extends StatelessWidget {
       animation: Listenable.merge([TtcStore.instance, TtcLang.instance]),
       builder: (context, _) {
         final t = TtcS.current();
-        final hi = t.hinglish;
         final cycle = CycleStore.instance;
         final today = TtcStore.instance.today;
         final lengths = cycle.cycleLengths;
@@ -144,7 +143,7 @@ class TtcCycleScreen extends StatelessWidget {
                   ],
 
                 const SizedBox(height: 14),
-                _Disclaimer(hi: hi),
+                TtcDisclaimer(t: t),
               ],
             ),
           ),
@@ -374,7 +373,7 @@ class TtcOvulationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                 ],
-                _Disclaimer(hi: hi),
+                TtcDisclaimer(t: t),
               ],
             ),
           ),
@@ -460,7 +459,6 @@ class TtcFertilityWindowScreen extends StatelessWidget {
       animation: Listenable.merge([TtcStore.instance, TtcLang.instance]),
       builder: (context, _) {
         final t = TtcS.current();
-        final hi = t.hinglish;
         final store = TtcStore.instance;
         final today = store.today;
         const engine = TtcChapterEngine();
@@ -520,7 +518,7 @@ class TtcFertilityWindowScreen extends StatelessWidget {
                   ],
                 ],
                 const SizedBox(height: 16),
-                _Disclaimer(hi: hi),
+                TtcDisclaimer(t: t),
               ],
             ),
           ),
@@ -605,23 +603,3 @@ class _DayBar extends StatelessWidget {
 
 // ---- shared -----------------------------------------------------------------
 
-class _Disclaimer extends StatelessWidget {
-  const _Disclaimer({required this.hi});
-  final bool hi;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Icon(Icons.info_outline_rounded, size: 15, color: ttcMuted),
-      const SizedBox(width: 9),
-      Expanded(
-        child: Text(
-          hi
-              ? 'Ye andaaze hain, guarantee nahi. Agar aapke cycles badalte hain, periods band hain ya aap chinta mein hain, toh doctor se baat karein.'
-              : 'These are estimates, never guarantees. If your cycles change, stop, or you are worried, talk to a doctor.',
-          style: ttcBody(11.5, color: ttcMuted, h: 1.5),
-        ),
-      ),
-    ]);
-  }
-}
