@@ -337,12 +337,14 @@ class _RhythmCard extends StatelessWidget {
         ]),
         const SizedBox(height: 14),
 
-        // State 2 - logged, but we will not pretend to an estimate.
+        // State 2 - logged, but we will not pretend to an estimate. WHICH
+        // reason matters: "still learning your rhythm" is true for a new user
+        // and reads as a broken app to someone with a year of entries.
         if (fert == null) ...[
-          Text(t.noEstimateYet,
+          Text(_noEstimateTitle(t, today.noEstimate),
               style: ttcBody(14, color: ttcInk, w: FontWeight.w700)),
           const SizedBox(height: 5),
-          Text(t.noEstimateBody, style: ttcBody(13)),
+          Text(_noEstimateBody(t, today.noEstimate), style: ttcBody(13)),
         ]
 
         // State 3 - a graded reading, always with its confidence attached.
@@ -418,6 +420,39 @@ class _RhythmCard extends StatelessWidget {
   }
 }
 
+/// Naming the refusal, so a blank is never just a blank.
+///
+/// Shared with the Cycle Companion and the Ovulation Companion - the same
+/// number was missing on all three, and three different explanations for one
+/// cause is how a user concludes the app is guessing.
+String _noEstimateTitle(TtcS t, TtcNoEstimate why) {
+  switch (why) {
+    case TtcNoEstimate.historyLooksOff:
+      return t.noEstHistoryOffTitle;
+    case TtcNoEstimate.cycleOverdue:
+      return t.noEstOverdueTitle;
+    case TtcNoEstimate.none:
+    case TtcNoEstimate.noPeriodLogged:
+    case TtcNoEstimate.notEnoughHistory:
+    case TtcNoEstimate.clinicOwnsTiming:
+      return t.noEstimateYet;
+  }
+}
+
+String _noEstimateBody(TtcS t, TtcNoEstimate why) {
+  switch (why) {
+    case TtcNoEstimate.historyLooksOff:
+      return t.noEstHistoryOffBody;
+    case TtcNoEstimate.cycleOverdue:
+      return t.noEstOverdueBody;
+    case TtcNoEstimate.none:
+    case TtcNoEstimate.noPeriodLogged:
+    case TtcNoEstimate.notEnoughHistory:
+    case TtcNoEstimate.clinicOwnsTiming:
+      return t.noEstimateBody;
+  }
+}
+
 /// Shared by Today and the Cycle Companion, so a period is logged the same way
 /// wherever it is logged from.
 Future<void> logTtcPeriod(BuildContext context) async {
@@ -431,7 +466,49 @@ Future<void> logTtcPeriod(BuildContext context) async {
     lastDate: now,
     helpText: TtcS.current().logPeriodTitle,
   );
-  if (picked != null) CycleStore.instance.logPeriodStart(picked);
+  if (picked == null) return;
+
+  // Ask before accepting a start that cannot be a new cycle.
+  //
+  // The store already refuses to AVERAGE gaps under fifteen days, silently. So
+  // an entry three days after the last one was kept, shown in the list, and
+  // counted for nothing - with no way for her to know. Eleven entries once
+  // produced exactly one usable cycle, and the app's only response was to feel
+  // like it needed more logging.
+  //
+  // She can still add it. Some people bleed twice in a month and want both on
+  // record. What she cannot do any more is add it without being told.
+  final gap = CycleStore.instance.daysSincePreviousStart(picked);
+  if (gap != null && gap < CycleStore.minPlausibleCycleDays) {
+    if (!context.mounted) return;
+    final ok = await _confirmCloseStart(context, gap);
+    if (ok != true) return;
+  }
+  CycleStore.instance.logPeriodStart(picked);
+}
+
+Future<bool?> _confirmCloseStart(BuildContext context, int gap) {
+  final t = TtcS.current();
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      content: Text(t.tooCloseWarning(gap), style: ttcBody(13.5, h: 1.5)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(t.tooCloseCancel,
+              style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(t.tooCloseKeep,
+              style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+        ),
+      ],
+    ),
+  );
 }
 
 // ---- Today's Insight --------------------------------------------------------

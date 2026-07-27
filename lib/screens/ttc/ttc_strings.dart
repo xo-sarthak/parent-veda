@@ -144,6 +144,44 @@ class TtcS {
       'After a cycle or two we can share a gentle estimate. Until then, nothing here is a guess.',
       'Ek-do cycle ke baad hum ek halka sa andaaza de payenge. Tab tak, yahan kuch bhi guess nahi hai.');
 
+  // ---- why there is no estimate ---------------------------------------------
+  //  "Still learning your rhythm" is true for a new user and untrue for
+  //  everyone else. Said to someone with a year of entries it reads as the app
+  //  being broken, so each refusal now explains itself and, where she can do
+  //  something about it, says what.
+
+  String get noEstHistoryOffTitle => _p('Something in your dates looks off',
+      'Aapki dates mein kuch theek nahi lag raha');
+  String get noEstHistoryOffBody => _p(
+      'One of your recorded gaps is far longer than a cycle usually runs - most often a cycle that was never logged. We would rather show nothing than build an estimate on it. Fixing or removing that entry brings the estimate back.',
+      'Aapke record kiye gaps mein se ek cycle se kaafi lamba hai - aksar wo cycle jo log hi nahi hua. Uspe andaaza banane se accha hai kuch na dikhayein. Us entry ko theek ya delete karne par andaaza wapas aa jaayega.');
+
+  String get noEstOverdueTitle =>
+      _p('This cycle is running long', 'Ye cycle lamba chal raha hai');
+  String get noEstOverdueBody => _p(
+      'You are past where your own cycles usually end, so today\'s estimate would be arithmetic on an assumption that has already been contradicted. This happens, and on its own it is not a warning sign - but if it keeps happening, it is worth a doctor knowing.',
+      'Aap wahan se aage hain jahan aapke cycles aam taur par khatam hote hain, isliye aaj ka andaaza ek galat maani hui baat par hoga. Aisa hota hai, aur akele mein ye chinta ki baat nahi - par baar-baar ho toh doctor ko batana theek rahega.');
+
+  /// "28 days" but "1 day". The list said "1 days".
+  String cycleDayCount(int days) => hinglish
+      ? '$days din'
+      : days == 1
+          ? '1 day'
+          : '$days days';
+
+  /// Shown against a logged date the engine did not count.
+  String get notCountedChip => _p('Not counted', 'Gina nahi gaya');
+  String get notCountedWhy => _p(
+      'Too close to the entry before it to be a separate cycle, so it is kept but not used in the average.',
+      'Pichhli entry ke itne paas hai ki alag cycle nahi ho sakta, isliye rakha gaya hai par average mein use nahi hota.');
+
+  /// Shown at the moment she logs a start that cannot be a new cycle.
+  String tooCloseWarning(int days) => _p(
+      'That is $days days after the last start you logged. Periods do not usually begin that close together - if this is the same period, you may not need a second entry.',
+      'Ye aapke pichhle start ke $days din baad hai. Periods aam taur par itne paas shuru nahi hote - agar ye wahi period hai toh shayad doosri entry ki zaroorat nahi.');
+  String get tooCloseKeep => _p('Add it anyway', 'Phir bhi add karein');
+  String get tooCloseCancel => _p('Cancel', 'Rehne dein');
+
   String estimatedOvulation(int day) =>
       _p('Ovulation around day $day', 'Ovulation lagbhag din $day');
 

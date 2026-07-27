@@ -55,6 +55,16 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   DateTime? get lastPeriodStart =>
       _periodStarts.isEmpty ? null : _periodStarts.last;
 
+  /// The plausibility window for a real cycle.
+  ///
+  /// Public because it was the quiet half of a real problem: entries outside it
+  /// were dropped from the average with no signal anywhere, so a list of eleven
+  /// dates could produce a single usable cycle while the screen looked full.
+  /// The UI now warns at input and marks the ones it did not count, and both
+  /// need this number.
+  static const int minPlausibleCycleDays = 15;
+  static const int maxPlausibleCycleDays = 90;
+
   /// Lengths of COMPLETED cycles, oldest first. The current cycle is still
   /// running and so is deliberately not included.
   List<int> get cycleLengths {
@@ -63,9 +73,34 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       final len = _periodStarts[i].difference(_periodStarts[i - 1]).inDays;
       // Guard against a mis-tap producing an absurd cycle that would poison
       // the average. Clinically plausible cycles only.
-      if (len >= 15 && len <= 90) out.add(len);
+      if (_isPlausible(len)) out.add(len);
     }
     return out;
+  }
+
+  static bool _isPlausible(int len) =>
+      len >= minPlausibleCycleDays && len <= maxPlausibleCycleDays;
+
+  /// Days between [day] and the most recent start before it, or null when it
+  /// would be the first entry. Used to warn BEFORE an entry is accepted.
+  int? daysSincePreviousStart(DateTime day) {
+    final d = _dayOnly(day);
+    DateTime? prev;
+    for (final s in _periodStarts) {
+      if (s.isBefore(d)) prev = s;
+    }
+    return prev == null ? null : d.difference(prev).inDays;
+  }
+
+  /// Whether a logged start counts toward the average, and the gap it made.
+  ///
+  /// Returns null for the oldest entry, which has nothing before it to measure
+  /// against and is therefore neither counted nor discarded.
+  ({int gap, bool counted})? gapBefore(DateTime start) {
+    final i = _periodStarts.indexWhere((s) => _sameDay(s, start));
+    if (i <= 0) return null;
+    final gap = _periodStarts[i].difference(_periodStarts[i - 1]).inDays;
+    return (gap: gap, counted: _isPlausible(gap));
   }
 
   /// How many complete cycles she has logged with us.

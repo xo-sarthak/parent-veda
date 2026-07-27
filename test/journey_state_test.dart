@@ -262,11 +262,15 @@ void main() {
 
   // ===========================================================================
   group('it agrees with the TTC engine rather than duplicating it', () {
-    test('inference and the fertility window are never out of step', () {
+    test('a window can never appear where inference is forbidden', () {
+      // Relative dates only: a fixed start plus a relative end meant the gap
+      // between them grew by a day every day, and the fixture eventually
+      // tripped rules it was never written to exercise.
+      final now = DateTime.now();
       CycleStore.instance
-        ..logPeriodStart(DateTime(2026, 5, 1))
-        ..logPeriodStart(DateTime(2026, 5, 29))
-        ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
+        ..logPeriodStart(now.subtract(const Duration(days: 68)))
+        ..logPeriodStart(now.subtract(const Duration(days: 40)))
+        ..logPeriodStart(now.subtract(const Duration(days: 12)));
       LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
 
       for (final path in TtcPath.values) {
@@ -274,9 +278,30 @@ void main() {
         final mayInfer =
             currentJourneyState().mayInfer(Inferable.fertilityTiming);
         final hasWindow = TtcStore.instance.today.fertility != null;
-        expect(mayInfer, hasWindow,
-            reason: '$path: the boundary and the engine disagree');
+
+        // ONE-WAY on purpose. Permission and data quality are different
+        // questions, and only became visibly different once the engine started
+        // refusing to publish estimates built on a history it distrusts. A
+        // window without permission is the IVF defect; permission without a
+        // window is simply having nothing worth saying yet.
+        if (hasWindow) {
+          expect(mayInfer, isTrue,
+              reason: '$path: a window appeared where we may not infer');
+        }
       }
+    });
+
+    test('and on a natural path with clean data there IS one', () {
+      // Guards the test above from passing vacuously if the engine ever stopped
+      // producing windows at all.
+      final now = DateTime.now();
+      CycleStore.instance
+        ..logPeriodStart(now.subtract(const Duration(days: 68)))
+        ..logPeriodStart(now.subtract(const Duration(days: 40)))
+        ..logPeriodStart(now.subtract(const Duration(days: 12)));
+      LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+      TtcStore.instance.setPath(TtcPath.natural);
+      expect(TtcStore.instance.today.fertility, isNotNull);
     });
   });
 }

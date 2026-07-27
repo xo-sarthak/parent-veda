@@ -70,6 +70,43 @@ enum OvulationConfidence {
 /// "Everything remains emotionally calm." - TTC master, §3.6
 enum FertilityLevel { low, medium, high, peak }
 
+/// WHY there is no ovulation estimate today.
+///
+/// Withholding a number is only half an answer - "no estimate" with no reason
+/// reads as the app being broken, and she has no idea whether to wait, log
+/// something, or stop worrying. So every refusal names itself.
+///
+/// This exists because the engine used to do the opposite: it would work out
+/// that the history underneath an estimate was unreliable, quietly drop
+/// confidence to low, and then print the number anyway. On real data that
+/// produced "ovulation around day 40" on five separate screens, from a single
+/// eight-week gap where nothing had been logged.
+enum TtcNoEstimate {
+  /// There IS an estimate.
+  none,
+
+  /// Nothing logged yet. The invitation state, not a failure.
+  noPeriodLogged,
+
+  /// One cycle or none. We can count days, but the 28-day default is an
+  /// assumption about her rather than a fact.
+  notEnoughHistory,
+
+  /// A recorded gap so long it is more likely a cycle she did not log, or one
+  /// without ovulation, than a real cycle of that length. Averaging it produces
+  /// arithmetic nobody should act on.
+  historyLooksOff,
+
+  /// This cycle has already run past where her own history says it ends. The
+  /// average may be fine; the assumption behind today's estimate has already
+  /// been contradicted.
+  cycleOverdue,
+
+  /// A clinic owns the timing. Not a data problem, and must never be explained
+  /// as one.
+  clinicOwnsTiming,
+}
+
 // TtcPath and the pathway rules now live in ttc_care_pathway.dart, re-exported
 // here so every existing import keeps working. They moved because *which
 // treatment* turned out to be the wrong thing to branch on - see the header of
@@ -140,6 +177,7 @@ class TtcToday {
     required this.daysIntoChapter,
     required this.chapterLength,
     this.ownership = TimingOwnership.parentveda,
+    this.noEstimate = TtcNoEstimate.none,
   });
 
   final TtcChapter chapter;
@@ -154,6 +192,9 @@ class TtcToday {
 
   /// Estimated cycle day of ovulation. Null when we refuse to guess.
   final int? estimatedOvulationDay;
+
+  /// Why it is null, so a screen can say so instead of showing a hole.
+  final TtcNoEstimate noEstimate;
 
   final OvulationConfidence confidence;
 
@@ -247,14 +288,32 @@ class TtcChapterEngine {
     return days + 1;
   }
 
-  /// A recorded gap long enough that it is more likely a cycle she did not log,
-  /// or one where she did not ovulate, than a real cycle of that length.
+  /// A recorded gap more likely to be a cycle she never logged than a real
+  /// cycle of that length.
   ///
-  /// Either way the history underneath our arithmetic is thinner than the
-  /// number of entries suggests, so we should be less sure - not more sure
-  /// because there is "more data".
-  bool hasUnreliableHistory(TtcJourneyState s) =>
-      s.cycleLengths.any((l) => l > 45);
+  /// The naive version of this - "any cycle over 45 days" - was wrong, and the
+  /// existing tests caught it. A woman with PCOS can genuinely run fifty-day
+  /// cycles, and telling her every month that her dates "look off" is the exact
+  /// failure the note on [irregularVarianceDays] warns against: she must still
+  /// feel understood, so we lower confidence rather than hiding the tool.
+  ///
+  /// What actually distinguishes the two is CONTEXT, not length:
+  ///
+  ///   * one completed cycle, and it is very long - we cannot tell a missed
+  ///     log from a long cycle, and averaging a single 54 produced "ovulation
+  ///     around day 40" on real data. Refuse.
+  ///   * several cycles, one of them roughly twice her own median - that is an
+  ///     outlier among her normals, so it is a gap she did not log. Refuse.
+  ///   * several cycles that are all long - that is simply her rhythm.
+  ///     [isIrregular] already softens the confidence. Do not refuse.
+  bool hasUnreliableHistory(TtcJourneyState s) {
+    final lengths = s.cycleLengths;
+    if (lengths.isEmpty) return false;
+    if (lengths.length == 1) return lengths.first > 45;
+    final sorted = [...lengths]..sort();
+    final median = sorted[sorted.length ~/ 2];
+    return lengths.any((l) => l > median * 1.8);
+  }
 
   /// The current cycle has run well past where her own history says it should
   /// have ended.
@@ -292,7 +351,32 @@ class TtcChapterEngine {
     return OvulationConfidence.low;
   }
 
+  /// Why there is no estimate today, or [TtcNoEstimate.none] when there is one.
+  ///
+  /// Checked in the order the reasons override each other: a body signal beats
+  /// every doubt below it, because an LH strip is evidence about THIS cycle
+  /// rather than an average over past ones.
+  TtcNoEstimate whyNoEstimate(TtcJourneyState s) {
+    if (!TtcPathwayBehaviour(s.ownership).predictsOvulation) {
+      return TtcNoEstimate.clinicOwnsTiming;
+    }
+    if (s.lastPeriodStart == null) return TtcNoEstimate.noPeriodLogged;
+    if (s.lhPositiveDay != null || s.temperatureShiftDay != null) {
+      return TtcNoEstimate.none;
+    }
+    if (hasUnreliableHistory(s)) return TtcNoEstimate.historyLooksOff;
+    if (isCurrentCycleOverdue(s)) return TtcNoEstimate.cycleOverdue;
+    if (s.cycleLengths.isEmpty) return TtcNoEstimate.notEnoughHistory;
+    if (cycleLengthFor(s) - lutealPhaseDays < 1) {
+      return TtcNoEstimate.notEnoughHistory;
+    }
+    return TtcNoEstimate.none;
+  }
+
   /// Estimated cycle day of ovulation, or null when we will not guess.
+  ///
+  /// Every refusal here has a matching reason in [whyNoEstimate], so no surface
+  /// can show a blank without being able to say why it is blank.
   int? estimatedOvulationDay(TtcJourneyState s) {
     if (s.lastPeriodStart == null) return null;
     // A recorded body signal wins outright. A temperature shift is seen the
@@ -300,6 +384,10 @@ class TtcChapterEngine {
     if (s.lhPositiveDay != null) return s.lhPositiveDay! + 1;
     if (s.temperatureShiftDay != null) return s.temperatureShiftDay! - 1;
     if (confidence(s) == OvulationConfidence.unknown) return null;
+    // The half that was missing. Confidence already dropped to low for both of
+    // these and the number was printed regardless - which is how a single
+    // eight-week logging gap became "ovulation around day 40" everywhere.
+    if (hasUnreliableHistory(s) || isCurrentCycleOverdue(s)) return null;
     final day = cycleLengthFor(s) - lutealPhaseDays;
     return day < 1 ? null : day;
   }
@@ -338,6 +426,7 @@ class TtcChapterEngine {
     final ov = estimatedOvulationDay(s);
     final conf = confidence(s);
     final fert = fertilityFor(s, day);
+    final why = whyNoEstimate(s);
 
     // `ov` is still needed INTERNALLY to place a couple in the right chapter -
     // the waiting days are just as real during an IVF cycle - but it is only
@@ -354,6 +443,7 @@ class TtcChapterEngine {
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
         confidence: conf,
+        noEstimate: why,
         fertility: fert,
         ownership: s.ownership,
         daysIntoChapter: 0,
@@ -371,6 +461,7 @@ class TtcChapterEngine {
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
         confidence: conf,
+        noEstimate: why,
         fertility: fert,
         ownership: s.ownership,
         daysIntoChapter: (into ?? 0).clamp(0, preparingChapterDays),
@@ -390,6 +481,7 @@ class TtcChapterEngine {
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
         confidence: conf,
+        noEstimate: why,
         fertility: fert,
         ownership: s.ownership,
         daysIntoChapter: day - 1,
@@ -405,6 +497,7 @@ class TtcChapterEngine {
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
         confidence: conf,
+        noEstimate: why,
         fertility: fert,
         ownership: s.ownership,
         daysIntoChapter: day - windowOpens,
@@ -420,9 +513,14 @@ class TtcChapterEngine {
       chapter: TtcChapter.theWaitingDays,
       cycleDay: day,
       cycleLength: len,
-      estimatedOvulationDay: ov,
+      // Was `ov` (ungated) and had no `ownership` at all - so a couple on a
+      // clinic cycle reached the waiting days and got a published ovulation
+      // day plus the non-clinic card. The IVF defect, alive in one branch.
+      estimatedOvulationDay: publishedOv,
       confidence: conf,
+      noEstimate: why,
       fertility: fert,
+      ownership: s.ownership,
       daysIntoChapter: (day - windowCloses).clamp(0, waitLength),
       chapterLength: waitLength,
     );

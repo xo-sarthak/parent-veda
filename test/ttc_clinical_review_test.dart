@@ -110,23 +110,42 @@ void main() {
       expect(engine.confidence(s), OvulationConfidence.low);
     });
 
-    test('a very long recorded gap makes the history unreliable', () {
-      // Either she missed logging one, or that cycle had no ovulation. We
-      // cannot tell which, so we get less sure rather than more.
+    test('one gap far out of line with her own is treated as a missed log', () {
+      // Two ordinary cycles and then a stretch roughly twice as long. Against
+      // HER normals that is a cycle she never logged, not a long one.
       final s = stateWith([
-        DateTime(2026, 3, 1),
-        DateTime(2026, 5, 20), // 80 days
+        DateTime(2026, 3, 4),
+        DateTime(2026, 4, 1), // 28
+        DateTime(2026, 4, 29), // 28
+        DateTime(2026, 6, 22), // 54 - the outlier
         DateTime(2026, 7, 20),
       ], now: DateTime(2026, 7, 27));
       expect(engine.hasUnreliableHistory(s), isTrue);
       expect(engine.confidence(s), OvulationConfidence.low);
     });
 
+    test('but consistently long cycles are her rhythm, not an error', () {
+      // The first version of this rule flagged any cycle over 45 days, which
+      // told a woman with PCOS that her dates "look off" every single month -
+      // the exact opposite of the promise on irregularVarianceDays that she
+      // must still feel understood.
+      final s = stateWith([
+        DateTime(2026, 2, 1),
+        DateTime(2026, 3, 24), // 51
+        DateTime(2026, 5, 14), // 51
+        DateTime(2026, 7, 5), // 52
+      ], now: DateTime(2026, 7, 27));
+      expect(engine.hasUnreliableHistory(s), isFalse,
+          reason: 'long and consistent is a rhythm, not a mistake');
+    });
+
     test('a signal from THIS cycle still beats the doubt', () {
       final now = DateTime(2026, 7, 27);
       final s = stateWith([
-        DateTime(2026, 3, 1),
-        DateTime(2026, 5, 20),
+        DateTime(2026, 3, 4),
+        DateTime(2026, 4, 1),
+        DateTime(2026, 4, 29),
+        DateTime(2026, 6, 22), // the outlier again
         DateTime(2026, 7, 16),
       ], now: now);
       expect(engine.hasUnreliableHistory(s), isTrue);

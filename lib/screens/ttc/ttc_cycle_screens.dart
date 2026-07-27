@@ -219,23 +219,60 @@ class _PeriodRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Whether this gap reached the average at all.
+    //
+    // The stats card and this list used to disagree in plain sight: "Average
+    // 54 days · Range 54-54" sitting directly above gaps of 1, 2, 3 and 6.
+    // The stats were right - every short gap had been discarded - but nothing
+    // said so, so the screen simply looked wrong.
+    final gap = CycleStore.instance.gapBefore(start);
+    final uncounted = gap != null && !gap.counted;
+
     return TtcCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(children: [
-        const Icon(Icons.circle, size: 9, color: ttcCoral),
-        const SizedBox(width: 12),
-        Expanded(child: Text(_fmt(start), style: ttcBody(13.5, color: ttcInk, w: FontWeight.w600))),
-        if (length != null)
-          Text('$length ${t.cycleDays}',
-              style: ttcBody(12.5, color: ttcMuted, w: FontWeight.w700)),
-        GestureDetector(
-          onTap: () => CycleStore.instance.removePeriodStart(start),
-          behavior: HitTestBehavior.opaque,
-          child: const Padding(
-            padding: EdgeInsets.only(left: 12),
-            child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.circle,
+              size: 9, color: uncounted ? ttcLine : ttcCoral),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(_fmt(start),
+                style: ttcBody(13.5,
+                    color: uncounted ? ttcMuted : ttcInk,
+                    w: FontWeight.w600)),
           ),
-        ),
+          if (length != null)
+            Text(t.cycleDayCount(length!),
+                style: ttcBody(12.5, color: ttcMuted, w: FontWeight.w700)),
+          GestureDetector(
+            onTap: () => CycleStore.instance.removePeriodStart(start),
+            behavior: HitTestBehavior.opaque,
+            child: const Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+            ),
+          ),
+        ]),
+        if (uncounted) ...[
+          const SizedBox(height: 9),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: ttcPanel,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(t.notCountedChip,
+                  style: ttcBody(10.5, color: ttcSoft, w: FontWeight.w800)),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(t.notCountedWhy,
+                  style: ttcBody(11, color: ttcMuted, h: 1.45)),
+            ),
+          ]),
+        ],
       ]),
     );
   }

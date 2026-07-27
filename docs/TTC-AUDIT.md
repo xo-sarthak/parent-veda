@@ -160,10 +160,22 @@ No warning at input when a start is implausibly close to the last one, and no
 "not counted" marker on the discarded rows. **This is why testing felt like
 "having to do a lot"** — the app never acknowledged what had already been done.
 
-## A-13. The Weight tracker uses a −/+ stepper
+## A-13. ~~The Weight tracker uses a −/+ stepper~~ — **WRONG, withdrawn**
 
-To record 55 kg you tap **+** fifty-five times from zero. The shared tracker
-engine's stepper suits "glasses of water", not a body weight. No numeric input.
+I claimed you would tap **+** fifty-five times from zero. Both halves were
+false, and I should have read the code before writing it down:
+
+* **"Tap to add" opens a numeric keypad.** `_typeIn()` in
+  `ttc_tracker_screen.dart` — a text field with a decimal keyboard and the
+  unit as a suffix.
+* **The stepper never starts at zero.** `_sensibleStart()` begins weight at 60
+  kg, sleep at 7 hours, movement at 30 minutes — with the stated reason that
+  *"add" should not mean "record that you slept 0.5 hours"*.
+
+The real finding, much smaller: **"Tap to add" does not look like a text field**,
+so the keypad is discoverable only by trying. A unit hint or a caret would fix
+it. Recorded here rather than deleted, because a withdrawn finding is worth as
+much as a confirmed one.
 
 ---
 
