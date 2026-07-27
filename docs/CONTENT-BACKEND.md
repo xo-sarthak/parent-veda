@@ -170,22 +170,28 @@ Migration-number reservation: `0019` articles, `0020` web content (this terminal
 
 ### Migration numbers reserved for the admin-panel build (2026-07-27)
 
-The admin-panel terminal has claimed **`0045`–`0054`**. Other terminals must
-start at `0055`. A collision here is silent — two files with the same number
-apply in whatever order the runner sorts them, and the loser is simply never run.
+The admin-panel terminal has written **`0045`–`0051`**. A collision here is
+silent — two files with the same number apply in whatever order the runner sorts
+them, and the loser is simply never run — so add your file to this table in the
+same commit that creates it.
 
 | # | File | Phase |
 |---|---|---|
-| `0045` | `cms_role_and_grants.sql` — the restricted `directus_cms` role | 0 (written) |
+| `0045` | `cms_role_and_grants.sql` — the restricted `directus_cms` role | 0 |
 | `0046` | `content_field_polish.sql` — dropdowns, R2 file fields, `has_hi` | 1 |
 | `0047` | `recipes.sql` | 3 |
 | `0048` | `reads.sql` | 3 |
 | `0049` | `products.sql` | 3 |
-| `0050` | *(spare — held for the TTC daily flip when TTC settles)* | 3, deferred |
-| `0051` | `admin_audit.sql` — workflow columns + the admin action log | 4 |
-| `0052` | `admin_actions.sql` — approve/rotate/campaign/certify functions | 5 |
-| `0053` | `programmes.sql` | 6 |
-| `0054` | `programme_scheduling.sql` | 6 |
+| `0050` | `admin_audit.sql` — the action log + private verification records | 5 |
+| `0051` | `admin_actions.sql` — approve / deactivate / campaign / rotate / demo cleanup | 5 |
+
+**Numbers are claimed when a file is written, never before.** An earlier version
+of this table reserved `0050` for the TTC daily flip, that flip was deferred, and
+the reservation became a hole between `0049` and `0051` that read as a missing
+migration. Reserving a number for work with no date is the same speculative
+instinct `CLAUDE.md` warns about elsewhere: it can express a state the project
+does not have. The next admin-panel file takes `0052`; other terminals should
+take the next free number and say so here.
 
 **Key insight:** one Directus → feeds the app, the website, AND the chatbot. Publish once, everywhere reads it.
 

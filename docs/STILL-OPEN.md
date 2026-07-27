@@ -159,11 +159,23 @@ row and a doctor's name under an advertising label.
 `partner_referrals` carries `campaign_id`, and nothing creates campaigns —
 dates, channel, landing behaviour. Admin panel work.
 
+**Half closed (2026-07-27).** `0051` adds `create_partner_campaign()`, which
+mints a token carrying a campaign and channel — and refuses for a partner who is
+not `active`, so a campaign cannot print a code for someone nobody vouched for.
+What remains is the Directus Flow that calls it. See `docs/DIRECTUS-SETUP.md`.
+
 ## 4.4 Not built, deliberately
 
 A/B variants of visibility rules · shared/tiered commission (flat basis points
-only) · partner brand colour and contact details · materialized views · audit
-logging · versioning · Realtime.
+only) · partner brand colour and contact details · materialized views ·
+versioning · Realtime.
+
+**Audit logging is now built** (`0050`): `admin_audit`, append-only, written
+*inside* each `0051` function so it cannot be bypassed by calling them another
+way. Directus's own activity log records that a Flow ran, not what the database
+agreed to or what it checked first — which is the question anyone actually asks
+afterwards. The panel reads it through the `admin_audit_log` view, never the
+table, so there is no path to editing the record of your own actions.
 
 **Brand colour deserves a decision, not just deferral:** letting a partner tint
 app surfaces cuts directly against "never promotional".
@@ -183,6 +195,25 @@ editorial act in the panel, never in the app the applicant controls.
 This now also gates the referral kit: no `active` partner row → no QR. `0040`
 added `create_care_partner()` and `mint_partner_token()` (service_role only) so
 the panel has functions to sit on top of.
+
+**Unblocked, not finished (2026-07-27).** `0051` adds `approve_care_partner()`,
+and the point of it is the refusal rather than the update. It reads
+`care_partner_verification` (`0050`) and raises unless the council, the
+registration number and the KYC reference are all present and the registration
+has not expired. So approval cannot be a dropdown someone clicks assuming the
+checks happened elsewhere, and licence expiry gets looked at on the one occasion
+anyone reliably would — the moment they are about to rely on it. Every call,
+allowed or refused, writes `admin_audit`.
+
+Verification paperwork is a **separate, private table on purpose**:
+`care_partners` is public-read so a parent can see "Invited by Dr Meera Rao"
+before she has an account, which means any column added there is world-readable.
+A council registration number and a KYC reference are not public identity.
+
+**Still needed:** the Directus Flow that calls the function, and a form over
+`care_partner_verification` for capturing the paperwork. Until then approval is
+possible from the SQL editor but not from the panel — so keep raising this.
+`test/admin_actions_test.dart` holds the invariants meanwhile.
 
 ## 5.2 One-to-many programmes — not built at all
 
