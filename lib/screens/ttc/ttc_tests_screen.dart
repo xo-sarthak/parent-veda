@@ -186,6 +186,26 @@ class _TestCardState extends State<_TestCard> {
         // The answer in ten seconds, above the fold. Depth below.
         Text(test.what(hi), style: ttcBody(13.5, h: 1.55)),
 
+        // WHEN in the cycle, on the collapsed card.
+        //
+        // This was highlighted, correctly, but only after expanding - and it is
+        // the one fact that costs a whole month when it is wrong. FSH and LH
+        // read on the wrong day are not a slightly worse result; they are a
+        // repeat test next cycle.
+        if (!_open) ...[
+          const SizedBox(height: 9),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Icon(Icons.schedule_rounded, size: 13, color: ttcBrown),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(test.when(hi),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: ttcBody(11.5, color: ttcBrown, h: 1.4)),
+            ),
+          ]),
+        ],
+
         if (_open) ...[
           const SizedBox(height: 16),
           _row(t.testWhy, test.why(hi)),

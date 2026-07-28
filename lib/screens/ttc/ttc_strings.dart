@@ -297,6 +297,45 @@ class TtcS {
   String get ovulationNotYet => _p(
       'Log a period first and we can estimate this.',
       'Pehle ek period log karein, phir hum iska andaaza laga sakte hain.');
+
+  // ---- what these two signals actually are ----------------------------------
+  //  The screen named an ovulation strip and a temperature rise and explained
+  //  neither, then asked her to "mark as done" - a checklist verb for something
+  //  that is a reading, not a task. Someone who already knows this subject
+  //  needed none of it; someone who does not learned nothing.
+
+  String get ovulationLhWhat => _p(
+      'A pee-on stick from any pharmacy, around ₹30–60 each. It turns positive in the day or two BEFORE you ovulate, which is what makes it useful - it tells you the window is opening, not that it has closed.',
+      'Kisi bhi pharmacy se milne wali stick, lagbhag ₹30–60 ki. Ovulation se ek-do din PEHLE positive aati hai - isiliye kaam ki hai. Ye batati hai ki window khul rahi hai, band nahi hui.');
+
+  String get ovulationBbtWhat => _p(
+      'Your temperature the moment you wake, before sitting up, taken at the same time each day with a basal thermometer. It rises AFTER ovulation, so it confirms what happened rather than predicting what will - useful for learning your pattern over months, not for timing this week.',
+      'Jagte hi, uthne se pehle, roz ek hi waqt par basal thermometer se liya gaya temperature. Ye ovulation ke BAAD badhta hai - yaani jo ho chuka use confirm karta hai, aage ka nahi batata. Mahino mein pattern samajhne ke liye kaam ka, is hafte ki timing ke liye nahi.');
+
+  /// Above the prompt offered on an empty journal.
+  String get journalPromptEyebrow =>
+      _p('If you want somewhere to start', 'Agar shuru karne ki jagah chahiye');
+
+  // ---- when a logged symptom is worth a doctor -------------------------------
+  //  Ask Veda's guardrails treat "severe pain" as a red flag and route to a
+  //  doctor. The tracker recorded the identical thing in silence, so two parts
+  //  of one product disagreed about what severe pain means.
+  //
+  //  Deliberately NOT alarming, and deliberately not a diagnosis: it names the
+  //  thing worth mentioning and stops. Anything stronger would break the rule
+  //  this tracker is built on - notice, never diagnose.
+  String get severeNoticedTitle =>
+      _p('Worth mentioning to a doctor', 'Doctor ko batane layak');
+  String get severeNoticedBody => _p(
+      'You have recorded something as severe. That does not mean anything is wrong - but severe pain is one of the things worth saying out loud at your next appointment rather than waiting to see if it settles.',
+      'Aapne kuch "bahut zyada" record kiya hai. Iska matlab ye nahi ki kuch galat hai - par tez dard un cheezon mein hai jo agli appointment par khud bata dena behtar hai, ye dekhne se ki apne aap theek hota hai ya nahi.');
+  String get severeNoticedAdd =>
+      _p('Add it to my questions', 'Mere sawaalon mein jodein');
+
+  /// Replaces "Mark as done".
+  String get ovulationRecordIt => _p('Record it', 'Record karein');
+  String get ovulationWhichDay => _p('Which day?', 'Kis din?');
+  String get ovulationToday => _p('Today', 'Aaj');
   String whichCycleDay(int day) => _p('Cycle day $day', 'Cycle din $day');
 
   String get fertilityWindow => _p('Fertility Window', 'Fertility Window');

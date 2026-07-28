@@ -102,6 +102,10 @@ class TtcTrackerScreen extends StatelessWidget {
                     ],
                   ]),
                 ),
+                // Ask Veda's guardrails route "severe pain" to a doctor. The
+                // tracker recorded the identical thing in silence, so two parts
+                // of one product disagreed about what severe means.
+                _SevereNotice(tracker: tracker, t: t),
                 const SizedBox(height: 20),
 
                 // ---- history ----------------------------------------------
@@ -136,6 +140,46 @@ class TtcTrackerScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Shown once, quietly, when anything today sits at the top of its scale.
+///
+/// Not alarming and not a diagnosis - it names the thing worth mentioning and
+/// stops, because this tracker's whole premise is notice, never diagnose.
+class _SevereNotice extends StatelessWidget {
+  const _SevereNotice({required this.tracker, required this.t});
+
+  final TtcTracker tracker;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final severe = tracker.fields.any((f) {
+      if (f.kind != TtcFieldKind.scale) return false;
+      final v = TtcLogStore.instance.valueFor(tracker.id, f.id);
+      // Top of the scale - "Severe", "A lot" at the far end.
+      return v != null && v.value.round() >= f.choicesEn.length - 1;
+    });
+    if (!severe) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: TtcCard(
+        color: ttcCoralTint,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.info_outline_rounded, size: 17, color: ttcCoral),
+            const SizedBox(width: 9),
+            Expanded(
+                child:
+                    Text(t.severeNoticedTitle, style: ttcJakarta(14.5))),
+          ]),
+          const SizedBox(height: 9),
+          Text(t.severeNoticedBody, style: ttcBody(12.5, h: 1.55)),
+        ]),
+      ),
     );
   }
 }

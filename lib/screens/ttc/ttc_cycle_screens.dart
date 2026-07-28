@@ -389,6 +389,7 @@ class TtcOvulationScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           _SignalRow(
                             label: t.ovulationLh,
+                            what: t.ovulationLhWhat,
                             day: cycle.lhPositiveDay,
                             enabled: today.cycleDay != null,
                             currentDay: today.cycleDay,
@@ -400,6 +401,7 @@ class TtcOvulationScreen extends StatelessWidget {
                           const SizedBox(height: 14),
                           _SignalRow(
                             label: t.ovulationBbt,
+                            what: t.ovulationBbtWhat,
                             day: cycle.temperatureShiftDay,
                             enabled: today.cycleDay != null,
                             currentDay: today.cycleDay,
@@ -420,9 +422,56 @@ class TtcOvulationScreen extends StatelessWidget {
   }
 }
 
+/// Today, or one of the last few days.
+///
+/// Deliberately not a full date picker: a signal recorded against a day weeks
+/// back is a guess, and this stage does not trade in those.
+Future<int?> _pickSignalDay(BuildContext context, int today, TtcS t) {
+  final options = <int>[
+    for (var back = 0; back < 4; back++)
+      if (today - back >= 1) today - back
+  ];
+  return showModalBottomSheet<int>(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(t.ovulationWhichDay, style: ttcJakarta(16)),
+          const SizedBox(height: 16),
+          for (final d in options)
+            GestureDetector(
+              onTap: () => Navigator.of(ctx).pop(d),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: ttcPanel,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  d == today ? t.ovulationToday : t.whichCycleDay(d),
+                  style: ttcBody(13.5, color: ttcInk, w: FontWeight.w700),
+                ),
+              ),
+            ),
+        ]),
+      ),
+    ),
+  );
+}
+
 class _SignalRow extends StatelessWidget {
   const _SignalRow({
     required this.label,
+    required this.what,
     required this.day,
     required this.enabled,
     required this.currentDay,
@@ -431,6 +480,12 @@ class _SignalRow extends StatelessWidget {
   });
 
   final String label;
+
+  /// What the signal actually is, and - for the temperature - that it confirms
+  /// ovulation AFTER it happens rather than predicting it. The screen named
+  /// both of these and explained neither.
+  final String what;
+
   final int? day;
   final bool enabled;
   final int? currentDay;
@@ -444,8 +499,10 @@ class _SignalRow extends StatelessWidget {
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, style: ttcBody(13.5, color: ttcInk, w: FontWeight.w700)),
+          const SizedBox(height: 5),
+          Text(what, style: ttcBody(11.5, color: ttcSoft, h: 1.5)),
           if (on) ...[
-            const SizedBox(height: 3),
+            const SizedBox(height: 5),
             Text(t.whichCycleDay(day!),
                 style: ttcBody(12, color: ttcPurple, w: FontWeight.w700)),
           ],
@@ -453,9 +510,23 @@ class _SignalRow extends StatelessWidget {
       ),
       const SizedBox(width: 12),
       GestureDetector(
-        // Recorded against TODAY's cycle day, which is the only day a woman can
-        // honestly report a strip or a thermometer reading from.
-        onTap: !enabled ? null : () => onSet(on ? null : currentDay),
+        // Today by default, but the last few days are offered too.
+        //
+        // The original restricted this to today on the grounds that it is "the
+        // only day a woman can honestly report a reading from". That holds for
+        // inventing a day; it does not hold for remembering on Tuesday that
+        // Sunday's strip was positive. The range is kept short so the guard
+        // survives.
+        onTap: !enabled
+            ? null
+            : () async {
+                if (on) {
+                  onSet(null);
+                  return;
+                }
+                final picked = await _pickSignalDay(context, currentDay!, t);
+                if (picked != null) onSet(picked);
+              },
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
@@ -468,7 +539,7 @@ class _SignalRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
-            on ? t.trackerClear : t.ritualMarkDone,
+            on ? t.trackerClear : t.ovulationRecordIt,
             style: ttcBody(12.5,
                 color: !enabled
                     ? ttcMuted

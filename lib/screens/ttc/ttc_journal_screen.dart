@@ -15,7 +15,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_journal_store.dart';
+import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show ttcEntryIcon;
@@ -82,12 +84,19 @@ class TtcJournalScreen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 22),
 
-                if (entries.isEmpty)
+                if (entries.isEmpty) ...[
                   TtcEmpty(
                     icon: Icons.auto_stories_outlined,
                     title: t.journalEmptyTitle,
                     body: t.journalEmptyBody,
-                  )
+                  ),
+                  const SizedBox(height: 14),
+                  // Sixteen prompts were written for this stage and none of
+                  // them reached the screen that says "write here". A blank
+                  // page is the hardest possible ask of someone who is anxious
+                  // or low, and the answer was already sitting in data.
+                  _PromptNudge(t: t),
+                ]
                 else
                   for (final e in entries) ...[
                     _EntryCard(entry: e, t: t),
@@ -313,4 +322,29 @@ Future<void> writeTtcEntry(
     );
   }
   controller.dispose();
+}
+
+/// One prompt, offered rather than required.
+///
+/// Phrased as something to answer if she wants to, never as a task - this
+/// stage has no streaks and nothing that counts against her for skipping.
+class _PromptNudge extends StatelessWidget {
+  const _PromptNudge({required this.t});
+
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final prompt = ttcPromptForToday(TtcStore.instance.today.chapter);
+    return TtcCard(
+      color: ttcPanel,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(t.journalPromptEyebrow.toUpperCase(),
+            style: ttcBody(9.5, color: ttcPurple, w: FontWeight.w800)),
+        const SizedBox(height: 8),
+        Text(prompt.text(t.hinglish),
+            style: ttcBody(14, color: ttcInk, h: 1.55, w: FontWeight.w600)),
+      ]),
+    );
+  }
 }
