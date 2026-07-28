@@ -59,6 +59,11 @@ void main() {
     'programme_sessions': 'the schedule, authored with the programme',
     'programme_experts': 'assignment is an admin act; ACCEPTANCE is the expert\'s',
     'programme_coupons': 'discounts — not public-read, validated via a function',
+    'capabilities': 'the access registry — Internal Admin manages plans',
+    'plans': 'bundles of capabilities; making something Premium is a row here',
+    'plan_capabilities': 'the entitlement matrix itself',
+    'sponsors': 'organisations sponsoring a plan — ops manages these',
+    'sponsor_domains': 'the eligibility rule; NOT public-read (a customer list)',
   };
 
   /// True when the store reads a VIEW rather than a base table. Views play by

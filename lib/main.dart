@@ -35,6 +35,7 @@ import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_scaffold.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
+import 'services/entitlement_store.dart';
 import 'services/product_catalog_store.dart';
 import 'services/programme_store.dart';
 import 'services/read_store.dart';
@@ -204,6 +205,10 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     ReadStore.instance.ensureLoaded();
     ProductCatalogStore.instance.ensureLoaded();
     ProgrammeStore.instance.ensureLoaded();
+    // What this user may do, and who is paying for it. Resolved per-user from
+    // Supabase; a signed-out user resolves to nothing, exactly like an
+    // uninitialised backend.
+    EntitlementStore.instance.ensureLoaded();
     WatchStore.instance.init();
     ReadingStore.instance.init();
     RecoStore.instance.init();
