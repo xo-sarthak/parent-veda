@@ -75,6 +75,11 @@ class TtcTodayScreen extends StatelessWidget {
           overlay: ttcModePill(t, him: false),
           header: const TtcHeader(),
           children: [
+            // Pregnancy has "WEEKLY SNAPSHOT" above its hero and parenting has
+            // "HOW YOUR BABY IS TODAY". TTC's hero floated with nothing naming
+            // it, which is part of why it read as a different app.
+            ttcEyebrow(t.yourChapter.toUpperCase(), color: ttcCoral),
+            const SizedBox(height: 8),
             _Hero(today: today, t: t, daysTrying: store.daysTrying),
             const SizedBox(height: 20),
             _RhythmCard(today: today, t: t),
@@ -132,22 +137,36 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     final chapter = today.chapter;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ttcCardRadius),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [ttcPurple, Color(0xFF8B4FD0), ttcCoral],
-          stops: [0.0, 0.55, 1.0],
+    // Deliberately the SAME construction as the pregnancy hero: two-stop purple
+    // gradient, two soft decorative circles bleeding off the corners, a divider
+    // above the shortcuts, and circular shortcut buttons. TTC had a
+    // purple-to-coral gradient, a flat bar and rounded squares - individually
+    // small, together enough that the two never read as one component.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [ttcPurple, ttcPurpleDeep],
+          ),
         ),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x3D6A30B6), blurRadius: 24, offset: Offset(0, 10)),
-        ],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Stack(children: [
+          Positioned(
+            right: -36,
+            top: -36,
+            child: _circle(150, Colors.white.withValues(alpha: 0.10)),
+          ),
+          Positioned(
+            right: 30,
+            bottom: -40,
+            child: _circle(100, ttcCoral.withValues(alpha: 0.22)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Text(_greeting(t),
@@ -215,9 +234,9 @@ class _Hero extends StatelessWidget {
             ]),
           ),
         ]),
-        const SizedBox(height: 7),
-        TtcProgressBar(value: today.chapterProgress),
-        const SizedBox(height: 10),
+        const SizedBox(height: 9),
+        TtcChapterBar(today: today),
+        const SizedBox(height: 12),
 
         // What is coming, and what brings it. The one line the other two
         // stages have and this one did not.
@@ -239,19 +258,37 @@ class _Hero extends StatelessWidget {
 
         // Three shortcuts, exactly where pregnancy puts Baby / Mother /
         // What's next. Here the subject is the couple.
+        Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
+        const SizedBox(height: 14),
         Row(children: [
-          _shortcut(context, Icons.self_improvement_rounded, t.shortcutMe,
-              TtcChapterTab.me),
-          const SizedBox(width: 9),
-          _shortcut(
-              context, Icons.favorite_rounded, t.shortcutUs, TtcChapterTab.us),
-          const SizedBox(width: 9),
-          _shortcut(context, Icons.event_available_rounded, t.shortcutNext,
-              TtcChapterTab.next),
+          TtcHeroShortcut(
+              icon: Icons.self_improvement_rounded,
+              label: t.shortcutMe,
+              onTap: () =>
+                  openTtcChapter(context, today.chapter, tab: TtcChapterTab.me)),
+          TtcHeroShortcut(
+              icon: Icons.favorite_rounded,
+              label: t.shortcutUs,
+              onTap: () =>
+                  openTtcChapter(context, today.chapter, tab: TtcChapterTab.us)),
+          TtcHeroShortcut(
+              icon: Icons.event_available_rounded,
+              label: t.shortcutNext,
+              onTap: () => openTtcChapter(context, today.chapter,
+                  tab: TtcChapterTab.next)),
         ]),
-      ]),
+              ]),
+          ),
+        ]),
+      ),
     );
   }
+
+  static Widget _circle(double size, Color color) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      );
 
   Widget _heroFact(String label, String value) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,28 +307,6 @@ class _Hero extends StatelessWidget {
         ],
       );
 
-  Widget _shortcut(
-      BuildContext context, IconData icon, String label, TtcChapterTab tab) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => openTtcChapter(context, today.chapter, tab: tab),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.18),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(children: [
-            Icon(icon, size: 19, color: Colors.white),
-            const SizedBox(height: 5),
-            Text(label,
-                style: ttcBody(11.5, color: Colors.white, w: FontWeight.w700)),
-          ]),
-        ),
-      ),
-    );
-  }
 }
 
 // ---- the rhythm card --------------------------------------------------------

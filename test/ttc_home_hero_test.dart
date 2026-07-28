@@ -20,11 +20,15 @@
 //  "not a step backwards" line was written to prevent.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_cycle_screens.dart';
+import 'package:parentveda/screens/ttc/ttc_chapter_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_journey_map_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -176,6 +180,53 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.textContaining('Aage:'), findsWidgets);
       TtcLang.instance.hinglish = false;
+    });
+  });
+
+  // ===========================================================================
+  group("the hero is the same component as pregnancy's", () {
+    testWidgets('it sits under a named eyebrow', (tester) async {
+      await pumpToday(tester);
+      // Pregnancy has "WEEKLY SNAPSHOT", parenting "HOW YOUR BABY IS TODAY".
+      // TTC's hero floated with nothing naming it.
+      expect(find.text('YOUR CHAPTER'), findsOneWidget);
+    });
+
+    testWidgets('the progress is segmented, one per chapter', (tester) async {
+      await pumpToday(tester);
+      expect(find.byType(TtcChapterBar), findsOneWidget);
+      // Matching pregnancy's T1 / T2 / T3 labels under the bar.
+      for (final n in ['1', '2', '3', '4', '5']) {
+        expect(find.text(n), findsWidgets, reason: 'segment $n');
+      }
+    });
+
+    testWidgets('and the shortcuts are circles, like Baby / Mother / next',
+        (tester) async {
+      await pumpToday(tester);
+      expect(find.byType(TtcHeroShortcut), findsNWidgets(3));
+    });
+
+    testWidgets('the shortcuts still open the chapter screen', (tester) async {
+      await pumpToday(tester);
+      await tester.tap(find.byType(TtcHeroShortcut).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(TtcChapterScreen), findsOneWidget);
+    });
+  });
+
+  // ===========================================================================
+  group('but the bar does NOT accumulate across chapters', () {
+    test('only the current segment is ever filled', () {
+      // Pregnancy fills T1 then T2 then T3 because a pregnancy only moves
+      // forward. Chapters 2-4 come round with every cycle, so a bar that
+      // reached 80% and dropped back to 40% would say "you lost ground" on the
+      // morning a period arrives. The shape is borrowed; the claim is not.
+      const src = 'lib/screens/ttc/ttc_common.dart';
+      final text = File(src).readAsStringSync();
+      final bar = text.substring(text.indexOf('class TtcChapterBar'));
+      expect(bar, contains('if (active)'),
+          reason: 'segments fill cumulatively again');
     });
   });
 }
