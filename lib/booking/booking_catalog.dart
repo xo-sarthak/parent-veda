@@ -50,7 +50,10 @@ class BookingCatalog {
       final o = _fromYoga(y);
       if (o != null) list.add(o);
     }
-    for (final p in kLearningPrograms) {
+    // Merged, not the bundled const: a masterclass published in the admin
+    // panel has to become a bookable offering too, or it renders on the
+    // Courses screen and then cannot be bought — visible and inert.
+    for (final p in mergedLearningPrograms()) {
       final o = _fromLearning(p);
       if (o != null) list.add(o);
     }

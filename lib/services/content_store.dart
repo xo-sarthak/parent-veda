@@ -73,8 +73,11 @@ abstract class ContentStore<T> extends ChangeNotifier {
     required this.cacheKey,
     required List<T> seed,
     this.domain,
-  })  : assert(seed.isNotEmpty,
-            'A content store must ship a non-empty seed: it is the offline floor.'),
+    this.serverOnly = false,
+  })  : assert(serverOnly || seed.isNotEmpty,
+            'A content store must ship a non-empty seed: it is the offline '
+            'floor. If this type genuinely has nothing to ship, say so with '
+            'serverOnly: true rather than passing an empty list.'),
         _seed = List<T>.unmodifiable(seed),
         _items = List<T>.of(seed);
 
@@ -88,6 +91,27 @@ abstract class ContentStore<T> extends ChangeNotifier {
 
   /// Optional `domain` filter ('pregnancy' | 'parenting' | 'universal').
   final String? domain;
+
+  /// This type ships NOTHING with the app, deliberately.
+  ///
+  /// Content types are normally required to carry a bundled seed — it is the
+  /// offline floor, and a missing one shows as a blank screen on a slow
+  /// network that nobody notices until a user complains. That rule is right
+  /// for a library of recipes or articles, which exist before anyone opens
+  /// the app.
+  ///
+  /// It is wrong for INVENTORY. There are no masterclasses until somebody
+  /// schedules one, and "nothing scheduled yet" is a legitimate state that
+  /// should render its own invitation rather than a stale bundled list.
+  ///
+  /// So the exception is declared rather than smuggled in as an empty list:
+  /// the assertion still fires for every type that simply forgot its seed.
+  ///
+  /// It also changes the empty-result rule. A seeded type only honours an
+  /// empty backend once it has been seen to serve rows (an unseeded table
+  /// must not blank a screen). A server-only type has no such ambiguity —
+  /// empty is the correct starting state and is honoured immediately.
+  final bool serverOnly;
 
   final List<T> _seed;
   List<T> _items;
@@ -197,9 +221,13 @@ abstract class ContentStore<T> extends ChangeNotifier {
 
     _lastFetchAt = DateTime.now();
 
-    if (rows.isEmpty && !_backendHasServedRows) {
+    if (rows.isEmpty && !_backendHasServedRows && !serverOnly) {
       // The backend has never served this type. Almost certainly a table that
       // exists but has not been seeded — not an editorial decision to empty it.
+      //
+      // serverOnly types are exempt: empty IS their correct starting state,
+      // and waiting for a first non-empty fetch would mean an unpublished
+      // catalogue kept showing whatever it last had.
       return;
     }
     if (rows.isNotEmpty) {

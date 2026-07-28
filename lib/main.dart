@@ -36,6 +36,7 @@ import 'screens/doctor/doctor_scaffold.dart';
 import 'screens/splash_screen.dart';
 import 'services/baby_voice_service.dart';
 import 'services/product_catalog_store.dart';
+import 'services/programme_store.dart';
 import 'services/read_store.dart';
 import 'services/recipe_store.dart';
 import 'services/bought_store.dart';
@@ -202,6 +203,7 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     RecipeStore.instance.ensureLoaded();
     ReadStore.instance.ensureLoaded();
     ProductCatalogStore.instance.ensureLoaded();
+    ProgrammeStore.instance.ensureLoaded();
     WatchStore.instance.init();
     ReadingStore.instance.init();
     RecoStore.instance.init();

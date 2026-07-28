@@ -61,8 +61,47 @@ void main() {
     'programme_coupons': 'discounts — not public-read, validated via a function',
   };
 
+  /// True when the store reads a VIEW rather than a base table. Views play by
+  /// different rules: they carry no RLS policies of their own, and the CMS
+  /// edits the tables underneath rather than the view, so the table checks
+  /// below would be wrong rather than merely noisy.
+  bool isView(String name) => RegExp(
+          'create (or replace )?view\\s+(public\\.)?$name\\b',
+          caseSensitive: false)
+      .hasMatch(allSql);
+
+  group('every content-backed VIEW is read-only and public', () {
+    for (final store in ContentRegistry.stores.where((s) => isView(s.table))) {
+      final view = store.table;
+
+      test('$view is granted select to the app', () {
+        expect(
+          RegExp('grant select on\\s+(public\\.)?$view\\s+to[^;]*anon',
+                  caseSensitive: false, dotAll: true)
+              .hasMatch(allSql),
+          isTrue,
+          reason: 'The app reads $view with the anon key; without this every '
+              'fetch fails silently and the store serves nothing.',
+        );
+      });
+
+      test('$view is NOT granted to the CMS role', () {
+        // A view is a read shape. Granting it to Directus offers an editor a
+        // duplicate of data they already have, in a form that cannot be
+        // written back — two places showing the same thing, one of them inert.
+        expect(
+          RegExp('grant[^;]*on\\s+(public\\.)?$view\\s+to\\s+directus_cms',
+                  caseSensitive: false, dotAll: true)
+              .hasMatch(allSql),
+          isFalse,
+          reason: 'Edit the underlying tables, not $view.',
+        );
+      });
+    }
+  });
+
   group('every registered content table is fully wired', () {
-    for (final store in ContentRegistry.stores) {
+    for (final store in ContentRegistry.stores.where((s) => !isView(s.table))) {
       final table = store.table;
 
       test('$table has a published-only public read policy', () {

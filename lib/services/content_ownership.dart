@@ -61,6 +61,14 @@ class ContentOwnership {
     'reads': ContentOwner.bundled,
     'products': ContentOwner.bundled,
 
+    // Programmes are editor-owned from the start, and the flip that worries
+    // the other types does not apply: there is no bundled masterclass corpus
+    // to overwrite and no veda_knowledge rows to retire, because nothing was
+    // ever exported from Dart. The panel is where a masterclass comes into
+    // existence at all. (The store reads the `programmes_published` view; the
+    // key here is the view name, because that is what the store declares.)
+    'programmes_published': ContentOwner.editor,
+
     // Deliberately deferred, with reasons — see docs/ADMIN-PANEL.md:
     //   ttc_daily : TTC is the newest stage and has not been run on a device
     //               yet. Moving content whose structure is still moving means

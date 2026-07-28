@@ -58,7 +58,10 @@ void main() {
 
       for (final table in ContentOwnership.editorOwned) {
         expect(
-          RegExp('create table (if not exists )?(public\\.)?$table\\b',
+          // Or a VIEW — programmes are read through one, because resolving
+          // "who hosts this" is a join whose rule belongs beside the data.
+          RegExp('create (table (if not exists )?|or replace view |view )'
+                  '(public\\.)?$table\\b',
                   caseSensitive: false)
               .hasMatch(migrations),
           isTrue,

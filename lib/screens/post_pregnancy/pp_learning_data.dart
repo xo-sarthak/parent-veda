@@ -16,6 +16,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/programme_store.dart';
 import 'pp_courses_data.dart';
 import 'pp_experts_data.dart';
 
@@ -629,20 +630,48 @@ const List<LearningProgram> kLearningPrograms = [
 
 /// A program by id; falls back to the flagship so callers never crash.
 LearningProgram programById(String id) =>
-    kLearningPrograms.firstWhere((p) => p.id == id, orElse: () => kLearningPrograms.first);
+    mergedLearningPrograms().firstWhere((p) => p.id == id,
+        orElse: () => kLearningPrograms.first);
 
 /// Every program by a given instructor, newest first - for the "More by
 /// {instructor}" footer on a detail page, and for the Watch channel linkage.
 /// Pass [exclude] to drop the program you're already looking at.
 List<LearningProgram> programsByInstructor(String instructorId, {String? exclude}) {
-  final list = kLearningPrograms.where((p) => p.instructorId == instructorId && p.id != exclude).toList();
+  final list = mergedLearningPrograms()
+      .where((p) => p.instructorId == instructorId && p.id != exclude)
+      .toList();
   list.sort((a, b) => b.recency.compareTo(a.recency));
   return list;
 }
 
+/// Everything published in the admin panel, plus the bundled programmes.
+///
+/// A programme created in Directus reaches EVERY masterclass surface through
+/// this one function — the home rails, search, the kind and topic filters, an
+/// instructor's other programmes — because they all call it. Wiring each screen
+/// separately is how one gets missed and a published masterclass appears in two
+/// places out of four.
+///
+/// A published programme WINS over a bundled one with the same id, so a
+/// bundled stub can be superseded by a real, sellable version without deleting
+/// the Dart (this repo comments out rather than deletes).
+List<LearningProgram> mergedLearningPrograms() {
+  final live = ProgrammeStore.instance.all;
+  if (live.isEmpty) return [...kLearningPrograms];
+  final liveIds = {for (final p in live) p.id};
+  return [
+    ...live,
+    ...kLearningPrograms.where((p) => !liveIds.contains(p.id)),
+  ];
+}
+
+/// Listen to this wherever programmes are rendered, so a newly published
+/// masterclass appears without a relaunch.
+Listenable get programmeListenable => ProgrammeStore.instance;
+
 /// The full catalogue in display order (featured first, then by recency).
 List<LearningProgram> learningCatalogue() {
-  final list = [...kLearningPrograms];
+  final list = mergedLearningPrograms();
   list.sort((a, b) {
     if (a.featured != b.featured) return a.featured ? -1 : 1;
     return b.recency.compareTo(a.recency);

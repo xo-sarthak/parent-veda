@@ -25,14 +25,33 @@ void main() {
     expect(stores, isNotEmpty);
   });
 
-  test('every store ships a non-empty seed', () {
+  test('every store ships a non-empty seed, unless it declares serverOnly', () {
     for (final store in stores) {
+      if (store.serverOnly) continue; // inventory, not a library — see below
       expect(
         store.seed,
         isNotEmpty,
         reason: '${store.table} has no bundled seed. Local-first is absolute: '
             'first launch, offline, and a failed fetch must all still render '
-            'content, and the seed is the only thing standing there.',
+            'content, and the seed is the only thing standing there. If this '
+            'type genuinely ships nothing, declare serverOnly: true.',
+      );
+    }
+  });
+
+  test('serverOnly is used only where there is genuinely nothing to ship', () {
+    // The flag exists so an exception is stated rather than smuggled in as an
+    // empty list. It is right for INVENTORY — there are no masterclasses until
+    // somebody schedules one — and wrong for a library, where an empty screen
+    // offline is a defect. Passing a seed AND serverOnly means one of the two
+    // is a mistake.
+    for (final store in stores.where((s) => s.serverOnly)) {
+      expect(
+        store.seed,
+        isEmpty,
+        reason: '${store.table} declares serverOnly but ships ${store.seed.length} '
+            'seed item(s). Either it has content to ship — drop the flag — or '
+            'the seed is left over.',
       );
     }
   });
@@ -72,13 +91,19 @@ void main() {
         .join('\n');
 
     for (final store in stores) {
+      // A store may read a VIEW rather than a table — programmes do, because
+      // "who hosts this" is a join and the rule belongs next to the data.
+      final created = RegExp(
+              'create (table (if not exists )?|or replace view |view )'
+              '(public\\.)?${store.table}\\b',
+              caseSensitive: false)
+          .hasMatch(migrations);
       expect(
-        RegExp('create table (if not exists )?(public\\.)?${store.table}\\b',
-                caseSensitive: false)
-            .hasMatch(migrations),
+        created,
         isTrue,
-        reason: 'No migration creates "${store.table}", so every fetch will '
-            'fail silently and the store will serve its seed forever.',
+        reason: 'No migration creates "${store.table}" as a table or a view, '
+            'so every fetch will fail silently and the store will serve its '
+            'seed forever.',
       );
     }
   });
