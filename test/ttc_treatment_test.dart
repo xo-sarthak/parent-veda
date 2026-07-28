@@ -169,12 +169,18 @@ void main() {
     });
 
     testWidgets('a natural path still counts to her period', (tester) async {
+      // Relative dates throughout: a fixed start plus a relative end meant the
+      // gap between them grew by a day every day.
+      final now = DateTime.now();
       CycleStore.instance
-        ..logPeriodStart(DateTime(2026, 5, 1))
-        ..logPeriodStart(DateTime(2026, 5, 29))
-        ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
+        ..logPeriodStart(now.subtract(const Duration(days: 68)))
+        ..logPeriodStart(now.subtract(const Duration(days: 40)))
+        ..logPeriodStart(now.subtract(const Duration(days: 12)));
       await pumpTall(tester, const TtcCalendarScreen());
-      expect(find.text(const TtcS(false).calendarNextPeriod), findsOneWidget);
+      // Twice on purpose: once in the legend, which is now open by default,
+      // and once as the actual entry under Coming up. Asserting "at least one"
+      // would pass on the legend alone and stop testing the countdown.
+      expect(find.text(const TtcS(false).calendarNextPeriod), findsNWidgets(2));
     });
 
     test('no "expected period" marker is drawn on a clinic path', () {
