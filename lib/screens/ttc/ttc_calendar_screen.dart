@@ -43,7 +43,10 @@ class TtcCalendarScreen extends StatefulWidget {
 class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
   late DateTime _month = _monthOf(DateTime.now());
   late DateTime _selected = _dayOf(DateTime.now());
-  bool _legendOpen = false;
+  // Open by default. A first-time user met eight different markers with the
+  // key folded away, which makes the calendar something to decode rather than
+  // read. Once she knows them she can close it; the state is hers after that.
+  bool _legendOpen = true;
 
   static DateTime _monthOf(DateTime d) => DateTime(d.year, d.month);
   static DateTime _dayOf(DateTime d) => DateTime(d.year, d.month, d.day);
@@ -76,10 +79,15 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
               }),
               t: t,
             ),
+            // A fertile run that crosses a month boundary used to vanish at the
+            // edge of the grid: four faint circles trailing off the bottom row
+            // and nothing saying the peak was in the next month.
+            _BoundaryNote(month: _month, t: t),
             const SizedBox(height: 14),
             _Legend(
               open: _legendOpen,
               onToggle: () => setState(() => _legendOpen = !_legendOpen),
+              behaviour: TtcStore.instance.behaviour,
               t: t,
             ),
             const SizedBox(height: 18),
@@ -255,8 +263,12 @@ class _MonthGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final first = DateTime(month.year, month.month);
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    // Monday-first, matching how Indian calendars are usually printed.
-    final leading = (first.weekday - 1) % 7;
+    // Sunday-first, matching the pregnancy calendar.
+    //
+    // This was Monday-first "as Indian calendars are usually printed", which is
+    // arguable either way - but two stages of one app disagreeing about where
+    // the week starts is not. Pregnancy has real users; TTC moves.
+    final leading = first.weekday % 7;
     final today = DateTime.now();
 
     return TtcCard(
@@ -286,7 +298,7 @@ class _MonthGrid extends StatelessWidget {
         const SizedBox(height: 14),
         Row(
           children: [
-            for (final d in ['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+            for (final d in ['S', 'M', 'T', 'W', 'T', 'F', 'S'])
               Expanded(
                 child: Text(d,
                     textAlign: TextAlign.center,
@@ -296,29 +308,171 @@ class _MonthGrid extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         for (var row = 0; row < ((leading + daysInMonth) / 7).ceil(); row++)
-          Row(
-            children: [
-              for (var col = 0; col < 7; col++)
-                Expanded(
-                  child: Builder(builder: (context) {
-                    final dayNum = row * 7 + col - leading + 1;
-                    if (dayNum < 1 || dayNum > daysInMonth) {
-                      return const SizedBox(height: 42);
-                    }
-                    final date = DateTime(month.year, month.month, dayNum);
-                    return _DayCell(
-                      date: date,
-                      isToday: date.year == today.year &&
-                          date.month == today.month &&
-                          date.day == today.day,
-                      isSelected: date == selected,
-                      onTap: () => onSelect(date),
-                    );
-                  }),
-                ),
-            ],
-          ),
+          // The fertile run is drawn as ONE capsule behind the row, not as a
+          // tint on each day. Individually tinted circles were a hair off white
+          // - the most important days of the month were the least visible thing
+          // on the screen - and six separate marks never read as one stretch.
+          // The pregnancy calendar already draws its birth window this way.
+          Stack(children: [
+            Positioned.fill(
+              child: Row(children: [
+                for (var col = 0; col < 7; col++)
+                  Expanded(
+                    child: TtcFertileBand.isFertile(
+                            _dateAt(month, row, col, leading, daysInMonth))
+                        ? TtcFertileBand(
+                            date:
+                                _dateAt(month, row, col, leading, daysInMonth),
+                            before: _dateAt(
+                                month, row, col - 1, leading, daysInMonth),
+                            after: _dateAt(
+                                month, row, col + 1, leading, daysInMonth),
+                            firstInRow: col == 0,
+                            lastInRow: col == 6,
+                          )
+                        : const SizedBox(height: 42),
+                  ),
+              ]),
+            ),
+            Row(
+              children: [
+                for (var col = 0; col < 7; col++)
+                  Expanded(
+                    child: Builder(builder: (context) {
+                      final dayNum = row * 7 + col - leading + 1;
+                      if (dayNum < 1 || dayNum > daysInMonth) {
+                        return const SizedBox(height: 42);
+                      }
+                      final date = DateTime(month.year, month.month, dayNum);
+                      return _DayCell(
+                        date: date,
+                        isToday: date.year == today.year &&
+                            date.month == today.month &&
+                            date.day == today.day,
+                        isSelected: date == selected,
+                        onTap: () => onSelect(date),
+                      );
+                    }),
+                  ),
+              ],
+            ),
+          ]),
       ]),
+    );
+  }
+}
+
+/// Says so when the fertile run does not fit inside the month on screen.
+class _BoundaryNote extends StatelessWidget {
+  const _BoundaryNote({required this.month, required this.t});
+
+  final DateTime month;
+  final TtcS t;
+
+  static const _names = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  static bool isFertile(DateTime d) {
+    final f = ttcFactsFor(d).fertility;
+    return f != null && f != FertilityLevel.low;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lastDay = DateTime(month.year, month.month + 1, 0);
+    final firstDay = DateTime(month.year, month.month, 1);
+
+    // Only worth saying when the run is actually cut - a window sitting neatly
+    // inside the month needs no explanation.
+    final runsOn =
+        isFertile(lastDay) && isFertile(lastDay.add(const Duration(days: 1)));
+    final camefrom = isFertile(firstDay) &&
+        isFertile(firstDay.subtract(const Duration(days: 1)));
+
+    if (!runsOn && !camefrom) return const SizedBox(height: 14);
+
+    final next = DateTime(month.year, month.month + 1);
+    final prev = DateTime(month.year, month.month - 1);
+    final text = runsOn
+        ? t.continuesInto(_names[next.month - 1])
+        : t.continuedFrom(_names[prev.month - 1]);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Icon(Icons.east_rounded, size: 14, color: ttcCoral),
+        const SizedBox(width: 8),
+        Expanded(
+            child: Text(text, style: ttcBody(11.5, color: ttcSoft, h: 1.45))),
+      ]),
+    );
+  }
+}
+
+/// The date at a grid position, or null outside the month.
+DateTime? _dateAt(
+    DateTime month, int row, int col, int leading, int daysInMonth) {
+  final n = row * 7 + col - leading + 1;
+  if (n < 1 || n > daysInMonth) return null;
+  return DateTime(month.year, month.month, n);
+}
+
+/// One column's slice of the fertile capsule.
+///
+/// Rounds only where the run actually starts and ends, so a stretch of fertile
+/// days reads as a single band rather than a row of separate pills - including
+/// where it runs off the end of a week and picks up on the next line.
+/// Public so a test can assert the band exists rather than inferring it from a
+/// colour, which is how a "does the window render" test quietly stops testing
+/// anything.
+class TtcFertileBand extends StatelessWidget {
+  const TtcFertileBand({
+    super.key,
+    required this.date,
+    required this.before,
+    required this.after,
+    required this.firstInRow,
+    required this.lastInRow,
+  });
+
+  final DateTime? date;
+  final DateTime? before;
+  final DateTime? after;
+  final bool firstInRow;
+  final bool lastInRow;
+
+  /// Public so the grid can skip building a band that would draw nothing -
+  /// an invisible widget in the tree is a widget a test can find and wrongly
+  /// conclude something rendered.
+  static bool isFertile(DateTime? d) {
+    if (d == null) return false;
+    final f = ttcFactsFor(d).fertility;
+    return f != null && f != FertilityLevel.low;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final openLeft = isFertile(before) && !firstInRow;
+    final openRight = isFertile(after) && !lastInRow;
+    const r = Radius.circular(999);
+
+    return Center(
+      child: Container(
+        height: 34,
+        decoration: BoxDecoration(
+          // Deliberately a shade you can actually see. The old per-day tint at
+          // "medium" was indistinguishable from white.
+          color: ttcFertilityTint(ttcFactsFor(date!).fertility!),
+          borderRadius: BorderRadius.only(
+            topLeft: openLeft ? Radius.zero : r,
+            bottomLeft: openLeft ? Radius.zero : r,
+            topRight: openRight ? Radius.zero : r,
+            bottomRight: openRight ? Radius.zero : r,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -339,8 +493,6 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final facts = ttcFactsFor(date);
-    final fertile = facts.fertility != null &&
-        facts.fertility != FertilityLevel.low;
 
     return GestureDetector(
       onTap: onTap,
@@ -359,9 +511,7 @@ class _DayCell extends StatelessWidget {
                     ? ttcCoral
                     : isSelected
                         ? ttcPurple
-                        : fertile
-                            ? ttcFertilityTint(facts.fertility!)
-                            : Colors.transparent,
+                        : Colors.transparent,
                 shape: BoxShape.circle,
                 // The expected period is an OUTLINE, never a solid marker - it
                 // is a projection, not a fact about her body.
@@ -375,8 +525,17 @@ class _DayCell extends StatelessWidget {
                   style: ttcBody(12.5,
                       color: (facts.isPeriodStart || isSelected)
                           ? Colors.white
-                          : ttcInk,
-                      w: isToday ? FontWeight.w900 : FontWeight.w600)),
+                          // Ovulation is marked by WEIGHT on the deepest part
+                          // of the band, not by a separate dot. The dot was
+                          // ttcBrown - the only brown in a pink and purple
+                          // palette, which read as a bug on the single most
+                          // important day of the cycle.
+                          : facts.isOvulation
+                              ? ttcCoral
+                              : ttcInk,
+                      w: (isToday || facts.isOvulation)
+                          ? FontWeight.w900
+                          : FontWeight.w600)),
             ),
             const SizedBox(height: 3),
             SizedBox(
@@ -384,7 +543,6 @@ class _DayCell extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (facts.isOvulation) _dot(ttcBrown),
                   if (facts.loggedTrackers.isNotEmpty) _dot(ttcPurple),
                   if (facts.journalEntries.isNotEmpty) _dot(ttcMuted),
                 ],
@@ -407,10 +565,24 @@ class _DayCell extends StatelessWidget {
 // ---- legend -----------------------------------------------------------------
 
 class _Legend extends StatelessWidget {
-  const _Legend({required this.open, required this.onToggle, required this.t});
+  const _Legend({
+    required this.open,
+    required this.onToggle,
+    required this.behaviour,
+    required this.t,
+  });
 
   final bool open;
   final VoidCallback onToggle;
+
+  /// A legend must describe THIS calendar, not every calendar.
+  ///
+  /// It listed every marker unconditionally, so a couple on a clinic cycle -
+  /// where the fertile window, the ovulation day and the expected period are
+  /// all deliberately suppressed - read a key for three things their grid would
+  /// never draw. Opening the legend by default is what made that visible.
+  final TtcPathwayBehaviour behaviour;
+
   final TtcS t;
 
   @override
@@ -429,28 +601,46 @@ class _Legend extends StatelessWidget {
         if (open) ...[
           const SizedBox(height: 14),
           _row(ttcCoral, t.calendarPeriod, filled: true),
-          _row(ttcFertilityTint(FertilityLevel.peak), t.calendarFertile,
-              filled: true),
-          _row(ttcBrown, t.calendarOvulation),
+          if (behaviour.showsFertilityWindow) ...[
+            _row(ttcFertilityTint(FertilityLevel.peak), t.calendarFertile,
+                filled: true),
+            // Ovulation is weight on the band, not a swatch - so the legend
+            // says what to look for rather than showing a colour that no
+            // longer exists.
+            _row(ttcCoral, t.calendarOvulation, bold: true),
+          ],
+          // "Today" was missing entirely, while being the boldest ring drawn.
+          _row(ttcPurple, t.calendarToday, outline: true),
           _row(ttcPurple, t.calendarLogged),
-          _row(ttcCoral, t.calendarNextPeriod, outline: true),
+          if (behaviour.countsToPeriod)
+            _row(ttcCoral, t.calendarNextPeriod, outline: true),
         ],
       ]),
     );
   }
 
   Widget _row(Color c, String label,
-          {bool filled = false, bool outline = false}) =>
+          {bool filled = false, bool outline = false, bool bold = false}) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(children: [
-          Container(
-            width: filled ? 16 : 8,
-            height: filled ? 16 : 8,
-            decoration: BoxDecoration(
-              color: outline ? Colors.transparent : c,
-              shape: BoxShape.circle,
-              border: outline ? Border.all(color: c, width: 1.4) : null,
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: Center(
+              child: bold
+                  ? Text('14',
+                      style: ttcBody(10, color: c, w: FontWeight.w900))
+                  : Container(
+                      width: filled ? 16 : 8,
+                      height: filled ? 16 : 8,
+                      decoration: BoxDecoration(
+                        color: outline ? Colors.transparent : c,
+                        shape: BoxShape.circle,
+                        border:
+                            outline ? Border.all(color: c, width: 1.4) : null,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 11),

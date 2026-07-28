@@ -500,7 +500,25 @@ Today shows the logo; Tools shows a bare "Tools" title with no logo; Calendar
 shows "My Calendar" with actions. TTC uses the logo on all five tabs. Whatever
 rule is chosen, all three stages should follow it.
 
-## A-67. Journey: pregnancy draws a trail, TTC draws a list
+## A-67. Journey: pregnancy draws a *winding* trail — **overstated, softened**
+
+I wrote that TTC's Journey Map is "five stacked cards with a thin connector",
+implying a flat list. Re-reading the code: it is already a **trail** — numbered
+nodes, a connecting rail, a "You are here" pill, and a "Comes round each cycle"
+marker on the three chapters that repeat.
+
+The real gap is decoration, not comprehension: pregnancy's path winds, uses
+coloured milestone nodes and a progress ring. Converting TTC's would be a
+custom-painter rewrite of a screen that already communicates well and holds the
+best copy in the stage, for a modest gain and real regression risk.
+
+**What was actually missing is A-40** — no chapter said what brings it. That is
+now fixed using the same `nextUp()` copy the hero uses, so the two cannot drift.
+
+The winding-path treatment stays available as a later polish pass, deliberately
+unbooked.
+
+## A-67b. The original text, kept
 
 Pregnancy's "Your Pregnancy Journey" is a **winding dotted trail** — a progress
 ring, milestone nodes as coloured circles (teal star, gold trophy), labelled

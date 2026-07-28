@@ -766,7 +766,43 @@ class TtcS {
       'Your cycle, ovulation, supplements, tests, sleep, mood and reports - each one optional, each one yours.',
       'Aapka cycle, ovulation, supplements, tests, neend, mood aur reports - har ek optional, har ek aapka.');
 
-  String get calendarTitle => _p('Your command centre', 'Aapka command centre');
+  /// Was "Your command centre" - a cold, corporate phrase sitting in a stage
+  /// whose every other headline is warm.
+  String get calendarTitle =>
+      _p('Everything, in one place', 'Sab kuch, ek jagah');
+
+  // ---- the fertile window summary -------------------------------------------
+  //  The screen used to open with the whole cycle laid out a day at a time -
+  //  fifty-four rows on real data, of which seven carried information and the
+  //  rest said "Low". The one sentence she came for was never stated.
+
+  String get windowYourDays => _p('Your fertile days', 'Aapke fertile din');
+  String windowRange(String from, String to) =>
+      hinglish ? '$from se $to' : '$from to $to';
+  String get windowPeakDay => _p('Most likely', 'Sabse zyada mauka');
+  String get windowOpenNow => _p('Open now', 'Abhi khuli hai');
+  String windowOpensIn(int days) => hinglish
+      ? days == 1
+          ? 'Kal khulti hai'
+          : '$days din mein khulti hai'
+      : days == 1
+          ? 'Opens tomorrow'
+          : 'Opens in $days days';
+  String get windowClosed =>
+      _p('This cycle\'s window has passed', 'Is cycle ki window nikal gayi');
+
+  /// The whole cycle, kept but folded away.
+  String get windowSeeWhole =>
+      _p('See the whole cycle', 'Poora cycle dekhein');
+  String get windowHideWhole => _p('Hide the whole cycle', 'Poora cycle chhupayein');
+
+  /// Shown under the grid when the fertile run does not fit in this month.
+  String continuesInto(String month) => hinglish
+      ? 'Ye fertile window $month tak jaati hai'
+      : 'This fertile window continues into $month';
+  String continuedFrom(String month) => hinglish
+      ? 'Ye fertile window $month se chali aa rahi hai'
+      : 'This fertile window began in $month';
   String get calendarBody => _p(
       'Everything in one place: your cycle, appointments, supplements, tests and the moments you write down.',
       'Sab kuch ek jagah: aapka cycle, appointments, supplements, tests aur wo lamhe jo aap likhti hain.');

@@ -199,6 +199,18 @@ class _ChapterNode extends StatelessWidget {
                     ]),
                     const SizedBox(height: 6),
                     Text(chapter.focus(hi), style: ttcBody(12.5)),
+
+                    // What brings this chapter. The map showed five names and
+                    // never said what moved anyone between them, so "Preparing
+                    // Together" for twenty-eight days read as the app having
+                    // stopped rather than as a stretch with an end.
+                    //
+                    // Same copy the Today hero uses, so the two cannot drift.
+                    if (current) ...[
+                      const SizedBox(height: 8),
+                      Text(chapter.nextUp(hi),
+                          style: ttcBody(11.5, color: ttcPurple, h: 1.45)),
+                    ],
                     if (loops) ...[
                       const SizedBox(height: 8),
                       Row(children: [

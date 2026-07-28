@@ -487,8 +487,16 @@ class _SignalRow extends StatelessWidget {
 //  Fertility Window
 // =============================================================================
 
-class TtcFertilityWindowScreen extends StatelessWidget {
+class TtcFertilityWindowScreen extends StatefulWidget {
   const TtcFertilityWindowScreen({super.key});
+
+  @override
+  State<TtcFertilityWindowScreen> createState() =>
+      _TtcFertilityWindowScreenState();
+}
+
+class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
+  bool _wholeCycleOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -535,14 +543,26 @@ class TtcFertilityWindowScreen extends StatelessWidget {
                         : null,
                   )
                   else ...[
+                    // The answer, stated. This screen used to open with the
+                    // whole cycle a day at a time - fifty-four rows on real
+                    // data, of which seven carried information and the rest
+                    // said "Low". For an anxious reader that is a scrollable
+                    // list of failure, and the one sentence she came for was
+                    // never written down anywhere.
+                    _WindowSummary(today: today, t: t),
+                    const SizedBox(height: 18),
+
+                    // The window itself, as one picture. Keeping that idea from
+                    // the original - "the width is the point" is the reassuring
+                    // fact here - but seven adjacent bars show width, where
+                    // fifty-four bury it.
                     ttcSectionTitle(t.fertilityAcross),
                     TtcCard(
                       child: Column(children: [
-                        // The whole cycle laid out as graded days. Reading it as
-                        // one picture is the point - it shows plainly that the
-                        // window is wide, which is the reassuring fact.
                         for (var day = 1; day <= today.cycleLength; day++)
-                          if (engine.fertilityFor(state, day) != null)
+                          if (engine.fertilityFor(state, day) != null &&
+                              engine.fertilityFor(state, day) !=
+                                  FertilityLevel.low)
                             _DayBar(
                               day: day,
                               level: engine.fertilityFor(state, day)!,
@@ -552,6 +572,48 @@ class TtcFertilityWindowScreen extends StatelessWidget {
                             ),
                       ]),
                     ),
+                    const SizedBox(height: 14),
+
+                    // The rest of the cycle is still available - some people
+                    // want to see it - but folded, so it is a choice rather
+                    // than the first thing she meets.
+                    GestureDetector(
+                      onTap: () =>
+                          setState(() => _wholeCycleOpen = !_wholeCycleOpen),
+                      behavior: HitTestBehavior.opaque,
+                      child: Row(children: [
+                        Text(
+                            _wholeCycleOpen
+                                ? t.windowHideWhole
+                                : t.windowSeeWhole,
+                            style: ttcBody(12.5,
+                                color: ttcPurple, w: FontWeight.w800)),
+                        const SizedBox(width: 3),
+                        Icon(
+                            _wholeCycleOpen
+                                ? Icons.expand_less_rounded
+                                : Icons.expand_more_rounded,
+                            size: 18,
+                            color: ttcPurple),
+                      ]),
+                    ),
+                    if (_wholeCycleOpen) ...[
+                      const SizedBox(height: 12),
+                      TtcCard(
+                        child: Column(children: [
+                          for (var day = 1; day <= today.cycleLength; day++)
+                            if (engine.fertilityFor(state, day) != null)
+                              _DayBar(
+                                day: day,
+                                level: engine.fertilityFor(state, day)!,
+                                isToday: day == today.cycleDay,
+                                isOvulation:
+                                    day == today.estimatedOvulationDay,
+                                t: t,
+                              ),
+                        ]),
+                      ),
+                    ],
                   ],
                 ],
                 const SizedBox(height: 16),
@@ -561,6 +623,82 @@ class TtcFertilityWindowScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The answer, before the picture.
+///
+/// Stated in DATES, not cycle days. "Days 35 to 41" is how the engine thinks;
+/// "12 to 18 August" is how someone plans a week.
+class _WindowSummary extends StatelessWidget {
+  const _WindowSummary({required this.today, required this.t});
+
+  final TtcToday today;
+  final TtcS t;
+
+  static const _m = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  static String _fmt(DateTime d) => '${d.day} ${_m[d.month - 1]}';
+
+  @override
+  Widget build(BuildContext context) {
+    final start = CycleStore.instance.lastPeriodStart;
+    final ov = today.estimatedOvulationDay;
+    if (start == null || ov == null) return const SizedBox.shrink();
+
+    // Sperm survive about five days, the egg about one.
+    final opensDay = ov - 5;
+    final closesDay = ov + 1;
+    DateTime dateOf(int cycleDay) =>
+        start.add(Duration(days: cycleDay - 1));
+
+    final cycleDay = today.cycleDay ?? 0;
+    final status = cycleDay > closesDay
+        ? t.windowClosed
+        : cycleDay >= opensDay
+            ? t.windowOpenNow
+            : t.windowOpensIn(opensDay - cycleDay);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [ttcPurple, Color(0xFF8B4FD0)],
+        ),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Expanded(
+            child: Text(t.windowYourDays,
+                style: ttcBody(11.5,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    w: FontWeight.w800)),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(status,
+                style: ttcBody(10.5, color: Colors.white, w: FontWeight.w800)),
+          ),
+        ]),
+        const SizedBox(height: 9),
+        Text(t.windowRange(_fmt(dateOf(opensDay)), _fmt(dateOf(closesDay))),
+            style: ttcFraunces(24, w: FontWeight.w600, color: Colors.white)),
+        const SizedBox(height: 8),
+        Text('${t.windowPeakDay} · ${_fmt(dateOf(ov))}',
+            style: ttcBody(12.5,
+                color: Colors.white.withValues(alpha: 0.92),
+                w: FontWeight.w700)),
+      ]),
     );
   }
 }
