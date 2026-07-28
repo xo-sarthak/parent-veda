@@ -57,40 +57,41 @@ class TtcPartnerTodayScreen extends StatelessWidget {
         final insights = ttcInsights.where((i) => i.forPartner).toList();
         final insight = ttcPickForToday(insights, offset: 1);
 
-        return Scaffold(
-          backgroundColor: ttcSlateBg,
-          body: Stack(children: [
-            Positioned.fill(
-              child: SafeArea(
-                bottom: false,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                      ttcGutter, 8, ttcGutter, ttcBottomInset),
-                  children: [
-                    _Header(t: t),
-                    const SizedBox(height: 18),
-                    _Hero(chapter: chapter, today: today, t: t),
-                    const SizedBox(height: 20),
+        // His half was a raw Scaffold with no navigation at all: five cards,
+        // and the only way out was toggling back to Her. He could not reach
+        // Prepare, Tools, Calendar or Community from his own home.
+        //
+        // Same five destinations as hers, not a reduced set. Per-user
+        // navigation is forbidden - personalisation changes content, ranking
+        // and order, never structure - and the father shell in pregnancy makes
+        // the same choice: one scaffold, his content inside it.
+        //
+        // The shared tabs are safe for him by construction rather than by a
+        // check here: his device has no rows in ttc_cycles, so the Calendar
+        // simply has no cycle to draw. The privacy comes from the own-row rule,
+        // which is where it belongs.
+        return TtcPage(
+          tab: 0,
+          slate: true,
+          overlay: _ModePill(t: t, him: true),
+          children: [
+            _Header(t: t),
+            const SizedBox(height: 18),
+            _Hero(chapter: chapter, today: today, t: t),
+            const SizedBox(height: 20),
 
-                    _MissionCard(mission: mission, t: t),
-                    const SizedBox(height: 12),
-                    _SupportCard(brief: brief, t: t),
-                    const SizedBox(height: 12),
-                    _YourBodyCard(brief: brief, t: t),
-                    const SizedBox(height: 12),
-                    _LearnCard(insight: insight, t: t),
-                    const SizedBox(height: 12),
-                    _AskVedaCard(t: t),
-                    const SizedBox(height: 12),
-                    _JournalCard(t: t),
-                  ],
-                ),
-              ),
-            ),
-            // The dev-only Her | Him switch, mirroring the pregnancy shell's
-            // Mom | Dad pill. Remove before launch.
-            Positioned(right: 14, bottom: 26, child: _ModePill(t: t, him: true)),
-          ]),
+            _MissionCard(mission: mission, t: t),
+            const SizedBox(height: 12),
+            _SupportCard(brief: brief, t: t),
+            const SizedBox(height: 12),
+            _YourBodyCard(brief: brief, t: t),
+            const SizedBox(height: 12),
+            _LearnCard(insight: insight, t: t),
+            const SizedBox(height: 12),
+            _AskVedaCard(t: t),
+            const SizedBox(height: 12),
+            _JournalCard(t: t),
+          ],
         );
       },
     );

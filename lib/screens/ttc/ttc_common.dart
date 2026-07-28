@@ -471,10 +471,18 @@ void openTtc(BuildContext context) {
 /// component shape - active tab expands into a filled pill with icon AND label,
 /// so the parent always knows what each tab is.
 class TtcBottomNav extends StatelessWidget {
-  const TtcBottomNav({super.key, required this.active});
+  const TtcBottomNav({super.key, required this.active, this.slate = false});
 
   /// 0 = Today · 1 = Prepare · 2 = Tools · 3 = Calendar · 4 = Community
   final int active;
+
+  /// The partner's palette. Same five destinations, his colours.
+  ///
+  /// Deliberately NOT a reduced tab set. Per-user navigation is forbidden -
+  /// personalisation changes content, ranking and order, never structure - and
+  /// the father shell in pregnancy follows the same rule: one scaffold, his
+  /// content inside it.
+  final bool slate;
 
   static const List<(IconData, String)> _tabs = [
     (Icons.home_rounded, 'Today'),
@@ -517,7 +525,7 @@ class TtcBottomNav extends StatelessWidget {
         padding:
             EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
         decoration: BoxDecoration(
-          color: on ? ttcPurple : Colors.transparent,
+          color: on ? (slate ? ttcSlate : ttcPurple) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: on
@@ -553,7 +561,11 @@ class TtcPage extends StatefulWidget {
     required this.children,
     this.header,
     this.overlay,
+    this.slate = false,
   });
+
+  /// Renders the partner's palette instead of hers.
+  final bool slate;
 
   final int tab;
   final List<Widget> children;
@@ -593,7 +605,7 @@ class _TtcPageState extends State<TtcPage> {
     final overlay = widget.overlay;
     final children = widget.children;
     return Scaffold(
-      backgroundColor: ttcBg,
+      backgroundColor: widget.slate ? ttcSlateBg : ttcBg,
       body: Stack(children: [
         Positioned.fill(
           child: SafeArea(
@@ -613,7 +625,9 @@ class _TtcPageState extends State<TtcPage> {
           left: 14,
           right: 14,
           bottom: 14,
-          child: SafeArea(top: false, child: TtcBottomNav(active: tab)),
+          child: SafeArea(
+              top: false,
+              child: TtcBottomNav(active: tab, slate: widget.slate)),
         ),
       ]),
     );
@@ -628,13 +642,9 @@ class _TtcPageState extends State<TtcPage> {
 /// The profile entry is now part of the header itself rather than something
 /// each tab remembers to pass, so no tab can be the one that forgets.
 class TtcHeader extends StatelessWidget {
-  const TtcHeader({super.key, this.trailing, this.showProfile = true});
+  const TtcHeader({super.key, this.trailing});
 
   final Widget? trailing;
-
-  /// Off only where a profile door would be wrong - the partner's view, which
-  /// is not his account.
-  final bool showProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -652,7 +662,7 @@ class TtcHeader extends StatelessWidget {
       ),
       const Spacer(),
       ?trailing,
-      if (showProfile) ...[
+      ...[
         if (trailing != null) const SizedBox(width: 10),
         GestureDetector(
           onTap: () => openTtcProfile(context),
