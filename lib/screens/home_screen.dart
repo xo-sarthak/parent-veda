@@ -57,6 +57,7 @@ class HomeScreen extends StatelessWidget {
     if (fatherMode) {
       return FatherHomeScreen(
         pregnancy: pregnancy,
+        home: home,
         father: father,
         fatherMode: fatherMode,
         onFatherModeChanged: onFatherModeChanged,

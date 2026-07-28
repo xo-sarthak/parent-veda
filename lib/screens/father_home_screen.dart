@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_language.dart';
 import '../services/father_content_controller.dart';
+import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/father/father_modules.dart';
@@ -23,12 +24,18 @@ class FatherHomeScreen extends StatefulWidget {
   const FatherHomeScreen({
     super.key,
     required this.pregnancy,
+    required this.home,
     required this.father,
     required this.fatherMode,
     required this.onFatherModeChanged,
   });
 
   final PregnancyController pregnancy;
+
+  /// The MOTHER's daily content. His day is derived from it — one shared pool,
+  /// voiced for him. See lib/models/father_day_derive.dart.
+  final HomeContentController home;
+
   final FatherContentController father;
   final bool fatherMode;
   final ValueChanged<bool> onFatherModeChanged;
@@ -44,7 +51,8 @@ class _FatherHomeScreenState extends State<FatherHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.pregnancy, widget.father]),
+      animation:
+          Listenable.merge([widget.pregnancy, widget.home, widget.father]),
       builder: (context, _) => _buildBody(context),
     );
   }
@@ -63,7 +71,10 @@ class _FatherHomeScreenState extends State<FatherHomeScreen> {
     // day of pregnancy.
     final activeDay = father.previewDay ?? pregnancy.currentDay;
     final week = (((activeDay - 1) ~/ 7) + 1).clamp(4, 40);
-    final day = father.dayFor(activeDay, week);
+    // His day comes from her week: an authored father day wins if one exists,
+    // otherwise it is derived. Without this he saw day 143 every day.
+    final day = father.dayFor(activeDay, week,
+        motherWeek: widget.home.daysInWeek(week));
 
     if (day == null) {
       return SafeArea(

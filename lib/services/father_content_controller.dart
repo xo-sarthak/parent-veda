@@ -18,6 +18,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/father_day.dart';
+import '../models/father_day_derive.dart';
+import '../models/home_day.dart';
 import '../models/father_week.dart';
 import '../models/father_week_derive.dart';
 import '../models/week_content.dart';
@@ -116,26 +118,22 @@ class FatherContentController extends ChangeNotifier {
   /// The father moment for [day] of pregnancy (1–280), within [week]. Prefers an
   /// exact day match, then the nearest authored day in the same week, then the
   /// nearest authored day overall. Null if nothing loaded.
-  FatherDay? dayFor(int day, int week) {
-    if (_days.isEmpty) return null;
+  /// The father moment for [day] of pregnancy (1-280), within [week].
+  ///
+  /// THE NEAREST-DAY FALLBACK IS GONE. With one authored file it returned day
+  /// 143 for every day of the pregnancy, so a father at week 34 read a week-20
+  /// card and nothing anywhere said so.
+  ///
+  /// Now: an authored day wins if one exists, and otherwise the day is DERIVED
+  /// from the mother's week, which is written and reviewed for all 259 days.
+  /// Pass [motherWeek] from HomeContentController.daysInWeek(week).
+  FatherDay? dayFor(int day, int week, {List<HomeDay> motherWeek = const []}) {
     for (final d in _days) {
       if (d.day == day) return d;
     }
-    FatherDay? sameWeek;
-    for (final d in _days) {
-      if (d.week == week) {
-        if (sameWeek == null ||
-            (d.day - day).abs() < (sameWeek.day - day).abs()) {
-          sameWeek = d;
-        }
-      }
-    }
-    if (sameWeek != null) return sameWeek;
-    FatherDay nearest = _days.first;
-    for (final d in _days) {
-      if ((d.day - day).abs() < (nearest.day - day).abs()) nearest = d;
-    }
-    return nearest;
+    if (motherWeek.isNotEmpty) return fatherDayFromMother(day, week, motherWeek);
+    // Nothing authored and no mother content loaded yet.
+    return null;
   }
 
   /// The Weekly Journey for [week] (4–40), filled out from her matching week.

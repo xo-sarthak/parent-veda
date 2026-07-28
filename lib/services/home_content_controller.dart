@@ -99,6 +99,13 @@ class HomeContentController extends ChangeNotifier {
   /// The day content for the mother's [day] of pregnancy (1–280), within
   /// [week]. Prefers an exact day match, then the nearest authored day in the
   /// same week, then the nearest authored day overall. Null if nothing loaded.
+  /// Every authored day in [week], ascending. Exposed so Father Mode can build
+  /// his day from the same pool rather than needing a second 259-day corpus of
+  /// its own — see lib/models/father_day_derive.dart.
+  List<HomeDay> daysInWeek(int week) =>
+      (_days.where((d) => d.week == week).toList()
+        ..sort((a, b) => a.day.compareTo(b.day)));
+
   HomeDay? dayFor(int day, int week) {
     if (_days.isEmpty) return null;
     for (final d in _days) {

@@ -510,20 +510,23 @@ Two specific things a human should look at:
   specifically a father — they derive from `partnerCorner.oneMission`. Nothing
   is wrong in them; the question is whether the voice is his.
 
-## 10.2 Father DAILY content is still one prototype day
+## 10.2 Father DAILY copy is derived, and is a working draft
 
-Separate from the weekly, and **not fixed by this work.**
-`lib/data/father/fatherDailyContent.json` holds **one entry: day 143, week 20**.
-The loader expects `week_04.json … week_40.json` and none exist, so `dayFor()`
-falls back to the nearest authored day — which is always day 143.
+**The one-prototype-day bug is fixed** (see §12). What remains is the same note
+as §10.1: the father's daily card is now built from the mother's 259-day pool,
+re-voiced, and that is a working arrangement rather than authored father copy.
 
-So the Daily Moment shows the same content every day of the pregnancy, exactly
-the way the weekly did before. It has no derivation path because there is no
-per-day mother content to derive from, so this one genuinely needs writing:
-roughly 259 days, or a decision to author it per week rather than per day.
+Two things a human should decide when real copy exists:
 
-The weekly fix does **not** cover this. It is the same class of silent failure,
-still live.
+* **The Learn card is her `grow` block verbatim.** It reads fine to a father —
+  it is parenting wisdom, not pregnancy education — but it is her wording.
+* **The mission lead-ins are three fixed strings** ("Do this with her today",
+  "Say this to her today", "Make this happen for her today"), chosen by the
+  nurture type. Three phrases across 259 days will start to feel like a
+  template; more variants, or per-week ones, would fix that cheaply.
+
+Dropping an authored `journey`-style father day file in still overrides the
+derivation for that day — the precedence is the same as the weekly.
 
 ## 10.3 Content brief is a snapshot, not an inventory
 
@@ -535,12 +538,101 @@ belongs to the other terminal.
 
 ---
 
-# 11. Closed
+# 11. Sponsor / enterprise programme
+
+*Opened 2026-07-28 alongside the entitlement engine build. Full scoping in
+`docs/ADMIN-PANEL.md` §7; these are the points deliberately left open.*
+
+## 11.1 Where HR actually sees their stats — UNDECIDED
+
+The aggregation views are the product; the screen over them is a thin renderer.
+That is deliberate, because the surface is not settled:
+
+* **In-app** (a `sponsor_admin` capability revealing a Programme section) reuses
+  auth, sessions, RLS and the design system — nothing new to secure. But HR
+  works at a desk, a phone is a poor surface for a dense table, and some HR
+  contacts are not parents, so "install our pregnancy app to see your
+  dashboard" is an odd ask mid-procurement.
+* **Web** (`/portal` in `C:\parentveda-web`) has the right ergonomics but no
+  authentication exists there at all today.
+
+**A security point worth recording, because it will come up again:** a guessable
+URL like `/acme` is not the risk. The URL must never determine access — the
+session must. Resolve `sponsor_id` from the authenticated user and scope every
+query to it in Postgres, exactly as `expert_roster()` derives the expert from
+`auth.uid()` rather than a parameter. Then a guessed URL returns nothing.
+
+**Decision deferred on purpose.** Both surfaces read the same views, so this is
+a front-end choice made later, not an architecture one made now.
+
+## 11.2 "Download" should be a report, not an export
+
+HR forwards numbers to leadership far more often than they browse. A raw CSV
+makes that their formatting problem. The deliverable is a consistent, branded
+report — same shape every month, ready to forward. Treat it as a first-class
+output rather than an afterthought on whichever screen wins §11.1.
+
+## 11.3 Usage analytics — wanted, not built
+
+The sponsor dashboard ships with **activation, seats and consultations**, all
+derivable from real tables. Not available, and asked for:
+
+* average time spent in the app, per employee cohort
+* session frequency / monthly-active depth
+* feature and capability adoption
+
+All three need a **usage event stream the app does not have**. `profile_events`
+(0028) is anonymous by design (`install_id`, no `user_id`) and tracks profiling
+strips only, so it cannot answer them.
+
+Wanted for the product generally, not only for sponsors — "how long is someone
+spending in the app" is a question worth answering for ParentVeda itself.
+Deliberately out of the first build because every event is a privacy surface in
+a product whose promise is that the employer sees nothing personal, and it
+should be designed once, properly, rather than bolted onto a sponsor feature.
+
+## 11.4 Leavers
+
+Work-email domain verification cannot tell that someone left the company. Seats
+reclaim only at renewal unless an eligibility file (an HR-uploaded roster) is
+added. That feature is normally what forces a portal to exist, and it is
+deliberately out of v1.
+
+## 11.6 Activation codes have no sender — LAUNCH BLOCKER for sponsors
+
+`0058` creates the one-time code, its expiry, the attempt limit and the
+verification. **Nothing sends it.** There is no transactional email provider
+wired to this project — WhatsApp via MSG91 is the only outbound channel that
+exists, and a work-email benefit cannot verify a work email over WhatsApp.
+
+So `request_sponsor_activation()` writes a valid code that never reaches anyone,
+and `confirm_sponsor_activation()` can only be completed by reading the code out
+of the database. **The activation flow is inert until an edge function sends the
+email.** Stated rather than assumed, per CLAUDE.md: either both halves land or
+the app half is inert and we say so.
+
+Needs: an email provider (Resend/SES/Postmark), an edge function triggered by
+the insert, and a template. Roughly a day, but it is somebody's decision which
+provider.
+
+**Do not be tempted to skip the code.** Without it, anyone who types
+`someone@google.com` gets Premium — the domain list becomes free access for the
+internet. The code is the only thing proving control of the address.
+
+## 11.5 Company-uploaded resources are third-party content in a health product
+
+Sponsors upload documents that render inside the app. Needs a review path and a
+hard rule that they are never medical advice, before any sponsor uploads.
+
+---
+
+# 12. Closed
 
 Kept so the reasoning survives.
 
 | Item | Outcome | When |
 |---|---|---|
+| **Father Mode showed one prototype day for the whole pregnancy** | Only day 143 was ever authored and `dayFor()` returned "the nearest authored day", so every father read a week-20 card from week 4 to week 40 — the same shape as the weekly bug, in the other module. His day is now derived from the mother's 259-day pool, shuffled within the week so the two rarely open the same card. The shuffle also carries the safety filter: 37 of her `grow` blocks speak to her body ("Your Body Is Already Parenting"), and no week has more than 3 of 7 flagged, so walking the week for a father-safe day always finds one. Her `nurture.content` (60 flagged of 259) is never shown to him at all; the mission is re-framed from its title and one-line remember | 2026-07-28 |
 | Migrations `0043_ttc_treatment.sql` and `0044_ttc_care_pathway.sql` were written but not applied | Both applied. `0043` means treatment dates reach his phone too — a retrieval date is not one person's. `0044` is the one that mattered most: until it ran, her two pathway answers stayed device-local, so **his** app fell back to the pathway default. On an unmonitored letrozole cycle her side correctly gave the fertile window back and his still behaved as though a clinic owned the timing — the exact defect the care-pathway work existed to fix, live on the partner's device | 2026-07-27 |
 | **The app could not tell a due date it calculated from one a clinic gave** | The pregnancy version of the IVF window, and the stage with real users. The Due Date Calculator has always asked *how* she got the date — last period, conception, IVF transfer, ultrasound, "my doctor told me" — and then threw the answer away. Now `DueDateSource` travels with it: three of the five are the clinic's, and when one of those is the source, gestational age is theirs. Where she used a last period, the calculator says plainly that a scan date should replace it. `unknown` counts as **ours**, because assuming a clinic gave a date we cannot account for would silence our estimate on no evidence | 2026-07-27 |
 | Both pathway questions asked about clinical **events**, not the principle | "Is your clinic tracking this with scans?" and "are you on medication that controls ovulation?" are proxies. A natural-cycle FET has no scan-and-trigger and the clinic still owns the timing; a fully medicated transfer has no trigger at all; letrozole is medication and is about ovulation, so an unmonitored patient could answer yes and lose the window she should have kept. They now ask *is your clinic deciding the important dates* and *has medication taken over when it happens*, with the events demoted to an examples line so she does not have to translate her cycle into our vocabulary | 2026-07-27 |
