@@ -19,6 +19,8 @@ import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../ttc/ttc_prepare_data.dart';
+import '../../ttc/ttc_chapter.dart';
+import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
@@ -39,7 +41,19 @@ class TtcPrepareScreen extends StatelessWidget {
           tab: 1,
           header: const TtcHeader(),
           children: [
-            ttcSectionTitle(t.prepareTitle, eyebrow: t.tabPrepare),
+            // Eyebrow carries WHERE she is, the way pregnancy's Prepare says
+            // "30 WEEKS · THIRD TRIMESTER". "PREPARE" alone told her nothing
+            // she did not already know from the tab she just tapped.
+            ttcEyebrow(
+                '${t.tabPrepare.toUpperCase()} · '
+                '${TtcStore.instance.today.chapter.title(hi).toUpperCase()}',
+                color: ttcCoral),
+            const SizedBox(height: 8),
+            // Fraunces, matching pregnancy's serif Prepare headline. This is
+            // the commerce surface, and it was the plainest page in the stage.
+            Text(t.prepareTitle,
+                style: ttcFraunces(26, w: FontWeight.w600, color: ttcTitleInk)),
+            const SizedBox(height: 10),
             Text(t.prepareBody, style: ttcBody(14, h: 1.6)),
             const SizedBox(height: 20),
 

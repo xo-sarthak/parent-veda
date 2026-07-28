@@ -341,7 +341,21 @@ top and a void beneath.
 * **A-50.** It is a plain page — no progress, no font control, no theme, no
   read-next, no save. The parenting stage has a full reader with all of it. The
   clearest uniformity gap in the stage.
-* **A-51.** *"45 sec read"* on roughly 60 words.
+* **A-51 — fixed.** *"45 sec read"* was a flat default every insight inherited,
+  so a sixty-word piece and a three-hundred-word one claimed the same length.
+  Now counted from the words actually written, floored at fifteen seconds.
+
+> **A-50 / A-68 status: half done, and the other half is a commission.**
+>
+> `TtcInsight` carries title, body and takeaway — there is **no field** for
+> pregnancy's *"A little deeper"* layer. Adding one means authoring
+> **twenty-four new explainers about fertility**: content commissioning, not a
+> UI change, and not something to invent unreviewed. Left open deliberately.
+>
+> What pregnancy's **REMEMBER** panel does, *"Today's takeaway"* already did
+> here — that half was satisfied before the audit started.
+>
+> Still open from A-50: read-next, save, font control, themes.
 
 ## Ask Veda in TTC
 

@@ -563,7 +563,7 @@ class _InsightCard extends StatelessWidget {
         Row(children: [
           ttcEyebrow(t.todaysInsight),
           const Spacer(),
-          Text(t.readSeconds(insight.readSeconds),
+          Text(t.readSeconds(insight.readTime(hi)),
               style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
         ]),
         const SizedBox(height: 10),

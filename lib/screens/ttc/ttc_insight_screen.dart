@@ -51,7 +51,7 @@ class TtcInsightScreen extends StatelessWidget {
                             ttcBody(11, color: ttcPurple, w: FontWeight.w800)),
                   ),
                   const SizedBox(width: 9),
-                  Text(t.readSeconds(insight.readSeconds),
+                  Text(t.readSeconds(insight.readTime(hi)),
                       style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
                 ]),
                 const SizedBox(height: 14),

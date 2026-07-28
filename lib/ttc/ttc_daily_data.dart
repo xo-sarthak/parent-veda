@@ -75,7 +75,23 @@ class TtcInsight {
   final String takeawayEn;
   final String takeawayHi;
 
+  /// Declared, but only used as a fallback.
+  ///
+  /// Every insight inherited the default of 45 seconds, so a sixty-word piece
+  /// and a three-hundred-word one both claimed the same length. Prefer
+  /// [readTime], which counts the words actually written.
   final int readSeconds;
+
+  /// Seconds to read THIS piece, from its own length.
+  ///
+  /// ~200 words a minute, floored at fifteen so a short piece does not claim
+  /// to be instant. Computed rather than declared, because a number nobody
+  /// updates when the copy changes is worse than no number.
+  int readTime(bool hi) {
+    final words = (hi ? bodyHi : bodyEn).split(RegExp(r'\s+')).length;
+    final seconds = (words / 200 * 60).round();
+    return seconds < 15 ? 15 : seconds;
+  }
 
   /// Whether this also appears on the partner's Today. Most do - male fertility
   /// is half the picture and the stage is built for two.
