@@ -312,6 +312,31 @@ class TtcS {
       'Your temperature the moment you wake, before sitting up, taken at the same time each day with a basal thermometer. It rises AFTER ovulation, so it confirms what happened rather than predicting what will - useful for learning your pattern over months, not for timing this week.',
       'Jagte hi, uthne se pehle, roz ek hi waqt par basal thermometer se liya gaya temperature. Ye ovulation ke BAAD badhta hai - yaani jo ho chuka use confirm karta hai, aage ka nahi batata. Mahino mein pattern samajhne ke liye kaam ka, is hafte ki timing ke liye nahi.');
 
+  // ---- declaring the care pathway -------------------------------------------
+  //  This is what made the whole care-pathway system unreachable: TtcStore had
+  //  setPath, nothing in the app ever called it, and the card that leads to the
+  //  two questions only rendered once a non-natural path was already set. So a
+  //  woman on IVF got the natural-cycle experience - a fertile window, an
+  //  ovulation estimate, and a countdown to a period her progesterone was
+  //  delaying - and no way to tell us otherwise.
+
+  String get pathwayEntry =>
+      _p('Having treatment?', 'Kya aap treatment le rahi hain?');
+  String get pathwayEntryBody => _p(
+      'If a clinic is involved in this cycle, telling us changes what we show you - and stops us putting our numbers next to theirs.',
+      'Agar is cycle mein clinic shaamil hai, toh humein batayein - isse hum jo dikhate hain wo badal jaata hai, aur hum apne numbers unke saath nahi rakhte.');
+
+  String get pathwayChooseTitle =>
+      _p('What are you doing this cycle?', 'Is cycle mein aap kya kar rahi hain?');
+  String get pathwayChooseBody => _p(
+      'You can change this whenever it changes. Nothing you have logged is affected.',
+      'Jab bhi badle, aap ise badal sakti hain. Aapka logged data waisa hi rehta hai.');
+
+  /// Reassurance under the natural option, because choosing it should not feel
+  /// like admitting to something.
+  String get pathwayNaturalNote =>
+      _p('No clinic involved this cycle', 'Is cycle mein koi clinic nahi');
+
   /// Above the prompt offered on an empty journal.
   String get journalPromptEyebrow =>
       _p('If you want somewhere to start', 'Agar shuru karne ki jagah chahiye');

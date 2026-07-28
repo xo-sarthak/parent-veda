@@ -415,6 +415,39 @@ class _RhythmCard extends StatelessWidget {
             ]),
           ),
         ]),
+
+        // The way IN to the care pathway.
+        //
+        // Everything about treatment cycles was gated behind a card that only
+        // appeared once a clinic path was already set - and nothing in the app
+        // could set one. This is the door that was missing, and it belongs
+        // exactly here: on the card whose numbers stop being right the moment
+        // a clinic takes over the timing.
+        const SizedBox(height: 12),
+        ttcDivider(),
+        const SizedBox(height: 12),
+        GestureDetector(
+          onTap: () => openTtcTreatment(context),
+          behavior: HitTestBehavior.opaque,
+          child: Row(children: [
+            const Icon(Icons.local_hospital_outlined,
+                size: 16, color: ttcMuted),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.pathwayEntry,
+                        style: ttcBody(12.5,
+                            color: ttcInk, w: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    Text(t.pathwayEntryBody,
+                        style: ttcBody(11, color: ttcMuted, h: 1.4)),
+                  ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 17, color: ttcMuted),
+          ]),
+        ),
       ]),
     );
   }

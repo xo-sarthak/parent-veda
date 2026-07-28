@@ -111,6 +111,19 @@ class TtcTreatmentScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                 ],
 
+                // WHICH pathway, before the two questions about it.
+                //
+                // This is the wiring that was missing entirely. TtcStore.setPath
+                // had no caller anywhere in the app, and the card that leads
+                // here only rendered once a non-natural path was set - so the
+                // only way in was through a door that could not open until you
+                // were already through it. Every user stayed on `natural`, and
+                // the whole ownership model, the two questions, the treatment
+                // cycle, the trigger reminders and the beta countdown were
+                // unreachable code with forty-seven passing tests over the top.
+                const TtcPathChooser(),
+                const SizedBox(height: 20),
+
                 // Asked here rather than at signup: this is where she has come
                 // BECAUSE the app stopped predicting, so it is the one moment
                 // the questions obviously earn their place.
@@ -483,6 +496,79 @@ bool ttcShowTreatment() => TtcStore.instance.behaviour.showsClinicTimeline;
 ///
 /// So we ask. It is two taps, and getting it right is the difference between
 /// being useful and being switched off for no reason.
+/// The five pathways, as a list she picks from.
+///
+/// Ordered natural-first and worded so choosing "no clinic" does not read as
+/// admitting to something. Changing it is explicitly reversible - a cycle can
+/// go from IUI back to natural, and a chooser that felt permanent would stop
+/// people using it honestly.
+class TtcPathChooser extends StatelessWidget {
+  const TtcPathChooser({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([TtcStore.instance, TtcLang.instance]),
+      builder: (context, _) {
+        final t = TtcS.current();
+        final hi = t.hinglish;
+        final current = TtcStore.instance.path;
+
+        return TtcCard(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t.pathwayChooseTitle, style: ttcJakarta(16)),
+            const SizedBox(height: 8),
+            Text(t.pathwayChooseBody, style: ttcBody(12.5, h: 1.55)),
+            const SizedBox(height: 16),
+            for (final path in TtcPath.values) ...[
+              GestureDetector(
+                onTap: () => TtcStore.instance.setPath(path),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 9),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                  decoration: BoxDecoration(
+                    color: path == current ? ttcPurple : ttcPanel,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(path.label(hi),
+                                style: ttcBody(13.5,
+                                    color: path == current
+                                        ? Colors.white
+                                        : ttcInk,
+                                    w: FontWeight.w700)),
+                            if (path == TtcPath.natural) ...[
+                              const SizedBox(height: 3),
+                              Text(t.pathwayNaturalNote,
+                                  style: ttcBody(11,
+                                      color: path == current
+                                          ? Colors.white
+                                              .withValues(alpha: 0.85)
+                                          : ttcMuted)),
+                            ],
+                          ]),
+                    ),
+                    if (path == current)
+                      const Icon(Icons.check_rounded,
+                          size: 17, color: Colors.white),
+                  ]),
+                ),
+              ),
+            ],
+          ]),
+        );
+      },
+    );
+  }
+}
+
 class TtcPathwayQuestions extends StatelessWidget {
   const TtcPathwayQuestions({super.key});
 
