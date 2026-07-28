@@ -484,13 +484,19 @@ class TtcBottomNav extends StatelessWidget {
   /// content inside it.
   final bool slate;
 
-  static const List<(IconData, String)> _tabs = [
-    (Icons.home_rounded, 'Today'),
-    (Icons.school_rounded, 'Prepare'),
-    (Icons.widgets_rounded, 'Tools'),
-    (Icons.calendar_today_rounded, 'Calendar'),
-    (Icons.groups_rounded, 'Community'),
+  /// Icons only. The labels used to be hardcoded English here, so the one part
+  /// of the stage visible on EVERY screen was the one part that never
+  /// translated - the whole app in Hinglish with an English nav under it.
+  static const List<IconData> _icons = [
+    Icons.home_rounded,
+    Icons.school_rounded,
+    Icons.widgets_rounded,
+    Icons.calendar_today_rounded,
+    Icons.groups_rounded,
   ];
+
+  static List<String> _labels(TtcS t) =>
+      [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
 
   void _tap(BuildContext context, int i) {
     if (i == active) return;
@@ -509,13 +515,17 @@ class TtcBottomNav extends StatelessWidget {
               color: Color(0x292D144C), blurRadius: 28, offset: Offset(0, 8))
         ],
       ),
-      child: Row(children: [for (int i = 0; i < _tabs.length; i++) _item(context, i)]),
+      child: Row(children: [
+        for (int i = 0; i < _icons.length; i++) _item(context, i)
+      ]),
     );
   }
 
   Widget _item(BuildContext context, int i) {
     final on = i == active;
-    final (icon, label) = _tabs[i];
+    final t = TtcS.current();
+    final icon = _icons[i];
+    final label = _labels(t)[i];
     final child = GestureDetector(
       onTap: () => _tap(context, i),
       behavior: HitTestBehavior.opaque,

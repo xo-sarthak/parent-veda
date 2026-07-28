@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_community_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_prepare_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_profile_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -150,14 +151,39 @@ void main() {
   });
 
   // ===========================================================================
-  group('the stage switch actually moves the app', () {
-    testWidgets('it sets the life stage to pregnancy', (tester) async {
+  group('the stage switch', () {
+    testWidgets('sets the life stage to pregnancy', (tester) async {
       expect(LifeStageStore.instance.stage, isNot(LifeStage.pregnancy));
       await pumpTall(tester, const TtcProfileScreen());
       await tester.tap(find.text('Go to pregnancy'));
       await tester.pumpAndSettle();
       expect(LifeStageStore.instance.stage, LifeStage.pregnancy,
           reason: 'the switch did not reach LifeStageStore');
+    });
+
+    testWidgets('and says so when there is nowhere to pop back to',
+        (tester) async {
+      // The first version popped to the first route unconditionally. When the
+      // splash had booted TTC, that route WAS ttc/today - so the stage was set
+      // correctly and the screen never changed, which reads as a dead button.
+      tester.view.physicalSize = const Size(1200, 6000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        key: UniqueKey(),
+        // Mimic the splash: TTC as the FIRST route, nothing beneath it.
+        onGenerateRoute: (_) => MaterialPageRoute<void>(
+          settings: const RouteSettings(name: ttcHomeRoute),
+          builder: (_) => const TtcProfileScreen(),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Go to pregnancy'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Close and reopen'), findsOneWidget,
+          reason: 'a button that appears to do nothing is worse than one that '
+              'explains itself');
     });
   });
 }

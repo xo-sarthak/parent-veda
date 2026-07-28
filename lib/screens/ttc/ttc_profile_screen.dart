@@ -209,14 +209,52 @@ class TtcProfileScreen extends StatelessWidget {
   /// Deliberately does NOT touch the due date or write a timeline event - that
   /// is what the positive-test transition is for, and conflating the two would
   /// make a testing switch look like a life event.
+  /// Hands the app back to the pregnancy shell where that is possible, and says
+  /// so plainly where it is not.
+  ///
+  /// There are two different stacks underneath this button and they behave
+  /// differently:
+  ///
+  ///   * entered through the door on the pregnancy home - the pregnancy shell
+  ///     is still the first route, so popping to it works immediately.
+  ///   * booted here by the splash - `ttc/today` IS the first route, and
+  ///     `MainScaffold` needs controllers that live in `main.dart`, which
+  ///     nothing in this folder can reach. There is nothing to pop back TO.
+  ///
+  /// The first version popped to the first route unconditionally, which in the
+  /// second case landed exactly where it started: the stage was set correctly
+  /// and the screen never changed, so it read as a dead button.
+  ///
+  /// The real fix is an app-level swap on LifeStageStore, mirroring how
+  /// DoctorSession already swaps the whole app from `main.dart`'s builder. That
+  /// would also make the positive-test transition land immediately instead of
+  /// on next launch. It touches app boot for all three stages, so it is written
+  /// up rather than done here.
   Future<void> _toPregnancy(BuildContext context) async {
     final nav = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final t = TtcS.current();
+
     LifeStageStore.instance.setStage(LifeStage.pregnancy);
-    try {
-      await (await SharedPreferences.getInstance())
-          .setString(LifeStageStore.kLifeStageKey, LifeStage.pregnancy.id);
-    } catch (_) {/* best-effort, same as every other TTC write */}
-    nav.popUntil((r) => r.isFirst);
+
+    // The predicate runs against the top route as it unwinds, so the last one
+    // it sees is the first route - which tells us which stack we are in.
+    var ttcIsRoot = false;
+    nav.popUntil((r) {
+      if (r.isFirst) {
+        ttcIsRoot = r.settings.name == ttcHomeRoute;
+        return true;
+      }
+      return false;
+    });
+
+    if (ttcIsRoot) {
+      messenger.showSnackBar(SnackBar(
+        content: Text(t.stageSetReopen),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+      ));
+    }
   }
 
   /// Same shape as the pregnancy Profile's: clear the session and the local

@@ -451,8 +451,14 @@ class TtcS {
   String get partnerAboutHimself => _p('This one is about you', 'Ye aapke baare mein hai');
   String get partnerReadTogether => _p('Read together', 'Saath padhein');
   String get partnerSwitch => _p('Her view', 'Unka view');
-  String get partnerHim => _p('Him', 'Unka');
-  String get partnerHer => _p('Her', 'Unka');
+  /// Both of these were 'Unka' - the same word on both halves of a two-way
+  /// switch, so in Hinglish there was no way to tell which side you were on.
+  ///
+  /// "Aap" and "Partner" rather than a gendered pronoun pair, because that is
+  /// how the rest of the stage already addresses them: "Aapka partner", "Aap
+  /// dono". She is the one holding the phone; he is the partner.
+  String get partnerHim => _p('Him', 'Partner');
+  String get partnerHer => _p('Her', 'Aap');
 
   // ---- prepare --------------------------------------------------------------
   String get prepareForBoth => _p('For both of you', 'Aap dono ke liye');
@@ -805,6 +811,13 @@ class TtcS {
       'App ko pregnancy shell par le jaata hai. Asli families positive test record karke aage badhti hain, switch se nahi.');
   String get profileGoPregnancy =>
       _p('Go to pregnancy', 'Pregnancy par jaayein');
+
+  /// Shown when the app was booted straight into TTC, so there is no pregnancy
+  /// shell underneath to return to. Saying this beats a button that sets the
+  /// stage correctly and appears to do nothing.
+  String get stageSetReopen => _p(
+      'Switched to pregnancy. Close and reopen the app to land there.',
+      'Pregnancy par switch ho gaya. App band karke dobara kholein.');
 
   // ---- shared chrome --------------------------------------------------------
   String get seeAll => _p('See all', 'Sab dekhein');
