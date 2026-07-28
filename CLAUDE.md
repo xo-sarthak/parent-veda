@@ -195,6 +195,21 @@ source for exactly this reason.
 - **Quote costs in both USD and INR.**
 - End work green: `flutter analyze` clean of new issues, and the full suite
   passing.
+- **Explain the architecture as you build it.** The user is learning backend and
+  **system design** hands-on, using this product as the material, and has asked
+  for that explicitly. So:
+  * When a decision has a trade-off, name both sides and say why you chose one —
+    "returning instead of raising costs us a loud failure, buys us an audit row
+    that survives" is worth more than the conclusion alone.
+  * Prefer the *general* fact over the local fix: "a `raise` discards everything
+    the transaction wrote" travels; "added a return statement" does not.
+  * When a bug is found, explain the mechanism, not just the patch.
+  * Keep `docs/BACKEND-PATTERNS.md` current — it is the learning doc, written to
+    be read in order, and every new pattern belongs there rather than only in a
+    migration comment. `docs/CONTENT-BACKEND.md` does the same for the content
+    pipeline.
+  This is not a request for tutorials mid-task. It means the *reasoning* is part
+  of the deliverable, and a design worth choosing is worth being able to defend.
 
 ---
 
@@ -204,6 +219,7 @@ source for exactly this reason.
 |---|---|
 | `docs/STILL-OPEN.md` | Everything parked or half-built. **Read before raising or closing an open point.** |
 | `docs/TTC-SPEC.md` | The Trying-to-Conceive build spec and its decision record |
+| `docs/TTC-AUDIT.md` | Defects found walking the built TTC stage on a device, tiered by severity |
 | `docs/BACKEND-PATTERNS.md` | RLS shapes, co-parenting, sync patterns |
 | `docs/CONTENT-BACKEND.md` | Content pipeline and Ask Veda |
 | `docs/ADMIN-PANEL.md` | Everything waiting on Directus |

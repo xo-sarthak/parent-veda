@@ -16,7 +16,14 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  // 0055 redefined every gate to RETURN a refusal rather than raise one, so
+  // the audit row survives the call — raising rolled it back (STILL-OPEN 4.4a,
+  // proved by supabase/seed/verify_admin_gates.sql). The live definitions are
+  // therefore in 0055; 0051 is read too, because the invariants below must hold
+  // across both and a regression could be reintroduced in either.
   final actions =
+      File('supabase/migrations/0055_gates_return_refusals.sql').readAsStringSync();
+  final legacy =
       File('supabase/migrations/0051_admin_actions.sql').readAsStringSync();
   final audit =
       File('supabase/migrations/0050_admin_audit.sql').readAsStringSync();
@@ -56,21 +63,44 @@ void main() {
         );
       });
 
-      test('$fn writes an audit row', () {
+      test('$fn records every outcome', () {
         final body = _functionBody(actions, fn);
-        expect(body, contains('_audit('),
-            reason: '$fn performs a privileged act without recording it. '
-                'A Flow only logs that it ran, never what the database agreed to.');
+        expect(body, contains('_refuse('),
+            reason: '$fn has no refusal path that records itself.');
+        expect(body, contains('_allow('),
+            reason: '$fn does not record its successes.');
+      });
+
+      test('$fn returns its refusal instead of raising it', () {
+        // The defect 0055 fixed: `perform _audit(...); raise exception ...`
+        // rolls back the audit row the raise was meant to explain. A gate that
+        // raises is a gate whose refusals are invisible.
+        final body = _functionBody(actions, fn);
+        expect(body, isNot(contains('raise exception')),
+            reason: '$fn raises. That aborts the transaction and discards the '
+                'audit row written moments earlier, so the blocked attempt '
+                'leaves no trace. Return {ok:false, code, message} instead.');
+        expect(body, contains('returns jsonb'),
+            reason: '$fn must return a structured result a Flow can branch on.');
       });
     }
 
-    test('the internal audit writer is not callable by the panel either', () {
-      expect(
-        actions.contains('revoke execute on function\n  public._audit'),
-        isTrue,
-        reason: 'A caller who can write admin_audit directly can forge the '
-            'record of their own actions.',
-      );
+    test('the internal audit writers are not callable by the panel either', () {
+      // A caller who can write admin_audit directly can forge the record of
+      // their own actions. _audit is defined in 0051; _refuse and _allow wrap
+      // it in 0055 and must be locked down the same way.
+      expect(legacy.contains('revoke execute on function\n  public._audit'),
+          isTrue, reason: '_audit is callable — the log can be forged.');
+
+      for (final fn in const ['_refuse', '_allow']) {
+        expect(
+          RegExp('revoke execute on function\\s+public\\.$fn',
+                  multiLine: true, dotAll: true)
+              .hasMatch(actions),
+          isTrue,
+          reason: '$fn writes audit rows and must not be callable directly.',
+        );
+      }
     });
   });
 
@@ -84,12 +114,27 @@ void main() {
     });
 
     test('it refuses on missing or incomplete paperwork', () {
-      expect('raise exception'.allMatches(body).length, greaterThanOrEqualTo(3),
-          reason: 'The refusals ARE the feature. Expect one for a missing '
-              'partner, one for a missing record, one for incomplete fields.');
+      // The refusals ARE the feature: a missing partner, a missing record,
+      // incomplete fields, an expired licence.
+      expect('_refuse('.allMatches(body).length, greaterThanOrEqualTo(4),
+          reason: 'Approval that can only succeed is a dropdown with extra '
+              'steps.');
       expect(body, contains('registration_expires_at'),
           reason: 'Licence expiry is checked at the one moment anyone reliably '
               'looks at it - when they are about to rely on it.');
+    });
+
+    test('each refusal carries a machine-readable code', () {
+      // A Flow branches on `code`; `message` is for the human reading the
+      // failure. Without a code the Flow can only string-match prose.
+      for (final code in const [
+        'no_such_partner',
+        'no_verification_record',
+        'incomplete_verification',
+        'registration_expired',
+      ]) {
+        expect(body, contains(code), reason: 'missing refusal code: $code');
+      }
     });
   });
 

@@ -9,12 +9,17 @@
 -- programme, sessions, a coupon -- never reach your data. Read the
 -- message: it is a pass/fail table.
 --
--- Re-run it after any change to 0050-0054. It is the cheap version of
--- the integration test this project has no harness for.
+-- Re-run after any change to 0050-0055. It is the cheap version of the
+-- integration test this project has no harness for.
 --
--- WHAT IT DOES NOT COVER: respond_to_programme_assignment(), which
--- derives the expert from auth.uid() and therefore needs a real signed-in
--- session. The script simulates acceptance with a direct update instead.
+-- UPDATED FOR 0055. The gates used to raise on refusal; they now RETURN
+-- {ok:false, code, message} so the audit row survives the call (the
+-- raise used to roll it back -- see STILL-OPEN 4.4a). So the checks below
+-- read the returned `ok` rather than trapping an exception.
+--
+-- NOT COVERED: respond_to_programme_assignment(), which derives the
+-- expert from auth.uid() and needs a real signed-in session. Acceptance
+-- is simulated with a direct update.
 -- =====================================================================
 
 do $$
@@ -22,8 +27,7 @@ declare
   r     text := '';
   pass  int  := 0;
   fail  int  := 0;
-  v_txt text;
-  v_js  jsonb;
+  js    jsonb;
   v_n   int;
 begin
   -- ---- fixtures --------------------------------------------------
@@ -34,246 +38,181 @@ begin
   values ('zzv_prog', 'Verify Programme', 'masterclass', 'parenting', 100000, 50);
 
   -- =================================================================
-  -- A. approve_care_partner -- the doctor verification gate
+  -- A. approve_care_partner
   -- =================================================================
-  begin
-    perform public.approve_care_partner('zzv_partner', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  approve with NO paperwork        -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    approve with NO paperwork        -> refused';
-  end;
+  js := public.approve_care_partner('zzv_partner', 'verifier');
+  if (js ->> 'ok') = 'false' and (js ->> 'code') = 'no_verification_record'
+    then pass := pass + 1; r := r || E'\nok    approve, NO paperwork          -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  approve, NO paperwork          -> ' || js::text;
+  end if;
 
   insert into public.care_partner_verification (partner_id, council)
   values ('zzv_partner', 'TS Medical Council');
 
-  begin
-    perform public.approve_care_partner('zzv_partner', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  approve with PARTIAL paperwork   -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    approve with PARTIAL paperwork   -> refused';
-  end;
+  js := public.approve_care_partner('zzv_partner', 'verifier');
+  if (js ->> 'code') = 'incomplete_verification'
+    then pass := pass + 1; r := r || E'\nok    approve, PARTIAL paperwork     -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  approve, PARTIAL paperwork     -> ' || js::text;
+  end if;
 
   update public.care_partner_verification
      set registration_number = 'TSMC-1', kyc_reference = 'kyc-1',
          registration_expires_at = current_date - 1
    where partner_id = 'zzv_partner';
 
-  begin
-    perform public.approve_care_partner('zzv_partner', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  approve with EXPIRED licence     -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    approve with EXPIRED licence     -> refused';
-  end;
+  js := public.approve_care_partner('zzv_partner', 'verifier');
+  if (js ->> 'code') = 'registration_expired'
+    then pass := pass + 1; r := r || E'\nok    approve, EXPIRED licence       -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  approve, EXPIRED licence       -> ' || js::text;
+  end if;
 
   update public.care_partner_verification
      set registration_expires_at = current_date + 365
    where partner_id = 'zzv_partner';
 
-  begin
-    v_txt := public.approve_care_partner('zzv_partner', 'verifier');
-    if v_txt = 'approved' then
-      pass := pass + 1;
-      r := r || E'\nok    approve with FULL paperwork      -> approved';
-    else
-      fail := fail + 1;
-      r := r || E'\nFAIL  approve with FULL paperwork      -> ' || v_txt;
-    end if;
-  exception when others then
-    fail := fail + 1;
-    r := r || E'\nFAIL  approve with FULL paperwork      -> refused: ' || left(sqlerrm, 50);
-  end;
+  js := public.approve_care_partner('zzv_partner', 'verifier');
+  if (js ->> 'ok') = 'true' and (js ->> 'code') = 'approved'
+    then pass := pass + 1; r := r || E'\nok    approve, FULL paperwork        -> approved';
+    else fail := fail + 1; r := r || E'\nFAIL  approve, FULL paperwork        -> ' || js::text;
+  end if;
 
   -- =================================================================
-  -- B. rotate_partner_tokens -- the physical-world confirmation
+  -- B. rotate_partner_tokens
   -- =================================================================
-  begin
-    perform public.rotate_partner_tokens('zzv_partner', 'wrong', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  rotate with WRONG confirmation   -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    rotate with WRONG confirmation   -> refused';
-  end;
+  js := public.rotate_partner_tokens('zzv_partner', 'wrong', 'verifier');
+  if (js ->> 'code') = 'not_confirmed'
+    then pass := pass + 1; r := r || E'\nok    rotate, WRONG confirmation     -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  rotate, WRONG confirmation     -> ' || js::text;
+  end if;
 
   -- =================================================================
-  -- C. create_partner_campaign -- refuses for a non-active partner
+  -- C. create_partner_campaign
   -- =================================================================
   update public.care_partners set status = 'pending' where id = 'zzv_partner';
-  begin
-    perform public.create_partner_campaign('zzv_partner', 'spring', 'qr', null, 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  campaign for PENDING partner     -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    campaign for PENDING partner     -> refused';
-  end;
+  js := public.create_partner_campaign('zzv_partner', 'spring', 'qr', null, 'verifier');
+  if (js ->> 'code') = 'partner_not_active'
+    then pass := pass + 1; r := r || E'\nok    campaign, PENDING partner      -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  campaign, PENDING partner      -> ' || js::text;
+  end if;
   update public.care_partners set status = 'active' where id = 'zzv_partner';
 
   -- =================================================================
-  -- D. publish_programme -- four gates
+  -- D. publish_programme -- five gates
   -- =================================================================
-  begin
-    perform public.publish_programme('zzv_prog', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish with NO sessions         -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    publish with NO sessions         -> refused';
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'code') = 'no_sessions'
+    then pass := pass + 1; r := r || E'\nok    publish, NO sessions           -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, NO sessions           -> ' || js::text;
+  end if;
 
   insert into public.programme_sessions (id, programme_id, seq, title, starts_utc)
-  values ('zzv_sess_past', 'zzv_prog', 1, 'Past', now() - interval '2 days');
+  values ('zzv_sess', 'zzv_prog', 1, 'Session', now() - interval '2 days');
 
-  begin
-    perform public.publish_programme('zzv_prog', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish with a PAST session      -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    publish with a PAST session      -> refused';
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'code') = 'session_in_past'
+    then pass := pass + 1; r := r || E'\nok    publish, a PAST session        -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, a PAST session        -> ' || js::text;
+  end if;
 
   update public.programme_sessions
-     set starts_utc = now() + interval '7 days' where id = 'zzv_sess_past';
+     set starts_utc = now() + interval '7 days' where id = 'zzv_sess';
 
-  begin
-    perform public.publish_programme('zzv_prog', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish with NO accepted expert  -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    publish with NO accepted expert  -> refused';
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'code') = 'no_accepted_expert'
+    then pass := pass + 1; r := r || E'\nok    publish, NO expert             -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, NO expert             -> ' || js::text;
+  end if;
 
-  -- Invited but NOT accepted: an invitation must not be enough.
+  -- Invited is not accepted.
   perform public.assign_programme_expert('zzv_prog', 'zzv_expert', 'verifier');
-  begin
-    perform public.publish_programme('zzv_prog', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish with INVITED-only expert -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    publish with INVITED-only expert -> refused';
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'code') = 'no_accepted_expert'
+    then pass := pass + 1; r := r || E'\nok    publish, INVITED-only expert   -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, INVITED-only expert   -> ' || js::text;
+  end if;
 
   update public.programme_experts set status = 'accepted'
    where programme_id = 'zzv_prog';
 
-  -- Still in draft: must not skip review.
-  begin
-    perform public.publish_programme('zzv_prog', 'verifier');
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish SKIPPING review          -> was allowed';
-  exception when others then
-    pass := pass + 1;
-    r := r || E'\nok    publish SKIPPING review          -> refused';
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'code') = 'not_reviewed'
+    then pass := pass + 1; r := r || E'\nok    publish, SKIPPING review       -> refused';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, SKIPPING review       -> ' || js::text;
+  end if;
 
   update public.programmes set status = 'marketing_review' where id = 'zzv_prog';
 
-  begin
-    v_txt := public.publish_programme('zzv_prog', 'verifier');
-    if v_txt = 'published' then
-      pass := pass + 1;
-      r := r || E'\nok    publish when ALL conditions met -> published';
-    else
-      fail := fail + 1;
-      r := r || E'\nFAIL  publish when ALL conditions met -> ' || v_txt;
-    end if;
-  exception when others then
-    fail := fail + 1;
-    r := r || E'\nFAIL  publish when ALL conditions met -> refused: ' || left(sqlerrm, 50);
-  end;
+  js := public.publish_programme('zzv_prog', 'verifier');
+  if (js ->> 'ok') = 'true' and (js ->> 'code') = 'published'
+    then pass := pass + 1; r := r || E'\nok    publish, ALL conditions met    -> published';
+    else fail := fail + 1; r := r || E'\nFAIL  publish, ALL conditions met    -> ' || js::text;
+  end if;
 
-  -- The seat mirror: book_slot() must be the one authority.
   select count(*) into v_n from public.booking_slots where offering_id = 'zzv_prog';
-  if v_n > 0 then
-    pass := pass + 1;
-    r := r || E'\nok    sessions mirrored to booking_slots (' || v_n || ')';
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  sessions NOT mirrored to booking_slots';
+  if v_n > 0
+    then pass := pass + 1; r := r || E'\nok    sessions mirrored to slots (' || v_n || ')';
+    else fail := fail + 1; r := r || E'\nFAIL  sessions NOT mirrored to booking_slots';
   end if;
 
   -- =================================================================
-  -- E. preview_programme_coupon -- a verdict, never the row
+  -- E. preview_programme_coupon
   -- =================================================================
-  v_js := public.preview_programme_coupon('NOPE', 'zzv_prog');
-  if (v_js ->> 'valid') = 'false' then
-    pass := pass + 1;
-    r := r || E'\nok    unknown coupon                   -> not applicable';
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  unknown coupon                   -> ' || v_js::text;
+  js := public.preview_programme_coupon('NOPE', 'zzv_prog');
+  if (js ->> 'valid') = 'false'
+    then pass := pass + 1; r := r || E'\nok    unknown coupon                 -> not applicable';
+    else fail := fail + 1; r := r || E'\nFAIL  unknown coupon                 -> ' || js::text;
   end if;
 
   insert into public.programme_coupons (code, programme_id, kind, value)
   values ('ZZVTEST', 'zzv_prog', 'percent', 25);
 
-  v_js := public.preview_programme_coupon('ZZVTEST', 'zzv_prog');
-  if (v_js ->> 'valid') = 'true' and (v_js ->> 'discount_paise') = '25000' then
-    pass := pass + 1;
-    r := r || E'\nok    25% of 100000 paise              -> 25000 off';
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  coupon maths                     -> ' || v_js::text;
+  js := public.preview_programme_coupon('ZZVTEST', 'zzv_prog');
+  if (js ->> 'discount_paise') = '25000'
+    then pass := pass + 1; r := r || E'\nok    25% of 100000 paise            -> 25000 off';
+    else fail := fail + 1; r := r || E'\nFAIL  coupon maths                   -> ' || js::text;
   end if;
 
-  -- A discount larger than the price must clamp, never pay out.
   update public.programme_coupons set kind = 'flat', value = 999999
    where code = 'ZZVTEST';
-  v_js := public.preview_programme_coupon('ZZVTEST', 'zzv_prog');
-  if (v_js ->> 'payable_paise')::int >= 0 then
-    pass := pass + 1;
-    r := r || E'\nok    oversized discount clamps        -> payable '
-           || (v_js ->> 'payable_paise');
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  oversized discount went NEGATIVE -> ' || v_js::text;
+  js := public.preview_programme_coupon('ZZVTEST', 'zzv_prog');
+  if (js ->> 'payable_paise')::int >= 0
+    then pass := pass + 1; r := r || E'\nok    oversized discount clamps      -> payable '
+                                   || (js ->> 'payable_paise');
+    else fail := fail + 1; r := r || E'\nFAIL  oversized discount NEGATIVE    -> ' || js::text;
   end if;
 
   -- =================================================================
-  -- F. THE AUDIT TRAIL -- the check I expect to FAIL
+  -- F. THE AUDIT TRAIL -- what 0055 exists to fix.
   --
-  -- Every gate does `perform _audit(...)` and then `raise exception`.
-  -- Raising aborts the transaction, which rolls back the audit insert
-  -- made moments earlier. So a refusal probably records NOTHING, and the
-  -- rows the log most needs -- the attempts that were stopped -- are the
-  -- ones it silently drops.
-  --
-  -- If this reports FAIL, the design is wrong and the fix is for the
-  -- functions to RETURN a refusal rather than raise one, with the
-  -- Directus Flow asserting on the result.
+  -- Before 0055 this failed: each gate audited then raised, and the
+  -- raise rolled the audit row back. Successes logged, refusals
+  -- vanished -- backwards, since blocked attempts are the rows a log
+  -- exists for.
   -- =================================================================
   select count(*) into v_n from public.admin_audit
    where target_id in ('zzv_partner', 'zzv_prog') and outcome = 'refused';
-  if v_n > 0 then
-    pass := pass + 1;
-    r := r || E'\nok    refusals recorded in admin_audit (' || v_n || ')';
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  refusals NOT recorded -- raise rolls back the audit row';
+  if v_n >= 8
+    then pass := pass + 1; r := r || E'\nok    REFUSALS recorded (' || v_n || ')';
+    else fail := fail + 1; r := r || E'\nFAIL  refusals recorded: ' || v_n || ' (expected 8+)';
   end if;
 
   select count(*) into v_n from public.admin_audit
    where target_id in ('zzv_partner', 'zzv_prog') and outcome = 'ok';
-  if v_n > 0 then
-    pass := pass + 1;
-    r := r || E'\nok    successes recorded in admin_audit (' || v_n || ')';
-  else
-    fail := fail + 1;
-    r := r || E'\nFAIL  successes NOT recorded either';
+  if v_n > 0
+    then pass := pass + 1; r := r || E'\nok    successes recorded (' || v_n || ')';
+    else fail := fail + 1; r := r || E'\nFAIL  successes NOT recorded';
   end if;
 
-  -- =================================================================
-  -- Report, and roll everything back by raising.
-  -- =================================================================
+  -- Every refusal must carry a machine-readable code, or a Flow cannot
+  -- branch on it and the message is all anyone has.
+  select count(*) into v_n from public.admin_audit
+   where target_id in ('zzv_partner', 'zzv_prog')
+     and outcome = 'refused' and coalesce(detail, '') = '';
+  if v_n = 0
+    then pass := pass + 1; r := r || E'\nok    every refusal carries a code';
+    else fail := fail + 1; r := r || E'\nFAIL  ' || v_n || ' refusal(s) with no code';
+  end if;
+
   raise exception E'\n\n=== ADMIN GATE VERIFICATION ===%\n\nPASSED %  FAILED %\n\n(This "error" is the report. It forces the rollback -- no fixtures were kept.)\n',
     r, pass, fail;
 end $$;

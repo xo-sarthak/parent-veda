@@ -347,7 +347,124 @@ refuses reads, and the client is built never to ask for one
 rows are private but a computed *answer* is exposed; here nothing is exposed to
 the app at all.
 
-## 9. Reading list, in order
+## 9. The admin panel: three boundaries, three different mechanisms
+
+Added 2026-07-28, from building migrations `0045`–`0055`. The panel is worth
+studying as system design because it needed **three different kinds of
+boundary**, and each one is enforced by a different mechanism. Using the wrong
+mechanism for a boundary is how most of these systems leak.
+
+### (a) "Which tables may the CMS touch at all?" → **Postgres GRANTs**
+
+Directus has its own permissions UI. It is a convenience layer, not a boundary:
+those permissions are rows in the same admin interface they are meant to
+restrain, so one mis-click makes them wider.
+
+`0045` moved the boundary somewhere the UI cannot reach — a dedicated
+`directus_cms` role with **allow-list** grants. Content tables get CRUD, config
+tables get select+update, and the ~65 user-data tables get *nothing*.
+
+Two properties worth copying:
+
+* **The deny list is never written down.** A new role has no privileges by
+  default, and this project grants only to `anon` / `authenticated` /
+  `service_role`, never to `PUBLIC`. So the safe state is the default state.
+  Enumerating what to deny would rot the day someone adds table 77 and forgets.
+* **The friction is the feature.** A new content table does not appear in
+  Directus until someone adds a grant *and* a policy. That is annoying exactly
+  once per table, and it means access is always a deliberate act.
+  `test/content_migrations_test.dart` fails if a grant appears outside a
+  reviewed list, so the list stays a review rather than a wishlist.
+
+### (b) "Which rows may it see?" → **RLS policies**
+
+A grant gets you past the privilege check; the *policy* decides which rows. Both
+must pass, and forgetting the second is the subtle one:
+
+| Missing | Symptom |
+|---|---|
+| the GRANT | "permission denied" — loud, obvious |
+| the POLICY | **zero rows** — looks like empty data, not a permission problem |
+
+That second failure had a specific consequence here. Content tables carry
+`using (status = 'published')` for the app. Without an additional CMS policy,
+Directus would connect fine, list the collection, and show an editor everything
+*except their own drafts* — which reads as a broken save button, not a
+permissions bug.
+
+### (c) "May this person do this *act*?" → **`security definer` functions**
+
+Approving a doctor is not a row edit. It is a decision with preconditions:
+registration present, KYC present, licence unexpired. Modelled as a `status`
+dropdown, an unverified doctor gets approved by someone who assumed the checks
+happened elsewhere.
+
+So the rule lives in a function that **refuses**, with `execute` revoked from
+public and granted to `service_role` alone. The doctor's own app cannot call it
+regardless of how any panel is configured — the permission is on the function,
+not on the screen that calls it.
+
+The general shape, reusable well beyond this:
+
+> **When an operation has preconditions, make the operation a function and put
+> the preconditions inside it.** Then no caller can skip them, because there is
+> no path that does not go through the check.
+
+### (d) The lesson that cost a real defect: a `raise` erases what it explains
+
+Every gate originally did this:
+
+```sql
+perform public._audit(... 'refused' ...);   -- record the blocked attempt
+raise exception 'cannot approve %: ...';    -- refuse
+```
+
+Correct-looking, and wrong. `raise exception` **aborts the transaction**, and
+aborting undoes everything the transaction did — including the audit INSERT one
+line above. Successes committed; refusals erased themselves. The log could
+answer "who approved this doctor" but not "who tried and was stopped", which is
+the question asked after something goes wrong.
+
+`0055` returns `{ok, code, message}` instead of raising, so nothing aborts and
+the row commits.
+
+**The generalisable fact:** *anything written inside a transaction that later
+aborts is lost — logs, metrics, queued notifications, all of it.* If a record
+must survive a failure, it cannot be written by the thing that fails.
+
+**And the trade-off, because there always is one.** Raising made a careless
+caller fail loudly (HTTP 4xx). Returning is HTTP 200, so a caller that ignores
+the body reports success for an approval that never happened. That was accepted
+deliberately: an unchecked caller is a bug in one place, visible the first time
+anyone tests it; a missing audit row is evidence nobody can recover. Recorded in
+`STILL-OPEN.md` §4.4a so the reasoning outlives the decision.
+
+### (e) One authority per fact
+
+Programmes needed seats. There was already a seat counter — `book_slot()` in
+`0029`, with a `FOR UPDATE` lock. Publishing a programme therefore *mirrors* its
+sessions into `booking_slots` rather than counting separately.
+
+Two counters for one fact will disagree eventually, and the disagreement shows
+up as a double-booked session on the day. Same reason `0040` made the database
+the only thing that mints a referral token: the app used to derive one too, and
+a token with no matching row scanned, looked right, and credited nobody — printed
+on a poster for two years.
+
+> Before adding a counter, a token generator or an id scheme, look for the one
+> that already exists.
+
+### Verifying it without a test harness
+
+There is no integration-test harness for SQL here. `supabase/seed/verify_admin_gates.sql`
+is the cheap substitute: it exercises every refusal path, reports pass/fail, and
+**raises at the end so the whole thing rolls back** — a transaction abort used
+deliberately, for the same property that caused the bug in (d). One paste, a
+readable report, nothing left behind. It is what found the defect.
+
+---
+
+## 10. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.

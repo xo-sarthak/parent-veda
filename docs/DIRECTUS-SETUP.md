@@ -307,10 +307,25 @@ Body:    {"p_partner_id":"{{$trigger.body.keys[0]}}",
 Pass `$accountability.user` as the actor, so the audit row names a human rather
 than "unknown".
 
-⚠️ **The Flow must assert on the response.** A refusal comes back as a PostgREST
-error, and a Flow that ignores it looks exactly like success — the same failure
-mode as the app's fire-and-forget writes. If a Flow reports a green tick for a
-refused approval, the panel is actively lying to whoever clicked it.
+🔴 **Every Flow MUST branch on `{{$last.ok}}`. This is not optional.**
+
+Since `0055` the gates **return** a refusal rather than raising one:
+
+```json
+{ "ok": false, "code": "incomplete_verification", "message": "..." }
+```
+
+That returns **HTTP 200**. A Flow that ignores the body will show a green tick
+for an approval that never happened — the panel actively lying to whoever
+clicked it.
+
+The gates were changed this way deliberately: raising aborted the transaction
+and rolled back the audit row written a line earlier, so refusals left no trace
+at all (STILL-OPEN §4.4a). Losing the evidence was the worse failure — but it
+moves the burden here. Branch on `ok`, and surface `message` to the operator.
+
+Branch on **`code`**, never on the message text: the code is stable, the wording
+is not.
 
 | Flow | Function | What it refuses |
 |---|---|---|

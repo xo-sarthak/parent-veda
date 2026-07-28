@@ -277,12 +277,108 @@ with a professional. Same plumbing where it helps, different products.
 
 ---
 
-# 7. Future — HR / corporate admin panel
+# 7. HR / enterprise — a THIRD surface, not an extension of this one
 
-When ParentVeda is sold to companies: an HR-side panel, employee-side
-functioning, and company benefits administration. Noted now so the partner model
-does not have to be rebuilt for it — `corporate` and `insurance` are already
-Care Partner types.
+*Scoped 2026-07-28 from two product docs: the HR Portal ("Benefit Management
+Portal") and the employee-app enterprise experience. Not started. Recorded now,
+per the rule at the bottom of this file, so the detail does not have to be
+reconstructed later.*
+
+`corporate` and `insurance` are already Care Partner types, so that model does
+not need rebuilding.
+
+## 7a. The HR Portal must not be Directus
+
+Directus is **internal** — ParentVeda staff editing ParentVeda's own data. The
+HR Portal is **external customers** managing their own company's benefit. Three
+properties make it a different product:
+
+* **Multi-tenant.** Every read is scoped to one company. Google's HR must never
+  see Infosys's employee list.
+* **External users.** HR staff are not ParentVeda staff.
+* **A privacy boundary the spec says must be structural** — *"the system should
+  enforce these restrictions technically, not just by policy."*
+
+Serving that from Directus would mean multi-tenancy enforced by permission
+filters edited in the same admin UI they are meant to constrain — the exact
+failure `0045` exists to remove, except a misconfiguration now leaks one paying
+customer's data to another. The spec also asks for something Directus is not by
+design: *"a modern Employee Benefits Management Platform, not a dashboard filled
+with tables."*
+
+**So: a separate web app** (naturally alongside the Next.js site), reading
+Supabase through RLS scoped by company. It is the largest single piece of this
+programme.
+
+## 7b. What DOES belong in this Directus panel
+
+The ParentVeda-side acts of running a corporate customer — small, roughly one
+migration plus a few collections:
+
+| Need | Note |
+|---|---|
+| Create a company / enterprise account | Onboarding a customer is ops, not HR self-serve |
+| Approved email domains | `@google.com`, `@google.co.in` — what activation checks |
+| Plan, seats purchased, renewal date, status | HR sees this read-only in their Billing screen |
+| Benefit definitions | Premium + N consultation credits + masterclass access. Config, the `0036` pattern |
+| Provision the first HR user | Somebody has to create the account HR logs into |
+| Invoices / subscription oversight | The ParentVeda side of billing |
+
+## 7c. Privacy is the architecture, not a screen
+
+The spec's hard rule: HR sees **activation status and anonymous aggregates**,
+never behaviour. Three consequences that must be designed in, not bolted on:
+
+1. **HR reads only pre-aggregated views.** If the portal can query anything
+   per-employee beyond activation status, the promise is policy rather than a
+   boundary. The aggregation layer is the only thing that touches user data.
+2. **k-anonymity is a feature.** *"If only three employees are pregnant, do not
+   create pregnancy-specific analytics."* That is a suppression rule living in
+   SQL, and it needs a threshold decision — 5 is common, 10 is safer. Without
+   it, a 20-person company's "anonymous" analytics identify individuals.
+3. **The employee↔company link is sensitive on its own.** That row says "this
+   user works at Google"; joined to anything else it de-anonymises. It must be
+   reachable only by the aggregation layer, never by an HR-facing query.
+
+## 7d. Decisions needed before any schema
+
+* **Suppression threshold** for analytics (see above).
+* **Are company events `programmes` scoped to a company?** Strong recommendation
+  yes — `0054` already has programmes, sessions, expert assignment, capacity and
+  a publishing workflow. A company webinar is a programme with an audience
+  restriction; a parallel events system means two schedulers and two
+  registration flows to keep in step. Cost today is one additive column.
+* **Moderating company-uploaded resources.** HR uploads documents that render
+  *inside the app*. Third-party content in a health product needs a review path
+  and a hard rule that it is never medical advice.
+* **Consultation credits must reuse the existing entitlement/booking engine**,
+  not fork it. Two systems that each believe they know how many consultations
+  remain will disagree. Same argument as programmes reusing `booking_slots`.
+* **Support impersonation** — useful for troubleshooting, dangerous by
+  definition. Decide deliberately or not at all.
+
+## 7e. A tension to resolve deliberately
+
+`CLAUDE.md` says *a feature is never hidden*; the enterprise spec says the
+enterprise layer must be *"completely hidden for consumer users."* Both hold if
+the split is: the **activation entry point** is always visible ("Does your
+employer provide ParentVeda Premium?"), and the **Employer Benefits section**
+appears only once activated. Worth deciding on purpose rather than discovering.
+
+## 7f. Sizing, honestly
+
+| Piece | Size |
+|---|---|
+| Directus collections for companies / plans | Small |
+| Supabase schema + entitlements + activation (work email → OTP → domain → seats) | Medium |
+| Analytics with k-anonymity | Medium, and subtle |
+| App-side enterprise layer (activation, Employer Benefits, privacy centre, credits) | Medium |
+| **HR Portal web app** | **Large — a new product surface** |
+
+Larger than everything the admin panel has needed so far, and the portal is most
+of it. **Sequenced after the current panel is configured and running** — nothing
+here is blocked by it, and running a real panel first is the best input into
+designing one for external customers.
 
 ---
 

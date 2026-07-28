@@ -177,10 +177,28 @@ agreed to or what it checked first — which is the question anyone actually ask
 afterwards. The panel reads it through the `admin_audit_log` view, never the
 table, so there is no path to editing the record of your own actions.
 
-### 4.4a Refused admin actions are NOT audited — confirmed 2026-07-27
+### 4.4a Refused admin actions were not audited — FIXED 2026-07-28 (`0055`)
 
-**Fix this before wiring any Directus Flow.** Verified against the live database
-by `supabase/seed/verify_admin_gates.sql`: 17 checks pass, 1 fails.
+**Resolved.** `0055_gates_return_refusals.sql` redefines all seven gates to
+RETURN `{ok, code, message}` instead of raising, so nothing aborts and the audit
+row commits with the call. `verify_admin_gates.sql` was updated to read the
+returned `ok` rather than trap an exception, and now also asserts that every
+refusal carries a machine-readable `code` — a Flow branches on the code; the
+message is for the human reading the failure.
+
+**The trade-off this accepted, and the obligation it creates:** a raise made a
+careless caller fail loudly; a returned `{ok:false}` is HTTP 200, so **a Directus
+Flow that ignores the body will report success for an approval that never
+happened.** Every Flow MUST branch on `{{$last.ok}}`. That is now load-bearing
+rather than good practice — see `docs/DIRECTUS-SETUP.md` §5d. It is the right
+trade because a Flow that does not check its result is a Flow bug, visible the
+first time anyone looks; losing the audit row was a design defect no Flow could
+compensate for.
+
+*Original entry, kept per the rule at the top of this file:*
+
+Verified against the live database by `supabase/seed/verify_admin_gates.sql`:
+17 checks passed, 1 failed.
 
 Every gate in `0051`/`0054` does `perform _audit(...)` and then
 `raise exception`. The raise aborts the transaction, which rolls back the audit
