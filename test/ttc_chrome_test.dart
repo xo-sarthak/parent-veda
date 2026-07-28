@@ -12,6 +12,8 @@
 //      scale looked like a separate control
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -159,6 +161,44 @@ void main() {
       await tester.tap(find.text('Some').first);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  // ===========================================================================
+  group('no card lightens toward the bottom of a gradient', () {
+    test('every TTC gradient runs toward the deeper shade', () {
+      // Seven surfaces ran purple to a LIGHTER purple, and two ran all the way
+      // to coral - which is what made TTC read pink beside pregnancy, whose
+      // hero runs primary500 to primary700. One constant now, so the next card
+      // cannot quietly pick its own.
+      final dir = Directory('lib/screens/ttc');
+      final offenders = <String>[];
+      for (final f in dir.listSync().whereType<File>()) {
+        if (!f.path.endsWith('.dart')) continue;
+        for (final line in f.readAsLinesSync()) {
+          if (!line.contains('colors: [')) continue;
+          final ok = line.contains('ttcPurpleDeep') ||
+              line.contains('ttcSlateDeep');
+          if (!ok) offenders.add('${f.uri.pathSegments.last}: ${line.trim()}');
+        }
+      }
+      expect(offenders, isEmpty,
+          reason: 'a gradient is picking its own far colour again');
+    });
+
+    test('and coral never appears as a gradient stop', () {
+      // It is an accent - eyebrows, the period marker, one soft circle behind
+      // the hero. As a gradient stop it turned whole cards pink.
+      final dir = Directory('lib/screens/ttc');
+      for (final f in dir.listSync().whereType<File>()) {
+        if (!f.path.endsWith('.dart')) continue;
+        for (final line in f.readAsLinesSync()) {
+          if (line.contains('colors: [')) {
+            expect(line.contains('ttcCoral'), isFalse,
+                reason: '${f.uri.pathSegments.last}: ${line.trim()}');
+          }
+        }
+      }
     });
   });
 }

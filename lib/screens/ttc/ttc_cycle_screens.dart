@@ -179,7 +179,7 @@ class _CycleHero extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [ttcPurple, Color(0xFF8B4FD0)],
+          colors: [ttcPurple, ttcPurpleDeep],
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -740,7 +740,7 @@ class _WindowSummary extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [ttcPurple, Color(0xFF8B4FD0)],
+          colors: [ttcPurple, ttcPurpleDeep],
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -179,7 +179,7 @@ class _Hero extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [ttcSlate, Color(0xFF3E6B85)],
+          colors: [ttcSlate, ttcSlateDeep],
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

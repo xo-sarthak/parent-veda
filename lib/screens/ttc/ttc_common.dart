@@ -36,6 +36,17 @@ const Color ttcBg = Color(0xFFFBF9FE);
 const Color ttcInk = Color(0xFF2F2C30);
 const Color ttcSoft = Color(0xFF69636C);
 const Color ttcPurple = Color(0xFF6A30B6);
+
+/// The far end of every TTC gradient.
+///
+/// Gradients here used to run purple → a LIGHTER purple, and twice all the way
+/// to coral, which is what made TTC's cards read pink beside pregnancy's. The
+/// pregnancy hero runs primary500 → primary700 - toward the deeper shade - so
+/// every purple surface in this stage does the same.
+///
+/// One constant rather than a hex repeated in seven files, so the next card
+/// cannot quietly pick its own.
+const Color ttcPurpleDeep = Color(0xFF4A1C86);
 const Color ttcCoral = Color(0xFFFF5A79);
 const Color ttcPanel = Color(0xFFF3EEF7);
 const Color ttcMuted = Color(0xFFA99CBB);
@@ -56,6 +67,10 @@ const Color ttcTitleInk = Color(0xFF2D144C);
 const Color ttcSlateBg = Color(0xFFF4EFE8);
 const Color ttcSlateInk = Color(0xFF22333B);
 const Color ttcSlate = Color(0xFF2E5266);
+
+/// His half had the identical construction error - a gradient running toward a
+/// LIGHTER shade. Fixed alongside hers so the two stay mirror images.
+const Color ttcSlateDeep = Color(0xFF1C3A4A);
 const Color ttcSlateAmber = Color(0xFFE0915B);
 const Color ttcSlatePanel = Color(0xFFEAE3D9);
 const Color ttcSlateSoft = Color(0xFF6B7A81);
@@ -689,6 +704,129 @@ class TtcHeader extends StatelessWidget {
         ),
       ],
     ]);
+  }
+}
+
+/// The chapter stepper, drawn to the same silhouette as pregnancy's
+/// TrimesterProgressBar so the two heroes read as one component.
+///
+/// One difference, and it is deliberate: the segments do NOT accumulate.
+/// Pregnancy fills T1, then T2, then T3, because a pregnancy only moves
+/// forward. Chapters 2-4 here come round with every cycle, so a bar that
+/// filled to 80% and then dropped back to 40% would say "you lost ground" on
+/// the morning a period arrives - the exact feeling the Journey Map's "not a
+/// step backwards" line exists to prevent.
+///
+/// So only the CURRENT segment fills, by progress through that chapter. It is a
+/// position marker wearing a progress bar's clothes: same shape, no claim about
+/// how much of anything is banked.
+class TtcChapterBar extends StatelessWidget {
+  const TtcChapterBar({super.key, required this.today});
+
+  final TtcToday today;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = today.chapter.index;
+    final frac = today.chapterProgress;
+    const track = Color(0x38FFFFFF);
+
+    Widget segment(int i) {
+      final active = i == current;
+      return Expanded(
+        child: Padding(
+          padding: EdgeInsets.only(right: i == TtcChapter.values.length - 1 ? 0 : 6),
+          child: Stack(children: [
+            Container(
+              height: 8,
+              decoration: BoxDecoration(
+                color: track,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            if (active)
+              FractionallySizedBox(
+                widthFactor: frac.clamp(0.04, 1.0),
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+          ]),
+        ),
+      );
+    }
+
+    Widget label(int i) {
+      final active = i == current;
+      return Expanded(
+        child: Padding(
+          padding: EdgeInsets.only(right: i == TtcChapter.values.length - 1 ? 0 : 6),
+          child: Text('${i + 1}',
+              textAlign: TextAlign.center,
+              style: ttcBody(10.5,
+                  color: Colors.white.withValues(alpha: active ? 1 : 0.55),
+                  w: active ? FontWeight.w900 : FontWeight.w700)),
+        ),
+      );
+    }
+
+    return Column(children: [
+      Row(children: [for (var i = 0; i < TtcChapter.values.length; i++) segment(i)]),
+      const SizedBox(height: 6),
+      Row(children: [for (var i = 0; i < TtcChapter.values.length; i++) label(i)]),
+    ]);
+  }
+}
+
+/// The circular hero shortcut, matching pregnancy's Baby / Mother / What's next.
+///
+/// 44px, a translucent white fill and a lighter border - TTC had rounded
+/// squares, which is a small difference that made the two heroes read as
+/// different components at a glance.
+class TtcHeroShortcut extends StatelessWidget {
+  const TtcHeroShortcut({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(children: [
+          Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+            ),
+            child: Icon(icon, size: 21, color: Colors.white),
+          ),
+          const SizedBox(height: 6),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ttcBody(11,
+                  color: Colors.white.withValues(alpha: 0.95),
+                  w: FontWeight.w700)),
+        ]),
+      ),
+    );
   }
 }
 
