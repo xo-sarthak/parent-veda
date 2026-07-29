@@ -169,18 +169,78 @@ void main() {
 
   // ===========================================================================
   group('the list and the stats can no longer disagree', () {
-    test('the store says which gaps it counted', () {
+    test('a cycle belongs to the date it BEGAN on', () {
       logTheRealDefect();
-      // The 54-day gap counts; the three-day one does not.
-      expect(CycleStore.instance.gapBefore(DateTime(2026, 7, 1))?.counted,
-          isTrue);
-      expect(CycleStore.instance.gapBefore(DateTime(2026, 7, 5))?.counted,
-          isFalse);
+      // The 54 days ran from 8 May to 1 July, so they are the cycle that began
+      // on 8 May. Attributing them to 1 July instead is what made the screen
+      // print "54 days · Not counted · too close to the entry before it" - the
+      // number describing one cycle and the verdict another.
+      final may = CycleStore.instance.cycleFrom(DateTime(2026, 5, 8));
+      expect(may?.days, 54);
+      expect(may?.counted, isTrue);
     });
 
-    test('the oldest entry is neither counted nor discarded', () {
+    test('the length shown and the verdict shown are the same fact', () {
       logTheRealDefect();
-      expect(CycleStore.instance.gapBefore(DateTime(2026, 4, 17)), isNull);
+      // Every row, not just the interesting one: whatever number a row prints,
+      // its counted-ness must be about THAT number.
+      for (final start in [
+        DateTime(2026, 4, 17),
+        DateTime(2026, 4, 24),
+        DateTime(2026, 5, 8),
+        DateTime(2026, 7, 1),
+        DateTime(2026, 7, 5),
+      ]) {
+        final c = CycleStore.instance.cycleFrom(start)!;
+        final plausible = c.days >= CycleStore.minPlausibleCycleDays &&
+            c.days <= CycleStore.maxPlausibleCycleDays;
+        expect(c.counted, plausible,
+            reason: '$start printed ${c.days} days but judged otherwise');
+      }
+    });
+
+    test('short gaps are not quietly counted', () {
+      logTheRealDefect();
+      // These two were shown with the "counted" dot while the average above
+      // them excluded both - the list contradicting the statistic beside it.
+      expect(CycleStore.instance.cycleFrom(DateTime(2026, 4, 17))?.counted,
+          isFalse, reason: '7 days');
+      expect(CycleStore.instance.cycleFrom(DateTime(2026, 7, 1))?.counted,
+          isFalse, reason: '4 days');
+    });
+
+    test('a too-LONG gap is not explained as too close', () {
+      // One string used to cover both directions, so a 100-day gap - almost
+      // always a period nobody logged - was explained to her as being too
+      // close together. The app visibly not reading her own data.
+      const t = TtcS(false);
+      expect(t.notCountedWhy(4).toLowerCase(), contains('too close'));
+      expect(t.notCountedWhy(120).toLowerCase(), isNot(contains('too close')));
+      expect(t.notCountedWhy(120).toLowerCase(), contains('never logged'));
+      // And it names the right neighbour: the cycle on this row runs FORWARD.
+      expect(t.notCountedWhy(4).toLowerCase(), contains('next entry'));
+
+      const hi = TtcS(true);
+      expect(hi.notCountedWhy(4), isNot(hi.notCountedWhy(120)));
+    });
+
+    test('the most recent entry has no length yet', () {
+      logTheRealDefect();
+      // Her current cycle has not ended, so there is no number to print and
+      // nothing to judge.
+      expect(CycleStore.instance.cycleFrom(DateTime(2026, 7, 25)), isNull);
+    });
+
+    test('every counted cycle appears in the average, and no other', () {
+      logTheRealDefect();
+      final counted = <int>[];
+      for (final s in CycleStore.instance.periodStarts) {
+        final c = CycleStore.instance.cycleFrom(s);
+        if (c != null && c.counted) counted.add(c.days);
+      }
+      // The one place the two representations meet. If this ever fails, the
+      // list and the stats card have started disagreeing again.
+      expect(counted..sort(), CycleStore.instance.cycleLengths.toList()..sort());
     });
 
     test('the gap before a new entry is knowable before it is accepted', () {

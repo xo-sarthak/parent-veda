@@ -92,15 +92,29 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     return prev == null ? null : d.difference(prev).inDays;
   }
 
-  /// Whether a logged start counts toward the average, and the gap it made.
+  /// The cycle that BEGAN on [start] — how long it ran, and whether it counted
+  /// toward the average.
   ///
-  /// Returns null for the oldest entry, which has nothing before it to measure
-  /// against and is therefore neither counted nor discarded.
-  ({int gap, bool counted})? gapBefore(DateTime start) {
+  /// Returns null for the most recent start, whose cycle has not ended yet.
+  ///
+  /// **Both halves come from here on purpose.** They used to be computed
+  /// separately: the row printed `starts[i+1] - starts[i]` (the cycle beginning
+  /// on that date) while the "not counted" verdict came from
+  /// `starts[i] - starts[i-1]` (the cycle *before* it). Two different cycles on
+  /// one line, so a row could read "54 days · Not counted · too close to the
+  /// entry before it" — each half true about a different thing, and nonsense
+  /// together. In the other direction a four-day gap was shown as counted,
+  /// contradicting the average printed inches above it.
+  ///
+  /// A cycle **begins** on day one of a period and ends the day before the next,
+  /// so it belongs to the earlier start. Returning the length and the verdict
+  /// from one call is what makes it impossible for them to disagree again — the
+  /// bug was not arithmetic, it was two sources for one fact.
+  ({int days, bool counted})? cycleFrom(DateTime start) {
     final i = _periodStarts.indexWhere((s) => _sameDay(s, start));
-    if (i <= 0) return null;
-    final gap = _periodStarts[i].difference(_periodStarts[i - 1]).inDays;
-    return (gap: gap, counted: _isPlausible(gap));
+    if (i < 0 || i + 1 >= _periodStarts.length) return null;
+    final days = _periodStarts[i + 1].difference(_periodStarts[i]).inDays;
+    return (days: days, counted: _isPlausible(days));
   }
 
   /// How many complete cycles she has logged with us.

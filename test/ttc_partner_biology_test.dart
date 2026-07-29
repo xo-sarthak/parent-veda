@@ -137,6 +137,31 @@ void main() {
           reason: 'the card exists but nothing puts it on screen');
     });
 
+    test('his hero answers the same questions hers does', () {
+      // Hers carries where-am-I, what-is-next and show-me-it-all above the
+      // fold. His was a title, a tagline and one flat bar that could have been
+      // at any point of anything - the parity work was done on her side only.
+      final src =
+          File('lib/screens/ttc/ttc_partner_screen.dart').readAsStringSync();
+      final hero = src.substring(src.indexOf('class _Hero'));
+      expect(hero, contains('TtcChapterBar'), reason: 'where am I');
+      expect(hero, contains('chapter.nextUp(hi)'), reason: 'what is next');
+      expect(hero, contains('TtcJourneyMapScreen'), reason: 'show me it all');
+    });
+
+    test('but NOT the part that would leak her cycle', () {
+      // Hers reads "Day 2 of 28 in this chapter". That is her position in her
+      // own cycle, and he only ever receives the chapter she publishes - his
+      // device has no rows in ttc_cycles at all. Copying the line across "for
+      // parity" would route around the own-row rule in prose.
+      final src =
+          File('lib/screens/ttc/ttc_partner_screen.dart').readAsStringSync();
+      final hero = src.substring(src.indexOf('class _Hero'));
+      expect(hero, isNot(contains('chapterDay')));
+      expect(hero, isNot(contains('cycleDay')));
+      expect(hero, isNot(contains('inThisChapter')));
+    });
+
     test('and it sits above his own biology', () {
       // Order carries meaning here: he came to understand her.
       final src =

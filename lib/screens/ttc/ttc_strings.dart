@@ -171,9 +171,23 @@ class TtcS {
 
   /// Shown against a logged date the engine did not count.
   String get notCountedChip => _p('Not counted', 'Gina nahi gaya');
-  String get notCountedWhy => _p(
-      'Too close to the entry before it to be a separate cycle, so it is kept but not used in the average.',
-      'Pichhli entry ke itne paas hai ki alag cycle nahi ho sakta, isliye rakha gaya hai par average mein use nahi hota.');
+
+  /// Why THIS cycle was left out — and there are two different reasons.
+  ///
+  /// One string used to cover both, and it named the wrong neighbour besides:
+  /// "too close to the entry **before** it". The cycle shown on a row begins on
+  /// that date and ends at the next one, so shortness is about what comes
+  /// after. And a gap of 100+ days is not "too close" at all — it is the
+  /// opposite, and almost always a cycle nobody logged rather than a real one.
+  /// Telling her a four-month gap was "too close together" is the app visibly
+  /// not reading her own data.
+  String notCountedWhy(int days) => days < 15
+      ? _p(
+          'Too close to the next entry to be a separate cycle, so it is kept but not used in the average.',
+          'Agli entry ke itne paas hai ki alag cycle nahi ho sakta, isliye rakha gaya hai par average mein use nahi hota.')
+      : _p(
+          'Longer than a cycle usually runs — most often a period that was never logged. Kept, but not used in the average.',
+          'Cycle aam taur par itna lamba nahi hota - zyadatar aisa tab hota hai jab koi period log hi nahi hua. Rakha gaya hai, par average mein use nahi hota.');
 
   /// Shown at the moment she logs a start that cannot be a new cycle.
   String tooCloseWarning(int days) => _p(
@@ -278,6 +292,12 @@ class TtcS {
   String get cycleCompanion => _p('Cycle Companion', 'Cycle Companion');
   String get cycleHistory => _p('Your cycles', 'Aapke cycles');
   String get cycleAverage => _p('Average length', 'Average lambai');
+
+  /// With exactly one completed cycle there is no average and no range - there
+  /// is one observation. Labelling it "Average length · Range 54-54 days" was
+  /// the app dressing a single month up as a pattern.
+  String get cycleFirstFull =>
+      _p('Your first full cycle', 'Aapka pehla poora cycle');
   String get cycleRange => _p('Range', 'Range');
   String get cycleDays => _p('days', 'din');
   String get cycleIrregularNote => _p(

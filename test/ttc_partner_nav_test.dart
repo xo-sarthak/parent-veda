@@ -115,6 +115,25 @@ void main() {
   });
 
   // ===========================================================================
+  group('his nav is his colour, not hers', () {
+    test('the inactive tabs are not left on her lavender', () {
+      // `ttcMuted` is 0xFFA99CBB - a lavender grey. Against her near-white
+      // background it reads as neutral; against his warm cream one it reads
+      // unmistakably as HER PURPLE. Only the active pill had been given a slate
+      // variant, so four of his five tabs wore the other app's colour on every
+      // screen of his half.
+      //
+      // A muted tone is never neutral in the abstract. It is neutral against
+      // the background it was picked for.
+      final src =
+          File('lib/screens/ttc/ttc_common.dart').readAsStringSync();
+      final nav = src.substring(src.indexOf('class TtcBottomNav'));
+      expect(nav, contains('slate ? ttcSlateSoft : ttcMuted'),
+          reason: 'inactive tabs no longer switch palette');
+    });
+  });
+
+  // ===========================================================================
   group("his Today's learn is an article, not a caption", () {
     // The same insight rendered as a full read on her Today and as a title plus
     // one line on his. Both open the same screen, but only hers looked like it

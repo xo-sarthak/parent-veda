@@ -88,6 +88,15 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
               open: _legendOpen,
               onToggle: () => setState(() => _legendOpen = !_legendOpen),
               behaviour: TtcStore.instance.behaviour,
+              // A marker can be absent for TWO reasons and the legend only knew
+              // one. It correctly hid the fertile rows on a clinic path, then
+              // showed them anyway when the engine had refused to estimate from
+              // an unreliable history - so the key advertised two colours the
+              // grid never drew, on the one screen she would go looking for
+              // them.
+              hasEstimate: const TtcChapterEngine()
+                      .estimatedOvulationDay(TtcStore.instance.state()) !=
+                  null,
               t: t,
             ),
             const SizedBox(height: 18),
@@ -569,6 +578,7 @@ class _Legend extends StatelessWidget {
     required this.open,
     required this.onToggle,
     required this.behaviour,
+    required this.hasEstimate,
     required this.t,
   });
 
@@ -582,6 +592,15 @@ class _Legend extends StatelessWidget {
   /// all deliberately suppressed - read a key for three things their grid would
   /// never draw. Opening the legend by default is what made that visible.
   final TtcPathwayBehaviour behaviour;
+
+  /// The OTHER reason those markers can be missing: the engine looked at her
+  /// history, found a gap long enough to be a cycle nobody logged, and refused
+  /// to estimate. The pathway is still `natural`, so `showsFertilityWindow`
+  /// stays true and the key kept promising a shading the grid had not drawn.
+  ///
+  /// Suppressing a marker and advertising it are decided in different places,
+  /// which is exactly how they came apart.
+  final bool hasEstimate;
 
   final TtcS t;
 
@@ -601,7 +620,7 @@ class _Legend extends StatelessWidget {
         if (open) ...[
           const SizedBox(height: 14),
           _row(ttcCoral, t.calendarPeriod, filled: true),
-          if (behaviour.showsFertilityWindow) ...[
+          if (behaviour.showsFertilityWindow && hasEstimate) ...[
             _row(ttcFertilityTint(FertilityLevel.peak), t.calendarFertile,
                 filled: true),
             // Ovulation is weight on the band, not a swatch - so the legend

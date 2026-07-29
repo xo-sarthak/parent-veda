@@ -30,6 +30,7 @@ import 'ttc_askveda_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_insight_screen.dart';
 import 'ttc_journal_screen.dart';
+import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
 
 class TtcPartnerTodayScreen extends StatelessWidget {
@@ -186,11 +187,45 @@ class _Hero extends StatelessWidget {
           colors: [ttcSlate, ttcSlateDeep],
         ),
       ),
+      // Hers answers three questions above the fold - where am I, what is next,
+      // show me it all. His answered none: a title, a tagline and one flat bar
+      // that could have been at any point of anything. The hero parity work was
+      // done on her side only, so the stage still had a first-class half and a
+      // second-class one.
+      //
+      // ONE THING IS DELIBERATELY MISSING. Hers reads "Day 2 of 28 in this
+      // chapter"; his does not, and must not. That number is her position in
+      // her cycle, and he is only ever given the chapter she publishes - his
+      // device holds no rows in `ttc_cycles`. Copying the line across "for
+      // parity" would route around the own-row rule in prose, which is exactly
+      // the leak the partner Ask Veda door is careful to avoid. The segmented
+      // bar is chapter-level and therefore safe.
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(t.partnerTodayTitle,
-            style: ttcBody(12,
-                color: Colors.white.withValues(alpha: 0.82),
-                w: FontWeight.w700)),
+        Row(children: [
+          Expanded(
+            child: Text(t.partnerTodayTitle,
+                style: ttcBody(12,
+                    color: Colors.white.withValues(alpha: 0.82),
+                    w: FontWeight.w700)),
+          ),
+          // "Show me it all" - the same door hers has. Structure is never
+          // personalised, so he reaches the map too.
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const TtcJourneyMapScreen(),
+              settings: const RouteSettings(name: 'ttc/journey'),
+            )),
+            behavior: HitTestBehavior.opaque,
+            child: Row(children: [
+              Text(t.journeyMap,
+                  style: ttcBody(12.5,
+                      color: Colors.white, w: FontWeight.w700)),
+              const SizedBox(width: 3),
+              const Icon(Icons.chevron_right_rounded,
+                  size: 17, color: Colors.white),
+            ]),
+          ),
+        ]),
         const SizedBox(height: 10),
         // Fraunces, as the father mode does for its headers.
         Text(chapter.title(hi),
@@ -200,7 +235,16 @@ class _Hero extends StatelessWidget {
             style: ttcBody(13,
                 color: Colors.white.withValues(alpha: 0.92), h: 1.5)),
         const SizedBox(height: 16),
-        TtcProgressBar(value: today.chapterProgress),
+        TtcChapterBar(today: today),
+        const SizedBox(height: 14),
+        Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
+        const SizedBox(height: 12),
+        // What is coming, named by its trigger rather than a countdown - the
+        // same copy hers uses, so the two cannot describe the journey
+        // differently to the two people on it.
+        Text(chapter.nextUp(hi),
+            style: ttcBody(12.5,
+                color: Colors.white.withValues(alpha: 0.9), h: 1.5)),
       ]),
     );
   }

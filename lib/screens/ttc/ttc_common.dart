@@ -607,13 +607,24 @@ class TtcBottomNav extends StatelessWidget {
                     style: ttcBody(12.5, color: Colors.white, w: FontWeight.w700)),
               ])
             : Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 20, color: ttcMuted),
+                // The ACTIVE pill was made slate for him and the four inactive
+                // tabs were left on `ttcMuted` - which is 0xFFA99CBB, a
+                // lavender grey. It reads as neutral on her near-white
+                // background and unmistakably as HER PURPLE on his warm cream
+                // one. So four of his five tabs were tinted the other app's
+                // colour, on every screen of his half.
+                //
+                // A muted tone is never neutral in the abstract; it is neutral
+                // against the background it was chosen for.
+                Icon(icon, size: 20, color: slate ? ttcSlateSoft : ttcMuted),
                 const SizedBox(height: 3),
                 Text(label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: ttcBody(8.5, color: ttcMuted, w: FontWeight.w600)),
+                    style: ttcBody(8.5,
+                        color: slate ? ttcSlateSoft : ttcMuted,
+                        w: FontWeight.w600)),
               ]),
       ),
     );

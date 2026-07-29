@@ -39,7 +39,14 @@ class TtcCycleScreen extends StatelessWidget {
         final today = TtcStore.instance.today;
         final lengths = cycle.cycleLengths;
         const engine = TtcChapterEngine();
-        final irregular = engine.isIrregular(TtcStore.instance.state());
+        final state = TtcStore.instance.state();
+        final irregular = engine.isIrregular(state);
+        // The engine has already decided this history cannot carry an estimate.
+        // Today says so out loud; this screen used to print "Average length 54
+        // days · Range 54-54" anyway, from a single gap that was itself a month
+        // nobody logged. Two screens, one dataset, opposite verdicts - and the
+        // confident one was wrong.
+        final untrustworthy = engine.hasUnreliableHistory(state);
 
         return Scaffold(
           backgroundColor: ttcBg,
@@ -65,22 +72,47 @@ class TtcCycleScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // ---- what we know about her rhythm ------------------------
-                if (lengths.isNotEmpty) ...[
+                if (untrustworthy) ...[
+                  // Word for word what Today shows, from the same strings, so
+                  // the two can never drift into disagreeing again.
+                  ttcSectionTitle(t.yourRhythm),
+                  TtcCard(
+                    color: ttcPanel,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.noEstHistoryOffTitle, style: ttcJakarta(15)),
+                          const SizedBox(height: 8),
+                          Text(t.noEstHistoryOffBody,
+                              style: ttcBody(12.5, h: 1.55)),
+                        ]),
+                  ),
+                  const SizedBox(height: 20),
+                ] else if (lengths.isNotEmpty) ...[
                   ttcSectionTitle(t.yourRhythm),
                   TtcCard(
                     child: Column(children: [
                       Row(children: [
                         Expanded(
                           child: _stat(
-                              t.cycleAverage,
-                              '${engine.cycleLengthFor(TtcStore.instance.state())} ${t.cycleDays}'),
+                              // One cycle is not an average. Calling it one
+                              // invites her to plan around a single month.
+                              lengths.length == 1
+                                  ? t.cycleFirstFull
+                                  : t.cycleAverage,
+                              '${engine.cycleLengthFor(state)} ${t.cycleDays}'),
                         ),
-                        Container(width: 1, height: 34, color: ttcLine),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: _stat(t.cycleRange,
-                              '${lengths.reduce((a, b) => a < b ? a : b)}–${lengths.reduce((a, b) => a > b ? a : b)} ${t.cycleDays}'),
-                        ),
+                        // A "range" needs two points. "54-54 days" was the app
+                        // dressing one observation up as a spread.
+                        if (lengths.length > 1) ...[
+                          Container(width: 1, height: 34, color: ttcLine),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: _stat(t.cycleRange,
+                                '${lengths.reduce((a, b) => a < b ? a : b)}–${lengths.reduce((a, b) => a > b ? a : b)} ${t.cycleDays}'),
+                          ),
+                        ] else
+                          const Spacer(),
                       ]),
                       if (irregular) ...[
                         const SizedBox(height: 16),
@@ -129,17 +161,10 @@ class TtcCycleScreen extends StatelessWidget {
                   )
                 else
                   for (var i = cycle.periodStarts.length - 1; i >= 0; i--) ...[
-                    _PeriodRow(
-                      start: cycle.periodStarts[i],
-                      // The length of the cycle that BEGAN on this date, which
-                      // only exists once the next period has been logged.
-                      length: i + 1 < cycle.periodStarts.length
-                          ? cycle.periodStarts[i + 1]
-                              .difference(cycle.periodStarts[i])
-                              .inDays
-                          : null,
-                      t: t,
-                    ),
+                    // The row derives its own length and verdict from the store
+                    // - see `cycleFrom`. Passing a length in from here is what
+                    // let the two drift apart.
+                    _PeriodRow(start: cycle.periodStarts[i], t: t),
                     const SizedBox(height: 10),
                   ],
 
@@ -212,22 +237,26 @@ class _CycleHero extends StatelessWidget {
 }
 
 class _PeriodRow extends StatelessWidget {
-  const _PeriodRow({required this.start, required this.length, required this.t});
+  const _PeriodRow({required this.start, required this.t});
 
   final DateTime start;
-  final int? length;
   final TtcS t;
 
   @override
   Widget build(BuildContext context) {
-    // Whether this gap reached the average at all.
+    // The length AND the verdict, from one call.
     //
-    // The stats card and this list used to disagree in plain sight: "Average
-    // 54 days · Range 54-54" sitting directly above gaps of 1, 2, 3 and 6.
-    // The stats were right - every short gap had been discarded - but nothing
-    // said so, so the screen simply looked wrong.
-    final gap = CycleStore.instance.gapBefore(start);
-    final uncounted = gap != null && !gap.counted;
+    // They used to come from two: the number was the cycle that began on this
+    // date, the verdict was about the cycle before it. So a row could read
+    // "54 days · Not counted · too close to the entry before it" - both halves
+    // true, about different cycles - while a four-day gap sat there marked as
+    // counted, contradicting the average printed inches above it.
+    //
+    // The stats card and this list have to agree, and the only reliable way to
+    // make two things agree is to stop computing them twice.
+    final cycle = CycleStore.instance.cycleFrom(start);
+    final length = cycle?.days;
+    final uncounted = cycle != null && !cycle.counted;
 
     return TtcCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -243,7 +272,7 @@ class _PeriodRow extends StatelessWidget {
                     w: FontWeight.w600)),
           ),
           if (length != null)
-            Text(t.cycleDayCount(length!),
+            Text(t.cycleDayCount(length),
                 style: ttcBody(12.5, color: ttcMuted, w: FontWeight.w700)),
           GestureDetector(
             onTap: () => CycleStore.instance.removePeriodStart(start),
@@ -269,7 +298,7 @@ class _PeriodRow extends StatelessWidget {
             ),
             const SizedBox(width: 9),
             Expanded(
-              child: Text(t.notCountedWhy,
+              child: Text(t.notCountedWhy(cycle.days),
                   style: ttcBody(11, color: ttcMuted, h: 1.45)),
             ),
           ]),

@@ -90,7 +90,7 @@ positive-test transition. **For testing it is a hard block**, and a claim in
 Scrolled to the end: the page simply stops. No Today / Prepare / Tools /
 Calendar / Community. His only exit is toggling back to Her.
 
-## A-6 — fixed (TTC only). The Ask Veda FAB collides with content on every scrollable screen
+## A-6 — half fixed (TTC only). The Ask Veda FAB collides with content on every scrollable screen
 
 Pinned mid-right at roughly 73% of viewport height, over scrolling content, with
 no offset. **Sixteen screens affected.** It is not a polish issue — it blocks
@@ -129,8 +129,24 @@ One deliberate exception, named rather than exempted: **Ask Veda's own screen**,
 where `FabRouteObserver` suppresses the FAB — it will not offer to open the
 screen you are standing on — so its lists clear the pinned composer instead.
 
-**Still open, and not mine to close alone: pregnancy and parenting have the
-identical collision.** The constant is shared and ready; adopting it there
+**Half, not all — verified on the device after the fix.** The reserve guarantees
+that the END of a list clears the button, which is what unblocked the delete
+`×`, the **Join** and the ₹599 price: those sit at the bottom of their lists and
+could not be scrolled past. Confirmed working.
+
+What it does **not** do is stop content passing *under* the FAB mid-scroll. On
+the device it still sits over a Tools tile, over the "What you can do" paragraph
+in Him mode, and over a cycle row. Nothing is unreachable — scrolling brings it
+out — but the button is opaque and it is over prose.
+
+Closing that half means changing the FAB itself, not the screens: hide it while
+the user is scrolling and restore it when they stop, or give it a translucent
+scrim. Both are one small change in `MaterialApp.builder` and both affect all
+three stages at once, so it is a product call.
+
+**Also still open, and not mine to close alone: pregnancy and parenting have the
+identical collision** — visible on the pregnancy home, where the FAB sits on
+"Today's parenting tip". The constant is shared and ready; adopting it there
 touches two shipped stages carrying real user data, which needs your call rather
 than my initiative.
 
@@ -836,3 +852,196 @@ Pinned by `test/ttc_stage_exit_test.dart`, including that the new shell becomes
 the *first* route. That last one guards a subtler bug than the dead button: if
 TTC stayed underneath, a system back gesture from her new pregnancy home would
 drop her into the stage she had just left, on the day she left it.
+
+## A-77 — fixed. The cycle list printed one cycle's length beside another cycle's verdict
+
+Found on the device, on the second pass, on a screen that had already been
+audited once and "fixed" once. Cycle Companion showed:
+
+> **8 May 2026 · 54 days** — *Not counted* — "Too close to the entry before it
+> to be a separate cycle."
+
+Fifty-four days is not too close. It is a perfectly ordinary — if long — cycle,
+and comfortably inside the plausible window.
+
+**Two sources for one fact.** `_PeriodRow` printed `length`, computed in the
+list builder as `starts[i+1] - starts[i]` — the cycle that *began* on that date.
+It took the "not counted" verdict from `CycleStore.gapBefore(start)`, which is
+`starts[i] - starts[i-1]` — the cycle *before* it. Every row on the screen was
+describing two different cycles at once. Both halves were individually true.
+Together they were nonsense.
+
+It failed in both directions, and the other one is worse:
+
+* the **8 May** row printed 54 days (its own cycle) and was judged on 14 (the
+  previous one), so a normal cycle was labelled discarded;
+* the **1 July** row was a **4-day** cycle and was judged on the 54-day gap
+  before it, so it displayed as **counted** — with the coral dot — while the
+  average printed inches above it correctly excluded it. The list contradicting
+  the statistic beside it is the exact defect the row's own code comment claims
+  to have fixed. It had been fixed in the wrong direction.
+
+The oldest entry inherited the same flaw for free: `gapBefore` returns null for
+index 0, which rendered as "counted" regardless of what its cycle actually was.
+
+**The fix is structural, not arithmetic.** One store method, `cycleFrom(start)`,
+returns the length *and* the verdict together, and the row derives both from it.
+Passing a length in from the list is what let them drift, so the widget no
+longer accepts one.
+
+> Two sources for one fact will disagree eventually. The bug is not that
+> somebody subtracted in the wrong order — it is that the screen was in a
+> position to be wrong at all.
+
+**Copy fixed alongside it**, because the string was wrong twice over. It named
+the wrong neighbour — a cycle shown on a row runs *forward*, so shortness is
+about the **next** entry, not the previous one — and one string served both
+exclusion reasons, so a 120-day gap was explained to her as "too close
+together". A gap that long is almost always a period nobody logged, and telling
+her otherwise is the app visibly not reading her own data. Two strings now,
+chosen by direction.
+
+Pinned by `test/ttc_data_chain_test.dart`, including a cross-check that the set
+of rows marked counted is exactly `cycleLengths` — the one place the list and
+the stats card meet.
+
+**Worth noting for the next audit:** this screen was walked on the device in the
+first pass and the row was read as correct, because 54 days *looks* plausible
+next to a date. It only broke once the reasons were read against the numbers.
+Neither reading the code nor the 1,610 tests caught it.
+
+## A-78 — fixed. Cycle Companion printed statistics from a history Today refuses to trust
+
+Same screen, one scroll up from A-77, and the same class of fault: two parts of
+the app looking at one dataset and reaching opposite conclusions.
+
+**Today** examined her history, decided a recorded gap was long enough to be a
+cycle nobody logged, and said so — "Something in your dates looks off" — and
+refused to print an ovulation estimate.
+
+**Cycle Companion**, one tap away, printed from that same gap:
+
+> **AVERAGE LENGTH** 54 days  ·  **RANGE** 54–54 days
+
+in the largest type on the screen, with no caveat.
+
+The confident one was the wrong one, which is the dangerous way round. Silence
+would have been safer than a number, and a woman planning around a 54-day
+average because the app told her so in bold is worse off than one told nothing.
+
+Two faults, fixed together:
+
+* **The statistics are now behind the same gate Today uses** —
+  `engine.hasUnreliableHistory` — and when it closes, the card shows *Today's
+  own strings* rather than inventing a second explanation. Sharing the copy is
+  the point: it is what stops the two screens drifting back into disagreement.
+* **One cycle is not an average, and never a range.** "Range 54–54 days" is a
+  single observation wearing a spread's clothes. With one completed cycle the
+  card now says **"Your first full cycle"** and shows no range at all.
+
+> If the engine will not estimate from a history, no screen may present
+> statistics derived from it. A refusal that one screen honours and another
+> ignores is not a refusal.
+
+Pinned by `test/ttc_rhythm_honesty_test.dart`.
+
+## A-79 — fixed. The hero parity work was done on her side only
+
+A-75 rebuilt her hero to answer three questions above the fold — where am I,
+what is next, show me it all. His still read: a title, a tagline, and one flat
+progress bar that could have been at any point of anything. The stage had a
+first-class half and a second-class one.
+
+His hero now carries the segmented chapter bar, the same `nextUp()` copy hers
+uses — so the journey cannot be described differently to the two people on it —
+and the Journey Map door. Structure is never personalised, so he reaches the map
+too.
+
+**One thing is deliberately missing and must stay missing.** Hers reads "Day 2
+of 28 in this chapter". His does not. That number is her position in her own
+cycle, and he receives only the chapter she publishes — his device holds no rows
+in `ttc_cycles`. Copying the line across "for parity" would route around the
+own-row rule in prose, which is precisely the leak the partner Ask Veda door is
+careful to avoid. The segmented bar is chapter-level, and therefore safe.
+
+Both the presence and the absence are pinned in
+`test/ttc_partner_biology_test.dart`.
+
+## A-80 — fixed. Four of his five nav tabs were tinted her purple
+
+`ttcMuted` is `0xFFA99CBB` — a lavender grey. The active nav pill had been given
+a slate variant for him; the four inactive tabs were left on `ttcMuted`, which
+reads as neutral against her near-white background (`0xFFFBF9FE`) and
+unmistakably as **her purple** against his warm cream one (`0xFFF4EFE8`). On
+every screen of his half.
+
+> A muted tone is never neutral in the abstract. It is neutral against the
+> background it was chosen for.
+
+Now `ttcSlateSoft` when slate. Pinned in `test/ttc_partner_nav_test.dart`.
+
+## A-8 — still open, and it now lands on new content
+
+The floating **Her | Him** pill sits in `TtcPage`'s overlay slot at `bottom: 96`
+and covers whatever card is behind it. In Him mode it currently sits across the
+title of the new biology card — *"What's happening in her bod…"* — which is the
+one card on his screen written to be read.
+
+It is the same shape of problem as A-6: a floating element that is in no
+screen's layout. Two differences make it easier to settle:
+
+* it is a **testing affordance**, not a feature. Real pairing (A-62) replaces
+  it, and the pill disappears with it.
+* it is TTC-only, so fixing it touches nothing shipped.
+
+Cheapest honest fix until pairing exists: move it into the header row beside the
+profile door, where it is chrome rather than an overlay. Left alone for now
+because it is deliberately temporary — noted so that stays a decision rather
+than an oversight.
+
+## A-81 — fixed. The calendar legend advertised two colours the grid never drew
+
+Third instance of the same family in one sitting, and the one that shows the
+pattern clearly.
+
+The legend already had the right principle written on it — *"A legend must
+describe THIS calendar, not every calendar"* — and correctly hid **Fertile
+days** and **Estimated ovulation** on a clinic path, where those markers are
+deliberately suppressed.
+
+But a marker can be absent for **two** reasons, and it knew one. When the engine
+refuses to estimate from an unreliable history, the pathway is still `natural`,
+so `showsFertilityWindow` stays true and the key kept promising a shading the
+grid had not drawn — on the one screen she would go looking for it.
+
+> Suppressing a marker and advertising it were decided in different places.
+> That is how they came apart, and it is the same shape as A-77 (a length and a
+> verdict from two sources) and A-78 (an estimate refused on one screen and
+> printed on another).
+
+The legend now asks the engine directly. Pinned in
+`test/ttc_rhythm_honesty_test.dart`, including a guard that the engine really
+does refuse on this history — otherwise the gate would be dead code and the test
+would pass vacuously.
+
+---
+
+## What this second pass says about the first one
+
+Four defects (A-77 to A-81) on screens that had already been walked once, and
+three of them are the same fault wearing different clothes: **one fact computed
+in two places, and the two disagreeing.**
+
+* a cycle's length and whether it counted — two sources
+* an estimate refused by the engine, printed by a screen
+* a marker suppressed by the grid, advertised by the legend
+
+None was catchable by reading code, because each half is correct on its own. None
+was catchable by the 1,623 tests, because each half was tested on its own. They
+were only visible with both halves on screen at the same time, which is what a
+device pass is *for*.
+
+The first pass missed them because it read each screen for what it said, not for
+whether its parts agreed with each other. The check that would have caught all
+three: **for every number on screen, find the other place that number is
+derived, and ask whether they can ever differ.**
