@@ -635,7 +635,14 @@ belongs to the other terminal.
 *Opened 2026-07-28 alongside the entitlement engine build. Full scoping in
 `docs/ADMIN-PANEL.md` §7; these are the points deliberately left open.*
 
-## 11.1 Where HR actually sees their stats — UNDECIDED
+## 11.1 Where HR actually sees their stats — IN-APP BUILT, WEB STILL OPEN
+
+**Update 2026-07-29:** the in-app surface is built (`0060` + Profile → Employer
+Benefits → Programme, behind the `sponsor_admin` capability). The web option
+stays open rather than closed: the two read the same functions, so a `/portal`
+page later is a front-end job. The original reasoning is kept below because the
+argument against a phone has not gone away, it has only been outweighed by
+being able to ship something.
 
 The aggregation views are the product; the screen over them is a thin renderer.
 That is deliberate, because the surface is not settled:
@@ -715,6 +722,65 @@ provider.
 **Do not be tempted to skip the code.** Without it, anyone who types
 `someone@google.com` gets Premium — the domain list becomes free access for the
 internet. The code is the only thing proving control of the address.
+
+**Interim, so this can be demonstrated (0059).** A nullable
+`sponsors.dev_bypass_code`: when set, that one sponsor also accepts a fixed
+string. Everything else on the path stays real — domain match, active sponsor,
+free seat, rate limit, single use, attempt limit — only the inbox is skipped.
+Kept honest three ways: it is opt-in per sponsor rather than a global flag, a
+check constraint refuses anything under ten characters, and a bypassed grant
+audits as `activated_dev_bypass` rather than `activated`, so it is findable.
+Directus cannot set it (0059 replaces the table-level grant on `sponsors` with a
+column list that omits it). **Every real customer must have it null**:
+
+```sql
+select id, name, status from public.sponsors where dev_bypass_code is not null;
+```
+
+The rejected alternative was returning the real code from
+`request_sponsor_activation()`. That deletes the feature while leaving the UI
+looking like it still has it — which is worse than absent, because it would be
+trusted.
+
+## 11.7 The sponsored consultation credit is granted client-side
+
+`SponsorBenefits.sync()` mints the floating credit in `BookingStore` once the
+server confirms the capability. The credit is therefore a **local** fact:
+`book_slot()` (0029) counts seats but does not check an entitlement, so a
+modified client could book without one.
+
+Not new — the referral reward has worked this way since `0035`, and this reuses
+that counter deliberately rather than inventing a second one. But it is now the
+same mechanism carrying something an employer paid for, which raises what a
+defect costs.
+
+The fix is a check inside `book_slot()`, not a better client: mark consult
+offerings as capability-gated and refuse there. Deferred because payments are
+still stubbed, so nothing about the money path is settled yet.
+
+## 11.8 A sponsor admin consumes a seat
+
+`my_sponsor_admin_id()` (0060) resolves the company from the caller's
+`sponsor_members` row, so an HR person must activate like any employee. Simple,
+and it means granting the plan to the wrong person still shows them nothing
+unless they also control an address at that domain.
+
+The cost: an HR contact who is not a parent takes one of the seats their company
+bought, and an HR contact at an agency cannot administer at all. Acceptable at
+this size; the fix is a nullable `sponsor_members.role` or a separate
+`sponsor_admins` table, and it should wait until a real customer hits it rather
+than be guessed at now.
+
+## 11.9 Company events and resources have no audience scope
+
+`sponsor_events` and `sponsor_resources` capabilities are registered and the
+Employer Benefits screen renders their sections, but `programmes` (0054) has no
+`sponsor_id` audience column, so there is nothing to filter by and nothing to
+show. The sections say so plainly rather than showing a fabricated zero.
+
+One additive column on `programmes` plus a filter in `programmes_published`
+closes it. Left until a sponsor actually wants to run a session, because a
+scoping rule invented before its first use is a guess.
 
 ---
 

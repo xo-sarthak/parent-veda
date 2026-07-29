@@ -36,6 +36,12 @@ class Caps {
   static const sponsorResources = 'sponsor_resources';
   static const sponsorAnnouncements = 'sponsor_announcements';
   static const masterclassAccess = 'masterclass_access';
+
+  /// Reveals the Programme section — take-up of the benefit an organisation
+  /// sponsors. Granted by its OWN plan (0060), never by `employer_standard`:
+  /// bundling it with the employee plan would show every colleague the
+  /// roster. It is the one capability here that is about other people.
+  static const sponsorAdmin = 'sponsor_admin';
 }
 
 /// The sponsor behind a user's benefit, when there is one.

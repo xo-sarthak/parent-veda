@@ -64,6 +64,9 @@ void main() {
     'plan_capabilities': 'the entitlement matrix itself',
     'sponsors': 'organisations sponsoring a plan — ops manages these',
     'sponsor_domains': 'the eligibility rule; NOT public-read (a customer list)',
+    'sponsor_analytics_config': 'the k-anonymity threshold for HR analytics '
+        '(0060) — select+update only, and it exists as a row precisely so a '
+        'privacy decision can be tightened without a release',
   };
 
   /// True when the store reads a VIEW rather than a base table. Views play by

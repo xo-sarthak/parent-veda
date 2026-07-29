@@ -464,7 +464,167 @@ readable report, nothing left behind. It is what found the defect.
 
 ---
 
-## 10. Reading list, in order
+## 10. Multi-tenancy: letting a customer see their own data and nothing else
+
+The sponsor programme (`0057`–`0060`) is the first place ParentVeda has a
+*second kind of customer* reading the database — an employer, looking at
+take-up of a benefit they bought for their staff. That is a different problem
+from co-parenting, and it is worth its own section because the failure mode is
+categorical: one company seeing another company's rows is not a bug you patch,
+it is the end of the product.
+
+### (a) Never ask "is this user Premium?" — ask "does this user have X?"
+
+The obvious design is a `plan` column and `if plan == 'premium'` at each gate.
+It survives one plan. Then it is `if premium or employer`, then `or insurer`,
+then `or hospital` — and every one of those conditions lives in **app code**, so
+onboarding a new customer type means a release, a review, and a rollout to
+people who never update.
+
+Capabilities invert it (`0057`). A gate asks one question that never changes
+("may this user book a sponsored consultation?"); *who may* is a row in
+`plan_capabilities`. Adding an insurer tier becomes data entry.
+
+The migration was seeded so the `free` plan grants everything, which means it
+changed nothing on the day it ran. **That is what makes it safe to ship an
+architecture before the product decisions it will eventually carry** — the same
+trick `0019` and `0036` used. Making something Premium later is deleting one
+row.
+
+> The general fact: a design that turns future *decisions* into future *data*
+> is worth an extra table. A design that turns them into future *conditions* is
+> not, because conditions accumulate in the place that is hardest to change.
+
+### (b) The tenant is resolved from the session, never from a parameter
+
+```sql
+create function public.sponsor_roster() returns table (...)
+  security definer as $$
+  select ... where m.sponsor_id = public.my_sponsor_admin_id();
+$$;
+```
+
+`my_sponsor_admin_id()` reads `auth.uid()`. There is no argument, so there is
+nothing for a modified client to change and no shape of the call that answers
+about another company. Same reasoning as `expert_roster()` in `0030`.
+
+This also settles a question that keeps coming back: is a guessable URL like
+`/portal/acme` a risk? No — **the URL must never determine access; the session
+must.** Scope the query to the caller in Postgres and a guessed URL returns
+zero rows.
+
+### (c) The return type IS the privacy policy
+
+`sponsor_roster()` returns `work_email, status, activated_at, removed_at`. Not
+`user_id`, not a name, not a booking, not a last-seen.
+
+A caller cannot select a column a function does not return. So the promise made
+to the employee — *your employer sees whether you activated, never what you
+did* — is enforced by a **signature** rather than by everyone remembering. A
+policy can be forgotten; a column that does not exist cannot be selected.
+
+Compare with `0034`, where the *opposite* call was right: `expert_roster()` was
+widened to include the patient's name and due date, because a doctor about to
+see someone needs to know who. Same mechanism, opposite answer — which is the
+point. The return type is where you make that decision, and it is the only place
+it is enforced.
+
+### (d) Aggregate in the database, not in the client
+
+Every number on the HR dashboard arrives already counted. The alternative —
+returning rows and counting in Dart — leaks by construction: to compute *how
+many consultations*, the client would first have to **hold the consultations**.
+
+> If a screen shows a total, ask what the client had to receive in order to
+> compute it. That, not the total, is what you shipped.
+
+It is also why a web portal later is a front-end job rather than a rebuild: the
+product is the functions.
+
+### (e) k-anonymity: when an aggregate is still a name
+
+"Three consultations this month" is anonymous at Infosys and is a *name* at a
+thirty-person startup. So behavioural figures are withheld below a cohort of
+`n` (default 5, a **config row** so a privacy decision can be tightened without
+a release), and the API returns `null` with a `suppressed` flag — not `0`.
+
+The null-versus-zero distinction is the whole thing. A zero is a claim about
+the company ("nobody is using it"); a null is a statement about our policy. Show
+the wrong one and a sponsor concludes the benefit is failing.
+
+**What is *not* suppressed:** seats and activation counts. Those are commercial
+facts about a contract the customer signed, they are not behaviour, and refusing
+to tell someone how many of their own seats are used would be absurd. The line
+is behaviour, not headcount — and drawing it in the right place is what makes
+the rest of the suppression credible.
+
+### (f) Column-level grants do not narrow a table-level grant
+
+A real Postgres trap, hit in `0059`. `0058` had done:
+
+```sql
+grant select, insert, update, delete on public.sponsors to directus_cms;
+```
+
+Then `0059` added a demo-only `dev_bypass_code` column that the CMS must never
+write. The instinct is:
+
+```sql
+revoke update (dev_bypass_code) on public.sponsors from directus_cms;   -- does nothing useful
+```
+
+It does not work. A table-level `UPDATE` grant is a single privilege covering
+every column, present and future; a column-level revoke cannot carve a hole in
+it. The fix is to drop the table-level grant and re-grant an explicit column
+list:
+
+```sql
+revoke insert, update on public.sponsors from directus_cms;
+grant insert (id, name, kind, plan_id, ...), update (name, kind, ...)
+  on public.sponsors to directus_cms;
+```
+
+> The general fact: privileges in Postgres are granted, not subtracted. If you
+> need an exception, you need a narrower grant — not a revoke on top of a broad
+> one. The same is true of RLS: policies are permissive by default and OR
+> together, so adding one never restricts anything.
+
+### (g) A backdoor is acceptable only if it is findable
+
+`0059` exists because there is no email provider yet (`STILL-OPEN` §11.6), so
+activation could not be demonstrated at all. The tempting fix — return the real
+code from `request_sponsor_activation()` — deletes the feature while leaving the
+UI *looking* like it still verifies, which is worse than having no verification,
+because the appearance would be trusted.
+
+What was done instead is worth generalising into four properties any deliberate
+weakening should have:
+
+1. **Scoped to one row**, not a global flag or an environment variable. A
+   forgotten demo sponsor cannot weaken anyone else.
+2. **Everything else stays real** — domain match, active customer, free seat,
+   rate limit, attempt limit, single use. Only the inbox is skipped.
+3. **Audited as a different fact.** A bypassed grant returns
+   `activated_dev_bypass`, so `admin_audit` distinguishes it from a verified
+   one. *A backdoor you cannot find in the log is the one that stays.*
+4. **Unreachable from the panel**, via (f) above, and constrained by the
+   database (`length >= 10`) so it cannot become guessable.
+
+Plus a one-line audit anybody can run: `select id from public.sponsors where
+dev_bypass_code is not null;`
+
+### Verifying it
+
+`supabase/seed/verify_sponsor_gates.sql`, same shape as `verify_admin_gates.sql`:
+every refusal path, real tables, a borrowed session via `set_config
+('request.jwt.claims', ...)` so `auth.uid()` resolves, and `raise exception` at
+the end to roll it all back. It asserts the cross-tenant case explicitly —
+including creating a member of the *other* sponsor first, because a leak test
+with nothing to leak passes for the wrong reason.
+
+---
+
+## 11. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -473,5 +633,11 @@ readable report, nothing left behind. It is what found the defect.
 5. `0022_pp_health.sql` — the co-parent pattern applied at scale.
 6. `0027_pp_name_votes.sql` — privacy past the limit of RLS.
 7. `0028_profile_events.sql` — the write-only shape (deny reads on purpose).
-8. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
-   client half of everything above.
+8. `0045_cms_role_and_grants.sql` — grants as the boundary, the panel as a
+   convenience layer on top of it (§9).
+9. `0057_entitlement_engine.sql` — capabilities instead of user types (§10a),
+   and a migration seeded so it changes nothing on the day it runs.
+10. `0060_sponsor_admin.sql` — multi-tenancy: the tenant from the session, the
+    privacy promise as a return type, suppression as a config row (§10b–e).
+11. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
+    client half of everything above.

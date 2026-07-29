@@ -38,6 +38,7 @@ import 'screens/splash_screen.dart';
 import 'services/app_shell.dart';
 import 'services/baby_voice_service.dart';
 import 'services/entitlement_store.dart';
+import 'services/sponsor_benefits.dart';
 import 'services/product_catalog_store.dart';
 import 'services/programme_store.dart';
 import 'services/read_store.dart';
@@ -223,6 +224,12 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // Supabase; a signed-out user resolves to nothing, exactly like an
     // uninitialised backend.
     EntitlementStore.instance.ensureLoaded();
+    // ...and turn what she holds into the thing it promises. A listener, not a
+    // call: the entitlement fetch is asynchronous, so a one-shot here would
+    // usually run before the answer arrived and the sponsored consultation
+    // credit would appear a launch late. Idempotent by construction — the
+    // credit id is derived from the sponsor id.
+    SponsorBenefits.attach();
     WatchStore.instance.init();
     ReadingStore.instance.init();
     RecoStore.instance.init();

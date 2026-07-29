@@ -7,6 +7,36 @@ than re-deriving. Read this, `docs/ADMIN-PANEL.md` §7 and `docs/STILL-OPEN.md`
 **Goal:** something demonstrable to a senior — a parent activates with a work
 email, Premium appears, and HR can see uptake.
 
+> ## STATUS — 2026-07-29, end of session: §2 (a)–(e) are BUILT
+>
+> Everything below in "what to build next" now exists. Migrations `0059`
+> (demo bypass) and `0060` (sponsor admin) are written but **not yet run** —
+> that is the one outstanding action, along with `supabase/seed/sponsor_demo.sql`.
+>
+> | Built | Where |
+> |---|---|
+> | Employer Benefits row (always visible) | `lib/screens/profile_screen.dart` — `_EmployerBenefitsCard` |
+> | Activation flow (email → code → welcome) | `lib/screens/enterprise/activation_flow_screen.dart` |
+> | The benefits screen | `lib/screens/enterprise/employer_benefits_screen.dart` |
+> | HR dashboard + roster | `lib/screens/enterprise/sponsor_dashboard_screen.dart` |
+> | Refusal vocabulary, both languages | `lib/screens/enterprise/enterprise_common.dart` |
+> | Credit bridge (reuses `grantFloatingCredit`) | `lib/services/sponsor_benefits.dart`, attached in `main.dart` |
+> | HR stats reader | `lib/services/sponsor_admin_store.dart` |
+> | 34 tests | `test/sponsor_enterprise_test.dart` |
+> | SQL verification | `supabase/seed/verify_sponsor_gates.sql` |
+>
+> **To demo:** run `0059`, `0060`, then `supabase/seed/sponsor_demo.sql`.
+> Activate in-app with any address `@parentveda-demo.com`, code
+> `DEMO-ACTIVATE-2026`. To see the HR side, `grant_plan(<your uid>,
+> 'sponsor_admin', 'internal', 'demo_northwind', null, 'demo setup')`.
+>
+> **New open points opened by this work:** `STILL-OPEN` §11.7 (the credit is
+> granted client-side), §11.8 (an admin consumes a seat), §11.9 (company
+> events/resources have no audience scope). The design reasoning is written up
+> in `BACKEND-PATTERNS` §10.
+>
+> **Next free migration number is `0061`.**
+
 ---
 
 ## 1. What is already built (do not rebuild)

@@ -41,6 +41,9 @@ import 'pregnancy_profile_screen.dart';
 import 'profile_analytics_screen.dart';
 import '../services/profile_analytics.dart';
 import 'auth/auth_flow_screen.dart';
+import 'enterprise/activation_flow_screen.dart';
+import 'enterprise/employer_benefits_screen.dart';
+import '../services/entitlement_store.dart';
 import 'bump_journey_screen.dart';
 import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
@@ -305,6 +308,17 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 14),
+          // --- Employer benefits ------------------------------------------
+          // ALWAYS VISIBLE, activated or not, and that is the deliberate part.
+          // The spec asks for this to be hidden from consumer users; CLAUDE.md
+          // says a feature is never hidden. Both are right about different
+          // halves: a parent whose company already pays for ParentVeda would
+          // never discover it if the door only appeared once she was through
+          // it, so the ROW is always here and the BENEFITS are only real once
+          // she has them. Shown to the father too — his employer may be the
+          // one sponsoring.
+          _EmployerBenefitsCard(controller: controller),
           const SizedBox(height: 14),
           // --- Language toggle --------------------------------------------
           _LanguageCard(controller: controller),
@@ -772,6 +786,70 @@ class _VaultCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The Employer Benefits row.
+///
+/// Two states, one entry point. Not activated: an invitation, worded so that
+/// someone whose company does NOT sponsor ParentVeda is not made to feel they
+/// are missing out on something — "your employer MAY already provide this".
+/// Activated: the benefit and who is paying for it, which is the only branding
+/// a sponsor ever gets in this app.
+///
+/// Reads [EntitlementStore] through an [AnimatedBuilder] so activating in the
+/// flow updates this row on the way back without anyone re-navigating.
+class _EmployerBenefitsCard extends StatelessWidget {
+  const _EmployerBenefitsCard({required this.controller});
+
+  final PregnancyController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: EntitlementStore.instance,
+      builder: (context, _) {
+        final sponsor = EntitlementStore.instance.sponsor;
+        final hinglish = controller.language.isHinglish;
+        final active = sponsor != null;
+
+        return _VaultCard(
+          // "Employer benefits" is left in English in both languages on
+          // purpose: it is what HR calls it in the email an employee will have
+          // already received, and matching that wording is worth more here
+          // than translating it.
+          title: 'Employer benefits',
+          subtitle: active
+              ? (hinglish
+                  ? 'ParentVeda Premium — ${sponsor.name} ki taraf se.'
+                  : 'ParentVeda Premium, provided by ${sponsor.name}.')
+              : (hinglish
+                  ? 'Ho sakta hai aapki company ParentVeda ka kharcha uthati '
+                      'ho. Work email se check kar lijiye.'
+                  : 'Your employer may already provide ParentVeda. Check with '
+                      'your work email.'),
+          trailing: active ? (hinglish ? 'Chalu' : 'Active') : '',
+          icon: active
+              ? Icons.workspace_premium_outlined
+              : Icons.business_outlined,
+          accent: AppTheme.primary600,
+          accentBg: AppTheme.primary50,
+          onTap: () {
+            if (active) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'enterprise/benefits'),
+                  builder: (_) =>
+                      EmployerBenefitsScreen(lang: controller.language),
+                ),
+              );
+            } else {
+              openActivationFlow(context, lang: controller.language);
+            }
+          },
+        );
+      },
     );
   }
 }
