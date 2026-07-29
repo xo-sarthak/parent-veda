@@ -441,6 +441,15 @@ class TtcS {
       _p('What she may be carrying', 'Wo kya jhel rahi hain');
   String get partnerYouCan => _p('What you can do', 'Aap kya kar sakte hain');
   String get partnerYourBody => _p('Your half of this', 'Iska aapka aadha hissa');
+
+  /// The biology card his side never had. Titled as understanding rather than
+  /// instruction - "What is happening to her", not "Know her body", which reads
+  /// as something to master.
+  String get partnerHerBody =>
+      _p("What's happening in her body", 'Unke body mein kya ho raha hai');
+  String get partnerHerBodyNote => _p(
+      'Written for this chapter, not for today. You are never shown where she is in her cycle.',
+      'Ye chapter ke liye likha hai, aaj ke liye nahi. Unka cycle kahan hai, ye aapko kabhi nahi dikhaya jaata.');
   String get partnerReflection => _p("Today's reflection", 'Aaj ka vichaar');
   String get partnerNutrition => _p("Today's nutrition", 'Aaj ka khaana');
   String get partnerMovement => _p("Today's movement", 'Aaj ki harkat');

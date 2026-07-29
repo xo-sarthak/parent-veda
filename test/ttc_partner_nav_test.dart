@@ -16,6 +16,8 @@
 //  own-row rule, which is where it belongs and where it is already tested.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -111,4 +113,43 @@ void main() {
       expect(find.text('Him'), findsOneWidget);
     });
   });
+
+  // ===========================================================================
+  group("his Today's learn is an article, not a caption", () {
+    // The same insight rendered as a full read on her Today and as a title plus
+    // one line on his. Both open the same screen, but only hers looked like it
+    // had anything behind it - so his door was there and nobody would push it.
+    //
+    // Asserted against the SOURCE because the difference is which pieces of the
+    // insight are rendered, and a widget probe for "is there a paragraph" is
+    // exactly the kind of test that passes on an empty string.
+    const src = 'lib/screens/ttc/ttc_partner_screen.dart';
+
+    test('it shows how long it takes to read', () {
+      final learn = _classBody(src, '_LearnCard');
+      expect(learn, contains('insight.readTime(hi)'));
+    });
+
+    test('and the opening paragraph, like hers', () {
+      final learn = _classBody(src, '_LearnCard');
+      expect(learn, contains("insight.body(hi).split('\\n\\n').first"));
+    });
+
+    test('with the takeaway in a panel, like hers', () {
+      final learn = _classBody(src, '_LearnCard');
+      expect(learn, contains('insight.takeaway(hi)'));
+      expect(learn, contains('ttcSlatePanel'),
+          reason: 'the takeaway lost the panel that makes it read as the point');
+    });
+  });
+}
+
+/// The source of one class, so a check on `_LearnCard` cannot be satisfied by
+/// something that happens to appear in a different card on the same screen.
+String _classBody(String path, String name) {
+  final text = File(path).readAsStringSync();
+  final start = text.indexOf('class $name');
+  expect(start, greaterThan(-1), reason: '$name no longer exists');
+  final next = text.indexOf('\nclass ', start + 1);
+  return next == -1 ? text.substring(start) : text.substring(start, next);
 }

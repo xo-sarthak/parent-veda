@@ -39,6 +39,36 @@ const String kTtcRootRoute = 'ttc/today';
 const String kPremiereRoute = 'premiere';
 const String kAskVedaRoute = 'askveda';
 
+// ---- geometry ---------------------------------------------------------------
+//  The FAB floats above every route in `MaterialApp.builder`, which means it is
+//  NOT part of any screen's layout: nothing reserves room for it, and a scroll
+//  view's last few rows simply end up underneath a 56px opaque circle.
+//
+//  On the TTC stage that blocked real tap targets on sixteen screens - a row's
+//  delete button, a room's Join, a consultation's price - not just decoration.
+//  A user cannot discover that the fix is "scroll further"; from where she sits
+//  the button is just gone.
+//
+//  So the numbers live here as named constants rather than as literals inside
+//  build(), and screens reserve `kAskFabReserve` at the bottom of their scroll
+//  padding. Deriving the reserve from the position means moving the FAB moves
+//  the reservation with it - the alternative, a hand-picked "160" copied into
+//  thirty files, is wrong the first time anyone nudges this.
+
+/// How far the FAB sits above the bottom of the screen, normally.
+const double kAskFabBottomOffset = 92;
+
+/// Raised on the pregnancy Today tab, which has its own floating dev pill.
+const double kAskFabRaisedOffset = 150;
+
+/// The circle's diameter.
+const double kAskFabSize = 56;
+
+/// What a scroll view must keep clear at its bottom so its last row is not
+/// stranded under the FAB. Uses the raised offset, because a single constant
+/// that is occasionally generous beats two that are occasionally wrong.
+const double kAskFabReserve = kAskFabRaisedOffset + kAskFabSize + 12;
+
 /// Shared, tiny reactive state the observer writes and the FAB reads.
 class FabState extends ChangeNotifier {
   FabState._();
@@ -170,7 +200,7 @@ class GlobalAskFab extends StatelessWidget {
         // pill floats at bottom:96, so sit above it there; otherwise clear the
         // bottom nav pill.
         final onPregToday = !FabState.instance.inParenting && AppNav.instance.index == AppNav.todayTab;
-        final bottom = onPregToday ? 150.0 : 92.0;
+        final bottom = onPregToday ? kAskFabRaisedOffset : kAskFabBottomOffset;
         final pad = MediaQuery.of(context).padding.bottom;
 
         return Positioned(
@@ -191,8 +221,8 @@ class GlobalAskFab extends StatelessWidget {
           onTap: _open,
           customBorder: const CircleBorder(),
           child: Container(
-            width: 56,
-            height: 56,
+            width: kAskFabSize,
+            height: kAskFabSize,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: Color(0xFF6A30B6),

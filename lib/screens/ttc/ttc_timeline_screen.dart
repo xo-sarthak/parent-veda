@@ -51,7 +51,8 @@ class TtcTimelineScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
                 TtcBackBar(title: t.familyTimeline),
                 const SizedBox(height: 16),

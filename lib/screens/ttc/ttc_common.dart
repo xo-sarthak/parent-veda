@@ -21,6 +21,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../services/app_shell.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
@@ -88,7 +89,18 @@ const List<BoxShadow> ttcCardShadow = [
 
 /// Leaves room for the floating pill nav so the last card is never trapped
 /// underneath it.
-const double ttcBottomInset = 108;
+///
+/// It used to be 108 - sized for the nav pill alone, and the nav pill was the
+/// only floating thing anyone had thought about. The Ask Veda FAB floats over
+/// every route from `MaterialApp.builder`, so it is in no screen's layout at
+/// all, and the last rows of sixteen screens sat under it: a delete ×, a Join
+/// button, a ₹599 price. `kAskFabReserve` is the taller of the two, so one
+/// constant covers both.
+///
+/// One constant, not two, and it applies to PUSHED screens as well. Those have
+/// no nav pill, which is how thirty of them ended up hardcoding `40` - correct
+/// for the pill they did not have, wrong for the FAB they did.
+const double ttcBottomInset = kAskFabReserve;
 
 // ---- text -------------------------------------------------------------------
 //  Three fonts, three jobs - Fraunces for hero moments only, Jakarta for
@@ -480,6 +492,40 @@ void openTtc(BuildContext context) {
     builder: (_) => const TtcTodayScreen(),
     settings: const RouteSettings(name: ttcHomeRoute),
   ));
+}
+
+/// Leaves TTC for the pregnancy shell. The one exit from this stage, shared by
+/// the positive test and the Profile's stage switch.
+///
+/// There are two stacks underneath a caller and they need opposite treatment:
+///
+///   * **entered through the door on the pregnancy Home** - the pregnancy shell
+///     is still alive at the bottom of the stack. Popping to it is not just
+///     enough, it is BETTER than rebuilding: her tab, her scroll position and
+///     her controllers are all still there.
+///   * **booted straight here by the splash** - `ttc/today` IS the first route.
+///     There is nothing behind it, so a pop lands exactly where it started. This
+///     is the case that read as a dead button.
+///
+/// So: pop first, then look at what we landed on. `popUntil`'s predicate runs
+/// against the top route as the stack unwinds, so the last route it sees is the
+/// first route - which tells us which of the two stacks we were in without
+/// having to be told.
+///
+/// Returns false only when we are in the second case and no shell is registered
+/// (a widget test, or a build where `main.dart` has not run), so the caller can
+/// say something true rather than appear to do nothing.
+bool leaveTtcForPregnancy(NavigatorState nav) {
+  var ttcWasRoot = false;
+  nav.popUntil((r) {
+    if (r.isFirst) {
+      ttcWasRoot = r.settings.name == ttcHomeRoute;
+      return true;
+    }
+    return false;
+  });
+  if (!ttcWasRoot) return true; // the live pregnancy shell is back on screen
+  return AppShell.openPregnancy(nav);
 }
 
 /// The floating pill tab bar. Same five destinations as the pregnancy app, same

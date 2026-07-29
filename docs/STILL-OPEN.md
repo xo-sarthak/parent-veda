@@ -3,13 +3,13 @@
 Everything parked, undecided, or half-built — in one place, so nothing gets
 quietly dropped between sessions.
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-07-29
 
 ## How to use this file
 
 * **Add the day it appears.** A thing you decide to leave for later is an open
   point at that moment, not when you remember it.
-* **Never delete an entry — move it to §9 Closed** with what was decided and
+* **Never delete an entry — move it to §12 Closed** with what was decided and
   when. Half the value here is being able to see why something was left.
 * Each entry says what is *blocked* by it. Most block nothing today; a few
   block launch or block money moving, and those are marked.
@@ -18,6 +18,7 @@ quietly dropped between sessions.
   than repeating it.
 
 **Blocking launch:** §1.1, §1.2, §1.3
+**Blocking the sponsor programme:** §11.6 — the activation code has no sender
 **Blocking real money:** §2.1, §2.2, §5.1
 **Everything else** can wait without harm.
 
@@ -485,6 +486,48 @@ events demoted to examples underneath:
 What remains open is whether they hold for pathways we have not thought of.
 That is now a question in the brief rather than a wording note.
 
+## 9.5 The Ask Veda FAB still overlaps content on pregnancy and parenting
+
+TTC is fixed; the other two stages are not, and they have the identical problem
+for the identical reason.
+
+The FAB is mounted in `MaterialApp.builder`, above every route, so it is
+invisible to layout — no screen reserves room for it, no `Scaffold` knows it is
+there, and a list's last rows end up under a 56px opaque circle. On TTC that
+blocked a delete `×`, a room's **Join**, and a consultation's price. It is
+undiscoverable rather than merely ugly: from where the user sits the control is
+not obscured, it is absent, and "scroll further" is not something anyone tries
+when a list has visibly ended.
+
+**The fix already exists and is shared:** `kAskFabReserve` in
+`lib/widgets/global_ask_fab.dart`, derived from the FAB's own offset and size so
+it cannot drift. Adopting it is mechanical — point each stage's scroll padding at
+it, the way `ttcBottomInset` now does.
+
+**Why it is parked rather than done.** Pregnancy and parenting are shipped and
+carry real user data, and the rule here is that they get extended additively, not
+swept. It is also a visible change to two apps' bottom spacing on every screen,
+which is a product call rather than a bug fix. `test/ttc_fab_clearance_test.dart`
+shows the shape a matching test would take.
+
+One thing to decide with it: the FAB sits at `bottom: 150` whenever
+`AppNav.index == todayTab` and we are not in parenting — a condition meant for
+the pregnancy Today tab's Mom|Dad pill, but which is also true inside TTC. It
+happens to be right there (TTC has its own Her|Him overlay at `bottom: 96`), so
+the reserve is sized for the taller position. If either overlay moves, revisit
+the pair together.
+
+## 9.6 `TtcInsight.forPartner` is an inert flag
+
+It defaults to `true` and nothing anywhere sets it `false`, so the partner
+screen's `where((i) => i.forPartner)` selects all twenty-five insights. Not
+broken — the intent is documented on the field — but it is currently a config
+option expressing a state the product does not have, which is the shape this
+codebase has said it does not want.
+
+Either author some insights that are genuinely hers alone, or drop the field.
+Cheap either way; noted so it is a decision rather than a leftover.
+
 ---
 
 # 10. Content
@@ -598,6 +641,11 @@ reclaim only at renewal unless an eligibility file (an HR-uploaded roster) is
 added. That feature is normally what forces a portal to exist, and it is
 deliberately out of v1.
 
+## 11.5 Company-uploaded resources are third-party content in a health product
+
+Sponsors upload documents that render inside the app. Needs a review path and a
+hard rule that they are never medical advice, before any sponsor uploads.
+
 ## 11.6 Activation codes have no sender — LAUNCH BLOCKER for sponsors
 
 `0058` creates the one-time code, its expiry, the attempt limit and the
@@ -618,11 +666,6 @@ provider.
 **Do not be tempted to skip the code.** Without it, anyone who types
 `someone@google.com` gets Premium — the domain list becomes free access for the
 internet. The code is the only thing proving control of the address.
-
-## 11.5 Company-uploaded resources are third-party content in a health product
-
-Sponsors upload documents that render inside the app. Needs a review path and a
-hard rule that they are never medical advice, before any sponsor uploads.
 
 ---
 

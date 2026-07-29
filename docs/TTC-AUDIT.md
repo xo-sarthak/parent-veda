@@ -90,7 +90,7 @@ positive-test transition. **For testing it is a hard block**, and a claim in
 Scrolled to the end: the page simply stops. No Today / Prepare / Tools /
 Calendar / Community. His only exit is toggling back to Her.
 
-## A-6. The Ask Veda FAB collides with content on every scrollable screen
+## A-6 — fixed (TTC only). The Ask Veda FAB collides with content on every scrollable screen
 
 Pinned mid-right at roughly 73% of viewport height, over scrolling content, with
 no offset. **Sixteen screens affected.** It is not a polish issue — it blocks
@@ -107,6 +107,32 @@ real tap targets:
 
 Plus text on Today, Tools, Journey Map, Can I…?, Symptom, Weight, Medical Tests,
 Nutrition, Supplements, Product Guide.
+
+**The cause was arithmetic, not carelessness.** The FAB is mounted in
+`MaterialApp.builder`, above every route, which makes it invisible to layout:
+no screen reserves room for it and no `Scaffold` knows it is there.
+`ttcBottomInset` was `108`, sized for the floating nav pill, and every *pushed*
+screen — which has no pill — reasonably hardcoded `40`. Both numbers were right
+about the chrome their author was thinking about. Neither knew about the FAB.
+
+The failure is worse than it looks because it is **undiscoverable**: from where
+she sits the button is not obscured, it is simply absent, and "scroll further"
+is not a thing anyone tries when the list has visibly ended.
+
+Fixed by deriving the reserve from the FAB's own geometry —
+`kAskFabReserve` in `global_ask_fab.dart` — and pointing all twenty-two TTC
+scroll views at it. A hand-picked `160` copied into thirty files is wrong the
+first time anyone nudges the button. `test/ttc_fab_clearance_test.dart` fails if
+a literal comes back.
+
+One deliberate exception, named rather than exempted: **Ask Veda's own screen**,
+where `FabRouteObserver` suppresses the FAB — it will not offer to open the
+screen you are standing on — so its lists clear the pinned composer instead.
+
+**Still open, and not mine to close alone: pregnancy and parenting have the
+identical collision.** The constant is shared and ready; adopting it there
+touches two shipped stages carrying real user data, which needs your call rather
+than my initiative.
 
 ## A-7. Content scrolls under the bottom nav
 
@@ -370,12 +396,42 @@ top and a void beneath.
 
 ## Him mode
 
-* **A-55.** His "Today's Learn" is two lines where hers is a full insight with a
-  takeaway box. The asymmetry is backwards — he is the one who knows less.
-* **A-56.** **No biology at all for him.** He is told how to support her,
-  beautifully, but nothing explains what a cycle is, what ovulation means, or
-  what she is physically experiencing. Men are the audience with least prior
-  knowledge here and they get the least explanation.
+* **A-55 — fixed.** His "Today's Learn" was two lines where hers is a full
+  insight with a takeaway box. The asymmetry is backwards — he is the one who
+  knows less. Both cards now render read time, the opening paragraph and the
+  takeaway in a panel; his door was always there, it just looked like it had
+  nothing behind it. Pinned by `test/ttc_partner_nav_test.dart`.
+
+  Noticed while fixing it, **not** fixed: `TtcInsight.forPartner` defaults to
+  `true` and nothing anywhere sets it `false`, so his `where((i) => i.forPartner)`
+  filter selects all twenty-five. The flag is inert rather than broken. Left
+  alone because the intent is documented on the field, but it is currently a
+  config option expressing a state the product does not have.
+* **A-56 — fixed.** **No biology at all for him.** He was told how to support
+  her, beautifully, but nothing explained what a cycle is, what ovulation means,
+  or what she is physically experiencing. Men are the audience with least prior
+  knowledge here and they got the least explanation.
+
+  Now a fifth field on `TtcPartnerBrief` — `herBody` — and a `_HerBodyCard`
+  sitting **above** his own biology, because her body is what he came to
+  understand. Five chapters: what a cycle actually is · why the fertile window
+  is a stretch of days and not a date · what cervical fluid is doing · what
+  progesterone does and why early pregnancy and an approaching period are
+  genuinely indistinguishable · what a test detects and why she is "four weeks"
+  on day one.
+
+  Two rules constrain the copy and both are tested in
+  `test/ttc_partner_biology_test.dart`:
+
+  * **Chapter-level, never cycle-day level.** He holds no rows in `ttc_cycles`
+    and receives only the chapter she publishes. Prose is a side channel like
+    any other — "she is probably ovulating about now" would leak in text what
+    the schema refuses to hand over. The card says so on its face, because a
+    privacy rule nobody is told about reassures neither of them.
+  * **Explains, never predicts.** No likelihood, no "she will feel", nothing
+    that tells him whether she is pregnant. The waiting-days entry has to hold
+    that line hardest, since its whole point is that the symptoms cannot answer
+    the question.
 
 ## Copy and grammar
 
@@ -712,7 +768,71 @@ Health all run the same tracker engine as Weight and Symptom, so A-35, A-13 and
 A-20 apply. *Reports* and *Medication* are the same screens as Health Records
 and Supplements.
 
-**Not examined:** Care Circle (inside Community, excluded); the
-transition-to-pregnancy flow (writes real data); the true first-run empty state
-with nothing logged (would require deleting the test data — **worth doing**, it
-is what every real user meets first).
+**Not examined:** Care Circle (inside Community, excluded); the true first-run
+empty state with nothing logged (would require deleting the test data —
+**worth doing**, it is what every real user meets first).
+
+The **transition-to-pregnancy flow** was originally in this list — skipped on the
+device because it writes real data. Reading it instead found A-76, below. Worth
+remembering: the one flow too consequential to walk was the one holding the worst
+defect in the stage, and "too risky to test" is a reason to read it, not to leave
+it.
+
+---
+
+# 8. Found after the device pass
+
+## A-76 — fixed. Both doors out of TTC were dead ends
+
+Not a UI defect. A woman who recorded a positive test could not get to the
+pregnancy app, and the app already knew she was pregnant when it refused her.
+
+* **The positive-test button showed a "coming soon" toast.** `ttcSoon(context,
+  t.transitionNext)` — the single most important tap in the product. By the time
+  she reached that screen the Transition Engine had *already* flipped her life
+  stage, derived and written her due date, and added two timeline entries. Every
+  write had landed. Only the door was missing.
+* **"Go to pregnancy" in the Profile popped to the first route**, which for
+  anyone booted into TTC by the splash *was* TTC. It set the stage correctly and
+  never moved, so it read as a dead button.
+
+**Why nobody built it, which is the interesting part.** `MainScaffold` needs
+three long-lived controllers that live in `_ParentVedaAppState`, above every
+route, and nothing in `lib/screens/ttc/` can reach them — nor should it. The
+stages are deliberately code-isolated; handing TTC a `PregnancyController` is
+exactly the coupling the folder layout exists to prevent. So the two halves never
+met and the gap was papered over with a toast.
+
+Fixed with `lib/services/app_shell.dart`: `main.dart` **registers** how to build
+the pregnancy shell, TTC **asks** for it. Neither imports the other.
+
+**The design choice worth keeping.** The obvious mirror is `DoctorSession` — flip
+a flag, swap the whole app in `MaterialApp.builder`, keep the old shell offstage
+so state survives. Right there, wrong here. A doctor bounces in and out many
+times a day; a family crosses a life stage roughly once, ever. Keeping a TTC
+shell alive offstage for the rest of a pregnancy costs a second widget tree, a
+second Navigator, and a second source of truth for "which stage am I in" that the
+Ask Veda FAB would have to reconcile — and routes inside a nested Navigator do
+not reliably report their removal to the root observer, so a stale `inTtc` would
+answer a pregnant woman's question with trying-to-conceive framing.
+
+Replacing the stack instead means the old stage is genuinely gone, the observer
+sees every route leave, and the FAB corrects itself for free. The cost is honest
+and small: TTC's in-memory *screen* state is discarded. Her **data** is untouched
+— every store is local-first and stage-agnostic, which is the whole reason the
+Transition Engine has nothing to migrate.
+
+> **How long a thing lives decides whether you preserve it or rebuild it.**
+> Preserving state is not free, and "cheap to rebuild, rarely rebuilt" is the
+> case where replacing wins.
+
+Entering TTC through the door on the pregnancy Home is handled separately and
+deliberately: the live shell is still at the bottom of the stack, so we pop back
+to it rather than building a second one. Popping is not merely enough there, it
+is better — her tab, her scroll position and three loaded controllers are all
+still warm.
+
+Pinned by `test/ttc_stage_exit_test.dart`, including that the new shell becomes
+the *first* route. That last one guards a subtler bug than the dead button: if
+TTC stayed underneath, a system back gesture from her new pregnancy home would
+drop her into the stage she had just left, on the day she left it.

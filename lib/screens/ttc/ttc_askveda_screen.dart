@@ -33,6 +33,16 @@ import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_tests_screen.dart';
 
+/// What these lists have to clear at the bottom: the pinned composer, and
+/// nothing else.
+///
+/// Deliberately NOT `ttcBottomInset`. Every other TTC screen reserves room for
+/// the Ask Veda FAB, but `FabRouteObserver` suppresses the FAB over
+/// `kAskVedaRoute` - it will not offer to open the screen you are standing on.
+/// Inheriting the app-wide reserve here would open a hole above the text field
+/// in exchange for clearing a button that is never drawn.
+const double _composerInset = 108;
+
 /// Open Ask Veda for TTC. [initialQuery] runs a question immediately (used by
 /// the chapter screen's suggestion cards). [partnerMode] suppresses cycle day.
 void openTtcAskVeda(BuildContext context,
@@ -246,7 +256,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
     final questions = content?.askVeda(t.hinglish) ?? const <String>[];
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-          ttcGutter, 6, ttcGutter, ttcBottomInset),
+          ttcGutter, 6, ttcGutter, _composerInset),
       children: [
         Text(t.hinglish ? 'Kya jaanna hai?' : 'What would you like to know?',
             style: ttcFraunces(20, w: FontWeight.w600)),
@@ -305,7 +315,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   Widget _resultScroll(TtcS t) => ListView(
         controller: _scroll,
         padding: const EdgeInsets.fromLTRB(
-            ttcGutter, 6, ttcGutter, ttcBottomInset),
+            ttcGutter, 6, ttcGutter, _composerInset),
         children: _loading
             ? [_loadingCard(t)]
             : (_failed || _feed == null)

@@ -33,7 +33,9 @@ import 'services/remote/supabase_memory_sink.dart';
 import 'services/remote/supabase_profile_sink.dart';
 import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_scaffold.dart';
+import 'screens/main_scaffold.dart';
 import 'screens/splash_screen.dart';
+import 'services/app_shell.dart';
 import 'services/baby_voice_service.dart';
 import 'services/entitlement_store.dart';
 import 'services/product_catalog_store.dart';
@@ -116,6 +118,18 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     _home.load();
     _father = FatherContentController();
     _father.load();
+    // The one door OUT of a life stage. Registered here because this is the
+    // only place that holds the three controllers a pregnancy shell needs, and
+    // `lib/screens/ttc/` must not be able to reach them - the stages stay code
+    // isolated and meet through this registry instead. Without it, both exits
+    // from TTC were dead ends: the positive-test button and the Profile's stage
+    // switch. See lib/services/app_shell.dart.
+    AppShell.register(
+      pregnancy: () => MaterialPageRoute<void>(
+        builder: (_) => MainScaffold(
+            pregnancy: _controller, home: _home, father: _father),
+      ),
+    );
     // Warm up the baby-voice engine (loads persisted mute state).
     BabyVoiceService.instance.init();
     // Load the persisted Fruit/Baby size-view preference.

@@ -62,7 +62,8 @@ class TtcProfileScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
               TtcBackBar(title: t.profileTitle),
               const SizedBox(height: 20),
@@ -212,24 +213,14 @@ class TtcProfileScreen extends StatelessWidget {
   /// Hands the app back to the pregnancy shell where that is possible, and says
   /// so plainly where it is not.
   ///
-  /// There are two different stacks underneath this button and they behave
-  /// differently:
+  /// The stage is written FIRST and the navigation is second, in that order on
+  /// purpose. If the swap fails we are still in the state she asked for, and the
+  /// next launch honours it; if the write failed we would have moved her into a
+  /// shell the app does not believe she is in.
   ///
-  ///   * entered through the door on the pregnancy home - the pregnancy shell
-  ///     is still the first route, so popping to it works immediately.
-  ///   * booted here by the splash - `ttc/today` IS the first route, and
-  ///     `MainScaffold` needs controllers that live in `main.dart`, which
-  ///     nothing in this folder can reach. There is nothing to pop back TO.
-  ///
-  /// The first version popped to the first route unconditionally, which in the
-  /// second case landed exactly where it started: the stage was set correctly
-  /// and the screen never changed, so it read as a dead button.
-  ///
-  /// The real fix is an app-level swap on LifeStageStore, mirroring how
-  /// DoctorSession already swaps the whole app from `main.dart`'s builder. That
-  /// would also make the positive-test transition land immediately instead of
-  /// on next launch. It touches app boot for all three stages, so it is written
-  /// up rather than done here.
+  /// `leaveTtcForPregnancy` handles both stacks this button can sit on - see its
+  /// doc in `ttc_common.dart`. The snackbar is now the genuinely-stuck path
+  /// only, not the ordinary one.
   Future<void> _toPregnancy(BuildContext context) async {
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -237,18 +228,7 @@ class TtcProfileScreen extends StatelessWidget {
 
     LifeStageStore.instance.setStage(LifeStage.pregnancy);
 
-    // The predicate runs against the top route as it unwinds, so the last one
-    // it sees is the first route - which tells us which stack we are in.
-    var ttcIsRoot = false;
-    nav.popUntil((r) {
-      if (r.isFirst) {
-        ttcIsRoot = r.settings.name == ttcHomeRoute;
-        return true;
-      }
-      return false;
-    });
-
-    if (ttcIsRoot) {
+    if (!leaveTtcForPregnancy(nav)) {
       messenger.showSnackBar(SnackBar(
         content: Text(t.stageSetReopen),
         behavior: SnackBarBehavior.floating,

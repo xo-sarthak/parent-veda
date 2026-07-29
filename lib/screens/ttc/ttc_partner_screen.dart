@@ -84,6 +84,10 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _SupportCard(brief: brief, t: t),
             const SizedBox(height: 12),
+            // Understanding before advice, and her body before his. He was
+            // being told how to help with something he had never had explained.
+            _HerBodyCard(brief: brief, t: t),
+            const SizedBox(height: 12),
             _YourBodyCard(brief: brief, t: t),
             const SizedBox(height: 12),
             _LearnCard(insight: insight, t: t),
@@ -283,6 +287,54 @@ class _SupportCard extends StatelessWidget {
       );
 }
 
+// ---- her half ---------------------------------------------------------------
+
+/// The explanation his side was missing entirely.
+///
+/// He had what she may be feeling, what he could do about it, and his own
+/// biology - and nothing that said what a cycle IS. Most men arrive here knowing
+/// very little about any of it, and asking someone to support a process nobody
+/// has explained to them produces exactly the well-meaning uselessness this
+/// stage is trying to avoid.
+///
+/// Sits ABOVE `_YourBodyCard` deliberately: her body is the thing he came to
+/// understand, and his is the smaller half.
+///
+/// The footnote is not a disclaimer, it is a promise being kept in the open. He
+/// is told, on the card itself, that this is chapter-level and that he is never
+/// shown where she is in her cycle - because the privacy rule is only reassuring
+/// if the person it protects and the person it constrains can both see it.
+class _HerBodyCard extends StatelessWidget {
+  const _HerBodyCard({required this.brief, required this.t});
+
+  final TtcPartnerBrief brief;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    return _SlateCard(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.school_outlined, size: 18, color: ttcSlateAmber),
+          const SizedBox(width: 9),
+          Expanded(
+              child: Text(t.partnerHerBody,
+                  style: ttcJakarta(16.5, color: ttcSlateInk))),
+        ]),
+        const SizedBox(height: 12),
+        Text(brief.herBody(hi),
+            style: ttcBody(14, color: ttcSlateSoft, h: 1.7)),
+        const SizedBox(height: 14),
+        Container(height: 1, color: ttcSlateLine),
+        const SizedBox(height: 12),
+        Text(t.partnerHerBodyNote,
+            style: ttcBody(11.5, color: ttcSlateSoft, h: 1.5)),
+      ]),
+    );
+  }
+}
+
 // ---- his half ---------------------------------------------------------------
 
 class _YourBodyCard extends StatelessWidget {
@@ -328,15 +380,40 @@ class _LearnCard extends StatelessWidget {
         builder: (_) => TtcInsightScreen(insight: insight),
         settings: const RouteSettings(name: 'ttc/insight'),
       )),
+      // Parity with her `_InsightCard`, which carries a read time, the opening
+      // paragraph and the takeaway in a panel. His had a title and a takeaway,
+      // so the same piece of writing looked like a caption on his side and an
+      // article on hers - and he had no way to tell there was more behind it.
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(t.partnerLearn.toUpperCase(),
-            style: ttcBody(10, color: ttcSlateAmber, w: FontWeight.w800)),
+        Row(children: [
+          Text(t.partnerLearn.toUpperCase(),
+              style: ttcBody(10, color: ttcSlateAmber, w: FontWeight.w800)),
+          const Spacer(),
+          Text(t.readSeconds(insight.readTime(hi)),
+              style: ttcBody(11, color: ttcSlateSoft, w: FontWeight.w700)),
+        ]),
         const SizedBox(height: 10),
         Text(insight.title(hi),
             style: ttcJakarta(16.5, color: ttcSlateInk)),
         const SizedBox(height: 8),
-        Text(insight.takeaway(hi),
-            style: ttcBody(13.5, color: ttcSlateSoft, h: 1.6)),
+        Text(
+          insight.body(hi).split('\n\n').first,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: ttcBody(13.5, color: ttcSlateSoft, h: 1.55),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: ttcSlatePanel,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Text(insight.takeaway(hi),
+              style: ttcBody(13,
+                  color: ttcSlateInk, w: FontWeight.w700, h: 1.45)),
+        ),
       ]),
     );
   }

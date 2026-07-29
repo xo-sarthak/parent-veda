@@ -72,7 +72,8 @@ class TtcTransitionScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 24, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 24, ttcGutter, ttcBottomInset),
               children: [
                 // Quiet certainty, not confetti. Plenty of couples arrive here
                 // carrying a previous loss.
@@ -155,8 +156,13 @@ class TtcTransitionScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
+                // The single most important tap in the product, and until now
+                // it showed a "coming soon" toast - the stage had already
+                // flipped underneath her, so the app knew she was pregnant and
+                // still refused to show her the pregnancy. See
+                // `leaveTtcForPregnancy` for why this is a stack replacement.
                 GestureDetector(
-                  onTap: () => ttcSoon(context, t.transitionNext),
+                  onTap: () => _toPregnancy(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     alignment: Alignment.center,
@@ -205,6 +211,24 @@ class TtcTransitionScreen extends StatelessWidget {
           const Icon(Icons.check_rounded, size: 16, color: ttcPurple),
         ]),
       );
+
+  /// Into the pregnancy shell. The stage was already flipped by the engine
+  /// before this screen was pushed, so there is nothing to write here - this is
+  /// purely the app catching up with a decision it has already recorded.
+  ///
+  /// If no shell is registered we say so rather than doing nothing. She has not
+  /// lost anything either way: the due date, the stage and both timeline entries
+  /// are on disk, so reopening the app lands her in pregnancy regardless.
+  void _toPregnancy(BuildContext context) {
+    final t = TtcS.current();
+    final messenger = ScaffoldMessenger.of(context);
+    if (leaveTtcForPregnancy(Navigator.of(context))) return;
+    messenger.showSnackBar(SnackBar(
+      content: Text(t.stageSetReopen),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 5),
+    ));
+  }
 
   Future<void> _undo(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);

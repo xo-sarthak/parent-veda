@@ -45,7 +45,8 @@ class TtcCycleScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
                 TtcBackBar(title: t.cycleCompanion),
                 const SizedBox(height: 16),
@@ -307,7 +308,8 @@ class TtcOvulationScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
                 TtcBackBar(title: t.ovulationCompanion),
                 const SizedBox(height: 16),
@@ -584,7 +586,8 @@ class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
                 TtcBackBar(title: t.fertilityWindow),
                 const SizedBox(height: 16),

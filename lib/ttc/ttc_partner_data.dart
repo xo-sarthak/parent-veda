@@ -185,6 +185,8 @@ class TtcPartnerBrief {
     required this.sheMayFeelHi,
     required this.youCanEn,
     required this.youCanHi,
+    required this.herBodyEn,
+    required this.herBodyHi,
     required this.yourBodyEn,
     required this.yourBodyHi,
   });
@@ -194,12 +196,31 @@ class TtcPartnerBrief {
   final String youCanEn;
   final String youCanHi;
 
+  /// WHAT IS PHYSICALLY HAPPENING TO HER - the half his side was missing.
+  ///
+  /// He had `sheMayFeel` (her state of mind), `youCan` (what to do) and
+  /// `yourBody` (his own biology), and nowhere was he ever told what a cycle is,
+  /// what ovulation means, or why the two weeks before a period feel like early
+  /// pregnancy. He was being asked to support a process nobody had explained to
+  /// him - which is most men, and it is not their fault.
+  ///
+  /// Written at CHAPTER level, never cycle-day level, and that is a privacy
+  /// property rather than a stylistic one: his device holds no rows in
+  /// `ttc_cycles` and he only ever receives the chapter she publishes. A field
+  /// that needed her cycle day could not be filled on his side at all.
+  ///
+  /// Explains, never predicts. Nothing here tells him where she is today or what
+  /// will happen next - that would be reading her cycle through prose.
+  final String herBodyEn;
+  final String herBodyHi;
+
   /// His half of the biology, in every chapter without exception.
   final String yourBodyEn;
   final String yourBodyHi;
 
   String sheMayFeel(bool hi) => hi ? sheMayFeelHi : sheMayFeelEn;
   String youCan(bool hi) => hi ? youCanHi : youCanEn;
+  String herBody(bool hi) => hi ? herBodyHi : herBodyEn;
   String yourBody(bool hi) => hi ? yourBodyHi : yourBodyEn;
 }
 
@@ -213,6 +234,10 @@ const Map<TtcChapter, TtcPartnerBrief> ttcPartnerBriefs = {
         'Make the first appointment yourself. Book both your tests at the same time, not hers first. That one act sets the tone for the next year.',
     youCanHi:
         'Pehli appointment khud book karein. Dono ke test ek saath karwayein - pehle unke nahi. Ye ek kaam agle poore saal ka rukh tay kar deta hai.',
+    herBodyEn:
+        'One cycle, two halves. Counting starts on the first day of bleeding, and for roughly the next two weeks her body ripens a single egg while the lining of the womb rebuilds. The egg is released somewhere around the middle. The second half is a wait - that lining held ready in case the egg was fertilised, and shed if it was not. The shedding is the next period, and the count starts again.\n\nSo a period is the end of something, not the beginning of nothing. Most of a cycle is her body preparing, quietly, without any signal either of you would notice.',
+    herBodyHi:
+        'Ek cycle, do hisse. Ginti bleeding ke pehle din se shuru hoti hai, aur agle lagbhag do hafte body ek egg pakaati hai jabki bachchedani ki lining dobara banti hai. Egg beech mein kahin release hota hai. Doosra hissa intezaar ka hai - wahi lining taiyaar rakhi jaati hai agar egg fertilise ho gaya ho, aur nahi hua toh nikal jaati hai. Wahi agla period hai, aur ginti phir se shuru.\n\nToh period kisi cheez ka ant hai, shuruaat nahi. Cycle ka zyadatar hissa body ki chupchaap taiyaari hai - bina kisi aise signal ke jo aap dono ko dikhe.',
     yourBodyEn:
         'Sperm takes about ninety days to make. What you change this month shows up around three months from now, so starting now is not early - it is exactly on time.',
     yourBodyHi:
@@ -227,6 +252,10 @@ const Map<TtcChapter, TtcPartnerBrief> ttcPartnerBriefs = {
         'Agree on one time a week to talk about all of this, and let the rest of the week be about anything else. Not avoidance - a container.',
     youCanHi:
         'Hafte mein ek waqt tay karein jab is sab par baat hogi, aur baaki hafta kisi aur cheez ka rahe. Ye ignore karna nahi - ek jagah bana dena hai.',
+    herBodyEn:
+        'Ovulation is a single moment: one egg released, surviving about a day. Sperm survive far longer - up to five days inside her. That mismatch is the entire reason people talk about a fertile window rather than a fertile date, and why the days BEFORE the egg is released matter more than the day itself.\n\nIt is also why a cycle that moves by a few days from month to month is ordinary rather than a fault. The second half of a cycle is fairly fixed in length; almost all the variation sits in the first half, in how long that egg takes to be ready. A "late" ovulation is not lateness. It is her body taking the time it needed.',
+    herBodyHi:
+        'Ovulation ek pal hai: ek egg release hota hai, aur lagbhag ek din zinda rehta hai. Sperm us se kaafi zyada chalte hain - unke andar paanch din tak. Yahi farak poori wajah hai ki log fertile window kehte hain, fertile date nahi - aur isiliye egg release hone se PEHLE ke din us din se zyada maayne rakhte hain.\n\nIsi wajah se cycle ka har mahine do-chaar din aage-peechhe hona aam baat hai, kharaabi nahi. Cycle ka doosra hissa lagbhag tay lambai ka hota hai; poora farak pehle hisse mein hota hai - ki egg taiyaar hone mein kitna waqt leta hai. "Late" ovulation der nahi hai. Body ne jitna waqt chahiye tha, utna liya hai.',
     yourBodyEn:
         'This is your ninety-day window too. Pick one thing - sleep, drinking, the laptop, movement - and hold it for three months without being reminded.',
     yourBodyHi:
@@ -241,6 +270,10 @@ const Map<TtcChapter, TtcPartnerBrief> ttcPartnerBriefs = {
         'Do not name the window out loud. If tonight is not the night for either of you, say so lightly and mean it. Six days exist so one can be skipped without cost.',
     youCanHi:
         'Window ka naam mat lein. Agar aaj raat dono mein se kisi ka man nahi hai, toh halke se keh dein aur sach mein waisa hi samjhein. Chhe din isiliye hain ki ek bina kisi nuksaan ke chhoot sake.',
+    herBodyEn:
+        'Her body opens the window before the egg arrives, not after. Cervical fluid changes - clearer, thinner, stretchier - and that change is doing an actual job: it lets sperm through and keeps them alive for days. Some women also notice a dull ache low on one side.\n\nPlenty notice nothing at all, and noticing nothing means nothing. There is no version of this she can do better by concentrating harder, and none of it is a test either of you can pass or fail.',
+    herBodyHi:
+        'Body window egg aane se pehle kholti hai, baad mein nahi. Cervical fluid badalta hai - saaf, patla, khinchne wala - aur ye badlaav sach mein ek kaam kar raha hai: ye sperm ko andar jaane deta hai aur unhe kai din zinda rakhta hai. Kuch logon ko neeche ek taraf halka dard bhi mehsoos hota hai.\n\nBahuton ko kuch bhi mehsoos nahi hota, aur kuch mehsoos na hona ka koi matlab nahi hai. Aisa koi tareeka nahi hai jisme dhyaan lagane se ye behtar ho jaye, aur ye koi test nahi hai jise aap dono mein se koi paas ya fail kar sake.',
     yourBodyEn:
         'Nothing special is required of you this week. Every day or every other day across the window is plenty - more adds nothing and makes it heavier.',
     yourBodyHi:
@@ -255,6 +288,10 @@ const Map<TtcChapter, TtcPartnerBrief> ttcPartnerBriefs = {
         'Do not ask if she has tested. Plan something for the weekend that has nothing to do with any of this. If the period comes, do not move straight to next month.',
     youCanHi:
         'Ye mat poochhein ki test kiya ya nahi. Weekend ke liye kuch aisa plan karein jiska is sab se lena-dena na ho. Agar period aa jaye, toh turant agle mahine par mat jayein.',
+    herBodyEn:
+        'Once the egg is released, the structure it came from starts producing progesterone. That hormone holds the lining of the womb in place - and it is also what makes her tired, tender, warm, hungry, and often more emotional than she wants to be.\n\nHere is the part worth understanding properly: progesterone does all of that whether or not she is pregnant. Early pregnancy and an ordinary approaching period genuinely feel the same, because the same hormone is driving both. She is not imagining symptoms and she is not reading too much into them - she is having real ones that simply cannot answer the question.\n\nThat is why these two weeks are hard in a way the rest of the cycle is not. There is nothing to do, nothing to check, and no way to know early.',
+    herBodyHi:
+        'Egg release hone ke baad, jis structure se wo aaya tha wahi progesterone banana shuru kar deta hai. Ye hormone bachchedani ki lining ko apni jagah rakhta hai - aur yahi unhe thaka hua, dukhta hua, garam, bhookha, aur aksar apni marzi se zyada emotional bana deta hai.\n\nAb dhyaan se samajhne wali baat: progesterone ye sab tab bhi karta hai jab pregnancy na ho. Shuruaati pregnancy aur aam taur par aata hua period sach mein ek jaise lagte hain, kyunki dono ke peechhe wahi hormone hai. Wo na symptoms soch rahi hain, na zyada matlab nikaal rahi hain - unhe asli symptoms ho rahe hain jo bas is sawaal ka jawaab de hi nahi sakte.\n\nIsi wajah se ye do hafte cycle ke baaki hisse se alag mushkil hote hain. Kuch karne ko nahi hai, kuch check karne ko nahi hai, aur jaldi jaanne ka koi tareeka nahi hai.',
     yourBodyEn:
         'You will be somewhere different from her on the same day - one hopeful, one already sure it has not worked. Say where you are instead of guessing where she is.',
     yourBodyHi:
@@ -269,6 +306,10 @@ const Map<TtcChapter, TtcPartnerBrief> ttcPartnerBriefs = {
         'Book the first appointment. Agree together who you are telling and when, before either of you tells anyone.',
     youCanHi:
         'Pehli appointment book karein. Kise batana hai aur kab, ye saath mein tay karein - kisi ke kuch kehne se pehle.',
+    herBodyEn:
+        'A test looks for hCG, a hormone that only exists once a pregnancy has implanted - usually a few days before a period would have been due, which is why testing earlier than that tells you nothing rather than telling you no.\n\nPregnancy is counted from the first day of her last period, not from conception. So on the day of a positive test she is already considered around four weeks pregnant. That is a convention doctors use, not a mistake in the arithmetic, and a dating scan is what settles it properly.\n\nMuch of what she feels over the next weeks will be the progesterone she already knows from the second half of a cycle, turned up and left on.',
+    herBodyHi:
+        'Test hCG dhoondhta hai - ek hormone jo tabhi banta hai jab pregnancy implant ho chuki ho, aam taur par period ki tareekh se kuch din pehle. Isiliye us se pehle test karne par "nahi" nahi milta, kuch bhi nahi milta.\n\nPregnancy ki ginti aakhri period ke pehle din se hoti hai, conception se nahi. Toh positive test wale din wo pehle se lagbhag chaar hafte pregnant maani jaati hain. Ye doctors ka tareeka hai, hisaab ki galti nahi - aur dating scan hi ise theek se tay karta hai.\n\nAgle kuch hafton mein wo jo mehsoos karengi, uska bahut kuch wahi progesterone hoga jo cycle ke doosre hisse se aap dono jaante hain - bas zyada, aur lagataar.',
     yourBodyEn:
         'Whatever this chapter took, you both learned how you handle something that matters enormously and is not in your control. Pregnancy will ask for that again.',
     yourBodyHi:

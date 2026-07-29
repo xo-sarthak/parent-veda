@@ -45,7 +45,8 @@ class TtcRitualScreen extends StatelessWidget {
           backgroundColor: ttcBg,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 40),
+              padding: const EdgeInsets.fromLTRB(
+                  ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
                 TtcBackBar(title: t.ritualTitle),
                 const SizedBox(height: 18),
