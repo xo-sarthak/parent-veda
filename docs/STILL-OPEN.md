@@ -562,6 +562,21 @@ decision nobody has explicitly signed off, so it is written down here.
 If the two stages ever need separate lists, `MedType` already distinguishes
 them and a filter is one line. Do not build a second store.
 
+**A second, smaller gap in the same place.** `Medication` has no author field,
+where `TtcSupplement` has `TtcAuthor`. So the TTC medication list cannot say
+whose a row is.
+
+This is **not** a privacy problem in production: on a real paired setup his
+phone holds his own `MedicineStore` rows and hers holds hers, so neither ever
+sees the other's. It only shows up behind the Her|Him *testing* switch, where
+one device is pretending to be two — and there it is the testing affordance
+behaving as designed, not a leak.
+
+It becomes real work only if you want both partners' medication visible in one
+list, which male-factor treatment would eventually justify. `TtcAuthor` on the
+model plus a segmented control is the shape; it needs a column, so it waits with
+everything else here.
+
 ---
 
 # 10. Content
