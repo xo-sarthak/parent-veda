@@ -136,27 +136,34 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               Text(_p('Take-up', 'Take-up'),
                   style: t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
               const SizedBox(height: 14),
+              // THE DENOMINATOR IS LABELLED, not left to be guessed. When a
+              // company sent us a staff list, take-up is out of the people
+              // they named; when they did not, it is out of the seats they
+              // bought. Those are different numbers and an unlabelled
+              // percentage silently means whichever one HR assumed.
               Row(children: [
                 _stat(_p('Activated', 'Activated'), '${d.activated}'),
-                _stat(
-                  _p('Seats', 'Seats'),
-                  d.seatsPurchased == null
-                      ? _p('Unlimited', 'Unlimited')
-                      : '${d.seatsPurchased}',
-                ),
+                if (d.denominatorIsRoster)
+                  _stat(_p('On your list', 'Aapki list mein'),
+                      '${d.eligibleListed}')
+                else
+                  _stat(
+                    _p('Seats', 'Seats'),
+                    d.seatsPurchased == null
+                        ? _p('Unlimited', 'Unlimited')
+                        : '${d.seatsPurchased}',
+                  ),
                 _stat(
                   _p('Take-up', 'Take-up'),
                   d.activationRate == null ? '—' : '${d.activationRate}%',
                 ),
               ]),
-              if (d.seatsPurchased != null) ...[
+              if (_denominator(d) != null) ...[
                 const SizedBox(height: 14),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
-                    value: d.seatsPurchased == 0
-                        ? 0
-                        : (d.activated / d.seatsPurchased!).clamp(0.0, 1.0),
+                    value: (d.activated / _denominator(d)!).clamp(0.0, 1.0),
                     minHeight: 8,
                     backgroundColor: AppTheme.surfaceContainerHigh,
                     valueColor: const AlwaysStoppedAnimation(AppTheme.primary500),
@@ -164,8 +171,14 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _p('${d.seatsLeft ?? 0} seats left',
-                      '${d.seatsLeft ?? 0} seats bachi hain'),
+                  d.denominatorIsRoster
+                      ? _p(
+                          '${d.eligibleListed - d.activated} of the people you '
+                              'listed have not activated yet',
+                          'Aapki list ke ${d.eligibleListed - d.activated} log '
+                              'abhi tak activate nahi hue')
+                      : _p('${d.seatsLeft ?? 0} seats left',
+                          '${d.seatsLeft ?? 0} seats bachi hain'),
                   style: t.labelSmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
@@ -300,6 +313,16 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
             _rosterRow(r),
       ],
     );
+  }
+
+  /// What the progress bar fills toward, or null when there is nothing to
+  /// fill toward (no list, unlimited seats). Mirrors the server's choice in
+  /// `sponsor_dashboard()` rather than making its own — two places deciding
+  /// one denominator is two places to disagree about what a percentage means.
+  static int? _denominator(SponsorDashboard d) {
+    if (d.denominatorIsRoster) return d.eligibleListed;
+    final seats = d.seatsPurchased;
+    return (seats == null || seats == 0) ? null : seats;
   }
 
   Widget _suppressedNote(int min) {

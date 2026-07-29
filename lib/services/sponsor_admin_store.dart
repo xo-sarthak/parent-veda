@@ -65,6 +65,7 @@ class SponsorDashboard {
     required this.activated,
     required this.removed,
     required this.activatedLast30d,
+    required this.eligibleListed,
     required this.suppressed,
     required this.minCohort,
     this.seatsPurchased,
@@ -87,6 +88,18 @@ class SponsorDashboard {
   final int activated;
   final int removed;
   final int activatedLast30d;
+
+  /// How many people the organisation actually named on the list they sent
+  /// us. 0 when they never sent one and eligibility is by email domain.
+  ///
+  /// The better denominator when it exists: seats are what a company BOUGHT,
+  /// the roster is who they TOLD US ABOUT, and those are not always the same
+  /// number. "14 of 40 people" is a sentence HR can act on.
+  final int eligibleListed;
+
+  /// What "activation rate" is a percentage OF — so the screen can label it
+  /// honestly rather than leaving HR to guess.
+  bool get denominatorIsRoster => eligibleListed > 0;
   final int? seatsLeft;
   final int? activationRate; // percent, null when seats are unlimited
   final DateTime? renewalAt;
@@ -111,6 +124,7 @@ class SponsorDashboard {
       activated: _i(m['activated']) ?? 0,
       removed: _i(m['removed']) ?? 0,
       activatedLast30d: _i(m['activated_last_30d']) ?? 0,
+      eligibleListed: _i(m['eligible_listed']) ?? 0,
       seatsLeft: _i(m['seats_left']),
       activationRate: _i(m['activation_rate']),
       renewalAt: m['renewal_at'] == null

@@ -191,7 +191,15 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_p('Work email', 'Work email'),
+              // NOT "work email", deliberately. Plenty of Indian companies --
+              // especially the 30-to-200-person ones this is sold to first --
+              // issue no company addresses at all; their staff use Gmail, and
+              // HR gives us a list of those. Asking for a "work email" tells
+              // that person they are not eligible when they are, and they
+              // close the screen. What they need to type is whichever address
+              // their company gave us, which is what this says.
+              Text(_p('The email your company has for you',
+                  'Jo email aapki company ke paas hai'),
                   style: t.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               TextField(
@@ -219,11 +227,12 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                _p('We use it once, to check whether your company sponsors '
-                    'ParentVeda. It is never shown to them.',
-                    'Sirf ek baar use hoti hai — yeh check karne ke liye ki '
-                        'aapki company ParentVeda sponsor karti hai. Unhe kabhi '
-                        'dikhayi nahi jaati.'),
+                _p('Usually your work address — but if your company does not '
+                    'give you one, use whichever email HR has on file. We use '
+                    'it once to check, and never show it to them.',
+                    'Aam taur par work address — lekin agar company deti hi '
+                        'nahi, to jo bhi email HR ke paas hai wahi daaliye. '
+                        'Sirf ek baar check karte hain, unhe dikhate nahi.'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.45),
               ),

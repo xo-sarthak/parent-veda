@@ -690,12 +690,36 @@ Deliberately out of the first build because every event is a privacy surface in
 a product whose promise is that the employer sees nothing personal, and it
 should be designed once, properly, rather than bolted onto a sponsor feature.
 
-## 11.4 Leavers
+## 11.4 Leavers — MOSTLY SOLVED by the roster (0061)
 
-Work-email domain verification cannot tell that someone left the company. Seats
-reclaim only at renewal unless an eligibility file (an HR-uploaded roster) is
-added. That feature is normally what forces a portal to exist, and it is
-deliberately out of v1.
+*Original text: domain verification cannot tell that someone left, so seats
+reclaim only at renewal unless an eligibility file is added.*
+
+**Update 2026-07-29.** The eligibility file exists: `sponsor_eligible_people`,
+loaded from the sheet HR sends, and it **outranks the domain rule** — a sponsor
+with a roster is judged only on the roster, so removing a leaver from the sheet
+actually removes them rather than letting them fall through to their still-
+matching email domain.
+
+The rule is derived, not configured: *if a sponsor has a roster, the roster is
+the truth; if they never sent one, the domain is.* An `eligibility_mode` column
+with three values was the obvious alternative and was rejected — two of those
+values would never be chosen, and a config that can express more states than the
+product has is a bug surface.
+
+**What is still open:**
+
+* **Revoking eligibility does not revoke a live benefit.** Taking someone off
+  the sheet stops future activations; withdrawing the Premium they already hold
+  is `remove_sponsor_member()`, a separate deliberate act. That separation is
+  intentional — a benefit should not vanish because someone edited a
+  spreadsheet — but it means a leaver keeps access until someone acts.
+* **Nothing reconciles a re-uploaded sheet.** Uploading a new CSV adds and
+  updates rows; it does not mark the people who disappeared from it as revoked.
+  Today that is a manual comparison. The fix is a small function that diffs an
+  upload against the current roster and reports what it would revoke before
+  doing it — deliberately not automatic, because "the CSV was truncated" and
+  "forty people left" look identical to a database.
 
 ## 11.5 Company-uploaded resources are third-party content in a health product
 

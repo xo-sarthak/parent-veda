@@ -16,13 +16,15 @@ email, Premium appears, and HR can see uptake.
 > | Built | Where |
 > |---|---|
 > | Employer Benefits row (always visible) | `lib/screens/profile_screen.dart` — `_EmployerBenefitsCard` |
+> | Signup step — the door most employees arrive by | `lib/screens/auth/auth_flow_screen.dart` — `_employer()`, between `'profile'` and `'success'` |
 > | Activation flow (email → code → welcome) | `lib/screens/enterprise/activation_flow_screen.dart` |
 > | The benefits screen | `lib/screens/enterprise/employer_benefits_screen.dart` |
 > | HR dashboard + roster | `lib/screens/enterprise/sponsor_dashboard_screen.dart` |
 > | Refusal vocabulary, both languages | `lib/screens/enterprise/enterprise_common.dart` |
 > | Credit bridge (reuses `grantFloatingCredit`) | `lib/services/sponsor_benefits.dart`, attached in `main.dart` |
 > | HR stats reader | `lib/services/sponsor_admin_store.dart` |
-> | 34 tests | `test/sponsor_enterprise_test.dart` |
+> | Eligibility roster (the sheet HR sends) | `0061` — `sponsor_eligible_people`, CSV-imported via Directus |
+> | 50 tests | `test/sponsor_enterprise_test.dart` |
 > | SQL verification | `supabase/seed/verify_sponsor_gates.sql` |
 >
 > **To demo:** run `0059`, `0060`, then `supabase/seed/sponsor_demo.sql`.
@@ -35,7 +37,14 @@ email, Premium appears, and HR can see uptake.
 > events/resources have no audience scope). The design reasoning is written up
 > in `BACKEND-PATTERNS` §10.
 >
-> **Next free migration number is `0061`.**
+> **Next free migration number is `0062`.**
+>
+> **How a customer is onboarded, end to end:** create the `sponsors` row →
+> import their staff sheet into `sponsor_eligible_people` (Directus CSV
+> import; columns `work_email`, `sponsor_id`, `full_name`, `employee_ref`,
+> emails **lowercased in the spreadsheet first** or the CHECK rejects them) →
+> tell HR to announce it. Domains are the fallback for a customer who never
+> sends a list, not the primary path.
 
 ---
 

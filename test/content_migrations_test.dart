@@ -64,6 +64,16 @@ void main() {
     'plan_capabilities': 'the entitlement matrix itself',
     'sponsors': 'organisations sponsoring a plan — ops manages these',
     'sponsor_domains': 'the eligibility rule; NOT public-read (a customer list)',
+    'public_email_domains': 'the consumer-provider block list (0062) — ops may '
+        'ADD to it when a customer\'s staff use a provider not listed, but '
+        'note there is deliberately no delete grant: removing gmail.com from '
+        'it is the exact move that makes every Gmail account eligible',
+    'sponsor_eligible_people': 'the staff list HR sends us (0061) — this is '
+        'the table the CSV lands in, so if the panel cannot write it, '
+        'onboarding a customer stays an engineering ticket forever. It is '
+        'ELIGIBILITY ("Acme pays for priya@acme.com"), not MEMBERSHIP '
+        '("priya@acme.com uses ParentVeda") — the second is sponsor_members '
+        'and is deliberately still absent from this list',
     'sponsor_analytics_config': 'the k-anonymity threshold for HR analytics '
         '(0060) — select+update only, and it exists as a row precisely so a '
         'privacy decision can be tightened without a release',

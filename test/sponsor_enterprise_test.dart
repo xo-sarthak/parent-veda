@@ -41,6 +41,134 @@ void main() {
       File('supabase/migrations/0059_sponsor_dev_bypass.sql').readAsStringSync();
   final adminSql =
       File('supabase/migrations/0060_sponsor_admin.sql').readAsStringSync();
+  final rosterSql =
+      File('supabase/migrations/0061_sponsor_eligibility_roster.sql')
+          .readAsStringSync();
+
+  // ===========================================================================
+  //  0. Eligibility: the named list beats the email domain (0061)
+  // ===========================================================================
+  group('the roster is the truth when there is one', () {
+    test('a domain match is refused once a sponsor has sent a list', () {
+      // Otherwise removing a leaver from the sheet is theatre: they fall
+      // straight through to their still-matching email domain.
+      expect(rosterSql, contains('not exists (select 1 from public.sponsor_eligible_people e2'));
+    });
+
+    test('the rule is derived, not configured', () {
+      // The alternative was an eligibility_mode column with three values,
+      // two of which nobody would ever pick. A config that can express more
+      // states than the product has is a bug surface, not flexibility.
+      //
+      // Comments are stripped first, because the migration DISCUSSES the
+      // column it decided against — and a test that cannot tell an
+      // implementation from an explanation of why there isn't one will fail
+      // on well-documented code, which is the wrong incentive.
+      final code = rosterSql
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('--'))
+          .join('\n');
+      expect(
+        RegExp(r'eligibility_mode', caseSensitive: false).hasMatch(code),
+        isFalse,
+      );
+    });
+
+    test('one function answers eligibility, and both callers use it', () {
+      // Two copies of an eligibility rule is how they come to disagree.
+      expect(rosterSql, contains('function public.sponsor_for_work_email'));
+      expect(
+        'public.sponsor_for_work_email('.allMatches(rosterSql).length,
+        greaterThanOrEqualTo(3),
+        reason: 'defined once, called by request_ and confirm_',
+      );
+    });
+
+    test('eligibility is re-checked at the moment of granting', () {
+      // Ten minutes is long enough for HR to take somebody off the list,
+      // and 0059 already claims this principle for seats and status —
+      // half-keeping it would be worse than not claiming it.
+      final confirm = rosterSql.substring(
+          rosterSql.indexOf('function public.confirm_sponsor_activation'));
+      expect(confirm, contains('v_now := public.sponsor_for_work_email'));
+    });
+
+    test('being on the list does not by itself grant anything', () {
+      // A leaked spreadsheet must not be free Premium for whoever holds it.
+      expect(
+        RegExp(r"jsonb_build_object\([^)]*'code',\s*v_code").hasMatch(rosterSql),
+        isFalse,
+      );
+      expect(rosterSql, contains('The code is NOT returned'));
+    });
+
+    test('every eligibility failure gives the same vague answer', () {
+      // Not on the list, revoked from it, unknown domain, lapsed customer.
+      // If these differed, this endpoint would enumerate both our customers
+      // AND their staff lists.
+      final req = rosterSql.substring(
+          rosterSql.indexOf('function public.request_sponsor_activation'),
+          rosterSql.indexOf('function public.confirm_sponsor_activation'));
+      expect("'not_eligible'".allMatches(req).length, 1,
+          reason: 'one refusal code covers every eligibility failure');
+    });
+
+    test('the roster is writable by the panel; membership still is not', () {
+      // THE DISTINCTION THIS WHOLE TABLE EXISTS FOR. "Acme pays for Priya"
+      // is an HR fact ops must load from a sheet. "Priya uses ParentVeda" is
+      // a fact about someone's health app and ops must never see it.
+      expect(rosterSql,
+          contains('grant select, insert, update, delete on public.sponsor_eligible_people'));
+      expect(
+        RegExp(r'grant[^;]*on\s+public\.sponsor_members\s+to\s+directus_cms',
+                caseSensitive: false, dotAll: true)
+            .hasMatch(rosterSql),
+        isFalse,
+      );
+    });
+
+    test('the roster is not readable by app sessions', () {
+      expect(rosterSql,
+          contains('revoke all on public.sponsor_eligible_people from anon, authenticated'));
+    });
+
+    test('emails are forced lowercase by the database, not by the importer', () {
+      // A CSV out of Excel contains "Priya.Sharma@Acme.com". Storing it
+      // verbatim gives a row that looks right and can never match.
+      expect(rosterSql, contains('work_email = lower(work_email)'));
+    });
+
+    test('a consumer email provider can never be a sponsor domain', () {
+      // One row from catastrophe: 'gmail.com' in sponsor_domains would make
+      // every Gmail account on earth eligible for that sponsor. 0061's
+      // roster-wins rule makes it survivable in the common case, but
+      // "survivable because of an unrelated rule" is not a safeguard.
+      final guard =
+          File('supabase/migrations/0062_public_domains_blocked.sql')
+              .readAsStringSync();
+      expect(guard, contains('public_email_domains'));
+      expect(guard, contains('sponsor_domains_reject_public_trg'));
+      for (final d in const ['gmail.com', 'rediffmail.com', 'yahoo.co.in']) {
+        expect(guard, contains("('$d'"));
+      }
+      // It must also catch what is ALREADY in the table — a guard added after
+      // the fact that ignores existing rows guards nothing, and the row it
+      // was written for is the one already sitting there.
+      expect(guard, contains('ALREADY CONTAINS consumer providers'));
+      // And the list must not be deletable from the panel: removing
+      // 'gmail.com' from it is exactly the move that reopens the hole.
+      expect(guard,
+          contains('grant select, insert, update on public.public_email_domains'));
+      expect(guard.contains('delete on public.public_email_domains'), isFalse);
+    });
+
+    test('revoking eligibility does not silently take back a live benefit', () {
+      // Stopping future activations and withdrawing someone's Premium are
+      // different acts, and only one of them should happen by editing a
+      // spreadsheet.
+      expect(rosterSql, contains('it does not take away a benefit already granted'));
+    });
+  });
 
   // ===========================================================================
   //  1. The demo door (0059)
@@ -115,30 +243,48 @@ void main() {
   //  2. The HR wall (0060)
   // ===========================================================================
   group('HR sees numbers, never people', () {
+    // THE LAST DEFINITION WINS, and the test has to know that. 0060 declared
+    // sponsor_roster() and 0061 replaced it; a test still reading 0060 would
+    // have gone on passing against a signature nothing runs — which is worse
+    // than no test, because it reports safety it is not checking.
+    String liveRosterReturnType() {
+      for (final sql in [rosterSql, adminSql]) {
+        final m = RegExp(
+                r'create or replace function public\.sponsor_roster\(\)\s*returns table \(([^)]*)\)',
+                dotAll: true)
+            .firstMatch(sql);
+        if (m != null) return m.group(1)!;
+      }
+      fail('sponsor_roster() is not defined in 0060 or 0061');
+    }
+
     test('the roster returns no user id — the promise is a signature', () {
       // A caller cannot select a column the function does not return, so this
       // is stronger than a policy: it is the shape of the type.
-      final ret = RegExp(
-              r'create or replace function public\.sponsor_roster\(\)\s*returns table \(([^)]*)\)',
-              dotAll: true)
-          .firstMatch(adminSql);
-      expect(ret, isNotNull);
-      expect(ret!.group(1), isNot(contains('user_id')));
-      expect(ret.group(1), isNot(contains('uuid')));
+      final ret = liveRosterReturnType();
+      expect(ret, isNot(contains('user_id')));
+      expect(ret, isNot(contains('uuid')));
     });
 
     test('the roster carries nothing behavioural', () {
-      final ret = RegExp(
-              r'create or replace function public\.sponsor_roster\(\)\s*returns table \(([^)]*)\)',
-              dotAll: true)
-          .firstMatch(adminSql)!
-          .group(1)!;
+      final ret = liveRosterReturnType();
+      // full_name is NOT on this list, and the distinction is the point: HR
+      // sent us those names on their own spreadsheet, so returning them is
+      // handing back their data. The line is what a person DID.
       for (final leak in const [
-        'booking', 'consult', 'last_seen', 'due_date', 'child', 'name'
+        'booking', 'consult', 'last_seen', 'due_date', 'child', 'read', 'search'
       ]) {
         expect(ret.contains(leak), isFalse,
             reason: 'sponsor_roster must not expose $leak.');
       }
+    });
+
+    test('the roster shows who has NOT started, not only who has', () {
+      // The follow-up list is the reason HR opens the page at all. A roster
+      // of activated people answers a question they already saw a number for.
+      final ret = liveRosterReturnType();
+      expect(ret, contains('full_name'));
+      expect(rosterSql, contains("coalesce(m.status, 'not_activated')"));
     });
 
     test('the company is resolved from the session, never passed in', () {
@@ -400,6 +546,27 @@ void main() {
       expect(d.activated, 3, reason: 'headcount is never suppressed');
     });
 
+    test('take-up is out of the roster when there is one, seats when not', () {
+      // Seats are what a company BOUGHT; the roster is who they TOLD US
+      // ABOUT. An unlabelled percentage silently means whichever one HR
+      // happened to assume.
+      final withList = SponsorDashboard.fromMap({
+        'ok': true, 'sponsor_id': 'a', 'sponsor_name': 'A',
+        'activated': 14, 'eligible_listed': 40, 'seats_purchased': 50,
+        'activation_rate': 35, 'suppressed': false, 'min_cohort': 5,
+      })!;
+      expect(withList.denominatorIsRoster, isTrue);
+      expect(withList.eligibleListed, 40);
+
+      final domainOnly = SponsorDashboard.fromMap({
+        'ok': true, 'sponsor_id': 'b', 'sponsor_name': 'B',
+        'activated': 14, 'seats_purchased': 50,
+        'suppressed': false, 'min_cohort': 5,
+      })!;
+      expect(domainOnly.denominatorIsRoster, isFalse);
+      expect(domainOnly.eligibleListed, 0);
+    });
+
     test('a non-admin resolves to no dashboard at all', () {
       expect(
         SponsorDashboard.fromMap(
@@ -448,6 +615,64 @@ void main() {
 
     test('the credit bridge is attached at startup', () {
       expect(main, contains('SponsorBenefits.attach()'));
+    });
+
+    group('signup offers activation — the door most employees arrive by', () {
+      final auth =
+          File('lib/screens/auth/auth_flow_screen.dart').readAsStringSync();
+
+      test('the step exists and is in the state machine', () {
+        expect(auth, contains("case 'employer':"));
+        expect(auth, contains('Widget _employer()'));
+        expect(auth, contains('openActivationFlow(context)'));
+      });
+
+      test('it sits BETWEEN profile and success, not after it', () {
+        // After "You're all set!" someone is finished, and anything offered
+        // there reads as an upsell. Before it, it is still setup.
+        expect(auth, contains("'employer': 'profile'"),
+            reason: 'back from the employer step must return to profile');
+        expect(
+          RegExp(r"_go\('employer'\);").hasMatch(auth),
+          isTrue,
+          reason: 'finishing the profile step must lead into it',
+        );
+        // The old direct jump must be gone, or the step is unreachable —
+        // exactly the correct-but-unreachable failure the wiring gate exists
+        // for.
+        expect(
+          RegExp(r"_go\('success'\); // continue regardless").hasMatch(auth),
+          isFalse,
+        );
+      });
+
+      test('both ways out land on success', () {
+        // Someone who just activated must not be asked again, and someone who
+        // was refused must not be stranded on the step that refused them.
+        final body = RegExp(r'Widget _employer\(\) =>(.*?)\n  // WhatsApp',
+                dotAll: true)
+            .firstMatch(auth)!
+            .group(1)!;
+        expect("_go('success')".allMatches(body).length, greaterThanOrEqualTo(2));
+      });
+
+      test('the privacy answer comes before the ask, not after', () {
+        final body = RegExp(r'Widget _employer\(\) =>(.*?)\n  // WhatsApp',
+                dotAll: true)
+            .firstMatch(auth)!
+            .group(1)!;
+        final privacy = body.indexOf('only ever sees how many people');
+        final ask = body.indexOf('Check with my work email');
+        expect(privacy, greaterThan(-1));
+        expect(privacy, lessThan(ask),
+            reason: 'someone about to type where they work into a pregnancy '
+                'app is owed the answer first.');
+      });
+
+      test('skipping is one tap and says so', () {
+        expect(auth, contains('Skip — my company does not'));
+        expect(auth, contains('You can do this later from Profile.'));
+      });
     });
 
     test('the HR dashboard has a door', () {

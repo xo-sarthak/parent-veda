@@ -26,6 +26,8 @@ import '../../referral/referral_links.dart';
 import '../../referral/referral_engine.dart';
 import '../../referral/referral_analytics.dart';
 import '../referral/enter_code_sheet.dart';
+import '../enterprise/activation_flow_screen.dart';
+import '../../services/entitlement_store.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
@@ -113,6 +115,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     'signup': 'welcome',
     'role': 'welcome',
     'profile': 'role',
+    'employer': 'profile',
     'pairCode': 'role',
     'forgot': 'login',
     'otp': 'forgot',
@@ -253,7 +256,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     } finally {
       if (mounted) {
         setState(() => _busy = false);
-        _go('success'); // continue regardless; the account already exists
+        // Continue regardless; the account already exists.
+        //
+        // The employer step sits BETWEEN profile and success rather than after
+        // it. Once someone has read "You're all set!" they are finished, and
+        // anything offered after that reads as an upsell. Before it, it is
+        // still part of setting up.
+        _go('employer');
       }
     }
   }
@@ -422,6 +431,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         return _role();
       case 'profile':
         return _profile();
+      case 'employer':
+        return _employer();
       case 'pairCode':
         return _pairCode();
       case 'pairing':
@@ -1254,6 +1265,37 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       color: _muted),
                 ),
               ),
+              // WHO IS PAYING, said once, here. Someone who just proved control
+              // of a work address should see that it worked before anything
+              // else happens - otherwise the activation reads as having
+              // vanished, and the first thing they do is go looking for it.
+              // This is also the ONLY branding a sponsor ever gets: one line.
+              if (EntitlementStore.instance.sponsor != null) ...[
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 15, vertical: 11),
+                  decoration: BoxDecoration(
+                    color: const Color(0x147C3FC4),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.workspace_premium_outlined,
+                        size: 17, color: _purple),
+                    const SizedBox(width: 9),
+                    Flexible(
+                      child: Text(
+                        'Premium, provided by '
+                        '${EntitlementStore.instance.sponsor!.name}',
+                        style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: _ink2),
+                      ),
+                    ),
+                  ]),
+                ),
+              ],
               const SizedBox(height: 22),
               // THE DEFERRED-LINK DOOR. A friend who installed from the store
               // arrives with no code attached - carrying one through an install
@@ -1495,6 +1537,130 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     ];
     return '${d.day} ${m[d.month - 1]} ${d.year}';
   }
+
+  // ===========================================================================
+  //  EMPLOYER BENEFIT  -  the second door, and the one most people arrive by
+  // ---------------------------------------------------------------------------
+  //  THE PROBLEM THIS SOLVES. Activation already worked from Profile, and that
+  //  is the right door for someone who has been using ParentVeda for months
+  //  when their company becomes a customer. It is the WRONG door for the far
+  //  more common case: HR emails the team, a new employee installs, signs up -
+  //  and is never once asked the question. They would have to already be a user
+  //  and then go looking in a settings list for a benefit they do not know
+  //  exists. Nothing errors; take-up just quietly halves, and the customer
+  //  concludes their people did not want it.
+  //
+  //  THE TRADE-OFF, NAMED RATHER THAN HIDDEN. This adds a screen to every
+  //  signup, and most people have no employer benefit. That is a real cost and
+  //  it is accepted for two reasons:
+  //
+  //    * It costs them ONE TAP. There is nothing to type unless they say yes,
+  //      so the no-benefit path is "read a line, tap Skip".
+  //    * Unlike an invite code, this is something people do not KNOW they have.
+  //      "Have an invite code?" can be a quiet link at the bottom of a screen
+  //      because you either hold one or you do not. "Does your employer pay for
+  //      this?" has to be asked, because the honest answer for most people is
+  //      "I have no idea" - and the only way to find out is to check.
+  //
+  //  So it is phrased as a question with an obvious way out, not as a form.
+  //
+  //  ENGLISH ONLY, deliberately. Signup happens before the language toggle
+  //  exists - there is no AppLanguage to read here, which is why the rest of
+  //  this file is English too. The flow itself IS bilingual; it just inherits
+  //  English when opened from here.
+  Widget _employer() => _formScroll([
+        _centeredHeader(
+          'Does your company offer ParentVeda?',
+          'Some employers pay for it. It takes a minute to check.',
+          showLogo: false,
+        ),
+        const SizedBox(height: 14),
+        _glass(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0x1A7C3FC4),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(Icons.business_outlined,
+                    size: 21, color: _purple),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'If they do, you get ParentVeda Premium and a free '
+                  'consultation — paid for by them.',
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                      color: _muted2),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 16),
+            // The privacy answer comes BEFORE the ask, not after it. Someone is
+            // about to type where they work into a pregnancy app; the question
+            // they have not asked out loud yet is "will my boss find out I am
+            // pregnant?" Waiting until after they commit to answer it is how
+            // you get a screen people back out of.
+            Container(
+              padding: const EdgeInsets.all(13),
+              decoration: BoxDecoration(
+                color: const Color(0x0D7C3FC4),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 1),
+                    child: Icon(Icons.lock_outline_rounded,
+                        size: 15, color: _purple),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      'Your employer only ever sees how many people activated. '
+                      'Never your pregnancy, your baby, your journal or '
+                      'anything you ask us.',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12.5,
+                          height: 1.45,
+                          fontWeight: FontWeight.w500,
+                          color: _ink2),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            _primaryBtn('Check with my work email', () async {
+              final ok = await openActivationFlow(context);
+              if (!mounted) return;
+              // Straight on either way. Someone who just activated does not
+              // need to be asked again, and someone who could not should not
+              // be stuck on the step that refused them.
+              _go('success');
+              if (ok) setState(() {});
+            }),
+            const SizedBox(height: 10),
+            _outlineBtn('Skip — my company does not', () => _go('success')),
+            const SizedBox(height: 12),
+            Center(
+              child: Text(
+                'You can do this later from Profile.',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12, fontWeight: FontWeight.w600, color: _label),
+              ),
+            ),
+          ]),
+        ),
+      ]);
 
   // WhatsApp opt-in (B2) - optional; captured here at onboarding and mirrored
   // on the Profile tab. _saveProfile persists it (source 'onboarding').

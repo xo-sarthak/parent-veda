@@ -227,6 +227,39 @@ compiled into the app, so the panel cannot silently diverge.
 
 ---
 
+## 4b. The sponsor collections — onboarding a company without a developer
+
+Four tables, and getting the boundary right between two of them is the point of
+the whole section.
+
+| Collection | Interface notes |
+|---|---|
+| `sponsors` | `id` — the slug, note it as permanent (memberships and entitlements point at it). `kind` — dropdown `employer`/`insurer`/`hospital`/`ngo`/`university`/`clinic`, allow other values. `plan_id` — M2O on `plans`, display `{{name}}`. `seats_purchased` — **note that EMPTY means unlimited**, or someone types `0` and locks every employee out. `status` — dropdown `pending`/`active`/`suspended`/`ended`; this is the kill switch when a customer stops paying. **`dev_bypass_code` — HIDDEN** (`0059` revoked the write grant, so a visible field just produces a raw `permission denied`) |
+| `sponsor_eligible_people` | **The sheet HR sends.** Use Directus's CSV import. Columns `work_email`, `sponsor_id`, `full_name`, `employee_ref`. ⚠️ **Lowercase the email column in the spreadsheet first** — a CHECK rejects `Priya@Acme.com`, and it is better to be rejected than to store a row that looks right and can never match |
+| `sponsor_domains` | `domain` — note "lowercase, no `@`". The **fallback** for a customer who never sends a list; once a roster exists it is ignored |
+| `sponsor_analytics_config` | `min_cohort` — note "behavioural stats are withheld below this many activations". `id` hidden; there is only one row |
+
+**Do not register `sponsor_members` or `sponsor_activation_codes.`** They have
+no grants, so Directus lists the names and every read fails.
+
+The distinction to hold on to, because the two tables look almost identical:
+
+> `sponsor_eligible_people` says **"Acme is paying for priya@acme.com"** — an HR
+> fact, true before she has heard of ParentVeda. Ops loads it from a sheet.
+>
+> `sponsor_members` says **"priya@acme.com uses ParentVeda"** — a fact about
+> someone's health app. Ops must never see it.
+>
+> That difference is what lets operations onboard a customer without ever
+> learning who signed up, and it is enforced by grants rather than by
+> configuring this screen carefully.
+
+**Give these to Ops, not Editor.** Onboarding a paying customer is an
+operations act; an editor who can flip a sponsor to `active` can hand out
+Premium.
+
+---
+
 ## 5. Publishing must reach three places
 
 One write, three readers. Without these two Flows, publishing changes a row and
