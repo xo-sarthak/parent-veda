@@ -100,11 +100,15 @@ void main() {
         (tester) async {
       await tester.pumpWidget(const MaterialApp(home: TtcToolsScreen()));
       await tester.pump();
-      // Tile count, not tool count - Medication and Reports were folded into
-      // the tiles they already opened. Coverage of the master document's tools
-      // is asserted by name in ttc_tools_test.dart, which is the promise that
-      // actually matters.
-      expect(TtcToolsScreen.toolCount, 20);
+      // Tile count, not tool count. Reports is still folded into Health
+      // Records, which it always opened; Medication was folded too and has
+      // since been split back out, because it finally has a destination of its
+      // own instead of a supplement list it could not hold a prescription in.
+      //
+      // Coverage of the master document's tools is asserted by NAME in
+      // ttc_tools_test.dart, which is the promise that actually matters - this
+      // number is only here so a tile cannot vanish unnoticed.
+      expect(TtcToolsScreen.toolCount, 21);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

@@ -89,8 +89,16 @@ const List<TtcTest> ttcTests = [
     id: 'amh',
     name: 'AMH',
     forHim: false,
-    whatEn: 'A rough estimate of how many eggs remain - the size of the reserve.',
-    whatHi: 'Kitne eggs bache hain iska mota andaaza - reserve ka size.',
+    // The card-level line sat one level ABOVE its own correction. `whyEn` and
+    // `readingEn` below already carry the reviewer's verdict - a planning
+    // number, not a fertility score, and almost silent on egg quality - but the
+    // first line she read was "how many eggs remain", which is the exact
+    // framing that invites "I am running out". Nothing new is claimed here;
+    // the vetted wording was moved to where the fear starts.
+    whatEn:
+        'How your ovaries are likely to respond to IVF stimulation - a planning number, not a count of what is left.',
+    whatHi:
+        'Ovaries IVF stimulation par kaisa jawab dengi, iska andaaza - planning ka number hai, ye nahi ki kitna bacha hai.',
     whyEn:
         'Mainly used to predict how ovaries will respond to IVF stimulation. It is a planning number for a specialist, not a fertility score.',
     whyHi:

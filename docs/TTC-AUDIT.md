@@ -1045,3 +1045,130 @@ The first pass missed them because it read each screen for what it said, not for
 whether its parts agreed with each other. The check that would have caught all
 three: **for every number on screen, find the other place that number is
 derived, and ask whether they can ever differ.**
+
+---
+
+# 9. The UI-phase batch
+
+Decided together: build the interface, add no backend. Every item here works
+with the database switched off.
+
+## A-41 — fixed. AMH read as a countdown of what is left
+
+The card-level line was *"A rough estimate of how many eggs remain — the size of
+the reserve."* That is the first thing an anxious person reads, and it invites
+*"I am running out."*
+
+The correction already existed, two fields below in the same entry: `whyEn` says
+*"a planning number for a specialist, not a fertility score"*, `readingEn` says
+it *"says almost nothing about egg QUALITY"*. Nothing new is claimed — the
+vetted wording was moved to where the fear starts:
+
+> *"How your ovaries are likely to respond to IVF stimulation — a planning
+> number, not a count of what is left."*
+
+The test that guarded this asserted `what(false)` contained the word
+*"estimate"*, which was a proxy for hedging language and happened to pin the
+exact sentence in place. It now asserts the intent — no "how many eggs", no
+"remain", and "respond" present.
+
+> A test written against a proxy will eventually defend the thing it was
+> written to prevent.
+
+## A-42 — fixed. She can write down what her clinic actually prescribed
+
+The widest gap in the stage, and it sat directly under the most careful thinking
+in it. The care pathway asks her, in these words, whether medication has taken
+over *when* ovulation happens — and the answer decides whether we predict a
+fertile window or defer to her clinic entirely. Then the Medication tile opened
+a curated supplement list with `+` buttons and no text field anywhere. She could
+add *folic acid, from our list*. She could not write *Letrozole 2.5mg, days 3
+to 7*.
+
+A woman on a stimulation protocol carries four drugs on a schedule, and the app
+that had just asked her about her medication could hold none of them.
+
+**No new store, no new table, no SQL.** `MedicineStore` lives in
+`lib/services/`, not a stage folder, because a medication is not a pregnancy
+concept or a TTC concept — it is a fact about a person. It already had the model
+(name, dose, frequency, notes, start/end), per-day taken logs, and real OS
+alarms with times and windows. Its tables already exist. This is a TTC-skinned
+door onto infrastructure the app already had.
+
+Local-first falls out for free: every cloud call in that store is gated on
+`isLoggedIn`, so signed out it is a purely local record behaving identically.
+
+**Two tiles now, not one.** "Supplements & medication" could only ever do one of
+those jobs. A supplement is something *we suggested*, from a list, with a `+`. A
+medication is something a *clinic prescribed* and she is reporting to us — free
+text, her dose, her schedule. The tile count test moved 20 → 21, and the rule it
+stands for did not change: a tile must lead somewhere genuinely its own.
+Splitting when that becomes true is the same rule as merging when it is not.
+
+**What it deliberately will not do:** no dose checking, no interaction warnings,
+no inference from a drug name to a diagnosis. Seeing "Letrozole" does not let us
+decide she has PCOS. A test asserts no conditional anywhere mentions a drug
+name. `TruthSource.verifiedMedication` already sits above our own calculation
+precisely so a schedule she reports outranks anything we derive.
+
+## A-49 — fixed. Health Records holds the actual document
+
+Fertility results in India arrive on paper and as PDFs. A text-only folder could
+hold a number she retyped and never the report her clinic handed her — which
+stayed in her gallery or her email, which is where she would go looking for it.
+The folder was not the folder.
+
+Cheaper than estimated, and I had said otherwise: `StorageService`,
+`image_picker` and `file_picker` were all already in the app, with
+`pp_attachments.dart` as a working reference. The storage decision had been made
+and shipped; TTC had simply never used it.
+
+**Local-first by construction.** `StorageService.upload()` returns the original
+local path when signed out, and `resolve()` accepts either a local path or a
+storage object path — so this behaves identically with no backend and starts
+syncing files the day one exists.
+
+The *list* of refs is deliberately local-only. `TtcRecord.toJson` is the
+`shared_preferences` cache; the cloud row is written column by column in
+`pushToCloud`. A field therefore reaches the database only when someone types
+the column name out — which is what makes this safe rather than lucky. Adding a
+column is a migration, and TTC is taking no new schema yet.
+
+**Detaching is not deleting.** Removing a chip edits the list and leaves the
+file alone. Wrong here is unrecoverable — she detaches a scan from the wrong
+record and it is gone from her phone.
+
+TTC got its own picker rather than importing the parenting one: the stages agree
+on *values*, not widgets, and that file is pp-palette throughout. Sharing
+happens one layer down, at the infrastructure.
+
+## A-82 — fixed. His half had no profile door, and no header of its own
+
+`TtcHeader` gained the profile door when A-2 / A-3 / A-61 were fixed — no
+language control, no sign-out, no way to correct anything. His side had rolled
+its own private `_Header`: a logo and nothing else. So the sealed room those
+findings describe stayed sealed on his half. A paired partner had no route to
+Hinglish and no way to sign out, on any screen.
+
+> A private copy of a shared component looks harmless the day it is written and
+> then silently stops receiving every fix the shared one gets.
+
+One header with a `slate` flag now. The private one is commented out with that
+note attached, because it is the clearest example of the rule in the codebase.
+
+## A-83 — fixed. His hero rebuilt against the pregnancy Dad hero
+
+Her TTC hero was built against the pregnancy *mother's* home. His was not built
+against anything — a title, a tagline and one flat bar.
+
+Now built element for element against `father_daily_screen.dart`'s
+`_weeklySnapshot`: a muted eyebrow above the card, a clipped two-stop gradient,
+one large white circle bleeding off the top right and one **amber** circle off
+the bottom (amber is his accent exactly as coral is hers), a greeting, the serif
+headline, the tagline, an onward link, the segmented bar, the "next" line, a
+hairline divider, and three circular shortcuts.
+
+The two products' father halves should look like each other, rather than one
+looking like a plainer version of the same app.
+
+The privacy omission from A-79 stands unchanged: no "Day N of 28".

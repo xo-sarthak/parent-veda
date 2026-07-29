@@ -528,6 +528,40 @@ codebase has said it does not want.
 Either author some insights that are genuinely hers alone, or drop the field.
 Cheap either way; noted so it is a decision rather than a leftover.
 
+
+## 9.7 TTC attachments do not sync
+
+`TtcRecord.attachments` is cached locally and is deliberately absent from the
+cloud row: `pushToCloud` names its columns explicitly and does not name this
+one. So a report attached on one phone is not on the next one.
+
+That is the agreed position while the UI is being finalised — TTC takes no new
+schema. The **files themselves** already travel: `StorageService.upload()`
+returns a storage object path once signed in and the original local path
+otherwise, so switching the backend on starts uploading them without a code
+change. What is missing is only the *list*.
+
+Closing it: one nullable `files jsonb` (or `text[]`) column on `ttc_records`,
+one line in `pushToCloud`, one line in the row decode. Ten minutes plus a
+migration — stated here so it is a decision rather than a surprise on the day
+someone reinstalls.
+
+## 9.8 TTC medication uses the app-wide `medications` table
+
+`ttc_medication_screen.dart` writes through `MedicineStore`, which is app-level
+(`lib/services/`) and already backed by `medications` / `medication_logs`. That
+is deliberate — a medication is a fact about a person, not about a stage, and it
+meant the feature needed no new schema at all.
+
+The consequence worth knowing: a medication recorded in TTC is the *same row*
+the pregnancy Medicine Tracker reads. That is almost certainly right — the
+letrozole she was on before conceiving is the same letrozole afterwards, and the
+transition engine's promise is that nothing restarts. But it is a shared-surface
+decision nobody has explicitly signed off, so it is written down here.
+
+If the two stages ever need separate lists, `MedType` already distinguishes
+them and a filter is one line. Do not build a second store.
+
 ---
 
 # 10. Content

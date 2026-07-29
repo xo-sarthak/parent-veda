@@ -27,6 +27,7 @@ import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_partner_data.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_askveda_screen.dart';
+import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_insight_screen.dart';
 import 'ttc_journal_screen.dart';
@@ -76,7 +77,12 @@ class TtcPartnerTodayScreen extends StatelessWidget {
           slate: true,
           overlay: _ModePill(t: t, him: true),
           children: [
-            _Header(t: t),
+            // The SHARED header, in his palette - not a private one. His was a
+            // logo row with no actions, so the profile door added to fix A-2 /
+            // A-3 / A-61 (no language control, no sign-out, no way to correct
+            // anything) never reached his half. Two headers is exactly how his
+            // came to be missing it.
+            const TtcHeader(slate: true),
             const SizedBox(height: 18),
             _Hero(chapter: chapter, today: today, t: t),
             const SizedBox(height: 20),
@@ -152,20 +158,27 @@ class _ModePill extends StatelessWidget {
 /// Reusable so her Today can carry the same dev switch.
 Widget ttcModePill(TtcS t, {required bool him}) => _ModePill(t: t, him: him);
 
-class _Header extends StatelessWidget {
-  const _Header({required this.t});
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Image.asset('assets/brand/pv-mark.png', height: 30),
-      const SizedBox(width: 9),
-      Text('ParentVeda',
-          style: ttcFraunces(20, w: FontWeight.w600, color: ttcSlate)),
-    ]);
-  }
-}
+// Superseded by `TtcHeader(slate: true)`. Kept for revert.
+//
+// This is the object lesson: a private copy of a shared component looks
+// harmless the day it is written and silently stops receiving every fix the
+// shared one gets. The profile door - his only route to Hinglish and to signing
+// out - was added to `TtcHeader` and never arrived here.
+//
+// class _Header extends StatelessWidget {
+//   const _Header({required this.t});
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(children: [
+//       Image.asset('assets/brand/pv-mark.png', height: 30),
+//       const SizedBox(width: 9),
+//       Text('ParentVeda',
+//           style: ttcFraunces(20, w: FontWeight.w600, color: ttcSlate)),
+//     ]);
+//   }
+// }
 
 class _Hero extends StatelessWidget {
   const _Hero({required this.chapter, required this.today, required this.t});
@@ -177,16 +190,70 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hi = t.hinglish;
+    // Built against the pregnancy stage's DAD hero (`father_daily_screen.dart`,
+    // `_weeklySnapshot`), the same way her TTC hero was built against the
+    // mother's home. That is the standard: the two products' father halves
+    // should look like each other, not like a plainer version of the same app.
+    //
+    // Dad's shape, element for element: a muted eyebrow ABOVE the card, a
+    // clipped two-stop gradient, one large white circle bleeding off the top
+    // right and one amber circle off the bottom, a greeting, the serif
+    // headline, a summary, an onward link, a progress bar, a hairline divider,
+    // and three circular shortcuts.
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Dad has "WEEKLY SNAPSHOT" here; she has "YOUR CHAPTER". His hero
+      // floated with nothing naming it.
+      Padding(
+        padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
+        child: ttcEyebrow(t.partnerTodayTitle, color: ttcSlateSoft),
+      ),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        child: Stack(children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [ttcSlate, ttcSlateDeep],
+                ),
+              ),
+            ),
+          ),
+          // The two soft circles Dad's hero carries. Amber is the accent on
+          // his side exactly as coral is on hers.
+          Positioned(
+              right: -34,
+              top: -40,
+              child: _softCircle(150, Colors.white.withValues(alpha: 0.06))),
+          Positioned(
+              right: 26,
+              bottom: -42,
+              child:
+                  _softCircle(96, ttcSlateAmber.withValues(alpha: 0.20))),
+          _body(context, hi),
+        ]),
+      ),
+    ]);
+  }
+
+  static String _greeting(TtcS t) {
+    final h = DateTime.now().hour;
+    if (h < 12) return t.goodMorning;
+    if (h < 17) return t.goodAfternoon;
+    return t.goodEvening;
+  }
+
+  static Widget _softCircle(double size, Color c) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+      );
+
+  Widget _body(BuildContext context, bool hi) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ttcCardRadius),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [ttcSlate, ttcSlateDeep],
-        ),
-      ),
       // Hers answers three questions above the fold - where am I, what is next,
       // show me it all. His answered none: a title, a tagline and one flat bar
       // that could have been at any point of anything. The hero parity work was
@@ -201,32 +268,12 @@ class _Hero extends StatelessWidget {
       // the leak the partner Ask Veda door is careful to avoid. The segmented
       // bar is chapter-level and therefore safe.
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(
-            child: Text(t.partnerTodayTitle,
-                style: ttcBody(12,
-                    color: Colors.white.withValues(alpha: 0.82),
-                    w: FontWeight.w700)),
-          ),
-          // "Show me it all" - the same door hers has. Structure is never
-          // personalised, so he reaches the map too.
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-              builder: (_) => const TtcJourneyMapScreen(),
-              settings: const RouteSettings(name: 'ttc/journey'),
-            )),
-            behavior: HitTestBehavior.opaque,
-            child: Row(children: [
-              Text(t.journeyMap,
-                  style: ttcBody(12.5,
-                      color: Colors.white, w: FontWeight.w700)),
-              const SizedBox(width: 3),
-              const Icon(Icons.chevron_right_rounded,
-                  size: 17, color: Colors.white),
-            ]),
-          ),
-        ]),
-        const SizedBox(height: 10),
+        // Dad opens "Good afternoon, {name}". Same beat.
+        Text(_greeting(t),
+            style: ttcBody(12.5,
+                color: Colors.white.withValues(alpha: 0.85),
+                w: FontWeight.w600)),
+        const SizedBox(height: 6),
         // Fraunces, as the father mode does for its headers.
         Text(chapter.title(hi),
             style: ttcFraunces(26, w: FontWeight.w600, color: Colors.white)),
@@ -234,17 +281,53 @@ class _Hero extends StatelessWidget {
         Text(chapter.tagline(hi),
             style: ttcBody(13,
                 color: Colors.white.withValues(alpha: 0.92), h: 1.5)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+        // Dad's "Open her week ›" — the onward link sits under the summary,
+        // not floating in the top corner.
+        GestureDetector(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (_) => const TtcJourneyMapScreen(),
+            settings: const RouteSettings(name: 'ttc/journey'),
+          )),
+          behavior: HitTestBehavior.opaque,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(t.journeyMap,
+                style: ttcBody(12.5, color: Colors.white, w: FontWeight.w700)),
+            const Icon(Icons.chevron_right_rounded,
+                size: 17, color: Colors.white),
+          ]),
+        ),
+        const SizedBox(height: 18),
         TtcChapterBar(today: today),
         const SizedBox(height: 14),
-        Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
-        const SizedBox(height: 12),
         // What is coming, named by its trigger rather than a countdown - the
         // same copy hers uses, so the two cannot describe the journey
         // differently to the two people on it.
         Text(chapter.nextUp(hi),
             style: ttcBody(12.5,
                 color: Colors.white.withValues(alpha: 0.9), h: 1.5)),
+        const SizedBox(height: 16),
+        Container(height: 1, color: Colors.white.withValues(alpha: 0.16)),
+        const SizedBox(height: 14),
+        // Dad's Baby / Mother / What's-next circles. Same component hers uses -
+        // it is white-on-translucent, so it carries across palettes unchanged.
+        Row(children: [
+          TtcHeroShortcut(
+              icon: Icons.self_improvement_rounded,
+              label: t.shortcutMe,
+              onTap: () =>
+                  openTtcChapter(context, chapter, tab: TtcChapterTab.me)),
+          TtcHeroShortcut(
+              icon: Icons.favorite_rounded,
+              label: t.shortcutUs,
+              onTap: () =>
+                  openTtcChapter(context, chapter, tab: TtcChapterTab.us)),
+          TtcHeroShortcut(
+              icon: Icons.event_available_rounded,
+              label: t.shortcutNext,
+              onTap: () =>
+                  openTtcChapter(context, chapter, tab: TtcChapterTab.next)),
+        ]),
       ]),
     );
   }

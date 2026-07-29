@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_records_store.dart';
+import '../../services/medicine_store.dart';
 import '../../ttc/ttc_supplements_store.dart';
 import '../../ttc/ttc_trackers_data.dart';
 import 'ttc_appointments_screen.dart';
@@ -29,6 +30,7 @@ import 'ttc_nutrition_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_medication_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_tracker_screen.dart';
@@ -210,16 +212,33 @@ final List<TtcToolGroup> ttcToolGroups = [
     titleEn: 'Care and medicines',
     titleHi: 'Dekhbhaal aur dawaiyan',
     tools: [
+      // Two tiles, because they are two different things and the single
+      // "Supplements & medication" tile could only ever do one of them.
+      //
+      // A supplement here is something WE suggested, from a curated list with
+      // a `+`. A medication is something a CLINIC prescribed and she is
+      // reporting to us - free text, her dose, her schedule. Collapsing them
+      // meant the stage asked "has medication taken over your timing?" and then
+      // offered her nowhere to write the medication down.
       TtcTool(
         id: 'supplements',
-        icon: Icons.medication_outlined,
-        nameEn: 'Supplements & medication',
-        nameHi: 'Supplements aur dawaiyan',
-        descEn: 'One list of what you take',
-        descHi: 'Jo aap lete hain, ek list',
+        icon: Icons.eco_outlined,
+        nameEn: 'Supplements',
+        nameHi: 'Supplements',
+        descEn: 'What is worth taking, and why',
+        descHi: 'Kya lena theek hai, aur kyun',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcSupplementsScreen(),
             settings: const RouteSettings(name: 'ttc/supplements'))),
+      ),
+      TtcTool(
+        id: 'medication',
+        icon: Icons.medication_outlined,
+        nameEn: 'Medication',
+        nameHi: 'Dawaiyan',
+        descEn: 'What your clinic put you on',
+        descHi: 'Clinic ne jo shuru karwaya',
+        open: openTtcMedication,
       ),
       TtcTool(
         id: 'tests',
@@ -321,6 +340,10 @@ class TtcToolsScreen extends StatelessWidget {
         TtcLang.instance,
         TtcLogStore.instance,
         TtcSupplementsStore.instance,
+        // Without this the medication count under the tile would be whatever it
+        // was when the hub was last built - the badge would go stale the moment
+        // she added one and came back.
+        MedicineStore.instance,
         TtcRecordsStore.instance,
         TtcAppointmentsStore.instance,
       ]),
@@ -426,10 +449,16 @@ class TtcToolsScreen extends StatelessWidget {
     if (!tool.built) return hi ? 'Jald' : 'Soon';
     switch (tool.id) {
       case 'supplements':
-      case 'medication':
         final n = TtcSupplementsStore.instance.items.length;
         if (n == 0) return null;
         return hi ? '$n add kiye' : '$n added';
+      // Its own count now. While the two shared a tile this fell through to the
+      // supplement total, which would have put HER supplement count under the
+      // medication her clinic prescribed.
+      case 'medication':
+        final n = MedicineStore.instance.activeMeds.length;
+        if (n == 0) return null;
+        return hi ? '$n dawai' : '$n recorded';
       case 'reports':
       case 'records':
         final n = TtcRecordsStore.instance.count;

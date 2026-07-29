@@ -104,26 +104,43 @@ void main() {
 
   // ===========================================================================
   group('one destination, one tile', () {
-    test('the duplicates are gone', () {
-      final ids = [for (final g in ttcToolGroups) ...g.tools].map((t) => t.id);
-      // Medication opened Supplements; Reports opened Health Records. Correct
-      // in code - "one list rather than two that disagree" - and unexplained on
-      // screen, so it read as broken routing.
-      expect(ids, isNot(contains('medication')));
-      expect(ids, isNot(contains('reports')));
+    // THE RULE, which has not changed: a tile must lead somewhere that is
+    // genuinely its own. Two tiles onto one screen reads as broken routing.
+    //
+    // What changed is which tiles satisfy it. Medication and Reports both used
+    // to open somebody else's screen, so both were folded away. Medication has
+    // since earned its own tile back by acquiring a real destination - a record
+    // with a name, a dose, a schedule and reminders, which a curated supplement
+    // list could never be. Reports has not, and is still folded.
+    //
+    // Splitting when a destination becomes real is the same rule as merging
+    // when it is not. These assert the rule, not the snapshot.
+    test('no tile opens a screen another tile already owns', () {
+      final all = [for (final g in ttcToolGroups) ...g.tools];
+      final ids = all.map((t) => t.id);
+      expect(ids, isNot(contains('reports')),
+          reason: 'Reports still opens Health Records - it has no screen');
+      expect(ids, contains('medication'),
+          reason: 'Medication has its own screen now and should have its tile');
     });
 
-    test('and the survivors say they cover both', () {
+    test('the folded one still names what it covers', () {
+      final all = [for (final g in ttcToolGroups) ...g.tools];
+      final rec = all.firstWhere((t) => t.id == 'records');
+      expect(rec.name(false).toLowerCase(), contains('reports'));
+    });
+
+    test('and the unfolded one is no longer carrying a second name', () {
+      // While they shared a tile it had to say "Supplements & medication".
+      // Leaving that on it would now point at the wrong screen.
       final all = [for (final g in ttcToolGroups) ...g.tools];
       final supp = all.firstWhere((t) => t.id == 'supplements');
-      final rec = all.firstWhere((t) => t.id == 'records');
-      expect(supp.name(false).toLowerCase(), contains('medication'));
-      expect(rec.name(false).toLowerCase(), contains('reports'));
+      expect(supp.name(false).toLowerCase(), isNot(contains('medication')));
     });
 
     testWidgets('supplements still opens', (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
-      await tester.tap(find.text('Supplements & medication'));
+      await tester.tap(find.text('Supplements'));
       await tester.pumpAndSettle();
       expect(find.byType(TtcSupplementsScreen), findsOneWidget);
     });

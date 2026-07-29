@@ -531,6 +531,40 @@ class TtcS {
   String get careCircleJoined => _p('Joined', 'Juda hua');
 
   // ---- products -------------------------------------------------------------
+  // ---- medication -----------------------------------------------------------
+  //  The stage asks her whether medication has taken over her timing, and then
+  //  had nowhere for her to write the medication down. These are the strings
+  //  for the record that closes that gap.
+  String get medTitle => _p('Your medication', 'Aapki dawaiyan');
+  String get medToday => _p('Today', 'Aaj');
+  String get medAdd => _p('Add a medication', 'Dawai jodein');
+  String get medEdit => _p('Edit', 'Badlein');
+  String get medDelete => _p('Remove this medication', 'Ye dawai hata dein');
+  String get medSave => _p('Save', 'Save karein');
+  String get medEmptyTitle =>
+      _p('Nothing recorded yet', 'Abhi kuch likha nahi hai');
+  String get medEmptyBody => _p(
+      'If a clinic has put you on anything - tablets, injections, a schedule - this is where it lives. We hold what you tell us and remind you if you want reminders. Nothing here is advice.',
+      'Agar clinic ne kuch shuru karwaya hai - goliyan, injection, koi schedule - wo yahan rehta hai. Jo aap batati hain wo hum rakhte hain, aur agar aap chaahein toh yaad dila dete hain. Yahan kuch bhi salaah nahi hai.');
+  String get medName => _p('Name', 'Naam');
+  String get medNameHint => _p('Letrozole', 'Letrozole');
+  String get medDose => _p('Dose', 'Kitni');
+  String get medDoseHint => _p('2.5 mg', '2.5 mg');
+  String get medFrequency => _p('When', 'Kab');
+  String get medFrequencyHint =>
+      _p('Days 3 to 7, once a day', 'Din 3 se 7, roz ek baar');
+  String get medNotes => _p('Anything to remember', 'Yaad rakhne layak kuch');
+  String get medNotesHint => _p(
+      'Prescribed by Dr Rao, take after food', 'Dr Rao ne di, khaane ke baad');
+  String get medReminders => _p('Reminders', 'Yaad dilana');
+  String get medRemindersNote => _p(
+      'Optional. Add a time and your phone will remind you; leave it empty and it simply will not.',
+      'Marzi ki baat hai. Time daal dein toh phone yaad dila dega; khaali chhod dein toh nahi dilayega.');
+  String get medAddTime => _p('Add a time', 'Time jodein');
+  String get medNoAdvice => _p(
+      'We hold this exactly as you write it. We do not check doses, we do not warn about combinations, and we never change what we show you because of a medicine name. Your doctor owns all of that.',
+      'Jo aap likhti hain, bilkul waisa hi rakhte hain. Hum dose nahi jaanchte, combination ki chetavni nahi dete, aur kisi dawai ke naam se aapko dikhne wali cheezein nahi badalte. Ye sab aapke doctor ka kaam hai.');
+
   String get productsTitle => _p('Worth knowing about', 'Jaanne layak');
   String get productsIntro => _p(
       'Research first, buy second - and several of these say plainly that you probably do not need them. Every entry shows what to look for and what to watch out for.',
@@ -620,6 +654,17 @@ class TtcS {
   String get recordsWhose => _p('Whose result', 'Kiska result');
   String get recordsHistory => _p('Earlier results', 'Pehle ke results');
   String get recordsRemove => _p('Remove', 'Hatayein');
+
+  // ---- attachments ----------------------------------------------------------
+  //  Fertility results here arrive on paper and as PDFs. A text-only folder
+  //  could hold a number she retyped and never the thing her clinic gave her.
+  String get recordsAttach => _p('Attach the report', 'Report lagayein');
+  String get recordsAttachMore => _p('Attach another', 'Ek aur lagayein');
+  String get recordsAttachCamera =>
+      _p('Take a photo', 'Photo kheenchein');
+  String get recordsAttachGallery =>
+      _p('Choose from gallery', 'Gallery se chunein');
+  String get recordsAttachPdf => _p('Attach a PDF', 'PDF lagayein');
   String get recordsEmptyTitle => _p('Nothing added yet', 'Abhi kuch add nahi');
   String get recordsEmptyBody => _p(
       'Add a result the day it arrives, while the paper is still in your hand. A number you can show a doctor beats a memory of how you have been feeling.',

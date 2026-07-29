@@ -36,6 +36,7 @@ class TtcRecord {
     this.unit = '',
     this.note,
     this.forPartner = false,
+    this.attachments = const [],
   });
 
   /// App-generated, so the local row and its cloud copy share one identity.
@@ -53,6 +54,30 @@ class TtcRecord {
   final String? note;
   final bool forPartner;
 
+  /// The actual document — a scan PDF, a photo of a printed report.
+  ///
+  /// Fertility results in India arrive on paper and as PDFs, so a text-only
+  /// folder could hold a number she retyped and never the thing her clinic gave
+  /// her. Each entry is whatever `StorageService` hands back: a local file path
+  /// when signed out, a storage object path once uploaded. `resolve()` turns
+  /// either back into a File, so the screen does not care which it is.
+  ///
+  /// **LOCAL-ONLY, and structurally so.** `toJson()` here is the
+  /// `shared_preferences` cache; the cloud row is hand-built in `pushToCloud`,
+  /// column by column. Adding a field to the model therefore cannot leak
+  /// upward by accident — it reaches the database only when someone writes the
+  /// column name out, which is the shape that makes this safe rather than
+  /// lucky.
+  ///
+  /// Adding a column to `ttc_records` is a migration, and the decision for now
+  /// is that TTC gains no new schema. So attachments do not travel to a second
+  /// device — stated here rather than discovered later, because a silent
+  /// half-sync is exactly the failure this codebase keeps having.
+  ///
+  /// Making them travel later is one nullable column and one line in
+  /// `pushToCloud`.
+  final List<String> attachments;
+
   String get display => unit.isEmpty ? value : '$value $unit';
 
   Map<String, Object?> toJson() => {
@@ -64,6 +89,9 @@ class TtcRecord {
         'on': TtcSyncUtil.date(takenOn),
         if (note != null) 'note': note,
         'partner': forPartner,
+        // Cached on disk with the rest of the row. Never sent up - `pushToCloud`
+        // names its columns explicitly and does not name this one.
+        if (attachments.isNotEmpty) 'files': attachments,
       };
 
   static TtcRecord? fromJson(Object? raw) {
@@ -81,8 +109,23 @@ class TtcRecord {
       takenOn: on,
       note: raw['note'] as String?,
       forPartner: raw['partner'] == true,
+      attachments: [
+        for (final f in (raw['files'] as List?) ?? const []) f.toString(),
+      ],
     );
   }
+
+  TtcRecord copyWith({List<String>? attachments}) => TtcRecord(
+        id: id,
+        testId: testId,
+        label: label,
+        value: value,
+        unit: unit,
+        takenOn: takenOn,
+        note: note,
+        forPartner: forPartner,
+        attachments: attachments ?? this.attachments,
+      );
 }
 
 class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
@@ -150,6 +193,22 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     if (SupabaseRepo.isLoggedIn) {
       SupabaseRepo.delete('ttc_records', id).catchError((_) {});
     }
+    notifyListeners();
+  }
+
+  /// Swap a record for an edited copy, keeping its id.
+  ///
+  /// Persists locally and does NOT push. Today its only caller is attaching or
+  /// detaching a document, and the attachment list has no column in
+  /// `ttc_records` — so a push here would upload a row identical to the one
+  /// already there, which is a network call that changes nothing. When
+  /// attachments gain a column this grows a push, and that is the moment to add
+  /// it, not before.
+  void replace(TtcRecord updated) {
+    final i = _items.indexWhere((e) => e.id == updated.id);
+    if (i < 0) return;
+    _items[i] = updated;
+    _persist();
     notifyListeners();
   }
 

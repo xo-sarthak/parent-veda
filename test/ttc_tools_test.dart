@@ -79,8 +79,25 @@ void main() {
     });
 
     test('and every tile still leads somewhere distinct enough to matter', () {
-      // The merge removed two tiles. It must not have removed a destination.
-      expect(TtcToolsScreen.toolCount, 20);
+      // Was 20 after Medication and Reports were folded into the tiles they
+      // already opened. Medication has since been UNfolded - not as a
+      // reversal, but because it finally has its own destination: a real
+      // record with a name, a dose, a schedule and reminders, instead of a
+      // curated supplement list it could never hold a prescription in.
+      //
+      // The rule the number is standing in for has not changed: a tile must
+      // lead somewhere that is genuinely its own. Splitting when that becomes
+      // true is the same rule as merging when it is not.
+      expect(TtcToolsScreen.toolCount, 21);
+    });
+
+    test('supplements and medication are not the same destination', () {
+      final ids = [
+        for (final g in ttcToolGroups)
+          for (final t in g.tools) t.id
+      ];
+      expect(ids, contains('supplements'));
+      expect(ids, contains('medication'));
     });
 
     test('every tile has a unique id', () {
@@ -429,7 +446,20 @@ void main() {
     test('AMH is explicitly talked down from being a fertility score', () {
       final amh = ttcTestById('amh')!;
       expect(amh.reading(false).toLowerCase(), contains('quality'));
-      expect(amh.what(false).toLowerCase(), contains('estimate'));
+
+      // The card-level line is the one an anxious person reads first, and it
+      // used to say "how many eggs remain - the size of the reserve" while its
+      // own correction sat two fields below. The assertion here used to be
+      // `contains('estimate')`, which was a proxy for hedging and happened to
+      // pin that exact sentence in place.
+      //
+      // What actually matters is that the first line does not frame AMH as a
+      // countdown of what is left, so that is what is asserted now.
+      final what = amh.what(false).toLowerCase();
+      expect(what, isNot(contains('how many eggs')));
+      expect(what, isNot(contains('remain')));
+      expect(what, contains('respond'),
+          reason: 'AMH predicts ovarian response, and should say so first');
     });
 
     testWidgets('the screen builds and both segments have tests',

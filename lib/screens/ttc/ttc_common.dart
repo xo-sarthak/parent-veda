@@ -724,12 +724,25 @@ class _TtcPageState extends State<TtcPage> {
 /// The profile entry is now part of the header itself rather than something
 /// each tab remembers to pass, so no tab can be the one that forgets.
 class TtcHeader extends StatelessWidget {
-  const TtcHeader({super.key, this.trailing});
+  const TtcHeader({super.key, this.trailing, this.slate = false});
 
   final Widget? trailing;
 
+  /// His palette.
+  ///
+  /// The profile door was added to fix A-2/A-3/A-61 — no language control, no
+  /// sign-out, no way to correct anything — and it was added to HER header
+  /// only. His half rolled its own logo-and-nothing row, so the sealed room
+  /// those findings describe stayed sealed on his side: a paired partner had no
+  /// way to switch to Hinglish and no way to sign out, on any screen.
+  ///
+  /// One header with a palette flag, rather than two headers. Two headers is
+  /// how his came to be missing the door in the first place.
+  final bool slate;
+
   @override
   Widget build(BuildContext context) {
+    final ink = slate ? ttcSlate : ttcPurple;
     return Row(children: [
       Image.asset('assets/brand/pv-mark.png', height: 30),
       const SizedBox(width: 9),
@@ -738,7 +751,7 @@ class TtcHeader extends StatelessWidget {
         style: GoogleFonts.plusJakartaSans(
           fontSize: 19,
           fontWeight: FontWeight.w800,
-          color: ttcPurple,
+          color: ink,
           letterSpacing: -0.5,
         ),
       ),
@@ -753,10 +766,10 @@ class TtcHeader extends StatelessWidget {
             width: 38,
             height: 38,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-                color: ttcPanel, shape: BoxShape.circle),
-            child: const Icon(Icons.person_outline_rounded,
-                size: 19, color: ttcPurple),
+            decoration: BoxDecoration(
+                color: slate ? ttcSlatePanel : ttcPanel,
+                shape: BoxShape.circle),
+            child: Icon(Icons.person_outline_rounded, size: 19, color: ink),
           ),
         ),
       ],

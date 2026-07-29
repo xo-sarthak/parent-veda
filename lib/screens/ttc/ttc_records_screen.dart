@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_tests_data.dart';
+import 'ttc_attachments.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
@@ -199,6 +200,16 @@ class _RecordCard extends StatelessWidget {
           const SizedBox(height: 9),
           Text(record.note!, style: ttcBody(13, h: 1.5)),
         ],
+
+        // The actual document.
+        //
+        // Fertility results in India arrive on paper and as PDFs. Without this
+        // the folder could only ever hold a number she retyped, while the thing
+        // her clinic actually handed her lived in her gallery or her email -
+        // which is where she would go looking for it anyway, so the folder was
+        // not the folder.
+        const SizedBox(height: 12),
+        TtcAttachments(record: record, t: t),
 
         // A repeat reads as a trend, not a contradiction.
         if (history.length > 1) ...[
