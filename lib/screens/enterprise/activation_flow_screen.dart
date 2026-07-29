@@ -27,6 +27,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/entitlement_store.dart';
@@ -60,9 +61,36 @@ class ActivationFlowScreen extends StatefulWidget {
 
 enum _Step { email, code, welcome }
 
+/// The signed-in account's own address, or ''.
+///
+/// PREFILLED BECAUSE IT IS USUALLY RIGHT. Plenty of companies issue no work
+/// addresses, so HR lists their staff's personal ones — which is very often the
+/// same address that person signed up to ParentVeda with. Asking them to retype
+/// what we already know is friction with nothing on the other side of it.
+///
+/// It is a SUGGESTION, not an answer: the field stays editable, because someone
+/// with a real work address will have signed up with a personal one, and for
+/// them the prefill is wrong and obviously so.
+///
+/// ⚠️ AND IT IS NOT PROOF OF ANYTHING. The tempting next step is to skip the
+/// code entirely when this address is on the roster — after all, Supabase says
+/// `email_confirmed_at` is set. It is not proof: with "Confirm email" turned
+/// OFF, Supabase auto-confirms at signup, so that column means "confirmation
+/// happened, OR was disabled" — two opposite facts sharing one value. Trusting
+/// it would let anyone who signs up as priya@acme.com take Acme's benefit,
+/// which is precisely the hole the one-time code exists to close.
+String _signedInEmail() {
+  try {
+    return Supabase.instance.client.auth.currentUser?.email ?? '';
+  } catch (_) {
+    // Uninitialised backend behaves exactly like being logged out.
+    return '';
+  }
+}
+
 class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
-  late final TextEditingController _email =
-      TextEditingController(text: widget.prefillEmail ?? '');
+  late final TextEditingController _email = TextEditingController(
+      text: widget.prefillEmail ?? _signedInEmail());
   final _code = TextEditingController();
 
   _Step _step = _Step.email;
@@ -227,11 +255,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                _p('Usually your work address — but if your company does not '
-                    'give you one, use whichever email HR has on file. We use '
-                    'it once to check, and never show it to them.',
-                    'Aam taur par work address — lekin agar company deti hi '
-                        'nahi, to jo bhi email HR ke paas hai wahi daaliye. '
+                _p('We have filled in your ParentVeda address — change it if '
+                    'your company uses a different one for you. Either way we '
+                    'check it once and never show it to them.',
+                    'Humne aapka ParentVeda address bhar diya hai — agar '
+                        'company koi aur email use karti hai to badal lijiye. '
                         'Sirf ek baar check karte hain, unhe dikhate nahi.'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.45),
@@ -274,13 +302,26 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
         EnterpriseCard(
           child: TextField(
             controller: _code,
-            keyboardType: TextInputType.number,
+            // TEXT, NOT NUMBER, and this cost a demo before it was noticed.
+            //
+            // A real code is six digits, so TextInputType.number is the
+            // obviously right choice and it was the first one made. But on
+            // Android that raises a keypad with NO LETTERS — which makes the
+            // demo sponsor's bypass string physically impossible to enter.
+            // The field accepted it; the keyboard would not produce it.
+            //
+            // The trade is a few extra taps for the numeric case against a
+            // whole path being unreachable, so text wins. Worth revisiting
+            // the day real codes are actually delivered and the bypass goes:
+            // then numeric is free.
+            keyboardType: TextInputType.text,
+            textCapitalization: TextCapitalization.characters,
             textAlign: TextAlign.center,
             autocorrect: false,
             enableSuggestions: false,
-            // Not `digitsOnly`: the demo sponsor's bypass string is not
-            // numeric, and a formatter that silently eats what someone typed
-            // is the worst kind of refusal — one with no message.
+            // Not `digitsOnly` either, for the same reason. A formatter that
+            // silently eats what someone typed is the worst kind of refusal —
+            // one with no message.
             inputFormatters: [LengthLimitingTextInputFormatter(24)],
             style: t.headlineSmall
                 ?.copyWith(letterSpacing: 6, fontWeight: FontWeight.w800),

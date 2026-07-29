@@ -669,7 +669,36 @@ void main() {
                 'app is owed the answer first.');
       });
 
-      test('skipping is one tap and says so', () {
+      test('the address is prefilled but never trusted as proof', () {
+      final flow =
+          File('lib/screens/enterprise/activation_flow_screen.dart')
+              .readAsStringSync();
+      expect(flow, contains('_signedInEmail()'),
+          reason: 'we know the address; retyping it buys nothing');
+      // THE TRAP THIS GUARDS. With "Confirm email" off, Supabase auto-sets
+      // the confirmation timestamp at signup — so it means "confirmed OR
+      // disabled", two opposite facts sharing one value. Branching on it
+      // would let anyone who signs up as priya@acme.com take Acme's benefit.
+      //
+      // Comments stripped first: the file EXPLAINS the column it refuses to
+      // use, and a check that cannot tell an implementation from a warning
+      // about one fails on well-documented code.
+      final code = flow
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(code.contains('email_confirmed_at'), isFalse,
+          reason: 'that column is not evidence of anything while email '
+              'confirmation is off.');
+      // And the demo bypass must remain typeable — a numeric keyboard on
+      // Android has no letters, which made the bypass string impossible to
+      // enter even though the field accepted it.
+      expect(code.contains('TextInputType.number'), isFalse);
+      expect(flow, contains('confirmActivation('),
+          reason: 'the one-time code must still be required.');
+    });
+
+    test('skipping is one tap and says so', () {
         expect(auth, contains('Skip — my company does not'));
         expect(auth, contains('You can do this later from Profile.'));
       });
