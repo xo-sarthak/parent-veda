@@ -141,6 +141,87 @@ Widget ttcEyebrow(String t, {Color color = ttcCoral, double spacing = 1.4}) =>
 
 Widget ttcDivider() => Container(height: 1, color: ttcLine);
 
+/// A body paragraph that shows a few lines and opens in place.
+///
+/// The home screens on the other two stages cap almost everything — parenting's
+/// caps text in fourteen places and follows each with "Explore Brain ›" or
+/// "Read more →". TTC's Today did it in five, and five of its nine cards
+/// printed their body uncapped, which is why it read as a wall of text where
+/// the others read as a menu.
+///
+/// The obvious fix — cap everything — only works where there is somewhere for
+/// the rest to live. Rhythm has the Cycle Companion behind it and Nutrition has
+/// the Planner, so those cap and link. Today's movement and the myth have no
+/// detail screen at all, and capping them would simply delete the second half
+/// of a paragraph nobody could then reach.
+///
+/// So this is the third option: the content stays on the card and stays out of
+/// the way. **You can only hide what has somewhere to go** — and where it does
+/// not, "hidden" has to mean one tap, not gone.
+class TtcExpandableText extends StatefulWidget {
+  const TtcExpandableText({
+    super.key,
+    required this.text,
+    required this.t,
+    this.lines = 2,
+    this.style,
+  });
+
+  final String text;
+  final TtcS t;
+
+  /// How much shows before the fold. Two lines is enough to decide whether the
+  /// rest is worth opening, which is the only job the preview has.
+  final int lines;
+  final TextStyle? style;
+
+  @override
+  State<TtcExpandableText> createState() => _TtcExpandableTextState();
+}
+
+class _TtcExpandableTextState extends State<TtcExpandableText> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = widget.style ?? ttcBody(13, h: 1.55);
+    return LayoutBuilder(builder: (context, box) {
+      // Only offer the control when there is genuinely something behind it. A
+      // "More" that reveals nothing is worse than no control at all.
+      final painter = TextPainter(
+        text: TextSpan(text: widget.text, style: style),
+        maxLines: widget.lines,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: box.maxWidth);
+      final overflows = painter.didExceedMaxLines;
+
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          widget.text,
+          style: style,
+          maxLines: _open ? null : widget.lines,
+          overflow: _open ? TextOverflow.visible : TextOverflow.ellipsis,
+        ),
+        if (overflows) ...[
+          const SizedBox(height: 7),
+          GestureDetector(
+            onTap: () => setState(() => _open = !_open),
+            behavior: HitTestBehavior.opaque,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(_open ? widget.t.showLess : widget.t.showMore,
+                  style:
+                      ttcBody(12, color: ttcPurple, w: FontWeight.w700)),
+              const SizedBox(width: 2),
+              Icon(_open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                  size: 17, color: ttcPurple),
+            ]),
+          ),
+        ],
+      ]);
+    });
+  }
+}
+
 /// The section title used above every block on every TTC screen.
 Widget ttcSectionTitle(String title, {String? eyebrow, Widget? trailing}) =>
     Padding(

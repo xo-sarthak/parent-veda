@@ -359,7 +359,10 @@ class _RhythmCard extends StatelessWidget {
           Text(_noEstimateTitle(t, today.noEstimate),
               style: ttcBody(14, color: ttcInk, w: FontWeight.w700)),
           const SizedBox(height: 5),
-          Text(_noEstimateBody(t, today.noEstimate), style: ttcBody(13)),
+          // Capped: the Cycle Companion behind "Understand this" carries the
+          // full version, so nothing is lost by folding it here.
+          TtcExpandableText(
+              text: _noEstimateBody(t, today.noEstimate), t: t),
         ]
 
         // State 3 - a graded reading, always with its confidence attached.
@@ -787,7 +790,9 @@ class _MythCard extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Icon(Icons.check_rounded, size: 17, color: ttcPurple),
           const SizedBox(width: 9),
-          Expanded(child: Text(myth.truth(hi), style: ttcBody(13, h: 1.5))),
+          // No myth detail screen exists, so this opens in place rather than
+          // hiding a second half nobody could reach.
+          Expanded(child: TtcExpandableText(text: myth.truth(hi), t: t)),
         ]),
       ]),
     );
@@ -891,7 +896,7 @@ class _NutritionCard extends StatelessWidget {
         const SizedBox(height: 11),
         Text(n.meal(hi), style: ttcJakarta(16)),
         const SizedBox(height: 7),
-        Text(n.why(hi), style: ttcBody(13, h: 1.5)),
+        TtcExpandableText(text: n.why(hi), t: t),
         const SizedBox(height: 12),
         // The India-first line. This is the part that makes the section ours
         // rather than translated from somewhere else.
@@ -949,7 +954,7 @@ class _MovementCard extends StatelessWidget {
           Expanded(child: Text(m.title(hi), style: ttcJakarta(15.5))),
         ]),
         const SizedBox(height: 10),
-        Text(m.body(hi), style: ttcBody(13, h: 1.55)),
+        TtcExpandableText(text: m.body(hi), t: t),
       ]),
     );
   }

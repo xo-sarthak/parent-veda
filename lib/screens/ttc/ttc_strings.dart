@@ -655,6 +655,29 @@ class TtcS {
   String get recordsHistory => _p('Earlier results', 'Pehle ke results');
   String get recordsRemove => _p('Remove', 'Hatayein');
 
+  /// The expand control on a card. "More" rather than "Read more", because
+  /// nothing leaves the screen - the paragraph simply opens where it is.
+  String get showMore => _p('More', 'Aur');
+  String get showLess => _p('Less', 'Kam');
+
+  // ---- the reader -----------------------------------------------------------
+  String get readSettings => _p('Reading', 'Padhna');
+  String get readTextSize => _p('Text size', 'Text ka size');
+  String get readMode => _p('Background', 'Rang');
+  String get readNext => _p('Read next', 'Aage padhein');
+
+  /// Named one by one rather than switched over `TtcReadMode`, because this
+  /// file deliberately imports nothing from `screens/` — strings are the layer
+  /// underneath the UI, and having them reach up to see a screen's enum would
+  /// invert that for the sake of three words.
+  ///
+  /// "Sepia" stays "Sepia" in both. It is the word people know from every other
+  /// reader they have used, and translating it would make the control harder to
+  /// recognise rather than easier.
+  String get readModeLight => _p('Light', 'Light');
+  String get readModeSepia => _p('Sepia', 'Sepia');
+  String get readModeDark => _p('Dark', 'Dark');
+
   // ---- attachments ----------------------------------------------------------
   //  Fertility results here arrive on paper and as PDFs. A text-only folder
   //  could hold a number she retyped and never the thing her clinic gave her.
