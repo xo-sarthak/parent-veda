@@ -557,7 +557,7 @@ happens to be right there (TTC has its own Her|Him overlay at `bottom: 96`), so
 the reserve is sized for the taller position. If either overlay moves, revisit
 the pair together.
 
-## 9.6 `TtcInsight.forPartner` is an inert flag
+## 9.6 `TtcInsight.forPartner` is an inert flag — CLOSED 2026-07-30, leave it
 
 It defaults to `true` and nothing anywhere sets it `false`, so the partner
 screen's `where((i) => i.forPartner)` selects all twenty-five insights. Not
@@ -565,8 +565,20 @@ broken — the intent is documented on the field — but it is currently a confi
 option expressing a state the product does not have, which is the shape this
 codebase has said it does not want.
 
-Either author some insights that are genuinely hers alone, or drop the field.
-Cheap either way; noted so it is a decision rather than a leftover.
+**Decided: leave it as is.** This was code tidiness written up as an open
+point, which was a mistake — it belonged in a comment, not on a list beside the
+FAB.
+
+The reasoning for keeping it: TTC is still in development, not testing. New
+sections are coming, and a flag already threaded through the model and the
+partner screen is cheaper to have in place than to add back the day content
+genuinely diverges. Dropping it would change nothing any user sees, so the only
+argument for dropping was that the code implies a curation nobody authored — and
+that is a comment's job to explain, not a refactor's.
+
+**Do not raise this again.** If insights are ever written that are hers alone,
+set `forPartner: false` on them and the filter starts doing the work it was
+declared for.
 
 
 ## 9.7 TTC attachments do not sync
