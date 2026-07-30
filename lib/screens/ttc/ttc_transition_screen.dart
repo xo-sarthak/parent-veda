@@ -15,8 +15,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../memories/memory_models.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_transition.dart';
+import '../memories/memory_personalize_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
@@ -175,7 +177,57 @@ class TtcTransitionScreen extends StatelessWidget {
                             color: Colors.white, w: FontWeight.w800)),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
+
+                // A keepsake, offered ONCE, here, and nowhere else in the stage.
+                //
+                // §3.3 asked where share cards should be reachable from. The
+                // answer for TTC is not "everywhere the other stages have them"
+                // - it is exactly one place, and choosing that carefully is the
+                // whole design.
+                //
+                // `MemoryType` is {expecting, welcomeBaby}, and TTC needs no
+                // third: this stage's final moment IS the expecting
+                // announcement. The card that already exists is the right card.
+                //
+                // WHY NOT THE OTHER TEN MILESTONES. `ttc_milestones.dart` has
+                // eleven - first cycle logged, ovulation learned, tests done,
+                // lifestyle tracked. A shareable graphic for "cycle 6 logged"
+                // would be grotesque, and more to the point most people trying
+                // to conceive are deliberately private about it. Offering a
+                // card at every milestone would turn a private year into
+                // something with a publish button on it.
+                //
+                // OFFERED, never prompted. Secondary styling, below the primary
+                // action, and it does not appear on the way IN to this screen -
+                // only after she has already decided to go on. Plenty of people
+                // reach a positive test carrying a previous loss and will not
+                // want to announce anything for weeks. This waits to be found.
+                Center(
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const MemoryPersonalizeScreen(
+                            type: MemoryType.expecting),
+                        settings:
+                            const RouteSettings(name: 'ttc/memory'),
+                      ),
+                    ),
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        const Icon(Icons.auto_awesome_outlined,
+                            size: 16, color: ttcPurple),
+                        const SizedBox(width: 8),
+                        Text(t.transitionMakeCard,
+                            style: ttcBody(13,
+                                color: ttcPurple, w: FontWeight.w700)),
+                      ]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
 
                 // Undo, in plain sight. A stage change you cannot reverse
                 // would be the cruellest bug in this product.

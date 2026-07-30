@@ -655,6 +655,12 @@ class TtcS {
   String get recordsHistory => _p('Earlier results', 'Pehle ke results');
   String get recordsRemove => _p('Remove', 'Hatayein');
 
+  /// Offered once, on the transition screen, and nowhere else in the stage.
+  /// "If you want to" is load-bearing: plenty of people reach a positive test
+  /// carrying a previous loss and will not announce anything for weeks.
+  String get transitionMakeCard =>
+      _p('Make a card, if you want to', 'Card banayein, agar man ho');
+
   /// The expand control on a card. "More" rather than "Read more", because
   /// nothing leaves the screen - the paragraph simply opens where it is.
   String get showMore => _p('More', 'Aur');
