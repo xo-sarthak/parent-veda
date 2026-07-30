@@ -969,6 +969,20 @@ class S {
   String get ddcScanWins => _p(
       'If a scan has already given you a date, use that instead. A dating scan is more accurate than counting from a period, and your clinic\'s date is the one that counts.',
       'Agar scan se aapko date mil chuki hai toh wahi use karein. Dating scan period se ginne se zyada sahi hota hai, aur aapki clinic ki date hi maayne rakhti hai.');
+  /// The after-the-fact half of the same idea (§9.1b).
+  ///
+  /// `ddcScanWins` above says it while she is choosing. This says it later, once
+  /// a dating scan has probably happened and we are still counting from
+  /// something weaker.
+  ///
+  /// "If you have had" — an offer, not a correction. The app does not know she
+  /// had a scan and does not get to tell her her date is wrong. `TruthSource`
+  /// puts her clinician above our calculation; this is the one place we can act
+  /// on that with no clinician in the room.
+  String get ddcMayBeStale => _p(
+      'If you have had a dating scan since, its date is the better one.',
+      'Agar us ke baad dating scan hua hai, toh uski date behtar hai.');
+
   String get ddcCycle => _p('Cycle length', 'Cycle ki lambai');
   String get ddcDays => _p('days', 'din');
   String get ddcDaysLabel => _p('Days', 'Din');

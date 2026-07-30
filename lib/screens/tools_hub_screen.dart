@@ -142,7 +142,8 @@ class ToolsHubScreen extends StatelessWidget {
       // _Tool(s.scnToolTitle, Icons.event_note_rounded, const Color(0xFF2E9C8E),
       //     () => open(() => ScansAppointmentsScreen(controller: controller))),
       _Tool(s.ddcToolTitle, Icons.calendar_month_rounded, AppTheme.primary500,
-          () => open(() => DueDateCalculatorScreen(controller: controller))),
+          () => open(() => DueDateCalculatorScreen(controller: controller)),
+          staleDueDate: controller.dueDateMayBeStale),
       _Tool(s.vedaToolTitle, Icons.auto_awesome_rounded, AppTheme.primary600,
           () => open(() => AskVedaScreen(controller: controller))),
       // Father's "Stories, Fables & Mythology" removed (the feature was retired
@@ -300,6 +301,31 @@ class ToolsHubScreen extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
+              // A quiet line, only when there is something true to say.
+              //
+              // This is the surfacing half of §9.1b. `DueDateSource` has
+              // recorded who owns her date since 2026-07-27 and nothing ever
+              // read it, so a woman who counted from her last period in week six
+              // and had a dating scan in week twelve kept the weaker number for
+              // the rest of her pregnancy — every week card, every appointment,
+              // every countdown derived from it.
+              //
+              // It goes HERE rather than on the home, deliberately. Nothing is
+              // wrong today: the app holds one date and derives everything from
+              // it consistently, so this is a correction OPPORTUNITY, not an
+              // error. A banner on the home for something that is not yet wrong
+              // is precisely the noise a calm product cannot afford — and this
+              // is the tile she opens when she wants to change the date, which
+              // is the moment the sentence is useful.
+              if (t.staleDueDate) ...[
+                const SizedBox(height: 6),
+                Text(s.ddcMayBeStale,
+                    style: GoogleFonts.manrope(
+                        fontSize: 10.5,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primary700)),
+              ],
               const SizedBox(height: 6),
               Row(children: [
                 Text(s.openLabel,
@@ -317,11 +343,20 @@ class ToolsHubScreen extends StatelessWidget {
 }
 
 class _Tool {
-  const _Tool(this.title, this.icon, this.color, this.onTap, {this.priority});
+  const _Tool(this.title, this.icon, this.color, this.onTap,
+      {this.priority, this.staleDueDate = false});
   final String title;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+
+  /// Only the Due Date Calculator sets this, and only when the controller says
+  /// her date is ours and a scan has probably overtaken it.
+  ///
+  /// A bool on the tile rather than a general "subtitle" slot: there is exactly
+  /// one thing in this hub that has something conditional to say, and a generic
+  /// field would invite a second and a third until every tile carried a line.
+  final bool staleDueDate;
 
   /// Which parenting priority this tool serves, if any. Used ONLY to float a
   /// tool she asked for help with nearer the top. Tools with no priority, and

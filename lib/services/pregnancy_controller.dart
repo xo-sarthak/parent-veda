@@ -144,6 +144,44 @@ class PregnancyController extends ChangeNotifier {
   /// theirs and ours is not a second opinion.
   bool get dueDateFromClinic => _dueDateSource.clinicOwned;
 
+  /// A date OF OURS that a scan has probably superseded by now.
+  ///
+  /// The Due Date Calculator already says, at the moment she picks a method,
+  /// that a dating scan should replace a counted date. What nothing did was ask
+  /// again AFTERWARDS — so a woman who set her date from her last period in week
+  /// six, and had a dating scan in week twelve, quietly keeps the weaker number
+  /// for the rest of her pregnancy. Every week card, every appointment, every
+  /// countdown derives from it.
+  ///
+  /// This is not a defect she can see. The app is internally consistent: one
+  /// date in, everything derived from it. That is exactly what makes it worth
+  /// surfacing — nothing looks wrong, so nobody goes looking.
+  ///
+  /// **Fourteen weeks, and why.** A dating scan happens somewhere between six
+  /// and fourteen weeks; the combined/NT scan sits at eleven to fourteen. Past
+  /// fourteen, if she was ever going to have one she has had it. Asking earlier
+  /// would be asking about something that has not happened yet, which is how a
+  /// helpful prompt turns into a nag about an appointment she is already
+  /// worrying about.
+  ///
+  /// It says MAY. We do not know that she had a scan, we know that she probably
+  /// has and that we are still counting from something weaker. So whatever
+  /// surfaces this must offer, never assert — the app does not get to tell her
+  /// her date is wrong. `TruthSource` puts her clinician above our calculation;
+  /// this is the one place we can act on that without a clinician present.
+  bool get dueDateMayBeStale {
+    if (!_dueDateIsSet) return false; // still on the placeholder
+    if (_dueDateSource.clinicOwned) return false; // already theirs
+    // `unknown` is deliberately excluded. It means an older install we cannot
+    // account for, and prompting someone to "update" a date we never recorded
+    // the origin of is a guess wearing a suggestion's clothes.
+    if (_dueDateSource == DueDateSource.unknown) return false;
+    return currentWeek >= datingScanByWeek;
+  }
+
+  /// By this week a dating scan has happened if it was going to.
+  static const int datingScanByWeek = 14;
+
   /// The mother's name - the logged-in user's own name in mother mode, or the
   /// paired mother's name in father mode. Falls back to a placeholder.
   String get motherName =>
