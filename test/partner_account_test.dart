@@ -206,6 +206,58 @@ void main() {
       }
     });
 
+    test('the CMS can attach a login, and both halves are present', () {
+      // A grant alone yields a collection that lists nothing and inserts
+      // nothing, with no error explaining why: RLS is on and there is no
+      // policy for this role. 0045 §4 established grant + policy together.
+      final cms = File('supabase/migrations/0070_partner_accounts_cms.sql')
+          .readAsStringSync();
+      expect(
+          cms.contains('grant select, insert, update, delete on '
+              'public.partner_accounts to directus_cms;'),
+          isTrue);
+      expect(cms.contains('for all to directus_cms using (true) '
+              'with check (true);'), isTrue);
+    });
+
+    test('function grants look the signature up rather than spelling it out',
+        () {
+      // Spelling it out failed on a live database with "function does not
+      // exist" while the function was plainly there: the deployed signature
+      // had drifted from 0040, and a GRANT names a function by its exact
+      // argument types. That error reads as "the migration never ran", which
+      // sends you looking in the wrong place entirely.
+      final cms = File('supabase/migrations/0070_partner_accounts_cms.sql')
+          .readAsStringSync();
+      expect(cms.contains('oid::regprocedure'), isTrue);
+      for (final fn in [
+        'create_care_partner',
+        'mint_partner_token',
+        'link_partner_account',
+        'rotate_partner_token',
+        'partner_token_history',
+      ]) {
+        expect(cms.contains("'$fn'"), isTrue, reason: '$fn is not granted');
+      }
+      expect(RegExp(r'grant execute on function\s+public\.').hasMatch(cms),
+          isFalse,
+          reason: 'a hardcoded signature will drift again');
+    });
+
+    test('the panel is NOT granted the two family-data tables', () {
+      final cms = File('supabase/migrations/0070_partner_accounts_cms.sql')
+          .readAsStringSync();
+      for (final t in ['partner_attributions', 'parent_timeline']) {
+        expect(RegExp('grant[^;]*on public\.$t[^;]*to directus_cms')
+                .hasMatch(cms),
+            isFalse,
+            reason: '$t carries which mother came from which partner, and '
+                'her timeline. Granting it makes that browsable from a panel '
+                'login — a decision, not a side effect of registering a '
+                'collection');
+      }
+    });
+
     test('link_partner_account is not callable by a client', () {
       expect(
           sql.contains('revoke execute on function\n'

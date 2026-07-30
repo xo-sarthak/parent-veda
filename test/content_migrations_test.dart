@@ -51,6 +51,13 @@ void main() {
     'wa_message_templates': 'config — select+update only',
     'care_partners': 'read only; writes go through 0040/0051 functions',
     'partner_referrals': 'read only; tokens are minted, never inserted',
+    'partner_accounts': 'which login belongs to which partner (0068/0070) — '
+        'full CRUD, and the only way a HOSPITAL can sign in at all, since an '
+        'institution has no expert record to authorise through. Attaching a '
+        'login is an editorial act, the same class as verification. It carries '
+        'no family data: a user id, a partner id and a label. Deliberately NOT '
+        'accompanied by grants on partner_attributions or parent_timeline, '
+        'which do carry family data',
     'care_partner_verification': 'the paperwork behind an approval (0050)',
     'admin_audit_log': 'a VIEW, read only — never the admin_audit table',
     'veda_drafts': "Ask Veda's editorial inbox",

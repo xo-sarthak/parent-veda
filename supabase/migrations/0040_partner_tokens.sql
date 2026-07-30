@@ -101,6 +101,18 @@ revoke execute on function
 -- token together, because a partner without a token cannot do anything
 -- and forgetting the second step is precisely the defect above.
 -- ---------------------------------------------------------------------
+-- ⚠️ SUPERSEDED BY 0052_audit_partner_creation.sql, which adds a ninth
+-- parameter (p_actor) so partner creation is audited.
+--
+-- DO NOT RE-RUN THIS FILE expecting it to be a no-op. Adding a parameter does
+-- not replace a function in Postgres — it creates a SECOND one. Re-running
+-- 0040 after 0052 resurrects this 8-argument version alongside the audited
+-- 9-argument one, and then a caller supplying eight arguments silently gets
+-- the version that writes no audit row. Happened on 2026-07-30.
+--
+-- If you have both, drop this one:
+--   drop function public.create_care_partner(
+--     text,text,text,text,text,text,text,text);
 create or replace function public.create_care_partner(
   p_id           text,
   p_name         text,

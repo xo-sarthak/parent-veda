@@ -624,7 +624,114 @@ with nothing to leak passes for the wrong reason.
 
 ---
 
-## 11. Reading list, in order
+## 11. Three ways a migration lies about having run
+
+All three were hit for real on 2026-07-30, within an hour, and each cost time
+because the error message points somewhere other than the cause.
+
+### `create or replace function` will not rename a parameter
+
+Replacing a function is idempotent *until* you change a parameter's **name**.
+Then Postgres refuses:
+
+```
+cannot change name of input parameter "p_speciality"
+```
+
+The statement fails, **the old version stays**, and the rest of the script
+carries on. So the function exists, the migration file looks applied, and the
+signature quietly does not match what the file says. Nothing in the database
+records that a statement was skipped.
+
+The only way out is to drop and re-create:
+
+```sql
+drop function if exists public.create_care_partner(text, text, text, text,
+                                                   text, text, text, text);
+```
+
+Which means the drop needs the OLD signature — the one you no longer have in
+front of you. Hence the introspection habit below.
+
+**The habit:** when a function behaves as though a migration did not run, look
+before diagnosing.
+
+```sql
+select proname, pg_get_function_identity_arguments(oid) as args
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+ where n.nspname = 'public' and proname like 'partner%';
+```
+
+### A `GRANT` names a function by its exact argument types
+
+```sql
+grant execute on function public.create_care_partner(text, text, text, text,
+                                                     text, text, text, text)
+  to directus_cms;
+```
+
+If the deployed signature has drifted by even one type, this fails with:
+
+```
+ERROR: function public.create_care_partner(...) does not exist
+```
+
+Which is true of the signature you *named*, and reads as *"the migration was
+never run"* — sending you to check the wrong thing entirely. The function is
+right there.
+
+**The fix is to grant what exists rather than what you believe exists**
+(`0070_partner_accounts_cms.sql`):
+
+```sql
+do $$
+declare r record;
+begin
+  for r in
+    select p.oid::regprocedure as sig
+      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+     where n.nspname = 'public'
+       and p.proname in ('create_care_partner', 'mint_partner_token')
+  loop
+    execute format('grant execute on function %s to directus_cms', r.sig);
+  end loop;
+end $$;
+```
+
+`oid::regprocedure` renders the signature Postgres actually has. This cannot
+drift, and it survives someone adding a default parameter later.
+
+### Re-running an old migration can resurrect what a newer one replaced
+
+The sting in the tail of the first case. `0052` superseded `0040`'s
+`create_care_partner` by adding a ninth parameter for the audit actor. Adding a
+parameter creates a SECOND function, so after re-running `0040` the database
+held both — and a caller passing eight arguments would get the version that
+writes **no audit row**. Silently. The audit trail would have gaps that nothing
+explains.
+
+```sql
+select p.oid::regprocedure, has_function_privilege('directus_cms',p.oid,'execute')
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+ where n.nspname='public' and p.proname='create_care_partner';
+```
+
+Two rows where you expect one is the tell.
+
+**So a migration is only idempotent against the schema it was written for.**
+Re-running an old one is not free once a later migration has changed the same
+object. When you must, check for duplicates afterwards — and leave a warning in
+the older file, as `0040` now carries.
+
+**The general shape**, and why all three sit in one section: an error naming
+something you wrote is easy to trust. An error saying a thing *does not exist*,
+when you can plainly see that it does, almost always means you named a
+**different** thing — a different signature, a different schema, a different
+role. Check what is there before deciding what is wrong.
+
+---
+
+## 12. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
