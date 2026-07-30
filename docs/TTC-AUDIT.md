@@ -145,10 +145,28 @@ scrim. Both are one small change in `MaterialApp.builder` and both affect all
 three stages at once, so it is a product call.
 
 **Also still open, and not mine to close alone: pregnancy and parenting have the
-identical collision** — visible on the pregnancy home, where the FAB sits on
-"Today's parenting tip". The constant is shared and ready; adopting it there
-touches two shipped stages carrying real user data, which needs your call rather
-than my initiative.
+identical collision.** Walked on the device 2026-07-29 so the decision has a
+list behind it rather than a guess:
+
+| Stage | What the FAB covers |
+|---|---|
+| Pregnancy | **Record Voice** in My Journal — a tap target, exactly like the delete `×` here |
+| Pregnancy | the product name and part of **₹1,999** on Today's recommendation |
+| Pregnancy | **the last card on the home** sits under it — end-of-list stranding |
+| Parenting | the right end of the **Read more** button |
+| Parenting | the **"On track"** status chip on the Nutrition row |
+
+The two fixes are not alternatives — they close different halves.
+`kAskFabReserve` clears the *end* of a list (Record Voice, the last card);
+hide-on-scroll clears everything *mid-scroll* (the price, the status chip).
+Neither alone is sufficient.
+
+Adopting the reserve touches two shipped stages carrying real user data, and
+hide-on-scroll changes all three at once, so both need your call rather than my
+initiative. One landmine to respect if hide-on-scroll happens: the hidden state
+must stay a `Positioned`. A bare zero-sized non-positioned child collapsed the
+root `Stack` and blacked out the whole app once already — the comment in
+`global_ask_fab.dart` records it.
 
 ## A-7. Content scrolls under the bottom nav
 
@@ -397,7 +415,9 @@ top and a void beneath.
 > What pregnancy's **REMEMBER** panel does, *"Today's takeaway"* already did
 > here — that half was satisfied before the audit started.
 >
-> Still open from A-50: read-next, save, font control, themes.
+> **A-50 closed 2026-07-29.** Read-next, save, font control and light/sepia/dark
+> all shipped — see A-84 below. A-68's twenty-four explainers remain a writing
+> commission, which is the half that was never an engineering problem.
 
 ## Ask Veda in TTC
 
@@ -1172,3 +1192,56 @@ The two products' father halves should look like each other, rather than one
 looking like a plainer version of the same app.
 
 The privacy omission from A-79 stands unchanged: no "Day N of 28".
+
+## A-84 — fixed. The reader, and the home that feeds it
+
+Two halves of one idea: **the content exists, you just have to tap.**
+
+### The reader (A-50)
+
+Was a title, a body and a takeaway on a fixed white page. Now carries reading
+progress, font size, light/sepia/dark, save, and read-next.
+
+**What was deliberately NOT copied from parenting's reader:** the table of
+contents and the mid-article video slot. A TTC insight is a twenty-five to sixty
+second read with no sections. A contents list on it is a control that exists to
+look thorough and answers a question nobody has.
+
+> Match the other stage's standard of care, not its component list. Copying a
+> component because the other stage has it is how uniformity turns into clutter.
+
+Progress is stored to **resume, never to score**. There is no "3 of 25 read"
+anywhere and a test forbids a percentage on screen: on a health article a
+percentage invites her to decide whether the rest is worth finishing. It also
+only ever moves forward — scrolling back to re-read a paragraph is not losing
+your place, and a value that fell on every upward flick would make the bar
+jitter.
+
+`TtcReadStore` is local-only. No mixin, no table. A reading position is the
+least costly thing in this app to lose.
+
+### The home (density)
+
+Measured rather than guessed. Parenting's home caps text in **fourteen** places
+and follows each with an explicit link — *"Explore Brain ›"*, *"Read more →"*.
+TTC's Today capped in **five** across nine cards, and **five of nine printed
+their body with no cap at all**: Rhythm, Video, Myth, Nutrition, Movement. That
+is the whole reason one reads as a menu and the other as a wall.
+
+**The constraint that shaped the fix: you can only hide what has somewhere to
+go.** Rhythm has the Cycle Companion behind "Understand this" and can cap and
+link. Movement and the Myth have no detail screen at all — capping those would
+have deleted the second half of a paragraph nobody could then reach. So they
+expand in place via `TtcExpandableText`, which only shows its control when the
+text genuinely overflows. A "More" that reveals nothing is worse than no control.
+
+### A note for whoever writes the next source-scanning test
+
+Three tests in this batch failed by matching **their own explanation** — a check
+for "no table of contents" tripped on the comment saying why there isn't one; a
+check that a store carries no `TtcSyncedStore` tripped on the comment saying it
+deliberately doesn't. `codeOf()` in `test/ttc_reader_test.dart` strips comments
+before asserting.
+
+> A test that greps source is reading prose as well as code, and prose about a
+> thing contains the name of the thing. Assert against what executes.

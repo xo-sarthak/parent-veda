@@ -125,9 +125,30 @@ offline. Union-merge by id with tombstones cannot.
 
 **Recommendation: union-merge.**
 
-## 3.3 More entry points (Gap 4)
+## 3.3 More entry points (Gap 4) — TTC done 2026-07-30, the rest still parked
 
-Parked. Known where it lives during testing.
+**TTC now has one.** The positive-test transition screen offers a keepsake, and
+that is the only place in the stage that does.
+
+The reasoning is the useful part, because "add more entry points" was the wrong
+framing. `MemoryType` is `{expecting, welcomeBaby}` and TTC needs no third: this
+stage's final moment **is** the expecting announcement, so the card that already
+existed was the right card.
+
+`ttc_milestones.dart` has eleven milestones — first cycle logged, ovulation
+learned, tests done, lifestyle tracked. **None of the other ten gets a card.** A
+shareable graphic for "cycle 6 logged" would be grotesque, and more to the point
+most people trying to conceive are deliberately private about it. Offering a card
+at every milestone turns a private year into something with a publish button on
+it. A test asserts the offer appears in exactly one file.
+
+It is **offered, never prompted**: secondary styling, below the primary action,
+absent from the confirm dialog on the way in, and worded *"Make a card, if you
+want to"*. Plenty of people reach a positive test carrying a previous loss and
+will not announce anything for weeks.
+
+Still parked: pregnancy and parenting already have theirs, and no further entry
+points are planned until someone asks for one.
 
 ---
 
@@ -409,11 +430,30 @@ method she already picks, and `PregnancyController.dueDateFromClinic` reports it
 A scan, an IVF transfer and "my doctor told me" are the clinic's; a last period
 and a conception date are ours.
 
-**What is not done:** no pregnancy *screen* consults it yet. Nothing today shows
-a competing number, so there is no live defect — the app stores one date and
-derives from it. The gap is that a woman who set her date by last period and
-later had a scan keeps the old number silently. The calculator now tells her a
-scan should replace it; it does not yet prompt her after the fact.
+**The after-the-fact prompt now exists (2026-07-30).**
+`PregnancyController.dueDateMayBeStale` is true when the date is OURS
+(`lastPeriod` or `conception`) and she is past **week 14** — a dating scan runs
+six to fourteen weeks and the combined/NT scan sits at eleven to fourteen, so
+past fourteen she has had one if she was ever going to. Asking earlier would be
+asking about an appointment she is already worrying about.
+
+Surfaced as a quiet line under the **Due Date Calculator tile** in Tools, not as
+a banner on the home. Nothing is wrong today — the app holds one date and derives
+everything from it consistently — so this is a correction *opportunity*, not an
+error, and the tile she opens to change the date is the moment the sentence is
+useful. A test asserts the home never carries it.
+
+`unknown` is excluded deliberately: it means an older install whose origin we
+cannot account for, and telling someone to "update" a date we never recorded the
+source of is a guess wearing a suggestion's clothes.
+
+Worded as an offer — *"If you have had a dating scan since, its date is the
+better one"* — never a correction. `TruthSource` puts her clinician above our
+calculation, and there is no clinician in the room here.
+
+**What is still not done:** `Inferable.growthExpectation` /
+`developmentalStage` remain unread, and nothing yet reconciles two dates if she
+enters a second one.
 
 Also still unread: `Inferable.growthExpectation` / `developmentalStage` —
 parenting is currently permitted both. Worth a clinician's view on whether a
