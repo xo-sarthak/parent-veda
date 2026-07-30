@@ -654,6 +654,41 @@ extension TtcChapterCopy on TtcChapter {
             : 'Book your first pregnancy appointment';
     }
   }
+
+  /// The thing worth NOT worrying about in this chapter.
+  ///
+  /// Written for the info sheet, which exists because the hero was trying to
+  /// explain the chapter in four fragments and had room for none of them.
+  ///
+  /// Every chapter here has a characteristic anxiety, and in each case the
+  /// honest answer is the same shape: the thing she is worried she is doing
+  /// wrong is not a thing that can be done wrong. That is not reassurance for
+  /// its own sake — it is the single most useful sentence in the chapter, and it
+  /// was nowhere on the screen.
+  String reassurance(bool hinglish) {
+    switch (this) {
+      case TtcChapter.preparingTogether:
+        return hinglish
+            ? 'Isme "peechhe reh jaana" jaisa kuch nahi hai. Ye hissa mahino mein ginne wala hai, dino mein nahi - aur jo aaj shuru karenge wo teen mahine baad kaam aayega.'
+            : 'There is no falling behind in this part. It is measured in months, not days, and what you start today is doing its work three months from now.';
+      case TtcChapter.knowingYourRhythm:
+        return hinglish
+            ? 'Cycle ka har mahine do-chaar din aage-peechhe hona aam baat hai, kharaabi nahi. Aur agar is mahine kuch bhi log na ho paaye - koi baat nahi, cycle agla bhi aayega.'
+            : 'A cycle moving by a few days from month to month is ordinary, not a fault. And if you log nothing at all this month, nothing is lost — there will be another one.';
+      case TtcChapter.tryingTogether:
+        return hinglish
+            ? 'Ek din chhoot jaana kuch nahi bigaadta. Window chhe din ki isliye hai ki ek din bina nuksaan chhoot sake - aur koi position, koi timing trick isse behtar nahi karti.'
+            : 'Missing a day ruins nothing. The window is six days long precisely so one can be skipped without cost — and no position or timing trick improves on that.';
+      case TtcChapter.theWaitingDays:
+        return hinglish
+            ? 'In dino koi symptom kuch sabit nahi karta - na hona, na dikhna. Ye jaanne ka koi jaldi tareeka nahi hai, aur dhyaan lagane se pata nahi chalta.'
+            : 'No symptom in these days proves anything, present or absent. There is no early way to know, and paying closer attention does not create one.';
+      case TtcChapter.aNewBeginning:
+        return hinglish
+            ? 'Raahat aur chinta ek saath aana bilkul normal hai. Abhi bas do cheezein maayne rakhti hain - folic acid lete rehna, aur pehli appointment.'
+            : 'Feeling relieved and anxious at the same time is completely ordinary. Only two things matter right now — keep taking folic acid, and book the first appointment.';
+    }
+  }
 }
 
 extension FertilityLevelCopy on FertilityLevel {

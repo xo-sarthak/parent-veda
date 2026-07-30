@@ -409,24 +409,45 @@ void main() {
     testWidgets('every section is on the screen', (tester) async {
       await pumpTall(tester, const TtcTodayScreen());
       final t = const TtcS(false);
-      // These are eyebrows, which render uppercase.
+      // The rule this protects has not changed: no section may silently
+      // vanish. What changed is the SHAPE - four of these are now rows in one
+      // list rather than four full cards, and a row renders its eyebrow just
+      // as a card did, so the same assertion still holds for them.
       for (final label in [
-        t.todaysInsight,
-        t.todaysVideo,
-        t.dailyRitual,
-        t.todaysMyth,
-        t.todaysNutrition,
-        t.todaysMovement,
+        t.todaysInsight, // still a card - the one real read of the day
+        t.dailyRitual, // still a card - it has checkboxes
+        t.todaysMyth, // row
+        t.todaysNutrition, // row
+        t.todaysMovement, // row
+        t.todaysPick, // row
       ]) {
         expect(find.text(label.toUpperCase()), findsWidgets,
             reason: 'missing section: $label');
       }
       // The journal leads with a card title rather than an eyebrow.
       expect(find.text(t.myJournal), findsWidgets);
-      // Today's pick sits last on purpose: education, then confidence, then
-      // recommendation, then commerce.
-      expect(find.text(t.todaysPick.toUpperCase()), findsOneWidget);
-      expect(find.text(t.productsWatchOut), findsOneWidget);
+    });
+
+    testWidgets('the video section is deliberately absent', (tester) async {
+      // Its entire content was "coming soon". It spent a section of the most
+      // valuable screen in the stage advertising an absence, every day, with
+      // nothing she could do about it.
+      //
+      // This is NOT the "a feature is never hidden" rule. That rule is about
+      // HER empty data - an empty journal renders an invitation to write. This
+      // was OUR content gap: there is nothing to invite her into. The card is
+      // commented out rather than deleted and returns the day videos exist.
+      await pumpTall(tester, const TtcTodayScreen());
+      expect(find.text(const TtcS(false).todaysVideo.toUpperCase()),
+          findsNothing);
+    });
+
+    testWidgets("today's pick keeps its price, and loses its warning to the "
+        'screen that can hold it', (tester) async {
+      // A row has room for a price. "What to watch out for" is a paragraph, and
+      // it already lives on the products screen the row opens.
+      await pumpTall(tester, const TtcTodayScreen());
+      expect(find.text(const TtcS(false).productsWatchOut), findsNothing);
     });
 
     testWidgets('the ritual shows 0/5 before anything is done', (tester) async {

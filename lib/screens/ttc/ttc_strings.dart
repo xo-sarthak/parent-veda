@@ -655,6 +655,19 @@ class TtcS {
   String get recordsHistory => _p('Earlier results', 'Pehle ke results');
   String get recordsRemove => _p('Remove', 'Hatayein');
 
+  // ---- the chapter info sheet -----------------------------------------------
+  //  The hero was explaining the chapter in four fragments and had room for
+  //  none of them. These are the headings of the sheet those fragments moved to.
+  String get infoWhatThisIs => _p('What this chapter is', 'Ye chapter kya hai');
+  String get infoWhatMovesYouOn =>
+      _p('What moves you on', 'Aage kab badhenge');
+  String get infoWorthDoing => _p('Worth doing', 'Karne layak');
+  String get infoNotToWorry =>
+      _p('What not to worry about', 'Kis baat ki chinta na karein');
+
+  /// The single header the six collapsed cards now sit under.
+  String get todayList => _p('Today', 'Aaj');
+
   /// Offered once, on the transition screen, and nowhere else in the stage.
   /// "If you want to" is load-bearing: plenty of people reach a positive test
   /// carrying a previous loss and will not announce anything for weeks.

@@ -1245,3 +1245,100 @@ before asserting.
 
 > A test that greps source is reading prose as well as code, and prose about a
 > thing contains the name of the thing. Assert against what executes.
+
+## A-85 — fixed. Today was too many purposes, not too much text
+
+Raised on the device: *"in comparison to pregnancy or parenting, TTC's home is
+text heavy — less encapsulation. The content exists, you just have to click to
+see it, rather than trying to show as much as we can."*
+
+**The measurement contradicted the assumption behind it.** TTC's Today had
+eleven sections; the parenting home has about eleven too. Identical. So "TTC
+shows too much" was never about quantity, and the first fix — folding four card
+bodies behind "More" — was aimed at the wrong axis.
+
+The actual difference:
+
+| | Structure |
+|---|---|
+| Parenting home | **six compact row builders** — `_domainRow`, `_win`, `_qa`, `_bigRow`, `_discoverCard`, `_aheadCard` |
+| TTC Today | **nine full `TtcCard`s** |
+
+> A row is a line you scan. A card is a small article you have to read.
+
+Eleven cards feels like far more than eleven rows at the same word count. That is
+structural, and no amount of capping paragraphs fixes it.
+
+### The hero was trying to teach when its job is to orient
+
+It had accumulated **four** attempts to explain the chapter, none with room to do
+it — which is why all four read as vague:
+
+| Was on the hero | Now |
+|---|---|
+| `nextUp()` — *"Next: Knowing Your Rhythm — from the day you log your next period"* | ⓘ sheet → **What moves you on** |
+| `goal()` — *"WORTH DOING · Start folic acid and see a doctor once"* | ⓘ sheet → **Worth doing** |
+| `focus()` — *"FOCUS · Health and habits"* | **dropped** |
+
+`nextUp()` was mine, added in A-75. It named an internal chapter the reader has
+no reason to recognise yet, so it cost two lines of the most valuable space in
+the stage and explained nothing. `focus()` is the only one actually deleted: a
+category label telling her which drawer she is in, which the title already does.
+
+**A hero ORIENTS. A sheet EXPLAINS.** Separating those two jobs is the whole fix,
+and it is the same principle as folding a paragraph behind "More".
+
+The ⓘ sits **on the title**, because *"what does Preparing Together actually
+mean?"* is a question about the title — so it is answered beside the thing that
+raised it. That also means renaming the chapters can now be tested rather than
+guessed at: read the sheet, then decide whether the name still needs changing.
+
+**One thing added that was nowhere on the screen at all:** `reassurance()`, per
+chapter — *"There is no falling behind in this part. It is measured in months,
+not days, and what you start today is doing its work three months from now."*
+Every chapter has a characteristic anxiety and in each case the honest answer has
+the same shape: **the thing she is worried she is doing wrong is not a thing that
+can be done wrong.** Probably the most useful sentence in each chapter, and it
+had no home.
+
+### Four cards became rows. Two did not.
+
+Rows: the myth, today's nutrition, today's movement, today's pick. Each opens the
+same content in a sheet — three of them had no detail screen anywhere, so
+truncating them would have deleted content rather than folded it, which the whole
+exercise was not allowed to do.
+
+**The ritual and the journal keep their cards.** I had listed the ritual for
+collapsing and was wrong: it has per-item checkboxes, a done/total and a streak.
+Turning it into a row would remove the ability to tick things off from Today.
+
+> Density work has to know the difference between something you **read** and
+> something you **use**.
+
+### The video card is gone
+
+Its entire content was *"coming soon"*. It spent a section of the most valuable
+screen in the stage advertising an absence, every day.
+
+This is **not** the "a feature is never hidden" rule, and the distinction
+matters: that rule is about **her** empty data — an empty journal renders an
+invitation to write. This was **our** content gap. There is nothing she can do
+about it and nothing to invite her into. Commented out, returns the day videos
+exist.
+
+**Twelve sections became eight.** Hero · rhythm · insight · the row list ·
+ritual · journal · record-a-test · disclaimer.
+
+### And a fourth test that defended a placement
+
+`ttc_home_hero_test` asserted `Next:` inline on the hero — a test **I** wrote
+when I put it there. It now asserts the answer is reachable in one tap, which is
+what it should have asserted originally: the requirement was never "print it on
+the hero", it was that a twenty-eight-day chapter must not read as the app having
+stopped. The segmented bar and "Day N of 28" carry that.
+
+Four times in two days. Worth stating as a rule:
+
+> **Assert the requirement, not the layout.** A test that pins where something
+> sits will block the next correct move; one that pins what the user can find
+> out survives it.

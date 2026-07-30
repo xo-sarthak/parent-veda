@@ -31,6 +31,7 @@ import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_chapter_screen.dart';
+import 'ttc_today_parts.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
 import 'ttc_insight_screen.dart';
@@ -86,21 +87,39 @@ class TtcTodayScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             ttcSectionTitle(t.todaysJourneyTitle, eyebrow: t.todaysJourney),
+
+            // The one real read of the day keeps its card. It is the only thing
+            // here that is an article rather than a line, and the reader behind
+            // it now earns the tap.
             _InsightCard(t: t),
             const SizedBox(height: 12),
-            _VideoCard(t: t, chapter: chapter),
+
+            // ---- the READING becomes rows -----------------------------------
+            //  Was four more full-height cards — the myth, today's nutrition,
+            //  today's movement, today's pick — each with an eyebrow, a title, a
+            //  paragraph and a fold, each carrying exactly one idea and given
+            //  the same visual weight as the hero.
+            //
+            //  A row is a line you scan; a card is a small article you have to
+            //  read. Four cards feels like far more than four rows at identical
+            //  word count, which is the whole difference between this screen and
+            //  the parenting home — it renders almost everything as grouped
+            //  rows and reads as a menu rather than a wall.
+            //
+            //  Nothing was removed. Every row opens the same content in a sheet.
+            _TodayList(t: t),
             const SizedBox(height: 12),
+
+            // ---- the DOING keeps its cards ----------------------------------
+            //  The ritual has per-item checkboxes, a count and a streak; the
+            //  journal has four shortcut circles. Collapsing either into a row
+            //  would take away the ability to DO the thing from Today, which is
+            //  removing function rather than compacting it. Density work has to
+            //  know the difference between something you read and something you
+            //  use.
             _RitualCard(t: t, chapter: chapter),
             const SizedBox(height: 12),
-            _MythCard(t: t),
-            const SizedBox(height: 12),
             _JournalCard(t: t, chapter: chapter),
-            const SizedBox(height: 12),
-            _NutritionCard(t: t),
-            const SizedBox(height: 12),
-            _MovementCard(t: t),
-            const SizedBox(height: 12),
-            _ProductCard(t: t),
             const SizedBox(height: 20),
             // The door out of this stage. Always present, understated, and
             // never phrased as a prompt to test.
@@ -190,8 +209,18 @@ class _Hero extends StatelessWidget {
         // The chapter name is the hero's headline - the emotional equivalent of
         // pregnancy's "Week 20 · Day 3". Fraunces, because this is a hero
         // moment and hero moments are the only place Fraunces is allowed.
-        Text(chapter.title(hi),
-            style: ttcFraunces(29, w: FontWeight.w600, color: Colors.white)),
+        // The ⓘ sits ON the title, because "what does Preparing Together
+        // actually mean?" is a question about the title. Answering it beside
+        // the thing that raised it is the whole reason this is not a card
+        // further down the page.
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Text(chapter.title(hi),
+                style:
+                    ttcFraunces(29, w: FontWeight.w600, color: Colors.white)),
+          ),
+          TtcChapterInfoButton(chapter: chapter, t: t),
+        ]),
         const SizedBox(height: 8),
         Text(chapter.tagline(hi),
             style: ttcBody(13.5,
@@ -236,25 +265,30 @@ class _Hero extends StatelessWidget {
         ]),
         const SizedBox(height: 9),
         TtcChapterBar(today: today),
-        const SizedBox(height: 12),
-
-        // What is coming, and what brings it. The one line the other two
-        // stages have and this one did not.
-        Text(chapter.nextUp(hi),
-            style: ttcBody(11.5,
-                color: Colors.white.withValues(alpha: 0.88), h: 1.45)),
-        const SizedBox(height: 14),
-
-        Row(children: [
-          Expanded(child: _heroFact(t.currentFocus, chapter.focus(hi))),
-          Container(
-              width: 1,
-              height: 30,
-              color: Colors.white.withValues(alpha: 0.22)),
-          const SizedBox(width: 14),
-          Expanded(flex: 2, child: _heroFact(t.currentGoal, chapter.goal(hi))),
-        ]),
         const SizedBox(height: 18),
+
+        // ---------------------------------------------------------------------
+        //  THREE THINGS WERE HERE AND ARE NOW IN THE ⓘ SHEET.
+        //
+        //    * `nextUp()`  — "Next: Knowing Your Rhythm, from the day you log
+        //      your next period". It named an internal chapter she has no
+        //      reason to recognise yet, so it explained nothing and cost two
+        //      lines. Now the sheet's "What moves you on", where it can be a
+        //      sentence instead of a clause.
+        //    * `focus()`  — "FOCUS · Health and habits". A category label. It
+        //      told her which drawer she was in, which the title already does.
+        //      Dropped entirely; it is the one of the four that had no content
+        //      to move.
+        //    * `goal()`  — "WORTH DOING · Start folic acid and see a doctor
+        //      once". The only genuinely actionable line in the hero, and
+        //      STATIC for all twenty-eight days of a chapter, so it was
+        //      wallpaper by day three. Now the sheet's "Worth doing", read once.
+        //
+        //  Between them they were four attempts to EXPLAIN the chapter inside a
+        //  component whose job is to ORIENT — and none had room to do it, which
+        //  is why all four read as vague. Separating those two jobs is the whole
+        //  fix. Nothing was deleted except the category label.
+        // ---------------------------------------------------------------------
 
         // Three shortcuts, exactly where pregnancy puts Baby / Mother /
         // What's next. Here the subject is the couple.
@@ -290,22 +324,25 @@ class _Hero extends StatelessWidget {
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       );
 
-  Widget _heroFact(String label, String value) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label.toUpperCase(),
-              style: ttcBody(9.5,
-                  color: Colors.white.withValues(alpha: 0.75),
-                  w: FontWeight.w800)),
-          const SizedBox(height: 3),
-          Text(value,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: ttcBody(12.5,
-                  color: Colors.white, w: FontWeight.w700, h: 1.3)),
-        ],
-      );
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. Superseded: the hero no longer carries FOCUS / WORTH DOING.
+//
+//   Widget _heroFact(String label, String value) => Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Text(label.toUpperCase(),
+//               style: ttcBody(9.5,
+//                   color: Colors.white.withValues(alpha: 0.75),
+//                   w: FontWeight.w800)),
+//           const SizedBox(height: 3),
+//           Text(value,
+//               maxLines: 2,
+//               overflow: TextOverflow.ellipsis,
+//               style: ttcBody(12.5,
+//                   color: Colors.white, w: FontWeight.w700, h: 1.3)),
+//         ],
+//       );
 
 }
 
@@ -612,55 +649,62 @@ class _InsightCard extends StatelessWidget {
 
 // ---- Today's Video ----------------------------------------------------------
 
-class _VideoCard extends StatelessWidget {
-  const _VideoCard({required this.t, required this.chapter});
-  final TtcS t;
-  final TtcChapter chapter;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final insight = ttcPickForToday(ttcInsights);
-    return TtcCard(
-      padding: const EdgeInsets.all(14),
-      onTap: () => ttcSoon(context, t.todaysVideo),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TtcStriped(
-          height: 148,
-          child: Center(
-            child: Container(
-              width: 46,
-              height: 46,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.9),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.play_arrow_rounded,
-                  size: 26, color: ttcPurple),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        ttcEyebrow(t.todaysVideo),
-        const SizedBox(height: 7),
-        Text(insight.title(hi), style: ttcJakarta(15.5)),
-        const SizedBox(height: 6),
-        // The "why now" line every recommendation in this product carries.
-        Row(children: [
-          const Icon(Icons.auto_awesome_outlined, size: 14, color: ttcCoral),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(t.whyNow(chapter.title(hi)),
-                style: ttcBody(12, color: ttcCoral, w: FontWeight.w600)),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        Text(t.videoComing, style: ttcBody(11.5, color: ttcMuted)),
-      ]),
-    );
-  }
-}
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. REMOVED FROM TODAY. Its entire content was "coming soon" - it spent a
+// section of the most valuable screen in the stage advertising an absence.
+// "A feature is never hidden" is about HER empty data (an empty journal
+// invites her to write); this was OUR content gap, which she can do nothing
+// about and cannot be invited into. Restore the moment videos exist.
+//
+// class _VideoCard extends StatelessWidget {
+//   const _VideoCard({required this.t, required this.chapter});
+//   final TtcS t;
+//   final TtcChapter chapter;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final insight = ttcPickForToday(ttcInsights);
+//     return TtcCard(
+//       padding: const EdgeInsets.all(14),
+//       onTap: () => ttcSoon(context, t.todaysVideo),
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         TtcStriped(
+//           height: 148,
+//           child: Center(
+//             child: Container(
+//               width: 46,
+//               height: 46,
+//               alignment: Alignment.center,
+//               decoration: BoxDecoration(
+//                 color: Colors.white.withValues(alpha: 0.9),
+//                 shape: BoxShape.circle,
+//               ),
+//               child: const Icon(Icons.play_arrow_rounded,
+//                   size: 26, color: ttcPurple),
+//             ),
+//           ),
+//         ),
+//         const SizedBox(height: 12),
+//         ttcEyebrow(t.todaysVideo),
+//         const SizedBox(height: 7),
+//         Text(insight.title(hi), style: ttcJakarta(15.5)),
+//         const SizedBox(height: 6),
+//         // The "why now" line every recommendation in this product carries.
+//         Row(children: [
+//           const Icon(Icons.auto_awesome_outlined, size: 14, color: ttcCoral),
+//           const SizedBox(width: 6),
+//           Expanded(
+//             child: Text(t.whyNow(chapter.title(hi)),
+//                 style: ttcBody(12, color: ttcCoral, w: FontWeight.w600)),
+//           ),
+//         ]),
+//         const SizedBox(height: 8),
+//         Text(t.videoComing, style: ttcBody(11.5, color: ttcMuted)),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- The Daily Ritual -------------------------------------------------------
 
@@ -764,40 +808,43 @@ class _RitualCard extends StatelessWidget {
 
 // ---- Daily Myth -------------------------------------------------------------
 
-class _MythCard extends StatelessWidget {
-  const _MythCard({required this.t});
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final myth = ttcPickForToday(ttcMyths, offset: 3);
-    return TtcCard(
-      color: ttcCoralTint,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ttcEyebrow(t.todaysMyth),
-        const SizedBox(height: 10),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.close_rounded, size: 17, color: ttcCoral),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(myth.myth(hi),
-                style: ttcBody(13.5,
-                    color: ttcInk, w: FontWeight.w700, h: 1.45)),
-          ),
-        ]),
-        const SizedBox(height: 11),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.check_rounded, size: 17, color: ttcPurple),
-          const SizedBox(width: 9),
-          // No myth detail screen exists, so this opens in place rather than
-          // hiding a second half nobody could reach.
-          Expanded(child: TtcExpandableText(text: myth.truth(hi), t: t)),
-        ]),
-      ]),
-    );
-  }
-}
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. Superseded by a row in _TodayList. Same content, opened in a sheet.
+//
+// class _MythCard extends StatelessWidget {
+//   const _MythCard({required this.t});
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final myth = ttcPickForToday(ttcMyths, offset: 3);
+//     return TtcCard(
+//       color: ttcCoralTint,
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         ttcEyebrow(t.todaysMyth),
+//         const SizedBox(height: 10),
+//         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           const Icon(Icons.close_rounded, size: 17, color: ttcCoral),
+//           const SizedBox(width: 9),
+//           Expanded(
+//             child: Text(myth.myth(hi),
+//                 style: ttcBody(13.5,
+//                     color: ttcInk, w: FontWeight.w700, h: 1.45)),
+//           ),
+//         ]),
+//         const SizedBox(height: 11),
+//         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           const Icon(Icons.check_rounded, size: 17, color: ttcPurple),
+//           const SizedBox(width: 9),
+//           // No myth detail screen exists, so this opens in place rather than
+//           // hiding a second half nobody could reach.
+//           Expanded(child: TtcExpandableText(text: myth.truth(hi), t: t)),
+//         ]),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- Today's Journal --------------------------------------------------------
 
@@ -872,133 +919,142 @@ class _JournalCard extends StatelessWidget {
 
 // ---- Today's Nutrition ------------------------------------------------------
 
-class _NutritionCard extends StatelessWidget {
-  const _NutritionCard({required this.t});
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final n = ttcPickForToday(ttcNutrition, offset: 1);
-    return TtcCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          ttcEyebrow(t.todaysNutrition),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-                color: ttcPanel, borderRadius: BorderRadius.circular(999)),
-            child: Text(n.nutrient(hi),
-                style: ttcBody(11, color: ttcPurple, w: FontWeight.w800)),
-          ),
-        ]),
-        const SizedBox(height: 11),
-        Text(n.meal(hi), style: ttcJakarta(16)),
-        const SizedBox(height: 7),
-        TtcExpandableText(text: n.why(hi), t: t),
-        const SizedBox(height: 12),
-        // The India-first line. This is the part that makes the section ours
-        // rather than translated from somewhere else.
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFDF6EC),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.emoji_objects_outlined, size: 16, color: ttcBrown),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Text(n.indian(hi),
-                  style: ttcBody(12.5, color: ttcBrown, h: 1.5, w: FontWeight.w600)),
-            ),
-          ]),
-        ),
-      ]),
-    );
-  }
-}
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. Superseded by a row in _TodayList. Same content, opened in a sheet.
+//
+// class _NutritionCard extends StatelessWidget {
+//   const _NutritionCard({required this.t});
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final n = ttcPickForToday(ttcNutrition, offset: 1);
+//     return TtcCard(
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         Row(children: [
+//           ttcEyebrow(t.todaysNutrition),
+//           const Spacer(),
+//           Container(
+//             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+//             decoration: BoxDecoration(
+//                 color: ttcPanel, borderRadius: BorderRadius.circular(999)),
+//             child: Text(n.nutrient(hi),
+//                 style: ttcBody(11, color: ttcPurple, w: FontWeight.w800)),
+//           ),
+//         ]),
+//         const SizedBox(height: 11),
+//         Text(n.meal(hi), style: ttcJakarta(16)),
+//         const SizedBox(height: 7),
+//         TtcExpandableText(text: n.why(hi), t: t),
+//         const SizedBox(height: 12),
+//         // The India-first line. This is the part that makes the section ours
+//         // rather than translated from somewhere else.
+//         Container(
+//           width: double.infinity,
+//           padding: const EdgeInsets.all(12),
+//           decoration: BoxDecoration(
+//             color: const Color(0xFFFDF6EC),
+//             borderRadius: BorderRadius.circular(14),
+//           ),
+//           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//             const Icon(Icons.emoji_objects_outlined, size: 16, color: ttcBrown),
+//             const SizedBox(width: 9),
+//             Expanded(
+//               child: Text(n.indian(hi),
+//                   style: ttcBody(12.5, color: ttcBrown, h: 1.5, w: FontWeight.w600)),
+//             ),
+//           ]),
+//         ),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- Today's Movement -------------------------------------------------------
 
-class _MovementCard extends StatelessWidget {
-  const _MovementCard({required this.t});
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final m = ttcPickForToday(ttcMovements, offset: 2);
-    return TtcCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          ttcEyebrow(t.todaysMovement),
-          const Spacer(),
-          if (m.minutes > 0)
-            Text(t.minutes(m.minutes),
-                style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
-        ]),
-        const SizedBox(height: 11),
-        Row(children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration:
-                const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
-            child: Icon(ttcMovementIcon(m.kind), size: 20, color: ttcPurple),
-          ),
-          const SizedBox(width: 13),
-          Expanded(child: Text(m.title(hi), style: ttcJakarta(15.5))),
-        ]),
-        const SizedBox(height: 10),
-        TtcExpandableText(text: m.body(hi), t: t),
-      ]),
-    );
-  }
-}
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. Superseded by a row in _TodayList. Same content, opened in a sheet.
+//
+// class _MovementCard extends StatelessWidget {
+//   const _MovementCard({required this.t});
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final m = ttcPickForToday(ttcMovements, offset: 2);
+//     return TtcCard(
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         Row(children: [
+//           ttcEyebrow(t.todaysMovement),
+//           const Spacer(),
+//           if (m.minutes > 0)
+//             Text(t.minutes(m.minutes),
+//                 style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
+//         ]),
+//         const SizedBox(height: 11),
+//         Row(children: [
+//           Container(
+//             width: 42,
+//             height: 42,
+//             alignment: Alignment.center,
+//             decoration:
+//                 const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
+//             child: Icon(ttcMovementIcon(m.kind), size: 20, color: ttcPurple),
+//           ),
+//           const SizedBox(width: 13),
+//           Expanded(child: Text(m.title(hi), style: ttcJakarta(15.5))),
+//         ]),
+//         const SizedBox(height: 10),
+//         TtcExpandableText(text: m.body(hi), t: t),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- Today's Product --------------------------------------------------------
 
-class _ProductCard extends StatelessWidget {
-  const _ProductCard({required this.t});
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    // Today's pick rotates from the research library, and it opens the research
-    // page rather than a buy flow. Commerce sits last on this screen and stays
-    // last: education, then confidence, then recommendation, then commerce.
-    final product = ttcPickForToday(ttcProducts, offset: 4);
-    return TtcCard(
-      onTap: () => openTtcProducts(context),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ttcEyebrow(t.todaysPick),
-        const SizedBox(height: 10),
-        Text(product.name(hi), style: ttcJakarta(16)),
-        const SizedBox(height: 7),
-        Text(product.why(hi),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: ttcBody(13, h: 1.55)),
-        const SizedBox(height: 12),
-        Row(children: [
-          const Icon(Icons.error_outline_rounded, size: 14, color: ttcBrown),
-          const SizedBox(width: 7),
-          Expanded(
-            child: Text(t.productsWatchOut,
-                style: ttcBody(11.5, color: ttcBrown, w: FontWeight.w700)),
-          ),
-          Text(product.priceEn,
-              style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
-        ]),
-      ]),
-    );
-  }
-}
+// --------------------------------------------------------------------------
+// KEPT FOR REVERT. Superseded by a row in _TodayList, which opens the product guide.
+//
+// class _ProductCard extends StatelessWidget {
+//   const _ProductCard({required this.t});
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     // Today's pick rotates from the research library, and it opens the research
+//     // page rather than a buy flow. Commerce sits last on this screen and stays
+//     // last: education, then confidence, then recommendation, then commerce.
+//     final product = ttcPickForToday(ttcProducts, offset: 4);
+//     return TtcCard(
+//       onTap: () => openTtcProducts(context),
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         ttcEyebrow(t.todaysPick),
+//         const SizedBox(height: 10),
+//         Text(product.name(hi), style: ttcJakarta(16)),
+//         const SizedBox(height: 7),
+//         Text(product.why(hi),
+//             maxLines: 3,
+//             overflow: TextOverflow.ellipsis,
+//             style: ttcBody(13, h: 1.55)),
+//         const SizedBox(height: 12),
+//         Row(children: [
+//           const Icon(Icons.error_outline_rounded, size: 14, color: ttcBrown),
+//           const SizedBox(width: 7),
+//           Expanded(
+//             child: Text(t.productsWatchOut,
+//                 style: ttcBody(11.5, color: ttcBrown, w: FontWeight.w700)),
+//           ),
+//           Text(product.priceEn,
+//               style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
+//         ]),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- shared icon maps -------------------------------------------------------
 
@@ -1029,5 +1085,100 @@ IconData ttcMovementIcon(String kind) {
       return Icons.air_rounded;
     default:
       return Icons.bedtime_outlined;
+  }
+}
+
+// ---- Today's list -----------------------------------------------------------
+
+/// Four rows where there were four cards.
+///
+/// The video card is deliberately absent — see the note on `_VideoCard`, which is
+/// kept commented rather than deleted.
+class _TodayList extends StatelessWidget {
+  const _TodayList({required this.t});
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    final myth = ttcPickForToday(ttcMyths, offset: 3);
+    final n = ttcPickForToday(ttcNutrition, offset: 1);
+    final m = ttcPickForToday(ttcMovements, offset: 2);
+    final product = ttcPickForToday(ttcProducts, offset: 4);
+
+    return TtcCard(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Column(children: [
+        TtcTodayRow(
+          icon: Icons.lightbulb_outline_rounded,
+          eyebrow: t.todaysMyth,
+          title: myth.myth(hi),
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: t.todaysMyth,
+            title: myth.myth(hi),
+            body: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: ttcPanel,
+                  borderRadius: BorderRadius.circular(ttcCardRadius),
+                ),
+                child: Text(myth.truth(hi),
+                    style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+              ),
+            ],
+          ),
+        ),
+        TtcTodayRow(
+          icon: Icons.restaurant_rounded,
+          eyebrow: t.todaysNutrition,
+          title: n.meal(hi),
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: n.nutrient(hi),
+            title: n.meal(hi),
+            body: [
+              Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF6EC),
+                  borderRadius: BorderRadius.circular(ttcCardRadius),
+                ),
+                child: Text(n.indian(hi),
+                    style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+              ),
+            ],
+          ),
+        ),
+        TtcTodayRow(
+          icon: Icons.directions_walk_rounded,
+          eyebrow: t.todaysMovement,
+          title: m.title(hi),
+          meta: m.minutes > 0 ? t.minutes(m.minutes) : '',
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: t.todaysMovement,
+            title: m.title(hi),
+            body: [
+              Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+            ],
+          ),
+        ),
+        // The only row with a real destination already: the product guide.
+        TtcTodayRow(
+          icon: Icons.shopping_bag_outlined,
+          eyebrow: t.todaysPick,
+          title: product.name(hi),
+          meta: product.priceEn,
+          last: true,
+          onTap: () => openTtcProducts(context),
+        ),
+      ]),
+    );
   }
 }

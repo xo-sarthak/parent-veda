@@ -31,6 +31,7 @@ import 'package:parentveda/screens/ttc/ttc_chapter_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_journey_map_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
+import 'package:parentveda/screens/ttc/ttc_today_parts.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
@@ -92,9 +93,45 @@ void main() {
       expect(find.textContaining('in this chapter'), findsOneWidget);
     });
 
-    testWidgets('what is coming next', (tester) async {
+    testWidgets('what is coming next — one tap in, not printed on the hero',
+        (tester) async {
+      // This USED to assert `Next:` inline on the hero, because that is where I
+      // first put it. It has moved into the ⓘ sheet, and that is a fix rather
+      // than a regression:
+      //
+      //   "Next: Knowing Your Rhythm — from the day you log your next period"
+      //
+      // named an internal chapter the reader has no reason to recognise yet, so
+      // it cost two lines of the most valuable space in the stage and explained
+      // nothing. In the sheet it can be a sentence with a heading over it.
+      //
+      // The REQUIREMENT was never "print it on the hero" — it was that a
+      // twenty-eight-day chapter must not read as the app having stopped. The
+      // segmented bar and "Day N of 28" carry that. So this now asserts the
+      // answer is REACHABLE, which is what it always should have asserted.
       await pumpToday(tester);
+      expect(find.textContaining('Next:'), findsNothing,
+          reason: 'the fragment is back on the hero');
+
+      await tester.tap(find.byType(TtcChapterInfoButton));
+      await tester.pumpAndSettle();
       expect(find.textContaining('Next:'), findsWidgets);
+      expect(find.text(const TtcS(false).infoWhatMovesYouOn.toUpperCase()),
+          findsOneWidget);
+    });
+
+    testWidgets('and the sheet answers the question the title raises',
+        (tester) async {
+      // "What does Preparing Together actually mean?" is a question about the
+      // title, so it is answered beside the title.
+      await pumpToday(tester);
+      await tester.tap(find.byType(TtcChapterInfoButton));
+      await tester.pumpAndSettle();
+      const t = TtcS(false);
+      expect(find.text(t.infoWhatThisIs.toUpperCase()), findsOneWidget);
+      expect(find.text(t.infoWorthDoing.toUpperCase()), findsOneWidget);
+      // The sentence that was nowhere on the screen at all.
+      expect(find.text(t.infoNotToWorry.toUpperCase()), findsOneWidget);
     });
 
     testWidgets('and a link to the whole map', (tester) async {
@@ -178,6 +215,9 @@ void main() {
       TtcLang.instance.hinglish = true;
       await pumpToday(tester);
       expect(tester.takeException(), isNull);
+      // The Hinglish "Aage:" moved into the sheet with its English twin.
+      await tester.tap(find.byType(TtcChapterInfoButton));
+      await tester.pumpAndSettle();
       expect(find.textContaining('Aage:'), findsWidgets);
       TtcLang.instance.hinglish = false;
     });
