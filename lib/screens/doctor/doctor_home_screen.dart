@@ -13,6 +13,8 @@ import '../../booking/booking_models.dart';
 import '../../booking/call_screen.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_roster.dart';
+import '../../care_partner/care_partner_models.dart';
+import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_availability_screen.dart';
@@ -30,16 +32,41 @@ class DoctorHomeScreen extends StatelessWidget {
       animation:
           Listenable.merge([DoctorSession.instance, DoctorRoster.instance]),
       builder: (context, _) {
-        final e = doctorInfoById(DoctorSession.instance.expertId ?? '');
-        final calls = DoctorRoster.instance.upcomingConsults(e.id);
-        final sessions = DoctorRoster.instance.sessionsBy(e.id);
+        // doctorInfoById() falls back to the FIRST doctor for an unknown id, so
+        // a referral-only partner — a hospital, lab or IVF centre, none of
+        // which belong in the compiled kExperts catalogue — would render
+        // somebody else's name as its own. Only resolve a doctor when this
+        // session actually has a consulting identity.
+        final session = DoctorSession.instance;
+        final e = session.consults ? doctorInfoById(session.expertId!) : null;
+        final partner = PartnerDashboardStore.instance.partner;
+
+        final name = e?.name ?? partner?.name ?? 'Your practice';
+        final sub = e?.credential ??
+            (partner == null ? '' : CarePartnerType.label(partner.type));
+
+        // No consulting identity means no roster to read. Empty, not hidden:
+        // the sections below still render their invitations.
+        final calls = e == null
+            ? const <Booking>[]
+            : DoctorRoster.instance.upcomingConsults(e.id);
+        final sessions = e == null
+            ? const <Offering>[]
+            : DoctorRoster.instance.sessionsBy(e.id);
+
         return ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 40),
           children: [
-            _pad(_header(e)),
+            _pad(_header(name, sub)),
             const SizedBox(height: 16),
-            _pad(_stageToggle(e.stage)),
-            const SizedBox(height: 20),
+            // The stage toggle is a TESTING affordance for flipping between a
+            // pregnancy-side and a parenting-side doctor. A partner with no
+            // expert record has no stage to flip.
+            if (e != null) ...[
+              _pad(_stageToggle(e.stage)),
+              const SizedBox(height: 16),
+            ],
+            const SizedBox(height: 4),
             _pad(_statRow(calls.length, sessions.length)),
             const SizedBox(height: 24),
 
@@ -121,15 +148,14 @@ class DoctorHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _header(DoctorInfo e) => Row(children: [
+  Widget _header(String name, String sub) => Row(children: [
         Container(
           width: 54,
           height: 54,
           alignment: Alignment.center,
           decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle),
           child: Text(
-            e.name.replaceAll(RegExp(r'^Dr\.?\s*'), '').characters.first
-                .toUpperCase(),
+            _initial(name),
             style: const TextStyle(
                 color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700),
           ),
@@ -139,17 +165,24 @@ class DoctorHomeScreen extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(_greeting(), style: ppBody(12.5, color: ppMuted)),
             const SizedBox(height: 2),
-            Text(e.name,
+            Text(name,
                 style: ppFraunces(23, color: ppTitleInk, h: 1.05),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
-            Text(e.credential,
+            Text(sub,
                 style: ppBody(12, color: ppSoft),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ]),
         ),
       ]);
+
+  /// First letter, with a title stripped: "Dr Meera Rao" -> M, and
+  /// "Rainbow Children's Hospital" -> R.
+  static String _initial(String name) {
+    final n = name.replaceAll(RegExp(r'^(Dr|Prof)\.?\s*'), '').trim();
+    return n.isEmpty ? '?' : n.characters.first.toUpperCase();
+  }
 
   String _greeting() {
     final h = DateTime.now().hour;

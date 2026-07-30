@@ -16,6 +16,7 @@ import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
 import 'memories/memories_home_screen.dart';
 import 'referral/invite_friends_screen.dart';
+import '../care_partner/care_partner_models.dart';
 import '../care_partner/care_visibility.dart';
 import 'care_partner/care_partner_card.dart';
 import 'care_partner/care_partner_slot.dart';
@@ -29,6 +30,7 @@ import '../services/daily_store.dart';
 import '../services/journal_store.dart';
 import '../services/journey_dates_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/remote/supabase_repo.dart';
 import '../services/remote/sync_registry.dart';
 import '../services/read_next_store.dart';
 import '../services/read_to_baby_saved_store.dart';
@@ -503,6 +505,16 @@ class ProfileScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               _docGroup(ctx, 'Pregnancy side', DoctorStage.pregnancy),
               _docGroup(ctx, 'Parenting side', DoctorStage.parenting),
+              // Organisations — hospitals, IVF centres, labs, corporates. They
+              // are partners in exactly the same sense a solo doctor is, and
+              // they get the same view; what differs is only that they have no
+              // consulting record, so slots and availability stay empty.
+              //
+              // Which partner an account actually IS remains the server's
+              // answer (my_care_partner, 0068). Entering here without a
+              // link_partner_account row gives a view that correctly finds
+              // nothing rather than one that invents an identity.
+              const _OrgSignInGroup(),
             ],
           ),
         ),
@@ -1098,5 +1110,89 @@ class _Segmented extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// TESTING: sign in to the partner view as an ORGANISATION.
+///
+/// Reads the live care_partners table rather than a compiled list, because an
+/// organisation is created by ParentVeda in SQL (or later Directus) and never
+/// exists in the kExperts catalogue. Shows only partners with no expert record,
+/// since the doctor groups above already cover the ones that consult.
+class _OrgSignInGroup extends StatefulWidget {
+  const _OrgSignInGroup();
+
+  @override
+  State<_OrgSignInGroup> createState() => _OrgSignInGroupState();
+}
+
+class _OrgSignInGroupState extends State<_OrgSignInGroup> {
+  List<Map<String, dynamic>> _orgs = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final rows = await SupabaseRepo.selectAll('care_partners');
+      final orgs = rows
+          .whereType<Map>()
+          .where((r) =>
+              (r['expert_id'] == null ||
+                  '${r['expert_id']}'.trim().isEmpty) &&
+              // Only an approved partner can acquire families, so only an
+              // approved one is worth signing in as.
+              '${r['status']}' == 'active')
+          .map((r) => Map<String, dynamic>.from(r))
+          .toList();
+      if (mounted) setState(() => _orgs = orgs);
+    } catch (_) {
+      // Signed out or offline: the group simply does not appear. Nothing here
+      // is required to reach the doctor view.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_orgs.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 14),
+      Text('ORGANISATIONS',
+          style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: AppTheme.neutral500)),
+      const SizedBox(height: 4),
+      for (final o in _orgs)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: AppTheme.primary500,
+            child: Text(
+                ('${o['name']}'.trim().isEmpty ? '?' : '${o['name']}'.trim())
+                    .characters
+                    .first
+                    .toUpperCase(),
+                style: const TextStyle(color: Colors.white)),
+          ),
+          title: Text('${o['name']}',
+              style: const TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text(
+              [
+                CarePartnerType.label('${o['type']}'),
+                if ('${o['city']}'.trim().isNotEmpty) '${o['city']}',
+              ].join(' · '),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+          onTap: () {
+            Navigator.of(context).pop();
+            DoctorSession.instance.enterAsPartner('${o['id']}');
+          },
+        ),
+    ]);
   }
 }

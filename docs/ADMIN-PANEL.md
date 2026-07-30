@@ -153,6 +153,35 @@ pages exist.
   rate has been agreed (0038 seeds every rate at zero). Until then the doctor's
   earnings view shows real consultation earnings and an empty referral ledger.
 
+## 1c-bis. The QR pass (0068-0069) changed what the panel needs
+
+Built since this list was written, so these rows are now *forms over existing
+functions* rather than new backend work:
+
+| Need | Function to sit on |
+|---|---|
+| Create a partner + its first code | `create_care_partner(...)` (0040) |
+| Issue an extra code for a surface | `mint_partner_token(partner, channel)` (0040) |
+| **Attach a login to a partner** | `link_partner_account(user, partner, label)` (0068) — this is what lets a HOSPITAL sign in. Same editorial weight as verification |
+| **Retire a code and replace it** | `rotate_partner_token(partner, reason, grace_days)` (0069) |
+| Show a partner's code history | `partner_token_history(partner)` (0069) — readable by the partner |
+
+Three things the panel must respect:
+
+* **Rotation needs a confirmation step and a reason.** The function refuses an
+  empty reason on purpose. Retiring a code kills every printed copy of it, so
+  it is a physical-world action, not a toggle.
+* **The 30-day grace window is not padding.** A patient who scanned the old
+  poster ten minutes ago and installs later must still bind. Setting grace to 0
+  refuses her, and refuses her with "expired", which reads as the doctor's code
+  being wrong.
+* **Never let a partner rotate their own code.** They could invalidate posters
+  ParentVeda paid to print. `rotate_partner_token` is revoked from clients.
+
+A partner's identity is now `care_partners` + `partner_accounts`, and
+`expert_id` means only "this partner also consults". An organisation needs no
+expert record, and the panel must not create one for it.
+
 ## 1d. Known gaps against the spec, deliberately not built
 
 Recorded so they are decisions rather than oversights:

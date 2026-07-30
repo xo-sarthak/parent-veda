@@ -31,6 +31,7 @@ import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import 'care_poster_screen.dart';
 
 class DoctorReferralKitScreen extends StatefulWidget {
   const DoctorReferralKitScreen({super.key});
@@ -46,7 +47,7 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
   @override
   void initState() {
     super.initState();
-    _store.load(DoctorSession.instance.expertId);
+    _store.load(DoctorSession.instance.sessionKey);
   }
 
   @override
@@ -164,9 +165,20 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
           () => _copy(
               CarePartnerEngine.linkFor(token, channel: ReferralChannel.link)),
         ),
+        // The poster is the one that matters: before this a partner could see
+        // the code and share a LINK, but had no way to get an IMAGE out of the
+        // app, so anything reaching a clinic wall was a screenshot.
         _action(
-          Icons.print_outlined,
-          'Share the poster link',
+          Icons.image_outlined,
+          'Get your poster',
+          'A ParentVeda card with your QR — save it or send it.',
+          () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) =>
+                  CarePosterScreen(partner: partner, token: token))),
+        ),
+        _action(
+          Icons.link_rounded,
+          'Share the link',
           'Send this to whoever prints for your clinic.',
           () => _share(ReferralChannel.qr, partner),
         ),

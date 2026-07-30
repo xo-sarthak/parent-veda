@@ -166,25 +166,31 @@ class PartnerDashboardStore extends ChangeNotifier {
   int get totalEarnedMinor =>
       _earnings.fold(0, (a, r) => a + r.partnerMinor);
 
-  /// Load everything for the doctor currently in session.
+  /// Load everything for the partner currently signed in.
   ///
-  /// [expertId] is the kExperts id from DoctorSession. The care_partners row is
-  /// found through its expert_id column — the same person, two roles: someone
-  /// who consults inside the app AND brings families to it.
-  Future<void> load(String? expertId, {bool force = false}) async {
-    if (expertId == null || expertId.isEmpty) return;
+  /// [sessionKey] only de-duplicates repeat loads — it is NOT how the partner
+  /// is identified. The server answers that, via my_care_partner(). A doctor in
+  /// solo practice and a hospital are the same shape here: one care_partners
+  /// row, one account, and `expert_id` present only if they also consult.
+  Future<void> load(String? sessionKey, {bool force = false}) async {
+    if (sessionKey == null || sessionKey.isEmpty) return;
     if (_loading) return;
-    if (_loadedFor == expertId && !force) return;
+    if (_loadedFor == sessionKey && !force) return;
 
     _loading = true;
     notifyListeners();
     try {
       if (SupabaseRepo.isLoggedIn) {
-        final rows = await SupabaseRepo.selectAll('care_partners');
-        final row = rows
-            .whereType<Map>()
-            .where((r) => '${r['expert_id']}' == expertId)
-            .firstOrNull;
+        // ASK THE SERVER WHO WE ARE, rather than matching expert_id here.
+        //
+        // Matching on expert_id could only ever find a partner that is also a
+        // consulting expert, so a hospital, IVF centre or lab — every partner
+        // whose expert_id is null by design — resolved to nothing and its
+        // dashboard read "not set up yet" permanently. my_care_partner()
+        // (0068) resolves either route: a direct partner login, or the expert
+        // account of a partner that has one.
+        final mine = await SupabaseRepo.callFunction('my_care_partner');
+        final row = mine.whereType<Map>().firstOrNull;
         _partner = row == null ? null : CarePartnerStore.partnerFromRow(row);
 
         final id = _partner?.id;
@@ -196,19 +202,15 @@ class PartnerDashboardStore extends ChangeNotifier {
               ? const PartnerImpact()
               : PartnerImpact.fromMap(first);
 
-          // The token comes from the table the website resolves against, so
-          // there is exactly one source of truth for what a poster carries.
-          final refs = await SupabaseRepo.selectAll('partner_referrals');
-          final mine = refs
-              .whereType<Map>()
-              .where((r) =>
-                  '${r['partner_id']}' == id && (r['active'] as bool? ?? true))
-              .toList()
-            // Newest first: rotating a partner issues a new row, and the most
-            // recent one is the one now printed.
-            ..sort((a, b) =>
-                '${b['created_at']}'.compareTo('${a['created_at']}'));
-          _token = mine.isEmpty ? null : '${mine.first['token']}';
+          // ONE source of truth for what a poster carries, and the server owns
+          // it. This used to sort partner_referrals client-side and take the
+          // newest active row — which breaks the moment a token is rotated,
+          // because a retired token keeps `active` true through its grace
+          // window (0069) and would have won that sort. A partner would then
+          // be shown, and print, a code that is on its way out.
+          final tok = await SupabaseRepo.callFunction('my_partner_token');
+          final live = tok.isEmpty ? null : '${tok.first}'.trim();
+          _token = (live == null || live.isEmpty) ? null : live;
 
           final funnel = await SupabaseRepo.callFunction(
               'partner_funnel', {'p_partner_id': id});
@@ -225,12 +227,12 @@ class PartnerDashboardStore extends ChangeNotifier {
             ..sort((a, b) => b.partnerMinor.compareTo(a.partnerMinor));
         }
       }
-      _loadedFor = expertId;
+      _loadedFor = sessionKey;
     } catch (_) {
       // A failed load leaves the previous numbers on screen rather than
       // replacing real figures with zeroes, which would read as "you lost
       // everything" instead of "we could not reach the server".
-      _loadedFor = expertId;
+      _loadedFor = sessionKey;
     }
     _loading = false;
     notifyListeners();
@@ -249,7 +251,10 @@ class PartnerDashboardStore extends ChangeNotifier {
     _funnel = funnel;
     _token = token;
     _earnings = earnings ?? const [];
-    _loadedFor = partner?.expertId ?? 'debug';
+    // An organisation has no expertId, so key the debug seed off the
+    // partner id — otherwise seeding an org left _loadedFor null and the
+    // next load() would overwrite the seed.
+    _loadedFor = partner?.id ?? 'debug';
     _loading = false;
     notifyListeners();
   }

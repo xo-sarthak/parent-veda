@@ -71,6 +71,10 @@ dependencies:
   # in-app preview before saving/sharing.
   pdf: ^3.11.1
   printing: ^5.13.4
+  # Declared explicitly even though `pdf` pulls it in: the referral poster
+  # draws its QR as VECTOR paths (Barcode.qrCode), and depending on another
+  # package's transitive dep means the poster breaks the day pdf changes them.
+  barcode: ^2.2.9
   record: ^7.1.0
   url_launcher: ^6.3.0
 

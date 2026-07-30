@@ -33,6 +33,7 @@ import 'package:flutter/foundation.dart';
 
 import '../brand/brand_preview_screen.dart';
 import 'brand_showcase_screen.dart';
+import 'care_partner/care_debug_screen.dart';
 import '../brand/brand_models.dart';
 import '../brand/launch_hub_screen.dart';
 import 'product_guide/product_guide_hub_screen.dart';
@@ -123,6 +124,13 @@ class ToolsHubScreen extends StatelessWidget {
       if (kDebugMode)
         _Tool('Brand Studio (debug)', Icons.science_outlined, const Color(0xFFD92D20),
             () => open(() => BrandPreviewScreen(pregnancyWeek: controller.currentWeek))),
+      // Same reason as above. The Care Partner module is deliberately quiet in
+      // the product, and the scan-to-attribution chain cannot be walked for
+      // real until there is a Play listing — so this is the only way to see
+      // whether any of it works.
+      if (kDebugMode)
+        _Tool('Care Partner (debug)', Icons.qr_code_2_rounded, const Color(0xFFD92D20),
+            () => open(() => const CareDebugScreen())),
       _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
           () => open(() => MedicineTrackerScreen(controller: controller)), priority: PregPriority.symptoms),
       _Tool(s.rmdTitle, Icons.notifications_active_rounded,

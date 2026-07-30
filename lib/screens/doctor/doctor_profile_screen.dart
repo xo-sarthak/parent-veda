@@ -8,6 +8,8 @@
 import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_directory.dart';
+import '../../care_partner/care_partner_models.dart';
+import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_onboarding_screen.dart';
@@ -16,9 +18,22 @@ import 'doctor_referral_kit_screen.dart';
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
 
+  static String _initial(String name) {
+    final n = name.replaceAll(RegExp(r'^(Dr|Prof)\.?\s*'), '').trim();
+    return n.isEmpty ? '?' : n.characters.first.toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final e = doctorInfoById(DoctorSession.instance.expertId ?? '');
+    // Same trap as the home header: doctorInfoById() returns the FIRST doctor
+    // for an unknown id, so a hospital or lab would see a stranger's name and
+    // credential presented as its own.
+    final session = DoctorSession.instance;
+    final e = session.consults ? doctorInfoById(session.expertId!) : null;
+    final partner = PartnerDashboardStore.instance.partner;
+    final name = e?.name ?? partner?.name ?? 'Your practice';
+    final sub = e?.credential ??
+        (partner == null ? '' : CarePartnerType.label(partner.type));
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
       children: [
@@ -96,8 +111,7 @@ class DoctorProfileScreen extends StatelessWidget {
             decoration:
                 const BoxDecoration(color: ppPurple, shape: BoxShape.circle),
             child: Text(
-              e.name.replaceAll(RegExp(r'^Dr\.?\s*'), '').characters.first
-                  .toUpperCase(),
+              _initial(name),
               style: const TextStyle(
                   color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700),
             ),
@@ -105,11 +119,11 @@ class DoctorProfileScreen extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(e.name,
+              Text(name,
                   style: ppFraunces(23, color: ppTitleInk, h: 1.05),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
-              Text(e.credential,
+              Text(sub,
                   style: ppBody(12.5, color: ppSoft),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis),
@@ -118,15 +132,27 @@ class DoctorProfileScreen extends StatelessWidget {
         ]),
         const SizedBox(height: 18),
         Row(children: [
-          _stat(e.category.isNotEmpty ? e.category : 'Expert', 'Field'),
+          // A referral-only partner has no consulting category or rating. It
+          // shows what it does have — what kind of partner it is, and the city.
+          _stat(
+              e != null && e.category.isNotEmpty
+                  ? e.category
+                  : (partner == null
+                      ? 'Partner'
+                      : CarePartnerType.label(partner.type)),
+              'Field'),
           const SizedBox(width: 12),
-          _stat(e.rating.isNotEmpty ? e.rating : '—', 'Rating'),
+          _stat(
+              e != null && e.rating.isNotEmpty
+                  ? e.rating
+                  : (partner?.city.isNotEmpty == true ? partner!.city : '—'),
+              e != null && e.rating.isNotEmpty ? 'Rating' : 'Location'),
         ]),
-        if (e.blurb.trim().isNotEmpty) ...[
+        if ((e?.blurb ?? '').trim().isNotEmpty) ...[
           const SizedBox(height: 22),
           Text('About', style: ppJakarta(16)),
           const SizedBox(height: 8),
-          Text(e.blurb, style: ppBody(14, color: ppInk, h: 1.6)),
+          Text(e!.blurb, style: ppBody(14, color: ppInk, h: 1.6)),
         ],
         const SizedBox(height: 30),
         GestureDetector(

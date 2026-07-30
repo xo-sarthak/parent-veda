@@ -38,7 +38,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
   @override
   void initState() {
     super.initState();
-    _store.load(DoctorSession.instance.expertId);
+    _store.load(DoctorSession.instance.sessionKey);
   }
 
   @override

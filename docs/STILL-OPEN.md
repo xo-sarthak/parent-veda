@@ -176,6 +176,33 @@ config. **Consequence today:** `care_partners.trust` is plain `jsonb` with *no*
 constraint, so the website's allowlist is the only thing standing between a bad
 row and a doctor's name under an advertising label.
 
+## 4.2b The QR pass is done — what is left of it
+
+Built: `partner_accounts` (0068) so an ORGANISATION is a partner in its own
+right; a poster with a **print-ready A4 + cut-in-half A5 PDF** (vector QR) and
+a PNG for sending; a debug workbench that walks scan → attribution without a
+Play listing; and rotation with a grace window (0069). See §12 for the defects
+it fixed.
+
+Still open, and all of it small:
+
+* **`link_partner_account` is SQL only.** Attaching a login to a hospital is a
+  one-liner in the editor (`supabase/seed/link_partner_login.sql`). Fine at ten
+  partners; a panel form at a hundred. Recorded in `docs/ADMIN-PANEL.md §1c-bis`.
+* **No rotation UI.** `rotate_partner_token()` exists and is deliberately
+  service_role. It needs a confirmation flow before any human touches it,
+  because it kills printed posters.
+* **`partner_token_history()` is not surfaced.** A partner can be told why their
+  old code stopped working; nothing shows them yet.
+* **Print PDF fonts are fetched, not bundled.** `CarePosterPdf` loads Fraunces
+  and Manrope through `PdfGoogleFonts`, which downloads them. Offline it falls
+  back to Helvetica — which has **no Unicode support**, so a partner name with
+  an accent, or a Devanagari word in an organisation's name, would print broken.
+  The load is guarded so the PDF always builds, and a fallback chain is set, but
+  the honest fix before launch is bundling the two TTFs (~300 KB) as assets.
+  Nothing else in the app cares, because nothing else in the app ends up on
+  paper.
+
 ## 4.3 No campaign rows exist
 
 `partner_referrals` carries `campaign_id`, and nothing creates campaigns —
@@ -325,6 +352,71 @@ rejected: two were other brands' vintage adverts, one was a real child's photo.
 ---
 
 # 7. Admin panel (Directus)
+
+**Update 2026-07-30 — it exists now.** Directus is live on Render as the
+`directus_cms` Postgres role (`0045`), ~20 collections registered, and the
+boundary is proved: `permission denied for table journal_entries`. The text
+below is kept because the reasoning for delaying it was right; what follows are
+the gaps that remain.
+
+## 7.0 Publish reaches two of three readers
+
+One write, three readers, and only one of them is automatic:
+
+| Reader | How it learns | State |
+|---|---|---|
+| **The app** | reads Supabase directly | ✅ nothing needed |
+| **The website** | caches 60s; a webhook flushes it | ✅ **done 2026-07-30** — `POST /api/revalidate` + a non-blocking Directus Flow. `REVALIDATE_SECRET` set in Vercel and verified |
+| **Ask Veda** | keeps its OWN pgvector index | ⛔ **blocked — see below** |
+
+### The Ask Veda Flow is blocked on deploying Ask Veda
+
+`POST /reindex` exists (Phase 8, guarded by `reindex_secret`), and as of
+2026-07-30 `recipes`, `reads` and `products` are registered in the ingest's
+`SOURCE_SPECS`. Both halves are built and tested. **The Flow still cannot be
+created**, for a dull reason: Ask Veda has never been deployed.
+`lib/ask_veda_config.dart` points at `http://127.0.0.1:8000` over an
+`adb reverse` tunnel, and the repo has no `render.yaml`, `fly.toml` or
+`Procfile` at all. Directus runs on Render and cannot reach a laptop.
+
+**Until then, content reaches Ask Veda only when someone runs the ingest by
+hand** (`python -m ingest.ingest`). Fine at the current publishing rate; a real
+gap the moment publishing is weekly, because the failure is silent — an article
+that was never indexed is never found, and the only symptom is Veda saying "I
+don't know" about content we published ourselves.
+
+Phase 9 is bigger than pointing a Flow at a URL: it needs a host chosen, a
+deploy config written, and somewhere for the embedding model to live (it
+downloads on first run, which is a cold-start problem on a free tier).
+
+## 7.1 The panel labels rows badly out of the box
+
+Raised 2026-07-30 from a real attempt to find an article. A collection with no
+**Display Template** makes Directus pick the first text-ish field, so
+`content_posts` names every row by the first 30 characters of `body` — three
+different articles all reading `If you're reading t…`.
+
+Fix is per collection: Display Template (`{{title}}`) plus a sensible list
+layout. The table of templates for every registered collection is in
+`docs/DIRECTUS-SETUP.md`. **Do it when a collection is registered, not later** —
+a bad template also poisons every relation picker that points at that
+collection.
+
+## 7.2 Content edits have no history in the database
+
+Both a developer (via SQL) and an editor (via Directus) can write the same
+`content_posts` row. **Last write wins, silently.** Directus's Activity &
+Revisions covers its own edits and reverts; a SQL write bypasses Directus
+entirely and leaves no trace anywhere.
+
+Turning on Activity & Revisions closes half of it. Closing it properly means an
+audit trigger on the content tables in Postgres — the same reasoning as
+`admin_audit`: *the panel is a convenience layer, the database is the
+authority*, so history belongs where the writes actually land.
+
+---
+
+## 7.3 Original note — why the panel was delayed
 
 Not built at all — no collections, for any table. Deliberate: features are
 still churning, and rebuilding the panel each time is the expensive kind of
@@ -1007,6 +1099,9 @@ Kept so the reasoning survives.
 
 | Item | Outcome | When |
 |---|---|---|
+| **An organisation could never see its own numbers or its own QR** | Every partner-facing read authorised through `care_partners.expert_id -> expert_accounts -> auth.uid()`. `expert_id` is nullable by design and `kExperts` is a compiled catalogue no institution belongs in, so a hospital, IVF centre or lab could hold a token, be named correctly on `/care/`, and then see nothing at all — its kit reading "not set up yet" permanently. 0068 adds `partner_accounts` and one authorisation helper accepting both routes. `expert_id` now means only "this partner also consults" | 2026-07-30 |
+| **A signed-in organisation would have shown a stranger name as its own** | `doctorInfoById()` falls back to the FIRST doctor in the catalogue for an unknown id, so both the partner home header and the profile would have rendered some other doctor's name and credential. Same class as the `expert_roster` bug. Both now resolve a doctor only when the session actually consults, and otherwise show the partner's own name, type and city | 2026-07-30 |
+| **The app chose which token was current, client-side** | It sorted `partner_referrals` and took the newest ACTIVE row. A rotated token stays active through its grace window, so that sort would have handed a partner a code on its way out — and they would have printed it. `my_partner_token()` (0069) decides on the server, excluding retired and expired | 2026-07-30 |
 | **Father Mode showed one prototype day for the whole pregnancy** | Only day 143 was ever authored and `dayFor()` returned "the nearest authored day", so every father read a week-20 card from week 4 to week 40 — the same shape as the weekly bug, in the other module. His day is now derived from the mother's 259-day pool, shuffled within the week so the two rarely open the same card. The shuffle also carries the safety filter: 37 of her `grow` blocks speak to her body ("Your Body Is Already Parenting"), and no week has more than 3 of 7 flagged, so walking the week for a father-safe day always finds one. Her `nurture.content` (60 flagged of 259) is never shown to him at all; the mission is re-framed from its title and one-line remember | 2026-07-28 |
 | Migrations `0043_ttc_treatment.sql` and `0044_ttc_care_pathway.sql` were written but not applied | Both applied. `0043` means treatment dates reach his phone too — a retrieval date is not one person's. `0044` is the one that mattered most: until it ran, her two pathway answers stayed device-local, so **his** app fell back to the pathway default. On an unmonitored letrozole cycle her side correctly gave the fertile window back and his still behaved as though a clinic owned the timing — the exact defect the care-pathway work existed to fix, live on the partner's device | 2026-07-27 |
 | **The app could not tell a due date it calculated from one a clinic gave** | The pregnancy version of the IVF window, and the stage with real users. The Due Date Calculator has always asked *how* she got the date — last period, conception, IVF transfer, ultrasound, "my doctor told me" — and then threw the answer away. Now `DueDateSource` travels with it: three of the five are the clinic's, and when one of those is the source, gestational age is theirs. Where she used a last period, the calculator says plainly that a scan date should replace it. `unknown` counts as **ours**, because assuming a clinic gave a date we cannot account for would silence our estimate on no evidence | 2026-07-27 |
