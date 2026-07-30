@@ -19,11 +19,12 @@
 
 import 'package:flutter/material.dart';
 
-import '../../booking/booking_store.dart';
+import '../../services/credits_store.dart';
 import '../../localization/app_language.dart';
 import '../../services/entitlement_store.dart';
 import '../../services/sponsor_admin_store.dart';
 import '../../services/sponsor_benefits.dart';
+import '../../services/usage_events.dart';
 import '../../theme/app_theme.dart';
 import 'enterprise_common.dart';
 import 'sponsor_dashboard_screen.dart';
@@ -45,6 +46,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
     // advertised here on the next visit rather than at the next cold start.
     EntitlementStore.instance.refresh();
     SponsorAdminStore.instance.refresh();
+    UsageEvents.instance.screen(UsageSurface.employerBenefits);
   }
 
   String _p(String en, String hi) => ep(widget.lang, en, hi);
@@ -63,7 +65,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
         child: AnimatedBuilder(
           animation: Listenable.merge([
             EntitlementStore.instance,
-            BookingStore.instance,
+            CreditsStore.instance,
             SponsorAdminStore.instance,
           ]),
           builder: (context, _) => _body(context),
@@ -97,13 +99,15 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
       );
     }
 
-    final credit = BookingStore.instance
-        .entitlements()
-        .where((e) => e.id == 'ent_gift_sponsor_${sponsor.id}')
-        .toList();
-    final creditsLeft =
-        credit.isEmpty ? 0 : credit.first.creditsLeft;
-    final creditExpires = credit.isEmpty ? null : credit.first.expiresUtc;
+    // FROM THE SERVER, not from BookingStore. The local entitlement is a
+    // rendering hint kept in step by SponsorBenefits; this screen is where
+    // someone checks what they actually have, so it reads the authority
+    // (0066) and shows the number that will still be true at the moment they
+    // press Book.
+    final credits = CreditsStore.instance;
+    final creditsLeft = credits.available;
+    final creditsSpent = credits.spent;
+    final creditExpires = credits.expiringNext;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
@@ -179,13 +183,24 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                               'karo. Employer ko yeh nahi pata chalta ki kisse '
                               'mile ya kyun.')
                       : _p(
-                          'You have used this year\'s consultation. It renews '
+                          'You have used this year\'s consultations. They renew '
                               'when your company renews.',
-                          'Is saal ki consultation use ho chuki hai. Company '
-                              'renew karegi to yeh bhi renew ho jayegi.'),
+                          'Is saal ki consultations use ho chuki hain. Company '
+                              'renew karegi to yeh bhi renew ho jayengi.'),
                   style: t.bodySmall
                       ?.copyWith(color: AppTheme.neutral600, height: 1.45),
                 ),
+                // SAID PLAINLY, because "1 of 2" already implies it and a
+                // parent who cancelled late deserves to know where the other
+                // one went rather than assume the app lost it.
+                if (creditsSpent > 0) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    _p('$creditsSpent used so far.',
+                        'Ab tak $creditsSpent use hui.'),
+                    style: t.labelSmall?.copyWith(color: AppTheme.neutral400),
+                  ),
+                ],
                 if (creditExpires != null && creditsLeft > 0) ...[
                   const SizedBox(height: 8),
                   Text(

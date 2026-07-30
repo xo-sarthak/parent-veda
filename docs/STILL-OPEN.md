@@ -632,6 +632,45 @@ belongs to the other terminal.
 
 # 11. Sponsor / enterprise programme
 
+## 11.0 What the benefit contains — DECIDED 2026-07-30 (`0067`)
+
+Left open for weeks because it is a product decision, then taken because an
+engine that can express anything and currently expresses nothing is not
+flexibility, it is an unfinished product.
+
+**An activated employee gets:**
+
+1. **Two one-to-one consultations a year.**
+2. **Every masterclass, included.**
+3. Nothing else that is bounded.
+
+**Why two, not one or unlimited.** One is a sample: it gets saved "for when
+something is really wrong", never spent, and HR sees a take-up number with
+nothing behind it. Unlimited is unbudgetable — a consultation is a real hour of
+a real clinician, so cost is linear and the sales conversation becomes about
+risk instead of value. Two is enough that the first gets spent on something
+ordinary, which is when somebody learns the benefit is real.
+
+**Why masterclasses are unlimited.** Recorded, one-to-many, marginal cost of the
+tenth attendee ≈ 0.
+
+> **The rule, for the next tier:** meter what costs you per use, include what
+> does not. Credits for clinician hours; open access to recordings. A model that
+> ignores this either bleeds on the hours or insults people over the recordings.
+
+**Removed from the plan:** `sponsor_events` and `sponsor_resources`. `0058`
+seeded them and there is nothing behind either — `programmes` has no sponsor
+audience scope, so two sections rendered "nothing scheduled yet". *A capability
+granting access to an empty set is worse than an absent feature, because
+somebody reads it as a feature.* Re-add the row the day a sponsor runs a
+session (§11.9).
+
+**Note what `0067` does NOT do:** it locks nothing for existing users.
+Masterclasses stay free. The difference the employer plan buys is the
+consultations — a thing free users never had, not a thing taken away. Metering
+masterclasses later is deleting one row; doing it in that migration would have
+been a product decision smuggled into plumbing.
+
 *Opened 2026-07-28 alongside the entitlement engine build. Full scoping in
 `docs/ADMIN-PANEL.md` §7; these are the points deliberately left open.*
 
@@ -664,14 +703,77 @@ query to it in Postgres, exactly as `expert_roster()` derives the expert from
 **Decision deferred on purpose.** Both surfaces read the same views, so this is
 a front-end choice made later, not an architecture one made now.
 
-## 11.2 "Download" should be a report, not an export
+## 11.2 "Download" should be a report, not an export — BUILT
+
+**Update 2026-07-30.** `/portal/report` on the website: one page, same shape
+every month, print-to-PDF. Headline sentence, four figures, a month-by-month
+table, and a section stating what the report does *not* contain.
+
+Two decisions worth keeping:
+
+* **A page, not a CSV.** A CSV makes formatting HR's problem, so what leaves the
+  building is a spreadsheet pasted into an email — and whatever the reader
+  concludes from raw columns is what we shipped.
+* **Print-to-PDF, not a generated PDF.** A server-side PDF means a rendering
+  library, a font pipeline, and a second layout to keep in step with the page.
+  The browser already has all of it.
+
+The limits section is not modesty. A report listing only what it can prove
+invites the reader to assume everything else is being watched.
+
+Still open: a **monthly email** of it, which needs the same provider as §11.6.
+
+### Original reasoning
 
 HR forwards numbers to leadership far more often than they browse. A raw CSV
 makes that their formatting problem. The deliverable is a consistent, branded
 report — same shape every month, ready to forward. Treat it as a first-class
 output rather than an afterthought on whichever screen wins §11.1.
 
-## 11.3 Usage analytics — wanted, not built
+## 11.3 Usage analytics — BUILT (0065), and the earlier position was wrong
+
+**Update 2026-07-30.** `usage_events` records session shape per user;
+`sponsor_engagement()` exposes monthly totals with the same suppression.
+
+The original text below argued for *not* building it, on the grounds that the
+rows would become a liability. **That was too strong, and the correction is
+worth keeping** — there is no technical reason a per-user measurement cannot be
+exposed only as an aggregate, and `sponsor_dashboard()` has done exactly that
+for consultations since `0060`. Refusing to measure was refusing to answer a
+question ParentVeda needs for itself: you cannot improve a product you cannot
+see being used.
+
+So it is built **for ParentVeda**, with the sponsor view as a downstream
+consumer. That order is the design: shaped around HR's questions it would answer
+those and nothing else, and the day you want to know why people drop off at week
+12 you would start again.
+
+Four constraints hold the line, and they are the reason this is not a
+surveillance product:
+
+* **Insert-only.** No select grant, no select policy — same shape as `0028`. A
+  client cannot read the log back. *If a select policy ever appears there, the
+  behavioural log becomes downloadable.*
+* **No content, only shape.** `surface` is a screen name from a closed list
+  (`UsageSurface` in `lib/services/usage_events.dart`). There is no column for a
+  query, a question, an article or an answer — so "she opened Ask Veda" is
+  recordable and "she asked about bleeding at week 9" is not.
+* **Never granted to the CMS.** Not a form, not a report, not an export.
+* **It expires.** `prune_usage_events(400)`. Not scheduled by the migration —
+  a delete job that starts running the moment a migration lands is how a
+  backfill disappears overnight. Turn it on deliberately.
+
+**No per-surface breakdown is offered to a sponsor.** "Your people spend most of
+their time in Health" sounds harmless and narrows down who is worried about what
+in a small team. ParentVeda answers that from the raw table; the employer does
+not get it at all.
+
+Still open: the **product-side analysis surfaces**. The queries are written at
+the bottom of `0065` (weekly actives, median session, retention cohorts) but
+nothing renders them — they are run by hand in the SQL editor. That is fine
+until it isn't.
+
+### Original text, kept because the reasoning is still half-right
 
 The sponsor dashboard ships with **activation, seats and consultations**, all
 derivable from real tables. Not available, and asked for:
@@ -714,12 +816,18 @@ product has is a bug surface.
   is `remove_sponsor_member()`, a separate deliberate act. That separation is
   intentional — a benefit should not vanish because someone edited a
   spreadsheet — but it means a leaver keeps access until someone acts.
-* **Nothing reconciles a re-uploaded sheet.** Uploading a new CSV adds and
-  updates rows; it does not mark the people who disappeared from it as revoked.
-  Today that is a manual comparison. The fix is a small function that diffs an
-  upload against the current roster and reports what it would revoke before
-  doing it — deliberately not automatic, because "the CSV was truncated" and
-  "forty people left" look identical to a database.
+* ~~**Nothing reconciles a re-uploaded sheet.**~~ Built in `0064`, as two
+  functions on purpose: `sponsor_roster_stale(sponsor, latest_batch)` reports
+  what *would* be revoked and how many of those people are currently using the
+  benefit; `sponsor_roster_revoke(sponsor, emails[], actor)` acts on an
+  **explicit list**. It takes the addresses rather than recomputing the diff, so
+  the thing approved and the thing done are the same thing. Set `import_batch`
+  on every CSV upload or the diff has nothing to compare against.
+
+  Deliberately never automatic: *"forty people left"* and *"the CSV was
+  truncated"* are identical input, and only a person can tell which. **When two
+  very different intentions produce the same bytes, do not infer the
+  intention.**
 
 ## 11.5 Company-uploaded resources are third-party content in a health product
 
@@ -766,7 +874,40 @@ The rejected alternative was returning the real code from
 looking like it still has it — which is worse than absent, because it would be
 trusted.
 
-## 11.7 The sponsored consultation credit is granted client-side
+## 11.7 The sponsored consultation credit is granted client-side — FIXED (0066)
+
+**Update 2026-07-30.** Credits are a server-side ledger. `book_slot()` claims a
+real row or records the booking as `unpaid`; a client can no longer mint one.
+
+The questions this forced answers to are the fixed ones — the answers may
+change, the questions will not:
+
+| Question | Answer taken | Where |
+|---|---|---|
+| Counter or ledger? | **Ledger. One row is one credit.** Nothing adds or subtracts, so there is no race to lose | `consult_credits` |
+| Double-spend? | A unique partial index on `booking_id`. Impossible, not unlikely | `consult_credits_booking_idx` |
+| Replay / re-sync? | `(user_id, grant_key, seq)` unique. Granting twice grants once | `grant_consult_credits` |
+| Cancellation? | Credit returns if cancelled **≥ 4h** before; spent otherwise. Config row | `booking_policy.credit_return_hours` |
+| Leaver? | **Unspent voided, booked and attended untouched** | `void_consult_credits` |
+| Unpaid booking? | Allowed, and **recorded as `unpaid`**. Enforcement is one condition away | `booking_bookings.paid_by` |
+| How does the server know a consult from a class? | **`capacity = 1`** — a number it already holds and already trusts | `book_slot` |
+
+Still open:
+
+* **Referral rewards still grant locally.** `ReferralStore` calls
+  `grantFloatingCredit()`; it should call `grant_consult_credits(..., 'referral',
+  <reward id>)` server-side when a reward qualifies. The ledger is already the
+  right shape; this is a two-hour job and the same hole, one source over.
+* **No money moves.** A purchase becomes
+  `grant_consult_credits(..., 'purchase', <razorpay payment id>)`. That is why
+  this was built now rather than twice.
+* **`paid_by = 'unpaid'` is not refused.** Deliberate: payments are stubbed and
+  refusing today would break every existing booking. Flip it when Razorpay lands.
+* **A scoped credit for a multi-seat offering cannot be spent** — the
+  `capacity = 1` test blocks it. Nothing grants one yet; a bought class pack
+  would need the exact-scope case exempting.
+
+### Original text
 
 `SponsorBenefits.sync()` mints the floating credit in `BookingStore` once the
 server confirms the capability. The credit is therefore a **local** fact:

@@ -1,79 +1,88 @@
 // =============================================================================
-//  SponsorBenefits — turning a capability into the thing it promises.
+//  SponsorBenefits — keeping the phone's copy honest about what the server says.
 // -----------------------------------------------------------------------------
-//  An entitlement says "this user may have a sponsored consultation". A
-//  consultation is booked against a CREDIT. Something has to bridge the two,
-//  and this is deliberately the whole of it.
+//  THIS FILE USED TO MINT CREDITS. It called
+//  BookingStore.grantFloatingCredit() when a sponsor appeared, which meant the
+//  phone decided how many consultations somebody had and the server never
+//  checked. Migration 0066 moved the ledger server-side, so the direction of
+//  travel has reversed:
 //
-//  IT REUSES THE REFERRAL CREDIT. BookingStore.grantFloatingCredit() already
-//  mints "a free consultation, with whoever you like" — built for referral
-//  rewards, minted against kAnyConsultOffering. An enterprise credit is the
-//  same fact with a different payer, so it uses the same counter.
+//      before   the phone granted, and the server trusted it
+//      after    the server grants, and the phone mirrors it
 //
-//  Inventing a second one is the tempting alternative and it is a trap: two
-//  counters disagree the first time someone holds both, and then the question
-//  "how many free consultations does she have left" has two answers and no
-//  authority. Same rule that made programmes mirror into booking_slots rather
-//  than count seats separately.
+//  It still writes into BookingStore, and that is deliberate rather than
+//  leftover. The booking UI reads entitlements from there to decide whether to
+//  show "Book with your credit" or "Pay" — rewiring every one of those call
+//  sites to a second source would be a large change for no gain, and would
+//  leave two places answering "can she book this".
 //
-//  IDEMPOTENCE IS THE WHOLE DESIGN. The credit id is derived from the sponsor
-//  id, so this can run on every notification from EntitlementStore — every app
-//  launch, every refresh, every reconnect — and still grant exactly one. That
-//  is what lets it be attached to a listener instead of carefully called once.
+//  So BookingStore stays the one thing screens ask, and this keeps its answer
+//  equal to the server's. The important part is what that local row now IS: a
+//  rendering hint. book_slot() claims a real row from consult_credits or
+//  records the booking as unpaid, so a phone that says 99 gains nothing.
 //
-//  ⚠️ KNOWN GAP, stated rather than hidden. This grants the credit CLIENT-SIDE,
-//  exactly as the referral reward does, and book_slot() does not yet check an
-//  entitlement server-side. So the credit is currently a local fact. It is
-//  recorded in STILL-OPEN §11.7; the fix is a check inside book_slot(), not a
-//  better client. Nothing here should be read as a boundary.
+//  > When you move an authority, do not also move every reader. Keep the
+//  > interface screens already use and make it a mirror — otherwise a security
+//  > fix becomes a refactor, and refactors are where the bugs are.
 // =============================================================================
 
 import '../booking/booking_store.dart';
+import 'credits_store.dart';
 import 'entitlement_store.dart';
 
 class SponsorBenefits {
   const SponsorBenefits._();
 
-  /// How many consultations a sponsored parent gets. One, for now, and it
-  /// lives here rather than in the database because it is the same for every
-  /// sponsor today — the day a plan disagrees, it becomes a column on `plans`
-  /// and this constant goes. Registering the variation before there is any is
-  /// the config-object mistake CLAUDE.md warns about.
-  static const int consultationsPerActivation = 1;
-
-  /// Keep the booking side in step with what the server says this user holds.
+  /// What a sponsored activation is worth, and the number HR is told.
   ///
-  /// Safe to call any number of times.
+  /// Duplicated from `0067`, which is the authority — this exists so a screen
+  /// can say "1 of 2 left" without a round trip. If they disagree, the server
+  /// is right; the test in `sponsor_enterprise_test.dart` pins them together.
+  static const int consultationsPerActivation = 2;
+
+  /// Make the local entitlement equal the server's count.
+  ///
+  /// Safe to call any number of times: the credit id is derived from the
+  /// sponsor, so this is an upsert rather than a grant.
   static void sync() {
     final ent = EntitlementStore.instance;
     final sponsor = ent.sponsor;
     if (sponsor == null) return;
     if (!ent.can(Caps.consultationCredit)) return;
 
-    BookingStore.instance.grantFloatingCredit(
-      // Derived from the sponsor, so re-activating, re-installing or simply
-      // launching the app again all resolve to the one credit.
+    // THE SERVER'S NUMBER, not a constant. If a credit was spent, voided or
+    // expired, the phone must stop advertising it — the old version granted a
+    // fixed 1 forever and would have shown a credit that no longer existed,
+    // which is the worst of both: a button that fails at the last step.
+    final available = CreditsStore.instance.available;
+
+    // MIRROR, not grant. grantFloatingCredit() is grant-once by design — it
+    // returns the existing row untouched, so it can only ever count upward and
+    // a spent credit would stay on screen forever. mirrorFloatingCredit() sets
+    // the number, and removes the row at zero.
+    BookingStore.instance.mirrorFloatingCredit(
       sourceId: 'sponsor_${sponsor.id}',
       title: 'Consultation, provided by ${sponsor.name}',
-      credits: consultationsPerActivation,
-      // A year rather than the referral reward's 90 days: this one is tied to
-      // an annual contract, and expiring it mid-term would take away something
-      // the employer has already paid for.
+      credits: available,
+      // A year, matching booking_policy.default_validity_days. Tied to an
+      // annual contract; expiring it mid-term would take away something the
+      // employer has already paid for.
       validFor: const Duration(days: 365),
     );
   }
 
   static bool _attached = false;
 
-  /// Run [sync] whenever entitlements change. Called once from main().
+  /// Mirror whenever either side changes. Called once from main().
   ///
-  /// A listener rather than a single call at startup because the entitlement
-  /// fetch is asynchronous — calling once during boot would usually run before
-  /// the answer arrived, and the credit would appear a launch late.
+  /// Listens to BOTH stores: the entitlement tells us there is a sponsor at
+  /// all, and the credit count tells us how many. Either arriving first is
+  /// fine, because sync() is idempotent and reads both.
   static void attach() {
     if (_attached) return;
     _attached = true;
     EntitlementStore.instance.addListener(sync);
+    CreditsStore.instance.addListener(sync);
     sync();
   }
 }

@@ -175,6 +175,61 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     return e;
   }
 
+  /// MAKE the local floating credit for [sourceId] equal [credits].
+  ///
+  /// Not a grant — a mirror. [grantFloatingCredit] is deliberately grant-once:
+  /// it returns the existing row untouched, because minting a referral reward
+  /// twice is how a referral system gives away unlimited credit.
+  ///
+  /// That is exactly wrong for a copy of a server-side number (0066). A credit
+  /// that has been spent, voided or has expired must stop being advertised, and
+  /// a grant-once helper can only ever count upward — leaving a Book button on
+  /// screen that fails at the last step, which is worse than never offering it.
+  ///
+  /// So: sets the total, and REMOVES the row at zero. Passing 0 is meaningful
+  /// here and refused there, which is the whole difference between the two.
+  void mirrorFloatingCredit({
+    required String sourceId,
+    required String title,
+    required int credits,
+    Duration? validFor = const Duration(days: 365),
+    DateTime? at,
+  }) {
+    final id = 'ent_gift_$sourceId';
+    final existing = _entitlements[id];
+
+    if (credits <= 0) {
+      if (existing == null) return;
+      _entitlements.remove(id);
+      _save();
+      notifyListeners();
+      return;
+    }
+
+    if (existing != null &&
+        existing.creditsTotal == credits &&
+        existing.creditsUsed == 0) {
+      return; // already correct — do not churn listeners on every launch
+    }
+
+    final now = (at ?? DateTime.now()).toUtc();
+    _entitlements[id] = Entitlement(
+      id: id,
+      offeringId: kAnyConsultOffering,
+      stage: ServiceStage.pregnancy,
+      title: title,
+      creditsTotal: credits,
+      // Always zero: "how many are left" is the server's answer now, and
+      // tracking spends locally as well would create a second number that
+      // disagrees with it the first time a booking is cancelled.
+      creditsUsed: 0,
+      purchasedUtc: existing?.purchasedUtc ?? now,
+      expiresUtc: validFor == null ? null : now.add(validFor),
+    );
+    _save();
+    notifyListeners();
+  }
+
   /// Record a purchase. Mints an entitlement from the offering's grant. (The
   /// real charge happens before this once payments are live; for now it is the
   /// purchase.) Returns the new entitlement.

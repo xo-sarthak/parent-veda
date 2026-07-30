@@ -38,7 +38,9 @@ import 'screens/splash_screen.dart';
 import 'services/app_shell.dart';
 import 'services/baby_voice_service.dart';
 import 'services/entitlement_store.dart';
+import 'services/credits_store.dart';
 import 'services/sponsor_benefits.dart';
+import 'services/usage_events.dart';
 import 'services/product_catalog_store.dart';
 import 'services/programme_store.dart';
 import 'services/read_store.dart';
@@ -98,7 +100,8 @@ class ParentVedaApp extends StatefulWidget {
   State<ParentVedaApp> createState() => _ParentVedaAppState();
 }
 
-class _ParentVedaAppState extends State<ParentVedaApp> {
+class _ParentVedaAppState extends State<ParentVedaApp>
+    with WidgetsBindingObserver {
   // The single controller for the Week-on-Week Card Stack. It loads the
   // bundled content and derives the current week from a placeholder due date.
   late final PregnancyController _controller;
@@ -112,6 +115,15 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
   @override
   void initState() {
     super.initState();
+    // ENGAGEMENT MEASUREMENT (0065). A session starts when the app does and
+    // ends when it goes to the background, which is the only definition of
+    // "session" a phone actually supports — there is no close button.
+    //
+    // Tied to the lifecycle here rather than to a screen because a screen can
+    // be replaced (the whole app swaps shells between stages) and the session
+    // would restart every time, doubling every count.
+    WidgetsBinding.instance.addObserver(this);
+    UsageEvents.instance.startSession();
     _controller = PregnancyController();
     // Kick off the async content load; the screen shows a loader until ready.
     _controller.load();
@@ -224,6 +236,9 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
     // Supabase; a signed-out user resolves to nothing, exactly like an
     // uninitialised backend.
     EntitlementStore.instance.ensureLoaded();
+    // How many consultations she may book, per the SERVER (0066). Was a number
+    // on the phone until then, which meant the phone decided.
+    CreditsStore.instance.ensureLoaded();
     // ...and turn what she holds into the thing it promises. A listener, not a
     // call: the entitlement fetch is asynchronous, so a one-shot here would
     // usually run before the answer arrived and the sponsored consultation
@@ -293,10 +308,27 @@ class _ParentVedaAppState extends State<ParentVedaApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    UsageEvents.instance.endSession();
     _controller.dispose();
     _home.dispose();
     _father.dispose();
     super.dispose();
+  }
+
+  @override
+  /// `paused` is the closest a phone gets to "closed", and `resumed` to
+  /// "opened". `detached` is deliberately NOT used to end a session: on Android
+  /// it often never fires, so a session ended only there would never be timed
+  /// at all and every duration would be missing.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      UsageEvents.instance.endSession();
+    } else if (state == AppLifecycleState.resumed) {
+      UsageEvents.instance.startSession();
+    }
   }
 
   @override

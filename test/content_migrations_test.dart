@@ -64,6 +64,10 @@ void main() {
     'plan_capabilities': 'the entitlement matrix itself',
     'sponsors': 'organisations sponsoring a plan — ops manages these',
     'sponsor_domains': 'the eligibility rule; NOT public-read (a customer list)',
+    'booking_policy': 'the cancellation window and default credit validity '
+        '(0066) — select+update only. A row because it is a policy: how long '
+        'before a session a cancellation still returns the credit is a '
+        'business decision, not a constant',
     'public_email_domains': 'the consumer-provider block list (0062) — ops may '
         'ADD to it when a customer\'s staff use a provider not listed, but '
         'note there is deliberately no delete grant: removing gmail.com from '

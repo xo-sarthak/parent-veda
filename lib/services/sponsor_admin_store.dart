@@ -139,17 +139,66 @@ class SponsorDashboard {
   }
 }
 
+/// One month of history. Behavioural fields are null when THAT MONTH's cohort
+/// was too small — a stricter test than the dashboard's, because a programme of
+/// 40 can still have a month with three people in it.
+@immutable
+class SponsorTrendPoint {
+  const SponsorTrendPoint({
+    required this.month,
+    required this.activatedInMonth,
+    required this.activatedCumulative,
+    this.consultationsBooked,
+  });
+
+  final DateTime month;
+  final int activatedInMonth;
+  final int activatedCumulative;
+  final int? consultationsBooked;
+
+  static SponsorTrendPoint? fromMap(Map<String, dynamic> m) {
+    final d = DateTime.tryParse((m['month'] ?? '').toString());
+    if (d == null) return null;
+    int? i(Object? v) =>
+        v == null ? null : (v is num ? v.toInt() : int.tryParse(v.toString()));
+    return SponsorTrendPoint(
+      month: d,
+      activatedInMonth: i(m['activated_in_month']) ?? 0,
+      activatedCumulative: i(m['activated_cumulative']) ?? 0,
+      consultationsBooked: i(m['consultations_booked']),
+    );
+  }
+}
+
 class SponsorAdminStore extends ChangeNotifier {
   SponsorAdminStore._();
   static final SponsorAdminStore instance = SponsorAdminStore._();
 
   SponsorDashboard? _dashboard;
+  List<SponsorTrendPoint> _trend = const [];
   List<SponsorMemberRow> _roster = const [];
   bool _loading = false;
   bool _everLoaded = false;
   String? _error;
 
   SponsorDashboard? get dashboard => _dashboard;
+
+  /// Oldest month first. Empty until the first refresh, or when not an admin.
+  List<SponsorTrendPoint> get trend => List.unmodifiable(_trend);
+
+  /// The change in take-up against the same figure three months ago — the one
+  /// number that turns a snapshot into an argument.
+  ///
+  /// Null when there is not enough history to say, rather than 0: "no change"
+  /// and "we have only been running a month" are different facts, and only one
+  /// of them is worth putting on a slide.
+  int? get activationChange3m {
+    if (_trend.length < 4) return null;
+    final now = _trend.last.activatedCumulative;
+    final then = _trend[_trend.length - 4].activatedCumulative;
+    return now - then;
+  }
+
   List<SponsorMemberRow> get roster => List.unmodifiable(_roster);
   bool get loading => _loading;
   bool get everLoaded => _everLoaded;
@@ -192,8 +241,23 @@ class SponsorAdminStore extends ChangeNotifier {
             .map((e) => SponsorMemberRow.fromMap(
                 (e as Map).cast<String, dynamic>()))
             .toList();
+
+        // History is a separate call and deliberately not fatal: it is the
+        // nice-to-have on this screen, and a sponsor whose trend query fails
+        // should still see their take-up rather than an error page.
+        try {
+          final t = await client.rpc('sponsor_trend', params: {'p_months': 12});
+          _trend = ((t as List?) ?? const [])
+              .map((e) =>
+                  SponsorTrendPoint.fromMap((e as Map).cast<String, dynamic>()))
+              .whereType<SponsorTrendPoint>()
+              .toList();
+        } catch (_) {
+          _trend = const [];
+        }
       } else {
         _roster = const [];
+        _trend = const [];
       }
     } catch (e) {
       _error = 'We could not load your programme just now.';
@@ -225,9 +289,14 @@ class SponsorAdminStore extends ChangeNotifier {
   }
 
   @visibleForTesting
-  void setForTest({SponsorDashboard? dashboard, List<SponsorMemberRow>? roster}) {
+  void setForTest({
+    SponsorDashboard? dashboard,
+    List<SponsorMemberRow>? roster,
+    List<SponsorTrendPoint>? trend,
+  }) {
     _dashboard = dashboard;
     _roster = roster ?? const [];
+    _trend = trend ?? const [];
     _everLoaded = true;
     _loading = false;
     notifyListeners();

@@ -24,7 +24,12 @@ email, Premium appears, and HR can see uptake.
 > | Credit bridge (reuses `grantFloatingCredit`) | `lib/services/sponsor_benefits.dart`, attached in `main.dart` |
 > | HR stats reader | `lib/services/sponsor_admin_store.dart` |
 > | Eligibility roster (the sheet HR sends) | `0061` — `sponsor_eligible_people`, CSV-imported via Directus |
-> | 50 tests | `test/sponsor_enterprise_test.dart` |
+> | Consumer-domain guard | `0062` — `gmail.com` can never be a sponsor domain |
+> | Monthly trend, no snapshot table | `0063` — `sponsor_trend()`, derived from `activated_at` |
+> | Roster reconcile — report, then act | `0064` — `sponsor_roster_stale()` / `sponsor_roster_revoke()` |
+> | Engagement measurement | `0065` — `usage_events` (insert-only) + `sponsor_engagement()`; `lib/services/usage_events.dart` |
+> | Web portal (login / dashboard / people / report) | `C:\parentveda-web` → `src/app/portal/` |
+> | 74 tests | `test/sponsor_enterprise_test.dart` |
 > | SQL verification | `supabase/seed/verify_sponsor_gates.sql` |
 >
 > **To demo:** run `0059`, `0060`, then `supabase/seed/sponsor_demo.sql`.
@@ -37,7 +42,7 @@ email, Premium appears, and HR can see uptake.
 > events/resources have no audience scope). The design reasoning is written up
 > in `BACKEND-PATTERNS` §10.
 >
-> **Next free migration number is `0062`.**
+> **Next free migration number is `0066`.**
 >
 > **How a customer is onboarded, end to end:** create the `sponsors` row →
 > import their staff sheet into `sponsor_eligible_people` (Directus CSV

@@ -25,10 +25,26 @@ import 'package:parentveda/booking/booking_models.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/screens/enterprise/enterprise_common.dart';
+import 'package:parentveda/services/credits_store.dart';
 import 'package:parentveda/services/entitlement_store.dart';
 import 'package:parentveda/services/sponsor_admin_store.dart';
 import 'package:parentveda/services/sponsor_benefits.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// Strip comment lines before asserting that something is ABSENT.
+///
+/// Written once, after getting it wrong three times. These migrations explain
+/// the columns and flags they deliberately do NOT have — an `eligibility_mode`
+/// that was rejected, an `email_confirmed_at` that cannot be trusted, a
+/// `question` column that must never exist. A naive `isNot(contains(...))` then
+/// fails on the very files that documented the decision best, which is exactly
+/// the wrong incentive: it rewards writing code nobody explained.
+///
+/// Absence tests must read the CODE. Presence tests can read the whole file.
+String codeOnly(String source, {String marker = '--'}) => source
+    .split('\n')
+    .where((l) => !l.trimLeft().startsWith(marker))
+    .join('\n');
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -60,14 +76,8 @@ void main() {
       // two of which nobody would ever pick. A config that can express more
       // states than the product has is a bug surface, not flexibility.
       //
-      // Comments are stripped first, because the migration DISCUSSES the
-      // column it decided against — and a test that cannot tell an
-      // implementation from an explanation of why there isn't one will fail
-      // on well-documented code, which is the wrong incentive.
-      final code = rosterSql
-          .split('\n')
-          .where((l) => !l.trimLeft().startsWith('--'))
-          .join('\n');
+      // See codeOnly(): the migration DISCUSSES the column it decided against.
+      final code = codeOnly(rosterSql);
       expect(
         RegExp(r'eligibility_mode', caseSensitive: false).hasMatch(code),
         isFalse,
@@ -463,43 +473,62 @@ void main() {
         .firstWhere((e) => true, orElse: () => null);
 
     test('no sponsor, no credit', () {
+      CreditsStore.instance.setForTest(available: 2);
       SponsorBenefits.sync();
       expect(sponsored(), isNull);
     });
 
-    test('a sponsor WITHOUT the capability grants nothing', () {
+    test('a sponsor WITHOUT the capability mirrors nothing', () {
       // The capability is the fact that decides, not the sponsorship. A plan
       // that does not include consultations must not quietly include them.
       EntitlementStore.instance.setForTest(
         capabilities: const {Caps.sponsorEvents},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
+      CreditsStore.instance.setForTest(available: 2);
       SponsorBenefits.sync();
       expect(sponsored(), isNull);
     });
 
-    test('an activated sponsor grants exactly one spendable credit', () {
+    test('the local copy equals the SERVER count, never a constant', () {
+      // 0066 moved the ledger server-side. If this mirrored a fixed number, a
+      // credit that had been spent, voided or expired would still be
+      // advertised — a button that fails at the last step, which is worse than
+      // one that was never offered.
       EntitlementStore.instance.setForTest(
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
+      CreditsStore.instance.setForTest(available: 2);
       SponsorBenefits.sync();
 
       final e = sponsored();
       expect(e, isNotNull);
-      expect(e!.creditsLeft, SponsorBenefits.consultationsPerActivation);
+      expect(e!.creditsLeft, 2);
       // Floating: "a free consultation" is not a promise about who with.
       expect(e.offeringId, kAnyConsultOffering);
     });
 
-    test('syncing on every launch still grants once — the listener case', () {
-      // This runs on every notification from EntitlementStore. If it were not
-      // idempotent, a sponsored parent would accumulate free consultations by
-      // opening the app.
+    test('a server count of zero advertises nothing', () {
       EntitlementStore.instance.setForTest(
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
+      CreditsStore.instance.setForTest(available: 0);
+      SponsorBenefits.sync();
+      expect(sponsored(), isNull,
+          reason: 'a spent or expired credit must stop being shown.');
+    });
+
+    test('syncing on every launch still mirrors once — the listener case', () {
+      // This runs on every notification from BOTH stores. If it were not
+      // idempotent, a sponsored parent would accumulate rows by opening the
+      // app — which no longer grants anything, but would still lie on screen.
+      EntitlementStore.instance.setForTest(
+        capabilities: const {Caps.consultationCredit},
+        sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
+      );
+      CreditsStore.instance.setForTest(available: 2);
       for (var i = 0; i < 25; i++) {
         SponsorBenefits.sync();
       }
@@ -508,19 +537,36 @@ void main() {
           .where((e) => e.id.startsWith('ent_gift_sponsor_'))
           .toList();
       expect(all.length, 1);
-      expect(all.single.creditsLeft, SponsorBenefits.consultationsPerActivation);
+      expect(all.single.creditsLeft, 2);
     });
 
-    test('the credit outlives a 90-day referral reward', () {
-      // It is tied to an annual contract; expiring it mid-term would take away
+    test('the local mirror outlives a 90-day referral reward', () {
+      // Tied to an annual contract; expiring it mid-term would take away
       // something the employer has already paid for.
       EntitlementStore.instance.setForTest(
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
+      CreditsStore.instance.setForTest(available: 2);
       SponsorBenefits.sync();
       final e = sponsored()!;
       expect(e.expiresUtc!.difference(e.purchasedUtc).inDays, greaterThan(300));
+    });
+
+    test('the app constant and the migration agree on how many', () {
+      // Two places say "2": SponsorBenefits, so a screen can render "1 of 2"
+      // without a round trip, and 0067, which is the authority. They must not
+      // drift — a screen saying "1 of 3" is a promise the server will refuse.
+      final benefit =
+          File('supabase/migrations/0067_employer_benefit_contents.sql')
+              .readAsStringSync();
+      expect(
+        benefit,
+        contains("v_uid, ${SponsorBenefits.consultationsPerActivation}, "
+            "'sponsor'"),
+        reason: 'SponsorBenefits.consultationsPerActivation and the grant in '
+            '0067 must be the same number.',
+      );
     });
   });
 
@@ -680,13 +726,8 @@ void main() {
       // disabled", two opposite facts sharing one value. Branching on it
       // would let anyone who signs up as priya@acme.com take Acme's benefit.
       //
-      // Comments stripped first: the file EXPLAINS the column it refuses to
-      // use, and a check that cannot tell an implementation from a warning
-      // about one fails on well-documented code.
-      final code = flow
-          .split('\n')
-          .where((l) => !l.trimLeft().startsWith('//'))
-          .join('\n');
+      // See codeOnly(): the file EXPLAINS the column it refuses to use.
+      final code = codeOnly(flow, marker: '//');
       expect(code.contains('email_confirmed_at'), isFalse,
           reason: 'that column is not evidence of anything while email '
               'confirmation is off.');
@@ -719,6 +760,222 @@ void main() {
           File('lib/services/sponsor_admin_store.dart').readAsStringSync();
       expect(store.contains("import 'package:shared_preferences"), isFalse,
           reason: 'a roster of employees must not be written to a phone.');
+    });
+  });
+
+  // ===========================================================================
+  //  7. Trend, reconcile and engagement (0063 / 0064 / 0065)
+  // ===========================================================================
+  group('history is derived, never a second copy', () {
+    final trendSql =
+        File('supabase/migrations/0063_sponsor_trend.sql').readAsStringSync();
+
+    test('no snapshot table was added', () {
+      // Both facts already carry the moment they happened, so history is a
+      // query. A snapshot table would be a second copy of a fact that already
+      // has an owner — the defect shape this repo has hit before.
+      expect(
+        RegExp(r'create table[^;]*sponsor_stats', dotAll: true)
+            .hasMatch(trendSql),
+        isFalse,
+      );
+      expect(trendSql, contains("date_trunc('month', sm.activated_at)"));
+    });
+
+    test('months are generated, so an empty month is a zero not a gap', () {
+      // A gap in a chart reads as "no data"; a zero reads as "nothing
+      // happened", and only one of those is what we mean.
+      expect(trendSql, contains('generate_series'));
+    });
+
+    test('suppression is per MONTH, stricter than the dashboard', () {
+      // 40 activated people passes any whole-programme test, but a month in
+      // which 3 of them booked is still 3 identifiable people.
+      expect(trendSql, contains('count(distinct b.user_id)'));
+      expect(trendSql, contains('coalesce(bk.people, 0) < v_min'));
+    });
+
+    test('the company still comes from the session', () {
+      expect(trendSql, contains('public.my_sponsor_admin_id()'));
+      expect(
+        RegExp(r'sponsor_trend\([^)]*p_sponsor').hasMatch(trendSql),
+        isFalse,
+      );
+    });
+  });
+
+  group('a re-uploaded sheet is reported before it is obeyed', () {
+    final rec = File('supabase/migrations/0064_roster_reconcile.sql')
+        .readAsStringSync();
+
+    test('looking and acting are two separate functions', () {
+      // "40 people left" and "the CSV was truncated" are identical input.
+      // When two very different intentions produce the same bytes, do not
+      // infer the intention — report, and make someone say yes.
+      expect(rec, contains('function public.sponsor_roster_stale'));
+      expect(rec, contains('function public.sponsor_roster_revoke'));
+    });
+
+    test('acting takes an explicit list, never a recomputed diff', () {
+      // Recomputing would silently include whatever changed between looking
+      // and confirming — approving one number and applying another.
+      expect(rec, contains('p_emails     text[]'));
+      expect(rec, contains('work_email = any (v_list)'));
+    });
+
+    test('the preview surfaces how many are ACTIVE — the warning sign', () {
+      expect(rec, contains('is_active'));
+      expect(rec, contains('order by 4 desc'));
+    });
+
+    test('revoking eligibility never removes a live benefit', () {
+      expect(rec, contains('still_active'));
+      expect(rec, contains('keep it until removed individually'));
+      expect(rec.contains('perform public.remove_sponsor_member'), isFalse,
+          reason: 'losing access mid-pregnancy is not a row change to the '
+              'person it happens to.');
+    });
+
+    test('neither is callable by an app session', () {
+      for (final fn in const [
+        'sponsor_roster_stale',
+        'sponsor_roster_revoke'
+      ]) {
+        expect(
+          RegExp('revoke execute on function\\s+public\\.$fn', dotAll: true)
+              .hasMatch(rec),
+          isTrue,
+          reason: '$fn enumerates or edits a customer staff list.',
+        );
+      }
+    });
+  });
+
+  group('engagement is measured without becoming surveillance', () {
+    final usageSql =
+        File('supabase/migrations/0065_usage_events.sql').readAsStringSync();
+    final dart = File('lib/services/usage_events.dart').readAsStringSync();
+
+    test('the log is insert-only — no client can read it back', () {
+      expect(usageSql, contains('grant insert on public.usage_events'));
+      expect(
+        RegExp(r'grant[^;]*select[^;]*on\s+public\.usage_events\s',
+                caseSensitive: false, dotAll: true)
+            .hasMatch(usageSql),
+        isFalse,
+        reason: 'a select grant makes the behavioural log downloadable.',
+      );
+      expect(
+        RegExp(r'create policy[^;]*on public\.usage_events[^;]*for select',
+                caseSensitive: false, dotAll: true)
+            .hasMatch(usageSql),
+        isFalse,
+      );
+    });
+
+    test('a client cannot log events against someone else', () {
+      // A grant says WHICH TABLE; a policy says WHICH ROWS. Both are needed.
+      expect(usageSql, contains('with check (auth.uid() = user_id)'));
+    });
+
+    test('there is nowhere to put content, on either side', () {
+      // "She opened Ask Veda" is a product metric. "She asked about bleeding
+      // at week 9" is a medical record. The second must be impossible rather
+      // than merely discouraged.
+      final createStmt = codeOnly(RegExp(
+              r'create table if not exists public\.usage_events \((.*?)\n\);',
+              dotAll: true)
+          .firstMatch(usageSql)!
+          .group(1)!);
+      for (final banned in const [
+        'query',
+        'question',
+        'search',
+        'article',
+        'document',
+        'answer'
+      ]) {
+        expect(createStmt.contains(banned), isFalse,
+            reason: 'no column may hold a $banned.');
+      }
+    });
+
+    test('the surface vocabulary is closed', () {
+      // An open one becomes where somebody puts an article slug in six
+      // months, and by then the log has content in it.
+      expect(dart, contains('static const all = <String>{'));
+      expect(dart, contains('UsageSurface.all.contains(surface)'));
+    });
+
+    test('it is never granted to the CMS', () {
+      expect(
+        RegExp(r'grant[^;]*on\s+public\.usage_events\s+to\s+directus_cms',
+                caseSensitive: false, dotAll: true)
+            .hasMatch(usageSql),
+        isFalse,
+      );
+    });
+
+    test('it expires', () {
+      // A log with no retention limit is a liability that grows on its own.
+      expect(usageSql, contains('function public.prune_usage_events'));
+      expect(usageSql, contains('greatest(coalesce(p_keep_days, 400), 30)'));
+    });
+
+    test('a wild client clock cannot drag the average', () {
+      expect(usageSql, contains('usage_events_duration_sane'));
+    });
+
+    test('the sponsor view offers no per-surface breakdown', () {
+      // "Your people spend their time in Health" narrows down who is worried
+      // about what in a small team.
+      final fn = usageSql
+          .substring(usageSql.indexOf('function public.sponsor_engagement'));
+      expect(fn.contains('u.surface'), isFalse,
+          reason: 'a sponsor gets totals, never a breakdown by section.');
+    });
+  });
+
+  group('the event stream is wired', () {
+    final main = File('lib/main.dart').readAsStringSync();
+
+    test('a session follows the app lifecycle, not a screen', () {
+      // A screen can be replaced — the app swaps shells between stages — and
+      // the session would restart each time, doubling every count.
+      expect(main, contains('WidgetsBindingObserver'));
+      expect(main, contains('UsageEvents.instance.startSession()'));
+      expect(main, contains('didChangeAppLifecycleState'));
+    });
+
+    test('screens are recorded on the tap, not in build()', () {
+      // build() runs on every rebuild; a language toggle would otherwise look
+      // like a hundred screen views.
+      final scaffold =
+          File('lib/screens/main_scaffold.dart').readAsStringSync();
+      expect(scaffold, contains('UsageEvents.instance.screen('));
+      expect(scaffold, contains('_pregnancySurfaces'));
+    });
+  });
+
+  group('the trend reaches the screen', () {
+    final store =
+        File('lib/services/sponsor_admin_store.dart').readAsStringSync();
+
+    test('the store fetches it and the dashboard renders it', () {
+      final screen =
+          File('lib/screens/enterprise/sponsor_dashboard_screen.dart')
+              .readAsStringSync();
+      expect(store, contains("client.rpc('sponsor_trend'"));
+      expect(screen, contains('_TrendStrip'));
+      // Not fatal: a sponsor whose trend query fails should still see their
+      // take-up rather than an error page.
+      expect(store, contains('_trend = const [];'));
+    });
+
+    test('no change and no history are different answers', () {
+      expect(store, contains('if (_trend.length < 4) return null;'),
+          reason: '"level with last quarter" and "we have only been running a '
+              'month" must not both render as 0.');
     });
   });
 }

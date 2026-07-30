@@ -24,16 +24,30 @@
 //  consultations" concludes the benefit is failing, which is the opposite of
 //  what the data says.
 //
-//  ⚠️ NOT HERE, AND CANNOT BE: average time in the app. It needs a per-user
-//  usage event stream this product deliberately does not build — profile_events
-//  is anonymous by construction. Telling a sponsor plainly that we do not
-//  measure it is better than building the thing we promise not to.
+//  TREND, NOT JUST A SNAPSHOT. `sponsor_trend()` (0063) derives monthly history
+//  from `activated_at` and `booking_bookings.created_at` — no snapshot table,
+//  because both facts already carry the moment they happened and a second copy
+//  can drift from the first. Cumulative rather than per-month: per-month
+//  activations collapse the instant onboarding finishes, which reads as failure
+//  when it is success.
+//
+//  ⚠️ ENGAGEMENT IS MEASURED NOW, and this comment used to say it never would
+//  be. `usage_events` (0065) records session shape per user, and
+//  `sponsor_engagement()` exposes monthly totals with the same suppression.
+//  The earlier position — do not measure, because the rows are a liability —
+//  was wrong: there is no technical reason a per-user measurement cannot be
+//  exposed only as an aggregate, which is what this file has always done for
+//  consultations. What DOES still hold is that no per-surface breakdown is
+//  offered to a sponsor: "your people spend their time in Health" narrows down
+//  who is worried about what in a small team. That question is answered for
+//  ParentVeda from the raw table, never for the employer.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/sponsor_admin_store.dart';
+import '../../services/usage_events.dart';
 import '../../theme/app_theme.dart';
 import 'enterprise_common.dart';
 
@@ -53,6 +67,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
   void initState() {
     super.initState();
     SponsorAdminStore.instance.refresh();
+    UsageEvents.instance.screen(UsageSurface.sponsorProgramme);
   }
 
   String _p(String en, String hi) => ep(widget.lang, en, hi);
@@ -190,6 +205,14 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                   style: t.bodySmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
+              // TREND. "35%" is a number; "35%, up 6 since April" is the
+              // sentence HR repeats upward. Rendered only when there is
+              // enough history to mean something — three months of nothing
+              // dressed as a chart is worse than no chart.
+              if (store.trend.length >= 4) ...[
+                const SizedBox(height: 16),
+                _TrendStrip(points: store.trend, label: _trendLabel(store)),
+              ],
             ],
           ),
         ),
@@ -313,6 +336,25 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
             _rosterRow(r),
       ],
     );
+  }
+
+  String _trendLabel(SponsorAdminStore store) {
+    final change = store.activationChange3m;
+    if (change == null) {
+      return _p('Take-up so far', 'Ab tak ka take-up');
+    }
+    if (change > 0) {
+      return _p('Up $change since three months ago',
+          'Teen mahine pehle se $change zyada');
+    }
+    if (change == 0) {
+      return _p('Level with three months ago',
+          'Teen mahine pehle jitna hi');
+    }
+    // Shown as plainly as growth is. A dashboard that only narrates good news
+    // is one nobody trusts the good news on either.
+    return _p('Down ${-change} since three months ago',
+        'Teen mahine pehle se ${-change} kam');
   }
 
   /// What the progress bar fills toward, or null when there is nothing to
@@ -456,6 +498,10 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
     ));
   }
 
+  static String monthInitial(DateTime d) =>
+      const ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+          [d.month - 1];
+
   static String _date(DateTime? d) {
     if (d == null) return '—';
     const m = [
@@ -464,5 +510,81 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
     ];
     final l = d.toLocal();
     return '${l.day} ${m[l.month - 1]} ${l.year}';
+  }
+}
+
+/// A twelve-month bar of cumulative take-up.
+///
+/// CUMULATIVE, NOT PER-MONTH, and the choice matters. Per-month activations
+/// look like a collapse the moment a company finishes onboarding — a big first
+/// bar and eleven small ones — which reads as the product failing when it is
+/// the product having succeeded. Cumulative only ever goes up or flattens, and
+/// flattening is the honest signal that take-up has stalled.
+///
+/// No axes, no gridlines, no numbers on the bars. This is a sparkline whose job
+/// is to answer "is the line going up" in one glance; the exact figures are
+/// already above it, and repeating them here would just be two places to
+/// disagree.
+class _TrendStrip extends StatelessWidget {
+  const _TrendStrip({required this.points, required this.label});
+
+  final List<SponsorTrendPoint> points;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final peak = points
+        .map((p) => p.activatedCumulative)
+        .fold<int>(1, (a, b) => b > a ? b : a);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: t.labelSmall?.copyWith(
+                color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 46,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final p in points)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          // A floor of 3px so a zero month is still a visible
+                          // tick. An invisible bar reads as missing data; a
+                          // short one reads as nothing happened, which is what
+                          // is true.
+                          height: (p.activatedCumulative / peak * 34)
+                              .clamp(3.0, 34.0),
+                          decoration: BoxDecoration(
+                            color: p == points.last
+                                ? AppTheme.primary600
+                                : AppTheme.primary200,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _SponsorDashboardScreenState.monthInitial(p.month),
+                          style: t.labelSmall?.copyWith(
+                              fontSize: 9, color: AppTheme.neutral400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

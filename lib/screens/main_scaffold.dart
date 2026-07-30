@@ -36,6 +36,21 @@ import 'home_screen_b.dart';
 import 'prepare/prepare_hub_screen.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
+import '../services/usage_events.dart';
+
+/// The five pregnancy tabs, in nav order, as usage surfaces.
+///
+/// Positional rather than derived from the tab label, because the labels are
+/// bilingual and father mode swaps three of them — a metric keyed on display
+/// text would silently split one surface into several the day someone switched
+/// language, and the numbers would look like a drop in usage.
+const _pregnancySurfaces = <String>[
+  UsageSurface.home,
+  UsageSurface.prepare,
+  UsageSurface.tools,
+  UsageSurface.calendar,
+  UsageSurface.community,
+];
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({
@@ -181,7 +196,17 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 child: PvTabBar(
                   tabs: tabs,
                   activeIndex: AppNav.instance.index,
-                  onChanged: (i) => AppNav.instance.go(i),
+                  onChanged: (i) {
+                    // ENGAGEMENT (0065): which section, never what was in it.
+                    // Recorded on the TAP rather than in build(), because
+                    // build runs on every rebuild — a language toggle would
+                    // otherwise look like a hundred screen views.
+                    UsageEvents.instance.screen(
+                      _pregnancySurfaces[i],
+                      stage: 'pregnancy',
+                    );
+                    AppNav.instance.go(i);
+                  },
                   // In Dad mode the nav pill takes the father (Slate) colours.
                   father: fatherMode,
                 ),
