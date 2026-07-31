@@ -253,6 +253,11 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'No added salt, sugar or butter - just the vegetable, the way a first food should be.',
     tags: {'first food', 'vitamin a', 'sweet potato', 'puree', 'vegetables'},
     ingredientKeys: {'sweet potato'},
+    // A first-foods puree at 6+ months is the one moment a weaning spoon set
+    // is genuinely the next thing a parent needs — so this is what Native
+    // Discovery is for. Routed through openProductWithGuideCheck, so a tap
+    // lands on the Guide rather than a buy page.
+    relatedProductId: 'spoons',
     relatedVideoId: 'solids101',
   ),
   FoodRecipe(
@@ -291,6 +296,9 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'protein', 'iron', 'lunch', 'first food', 'khichdi', 'rice', 'dal', 'moong dal'},
     ingredientKeys: {'rice', 'moong dal', 'vegetables'},
     relatedCommunity: 'Khichdi variations we love',
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'veggieoats',
@@ -361,7 +369,13 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'Pan-fried in a little ghee, not deep-fried, and bound with rice flour instead of a heavy breadcrumb coating.',
     tags: {'protein', 'calcium', 'finger food', 'snack', 'paneer', 'vegetables'},
     ingredientKeys: {'paneer', 'vegetables'},
-    relatedProductId: 'clothbook',
+    // No relatedProductId. This used to point at 'clothbook' — a peekaboo
+    // cloth book, on a paneer cutlet recipe. Native Discovery is meant to
+    // surface a product the CONTENT ALREADY IMPLIES; an unrelated one is the
+    // exact thing the brief forbids ("never display irrelevant promotions"),
+    // and it is worse than showing nothing because it teaches a parent that
+    // the row is an advert. Finger food needs no equipment, so this recipe
+    // correctly has none.
   ),
   // ---- dinners -------------------------------------------------------------
   //  Added 18 Jul: the weekly meal plan repeated because only two dinners were
@@ -439,6 +453,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'No sugar and no jaggery - ragi and a sweet vegetable are sweet enough, and early sugar sets preferences that last for years.',
     tags: {'calcium', 'iron', 'ragi', 'dinner', 'porridge'},
     ingredientKeys: {'ragi', 'vegetables'},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'daliaveg',
@@ -932,6 +949,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'Just fruit, no added sugar - the sweetness and the fibre both come from the prunes and apple themselves.',
     tags: {'fibre', 'constipation', 'sick day', 'prune', 'apple', 'vegan'},
     ingredientKeys: {},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'ragiporridge',
@@ -963,6 +983,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'Kept loose and unsweetened (or sweetened only with a date) - a wholegrain porridge, not a sugary cereal.',
     tags: {'fibre', 'iron', 'constipation', 'sick day', 'ragi'},
     ingredientKeys: {'ragi', 'milk'},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'bananarice',
@@ -995,6 +1018,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'No sugar, no dairy while his tummy settles - just two gentle, binding foods and nothing to irritate.',
     tags: {'loose motion', 'sick day', 'banana', 'rice', 'vegan', 'binding'},
     ingredientKeys: {'banana', 'rice'},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'coconutwater',
@@ -1122,6 +1148,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'The lightest, plainest form of nourishment - just strained dal water, no salt or oil, for when solids are too much.',
     tags: {'fever', 'sick day', 'dal water', 'moong dal', 'vegan', 'hydration'},
     ingredientKeys: {'moong dal'},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
   FoodRecipe(
     id: 'lightkhichdi',
@@ -1153,6 +1182,9 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'Made thinner, milder and lower-salt than the everyday khichdi - all the comfort, nothing to tax a poorly tummy.',
     tags: {'fever', 'sick day', 'khichdi', 'rice', 'dal'},
     ingredientKeys: {'rice', 'moong dal'},
+    // Age band opens at 6 mo: a first-tastes recipe, where a soft-tipped
+    // weaning spoon is the next thing a parent actually needs.
+    relatedProductId: 'spoons',
   ),
 ];
 

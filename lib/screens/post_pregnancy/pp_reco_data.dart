@@ -404,7 +404,11 @@ const List<RecoItem> kReco = [
     skills: ['Reaching', 'Grasp', 'Hand-eye coordination'], benefits: ['Fine motor'],
     collections: ['openended', 'montessori'], tags: ['wooden', 'grasp', 'teether', 'open-ended', 'indian'],
     subtype: 'Grasping toy', facets: {'skill': ['motor', 'sensory'], 'material': ['wood']},
-    relatedActivityId: 'reach_ring', relatedProductId: 'dozy',
+    // Was 'dozy' (a white-noise soother) on a reach-and-grasp toy — the same
+    // mistake as a cloth book on a cutlet recipe, and it reads as an advert
+    // because it is one. A high-contrast play gym is where reaching is
+    // practised, so it follows from the content instead of sitting beside it.
+    relatedActivityId: 'reach_ring', relatedProductId: 'playgym',
   ),
   RecoItem(
     id: 'ty_stacker', category: 'Toys', title: 'Open-ended stacking cups', summary: 'Stack, nest, pour, hide - for years.',

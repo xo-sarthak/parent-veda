@@ -354,9 +354,33 @@ Cancel/reschedule from the **parent** side · an in-app notification centre
 
 Detail in `docs/BRAND-STUDIO.md`.
 
-## 6.1 Native Discovery breadth
-Needs article/FAQ → product tagging. Manual (safe) vs automatic keyword match
-(risky in health copy). **Recommendation: manual.**
+## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
+
+Manual it is, and the reason is now on record: two wrong pairings had already
+shipped, both from a tag typed without reading the content around it.
+
+* a paneer cutlet recipe → a peekaboo cloth book
+* a wooden grasping ring reco → a white-noise soother
+
+An off-topic product is *worse* than no product. A missing link is invisible; a
+wrong one teaches a parent the row is an advert, and after that she stops
+tapping the ones that are useful. Automatic keyword matching would have
+produced exactly these, faster.
+
+Both fixed. Coverage now follows a stated rule rather than taste — **every
+recipe whose age band opens at 6 months carries the weaning spoon set, and
+nothing older does** (8 recipes), so a new recipe inherits the decision instead
+of re-arguing it. `test/native_discovery_test.dart` holds all four content
+types — recipes, articles, videos, recommendations — and fails a pairing whose
+subject never appears in the content's own words. The first version of that
+test only checked recipes, which is precisely why the reco mis-tag survived.
+
+**Still open, and it is a catalogue problem, not a tagging one:** `Feeding` has
+only three products (`bottle`, `spoons`, `steriliser`), so every one of the 28
+recipes can honestly point at one thing. Widening this means adding genuinely
+food-adjacent products first — a suction bowl set, a bib, freezer purée trays,
+a high chair — and *then* tagging. Adding more tags to the current catalogue
+would only put the same spoon set on more pages.
 
 ## 6.2 Sampling fulfilment — **DONE 2026-07-31**
 
