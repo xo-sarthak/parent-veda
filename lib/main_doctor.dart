@@ -57,6 +57,7 @@ import 'screens/doctor/doctor_auth_screen.dart';
 import 'screens/doctor/doctor_scaffold.dart';
 import 'services/notification_service.dart';
 import 'supabase_config.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,15 +103,26 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
     return MaterialApp(
       title: 'ParentVeda+',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF101418),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3FA9A0),
-          brightness: Brightness.dark,
-        ),
-      ),
+      // ONE BRAND, TWO AUDIENCES. This used to be its own dark slate/teal
+      // theme, on the argument that a clinician should never wonder which app
+      // they are in. The argument was sound and the execution was not: only
+      // this file and the sign-in screen ever adopted it, so every screen past
+      // the front door was already ParentVeda lavender and the app changed
+      // colour the moment you signed in.
+      //
+      // Resolved in favour of the brand. What tells the two apart is the name
+      // on the launcher (ParentVeda+), the icon, and a home screen full of
+      // patients — not a palette, which mostly signalled "unfinished".
+      //
+      // Kept for revert:
+      //   theme: ThemeData(
+      //     useMaterial3: true,
+      //     brightness: Brightness.dark,
+      //     scaffoldBackgroundColor: const Color(0xFF101418),
+      //     colorScheme: ColorScheme.fromSeed(
+      //       seedColor: const Color(0xFF3FA9A0), brightness: Brightness.dark),
+      //   ),
+      theme: AppTheme.light,
       home: switch (_signedIn) {
         null => const _Booting(),
         true => const DoctorScaffold(),
@@ -127,13 +139,13 @@ class _Booting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Scaffold(
-        backgroundColor: Color(0xFF101418),
+        backgroundColor: AppTheme.scaffoldBackground,
         body: Center(
           child: SizedBox(
             width: 26,
             height: 26,
             child: CircularProgressIndicator(
-                strokeWidth: 2.2, color: Color(0xFF3FA9A0)),
+                strokeWidth: 2.2, color: AppTheme.primary),
           ),
         ),
       );

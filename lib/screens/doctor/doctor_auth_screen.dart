@@ -23,16 +23,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../doctor/doctor_session.dart';
+import '../post_pregnancy/pp_common.dart';
 
-// The doctor app's own palette — deep slate rather than the parent app's
-// lavender. A clinician opening this between appointments should never wonder
-// which app they are in, and colour is the fastest signal there is.
-const _bg = Color(0xFF101418);
-const _panel = Color(0xFF181D23);
-const _line = Color(0xFF262C34);
-const _ink = Color(0xFFF2F5F8);
-const _muted = Color(0xFF8A94A0);
-const _accent = Color(0xFF3FA9A0);
+// ---- palette -----------------------------------------------------------------
+// This screen used to carry its own deep-slate/teal scheme, on the argument
+// that a clinician should never wonder which app they are in. Sound argument,
+// but it was true of this screen ALONE: every doctor screen behind it already
+// used the ParentVeda tokens, so the app changed colour at sign-in — which
+// reads as a half-finished build rather than as a second product.
+//
+// So the aliases below now point at the shared palette instead. The names stay
+// (`_accent`, `_muted`) because they describe the ROLE the colour plays here,
+// and one line per role is a cheaper place to change a decision than forty
+// call sites.
+//
+// Kept for revert — the original slate scheme:
+//   const _bg = Color(0xFF101418);
+//   const _panel = Color(0xFF181D23);
+//   const _line = Color(0xFF262C34);
+//   const _ink = Color(0xFFF2F5F8);
+//   const _muted = Color(0xFF8A94A0);
+//   const _accent = Color(0xFF3FA9A0);
+const _bg = ppBg;
+const _panel = ppPanel;
+const _line = ppBorder;
+const _ink = ppTitleInk;
+const _muted = ppSoft;
+const _accent = ppPurple;
 
 class DoctorAuthScreen extends StatefulWidget {
   const DoctorAuthScreen({super.key, required this.onSignedIn});
@@ -166,16 +183,18 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                     const SizedBox(height: 14),
                     Container(
                       padding: const EdgeInsets.all(13),
+                      // Matches the alert panel the Impact screen already
+                      // uses (ppCoralTint on a 40% coral hairline), so a
+                      // warning looks the same in both apps.
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3A1F24),
+                        color: ppCoralTint,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFF5C2C33)),
+                        border:
+                            Border.all(color: ppCoral.withValues(alpha: 0.4)),
                       ),
                       child: Text(_error!,
                           style: GoogleFonts.plusJakartaSans(
-                              fontSize: 13,
-                              height: 1.45,
-                              color: const Color(0xFFFFB4BC))),
+                              fontSize: 13, height: 1.45, color: ppTitleInk)),
                     ),
                   ],
                   const SizedBox(height: 22),
@@ -195,11 +214,13 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                               height: 20,
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: _muted))
+                          // White on purple. The old near-black ink worked on
+                          // a bright teal; on ppPurple it fails contrast.
                           : Text('Sign in',
                               style: GoogleFonts.plusJakartaSans(
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF06231F))),
+                                  color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 26),
