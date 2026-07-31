@@ -401,6 +401,23 @@ select public.mint_partner_token('cp_apollo', 'qr', null, null, 'priya');
 and the decision above settled first. Design write-up for the whole partner
 model: `docs/BACKEND-PATTERNS.md` §12.
 
+## 5.1c Panel work for the booking side — DEFERRED, checklist written
+
+Raised 2026-07-30. `0072`/`0073` are run and the app works from the bundled
+catalogue, so nothing is broken while this waits — but **adding a doctor is
+still SQL**, which is the exact thing those migrations existed to remove.
+
+Full click-by-click list in `docs/DIRECTUS-SETUP.md` **§4c**: register
+`expert_profiles`, `programmes`, `programme_sessions`, `programme_experts`;
+make `programme_experts.expert_id` a Many-to-One so the masterclass host is a
+dropdown rather than a typed id; and the two traps that matter —
+`takes_consults` as a real toggle, and `fee_paise` labelled **paise, not
+rupees**.
+
+Deferred by decision: testing 1:1 and 1:many end to end comes first. Do it in
+the same sitting as §1b (the presentation pass), since both are Data Model work
+on the same screens.
+
 ## 5.2 One-to-many programmes — not built at all
 
 Masterclasses and cohorts. The single biggest reason the admin panel will be

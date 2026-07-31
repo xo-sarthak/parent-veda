@@ -337,6 +337,139 @@ Premium.
 
 ---
 
+## 4c. The booking side — doctors, consultations, masterclasses
+
+**⏳ NOT DONE YET. Deferred deliberately 2026-07-30** — the migrations
+(`0072`, `0073`) are run and the app works from the bundled catalogue, so
+nothing is broken while this waits. Do it in the same sitting as §1b.
+
+Until it is done, **adding a doctor is SQL**, which is the exact thing this
+section exists to remove.
+
+### Why this section exists
+
+Onboarding a clinician was already panel-driven — `care_partners` holds the
+identity, `care_partner_verification` holds the KYC, `approve_care_partner()`
+refuses without complete paperwork — right up to the moment they wanted to
+*consult*. The consulting catalogue was a compiled Dart list, so adding a doctor
+who takes appointments meant editing code and shipping a release.
+
+`0072` fixed the database half. This is the panel half.
+
+### The model, in one table
+
+Everyone we partner with is the same kind of thing. A solo doctor, a hospital,
+an IVF centre — one identity in `care_partners`, and optional capability records
+hanging off it. Full reasoning in `docs/BACKEND-PATTERNS.md` §12.
+
+```
+expert_profiles
+  expert_id  partner_id  name             takes_consults  fee_paise
+  meera      cp_meera    Dr Meera Rao     true            80000
+  apollo     cp_apollo   Apollo Hospital  false           0
+  arjun      cp_apollo   Dr Arjun Nair    true            60000
+```
+
+`partner_id` pointing at **yourself** means you are your own partner; pointing
+at **somebody else** means you come from them. That column is the whole
+organisation layer — there is no second link, and adding one would be a second
+answer to a question that already has one.
+
+### Register
+
+| Collection | Display Template | Icon |
+|---|---|---|
+| `expert_profiles` | `{{name}}` | `stethoscope` |
+| `programmes` | `{{title}}` | `school` |
+| `programme_sessions` | `{{starts_utc}}` | `event` |
+| `programme_experts` | `{{expert_id}}` | `co_present` |
+
+⚠️ The free Directus tier caps collections. Check the counter top-right before
+registering four more.
+
+### Field configuration
+
+**`expert_profiles`**
+
+| Field | Interface | Why |
+|---|---|---|
+| `expert_id` | Input, **read-only after creation** | It is what `expert_accounts`, `booking_slots` and `care_partners.expert_id` all point at. Changing it orphans a doctor's login and their booking history in one edit |
+| `partner_id` | **Many to One** → `care_partners`, display `{{name}}` | The organisation layer. Leave it pointing at their own record for a solo practitioner |
+| `takes_consults` | **Toggle** | ⚠️ The one that matters. False means "appears in the catalogue, is never offered as a 1:1" — how a hospital that only teaches exists without pretending to take appointments. The app reads it as the bookability gate |
+| `fee_paise` | Input, field note **"PAISE, not rupees — ₹800 is 80000"** | The single likeliest mistake in this whole file. A doctor listed at ₹8 instead of ₹800 looks like a bargain and is a support call |
+| `duration_min` | Input, 1–240 | A CHECK enforces the range |
+| `status` | Dropdown `draft`/`published`/`archived` | Same trap as every content table: type "Published" and the row silently never appears |
+| `rating`, `reviews_count` | Read-only, or hidden | Editorial standing. Not a field to type a number into |
+| `photo_file` | File → R2 folder; `photo_url` read-only | The `0046` pattern. Inert until `cms_media_base()` is set |
+
+⚠️ **`timings` is not a column, on purpose.** A doctor's real availability comes
+from their own schedule in ParentVeda+. The panel makes someone *appear*; it
+must never invent hours for them.
+
+**`programme_experts`** — this is the masterclass host dropdown
+
+* `expert_id` → **Many to One** on `expert_profiles`, display `{{name}}`.
+  Currently a free-text box, so a typo publishes a masterclass whose host
+  resolves to nobody.
+* `status` → Dropdown `invited`/`accepted`/`declined`/`withdrawn`, **read-only**.
+  Acceptance is the expert's own act through
+  `respond_to_programme_assignment()`; an admin flipping it to `accepted` would
+  forge a consent that `publish_programme()` exists to check.
+
+**`programme_sessions`** — `starts_utc` must be in the future for
+`publish_programme()` to allow the programme out.
+
+### Adding a doctor, end to end
+
+```
+1. Care Partners → Create            id, name, type 'doctor', status 'pending'
+2. Care Partner Verification → Create  council, registration_number,
+                                       kyc_reference, registration_expires_at
+3. SQL: select approve_care_partner('cp_meera', 'your-name');
+        → refuses unless the paperwork is complete and unexpired
+4. Expert Profiles → Create          expert_id, partner_id, name, credential,
+   (only if they consult)            fee_paise, takes_consults, status published
+5. SQL: link their login
+        insert into public.expert_accounts (user_id, expert_id)
+        values ((select id from auth.users where email='...'), 'meera')
+        on conflict (user_id) do update set expert_id = excluded.expert_id;
+6. They set their own hours in ParentVeda+.
+```
+
+Steps 1, 2 and 4 become forms. **3 and 5 stay SQL on purpose** — both are
+audited acts (approving someone, and granting a login the power to see
+patients), and both should remain deliberate rather than a checkbox.
+
+### Creating a masterclass, end to end
+
+```
+1. Programmes → Create               title, kind 'masterclass', stage,
+                                     price_paise, capacity, status draft
+2. Programme Sessions → Create       at least one, starts_utc in the FUTURE
+3. Programme Experts → Create        pick the host from the dropdown
+4. The host accepts, in their app
+5. SQL: select publish_programme('<id>', 'your-name');
+```
+
+`publish_programme()` refuses without sessions, with a past session, without an
+**accepted** expert, or without a passing review — and mirrors the sessions into
+`booking_slots`, so seats are counted by the one counter that already exists.
+
+Step 5 stays SQL for now; §5d covers turning the admin actions into Flows.
+
+### Known gaps, so nothing here is mistaken for finished
+
+* **A published masterclass shows a fabricated slot time.** `publish_programme()`
+  mirrors real sessions into `booking_slots`, but the app still generates its
+  slot list client-side and does not read that mirror. Booking works end to end;
+  the time shown is not the time you set.
+* **A pregnancy masterclass published here lands in Parenting.**
+  `lib/screens/prepare/` reads bundled data and never calls
+  `mergedLearningPrograms()`.
+* **Rotating a QR flattens the per-doctor referral split** — `STILL-OPEN` §5.1b.
+
+---
+
 ## 5. Publishing must reach three places
 
 One write, three readers. Without these two Flows, publishing changes a row and
