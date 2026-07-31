@@ -70,6 +70,20 @@ void main() {
       expect(sql, contains('expert_profiles_duration_check'));
     });
 
+    test('the fee is WHOLE RUPEES, so an editor types what they mean', () {
+      // 0074. Storing paise passed every constraint while showing ₹8 for a
+      // ₹800 consult — silent, and first noticed by a parent who booked.
+      final fee = File('supabase/migrations/0074_expert_fee_in_rupees.sql')
+          .readAsStringSync();
+      expect(fee, contains('add column if not exists fee_inr'));
+      expect(fee, contains('drop column fee_paise'));
+      // Converted, not renamed: correct whether the table is empty today or
+      // full next month.
+      expect(fee, contains('set fee_inr = round(fee_paise / 100.0)'));
+      final store = File('lib/services/expert_store.dart').readAsStringSync();
+      expect(store.contains("row['fee_paise']"), isFalse);
+    });
+
     test('an ORGANISATION can deliver a programme without consulting', () {
       // Got wrong twice. First a FK to expert_profiles — which made teaching
       // require a 1:1 consulting profile. Then a second host column on

@@ -43,8 +43,10 @@ class ExpertStore extends ContentStore<Expert> {
 
   @override
   Expert fromMap(Map<String, dynamic> row) {
-    final fee = (row['fee_paise'] as num?)?.toInt() ?? 0;
-    final rupees = (fee / 100).round();
+    // WHOLE RUPEES (0074). It used to be paise and be divided here — the
+    // conversion moved to the Razorpay boundary, which is the only place that
+    // needs minor units, rather than living in an editor's head.
+    final rupees = (row['fee_inr'] as num?)?.toInt() ?? 0;
     final rating = (row['rating'] as num?)?.toDouble() ?? 0;
 
     return Expert(
@@ -106,7 +108,7 @@ class ExpertStore extends ContentStore<Expert> {
         'category': e.category,
         'location': e.location,
         'blurb': e.blurb,
-        'fee_paise': e.priceValue * 100,
+        'fee_inr': e.priceValue,
         'rating': e.ratingValue,
         'reviews_count': _digits(e.reviewsCount),
         'why_heading': e.whyHeading,

@@ -396,7 +396,7 @@ registering four more.
 | `expert_id` | Input, **read-only after creation** | It is what `expert_accounts`, `booking_slots` and `care_partners.expert_id` all point at. Changing it orphans a doctor's login and their booking history in one edit |
 | `partner_id` | **Many to One** → `care_partners`, display `{{name}}` | The organisation layer. Leave it pointing at their own record for a solo practitioner |
 | `takes_consults` | **Toggle** | ⚠️ The one that matters. False means "appears in the catalogue, is never offered as a 1:1" — how a hospital that only teaches exists without pretending to take appointments. The app reads it as the bookability gate |
-| `fee_paise` | Input, field note **"PAISE, not rupees — ₹800 is 80000"** | The single likeliest mistake in this whole file. A doctor listed at ₹8 instead of ₹800 looks like a bargain and is a support call |
+| `fee_inr` | Input, field note **"whole rupees"** | Was `fee_paise` until `0074`. An editor typing 800 and getting ₹8 was silent, passed every constraint, and would first be noticed by a parent who booked expecting it. A convention that needs a warning label is a convention fighting the person using it — so the column changed rather than the label. Conversion to paise happens once, at the Razorpay boundary |
 | `duration_min` | Input, 1–240 | A CHECK enforces the range |
 | `status` | Dropdown `draft`/`published`/`archived` | Same trap as every content table: type "Published" and the row silently never appears |
 | `rating`, `reviews_count` | Read-only, or hidden | Editorial standing. Not a field to type a number into |

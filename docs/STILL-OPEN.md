@@ -418,6 +418,28 @@ Deferred by decision: testing 1:1 and 1:many end to end comes first. Do it in
 the same sitting as §1b (the presentation pass), since both are Data Model work
 on the same screens.
 
+## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
+
+`0074` moved the consult fee to whole rupees (`expert_profiles.fee_inr`) because
+an editor typing 800 and getting ₹8 was silent and passed every constraint.
+`programmes.price_paise` was left alone.
+
+The convention now in force, so the next column gets it right:
+
+* **`_inr`** — whole rupees. Typed by a person, read by a person.
+  `products.price_inr`, `expert_profiles.fee_inr`.
+* **`_paise`** — minor units, handed to a payment gateway.
+  `programmes.price_paise`.
+
+Both are defensible; having both is the inconsistency. `price_paise` was not
+changed today because it may already hold live rows, which makes it a data
+migration rather than a rename, and because the same trap is smaller there —
+programme prices are set far less often than a doctor is onboarded.
+
+Fix it when programmes next get touched, or leave it: the field note is enough
+for a column edited once a quarter, and it is not enough for one edited every
+time a clinician signs up. That difference is the whole reason `0074` exists.
+
 ## 5.2 One-to-many programmes — not built at all
 
 Masterclasses and cohorts. The single biggest reason the admin panel will be
