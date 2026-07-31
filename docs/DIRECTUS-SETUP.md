@@ -60,6 +60,83 @@ not in effect: check `DB_USER` on Render before going further.
 
 ---
 
+## 1b. The presentation pass — DEFERRED, do it in one sitting
+
+*Raised 2026-07-30, from actually trying to find an article among thirteen and
+failing.* Repetitive, so it is batched rather than done per collection as they
+are registered. **Do it before anyone else gets a login.**
+
+### Why it is not optional
+
+A collection with no **Display Template** makes Directus name every row by the
+first text-ish field it finds. For `content_posts` that was `body`, so three
+different articles all read `If you're reading t…` and the list was unusable.
+
+Two settings, doing different jobs, and the distinction is the point:
+
+| | Where | Scope |
+|---|---|---|
+| **Display Template** | Settings → Data Model → collection → Collection Setup | **Per collection.** Everyone, everywhere |
+| **Table columns** | Content → collection → the `+` at the end of the header row | **Per USER.** Only you |
+
+The second one is the trap. Setting up columns fixes *your* view; a new Editor
+opens the same collection and gets Body / Category / ID back. The template is
+what survives other people.
+
+The template also names rows in **relation pickers**, breadcrumbs, revision
+history, Flow logs and search — so a collection without one makes "choose an
+author for this post" render a list of bios.
+
+⚠️ **Use the ⊞ picker, never type the braces.** A typed `{{titel}}` stores
+happily as literal text and renders on every row with no error anywhere.
+
+### The checklist
+
+| Collection | Display Template | Icon | Columns |
+|---|---|---|---|
+| `content_posts` | `{{title}}` | `article` | title · category · status · published_at |
+| `articles` | `{{title}}` | `menu_book` | title · domain · week · status |
+| `reads` | `{{title}}` | `auto_stories` | title · collection · kind · status |
+| `recipes` | `{{title}}` | `restaurant` | title · category · slot · age_tag · status |
+| `products` | `{{brand}} — {{name}}` | `shopping_bag` | name · brand · category · price_inr · status |
+| `content_authors` | `{{name}}` | `person` | name · registration |
+| `content_categories` | `{{name}}` | `sell` | name · sort |
+| `programmes` | `{{title}}` | `school` | title · kind · stage · status |
+| `sponsors` | `{{name}}` | `business` | name · kind · status · seats_purchased · renewal_at |
+| `care_partners` | `{{name}}` | `local_hospital` | name · type · status · city · expert_id |
+| `partner_referrals` | `{{token}} — {{channel}}` | `qr_code_2` | token · partner_id · channel · active · expires_at |
+| `partner_accounts` | `{{partner_id}} — {{label}}` | `key` | partner_id · label · created_at |
+| `care_partner_verification` | `{{partner_id}}` | `verified_user` | partner_id · council · registration_number · reviewed_at |
+| `brand_sample_claims` | `{{campaign_id}} — {{status}}` | `local_shipping` | campaign_id · status · created_at · posted_at |
+
+Drop **`body`** and **`id`** everywhere. A UUID identifies nothing to a human,
+and the body belongs in the editor.
+
+`products` shows the pattern for when one field is not enough — a template takes
+several fields plus literal text, and "Hush White Noise" is ambiguous across
+brands where `Acme — Hush White Noise` is not.
+
+⚠️ **`brand_sample_claims` is the one where getting this wrong is not merely
+ugly.** Its first text-ish column is `address`, so with no Display Template
+Directus names every row by a fragment of somebody's home address — in the list,
+in search, in relation pickers and in Flow logs. A fulfilment desk that leaks
+addresses into every breadcrumb is a different kind of mistake from an article
+list that reads badly.
+
+The address is still on the row, and it has to be: "ParentVeda posts it" is the
+promise printed on that screen, and a parcel cannot be addressed without one.
+What the template controls is whether it shows up in twenty places it was never
+needed. Same reason `partner_accounts` is templated on `partner_id` and not on
+whatever free text sits in `label`.
+
+### Then make the columns everyone's
+
+Layout is per-user, so finish with **Settings → Bookmarks (Presets)**: one
+preset per content collection with **Role left blank**, which makes it the
+default for every user. Otherwise the panel is set up for one person.
+
+---
+
 ## 2. Field configuration, per collection
 
 Directus guesses an interface from the column type. The guesses are wrong in
@@ -283,8 +360,24 @@ for the endpoint itself. Unpublishing is handled correctly too: `reindex_source`
 deletes the row's chunks, re-fetches with `.eq('status','published')`, finds
 nothing, and the stale chunks stay gone.
 
-⚠️ **The new tables are not in `SOURCE_SPECS` yet**, so a reindex call naming
-`recipes` will do nothing until the AskVeda half lands (§7).
+~~⚠️ **The new tables are not in `SOURCE_SPECS` yet**~~ — **DONE 30 July 2026.**
+`recipes`, `reads` and `products` are registered in
+`C:\Projects\parentveda-askveda/ingest/ingest.py`, so both halves of this Flow
+now exist and the only thing left is creating it in Directus.
+
+That change was more than a spec entry, and the reason is worth knowing before
+adding the next content table: **none of the three has a `body` column.** A
+recipe's teaching is spread across `why`, `steps` and `mistakes`; a read's whole
+article lives inside a `sections` jsonb blob. `SOURCE_SPECS` entries therefore
+now carry a third element — a function that flattens a row into the text to
+embed — because the alternative was a `body` column per table kept in step by a
+trigger, which is a second copy of prose that already exists.
+
+The failure this avoided is the quiet kind: `chunk_text(None)` returns nothing,
+the ingest prints "0 chunks" for one table among six, and Ask Veda simply never
+knows the content exists. Nothing raises. `tests/test_source_specs.py` in that
+repo now asserts every registered source produces text, survives an empty row,
+and — for products — carries **cons as well as pros**.
 
 ### 5b. Flow → the website (`revalidateTag`)
 
@@ -297,8 +390,25 @@ POST  https://parentveda.in/api/revalidate
 Header: x-revalidate-secret: <REVALIDATE_SECRET>
 ```
 
-⚠️ **That route does not exist yet** (§6). Until it does, the site updates on
-its 60-second ISR window, which is the backstop and is fine.
+~~⚠️ **That route does not exist yet**~~ — **BUILT 30 July 2026**,
+`C:\parentveda-web/src/app/api/revalidate/route.ts`. Add
+`REVALIDATE_SECRET` in Vercel, then create the Flow. `GET` on the same URL
+reports whether the secret is set (never what it is), so a deployment can be
+checked without crafting a POST.
+
+Two things worth carrying to the next endpoint like it:
+
+* **It needs a secret even though every guide is public.** Nothing secret
+  leaks; money and latency do. An open cache-buster called in a loop makes
+  every page view a cold render against Supabase — slower site, higher bills,
+  and nothing in the logs that looks like an attack. *Anything that lets a
+  stranger make your infrastructure do expensive work needs a gate.*
+* **An unset secret fails closed (503).** "None configured, so allow it" turns
+  a forgotten environment variable into an open endpoint, and forgetting one is
+  the likeliest way this ends up misconfigured.
+
+If the webhook never fires, the site still updates on its 60-second ISR window.
+That backstop is why the Flow is non-blocking.
 
 Point the Flow at the **production domain explicitly**. A Vercel preview URL
 returns 200 and revalidates nothing anyone can see — a webhook that looks

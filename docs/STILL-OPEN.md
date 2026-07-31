@@ -432,7 +432,12 @@ downloads on first run, which is a cold-start problem on a free tier).
 **Deferred by decision 2026-07-30** ("very repetitive, I will do this at the
 very end"). The full checklist — display templates, icons, columns, presets —
 is `docs/DIRECTUS-SETUP.md` **§1b**. `content_posts` is done as the worked
-example; eight collections remain.
+example; the rest remain, and that table grows every time a collection is
+registered — it is the running list, so add a row there rather than here.
+
+⚠️ **`brand_sample_claims` is not optional to template.** Its first text column
+is `address`, so without one Directus names every row by a fragment of a home
+address, everywhere a row is named.
 
 **Do it before anyone else gets a login**, for a reason that is easy to miss:
 the column layout is stored **per user**, so setting it up now fixes only your
