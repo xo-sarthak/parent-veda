@@ -26,6 +26,25 @@ import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
 import 'outbound.dart';
 
+/// TESTING: show the Premiere on EVERY app open, ignoring the once-per-campaign
+/// cap.
+///
+/// ⚠️ MUST BE `false` BEFORE LAUNCH. Tracked in docs/STILL-OPEN.md §1.4.
+///
+/// The cap is not a technical limit, it is the thing that makes a full-screen
+/// takeover acceptable at all: `maxImpressions: 1`, persisted, surviving a
+/// reinstall. Seen once it is a launch story; seen on every open it is an
+/// advert a parent cannot escape — and this app opens at 2am, by someone who
+/// is worried. That is the wrong moment to be sold to for the fourth time.
+///
+/// It is on now because the flagship is otherwise almost impossible to look
+/// at: one impression per campaign, three to six campaigns a year, and no way
+/// to see it again short of wiping app storage.
+///
+/// Tools -> Brand Studio -> "Show me" does the same thing WITHOUT this flag,
+/// and is the better habit — it does not change what a real parent gets.
+bool kPremiereAlwaysShow = true;
+
 /// Resolve and show the Premiere, if one is live for this parent.
 ///
 /// Null-safe by design: no campaign is the normal case and the caller does
@@ -37,11 +56,18 @@ Future<void> showPremiereIfAny(
 }) async {
   try {
     final ctx = captureBrandContext(stage: stage, pregnancyWeek: pregnancyWeek);
-    final campaign = BrandStudio.instance.resolve(BrandSlot.premiere, ctx);
+    final campaign = BrandStudio.instance.resolve(
+      BrandSlot.premiere,
+      ctx,
+      // Resolve normally, but let the testing flag look past a spent cap.
+      ignoreImpressionCap: kPremiereAlwaysShow,
+    );
     if (campaign == null) return;
     if (!context.mounted) return;
 
     // Spend the cap at the moment it is actually surfaced, not at resolve time.
+    // Still recorded while testing: the analytics and the store should reflect
+    // what was actually shown, not what the cap would have allowed.
     BrandStudioStore.instance.recordImpression(campaign.id);
     BrandAnalytics.instance.event(campaign, BrandEvent.impression);
 

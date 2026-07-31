@@ -84,7 +84,15 @@ class BrandStudio extends ChangeNotifier {
   ///
   /// The preview screen renders these verbatim. Written as sentences a person
   /// can act on, not error codes.
-  String? blockReason(BrandCampaign c, BrandContext ctx) {
+  /// [ignoreCaps] skips the two PER-PARENT suppressors — the impression cap
+  /// and a previous dismissal — while leaving everything else intact: the kill
+  /// switch, the schedule, the audience and whether the surface exists at all.
+  ///
+  /// It is for looking at a campaign, never for deciding what a parent gets.
+  /// The caps are what make a pushed surface acceptable, so bypassing them is
+  /// always a testing act with a name attached to it.
+  String? blockReason(BrandCampaign c, BrandContext ctx,
+      {bool ignoreCaps = false}) {
     if (!enabled) return 'The Brand Studio is switched off.';
     if (!c.active) return 'The campaign is not active.';
     if (!c.slot.isLive) {
@@ -98,8 +106,13 @@ class BrandStudio extends ChangeNotifier {
     if (!demoMode && !c.audience.matches(ctx)) return _audienceReason(c.audience, ctx);
 
     final store = BrandStudioStore.instance;
-    if (!demoMode && store.dismissed(c.id)) return 'You closed this, so it will not come back.';
-    if (!demoMode && c.slot.archetype.isPushed && store.impressions(c.id) >= c.maxImpressions) {
+    if (!demoMode && !ignoreCaps && store.dismissed(c.id)) {
+      return 'You closed this, so it will not come back.';
+    }
+    if (!demoMode &&
+        !ignoreCaps &&
+        c.slot.archetype.isPushed &&
+        store.impressions(c.id) >= c.maxImpressions) {
       return 'Already shown ${store.impressions(c.id)} of ${c.maxImpressions} times — its cap is spent.';
     }
     return null;
@@ -131,7 +144,8 @@ class BrandStudio extends ChangeNotifier {
   ///
   /// Every clause here fails CLOSED. When we cannot verify something, the
   /// parent sees nothing — that is always the cheaper mistake.
-  bool isEligible(BrandCampaign c, BrandContext ctx) => blockReason(c, ctx) == null;
+  bool isEligible(BrandCampaign c, BrandContext ctx, {bool ignoreCaps = false}) =>
+      blockReason(c, ctx, ignoreCaps: ignoreCaps) == null;
 
   /// The Launch Hub campaign a Premiere announces, if it is still available.
   ///
@@ -157,12 +171,13 @@ class BrandStudio extends ChangeNotifier {
   /// [placementKey] names the instance (which tool, which collection). It is
   /// matched exactly: a campaign that named a placement never appears anywhere
   /// else, and a request for a placement never picks up an unkeyed campaign.
-  BrandCampaign? resolve(BrandSlot slot, BrandContext ctx, {String? placementKey}) {
+  BrandCampaign? resolve(BrandSlot slot, BrandContext ctx,
+      {String? placementKey, bool ignoreImpressionCap = false}) {
     if (!enabled) return null;
     for (final c in _campaigns) {
       if (c.slot != slot) continue;
       if (c.placementKey != placementKey) continue;
-      if (isEligible(c, ctx)) return c;
+      if (isEligible(c, ctx, ignoreCaps: ignoreImpressionCap)) return c;
     }
     return null;
   }

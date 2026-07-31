@@ -17,7 +17,7 @@ quietly dropped between sessions.
   the Directus panel. Where an item lives in both, this file links there rather
   than repeating it.
 
-**Blocking launch:** §1.1, §1.2, §1.3
+**Blocking launch:** §1.1, §1.2, §1.3, §1.4
 **Blocking the sponsor programme:** §11.6 — the activation code has no sender
 **Blocking real money:** §2.1, §2.2, §5.1
 **Everything else** can wait without harm.
@@ -60,6 +60,31 @@ If those rows reach production, a fake doctor is live on a public page.
 delete from public.partner_referrals where partner_id like 'demo\_%';
 delete from public.care_partners      where id         like 'demo\_%';
 ```
+
+## 1.4 `kPremiereAlwaysShow` is `true`
+
+`lib/brand/premiere_screen.dart`. The Premiere takeover currently fires on
+**every app open**, bypassing its once-per-campaign cap and any previous
+dismissal.
+
+Switched on deliberately so the flagship can be looked at — one impression per
+campaign, three to six campaigns a year, and no way to see it again short of
+wiping app storage made it nearly impossible to review.
+
+**It must be `false` before launch.** The cap is not a technical limit, it is
+the thing that makes a full-screen takeover acceptable at all. Seen once it is
+a launch story; seen on every open it is an advert a parent cannot escape — and
+this app is opened at 2am by someone who is worried, which is the wrong moment
+to be sold to for the fourth time.
+
+One line, no other change:
+
+```dart
+bool kPremiereAlwaysShow = false;
+```
+
+Tools → Brand Studio → "Show me" does the same thing without the flag, and does
+not change what a real parent gets.
 
 ---
 
