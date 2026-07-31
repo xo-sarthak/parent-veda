@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon, Android 8+ (API 26).
+
+  WHY THIS FILE EXISTS AT ALL. Without it, a modern launcher takes the legacy
+  ic_launcher.png and drops the whole square inside its own mask - so the mark
+  ends up shrunken in a white circle sitting on a white tile, with a visible
+  seam. Splitting background and foreground lets the launcher mask the two
+  layers together, which is what makes the icon look native next to every other
+  app on the phone.
+
+  The doctor flavour overrides only the FOREGROUND (src/doctor/res), not this
+  file: same background, same geometry, one extra "+" - so the two apps read as
+  one family rather than as two unrelated icons.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

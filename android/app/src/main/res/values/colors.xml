@@ -7,4 +7,12 @@
          composition when a platform view (LiveKit/WebRTC, video_player) is on
          screen - shows the app's own colour instead of a black hole. -->
     <color name="pv_window_background">#FFFBF9FE</color>
+
+    <!-- The adaptive launcher icon's background layer. WHITE, not ppBg: the
+         mark is purple and coral, and a launcher may sit it on a dark
+         wallpaper, a light one, or inside a themed circle. White is the one
+         backdrop the logo was drawn against and reads correctly on all of
+         them - ppBg's lavender tint reads as "slightly dirty white" beside
+         other icons rather than as a brand colour. -->
+    <color name="ic_launcher_background">#FFFFFFFF</color>
 </resources>
