@@ -338,6 +338,69 @@ A council registration number and a KYC reference are not public identity.
 possible from the SQL editor but not from the panel — so keep raising this.
 `test/admin_actions_test.dart` holds the invariants meanwhile.
 
+## 5.1b Rotating a QR drops the per-doctor layer — KNOWN, NOT URGENT
+
+*Raised 2026-07-30, while building `0073`. Left broken on purpose, with a
+workaround, rather than half-fixed.*
+
+**What is fine.** `0073` gave a referral two layers: `partner_referrals.expert_id`
+records WHO handed a code over, so Apollo can see which of its clinicians brought
+which families (`partner_referral_breakdown()`). Aggregate for the organisation,
+breakdown by doctor beside it — the same shape as `sponsor_dashboard`.
+
+**What is broken.** `rotate_partner_token()` (`0069`) was written when a partner
+had exactly ONE code, which was true of every partner that existed. It now:
+
+```sql
+update public.partner_referrals set retired_at = now(), expires_at = now() + 30d
+ where partner_id = p_partner_id;      -- retires ALL of them
+v_new := public.mint_partner_token(p_partner_id);   -- mints exactly ONE
+```
+
+So a hospital with a code per clinician comes back from a rotation holding a
+single organisation-wide code:
+
+```
+BEFORE          cp_apollo/—, cp_apollo/arjun, cp_apollo/priya, cp_apollo/rahul
+AFTER           cp_apollo/—                    ← one code, no person layer
+```
+
+**Why it is nasty rather than obvious.** Nothing errors. Rotation succeeds,
+returns a token, posters keep working through the grace window. What silently
+stops is the breakdown: every family arriving afterwards attributes to
+`expert_id = NULL`, so each doctor's number **freezes at its historical value
+and never grows again**. The figures are not wrong — those families really did
+come through them — they simply stop. The person most likely to notice is the
+doctor, months later, asking why their number has not moved.
+
+**Why it was not fixed in `0073`.**
+
+1. **It is a different kind of change.** Rotation is about invalidating things
+   that are PRINTED, and the 30-day grace window is a real-world safety
+   property, not a technicality. Making it remint N codes changes what
+   invalidation means, and raises a question only a human can answer: *when a
+   hospital rotates, does a doctor who has already left get a new code?*
+   Silently dropping theirs is the right outcome or a lost one depending on why
+   they left.
+2. **It is a gate.** Every gate here has been through
+   `supabase/seed/verify_admin_gates.sql` — each refusal path exercised inside a
+   transaction that rolls back. Bundling a rotation rewrite into a migration
+   about identity would ship it without that pass, and rotation is the one
+   function whose failure mode is *posters on walls stop working*.
+
+**The workaround, until it is fixed:** rotate BEFORE handing out per-doctor
+codes, not after. If a rotation happens anyway, remint each doctor by hand —
+the argument exists:
+
+```sql
+select public.mint_partner_token('cp_apollo', 'qr', null, null, 'arjun');
+select public.mint_partner_token('cp_apollo', 'qr', null, null, 'priya');
+```
+
+**When it is fixed**, it needs its own migration and its own verification pass,
+and the decision above settled first. Design write-up for the whole partner
+model: `docs/BACKEND-PATTERNS.md` §12.
+
 ## 5.2 One-to-many programmes — not built at all
 
 Masterclasses and cohorts. The single biggest reason the admin panel will be

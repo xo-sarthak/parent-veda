@@ -731,7 +731,162 @@ role. Check what is there before deciding what is wrong.
 
 ---
 
-## 12. Reading list, in order
+## 12. One entity, many capabilities — modelling partners without exceptions
+
+*Added 2026-07-30, after getting the same table wrong twice.*
+
+`0072` and `0073` model everyone ParentVeda partners with: a doctor in her own
+clinic, a 400-bed hospital, an IVF centre, a diagnostic lab, a nutritionist.
+The lesson is not about doctors. It is about what happens when you model people
+by **what they do** instead of **who they are**.
+
+### (a) The mistake: splitting an identity by activity
+
+The first design had two records. `care_partners` for *"we vetted this person
+and they refer families"*; a separate `experts` for *"this person takes
+consultations"*.
+
+It reads sensibly and it is wrong, because one doctor may refer families, take
+consults, teach a masterclass and review articles. Split by activity and the
+same person exists twice, and the two copies drift the first time a phone
+number changes.
+
+The correct shape was already in this codebase — `0057`'s entitlement engine:
+
+> Never ask *"is this user Premium?"* Ask *"does this user hold capability X?"*
+
+Applied here: never ask *"is this a partner or an expert?"* Ask *"what may this
+entity do?"* So there is **one identity** and **optional capability records**
+hanging off it, none required:
+
+```
+care_partners  ── WHO THEY ARE. One row, forever. KYC lives here.
+   ├── partner_referrals   they refer families      (0037)
+   ├── expert_profiles     they deliver something   (0072)
+   ├── programme_experts   they teach THIS thing    (0054)
+   └── partner_accounts    they can sign in         (0068)
+```
+
+A doctor who only refers has one row. One who does everything has four. Gaining
+a capability six months later is **adding a row**, never re-onboarding.
+
+> Generally: when you catch yourself writing `type_a_table` and `type_b_table`
+> for things that are the same noun doing different verbs, the verbs belong in
+> their own tables and the noun belongs in one.
+
+### (b) The second mistake: an exception in the schema
+
+Fixing (a) still left *"who delivers this programme?"* An organisation might
+teach without ever consulting, so requiring an `expert_profiles` row felt
+wrong — it meant a hospital inventing a consulting profile it does not offer.
+
+So: two host columns on `programme_experts`, `expert_id` **or** `partner_id`,
+exactly one set.
+
+Also wrong, and wrong one level down. **Two host columns is itself an
+exception** — every query about "who is hosting" carries a branch. The rule was
+removed from the functions and reintroduced in the table.
+
+Postgres refused it outright, which was a favour:
+
+```
+ERROR: 42P16: column "expert_id" is in a primary key
+```
+
+A primary-key column cannot be nullable. The constraint was pointing at the
+design flaw.
+
+**The answer was smaller than both attempts.** An organisation gets a deliverer
+row like everybody else, with one boolean inside it:
+
+```
+expert_profiles
+  expert_id  partner_id  name             takes_consults  fee_paise
+  meera      cp_meera    Dr Meera Rao     true            80000
+  apollo     cp_apollo   Apollo Hospital  false           0
+  arjun      cp_apollo   Dr Arjun Nair    true            60000
+```
+
+That is not Apollo pretending to consult. It is Apollo having an entry in the
+**deliverer catalogue** — the app's existing vocabulary, already used by
+`booking_slots.expert_id` and `expert_accounts.expert_id`. Whether it takes 1:1
+appointments is one optional fact *inside* the row, not a reason for a second
+column.
+
+`programme_experts` then needed no change at all: one host column, composite key
+intact, `assign_programme_expert`'s `ON CONFLICT` still working.
+
+> If a design needs a special case in the schema, the model is wrong one level
+> up. A boolean inside a row beats a second column beside it, which beats a
+> second table.
+
+### (c) The layer was already there
+
+The "which hospital does this doctor come from" link needed no new column:
+
+```
+partner_id points at YOURSELF     → you are your own partner  (Meera)
+partner_id points at SOMEBODY     → you come from them        (Arjun → Apollo)
+```
+
+A `care_partners.parent_partner_id` was proposed and rejected: it would have
+been a **second answer to a question that already had one**, and the two would
+disagree eventually.
+
+### (d) One resolver, or a bug generator
+
+Two login routes existed — `expert_accounts` (a person), `partner_accounts` (an
+organisation) — and almost every consulting gate resolved through the first
+only. So a hospital could sign in, see a dashboard, be invited to teach, and
+then accept nothing, see no bookings, set no hours, write no prescriptions.
+Every failure silent, or wearing an error about something else
+(`not an expert account`).
+
+That is not five bugs. It is **one missing primitive, discovered five times**.
+
+```sql
+create function public.my_expert_ids() returns setof text ...
+-- a solo doctor   -> their own id
+-- an organisation -> every deliverer under it
+```
+
+Every gate became `expert_id in (select my_expert_ids())`. The branch is gone
+from **one** place, so the next feature cannot forget it — there is nowhere left
+to put it.
+
+> When the same conditional appears in five gates, it is not five conditionals.
+> Extract it, and the sixth gate gets it for free.
+
+### (e) The depth arrives for free
+
+`expert_roster()` now returns `expert_id`, so Apollo sees *which clinician* each
+booking belongs to; `partner_referrals.expert_id` records *who handed a QR
+over*, so `partner_referral_breakdown()` answers "which of our doctors brought
+these families".
+
+Aggregate for the organisation, breakdown by member beside it — deliberately the
+same shape as `sponsor_dashboard` / `sponsor_roster` (§10), because it is the
+same question asked of a different customer. `company : employees` is
+`hospital : doctors`. Same privacy line too: numbers and names of *members*,
+never anything about the families.
+
+### (f) Two Postgres traps hit while building it
+
+**`create or replace` with a different arity creates an OVERLOAD.** Adding a
+fifth defaulted argument to `mint_partner_token` did not replace the four-arg
+version — it added a second function. Both accept `mint_partner_token('cp_x')`,
+so Postgres refuses the call as ambiguous and every existing caller breaks at
+once, with an error about function resolution rather than about anything anyone
+changed. `0052` had already hit this with `create_care_partner`. **Drop the old
+signature explicitly, then create.**
+
+**A `not valid` constraint is the difference between a migration that runs and
+one that does not.** History that predates a rule would otherwise fail the
+migration, and a migration nobody can run protects nothing.
+
+---
+
+## 13. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -746,5 +901,8 @@ role. Check what is there before deciding what is wrong.
    and a migration seeded so it changes nothing on the day it runs.
 10. `0060_sponsor_admin.sql` — multi-tenancy: the tenant from the session, the
     privacy promise as a return type, suppression as a config row (§10b–e).
-11. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
+11. `0072_expert_profiles.sql` + `0073_one_partner_no_exceptions.sql` — one
+    entity with many capabilities, and the two wrong turns it took to get
+    there (§12).
+12. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
     client half of everything above.

@@ -34,6 +34,7 @@ import '../screens/post_pregnancy/pp_experts_data.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import '../screens/post_pregnancy/pp_yoga_data.dart';
 import '../ttc/ttc_prepare_data.dart';
+import '../services/expert_store.dart';
 import 'booking_models.dart';
 import 'booking_store.dart';
 
@@ -58,7 +59,11 @@ class BookingCatalog {
       if (o != null) list.add(o);
     }
     // In-app doctor/specialist consults (Practo dropped — everything books here).
-    for (final e in kExperts) {
+    // MERGED, not the bundled const: a doctor added in the admin panel has to
+    // become a bookable offering too, or they render on the consult screen and
+    // then cannot be booked — visible and inert, the same defect the merged
+    // programmes call fixed one line above.
+    for (final e in mergedExperts()) {
       final o = _fromExpert(e);
       if (o != null) list.add(o);
     }

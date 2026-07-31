@@ -42,6 +42,7 @@ import 'services/credits_store.dart';
 import 'services/sponsor_benefits.dart';
 import 'services/usage_events.dart';
 import 'services/product_catalog_store.dart';
+import 'services/expert_store.dart';
 import 'services/programme_store.dart';
 import 'services/read_store.dart';
 import 'services/recipe_store.dart';
@@ -232,6 +233,10 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     ReadStore.instance.ensureLoaded();
     ProductCatalogStore.instance.ensureLoaded();
     ProgrammeStore.instance.ensureLoaded();
+    // The consulting catalogue (0072). Loaded here rather than lazily from a
+    // screen because BookingCatalog derives every consult offering from it at
+    // first access, and that happens from several screens at once.
+    ExpertStore.instance.ensureLoaded();
     // What this user may do, and who is paying for it. Resolved per-user from
     // Supabase; a signed-out user resolves to nothing, exactly like an
     // uninitialised backend.

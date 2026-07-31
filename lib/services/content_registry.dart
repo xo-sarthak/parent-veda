@@ -18,6 +18,7 @@
 
 import 'article_store.dart';
 import 'content_store.dart';
+import 'expert_store.dart';
 import 'product_catalog_store.dart';
 import 'programme_store.dart';
 import 'read_store.dart';
@@ -37,6 +38,7 @@ class ContentRegistry {
         ReadStore.instance,
         ProductCatalogStore.instance,
         ProgrammeStore.instance,
+        ExpertStore.instance,
       ];
 
   /// Re-pull everything. Called on app resume; each store applies its own

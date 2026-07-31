@@ -259,6 +259,21 @@ abstract class ContentStore<T> extends ChangeNotifier {
     }
   }
 
+  /// Testing seam: stand in for what the backend served.
+  ///
+  /// Merge behaviour — a published row superseding a bundled one — is a real
+  /// rule with a real failure mode (two rows for one id, or a published row
+  /// blanking the catalogue), and there was no way to exercise it without a
+  /// network. Passing an empty list is meaningful: it is the "backend has
+  /// nothing" case, which for a seeded type must fall back rather than blank.
+  @visibleForTesting
+  void setItemsForTest(List<T> items) {
+    _items = List<T>.of(items);
+    _loaded = true;
+    _backendHasServedRows = items.isNotEmpty;
+    notifyListeners();
+  }
+
   /// Testing seam: forget the cache and the once-per-session guard.
   @visibleForTesting
   void resetForTest() {

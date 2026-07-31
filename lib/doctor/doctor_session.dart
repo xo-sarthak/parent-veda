@@ -65,6 +65,70 @@ class DoctorSession extends ChangeNotifier {
     }
   }
 
+  /// Ask the SERVER who this account is, and become them.
+  ///
+  /// THE DIFFERENCE FROM [enter]. `enter` is the testing affordance: a picker
+  /// listing every doctor in the compiled catalogue, chosen by hand each time.
+  /// That is fine on a developer's phone and wrong in a doctor's hands — an
+  /// identity you select from a dropdown is not an identity, and the row it
+  /// writes would let one account claim to be any expert.
+  ///
+  /// This is the real path. `expert_accounts` already maps user → expert (the
+  /// row `enter` upserts); nothing read it back until now, which is why the
+  /// picker survived. So a doctor signs in once and simply IS that doctor, on
+  /// every launch, with the server as the authority.
+  ///
+  /// Falls back to `partner_accounts` (0068) for an organisation — a hospital,
+  /// IVF centre or lab has no entry in the compiled expert catalogue and should
+  /// not. Returns true when an identity was found.
+  ///
+  /// Note the ORDER: expert first. Someone who both consults and represents a
+  /// clinic should land in their consulting view, because that is the one with
+  /// patients waiting in it.
+  Future<bool> resolveFromServer() async {
+    if (!SupabaseRepo.isLoggedIn) return false;
+
+    try {
+      // expert_accounts is keyed on user_id and has no created_at, so order by
+      // the column it does have — fetch() defaults to created_at and would 400.
+      final rows =
+          await SupabaseRepo.fetch('expert_accounts', orderBy: 'user_id');
+      final expertId = rows.isEmpty ? null : rows.first['expert_id'] as String?;
+      if (expertId != null && expertId.isNotEmpty) {
+        _active = true;
+        _expertId = expertId;
+        _partnerId = null;
+        notifyListeners();
+        return true;
+      }
+    } catch (_) {/* fall through to the partner check */}
+
+    try {
+      final res = await SupabaseRepo.callFunction('my_care_partner');
+      final first = res.isEmpty ? null : res.first;
+      final id = (first is Map) ? first['id'] as String? : null;
+      if (id != null && id.isNotEmpty) {
+        _active = true;
+        _expertId = null;
+        _partnerId = id;
+        notifyListeners();
+        return true;
+      }
+    } catch (_) {/* no partner identity either */}
+
+    return false;
+  }
+
+  /// Leave doctor mode entirely. Used when the doctor app signs out, so the
+  /// next person to sign in on that device does not inherit an identity.
+  void clear() {
+    if (!_active && _expertId == null && _partnerId == null) return;
+    _active = false;
+    _expertId = null;
+    _partnerId = null;
+    notifyListeners();
+  }
+
   /// Enter the partner view as a care_partners row that has NO expert record —
   /// a hospital, IVF centre, diagnostic lab, corporate.
   ///

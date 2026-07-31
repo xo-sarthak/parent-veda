@@ -69,6 +69,19 @@ class ContentOwnership {
     // key here is the view name, because that is what the store declares.)
     'programmes_published': ContentOwner.editor,
 
+    // Experts (0072) are `bundled`, and that is not a stalling answer.
+    //
+    // The compiled catalogue is still the offline floor — a booking screen
+    // with no clinicians on it is indistinguishable from a broken fetch, and
+    // it would be broken for someone who has already paid. So the panel ADDS
+    // to a bundled list rather than replacing it, and mergedExperts() lets a
+    // published row supersede a bundled one by id.
+    //
+    // It flips to `editor` the day the compiled catalogue is exported into
+    // the table and the Dart becomes a stub — the same one-at-a-time rule the
+    // three types above are waiting on.
+    'expert_profiles': ContentOwner.bundled,
+
     // Deliberately deferred, with reasons — see docs/ADMIN-PANEL.md:
     //   ttc_daily : TTC is the newest stage and has not been run on a device
     //               yet. Moving content whose structure is still moving means

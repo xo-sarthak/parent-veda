@@ -29,6 +29,38 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Default label, overridden per flavour below. The manifest reads
+        // ${appLabel} rather than hardcoding a name, so the two apps can differ
+        // by one line here instead of by a second manifest to keep in step.
+        manifestPlaceholders["appLabel"] = "ParentVeda"
+    }
+
+    // ---- Two apps, one codebase -------------------------------------------
+    //
+    // `parent` is the app as it has always been: same applicationId, so an
+    // existing install UPDATES rather than appearing twice. Changing it would
+    // orphan every device that already has the app, which is a migration, not
+    // a rename.
+    //
+    // `doctor` (ParentVeda+) gets its own applicationId suffix, so it installs
+    // ALONGSIDE the parent app rather than replacing it. That matters even
+    // though a clinician would only have one: during testing, one phone
+    // needs both.
+    //
+    // Entry point is chosen at build time, not here:
+    //     flutter build apk --release --flavor parent
+    //     flutter build apk --release --flavor doctor --target lib/main_doctor.dart
+    flavorDimensions += "audience"
+    productFlavors {
+        create("parent") {
+            dimension = "audience"
+            manifestPlaceholders["appLabel"] = "ParentVeda"
+        }
+        create("doctor") {
+            dimension = "audience"
+            applicationIdSuffix = ".doctor"
+            manifestPlaceholders["appLabel"] = "ParentVeda+"
+        }
     }
 
     buildTypes {

@@ -12,7 +12,7 @@
 // =============================================================================
 
 import '../data/prepare_data.dart';
-import '../screens/post_pregnancy/pp_experts_data.dart';
+import '../services/expert_store.dart';
 
 enum DoctorStage { pregnancy, parenting }
 
@@ -39,7 +39,7 @@ class DoctorInfo {
 /// Every doctor a person could log in as — parenting experts (those who take
 /// consults) and pregnancy specialists.
 List<DoctorInfo> allDoctors() => [
-      for (final e in kExperts.where((e) => e.timings.trim().isNotEmpty))
+      for (final e in mergedExperts().where((e) => e.timings.trim().isNotEmpty))
         DoctorInfo(
           id: e.id,
           name: e.name,
