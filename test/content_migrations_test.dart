@@ -58,6 +58,12 @@ void main() {
         'no family data: a user id, a partner id and a label. Deliberately NOT '
         'accompanied by grants on partner_attributions or parent_timeline, '
         'which do carry family data',
+    'brand_sample_claims': 'the sampling fulfilment desk (0071) — select+update '
+        'only, so staff can read an address to post a parcel and mark it sent, '
+        'never invent or delete a claim. This one DOES carry family data (a '
+        'postal address) and is granted anyway, because "ParentVeda posts it" '
+        'is the promise printed on the screen and a parcel cannot be addressed '
+        'without one. The BRAND gets brand_sample_counts() and nothing else',
     'care_partner_verification': 'the paperwork behind an approval (0050)',
     'admin_audit_log': 'a VIEW, read only — never the admin_audit table',
     'veda_drafts': "Ask Veda's editorial inbox",

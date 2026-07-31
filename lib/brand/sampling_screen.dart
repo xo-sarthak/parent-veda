@@ -24,6 +24,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'brand_analytics.dart';
 import 'brand_mark.dart';
 import 'brand_models.dart';
+import 'brand_sampling.dart';
 import 'brand_store.dart';
 
 const _bg = Color(0xFFFBF9FE);
@@ -53,13 +54,46 @@ class _SamplingScreenState extends State<SamplingScreen> {
     super.dispose();
   }
 
-  void _register() {
-    if (!_consent || _address.text.trim().length < 10) return;
-    BrandStudioStore.instance.markCompleted(c.id);
-    // `completed` is the campaign-lifecycle event, i.e. the parent reached the
-    // end of what this placement asks of them. For sampling that is the claim.
-    BrandAnalytics.instance.event(c, BrandEvent.completed);
-    setState(() {});
+  bool _saving = false;
+
+  /// The confirmation is shown ONLY if the claim was actually saved.
+  ///
+  /// This used to set a local flag and discard the address — she saw a
+  /// confirmation for a parcel nobody could send. So this awaits the write,
+  /// and a failure keeps her on the form with her address still in it rather
+  /// than telling her something untrue and losing what she typed.
+  Future<void> _register() async {
+    if (_saving || !_consent || _address.text.trim().length < 10) return;
+    setState(() => _saving = true);
+
+    final result = await BrandSampling.claim(
+      campaignId: c.id,
+      address: _address.text,
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    switch (result) {
+      case SampleClaimResult.ok:
+      case SampleClaimResult.alreadyClaimed:
+        // Already claimed is not an error: the parcel is on somebody's list
+        // either way, so the honest thing to show is the confirmation.
+        BrandStudioStore.instance.markCompleted(c.id);
+        // `completed` is the campaign-lifecycle event, i.e. the parent reached
+        // the end of what this placement asks of them. For sampling that is
+        // the claim — and it is recorded only once the claim is real.
+        BrandAnalytics.instance.event(c, BrandEvent.completed);
+        setState(() {});
+      case SampleClaimResult.notSignedIn:
+        _say('Sign in first, so we know where to send it.');
+      case SampleClaimResult.failed:
+        _say('Could not save that — check your connection and try again.');
+    }
+  }
+
+  void _say(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -215,7 +249,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
       ];
 
   Widget _cta(Brand brand) {
-    final ready = _consent && _address.text.trim().length >= 10;
+    final ready = !_saving && _consent && _address.text.trim().length >= 10;
     return GestureDetector(
       onTap: ready ? _register : null,
       behavior: HitTestBehavior.opaque,

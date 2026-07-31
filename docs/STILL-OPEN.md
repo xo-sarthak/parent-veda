@@ -358,21 +358,34 @@ Detail in `docs/BRAND-STUDIO.md`.
 Needs article/FAQ → product tagging. Manual (safe) vs automatic keyword match
 (risky in health copy). **Recommendation: manual.**
 
-## 6.2 Sampling fulfilment
-Registrations reach nobody. Demo-only, or a Supabase table with CSV export.
-**Not** sending the list to the brand — the screen promises the brand receives
-*a count, never a name or address*.
+## 6.2 Sampling fulfilment — **DONE 2026-07-31**
+
+`0071_brand_sample_claims.sql`. The claim now saves, the fulfilment desk is a
+Directus collection (select + update: read the address, mark it posted), and
+the brand gets `brand_sample_counts()` and nothing else.
+
+What is left is operational, not code: **nobody is watching the desk.** A claim
+lands and sits at `status = 'claimed'` until a human opens Directus and posts a
+parcel. Before running a real campaign, decide who does that and how often.
 
 ## 6.3 ParentVeda Certified
 Only a `certified` bool exists. The visible half — badge, a "what Certified
 means" page, published criteria, one demo certified brand — is unbuilt and is
 pure front-end. Must never be sellable.
 
-## 6.4 Partner logos
-Drop 7 PNGs into `assets/brand/partners/`; monogram fallback until then.
+## 6.4 Partner logos — placeholders in place 2026-07-31
 
-Do **not** retry random web image sources. Already tried, inspected and
-rejected: two were other brands' vintage adverts, one was a real child's photo.
+Seven generated wordmark tiles now sit in `assets/brand/partners/`, in each
+brand's real colour, so the `logoAsset` path renders for the first time instead
+of always falling through to the monogram.
+
+They are **not the real trademarks**, deliberately. Replace with licensed assets
+from contracted partners before anything public-facing, and delete any brand you
+have no agreement with — the README in that folder says the same.
+
+Do **not** retry random web image sources for these. Already tried, inspected
+and rejected: two were other brands' vintage adverts, one was a real child's
+photo.
 
 ---
 
@@ -414,7 +427,17 @@ Phase 9 is bigger than pointing a Flow at a URL: it needs a host chosen, a
 deploy config written, and somewhere for the embedding model to live (it
 downloads on first run, which is a cold-start problem on a free tier).
 
-## 7.1 The panel labels rows badly out of the box
+## 7.1 The panel labels rows badly out of the box — CHECKLIST IN THE RUNBOOK
+
+**Deferred by decision 2026-07-30** ("very repetitive, I will do this at the
+very end"). The full checklist — display templates, icons, columns, presets —
+is `docs/DIRECTUS-SETUP.md` **§1b**. `content_posts` is done as the worked
+example; eight collections remain.
+
+**Do it before anyone else gets a login**, for a reason that is easy to miss:
+the column layout is stored **per user**, so setting it up now fixes only your
+own view. A new Editor gets Body / Category / ID back. Only the Display
+Template and a role-blank Preset apply to everyone.
 
 Raised 2026-07-30 from a real attempt to find an article. A collection with no
 **Display Template** makes Directus pick the first text-ish field, so

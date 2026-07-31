@@ -419,6 +419,21 @@ class SupabaseRepo {
     } catch (_) {/* best-effort */}
   }
 
+  /// Update rows matching every column in [filters]. The mirror of
+  /// [deleteMatch], for a table whose natural key is not `id` — a sample claim
+  /// is identified by (campaign_id, user_id), not by a serial nobody holds.
+  /// RLS gates which rows are reachable.
+  static Future<void> updateMatch(
+    String table,
+    Map<String, Object> filters,
+    Map<String, dynamic> changes,
+  ) async {
+    if (userId == null) return;
+    var q = _client.from(table).update(changes);
+    filters.forEach((k, v) => q = q.eq(k, v));
+    await q;
+  }
+
   /// Delete rows matching every column in [filters] (no user_id). RLS gates it.
   static Future<void> deleteMatch(
     String table,
