@@ -21,6 +21,11 @@ class DoctorSession extends ChangeNotifier {
   DoctorSession._();
   static final DoctorSession instance = DoctorSession._();
 
+  /// How long [resolveFromServer] waits for the server before deciding the
+  /// answer is "no identity". See that method for why silence, not just
+  /// failure, has to be handled.
+  static const _resolveDeadline = Duration(seconds: 6);
+
   bool _active = false;
   String? _expertId;
   String? _partnerId;
@@ -85,14 +90,27 @@ class DoctorSession extends ChangeNotifier {
   /// Note the ORDER: expert first. Someone who both consults and represents a
   /// clinic should land in their consulting view, because that is the one with
   /// patients waiting in it.
+  ///
+  /// EVERY CALL HERE IS DEADLINED. This runs on the boot path — main_doctor.dart
+  /// shows a spinner until it answers — so a request that never returns is not a
+  /// slow launch, it is an app that never launches. try/catch does not cover
+  /// that case: it handles a call that FAILS, and says nothing about a call that
+  /// simply never comes back, which is what an unreachable network looks like
+  /// from Dart. The timeout is the other half of "a cloud failure degrades to
+  /// local-only"; without it the rule holds for errors and breaks for silence.
+  ///
+  /// A timeout resolves to "no identity", the same answer as a refusal, so the
+  /// doctor sees the sign-in screen and can act. Six seconds because this blocks
+  /// a person looking at a spinner, not a background sync.
   Future<bool> resolveFromServer() async {
     if (!SupabaseRepo.isLoggedIn) return false;
 
     try {
       // expert_accounts is keyed on user_id and has no created_at, so order by
       // the column it does have — fetch() defaults to created_at and would 400.
-      final rows =
-          await SupabaseRepo.fetch('expert_accounts', orderBy: 'user_id');
+      final rows = await SupabaseRepo.fetch('expert_accounts',
+              orderBy: 'user_id')
+          .timeout(_resolveDeadline);
       final expertId = rows.isEmpty ? null : rows.first['expert_id'] as String?;
       if (expertId != null && expertId.isNotEmpty) {
         _active = true;
@@ -101,10 +119,16 @@ class DoctorSession extends ChangeNotifier {
         notifyListeners();
         return true;
       }
-    } catch (_) {/* fall through to the partner check */}
+    } catch (e) {
+      // Named, not swallowed. "No expert record" and "could not reach the
+      // server" produce the same screen, and telling them apart from the
+      // outside is guesswork — which is exactly how this cost an evening.
+      debugPrint('[doctor] expert_accounts lookup failed: $e');
+    }
 
     try {
-      final res = await SupabaseRepo.callFunction('my_care_partner');
+      final res = await SupabaseRepo.callFunction('my_care_partner')
+          .timeout(_resolveDeadline);
       final first = res.isEmpty ? null : res.first;
       final id = (first is Map) ? first['id'] as String? : null;
       if (id != null && id.isNotEmpty) {
@@ -114,7 +138,9 @@ class DoctorSession extends ChangeNotifier {
         notifyListeners();
         return true;
       }
-    } catch (_) {/* no partner identity either */}
+    } catch (e) {
+      debugPrint('[doctor] my_care_partner lookup failed: $e');
+    }
 
     return false;
   }

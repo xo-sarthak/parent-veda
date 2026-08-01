@@ -10,11 +10,17 @@
 //  SLOT, so the mother and the expert of the same session land in the same room
 //  automatically.
 //
+//  That gate lives in POSTGRES, not here — join_room_for_booking() in 0075.
+//  This file signs a JWT and nothing else, which is the only thing that has to
+//  happen outside the database. It holds no service-role credential; read 0075
+//  for why it used to, and what that cost.
+//
 //  DEPLOY:
 //    supabase functions deploy livekit-token
 //  SECRETS (already set by you):
 //    LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET
 //  (SUPABASE_URL / SUPABASE_ANON_KEY are injected automatically.)
+//  SUPABASE_SERVICE_ROLE_KEY is deliberately NOT used.
 // =============================================================================
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -30,11 +36,17 @@ const cors = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
+const json = (body: unknown, status = 200) => {
+  // LOG EVERY REFUSAL. Without this the function returns an error object and
+  // says nothing, the Dart client throws the body away (invokeEdge returns
+  // null on any 4xx/5xx), and the app shows one generic message for six
+  // different causes. Debugging that means guessing.
+  if (status >= 400) console.error("livekit-token refused", status, body);
+  return new Response(JSON.stringify(body), {
     status,
     headers: { ...cors, "Content-Type": "application/json" },
   });
+};
 
 // --- minimal JWT (HS256), the format LiveKit expects -----------------------
 
@@ -68,7 +80,13 @@ async function signJwt(payload: object, secret: string): Promise<string> {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (!LK_URL || !LK_KEY || !LK_SECRET) {
-    return json({ error: "livekit keys not set" }, 500);
+    // Which one is missing, not just that one is. Says whether a value is
+    // PRESENT, never what it is.
+    return json({
+      error: "livekit keys not set",
+      has: { url: !!LK_URL, key: !!LK_KEY, secret: !!LK_SECRET },
+      urlLooksRight: LK_URL.startsWith("wss://"),
+    }, 500);
   }
 
   try {
@@ -84,43 +102,40 @@ serve(async (req) => {
     const { data: { user } } = await authClient.auth.getUser();
     if (!user) return json({ error: "not authenticated" }, 401);
 
-    // Service-role client to look the booking up regardless of who owns it —
-    // needed because the EXPERT does not own the mother's booking row.
-    const admin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    // AUTHORISE — in the database, not here. join_room_for_booking (0075) is
+    // security definer and answers with the SLOT ID if this caller may join
+    // (the parent who booked it, or the expert hosting it via my_expert_ids),
+    // and null otherwise.
+    //
+    // THIS USED TO USE A SERVICE-ROLE CLIENT and it is why joining was broken:
+    // the elevated client could not read the table, the `error` was discarded
+    // by the destructure, and every failure surfaced as "no such booking" —
+    // pointing at the one thing that was fine. Now the only credential in play
+    // is the caller's own token, the same one getUser() just validated, so
+    // there is no second way to be unauthenticated here.
+    //
+    // It is also less authority: this function can no longer read any row in
+    // any table, only ask one yes/no question about one booking.
+    const { data: slotId, error: authErr } = await authClient
+      .rpc("join_room_for_booking", { p_booking_id: bookingId });
 
-    const { data: booking } = await admin
-      .from("booking_bookings")
-      .select("user_id, slot_id, status")
-      .eq("id", bookingId)
-      .maybeSingle();
-    if (!booking || booking.status === "cancelled") {
-      return json({ error: "no such booking" }, 403);
+    // Keep the error. A failed CALL and a refused ANSWER are different facts
+    // and must not share a message — conflating them is the exact bug above.
+    if (authErr) {
+      return json({
+        error: "authorisation lookup failed",
+        detail: authErr.message,
+        hint: "is migration 0075 applied?",
+      }, 500);
     }
-
-    // AUTHORISE: the mother who booked it, OR the expert who hosts the slot.
-    let allowed = booking.user_id === user.id;
-    if (!allowed) {
-      const { data: slot } = await admin
-        .from("booking_slots")
-        .select("expert_id")
-        .eq("id", booking.slot_id)
-        .maybeSingle();
-      if (slot) {
-        const { data: ea } = await admin
-          .from("expert_accounts")
-          .select("expert_id")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        allowed = !!ea && ea.expert_id === slot.expert_id;
-      }
+    if (!slotId) {
+      // Deliberately one message for "no such booking" and "not yours": the
+      // database returns null for both so ids cannot be probed from here.
+      return json({ error: "not your session", bookingId }, 403);
     }
-    if (!allowed) return json({ error: "not your session" }, 403);
 
     // Same slot -> same room, so both parties meet.
-    const room = `bkroom_${booking.slot_id}`;
+    const room = `bkroom_${slotId}`;
     const now = Math.floor(Date.now() / 1000);
     const token = await signJwt(
       {
@@ -142,6 +157,7 @@ serve(async (req) => {
 
     return json({ url: LK_URL, token, room });
   } catch (e) {
+    console.error("livekit-token threw", e);
     return json({ error: String(e) }, 500);
   }
 });

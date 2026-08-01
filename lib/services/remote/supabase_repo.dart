@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Shared cloud data-access layer ("repository") for ParentVeda.
@@ -466,11 +467,30 @@ class SupabaseRepo {
   ) async {
     try {
       final res = await _client.functions.invoke(name, body: body);
-      if (res.status >= 400) return null;
+      if (res.status >= 400) {
+        // WHY THIS LOGS. Returning a bare null made every edge-function
+        // failure identical: "keys not set", "not your session", "no such
+        // booking" and a network timeout all reached the caller as null, and
+        // every caller then showed one generic message for six causes. That
+        // cost three rounds of guessing on the first LiveKit call.
+        //
+        // The body is the server's own refusal — it is not secret, it is the
+        // explanation. Log it.
+        debugPrint('[edge] $name -> ${res.status} ${res.data}');
+        return null;
+      }
       final data = res.data;
       if (data is Map) return Map<String, dynamic>.from(data);
+      debugPrint('[edge] $name -> 200 but not a map: ${res.data}');
       return null;
-    } catch (_) {
+    } on FunctionException catch (e) {
+      // Newer supabase_flutter THROWS on non-2xx rather than returning a
+      // status, so the branch above never runs and the reason vanished into
+      // the catch-all. Both paths now say the same thing.
+      debugPrint('[edge] $name -> ${e.status} ${e.details ?? e.reasonPhrase}');
+      return null;
+    } catch (e) {
+      debugPrint('[edge] $name threw: $e');
       return null;
     }
   }
