@@ -39,14 +39,45 @@ String hhmm(Minutes m) {
 }
 
 /// A continuous stretch of a working day, e.g. 10:00-13:00.
+///
+/// OVERNIGHT SESSIONS. [end] may run PAST 1440 — 11:00 PM to 1:00 AM is
+/// `Session(1380, 1500)`, not `Session(1380, 60)`. The second form is the one
+/// that reads as "ends before it starts", and refusing it was a real bug: a
+/// doctor who consults late could not describe their own hours.
+///
+/// Minutes-past-midnight-of-the-START-day is the fix, and it is worth saying
+/// why it beats the alternatives. A wrap-around flag (`crossesMidnight: true`)
+/// puts a special case into every comparison — `overlaps`, sorting, the slot
+/// loop — and each one is a chance to forget it. A pair of DateTimes drags a
+/// calendar date into a WEEKLY pattern that deliberately has none. Letting the
+/// number keep counting past midnight leaves the arithmetic linear, so
+/// `end > start`, `end - start` and `overlaps` all keep working unchanged.
+///
+/// [hhmm] already wraps the hour with `% 24`, so 1500 has always printed as
+/// "1:00 AM" — the display half was correct before the model allowed it.
+///
+/// A session may not exceed 24 hours, so [end] is bounded at `start + 1440`.
+/// That is the difference between "a late clinic" and a typo.
 @immutable
 class Session {
   const Session(this.start, this.end);
   final Minutes start;
   final Minutes end;
 
-  bool get isValid => end > start;
+  /// True when this session runs into the following calendar day.
+  bool get crossesMidnight => end > 1440;
+
+  /// How far into the NEXT day it reaches, in minutes. 0 when it does not.
+  /// Used to check a late session against the next morning's first one.
+  Minutes get spillMin => crossesMidnight ? end - 1440 : 0;
+
+  bool get isValid =>
+      start >= 0 && start < 1440 && end > start && (end - start) <= 1440;
   int get lengthMin => end - start;
+
+  /// Same-day overlap only. Two sessions on DIFFERENT days can still collide in
+  /// real time when the earlier one crosses midnight — see [spillsInto], which
+  /// is the check that catches it.
   bool overlaps(Session o) => start < o.end && o.start < end;
 
   Map<String, Object?> toMap() => {'start': start, 'end': end};
@@ -54,7 +85,8 @@ class Session {
       Session((d['start'] as num).toInt(), (d['end'] as num).toInt());
 
   @override
-  String toString() => '${hhmm(start)}-${hhmm(end)}';
+  String toString() =>
+      '${hhmm(start)}-${hhmm(end)}${crossesMidnight ? ' (next day)' : ''}';
 
   @override
   bool operator ==(Object other) =>
@@ -73,12 +105,44 @@ class DaySchedule {
   bool get isWorking => sessions.isNotEmpty;
   int get totalMin => sessions.fold(0, (a, s) => a + s.lengthMin);
 
+  /// How far past midnight this day reaches, in minutes. 0 for an ordinary
+  /// day. The slot engine needs it to know how wide "one working day" is when
+  /// counting a daily cap.
+  Minutes get spillMin =>
+      sessions.fold(0, (a, s) => s.spillMin > a ? s.spillMin : a);
+
   Map<String, Object?> toMap() =>
       {'sessions': sessions.map((s) => s.toMap()).toList()};
   static DaySchedule fromMap(Map d) => DaySchedule(
       ((d['sessions'] as List?) ?? const [])
           .map((e) => Session.fromMap(e as Map))
           .toList());
+}
+
+/// Does a session that runs past midnight collide with the FOLLOWING day's
+/// work? A Monday 11 PM - 2 AM session and a Tuesday 1 AM start are the same
+/// hour of the same night, and [Session.overlaps] cannot see it because it
+/// compares two numbers on one day's axis.
+///
+/// Kept as a free function rather than a method because it is a fact about a
+/// PAIR of days, and putting it on either one would imply the other is the
+/// special case.
+bool spillsInto(Session s, DaySchedule nextDay) {
+  if (!s.crossesMidnight) return false;
+  return nextDay.sessions.any((n) => n.start < s.spillMin);
+}
+
+/// The sessions actually in force on [day]: a date override if one exists,
+/// otherwise the weekly pattern, and nothing at all on a closed day or during
+/// time off. One place, because the slot loop now needs to ask this about the
+/// PREVIOUS day too — and two copies of "what is this doctor doing on date X"
+/// is how a holiday ends up honoured in one calculation and ignored in the next.
+List<Session> _sessionsFor(DoctorSchedule schedule, DateTime day) {
+  final d = DateTime(day.year, day.month, day.day);
+  if (schedule.timeOff.any((t) => t.covers(d))) return const [];
+  final ov = schedule.overrides[DateOverride.keyFor(d)];
+  if (ov != null && ov.closed) return const [];
+  return ov?.sessions ?? schedule.dayFor(d.weekday).sessions;
 }
 
 /// How consultations are spaced. All doctor-editable.
@@ -375,15 +439,27 @@ List<GeneratedSlot> generateSlots(
     if (schedule.timeOff.any((t) => t.covers(day))) continue;
 
     // A date override beats the weekly pattern.
-    final ov = schedule.overrides[DateOverride.keyFor(day)];
-    if (ov != null && ov.closed) continue;
-    final sessions = ov?.sessions ?? schedule.dayFor(day.weekday).sessions;
+    final sessions = _sessionsFor(schedule, day);
     if (sessions.isEmpty) continue;
 
-    // How many more bookings this day can take at all.
-    final bookedToday = booked
-        .where((b) => b.year == day.year && b.month == day.month && b.day == day.day)
-        .length;
+    // How many more bookings this WORKING day can take at all.
+    //
+    // "Day" here is the SHIFT, not the calendar square. A session running
+    // 11 PM - 2 AM belongs to the evening it started, so a consult at 00:30
+    // spends the same daily cap as one at 11:30 PM. Counting by calendar date
+    // would hand a doctor working nights a fresh maxPerDay at midnight, which
+    // is exactly the exhaustion the cap exists to prevent.
+    //
+    // The window therefore starts where YESTERDAY's shift ended, so a booking
+    // in the small hours is charged to one night and not to both.
+    final from0 = day.add(Duration(
+        minutes: DaySchedule(
+                _sessionsFor(schedule, day.subtract(const Duration(days: 1))))
+            .spillMin));
+    final to0 = day.add(const Duration(days: 1)).add(
+        Duration(minutes: DaySchedule(sessions).spillMin));
+    final bookedToday =
+        booked.where((b) => !b.isBefore(from0) && b.isBefore(to0)).length;
     var remaining = rules.maxPerDay - bookedToday;
     if (remaining <= 0) continue;
 

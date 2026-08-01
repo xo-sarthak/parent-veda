@@ -242,6 +242,85 @@ void main() {
     });
   });
 
+
+  // ---------------------------------------------------------------------------
+  //  Sessions that run past midnight
+  // ---------------------------------------------------------------------------
+  //  A late clinic - 11 PM to 1 AM - used to be rejected as "ends before it
+  //  starts", because 60 really is less than 1380 on one day's clock. `end` may
+  //  now count past 1440, which keeps every comparison linear. These pin the
+  //  three things that could quietly break: the arithmetic, the slots landing
+  //  on the RIGHT calendar day, and the daily cap counting a night as one shift
+  //  rather than handing out a fresh allowance at midnight.
+  group('overnight sessions', () {
+    test('11 PM to 1 AM is a valid two-hour session, not a backwards one', () {
+      const s = Session(23 * 60, 25 * 60); // 1380 -> 1500
+      expect(s.isValid, isTrue);
+      expect(s.crossesMidnight, isTrue);
+      expect(s.lengthMin, 120);
+      expect(s.spillMin, 60);
+      expect(s.toString(), '11:00 PM-1:00 AM (next day)');
+    });
+
+    test('a session may not exceed 24 hours', () {
+      expect(const Session(23 * 60, 23 * 60 + 1441).isValid, isFalse);
+      expect(const Session(23 * 60, 23 * 60 + 1440).isValid, isTrue);
+    });
+
+    test('the slots after midnight land on the NEXT calendar day', () {
+      final slots = _oneDay(_sched(sessions: const [Session(23 * 60, 25 * 60)]));
+      // 23:00, 23:30, 00:00, 00:30 - four 30-minute slots inside two hours.
+      expect(slots.length, 4);
+      expect(slots.first.start, DateTime(2026, 8, 3, 23, 0));
+      expect(slots.last.start, DateTime(2026, 8, 4, 0, 30));
+      // The last one must still FINISH inside the session.
+      expect(slots.last.end, DateTime(2026, 8, 4, 1, 0));
+    });
+
+    test('a night is ONE working day for the per-day cap', () {
+      // Two already booked, cap of three: exactly one slot may remain, and the
+      // booking after midnight has to count against the same night. Counting by
+      // calendar date would reset the cap at 00:00 and offer more.
+      final slots = generateSlots(
+        _sched(
+          sessions: const [Session(23 * 60, 25 * 60)],
+          rules: const ConsultRules(
+            slotMinutes: 30,
+            bufferAfterMin: 0,
+            minNoticeMinutes: 0,
+            maxPerDay: 3,
+            maxConsecutive: 0,
+          ),
+        ),
+        from: _now,
+        days: 1,
+        booked: {
+          DateTime(2026, 8, 3, 23, 0),
+          DateTime(2026, 8, 4, 0, 0), // after midnight, same shift
+        },
+        now: _now,
+      );
+      expect(slots.length, 1);
+    });
+
+    test('spillsInto catches a clash the same-day overlap check cannot', () {
+      const late = Session(23 * 60, 26 * 60); // 11 PM - 2 AM
+      const earlyNext = DaySchedule([Session(60, 9 * 60)]); // 1 AM - 9 AM
+      const clearNext = DaySchedule([Session(10 * 60, 13 * 60)]);
+      expect(spillsInto(late, earlyNext), isTrue);
+      expect(spillsInto(late, clearNext), isFalse);
+      // An ordinary session never spills, whatever the next day looks like.
+      expect(spillsInto(const Session(600, 780), earlyNext), isFalse);
+    });
+
+    test('an overnight session survives toMap/fromMap unchanged', () {
+      const s = Session(23 * 60, 25 * 60);
+      final back = Session.fromMap(s.toMap());
+      expect(back, s);
+      expect(back.crossesMidnight, isTrue);
+    });
+  });
+
   group('round trips', () {
     test('a whole schedule survives toMap/fromMap', () {
       final s = DoctorSchedule.starter.copyWith(

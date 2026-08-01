@@ -100,6 +100,24 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
       sessions.add(result);
     }
     sessions.sort((a, b) => a.start.compareTo(b.start));
+
+    // A session that runs past midnight lands in the NEXT day's hours, where
+    // Session.overlaps cannot see it — that comparison works on one day's axis
+    // and these are two. Refused rather than merged: a doctor who is booked
+    // 11 PM-2 AM and again from 1 AM has described two consults at once, and
+    // silently trimming one of them decides something that is theirs to decide.
+    //
+    // In "same hours every day" mode the next day carries the same sessions,
+    // so this also catches a nightly session that would collide with itself.
+    final nextDay = _perDay
+        ? _s.dayFor(weekday == DateTime.sunday ? DateTime.monday : weekday + 1)
+        : DaySchedule(sessions);
+    final clash = sessions.where((s) => spillsInto(s, nextDay)).firstOrNull;
+    if (clash != null) {
+      _toast('${clash.toString()} runs into the next day\'s hours.');
+      return;
+    }
+
     _applyDay(weekday, DaySchedule(sessions));
   }
 
@@ -139,9 +157,30 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
       helpText: 'Session ends',
     );
     if (end == null) return null;
-    final s = Session(start.hour * 60 + start.minute, end.hour * 60 + end.minute);
+
+    final startMin = start.hour * 60 + start.minute;
+    var endMin = end.hour * 60 + end.minute;
+
+    // AN END BEFORE THE START MEANS TOMORROW, NOT A MISTAKE.
+    //
+    // A doctor picking 11:00 PM to 1:00 AM used to be told "that session ends
+    // before it starts", because 60 really is less than 1380 on one day's
+    // clock. But nobody schedules a session backwards — there is no other
+    // thing they could have meant. So the only reading that makes sense is the
+    // one the clock gives you when you keep going: 1:00 AM is minute 1500.
+    //
+    // EQUAL is still refused, and that one is genuinely ambiguous: 11 PM to
+    // 11 PM is either a zero-length session or a twenty-four hour one, and
+    // guessing between them is worse than asking again.
+    if (endMin < startMin) endMin += 1440;
+
+    final s = Session(startMin, endMin);
     if (!s.isValid) {
-      if (mounted) _toast('That session ends before it starts.');
+      if (mounted) {
+        _toast(endMin == startMin
+            ? 'Start and end are the same time.'
+            : 'That session is not a valid stretch of time.');
+      }
       return null;
     }
     return s;
