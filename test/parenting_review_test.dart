@@ -31,6 +31,7 @@ String _code(String src) => src
     .join('\n');
 
 void main() {
+  productTemplateAcrossApps();
   final drawerRaw = _read('lib/screens/post_pregnancy/explore_drawer.dart');
   final drawer = _code(drawerRaw);
   final navRaw = _read('lib/screens/post_pregnancy/pp_common.dart');
@@ -577,6 +578,107 @@ void main() {
       // saying so.
       expect(next.contains('coming very') || next.contains('coming soon'), isTrue);
       expect(next.contains('Your parenting side stays exactly'), isTrue);
+    });
+  });
+}
+
+// =============================================================================
+//  The other half of the product point: pregnancy AND parenting.
+// -----------------------------------------------------------------------------
+//  "Currently some diff is there in the format and template across pregnancy
+//  and parenting and within parenting as well."
+//
+//  Within-parenting was one `if (_isSoother)` branch, covered above. This is
+//  the across half — the two pages are deliberately NOT the same code (the
+//  pregnancy one is bilingual and carries affiliate rules, a cart, a checklist
+//  and a week timeline that only means anything before birth), so what is
+//  aligned is what a parent actually experiences as "a different template":
+//  the section names and their order.
+// =============================================================================
+
+void productTemplateAcrossApps() {
+  final preg = _code(_read('lib/screens/products_screen.dart'));
+  final strings = _read('lib/localization/app_language.dart');
+
+  group('product template across both apps', () {
+    test('the shared section names exist in both languages', () {
+      for (final getter in [
+        'prAtAGlance',
+        'prWhatsInside',
+        'prPvTake',
+        'prVerifiedParents',
+        'prCompareAlternatives',
+        'prHowWeReview',
+      ]) {
+        expect(strings.contains('String get $getter'), isTrue,
+            reason: '$getter missing');
+      }
+      // Hinglish, not English twice — this screen is bilingual and a section
+      // heading that stays English is the tell.
+      expect(strings.contains("_p('At a glance', 'Ek nazar mein')"), isTrue);
+      expect(strings.contains("_p(\"ParentVeda's take\", 'ParentVeda ki raay')"),
+          isTrue);
+      expect(strings.contains("_p('From verified parents', 'Verified parents se')"),
+          isTrue);
+    });
+
+    test('the pregnancy page uses them', () {
+      for (final g in [
+        's.prAtAGlance',
+        's.prPvTake',
+        's.prVerifiedParents',
+        's.prCompareAlternatives',
+        's.prHowWeReview',
+      ]) {
+        expect(preg.contains(g), isTrue, reason: '$g never rendered');
+      }
+    });
+
+    test('the old headings are commented, not deleted', () {
+      final raw = _read('lib/screens/products_screen.dart');
+      for (final old in [
+        'Text(s.prVerdict, ...)',
+        'Text(s.prWhy, ...)',
+        's.prReviewSummary',
+        's.prRelated',
+      ]) {
+        expect(raw.contains(old), isTrue, reason: 'missing revert note: $old');
+      }
+    });
+
+    test('both apps disclose how a product is reviewed', () {
+      expect(preg.contains('_HowWeReviewPreg('), isTrue);
+      expect(
+          _code(_read('lib/screens/post_pregnancy/product_detail_screen.dart'))
+              .contains('_HowWeReview('),
+          isTrue);
+    });
+
+    test('the shared sections run in the same order in both', () {
+      // Only the sections the pregnancy DETAIL page actually renders. The
+      // first attempt at this test included prWhatsInside and caught a real
+      // mistake: that heading belongs to _GuidanceCard, which is on the
+      // CATEGORY screen, so renaming it aligned nothing.
+      final order = [
+        'prAtAGlance',
+        'prPvTake',
+        'prVerifiedParents',
+        'prHowWeReview',
+        'prCompareAlternatives',
+      ];
+      var last = -1;
+      for (final g in order) {
+        final at = preg.indexOf('s.$g');
+        expect(at, greaterThan(last), reason: '$g is out of order');
+        last = at;
+      }
+    });
+
+    test('the week timeline survives — a stage-specific section is allowed', () {
+      // Consistency is about the SHARED sections. A pregnancy page losing its
+      // week timeline to match a parenting page would be consistency bought by
+      // deleting something useful.
+      expect(preg.contains('_WeekTimeline('), isTrue);
     });
   });
 }

@@ -486,6 +486,15 @@ class _GuidanceCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
+          // NOT renamed. This is _GuidanceCard, which renders on the CATEGORY
+          // screen, not on the product detail — so retitling it would have
+          // aligned nothing and would have renamed a category's buying advice
+          // into a product's ingredient list. Caught by the order test.
+          //
+          // The detail page's own section names are aligned below; what it
+          // genuinely lacks ("What's inside & how it works", "Read the
+          // research") is content that does not exist on the pregnancy side
+          // and is recorded in STILL-OPEN rather than faked here.
           Text('${s.prGuidance} ', style: text.titleSmall?.copyWith(
               color: _accent, fontWeight: FontWeight.w800)),
           const Text('❤️', style: TextStyle(fontSize: 14)),
@@ -790,10 +799,12 @@ class ProductDetailScreen extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 16),
-          // Verdict
+          // WAS "ParentVeda Verdict". Renamed to the shared template's name so
+          // the same block is called the same thing in both apps. Kept:
+          //   Text(s.prVerdict, ...)
           _sectionCard(context, [
             Row(children: [
-              Text(s.prVerdict, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              Text(s.prAtAGlance, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
               const Spacer(),
               _scorePill(product.score),
             ]),
@@ -816,10 +827,14 @@ class ProductDetailScreen extends StatelessWidget {
               ),
             ]),
           ],
-          // Why
+          // WAS s.prWhy ("Why we picked it"). This block is a verdict with
+          // reasons for and against - which is exactly what the parenting
+          // page's "ParentVeda's take" is, right down to the check rows and
+          // the bulleted considerations. Same thing, shared name.
+          // Kept: Text(s.prWhy, ...)
           const SizedBox(height: 12),
           _sectionCard(context, [
-            Text(s.prWhy, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+            Text(s.prPvTake, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
             for (final w in product.why)
               Padding(
@@ -859,7 +874,9 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _sectionCard(context, [
               Row(children: [
-                Text(s.prReviewSummary, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                // WAS s.prReviewSummary ("What parents say"). Same section,
+                // same content, shared name. Kept for revert.
+                Text(s.prVerifiedParents, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 const Text(' ❤️'),
               ]),
               const SizedBox(height: 10),
@@ -883,6 +900,14 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
             for (final r in product.reviews) _reviewCard(context, r, s),
           ],
+          // HOW PARENTVEDA REVIEWS THIS, as an expandable (!) - the review
+          // asked for it on the product template, and it was on neither app's
+          // page as a disclosure a parent could open. Same treatment as the
+          // parenting side: collapsed, because it answers a question asked
+          // once and then never again.
+          const SizedBox(height: 16),
+          _HowWeReviewPreg(title: s.prHowWeReview, body: s.prHowWeReviewSub),
+
           // Buy actions - affiliate (Amazon only) vs ParentVeda (cart + buy now).
           const SizedBox(height: 16),
           if (productIsAffiliate(product)) ...[
@@ -949,11 +974,68 @@ class ProductDetailScreen extends StatelessWidget {
           // Related
           if (related.isNotEmpty) ...[
             const SizedBox(height: 22),
-            Text(s.prRelated, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            // WAS s.prRelated ("Related"). The parenting page calls the same
+            // rail "Compare with alternatives", which also says what it is FOR
+            // rather than merely how it is related. Kept for revert.
+            Text(s.prCompareAlternatives, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
             for (final p in related) _ProductCard(product: p, controller: controller),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// The (!) disclosure, matching the parenting product page.
+///
+/// A separate StatefulWidget because ProductDetailScreen here is stateless and
+/// one boolean does not justify making a 300-line bilingual page stateful.
+class _HowWeReviewPreg extends StatefulWidget {
+  const _HowWeReviewPreg({required this.title, required this.body});
+  final String title;
+  final String body;
+
+  @override
+  State<_HowWeReviewPreg> createState() => _HowWeReviewPregState();
+}
+
+class _HowWeReviewPregState extends State<_HowWeReviewPreg> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return GestureDetector(
+      onTap: () => setState(() => _open = !_open),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.outlineVariant),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.info_outline_rounded,
+                size: 17, color: AppTheme.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(widget.title,
+                  style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+            ),
+            Icon(_open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                size: 20, color: AppTheme.neutral500),
+          ]),
+          if (_open) ...[
+            const SizedBox(height: 10),
+            Text(widget.body,
+                style: text.bodyMedium
+                    ?.copyWith(color: AppTheme.neutral700, height: 1.5)),
+          ],
+        ]),
       ),
     );
   }

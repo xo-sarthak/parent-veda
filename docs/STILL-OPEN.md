@@ -623,18 +623,20 @@ Held by `test/parenting_review_test.dart`.
 
 Everything removed is **commented in place** with its screen still on disk.
 
-### Blocked — needs the WhatsApp material
+### The "WhatsApp feedback" was pass 1 — RESOLVED 2026-08-01
 
-Three items reference feedback shared on WhatsApp, which is not in the repo and
-was not in either PDF:
+Three items in pass 2 point at "feedback shared on whats app" (2·3 the baby
+profile, 2·21 the My Child section, Products·1 the product changes). **That
+feedback IS pass 1**, confirmed by the user, so all three were already covered
+by implementing it. Both documents are now fully applied.
 
-* **2·3** redesign the first section (baby profile) "based on image shared on
-  whats app"
-* **2·21** "changes to the My child section as per the feedback shared on
-  whatsapp"
-* **Products·1** "changes as per the changes mentioned in whats app"
+Two things surfaced when that was rechecked:
 
-Nothing was guessed at for these. Everything else in both documents is done.
+* **"Add to compare"** was already in the right place on the parenting product
+  page — a row between "From verified parents" and "Compare with alternatives",
+  exactly as pass 1 specifies.
+* **"Across pregnancy and parenting" had NOT been done.** Only the
+  within-parenting half was. Now fixed — see below.
 
 ### Judgement calls worth knowing about
 
@@ -671,6 +673,39 @@ Nothing was guessed at for these. Everything else in both documents is done.
   a mechanism and a named body of work. They deliberately avoid precise
   citations — a fabricated-looking reference is the one error a reader cannot
   catch — but they are health-adjacent copy and should be reviewed.
+
+### The product template across both apps
+
+The two product pages are deliberately **not** the same code. The pregnancy one
+is bilingual and carries affiliate rules, a cart, a checklist and a week
+timeline that only means anything before birth; rewriting it into the parenting
+one would be a rewrite of a shipped stage and would drag the whole pregnancy
+commerce flow with it.
+
+What a parent experiences as "a different template" is the section NAMES and
+their ORDER, so those are aligned, with new bilingual strings:
+
+| shared name | was, on the pregnancy page |
+|---|---|
+| At a glance | ParentVeda Verdict |
+| ParentVeda's take | Why we picked it |
+| From verified parents | What parents say |
+| Compare with alternatives | Related |
+| How ParentVeda reviews this (!) | did not exist on either page |
+
+The week timeline stays — consistency is about the shared sections, and a
+pregnancy page losing something useful to match a parenting page is consistency
+bought at the wrong price.
+
+**Still missing on the pregnancy side, and it is content rather than code:**
+"What's inside & how it works" and "Read the research" have no equivalent data
+on a pregnancy `Product`. They were not faked.
+
+⚠️ **A mistake worth recording.** The first attempt renamed `_GuidanceCard`'s
+heading to "What's inside & how it works" — but that card renders on the
+CATEGORY screen, not the product detail, so it aligned nothing and would have
+retitled a category's buying advice into a product's ingredient list. The order
+test caught it. Reverted, with a note in place.
 
 ### Four existing tests retired
 

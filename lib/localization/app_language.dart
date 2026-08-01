@@ -3139,6 +3139,28 @@ class S {
   String get prCompare => _p('Compare', 'Compare');
   String prBrowseAllCount(int n) => _p('Browse all $n', 'Sabhi $n dekhein');
   String get prVerdict => _p('ParentVeda Verdict', 'ParentVeda Verdict');
+
+  // ---- SHARED PRODUCT TEMPLATE ---------------------------------------------
+  // The parenting product page and this one used different section names for
+  // the same things, which is what the review meant by the template differing
+  // "across pregnancy and parenting". These are the shared vocabulary; the
+  // parenting side already uses the English of each.
+  //
+  // prVerdict above is kept: it is what the old "ParentVeda Verdict" heading
+  // used, and leaving it means the rename is one line to undo.
+  String get prAtAGlance => _p('At a glance', 'Ek nazar mein');
+  String get prWhatsInside =>
+      _p("What's inside & how it works", 'Ismein kya hai aur kaise kaam karta hai');
+  String get prPvTake => _p("ParentVeda's take", 'ParentVeda ki raay');
+  String get prVerifiedParents =>
+      _p('From verified parents', 'Verified parents se');
+  String get prCompareAlternatives =>
+      _p('Compare with alternatives', 'Doosre options se compare karein');
+  String get prHowWeReview => _p('How ParentVeda reviews this',
+      'ParentVeda ise kaise review karta hai');
+  String get prHowWeReviewSub => _p(
+      'Every pick is checked the same way - so a rating means the same thing across the shelf.',
+      'Har pick ek hi tarah se check hota hai - taaki rating ka matlab har jagah same rahe.');
   String get prReviewSummary => _p('What parents say', 'Parents kya kehte hain');
   String get prMostLoved => _p('Most loved', 'Sabse pasand');
   String get prPraise => _p('Most mentioned praise', 'Sabse zyada taareef');
