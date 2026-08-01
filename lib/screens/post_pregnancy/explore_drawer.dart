@@ -23,6 +23,7 @@ import 'family_profile_screen.dart';
 // ignore: unused_import
 import 'development_home_screen.dart';
 import 'grow_home_screen.dart';
+import 'wallet_home_screen.dart';
 // Food is merged into Recipes; "Guides & Tools" retired. Kept for revert:
 // import 'food_home_screen.dart';
 // import 'guides_tools_screen.dart';
@@ -34,6 +35,9 @@ import 'yoga_home_screen.dart';
 // The Health Guide is now reached from inside the Health ecosystem, not the
 // drawer directly. Kept (commented) in case we want the direct entry back.
 // import 'health_guide_screen.dart';
+// Kept: referenced by the commented-out V1-direct row below, and constructed
+// for real by WalletHomeScreen.
+// ignore: unused_import
 import 'health_home_screen.dart';
 import 'investments_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
@@ -102,8 +106,14 @@ class ExploreDrawer extends StatelessWidget {
                   // inside it now). Old row kept, commented, for easy revert:
                   // _section(context, Icons.monitor_heart_outlined, 'Health Guide',
                   //     "Aarav's health record & guidance.", const HealthGuideScreen()),
+                  // Now opens the three-version wrapper (V1 = this exact
+                  // screen, unchanged; V2 = the Health Wallet brief as
+                  // written; V3 = the recommendation). Old row kept,
+                  // commented, for easy revert:
+                  // _section(context, Icons.monitor_heart_outlined, 'Health',
+                  //     "${ChildProfileStore.instance.name}'s living health story, organised.", const HealthHomeScreen()),
                   _section(context, Icons.monitor_heart_outlined, 'Health',
-                      "${ChildProfileStore.instance.name}'s living health story, organised.", const HealthHomeScreen()),
+                      "${ChildProfileStore.instance.name}'s living health story, organised.", const WalletHomeScreen()),
                   // Food is merged into Recipes now (one unified food companion). Kept for revert:
                   // _section(context, Icons.ramen_dining_outlined, 'Food',
                   //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),

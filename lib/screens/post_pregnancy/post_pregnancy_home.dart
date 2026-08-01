@@ -30,7 +30,11 @@ import 'pp_food_data.dart';
 // The Health quick action now opens the full Health ecosystem; the old
 // HealthGuideScreen import is kept (commented) for easy revert.
 // import 'health_guide_screen.dart';
+// Kept: referenced by the commented-out row below, and constructed for real
+// by WalletHomeScreen.
+// ignore: unused_import
 import 'health_home_screen.dart';
+import 'wallet_home_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'my_child_screen.dart';
@@ -449,8 +453,12 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           _qa(Icons.auto_awesome_outlined, 'Ask Veda', () => openPpTab(context, 1)),
           _qa(Icons.menu_book_outlined, 'Journal', () => _push(const JournalV2Home())),
           _qa(Icons.compare_arrows_rounded, 'Compare', () => _push(const ProductsCompareScreen())),
-          // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem:
-          _qa(Icons.monitor_heart_outlined, 'Health', () => _push(const HealthHomeScreen())),
+          // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem.
+          // Then, with the Health Wallet versions, the wrapper rather than V1
+          // directly, so the same door is used from Explore and from here.
+          // Kept for revert:
+          // _qa(Icons.monitor_heart_outlined, 'Health', () => _push(const HealthHomeScreen())),
+          _qa(Icons.monitor_heart_outlined, 'Health', () => _push(const WalletHomeScreen())),
         ])),
       ]);
 

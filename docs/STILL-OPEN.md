@@ -528,6 +528,92 @@ fix. **Roughly 120–150 activities is where this stops being propped up.**
 Where they come from — written in-house, licensed, or generated and clinically
 reviewed — is undecided and is the long pole for whichever version ships.
 
+## 5.10 Health Wallet — two live versions behind one Explore row
+
+Explore → "Health" and the parenting home's Health quick action now both open
+`WalletHomeScreen`, which carries a version pill (session-only). Built
+2026-08-01, same arrangement as Grow §5.9.
+
+**Still undecided, and it is the same question as Grow's:** which of the two
+wins, and does it replace the Health row or ship beside it. Until that is
+answered both stay.
+
+* ~~**V1** — `HealthHomeScreen`, the real screen, constructed as-is.~~
+  **Retired from the toggle 2026-08-01**, once the comparison against what
+  ships had been made. Commented in place, screen still on disk, Explore's
+  direct row still commented — reinstating it is one line in
+  `WalletHomeScreen` plus the default in `WalletVersionStore`.
+* **V2** — the Health Wallet brief as written, *including* the "Healthy" status
+  card and auto-creating reminders from an uploaded document. **Now the
+  default.**
+* **V3** — the brief's structure with two changes, both safety rather than
+  taste (below).
+
+The pill now reads **V2 | V3**.
+
+Most of the brief already existed. Timeline, Records, Growth, Doctor Visit and
+the Emergency editor are shipped screens that already match what it describes,
+and all of them are reused rather than rebuilt. The genuinely new surfaces are
+the **Reminders hub** and the **Emergency card**, and those are shared by V2
+and V3 because the versions do not disagree about them.
+
+### The two things V3 changes
+
+**1. The status card does not say "Healthy".** The brief leads its home with a
+green dot and that word. ParentVeda knows what has been typed into it, which is
+not the same thing, and the gap is where the harm sits: a child with an
+unlogged problem still gets a green dot, so the parent who most needs a nudge
+is the one most reassured. V3 answers a question it can answer — *is anything
+waiting for you?* — and carries a "what this card is, and is not" sheet.
+
+Same reasoning `TruthSource` already uses: ParentVeda's own calculation sits
+second from the bottom, below the mother's own observation. A computed
+"Healthy" would put it at the top.
+
+**2. Nothing is created from a document without a human confirming it.** The
+brief wants an uploaded prescription to create medicine reminders
+automatically. A misread dose then becomes a recurring alarm for the wrong
+amount, on time, with the app's authority behind it. V3 keeps the extraction
+and adds a confirm step.
+
+Both are asserted in `test/health_wallet_test.dart` rather than left in a
+comment.
+
+### Deliberate omissions, so they are not mistaken for gaps
+
+* **Medicine is not in the Reminders hub.** Dose alarms are set on the
+  medication record itself, so the time, the dose and the alarm cannot
+  disagree. The hub explains where it went rather than leaving a parent to
+  conclude it is missing.
+* **Vaccination is linked, not absorbed.** The brief lists it as one row inside
+  Records; it is a large shipped tracker with its own schedule, reminders and
+  learn-why pages. Folding it in would duplicate or strand it.
+* **The emergency QR encodes the details, not a URL.** An emergency is the one
+  moment there may be no signal. The trade — anyone who can see the code can
+  read the card — is correct for a card whose purpose is to be read by a
+  stranger in a hurry, and it carries nothing beyond the first two minutes: no
+  history, no reports, no address.
+
+### ⚠️ CROSS-REPO HANDOVER — the "Smart AI" half is not built
+
+The brief's document-extraction (detect medicines, identify doctor, detect
+visit date, classify the document) **does not exist and must not be built
+here.** There is no OCR or entity extraction in this repo by design — AI lives
+in the Ask Veda service, `C:\Projects\parentveda-askveda`, a separate
+codebase. The upload screen says so on screen rather than faking a progress bar
+that fills up to invented results.
+
+What the service needs to add, written down so this is a handover and not a
+silent gap:
+
+* an endpoint taking an image or PDF
+* returning `{document_type, medicines[], doctor, visit_date}`
+* **with a per-field confidence**, because V3's confirm screen needs to show
+  which fields to look at hardest
+
+Until that exists, both versions store the document and the parent types what
+they want searchable.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already
