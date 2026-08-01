@@ -10,17 +10,22 @@
 //  the day is something you meet once and then get on with, not a card you
 //  scroll past forty times.
 //
-//  ONCE A DAY, NOT ONCE A LAUNCH, and the difference matters. A parent opens
+//  TIP OR VIDEO, ALTERNATING BY DAY. The review asked for either "content or
+//  video (short one)", so the pop-up shuffles: even days bring something to
+//  read, odd days something to watch. Both can be saved; the video plays in
+//  place rather than throwing a parent into the Watch tab, which would lose
+//  the moment the pop-up exists to create.
+//
+//  ONCE A DAY, NOT ONCE A LAUNCH, is the intended behaviour. A parent opens
 //  this app many times in a day — at 3am, in a waiting room, one-handed while
 //  feeding. A pop-up on every launch stops being a gift by the third time and
-//  becomes a door to push through. So it is keyed on the DATE, and once
-//  dismissed it does not come back until tomorrow.
+//  becomes a door to push through. So it is keyed on the DATE.
 //
-//  The Premiere takeover (brand/premiere_screen.dart) already learned this the
-//  hard way and is currently forced on for review with kPremiereAlwaysShow — a
-//  flag STILL-OPEN §1.4 says must be false before launch. This one has no such
-//  flag: the debug affordance is a menu entry, not a global override, because
-//  "show it every time" is exactly the state that must never reach a parent.
+//  ⚠️ kDailyPopupAlwaysShow IS CURRENTLY TRUE, so it fires on every open while
+//  this is being reviewed — seeing it once and never again makes it impossible
+//  to look at. Named to match kPremiereAlwaysShow (brand/premiere_screen.dart)
+//  so the two testing overrides turn up in the same search, and both must be
+//  false before launch. STILL-OPEN §1.4 and §5.12.
 //
 //  SAVING is local and instant. Sharing hands plain text to the OS sheet and
 //  always carries the source line — a tip forwarded into a family WhatsApp
@@ -42,6 +47,47 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/remote/cloud_synced_store.dart';
 import 'pp_common.dart';
 import 'pp_daily_tips.dart';
+import 'pp_watch_data.dart';
+import 'watch_player_screen.dart';
+import 'watch_quicklearn_screen.dart';
+
+/// Show the pop-up on EVERY app open instead of once a day.
+///
+/// Deliberately a mutable top-level bool, exactly like kPremiereAlwaysShow: a
+/// const would be compiled out and could not be flipped from a debug screen,
+/// and the point of both flags is that somebody reviewing the app can see the
+/// thing more than once.
+///
+/// ⚠️ MUST BE false BEFORE LAUNCH. Once a day is what makes a pop-up welcome;
+/// on every open it is a door a parent has to push through at 3am.
+bool kDailyPopupAlwaysShow = true;
+
+/// What today's pop-up carries.
+enum DailyPopupKind { tip, video }
+
+/// Alternates by day-of-year: even days read, odd days watch.
+///
+/// Deterministic rather than random for the same reason today's tip is — the
+/// app can then say what tomorrow holds, and a parent who closes it and
+/// reopens does not get a different thing.
+DailyPopupKind dailyPopupKind([DateTime? on]) {
+  final now = on ?? DateTime.now();
+  final doy = now.difference(DateTime(now.year)).inDays;
+  return doy.isEven ? DailyPopupKind.tip : DailyPopupKind.video;
+}
+
+/// The short video for a watch-day.
+///
+/// Prefers the QUICK ones — a pop-up is a thirty-second moment, and offering a
+/// twelve-minute masterclass in it is offering something nobody is about to
+/// start. Falls back to the full catalogue if no shorts exist.
+WatchVideo dailyPopupVideo([DateTime? on]) {
+  final now = on ?? DateTime.now();
+  final doy = now.difference(DateTime(now.year)).inDays;
+  final shorts = kWatchVideos.where((v) => v.quick).toList();
+  final pool = shorts.isEmpty ? kWatchVideos : shorts;
+  return pool[doy % pool.length];
+}
 
 // =============================================================================
 //  Store — what was seen, and what was kept
@@ -162,8 +208,9 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
 Future<void> maybeShowDailyTip(BuildContext context) async {
   final store = DailyTipStore.instance;
   // See DailyTipStore._ready: showing before the saved state is loaded would
-  // re-show a tip already dismissed today.
-  if (!store.isReady || store.shownToday) return;
+  // re-show something already dismissed today.
+  if (!store.isReady) return;
+  if (!kDailyPopupAlwaysShow && store.shownToday) return;
   store.markShown();
   if (!context.mounted) return;
   await showDailyTip(context);
@@ -189,14 +236,21 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final kind = dailyPopupKind();
+    final isVideo = kind == DailyPopupKind.video;
     final tip = dailyTip();
-    final id = dailyTipId();
+    final video = dailyPopupVideo();
+    // Videos save into the WATCH store, not the tip store, so a video saved
+    // from here turns up in Watch's own saved list too — one saved video, one
+    // place, wherever it was saved from.
+    final id = isVideo ? video.id : dailyTipId();
     final store = DailyTipStore.instance;
 
     return ListenableBuilder(
-      listenable: store,
+      listenable: Listenable.merge([store, WatchStore.instance]),
       builder: (context, _) {
-        final saved = store.isSaved(id);
+        final saved =
+            isVideo ? WatchStore.instance.isSaved(video.id) : store.isSaved(id);
         return Container(
           constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.86),
@@ -223,25 +277,33 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
                   ),
                   const SizedBox(height: 22),
                   Row(children: [
-                    const Icon(Icons.wb_twilight_rounded,
-                        size: 16, color: ppPurple),
+                    Icon(
+                        isVideo
+                            ? Icons.play_circle_outline_rounded
+                            : Icons.wb_twilight_rounded,
+                        size: 16,
+                        color: ppPurple),
                     const SizedBox(width: 8),
-                    Text('TODAY, IN ONE THING',
+                    Text(isVideo ? 'TODAY, IN ONE WATCH' : 'TODAY, IN ONE THING',
                         style: ppBody(10.5, color: ppPurple, w: FontWeight.w800)
                             .copyWith(letterSpacing: 1.0)),
                   ]),
                   const SizedBox(height: 14),
-                  Text(tip.title, style: ppFraunces(27, h: 1.1)),
-                  const SizedBox(height: 12),
-                  Text(tip.body, style: ppBody(14.5, h: 1.65)),
 
-                  if (tip.why.isNotEmpty) ...[
-                    const SizedBox(height: 18),
-                    _why(tip),
+                  if (isVideo) ...[
+                    _videoBody(context, video),
+                  ] else ...[
+                    Text(tip.title, style: ppFraunces(27, h: 1.1)),
+                    const SizedBox(height: 12),
+                    Text(tip.body, style: ppBody(14.5, h: 1.65)),
+                    if (tip.why.isNotEmpty) ...[
+                      const SizedBox(height: 18),
+                      _why(tip),
+                    ],
                   ],
 
                   const SizedBox(height: 22),
-                  _actions(context, tip, id, saved),
+                  _actions(context, tip, video, isVideo, id, saved),
                   const SizedBox(height: 12),
                   _dismiss(context),
                   const SizedBox(height: 14),
@@ -308,11 +370,66 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
         ),
       );
 
-  Widget _actions(BuildContext context, DailyTip tip, String id, bool saved) =>
+  /// The watch-day body: a thumbnail that plays, the title, who it is from.
+  ///
+  /// "Watch now" opens the player over the sheet rather than navigating the
+  /// whole app to the Watch tab. A pop-up creates a thirty-second moment; the
+  /// point is to spend it here, not to relocate somebody.
+  Widget _videoBody(BuildContext context, WatchVideo v) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () => _openVideo(context, v),
+            behavior: HitTestBehavior.opaque,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                height: 168,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF6A30B6), Color(0xFF2D144C)],
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Container(
+                  width: 58,
+                  height: 58,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: const Icon(Icons.play_arrow_rounded,
+                      size: 32, color: ppPurple),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(v.title, style: ppFraunces(24, h: 1.12)),
+          const SizedBox(height: 8),
+          Text('${v.durationLabel} · ${v.expert.name}',
+              style: ppBody(12.5, color: ppMuted)),
+          const SizedBox(height: 10),
+          Text(v.why, style: ppBody(14, h: 1.6)),
+        ],
+      );
+
+  void _openVideo(BuildContext context, WatchVideo v) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) =>
+            v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v)));
+  }
+
+  Widget _actions(BuildContext context, DailyTip tip, WatchVideo video,
+          bool isVideo, String id, bool saved) =>
       Row(children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => DailyTipStore.instance.toggleSaved(id),
+            onTap: () => isVideo
+                ? WatchStore.instance.toggleSave(video.id)
+                : DailyTipStore.instance.toggleSaved(id),
             behavior: HitTestBehavior.opaque,
             child: Container(
               height: 50,
@@ -341,22 +458,30 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
         const SizedBox(width: 10),
         Expanded(
           child: GestureDetector(
-            onTap: () => Share.share(dailyTipShareText(tip)),
+            // Watch-day: the second button PLAYS rather than shares. Sharing a
+            // video out of a pop-up before having watched it is not something
+            // anybody does, and the sheet only has room for two.
+            onTap: () => isVideo
+                ? _openVideo(context, video)
+                : Share.share(dailyTipShareText(tip)),
             behavior: HitTestBehavior.opaque,
             child: Container(
               height: 50,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isVideo ? ppPurple : Colors.white,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: ppBorder),
+                border: Border.all(color: isVideo ? ppPurple : ppBorder),
               ),
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Icon(Icons.ios_share_rounded, size: 16, color: ppPurple),
+                Icon(isVideo ? Icons.play_arrow_rounded : Icons.ios_share_rounded,
+                    size: isVideo ? 18 : 16,
+                    color: isVideo ? Colors.white : ppPurple),
                 const SizedBox(width: 8),
-                Text('Share',
-                    style:
-                        ppBody(13.5, color: ppPurple, w: FontWeight.w800)),
+                Text(isVideo ? 'Watch now' : 'Share',
+                    style: ppBody(13.5,
+                        color: isVideo ? Colors.white : ppPurple,
+                        w: FontWeight.w800)),
               ]),
             ),
           ),

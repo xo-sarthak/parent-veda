@@ -17,6 +17,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/tests_scans_reports_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
+import 'package:parentveda/screens/post_pregnancy/daily_tip_popup.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_daily_tips.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_development_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_vaccine_data.dart';
@@ -31,6 +32,7 @@ String _code(String src) => src
     .join('\n');
 
 void main() {
+  dailyPopupAndSaved();
   productTemplateAcrossApps();
   final drawerRaw = _read('lib/screens/post_pregnancy/explore_drawer.dart');
   final drawer = _code(drawerRaw);
@@ -255,11 +257,16 @@ void main() {
           isTrue);
     });
 
-    test('it is once a DAY, not once a launch', () {
+    test('once a day is the INTENDED behaviour, even while overridden', () {
       final popup = _code(_read('lib/screens/post_pregnancy/daily_tip_popup.dart'));
+      // The date-keyed check must survive the testing override, or turning the
+      // flag off at launch would leave nothing behind it.
       expect(popup.contains('bool get shownToday'), isTrue);
-      // No global always-show flag, unlike the Premiere takeover.
-      expect(popup.contains('AlwaysShow'), isFalse);
+      expect(popup.contains('store.shownToday'), isTrue);
+      // Was: no always-show flag at all. The review asked for the pop-up on
+      // every open while it is being looked at, so there is one now — named to
+      // match kPremiereAlwaysShow, and asserted to be launch-blocking in
+      // "every open while testing, behind a named flag" above.
     });
   });
 
@@ -679,6 +686,146 @@ void productTemplateAcrossApps() {
       // week timeline to match a parenting page would be consistency bought by
       // deleting something useful.
       expect(preg.contains('_WeekTimeline('), isTrue);
+    });
+  });
+}
+
+// =============================================================================
+//  The daily pop-up: tip OR video, every open, after the brand ad.
+// -----------------------------------------------------------------------------
+//  The follow-up ask, in four parts:
+//
+//    * the pop-up shuffles daily between something to read and something to
+//      watch, and both can be saved;
+//    * the video plays in place;
+//    * it fires AFTER the brand takeover, not racing it;
+//    * and the parenting side gains the saved-collections button the pregnancy
+//      side has had all along.
+// =============================================================================
+
+void dailyPopupAndSaved() {
+  final popup = _code(_read('lib/screens/post_pregnancy/daily_tip_popup.dart'));
+  final popupRaw = _read('lib/screens/post_pregnancy/daily_tip_popup.dart');
+  final hub = _code(_read('lib/screens/post_pregnancy/pp_saved_hub_screen.dart'));
+  final child = _code(_read('lib/screens/post_pregnancy/my_child_screen.dart'));
+
+  group('the pop-up alternates', () {
+    test('even days read, odd days watch, and it never changes on a reopen', () {
+      final even = dailyPopupKind(DateTime(2026, 1, 1).add(const Duration(days: 2)));
+      final odd = dailyPopupKind(DateTime(2026, 1, 1).add(const Duration(days: 3)));
+      expect(even, isNot(odd));
+      // Deterministic: the same day must give the same answer every time, or a
+      // parent who closes and reopens gets a different card.
+      for (var i = 0; i < 5; i++) {
+        expect(dailyPopupKind(DateTime(2026, 4, 7)), dailyPopupKind(DateTime(2026, 4, 7)));
+      }
+    });
+
+    test('both kinds come round within a week', () {
+      final kinds = <DailyPopupKind>{};
+      for (var i = 0; i < 7; i++) {
+        kinds.add(dailyPopupKind(DateTime(2026, 5, 1).add(Duration(days: i))));
+      }
+      expect(kinds.length, 2);
+    });
+
+    test('a watch-day offers a SHORT video, not a masterclass', () {
+      // A pop-up is a thirty-second moment; a twelve-minute video in it is
+      // something nobody is about to start.
+      for (var i = 0; i < 14; i++) {
+        final v = dailyPopupVideo(DateTime(2026, 6, 1).add(Duration(days: i)));
+        expect(v.quick, isTrue, reason: '"${v.title}" is not a short');
+      }
+    });
+
+    test('it does not repeat inside a fortnight', () {
+      final seen = <String>{};
+      for (var i = 0; i < 12; i++) {
+        final v = dailyPopupVideo(DateTime(2026, 6, 1).add(Duration(days: i)));
+        expect(seen.add(v.id), isTrue, reason: '"${v.title}" came round again');
+      }
+    });
+
+    test('the video plays in place and can be saved', () {
+      expect(popup.contains("'Watch now'"), isTrue);
+      expect(popup.contains('WatchPlayerScreen(video: v)'), isTrue);
+      // Saved into the WATCH store, so one saved video is one saved video
+      // wherever it was saved from.
+      expect(popup.contains('WatchStore.instance.toggleSave(video.id)'), isTrue);
+    });
+
+    test('a tip can still be saved and shared', () {
+      expect(popup.contains('DailyTipStore.instance.toggleSaved(id)'), isTrue);
+      expect(popup.contains('Share.share(dailyTipShareText(tip))'), isTrue);
+    });
+  });
+
+  group('timing', () {
+    test('it fires after the brand takeover, awaited', () {
+      // showPremiereIfAny returns a Future that completes when its route pops.
+      // Without the await both sheets land in the same frame, stacked.
+      final at = child.indexOf('await showPremiereIfAny(');
+      final then = child.indexOf('await maybeShowDailyTip(');
+      expect(at, greaterThan(-1), reason: 'the brand ad must be awaited');
+      expect(then, greaterThan(at), reason: 'the tip must come second');
+    });
+
+    test('every open while testing, behind a named flag', () {
+      expect(popup.contains('bool kDailyPopupAlwaysShow = true'), isTrue);
+      expect(popup.contains('if (!kDailyPopupAlwaysShow && store.shownToday) return;'),
+          isTrue);
+      // Named to match the other testing override so both turn up in one search.
+      expect(
+          _code(_read('lib/brand/premiere_screen.dart'))
+              .contains('kPremiereAlwaysShow'),
+          isTrue);
+    });
+
+    test('the flag is loudly marked as launch-blocking', () {
+      expect(popupRaw.contains('MUST BE false BEFORE LAUNCH'), isTrue);
+    });
+
+    test('it still never fires before the store has loaded', () {
+      // The bug found earlier: showing before the cache load finishes would
+      // re-show something already dismissed.
+      expect(popup.contains('if (!store.isReady) return;'), isTrue);
+    });
+  });
+
+  group('saved collections on the parenting side', () {
+    test('the bookmark sits in the My Child header, like pregnancy', () {
+      expect(child.contains('Icons.bookmark_border_rounded'), isTrue);
+      expect(child.contains('const PpSavedHubScreen()'), isTrue);
+      // Same icon as the pregnancy home, so the two apps read as one product.
+      expect(_code(_read('lib/screens/home_screen_b.dart'))
+              .contains('Icons.bookmark_border_rounded'),
+          isTrue);
+    });
+
+    test('it owns no state — it reads the stores that already hold it', () {
+      for (final store in [
+        'WatchStore.instance',
+        'ReadingStore.instance',
+        'DailyTipStore.instance',
+      ]) {
+        expect(hub.contains(store), isTrue, reason: '$store not read');
+      }
+      // No save state of its own would mean three lists that drift.
+      expect(hub.contains('class PpSavedHubStore'), isFalse);
+    });
+
+    test('all three groups render even when empty', () {
+      // A feature is never hidden for being empty — a parent who has only ever
+      // saved videos should still learn reads and tips are savable.
+      expect(hub.contains("'Videos'"), isTrue);
+      expect(hub.contains("'Reads'"), isTrue);
+      expect(hub.contains("'Daily tips'"), isTrue);
+      expect(hub.contains('Nothing here yet.'), isTrue);
+      expect(hub.contains('count == 0'), isTrue);
+    });
+
+    test('anything saved can be unsaved from the list it is in', () {
+      expect(hub.contains('onUnsave:'), isTrue);
     });
   });
 }

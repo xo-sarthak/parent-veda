@@ -722,6 +722,57 @@ empty value and a parent could be shown a tip she had already dismissed that
 morning — worst on a slow device, where an extra modal is least welcome. Now
 gated on the store being ready.
 
+## 5.12 The daily pop-up, and saved collections on the parenting side
+
+Follow-up to §5.11, 2026-08-01. **Parenting side only** — pregnancy is on hold
+for this by decision, and TTC is out because there is no content for it.
+
+The sequence on app open is now: **brand takeover → today's card**. The brand
+one is `await`ed, because `showPremiereIfAny()` returns a Future that completes
+when its route pops; without the await both sheets land in the same frame and a
+parent meets them stacked.
+
+**The card shuffles daily** — even days something to read, odd days a short
+video. Both are savable. The video plays in place rather than throwing a parent
+into the Watch tab, which would lose the moment the pop-up exists to create, and
+it saves into `WatchStore`, so a video saved here is the same saved video as one
+bookmarked anywhere else.
+
+Only the **quick** videos are eligible: a pop-up is a thirty-second moment, and
+offering a twelve-minute masterclass in one is offering something nobody is
+about to start. Twelve shorts exist, so it does not repeat inside a fortnight.
+
+**Saved collections** now exist on the parenting side, reached from a bookmark
+in the My Child header — same icon and same placement as the pregnancy home has
+had all along. It owns no state: it reads `WatchStore`, `ReadingStore` and
+`DailyTipStore`, so there is one saved list rather than three that drift. All
+three groups render even when empty.
+
+### ⚠️ `kDailyPopupAlwaysShow` is `true`
+
+`lib/screens/post_pregnancy/daily_tip_popup.dart`. The card fires on **every app
+open** rather than once a day, so it can actually be reviewed — seeing it once
+and never again makes it impossible to look at.
+
+Named to match `kPremiereAlwaysShow` (§1.4) so both testing overrides turn up in
+one search. **Both must be `false` before launch.** Once a day is what makes a
+pop-up welcome; on every open it is a door a parent has to push through at 3am,
+and this app is opened at 3am by someone who is worried.
+
+The date-keyed `shownToday` check is untouched behind the flag, so turning it
+off restores once-a-day with no other change.
+
+```dart
+bool kDailyPopupAlwaysShow = false;
+```
+
+### Still not built
+
+* **No video on the pregnancy side.** Held by decision, not by difficulty.
+* **Tips are not personalised by age.** The rotation is by day-of-year, so a
+  four-month-old and a four-year-old get the same tip. Fine for fourteen
+  general tips; wrong the moment the set grows.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already

@@ -35,6 +35,7 @@ import 'pp_child_profile.dart';
 import 'multichild_sheet.dart';
 import 'pp_common.dart';
 import 'daily_tip_popup.dart';
+import 'pp_saved_hub_screen.dart';
 import 'pp_daily_tips.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
@@ -95,15 +96,18 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // the correct, normal answer.
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
-        showPremiereIfAny(context, stage: BrandStage.parenting);
-        // TODAY'S TIP, once a day. Fired AFTER the Premiere on purpose: a
-        // launch takeover happens a handful of times a year and the tip
-        // happens daily, so if both are due today the rare one goes first and
-        // the tip is waiting behind it rather than being buried under it.
+        // ORDER MATTERS, AND IT IS AWAITED. The brand takeover goes first and
+        // this waits for it to be dismissed — showPremiereIfAny() returns a
+        // Future that completes when its route pops, so awaiting is the whole
+        // mechanism. Firing both without it would push two sheets onto the
+        // navigator in the same frame and the parent would meet them stacked,
+        // with the tip underneath.
         //
-        // maybeShowDailyTip() no-ops when it has already run today, so this can
-        // sit here unguarded.
+        // The sequence the review described: brand ad, then today's thing.
+        await showPremiereIfAny(context, stage: BrandStage.parenting);
         if (!mounted) return;
+        // No-ops if it has already shown today — unless kDailyPopupAlwaysShow
+        // is on, which it is while this is being reviewed.
         await maybeShowDailyTip(context);
       });
     }
@@ -243,16 +247,41 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return Row(children: [
       Image.asset('assets/brand/pv-mark.png', height: 28),
       const SizedBox(width: 8),
-      // Plain Text (not Flexible): the pregnancy header does the same, so the
-      // wordmark always shows in full rather than sharing free space with the
-      // Spacer and truncating. The smaller icons opposite leave room for it.
-      Text('ParentVeda',
-          style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+      // WAS a plain Text with a Spacer, on the reasoning that the pregnancy
+      // header does the same and the wordmark should always show in full
+      // rather than sharing free space. That held while there were three
+      // icons opposite it. A fourth (the bookmark) overflowed the row by 7px
+      // on a 390pt phone — a rigid Text next to a Spacer has nothing to give,
+      // so the overflow lands as a thrown FlutterError rather than as
+      // truncation, and "My Child home builds without throwing" caught it.
+      //
+      // Flexible with ellipsis instead: on any real phone the wordmark still
+      // renders in full, and it can never again be the thing that breaks the
+      // header when an icon is added. Kept for revert:
+      // Text('ParentVeda',
+      //     style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+      Flexible(
+        child: Text('ParentVeda',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+      ),
       const Spacer(),
+      // SAVED / COLLECTIONS, beside search — the same placement and the same
+      // icon the pregnancy home has had (home_screen_b). The parenting side
+      // already had bookmarks scattered across Watch, Learn and the daily
+      // card, and nowhere to see them, which makes a bookmark a button that
+      // appears to do nothing.
+      // Gaps tightened 8 -> 6 with the fourth icon. Three gaps, so it buys back
+      // 6 of the 7 overflowed pixels; the Flexible above covers the rest and
+      // any future phone narrower than the ones tested.
+      _headerIcon(Icons.bookmark_border_rounded,
+          () => _push(const PpSavedHubScreen())),
+      const SizedBox(width: 6),
       _headerIcon(Icons.search_rounded, () => _push(const RecoSearchScreen())),
-      const SizedBox(width: 8),
+      const SizedBox(width: 6),
       _headerIcon(Icons.person_outline_rounded, () => _push(const FamilyProfileScreen())),
-      const SizedBox(width: 8),
+      const SizedBox(width: 6),
       _headerIcon(Icons.menu_rounded, () => _scaffoldKey.currentState?.openDrawer()),
     ]);
   }
