@@ -331,19 +331,69 @@ class TestScanDetailScreen extends StatelessWidget {
           _ExpandableSection(title: 'When', body: info.when),
           _ExpandableSection(title: 'Preparation', body: info.preparation),
           _ExpandableSection(title: 'Procedure', body: info.procedure),
+          // Renamed per the review, from 'Understanding Your Report'. It never
+          // explained the report — it explained each PARAMETER on it, one at a
+          // time, which is a different and narrower thing. The title now says
+          // which of the two it is, and the section below is the one that does
+          // the other job.
           _ExpandableSection(
-            title: 'Understanding Your Report',
+            title: 'Understanding your report parameters',
             body: info.understandingReport,
             children: [
               for (final param in info.parameters) _ParameterCard(param),
             ],
           ),
+          // THE CLOSING READ, asked for by the review: a parent finishes the
+          // parameter list knowing what nine numbers mean and still not knowing
+          // what the report SAYS. This is the cumulative summary — normal
+          // means this, abnormal can point at that, here is what throws it off,
+          // and your doctor is who interprets it.
+          if (info.interpretation.isNotEmpty)
+            _ExpandableSection(
+              title: 'How do I interpret the test results?',
+              body: info.interpretation,
+              children: [
+                for (final pointer in info.interpretPointers)
+                  _InterpretPointer(pointer),
+              ],
+            ),
           const SizedBox(height: 4),
           MedicalDisclaimerCard(text: info.disclaimer),
         ],
       ),
     );
   }
+}
+
+/// One pointer under "How do I interpret the test results?".
+///
+/// A plain bullet on purpose. The parameter cards above are dense by
+/// necessity; this section is the one a worried parent reads first, and it
+/// should be skimmable in ten seconds.
+class _InterpretPointer extends StatelessWidget {
+  const _InterpretPointer(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            margin: const EdgeInsets.only(top: 7),
+            width: 5,
+            height: 5,
+            decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Text(text,
+                style: GoogleFonts.manrope(
+                    fontSize: 13.5,
+                    height: 1.55,
+                    color: AppTheme.neutral600)),
+          ),
+        ]),
+      );
 }
 
 /// One report parameter, fully explained (measures / why / range / low / high).

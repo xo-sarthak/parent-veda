@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'brand/brand_store.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
 import 'screens/post_pregnancy/pp_development_data.dart';
+import 'screens/post_pregnancy/daily_tip_popup.dart';
 import 'screens/post_pregnancy/pp_grow_data.dart';
 import 'screens/post_pregnancy/pp_documents_data.dart';
 import 'screens/post_pregnancy/pp_food_data.dart';
@@ -230,6 +231,11 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // the moment the app is reopened somewhere else — and this one's whole job
     // is remembering yesterday.
     GrowStore.instance.init();
+    // The once-a-day tip pop-up: remembers which DAY it last showed (so it is
+    // not once per launch) and which tips were saved. Booted here for the same
+    // reason as GrowStore — a store first touched by a screen has already lost
+    // whatever it saved before that screen was opened.
+    DailyTipStore.instance.init();
     FoodStore.instance.init();
     // The dish CATALOGUE, as opposed to FoodStore's saved list — editor-owned
     // content read from Supabase. Loaded here rather than lazily from a screen

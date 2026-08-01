@@ -37,11 +37,25 @@ class MultiChildSheet extends StatelessWidget {
   /// cloud-writing) for a while; only this form was missing, so the button sat
   /// on a "coming soon" snackbar while the data layer was ready.
   ///
-  /// Name and date of birth ONLY. No weight or height here: those are
-  /// measurements, and a measurement belongs in the growth record where it is
-  /// dated - not guessed at sign-up.
+  /// Name and date of birth are required; birth weight, weight and height are
+  /// OPTIONAL, added at the review's request.
+  ///
+  /// This deliberately used to ask for name and date of birth only, on the
+  /// grounds that a measurement belongs in the growth record where it is dated
+  /// rather than guessed at sign-up. That still holds for CURRENT weight and
+  /// height, which is why they are marked optional and the form saves happily
+  /// without them.
+  ///
+  /// Birth weight is the one that genuinely belongs here: it is a fixed fact
+  /// about the child that never changes, a parent knows it on the day, and
+  /// asking later means asking someone to remember it.
   Future<void> _addChild(BuildContext context) async {
     final nameCtl = TextEditingController();
+    // Optional, per the review. Empty stays empty — _num() returns 0 and the
+    // store treats 0 as "not recorded" rather than as a measurement of zero.
+    final birthWtCtl = TextEditingController();
+    final wtCtl = TextEditingController();
+    final htCtl = TextEditingController();
     var isBoy = true;
     DateTime? dob;
 
@@ -119,6 +133,25 @@ class MultiChildSheet extends StatelessWidget {
                 ]),
               ),
             ),
+            const SizedBox(height: 14),
+            Row(children: [
+              Text('Optional', style: ppBody(11.5, color: ppMuted, w: FontWeight.w700)),
+              const SizedBox(width: 8),
+              Expanded(child: Container(height: 1, color: ppHair)),
+            ]),
+            const SizedBox(height: 12),
+            _numField(birthWtCtl, 'Birth weight', 'kg', Icons.child_friendly_outlined),
+            const SizedBox(height: 10),
+            Row(children: [
+              Expanded(child: _numField(wtCtl, 'Weight now', 'kg', Icons.monitor_weight_outlined)),
+              const SizedBox(width: 10),
+              Expanded(child: _numField(htCtl, 'Height now', 'cm', Icons.straighten_outlined)),
+            ]),
+            const SizedBox(height: 8),
+            Text(
+                'You can leave these blank and add them later from the growth '
+                'record.',
+                style: ppBody(11.5, color: ppMuted, h: 1.45)),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
@@ -142,7 +175,13 @@ class MultiChildSheet extends StatelessWidget {
 
     if (saved != true || dob == null) return;
     await _store.addChild(
-        name: nameCtl.text.trim(), isBoy: isBoy, dob: dob!);
+      name: nameCtl.text.trim(),
+      isBoy: isBoy,
+      dob: dob!,
+      birthWeightKg: _num(birthWtCtl.text),
+      weightKg: _num(wtCtl.text),
+      heightCm: _num(htCtl.text),
+    );
     if (!context.mounted) return;
     Navigator.of(context).maybePop();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -151,6 +190,43 @@ class MultiChildSheet extends StatelessWidget {
           behavior: SnackBarBehavior.floating),
     );
   }
+
+  /// A blank optional field is 0, not an error and not a zero measurement.
+  ///
+  /// Also tolerates a comma decimal separator, which is what a phone keypad
+  /// gives on a lot of Indian locales — '3,2' silently parsing to null would
+  /// look to a parent like the app had ignored what they typed.
+  static double _num(String raw) =>
+      double.tryParse(raw.trim().replaceAll(',', '.')) ?? 0;
+
+  Widget _numField(
+          TextEditingController c, String label, String unit, IconData icon) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        decoration: BoxDecoration(
+            border: Border.all(color: ppHair),
+            borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [
+          Icon(icon, size: 18, color: ppMuted),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: c,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              style: ppBody(14, color: ppInk),
+              cursorColor: ppPurple,
+              decoration: InputDecoration(
+                isDense: true,
+                border: InputBorder.none,
+                hintText: label,
+                hintStyle: ppBody(14, color: ppMuted),
+              ),
+            ),
+          ),
+          Text(unit, style: ppBody(12.5, color: ppMuted)),
+        ]),
+      );
 
   /// "4 months · Reaching out" — the child's age and the phase they are in.
   /// Previously named a Wonder Weeks leap ("Leap 4 · The World of Events"),

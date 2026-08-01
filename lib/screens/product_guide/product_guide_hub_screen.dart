@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../post_pregnancy/products_compare_screen.dart';
 import 'product_guide_data.dart';
 import 'product_guide_screen.dart';
 import 'product_guide_style.dart';
@@ -77,7 +78,17 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
                 style: pgBody(14, h: 1.55))),
             const SizedBox(height: 20),
             _pad(_searchBar()),
-            const SizedBox(height: 22),
+            const SizedBox(height: 14),
+            // COMPARE MOVED IN HERE from the parenting Tools tab, per the
+            // review. It belongs where the choosing happens: comparing two
+            // products is a step in researching them, not a separate tool you
+            // remember to go and find. Hidden while searching so it does not
+            // sit between a query and its results.
+            if (!searching) ...[
+              _pad(_compareRow()),
+              const SizedBox(height: 22),
+            ] else
+              const SizedBox(height: 8),
 
             if (searching) ..._searchResults() else ..._browse(),
 
@@ -89,6 +100,39 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
       ),
     );
   }
+
+  /// The Compare entry, now the Product Guide's own.
+  ///
+  /// Deliberately a quiet row rather than a card: comparing is one of several
+  /// things you might do here, and dressing it as a hero would make the
+  /// guides underneath it look secondary — which is the mistake the Tools tab
+  /// had already made with its two banner cards.
+  Widget _compareRow() => GestureDetector(
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen())),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: pgHair),
+          ),
+          child: Row(children: [
+            const Icon(Icons.compare_arrows_rounded, size: 19, color: pgPurple),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Compare products', style: pgSerif(16, h: 1.2)),
+                const SizedBox(height: 3),
+                Text('Two picks, side by side.',
+                    style: pgBody(12.5, color: pgMuted)),
+              ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: pgMuted),
+          ]),
+        ),
+      );
 
   Widget _searchBar() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

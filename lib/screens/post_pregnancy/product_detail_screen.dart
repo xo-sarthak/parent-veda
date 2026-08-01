@@ -351,7 +351,26 @@ class ProductDetailScreen extends StatelessWidget {
               Text('${product.reviews} reviews', style: ppBody(13, color: ppMuted)),
             ])),
 
-            // what's inside (soothers only)
+            // ONE TEMPLATE FOR EVERY PRODUCT, per the review.
+            //
+            // This used to be `if (_isSoother) ... else ...`: a soother got
+            // "What's inside & how it works" and everything else got "At a
+            // glance", so no product ever had both and two products in the same
+            // shelf read as two different pages. That branch WAS the
+            // inconsistency the review reported between the Dozy soother and
+            // the Calm zinc rash cream.
+            //
+            // Both sections now render for everything, in the order asked for:
+            // "At a glance" first (the facts), then "What's inside" (how it
+            // works). The soother keeps its hand-written feature list because
+            // it exists; every other product gets the same section built from
+            // its own summary and pros, which is real content rather than a
+            // heading with nothing under it.
+            _div(),
+            _pad(ppEyebrow('At a glance', color: ppSoft, spacing: 1.2)),
+            const SizedBox(height: 12),
+            _pad(_specSheet()),
+
             if (_isSoother) ...[
               _div(),
               _pad(ppEyebrow("What's inside & how it works", color: ppSoft, spacing: 1.2)),
@@ -378,16 +397,32 @@ class ProductDetailScreen extends StatelessWidget {
                         "a small bedside box that makes a room calmer and darker for sleep, and turns itself off - that's the whole job."),
               ]), style: ppBody(13, color: ppInk, h: 1.55))),
             ] else ...[
-              // every other product gets the same structured "at a glance" block
+              // The same section for everything else, built from what the
+              // product already carries. Was: the "At a glance" block, which
+              // now runs above for every product instead.
               _div(),
-              _pad(ppEyebrow('At a glance', color: ppSoft, spacing: 1.2)),
-              const SizedBox(height: 12),
-              _pad(_specSheet()),
+              _pad(ppEyebrow("What's inside & how it works", color: ppSoft, spacing: 1.2)),
+              const SizedBox(height: 6),
+              _pad(Text(
+                  product.summary.isNotEmpty
+                      ? product.summary
+                      : 'What this is, and what it actually does for you.',
+                  style: ppBody(13, h: 1.55))),
+              if (product.pros.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _pad(Column(children: [
+                  for (var i = 0; i < product.pros.length; i++)
+                    _feature(Icons.check_rounded, product.pros[i], '',
+                        top: i == 0, bottom: i == product.pros.length - 1),
+                ])),
+              ],
             ],
 
             // the take
             _div(),
-            _pad(ppEyebrow('The ParentVeda take', color: ppSoft, spacing: 1.2)),
+            // Renamed from 'The ParentVeda take' so it matches the section name
+            // used across the rest of the app and in the review.
+            _pad(ppEyebrow("ParentVeda's take", color: ppSoft, spacing: 1.2)),
             const SizedBox(height: 10),
             _pad(Text(
                 _isSoother
@@ -462,15 +497,18 @@ class ProductDetailScreen extends StatelessWidget {
                 Text(_chooseThisIf(), style: ppBody(14, color: ppInk, h: 1.55)),
               ])),
 
-              // how we reviewed this (honest method - not fabricated papers)
-              _div(),
-              _pad(Text('How ParentVeda reviews this', style: ppJakarta(16))),
-              const SizedBox(height: 4),
-              _pad(Text('Every pick is checked the same way - so a rating means the same thing across the shelf.',
-                  style: ppBody(12, color: ppMuted))),
-              const SizedBox(height: 12),
-              _pad(_reviewMethod()),
             ],
+
+            // HOW PARENTVEDA REVIEWS THIS — now an expandable (!) rather than a
+            // full section, per the review, and moved OUT of the soother-only
+            // branch so every product has it.
+            //
+            // It answers a question a parent asks once ("who says so?") and
+            // then never again, so a permanent section spent page depth on
+            // something already read. Collapsed, it is still one tap from every
+            // rating on the shelf.
+            _div(),
+            _pad(_HowWeReview(method: _reviewMethod())),
 
             // reviews
             _div(),
@@ -689,4 +727,65 @@ class ProductDetailScreen extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// "How ParentVeda reviews this", collapsed behind an (!).
+///
+/// A separate widget rather than converting the whole screen to a
+/// StatefulWidget: one disclosure needs one boolean, and turning a 600-line
+/// stateless page stateful for it would put every unrelated rebuild through a
+/// setState.
+///
+/// The method itself is unchanged — the caller still builds it and passes it
+/// in. What changed is that it no longer occupies a full section on every
+/// product page for a question a parent asks once and then never again.
+class _HowWeReview extends StatefulWidget {
+  const _HowWeReview({required this.method});
+  final Widget method;
+
+  @override
+  State<_HowWeReview> createState() => _HowWeReviewState();
+}
+
+class _HowWeReviewState extends State<_HowWeReview> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: () => setState(() => _open = !_open),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ppHair),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              const Icon(Icons.info_outline_rounded, size: 17, color: ppPurple),
+              const SizedBox(width: 10),
+              Expanded(
+                  child:
+                      Text('How ParentVeda reviews this', style: ppJakarta(14.5))),
+              Icon(
+                  _open
+                      ? Icons.expand_less_rounded
+                      : Icons.expand_more_rounded,
+                  size: 20,
+                  color: ppMuted),
+            ]),
+            if (_open) ...[
+              const SizedBox(height: 8),
+              Text(
+                  'Every pick is checked the same way - so a rating means the '
+                  'same thing across the shelf.',
+                  style: ppBody(12, color: ppMuted)),
+              const SizedBox(height: 12),
+              widget.method,
+            ],
+          ]),
+        ),
+      );
 }

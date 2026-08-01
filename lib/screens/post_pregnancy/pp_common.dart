@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../ask_veda/veda_core.dart';
 import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
+import 'grow_home_screen.dart';
 import 'pp_child_profile.dart';
 import 'community_screen.dart';
 import 'parenting_veda.dart';
@@ -164,7 +165,15 @@ void openPpTab(BuildContext context, int index) {
   nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
   switch (index) {
     case 1:
-      nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
+      // WAS AskVeda. Tab 1 is now Brain Development (the Grow feature), per the
+      // parenting review: Ask Veda comes OUT of the bottom tabs and Skill
+      // Development comes out of Explore and takes its place, renamed.
+      //
+      // Ask Veda is not gone — it is still reached from the My Child page
+      // ("Ask Veda anything else") and from the Ask FAB. Only the tab moved.
+      // Kept for revert:
+      //   nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
+      nav.push(MaterialPageRoute<void>(builder: (_) => const GrowHomeScreen()));
       break;
     case 2:
       nav.push(MaterialPageRoute<void>(builder: (_) => const ToolsHubScreen()));
@@ -182,15 +191,22 @@ void openPpTab(BuildContext context, int index) {
 class PpBottomNav extends StatelessWidget {
   const PpBottomNav({super.key, required this.active});
 
-  /// 0 = My Child · 1 = AskVeda · 2 = Tools · 3 = Community · 4 = Products
+  /// 0 = My Child · 1 = Brain · 2 = Tools · 3 = Community · 4 = Products
   final int active;
 
   // Mirrors the pregnancy app's PvTabBar: a floating white pill where the active
   // tab expands into a purple icon+label pill and the rest are icon + tiny label,
   // so the two apps' bottom navs read as the same component.
+  // Tab 1 was AskVeda. Kept for revert:
+  //   (Icons.auto_awesome_rounded, 'AskVeda'),
+  //
+  // 'Brain' rather than 'Brain Development': the active tab expands into a
+  // horizontal pill with the label beside the icon, and a two-word label in a
+  // five-tab row wraps or truncates on a small phone. The screen it opens is
+  // titled in full.
   static const List<(IconData, String)> _tabs = [
     (Icons.child_care_rounded, 'My Child'),
-    (Icons.auto_awesome_rounded, 'AskVeda'),
+    (Icons.emoji_objects_rounded, 'Brain'),
     (Icons.widgets_rounded, 'Tools'),
     (Icons.groups_rounded, 'Community'),
     (Icons.shopping_bag_rounded, 'Products'),

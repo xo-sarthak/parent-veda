@@ -130,43 +130,53 @@ void main() {
 //  identical to one that was never asked for.
 // =============================================================================
 void julyReviewTests() {
-  testWidgets('My Child home: the tip sits ABOVE the phase video', (tester) async {
-    // A TALL viewport (2000 logical px), not a phone-sized one. This is an
-    // ordering assertion, and in a ListView only what is on screen is built —
-    // on a 844pt screen the tip and the video cannot both be laid out, so
-    // scrolling to one drops the other out of the tree. Height here is a test
-    // fixture, not a claim about any real device.
-    tester.view.physicalSize = const Size(1170, 6000);
-    tester.view.devicePixelRatio = 3.0;
-    addTearDown(tester.view.reset);
+    // RETIRED by the parenting review: Today's parenting tip left the page and became the app-open pop-up.
+  // The replacement assertions live in test/parenting_review_test.dart,
+  // which checks both that it is gone and that the builder survives.
+  //
+  // Kept commented rather than deleted, matching the code it covered:
+  // testWidgets('My Child home: the tip sits ABOVE the phase video', (tester) async {
+  // // A TALL viewport (2000 logical px), not a phone-sized one. This is an
+  // // ordering assertion, and in a ListView only what is on screen is built —
+  // // on a 844pt screen the tip and the video cannot both be laid out, so
+  // // scrolling to one drops the other out of the tree. Height here is a test
+  // // fixture, not a claim about any real device.
+  // tester.view.physicalSize = const Size(1170, 6000);
+  // tester.view.devicePixelRatio = 3.0;
+  // addTearDown(tester.view.reset);
+  //
+  // await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+  // await tester.pumpAndSettle();
+  //
+  // final tip = tester.getTopLeft(find.text("TODAY'S PARENTING TIP")).dy;
+  // final video = tester.getTopLeft(find.text('This phase, in a video')).dy;
+  // expect(tip, lessThan(video),
+  // reason: 'the tip was moved above the video in the 17-18 July review');
+  // });
 
-    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
-    await tester.pumpAndSettle();
-
-    final tip = tester.getTopLeft(find.text("TODAY'S PARENTING TIP")).dy;
-    final video = tester.getTopLeft(find.text('This phase, in a video')).dy;
-    expect(tip, lessThan(video),
-        reason: 'the tip was moved above the video in the 17-18 July review');
-  });
-
-  testWidgets('My Child home: milestones became "preparing for next"', (tester) async {
-    tester.view.physicalSize = const Size(1170, 2532);
-    tester.view.devicePixelRatio = 3.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
-    await tester.pumpAndSettle();
-
-    await tester.scrollUntilVisible(
-      find.textContaining('preparing for next'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-      maxScrolls: 40,
-    );
-    expect(find.textContaining('preparing for next'), findsOneWidget);
-    // The old duplicate-of-the-snapshot framing is gone.
-    expect(find.text('Milestones'), findsNothing);
-  });
+    // RETIRED by the parenting review: the "Coming up" section was removed from the page by the review.
+  // The replacement assertions live in test/parenting_review_test.dart,
+  // which checks both that it is gone and that the builder survives.
+  //
+  // Kept commented rather than deleted, matching the code it covered:
+  // testWidgets('My Child home: milestones became "preparing for next"', (tester) async {
+  // tester.view.physicalSize = const Size(1170, 2532);
+  // tester.view.devicePixelRatio = 3.0;
+  // addTearDown(tester.view.reset);
+  //
+  // await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+  // await tester.pumpAndSettle();
+  //
+  // await tester.scrollUntilVisible(
+  // find.textContaining('preparing for next'),
+  // 300,
+  // scrollable: find.byType(Scrollable).first,
+  // maxScrolls: 40,
+  // );
+  // expect(find.textContaining('preparing for next'), findsOneWidget);
+  // // The old duplicate-of-the-snapshot framing is gone.
+  // expect(find.text('Milestones'), findsNothing);
+  // });
 
   testWidgets('My Child home: FAQs render and expand', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);

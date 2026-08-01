@@ -614,6 +614,79 @@ silent gap:
 Until that exists, both versions store the document and the parent types what
 they want searchable.
 
+## 5.11 Parenting review — two passes, applied 2026-08-01
+
+Two review documents ("parenting app changes - 1" and "- 2"), written weeks
+apart. **Pass 2 overrides pass 1 where they disagree** — the clearest case being
+Today's parenting tip, which pass 1 asked to fix and pass 2 asked to remove.
+Held by `test/parenting_review_test.dart`.
+
+Everything removed is **commented in place** with its screen still on disk.
+
+### Blocked — needs the WhatsApp material
+
+Three items reference feedback shared on WhatsApp, which is not in the repo and
+was not in either PDF:
+
+* **2·3** redesign the first section (baby profile) "based on image shared on
+  whats app"
+* **2·21** "changes to the My child section as per the feedback shared on
+  whatsapp"
+* **Products·1** "changes as per the changes mentioned in whats app"
+
+Nothing was guessed at for these. Everything else in both documents is done.
+
+### Judgement calls worth knowing about
+
+* **"Remove watch tab in this phase video section" (2·6)** was read as the
+  **Watch button** inside the "This phase, in a video" card — the card already
+  opens the player, so the button was a second control for the thing you had
+  just tapped. The other possible reading is the whole "Videos for this phase"
+  rail; say so and it is a two-line change.
+* **"Remove phase explanation from tools" (2·9)** was **already done** in the
+  17–18 July review, when the "His Leap Window" hero came out. Asserted in the
+  tests so nobody re-does it.
+* **Due date "coming soon" (2·20)** was read as a bug report about the old
+  Tools row, resolved by 2·18's routing rather than by adding a coming-soon
+  state.
+
+### Deliberately not built, and why
+
+* **Birth weight does NOT adjust the expected-weight figure.** It is stored,
+  asked for at registration, and shown as a fact ("Born at 3.1 kg · +3.4 kg
+  since"). Shifting the WHO expected curve by a child's birth weight is a
+  clinical calculation about one particular child — the class of thing
+  CLAUDE.md puts behind a clinician, and where `TruthSource` deliberately ranks
+  our own calculation low. **Needs clinical sign-off before it is wired.**
+* **`children.birth_weight_kg` has no column yet.** `Child.fromRow` reads it
+  defensively and tolerates its absence, so nothing crashes — but birth weight
+  does not survive to the cloud until a migration adds it.
+* **The stage switch itself.** Due date / Track ovulation ask their question
+  and then say plainly that moving a family across is still being built.
+  Pushing a pregnancy home over a toddler's data would be worse than saying so.
+* **No short video on the daily tip.** The review allows "content OR video
+  (short one)"; only content is built, because no tip has a video attached and
+  a play button that opens nothing is worse than its absence.
+* **The tip sources want a clinician's read.** Each of the 14 tips now carries
+  a mechanism and a named body of work. They deliberately avoid precise
+  citations — a fabricated-looking reference is the one error a reader cannot
+  catch — but they are health-adjacent copy and should be reviewed.
+
+### Four existing tests retired
+
+`post_pregnancy_smoke_test.dart` and `pp_ui_harmony_test.dart` each had tests
+asserting behaviour this review removed. They are commented in place with a
+pointer to their replacements. **Note for the other terminal:**
+`post_pregnancy_smoke_test.dart` is normally theirs — it was edited only
+because the review removed what it asserted.
+
+### One real bug found while wiring
+
+The tip pop-up fired before `DailyTipStore` had loaded, so `shownToday` read an
+empty value and a parent could be shown a tip she had already dismissed that
+morning — worst on a slow device, where an extra modal is least welcome. Now
+gated on the store being ready.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already

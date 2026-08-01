@@ -153,6 +153,12 @@ const List<Vaccine> kVaccines = [
     diseases: ['Poliomyelitis (polio) - a virus that can cause lifelong paralysis'],
     why:
         'Polio can cause permanent paralysis. Thanks to vaccination it is now extremely rare, but keeping every baby protected is exactly how it stays that way. IPV is the injectable form, given alongside oral polio drops.',
+    faqs: [
+      ('Why does he need injected polio when he also gets drops?',
+          'They do different jobs. The injection gives strong protection in the blood; the drops give protection in the gut, which is what stops the virus spreading to other children. India uses both on purpose.'),
+      ('Polio is gone from India - why still vaccinate?',
+          'India is polio-free because vaccination did not stop. The virus still circulates in a few countries and travels, so keeping cover high is what holds the line.'),
+    ],
   ),
   Vaccine(
     id: 'opv',
@@ -162,6 +168,16 @@ const List<Vaccine> kVaccines = [
     diseases: ['Poliomyelitis (polio)'],
     why: 'OPV is the oral (drops) polio vaccine, given alongside IPV for broad, lasting protection against polio.',
     reactions: ['Usually none - it is given as gentle oral drops'],
+    myths: [
+      ('The drops are unsafe or are a way of making children infertile.',
+          'This claim has been circulating for decades and has been investigated repeatedly. OPV contains a weakened poliovirus and nothing that affects fertility. It is the reason India is polio-free.'),
+    ],
+    faqs: [
+      ('He spat some out - does the dose still count?',
+          'If he spits out most of it within a few minutes, tell the vaccinator; they will usually repeat it. A small dribble is fine.'),
+      ('Can he feed straight after the drops?',
+          'Yes. There is no need to hold off feeding before or after OPV.'),
+    ],
   ),
   Vaccine(
     id: 'bcg',
@@ -172,6 +188,16 @@ const List<Vaccine> kVaccines = [
     why:
         'Given at birth, BCG protects newborns against the most severe forms of TB. A small raised mark or tiny scar at the injection site over the following weeks is normal and expected.',
     reactions: ['A small swelling that may form a tiny scar over weeks - this is normal'],
+    myths: [
+      ('No scar means the BCG failed and must be repeated.',
+          'A scar is common but not necessary. Many protected children never form one, and repeating on that basis alone is not recommended.'),
+    ],
+    faqs: [
+      ('There is no scar. Did it work?',
+          'Usually yes. A visible scar is common but not required, and its absence is not proof the vaccine failed. Ask your paediatrician before assuming it needs repeating.'),
+      ('A small sore or lump appeared weeks later. Is that normal?',
+          'A small raised spot that slowly forms, sometimes weeps a little and then heals into a flat mark over weeks or months is the expected course. Keep it clean and dry, and do not squeeze or bandage it.'),
+    ],
   ),
   Vaccine(
     id: 'hepb',
@@ -180,6 +206,16 @@ const List<Vaccine> kVaccines = [
     protects: 'Protects the liver from hepatitis B.',
     diseases: ['Hepatitis B (a serious, sometimes lifelong liver infection)'],
     why: 'The birth dose of Hepatitis B gives early protection against a virus that can cause long-term liver disease. Later doses in the pentavalent shot complete the cover.',
+    myths: [
+      ('A newborn\'s body is too small and too new for a vaccine.',
+          'A newborn meets an enormous number of germs from the first breath. One vaccine is a very small addition, and this one works best precisely because it is given early.'),
+    ],
+    faqs: [
+      ('Why so soon - can it not wait?',
+          'The birth dose works best in the first 24 hours, because it is protecting against transmission around the time of birth itself. Waiting loses most of that benefit.'),
+      ('I tested negative. Does he still need it?',
+          'Yes, and it is still recommended. It protects him from exposure later in childhood too, not only at birth.'),
+    ],
   ),
   Vaccine(
     id: 'vitk',
@@ -189,6 +225,16 @@ const List<Vaccine> kVaccines = [
     diseases: ['Vitamin K deficiency bleeding (VKDB) in newborns'],
     why: 'Not a vaccine but given at birth: a single Vitamin K injection prevents a rare but dangerous bleeding disorder in newborns. A routine, reassuring first-day step.',
     reactions: ['Usually none beyond a brief pinch'],
+    myths: [
+      ('It is an unnecessary injection for a healthy baby.',
+          'Newborns are all born with low vitamin K, healthy or not, and the bleeding it prevents can happen without warning in a baby who seemed entirely well.'),
+    ],
+    faqs: [
+      ('Is this a vaccine?',
+          'No. It is a vitamin newborns are simply born low on, given once to prevent a rare but serious bleeding problem in the first weeks. It is on this list because it is given at the same visit.'),
+      ('Can it be given by mouth instead?',
+          'An oral course exists but needs several correctly timed doses and is less reliable. The single injection is what most paediatricians recommend.'),
+    ],
   ),
   Vaccine(
     id: 'mmr',
@@ -213,6 +259,12 @@ const List<Vaccine> kVaccines = [
     protects: 'Protects against typhoid fever.',
     diseases: ['Typhoid fever (a serious bacterial infection common in many regions)'],
     why: 'Typhoid conjugate vaccine gives lasting protection against typhoid fever - especially valuable in regions where it is common.',
+    faqs: [
+      ('We are careful with food and water. Is it needed?',
+          'Care helps and is worth keeping up, but typhoid spreads through water and food handled outside the home too. The vaccine covers what hygiene at home cannot.'),
+      ('How long does it protect for?',
+          'The conjugate vaccine gives several years of protection from one dose. Your paediatrician will say whether and when a booster applies.'),
+    ],
   ),
   Vaccine(
     id: 'hepa',
@@ -221,6 +273,12 @@ const List<Vaccine> kVaccines = [
     protects: 'Protects the liver from hepatitis A.',
     diseases: ['Hepatitis A (a liver infection spread through food and water)'],
     why: 'Hepatitis A spreads through contaminated food and water. The vaccine, given in the second year, gives long-lasting protection.',
+    faqs: [
+      ('Is one dose enough?',
+          'No - it is a two-dose course, with the second usually six months or more after the first. Protection is much better after both.'),
+      ('He had hepatitis A already. Does he still need it?',
+          'Usually not, but confirm with your paediatrician: past infection generally gives lasting protection.'),
+    ],
   ),
   Vaccine(
     id: 'varicella',
@@ -229,6 +287,16 @@ const List<Vaccine> kVaccines = [
     protects: 'Protects against chickenpox.',
     diseases: ['Chickenpox (varicella)'],
     why: 'Chickenpox is usually mild but can occasionally be serious. The vaccine prevents it and the discomfort of the itchy rash and fever.',
+    myths: [
+      ('Chickenpox is a harmless childhood illness.',
+          'It is mild for most children and genuinely dangerous for a few, and nobody can tell in advance which. It also stays in the body and can return as shingles decades later.'),
+    ],
+    faqs: [
+      ('Is it not better to just catch chickenpox?',
+          'Most children recover fine, but a minority get serious complications - skin infection, pneumonia, rarely brain inflammation - and there is no way to know in advance which child that will be. The vaccine avoids the gamble.'),
+      ('He got chickenpox anyway after being vaccinated.',
+          'It happens, and it is almost always far milder - fewer spots, shorter, and much less likely to cause complications. That is the vaccine doing its job, not failing.'),
+    ],
   ),
 ];
 

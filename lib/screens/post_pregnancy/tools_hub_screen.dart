@@ -8,6 +8,10 @@
 //  content.dc.html" · S22 v2. A hero tab (index 2 in the bottom-nav pill).
 // =============================================================================
 
+// Kept: every one of these is still referenced by a commented-out row
+// above, so uncommenting a row needs no import archaeology.
+// ignore_for_file: unused_import, unnecessary_import, unused_element
+
 import 'package:flutter/material.dart';
 
 import 'baby_naming_home_screen.dart';
@@ -103,25 +107,29 @@ class ToolsHubScreen extends StatelessWidget {
               _tracker(context, Icons.menu_book_outlined, const Color(0xFFEAF4EE), 'Product Guide', 'Is it right for your child?', ppMuted,
                   () => _push(context, const ProductGuideHubScreen())),
               const SizedBox(height: 10),
-              // The Launch Hub's only front door. A destination is visited on
-              // purpose — it is never pushed at anyone. docs/BRAND-STUDIO.md §3.
-              _tracker(context, Icons.auto_awesome_outlined, const Color(0xFFF6EFE6), 'Launches', 'New, and worth knowing about', ppBrown,
-                  () => _push(context, const LaunchHubScreen(stage: BrandStage.parenting))),
-              const SizedBox(height: 10),
-              // The guided tour of all 15 brand products. NOT debug-gated: the
-              // whole point is that someone can be handed the app and shown the
-              // monetization architecture working, in context.
-              _tracker(context, Icons.workspace_premium_outlined, const Color(0xFFF3EEF7), 'Brand Studio', 'All 15 brand products, walk them end to end', ppPurple,
-                  () => _push(context, const BrandShowcaseScreen())),
-              const SizedBox(height: 10),
-              // Debug-only workbench — see every campaign and why it is blocked.
-              if (kDebugMode)
-                _tracker(context, Icons.science_outlined, const Color(0xFFFFF1F3), 'Brand Studio (debug)', 'Every campaign, and why it is blocked', const Color(0xFFD92D20),
-                    () => _push(context, const BrandPreviewScreen())),
-              const SizedBox(height: 10),
-              _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
-                  () => _push(context, const ProductsCompareScreen())),
-              const SizedBox(height: 10),
+              // LAUNCHES + BRAND STUDIO MOVED TO EXPLORE, per the parenting
+              // review. Tools is for what you use ON your child — trackers and
+              // journeys; these are things to browse. The Launch Hub still has
+              // exactly one front door (docs/BRAND-STUDIO.md §3) — the door
+              // moved, it did not multiply. All three kept for revert:
+              //
+              // _tracker(context, Icons.auto_awesome_outlined, const Color(0xFFF6EFE6), 'Launches', 'New, and worth knowing about', ppBrown,
+              //     () => _push(context, const LaunchHubScreen(stage: BrandStage.parenting))),
+              // const SizedBox(height: 10),
+              // _tracker(context, Icons.workspace_premium_outlined, const Color(0xFFF3EEF7), 'Brand Studio', 'All 15 brand products, walk them end to end', ppPurple,
+              //     () => _push(context, const BrandShowcaseScreen())),
+              // const SizedBox(height: 10),
+              // if (kDebugMode)
+              //   _tracker(context, Icons.science_outlined, const Color(0xFFFFF1F3), 'Brand Studio (debug)', 'Every campaign, and why it is blocked', const Color(0xFFD92D20),
+              //       () => _push(context, const BrandPreviewScreen())),
+              // const SizedBox(height: 10),
+              // COMPARE MOVED INSIDE THE PRODUCT GUIDE, per the review — you
+              // compare while you are choosing, not from a toolbox two taps
+              // away. It is now a row at the top of ProductGuideHubScreen.
+              // Kept for revert:
+              // _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
+              //     () => _push(context, const ProductsCompareScreen())),
+              // const SizedBox(height: 10),
               _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', 'Next due in 3 weeks', ppCoral,
                   () => _push(context, const VaxTrackerScreen())),
               const SizedBox(height: 10),
@@ -135,9 +143,17 @@ class ToolsHubScreen extends StatelessWidget {
               const SizedBox(height: 10),
               _tracker(context, Icons.bedtime_outlined, const Color(0xFFEDEAF7), 'Sleep journey', 'Rest, gently understood', ppMuted, () => _push(context, const SleepJourneyScreen())),
               const SizedBox(height: 10),
-              _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Development journey', 'Milestones to celebrate', ppMuted, () => _push(context, const MilestoneJourneyScreen())),
-              const SizedBox(height: 10),
-              _tracker(context, Icons.calendar_month_outlined, const Color(0xFFFBEAF0), 'Due date & ovulation', 'Plan the next', ppMuted, () => _soon(context, 'Due date & ovulation planner - coming soon')),
+              // DEVELOPMENT JOURNEY REMOVED FROM TOOLS, per the review: the
+              // gateway already exists in the My Child hero, and the journey
+              // itself belongs in the milestone section. A third door to the
+              // same place made Tools look like it was padding. Kept:
+              // _tracker(context, Icons.checklist_rounded, const Color(0xFFEAF4EE), 'Development journey', 'Milestones to celebrate', ppMuted, () => _push(context, const MilestoneJourneyScreen())),
+              // const SizedBox(height: 10),
+              // DUE DATE & OVULATION MOVED TO THE EXPLORE MENU, and split into
+              // two separate features there — they answer different questions
+              // and belong to different stages of the app. This row did nothing
+              // but raise a snackbar. Kept for revert:
+              // _tracker(context, Icons.calendar_month_outlined, const Color(0xFFFBEAF0), 'Due date & ovulation', 'Plan the next', ppMuted, () => _soon(context, 'Due date & ovulation planner - coming soon')),
             ])),
           ],
         ),
@@ -160,8 +176,8 @@ class ToolsHubScreen extends StatelessWidget {
     );
   }
 
-  // RETIRED with the two hero cards. Kept for revert.
-  // ignore: unused_element
+  // RETIRED with the two hero cards. Kept for revert. (The file-level ignore
+  // at the top now covers unused_element, so the local one has gone.)
   Widget _hero(BuildContext context,
       {required bool dark,
       required IconData icon,

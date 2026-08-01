@@ -103,6 +103,8 @@ class TestScanInfo {
     required this.procedure,
     required this.understandingReport,
     this.parameters = const [],
+    this.interpretation = '',
+    this.interpretPointers = const [],
     this.disclaimer = kMedicalDisclaimer,
     this.aliases = const [],
   });
@@ -118,11 +120,32 @@ class TestScanInfo {
   final String preparation; // Preparation
   final String procedure; // Procedure
 
-  /// Free-text lead-in for "Understanding Your Report".
+  /// Free-text lead-in for "Understanding your report parameters".
   final String understandingReport;
 
-  /// The parameter-by-parameter breakdown under "Understanding Your Report".
+  /// The parameter-by-parameter breakdown under that heading.
   final List<ReportParameter> parameters;
+
+  /// THE CLOSING SUMMARY — "How do I interpret the test results".
+  ///
+  /// Asked for by the review, and the gap it fills is real: the parameters
+  /// above explain each line of a report one at a time, and a parent finishes
+  /// them knowing what nine numbers mean and still not knowing what the REPORT
+  /// says. This is the cumulative read — what a normal result means, what an
+  /// abnormal one can point at, and what to do next.
+  ///
+  /// Written to a strict rule, because this is the most dangerous copy in the
+  /// feature: it names what a finding CAN indicate, never what it does
+  /// indicate, and every one of them ends at the same place — the doctor
+  /// interprets the actual result. The app explains a report; it never reads
+  /// one. See CLAUDE.md's clinical invariants.
+  ///
+  /// Optional. A test without it simply does not render the section.
+  final String interpretation;
+
+  /// Short pointers under the summary — the "what can throw this off" and
+  /// "what happens next" lines that a paragraph buries.
+  final List<String> interpretPointers;
 
   final String disclaimer;
   final List<String> aliases;
@@ -305,6 +328,14 @@ final List<TestScanInfo> kTestsScans = [
             'and easily supported with a small daily tablet.',
       ),
     ],
+    interpretation:
+        'Most first-visit bloods come back in range, and that is what the lab is checking for: enough haemoglobin and iron to carry oxygen for two, a thyroid working normally, and no infection that needs treating before it matters. A value outside the range is common in pregnancy and usually means a supplement or a repeat test, not a problem with the baby.',
+    interpretPointers: [
+      'Low haemoglobin or ferritin most often means iron is needed - the commonest abnormal result in Indian pregnancies, and among the most treatable.',
+      'A thyroid value outside range is usually managed with a daily tablet and a repeat test a few weeks later.',
+      'Eating before a fasting test, a recent illness, or being poorly hydrated can each skew a result enough to need it repeated.',
+      'Your doctor reads these together, not one at a time. A single number outside range rarely means anything on its own.',
+    ],
   ),
 
   // -- Dating scan -----------------------------------------------------------
@@ -368,6 +399,14 @@ final List<TestScanInfo> kTestsScans = [
             'It anchors the timing of every future scan, test and milestone.',
         note: 'It may be adjusted slightly from the date based on your period.',
       ),
+    ],
+    interpretation:
+        'A normal dating scan means one pregnancy, in the right place, with a heartbeat and a size that gives a due date. From here the scan date is the one that counts - it is measured, where a date from your last period is estimated, and this is the most accurate dating scan you will have.',
+    interpretPointers: [
+      'If the scan date differs from your period date by more than about a week, the scan usually wins and your notes are updated.',
+      'No heartbeat at a very early scan often means it is simply too early. A repeat in one to two weeks is the normal next step, not bad news.',
+      'A very early scan, an unusual position of the uterus, or a full bladder can all make measuring harder.',
+      'Your sonographer will not usually discuss findings during the scan. The report goes to your doctor, who explains it.',
     ],
   ),
 
@@ -433,6 +472,14 @@ final List<TestScanInfo> kTestsScans = [
             'it is a next step, not a conclusion.',
       ),
     ],
+    interpretation:
+        'This scan estimates a CHANCE, not an answer, and that distinction is the whole of it. A low-chance result means the probability of a chromosomal condition is small - not that it is zero. A high-chance result is not a finding either; most babies in that group turn out to be fine, and it is an invitation to a further test.',
+    interpretPointers: [
+      'The result is a probability, written as a ratio. Both 1 in 900 and 1 in 90 are ordinary outcomes of a normal scan.',
+      'A raised nuchal measurement on its own is not a diagnosis of anything.',
+      'The baby\'s position, where you are in the 11-13 week window, and your own build can each affect the measurement.',
+      'If the chance comes back raised, NIPT or a diagnostic test is the usual next conversation - one your doctor will walk you through.',
+    ],
   ),
 
   // -- NIPT ------------------------------------------------------------------
@@ -489,6 +536,14 @@ final List<TestScanInfo> kTestsScans = [
             'Note: in India, disclosing the baby\'s sex is not permitted under '
             'the PCPNDT Act, so labs here withhold it.',
       ),
+    ],
+    interpretation:
+        'NIPT screens with very high accuracy, which still is not the same as diagnosing. A low-chance result is strongly reassuring for the conditions it looks at. A high-chance result has to be confirmed by a diagnostic test before anything is concluded, and a proportion of them turn out to be false alarms.',
+    interpretPointers: [
+      'It screens for specific conditions only. A low-chance result says nothing about anything it did not test for.',
+      'A no-result happens occasionally - usually too little fetal DNA in the sample, and usually solved by repeating it a week or two later.',
+      'Twins, an IVF pregnancy, a very early sample and higher maternal weight can each affect whether a result can be given at all.',
+      'No decision should ever rest on NIPT alone. Confirmation comes from a diagnostic test, arranged and explained by your doctor.',
     ],
   ),
 
@@ -577,6 +632,14 @@ final List<TestScanInfo> kTestsScans = [
             'up.',
       ),
     ],
+    interpretation:
+        'A normal anomaly scan means the structures visible at this stage look as expected - brain, heart, spine, kidneys, limbs, and where the placenta is sitting. It cannot rule everything out: some conditions are not visible before birth and some develop later. It is the most detailed look you get, not a complete one.',
+    interpretPointers: [
+      'Soft markers are minor findings that often mean nothing on their own. They are noted so they can be watched.',
+      'A low-lying placenta at this scan usually moves up as the uterus grows, and is simply rechecked later.',
+      'The baby\'s position, your build, and where you are in the 18-22 week window can each limit what is visible. An incomplete scan is often just rebooked.',
+      'Anything flagged goes to your doctor with a plan attached. Wait for that conversation rather than searching the words.',
+    ],
   ),
 
   // -- OGTT / glucose --------------------------------------------------------
@@ -642,6 +705,14 @@ final List<TestScanInfo> kTestsScans = [
         whyImportant: 'Sometimes added to give a fuller picture.',
         note: 'Not the main test for GDM but useful background context.',
       ),
+    ],
+    interpretation:
+        'A normal result means your body is handling the sugar load as expected. A raised value means gestational diabetes - which is common, is about the pregnancy rather than about anything you did, and in most cases is managed with diet and monitoring alone.',
+    interpretPointers: [
+      'Only one of the timed values needs to be above threshold for the test to be positive.',
+      'Not fasting properly, being unwell on the day, or vomiting the drink will invalidate the test and mean repeating it.',
+      'A positive result leads to a diet plan and home glucose monitoring first. Only a minority need insulin.',
+      'It usually resolves after birth, but it does raise later risk, so your doctor will normally arrange a follow-up test a few months postpartum.',
     ],
   ),
 
@@ -717,6 +788,14 @@ final List<TestScanInfo> kTestsScans = [
             '(cephalic) by term.',
       ),
     ],
+    interpretation:
+        'A growth scan places the baby\'s estimated weight on a centile chart. Anywhere between the 10th and 90th centile is the expected range, and a small baby is not automatically a worrying one - some babies are simply small. The TREND across scans matters more than any single number.',
+    interpretPointers: [
+      'Estimated fetal weight carries a real margin of error, commonly around 10-15%. It is an estimate, not a weighing.',
+      'A drop across centiles between two scans matters more than one measurement on its own.',
+      'The baby\'s position, reduced fluid, and later gestation all make measuring less precise.',
+      'If growth is a concern, your doctor will usually respond with closer monitoring - more scans and Dopplers - rather than an immediate decision.',
+    ],
   ),
 
   // -- Doppler ---------------------------------------------------------------
@@ -770,6 +849,14 @@ final List<TestScanInfo> kTestsScans = [
             'carefully.',
       ),
     ],
+    interpretation:
+        'Doppler checks blood flow rather than size: how well the placenta is delivering to the baby. Normal flow is reassuring even when a baby measures small, which is exactly why it is done alongside a growth scan. Abnormal flow is the finding that changes what happens next.',
+    interpretPointers: [
+      'A small baby with normal Dopplers is usually a constitutionally small baby - watched, rather than acted on.',
+      'Abnormal or reversed flow means closer monitoring, and sometimes earlier delivery. It is the finding a team acts on quickly.',
+      'Fetal movement or breathing during the scan, and the baby\'s position, can each affect the reading.',
+      'Dopplers are read as a set alongside growth and fluid. No single one of the three decides anything by itself.',
+    ],
   ),
 
   // -- GBS -------------------------------------------------------------------
@@ -809,6 +896,14 @@ final List<TestScanInfo> kTestsScans = [
         whyImportant: 'No GBS precaution is needed based on this result.',
         note: 'Reassuring; routine care continues.',
       ),
+    ],
+    interpretation:
+        'This is not a test of illness. Group B Strep is a bacterium many healthy women carry with no symptoms at all, and a positive result simply means antibiotics during labour to protect the baby at birth. Positive is not an infection, and it is not something you did.',
+    interpretPointers: [
+      'Around one in five women carry it. Carrying it changes the plan for labour and nothing else.',
+      'A positive result means antibiotics through a drip once labour starts, which is highly effective at preventing transmission.',
+      'Carriage comes and goes, so a swab close to your due date is the useful one - an early result can be out of date by delivery.',
+      'Recent antibiotics can produce a false negative, so tell your doctor if you have taken any.',
     ],
   ),
 ];

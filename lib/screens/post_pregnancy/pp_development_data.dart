@@ -50,6 +50,7 @@ class DevArea {
   const DevArea({
     required this.id,
     required this.name,
+    this.shortName = '',
     required this.icon,
     required this.accent,
     required this.word,
@@ -66,6 +67,22 @@ class DevArea {
   });
   final String id;
   final String name;
+
+  /// THE NAME A PARENT TAPPED, which is not always the name of the field.
+  ///
+  /// The My Child snapshot calls these Brain / Physical / Language / Emotional;
+  /// `name` is the developmental term ("Thinking & Problem Solving"). Tapping
+  /// "Brain" and landing on a page headed with a phrase you have never seen is
+  /// the specific complaint this fixes — the review asked for the category name
+  /// at the top of the page to match the one on My Child.
+  ///
+  /// Defaults to empty and falls back to [name] via [label], so the eight areas
+  /// did not all have to be edited at once and any new area works without it.
+  final String shortName;
+
+  /// What to put at the top of a page. Always prefer what the parent tapped.
+  String get label => shortName.isEmpty ? name : shortName;
+
   final IconData icon;
   final Color accent;
   final DevWord word;
@@ -143,6 +160,7 @@ const Color _violet = Color(0xFF7C5CC4);
 const List<DevArea> kDevAreas = [
   DevArea(
     id: 'cognitive',
+    shortName: 'Brain',
     name: 'Thinking & Problem Solving',
     icon: Icons.psychology_outlined,
     accent: Color(0xFF6A30B6),
@@ -169,6 +187,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'language',
+    shortName: 'Language',
     name: 'Language & Communication',
     icon: Icons.chat_bubble_outline_rounded,
     accent: Color(0xFFFF5A79),
@@ -196,6 +215,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'gross_motor',
+    shortName: 'Physical',
     name: 'Gross Motor',
     icon: Icons.directions_run_rounded,
     accent: _amber,
@@ -223,6 +243,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'fine_motor',
+    shortName: 'Hands',
     name: 'Fine Motor',
     icon: Icons.back_hand_outlined,
     accent: _blue,
@@ -243,6 +264,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'emotional',
+    shortName: 'Emotional',
     name: 'Emotional',
     icon: Icons.favorite_border,
     accent: _rose,
@@ -267,6 +289,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'social',
+    shortName: 'Social',
     name: 'Social',
     icon: Icons.groups_outlined,
     accent: _violet,
@@ -286,6 +309,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'creativity',
+    shortName: 'Creativity',
     name: 'Creativity & Imagination',
     icon: Icons.palette_outlined,
     accent: Color(0xFFFF5A79),
@@ -304,6 +328,7 @@ const List<DevArea> kDevAreas = [
   ),
   DevArea(
     id: 'selfcare',
+    shortName: 'Independence',
     name: 'Self-care & Independence',
     icon: Icons.emoji_food_beverage_outlined,
     accent: _amber,

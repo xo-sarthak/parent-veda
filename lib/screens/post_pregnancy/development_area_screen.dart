@@ -56,14 +56,28 @@ class DevelopmentAreaScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
             // The back title used to read "Development", so tapping Brain landed you on
-            // a page headed with a word you did not tap. It now names what you opened.
-            _pad(ppBack(context, area.name)),
+            // a page headed with a word you did not tap. It now names what you opened —
+            // and `label` is the name the parent actually tapped ("Brain"), not the
+            // developmental term ("Thinking & Problem Solving"), which is what the
+            // review asked for. Was `area.name`.
+            _pad(ppBack(context, area.label)),
             const SizedBox(height: 16),
             _pad(Row(children: [
               Container(width: 48, height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: _a.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(15)), child: Icon(area.icon, size: 24, color: _a)),
               const SizedBox(width: 14),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(area.name, style: ppFraunces(24, h: 1.1)),
+                // The heading matches the My Child row that opened this page.
+                // Was `area.name`; the full developmental term now sits under
+                // it, so nothing is lost — it just stops being the first thing
+                // you read after tapping a different word.
+                Text(area.label, style: ppFraunces(24, h: 1.1)),
+                if (area.shortName.isNotEmpty && area.shortName != area.name) ...[
+                  const SizedBox(height: 2),
+                  Text(area.name,
+                      style: ppBody(12, color: ppMuted),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ],
                 const SizedBox(height: 4),
                 // Was a "Growing" pill next to the stage name, which read as two
               // competing labels - it was unclear whether "Growing" was a tag,
@@ -96,13 +110,30 @@ class DevelopmentAreaScreen extends StatelessWidget {
 
             // skills as clickable boxes
             const SizedBox(height: 26),
-            _pad(Text('${area.name} skills timeline', style: ppJakarta(18))),
+            // Was `area.name`. Uses the tapped name, so a parent who came from
+            // "Brain" reads "Brain skills timeline".
+            _pad(Text('${area.label} skills timeline', style: ppJakarta(18))),
             const SizedBox(height: 4),
             _pad(Text('Mastered, practising now, and what is coming - tap any skill to understand it and how to help.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [
               for (final s in area.journey) _skillBox(context, s),
             ])),
+
+            // WAYS TO HELP IT ALONG — asked for by the review, and the one
+            // section of the five that was genuinely missing here.
+            //
+            // The bullets already existed (helpBulletsFor, in
+            // pp_development_data.dart) and were only rendered on the
+            // individual skill page. So a parent who opened "Brain" and did
+            // not tap further got the timeline and three shopping-ish rails,
+            // and never the part that says what to actually DO. It is now
+            // above "Go deeper", because doing beats browsing.
+            //
+            // Keyed to the skill he is on RIGHT NOW rather than the area in
+            // general — the same area gives different advice at four months
+            // and at four years.
+            ..._helpSection(area),
 
             // go deeper - three rails
             _pad(ppSectionDivider()),
@@ -137,6 +168,58 @@ class DevelopmentAreaScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // ---- ways to help it along ----------------------------------------------
+  List<Widget> _helpSection(DevArea area) {
+    // The skill he is actually on. Falls back to the first entry rather than
+    // returning nothing: an area with no 'current' skill is a data gap, and a
+    // parent should still get the advice.
+    final stage = area.journey.firstWhere(
+      (s) => s.status == 'current',
+      orElse: () => area.journey.isEmpty
+          ? const DevStage('', 'current', '', '')
+          : area.journey.first,
+    );
+    final bullets = helpBulletsFor(area, stage);
+    if (bullets.isEmpty) return const [];
+
+    return [
+      const SizedBox(height: 26),
+      _pad(Text('Ways to help it along', style: ppJakarta(18))),
+      const SizedBox(height: 4),
+      _pad(Text(
+          'Small things that make a real difference at this stage — nothing '
+          'to buy, nothing to schedule.',
+          style: ppBody(12.5, color: ppMuted))),
+      const SizedBox(height: 14),
+      _pad(Container(
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: ppHair),
+        ),
+        child: Column(children: [
+          for (var i = 0; i < bullets.length; i++) ...[
+            if (i != 0) Container(height: 1, color: ppHair),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 6),
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(color: _a, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(bullets[i], style: ppBody(13.5, h: 1.55))),
+              ]),
+            ),
+          ],
+        ]),
+      )),
+    ];
   }
 
   // ---- skill box ----------------------------------------------------------

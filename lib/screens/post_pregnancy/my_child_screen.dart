@@ -34,6 +34,7 @@ import 'leap_definition_screen.dart';
 import 'pp_child_profile.dart';
 import 'multichild_sheet.dart';
 import 'pp_common.dart';
+import 'daily_tip_popup.dart';
 import 'pp_daily_tips.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
@@ -92,9 +93,18 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // placement that most obviously reads as "sponsorship exists". Resolves
       // to null almost always (3–6 campaigns a year, once each), and null is
       // the correct, normal answer.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         showPremiereIfAny(context, stage: BrandStage.parenting);
+        // TODAY'S TIP, once a day. Fired AFTER the Premiere on purpose: a
+        // launch takeover happens a handful of times a year and the tip
+        // happens daily, so if both are due today the rare one goes first and
+        // the tip is waiting behind it rather than being buried under it.
+        //
+        // maybeShowDailyTip() no-ops when it has already run today, so this can
+        // sit here unguarded.
+        if (!mounted) return;
+        await maybeShowDailyTip(context);
       });
     }
   }
@@ -151,11 +161,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   const SizedBox(height: 8),
                   _leapHero(phase),
                   const SizedBox(height: 22),
-                  // Today's Parenting Tip now sits ABOVE the video: a narrow,
-                  // centred card (70% width, two lines, "Read more") so it
-                  // reads as a quick thought rather than a section.
-                  _dailyTip(),
-                  const SizedBox(height: 22),
+                  // TODAY'S PARENTING TIP REMOVED from the page, per the
+                  // review. The first pass asked for its expansion to open a
+                  // proper page; the second asked for the section to go
+                  // altogether — and the same content now arrives as the
+                  // landing pop-up (DailyTipPopup), which is where a
+                  // once-a-day thought belongs. Kept for revert:
+                  // _dailyTip(),
+                  // const SizedBox(height: 22),
                   // Video follows the tip. It carries its own header inside the
                   // card (like the pregnancy "Today's Video"), so it needs no
                   // page-level lead above it.
@@ -181,8 +194,12 @@ class _MyChildScreenState extends State<MyChildScreen> {
                       padding: EdgeInsets.only(bottom: 26))),
                   _snapshot(),
                   const SizedBox(height: 26),
-                  _milestones(),
-                  const SizedBox(height: 26),
+                  // "COMING UP" REMOVED, asked for in both review passes. The
+                  // milestone PAGES are untouched and still reached from the
+                  // snapshot's domain rows and from Brain Development — only
+                  // this preview section on the home has gone. Kept:
+                  // _milestones(),
+                  // const SizedBox(height: 26),
                   _journal(),
                   const SizedBox(height: 26),
                   _leapWatch(phase),
@@ -388,6 +405,34 @@ class _MyChildScreenState extends State<MyChildScreen> {
               Container(width: 1, height: 32, color: Colors.white.withValues(alpha: 0.18)),
               Expanded(child: _heroStat('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)}')),
             ]),
+            // BIRTH WEIGHT, when it is known. Shown as the FACT and the gain
+            // since — both of which are simply true — rather than used to shift
+            // the "~" expected figures beside them.
+            //
+            // A baby born at 2.4 kg really does track differently from one born
+            // at 3.6 kg, and adjusting the expected curve for that is a
+            // clinical calculation about one particular child. CLAUDE.md puts
+            // that behind a clinician, and ParentVeda's own calculation sits
+            // near the bottom of TruthSource on purpose. So the app reports
+            // what happened and leaves the interpreting where it belongs.
+            // Recorded in STILL-OPEN as needing clinical sign-off.
+            if (_child.active.birthWeightKg > 0) ...[
+              const SizedBox(height: 10),
+              Row(children: [
+                const Icon(Icons.child_friendly_outlined,
+                    size: 13, color: Color(0xB3FFFFFF)),
+                const SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                      'Born at ${_child.active.birthWeightKg.toStringAsFixed(1)} kg'
+                      '${_child.weightKg > _child.active.birthWeightKg ? ' · '
+                          '+${(_child.weightKg - _child.active.birthWeightKg).toStringAsFixed(1)} kg since' : ''}',
+                      style: ppBody(11, color: const Color(0xB3FFFFFF)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ),
+              ]),
+            ],
           ]),
         ),
       ]),
@@ -451,14 +496,61 @@ class _MyChildScreenState extends State<MyChildScreen> {
                       borderRadius: BorderRadius.circular(999)),
                 ),
               ),
-              // One faint tick per phase, so the bar reads as twenty stages
-              // rather than an unmarked five-year smear.
+              // THE STOPS, WEIGHTED BY HOW NEAR THEY ARE.
+              //
+              // This drew one identical tick per phase — twenty of them,
+              // evenly bright, so the bar was a row of stops with no way to
+              // tell which one mattered. The review asked for the near-term
+              // to lead, with the ones already passed and the ones still far
+              // off drawn differently from the phase he is in.
+              //
+              // So distance from the current phase decides the weight, and
+              // BEHIND vs AHEAD decides the shape:
+              //
+              //   passed      a small solid dot   — a stop already made
+              //   next 2      a tall bright tick  — the near term, in focus
+              //   3-4 away    a medium tick       — visible, clearly not now
+              //   beyond      a faint short tick  — the road continues
+              //
+              // The track still spans birth to five, because where he is on
+              // the whole road is the honest thing the bar is for. What
+              // changed is which stops ask for attention.
               for (var i = 0; i < kPhases.length; i++)
-                Positioned(
-                  left: 7 + (c.maxWidth - 14) * (i / (kPhases.length - 1)) - 0.5,
-                  top: 4,
-                  child: Container(width: 1, height: 7, color: Colors.white.withValues(alpha: 0.30)),
-                ),
+                if (i != idx)
+                  Positioned(
+                    left: 7 +
+                        (c.maxWidth - 14) * (i / (kPhases.length - 1)) -
+                        (i < idx ? 2 : 0.5),
+                    top: i < idx ? 5.5 : (() {
+                      final d = i - idx;
+                      return d <= 2 ? 3.0 : (d <= 4 ? 4.0 : 5.5);
+                    })(),
+                    child: i < idx
+                        // Already passed: a dot, not a tick. Same size for all
+                        // of them — how long ago a stage ended is not something
+                        // a parent is asking on the home screen.
+                        ? Container(
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.55),
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                        : (() {
+                            final d = i - idx;
+                            final h = d <= 2 ? 9.0 : (d <= 4 ? 7.0 : 4.0);
+                            final a = d <= 2 ? 0.75 : (d <= 4 ? 0.40 : 0.16);
+                            return Container(
+                              width: 1.5,
+                              height: h,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: a),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            );
+                          })(),
+                  ),
               Positioned(
                 left: 0, top: 6,
                 child: Container(
@@ -485,10 +577,33 @@ class _MyChildScreenState extends State<MyChildScreen> {
           );
         }),
         const SizedBox(height: 7),
+        // WAS 'Birth' … '5 years' — the two ends of the road, which are the
+        // two points a parent is least likely to be wondering about. The near
+        // term is what the review asked to lead, so the row now names the stop
+        // just behind and the stop just ahead. Kept for revert:
+        // Row(children: [
+        //   Text('Birth', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+        //   const Spacer(),
+        //   Text('5 years', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+        // ]),
         Row(children: [
-          Text('Birth', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
-          const Spacer(),
-          Text('5 years', style: ppBody(10.5, color: w70, w: FontWeight.w700)),
+          Expanded(
+            child: Text(
+                idx > 0 ? kPhases[idx - 1].name : 'Birth',
+                style: ppBody(10.5, color: w70, w: FontWeight.w700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(next != null ? 'Next · ${next.name}' : '5 years',
+                textAlign: TextAlign.right,
+                style: ppBody(10.5,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    w: FontWeight.w700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
         ]),
         const SizedBox(height: 9),
         Row(children: [
@@ -1230,6 +1345,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  with a bare text link — still a footnote next to pregnancy's featured read.
   //  The pregnancy card treats the daily tip as editorial. This is the same
   //  content in the same role, so it gets the same weight.
+  // RETIRED from the page — the tip is now the landing pop-up. The call site
+  // is commented out above; this stays so uncommenting it is the whole revert.
+  // ignore: unused_element
   Widget _dailyTip() {
     final t = dailyTip();
     return _pad(ppCard(
@@ -1349,20 +1467,25 @@ class _MyChildScreenState extends State<MyChildScreen> {
               Text(v.title, style: ppJakarta(16)),
               const SizedBox(height: 6),
               Text('${v.durationLabel} · ${v.expert.name}', style: ppBody(12.5, color: ppMuted, h: 1.4)),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: ppPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  onPressed: open,
-                  icon: const Icon(Icons.play_arrow_rounded, size: 18, color: Colors.white),
-                  label: Text('Watch', style: ppBody(14, color: Colors.white, w: FontWeight.w800)),
-                ),
-              ),
+              // WATCH BUTTON REMOVED from the phase video card, per the
+              // review. The whole card is already a tap target that opens the
+              // player — the thumbnail, the title and the row all call open()
+              // — so a full-width button underneath was a second control for
+              // the thing you had just tapped. Kept for revert:
+              // const SizedBox(height: 12),
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: FilledButton.icon(
+              //     style: FilledButton.styleFrom(
+              //       backgroundColor: ppPurple,
+              //       padding: const EdgeInsets.symmetric(vertical: 13),
+              //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              //     ),
+              //     onPressed: open,
+              //     icon: const Icon(Icons.play_arrow_rounded, size: 18, color: Colors.white),
+              //     label: Text('Watch', style: ppBody(14, color: Colors.white, w: FontWeight.w800)),
+              //   ),
+              // ),
             ]),
           ),
         ),
@@ -1500,6 +1623,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  help him get there. Only 'next' stages appear; the "now" story belongs to
   //  the snapshot. Each row opens the milestone detail, where the preparation
   //  actually lives.
+  // RETIRED from the page ("Coming up"). Milestone PAGES are untouched and
+  // still reached from the snapshot rows. Kept so the call site can come back.
+  // ignore: unused_element
   Widget _milestones() {
     final areas = ['gross_motor', 'cognitive', 'language', 'emotional'].map(devAreaById).toList();
     final rows = <(DevArea, DevStage)>[];
@@ -1580,7 +1706,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return _pad(ppCarousel(
       accent: phase.accent,
       icon: Icons.shopping_bag_outlined,
-      title: 'Picks for this phase',
+      // Renamed from 'Picks for this phase' per the review. "Picks" reads as
+      // an editorial recommendation; this rail is the one place on the page
+      // that is about buying, and calling it Products says so. Kept:
+      //   title: 'Picks for this phase',
+      title: 'Products for this phase',
       seeAll: 'View more',
       onSeeAll: () => _push(const RecommendationsScreen()),
       railHeight: 176,

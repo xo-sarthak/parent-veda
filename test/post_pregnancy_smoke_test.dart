@@ -419,35 +419,43 @@ void main() {
   // next, which made it near-indistinguishable from the Child snapshot above
   // it. It is now "What <name> is preparing for next" and lists ONLY upcoming
   // stages - so this asserts a 'next' milestone, not a current one.
-  testWidgets('My Child home: an upcoming milestone opens its detail', (tester) async {
-    tester.view.physicalSize = const Size(1170, 2532);
-    tester.view.devicePixelRatio = 3.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
-    await tester.pumpAndSettle();
-
-    await tester.scrollUntilVisible(
-      find.text('Sitting with support'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-      maxScrolls: 40,
-    );
-    await tester.ensureVisible(find.text('Sitting with support'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Sitting with support'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(DevStageDetailScreen), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+    // RETIRED by the parenting review: the "Coming up" section was removed
+  // from the My Child page in both review passes. The milestone PAGES are
+  // untouched and still reached from the snapshot rows - that path is
+  // covered by "snapshot card opens the My Child profile" below, and by
+  // test/parenting_review_test.dart, which asserts the section is gone AND
+  // that its builder survives.
+  //
+  // Kept commented rather than deleted, matching the code it covered:
+  // testWidgets('My Child home: an upcoming milestone opens its detail', (tester) async {
+  // tester.view.physicalSize = const Size(1170, 2532);
+  // tester.view.devicePixelRatio = 3.0;
+  // addTearDown(tester.view.reset);
+  //
+  // await tester.pumpWidget(const MaterialApp(home: MyChildScreen(home: true)));
+  // await tester.pumpAndSettle();
+  //
+  // await tester.scrollUntilVisible(
+  // find.text('Sitting with support'),
+  // 300,
+  // scrollable: find.byType(Scrollable).first,
+  // maxScrolls: 40,
+  // );
+  // await tester.ensureVisible(find.text('Sitting with support'));
+  // await tester.pumpAndSettle();
+  // await tester.tap(find.text('Sitting with support'));
+  // await tester.pumpAndSettle();
+  //
+  // expect(find.byType(DevStageDetailScreen), findsOneWidget);
+  // expect(tester.takeException(), isNull);
+  // });
 
   // The Explore drawer (hamburger) carries the new Leap Calendar entry, which
   // opens the calendar.
   // The Leap Calendar became the Phase Map when the app moved off the Wonder
   // Weeks framework: twenty AAP-aligned age phases instead of ten fixed-week
   // leaps. Asserts the new route works AND the old label is genuinely gone.
-  testWidgets('My Child home: Explore drawer opens the phase map', (tester) async {
+  testWidgets('My Child home: Explore no longer lists His journey', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -457,12 +465,19 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.menu_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('His journey'), findsOneWidget);
+    // 'His journey' LEFT THE MENU in the parenting review - "remove from
+    // menu/explore and not the feature as such". PhaseMapScreen is untouched
+    // and still opens from the My Child hero; only this door closed.
+    //
+    // Kept for revert, alongside the commented row in explore_drawer.dart:
+    // expect(find.text('His journey'), findsOneWidget);
+    // await tester.tap(find.text('His journey'));
+    // await tester.pumpAndSettle();
+    // expect(find.byType(PhaseMapScreen), findsOneWidget);
+    expect(find.text('His journey'), findsNothing);
     expect(find.text('Leap Calendar'), findsNothing);
-
-    await tester.tap(find.text('His journey'));
-    await tester.pumpAndSettle();
-    expect(find.byType(PhaseMapScreen), findsOneWidget);
+    // The drawer still opens and still has its rows.
+    expect(find.text('Health'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

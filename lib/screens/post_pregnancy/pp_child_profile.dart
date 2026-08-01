@@ -96,6 +96,7 @@ class Child {
     required this.weightKg,
     required this.heightCm,
     required this.headCm,
+    this.birthWeightKg = 0,
   });
 
   final String id;
@@ -106,6 +107,13 @@ class Child {
   double heightCm;
   double headCm;
 
+  /// What they weighed AT BIRTH, in kg. 0 = not recorded.
+  ///
+  /// Kept apart from [weightKg], which is the latest measurement. They are
+  /// different facts and conflating them would quietly rewrite history every
+  /// time a parent updated the current weight.
+  double birthWeightKg;
+
   Child copyWith({String? id}) => Child(
         id: id ?? this.id,
         name: name,
@@ -114,6 +122,7 @@ class Child {
         weightKg: weightKg,
         heightCm: heightCm,
         headCm: headCm,
+        birthWeightKg: birthWeightKg,
       );
 
   /// 'YYYY-MM-DD' for the `dob date` column (and the local cache).
@@ -129,6 +138,7 @@ class Child {
         'weightKg': weightKg,
         'heightCm': heightCm,
         'headCm': headCm,
+        'birthWeightKg': birthWeightKg,
       };
 
   factory Child.fromJson(Map<String, dynamic> j) => Child(
@@ -139,6 +149,7 @@ class Child {
         weightKg: (j['weightKg'] as num?)?.toDouble() ?? 0,
         heightCm: (j['heightCm'] as num?)?.toDouble() ?? 0,
         headCm: (j['headCm'] as num?)?.toDouble() ?? 0,
+        birthWeightKg: (j['birthWeightKg'] as num?)?.toDouble() ?? 0,
       );
 
   // camelCase model <-> snake_case columns. `user_id` is NOT here: on insert
@@ -162,6 +173,11 @@ class Child {
         weightKg: (r['weight_kg'] as num?)?.toDouble() ?? 0,
         heightCm: (r['height_cm'] as num?)?.toDouble() ?? 0,
         headCm: (r['head_cm'] as num?)?.toDouble() ?? 0,
+        // Reads the column if it is there, tolerates it not being there. The
+        // migration adding birth_weight_kg to public.children has not been
+        // written yet (STILL-OPEN), and a client that crashed on a missing
+        // column would take the whole child list down with it.
+        birthWeightKg: (r['birth_weight_kg'] as num?)?.toDouble() ?? 0,
       );
 }
 
@@ -281,6 +297,7 @@ class ChildProfileStore extends ChangeNotifier {
     double weightKg = 0,
     double heightCm = 0,
     double headCm = 0,
+    double birthWeightKg = 0,
   }) async {
     final c = Child(
       id: 'child_${DateTime.now().microsecondsSinceEpoch}',
@@ -290,6 +307,7 @@ class ChildProfileStore extends ChangeNotifier {
       weightKg: weightKg,
       heightCm: heightCm,
       headCm: headCm,
+      birthWeightKg: birthWeightKg,
     );
     _children.add(c);
     _activeId = c.id;
