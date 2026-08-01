@@ -114,24 +114,8 @@ class DoctorRoster extends ChangeNotifier {
               o.kind == OfferingKind.cohort))
       .toList();
 
-  // The expert_roster() rows are booking_bookings rows (snake_case).
-  static Booking _fromRow(Map r) => Booking(
-        id: (r['id'] ?? '').toString(),
-        offeringId: (r['offering_id'] ?? '').toString(),
-        slotId: (r['slot_id'] ?? '').toString(),
-        stage: ServiceStage.values.firstWhere(
-          (s) => s.name == r['stage'],
-          orElse: () => ServiceStage.parenting,
-        ),
-        title: (r['title'] ?? '').toString(),
-        startsUtc: DateTime.parse(r['starts_utc'].toString()).toUtc(),
-        durationMin: (r['duration_min'] as num?)?.toInt() ?? 0,
-        status: BookingStatus.values.firstWhere(
-          (s) => s.name == r['status'],
-          orElse: () => BookingStatus.upcoming,
-        ),
-        bookedUtc: DateTime.parse(
-                (r['created_at'] ?? r['starts_utc']).toString())
-            .toUtc(),
-      );
+  // The expert_roster() rows are booking_bookings rows (snake_case). The
+  // mapping moved to Booking.fromRow so the parent side decodes the same row
+  // the same way — see the note there.
+  static Booking _fromRow(Map r) => Booking.fromRow(r);
 }

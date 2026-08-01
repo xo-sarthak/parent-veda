@@ -64,6 +64,86 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     try {
       await syncStateFromCloud();
     } catch (_) {/* stay local */}
+    // AFTER the blob, deliberately. syncStateFromCloud adopts the cached blob
+    // with "cloud wins", which CLEARS _bookings and refills from it; hydrating
+    // first would be undone a line later.
+    try {
+      await _hydrateFromServer();
+    } catch (e) {
+      debugPrint('[booking] server hydrate failed: $e');
+    }
+  }
+
+  /// Re-read the server's bookings on demand — pull-to-refresh, or returning
+  /// to the app. Public because "wait for the next launch" is not an answer a
+  /// parent should ever be given about their own appointment.
+  Future<void> refreshFromServer() async {
+    try {
+      await _hydrateFromServer();
+    } catch (e) {
+      debugPrint('[booking] refresh failed: $e');
+    }
+  }
+
+  /// Adopt the authoritative `booking_bookings` rows for this user.
+  ///
+  /// WHY THIS EXISTS — the bug it fixes is worth stating, because the symptom
+  /// pointed away from the cause. A parent booked, the doctor saw it, and on
+  /// the parent's next launch "nothing booked yet". Two sources of truth:
+  ///
+  ///     doctor  -> expert_roster()  -> booking_bookings   (the table)
+  ///     parent  -> user_state blob  -> whatever was last pushed  (a cache)
+  ///
+  /// The blob push is fire-and-forget (`.catchError((_) {})`), so a failed
+  /// push is silent — and `syncStateFromCloud` then re-adopts the OLDER blob
+  /// on every start, wiping the booking from the phone while the row sat
+  /// untouched in Postgres. A cache that can overwrite the record is not a
+  /// cache; that is the actual defect, and this is the line that ends it.
+  ///
+  /// THE MERGE IS IDEMPOTENT because the APP generates the booking id, so a
+  /// local row and its server copy share one identity — the rule stated in
+  /// CLAUDE.md. Nothing here needs to guess whether two rows are "the same
+  /// booking", which is what makes re-running this safe.
+  ///
+  /// WHAT THE SERVER IS NOT ALLOWED TO DO. It may add a booking this device
+  /// has never seen, and it may CANCEL one. It may NOT push a booking back to
+  /// `upcoming` once this device has marked it attended: _reconcileStatuses()
+  /// calls CareJourney.consultationDone() exactly once on that transition, and
+  /// re-opening a finished booking would let the count climb by one on every
+  /// launch. The server does not track attendance yet (see 0029), so on that
+  /// one field the device knows more than the database — and the merge has to
+  /// say so rather than defer by reflex.
+  ///
+  /// Local-only bookings — made offline, never granted a seat — are left
+  /// alone. Absence from the server is not evidence of deletion when the
+  /// device may simply not have reached it yet.
+  Future<void> _hydrateFromServer() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    final rows = await SupabaseRepo.fetch('booking_bookings');
+    if (rows.isEmpty) return;
+
+    var changed = false;
+    for (final r in rows) {
+      final remote = Booking.fromRow(r);
+      if (remote.id.isEmpty) continue;
+      final local = _bookings[remote.id];
+
+      if (local == null) {
+        _bookings[remote.id] = remote; // the case that was being lost
+        changed = true;
+      } else if (remote.status == BookingStatus.cancelled &&
+          local.status != BookingStatus.cancelled) {
+        // Cancelled elsewhere — a seat this device must stop offering to join.
+        _bookings[remote.id] = local.copyWith(status: remote.status);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      // Newly adopted rows may already be in the past on this device's clock.
+      _reconcileStatuses();
+      await _save(); // writes the local cache AND re-pushes the blob
+    }
   }
 
   // ---- reads ----------------------------------------------------------------

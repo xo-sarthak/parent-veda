@@ -7,6 +7,8 @@
 //  the same binary.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_reminders.dart';
@@ -32,26 +34,68 @@ class DoctorScaffold extends StatefulWidget {
   State<DoctorScaffold> createState() => _DoctorScaffoldState();
 }
 
-class _DoctorScaffoldState extends State<DoctorScaffold> {
+class _DoctorScaffoldState extends State<DoctorScaffold>
+    with WidgetsBindingObserver {
   int _tab = 0;
+
+  /// KEEPING THE ROSTER CURRENT WITHOUT ASKING THE DOCTOR TO DO ANYTHING.
+  ///
+  /// The roster used to load exactly once, in initState. That is why a booking
+  /// made on the parent's phone only appeared after a hot RESTART and not a hot
+  /// reload: reload keeps the widget state, so initState never runs again, so
+  /// nothing refetched. Nothing was broken — the app simply never asked twice.
+  ///
+  /// In a doctor's hands that is worse than a bug. They leave the app open on a
+  /// desk between consults; a parent books ten minutes before their slot; the
+  /// screen keeps showing an empty afternoon until the app is killed. So three
+  /// triggers now, each covering what the others miss:
+  ///
+  ///   * app RESUMED  — the common case. Any switch away and back is current.
+  ///   * a POLL       — for the phone left open on the desk, which never
+  ///                    resumes because it never left.
+  ///   * pull-to-refresh on the lists — the deliberate "is it there yet?"
+  ///
+  /// Ninety seconds for the poll: a consult is fifteen minutes and the shortest
+  /// booking notice is measured in minutes, so a minute and a half of staleness
+  /// is never the difference between making a call and missing it. Shorter
+  /// would be a request per doctor per few seconds, all day, to change nothing
+  /// almost every time.
+  static const _pollEvery = Duration(seconds: 90);
+  Timer? _poll;
 
   @override
   void initState() {
     super.initState();
-    // Pull the server roster (bookings other parents made with this expert) and
-    // load saved availability the moment the doctor app opens.
-    DoctorRoster.instance.refresh().then((_) {
-      // A missed consultation is the worst outcome in the product - the parent
-      // waited, paid, and nobody came. Re-arming on every open is safe: the
-      // notification ids are derived from the booking id, so repeats overwrite
-      // rather than stack up.
-      final id = DoctorSession.instance.expertId;
-      if (id != null) {
-        DoctorReminders.instance
-            .syncAll(DoctorRoster.instance.upcomingConsults(id));
-      }
-    });
+    WidgetsBinding.instance.addObserver(this);
+    _refreshRoster();
+    _poll = Timer.periodic(_pollEvery, (_) => _refreshRoster());
     DoctorScheduleStore.instance.init();
+  }
+
+  @override
+  void dispose() {
+    _poll?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshRoster();
+  }
+
+  Future<void> _refreshRoster() async {
+    await DoctorRoster.instance.refresh();
+    if (!mounted) return;
+    // A missed consultation is the worst outcome in the product - the parent
+    // waited, paid, and nobody came. Re-arming on every refresh is safe: the
+    // notification ids are derived from the booking id, so repeats overwrite
+    // rather than stack up.
+    final id = DoctorSession.instance.expertId;
+    if (id != null) {
+      DoctorReminders.instance
+          .syncAll(DoctorRoster.instance.upcomingConsults(id));
+    }
   }
 
   static const _tabs = [

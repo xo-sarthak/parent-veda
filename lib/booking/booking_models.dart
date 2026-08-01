@@ -413,6 +413,36 @@ class Booking {
         bookedUtc: DateTime.parse(data['bookedUtc'].toString()).toUtc(),
         joinUrl: data['joinUrl']?.toString(),
       );
+
+  /// Build from a `booking_bookings` ROW (snake_case), as returned by
+  /// expert_roster() for the doctor and by a direct select for the parent.
+  ///
+  /// Distinct from [fromMap], which reads the app's own camelCase cache. Two
+  /// shapes exist because two things persist a booking — the table is the
+  /// record, the blob is the cache — and this is the seam between them. It
+  /// lives here, once, because it was written twice before: the doctor's copy
+  /// and the parent's would have drifted the first time a column was added,
+  /// and a booking that decodes differently on the two sides is the worst kind
+  /// of bug to look at, since both screens are "working".
+  ///
+  /// `join_url` is absent from the table on purpose — the room is derived from
+  /// the booking server-side (see livekit-token), so there is no link to store.
+  static Booking fromRow(Map r) => Booking(
+        id: (r['id'] ?? '').toString(),
+        offeringId: (r['offering_id'] ?? '').toString(),
+        slotId: (r['slot_id'] ?? '').toString(),
+        stage: _stageFrom(r['stage']),
+        title: (r['title'] ?? '').toString(),
+        startsUtc: DateTime.parse(r['starts_utc'].toString()).toUtc(),
+        durationMin: (r['duration_min'] as num?)?.toInt() ?? 0,
+        status: BookingStatus.values.firstWhere(
+          (s) => s.name == r['status'],
+          orElse: () => BookingStatus.upcoming,
+        ),
+        bookedUtc:
+            DateTime.parse((r['created_at'] ?? r['starts_utc']).toString())
+                .toUtc(),
+      );
 }
 
 ServiceStage _stageFrom(Object? v) => ServiceStage.values.firstWhere(

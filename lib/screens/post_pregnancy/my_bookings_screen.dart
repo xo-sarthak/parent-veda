@@ -16,12 +16,14 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../services/notification_service.dart';
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
 
 class MyBookingsScreen extends StatefulWidget {
@@ -41,6 +43,17 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scheduleReminders());
     // Pull any prescriptions the doctor has written for these consults.
     PrescriptionStore.instance.refresh();
+    // And the bookings themselves, from booking_bookings. Opening this screen
+    // is the clearest possible statement of "show me my bookings", so it is the
+    // right moment to ask the server rather than trust whatever is cached.
+    BookingStore.instance.refreshFromServer();
+  }
+
+  Future<void> _pullToRefresh() async {
+    await Future.wait([
+      BookingStore.instance.refreshFromServer(),
+      PrescriptionStore.instance.refresh(),
+    ]);
   }
 
   void _scheduleReminders() {
@@ -84,7 +97,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                     .isBefore(DateTime.now().toUtc()))
                 .toList();
 
-            return ListView(
+            return RefreshIndicator(
+              onRefresh: _pullToRefresh,
+              color: ppPurple,
+              child: ListView(
+              // alwaysScrollable so the pull gesture works even when the list
+              // is short — an empty "no bookings yet" screen is exactly when
+              // someone most wants to pull it down again.
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(top: 12, bottom: 40),
               children: [
                 _pad(ppBack(context, 'Explore')),
@@ -113,13 +133,21 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 else
                   for (final b in upcoming) _pad(_upcomingCard(b)),
 
-                if (past.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  _pad(_sectionLabel('Past')),
-                  const SizedBox(height: 10),
+                // HISTORY IS NEVER HIDDEN. This used to render only when there
+                // was something in it, so a parent with no past sessions saw
+                // no sign that a record was being kept — and a parent whose
+                // history had silently failed to load saw the same nothing.
+                // Two very different situations, one blank screen. The empty
+                // copy is the feature's advertisement (CLAUDE.md).
+                const SizedBox(height: 20),
+                _pad(_sectionLabel('Past')),
+                const SizedBox(height: 10),
+                if (past.isEmpty)
+                  _pad(_emptyPast())
+                else
                   for (final b in past) _pad(_pastRow(b)),
-                ],
               ],
+            ),
             );
           },
         ),
@@ -236,10 +264,22 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     );
   }
 
-  void _openCall(Booking b) => Navigator.of(context).push(
-        MaterialPageRoute<void>(
-            builder: (_) => CallScreen(bookingId: b.id, title: b.title)),
-      );
+  void _openCall(Booking b) {
+    // Who she is waiting for, by name. Derived from the offering rather than
+    // stored on the booking: the booking records WHAT was bought, and the
+    // catalogue already knows who delivers it — copying the name onto the row
+    // would be a second place for it to go stale.
+    final expertId = BookingCatalog.instance.offeringById(b.offeringId)?.expertId;
+    final who = (expertId == null || expertId.isEmpty)
+        ? null
+        : expertById(expertId).name;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
+      ),
+    );
+  }
 
   // ---- past -----------------------------------------------------------------
 
@@ -336,6 +376,26 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               style: ppJakarta(15, color: ppTitleInk)),
           const SizedBox(height: 4),
           Text('Classes and sessions you book will show up here.',
+              textAlign: TextAlign.center,
+              style: ppBody(12.5, color: ppSoft, h: 1.4)),
+        ]),
+      );
+
+  Widget _emptyPast() => Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ppHair),
+        ),
+        child: Column(children: [
+          const Icon(Icons.history_rounded, size: 26, color: ppMuted),
+          const SizedBox(height: 10),
+          Text('No past sessions yet', style: ppJakarta(15, color: ppTitleInk)),
+          const SizedBox(height: 4),
+          Text(
+              'Every session you attend stays here — with the doctor, the date, '
+              'and any prescription they wrote.',
               textAlign: TextAlign.center,
               style: ppBody(12.5, color: ppSoft, h: 1.4)),
         ]),

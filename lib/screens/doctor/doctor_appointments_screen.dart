@@ -26,6 +26,7 @@ import '../../doctor/doctor_reminders.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../post_pregnancy/pp_experts_data.dart';
 import 'doctor_prescription_screen.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
@@ -73,7 +74,13 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           _ => past,
         };
 
-        return ListView(
+        return RefreshIndicator(
+          onRefresh: _pullToRefresh,
+          color: ppPurple,
+          child: ListView(
+          // The pull has to work on an empty afternoon too — that is precisely
+          // when a doctor wants to check whether a booking has landed.
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
           children: [
             ppEyebrow('YOUR PRACTICE', color: ppPurple),
@@ -90,9 +97,17 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             else
               for (final b in list) _card(b, past: _tab == 2),
           ],
+        ),
         );
       },
     );
+  }
+
+  Future<void> _pullToRefresh() async {
+    await Future.wait([
+      DoctorRoster.instance.refresh(),
+      PrescriptionStore.instance.refresh(),
+    ]);
   }
 
   String _summary(int today, int later, List<Booking> past) {
@@ -169,6 +184,14 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
 
   // ---- one appointment ------------------------------------------------------
 
+  /// The name the parent sees over this doctor's video. Read from the session
+  /// rather than passed down, because the identity is the ACCOUNT — the same
+  /// reason DoctorAuthScreen has no "sign in as which doctor?" picker.
+  String? _myName() {
+    final id = DoctorSession.instance.expertId;
+    return (id == null || id.isEmpty) ? null : expertById(id).name;
+  }
+
   Widget _card(Booking b, {required bool past}) {
     final start = b.startsUtc.toLocal();
     final patient = DoctorRoster.instance.patientFor(b.id, stage: b.stage);
@@ -242,7 +265,15 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                   filled: soon,
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => CallScreen(bookingId: b.id, title: b.title),
+                      builder: (_) => CallScreen(
+                        bookingId: b.id,
+                        title: b.title,
+                        // The doctor announces themselves, and waits for the
+                        // parent by name — the roster already resolved it, so
+                        // neither side has to see "Guest".
+                        displayName: _myName(),
+                        waitingFor: patient.name.isEmpty ? null : patient.name,
+                      ),
                     ),
                   ),
                 ),

@@ -17,6 +17,7 @@ import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../post_pregnancy/pp_experts_data.dart';
 import 'doctor_availability_screen.dart';
 import 'doctor_prescription_screen.dart';
 
@@ -54,7 +55,11 @@ class DoctorHomeScreen extends StatelessWidget {
             ? const <Offering>[]
             : DoctorRoster.instance.sessionsBy(e.id);
 
-        return ListView(
+        return RefreshIndicator(
+          onRefresh: DoctorRoster.instance.refresh,
+          color: ppPurple,
+          child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.only(top: 8, bottom: 40),
           children: [
             _pad(_header(name, sub)),
@@ -93,6 +98,7 @@ class DoctorHomeScreen extends StatelessWidget {
               child: _availabilityCard(),
             )),
           ],
+        ),
         );
       },
     );
@@ -215,6 +221,13 @@ class DoctorHomeScreen extends StatelessWidget {
 
   // ---- calls ----------------------------------------------------------------
 
+  /// The name the parent sees over this doctor's video — the account's expert,
+  /// not a choice. See DoctorAuthScreen for why that distinction is load-bearing.
+  String? _myName() {
+    final id = DoctorSession.instance.expertId;
+    return (id == null || id.isEmpty) ? null : expertById(id).name;
+  }
+
   Widget _callCard(BuildContext context, Booking b) => ppCard(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -240,7 +253,14 @@ class DoctorHomeScreen extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                    builder: (_) => CallScreen(bookingId: b.id, title: b.title))),
+                    builder: (_) => CallScreen(
+                          bookingId: b.id,
+                          title: b.title,
+                          displayName: _myName(),
+                          waitingFor: DoctorRoster.instance
+                              .patientFor(b.id, stage: b.stage)
+                              .name,
+                        ))),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   height: 44,
