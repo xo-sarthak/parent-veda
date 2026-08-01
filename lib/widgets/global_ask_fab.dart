@@ -39,6 +39,13 @@ const String kTtcRootRoute = 'ttc/today';
 const String kPremiereRoute = 'premiere';
 const String kAskVedaRoute = 'askveda';
 
+/// A live video consultation. The FAB floats ABOVE the Navigator, so a pushed
+/// route does not cover it — which put a purple "ask a question" button on top
+/// of a doctor's face, over the leave-call control. Suppressed by NAME rather
+/// than by the screen hiding it, because the FAB is not the call screen's to
+/// know about; this file already owns the list of places it stays out of.
+const String kCallRoute = 'call';
+
 // ---- geometry ---------------------------------------------------------------
 //  The FAB floats above every route in `MaterialApp.builder`, which means it is
 //  NOT part of any screen's layout: nothing reserves room for it, and a scroll
@@ -120,7 +127,8 @@ class FabRouteObserver extends NavigatorObserver {
     final suppressed = top != null &&
         (top is PopupRoute || // modal sheets, dialogs, menus
             top.settings.name == kPremiereRoute ||
-            top.settings.name == kAskVedaRoute);
+            top.settings.name == kAskVedaRoute ||
+            top.settings.name == kCallRoute);
     FabState.instance
         ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
   }

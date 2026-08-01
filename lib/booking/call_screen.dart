@@ -320,6 +320,30 @@ class _CallScreenState extends State<CallScreen> {
     _refresh();
   }
 
+  /// The second line: state, then what this session IS — with the person's name
+  /// taken out of it.
+  ///
+  /// Booking titles read "Consult · Dr. Neha Sharma", and the headline above is
+  /// already "Dr. Neha Sharma", so printing both gave
+  /// "00:52 · Consult · Dr. Neha Sharma" under a heading saying the same name.
+  /// Stripping it here rather than shortening the title itself: the title is
+  /// what the parent BOUGHT and reads correctly everywhere else — it is only
+  /// redundant on the one screen where the name is already the headline.
+  String get _statusLine {
+    final state = _remote == null ? 'Waiting' : _clock;
+    final name = _remoteName.trim();
+    var what = widget.title.trim();
+    if (name.isNotEmpty && name != 'the other person') {
+      what = what
+          .replaceAll(RegExp(RegExp.escape(name), caseSensitive: false), '')
+          // whatever separator the removal left dangling at either end
+          .replaceAll(RegExp(r'^[\s·\-–—,:]+'), '')
+          .replaceAll(RegExp(r'[\s·\-–—,:]+$'), '')
+          .trim();
+    }
+    return what.isEmpty ? state : '$state · $what';
+  }
+
   String get _clock {
     final m = _elapsed.inMinutes.toString().padLeft(2, '0');
     final s = (_elapsed.inSeconds % 60).toString().padLeft(2, '0');
@@ -429,19 +453,34 @@ class _CallScreenState extends State<CallScreen> {
 
         _selfCard(pos, cardTrack, box),
 
-        AnimatedOpacity(
-          opacity: _chrome ? 1 : 0,
-          duration: const Duration(milliseconds: 180),
-          child: IgnorePointer(ignoring: !_chrome, child: _topBar()),
-        ),
-        AnimatedSlide(
-          offset: _chrome ? Offset.zero : const Offset(0, 1.4),
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
+        // POSITIONED, not just aligned. Stack(fit: StackFit.expand) forces
+        // every NON-positioned child to fill the stack — so the top bar's Row
+        // became full-height and centred its own contents, planting the
+        // doctor's name across the middle of their face. Pinning it to the top
+        // edge is the fix; the scrim above assumes it is up there too.
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
           child: AnimatedOpacity(
             opacity: _chrome ? 1 : 0,
             duration: const Duration(milliseconds: 180),
-            child: IgnorePointer(ignoring: !_chrome, child: _controls()),
+            child: IgnorePointer(ignoring: !_chrome, child: _topBar()),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: AnimatedSlide(
+            offset: _chrome ? Offset.zero : const Offset(0, 1.4),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            child: AnimatedOpacity(
+              opacity: _chrome ? 1 : 0,
+              duration: const Duration(milliseconds: 180),
+              child: IgnorePointer(ignoring: !_chrome, child: _controls()),
+            ),
           ),
         ),
       ]);
@@ -598,9 +637,7 @@ class _CallScreenState extends State<CallScreen> {
                       const SizedBox(width: 7),
                       Flexible(
                         child: Text(
-                          _remote == null
-                              ? 'Waiting · ${widget.title}'
-                              : '$_clock · ${widget.title}',
+                          _statusLine,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -638,7 +675,19 @@ class _CallScreenState extends State<CallScreen> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 22, left: 16, right: 16),
-            child: ClipRRect(
+            // FIVE CONTROLS DO NOT FIT EVERY PHONE. At 52px circles plus a
+            // 74px pill the bar needs ~344dp, which a narrow or large-font
+            // device does not have — and Flutter's answer to that is a yellow
+            // overflow stripe, on top of a live consultation.
+            //
+            // scaleDown rather than a smaller fixed size: the bar keeps its
+            // designed proportions on the phones that can hold it, and shrinks
+            // only where it must. Dropping a control instead would mean
+            // choosing which one a small-screen user does not get, and none of
+            // mute, camera, speaker, flip or leave is optional in a consult.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: ClipRRect(
               borderRadius: BorderRadius.circular(38),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -695,6 +744,7 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
           ),
+        ),
         ),
       );
 

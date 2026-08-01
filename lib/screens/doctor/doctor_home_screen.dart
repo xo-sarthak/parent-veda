@@ -18,6 +18,7 @@ import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart';
+import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'doctor_availability_screen.dart';
 import 'doctor_prescription_screen.dart';
 
@@ -253,6 +254,7 @@ class DoctorHomeScreen extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: kCallRoute),
                     builder: (_) => CallScreen(
                           bookingId: b.id,
                           title: b.title,

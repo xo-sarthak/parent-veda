@@ -134,6 +134,32 @@ serve(async (req) => {
       return json({ error: "not your session", bookingId }, 403);
     }
 
+    // WHOSE NAME GOES OVER THE VIDEO.
+    //
+    // The doctor app sends one (it knows its own expert). The parent app has
+    // no name on the device — ChildProfileStore holds the CHILD's name, not the
+    // parent's — so it sent nothing and every mother appeared to her doctor as
+    // "Guest". Cold, and useless in a masterclass with forty of them.
+    //
+    // Read it here rather than plumbing a name through the app: `profiles` is
+    // where onboarding already put it, this call is already authenticated as
+    // that user, and RLS lets a caller read their OWN row and no one else's.
+    // A client-supplied name would also be a client-supplied name — fine as a
+    // label, but the server can do better for free.
+    //
+    // Falls back to "Parent", never to "Guest": an unfinished profile is not a
+    // stranger, and ConsultPatient uses the same word for the same reason.
+    let display = (name ?? "").toString().trim();
+    if (!display) {
+      const { data: profile } = await authClient
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .maybeSingle();
+      display = (profile?.name ?? "").toString().trim();
+    }
+    if (!display) display = "Parent";
+
     // Same slot -> same room, so both parties meet.
     const room = `bkroom_${slotId}`;
     const now = Math.floor(Date.now() / 1000);
@@ -143,7 +169,7 @@ serve(async (req) => {
         iss: LK_KEY,
         nbf: now,
         sub: user.id, // participant identity
-        name: (name ?? "Guest").toString().slice(0, 40),
+        name: display.slice(0, 40),
         video: {
           room,
           roomJoin: true,

@@ -22,6 +22,7 @@ import '../../booking/booking_store.dart';
 import '../../booking/call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../services/notification_service.dart';
+import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
@@ -275,6 +276,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         : expertById(expertId).name;
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        // Named so GlobalAskFab suppresses itself — it floats above the
+        // Navigator and would otherwise sit on the doctor's face.
+        settings: const RouteSettings(name: kCallRoute),
         builder: (_) =>
             CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
       ),

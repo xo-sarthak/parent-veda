@@ -27,6 +27,7 @@ import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart';
+import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'doctor_prescription_screen.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
@@ -265,6 +266,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                   filled: soon,
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
+                      // Doctor mode is reachable inside the PARENT build too,
+                      // where the Ask FAB floats above the Navigator.
+                      settings: const RouteSettings(name: kCallRoute),
                       builder: (_) => CallScreen(
                         bookingId: b.id,
                         title: b.title,
