@@ -18,7 +18,11 @@ import 'family_profile_screen.dart';
 // Kept (commented) for easy revert:
 // import 'cohort_courses_screen.dart';
 // import 'courses_screen.dart';
+// Kept: still imported by the commented-out V1-direct row below, and by
+// GrowHomeScreen, which constructs the real DevelopmentHomeScreen for V1.
+// ignore: unused_import
 import 'development_home_screen.dart';
+import 'grow_home_screen.dart';
 // Food is merged into Recipes; "Guides & Tools" retired. Kept for revert:
 // import 'food_home_screen.dart';
 // import 'guides_tools_screen.dart';
@@ -86,8 +90,14 @@ class ExploreDrawer extends StatelessWidget {
                       "Every phase from birth to five, on his timeline.", const PhaseMapScreen()),
                   _section(context, Icons.play_circle_outline, 'Watch',
                       'Expert videos, chosen for his stage.', const WatchHomeScreen()),
+                  // Now opens the three-version wrapper (V1 = this exact
+                  // screen, unchanged; V2 = the redesign brief as written;
+                  // V3 = the recommendation). Old row kept, commented, for
+                  // easy revert:
+                  // _section(context, Icons.emoji_objects_outlined, 'Skill Development',
+                  //     'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
                   _section(context, Icons.emoji_objects_outlined, 'Skill Development',
-                      'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
+                      'Understand & nurture how he grows.', const GrowHomeScreen()),
                   // Replaced by the full Health ecosystem (the Health Guide lives
                   // inside it now). Old row kept, commented, for easy revert:
                   // _section(context, Icons.monitor_heart_outlined, 'Health Guide',

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'brand/brand_store.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
 import 'screens/post_pregnancy/pp_development_data.dart';
+import 'screens/post_pregnancy/pp_grow_data.dart';
 import 'screens/post_pregnancy/pp_documents_data.dart';
 import 'screens/post_pregnancy/pp_food_data.dart';
 import 'screens/post_pregnancy/pp_names_data.dart';
@@ -223,6 +224,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // JSON blob each into user_state, where own-only RLS is exactly right - a
     // saved recipe or reading position is personal, not shared with a partner.
     DevStore.instance.init();
+    // The dated completion log behind Grow's daily habit (V2's streak and V3's
+    // week ribbon read the same rows). Booted here, beside DevStore, because a
+    // store that is only initialised from a screen loses everything it saved
+    // the moment the app is reopened somewhere else — and this one's whole job
+    // is remembering yesterday.
+    GrowStore.instance.init();
     FoodStore.instance.init();
     // The dish CATALOGUE, as opposed to FoodStore's saved list — editor-owned
     // content read from Supabase. Loaded here rather than lazily from a screen

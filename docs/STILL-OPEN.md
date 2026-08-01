@@ -456,6 +456,78 @@ Cancel/reschedule from the **parent** side · an in-app notification centre
 
 Detail in `docs/BRAND-STUDIO.md`.
 
+## 5.9 Grow — three versions live behind one Explore row
+
+Skill Development now opens `GrowHomeScreen`, which carries a **V1 | V2 | V3**
+pill (session-only, opens on V1). Built 2026-08-01 so the redesign brief could
+be compared against what ships rather than argued about.
+
+* **V1** — `DevelopmentHomeScreen`, the real screen, constructed as-is. Not a
+  copy: a reimplementation would drift and the comparison would then be against
+  something that never shipped.
+* **V2** — the brief as written, *including* the breakable streak, the
+  celebration screen and the Map/check-in removed from the home. Filing those
+  edges off would have produced a V2 that was really V3 wearing the brief's
+  title.
+* **V3** — the reframe without the rewrite: capabilities kept, Map and check-in
+  one tap down, a week that fills instead of a streak that breaks, and a sixth
+  capability so self-care has somewhere to live.
+
+Nothing was deleted. `kDevActivities` still holds its eight, the eight areas are
+intact, and the old Explore row is commented in place.
+
+### How the brief's two conflicting instructions were read
+
+The brief says both of these, four lines apart:
+
+> Include ● Daily streaks ● Progress animations ● Activity completion
+> celebration ● Gentle encouragement
+>
+> Avoid gamification that feels childish.
+
+**Reading taken (decided 2026-08-01): the guardrail names a KIND of
+gamification, not gamification itself.** What it points at is childishness —
+badges, confetti, cartoon mascots, points, levels. So the explicit
+include-list stands and the guardrail is enforced against those devices
+specifically. When a document's general line fights its specific line, the
+specific one wins; the general line is usually the one written first and
+thought about least.
+
+So V2 has the streak, the celebration and a progress animation (the streak
+number counting up), and carries no badge, confetti or mascot anywhere.
+`grow_versions_test.dart` holds both halves, because a reading that lives only
+in a comment gets quietly reversed.
+
+**One addition the brief did not ask for:** an (i) on the streak explaining how
+it works, including *"a missed day sets it back to zero"*. A number that can
+reset should say so before it does, not after — otherwise a parent learns the
+rule by losing fourteen days. It is deliberately not softened: "don't worry if
+you miss a day" sitting above a counter that disagrees would be a lie, and a
+cheerful explanation of a punishing rule reads worse than the rule alone.
+
+### Decisions still yours
+
+1. **Streak or no streak.** A counter that resets to zero, beside the words
+   "your child's brain", punishes the parent who had a hard fortnight. V3 argues
+   against it; V2 implements it. This is a product call, not a technical one.
+2. **Does one of these replace Skill Development, or does "Grow" ship
+   alongside it?** The brief assumes replacement; the repo's rules assume
+   additive. Until this is answered, all three stay.
+
+### The content gap, which is the real blocker
+
+The library went from 8 activities to **47**, spanning birth to five — the
+original eight were all infant activities, so a five-year-old had nothing.
+
+It is still **thin per age band**: only 4 activities suit a 30-month-old
+exactly, and 5 suit a 60-month-old. `growActivitiesForAge()` widens the window
+(±0, ±6, ±12, ±24 months) until at least 14 are available, because a daily
+feature must not repeat inside a fortnight — but that is a mitigation, not a
+fix. **Roughly 120–150 activities is where this stops being propped up.**
+
+Where they come from — written in-house, licensed, or generated and clinically
+reviewed — is undecided and is the long pole for whichever version ships.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already
