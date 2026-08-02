@@ -914,6 +914,55 @@ is the right one for essentially any phone made in the last several years, and
 it is roughly a third of the combined size. Nothing is compromised: a split APK
 contains exactly the code that device would have used anyway.
 
+### ⚠️ THE STALE AOT SNAPSHOT — the second, worse trap
+
+2026-08-02, found after two APKs shipped with a correct launcher icon and
+days-old UI. That pairing is the signature, and it is worth memorising:
+
+> **Android resources rebuilt. The Dart did not.**
+
+Proved by hashing the compiled Dart out of two APKs built twelve hours apart,
+with real code changes committed in between:
+
+```
+app-doctor-release.apk        08-02 00:41   caccd8d5…  9,831,312 bytes
+app-arm64-v8a-doctor-release  08-02 13:39   caccd8d5…  9,831,312 bytes
+```
+
+**Byte-identical.** `libapp.so` — the AOT-compiled Dart, i.e. the entire app —
+had not been regenerated for days, while `flutter build` reported success every
+time and the icons and resources updated correctly on each run.
+
+That is why it went unnoticed: everything about the build LOOKED right. The file
+was new, the timestamp was current, the size was plausible, the icon was
+correct. Only the part that matters was old.
+
+**The fix is `flutter clean` before a build you are going to share.** After it,
+the parent snapshot went from 18.8 MB to 20,054,928 bytes — i.e. it actually
+recompiled.
+
+**Cost:** a clean release build takes ~30 minutes for three ABIs, against ~2
+minutes incremental. Worth it only for builds that leave the machine; keep using
+incremental builds and `flutter run` for yourself.
+
+**Root cause not established.** The observable fact is solid — identical bytes
+across changed source — but exactly which cache key failed to invalidate is not
+known. Candidates: Flutter's `.dart_tool/flutter_build` dependency hashing, or a
+flavour/target key collision between `--flavor parent -t lib/main.dart` and
+`--flavor doctor -t lib/main_doctor.dart` sharing one cache. If it recurs,
+that pair is where to look first.
+
+### How to check an APK before sending it
+
+Timestamps lie here; hashes do not.
+
+```
+unzip -p <apk> lib/arm64-v8a/libapp.so | md5sum
+```
+
+Different from the last one you shipped → the Dart really rebuilt. Identical
+after you changed code → the cache is stale, run `flutter clean`.
+
 ### Still worth doing
 
 * The build number is manual. A CI step, or a pre-share script that bumps it,
