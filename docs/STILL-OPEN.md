@@ -833,6 +833,94 @@ one, at 11pt. Old bar commented in place.
   everything renders at once; the listing screens are structured so a paged
   source drops in without a redesign.
 
+## 5.14 ⚠️ SHARING AN APK — the trap that already caught us once
+
+2026-08-02. A build was sent out for review and the reviewer saw an **eight-day-
+old app with the Flutter logo on it**. Three things combined, and each one is
+worth knowing separately.
+
+### 1. Flavours renamed the output, and left the old file behind
+
+Before the doctor app existed, `flutter build apk --release` wrote:
+
+    build/app/outputs/flutter-apk/app-release.apk
+
+After flavours were added (31 July), the output became `app-parent-release.apk`
+— and **`app-release.apk` was never deleted**. It sat in the same folder, with
+the name everyone recognises, frozen at 25 July.
+
+Worse: it can never be refreshed. With flavours defined, `flutter build apk`
+*without* `--flavor` fails, so nothing ever overwrites it. It is a permanent
+decoy with the most obvious filename in the directory.
+
+Both stale files have been renamed to `STALE-*.apk.bak`.
+
+### 2. The build number had never moved
+
+`pubspec.yaml` said `version: 1.0.0+1` for every build ever made. The `+N` is
+the Android **versionCode**, and Android only refuses an install when the
+incoming versionCode is *lower* than the installed one. With every build stamped
+`1`, Android could not tell two builds apart — so a July APK installed cleanly
+over an August one and took the app backwards, silently.
+
+Now `1.0.0+2`. **Bump it for every build you hand to somebody**, or pass
+`--build-number=N` for a one-off.
+
+### 3. Why `flutter run` looked fine
+
+It rebuilds from source and installs what it just built, so it is never affected
+by a stale artifact. A working `flutter run` says nothing about whether the APK
+on disk is current — which is exactly why this went unnoticed.
+
+### The commands
+
+```
+# parent app
+flutter build apk --release --flavor parent -t lib/main.dart
+#   -> build/app/outputs/flutter-apk/app-parent-release.apk
+
+# doctor app (ParentVeda+)
+flutter build apk --release --flavor doctor -t lib/main_doctor.dart
+#   -> build/app/outputs/flutter-apk/app-doctor-release.apk
+```
+
+**Check the timestamp before sending anything.** `ls -l` on the file is a
+two-second habit that would have caught this.
+
+### Why the APK was 147 MB — and the fix
+
+**138 of the 147 MB is native libraries.** Assets are 6.4 MB, Dart-compiled
+`libapp.so` is 18.8 MB, and the rest is three copies of everything:
+
+| ABI | size | who needs it |
+|---|---|---|
+| `x86_64` | 52.8 MB | **emulators only** — no phone |
+| `arm64-v8a` | 46.3 MB | essentially every phone since ~2018 |
+| `armeabi-v7a` | 38.9 MB | older 32-bit devices |
+
+The big libraries per ABI are `libapp.so` (18.8), `libjingle_peerconnection`
+(11.5 — LiveKit/WebRTC for consults), `libflutter.so` (11.0) and
+`libbarhopper_v3` (4.7 — ML Kit, for the QR scanner). All four are real
+dependencies; none can go without removing a feature.
+
+So the only lossless saving is **not shipping three ABIs in one file**:
+
+```
+flutter build apk --release --flavor parent -t lib/main.dart --split-per-abi
+```
+
+That writes one APK per ABI. **Send `app-arm64-v8a-parent-release.apk`** — it
+is the right one for essentially any phone made in the last several years, and
+it is roughly a third of the combined size. Nothing is compromised: a split APK
+contains exactly the code that device would have used anyway.
+
+### Still worth doing
+
+* The build number is manual. A CI step, or a pre-share script that bumps it,
+  would remove the one thing here that depends on remembering.
+* If a tester's phone ever refuses the arm64 build, they are on a 32-bit
+  device — send the `armeabi-v7a` one instead. Nothing else changes.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already
