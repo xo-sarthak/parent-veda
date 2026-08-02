@@ -47,7 +47,23 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
   @override
   void initState() {
     super.initState();
-    _store.load(DoctorSession.instance.sessionKey);
+    // force: true — ASK THE SERVER EVERY TIME THIS SCREEN OPENS.
+    //
+    // PartnerDashboardStore.load() short-circuits when it has already answered
+    // for this session, which is right for the dashboard's numbers and wrong
+    // here. Once it had answered "no partner", nothing in the app could make
+    // it ask again: neither pull-to-refresh gesture touches this store, so a
+    // doctor whose account was linked while the app was open saw "Not set up
+    // yet" until they force-stopped it. That is indistinguishable from being
+    // genuinely unapproved.
+    //
+    // This screen opens rarely and the call is three RPCs, so re-asking costs
+    // nothing worth counting.
+    _store.load(DoctorSession.instance.sessionKey, force: true);
+  }
+
+  Future<void> _recheck() async {
+    await _store.load(DoctorSession.instance.sessionKey, force: true);
   }
 
   @override
@@ -102,6 +118,47 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
                         'yours up.',
                 textAlign: TextAlign.center,
                 style: ppBody(12.5, h: 1.55),
+              ),
+              // A way to ask again without restarting the app. Whoever is
+              // setting a doctor up is usually doing it WHILE they are sitting
+              // with the app open, and the answer changes the moment the link
+              // lands.
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () async {
+                  await _recheck();
+                  // `mounted` on the State, not on the captured context — the
+                  // analyzer is right that they are different questions, and
+                  // this closure outlives the build that made it.
+                  if (!mounted) return;
+                  if (_store.partner == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Still not set up — nothing has changed '
+                            'on our side yet.'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 11),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: ppBorder),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.refresh_rounded,
+                        size: 16, color: ppPurple),
+                    const SizedBox(width: 8),
+                    Text('Check again',
+                        style:
+                            ppBody(13, color: ppPurple, w: FontWeight.w800)),
+                  ]),
+                ),
               ),
             ]),
           ),

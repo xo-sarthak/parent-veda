@@ -81,11 +81,20 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
   /// null = still deciding. Avoids a flash of the sign-in screen for a doctor
   /// who is already signed in — which on a phone reads as "it logged me out"
   /// and is the fastest way to lose trust in an app someone uses daily.
-  bool? _signedIn;
+  ///
+  /// ONLY tracks the FIRST resolve. Once that has happened, whether a doctor is
+  /// signed in is DoctorSession's answer, not this field's — see build(). It
+  /// used to be the only answer, which is why signing out was impossible: the
+  /// Profile cleared the session and this field never heard about it, so the
+  /// dashboard stayed on screen.
+  bool? _resolved;
 
   @override
   void initState() {
     super.initState();
+    // Tells the shared doctor screens they are in the standalone app, where
+    // "leave" means sign out rather than return to the parent app.
+    DoctorSession.standalone = true;
     NotificationService.instance.init();
     DoctorScheduleStore.instance.init();
     _resolve();
@@ -94,8 +103,8 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
   Future<void> _resolve() async {
     // A session restored from disk still has to be checked against the server:
     // an expert who was unlinked yesterday must not open a dashboard today.
-    final ok = await DoctorSession.instance.resolveFromServer();
-    if (mounted) setState(() => _signedIn = ok);
+    await DoctorSession.instance.resolveFromServer();
+    if (mounted) setState(() => _resolved = true);
   }
 
   @override
@@ -123,13 +132,18 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
       //       seedColor: const Color(0xFF3FA9A0), brightness: Brightness.dark),
       //   ),
       theme: AppTheme.light,
-      home: switch (_signedIn) {
-        null => const _Booting(),
-        true => const DoctorScaffold(),
-        false => DoctorAuthScreen(
-            onSignedIn: () => setState(() => _signedIn = true),
-          ),
-      },
+      // Listens to DoctorSession rather than to a local flag, so that ANY
+      // route out of the session — the Profile's sign out, an account that
+      // stops resolving — lands back on the sign-in screen. With a local flag
+      // there was no way for the app to hear about it, and no way out.
+      home: ListenableBuilder(
+        listenable: DoctorSession.instance,
+        builder: (context, _) {
+          if (_resolved != true) return const _Booting();
+          if (DoctorSession.instance.active) return const DoctorScaffold();
+          return DoctorAuthScreen(onSignedIn: () => setState(() {}));
+        },
+      ),
     );
   }
 }

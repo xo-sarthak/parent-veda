@@ -6,6 +6,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../doctor/doctor_directory.dart';
 import '../../care_partner/care_partner_models.dart';
@@ -14,6 +15,84 @@ import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_onboarding_screen.dart';
 import 'doctor_referral_kit_screen.dart';
+
+/// End the session properly: Supabase first, then the local identity.
+///
+/// ORDER MATTERS. Clearing DoctorSession first would return the app to the
+/// sign-in screen while the Supabase session was still live, and the next
+/// resolve would silently sign the same person back in — which reads as a
+/// sign-out button that does not work.
+///
+/// A confirm step, because on a shared clinic phone an accidental tap costs
+/// somebody their password.
+Future<void> _signOut(BuildContext context) async {
+  final ok = await showModalBottomSheet<bool>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => Container(
+      decoration: const BoxDecoration(
+        color: ppBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 18, 24, 30),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 38,
+          height: 4,
+          decoration: BoxDecoration(
+              color: ppBorder, borderRadius: BorderRadius.circular(999)),
+        ),
+        const SizedBox(height: 22),
+        Text('Sign out of ParentVeda+?', style: ppJakarta(17)),
+        const SizedBox(height: 10),
+        Text(
+            'Your patients, hours and records stay exactly as they are. You '
+            'will need your email and password to sign back in.',
+            textAlign: TextAlign.center,
+            style: ppBody(13, h: 1.6)),
+        const SizedBox(height: 20),
+        GestureDetector(
+          onTap: () => Navigator.of(ctx).pop(true),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 50,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: ppPurple,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text('Sign out',
+                style: ppBody(14, color: Colors.white, w: FontWeight.w800)),
+          ),
+        ),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: () => Navigator.of(ctx).pop(false),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 50,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: ppPanel,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text('Stay signed in', style: ppJakarta(14, color: ppPurple)),
+          ),
+        ),
+      ]),
+    ),
+  );
+  if (ok != true) return;
+  try {
+    await Supabase.instance.client.auth.signOut();
+  } catch (_) {
+    // Offline, or the token was already gone. Clearing the local identity is
+    // still the right thing — a doctor who taps sign out must not stay signed
+    // in because the network was down.
+  }
+  DoctorSession.instance.clear();
+  PartnerDashboardStore.instance.reset();
+}
 
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
@@ -155,8 +234,21 @@ class DoctorProfileScreen extends StatelessWidget {
           Text(e!.blurb, style: ppBody(14, color: ppInk, h: 1.6)),
         ],
         const SizedBox(height: 30),
+        // TWO DIFFERENT ACTIONS, and conflating them is what left ParentVeda+
+        // with no way out at all.
+        //
+        //   parent build   "Exit doctor mode" — you are still signed in, and
+        //                  you go back to your own app.
+        //   ParentVeda+    "Sign out" — there is nothing to go back to, so the
+        //                  only sensible action is to end the session.
+        //
+        // Previously only the first existed, and in the standalone app it did
+        // nothing: it cleared DoctorSession while main_doctor decided what to
+        // show from a local flag that never heard about it.
         GestureDetector(
-          onTap: () => DoctorSession.instance.exit(),
+          onTap: () => DoctorSession.standalone
+              ? _signOut(context)
+              : DoctorSession.instance.exit(),
           behavior: HitTestBehavior.opaque,
           child: Container(
             height: 50,
@@ -168,14 +260,17 @@ class DoctorProfileScreen extends StatelessWidget {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Icon(Icons.logout_rounded, size: 18, color: ppInk),
               const SizedBox(width: 8),
-              Text('Exit doctor mode',
+              Text(DoctorSession.standalone ? 'Sign out' : 'Exit doctor mode',
                   style: ppBody(14, color: ppInk, w: FontWeight.w700)),
             ]),
           ),
         ),
         const SizedBox(height: 12),
         Center(
-          child: Text('You’ll return to the parent app.',
+          child: Text(
+              DoctorSession.standalone
+                  ? 'You’ll need your email and password to get back in.'
+                  : 'You’ll return to the parent app.',
               style: ppBody(11.5, color: ppMuted)),
         ),
       ],

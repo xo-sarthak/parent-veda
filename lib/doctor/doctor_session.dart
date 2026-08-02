@@ -21,6 +21,16 @@ class DoctorSession extends ChangeNotifier {
   DoctorSession._();
   static final DoctorSession instance = DoctorSession._();
 
+  /// True when running as the standalone ParentVeda+ app (main_doctor.dart),
+  /// false when doctor mode is a swap inside the parent build.
+  ///
+  /// The distinction matters for exactly one thing: what "leave" means. In the
+  /// parent build, leaving doctor mode returns you to your own pregnancy or
+  /// parenting app and you are still signed in. In ParentVeda+ there is nothing
+  /// to return to, so the only sensible action is to sign out properly.
+  static bool standalone = false;
+
+  
   /// How long [resolveFromServer] waits for the server before deciding the
   /// answer is "no identity". See that method for why silence, not just
   /// failure, has to be handled.
