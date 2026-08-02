@@ -17,6 +17,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/app_theme.dart';
+
 import '../../booking/booking_models.dart';
 import '../../booking/call_screen.dart';
 import '../../booking/booking_store.dart';
@@ -422,7 +424,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     final (label, colour) = switch (b.status) {
       BookingStatus.cancelled => ('Cancelled', ppCoral),
       _ when past && !hasRx => ('Needs notes', ppBrown),
-      _ when past => ('Done', const Color(0xFF3E7A5E)),
+      _ when past => ('Done', AppTheme.accentGreen),
       _ => ('Confirmed', ppPurple),
     };
     return Container(

@@ -12,6 +12,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -308,7 +310,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
 
   Widget _inviteRow(Invite i) {
     final (colour, icon) = switch (i.status) {
-      InviteStatus.credited => (const Color(0xFF3E7A5E), Icons.check_circle_rounded),
+      InviteStatus.credited => (AppTheme.accentGreen, Icons.check_circle_rounded),
       InviteStatus.qualified => (ppPurple, Icons.card_giftcard_rounded),
       InviteStatus.blocked => (ppCoral, Icons.block_rounded),
       _ => (ppMuted, Icons.schedule_rounded),

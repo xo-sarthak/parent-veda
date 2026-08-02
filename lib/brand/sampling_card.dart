@@ -11,6 +11,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../theme/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
@@ -94,7 +96,7 @@ class _SamplingCardState extends State<SamplingCard> {
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.3,
-                          color: claimed ? const Color(0xFF3E7A5E) : brand.colour,
+                          color: claimed ? AppTheme.accentGreen : brand.colour,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -114,7 +116,7 @@ class _SamplingCardState extends State<SamplingCard> {
                       ? Icons.check_circle_rounded
                       : Icons.arrow_forward_rounded,
                   size: 18,
-                  color: claimed ? const Color(0xFF3E7A5E) : brand.colour),
+                  color: claimed ? AppTheme.accentGreen : brand.colour),
             ]),
             const SizedBox(height: 9),
             Text(

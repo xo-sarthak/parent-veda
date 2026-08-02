@@ -75,7 +75,7 @@ void showStreakInfo(BuildContext context) {
         const SizedBox(height: 22),
         Row(children: [
           const Icon(Icons.local_fire_department_outlined,
-              size: 20, color: Color(0xFFC2661E)),
+              size: 20, color: ppAccentAmber),
           const SizedBox(width: 10),
           Text('How the streak works', style: ppJakarta(17)),
         ]),
@@ -259,7 +259,7 @@ class GrowV2Home extends StatelessWidget {
       ),
       child: Row(children: [
         const Icon(Icons.local_fire_department_outlined,
-            size: 18, color: Color(0xFFC2661E)),
+            size: 18, color: ppAccentAmber),
         const SizedBox(width: 9),
         Text(n == 0 ? 'No streak yet' : '$n day streak',
             style: ppJakarta(13.5, color: const Color(0xFF8A4A12))),
@@ -291,7 +291,7 @@ class GrowV2Home extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.star_rounded, size: 15, color: Color(0xFFE0A800)),
+          const Icon(Icons.star_rounded, size: 15, color: ppAccentAmber),
           const SizedBox(width: 6),
           Text("TODAY'S BRAIN BUILDER",
               style: ppBody(10.5, color: ppSoft, w: FontWeight.w800)),
@@ -418,7 +418,7 @@ class GrowV2Home extends StatelessWidget {
           ),
           child: Row(children: [
             const Icon(Icons.check_circle_outline_rounded,
-                size: 17, color: Color(0xFF3E7A5E)),
+                size: 17, color: ppAccentGreen),
             const SizedBox(width: 11),
             Expanded(child: Text(a.title, style: ppJakarta(13))),
             Text('${a.minutes} min', style: ppBody(11.5, color: ppMuted)),
@@ -905,11 +905,11 @@ class GrowCompletedScreen extends StatelessWidget {
               height: 64,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: const Color(0xFF3E7A5E).withValues(alpha: 0.10),
+                color: ppAccentGreen.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(22),
               ),
               child: const Icon(Icons.check_rounded,
-                  size: 34, color: Color(0xFF3E7A5E)),
+                  size: 34, color: ppAccentGreen),
             ),
             const SizedBox(height: 22),
             Text(isV2 ? 'Great job' : "That's done",
@@ -957,7 +957,7 @@ class GrowCompletedScreen extends StatelessWidget {
         ),
         child: Row(children: [
           const Icon(Icons.local_fire_department_outlined,
-              size: 26, color: Color(0xFFC2661E)),
+              size: 26, color: ppAccentAmber),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

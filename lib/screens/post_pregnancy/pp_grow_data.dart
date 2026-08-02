@@ -126,10 +126,10 @@ class GrowCapability {
 
 const Color _capThink = Color(0xFF6A30B6);
 const Color _capTalk = Color(0xFF2E7D6E);
-const Color _capMove = Color(0xFFC2661E);
+const Color _capMove = ppAccentAmber;
 const Color _capConnect = Color(0xFFFF5A79);
 const Color _capCreate = Color(0xFF8F64C8);
-const Color _capDo = Color(0xFF3E6BA8);
+const Color _capDo = ppAccentBlue;
 
 /// THE BRIEF'S FIVE, exactly as written. Used by V2.
 const List<GrowCapability> kDocCapabilities = [

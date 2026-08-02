@@ -51,11 +51,11 @@ class CourseSection {
 
 const List<CourseSection> kCourseSections = [
   CourseSection('Live cohorts', LearningKind.liveCohort,
-      Icons.groups_outlined, Color(0xFFC2661E)),
+      Icons.groups_outlined, ppAccentAmber),
   CourseSection('Recorded courses', LearningKind.recordedCourse,
       Icons.play_lesson_outlined, ppPurple),
   CourseSection('Masterclasses', LearningKind.masterclass,
-      Icons.workspace_premium_outlined, Color(0xFF3E6BA8)),
+      Icons.workspace_premium_outlined, ppAccentBlue),
 ];
 
 String courseKindLabel(LearningKind k) => switch (k) {
@@ -696,7 +696,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               _section('Ratings',
                   child: Row(children: [
                     const Icon(Icons.star_rounded,
-                        size: 20, color: Color(0xFFE0A800)),
+                        size: 20, color: ppAccentAmber),
                     const SizedBox(width: 8),
                     Text(p.rating.toStringAsFixed(1), style: ppJakarta(18)),
                     const SizedBox(width: 10),
@@ -800,7 +800,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         ),
         child: Column(children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.check_rounded, size: 16, color: Color(0xFF3E7A5E)),
+            const Icon(Icons.check_rounded, size: 16, color: ppAccentGreen),
             const SizedBox(width: 10),
             Expanded(child: Text(text, style: ppBody(13.5, h: 1.5))),
             Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded,

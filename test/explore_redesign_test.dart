@@ -38,6 +38,7 @@ String _code(String src) => src
     .join('\n');
 
 void main() {
+  accentPalette();
   const dir = 'lib/screens/post_pregnancy';
   final recipes = _code(_read('$dir/recipes_explore_screen.dart'));
   final reco = _code(_read('$dir/reco_explore_screen.dart'));
@@ -462,6 +463,101 @@ void main() {
       ]) {
         final where = screens.values.any((v) => v.contains('$s('));
         expect(where, isTrue, reason: '$s is never opened');
+      }
+    });
+  });
+}
+
+// =============================================================================
+//  The accent palette has one definition per colour.
+// -----------------------------------------------------------------------------
+//  ParentVeda had a settled accent family — a green, an amber, a blue and a
+//  deep rose — repeated as raw hexes across roughly forty files. Recent work
+//  introduced a PARALLEL set three or four hex digits away:
+//
+//      green   0xFF1F8A5B (app)  vs  0xFF3E7A5E (new)
+//      amber   0xFFC98A2B (app)  vs  0xFFC2661E (new)
+//      blue    0xFF3E6DA6 (app)  vs  0xFF3E6BA8 (new)
+//
+//  Nobody would spot any single one. Together they are how a palette becomes
+//  eight colours in a year, and the only thing keeping the new screens
+//  consistent was that they had been copied carefully.
+//
+//  The tokens took the ESTABLISHED values, not the new ones, and every file
+//  carrying a variant moved onto them. This test is what stops the fork
+//  reappearing.
+// =============================================================================
+
+void accentPalette() {
+  group('one definition per accent', () {
+    test('the near-duplicate palette is gone from the whole app', () {
+      final offenders = <String>[];
+      for (final f in Directory('lib')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))) {
+        final src = _code(f.readAsStringSync());
+        for (final variant in [
+          '0xFF3E7A5E',
+          '0xFFC2661E',
+          '0xFF3E6BA8',
+        ]) {
+          if (src.contains(variant)) {
+            offenders.add('${f.path.split(RegExp(r'[\/]')).last} → $variant');
+          }
+        }
+      }
+      expect(offenders, isEmpty,
+          reason: 'these shadow an existing ParentVeda accent — use '
+              'ppAccent*/AppTheme.accent* instead:\n  ${offenders.join('\n  ')}');
+    });
+
+    test('each accent is defined exactly once', () {
+      final theme = _read('lib/theme/app_theme.dart');
+      for (final t in ['accentGreen', 'accentAmber', 'accentBlue', 'accentRose']) {
+        expect('static const Color $t = '.allMatches(theme).length, 1,
+            reason: '$t should have one definition');
+      }
+    });
+
+    test('the tokens carry the values the app already used', () {
+      // The direction matters: this was a correction of the new colours, not a
+      // blessing of them. If someone later "tidies" a token to the newer hex,
+      // this fails.
+      final theme = _read('lib/theme/app_theme.dart');
+      expect(theme.contains('accentGreen = Color(0xFF1F8A5B)'), isTrue);
+      expect(theme.contains('accentAmber = Color(0xFFC98A2B)'), isTrue);
+      expect(theme.contains('accentBlue = Color(0xFF3E6DA6)'), isTrue);
+      expect(theme.contains('accentRose = Color(0xFFC6295A)'), isTrue);
+    });
+
+    test('parenting reads them under pp* names, pointing at the same thing', () {
+      final common = _read('lib/screens/post_pregnancy/pp_common.dart');
+      for (final t in ['Green', 'Amber', 'Blue', 'Rose']) {
+        expect(common.contains('const Color ppAccent$t = AppTheme.accent$t;'),
+            isTrue,
+            reason: 'ppAccent$t must alias, not re-declare');
+      }
+    });
+
+    test('the explore screens use tokens, not hexes', () {
+      const dir = 'lib/screens/post_pregnancy';
+      for (final f in [
+        'pp_explore_kit.dart',
+        'recipes_explore_screen.dart',
+        'reco_explore_screen.dart',
+        'read_explore_screen.dart',
+        'courses_explore_screen.dart',
+      ]) {
+        final src = _code(_read('$dir/$f'));
+        // One exception: the 8% black shadow under a bookmark, which is not an
+        // accent and belongs to no family.
+        final hexes = RegExp(r'0x[0-9A-Fa-f]{8}')
+            .allMatches(src)
+            .map((m) => m[0]!)
+            .where((h) => h != '0x14000000')
+            .toSet();
+        expect(hexes, isEmpty, reason: '$f still has raw colours: $hexes');
       }
     });
   });

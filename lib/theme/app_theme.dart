@@ -45,6 +45,23 @@ class AppTheme {
   static const Color neutral = Color(0xFF7B757F); // warm grey
   static const Color danger = Color(0xFFD92D20); // red (delete / destructive)
 
+  // ---- SECTION ACCENTS ------------------------------------------------------
+  //  The four colours ParentVeda already used to tint a section, a category or
+  //  a status - previously repeated as raw hexes across ~40 files, and
+  //  therefore quietly forked more than once. Named here so there is one
+  //  definition to point at.
+  //
+  //  These are the ESTABLISHED values, taken from the files that had them
+  //  first and use them most. They are not new colours and nothing on screen
+  //  should change except where a near-duplicate was being used by mistake.
+  //
+  //  Distinct from primary/secondary above: those are the brand. These are the
+  //  supporting set a section header or a category tile is tinted with.
+  static const Color accentGreen = Color(0xFF1F8A5B); // growth, safe, done
+  static const Color accentAmber = Color(0xFFC98A2B); // warmth, food, caution
+  static const Color accentBlue = Color(0xFF3E6DA6);  // calm, sleep, learning
+  static const Color accentRose = Color(0xFFC6295A);  // attention, health
+
   // ===========================================================================
   //  2. FULL TONAL SHADES  (50 = lightest, 900 = darkest)
   //     Each ramp is anchored on the board's base value at 500.

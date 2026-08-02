@@ -19,6 +19,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../theme/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
@@ -163,7 +165,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFF3E7A5E)),
+            const Icon(Icons.lock_outline_rounded, size: 16, color: AppTheme.accentGreen),
             const SizedBox(width: 8),
             Text('Where your details go',
                 style: GoogleFonts.manrope(
@@ -184,7 +186,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Padding(
             padding: EdgeInsets.only(top: 4),
-            child: Icon(Icons.check_rounded, size: 13, color: Color(0xFF3E7A5E)),
+            child: Icon(Icons.check_rounded, size: 13, color: AppTheme.accentGreen),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -281,7 +283,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              const Icon(Icons.check_circle_rounded, size: 19, color: Color(0xFF3E7A5E)),
+              const Icon(Icons.check_circle_rounded, size: 19, color: AppTheme.accentGreen),
               const SizedBox(width: 9),
               Text('You are on the list',
                   style: GoogleFonts.manrope(
@@ -332,7 +334,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           const SizedBox(height: 12),
           Text('Thank you — noted.',
               style: GoogleFonts.manrope(
-                  fontSize: 12.5, fontWeight: FontWeight.w700, color: const Color(0xFF3E7A5E))),
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: AppTheme.accentGreen)),
         ],
       ];
 }

@@ -345,7 +345,7 @@ class GrowV3Home extends StatelessWidget {
           ),
           child: Row(children: [
             const Icon(Icons.check_circle_outline_rounded,
-                size: 17, color: Color(0xFF3E7A5E)),
+                size: 17, color: ppAccentGreen),
             const SizedBox(width: 11),
             Expanded(child: Text(a.title, style: ppJakarta(13))),
             Text('${a.minutes} min', style: ppBody(11.5, color: ppMuted)),
@@ -486,7 +486,7 @@ class GrowV3CapabilityScreen extends StatelessWidget {
             ),
             if (GrowStore.instance.isCompletedToday(a.id))
               const Icon(Icons.check_circle_rounded,
-                  size: 17, color: Color(0xFF3E7A5E))
+                  size: 17, color: ppAccentGreen)
             else
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),

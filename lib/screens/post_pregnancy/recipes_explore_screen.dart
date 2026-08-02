@@ -62,10 +62,10 @@ class RecipeSection {
   List<FoodRecipe> of(List<FoodRecipe> pool) => pool.where(match).toList();
 }
 
-const Color _cWarm = Color(0xFFC2661E);
-const Color _cGreen = Color(0xFF3E7A5E);
+const Color _cWarm = ppAccentAmber;
+const Color _cGreen = ppAccentGreen;
 const Color _cPurple = ppPurple;
-const Color _cBlue = Color(0xFF3E6BA8);
+const Color _cBlue = ppAccentBlue;
 const Color _cCoral = ppCoral;
 
 /// Beverages have no category of their own in the data, so they are matched on

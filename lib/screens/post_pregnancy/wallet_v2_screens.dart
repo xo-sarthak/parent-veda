@@ -247,8 +247,8 @@ class WalletV2Home extends StatelessWidget {
 /// it says.
 Widget walletStatusCard(WalletStatus s) {
   final tone = switch (s.tone) {
-    'good' => const Color(0xFF3E7A5E),
-    'watch' => const Color(0xFFC2661E),
+    'good' => ppAccentGreen,
+    'watch' => ppAccentAmber,
     _ => ppSoft,
   };
   return Container(
@@ -282,7 +282,7 @@ Widget walletStatusCard(WalletStatus s) {
           Text(s.tiles[i].value,
               style: ppJakarta(13,
                   color: s.tiles[i].status == 'watch'
-                      ? const Color(0xFFC2661E)
+                      ? ppAccentAmber
                       : ppTitleInk)),
         ]),
         if (i != s.tiles.length - 1) const SizedBox(height: 11),
@@ -757,7 +757,7 @@ class WalletUploadScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(auto ? Icons.bolt_rounded : Icons.fact_check_outlined,
-                size: 16, color: auto ? const Color(0xFFC2661E) : ppPurple),
+                size: 16, color: auto ? ppAccentAmber : ppPurple),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

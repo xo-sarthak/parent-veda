@@ -51,9 +51,9 @@ class RecoSection {
       kReco.where((r) => r.category == category).toList();
 }
 
-const Color _cWarm = Color(0xFFC2661E);
-const Color _cGreen = Color(0xFF3E7A5E);
-const Color _cBlue = Color(0xFF3E6BA8);
+const Color _cWarm = ppAccentAmber;
+const Color _cGreen = ppAccentGreen;
+const Color _cBlue = ppAccentBlue;
 
 const List<RecoSection> kRecoSections = [
   RecoSection('Books', 'Books', Icons.menu_book_outlined, ppPurple),

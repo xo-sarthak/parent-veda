@@ -12,6 +12,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../theme/app_theme.dart';
+
 import '../../ask_veda/veda_core.dart';
 import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
@@ -46,6 +48,16 @@ const Color ppStripeB = Color(0xFFF6F0FA);
 // Heading ink - matches the pregnancy app's primary900 (#2D144C), the dark
 // purple-black it uses for section & card titles (slightly warmer than ppInk).
 const Color ppTitleInk = Color(0xFF2D144C);
+
+// ---- section accents --------------------------------------------------------
+//  Aliases onto AppTheme's accent set, so parenting code reads in pp* style
+//  while there is still exactly ONE definition of each colour. Added after a
+//  near-duplicate palette appeared: a second green three hex digits from the
+//  first is invisible on any one screen and is how a palette forks.
+const Color ppAccentGreen = AppTheme.accentGreen;
+const Color ppAccentAmber = AppTheme.accentAmber;
+const Color ppAccentBlue = AppTheme.accentBlue;
+const Color ppAccentRose = AppTheme.accentRose;
 
 // ---- text -------------------------------------------------------------------
 TextStyle ppFraunces(double size,

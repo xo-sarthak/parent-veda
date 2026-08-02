@@ -54,7 +54,7 @@ class ExpertCuratedBanner extends StatelessWidget {
     super.key,
     required this.text,
     this.icon = Icons.verified_user_outlined,
-    this.accent = const Color(0xFF3E7A5E),
+    this.accent = ppAccentGreen,
   });
 
   final String text;
