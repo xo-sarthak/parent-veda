@@ -773,6 +773,66 @@ bool kDailyPopupAlwaysShow = false;
   four-month-old and a four-year-old get the same tip. Fine for fourteen
   general tips; wrong the moment the set grows.
 
+## 5.13 The four Explore redesigns, and the nav restyle
+
+2026-08-02. Four briefs (Recipes, Recommendations, Read, Courses) describing one
+page, and saying so themselves — "should feel like its sibling", "so all three
+sections feel like part of one cohesive Explore experience".
+
+So the shape is built once in `pp_explore_kit.dart` and applied four times:
+
+    expert banner -> search -> filters/chips -> a personalised "chosen for you"
+    -> horizontal sections with See more -> dedicated listing pages
+
+`test/explore_redesign_test.dart` holds both that each screen followed its own
+brief AND that all four still use the kit — the second is the one that rots
+first, and it is what stops the fifth person copying a card instead of
+importing one.
+
+**Nothing was deleted.** All four old screens are on disk and their Explore rows
+are commented in place.
+
+### The stack the briefs asked for, and why it was declined
+
+All four specify **Riverpod, GoRouter, Theme Extensions and
+CachedNetworkImage**. `CLAUDE.md` refuses the first two with reasons already
+taken more than once — a second state paradigm means two ways to do everything,
+and the route *name* is load-bearing here (`global_ask_fab` reads it), which
+GoRouter would break. The layout and behaviour of every brief are built exactly
+as written; the plumbing is this codebase's. A test asserts no Riverpod or
+GoRouter symbol appears in any of the five new files.
+
+`cached_network_image` is not a dependency and none of this content is network
+imagery yet, so `ExploreThumb` draws a tinted panel with the category icon.
+Dropping real photography in later changes one widget.
+
+### The bottom nav
+
+Restyled for readability from the reference screens, **parenting only** — the
+pregnancy bar is untouched, and a test asserts that.
+
+The old bar turned the ACTIVE tab into a horizontal pill and left the other four
+as an icon over an **8.5pt** label. Two problems: 8.5pt is there to be seen, not
+read, and because the active tab changed *shape*, the whole row re-flowed on
+every tap. Now every tab is the same shape and colour alone marks the active
+one, at 11pt. Old bar commented in place.
+
+### Content gaps, not built and not faked
+
+* **No photography.** Every brief is "image-first" and there are no images. The
+  layout is right and the pictures are missing, which is the honest half to be
+  missing.
+* **Per-outcome course detail.** The Courses brief wants each learning outcome
+  to expand into "detailed explanation, examples, practical tips". The
+  catalogue has the outcomes and not the detail, so the expansion says what it
+  can rather than generating filler.
+* **Beverages** has no category in the recipe data; four recipes are matched by
+  id in `recipes_explore_screen.dart`. Give beverages a real category and that
+  list should go.
+* **Pagination.** Every brief asks for it. Catalogues are 40–90 items, so
+  everything renders at once; the listing screens are structured so a paged
+  source drops in without a redesign.
+
 ## 6.1 Native Discovery breadth — **manual tagging DECIDED 2026-07-31**
 
 Manual it is, and the reason is now on record: two wrong pairings had already

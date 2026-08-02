@@ -220,7 +220,9 @@ class PpBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      // vertical 9 -> 10: the taller icon-over-label stack needs the room, and
+      // a cramped bar is the other half of "hard to read".
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
@@ -230,42 +232,98 @@ class PpBottomNav extends StatelessWidget {
     );
   }
 
+  // RESTYLED for readability, from the reference screens.
+  //
+  // The old bar (kept below, commented) made the ACTIVE tab a horizontal purple
+  // pill and left the other four as an icon over an 8.5pt label. Two things
+  // came out of that:
+  //
+  //   * 8.5pt is below what is comfortably readable on a phone held one-handed
+  //     while holding a baby. The label was there to be seen, not read.
+  //   * the active tab changed SHAPE, so the whole row re-flowed on every tap -
+  //     four labels sliding sideways as the pill grew and shrank. The bar never
+  //     sat still.
+  //
+  // Now every tab is the same shape - icon above label, always - and the active
+  // one is marked by COLOUR alone: a filled purple disc behind the icon, purple
+  // label under it. Nothing moves when you switch, and every label reads at
+  // 11pt.
+  //
+  // Every tab is Expanded, so the five share the width evenly and the row
+  // cannot overflow whatever the text scale.
+  //
+  // PARENTING ONLY. The pregnancy bar (PvTabBar) is deliberately untouched.
   Widget _item(BuildContext context, int i) {
     final on = i == active;
     final (icon, label) = _tabs[i];
-    final child = GestureDetector(
-      onTap: () => _tap(context, i),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
-        decoration: BoxDecoration(
-          color: on ? ppPurple : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _tap(context, i),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              width: 40,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: on ? ppPurple : Colors.transparent,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Icon(icon, size: 19, color: on ? Colors.white : ppMuted),
+            ),
+            const SizedBox(height: 4),
+            Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: ppBody(11,
+                    color: on ? ppPurple : ppSoft,
+                    w: on ? FontWeight.w800 : FontWeight.w600)),
+          ]),
         ),
-        // Active = horizontal pill (icon + label). Inactive = icon + tiny label.
-        child: on
-            ? Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 21, color: Colors.white),
-                const SizedBox(width: 6),
-                Text(label, style: ppBody(12.5, color: Colors.white, w: FontWeight.w700)),
-              ])
-            : Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 20, color: ppMuted),
-                const SizedBox(height: 3),
-                Text(label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: ppBody(8.5, color: ppMuted, w: FontWeight.w600)),
-              ]),
       ),
     );
-    // The active pill sizes to its content; the four inactive tabs share the rest
-    // evenly (Expanded) so the row can't overflow, even under the wide test font.
-    return on ? child : Expanded(child: child);
   }
+
+  // THE OLD BAR. Kept for revert:
+  //
+  // Widget _item(BuildContext context, int i) {
+  //   final on = i == active;
+  //   final (icon, label) = _tabs[i];
+  //   final child = GestureDetector(
+  //     onTap: () => _tap(context, i),
+  //     behavior: HitTestBehavior.opaque,
+  //     child: AnimatedContainer(
+  //       duration: const Duration(milliseconds: 200),
+  //       curve: Curves.easeOut,
+  //       padding: EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
+  //       decoration: BoxDecoration(
+  //         color: on ? ppPurple : Colors.transparent,
+  //         borderRadius: BorderRadius.circular(20),
+  //       ),
+  //       child: on
+  //           ? Row(mainAxisSize: MainAxisSize.min, children: [
+  //               Icon(icon, size: 21, color: Colors.white),
+  //               const SizedBox(width: 6),
+  //               Text(label, style: ppBody(12.5, color: Colors.white, w: FontWeight.w700)),
+  //             ])
+  //           : Column(mainAxisSize: MainAxisSize.min, children: [
+  //               Icon(icon, size: 20, color: ppMuted),
+  //               const SizedBox(height: 3),
+  //               Text(label,
+  //                   maxLines: 1,
+  //                   overflow: TextOverflow.ellipsis,
+  //                   textAlign: TextAlign.center,
+  //                   style: ppBody(8.5, color: ppMuted, w: FontWeight.w600)),
+  //             ]),
+  //     ),
+  //   );
+  //   return on ? child : Expanded(child: child);
+  // }
 }
 
 // ---- shared deep-dive pieces (back bar, section divider, rows) --------------

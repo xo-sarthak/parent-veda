@@ -15,7 +15,11 @@ import '../../brand/brand_models.dart';
 import '../../brand/brand_preview_screen.dart';
 import '../../brand/launch_hub_screen.dart';
 import '../brand_showcase_screen.dart';
+import 'courses_explore_screen.dart';
 import 'next_baby_screens.dart';
+import 'read_explore_screen.dart';
+import 'reco_explore_screen.dart';
+import 'recipes_explore_screen.dart';
 import '../care_partner/care_circle_screen.dart';
 import 'pp_child_profile.dart';
 
@@ -37,6 +41,8 @@ import 'wallet_home_screen.dart';
 // Food is merged into Recipes; "Guides & Tools" retired. Kept for revert:
 // import 'food_home_screen.dart';
 // import 'guides_tools_screen.dart';
+// Kept: the pre-redesign Courses row below is commented, not deleted.
+// ignore: unused_import
 import 'learning_home_screen.dart';
 import '../memories/memories_home_screen.dart';
 import '../referral/invite_friends_screen.dart';
@@ -63,10 +69,16 @@ import 'nuskhe_screen.dart';
 // ignore: unused_import
 import 'journeys_screen.dart';
 import 'pp_common.dart';
+// Kept: the pre-redesign Read row below is commented, not deleted.
+// ignore: unused_import
 import 'reading_home_screen.dart';
 import 'watch_home_screen.dart';
 import 'problem_solver_screen.dart';
+// Kept: the pre-redesign Recipes row below is commented, not deleted.
+// ignore: unused_import
 import 'recipes_screen.dart';
+// Kept: the pre-redesign Recommendations row below is commented, not deleted.
+// ignore: unused_import
 import 'recommendations_screen.dart';
 
 class ExploreDrawer extends StatelessWidget {
@@ -150,14 +162,33 @@ class ExploreDrawer extends StatelessWidget {
                   // Food is merged into Recipes now (one unified food companion). Kept for revert:
                   // _section(context, Icons.ramen_dining_outlined, 'Food',
                   //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
+                  // REDESIGNED (Recipes brief): expert banner, search, meal
+                  // planner, diet chips, ten browsable sections. The old screen
+                  // is untouched on disk. Kept for revert:
+                  // _section(context, Icons.restaurant_menu_outlined, 'Recipes',
+                  //     'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
                   _section(context, Icons.restaurant_menu_outlined, 'Recipes',
-                      'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
+                      'Curated by age — browse by meal, not by filter.', const RecipesExploreScreen()),
+                  // REDESIGNED (Recommendations brief): sticky section-nav
+                  // chips, Recommended For You, twelve category rails. Kept:
+                  // _section(context, Icons.recommend_outlined, 'Recommendations',
+                  //     'What to read, watch, play & do.', const RecommendationsScreen()),
                   _section(context, Icons.recommend_outlined, 'Recommendations',
-                      'What to read, watch, play & do.', const RecommendationsScreen()),
-                  _section(context, Icons.auto_stories_outlined, 'READ',
-                      'Guided reads, collections and short videos.', const ReadingHomeScreen()),
+                      'Expert-curated books, toys, activities & more.', const RecoExploreScreen()),
+                  // REDESIGNED (Read brief): filters moved to the top, Today's
+                  // Read / Continue Reading / Collections removed, topics become
+                  // playlists. Kept for revert:
+                  // _section(context, Icons.auto_stories_outlined, 'READ',
+                  //     'Guided reads, collections and short videos.', const ReadingHomeScreen()),
+                  _section(context, Icons.auto_stories_outlined, 'Read',
+                      'Vetted reads, by topic and by type.', const ReadExploreScreen()),
+                  // REDESIGNED (Courses brief): banner, search, the existing
+                  // filters, Chosen For You, three sections, and a detail page
+                  // whose sections are expanded by default. Kept for revert:
+                  // _section(context, Icons.school_outlined, 'Courses & Masterclasses',
+                  //     'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
                   _section(context, Icons.school_outlined, 'Courses & Masterclasses',
-                      'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
+                      'Expert-led, and vetted for your stage.', const CoursesExploreScreen()),
                   _section(context, Icons.self_improvement_outlined, 'Yoga & Classes',
                       'Live & recorded classes for every stage.', const YogaHomeScreen()),
                   _section(context, Icons.event_available_outlined, 'My Bookings',
