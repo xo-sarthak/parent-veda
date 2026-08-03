@@ -220,9 +220,17 @@ All of this is written, bilingual, and structured for export:
 
 Two things to preserve when chunking:
 
-1. **Both languages.** Every field has an `…En` / `…Hi` pair. Hinglish is real
-   conversational Hinglish in Latin script, and a Hinglish question should
-   retrieve the Hinglish chunk.
+1. **Both languages.** Every field has an `…En` / `…Hi` pair, and a question in
+   the second language should retrieve the `…Hi` chunk.
+
+   ⚠️ **That second language is mid-migration, so do not assume a script.**
+   The house style moved from Hinglish-in-Latin to **Hindi in Devanagari** on
+   2026-08-03, but only `weekContent.json` has actually moved. **Everything
+   under `lib/ttc/` is still Latin-script Hinglish today.** Ingest whatever the
+   export gives you rather than normalising to an assumed script, and expect
+   TTC `…Hi` fields to switch to Devanagari in a later pass — at which point
+   the embeddings for those chunks must be regenerated, because the vectors for
+   "takleef" and "तकलीफ़" have nothing to do with each other.
 2. **The honesty half.** For products, `watchOut` must be ingested with the same
    weight as `lookFor` — several entries exist mainly to talk a couple *out* of
    buying something, and dropping that half turns a research page into an advert.

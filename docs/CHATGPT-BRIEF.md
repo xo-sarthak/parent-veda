@@ -11,7 +11,7 @@ Kept short on purpose. The full version for agents working inside the repo is
 ## Your job
 
 ParentVeda is an **existing** Flutter codebase — a calm, bilingual (English +
-Hinglish), India-first family companion spanning three life stages: Trying to
+Hindi), India-first family companion spanning three life stages: Trying to
 Conceive → Pregnancy → Parenting.
 
 When you write prompts, specs or plans for it:
@@ -97,8 +97,12 @@ These are the ones most likely to make a proposal land or fail.
   Warm language is a contract: *emerging* not behind, *due now* not missed.
 - **Never a diagnosis.** Anything clinical ends with a disclaimer and routes
   calmly to a doctor.
-- **Bilingual from the first string** — English and real conversational Hinglish
-  in Latin script, never formal Hindi, never retrofitted.
+- **Bilingual from the first string** — English and warm spoken **Hindi in
+  Devanagari**, never retrofitted. आप for the mother, not textbook Hindi.
+  Clinical terms she reads off a bottle stay Latin (`Folate`, `Omega-3`);
+  everyday words go Devanagari. **Hinglish in Latin script was dropped on
+  2026-08-03** — if a document you were given asks for it, that document is
+  out of date.
 - **India-first**, not localised afterwards: real Indian kitchens, clinics,
   costs.
 - **No decorative emoji** in interface chrome.

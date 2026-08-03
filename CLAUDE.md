@@ -1,6 +1,6 @@
 # ParentVeda — how this codebase actually works
 
-A calm, bilingual (English + Hinglish), India-first family companion in Flutter,
+A calm, bilingual (English + Hindi), India-first family companion in Flutter,
 spanning three life stages: **Trying to Conceive → Pregnancy → Parenting**.
 
 This file exists because incoming briefs — product docs, architecture prompts,
@@ -56,6 +56,10 @@ If a brief you were handed assumes one, the brief is wrong, not the codebase.
   ranking and order — never structure. Everyone learns one ParentVeda.
 - **Rewrites of shipped stages.** Pregnancy and Parenting carry real user data.
   Extend additively.
+- **Hinglish in Latin script.** Dropped 2026-08-03 for Hindi in Devanagari.
+  A brief that asks for "Round ligament mein takleef" is working from the old
+  house style. It also broke voice: the app asks the OS for the `hi-IN` voice
+  and a Hindi voice cannot read Roman script.
 
 ---
 
@@ -128,12 +132,42 @@ it belongs in the answer rather than the screen, it belongs there.
 - **Derive, never ask.** Only ask for what is genuinely unknowable, and say what
   the answer unlocks.
 - **Comment out, never delete** superseded UI, with a "kept for revert" note.
-- **Bilingual from the first string** — `_p(english, hinglish)`. Real
-  conversational Hinglish in Latin script, not formal Hindi.
+- **Bilingual from the first string** — `_p(english, hindi)`. Warm spoken Hindi
+  in **Devanagari**, आप for the mother, not textbook Hindi. Clinical terms a
+  mother reads off a bottle or a prescription stay Latin (`Folate`, `Omega-3`,
+  `Braxton Hicks`, `anomaly scan`); everyday words go Devanagari (पालक, आयरन).
+  **Hinglish in Latin script has been dropped** — see the migration note below.
 - **No decorative emoji** in chrome. Line icons.
 - **Never a diagnosis.** Anything clinical ends with a disclaimer and routes
   calmly to a doctor. The app must never contradict a user's own clinician.
 - **Money and seats are decided server-side**, always.
+
+### The Hindi migration is half-done, and the identifiers still say `hinglish`
+
+Hinglish-in-Latin was dropped in favour of Hindi in Devanagari. The **content**
+moved before the **names** did, so the code reads as a contradiction until the
+rename lands. Both facts matter:
+
+- The enum value is still `AppLanguage.hinglish` and `_p`'s second parameter is
+  still literally named `hinglish`. Grep for `hinglish`, not `hindi`, when
+  looking for the language plumbing.
+- Prefer **`lang.isHindi`** in new code. It is an alias for the same value and
+  will survive the rename; `isHinglish` will not.
+
+What has actually moved, so nobody assumes a finished-looking file is finished:
+
+| Migrated | Not yet |
+|---|---|
+| `lib/data/weekContent.json` — all 37 weeks, 1,642 strings | `app_language.dart` (~1,827), `ttc_strings.dart` (392), enterprise screens (~92), inline `bool hinglish` in `lib/ttc/` |
+| Type: `lib/theme/pv_fonts.dart` + the call sites in pregnancy | Parenting call sites — deliberate; that content has no Hindi at all yet |
+
+⚠️ **`T _p<T>` is generic.** Some call sites return icons, colours and widgets,
+not strings. A regex sweep over `_p(` will corrupt them silently and the
+analyzer will not always catch it. Partition by return type before translating.
+
+The pre-migration Hinglish is kept verbatim in `lib/data/weekContent.hinglish.json`
+— JSON cannot hold comments, so a sibling file is how *comment out, never delete*
+applies to data.
 
 ---
 

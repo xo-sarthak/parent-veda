@@ -211,7 +211,9 @@ still open as a preference but this is the current direction).
 * **`sponsor_members` is the sensitive table** — it says where a person works.
   Only the aggregation layer touches it.
 * **Local-first.** Uninitialised backend behaves exactly like logged out.
-* **Bilingual from the first string** — `_p(english, hinglish)`.
+* **Bilingual from the first string** — `_p(english, hindi)`, Hindi in
+  **Devanagari**. The parameter is still *named* `hinglish` in code pending the
+  rename; the ~92 enterprise strings are not migrated yet. See CLAUDE.md.
 * **Next free migration number is `0059`.** Claim it in the commit that writes
   it; never reserve ahead (a held-then-deferred `0050` once became a hole).
 

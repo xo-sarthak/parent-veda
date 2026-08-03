@@ -155,14 +155,18 @@ ways that matter, and each of these has a specific failure behind it.
 | `domain` | Dropdown — `pregnancy`, `parenting`, `universal` | Free text here files content where nothing reads it |
 | `created_at`, `updated_at`, `published_at` | Hidden / read-only | |
 
-Group the `_hi` fields into a **"Hinglish" tab** in the layout rather than
+Group the `_hi` fields into a **"Hindi" tab** in the layout rather than
 leaving them inline. They are a second pass, not a second thought, and mixed
 into the English fields they make every form twice as long.
+
+The column names stay `_hi` — they always meant "the second language", and
+renaming live columns to chase a label change would cost a migration, a
+`fromMap`/`toCacheMap` edit and a Directus field re-create for nothing.
 
 ### `articles`
 
 * `has_hi` — hidden (it is a generated column and cannot be written).
-* Save a **filter preset named "Missing Hinglish"**: `has_hi` is `false`. That
+* Save a **filter preset named "Missing Hindi"**: `has_hi` is `false`. That
   turns "bilingual from the first string" from a rule people forget into a
   worklist someone can pick up.
 
@@ -673,16 +677,22 @@ single entry, by design. Needed for `recipes`, `reads`, `products` — select th
 columns worth embedding (title, the teaching prose, and for products **both**
 `pros` and `cons`).
 
-### 7b. Hinglish will silently stop being searchable
+### 7b. The Hindi half will silently stop being searchable
 
 `tool/export_ttc_corpus.dart` deliberately emits each item **twice** — an `_hi`
 twin — because `ingest.py` embeds only the `body` column. A live table read
 through the standard `SOURCE_SPECS` path emits **one** chunk set, from `body`.
 
-So the moment a bilingual type is served from its table, **Hinglish retrieval
-dies with no error anywhere and no test that catches it.** The fix is a second
-pass over `body_hi`, which needs a `lang` dimension in the
+So the moment a bilingual type is served from its table, **Hindi retrieval dies
+with no error anywhere and no test that catches it.** The fix is a second pass
+over `body_hi`, which needs a `lang` dimension in the
 `(source_table, source_id, chunk_index)` upsert key.
+
+Devanagari makes this *more* urgent, not less. While the second language was
+Latin-script Hinglish, an un-embedded Hindi question still landed partly on the
+English chunks — "folate" is spelled the same in both. In Devanagari it shares
+no characters with the English text, so a missing `body_hi` pass means a Hindi
+question retrieves nothing at all rather than something mediocre.
 
 ### 7c. Then, and only then, flip ownership
 

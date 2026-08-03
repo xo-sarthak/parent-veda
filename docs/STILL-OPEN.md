@@ -1432,9 +1432,13 @@ the change deliberate.
 
 Two specific things a human should look at:
 
-* **The Hindi is transliterated Hinglish**, matching the existing house style
-  across the app. It wants a native read before launch — not a translation
-  check, a *does-a-father-actually-talk-like-this* check.
+* **The Hindi is transliterated Hinglish**, matching the house style *at the
+  time it was written*. That style was dropped on 2026-08-03 for Devanagari,
+  and the father copy has **not** been migrated — so this is now two jobs, not
+  one: convert the script, and then get the native read it always wanted. Not a
+  translation check, a *does-a-father-actually-talk-like-this* check. Doing the
+  script conversion first would waste the reader's pass on copy that may not
+  survive it.
 * **The missions read correctly but were written for a "partner"**, not
   specifically a father — they derive from `partnerCorner.oneMission`. Nothing
   is wrong in them; the question is whether the voice is his.
