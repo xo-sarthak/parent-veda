@@ -620,13 +620,25 @@ void productTemplateAcrossApps() {
         expect(strings.contains('String get $getter'), isTrue,
             reason: '$getter missing');
       }
-      // Hinglish, not English twice — this screen is bilingual and a section
+      // Hindi, not English twice — this screen is bilingual and a section
       // heading that stays English is the tell.
-      expect(strings.contains("_p('At a glance', 'Ek nazar mein')"), isTrue);
-      expect(strings.contains("_p(\"ParentVeda's take\", 'ParentVeda ki raay')"),
-          isTrue);
-      expect(strings.contains("_p('From verified parents', 'Verified parents se')"),
-          isTrue);
+      //
+      // This asserts the second argument is *in Devanagari* rather than
+      // pinning the exact words. Pinning the copy made this test fail the day
+      // the house style moved off Hinglish, which told us nothing about the
+      // thing it exists to protect: that the heading was translated at all.
+      final devanagari = RegExp(r'[ऀ-ॿ]');
+      for (final en in [
+        "_p('At a glance',",
+        '_p("ParentVeda\'s take",',
+        "_p('From verified parents',",
+      ]) {
+        final at = strings.indexOf(en);
+        expect(at, isNot(-1), reason: '$en no longer passed to _p');
+        final call = strings.substring(at, strings.indexOf(')', at));
+        expect(devanagari.hasMatch(call), isTrue,
+            reason: 'the Hindi side of $en is not in Devanagari');
+      }
     });
 
     test('the pregnancy page uses them', () {
