@@ -15,7 +15,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/trimester_tips.dart';
 import '../../data/week_development_data.dart';
@@ -23,6 +22,7 @@ import '../../localization/app_language.dart';
 import '../../models/week_content.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/father_skin.dart';
+import '../../theme/pv_fonts.dart';
 
 /// WhatsApp brand green - used only as a small accent so the card reads as a
 /// WhatsApp-style weekly update.
@@ -105,7 +105,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   Text(
                     _t("Hi! Here's your Week ${w.week} update 💜",
                         'Namaste! Yeh raha aapka Hafta ${w.week} ka update 💜'),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 16.5,
                         fontWeight: FontWeight.w700,
                         height: 1.35,
@@ -115,7 +115,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   Text(
                     _t('Your baby is about ${_clean(snap.fruit.of(lang))} this week.',
                         'Aapka baby is hafte lagbhag ${_clean(snap.fruit.of(lang))} jitna hai.'),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 14, height: 1.5, color: AppTheme.neutral600),
                   ),
                   const SizedBox(height: 16),
@@ -170,7 +170,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
               Text(_t("This week's update", 'Is hafte ka update'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: father ? kFInk : AppTheme.primary900)),
@@ -178,7 +178,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   'Jo hum aapko WhatsApp par bhejte hain'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, color: AppTheme.neutral500)),
             ]),
       ),
@@ -225,7 +225,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
         child: Text(text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 15.5,
                 fontWeight: FontWeight.w800,
                 color: father ? kFInk : AppTheme.primary900)),
@@ -243,7 +243,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
               'ParentVeda - har hafte, WhatsApp par'),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12, color: AppTheme.neutral400),
         ),
       ),
@@ -298,7 +298,7 @@ class _MiniStat extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9.5,
                 letterSpacing: 0.9,
                 fontWeight: FontWeight.w700,
@@ -308,7 +308,7 @@ class _MiniStat extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: father ? kFInk : AppTheme.primary900)),
@@ -335,7 +335,7 @@ class _StatBar extends StatelessWidget {
           child: Text(stat.label.of(lang),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.neutral700)),
@@ -347,7 +347,7 @@ class _StatBar extends StatelessWidget {
               textAlign: TextAlign.right,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: accent)),
@@ -396,7 +396,7 @@ class _TipRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   height: 1.5,
                   color: const Color(0xFF5B5070))),

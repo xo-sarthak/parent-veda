@@ -79,6 +79,7 @@ import 'services/tools_store.dart';
 import 'services/video_store.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
+import 'theme/pv_fonts.dart';
 import 'widgets/global_ask_fab.dart';
 
 Future<void> main() async {
@@ -351,10 +352,27 @@ class _ParentVedaAppState extends State<ParentVedaApp>
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild the whole app when the language flips: the TYPE SYSTEM is
+    // language-dependent (Hindi swaps to a Devanagari pairing with corrected
+    // line metrics - see lib/theme/pv_fonts.dart), so the ThemeData itself has
+    // to be rebuilt, not just the strings inside it.
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        // Mirror the language for inline call sites that style themselves
+        // without reading the text theme. Set before the tree builds so the
+        // first frame in a new language is already correct.
+        PvType.setLanguage(_controller.language);
+        return _app(context);
+      },
+    );
+  }
+
+  Widget _app(BuildContext context) {
     return MaterialApp(
       title: 'ParentVeda',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
+      theme: AppTheme.lightFor(_controller.language),
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light,
       // Root navigator key + observer power the global "Ask Veda" FAB.

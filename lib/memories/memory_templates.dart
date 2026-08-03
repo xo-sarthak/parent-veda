@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'memory_models.dart';
+import '../theme/pv_fonts.dart';
 
 // ---------------------------------------------------------------------------
 //  Palettes — calm, timeless colour worlds
@@ -115,10 +116,10 @@ String _footerNames(MemoryData d) =>
 // ---------------------------------------------------------------------------
 
 TextStyle _serif(double s, Color c, {FontWeight w = FontWeight.w500, double h = 1.08}) =>
-    GoogleFonts.fraunces(fontSize: s, color: c, fontWeight: w, height: h, letterSpacing: -0.3);
+    pvFraunces(fontSize: s, color: c, fontWeight: w, height: h, letterSpacing: -0.3);
 
 TextStyle _sans(double s, Color c, {FontWeight w = FontWeight.w500, double ls = 0}) =>
-    GoogleFonts.manrope(fontSize: s, color: c, fontWeight: w, letterSpacing: ls);
+    pvManrope(fontSize: s, color: c, fontWeight: w, letterSpacing: ls);
 
 /// Calligraphy. Every announcement card in the reference set leans on a script
 /// for exactly one phrase — the name, or "Coming Soon" — and sets everything

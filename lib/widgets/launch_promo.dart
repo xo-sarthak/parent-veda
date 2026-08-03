@@ -8,10 +8,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/promo_data.dart';
+import '../theme/pv_fonts.dart';
 
 /// Guards so the pop-up appears only once per app process (an "on open" promo,
 /// not on every rebuild / tab change). Set false in tests to suppress it.
@@ -181,7 +182,7 @@ class _Slide extends StatelessWidget {
                 const Spacer(),
                 Text(
                   slide.headline,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                     fontSize: 30,
                     height: 1.05,
                     fontWeight: FontWeight.w900,
@@ -207,7 +208,7 @@ class _Slide extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     slide.subline,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 13.5,
                       height: 1.5,
                       color: slide.ink.withValues(alpha: 0.72),
@@ -229,7 +230,7 @@ class _Slide extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         slide.brand,
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: slide.ink,
@@ -256,7 +257,7 @@ class _Slide extends StatelessWidget {
         ),
         child: Text(
           'SPONSORED · ${slide.brand.toUpperCase()}',
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 9.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.8,
@@ -274,7 +275,7 @@ class _Slide extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
             fontSize: 14.5,
             fontWeight: FontWeight.w800,
             color: slide.ink,
@@ -300,7 +301,7 @@ class _Slide extends StatelessWidget {
             children: [
               Text(
                 slide.cta,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,

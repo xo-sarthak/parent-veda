@@ -16,7 +16,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/body_changes.dart';
@@ -30,6 +30,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/father_skin.dart';
 import '../cards/food_emoji.dart';
 import 'week_whatsapp_info_card.dart';
+import '../../theme/pv_fonts.dart';
 
 const LinearGradient _pageGradient = LinearGradient(
   begin: Alignment.topCenter,
@@ -184,7 +185,7 @@ class WeekSizeHero extends StatelessWidget {
                             color: accent2, shape: BoxShape.circle)),
                     const SizedBox(width: 7),
                     Text(snap.milestone.of(lang),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: father ? kFAccent : AppTheme.primary600)),
@@ -349,7 +350,7 @@ class _BabyFruitToggle extends StatelessWidget {
                     : null,
               ),
               child: Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: on
@@ -394,7 +395,7 @@ class _StatCard extends StatelessWidget {
       child: Column(children: [
         Text(label.toUpperCase(),
             textAlign: TextAlign.center,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9.5,
                 letterSpacing: 1.0,
                 fontWeight: FontWeight.w700,
@@ -404,7 +405,7 @@ class _StatCard extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: father ? kFInk : AppTheme.primary900)),
@@ -474,14 +475,14 @@ class _PvAccordionState extends State<PvAccordion> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(widget.title,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.primary900)),
                       if (widget.subtitle != null &&
                           widget.subtitle!.isNotEmpty)
                         Text(widget.subtitle!,
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 13, color: AppTheme.neutral500)),
                     ]),
               ),
@@ -514,7 +515,7 @@ class _PvAccordionState extends State<PvAccordion> {
 // ---------------------------------------------------------------------------
 //  Accordion bodies (full content, just collapsed by default = de-cluttered)
 // ---------------------------------------------------------------------------
-TextStyle _bodyStyle() => GoogleFonts.manrope(
+TextStyle _bodyStyle() => pvManrope(
     fontSize: 14.5, height: 1.6, color: const Color(0xFF5B5070));
 
 class _RichBaby extends StatelessWidget {
@@ -560,7 +561,7 @@ class _RichMother extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(ch.label.of(lang),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.tertiary700)),
@@ -584,7 +585,7 @@ class _RichMother extends StatelessWidget {
                     color: AppTheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(999)),
                 child: Text(sym.of(lang),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.neutral700)),
@@ -643,7 +644,7 @@ class _Tinted extends StatelessWidget {
             Icon(icon, size: 15, color: color),
             const SizedBox(width: 6),
             Text(label!.toUpperCase(),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11,
                     letterSpacing: 0.5,
                     fontWeight: FontWeight.w800,
@@ -704,7 +705,7 @@ Widget _cardHeader(IconData icon, Color color, String eyebrow, String title) {
     Expanded(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(eyebrow.toUpperCase(),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11,
                 letterSpacing: 0.6,
                 fontWeight: FontWeight.w800,
@@ -712,7 +713,7 @@ Widget _cardHeader(IconData icon, Color color, String eyebrow, String title) {
         Text(title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900)),
@@ -727,7 +728,7 @@ Widget _pill(String text, Color color) => Container(
           color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(999)),
       child: Text(text,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: color)),
     );
 
@@ -786,11 +787,11 @@ class WeekVideoCard extends StatelessWidget {
                     // Father uses the MOTHER's heading font (plusJakartaSans),
                     // a bit bolder (w800), in Slate ink - the serif read poorly.
                     style: father
-                        ? GoogleFonts.plusJakartaSans(
+                        ? pvJakarta(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
                             color: kFInk)
-                        : GoogleFonts.plusJakartaSans(
+                        : pvJakarta(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primary900)),
@@ -856,7 +857,7 @@ class WeekVideoCard extends StatelessWidget {
                         color: Colors.black.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(40)),
                     child: Text(v.duration,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11,
                             color: Colors.white,
                             fontWeight: FontWeight.w700)),
@@ -916,7 +917,7 @@ class WeekNutritionCard extends StatelessWidget {
                     color: AppTheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(999)),
                 child: Text(f.of(lang),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.neutral700)),
@@ -933,7 +934,7 @@ class WeekNutritionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(n.superfood!.food.of(lang),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.tertiary700)),
@@ -941,7 +942,7 @@ class WeekNutritionCard extends StatelessWidget {
                   Text(n.superfood!.benefit.of(lang), style: _bodyStyle()),
                   const SizedBox(height: 6),
                   Text(n.superfood!.howToConsume.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13, color: AppTheme.neutral600)),
                 ]),
           ),
@@ -990,7 +991,7 @@ class WeekActionCard extends StatelessWidget {
           title: s.mythBuster,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('${s.mythLabel}: ${a.mythBuster.myth.of(lang)}',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14,
                     height: 1.5,
                     fontStyle: FontStyle.italic,
@@ -1061,7 +1062,7 @@ class WeekShareCard extends StatelessWidget {
             onPressed: () => _share(context, s),
             icon: const Icon(Icons.chat_rounded, size: 18, color: Colors.white),
             label: Text(s.forwardWhatsapp,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontWeight: FontWeight.w700, color: Colors.white)),
           ),
         ),
@@ -1096,7 +1097,7 @@ class WeekTipsCard extends StatelessWidget {
                     color: AppTheme.tertiary500.withValues(alpha: 0.14),
                     shape: BoxShape.circle),
                 child: Text('${i + 1}',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.tertiary700)),
@@ -1261,7 +1262,7 @@ class _MilestoneRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(m.title.of(lang),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: current
@@ -1279,7 +1280,7 @@ class _MilestoneRow extends StatelessWidget {
                         color: AppTheme.secondary500.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(99)),
                     child: Text(s.msThisWeek.toUpperCase(),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.4,
@@ -1287,12 +1288,12 @@ class _MilestoneRow extends StatelessWidget {
                   )
                 else
                   Text(s.jrWeekLabel(m.week),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11, color: AppTheme.neutral400)),
               ]),
               const SizedBox(height: 3),
               Text(m.desc.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13,
                       height: 1.45,
                       color: (reached || current)

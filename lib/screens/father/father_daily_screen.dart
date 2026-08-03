@@ -10,7 +10,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/father/father_read_data.dart';
@@ -38,6 +38,7 @@ import '../profile_screen.dart';
 import '../week_flow_screen.dart';
 import 'father_journal_screen.dart';
 import 'father_stories_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- palettes ---------------------------------------------------------------
 class _Pal {
@@ -431,13 +432,13 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // ---- shared text styles ----
   TextStyle _serif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
-      GoogleFonts.fraunces(
+      pvFraunces(
           fontSize: size, fontWeight: w, color: c, height: 1.18, letterSpacing: -0.2);
   TextStyle _body(double size, Color c,
           {FontWeight w = FontWeight.w400, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(
+      pvJakarta(
           fontSize: size, fontWeight: w, color: c, height: h);
-  TextStyle _eyebrow(Color c, double spacing) => GoogleFonts.plusJakartaSans(
+  TextStyle _eyebrow(Color c, double spacing) => pvJakarta(
       fontSize: 11, fontWeight: FontWeight.w700, color: c, letterSpacing: spacing);
 
   // ---- Baby / Mother / What's-next quick circles ----
@@ -1052,7 +1053,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       : '“${_readAloudToday!.body}”',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 15,
                       fontStyle: FontStyle.italic,
                       height: 1.45,
@@ -1505,7 +1506,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                           color: p.warmSoft,
                           borderRadius: BorderRadius.circular(7)),
                       child: Text(_journalKindLabel(recent).toUpperCase(),
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.6,
@@ -1642,7 +1643,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         Icon(icon, size: 21, color: c),
         const SizedBox(height: 4),
         Text(label,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 10,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w600,
                 color: c)),
@@ -1768,7 +1769,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               today == null
                   ? 'Choose a few lines to read together.'
                   : '“${today.body}”',
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 18,
                   fontStyle: FontStyle.italic,
                   height: 1.5,
@@ -1965,7 +1966,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(e.date.toUpperCase(),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.6,
@@ -2020,7 +2021,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       decoration: const BoxDecoration(
                           color: Color(0xFFF3E3EC), shape: BoxShape.circle),
                       child: Text('M',
-                          style: GoogleFonts.fraunces(
+                          style: pvFraunces(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFFA2417A))),
@@ -2186,7 +2187,7 @@ class _FatherScanDetail extends StatelessWidget {
 
   TextStyle _b(double s,
           {FontWeight w = FontWeight.w400, Color c = kFInk, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(
+      pvJakarta(
           fontSize: s, fontWeight: w, color: c, height: h);
 
   @override
@@ -2242,7 +2243,7 @@ class _FatherScanDetail extends StatelessWidget {
           if (guide != null && guide.interpret.isNotEmpty) ...[
             const SizedBox(height: 20),
             Text('HOW TO READ THE REPORT',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
@@ -2277,7 +2278,7 @@ class _FatherScanDetail extends StatelessWidget {
             const Icon(Icons.info_outline_rounded, size: 18, color: kFAccent),
             const SizedBox(width: 8),
             Text('What is this scan?',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w800,
                     color: kFAccent)),
@@ -2292,7 +2293,7 @@ class _FatherScanDetail extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (label.trim().isNotEmpty) ...[
             Text(label,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
@@ -2307,7 +2308,7 @@ class _FatherScanDetail extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.3,
@@ -2338,7 +2339,7 @@ class _FatherScanDetail extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(term,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14.5, fontWeight: FontWeight.w800, color: kFAccent)),
           const SizedBox(height: 4),
           Text(meaning, style: _b(14, c: kFInk)),

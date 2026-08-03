@@ -9,7 +9,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
 import '../data/read_to_baby_data.dart';
@@ -28,6 +27,7 @@ import '../widgets/cards/raga_player.dart';
 // import 'home_detail_screens.dart' show TalkComposerScreen;
 import 'tools/ask_veda_screen.dart';
 import 'tools/garbh_games.dart';
+import '../theme/pv_fonts.dart';
 
 // --- warm palette ---
 const _cream = Color(0xFFFBF6EE);
@@ -122,7 +122,7 @@ class GarbhScreen extends StatelessWidget {
           // Intro - what Garbh Sanskar is + why it matters (no kicker/title hero,
           // no raga "video" hero, no progress/streak, no "today's rituals").
           Text(s.garbhSanskar,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900)),
@@ -288,14 +288,14 @@ class _RagaHero extends StatelessWidget {
               const SizedBox(height: 16),
               Text(audio.title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: Colors.white)),
               const SizedBox(height: 2),
               Text('${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, color: Colors.white.withValues(alpha: 0.85))),
             ]),
           ]),

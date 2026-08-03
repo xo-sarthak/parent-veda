@@ -8,9 +8,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/father/father_tales.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- Slate palette (mirrors the Father Daily _slate look) -----------------
 const _bg = Color(0xFFF4EFE8);
@@ -35,11 +35,11 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
   FatherTaleKind _kind = FatherTaleKind.story;
 
   TextStyle _serif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
-      GoogleFonts.fraunces(
+      pvFraunces(
           fontSize: size, fontWeight: w, color: c, height: 1.2, letterSpacing: -0.2);
   TextStyle _body(double size, Color c,
           {FontWeight w = FontWeight.w400, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(
+      pvJakarta(
           fontSize: size, fontWeight: w, color: c, height: h);
 
   @override
@@ -73,7 +73,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('FOR YOU TO READ ALOUD',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.14 * 11,
@@ -159,7 +159,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
                 decoration: BoxDecoration(
                     color: _accentSoft, borderRadius: BorderRadius.circular(999)),
                 child: Text(fatherTaleKindTag(t.kind).toUpperCase(),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.08 * 9.5,
@@ -188,11 +188,11 @@ class FatherTaleReadScreen extends StatelessWidget {
   final FatherTale tale;
 
   TextStyle _serif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
-      GoogleFonts.fraunces(
+      pvFraunces(
           fontSize: size, fontWeight: w, color: c, height: 1.2, letterSpacing: -0.2);
   TextStyle _body(double size, Color c,
           {FontWeight w = FontWeight.w400, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(
+      pvJakarta(
           fontSize: size, fontWeight: w, color: c, height: h);
 
   @override
@@ -223,7 +223,7 @@ class FatherTaleReadScreen extends StatelessWidget {
               const SizedBox(width: 13),
               Expanded(
                 child: Text(fatherTaleKindTag(tale.kind).toUpperCase(),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.14 * 11,
@@ -256,7 +256,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('THE LESSON',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.12 * 11,
@@ -281,14 +281,14 @@ class FatherTaleReadScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('FROM DAD',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.12 * 11,
                                   color: _accent)),
                           const SizedBox(height: 6),
                           Text(tale.dadNote,
-                              style: GoogleFonts.fraunces(
+                              style: pvFraunces(
                                   fontSize: 15.5,
                                   fontStyle: FontStyle.italic,
                                   height: 1.5,

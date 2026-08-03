@@ -11,7 +11,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
@@ -22,6 +22,7 @@ import '../../services/journal_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../mic_dictation_button.dart';
+import '../../theme/pv_fonts.dart';
 
 /// A small, on-brand "saved" confirmation at the bottom of the screen.
 void _savedSnack(ScaffoldMessengerState m, String msg) {
@@ -38,7 +39,7 @@ void _savedSnack(ScaffoldMessengerState m, String msg) {
         const SizedBox(width: 10),
         Flexible(
           child: Text(msg,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   color: Colors.white, fontWeight: FontWeight.w600)),
         ),
       ]),
@@ -83,7 +84,7 @@ Future<void> openJournalText(
           _grip(),
           const SizedBox(height: 16),
           Text(title,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -245,7 +246,7 @@ Widget _photoSourceTile(BuildContext ctx, IconData icon, String label,
         ),
         const SizedBox(width: 14),
         Text(label,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900)),
@@ -399,7 +400,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
         _grip(),
         const SizedBox(height: 14),
         Text(s.jcRecordTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900)),
@@ -429,7 +430,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
             _recording
                 ? s.jcRecording
                 : (_clips.isEmpty ? s.jcTapToRecord : s.jcRecordAnother),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13, color: AppTheme.neutral600)),
         const SizedBox(height: 14),
         for (int i = 0; i < _clips.length; i++)
@@ -450,7 +451,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
               ),
               Expanded(
                 child: Text('${s.jcVoiceNote} ${i + 1}',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primary900)),

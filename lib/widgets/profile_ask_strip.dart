@@ -20,11 +20,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/family_profile.dart';
 import '../services/profile_analytics.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 /// What a strip offers, for one profile field.
 class AskOption {
@@ -133,7 +133,7 @@ class _ProfileAskStripState extends State<ProfileAskStrip> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(widget.question,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
@@ -141,7 +141,7 @@ class _ProfileAskStripState extends State<ProfileAskStrip> {
           ]),
           const SizedBox(height: 6),
           Text(widget.payoff,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, height: 1.45, color: AppTheme.neutral600)),
           const SizedBox(height: 12),
           Wrap(spacing: 8, runSpacing: 8, children: [
@@ -167,7 +167,7 @@ class _ProfileAskStripState extends State<ProfileAskStrip> {
                 // Once she has picked something in a multi-select, "Not now"
                 // would be the wrong word for what the button does.
                 _picked ? 'Done' : 'Not now',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.neutral500),
@@ -192,7 +192,7 @@ class _ProfileAskStripState extends State<ProfileAskStrip> {
               border: Border.all(color: AppTheme.primary100),
             ),
             child: Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary700)),

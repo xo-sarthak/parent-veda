@@ -12,9 +12,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/father_preview.dart';
+import 'pv_fonts.dart';
 
 // Slate palette (mirrors the Father Daily screen / the Pregnancy Week design).
 const Color kFBg = Color(0xFFF4EFE8); // warm cream background
@@ -34,4 +34,4 @@ bool fatherWeekActive(int week) => FatherPreview.instance.on && week == 20;
 /// Fraunces (serif) header style for the father weekly re-skin.
 TextStyle fatherSerif(double size,
         {FontWeight weight = FontWeight.w600, Color color = kFInk}) =>
-    GoogleFonts.fraunces(fontSize: size, fontWeight: weight, color: color);
+    pvFraunces(fontSize: size, fontWeight: weight, color: color);

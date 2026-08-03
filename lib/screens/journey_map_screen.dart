@@ -10,7 +10,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/journey_node.dart';
@@ -25,6 +24,7 @@ import '../widgets/journey/journey_celebration.dart';
 import '../widgets/journey/journey_path.dart';
 import '../widgets/journey/node_cards.dart';
 import 'weekly_card_stack_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class JourneyMapScreen extends StatefulWidget {
   const JourneyMapScreen({super.key, required this.controller});
@@ -196,13 +196,13 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.jmOverdueTitle,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
               const SizedBox(height: 2),
               Text(s.jmOverdueBody(_c.daysPastDue),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
             ]),
           ),
@@ -226,13 +226,13 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.jmCatchUpTitle,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
               const SizedBox(height: 2),
               Text(s.jmCatchUpBody,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
               const SizedBox(height: 6),
               GestureDetector(
@@ -240,7 +240,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(s.jmCatchUpCta,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.secondary600)),
@@ -288,7 +288,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(s.jmCatchUpSheet,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -298,7 +298,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Text(s.jmAllCaughtUp,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 14, color: AppTheme.neutral600)),
                   )
                 else
@@ -326,7 +326,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
           const SizedBox(width: 12),
           Expanded(
             child: Text(m.title.of(_c.language),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
@@ -692,7 +692,7 @@ class _TrailHeaderCard extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
               s.journeyTrailKicker.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.8,
@@ -702,7 +702,7 @@ class _TrailHeaderCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               togo <= 0 ? s.weeksToGoNow : s.weeksToGo(togo),
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                 fontSize: 21,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.primary900,
@@ -728,7 +728,7 @@ class _TrailHeaderCard extends StatelessWidget {
             ),
             Text(
               '${(pct * 100).round()}%',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900,

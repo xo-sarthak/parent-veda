@@ -9,11 +9,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
 
@@ -124,7 +124,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.ddcTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: _edd == null ? _inputView(s) : _resultView(s, _edd!),
@@ -140,18 +140,18 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
       children: [
         Text(s.ddcHeader,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 25,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.primary900,
                 height: 1.15)),
         const SizedBox(height: 6),
         Text(s.ddcSub,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
         const SizedBox(height: 20),
         Text(s.ddcMethod,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900)),
@@ -167,7 +167,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16)),
             child: Text(s.ddcCalculate,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800)),
           ),
         ),
@@ -211,7 +211,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(it.$3,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -265,7 +265,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       {bool future = false}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppTheme.neutral600)),
@@ -293,7 +293,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 size: 18, color: AppTheme.primary500),
             const SizedBox(width: 12),
             Text(value == null ? s.ddcPickDate : s.formatLongDate(value),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: value == null
@@ -308,7 +308,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   Widget _cycleSelector(S s) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('${s.ddcCycle}: $_cycle ${s.ddcDays}',
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppTheme.neutral600)),
@@ -327,7 +327,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       ValueChanged<int> onPick) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppTheme.neutral600)),
@@ -349,7 +349,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                   boxShadow: selected == o.$1 ? null : _soft,
                 ),
                 child: Text(o.$2,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: selected == o.$1
@@ -366,7 +366,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     Widget step(String l, int v, VoidCallback dec, VoidCallback inc) => Row(
           children: [
             Text(l,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.neutral600)),
@@ -376,7 +376,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 width: 34,
                 child: Text('$v',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900))),
@@ -385,7 +385,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         );
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(s.ddcGa,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppTheme.neutral600)),
@@ -444,13 +444,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             const SizedBox(height: 10),
             Text(s.ddcResultLead,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     color: Colors.white.withValues(alpha: 0.85))),
             const SizedBox(height: 6),
             Text(s.formatLongDate(edd),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
                     color: Colors.white)),
@@ -463,7 +463,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                   borderRadius: BorderRadius.circular(99)),
               child: Text(
                   '${s.weekDayLine(week, dayOfWeek)} · ${s.trimesterName(week)}',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: Colors.white)),
@@ -511,7 +511,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             boxShadow: _soft),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -561,7 +561,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                     color: AppTheme.primary900,
                     borderRadius: BorderRadius.circular(99)),
                 child: Text(s.youAreHere,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,
                         color: Colors.white)),
@@ -613,13 +613,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(m.$2,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primary900)),
               ),
               Text(s.jrWeekLabel(m.$1),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5, color: AppTheme.neutral500)),
             ]),
           ),
@@ -633,13 +633,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           child: Row(children: [
             Expanded(
               child: Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
             ),
             Text('${s.formatShortDate(a)} – ${s.formatShortDate(b)}',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12, color: AppTheme.neutral600)),
           ]),
         );
@@ -661,13 +661,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: Text('${s.ddcConceptionAround}: ${s.formatLongDate(conception)}',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13, color: AppTheme.neutral700)),
         ),
       ]),
       const SizedBox(height: 14),
       Text(s.ddcMonths,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppTheme.neutral600)),
@@ -688,7 +688,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 shape: BoxShape.circle,
               ),
               child: Text('$m',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color:
@@ -721,7 +721,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(s.ddcReady,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.primary900)),
@@ -735,7 +735,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 Icon(b.$1, size: 16, color: AppTheme.primary500),
                 const SizedBox(width: 6),
                 Text(b.$2,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primary800)),
@@ -752,7 +752,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(s.ddcScanWins,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5,
                       height: 1.5,
                       fontWeight: FontWeight.w600,
@@ -777,7 +777,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16)),
             child: Text(s.ddcStart,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800)),
           ),
         ),

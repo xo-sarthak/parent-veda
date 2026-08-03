@@ -8,7 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/read_next_data.dart';
@@ -20,6 +20,7 @@ import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
 import 'book_companion_screen.dart';
 import 'read_reader_screen.dart';
+import '../theme/pv_fonts.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _gold = Color(0xFFE6A817);
@@ -813,7 +814,7 @@ class DailyReadsHomeCard extends StatelessWidget {
           ),
           child: Text(
             s.drTitle,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
           ),
         ),
@@ -1015,7 +1016,7 @@ class DailyReadsHomeCard extends StatelessWidget {
                   color: filled ? Colors.white : AppTheme.primary700),
               const SizedBox(width: 6),
               Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: filled ? Colors.white : AppTheme.primary700)),

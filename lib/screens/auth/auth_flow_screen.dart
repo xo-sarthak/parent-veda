@@ -19,7 +19,7 @@ import '../../care_partner/care_partner_store.dart';
 import '../care_partner/care_welcome_sheet.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../referral/referral_store.dart';
 import '../../referral/referral_links.dart';
@@ -34,6 +34,7 @@ import '../tools/due_date_calculator_screen.dart'
 import '../../services/life_stage_store.dart';
 import '../../services/whatsapp_prefs.dart';
 import '../../doctor/doctor_directory.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -462,7 +463,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             Image.asset(_logoAsset, width: 50, height: 50),
             const SizedBox(width: 11),
             Text('ParentVeda',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.4,
@@ -473,7 +474,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           const SizedBox(height: 18),
           RichText(
             text: TextSpan(
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 33,
                   height: 1.13,
                   fontWeight: FontWeight.w800,
@@ -490,7 +491,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             width: 300,
             child: Text(
               'Gentle, expert guidance for pregnancy and every milestone after.',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 15,
                   height: 1.55,
                   fontWeight: FontWeight.w500,
@@ -535,7 +536,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           ),
           const SizedBox(width: 9),
           Text('Loved by 50,000+ parents',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: _purpleDeep)),
@@ -590,7 +591,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 11,
                     height: 1.5,
                     fontWeight: FontWeight.w500,
@@ -627,7 +628,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         _glass(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('I AM CURRENTLY',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
@@ -686,14 +687,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text(title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: active ? const Color(0xFF5B2596) : _muted)),
             const SizedBox(height: 2),
             Text(sub,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w600,
                     color: (active ? const Color(0xFF5B2596) : _muted)
@@ -850,13 +851,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(title,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 16.5,
                               fontWeight: FontWeight.w800,
                               color: _ink)),
                       const SizedBox(height: 3),
                       Text(subtitle,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                               color: _muted2)),
@@ -896,7 +897,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   Widget _codeField() =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Pairing code',
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: _label)),
         const SizedBox(height: 7),
         TextField(
@@ -905,14 +906,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           autocorrect: false,
           textCapitalization: TextCapitalization.characters,
           inputFormatters: [_UpperCaseFormatter()],
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 17,
               fontWeight: FontWeight.w800,
               letterSpacing: 2.2,
               color: _ink),
           decoration: InputDecoration(
             hintText: 'e.g. 0XOS1U',
-            hintStyle: GoogleFonts.plusJakartaSans(
+            hintStyle: pvJakarta(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 1.4,
@@ -974,11 +975,11 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const SizedBox(height: 26),
               Text('Pairing you with your partner…',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 17, fontWeight: FontWeight.w800, color: _ink)),
               const SizedBox(height: 10),
               Text(_code.text.trim().toUpperCase(),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 2.4,
@@ -1010,7 +1011,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const SizedBox(height: 26),
               Text("You're now paired with\nyour partner.",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 25,
                       height: 1.25,
                       fontWeight: FontWeight.w800,
@@ -1022,7 +1023,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 child: Text(
                   "We're here to help you support her and understand her journey better.",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       height: 1.55,
                       fontWeight: FontWeight.w500,
@@ -1072,7 +1073,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
         const SizedBox(width: 7),
         Text(label,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 color: c == _teal ? _tealDeep : _purpleDeep)),
@@ -1109,7 +1110,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: Text(label,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: enabled
@@ -1164,7 +1165,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const SizedBox(height: 14),
             RichText(
               text: TextSpan(
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 13, fontWeight: FontWeight.w600, color: _muted2),
                 children: [
                   const TextSpan(text: "Didn't get it? "),
@@ -1196,7 +1197,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             if (v.isNotEmpty && i < 4) _otpNodes[i + 1].requestFocus();
             if (v.isEmpty && i > 0) _otpNodes[i - 1].requestFocus();
           },
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 24, fontWeight: FontWeight.w800, color: _ink),
           decoration: InputDecoration(
             counterText: '',
@@ -1247,7 +1248,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const _SuccessBadge(),
               const SizedBox(height: 24),
               Text("You're all set!",
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.6,
@@ -1258,7 +1259,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 child: Text(
                   'Welcome to the ParentVeda family. Your journey begins now. 💜',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       height: 1.55,
                       fontWeight: FontWeight.w500,
@@ -1287,7 +1288,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       child: Text(
                         'Premium, provided by '
                         '${EntitlementStore.instance.sponsor!.name}',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: _ink2),
@@ -1319,7 +1320,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text(
                       'Have an invite code?',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
                         color: _purple,
@@ -1354,7 +1355,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           const SizedBox(height: 8),
         Text(title,
             textAlign: TextAlign.center,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.55,
@@ -1364,7 +1365,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           width: 290,
           child: Text(sub,
               textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14,
                   height: 1.5,
                   fontWeight: FontWeight.w500,
@@ -1423,7 +1424,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: Text(label,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
@@ -1446,7 +1447,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           ),
           onPressed: onTap,
           child: Text(label,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 15, fontWeight: FontWeight.w700)),
         ),
       );
@@ -1455,18 +1456,18 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       {bool obscure = false, TextInputType? keyboard}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: _label)),
       const SizedBox(height: 7),
       TextField(
         controller: c,
         obscureText: obscure,
         keyboardType: keyboard,
-        style: GoogleFonts.plusJakartaSans(
+        style: pvJakarta(
             fontSize: 15, fontWeight: FontWeight.w600, color: _ink),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.plusJakartaSans(
+          hintStyle: pvJakarta(
               fontSize: 15, fontWeight: FontWeight.w500, color: _hint),
           filled: true,
           fillColor: _fieldBg,
@@ -1488,7 +1489,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     final has = _pickedDue != null;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: _label)),
       const SizedBox(height: 7),
       Material(
@@ -1508,7 +1509,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   size: 17, color: _purple),
               const SizedBox(width: 11),
               Text(has ? _fmtDate(_pickedDue!) : 'Select a date',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: has ? _ink : _hint)),
@@ -1594,7 +1595,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 child: Text(
                   'If they do, you get ParentVeda Premium and a free '
                   'consultation — paid for by them.',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 13.5,
                       height: 1.5,
                       fontWeight: FontWeight.w500,
@@ -1628,7 +1629,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       'Your employer only ever sees how many people activated. '
                       'Never your pregnancy, your baby, your journal or '
                       'anything you ask us.',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 12.5,
                           height: 1.45,
                           fontWeight: FontWeight.w500,
@@ -1654,7 +1655,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             Center(
               child: Text(
                 'You can do this later from Profile.',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 12, fontWeight: FontWeight.w600, color: _label),
               ),
             ),
@@ -1672,13 +1673,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('WhatsApp updates',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
                           color: _ink)),
                   const SizedBox(height: 2),
                   Text('Get your weekly guide on WhatsApp. Optional.',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w500,
                           color: _muted2)),
@@ -1707,7 +1708,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const Icon(Icons.auto_awesome_rounded, size: 15, color: _purple),
             const SizedBox(width: 6),
             Text("Don't know it? Calculate your due date",
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: _purple)),
@@ -1741,7 +1742,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
-        final lbl = GoogleFonts.plusJakartaSans(
+        final lbl = pvJakarta(
             fontSize: 12.5, fontWeight: FontWeight.w700, color: _label);
 
         Widget dateRow(String label, DateTime? value,
@@ -1781,7 +1782,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                         size: 16, color: _purple),
                     const SizedBox(width: 11),
                     Text(value == null ? 'Select a date' : _fmtDate(value),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,
                             color: value == null ? _hint : _ink)),
@@ -1805,7 +1806,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     color: on ? _purple : _fieldBorder, width: on ? 2 : 1),
               ),
               child: Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: on ? const Color(0xFF5B2596) : _muted)),
@@ -1827,7 +1828,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     color: on ? _purple : _fieldBorder, width: on ? 2 : 1),
               ),
               child: Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: on ? Colors.white : _muted)),
@@ -1856,7 +1857,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   width: 36,
                   child: Text('$v',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: _ink))),
@@ -1954,7 +1955,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Calculate your due date',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: _ink)),
@@ -1963,14 +1964,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text("Tell us what you know - we'll do the math.",
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 12.5, color: _muted)),
                 ),
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text('WHAT DO YOU KNOW?',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
@@ -2006,14 +2007,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('ESTIMATED DUE DATE',
-                                  style: GoogleFonts.plusJakartaSans(
+                                  style: pvJakarta(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 0.5,
                                       color: _label)),
                               const SizedBox(height: 2),
                               Text(_fmtDate(edd),
-                                  style: GoogleFonts.plusJakartaSans(
+                                  style: pvJakarta(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
                                       color: _ink)),
@@ -2036,7 +2037,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                             color: _purple,
                             borderRadius: BorderRadius.circular(14)),
                         child: Text('Use this date',
-                            style: GoogleFonts.plusJakartaSans(
+                            style: pvJakarta(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white)),
@@ -2061,7 +2062,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(text,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.6,
@@ -2095,7 +2096,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               SvgPicture.string(svg, height: 20),
               const SizedBox(height: 6),
               Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF5A4A70))),
@@ -2111,7 +2112,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Text(text,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 13, fontWeight: FontWeight.w700, color: color)),
         ),
       );
@@ -2120,7 +2121,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       Center(
         child: RichText(
           text: TextSpan(
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 14, fontWeight: FontWeight.w600, color: _muted2),
             children: [
               TextSpan(text: '$lead '),
@@ -2207,7 +2208,7 @@ class _FeaturePill extends StatelessWidget {
               decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
           const SizedBox(width: 6),
           Text(label,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF5A4A70))),

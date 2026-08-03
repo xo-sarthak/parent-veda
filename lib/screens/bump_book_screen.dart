@@ -20,7 +20,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -33,6 +33,7 @@ import '../services/bump_store.dart';
 import '../services/remote/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
+import '../theme/pv_fonts.dart';
 
 class BumpBookScreen extends StatefulWidget {
   const BumpBookScreen({super.key, required this.lang});
@@ -87,7 +88,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
             iconTheme: const IconThemeData(color: _accentDeep),
             title: Text(
               _t('My Bump Journey Book', 'Meri Bump Journey Book'),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontWeight: FontWeight.w700, color: _accentDeep, fontSize: 17),
             ),
             actions: photos.isEmpty
@@ -240,7 +241,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Text(
                 _t('My Bump\nJourney', 'Meri Bump\nJourney'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 40,
                     height: 1.05,
                     fontWeight: FontWeight.w600,
@@ -253,7 +254,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 _t('A keepsake of every week we grew together.',
                     'Har hafte ki ek pyaari yaad.'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
                     height: 1.5,
@@ -262,7 +263,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 30),
               Text(
                 _t('${photos.length} weeks captured', '${photos.length} hafte'),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.4,
@@ -271,7 +272,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 6),
               Text(
                 '${s.jrWeekLabel(photos.first.weekNumber)} - ${s.jrWeekLabel(photos.last.weekNumber)}',
-                style: GoogleFonts.manrope(fontSize: 12, color: AppTheme.neutral500),
+                style: pvManrope(fontSize: 12, color: AppTheme.neutral500),
               ),
             ],
           ),
@@ -301,7 +302,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               children: [
                 Text(
                   s.jrWeekLabel(b.weekNumber),
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 26,
                       fontWeight: FontWeight.w600,
                       color: _accentDeep),
@@ -309,7 +310,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 const SizedBox(height: 4),
                 Text(
                   note,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.3,
@@ -319,7 +320,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                   const SizedBox(height: 12),
                   Text(
                     b.caption.trim(),
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 15.5,
                         fontStyle: FontStyle.italic,
                         height: 1.45,
@@ -329,7 +330,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 const SizedBox(height: 10),
                 Text(
                   '$index / $totalPhotos',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11, color: AppTheme.neutral400),
                 ),
               ],
@@ -361,7 +362,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 _t('The waiting was\nthe sweetest part.',
                     'Intezaar bhi\nkitna pyaara tha.'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 27,
                     height: 1.15,
                     fontWeight: FontWeight.w500,
@@ -374,12 +375,12 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 _t('Keep this book, share it, or hold it in print one day.',
                     'Is book ko sambhaal ke rakhiye.'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: _ink),
               ),
               const SizedBox(height: 28),
               Text('- ${s.appName} -',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11, color: _accent)),
             ],
           ),
@@ -400,7 +401,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
             borderRadius: BorderRadius.circular(99),
             border: Border.all(color: _paperDeep)),
         child: Text('${_page + 1} / $total',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: _accentDeep)),
@@ -440,7 +441,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 ),
                 icon: const Icon(Icons.download_rounded, size: 18),
                 label: Text(_t('Download', 'Download'),
-                    style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                    style: pvManrope(fontWeight: FontWeight.w700)),
               ),
             ),
             const SizedBox(width: 12),
@@ -455,7 +456,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 ),
                 icon: const Icon(Icons.menu_book_rounded, size: 18),
                 label: Text(_t('Order print', 'Print order'),
-                    style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                    style: pvManrope(fontWeight: FontWeight.w700)),
               ),
             ),
           ],
@@ -482,7 +483,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Text(
                 _t('Your book is waiting', 'Aapki book taiyaar hai'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 23, fontWeight: FontWeight.w500, color: _accentDeep),
               ),
               const SizedBox(height: 8),
@@ -491,7 +492,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                     'Add a few bump photos to your journey first, and they will bloom into a keepsake book here.',
                     'Pehle apni journey mein kuch bump photos add karein - yehi book ban jayengi.'),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral600),
               ),
               const SizedBox(height: 24),
@@ -738,7 +739,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Text(
                 _t('A printed hardcover, coming soon',
                     'Printed hardcover, jald aa rahi hai'),
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
                     color: _accentDeep),
@@ -748,7 +749,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 _t(
                     'We are crafting a beautiful lay-flat hardcover of your Bump Journey Book - printed on thick matte paper and delivered to your door. It is not quite ready yet, but we will let you know the moment it is.',
                     'Hum aapki Bump Journey Book ki ek sundar hardcover taiyaar kar rahe hain - motay matte paper par, aapke ghar tak. Abhi taiyaar nahi, par ready hote hi aapko bata denge.'),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.55, color: _ink),
               ),
               const SizedBox(height: 22),
@@ -771,7 +772,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                   ),
                   icon: const Icon(Icons.notifications_active_rounded, size: 18),
                   label: Text(_t('Notify me', 'Mujhe notify karein'),
-                      style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                      style: pvManrope(fontWeight: FontWeight.w700)),
                 ),
               ),
               const SizedBox(height: 8),
@@ -779,7 +780,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 child: Text(
                   _t('Ordering opens later - no charge today.',
                       'Ordering baad mein - abhi koi charge nahi.'),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5, color: AppTheme.neutral500),
                 ),
               ),
@@ -838,7 +839,7 @@ class _BumpBookPreviewScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(lang.isEnglish ? 'My Bump Journey Book' : 'Bump Journey Book',
-            style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+            style: pvJakarta(fontWeight: FontWeight.w700)),
         actions: [
           IconButton(
             tooltip: lang.isEnglish ? 'Share' : 'Share',

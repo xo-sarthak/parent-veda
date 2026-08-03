@@ -14,7 +14,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_context.dart';
@@ -22,6 +21,7 @@ import 'brand_disclosure.dart';
 import 'brand_mark.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
+import '../theme/pv_fonts.dart';
 
 /// A quiet `Presented by <Brand>` line for a sponsored surface.
 ///
@@ -92,7 +92,7 @@ class _PresentedByState extends State<PresentedBy> {
     //       const SizedBox(width: 7),
     //       Text(
     //         c.disclosure,
-    //         style: GoogleFonts.manrope(
+    //         style: pvManrope(
     //           fontSize: 11,
     //           fontWeight: FontWeight.w700,
     //           color: widget.color ?? const Color(0xFF69636C),
@@ -133,7 +133,7 @@ class _PresentedByState extends State<PresentedBy> {
               child: Text(
                 c.disclosure,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.1,
@@ -176,19 +176,19 @@ void showSponsorSheet(BuildContext context, BrandCampaign c) {
         const SizedBox(height: 14),
         Text(
           'What that means',
-          style: GoogleFonts.fraunces(fontSize: 21, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
+          style: pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
         ),
         const SizedBox(height: 10),
         Text(
           '${c.brand.name} paid for this to exist. They did not write it, they did not review it before you saw it, '
           'and they cannot change it now. ParentVeda decides what it says.',
-          style: GoogleFonts.manrope(fontSize: 14, height: 1.6, color: const Color(0xFF2F2C30)),
+          style: pvManrope(fontSize: 14, height: 1.6, color: const Color(0xFF2F2C30)),
         ),
         const SizedBox(height: 12),
         Text(
           'Sponsorship never moves a product\'s ParentVeda rating, and it never changes what we recommend to you. '
           'If we stopped believing this was worth your time, it would come down — funded or not.',
-          style: GoogleFonts.manrope(fontSize: 13, height: 1.6, color: const Color(0xFF69636C)),
+          style: pvManrope(fontSize: 13, height: 1.6, color: const Color(0xFF69636C)),
         ),
         const SizedBox(height: 18),
         IndependenceNote(campaign: c),
@@ -225,7 +225,7 @@ class PresentedBySection extends StatelessWidget {
       Text(
         title,
         style: titleStyle ??
-            GoogleFonts.fraunces(fontSize: 22, height: 1.15, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
+            pvFraunces(fontSize: 22, height: 1.15, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
       ),
       PresentedBy(
         slot: slot,

@@ -7,9 +7,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 class PvTab {
   const PvTab(this.icon, this.label);
@@ -94,7 +94,7 @@ class PvTabBar extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     t.label,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -111,7 +111,7 @@ class PvTabBar extends StatelessWidget {
                     t.label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
                       color: idle,

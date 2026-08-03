@@ -76,6 +76,9 @@ class PregnancyController extends ChangeNotifier {
   /// exactly one name for it.
   static const String kDueDateKey = 'pregnancy_due_date';
 
+  /// The mother's chosen reading language, remembered across restarts.
+  static const String kLanguageKey = 'app_language';
+
   /// Where the saved due date came from. Same seam, same reason.
   static const String kDueDateSourceKey = 'pregnancy_due_date_source';
 
@@ -315,6 +318,15 @@ class PregnancyController extends ChangeNotifier {
       // of truth and overrides this when present.
       try {
         final prefs = await SharedPreferences.getInstance();
+        // Her reading language, restored before the first frame so the app
+        // opens in the language she chose rather than defaulting to English.
+        final savedLang = prefs.getString(kLanguageKey);
+        if (savedLang != null) {
+          _language = AppLanguage.values
+                  .where((l) => l.name == savedLang)
+                  .firstOrNull ??
+              _language;
+        }
         final saved = prefs.getString(kDueDateKey);
         final d = saved == null ? null : DateTime.tryParse(saved);
         if (d != null) {
@@ -391,15 +403,28 @@ class PregnancyController extends ChangeNotifier {
   }
 
   void toggleLanguage() {
-    _language =
-        _language.isEnglish ? AppLanguage.hinglish : AppLanguage.english;
-    notifyListeners();
+    setLanguage(
+        _language.isEnglish ? AppLanguage.hinglish : AppLanguage.english);
   }
 
   void setLanguage(AppLanguage language) {
     if (_language == language) return;
     _language = language;
     notifyListeners();
+    _persistLanguage();
+  }
+
+  /// Remember the chosen language across restarts.
+  ///
+  /// Without this the toggle lived only in memory, so a mother who reads in
+  /// Hindi had to re-pick it on EVERY cold start - the app always came back in
+  /// English. Fire-and-forget: a failed write costs her one relaunch in the
+  /// wrong language, never a crash.
+  Future<void> _persistLanguage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(kLanguageKey, _language.name);
+    } catch (_) {/* best-effort */}
   }
 
   /// Move the viewer to [week] (clamped to the available content range).

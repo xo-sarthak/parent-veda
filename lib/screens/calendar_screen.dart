@@ -9,7 +9,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/calendar_event.dart';
@@ -24,6 +23,7 @@ import '../widgets/mic_dictation_button.dart';
 import '../widgets/trimester_progress_bar.dart';
 import 'journal_screen.dart';
 import 'weekly_card_stack_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, required this.controller});
@@ -176,7 +176,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           hintText: s.calSearchHint, border: InputBorder.none),
                     )
                   : Text(s.calTitle,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -245,13 +245,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.weekOf(p.currentWeek, 40),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primary900)),
                     const SizedBox(height: 2),
                     Text('${s.calDaysTogether(p.daysCompleted)} ❤',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12.5, color: AppTheme.neutral600)),
                   ],
                 ),
@@ -273,7 +273,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                   Text('${p.progressPercent}%',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary700)),
@@ -283,7 +283,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           const SizedBox(height: 12),
           Text(s.journeyDaysRemaining(p.daysRemaining),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.neutral500)),
@@ -318,7 +318,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(tabs[i],
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: _tab == i
@@ -370,7 +370,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   boxShadow: _filter == c.$1 ? null : _soft,
                 ),
                 child: Text(c.$2,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: _filter == c.$1
@@ -448,7 +448,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(e.title,
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.primary900)),
@@ -465,14 +465,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         Text(e.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 12.5,
                                 height: 1.4,
                                 color: AppTheme.neutral600)),
                       ],
                       const SizedBox(height: 5),
                       Text(s.formatShortDate(e.date),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.neutral400)),
@@ -493,7 +493,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             color: c.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(99)),
         child: Text(label,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9.5, fontWeight: FontWeight.w800, color: c)),
       );
 
@@ -541,7 +541,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Expanded(
                 child: Text(s.calMonthYear(_month),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
@@ -560,7 +560,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Expanded(
                   child: Center(
                     child: Text(w,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.neutral400)),
@@ -635,7 +635,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               maxLines: 1,
                               softWrap: false,
                               overflow: TextOverflow.visible,
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 7,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.white)),
@@ -677,7 +677,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       : null,
                 ),
                 child: Text('$day',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight:
                             isToday ? FontWeight.w800 : FontWeight.w600,
@@ -744,7 +744,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
             child: Text(title.toUpperCase(),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.6,
@@ -800,13 +800,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(e.title,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
                   const SizedBox(height: 2),
                   Text(s.calInDays(n),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.neutral500)),
@@ -836,26 +836,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(s.formatLongDate(date),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
           if (week >= 4 && week <= 40) ...[
             const SizedBox(height: 4),
             Text('${s.weekWord} $week · ${s.trimesterName(week)}',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, color: AppTheme.neutral600)),
           ],
           if (isToday && snap != null) ...[
             const SizedBox(height: 10),
             Text(s.babyIsSize(snap.fruit.of(p.language)),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13, color: AppTheme.primary700)),
           ],
           const SizedBox(height: 14),
           if (events.isEmpty)
             Text(s.calNoEventsDay,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13, color: AppTheme.neutral500))
           else
             for (final e in events) _sheetEventRow(s, e),
@@ -884,7 +884,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(e.title,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -892,12 +892,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ]),
           const SizedBox(height: 6),
           Text(s.formatLongDate(e.date),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12, color: AppTheme.neutral500)),
           if (e.description.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(e.description,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
           ],
           const SizedBox(height: 16),
@@ -934,7 +934,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         const SizedBox(width: 10),
         Expanded(
           child: Text(e.title,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900)),
@@ -956,7 +956,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: danger ? AppTheme.danger : AppTheme.primary600),
             const SizedBox(width: 12),
             Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: danger ? AppTheme.danger : AppTheme.primary700)),
@@ -1032,7 +1032,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(s.calAddPersonal,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
@@ -1085,7 +1085,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           size: 18, color: AppTheme.primary600),
                       const SizedBox(width: 12),
                       Text(s.formatLongDate(date),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 13.5, color: AppTheme.primary900)),
                     ]),
                   ),
@@ -1121,7 +1121,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Center(
           child: Text(msg,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: AppTheme.neutral500)),
         ),
       );
@@ -1147,14 +1147,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
         Row(children: [
           Expanded(
             child: Text(s.formatLongDate(date),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
           ),
           if (wk >= 4 && wk <= 40)
             Text('$wk ${s.calWeeksUpper}',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFFE0921C))),
@@ -1164,14 +1164,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(s.calNoEventsDay,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, color: AppTheme.neutral500)),
           )
         else ...[
           Padding(
             padding: const EdgeInsets.only(top: 2, bottom: 4),
             child: Text(s.calOnThisDay.toUpperCase(),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.6,
@@ -1189,7 +1189,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 size: 20, color: AppTheme.primary500),
             const SizedBox(width: 8),
             Text(s.calAddNote,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary600)),
@@ -1226,7 +1226,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Text(e.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -1234,7 +1234,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Text('${_catName(s, e.category)} · ${_catMeaning(s, e.category)}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 10.5,
                           height: 1.3,
                           fontWeight: FontWeight.w700,
@@ -1243,7 +1243,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     Text(e.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11.5, color: AppTheme.neutral600)),
                 ]),
           ),
@@ -1290,7 +1290,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(s.calLegendTitle,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.primary900)),
@@ -1334,12 +1334,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
                   Text(meaning,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11,
                           height: 1.3,
                           color: AppTheme.neutral500)),
@@ -1354,7 +1354,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       decoration: BoxDecoration(color: c, shape: BoxShape.circle));
 
   Widget _textSwatch(String t, Color c) => Text(t,
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 9, fontWeight: FontWeight.w800, color: c));
 
   Widget _triSwatch() => Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1398,7 +1398,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       maxLines: 1,
       softWrap: false,
       overflow: TextOverflow.visible,
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 8.5,
           fontWeight: FontWeight.w800,
           color: const Color(0xFFE0921C)));

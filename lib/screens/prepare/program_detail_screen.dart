@@ -12,12 +12,12 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/prepare_data.dart';
 import '../../services/prepare_store.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 class ProgramDetailScreen extends StatelessWidget {
   const ProgramDetailScreen({super.key, required this.program});
@@ -418,7 +418,7 @@ class ProgramDetailScreen extends StatelessWidget {
                               onTap: () => PrepareStore.instance.cancel(program.id),
                               child: Center(
                                 child: Text('✓  Booked',
-                                    style: GoogleFonts.manrope(
+                                    style: pvManrope(
                                         fontSize: 15, fontWeight: FontWeight.w700, color: kPurple)),
                               ),
                             ),
@@ -437,7 +437,7 @@ class ProgramDetailScreen extends StatelessWidget {
                                   ],
                                   Flexible(
                                     child: Text(cta.label,
-                                        style: GoogleFonts.manrope(
+                                        style: pvManrope(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
                                             color: cta.enabled ? Colors.white : kMuted),

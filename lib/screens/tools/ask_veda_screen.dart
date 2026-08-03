@@ -22,7 +22,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/product_data.dart';
 import '../../data/veda_showcase.dart';
@@ -48,6 +47,7 @@ import 'ready_for_birth_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
 import '../../services/remote/ask_veda_service.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- design palette (the "Ask Veda Results" mock - our brand purple/coral) ----
 const _vBgTop = Color(0xFFF8F4FD);
@@ -310,7 +310,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const SizedBox(width: 7),
             RichText(
               text: TextSpan(
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 23,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2),
@@ -342,7 +342,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               child: initial.isEmpty
                   ? const Icon(Icons.person_rounded, size: 21, color: Colors.white)
                   : Text(initial,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
@@ -387,7 +387,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             onSubmitted: _send,
             cursorColor: _vPurple,
             cursorWidth: 2,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk),
             decoration: InputDecoration(
               hintText: s.vedaHint,
@@ -397,7 +397,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 11),
-              hintStyle: GoogleFonts.manrope(
+              hintStyle: pvManrope(
                   fontSize: 14.5, color: const Color(0xFFB6A9CC)),
             ),
           ),
@@ -426,7 +426,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Text(_query ?? '',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
         ),
         GestureDetector(
@@ -465,11 +465,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(s.vedaSuggestHeader,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 21, fontWeight: FontWeight.w600, color: _vInk2)),
             const SizedBox(height: 3),
             Text(s.vedaSuggestSub,
-                style: GoogleFonts.manrope(fontSize: 12.5, color: _vMuted)),
+                style: pvManrope(fontSize: 12.5, color: _vMuted)),
           ]),
         ),
         IconButton(
@@ -500,7 +500,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Text(sec.emoji, style: const TextStyle(fontSize: 17)),
           const SizedBox(width: 8),
           Text(sec.title.of(lang),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w800,
                   color: active ? _vInk : _vMuted)),
@@ -529,7 +529,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     active ? const Color(0x1F7C3AED) : AppTheme.outlineVariant),
           ),
           child: Text(text,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: active ? _vPurple : _vMuted)),
@@ -542,7 +542,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             color: const Color(0xFFFBEAF1),
             borderRadius: BorderRadius.circular(99)),
         child: Text(s.vedaStageSoon,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.2,
@@ -581,7 +581,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Row(children: [
           const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
           const SizedBox(width: 14),
-          Text('Asking Veda…', style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
+          Text('Asking Veda…', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ]),
       );
 
@@ -592,18 +592,18 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Row(children: [
             const Icon(Icons.wifi_off_rounded, size: 20, color: _vCoral),
             const SizedBox(width: 9),
-            Expanded(child: Text('Connect to the internet', style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk))),
+            Expanded(child: Text('Connect to the internet', style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk))),
           ]),
           const SizedBox(height: 10),
           Text('Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.',
-              style: GoogleFonts.manrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
+              style: pvManrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: () { if (_query != null) _send(_query!); },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
               decoration: BoxDecoration(color: _vPurple, borderRadius: BorderRadius.circular(99)),
-              child: Text('Retry', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
+              child: Text('Retry', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
           ),
         ]),
@@ -614,7 +614,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Row(children: [
           const Icon(Icons.hourglass_empty_rounded, size: 17, color: Color(0xFFB6A9CC)),
           const SizedBox(width: 10),
-          Expanded(child: Text(label, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w600, color: _vMuted2))),
+          Expanded(child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: _vMuted2))),
         ]),
       );
 
@@ -627,21 +627,21 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Row(children: [
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
             const SizedBox(width: 9),
-            Text(s.vedaAnswerLabel, style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
+            Text(s.vedaAnswerLabel, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
             _speakerButton(s),
           ]),
           const SizedBox(height: 13),
           _contextChip(s),
           const SizedBox(height: 14),
-          Text(answer, style: GoogleFonts.manrope(fontSize: 15, height: 1.66, fontWeight: FontWeight.w500, color: _vBody)),
+          Text(answer, style: pvManrope(fontSize: 15, height: 1.66, fontWeight: FontWeight.w500, color: _vBody)),
         ]),
       );
 
   // S2 - What this means for you
   Widget _feedMeaning(String meaning) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.favorite_rounded, 'What this means for you'),
-        _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(meaning, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
+        _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(meaning, style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
       ]);
 
   // S3 - Recommended next actions
@@ -675,7 +675,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
         ),
         const SizedBox(width: 14),
-        Expanded(child: Text(action, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk))),
+        Expanded(child: Text(action, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk))),
       ]),
     );
   }
@@ -692,7 +692,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Row(children: [
             const Icon(Icons.play_circle_outline_rounded, size: 19, color: _vPurple2),
             const SizedBox(width: 9),
-            Text('Videos', style: GoogleFonts.fraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
+            Text('Videos', style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
           ]),
         ),
         if (f.videos.isEmpty)
@@ -715,12 +715,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_kindLabel(it.kind), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: _vPurple2)),
+              Text(_kindLabel(it.kind), maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: _vPurple2)),
               const SizedBox(height: 4),
-              Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
+              Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
               if (snippet.isNotEmpty) ...[
                 const SizedBox(height: 3),
-                Text(snippet, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 12, height: 1.35, color: _vMuted)),
+                Text(snippet, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: _vMuted)),
               ],
             ]),
           ),
@@ -748,7 +748,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Row(children: [
             Container(width: 48, height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF3E9A8C).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.shopping_bag_rounded, size: 22, color: Color(0xFF3E9A8C))),
             const SizedBox(width: 13),
-            Expanded(child: Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: _vInk))),
+            Expanded(child: Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: _vInk))),
             const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD)),
           ]),
         ),
@@ -806,13 +806,13 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(_kindIconStr(it.kind), size: 13, color: c),
                   const SizedBox(width: 5),
-                  Text(_kindLabel(it.kind), style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: c)),
+                  Text(_kindLabel(it.kind), style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, color: c)),
                 ]),
               ),
               const SizedBox(height: 12),
-              Text(it.title, style: GoogleFonts.fraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: _vInk2)),
+              Text(it.title, style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: _vInk2)),
               const SizedBox(height: 12),
-              Text(text, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.6, color: _vBody)),
+              Text(text, style: pvManrope(fontSize: 14.5, height: 1.6, color: _vBody)),
             ],
           ),
         ),
@@ -911,7 +911,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(v.meaning,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, height: 1.62, color: _vBody2)),
               if (v.urgent) ...[
                 const SizedBox(height: 14),
@@ -971,7 +971,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         const SizedBox(width: 14),
         Expanded(
           child: Text(action,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ),
       ]),
@@ -1017,7 +1017,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(ref.typeLabel.toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.7,
@@ -1026,7 +1026,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(ref.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       height: 1.3,
@@ -1035,7 +1035,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(ref.snippet,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, height: 1.35, color: _vMuted)),
             ]),
           ),
@@ -1072,7 +1072,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(text,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13.5, height: 1.5, color: _vBody2)),
                 ),
                 const Icon(Icons.chevron_right_rounded,
@@ -1090,7 +1090,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 30, bottom: 13),
             child: Text(s.vedaProductsHint,
-                style: GoogleFonts.manrope(fontSize: 12, color: _vMuted2)),
+                style: pvManrope(fontSize: 12, color: _vMuted2)),
           ),
           SizedBox(
             height: 188,
@@ -1131,7 +1131,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(title,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 19,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2,
@@ -1155,7 +1155,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const Icon(Icons.pregnant_woman_rounded, size: 14, color: _vPurple),
           const SizedBox(width: 6),
           Text('${s.jrWeekLabel(wk)} · ${s.trimesterName(wk)}',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5, fontWeight: FontWeight.w800, color: _vPurple)),
         ]),
       ),
@@ -1176,7 +1176,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(width: 9),
           Expanded(
             child: Text(s.vedaUrgentBanner,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     height: 1.35,
                     fontWeight: FontWeight.w800,
@@ -1199,7 +1199,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
             const SizedBox(width: 9),
             Text(s.vedaAnswerLabel,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
             _speakerButton(s),
@@ -1210,7 +1210,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(
               child: Text(sc.answer.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 15,
                       height: 1.66,
                       fontWeight: FontWeight.w500,
@@ -1269,14 +1269,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             padding: const EdgeInsets.fromLTRB(17, 17, 18, 17),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(sc.meaning.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, height: 1.62, color: _vBody2)),
               // Personalized to HER (logged symptoms / medications), appended to
               // the curated explanation.
               if (personalLine != null) ...[
                 const SizedBox(height: 11),
                 Text(personalLine,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 14,
                         height: 1.6,
                         fontWeight: FontWeight.w600,
@@ -1309,13 +1309,13 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.vedaWhenChecked,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFFD6325A))),
               const SizedBox(height: 3),
               Text(s.vedaUrgentBanner,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, height: 1.55, color: const Color(0xFF6B4651))),
             ]),
           ),
@@ -1391,7 +1391,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         const SizedBox(width: 14),
         Expanded(
           child: Text(action.of(lang),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ),
         // No trailing chevron: these are guidance, not navigation - the arrow
@@ -1446,14 +1446,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(type.toUpperCase(),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.7,
                           color: _vPurple2)),
                   const SizedBox(height: 4),
                   Text(label.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           height: 1.32,
@@ -1481,12 +1481,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text('WEEK',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                   color: Colors.white.withValues(alpha: 0.85))),
           Text('${p.currentWeek}',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   height: 1,
@@ -1535,7 +1535,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(sc.community.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13.5,
                           height: 1.45,
                           fontWeight: FontWeight.w600,
@@ -1580,7 +1580,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 30, bottom: 13),
             child: Text(s.vedaProductsHint,
-                style: GoogleFonts.manrope(fontSize: 12, color: _vMuted2)),
+                style: pvManrope(fontSize: 12, color: _vMuted2)),
           ),
           SizedBox(
             height: 188,
@@ -1638,7 +1638,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             Text(prod?.name ?? label.of(lang),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     height: 1.3,
@@ -1646,11 +1646,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const SizedBox(height: 8),
             if ((prod?.price ?? '').isNotEmpty)
               Text(prod!.price,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, fontWeight: FontWeight.w800, color: _vPurple))
             else
               Text(' ',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, fontWeight: FontWeight.w800)),
           ]),
         ),
@@ -1719,7 +1719,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         const SizedBox(width: 14),
         Expanded(
           child: Text(svc.of(lang),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ),
         const SizedBox(width: 10),
@@ -1740,7 +1740,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     ],
                   ),
                   child: Text(s.vedaBook,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
@@ -1757,7 +1757,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     border: Border.all(color: const Color(0xFFE3D6F4)),
                   ),
                   child: Text(s.vedaCall,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: _vPurple)),
@@ -1777,7 +1777,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(width: 9),
           Expanded(
             child: Text(s.vedaDisclaimer,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, height: 1.55, color: _vMuted2)),
           ),
         ]),
@@ -1796,7 +1796,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
             const SizedBox(width: 9),
             Text(s.vedaAnswerLabel,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
             // A small verified tick when this answer came (grounded) from the
@@ -1812,7 +1812,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           _contextChip(s),
           const SizedBox(height: 14),
           Text(answer,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14.5,
                   height: 1.6,
                   fontWeight: FontWeight.w500,
@@ -1852,7 +1852,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(src.sourceLabel.toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.7,
@@ -1861,7 +1861,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(src.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       height: 1.3,
@@ -1870,7 +1870,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               Text(src.snippet,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, height: 1.35, color: _vMuted)),
             ]),
           ),
@@ -1964,7 +1964,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                   Flexible(
                     child: Text(src.sourceLabel,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                             color: c)),
@@ -1973,18 +1973,18 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               ),
               const SizedBox(height: 12),
               Text(src.title,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                       color: _vInk2)),
               const SizedBox(height: 12),
               Text(src.body.trim(),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, height: 1.6, color: _vBody)),
               const SizedBox(height: 18),
               Text(s.vedaDisclaimer,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5, height: 1.5, color: _vMuted2)),
             ],
           ),

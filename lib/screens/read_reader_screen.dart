@@ -17,7 +17,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/read_next_data.dart';
 import '../localization/app_language.dart';
@@ -26,6 +25,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
 import 'book_companion_screen.dart';
+import '../theme/pv_fonts.dart';
 
 // ---- reader preferences (session-scoped, mirrors PP ReadingStore font/mode) --
 enum ReadReaderMode { light, sepia, dark }
@@ -122,7 +122,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   double get _fs => _prefs.fontScale;
 
   TextStyle _bodyStyle(_RTheme t) =>
-      GoogleFonts.manrope(fontSize: 16.5 * _fs, height: 1.72, color: t.ink, letterSpacing: 0.1);
+      pvManrope(fontSize: 16.5 * _fs, height: 1.72, color: t.ink, letterSpacing: 0.1);
 
   // Inline bilingual helper (app_language.dart is off-limits for edits).
   String _tr(String en, String hin) => _lang == AppLanguage.hinglish ? hin : en;
@@ -193,11 +193,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     final bodyText = a.body.trim().isNotEmpty ? a.body : a.why;
     return [
       _pad(Text(a.category.toUpperCase(),
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: t.accent))),
       const SizedBox(height: 12),
       _pad(Text(a.title,
-          style: GoogleFonts.fraunces(
+          style: pvFraunces(
               fontSize: 30 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink))),
       const SizedBox(height: 14),
       _pad(_byline(t)),
@@ -209,7 +209,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       const SizedBox(height: 22),
       if (a.type == ReadType.expert && a.author.isNotEmpty) ...[
         _pad(Text('${s.rnRecommendedBy} ${a.author} · ${a.authorRole}',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13, fontWeight: FontWeight.w700, color: t.accent))),
         const SizedBox(height: 16),
       ],
@@ -309,7 +309,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(color: t.panel, shape: BoxShape.circle),
         child: Text(initial,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 14, fontWeight: FontWeight.w700, color: t.accent)),
       ),
       const SizedBox(width: 10),
@@ -320,13 +320,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             if (has && a.authorRole.isNotEmpty)
               TextSpan(text: '  ·  ${a.authorRole}', style: TextStyle(color: t.soft)),
           ]),
-          style: GoogleFonts.manrope(fontSize: 12.5),
+          style: pvManrope(fontSize: 12.5),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
       ),
       Text(a.readingTime,
-          style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: t.soft)),
+          style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: t.soft)),
     ]);
   }
 
@@ -362,7 +362,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             const Icon(Icons.lightbulb_rounded, size: 15, color: Color(0xFF9A7A14)),
             const SizedBox(width: 7),
             Text(s.rnWhyNow.toUpperCase(),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.6,
@@ -370,7 +370,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           ]),
           const SizedBox(height: 8),
           Text(a.reason,
-              style: GoogleFonts.manrope(fontSize: 14.5 * _fs, height: 1.55, color: t.ink)),
+              style: pvManrope(fontSize: 14.5 * _fs, height: 1.55, color: t.ink)),
         ]),
       );
 
@@ -378,10 +378,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         const Icon(Icons.star_rounded, size: 17, color: Color(0xFFE6A817)),
         const SizedBox(width: 4),
         Text(a.rating.toStringAsFixed(1),
-            style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w800, color: t.ink)),
+            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: t.ink)),
         const SizedBox(width: 6),
         Text('(${a.ratingCount >= 1000 ? '${(a.ratingCount / 1000).toStringAsFixed(1)}k' : a.ratingCount} ratings)',
-            style: GoogleFonts.manrope(fontSize: 12, color: t.soft)),
+            style: pvManrope(fontSize: 12, color: t.soft)),
       ]);
 
   // A distinct, styled section block (used for Why This Matters / Research).
@@ -403,12 +403,12 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             Icon(icon, size: 17, color: tint),
             const SizedBox(width: 9),
             Text(title.toUpperCase(),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: tint)),
           ]),
           const SizedBox(height: 11),
           Text(body,
-              style: GoogleFonts.manrope(fontSize: 14.5 * _fs, height: 1.65, color: t.ink)),
+              style: pvManrope(fontSize: 14.5 * _fs, height: 1.65, color: t.ink)),
         ]),
       );
 
@@ -422,12 +422,12 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             color: _progressColor.withValues(alpha: 0.09),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(_tr('MYTH', 'MYTH'),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: _progressColor)),
               const SizedBox(width: 14),
               Expanded(
                   child: Text(a.myth,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14 * _fs, height: 1.55, color: t.ink, fontStyle: FontStyle.italic))),
             ]),
           ),
@@ -436,12 +436,12 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             color: t.accent.withValues(alpha: 0.07),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(_tr('FACT', 'FACT'),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
               const SizedBox(width: 16),
               Expanded(
                   child: Text(a.fact,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14 * _fs, height: 1.6, color: t.ink, fontWeight: FontWeight.w600))),
             ]),
           ),
@@ -474,7 +474,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         _pad(_secTitle(t, _tr('The most important ideas', 'Sabse zaroori ideas'))),
         const SizedBox(height: 4),
         _pad(Text(_tr('Tap any idea to open it.', 'Kisi bhi idea ko kholne ke liye tap karein.'),
-            style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
+            style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
         const SizedBox(height: 14),
         for (var i = 0; i < c.ideas.length; i++) _pad(_ideaCard(t, i, c.ideas[i])),
         const SizedBox(height: 12),
@@ -485,7 +485,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         _pad(_secTitle(t, _tr('Chapter by chapter', 'Chapter dar chapter'))),
         const SizedBox(height: 4),
         _pad(Text(_tr('Tap any chapter to open its key points.', 'Kisi bhi chapter ko kholne ke liye tap karein.'),
-            style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
+            style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
         const SizedBox(height: 14),
         for (var i = 0; i < c.chapters.length; i++) _pad(_chapterCard(t, i, c.chapters[i])),
         const SizedBox(height: 12),
@@ -505,7 +505,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   }
 
   Widget _secTitle(_RTheme t, String text) => Text(text,
-      style: GoogleFonts.fraunces(fontSize: 22 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink));
+      style: pvFraunces(fontSize: 22 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink));
 
   Widget _companionMeta(_RTheme t, BookCompanion c) => Container(
         width: double.infinity,
@@ -513,13 +513,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(15)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (c.recommendedFor.isNotEmpty) ...[
-            Text(_tr('BEST FOR', 'KISKE LIYE'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            Text(_tr('BEST FOR', 'KISKE LIYE'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
             Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _metaChip(t, r, t.accent)]),
           ],
           if (c.recommendedFor.isNotEmpty && c.themes.isNotEmpty) const SizedBox(height: 14),
           if (c.themes.isNotEmpty) ...[
-            Text(_tr('THEMES', 'VISHAY'), style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            Text(_tr('THEMES', 'VISHAY'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
             Wrap(spacing: 7, runSpacing: 7, children: [for (final th in c.themes) _metaChip(t, th, t.soft)]),
           ],
@@ -529,11 +529,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   Widget _metaChip(_RTheme t, String label, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(color: t.bg, borderRadius: BorderRadius.circular(999), border: Border.all(color: t.rule)),
-        child: Text(label, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+        child: Text(label, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
       );
 
   // A small uppercase label used for the blocks inside an idea milestone.
-  TextStyle _companionLabel(_RTheme t) => GoogleFonts.manrope(
+  TextStyle _companionLabel(_RTheme t) => pvManrope(
       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: t.accent);
 
   // Key idea: a solid deep-purple bar (number + title + chevron), collapsed by
@@ -562,7 +562,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Expanded(
                 child: Text('${index + 1}. ${idea.title}',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15 * _fs, fontWeight: FontWeight.w800, color: Colors.white, height: 1.25)),
               ),
               const SizedBox(width: 8),
@@ -580,7 +580,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             color: _companionCardBg,
             padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(idea.body, style: GoogleFonts.manrope(fontSize: 14 * _fs, height: 1.6, color: t.ink)),
+              Text(idea.body, style: pvManrope(fontSize: 14 * _fs, height: 1.6, color: t.ink)),
               if (idea.pointers.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 for (final p in idea.pointers)
@@ -592,7 +592,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                         child: Container(width: 4.5, height: 4.5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle)),
                       ),
                       const SizedBox(width: 10),
-                      Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.5, color: t.soft))),
+                      Expanded(child: Text(p, style: pvManrope(fontSize: 13.5 * _fs, height: 1.5, color: t.soft))),
                     ]),
                   ),
               ],
@@ -612,10 +612,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             Icon(Icons.spa_outlined, size: 16, color: t.accent),
             const SizedBox(width: 8),
             Text(_tr('PARENTVEDA\'S TAKE', 'PARENTVEDA KI RAAY'),
-                style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.accent)),
+                style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.accent)),
           ]),
           const SizedBox(height: 11),
-          Text(body, style: GoogleFonts.fraunces(fontSize: 15.5 * _fs, height: 1.62, color: t.ink)),
+          Text(body, style: pvFraunces(fontSize: 15.5 * _fs, height: 1.62, color: t.ink)),
         ]),
       );
 
@@ -643,18 +643,18 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             alignment: Alignment.center,
             decoration: BoxDecoration(color: t.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(9)),
             child: Text('${index + 1}',
-                style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w800, color: t.accent)),
+                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: t.accent)),
           ),
           const SizedBox(width: 11),
           Expanded(
               child: Text(ch.title,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2))),
+                  style: pvJakarta(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2))),
         ]),
         const SizedBox(height: 10),
         Text(ch.summary,
             maxLines: open ? null : 2,
             overflow: open ? TextOverflow.visible : TextOverflow.ellipsis,
-            style: GoogleFonts.manrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
+            style: pvManrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
         if (open && ch.keyPoints.isNotEmpty) ...[
           const SizedBox(height: 14),
           Text(_tr('KEY POINTS COVERED', 'MUKHYA BINDU'), style: _companionLabel(t)),
@@ -666,7 +666,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 5),
                 child: Text(g.label,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.ink, height: 1.3)),
               ),
             ],
@@ -676,7 +676,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
+                  Expanded(child: Text(p, style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
                 ]),
               ),
             const SizedBox(height: 4),
@@ -688,7 +688,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           onTap: () => setState(() => open ? _expandedChapters.remove(index) : _expandedChapters.add(index)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Text(open ? _tr('Show less', 'Kam dikhayein') : _tr('Read more', 'Aur padhein'),
-                style: GoogleFonts.manrope(fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.accent)),
+                style: pvManrope(fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.accent)),
             const SizedBox(width: 3),
             Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: t.accent),
           ]),
@@ -706,7 +706,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           borderRadius: BorderRadius.circular(14),
           border: Border(left: BorderSide(color: t.accent, width: 3)),
         ),
-        child: Text(q, style: GoogleFonts.fraunces(fontSize: 15 * _fs, height: 1.5, fontStyle: FontStyle.italic, color: t.ink)),
+        child: Text(q, style: pvFraunces(fontSize: 15 * _fs, height: 1.5, fontStyle: FontStyle.italic, color: t.ink)),
       );
 
   // ---- actions: mark reading / mark done (same stores as the old reader) ----
@@ -752,7 +752,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               child: Text(done ? s.rnCompletedBadge : s.rnMarkDone,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ]),
@@ -786,10 +786,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     if (next.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(_tr('Read next', 'Aage padhein'),
-          style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
+          style: pvFraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
       Text(_tr('Keep reading - more on this, one after another.', 'Padhte rahein - isi par aur.'),
-          style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+          style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
         GestureDetector(
@@ -818,11 +818,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('${na.category.toUpperCase()} · ${na.readingTime.toUpperCase()}',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
                   const SizedBox(height: 3),
                   Text(na.title,
-                      style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink),
+                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis),
                 ]),
@@ -853,7 +853,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                     decoration: BoxDecoration(color: t.rule, borderRadius: BorderRadius.circular(999)))),
             const SizedBox(height: 16),
             Text(_tr('In this read', 'Is read mein'),
-                style: GoogleFonts.fraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
+                style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
             const SizedBox(height: 12),
             for (final e in entries)
               GestureDetector(
@@ -871,7 +871,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 11),
                   child: Text(e.$2,
-                      style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
+                      style: pvManrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
                 ),
               ),
           ]),
@@ -899,10 +899,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                       decoration: BoxDecoration(color: t.rule, borderRadius: BorderRadius.circular(999)))),
               const SizedBox(height: 16),
               Text(_tr('Reading', 'Reading'),
-                  style: GoogleFonts.fraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
+                  style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
               const SizedBox(height: 18),
               Row(children: [
-                Text('A', style: GoogleFonts.fraunces(fontSize: 15, color: t.soft)),
+                Text('A', style: pvFraunces(fontSize: 15, color: t.soft)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: SliderTheme(
@@ -924,7 +924,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text('A', style: GoogleFonts.fraunces(fontSize: 26, color: t.soft)),
+                Text('A', style: pvFraunces(fontSize: 26, color: t.soft)),
               ]),
               const SizedBox(height: 16),
               Row(children: [
@@ -959,7 +959,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             border: Border.all(color: on ? _t.accent : t.rule),
           ),
           child: Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13, fontWeight: FontWeight.w700, color: on ? _t.accent : t.soft)),
         ),
       ),

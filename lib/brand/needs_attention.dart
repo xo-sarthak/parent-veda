@@ -15,7 +15,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/pv_fonts.dart';
 
 /// Everything currently flagged. The single list the preview screen renders.
 enum BrandFlag {
@@ -135,7 +136,7 @@ class NeedsAttentionFlag extends StatelessWidget {
                 'NEEDS A DECISION · ${info.title}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
@@ -174,7 +175,7 @@ void showBrandFlagSheet(BuildContext context, BrandFlag flag) {
             const SizedBox(width: 8),
             Text(
               'NEEDS A DECISION',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -185,7 +186,7 @@ void showBrandFlagSheet(BuildContext context, BrandFlag flag) {
           const SizedBox(height: 12),
           Text(
             info.title,
-            style: GoogleFonts.fraunces(fontSize: 24, height: 1.15, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
+            style: pvFraunces(fontSize: 24, height: 1.15, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
           ),
           const SizedBox(height: 18),
           _block('WHAT WAS BUILT', info.what),
@@ -195,7 +196,7 @@ void showBrandFlagSheet(BuildContext context, BrandFlag flag) {
           const SizedBox(height: 8),
           Text(
             'This note is only visible in debug builds. Parents never see it.',
-            style: GoogleFonts.manrope(fontSize: 11, color: const Color(0xFFA99CBB)),
+            style: pvManrope(fontSize: 11, color: const Color(0xFFA99CBB)),
           ),
         ]),
       ),
@@ -208,7 +209,7 @@ Widget _block(String label, String body) => Padding(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
           label,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 10,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.8,
@@ -216,6 +217,6 @@ Widget _block(String label, String body) => Padding(
           ),
         ),
         const SizedBox(height: 6),
-        Text(body, style: GoogleFonts.manrope(fontSize: 13.5, height: 1.6, color: const Color(0xFF2F2C30))),
+        Text(body, style: pvManrope(fontSize: 13.5, height: 1.6, color: const Color(0xFF2F2C30))),
       ]),
     );

@@ -8,7 +8,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/symptom_data.dart';
 import '../../localization/app_language.dart';
@@ -17,6 +16,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/symptom_store.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_ask_strip.dart';
+import '../../theme/pv_fonts.dart';
 
 const List<BoxShadow> _soft = [
   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
@@ -94,7 +94,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.symTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -156,7 +156,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Center(
                 child: Text(s.symNoResults,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13.5, color: AppTheme.neutral500)),
               ),
             )
@@ -171,7 +171,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
   }
 
   Widget _sectionTitle(String t) => Text(t,
-      style: GoogleFonts.plusJakartaSans(
+      style: pvJakarta(
           fontSize: 16,
           fontWeight: FontWeight.w700,
           color: AppTheme.primary900));
@@ -200,7 +200,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                           : symptomCatMeta(c).color),
                   const SizedBox(width: 6),
                   Text(_catLabel(s, c),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: _category == c
@@ -241,14 +241,14 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(x.name.of(lang),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
                 Text(x.commonness.of(lang),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12, color: AppTheme.neutral500)),
               ],
             ),
@@ -273,12 +273,12 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
           const Icon(Icons.health_and_safety_rounded, size: 20, color: c),
           const SizedBox(width: 10),
           Text(s.symUrgentTitle,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 15, fontWeight: FontWeight.w700, color: c)),
         ]),
         const SizedBox(height: 6),
         Text(s.symUrgentBody,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 12.5, height: 1.4, color: AppTheme.neutral700)),
         const SizedBox(height: 10),
         Wrap(
@@ -297,7 +297,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                       color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(99)),
                   child: Text(x.name.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: c)),
@@ -315,7 +315,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: Text(s.symDisclaimer,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5, color: AppTheme.neutral500)),
         ),
       ]);
@@ -348,14 +348,14 @@ class _SymptomDetail extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
                     color: color ?? m.color)),
             const SizedBox(height: 4),
             Text(body,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
           ]),
         );
@@ -365,7 +365,7 @@ class _SymptomDetail extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(x.name.of(lang),
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -384,7 +384,7 @@ class _SymptomDetail extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(x.name.of(lang),
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primary900)),
@@ -399,7 +399,7 @@ class _SymptomDetail extends StatelessWidget {
                   color: m.color.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14)),
               child: Text(s.symInsight(x.name.of(lang), count),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, height: 1.4, color: AppTheme.primary800)),
             ),
             const SizedBox(height: 16),
@@ -412,7 +412,7 @@ class _SymptomDetail extends StatelessWidget {
 
           if (x.tips.isNotEmpty) ...[
             Text(s.symWhatHelps,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
@@ -434,7 +434,7 @@ class _SymptomDetail extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(t.of(lang),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 14,
                               height: 1.5,
                               color: AppTheme.neutral700)),
@@ -464,7 +464,7 @@ class _SymptomDetail extends StatelessWidget {
                         x.urgent ? AppTheme.secondary700 : AppTheme.primary600),
                 const SizedBox(width: 8),
                 Text(s.symWhenDoctor,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                         color: x.urgent
@@ -473,7 +473,7 @@ class _SymptomDetail extends StatelessWidget {
               ]),
               const SizedBox(height: 6),
               Text(x.doctorGuidance.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14, height: 1.5, color: AppTheme.neutral800)),
             ]),
           ),
@@ -527,13 +527,13 @@ class _SymptomDetail extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(x.name.of(lang),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
                 const SizedBox(height: 14),
                 Text(s.symSeverity,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.neutral600)),
@@ -559,7 +559,7 @@ class _SymptomDetail extends StatelessWidget {
                                   : sev == 'moderate'
                                       ? s.symModerate
                                       : s.symSevere,
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w700,
                                   color: severity == sev
@@ -589,7 +589,7 @@ class _SymptomDetail extends StatelessWidget {
                   value: addToJournal,
                   onChanged: (v) => setSheet(() => addToJournal = v),
                   title: Text(s.symAddToJournal,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13.5, color: AppTheme.primary900)),
                 ),
                 SizedBox(

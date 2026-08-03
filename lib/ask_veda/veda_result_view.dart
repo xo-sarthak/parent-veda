@@ -13,9 +13,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'veda_core.dart';
+import '../theme/pv_fonts.dart';
 
 /// The per-app palette for the shared result UI.
 class VedaViewTheme {
@@ -83,12 +83,12 @@ class VedaResultView extends StatelessWidget {
     VedaKind.health: Icons.monitor_heart_outlined,
   };
 
-  TextStyle get _serif => GoogleFonts.fraunces(color: theme.ink);
-  TextStyle get _body => GoogleFonts.manrope(color: theme.soft, height: 1.6);
+  TextStyle get _serif => pvFraunces(color: theme.ink);
+  TextStyle get _body => pvManrope(color: theme.soft, height: 1.6);
 
   Widget _eyebrow(String t) => Text(
         t.toUpperCase(),
-        style: GoogleFonts.manrope(
+        style: pvManrope(
             fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: theme.accent),
       );
 
@@ -139,7 +139,7 @@ class VedaResultView extends StatelessWidget {
     // Disclaimer
     gap();
     sections.add(Text(disclaimer,
-        style: GoogleFonts.manrope(fontSize: 11.5, height: 1.5, color: theme.muted)));
+        style: pvManrope(fontSize: 11.5, height: 1.5, color: theme.muted)));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: sections);
   }
@@ -162,7 +162,7 @@ class VedaResultView extends StatelessWidget {
               Icon(Icons.warning_amber_rounded, size: 14, color: theme.coral),
               const SizedBox(width: 6),
               Text('Worth checking with a doctor',
-                  style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: theme.coral)),
+                  style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, color: theme.coral)),
             ]),
           ),
           const SizedBox(height: 12),
@@ -238,10 +238,10 @@ class VedaResultView extends StatelessWidget {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(ref.typeLabel.toUpperCase(),
-                    style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: theme.accent)),
+                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: theme.accent)),
                 const SizedBox(height: 3),
                 Text(ref.title,
-                    style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: theme.ink),
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: theme.ink),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
@@ -289,7 +289,7 @@ class VedaResultView extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                     child: Text(it,
-                        style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w600, color: theme.ink),
+                        style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, color: theme.ink),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis)),
                 if (onOpen != null) Icon(Icons.chevron_right_rounded, size: 20, color: theme.muted),

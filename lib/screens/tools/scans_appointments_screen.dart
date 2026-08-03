@@ -8,7 +8,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/journey_milestones.dart';
 import '../../data/scan_guide_data.dart';
@@ -18,6 +17,7 @@ import '../../models/scan_appointment.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 const Color _scanColor = Color(0xFF2E9C8E); // teal - matches Journal "Scans"
 const List<BoxShadow> _soft = [
@@ -63,7 +63,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.scnTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
         actions: [
           IconButton(
@@ -111,7 +111,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                 ),
                 child: Text(tabs[i],
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: _tab == i ? Colors.white : AppTheme.neutral600)),
@@ -174,28 +174,28 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(s.scnNextUp,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.8,
                 color: _scanColor)),
         const SizedBox(height: 6),
         Text('${m.emoji} ${m.title.of(lang)}',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.primary900)),
         const SizedBox(height: 2),
         Text(
             '${m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek)} · ${s.calInDays(n < 0 ? 0 : n)}',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.neutral600)),
         if (why.isNotEmpty) ...[
           const SizedBox(height: 10),
           Text(why,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
         ],
         const SizedBox(height: 14),
@@ -248,12 +248,12 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(m.title.of(lang),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
                 Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12, color: AppTheme.neutral500)),
               ],
             ),
@@ -290,14 +290,14 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(m.title.of(lang),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
           ),
           if (d != null)
             Text(s.formatShortDate(d),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, color: AppTheme.neutral500)),
         ]),
       ));
@@ -378,19 +378,19 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(title,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: pvJakarta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primary900)),
                         Text(sub,
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 11.5, color: AppTheme.neutral500)),
                       ],
                     ),
                   ),
                   if (current)
                     Text(s.youAreHere,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.primary500)),
@@ -405,7 +405,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
 
   // --- helpers ---------------------------------------------------------------
   Widget _sectionTitle(String t) => Text(t,
-      style: GoogleFonts.plusJakartaSans(
+      style: pvJakarta(
           fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.primary900));
 
   Widget _apptRow(S s, Appointment a) {
@@ -436,14 +436,14 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(a.title,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               Text('${s.formatShortDate(a.date)}${sub.isNotEmpty ? ' · $sub' : ''}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, color: AppTheme.neutral500)),
             ],
           ),
@@ -462,7 +462,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         child: Center(
           child: Text(msg,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: AppTheme.neutral500)),
         ),
       );
@@ -527,7 +527,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(s.scnAddAppt,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -546,7 +546,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                             borderRadius: BorderRadius.circular(99),
                           ),
                           child: Text(typeLabel(t),
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: type == t
@@ -580,7 +580,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                             size: 18, color: _scanColor),
                         const SizedBox(width: 12),
                         Text(s.formatLongDate(date),
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 13.5, color: AppTheme.primary900)),
                       ]),
                     ),
@@ -670,7 +670,7 @@ class _ScanDetail extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(m.title.of(lang),
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -690,7 +690,7 @@ class _ScanDetail extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text('${m.emoji} ${m.title.of(lang)}',
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primary900)),
@@ -713,7 +713,7 @@ class _ScanDetail extends StatelessWidget {
                 color: AppTheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(14)),
             child: Text(s.scnImportantNote,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, height: 1.5, color: AppTheme.neutral700)),
           ),
           const SizedBox(height: 18),
@@ -756,7 +756,7 @@ class _ScanDetail extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (label.trim().isNotEmpty) ...[
             Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
@@ -764,7 +764,7 @@ class _ScanDetail extends StatelessWidget {
             const SizedBox(height: 4),
           ],
           Text(body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
         ]),
       );
@@ -773,7 +773,7 @@ class _ScanDetail extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.3,
@@ -789,7 +789,7 @@ class _ScanDetail extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(item.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
                 ),
               ]),
@@ -810,14 +810,14 @@ class _ScanDetail extends StatelessWidget {
             const Icon(Icons.info_outline_rounded, size: 18, color: _scanColor),
             const SizedBox(width: 8),
             Text(s.scnWhatIs,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w800,
                     color: _scanColor)),
           ]),
           const SizedBox(height: 8),
           Text(body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, height: 1.55, color: AppTheme.neutral800)),
         ]),
       );
@@ -849,13 +849,13 @@ class _ScanDetail extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(s.scnHowToInterpret,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary900)),
                       const SizedBox(height: 2),
                       Text(s.scnInterpretSub,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5, color: AppTheme.neutral600)),
                     ]),
               ),
@@ -892,14 +892,14 @@ class _ScanInterpretScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         children: [
           Text('${milestone.emoji} ${milestone.title.of(lang)}',
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.primary900)),
           const SizedBox(height: 4),
           Text(s.scnInterpretHeading,
               style:
-                  GoogleFonts.manrope(fontSize: 13, color: AppTheme.neutral600)),
+                  pvManrope(fontSize: 13, color: AppTheme.neutral600)),
           const SizedBox(height: 16),
           // BIG, unmissable "not for diagnosis" disclaimer.
           Container(
@@ -918,13 +918,13 @@ class _ScanInterpretScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(s.scnInterpretDisclaimerTitle,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
                               color: const Color(0xFFB36B12))),
                       const SizedBox(height: 4),
                       Text(s.scnInterpretDisclaimer,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5,
                               height: 1.5,
                               color: AppTheme.neutral800)),
@@ -949,13 +949,13 @@ class _ScanInterpretScreen extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(row.term.of(lang),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w800,
                   color: _scanColor)),
           const SizedBox(height: 4),
           Text(row.meaning.of(lang),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, height: 1.5, color: AppTheme.neutral800)),
         ]),
       );

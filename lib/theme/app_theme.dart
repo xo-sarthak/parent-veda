@@ -22,7 +22,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../localization/app_language.dart';
+import 'pv_fonts.dart';
 
 /// All brand colors and the full Material theme live here.
 /// Use `AppTheme.light` (and optionally `AppTheme.dark`) in MaterialApp:
@@ -266,41 +268,49 @@ class AppTheme {
   //                        Very legible at small sizes, calm personality.
   // ===========================================================================
 
-  static TextTheme _textTheme(ColorScheme scheme) {
+  //  LANGUAGE-AWARE: in Hindi the three Latin families are swapped for their
+  //  Devanagari counterparts and the tight line heights / negative tracking are
+  //  corrected. See lib/theme/pv_fonts.dart for the pairing and the reasoning -
+  //  none of the Latin faces carry Devanagari glyphs, so without this the whole
+  //  type system falls back to a platform font.
+  static TextTheme _textTheme(ColorScheme scheme, AppLanguage lang) {
     final Color strong = scheme.onSurface;
     final Color soft = scheme.onSurfaceVariant;
 
-    // Fraunces: soft display serif, warm and editorial
+    // Fraunces / Noto Serif Devanagari: display serif, warm and editorial
     TextStyle display(double size, FontWeight w, double spacing,
             {double height = 1.08, Color? color}) =>
-        GoogleFonts.fraunces(
-          fontSize: size,
-          fontWeight: w,
+        pvDisplayStyle(
+          size: size,
+          weight: w,
           letterSpacing: spacing,
           height: height,
           color: color ?? strong,
+          lang: lang,
         );
 
-    // Plus Jakarta Sans: clean geometric sans for UI titles
+    // Plus Jakarta Sans / Mukta: geometric sans for UI titles
     TextStyle head(double size, FontWeight w, double spacing,
             {double height = 1.15, Color? color}) =>
-        GoogleFonts.plusJakartaSans(
-          fontSize: size,
-          fontWeight: w,
+        pvHeadStyle(
+          size: size,
+          weight: w,
           letterSpacing: spacing,
           height: height,
           color: color ?? strong,
+          lang: lang,
         );
 
-    // Manrope: calm, legible sans for body and labels
+    // Manrope / Mukta: calm, legible sans for body and labels
     TextStyle body(double size, FontWeight w, double spacing,
             {double height = 1.5, Color? color}) =>
-        GoogleFonts.manrope(
-          fontSize: size,
-          fontWeight: w,
+        pvBodyStyle(
+          size: size,
+          weight: w,
           letterSpacing: spacing,
           height: height,
           color: color ?? strong,
+          lang: lang,
         );
 
     return TextTheme(
@@ -316,10 +326,8 @@ class AppTheme {
 
       // --- Titles: Jakarta for large, Manrope for smaller ------------------
       titleLarge:  head(18, FontWeight.w600, 0),
-      titleMedium: GoogleFonts.manrope(
-          fontSize: 16, fontWeight: FontWeight.w600, height: 1.4, color: strong),
-      titleSmall: GoogleFonts.manrope(
-          fontSize: 14, fontWeight: FontWeight.w600, height: 1.4, color: strong),
+      titleMedium: body(16, FontWeight.w600, 0, height: 1.4),
+      titleSmall:  body(14, FontWeight.w600, 0, height: 1.4),
 
       // --- Body (Manrope): all reading content -----------------------------
       bodyLarge:  body(16, FontWeight.w500, 0.1),
@@ -327,12 +335,9 @@ class AppTheme {
       bodySmall:  body(12, FontWeight.w500, 0.2, color: soft),
 
       // --- Labels (Manrope): buttons, chips, captions ----------------------
-      labelLarge:  GoogleFonts.manrope(
-          fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 0.2, color: strong),
-      labelMedium: GoogleFonts.manrope(
-          fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3, color: soft),
-      labelSmall:  GoogleFonts.manrope(
-          fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4, color: soft),
+      labelLarge:  body(14, FontWeight.w700, 0.2),
+      labelMedium: body(12, FontWeight.w600, 0.3, color: soft),
+      labelSmall:  body(11, FontWeight.w600, 0.4, color: soft),
     );
   }
 
@@ -349,8 +354,9 @@ class AppTheme {
   //  8. THEME BUILDER
   // ===========================================================================
 
-  static ThemeData _build(ColorScheme scheme, Color scaffold) {
-    final text = _textTheme(scheme);
+  static ThemeData _build(ColorScheme scheme, Color scaffold,
+      [AppLanguage lang = AppLanguage.english]) {
+    final text = _textTheme(scheme, lang);
 
     return ThemeData(
       useMaterial3: true,
@@ -586,4 +592,10 @@ class AppTheme {
 
   static ThemeData get light => _build(_lightScheme, scaffoldBackground);
   static ThemeData get dark => _build(_darkScheme, _darkScheme.surfaceContainerLowest);
+
+  /// The light theme typed for [lang]. The app root rebuilds with this when the
+  /// language toggle flips, so Hindi gets its Devanagari pairing and corrected
+  /// line metrics instead of a platform fallback. See pv_fonts.dart.
+  static ThemeData lightFor(AppLanguage lang) =>
+      _build(_lightScheme, scaffoldBackground, lang);
 }

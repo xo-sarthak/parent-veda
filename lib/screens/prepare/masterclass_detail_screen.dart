@@ -5,11 +5,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 class MasterclassDetailScreen extends StatelessWidget {
   const MasterclassDetailScreen({super.key, required this.m});
@@ -80,7 +80,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: kInk.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(999)),
                     child: Text('Watch the 90-sec intro',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
                 ),
@@ -233,7 +233,7 @@ class MasterclassDetailScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Text('★★★★★', style: TextStyle(color: kCoral, fontSize: 13)),
           const SizedBox(height: 8),
-          Text(t.quote, style: GoogleFonts.fraunces(fontSize: 16, height: 1.5, color: kInk)),
+          Text(t.quote, style: pvFraunces(fontSize: 16, height: 1.5, color: kInk)),
           const SizedBox(height: 12),
           Text.rich(TextSpan(children: [
             TextSpan(text: t.who, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),

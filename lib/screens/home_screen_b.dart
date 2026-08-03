@@ -22,7 +22,6 @@ import 'package:flutter/material.dart';
 import '../brand/brand_models.dart';
 import '../brand/launch_spotlight.dart';
 import 'referral/invite_nudge_card.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/garbh_data.dart';
 import '../data/product_data.dart';
@@ -69,6 +68,7 @@ import 'tools/medicine_tracker_screen.dart';
 import 'tools/tests_scans_reports_screen.dart';
 import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class HomeScreenB extends StatelessWidget {
   const HomeScreenB({super.key, required this.pregnancy, required this.home});
@@ -251,11 +251,11 @@ class HomeScreenB extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Post-Pregnancy',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 2),
               Text("Baby's arrived? Step into the parenting app",
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, color: Colors.white.withValues(alpha: 0.9))),
             ]),
           ),
@@ -315,13 +315,13 @@ class HomeScreenB extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t.doorTitle,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
                   const SizedBox(height: 2),
                   Text(t.doorBody,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.9))),
                 ]),
@@ -344,7 +344,7 @@ class HomeScreenB extends StatelessWidget {
         const SizedBox(width: 9),
         Text(
           'ParentVeda',
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
             fontSize: 19,
             fontWeight: FontWeight.w800,
             color: AppTheme.primary600,
@@ -404,7 +404,7 @@ class HomeScreenB extends StatelessWidget {
             ),
             child: Text(
               initial,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
@@ -438,7 +438,7 @@ class HomeScreenB extends StatelessWidget {
               ),
               child: Text(
                 label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: selected ? Colors.white : AppTheme.neutral500,
@@ -517,7 +517,7 @@ class HomeScreenB extends StatelessWidget {
                           children: [
                             Text(
                               '$greeting 🌸',
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                 fontSize: 12.5,
                                 color: Colors.white.withValues(alpha: 0.85),
                               ),
@@ -525,7 +525,7 @@ class HomeScreenB extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               s.weekDayLine(week, dayOfWeek),
-                              style: GoogleFonts.fraunces(
+                              style: pvFraunces(
                                 fontSize: 27,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
@@ -539,7 +539,7 @@ class HomeScreenB extends StatelessWidget {
                                 summary,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                   fontSize: 13,
                                   height: 1.4,
                                   color: Colors.white.withValues(alpha: 0.88),
@@ -552,7 +552,7 @@ class HomeScreenB extends StatelessWidget {
                               children: [
                                 Text(
                                   s.snapOpenWeek,
-                                  style: GoogleFonts.manrope(
+                                  style: pvManrope(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -623,7 +623,7 @@ class HomeScreenB extends StatelessWidget {
             Text(label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: Colors.white.withValues(alpha: 0.95))),
@@ -657,7 +657,7 @@ class HomeScreenB extends StatelessWidget {
               ),
               Text(
                 '${(pct * 100).round()}%',
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -671,7 +671,7 @@ class HomeScreenB extends StatelessWidget {
         Text(
           S(pregnancy.language).weeksLeftShort(weeksToGo),
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 10.5,
             height: 1.15,
             fontWeight: FontWeight.w700,
@@ -686,7 +686,7 @@ class HomeScreenB extends StatelessWidget {
   Widget _sectionEyebrow(String text) => Padding(
         padding: const EdgeInsets.only(left: 4, bottom: 2),
         child: Text(text.toUpperCase(),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.0,
@@ -700,7 +700,7 @@ class HomeScreenB extends StatelessWidget {
               size: 20, color: AppTheme.secondary500),
           const SizedBox(width: 8),
           Text(s.todaysJourney,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
@@ -732,7 +732,7 @@ class HomeScreenB extends StatelessWidget {
               Text(label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -798,13 +798,13 @@ class HomeScreenB extends StatelessWidget {
           ]),
           const SizedBox(height: 12),
           Text(label,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
           const SizedBox(height: 2),
           Text(s.wfTapExplore,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
@@ -847,7 +847,7 @@ class HomeScreenB extends StatelessWidget {
           child: Row(children: [
             Expanded(
               child: Text(s.prodSectionTitle,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 21,
                       fontWeight: FontWeight.w700,
                       color: Colors.white)),
@@ -857,7 +857,7 @@ class HomeScreenB extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(s.prodSeeAll,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
                         color: Colors.white)),
@@ -929,7 +929,7 @@ class HomeScreenB extends StatelessWidget {
                         size: 10, color: Color(0xFFB36B00)),
                     const SizedBox(width: 3),
                     Text(s.prAffiliate,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFFB36B00))),
@@ -949,7 +949,7 @@ class HomeScreenB extends StatelessWidget {
                           fontWeight: FontWeight.w700, height: 1.2)),
                   const SizedBox(height: 4),
                   Text(p.price,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary600)),
@@ -1000,7 +1000,7 @@ class HomeScreenB extends StatelessWidget {
                     const SizedBox(height: 3),
                     Row(children: [
                       Text(p.price,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary600)),
@@ -1083,7 +1083,7 @@ class HomeScreenB extends StatelessWidget {
                 Text(p.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         height: 1.25,
@@ -1091,7 +1091,7 @@ class HomeScreenB extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(children: [
                   Text(p.price,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary600)),
@@ -1103,7 +1103,7 @@ class HomeScreenB extends StatelessWidget {
                         color: AppTheme.primary500.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(99)),
                     child: Text(s.prodSeeNow,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.primary600)),
@@ -1160,7 +1160,7 @@ class HomeScreenB extends StatelessWidget {
             Expanded(
               child: Text(
                 s.todaysMoment,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900,
@@ -1170,7 +1170,7 @@ class HomeScreenB extends StatelessWidget {
             ),
             Text(
               s.momentDone(done, rituals.length),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary500,
@@ -1230,7 +1230,7 @@ class HomeScreenB extends StatelessWidget {
                     r.label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
                       color: done ? AppTheme.neutral300 : AppTheme.primary900,
@@ -1341,7 +1341,7 @@ class HomeScreenB extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 s.todaysAffirmation,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.secondary700,
@@ -1353,7 +1353,7 @@ class HomeScreenB extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             '“$text”',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
               fontSize: 19,
               fontStyle: FontStyle.italic,
               color: AppTheme.primary800,
@@ -1390,7 +1390,7 @@ class HomeScreenB extends StatelessWidget {
               Text(label,
                   textAlign: TextAlign.center,
                   maxLines: 2,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w700,
                       height: 1.15,
@@ -1409,13 +1409,13 @@ class HomeScreenB extends StatelessWidget {
         Row(children: [
           Expanded(
             child: Text(s.jcMyJournal,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
           ),
           Text(s.formatShortDate(DateTime.now()),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.neutral500)),
@@ -1443,7 +1443,7 @@ class HomeScreenB extends StatelessWidget {
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => JournalScreen(controller: pregnancy))),
             child: Text(s.jcViewTimeline,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary500)),
@@ -1484,7 +1484,7 @@ class HomeScreenB extends StatelessWidget {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             if (due.isEmpty && appts.isEmpty)
               Text(s.scnUpToDate,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5,
                       height: 1.5,
                       color: const Color(0xFF5B5070)))
@@ -1497,7 +1497,7 @@ class HomeScreenB extends StatelessWidget {
               child: TextButton(
                 onPressed: openAll,
                 child: Text(s.scnViewAll,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: teal)),
@@ -1528,12 +1528,12 @@ class HomeScreenB extends StatelessWidget {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(m.title.of(lang),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
             Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12, color: AppTheme.neutral500)),
           ]),
         ),
@@ -1550,7 +1550,7 @@ class HomeScreenB extends StatelessWidget {
             visualDensity: VisualDensity.compact,
           ),
           child: Text(s.scnAlreadyDone,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12, fontWeight: FontWeight.w700)),
         ),
       ]),
@@ -1577,14 +1577,14 @@ class HomeScreenB extends StatelessWidget {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(a.title,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
             Text(
                 s.formatShortDate(a.date) +
                     (a.time.isNotEmpty ? ' · ${a.time}' : ''),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12, color: AppTheme.neutral500)),
           ]),
         ),
@@ -1617,7 +1617,7 @@ class HomeScreenB extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             if (meds.isEmpty)
               Text(s.medHomeSubtitle,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5,
                       height: 1.5,
                       color: const Color(0xFF5B5070)))
@@ -1636,7 +1636,7 @@ class HomeScreenB extends StatelessWidget {
                 child: TextButton(
                   onPressed: openTracker,
                   child: Text(s.medManageCta,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: green)),
@@ -1663,7 +1663,7 @@ class HomeScreenB extends StatelessWidget {
         Icon(Icons.notifications_active_rounded, size: 15, color: green),
         const SizedBox(width: 6),
         Text(s.mrTitle,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.2,
@@ -1693,14 +1693,14 @@ class HomeScreenB extends StatelessWidget {
                       Text(r.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.primary900)),
                       Text(reminderSummary(s, r, context),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11.5, color: AppTheme.neutral500)),
                     ]),
               ),
@@ -1745,7 +1745,7 @@ class HomeScreenB extends StatelessWidget {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(m.name,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: taken ? AppTheme.neutral500 : AppTheme.primary900,
@@ -1753,7 +1753,7 @@ class HomeScreenB extends StatelessWidget {
                           taken ? TextDecoration.lineThrough : null)),
               if (sub.isNotEmpty)
                 Text(sub,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5, color: AppTheme.neutral500)),
             ]),
           ),
@@ -1807,7 +1807,7 @@ class HomeScreenB extends StatelessWidget {
                       // Was "Garbh Sanskar" + "Today's Rituals" subtitle;
                       // merged into a single "Today's Garbh Sanskar" heading.
                       Text(s.gsTodaysGarbhSanskar,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary900)),
@@ -1815,7 +1815,7 @@ class HomeScreenB extends StatelessWidget {
               ),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text('${store.doneCount}/${GarbhStore.dailyGoal}',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.tertiary500)),
@@ -1824,7 +1824,7 @@ class HomeScreenB extends StatelessWidget {
                     const Text('🔥', style: TextStyle(fontSize: 11)),
                     const SizedBox(width: 3),
                     Text(s.gsDayStreak(store.streak),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
                             color: const Color(0xFFC97B4A))),
@@ -1841,7 +1841,7 @@ class HomeScreenB extends StatelessWidget {
               ),
               child: Text(
                 s.gsHomeIntro,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12, height: 1.5, color: AppTheme.neutral700),
               ),
             ),
@@ -1906,7 +1906,7 @@ class HomeScreenB extends StatelessWidget {
               Row(children: [
                 Flexible(
                   child: Text(name,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -1916,7 +1916,7 @@ class HomeScreenB extends StatelessWidget {
                   child: Text(tag,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: accent)),
@@ -1926,7 +1926,7 @@ class HomeScreenB extends StatelessWidget {
               Text(todo,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, color: AppTheme.neutral600)),
             ]),
           ),
@@ -1984,13 +1984,13 @@ class HomeScreenB extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(s.garbhSanskar,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
                 const SizedBox(height: 2),
                 Text(s.homeGarbhSubtitle,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5, color: AppTheme.neutral600)),
               ],
             ),

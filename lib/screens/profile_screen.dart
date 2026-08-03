@@ -10,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:google_fonts/google_fonts.dart';
-
 import '../doctor/doctor_directory.dart';
 import '../doctor/doctor_session.dart';
 import 'memories/memories_home_screen.dart';
@@ -51,6 +49,7 @@ import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 import 'saved_hub_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -350,13 +349,13 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Invite a friend',
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white)),
                         const SizedBox(height: 2),
                         Text('You both get a free consultation.',
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 12,
                                 height: 1.4,
                                 color: Colors.white70)),
@@ -399,12 +398,12 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Memories',
-                            style: GoogleFonts.fraunces(
+                            style: pvFraunces(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF3A352E))),
                         Text('Announce your pregnancy or baby, beautifully.',
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 12, color: const Color(0xFF6B6154))),
                       ]),
                 ),

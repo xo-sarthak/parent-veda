@@ -11,7 +11,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_context.dart';
@@ -19,6 +18,7 @@ import 'brand_disclosure.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
 import 'outbound.dart';
+import '../theme/pv_fonts.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -27,13 +27,13 @@ const _line = Color(0xFFE4E2E5);
 const _titleInk = Color(0xFF2D144C);
 
 TextStyle _serif(double size, {FontWeight w = FontWeight.w600, Color color = _titleInk}) =>
-    GoogleFonts.fraunces(fontSize: size, height: 1.12, fontWeight: w, color: color, letterSpacing: -0.4);
+    pvFraunces(fontSize: size, height: 1.12, fontWeight: w, color: color, letterSpacing: -0.4);
 
 TextStyle _body(double size, {Color color = _soft, double h = 1.6, FontWeight w = FontWeight.w400}) =>
-    GoogleFonts.manrope(fontSize: size, height: h, color: color, fontWeight: w);
+    pvManrope(fontSize: size, height: h, color: color, fontWeight: w);
 
 TextStyle _eyebrow({Color color = _soft}) =>
-    GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: color);
+    pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: color);
 
 // =============================================================================
 //  The hub — every launch available to this parent
@@ -258,7 +258,7 @@ class LaunchDetailScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 c.creative.headline,
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                   fontSize: 36,
                   height: 1.05,
                   fontWeight: FontWeight.w600,
@@ -269,7 +269,7 @@ class LaunchDetailScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 c.creative.subline,
-                style: GoogleFonts.manrope(fontSize: 14, height: 1.5, color: Colors.white.withValues(alpha: 0.8)),
+                style: pvManrope(fontSize: 14, height: 1.5, color: Colors.white.withValues(alpha: 0.8)),
               ),
             ]),
           ),
@@ -289,7 +289,7 @@ class LaunchDetailScreen extends StatelessWidget {
             Text('PARENTVEDA\'S EXPERT', style: _eyebrow(color: const Color(0xFF6A30B6))),
           ]),
           const SizedBox(height: 11),
-          Text('"${c.creative.expertHook}"', style: GoogleFonts.fraunces(fontSize: 15, height: 1.55, color: _ink)),
+          Text('"${c.creative.expertHook}"', style: pvFraunces(fontSize: 15, height: 1.55, color: _ink)),
           const SizedBox(height: 10),
           Text(c.creative.expertName, style: _body(12.5, color: _ink, w: FontWeight.w800)),
           Text(c.creative.expertRole, style: _body(11.5)),
@@ -312,7 +312,7 @@ class LaunchDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(h.title, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w700, color: _ink)),
+              Text(h.title, style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: _ink)),
               const SizedBox(height: 3),
               Text(h.body, style: _body(13)),
             ]),
@@ -342,7 +342,7 @@ class LaunchDetailScreen extends StatelessWidget {
               const SizedBox(width: 11),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(r.label, style: GoogleFonts.plusJakartaSans(fontSize: 13.5, fontWeight: FontWeight.w700, color: _ink)),
+                  Text(r.label, style: pvJakarta(fontSize: 13.5, fontWeight: FontWeight.w700, color: _ink)),
                   const SizedBox(height: 2),
                   Text(r.blurb, style: _body(12)),
                 ]),
@@ -375,7 +375,7 @@ class LaunchDetailScreen extends StatelessWidget {
           },
           child: Text(
             'Visit ${c.brand.name}',
-            style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w800),
+            style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800),
           ),
         ),
       );

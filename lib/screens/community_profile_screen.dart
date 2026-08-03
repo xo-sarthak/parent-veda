@@ -8,7 +8,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/community_data.dart';
 import '../localization/app_language.dart';
@@ -18,6 +17,7 @@ import '../services/expert_follow_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'community_screen.dart';
+import '../theme/pv_fonts.dart';
 
 const Color _proInk = Color(0xFF2C1A45);
 const Color _proPurple = Color(0xFF7C3AED);
@@ -68,7 +68,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
         backgroundColor: AppTheme.scaffoldBackground,
         elevation: 0,
         title: Text(author,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w800, color: _proInk)),
       ),
       body: AnimatedBuilder(
@@ -105,7 +105,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                       Row(children: [
                         Flexible(
                           child: Text(author,
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: _proInk)),
@@ -117,7 +117,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                         ],
                       ]),
                       Text('@$handle',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 13.5, color: AppTheme.neutral500)),
                       const SizedBox(height: 10),
                       if (_isExpert) ...[
@@ -130,14 +130,14 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(post.cred,
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w800,
                                     color: _proPurpleDeep)),
                           ),
                         const SizedBox(height: 8),
                         Text(s.cmExpertBio,
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 13.5,
                                 height: 1.45,
                                 color: _proInk.withValues(alpha: 0.8))),
@@ -150,7 +150,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text('🌸 ${s.cmMember}',
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.neutral600)),
@@ -183,7 +183,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                   child: Center(
                     child: Text(
                         _tab == 0 ? s.cmNoPostsYet : s.cmNoVideosYet,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13.5, color: AppTheme.neutral500)),
                   ),
                 )
@@ -218,7 +218,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
               Border.all(color: _proPurple.withValues(alpha: active ? 0 : 0.3)),
         ),
         child: Text(label,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 color: active ? Colors.white : _proPurpleDeep)),
@@ -238,7 +238,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
           gradient: LinearGradient(colors: [_proPurple, Color(0xFFA855F7)]),
         ),
         child: Text(initial,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: size * 0.4,
                 fontWeight: FontWeight.w600,
                 color: Colors.white)),
@@ -251,7 +251,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
       decoration: BoxDecoration(
           color: _proPurple.withValues(alpha: 0.14), shape: BoxShape.circle),
       child: Text(initial,
-          style: GoogleFonts.fraunces(
+          style: pvFraunces(
               fontSize: size * 0.4,
               fontWeight: FontWeight.w600,
               color: _proPurpleDeep)),
@@ -271,7 +271,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
               color: following ? AppTheme.outlineVariant : _proPurple),
         ),
         child: Text(following ? s.cmFollowingState : s.cmFollow,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w800,
                 color: following ? _proInk : Colors.white)),
@@ -281,11 +281,11 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
 
   Widget _stat(String value, String label) => Row(children: [
         Text(value,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w800, color: _proInk)),
         const SizedBox(width: 4),
         Text(label,
             style:
-                GoogleFonts.manrope(fontSize: 12.5, color: AppTheme.neutral500)),
+                pvManrope(fontSize: 12.5, color: AppTheme.neutral500)),
       ]);
 }

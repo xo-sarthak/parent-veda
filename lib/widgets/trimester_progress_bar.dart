@@ -21,10 +21,10 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 class TrimesterProgressBar extends StatelessWidget {
   const TrimesterProgressBar({
@@ -139,7 +139,7 @@ class TrimesterProgressBar extends StatelessWidget {
         child: Text(
           s.trimesterShort(tri),
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 10.5,
             fontWeight: active ? FontWeight.w800 : FontWeight.w600,
             color: active ? ink : inkSoft,
@@ -158,7 +158,7 @@ class TrimesterProgressBar extends StatelessWidget {
             children: [
               Text(
                 s.trimesterLabel(currentTri),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: ink,
@@ -167,7 +167,7 @@ class TrimesterProgressBar extends StatelessWidget {
               const Spacer(),
               Text(
                 s.timeToGo(weeksToGo, daysToGoInWeek),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   color: inkSoft,

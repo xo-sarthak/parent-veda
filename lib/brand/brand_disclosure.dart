@@ -12,9 +12,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_models.dart';
+import '../theme/pv_fonts.dart';
 
 /// `Presented by <Brand>` — for takeover and destination surfaces.
 ///
@@ -45,7 +45,7 @@ class SponsorDisclosure extends StatelessWidget {
       ),
       child: Text(
         campaign.disclosure.toUpperCase(),
-        style: GoogleFonts.manrope(
+        style: pvManrope(
           fontSize: compact ? 9 : 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.8,
@@ -75,7 +75,7 @@ class IndependenceNote extends StatelessWidget {
       Expanded(
         child: Text(
           campaign.independenceNote,
-          style: GoogleFonts.manrope(fontSize: 11.5, height: 1.45, color: fg, fontWeight: FontWeight.w600),
+          style: pvManrope(fontSize: 11.5, height: 1.45, color: fg, fontWeight: FontWeight.w600),
         ),
       ),
     ]);
@@ -100,7 +100,7 @@ class SponsoredTag extends StatelessWidget {
       ),
       child: Text(
         'SPONSORED',
-        style: GoogleFonts.manrope(
+        style: pvManrope(
           fontSize: 8.5,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.7,

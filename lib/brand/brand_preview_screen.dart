@@ -14,13 +14,13 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_context.dart';
 import 'brand_models.dart';
 import 'brand_store.dart';
 import 'brand_studio.dart';
 import 'needs_attention.dart';
+import '../theme/pv_fonts.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -31,7 +31,7 @@ const _green = Color(0xFF3FA56A);
 const _red = Color(0xFFD92D20);
 
 TextStyle _t(double s, {FontWeight w = FontWeight.w400, Color c = _ink, double h = 1.4}) =>
-    GoogleFonts.manrope(fontSize: s, fontWeight: w, color: c, height: h);
+    pvManrope(fontSize: s, fontWeight: w, color: c, height: h);
 
 class BrandPreviewScreen extends StatefulWidget {
   const BrandPreviewScreen({super.key, this.pregnancyWeek});

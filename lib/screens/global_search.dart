@@ -7,7 +7,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/can_i_data.dart';
 import '../data/product_data.dart';
@@ -44,6 +43,7 @@ import 'tools/product_checklist_screen.dart';
 import 'tools/spiritual_reading_screen.dart';
 import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
+import '../theme/pv_fonts.dart';
 
 void showGlobalSearch(BuildContext context, PregnancyController controller) {
   showSearch<void>(context: context, delegate: _GlobalSearchDelegate(controller));
@@ -255,7 +255,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
   Widget _header(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
         child: Text(t.toUpperCase(),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.8,
@@ -274,7 +274,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             const SizedBox(height: 14),
             Text(text,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral500)),
           ]),
         ),

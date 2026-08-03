@@ -14,13 +14,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/spiritual_reading_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/spiritual_prefs_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 const Color _accent = Color(0xFF9A7BB5);
 const int _previewCount = 3;
@@ -118,7 +118,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(s.sprDisclaimer,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           height: 1.45,
                           color: AppTheme.primary700)),
@@ -161,7 +161,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                 const SizedBox(width: 6),
               ],
               Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: selected ? Colors.white : _accent)),
@@ -217,13 +217,13 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t.name,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
                   const SizedBox(height: 2),
                   Text(t.blurb,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12,
                           height: 1.35,
                           color: AppTheme.neutral600)),
@@ -248,7 +248,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
             padding: const EdgeInsets.fromLTRB(16, 13, 14, 13),
             child: Row(children: [
               Text(s.sprViewAll(t.readCount),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: _accent)),
@@ -319,7 +319,7 @@ class _TraditionDetailScreen extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         elevation: 0,
         title: Text('${tradition.symbol}  ${tradition.name}',
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
@@ -335,7 +335,7 @@ class _TraditionDetailScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
                   child: Text(sec.title,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.2,
@@ -398,7 +398,7 @@ class _SpiritualReadScreen extends StatelessWidget {
         backgroundColor: AppTheme.surface,
         elevation: 0,
         title: Text('${tradition.symbol}  ${tradition.name}',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.neutral700)),
@@ -407,14 +407,14 @@ class _SpiritualReadScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),
         children: [
           Text(read.title,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 25,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900)),
           const SizedBox(height: 16),
           Text(read.body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 15.5,
                   height: 1.7,
                   color: const Color(0xFF4A4358))),
@@ -482,7 +482,7 @@ class _SpiritualReadScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(s.sprFootnote,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     height: 1.4,
                     fontStyle: FontStyle.italic,

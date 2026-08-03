@@ -9,7 +9,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../memories/memories_store.dart';
 import '../../memories/memory_analytics.dart';
@@ -18,6 +17,7 @@ import '../../memories/memory_models.dart';
 import '../../memories/memory_templates.dart';
 import '../../theme/app_theme.dart';
 import 'memory_card.dart';
+import '../../theme/pv_fonts.dart';
 
 class MemoryPreviewScreen extends StatefulWidget {
   const MemoryPreviewScreen({
@@ -118,7 +118,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
               ),
               const SizedBox(width: 12),
               Text('Choose a template',
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 20, fontWeight: FontWeight.w600, color: _ink)),
             ]),
           ),
@@ -152,7 +152,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
           _dots(),
           const SizedBox(height: 8),
           Text('${_templates[_index].name} · ${_templates[_index].style.label}',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, color: _soft, fontWeight: FontWeight.w600)),
           const SizedBox(height: 14),
           _actions(),
@@ -205,7 +205,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                       size: 18, color: AppTheme.primary500),
                   const SizedBox(width: 7),
                   Text('Save',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary500)),
@@ -229,7 +229,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                       size: 18, color: Colors.white),
                   const SizedBox(width: 7),
                   Text(_busy ? 'Working…' : 'Share',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),

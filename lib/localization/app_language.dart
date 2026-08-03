@@ -16,6 +16,15 @@ enum AppLanguage { hinglish, english }
 extension AppLanguageX on AppLanguage {
   bool get isEnglish => this == AppLanguage.english;
   bool get isHinglish => this == AppLanguage.hinglish;
+
+  /// The non-English language, read by name rather than by script.
+  ///
+  /// ParentVeda is moving from Hinglish-in-Latin to Hindi in Devanagari. The
+  /// enum value is still `hinglish` while the content is converted file by
+  /// file; this alias lets new code say what it means (`isHindi`) instead of
+  /// carrying the old script's name, so the eventual rename touches the enum
+  /// and not every call site written from here on.
+  bool get isHindi => this == AppLanguage.hinglish;
 }
 
 /// A piece of content available in both languages.

@@ -10,7 +10,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/garbh_data.dart';
 import '../../data/read_to_baby_data.dart';
@@ -19,6 +18,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/read_to_baby_saved_store.dart';
 import '../../services/read_to_baby_store.dart';
 import '../../theme/father_skin.dart';
+import '../../theme/pv_fonts.dart';
 
 // One read-aloud piece (optional title + body) + a stable save key + group.
 typedef _FSP = ({String? title, String body, String saveKey, String group});
@@ -51,9 +51,9 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
 
   TextStyle _body(double s,
           {FontWeight w = FontWeight.w400, Color c = kFInk, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(
+      pvJakarta(
           fontSize: s, fontWeight: w, color: c, height: h);
-  TextStyle _eyebrow(Color c) => GoogleFonts.plusJakartaSans(
+  TextStyle _eyebrow(Color c) => pvJakarta(
       fontSize: 11, fontWeight: FontWeight.w700, color: c, letterSpacing: 1.4);
 
   @override
@@ -88,9 +88,9 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
               unselectedLabelColor: kFMuted,
               indicatorColor: kFAccent,
               tabAlignment: TabAlignment.start,
-              labelStyle: GoogleFonts.plusJakartaSans(
+              labelStyle: pvJakarta(
                   fontWeight: FontWeight.w700, fontSize: 13),
-              unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+              unselectedLabelStyle: pvJakarta(
                   fontWeight: FontWeight.w600, fontSize: 13),
               tabs: const [
                 Tab(text: 'Affirmations & Blessings'),
@@ -227,7 +227,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
           const SizedBox(height: 8),
         ],
         Text('“${p.body}”',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 15.5,
                 fontStyle: FontStyle.italic,
                 height: 1.55,

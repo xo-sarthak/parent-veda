@@ -19,7 +19,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../services/app_shell.dart';
 import '../../ttc/ttc_chapter.dart';
@@ -31,6 +30,7 @@ import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart';
 import 'ttc_tools_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
 const Color ttcBg = Color(0xFFFBF9FE);
@@ -110,7 +110,7 @@ TextStyle ttcFraunces(double size,
         {FontWeight w = FontWeight.w400,
         Color color = ttcInk,
         double h = 1.12}) =>
-    GoogleFonts.fraunces(
+    pvFraunces(
         fontSize: size,
         fontWeight: w,
         height: h,
@@ -119,20 +119,20 @@ TextStyle ttcFraunces(double size,
 
 TextStyle ttcJakarta(double size,
         {FontWeight w = FontWeight.w700, Color color = ttcTitleInk}) =>
-    GoogleFonts.plusJakartaSans(fontSize: size, fontWeight: w, color: color);
+    pvJakarta(fontSize: size, fontWeight: w, color: color);
 
 TextStyle ttcBody(double size,
         {Color color = ttcSoft,
         double h = 1.6,
         FontWeight w = FontWeight.w400}) =>
-    GoogleFonts.manrope(fontSize: size, height: h, color: color, fontWeight: w);
+    pvManrope(fontSize: size, height: h, color: color, fontWeight: w);
 
 // ---- small parts ------------------------------------------------------------
 
 Widget ttcEyebrow(String t, {Color color = ttcCoral, double spacing = 1.4}) =>
     Text(
       t.toUpperCase(),
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: spacing,
@@ -829,7 +829,7 @@ class TtcHeader extends StatelessWidget {
       const SizedBox(width: 9),
       Text(
         'ParentVeda',
-        style: GoogleFonts.plusJakartaSans(
+        style: pvJakarta(
           fontSize: 19,
           fontWeight: FontWeight.w800,
           color: ink,

@@ -7,9 +7,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'prepare_common.dart';
+import '../../theme/pv_fonts.dart';
 
 class PrepareVideoScreen extends StatelessWidget {
   const PrepareVideoScreen({
@@ -68,7 +68,7 @@ class PrepareVideoScreen extends StatelessWidget {
                           color: kInk.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(999)),
                       child: Text('Video coming soon',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
                   ]),

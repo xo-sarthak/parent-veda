@@ -17,7 +17,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../brand/brand_campaigns.dart';
 import '../brand/brand_mark.dart';
@@ -32,6 +31,7 @@ import 'post_pregnancy/reading_home_screen.dart';
 import 'post_pregnancy/recommendations_screen.dart';
 import 'post_pregnancy/sleep_journey_screen.dart';
 import 'prepare/prepare_hub_screen.dart';
+import '../theme/pv_fonts.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -170,7 +170,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text('Brand Studio',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 21, fontWeight: FontWeight.w600, color: _ink)),
       ),
       body: ListView(
@@ -178,7 +178,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         children: [
           Text(
             'Fifteen premium brand products, plus Certification. Every one is a real placement in the real app - tap "Show me" to go and see it in context.',
-            style: GoogleFonts.manrope(fontSize: 13.5, height: 1.55, color: _soft),
+            style: pvManrope(fontSize: 13.5, height: 1.55, color: _soft),
           ),
           const SizedBox(height: 14),
           _demoBanner(live),
@@ -192,7 +192,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
             'shows something. It never bypasses the kill switch, a campaign\'s '
             'schedule, or the recommendation rank floor - a sponsored product '
             'still cannot outrank a better one.',
-            style: GoogleFonts.manrope(fontSize: 11.5, height: 1.5, color: _soft),
+            style: pvManrope(fontSize: 11.5, height: 1.5, color: _soft),
           ),
         ],
       ),
@@ -214,7 +214,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
               on
                   ? 'Demo mode is ON, so placements show for this device.'
                   : 'Demo mode is off - most placements will resolve to nothing.',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: _ink),
             ),
           ),
@@ -228,7 +228,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
 
   Widget _partners() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('DEMO PARTNERS',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.2,
@@ -241,7 +241,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         ),
         const SizedBox(height: 8),
         Text('Not real partnerships - placeholders for review.',
-            style: GoogleFonts.manrope(fontSize: 11, color: _soft)),
+            style: pvManrope(fontSize: 11, color: _soft)),
       ]);
 
   Widget _row(_Product p) => Container(
@@ -263,7 +263,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text('${p.number}',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: p.built ? _purple : _soft)),
@@ -274,7 +274,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                 Row(children: [
                   Flexible(
                     child: Text(p.title,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w800,
                             color: _ink)),
@@ -286,7 +286,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                 ]),
                 const SizedBox(height: 3),
                 Text(p.what,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5, height: 1.45, color: _soft)),
               ]),
             ),
@@ -297,7 +297,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
             const SizedBox(width: 5),
             Expanded(
               child: Text(p.where,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5, fontWeight: FontWeight.w700, color: _soft)),
             ),
             if (p.built)
@@ -309,7 +309,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                   decoration: BoxDecoration(
                       color: _purple, borderRadius: BorderRadius.circular(9)),
                   child: Text('Show me',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
@@ -322,14 +322,14 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                     color: const Color(0xFFF0EEF3),
                     borderRadius: BorderRadius.circular(8)),
                 child: Text('Not built',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 10.5, fontWeight: FontWeight.w800, color: _soft)),
               ),
           ]),
           if (p.note != null) ...[
             const SizedBox(height: 8),
             Text(p.note!,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, height: 1.45, color: const Color(0xFF9A7B2E))),
           ],
         ]),

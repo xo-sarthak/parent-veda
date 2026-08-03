@@ -8,7 +8,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../services/family_profile.dart';
@@ -54,6 +53,7 @@ import 'tools/spiritual_reading_screen.dart';
 import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
 import 'tools/weight_tracker_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class ToolsHubScreen extends StatelessWidget {
   const ToolsHubScreen({super.key, required this.controller});
@@ -171,13 +171,13 @@ class ToolsHubScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 110),
           children: [
             Text(s.toolsTitle,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
             const SizedBox(height: 4),
             Text(s.toolsIntro,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13, color: AppTheme.neutral600)),
             const SizedBox(height: 18),
             _journeyHero(context, s),
@@ -217,7 +217,7 @@ class ToolsHubScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(s.toolsSupportNote,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12,
                           height: 1.4,
                           color: AppTheme.primary700)),
@@ -265,13 +265,13 @@ class ToolsHubScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.toolJourneyTitle,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
                   const SizedBox(height: 3),
                   Text(s.toolJourneySubtitle,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           color: Colors.white.withValues(alpha: 0.9))),
                 ],
@@ -305,7 +305,7 @@ class ToolsHubScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(t.title,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -328,7 +328,7 @@ class ToolsHubScreen extends StatelessWidget {
               if (t.staleDueDate) ...[
                 const SizedBox(height: 6),
                 Text(s.ddcMayBeStale,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 10.5,
                         height: 1.4,
                         fontWeight: FontWeight.w600,
@@ -337,7 +337,7 @@ class ToolsHubScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Row(children: [
                 Text(s.openLabel,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
                         color: t.color)),

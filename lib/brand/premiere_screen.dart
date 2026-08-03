@@ -15,7 +15,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_context.dart';
@@ -25,6 +24,7 @@ import 'brand_store.dart';
 import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
 import 'outbound.dart';
+import '../theme/pv_fonts.dart';
 
 /// TESTING: show the Premiere on EVERY app open, ignoring the once-per-campaign
 /// cap.
@@ -227,7 +227,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                   _stage(0.18, 0.42),
                   Text(
                     c.creative.eyebrow.toUpperCase(),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 2.2,
@@ -240,7 +240,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                   _stage(0.30, 0.62),
                   Text(
                     c.creative.headline,
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                       fontSize: 52,
                       height: 1.02,
                       fontWeight: FontWeight.w600,
@@ -254,7 +254,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                   _stage(0.46, 0.78),
                   Text(
                     c.creative.subline,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 15.5,
                       height: 1.5,
                       color: Colors.white.withValues(alpha: 0.82),
@@ -295,7 +295,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 c.creative.story,
-                style: GoogleFonts.manrope(fontSize: 14.5, height: 1.62, color: const Color(0xFF2F2C30)),
+                style: pvManrope(fontSize: 14.5, height: 1.62, color: const Color(0xFF2F2C30)),
               ),
               const SizedBox(height: 18),
               SizedBox(
@@ -309,7 +309,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                   onPressed: _cta,
                   child: Text(
                     c.creative.cta,
-                    style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                 ),
               ),
@@ -319,7 +319,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                   onPressed: _close,
                   child: Text(
                     'Not now',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF69636C),

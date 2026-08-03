@@ -9,7 +9,6 @@
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
@@ -21,6 +20,7 @@ import '../services/tools_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/journal/journal_create.dart';
 import '../widgets/storage_image.dart';
+import '../theme/pv_fonts.dart';
 
 /// Two ways to read the journal: a tidy grouped LIST, or a flip-through BOOKLET.
 enum _JournalView { list, booklet }
@@ -154,7 +154,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 ),
               )
             : Text(s.jrTitle,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontWeight: FontWeight.w700, color: AppTheme.primary900)),
         actions: [
           if (!_searching && !_combined)
@@ -270,7 +270,7 @@ class _JournalScreenState extends State<JournalScreen> {
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 6),
         child: Row(children: [
           Text(s.jrGroupBy,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.neutral500)),
@@ -300,7 +300,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     : AppTheme.outlineVariant),
           ),
           child: Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: sel ? AppTheme.primary600 : AppTheme.neutral500)),
@@ -402,14 +402,14 @@ class _JournalScreenState extends State<JournalScreen> {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(weekLabel,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary600)),
             if (dateRange.isNotEmpty) ...[
               const SizedBox(width: 8),
               Text(dateRange,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.neutral400)),
@@ -444,7 +444,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     child: Text(label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.primary900)),
@@ -455,7 +455,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       child: Text(subLabel,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.neutral400)),
@@ -471,7 +471,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   color: AppTheme.primary500.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(99)),
               child: Text('$count',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary600)),
@@ -509,7 +509,7 @@ class _JournalScreenState extends State<JournalScreen> {
             boxShadow: sel ? null : _soft,
           ),
           child: Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: sel ? Colors.white : AppTheme.neutral600)),
@@ -530,7 +530,7 @@ class _JournalScreenState extends State<JournalScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
             child: Text(entry.key,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.neutral500,
@@ -587,14 +587,14 @@ class _JournalScreenState extends State<JournalScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(e.title,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: pvJakarta(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primary900)),
                         if (e.description.isNotEmpty) ...[
                           const SizedBox(height: 3),
                           Text(e.description,
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 13,
                                   height: 1.4,
                                   color: AppTheme.neutral600)),
@@ -615,7 +615,7 @@ class _JournalScreenState extends State<JournalScreen> {
                                     size: 11, color: m.color),
                                 const SizedBox(width: 4),
                                 Text('From ${p.fatherName}',
-                                    style: GoogleFonts.manrope(
+                                    style: pvManrope(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         color: m.color)),
@@ -635,12 +635,12 @@ class _JournalScreenState extends State<JournalScreen> {
                       // Per-entry date + time, so each memory shows WHEN it was
                       // made (the group header only gives the period range).
                       Text(s.formatShortDate(e.date),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.neutral500)),
                       Text(_fmtTime(e.createdAt),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.neutral400)),
@@ -677,7 +677,7 @@ class _JournalScreenState extends State<JournalScreen> {
             color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(99)),
         child: Text('#$tag',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
       );
 
@@ -736,7 +736,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     color: AppTheme.primary500),
                 const SizedBox(width: 6),
                 Text('${s.jcVoiceNote} ${i + 1}',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary600)),
@@ -755,7 +755,7 @@ class _JournalScreenState extends State<JournalScreen> {
           borderRadius: BorderRadius.circular(99),
         ),
         child: Text(s.jrWeekLabel(w),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary600)),
@@ -813,7 +813,7 @@ class _JournalScreenState extends State<JournalScreen> {
           color: c.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(99)),
       child: Text(father ? 'Dad' : 'You',
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 10, fontWeight: FontWeight.w800, color: c)),
     );
   }
@@ -884,7 +884,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     borderRadius: BorderRadius.circular(99),
                     boxShadow: _soft),
                 child: Text('${cur + 1} / $pages',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.neutral600)),
@@ -978,7 +978,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     const SizedBox(height: 18),
                     Text(s.jrCoverTitle(p.motherName),
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.fraunces(
+                        style: pvFraunces(
                             fontSize: 28,
                             fontWeight: FontWeight.w500,
                             height: 1.15,
@@ -994,7 +994,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     if (combined) ...[
                       const SizedBox(height: 10),
                       Text('You + Dad',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: Colors.white.withValues(alpha: 0.9))),
@@ -1002,7 +1002,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     if (weeks.isNotEmpty) ...[
                       const SizedBox(height: 10),
                       Text(s.jrCoverWeeks(weeks.first, weeks.last),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: Colors.white.withValues(alpha: 0.85))),
@@ -1010,7 +1010,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     const SizedBox(height: 24),
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       Text(s.jrCoverHint,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w700,
                               color: Colors.white.withValues(alpha: 0.9))),
@@ -1070,7 +1070,7 @@ class _JournalScreenState extends State<JournalScreen> {
               Text(
                   s.jrWeekdayDate(date) +
                       (wk > 0 ? ' · ${s.jrWeekLabel(wk)}' : ''),
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.primary900)),
@@ -1096,7 +1096,7 @@ class _JournalScreenState extends State<JournalScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(e.title,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
@@ -1106,7 +1106,7 @@ class _JournalScreenState extends State<JournalScreen> {
             const SizedBox(width: 8),
           ],
           Text(_fmtTime(e.createdAt),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.neutral400)),
@@ -1114,7 +1114,7 @@ class _JournalScreenState extends State<JournalScreen> {
         if (e.description.isNotEmpty) ...[
           const SizedBox(height: 5),
           Text(e.description,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   height: 1.55,
                   color: const Color(0xFF5B5142))),
@@ -1162,7 +1162,7 @@ class _JournalScreenState extends State<JournalScreen> {
             if (isAll) ...[
               Text(s.jrEmptyTitle,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 21,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primary900)),
@@ -1170,7 +1170,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ],
             Text(body,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
             const SizedBox(height: 14),
             TextButton.icon(
@@ -1206,7 +1206,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 7),
                   child: Text(text,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           height: 1.4,
                           color: AppTheme.neutral700)),
@@ -1242,13 +1242,13 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
               const SizedBox(height: 16),
               Text(s.jrInfoTitle,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               const SizedBox(height: 6),
               Text(s.jrInfoIntro,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, height: 1.45, color: AppTheme.neutral600)),
               const SizedBox(height: 12),
               row(Icons.auto_stories_rounded, col(JournalEntryType.memory),
@@ -1285,7 +1285,7 @@ class _JournalScreenState extends State<JournalScreen> {
             child: Icon(icon, color: c),
           ),
           title: Text(label,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontWeight: FontWeight.w700, color: AppTheme.primary900)),
           onTap: onTap,
         );

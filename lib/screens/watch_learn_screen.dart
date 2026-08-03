@@ -10,13 +10,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/pv_video.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/video_store.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 const List<BoxShadow> _soft = [
   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
@@ -70,7 +70,7 @@ Widget _thumb(PvVideo v, {double height = 150}) {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(v.duration,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: Colors.white)),
@@ -112,24 +112,24 @@ void _openDetail(BuildContext context, PvVideo v, AppLanguage lang) {
             _thumb(v, height: 180),
             const SizedBox(height: 14),
             Text(v.title.of(lang),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary900)),
             const SizedBox(height: 4),
             Text(v.duration,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12, color: AppTheme.neutral500)),
             const SizedBox(height: 12),
             Text(s.vidWhyNow,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
                     color: videoMeta(v.category).color)),
             const SizedBox(height: 4),
             Text(v.reason.of(lang),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
             const SizedBox(height: 16),
             Container(
@@ -143,7 +143,7 @@ void _openDetail(BuildContext context, PvVideo v, AppLanguage lang) {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(s.vidComingSoon,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5, color: AppTheme.neutral600)),
                 ),
               ]),
@@ -204,7 +204,7 @@ class TodaysVideoCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Row(children: [
                   Text(s.vidTodaysVideo,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -214,7 +214,7 @@ class TodaysVideoCard extends StatelessWidget {
                         builder: (_) =>
                             WatchLearnScreen(controller: controller))),
                     child: Text(s.vidMoreVideos,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primary500)),
@@ -231,13 +231,13 @@ class TodaysVideoCard extends StatelessWidget {
                       _thumb(v),
                       const SizedBox(height: 12),
                       Text(v.title.of(lang),
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.primary900)),
                       const SizedBox(height: 6),
                       Text('${s.vidWhyNow}: ${v.reason.of(lang)}',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5,
                               height: 1.4,
                               color: AppTheme.neutral600)),
@@ -305,7 +305,7 @@ class WatchLearnScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.vidScreenTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -340,7 +340,7 @@ class WatchLearnScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
           child: Text(title,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -360,7 +360,7 @@ class WatchLearnScreen extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(note,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13, height: 1.45, color: AppTheme.neutral500)),
               ),
             ]),
@@ -374,7 +374,7 @@ class WatchLearnScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
           child: Text(title,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -419,7 +419,7 @@ class WatchLearnScreen extends StatelessWidget {
                       Text(v.title.of(lang),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.primary900)),
@@ -427,7 +427,7 @@ class WatchLearnScreen extends StatelessWidget {
                       Text(v.reason.of(lang),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11.5,
                               height: 1.35,
                               color: AppTheme.neutral500)),

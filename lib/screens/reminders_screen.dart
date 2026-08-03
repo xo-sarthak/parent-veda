@@ -8,7 +8,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../localization/app_language.dart';
 import '../models/reminder.dart';
@@ -16,6 +15,7 @@ import '../services/notification_service.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 /// A quick-add suggestion (its title comes from S so it stays bilingual).
 typedef _Preset = ({
@@ -115,7 +115,7 @@ class RemindersScreen extends StatelessWidget {
         shape: const StadiumBorder(),
         icon: const Icon(Icons.add_rounded),
         label: Text(s.rmdAdd,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, fontSize: 14.5)),
       ),
       body: AnimatedBuilder(
@@ -140,7 +140,7 @@ class RemindersScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(s.rmdScheduleNote,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13,
                             height: 1.4,
                             color: AppTheme.primary800)),
@@ -155,7 +155,7 @@ class RemindersScreen extends StatelessWidget {
               const SizedBox(height: 22),
               // Quick ideas (one-tap add).
               Text(s.rmdSuggestions,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
@@ -178,14 +178,14 @@ class RemindersScreen extends StatelessWidget {
           const SizedBox(height: 14),
           Text(s.rmdEmpty,
               textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
           const SizedBox(height: 6),
           Text(s.rmdEmptySub,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
         ]),
       );
@@ -616,7 +616,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
   //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
   //       children: [
   //         Text(label,
-  //             style: GoogleFonts.plusJakartaSans(
+  //             style: pvJakarta(
   //                 fontSize: 14,
   //                 fontWeight: FontWeight.w800,
   //                 color: AppTheme.primary900)),
@@ -1021,7 +1021,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
         children: [
           Flexible(
             child: Text(label,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),

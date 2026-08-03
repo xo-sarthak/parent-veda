@@ -11,11 +11,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 typedef _Month = ({int m, List<int> weeks});
 typedef _Tri = ({int t, Color block, Color month, Color week, List<_Month> months});
@@ -76,7 +76,7 @@ class TrimesterChartCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(s.tcTitle,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.primary900)),
@@ -87,7 +87,7 @@ class TrimesterChartCard extends StatelessWidget {
         ],
         const SizedBox(height: 2),
         Text(s.tcDueDate(s.formatLongDate(controller.dueDate)),
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary800)),
@@ -115,7 +115,7 @@ class TrimesterChartCard extends StatelessWidget {
                   BoxDecoration(color: tri.block, shape: BoxShape.circle)),
           const SizedBox(width: 8),
           Text('${s.tcTrimester} ${tri.t}',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
@@ -130,7 +130,7 @@ class TrimesterChartCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Text('${s.tcMonth} ${mo.m}',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.neutral700)),
@@ -163,7 +163,7 @@ class TrimesterChartCard extends StatelessWidget {
             width: here ? 0 : 1),
       ),
       child: Text('$w',
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 12.5,
               fontWeight: here ? FontWeight.w800 : FontWeight.w600,
               color: here ? Colors.white : AppTheme.neutral700)),

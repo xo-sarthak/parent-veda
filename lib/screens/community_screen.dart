@@ -15,7 +15,7 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -28,6 +28,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/mic_dictation_button.dart';
 import 'community_profile_screen.dart';
+import '../theme/pv_fonts.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
@@ -118,7 +119,7 @@ Widget _authorAvatar(CommunityPost post, {double size = 46}) {
             ),
           ),
           child: Text(initial,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: size * 0.4,
                   fontWeight: FontWeight.w600,
                   color: Colors.white)),
@@ -142,7 +143,7 @@ Widget _authorAvatar(CommunityPost post, {double size = 46}) {
     alignment: Alignment.center,
     decoration: BoxDecoration(color: c.withValues(alpha: 0.14), shape: BoxShape.circle),
     child: Text(initial,
-        style: GoogleFonts.fraunces(
+        style: pvFraunces(
             fontSize: size * 0.4, fontWeight: FontWeight.w600, color: c)),
   );
 }
@@ -207,7 +208,7 @@ class _EngageButton extends StatelessWidget {
           if (label.isNotEmpty) ...[
             const SizedBox(width: 5),
             Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, color: color, fontWeight: FontWeight.w600)),
           ],
         ]),
@@ -257,7 +258,7 @@ void _showPostMenu(BuildContext context, S s, CommunityPost post) {
                     color: _proPurple),
                 title: Text('${following ? s.cmUnfollow : s.cmFollow} $handle',
                     style:
-                        GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+                        pvJakarta(fontWeight: FontWeight.w700)),
                 onTap: () {
                   ef.toggleFollow(post.author);
                   done(following ? s.cmUnfollowedToast : s.cmFollowedToast);
@@ -305,7 +306,7 @@ Widget _sealAvatar(String name, {double size = 32}) {
             gradient: LinearGradient(colors: [_proPurple, Color(0xFFA855F7)]),
             shape: BoxShape.circle),
         child: Text(initial,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: size * 0.44,
                 fontWeight: FontWeight.w600,
                 color: Colors.white)),
@@ -351,7 +352,7 @@ void _showExpertsSheet(BuildContext context, S s, int total) {
               const SizedBox(width: 8),
               Expanded(
                 child: Text('${s.cmExpertsWhoVerified} · $total',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: _proInk)),
@@ -367,10 +368,10 @@ void _showExpertsSheet(BuildContext context, S s, int total) {
                   ListTile(
                     leading: _sealAvatar(e.name, size: 38),
                     title: Text(e.name,
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontWeight: FontWeight.w700, fontSize: 14)),
                     subtitle: Text('${e.cred} · ${e.specialty}',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12, color: AppTheme.neutral500)),
                   ),
                 if (more > 0)
@@ -495,7 +496,7 @@ Widget _verifiedHint(BuildContext context, S s, CommunityPost post) {
             tappable ? s.cmVerifiedByPlus(name, others) : s.cmVerifiedBy(name),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
                 color: _proPurpleDeep),
@@ -530,7 +531,7 @@ Widget _pendingVerifyTag(S s, CommunityPost post, {bool doctor = false}) {
       Icon(icon, size: 12, color: _proPurple),
       const SizedBox(width: 5),
       Text(label,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: _proPurpleDeep)),
@@ -681,21 +682,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
         padding: const EdgeInsets.fromLTRB(20, 6, 20, 2),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(s.cmTitle.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.4,
                   color: _proPink)),
           const SizedBox(height: 4),
           Text(s.cmWalkingTogether,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 35,
                   height: 1.05,
                   fontWeight: FontWeight.w600,
                   color: _proInk)),
           const SizedBox(height: 4),
           Text(s.cmSubtitle,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 13.5,
                   height: 1.4,
                   color: _proInk.withValues(alpha: 0.62))),
@@ -705,7 +706,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _label(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
         child: Text(t,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 18, fontWeight: FontWeight.w600, color: _proInk)),
       );
 
@@ -727,7 +728,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(text,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13,
                       height: 1.4,
                       fontWeight: FontWeight.w600,
@@ -751,7 +752,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(s.cmDoctorBanner,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     height: 1.3,
@@ -767,7 +768,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   color: Colors.white.withValues(alpha: 0.22),
                   borderRadius: BorderRadius.circular(20)),
               child: Text(s.cmExit,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: Colors.white)),
@@ -797,7 +798,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     : null,
               ),
               child: Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: active ? Colors.white : _proInk.withValues(alpha: 0.55))),
@@ -843,7 +844,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   size: 15, color: on ? Colors.white : _proPurpleDeep),
               const SizedBox(width: 6),
               Text(s.cmExpertsOnly,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: on ? Colors.white : _proPurpleDeep)),
@@ -878,7 +879,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   size: 15, color: on ? Colors.white : _proPurpleDeep),
               const SizedBox(width: 6),
               Text(s.cmNeedsVerify,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: on ? Colors.white : _proPurpleDeep)),
@@ -1116,7 +1117,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       const SizedBox(height: 12),
                       Text(s.cmNoVerifyRequests,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
                               color: _proInk)),
@@ -1131,14 +1132,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       const SizedBox(height: 12),
                       Text(s.cmFollowingEmpty,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
                               color: _proInk)),
                       const SizedBox(height: 6),
                       Text(s.cmFollowingEmptySub,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5, color: AppTheme.neutral500)),
                     ]),
                   )
@@ -1211,7 +1212,7 @@ class _ProPulseCard extends StatelessWidget {
             child: Text(tag,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
@@ -1221,7 +1222,7 @@ class _ProPulseCard extends StatelessWidget {
         const SizedBox(height: 12),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 17.5,
                   height: 1.32,
                   fontWeight: FontWeight.w500,
@@ -1231,7 +1232,7 @@ class _ProPulseCard extends StatelessWidget {
         Text(foot,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: _proInk.withValues(alpha: 0.55))),
@@ -1321,7 +1322,7 @@ class _CommunityCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(_mono(community.name),
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Colors.white)),
@@ -1695,7 +1696,7 @@ class CommunityPostCard extends StatelessWidget {
                                     '@${_handle(post.author)} · ${_timeAgo(post)}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.manrope(
+                                    style: pvManrope(
                                         fontSize: 12.5,
                                         color: AppTheme.neutral500)),
                               ),
@@ -1719,7 +1720,7 @@ class CommunityPostCard extends StatelessWidget {
                               '${s.cmInCommunity} ${community.emoji} ${community.name}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 11.5, color: AppTheme.neutral400)),
                         ),
                       const SizedBox(height: 6),
@@ -1763,7 +1764,7 @@ class CommunityPostCard extends StatelessWidget {
                                       tag: t.replaceAll(' ', ''),
                                       controller: controller)),
                               child: Text('#${t.replaceAll(' ', '')}',
-                                  style: GoogleFonts.manrope(
+                                  style: pvManrope(
                                       fontSize: 12.5,
                                       color: _proPurpleDeep,
                                       fontWeight: FontWeight.w600)),
@@ -2112,7 +2113,7 @@ class _DoctorEndorseButtonState extends State<_DoctorEndorseButton>
                   seal,
                   const SizedBox(width: 6),
                   Text(endorsed ? s.cmYouVerified : s.cmEndorseThis,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: endorsed ? Colors.white : _proPurpleDeep)),

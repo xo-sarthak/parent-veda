@@ -7,7 +7,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../app_constants.dart';
 import '../localization/app_language.dart';
@@ -23,6 +22,7 @@ import '../widgets/week_cards/celebration_card.dart';
 import '../widgets/week_cards/week_cards.dart';
 import 'week5_full_flow_screen.dart';
 import 'week_flow_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class WeeklyCardStackScreen extends StatefulWidget {
   const WeeklyCardStackScreen({super.key, required this.controller});
@@ -109,7 +109,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
               borderRadius: BorderRadius.circular(99),
             ),
             child: Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                     color: on
@@ -148,7 +148,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
               borderRadius: BorderRadius.circular(99),
             ),
             child: Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: on
@@ -194,7 +194,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
             Icon(Icons.chevron_left_rounded, size: 16, color: tint),
             const SizedBox(width: 1),
             Text(s.weeklyBackToDaily,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, fontWeight: FontWeight.w700, color: tint)),
           ]),
         ),
@@ -226,13 +226,13 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                 // Father uses the SAME font as the mother (the serif read poorly
                 // here), just in the Slate ink colour.
                 style: father
-                    ? GoogleFonts.plusJakartaSans(
+                    ? pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: kFAccent,
                         letterSpacing: -0.5,
                       )
-                    : GoogleFonts.plusJakartaSans(
+                    : pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.primary600,
@@ -685,12 +685,12 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                           // Same font as the mother (serif read poorly), Slate
                           // ink, a touch bolder (w800) per request.
                           style: father
-                              ? GoogleFonts.plusJakartaSans(
+                              ? pvJakarta(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: kFInk,
                                 )
-                              : GoogleFonts.plusJakartaSans(
+                              : pvJakarta(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: AppTheme.primary900,
@@ -700,7 +700,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                       const SizedBox(width: 10),
                       Text(
                         togo <= 0 ? s.weeksToGoNow : s.weeksToGo(togo),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
                           color: father ? kFAccent2 : AppTheme.secondary500,
@@ -738,7 +738,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                       const SizedBox(width: 10),
                       Text(
                         '${s.weekWord} $week · $dateText',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: father ? kFAccent : AppTheme.primary600,
@@ -1105,7 +1105,7 @@ class _WeekDot extends StatelessWidget {
             ),
             child: Text(
               '$week',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -1128,7 +1128,7 @@ class _WeekDot extends StatelessWidget {
           children: [
             Text(
               '$week',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: color,

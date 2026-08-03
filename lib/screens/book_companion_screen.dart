@@ -22,13 +22,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../models/read_item.dart';
 import '../services/book_companion_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 // ---- palette (light-only, matching the app) ---------------------------------
 const _bg = Color(0xFFFBF9FE);
@@ -191,7 +191,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
                   a.title,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                     fontSize: 25,
                     height: 1.1,
                     fontWeight: FontWeight.w600,
@@ -200,12 +200,12 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                   ),
                 ),
                 const SizedBox(height: 7),
-                Text(a.author, style: GoogleFonts.manrope(fontSize: 13.5, color: _soft, fontWeight: FontWeight.w600)),
+                Text(a.author, style: pvManrope(fontSize: 13.5, color: _soft, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
                 Row(children: [
                   const Icon(Icons.schedule_rounded, size: 13, color: _muted),
                   const SizedBox(width: 5),
-                  Text(a.readingTime, style: GoogleFonts.manrope(fontSize: 12, color: _muted, fontWeight: FontWeight.w700)),
+                  Text(a.readingTime, style: pvManrope(fontSize: 12, color: _muted, fontWeight: FontWeight.w700)),
                 ]),
               ]),
             ),
@@ -234,7 +234,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 onPressed: () => _jump(_sections.length > 1 ? _sections[1].id : 'overview'),
                 child: Text(
                   'Read summary',
-                  style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
+                  style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               ),
             ),
@@ -291,7 +291,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             a.title,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.fraunces(fontSize: 11.5, height: 1.2, color: Colors.white, fontWeight: FontWeight.w600),
+            style: pvFraunces(fontSize: 11.5, height: 1.2, color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ]),
       );
@@ -313,10 +313,10 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
     return Expanded(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(label, style: GoogleFonts.manrope(fontSize: 11, color: _soft, fontWeight: FontWeight.w700)),
+          Text(label, style: pvManrope(fontSize: 11, color: _soft, fontWeight: FontWeight.w700)),
           const Spacer(),
           Text('$done / $total',
-              style: GoogleFonts.manrope(fontSize: 11, color: _muted, fontWeight: FontWeight.w800)),
+              style: pvManrope(fontSize: 11, color: _muted, fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 6),
         ClipRRect(
@@ -381,7 +381,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
         ),
         child: Text(
           s.label,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
             color: on ? Colors.white : _soft,
@@ -459,7 +459,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
 
   Widget _sectionTitle(String s) => Text(
         s,
-        style: GoogleFonts.fraunces(
+        style: pvFraunces(
           fontSize: 24,
           height: 1.15,
           fontWeight: FontWeight.w600,
@@ -469,13 +469,13 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
       );
 
   TextStyle _bodyStyle() =>
-      GoogleFonts.manrope(fontSize: 16, height: 1.75, color: _ink, letterSpacing: 0.1);
+      pvManrope(fontSize: 16, height: 1.75, color: _ink, letterSpacing: 0.1);
 
-  TextStyle _subStyle() => GoogleFonts.manrope(fontSize: 13, height: 1.5, color: _muted);
+  TextStyle _subStyle() => pvManrope(fontSize: 13, height: 1.5, color: _muted);
 
   Widget _label(String s) => Text(
         s,
-        style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: _muted),
+        style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: _muted),
       );
 
   Widget _chip(String s, {bool quiet = false}) => Container(
@@ -487,7 +487,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
         ),
         child: Text(
           s,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: 11.5,
             fontWeight: FontWeight.w600,
             color: quiet ? _soft : AppTheme.primary,
@@ -499,7 +499,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
   Widget _author() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _label('ABOUT THE AUTHOR'),
         const SizedBox(height: 10),
-        Text(c.authorIntro, style: GoogleFonts.manrope(fontSize: 14, height: 1.6, color: _soft)),
+        Text(c.authorIntro, style: pvManrope(fontSize: 14, height: 1.6, color: _soft)),
         if (c.otherBooks.isNotEmpty) ...[
           const SizedBox(height: 14),
           Wrap(spacing: 8, runSpacing: 8, children: [for (final b in c.otherBooks) _bookChip(b)]),
@@ -525,7 +525,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w600, color: _ink),
+                style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w600, color: _ink),
               ),
             ),
           ]),
@@ -547,7 +547,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           // should remember if they read nothing else.
           Text(
             c.philosophy,
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
               fontSize: 19,
               height: 1.58,
               fontWeight: FontWeight.w400,
@@ -573,7 +573,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             const SizedBox(width: 8),
             Text(
               "PARENTVEDA'S TAKE",
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -584,7 +584,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           const SizedBox(height: 14),
           Text(
             c.perspective,
-            style: GoogleFonts.fraunces(fontSize: 16, height: 1.65, color: _ink),
+            style: pvFraunces(fontSize: 16, height: 1.65, color: _ink),
           ),
         ]),
       );
@@ -609,12 +609,12 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
       child: Column(children: [
         Text(
           '“',
-          style: GoogleFonts.fraunces(fontSize: 62, height: 1.1, color: AppTheme.primary.withValues(alpha: 0.22)),
+          style: pvFraunces(fontSize: 62, height: 1.1, color: AppTheme.primary.withValues(alpha: 0.22)),
         ),
         Text(
           line.replaceAll('"', ''),
           textAlign: TextAlign.center,
-          style: GoogleFonts.fraunces(
+          style: pvFraunces(
             fontSize: 18,
             height: 1.5,
             fontStyle: FontStyle.italic,
@@ -629,7 +629,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             child: Text(
               context,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(fontSize: 11, color: _soft, fontWeight: FontWeight.w600),
+              style: pvManrope(fontSize: 11, color: _soft, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -700,7 +700,7 @@ class _IdeaCardState extends State<_IdeaCard> {
             child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Text(
                 '${widget.index + 1}',
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: widget.opened ? AppTheme.primary : _muted,
@@ -710,7 +710,7 @@ class _IdeaCardState extends State<_IdeaCard> {
               Expanded(
                 child: Text(
                   widget.idea.title,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                     fontSize: 14.5,
                     height: 1.3,
                     fontWeight: FontWeight.w700,
@@ -738,7 +738,7 @@ class _IdeaCardState extends State<_IdeaCard> {
               // The paragraph is dominant; the pointers are supplementary.
               Text(
                 widget.idea.body,
-                style: GoogleFonts.manrope(fontSize: 14.5, height: 1.72, color: _ink),
+                style: pvManrope(fontSize: 14.5, height: 1.72, color: _ink),
               ),
               if (widget.idea.pointers.isNotEmpty) ...[
                 const SizedBox(height: 20),
@@ -754,7 +754,7 @@ class _IdeaCardState extends State<_IdeaCard> {
                       ),
                       const SizedBox(width: 11),
                       Expanded(
-                        child: Text(p, style: GoogleFonts.manrope(fontSize: 13, height: 1.55, color: _soft)),
+                        child: Text(p, style: pvManrope(fontSize: 13, height: 1.55, color: _soft)),
                       ),
                     ]),
                   ),
@@ -808,7 +808,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                 Expanded(
                   child: Text(
                     ch.title,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 14.5, height: 1.3, fontWeight: FontWeight.w700, color: _ink),
+                    style: pvJakarta(fontSize: 14.5, height: 1.3, fontWeight: FontWeight.w700, color: _ink),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -830,7 +830,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                   ch.summary,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(fontSize: 13, height: 1.5, color: _muted),
+                  style: pvManrope(fontSize: 13, height: 1.5, color: _muted),
                 ),
               ],
             ]),
@@ -844,14 +844,14 @@ class _ChapterCardState extends State<_ChapterCard> {
               ? Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(ch.summary, style: GoogleFonts.manrope(fontSize: 14.5, height: 1.72, color: _ink)),
+              Text(ch.summary, style: pvManrope(fontSize: 14.5, height: 1.72, color: _ink)),
               if (ch.keyPoints.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 Container(height: 1, color: _line),
                 const SizedBox(height: 16),
                 Text(
                   'KEY POINTS COVERED',
-                  style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, color: _muted),
+                  style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, color: _muted),
                 ),
                 const SizedBox(height: 14),
                 for (final g in ch.keyPoints) ...[
@@ -860,7 +860,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                       padding: const EdgeInsets.only(bottom: 7),
                       child: Text(
                         g.label,
-                        style: GoogleFonts.plusJakartaSans(fontSize: 12.5, fontWeight: FontWeight.w800, color: _ink),
+                        style: pvJakarta(fontSize: 12.5, fontWeight: FontWeight.w800, color: _ink),
                       ),
                     ),
                   ],
@@ -873,7 +873,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                           child: Container(width: 4, height: 4, decoration: const BoxDecoration(color: _muted, shape: BoxShape.circle)),
                         ),
                         const SizedBox(width: 11),
-                        Expanded(child: Text(p, style: GoogleFonts.manrope(fontSize: 13.5, height: 1.6, color: _soft))),
+                        Expanded(child: Text(p, style: pvManrope(fontSize: 13.5, height: 1.6, color: _soft))),
                       ]),
                     ),
                   const SizedBox(height: 6),

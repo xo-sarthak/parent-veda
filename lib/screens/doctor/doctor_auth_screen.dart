@@ -19,11 +19,12 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- palette -----------------------------------------------------------------
 // This screen used to carry its own deep-slate/teal scheme, on the argument
@@ -161,7 +162,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                   Text(
                     'ParentVeda+',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 30,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.7,
@@ -171,7 +172,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                   Text(
                     'For doctors, counsellors and partner clinics.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 14, height: 1.5, color: _muted),
                   ),
                   const SizedBox(height: 30),
@@ -193,7 +194,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                             Border.all(color: ppCoral.withValues(alpha: 0.4)),
                       ),
                       child: Text(_error!,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 13, height: 1.45, color: ppTitleInk)),
                     ),
                   ],
@@ -217,7 +218,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                           // White on purple. The old near-black ink worked on
                           // a bright teal; on ppPurple it fails contrast.
                           : Text('Sign in',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.white)),
@@ -228,7 +229,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                     'Accounts are created by ParentVeda. If you consult with us '
                     'and cannot sign in, contact your ParentVeda partner manager.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12, height: 1.55, color: _muted),
                   ),
                 ],
@@ -244,7 +245,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
       {bool obscure = false, TextInputType? keyboard}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label.toUpperCase(),
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 11,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.7,
@@ -256,11 +257,11 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
         keyboardType: keyboard,
         autocorrect: false,
         enableSuggestions: false,
-        style: GoogleFonts.plusJakartaSans(fontSize: 15, color: _ink),
+        style: pvJakarta(fontSize: 15, color: _ink),
         onSubmitted: (_) => _submit(),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.plusJakartaSans(
+          hintStyle: pvJakarta(
               fontSize: 15, color: _muted.withValues(alpha: 0.55)),
           filled: true,
           fillColor: _panel,

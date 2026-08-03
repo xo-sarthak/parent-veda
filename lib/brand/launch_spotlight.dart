@@ -16,7 +16,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_context.dart';
@@ -24,6 +23,7 @@ import 'brand_mark.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class LaunchSpotlight extends StatefulWidget {
   const LaunchSpotlight({
@@ -101,7 +101,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
                     children: [
                       Text(
                         'A PARENTVEDA LAUNCH',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.4,
@@ -113,7 +113,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
                         c.creative.headline,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.fraunces(
+                        style: pvFraunces(
                           fontSize: 19,
                           height: 1.1,
                           fontWeight: FontWeight.w600,
@@ -129,14 +129,14 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
               c.creative.subline,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, height: 1.45, color: const Color(0xFF5C5566)),
             ),
             const SizedBox(height: 9),
             // Disclosure is not optional and never abbreviated away.
             Text(
               c.disclosure,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.4,

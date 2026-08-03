@@ -10,7 +10,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../doctor/doctor_session.dart';
@@ -28,6 +28,7 @@ import 'auth/auth_flow_screen.dart';
 import 'main_scaffold.dart';
 import 'ttc/ttc_common.dart' show ttcHomeRoute;
 import 'ttc/ttc_today_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -225,7 +226,7 @@ class _SplashScreenState extends State<SplashScreen>
                       Text(
                         'Your trusted parenting companion',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.fraunces(
+                        style: pvFraunces(
                           fontSize: 17,
                           fontStyle: FontStyle.italic,
                           color: AppTheme.primary700,
@@ -243,7 +244,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Center(
                 child: Text(
                   s.splashFooter,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.neutral400,

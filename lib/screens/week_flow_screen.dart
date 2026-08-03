@@ -14,7 +14,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../data/journey_milestones.dart';
@@ -32,6 +32,7 @@ import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/week_cards/week_overview_card.dart';
+import '../theme/pv_fonts.dart';
 
 // TESTING-ONLY: when the Dad mode switch is on AND we're on week 20, the weekly
 // flow re-voices its copy for the father (same content, read for/about her).
@@ -57,7 +58,7 @@ const Color _fAccent2 = Color(0xFFE0915B); // amber highlight
 // the mother's sans font (plusJakartaSans). Kept for revert.
 // ignore: unused_element
 TextStyle _fSerif(double size, Color c, {FontWeight w = FontWeight.w600}) =>
-    GoogleFonts.fraunces(
+    pvFraunces(
         fontSize: size, fontWeight: w, color: c, height: 1.18, letterSpacing: -0.2);
 
 // ---------------------------------------------------------------------------
@@ -1491,7 +1492,7 @@ class _DailyMomentBridge extends StatelessWidget {
                   : s.wfDailyBridgeBody,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900),
@@ -1592,7 +1593,7 @@ Widget _pageCounter(int current, int total) {
           borderRadius: BorderRadius.circular(99),
         ),
         child: Text('$current / $total',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary600)),
@@ -1684,7 +1685,7 @@ class _FadingSwipeHintState extends State<_FadingSwipeHint> {
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Text(widget.hint,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: Colors.white)),
@@ -1755,11 +1756,11 @@ class _SectionBrief extends StatelessWidget {
                   // Father headings use the MOTHER's font (plusJakartaSans), a
                   // bit bolder (w800), in Slate ink - the serif read poorly.
                   style: father
-                      ? GoogleFonts.plusJakartaSans(
+                      ? pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: _fInk)
-                      : GoogleFonts.plusJakartaSans(
+                      : pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -1771,13 +1772,13 @@ class _SectionBrief extends StatelessWidget {
           Text(brief,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   height: 1.5,
                   color: father ? _fMuted : const Color(0xFF5B5070))),
           const SizedBox(height: 8),
           Text(cta,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                   color: color)),
@@ -1813,7 +1814,7 @@ Widget _whatsNextShortcut(
           Text(label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
@@ -1859,12 +1860,12 @@ class _TrimesterTips extends StatelessWidget {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: father ? _fInk : AppTheme.primary900)),
               Text(subtitle,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: father ? _fMuted : AppTheme.neutral500)),
@@ -1905,14 +1906,14 @@ class _TrimesterTips extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(t.title.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       height: 1.25,
                       color: AppTheme.primary900)),
               const SizedBox(height: 4),
               Text(t.detail.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       height: 1.45,
                       color: const Color(0xFF5B5070))),
@@ -1952,7 +1953,7 @@ class _TrimesterTips extends StatelessWidget {
                     // Heading only now (a complete-sentence tip). The full
                     // explanation stays in the tap-through pop-up (_showTip).
                     Text(t.title.of(lang),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
                             height: 1.3,
@@ -1962,7 +1963,7 @@ class _TrimesterTips extends StatelessWidget {
                     // Text(t.body.of(lang),
                     //     maxLines: 2,
                     //     overflow: TextOverflow.ellipsis,
-                    //     style: GoogleFonts.manrope(
+                    //     style: pvManrope(
                     //         fontSize: 12.5,
                     //         height: 1.45,
                     //         color: const Color(0xFF5B5070))),
@@ -1996,14 +1997,14 @@ class _TrimesterTips extends StatelessWidget {
             const SizedBox(height: 14),
             Text(t.title.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
             const SizedBox(height: 10),
             Text(t.body.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14.5,
                     height: 1.55,
                     color: const Color(0xFF5B5070))),
@@ -2016,7 +2017,7 @@ class _TrimesterTips extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(s.wfGotIt,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontWeight: FontWeight.w700, color: Colors.white)),
               ),
             ),
@@ -2056,16 +2057,16 @@ Widget _popupTitle(String week, String title, {bool father = false}) => Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Column(children: [
         Text(week,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14, color: father ? _fMuted : AppTheme.neutral500)),
         const SizedBox(height: 2),
         Text(title,
             // Father pop-up headers use the MOTHER's font (plusJakartaSans),
             // bolder, Slate ink - consistent with the weekly headings.
             style: father
-                ? GoogleFonts.plusJakartaSans(
+                ? pvJakarta(
                     fontSize: 24, fontWeight: FontWeight.w800, color: _fInk)
-                : GoogleFonts.plusJakartaSans(
+                : pvJakarta(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary600)),
@@ -2083,13 +2084,13 @@ Widget _articleSection(_Article a, AppLanguage lang, {Color? headingColor}) =>
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(a.heading.of(lang),
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 16.5,
                 fontWeight: FontWeight.w800,
                 color: headingColor ?? AppTheme.primary900)),
         const SizedBox(height: 6),
         Text(a.body.of(lang),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 15, height: 1.6, color: const Color(0xFF5B5070))),
       ]),
     );
@@ -2139,7 +2140,7 @@ Widget _mediaPlaceholder(BuildContext context, S s,
                 color: Colors.white.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(40)),
             child: Text(video ? s.wfMediaVideo : s.wfMediaPhoto,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 9.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.4,
@@ -2225,9 +2226,9 @@ class _BabyDetailScreen extends StatelessWidget {
           const SizedBox(height: 2),
           Text(s.wfBabyScience,
               style: fatherSkin
-                  ? GoogleFonts.plusJakartaSans(
+                  ? pvJakarta(
                       fontSize: 19, fontWeight: FontWeight.w800, color: _fInk)
-                  : GoogleFonts.plusJakartaSans(
+                  : pvJakarta(
                       fontSize: 19,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary600)),
@@ -2235,7 +2236,7 @@ class _BabyDetailScreen extends StatelessWidget {
           for (final f in science) _scienceRow(context, s, f, lang, fatherSkin),
           const SizedBox(height: 14),
           Text(s.wfDisclaimer,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5, height: 1.5, color: AppTheme.neutral500)),
         ],
       ),
@@ -2276,7 +2277,7 @@ class _BabyDetailScreen extends StatelessWidget {
                     // Heading only now (a complete-sentence fact). The full
                     // fact text stays in the tap-through pop-up (_showFact).
                     Text(f.title.of(lang),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
                             height: 1.3,
@@ -2286,14 +2287,14 @@ class _BabyDetailScreen extends StatelessWidget {
                     // Text(f.desc.of(lang),
                     //     maxLines: 2,
                     //     overflow: TextOverflow.ellipsis,
-                    //     style: GoogleFonts.manrope(
+                    //     style: pvManrope(
                     //         fontSize: 13,
                     //         height: 1.4,
                     //         color: father ? _fMuted : AppTheme.neutral600)),
                     const SizedBox(height: 6),
                     Row(children: [
                       Text(s.wfTapToRead,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
                               color: father ? _fAccent : AppTheme.primary500)),
@@ -2327,14 +2328,14 @@ class _BabyDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Text(f.title.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 21,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
             const SizedBox(height: 12),
             Text(f.desc.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, height: 1.6, color: const Color(0xFF5B5070))),
             const SizedBox(height: 20),
             SizedBox(
@@ -2345,7 +2346,7 @@ class _BabyDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(s.wfGotIt,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontWeight: FontWeight.w700, color: Colors.white)),
               ),
             ),
@@ -2464,7 +2465,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                 child: Text(label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: on ? Colors.white : AppTheme.neutral600)),
@@ -2534,7 +2535,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             father: fatherSkin),
         const SizedBox(height: 16),
         Text(s.wfDisclaimer,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5, height: 1.5, color: AppTheme.neutral500)),
       ],
     );
@@ -2577,7 +2578,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                   size: 16, color: on ? Colors.white : AppTheme.neutral500),
               const SizedBox(width: 6),
               Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: on ? Colors.white : AppTheme.neutral600)),
@@ -2630,20 +2631,20 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(t.label.of(lang),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
                             color: father ? _fInk : AppTheme.primary900)),
                     const SizedBox(height: 3),
                     Text(t.short.of(lang),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13.5,
                             height: 1.45,
                             color: father ? _fMuted : AppTheme.neutral600)),
                     const SizedBox(height: 6),
                     Row(children: [
                       Text(s.wfTapToRead,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
                               color:
@@ -2680,14 +2681,14 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             const SizedBox(height: 14),
             Text(t.label.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
             const SizedBox(height: 10),
             Text(t.detail.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14.5,
                     height: 1.55,
                     color: const Color(0xFF5B5070))),
@@ -2700,7 +2701,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(s.wfGotIt,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontWeight: FontWeight.w700, color: Colors.white)),
               ),
             ),
@@ -2722,12 +2723,12 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             Icon(icon, size: 18, color: c),
             const SizedBox(width: 8),
             Text(title,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5, fontWeight: FontWeight.w800, color: c)),
           ]),
           const SizedBox(height: 8),
           Text(body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14.5,
                   height: 1.55,
                   color: father ? _fMuted : const Color(0xFF5B5070))),
@@ -2744,7 +2745,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     return [
       Text(s.wfHealthIntro,
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
       const SizedBox(height: 14),
       for (final x in syms) _symptomCard(s, x, lang),
@@ -2756,7 +2757,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     return [
       Text(s.wfHealthIntro,
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
       const SizedBox(height: 14),
       for (final x in week5Full.symptoms) _w5SymptomCard(s, x, lang),
@@ -2786,7 +2787,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(x.name.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -2794,12 +2795,12 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               Text(x.teaser.of(lang),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, height: 1.4, color: AppTheme.neutral600)),
               const SizedBox(height: 6),
               Row(children: [
                 Text(s.wfTapToRead,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
                         color: accent)),
@@ -2840,13 +2841,13 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             ),
             const SizedBox(height: 16),
             Text(x.name.of(lang),
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
             const SizedBox(height: 6),
             Text(x.teaser.of(lang),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
             const SizedBox(height: 18),
             _sheetSection(s.symHowCommon, x.howCommon.of(lang)),
@@ -2882,7 +2883,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(x.name.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -2890,12 +2891,12 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               Text(x.why.of(lang),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, height: 1.4, color: AppTheme.neutral600)),
               const SizedBox(height: 6),
               Row(children: [
                 Text(s.wfTapToRead,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
                         color: meta.color)),
@@ -2949,7 +2950,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(x.name.of(lang),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 19,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.primary900)),
@@ -2971,14 +2972,14 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11,
                   letterSpacing: 0.4,
                   fontWeight: FontWeight.w800,
                   color: warn ? AppTheme.secondary700 : AppTheme.tertiary500)),
           const SizedBox(height: 5),
           Text(body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
         ]),
       );
@@ -2988,7 +2989,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11,
                   letterSpacing: 0.4,
                   fontWeight: FontWeight.w800,
@@ -3005,7 +3006,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                 ),
                 Expanded(
                   child: Text(t.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14,
                           height: 1.45,
                           color: const Color(0xFF5B5070))),
@@ -3027,11 +3028,11 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
         const SizedBox(height: 16),
       ],
       Text(n.whyNow.of(lang),
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
       const SizedBox(height: 16),
       Text(s.foodsToFavour,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF4F7A52))),
@@ -3039,7 +3040,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       for (final f in _eatFoods) _foodCard(f, lang, const Color(0xFF4F7A52)),
       const SizedBox(height: 10),
       Text(s.wfAvoid,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: AppTheme.secondary700)),
@@ -3056,11 +3057,11 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       _superfoodCard(_w5Superfood(), s, lang),
       const SizedBox(height: 16),
       Text(d.superfood.note.of(lang),
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
       const SizedBox(height: 16),
       Text(s.foodsToFavour,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF4F7A52))),
@@ -3068,7 +3069,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
       for (final f in _w5Favour()) _foodCard(f, lang, const Color(0xFF4F7A52)),
       const SizedBox(height: 10),
       Text(s.wfAvoid,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: AppTheme.secondary700)),
@@ -3095,13 +3096,13 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(f.name.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               const SizedBox(height: 3),
               Text(f.why.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, height: 1.45, color: const Color(0xFF5B5070))),
             ]),
           ),
@@ -3127,7 +3128,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             const SizedBox(width: 6),
             Expanded(
               child: Text(s.superfoodOfWeek.toUpperCase(),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.0,
@@ -3136,13 +3137,13 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           ]),
           const SizedBox(height: 8),
           Text(sf.food.of(lang),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.tertiary700)),
           const SizedBox(height: 5),
           Text(sf.benefit.of(lang),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: const Color(0xFF5B5070))),
           const SizedBox(height: 8),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -3151,7 +3152,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             const SizedBox(width: 6),
             Expanded(
               child: Text(sf.howToConsume.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, height: 1.45, color: const Color(0xFF6B5F7E))),
             ),
           ]),
@@ -3176,13 +3177,13 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(t.title.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
               const SizedBox(height: 5),
               Text(t.detail.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14, height: 1.55, color: const Color(0xFF5B5070))),
             ]),
           ),
@@ -3289,7 +3290,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                 child: Text(label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: on ? Colors.white : AppTheme.neutral600)),
@@ -3340,13 +3341,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Text(s.wfTrimesterLabel(trimester),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
           const Spacer(),
           Text(s.wfWeeksToGo(weeksToGo),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.secondary500)),
@@ -3363,7 +3364,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
         ),
         const SizedBox(height: 8),
         Text(s.wfPercentThere((progress * 100).round()),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.neutral500)),
@@ -3382,13 +3383,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
         Center(child: _popupTitle(s.jrWeekLabel(wk), s.wfNextSection)),
         const SizedBox(height: 8),
         Text(s.wfNextIntro,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 15, height: 1.6, color: const Color(0xFF5B5070))),
         const SizedBox(height: 18),
         _progressCard(s),
         const SizedBox(height: 18),
         Text(s.wfNextRadar,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF2E9C8E))),
@@ -3414,7 +3415,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(r.of(lang),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13.5,
                         height: 1.45,
                         color: const Color(0xFF5B5070))),
@@ -3441,7 +3442,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             child: Center(
                 child: Text(s.scnUpToDate,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(color: AppTheme.neutral500))),
+                    style: pvManrope(color: AppTheme.neutral500))),
           ),
         for (final m in list) _milestoneCard(s, m, lang, m.week == cw),
       ],
@@ -3479,7 +3480,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
               Row(children: [
                 Expanded(
                   child: Text(m.title.of(lang),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -3488,14 +3489,14 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                   _tag(s.msThisWeek)
                 else
                   Text(s.jrWeekLabel(m.week),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary500)),
               ]),
               const SizedBox(height: 3),
               Text(m.short.of(lang),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, height: 1.4, color: AppTheme.neutral600)),
             ]),
           ),
@@ -3515,7 +3516,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             color: AppTheme.secondary500.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(99)),
         child: Text(t.toUpperCase(),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.4,
@@ -3543,21 +3544,21 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             ),
             const SizedBox(height: 14),
             Text(s.jrWeekLabel(m.week),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary500)),
             const SizedBox(height: 4),
             Text(m.title.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.primary900)),
             const SizedBox(height: 10),
             Text(m.detail.of(lang),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14.5, height: 1.55, color: const Color(0xFF5B5070))),
             const SizedBox(height: 18),
             SizedBox(
@@ -3568,7 +3569,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(s.wfGotIt,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontWeight: FontWeight.w700, color: Colors.white)),
               ),
             ),
@@ -3597,7 +3598,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             child: Center(
                 child: Text(s.scnUpToDate,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(color: AppTheme.neutral500))),
+                    style: pvManrope(color: AppTheme.neutral500))),
           ),
       ],
     );
@@ -3617,7 +3618,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 96),
       children: [
         Text(s.wfNextMotherIntro,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14, height: 1.55, color: const Color(0xFF5B5070))),
         const SizedBox(height: 16),
         if (cards.isEmpty)
@@ -3626,7 +3627,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             child: Center(
                 child: Text(s.scnUpToDate,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(color: AppTheme.neutral500))),
+                    style: pvManrope(color: AppTheme.neutral500))),
           ),
         ...cards,
       ],
@@ -3653,7 +3654,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           Row(children: [
             Expanded(
               child: Text(s.jrWeekLabel(week),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
@@ -3664,12 +3665,12 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           Text(mom.physicalChanges.of(lang),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: const Color(0xFF5B5070))),
           const SizedBox(height: 8),
           Row(children: [
             Text(s.wfTapToRead,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.secondary600)),
@@ -3690,14 +3691,14 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label.toUpperCase(),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11,
                           letterSpacing: 0.4,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.secondary600)),
                   const SizedBox(height: 4),
                   Text(body,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14.5,
                           height: 1.55,
                           color: const Color(0xFF5B5070))),
@@ -3718,13 +3719,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.jrWeekLabel(week),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.secondary600)),
                   const SizedBox(height: 4),
                   Text(s.wfYouThisWeek,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -3740,7 +3741,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12)),
                       onPressed: () => Navigator.of(ctx).pop(),
                       child: Text(s.wfGotIt,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontWeight: FontWeight.w700, color: Colors.white)),
                     ),
                   ),
@@ -3767,7 +3768,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                 father: true)),
         const SizedBox(height: 8),
         Text(_fScansIntro.of(lang),
-            style: GoogleFonts.manrope(fontSize: 15, height: 1.6, color: _fInk)),
+            style: pvManrope(fontSize: 15, height: 1.6, color: _fInk)),
         const SizedBox(height: 16),
         if (scans.isEmpty)
           Padding(
@@ -3775,7 +3776,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             child: Center(
                 child: Text(s.scnUpToDate,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(color: _fMuted))),
+                    style: pvManrope(color: _fMuted))),
           )
         else
           for (final f in scans) _fScanCard(s, lang, f),
@@ -3799,22 +3800,22 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(f.title.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 16, fontWeight: FontWeight.w800, color: _fInk)),
             ),
             Text(f.when.of(lang),
-                style: GoogleFonts.manrope(fontSize: 11.5, color: _fMuted)),
+                style: pvManrope(fontSize: 11.5, color: _fMuted)),
           ]),
           const SizedBox(height: 8),
           Text(f.body.of(lang),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style:
-                  GoogleFonts.manrope(fontSize: 13.5, height: 1.5, color: _fInk)),
+                  pvManrope(fontSize: 13.5, height: 1.5, color: _fInk)),
           const SizedBox(height: 8),
           Row(children: [
             Text(s.wfTapToRead,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     color: _fAccent)),
@@ -3845,7 +3846,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(f.title.of(lang),
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
                               color: _fInk)),
@@ -3853,13 +3854,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                   ]),
                   const SizedBox(height: 4),
                   Text(f.when.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: _fAccent)),
                   const SizedBox(height: 14),
                   Text(f.body.of(lang),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 14.5, height: 1.55, color: _fInk)),
                   const SizedBox(height: 14),
                   Container(
@@ -3871,14 +3872,14 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('HOW TO SHOW UP',
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 11,
                                   letterSpacing: 0.4,
                                   fontWeight: FontWeight.w800,
                                   color: _fAccent)),
                           const SizedBox(height: 4),
                           Text(f.help.of(lang),
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 14, height: 1.55, color: _fInk)),
                         ]),
                   ),
@@ -3891,7 +3892,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12)),
                       onPressed: () => Navigator.of(ctx).pop(),
                       child: Text(s.wfGotIt,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontWeight: FontWeight.w700, color: Colors.white)),
                     ),
                   ),
@@ -3916,13 +3917,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(m.title.of(lang),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
             ),
             Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5, color: AppTheme.neutral500)),
           ]),
           if (m.sections.isNotEmpty) ...[
@@ -3930,13 +3931,13 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
             Text(m.sections.first.body.of(lang),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: const Color(0xFF5B5070))),
           ],
           const SizedBox(height: 8),
           Row(children: [
             Text(s.wfTapToRead,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF2E9C8E))),
@@ -3969,7 +3970,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(m.title.of(lang),
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 19,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary900)),
@@ -3977,7 +3978,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                   ]),
                   const SizedBox(height: 4),
                   Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2E9C8E))),
@@ -3989,14 +3990,14 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(sec.label.of(lang).toUpperCase(),
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 11,
                                     letterSpacing: 0.4,
                                     fontWeight: FontWeight.w800,
                                     color: AppTheme.tertiary500)),
                             const SizedBox(height: 4),
                             Text(sec.body.of(lang),
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 14.5,
                                     height: 1.55,
                                     color: const Color(0xFF5B5070))),
@@ -4010,7 +4011,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12)),
                       onPressed: () => Navigator.of(ctx).pop(),
                       child: Text(s.wfGotIt,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontWeight: FontWeight.w700, color: Colors.white)),
                     ),
                   ),
@@ -4038,7 +4039,7 @@ class _VideoFeed extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(s.wfVideosSection,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
@@ -4103,7 +4104,7 @@ Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
                 child: Text(v.title.of(lang),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         height: 1.25,
@@ -4153,7 +4154,7 @@ Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
                     color: Colors.black.withValues(alpha: 0.45),
                     borderRadius: BorderRadius.circular(99)),
                 child: Text(v.tag,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
                         color: Colors.white)),
@@ -4192,7 +4193,7 @@ class _ArticleFeed extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(s.wfArticlesSection,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
@@ -4240,7 +4241,7 @@ class _ArticleFeed extends StatelessWidget {
             child: Text(a.title,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     height: 1.3,
                     fontWeight: FontWeight.w800,
@@ -4252,7 +4253,7 @@ class _ArticleFeed extends StatelessWidget {
                 size: 13, color: AppTheme.neutral500),
             const SizedBox(width: 4),
             Text('${a.readMins} min read',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.neutral500)),
@@ -4283,7 +4284,7 @@ class _ArticleReader extends StatelessWidget {
           Text(article.emoji, style: const TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(article.title,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   height: 1.25,
@@ -4294,13 +4295,13 @@ class _ArticleReader extends StatelessWidget {
                 size: 14, color: AppTheme.neutral500),
             const SizedBox(width: 4),
             Text('${article.readMins} min read · Week ${article.week}',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, color: AppTheme.neutral500)),
           ]),
           const SizedBox(height: 18),
           for (final para in paras) ...[
             Text(para,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 15, height: 1.6, color: AppTheme.neutral700)),
             const SizedBox(height: 14),
           ],
@@ -4324,7 +4325,7 @@ Widget _viewAllButton(BuildContext context, S s, VoidCallback onTap) {
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
       Text(s.lang.isEnglish ? 'View all' : 'Sab dekhein',
-          style: GoogleFonts.manrope(
+          style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w800,
               color: AppTheme.primary500)),
@@ -4348,7 +4349,7 @@ class _AllVideosScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: AppTheme.primary900,
         title: Text(s.wfVideosSection,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
@@ -4397,7 +4398,7 @@ class _AllReadsScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: AppTheme.primary900,
         title: Text(s.wfArticlesSection,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
@@ -4430,7 +4431,7 @@ class _AllReadsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(a.title,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: pvJakarta(
                                 fontSize: 15,
                                 height: 1.3,
                                 fontWeight: FontWeight.w800,
@@ -4441,7 +4442,7 @@ class _AllReadsScreen extends StatelessWidget {
                               size: 13, color: AppTheme.neutral500),
                           const SizedBox(width: 4),
                           Text('${a.readMins} min read · Week ${a.week}',
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.neutral500)),
@@ -4526,14 +4527,14 @@ class _PartnerSection extends StatelessWidget {
               size: 20, color: AppTheme.secondary500),
           const SizedBox(width: 10),
           Text(s.wfPartnerSection,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary900)),
         ]),
         const SizedBox(height: 8),
         Text(s.wfPartnerBlurb,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13, height: 1.5, color: AppTheme.neutral700)),
         const SizedBox(height: 14),
         // A preview of the message that will be shared (WhatsApp-style bubble).
@@ -4550,7 +4551,7 @@ class _PartnerSection extends StatelessWidget {
             ),
           ),
           child: Text(_message(s),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, height: 1.55, color: const Color(0xFF2A3D2A))),
         ),
         const SizedBox(height: 14),
@@ -4571,7 +4572,7 @@ class _PartnerSection extends StatelessWidget {
             },
             icon: const Icon(Icons.chat_rounded, size: 18, color: Colors.white),
             label: Text(s.wfPartnerCta,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontWeight: FontWeight.w700, color: Colors.white)),
           ),
         ),
@@ -4652,13 +4653,13 @@ class _WeekNav extends StatelessWidget {
               isPrev ? CrossAxisAlignment.start : CrossAxisAlignment.end,
           children: [
             Text(caption,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: father ? _fMuted : AppTheme.neutral500)),
             const SizedBox(height: 2),
             Text(label,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w800,
                     color: accent)),

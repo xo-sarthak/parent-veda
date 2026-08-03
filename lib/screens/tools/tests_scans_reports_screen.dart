@@ -20,13 +20,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_ask_strip.dart';
+import '../../theme/pv_fonts.dart';
 
 const Color _accent = Color(0xFF2E9C8E); // calm teal (matches Scans / Journal)
 const List<BoxShadow> _soft = [
@@ -60,7 +60,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.tsrTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -71,7 +71,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           Text(
             'A calm library of the tests, scans and findings you may meet in '
             'pregnancy - what each one means, and how to read your report.',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral600),
           ),
           const SizedBox(height: 16),
@@ -111,7 +111,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
                 ),
                 child: Text(tabs[i],
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: _section == i
@@ -154,7 +154,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
                     width: 1),
               ),
               child: Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color:
@@ -206,7 +206,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
         child: Center(
           child: Text('Nothing in this filter yet.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, color: AppTheme.neutral500)),
         ),
       );
@@ -255,7 +255,7 @@ class _LibraryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -263,7 +263,7 @@ class _LibraryCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 1),
                       child: Text(subtitle!,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12, color: AppTheme.neutral500)),
                     ),
                   const SizedBox(height: 6),
@@ -288,7 +288,7 @@ class _Badge extends StatelessWidget {
           borderRadius: BorderRadius.circular(99),
         ),
         child: Text(text,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.2,
@@ -313,7 +313,7 @@ class TestScanDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(info.name,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -387,7 +387,7 @@ class _InterpretPointer extends StatelessWidget {
           const SizedBox(width: 11),
           Expanded(
             child: Text(text,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5,
                     height: 1.55,
                     color: AppTheme.neutral600)),
@@ -413,7 +413,7 @@ class _ParameterCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(param.name,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w800,
                 color: _accent)),
@@ -433,14 +433,14 @@ class _ParameterCard extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 8),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(k,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.2,
                   color: AppTheme.neutral500)),
           const SizedBox(height: 2),
           Text(v,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.5, color: AppTheme.neutral800)),
         ]),
       );
@@ -463,7 +463,7 @@ class FindingDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(info.name,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -519,13 +519,13 @@ class _FaqCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(faq.q,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
         const SizedBox(height: 5),
         Text(faq.a,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
       ]),
     );
@@ -577,13 +577,13 @@ class _DetailHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.primary900)),
                 if (subtitle != null && subtitle!.trim().isNotEmpty)
                   Text(subtitle!,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5, color: AppTheme.neutral600)),
                 const SizedBox(height: 6),
                 _Badge(badge),
@@ -647,7 +647,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
               ],
               Expanded(
                 child: Text(widget.title,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: widget.highlight
@@ -670,7 +670,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                 children: [
                   if (widget.body != null && widget.body!.trim().isNotEmpty)
                     Text(widget.body!,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13.5,
                             height: 1.55,
                             color: AppTheme.neutral800)),
@@ -687,7 +687,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                               ),
                               Expanded(
                                 child: Text(b,
-                                    style: GoogleFonts.manrope(
+                                    style: pvManrope(
                                         fontSize: 13.5,
                                         height: 1.5,
                                         color: AppTheme.neutral800)),
@@ -726,13 +726,13 @@ class MedicalDisclaimerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Medical disclaimer',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFFB36B12))),
                 const SizedBox(height: 4),
                 Text(text,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         height: 1.5,
                         color: AppTheme.neutral800)),

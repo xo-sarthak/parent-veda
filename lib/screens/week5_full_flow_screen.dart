@@ -10,12 +10,12 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/week5_full_data.dart';
 import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
 
 class Week5FullFlowView extends StatefulWidget {
   const Week5FullFlowView({super.key, required this.controller});
@@ -71,13 +71,13 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   }
 
   // ---- shared bits ----------------------------------------------------------
-  TextStyle get _title => GoogleFonts.plusJakartaSans(
+  TextStyle get _title => pvJakarta(
       fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.primary900);
-  TextStyle get _cardTitle => GoogleFonts.plusJakartaSans(
+  TextStyle get _cardTitle => pvJakarta(
       fontSize: 15.5, fontWeight: FontWeight.w800, color: AppTheme.primary900);
-  TextStyle _body([Color? c]) => GoogleFonts.manrope(
+  TextStyle _body([Color? c]) => pvManrope(
       fontSize: 13.5, height: 1.6, color: c ?? AppTheme.neutral700);
-  TextStyle get _eyebrow => GoogleFonts.manrope(
+  TextStyle get _eyebrow => pvManrope(
       fontSize: 11,
       fontWeight: FontWeight.w800,
       letterSpacing: 1.2,
@@ -157,7 +157,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                         color: AppTheme.primary500,
                         borderRadius: BorderRadius.circular(99)),
                     child: Text(_lang.isEnglish ? 'Got it' : 'Samajh gaya',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: Colors.white)),
@@ -215,7 +215,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Text(_lang.isEnglish ? en : hi,
             textAlign: TextAlign.center,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5, height: 1.55, color: AppTheme.neutral500)),
       );
 
@@ -269,7 +269,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         Text(_lang.isEnglish ? 'ABOUT YOUR BABY' : 'TUMHARE BABY KE BAARE MEIN', style: _eyebrow),
         const SizedBox(height: 10),
         Text(_tr(w.about.teaser),
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 18, height: 1.4, color: AppTheme.primary900, fontWeight: FontWeight.w500)),
         const SizedBox(height: 18),
         _aboutBlock(_lang.isEnglish ? 'In my words' : 'Meri zubaani', _tr(w.about.opening)),
@@ -403,7 +403,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(_lang.isEnglish ? 'WHEN TO CONTACT YOUR DOCTOR' : 'DOCTOR SE KAB SAMPARK KARO',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: AppTheme.danger)),
                     const SizedBox(height: 4),
                     Text(_tr(s.whenDoctor), style: _body(AppTheme.neutral800)),
@@ -444,7 +444,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(_lang.isEnglish ? 'INDIAN SUPERFOOD OF THE WEEK' : 'IS HAFTE KA INDIAN SUPERFOOD',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: const Color(0xFF3E7D52))),
           const SizedBox(height: 8),
           Text(_tr(w.diet.superfood.food), style: _title),
@@ -452,7 +452,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           Text(_tr(w.diet.superfood.benefit), style: _body(AppTheme.neutral800)),
           const SizedBox(height: 10),
           Text(_tr(w.diet.superfood.tryAs),
-              style: GoogleFonts.manrope(fontSize: 13, height: 1.5, fontWeight: FontWeight.w700, color: const Color(0xFF3E7D52))),
+              style: pvManrope(fontSize: 13, height: 1.5, fontWeight: FontWeight.w700, color: const Color(0xFF3E7D52))),
           const SizedBox(height: 6),
           Text(_tr(w.diet.superfood.note), style: _body(AppTheme.neutral600)),
         ]),
@@ -493,7 +493,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           Padding(padding: const EdgeInsets.only(top: 1, right: 11), child: Icon(icon, size: 17, color: color)),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_tr(c.title), style: GoogleFonts.plusJakartaSans(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+              Text(_tr(c.title), style: pvJakarta(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppTheme.primary900)),
               const SizedBox(height: 2),
               Text(_tr(c.body), style: _body(AppTheme.neutral600)),
             ]),
@@ -535,7 +535,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(color: AppTheme.primary50, shape: BoxShape.circle),
                   child: Text('${i + 1}',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.primary600)),
+                      style: pvJakarta(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.primary600)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(child: Text(_tr(tip.oneLine), style: _cardTitle)),

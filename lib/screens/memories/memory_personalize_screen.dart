@@ -10,7 +10,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 import '../../memories/memory_analytics.dart';
@@ -18,6 +18,7 @@ import '../../memories/memory_models.dart';
 import '../../memories/memory_photos.dart';
 import '../../theme/app_theme.dart';
 import 'memory_preview_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 class MemoryPersonalizeScreen extends StatefulWidget {
   const MemoryPersonalizeScreen({super.key, required this.type});
@@ -83,11 +84,11 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                 _back(),
                 const SizedBox(height: 16),
                 Text(widget.type.label,
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 28, fontWeight: FontWeight.w600, color: _ink)),
                 const SizedBox(height: 4),
                 Text('Add your details — everything is optional except a name.',
-                    style: GoogleFonts.manrope(fontSize: 13, color: _soft)),
+                    style: pvManrope(fontSize: 13, color: _soft)),
                 const SizedBox(height: 22),
 
                 _photoSection(),
@@ -152,13 +153,13 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
               size: 26, color: AppTheme.primary500),
           const SizedBox(height: 8),
           Text('Add a photo (optional)',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary500)),
           const SizedBox(height: 2),
           Text('You can zoom & position it after',
-              style: GoogleFonts.manrope(fontSize: 11, color: _soft)),
+              style: pvManrope(fontSize: 11, color: _soft)),
           const SizedBox(height: 14),
           Row(children: [
             Expanded(
@@ -195,12 +196,12 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
       const SizedBox(height: 8),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text('Pinch to zoom · drag to position',
-            style: GoogleFonts.manrope(fontSize: 11.5, color: _soft)),
+            style: pvManrope(fontSize: 11.5, color: _soft)),
         Row(children: [
           GestureDetector(
             onTap: () => _pick(ImageSource.gallery),
             child: Text('Replace',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary500)),
@@ -209,7 +210,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           GestureDetector(
             onTap: () => setState(() => _data.photo = null),
             child: Text('Remove',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, fontWeight: FontWeight.w700, color: _soft)),
           ),
         ]),
@@ -234,7 +235,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
             Icon(icon, size: 18, color: AppTheme.primary500),
             const SizedBox(width: 8),
             Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary500)),
@@ -250,7 +251,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.6,
@@ -259,10 +260,10 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           TextField(
             maxLines: lines,
             onChanged: onChanged,
-            style: GoogleFonts.manrope(fontSize: 14, color: _ink),
+            style: pvManrope(fontSize: 14, color: _ink),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.manrope(
+              hintStyle: pvManrope(
                   fontSize: 13.5, color: const Color(0xFFB8AFA2)),
               isDense: true,
               filled: true,
@@ -300,7 +301,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                 borderRadius: BorderRadius.circular(16)),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text('Preview templates',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Colors.white)),
@@ -319,7 +320,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           const Icon(Icons.arrow_back_rounded, size: 20, color: _soft),
           const SizedBox(width: 6),
           Text('Back',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, fontWeight: FontWeight.w700, color: _soft)),
         ]),
       );

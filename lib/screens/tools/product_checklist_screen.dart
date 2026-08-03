@@ -7,7 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/product_data.dart';
@@ -21,6 +21,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/mic_dictation_button.dart';
 import '../cart_screen.dart';
 import '../products_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 const Color _accent = Color(0xFF3E9A8C);
 const Color _green = Color(0xFF3FA56A);
@@ -164,7 +165,7 @@ Future<void> showAddToChecklistSheet(
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(s.pclAddToChecklist,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.primary900)),
@@ -185,10 +186,10 @@ Future<void> showAddToChecklistSheet(
                             : AppTheme.neutral400,
                       ),
                       title: Text(l.name,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontWeight: FontWeight.w700)),
                       subtitle: Text(s.pclItemsCount(l.items.length),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12, color: AppTheme.neutral500)),
                       onTap: () {
                         if (!store.isInChecklist(l.id, product.id)) {
@@ -202,7 +203,7 @@ Future<void> showAddToChecklistSheet(
                   ListTile(
                     leading: const Icon(Icons.add_rounded, color: _accent),
                     title: Text(s.pclNewChecklist,
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontWeight: FontWeight.w700, color: _accent)),
                     onTap: () async {
                       final name = await _promptText(
@@ -256,13 +257,13 @@ class ProductChecklistScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
             children: [
               Text(s.pclIntro,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13.5, height: 1.45, color: AppTheme.neutral600)),
               const SizedBox(height: 18),
               Row(children: [
                 Expanded(
                   child: Text(s.pclYourLists,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -271,7 +272,7 @@ class ProductChecklistScreen extends StatelessWidget {
                   onPressed: () => _newChecklist(context, s),
                   icon: const Icon(Icons.add_rounded, size: 18, color: _accent),
                   label: Text(s.pclNewChecklist,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontWeight: FontWeight.w700, color: _accent)),
                 ),
               ]),
@@ -282,13 +283,13 @@ class ProductChecklistScreen extends StatelessWidget {
                 for (final l in lists) _checklistCard(context, s, l),
               const SizedBox(height: 24),
               Text(s.pclCurated,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary900)),
               const SizedBox(height: 2),
               Text(s.pclCuratedSub,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12.5, color: AppTheme.neutral500)),
               const SizedBox(height: 12),
               for (final c in kCuratedChecklists) _curatedCard(context, s, c),
@@ -323,7 +324,7 @@ class ProductChecklistScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(s.pclEmpty,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13, height: 1.45, color: AppTheme.neutral600)),
         ]),
       );
@@ -386,13 +387,13 @@ class ProductChecklistScreen extends StatelessWidget {
                       Text(l.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.primary900)),
                       const SizedBox(height: 3),
                       Text(s.pclListSummary(total, got),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.neutral500)),
@@ -493,13 +494,13 @@ class ProductChecklistScreen extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(c.name,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               const SizedBox(height: 2),
               Text(s.pclItemsCount(c.items.length),
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12, color: AppTheme.neutral500)),
             ]),
           ),
@@ -536,7 +537,7 @@ class ProductChecklistScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(c.name,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -553,13 +554,13 @@ class ProductChecklistScreen extends StatelessWidget {
                       leading:
                           Text(e.product!.emoji, style: const TextStyle(fontSize: 24)),
                       title: Text(e.product!.name,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 14, fontWeight: FontWeight.w700)),
                       subtitle: Text(
                           e.note.isEmpty
                               ? e.product!.price
                               : '${e.note} · ${e.product!.price}',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12, color: AppTheme.neutral500)),
                     ),
                 ],
@@ -583,7 +584,7 @@ class ProductChecklistScreen extends StatelessWidget {
                             controller: controller, checklistId: id));
                   },
                   child: Text(s.pclAdopt,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontWeight: FontWeight.w800)),
                 ),
               ),
@@ -683,7 +684,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(s.pclGotOf(got, total),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
                         color: _accent)),
@@ -698,7 +699,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                           controller: controller, checklistId: list.id)),
                   icon: const Icon(Icons.add_rounded, color: _accent),
                   label: Text(s.pclAddProducts,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontWeight: FontWeight.w800, color: _accent)),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: _accent.withValues(alpha: 0.5)),
@@ -715,7 +716,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                   child: Center(
                     child: Text(s.pclEmptyItems,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13, color: AppTheme.neutral500)),
                   ),
                 )
@@ -755,7 +756,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 },
                 icon: const Icon(Icons.check_rounded, size: 18, color: _accent),
                 label: Text(s.pclSaveList,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontWeight: FontWeight.w800, color: _accent)),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: _accent.withValues(alpha: 0.5)),
@@ -779,7 +780,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 label: Text(s.pclAddRemaining,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontWeight: FontWeight.w800, color: Colors.white)),
                 onPressed: () => _addRemainingToCart(context, s, list),
               ),
@@ -901,7 +902,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                           child: Text(name,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.plusJakartaSans(
+                              style: pvJakarta(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w700,
                                   color: owned
@@ -937,7 +938,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                                 item.note.isEmpty ? s.pclAddWhen : item.note,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: item.note.isEmpty
@@ -947,7 +948,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                           if (price.isNotEmpty) ...[
                             const SizedBox(width: 6),
                             Text(price,
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 11.5,
                                     color: AppTheme.neutral500)),
                           ],
@@ -1008,7 +1009,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
             color: color.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(6)),
         child: Text(text,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 9.5, fontWeight: FontWeight.w800, color: color)),
       );
 
@@ -1140,7 +1141,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
             icon: const Icon(Icons.add_circle_outline_rounded,
                 size: 18, color: _accent),
             label: Text(s.pclAddOwn,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontWeight: FontWeight.w800, color: _accent)),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 44),
@@ -1165,7 +1166,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 if (results.isEmpty) {
                   return Center(
                     child: Text(s.pclNoResults,
-                        style: GoogleFonts.manrope(color: AppTheme.neutral500)),
+                        style: pvManrope(color: AppTheme.neutral500)),
                   );
                 }
                 return ListView(
@@ -1184,7 +1185,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 children.add(Padding(
                   padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
                   child: Text('${cat.emoji}  ${cat.name}',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -1196,7 +1197,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
               if (children.isEmpty) {
                 return Center(
                   child: Text(s.pclNoResults,
-                      style: GoogleFonts.manrope(color: AppTheme.neutral500)),
+                      style: pvManrope(color: AppTheme.neutral500)),
                 );
               }
               return ListView(
@@ -1236,7 +1237,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 Border.all(color: sel ? _accent : AppTheme.outlineVariant),
           ),
           child: Text(f,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: sel ? Colors.white : AppTheme.neutral600)),
@@ -1291,7 +1292,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                   Text(_productBrand(p).toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.4,
@@ -1300,7 +1301,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                   Text(p.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -1310,14 +1311,14 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                     const SizedBox(width: 2),
                     // score is the ParentVeda Score (x/10) — used as the rating.
                     Text('${p.score.toStringAsFixed(1)}/10',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.neutral600)),
                     if (reviewCount > 0) ...[
                       const SizedBox(width: 4),
                       Text('($reviewCount)',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 11, color: AppTheme.neutral400)),
                     ],
                     const SizedBox(width: 8),
@@ -1325,7 +1326,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                       child: Text(p.price,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w800,
                               color: _accent)),
@@ -1353,7 +1354,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                     size: 16, color: added ? _accent : Colors.white),
                 const SizedBox(width: 4),
                 Text(added ? s.pclAdded : s.pclAdd,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
                         color: added ? _accent : Colors.white)),
@@ -1393,11 +1394,11 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   //           Text(p.name,
   //               maxLines: 1,
   //               overflow: TextOverflow.ellipsis,
-  //               style: GoogleFonts.plusJakartaSans(
+  //               style: pvJakarta(
   //                   fontSize: 13.5, fontWeight: FontWeight.w700)),
   //           const SizedBox(height: 2),
   //           Text(p.price,
-  //               style: GoogleFonts.manrope(
+  //               style: pvManrope(
   //                   fontSize: 12, color: AppTheme.neutral500)),
   //         ]),
   //       ),
@@ -1421,7 +1422,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   //                 size: 16, color: added ? _accent : Colors.white),
   //             const SizedBox(width: 4),
   //             Text(added ? s.pclAdded : s.pclAdd,
-  //                 style: GoogleFonts.plusJakartaSans(
+  //                 style: pvJakarta(
   //                     fontSize: 12.5,
   //                     fontWeight: FontWeight.w800,
   //                     color: added ? _accent : Colors.white)),
@@ -1451,7 +1452,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 onPressed: _saveAndBack,
                 icon: const Icon(Icons.check_rounded, size: 18, color: _accent),
                 label: Text(s.pclSaveList,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontWeight: FontWeight.w800, color: _accent)),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: _accent.withValues(alpha: 0.5)),
@@ -1473,7 +1474,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 icon: const Icon(Icons.add_shopping_cart_rounded,
                     size: 18, color: Colors.white),
                 label: Text(s.cartAddToCart,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontWeight: FontWeight.w800, color: Colors.white)),
                 onPressed: _addToCartAndOpen,
               ),
@@ -1541,7 +1542,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.pclAddOwn,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
@@ -1578,7 +1579,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                               SnackBar(content: Text(s.pclCustomAdded(name))));
                       },
                       child: Text(s.pclSave,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontWeight: FontWeight.w800)),
                     ),
                   ),

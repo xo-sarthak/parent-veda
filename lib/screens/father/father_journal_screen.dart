@@ -10,7 +10,6 @@
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/journal_entry.dart';
 import '../../services/father_journal_store.dart';
@@ -19,6 +18,7 @@ import '../../services/remote/storage_service.dart';
 import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
 import '../../widgets/storage_image.dart';
+import '../../theme/pv_fonts.dart';
 
 class FatherJournalScreen extends StatefulWidget {
   const FatherJournalScreen(
@@ -53,10 +53,10 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
   }
 
   TextStyle _serif(double s, {FontWeight w = FontWeight.w600, Color c = kFInk}) =>
-      GoogleFonts.fraunces(fontSize: s, fontWeight: w, color: c, height: 1.2);
+      pvFraunces(fontSize: s, fontWeight: w, color: c, height: 1.2);
   TextStyle _body(double s,
           {FontWeight w = FontWeight.w400, Color c = kFInk, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(fontSize: s, fontWeight: w, color: c, height: h);
+      pvJakarta(fontSize: s, fontWeight: w, color: c, height: h);
 
   void _add(Future<void> Function() open) {
     open();
@@ -112,7 +112,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('YOUR MEMORIES',
-                          style: GoogleFonts.plusJakartaSans(
+                          style: pvJakarta(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.14 * 11,
@@ -407,7 +407,7 @@ class _FatherPhotoCarouselState extends State<_FatherPhotoCarousel> {
                     color: Colors.black.withValues(alpha: 0.55),
                     borderRadius: BorderRadius.circular(99)),
                 child: Text('${_i + 1}/$n',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: Colors.white)),

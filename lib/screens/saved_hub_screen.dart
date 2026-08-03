@@ -11,7 +11,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/read_next_data.dart';
 import '../localization/app_language.dart';
@@ -25,6 +24,7 @@ import '../theme/app_theme.dart';
 import 'garbh_screen.dart';
 import 'read_next_screen.dart';
 import 'watch_learn_screen.dart';
+import '../theme/pv_fonts.dart';
 
 PvVideo? _videoById(String id) {
   for (final v in kVideos) {
@@ -142,7 +142,7 @@ class SavedHubScreen extends StatelessWidget {
   Widget _header(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 18, 2, 8),
         child: Text(t,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
@@ -173,14 +173,14 @@ class SavedHubScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(text,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 13,
                               height: 1.45,
                               color: AppTheme.neutral500)),
                       const SizedBox(height: 8),
                       Row(children: [
                         Text(cta,
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primary600)),
@@ -231,13 +231,13 @@ class SavedHubScreen extends StatelessWidget {
           title: Text(title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14, fontWeight: FontWeight.w700)),
           subtitle: Text(
               date.isEmpty ? subtitle : '$subtitle · $date',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12, color: AppTheme.neutral500)),
           trailing:
               const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
@@ -257,7 +257,7 @@ class SavedHubScreen extends StatelessWidget {
             const SizedBox(height: 14),
             Text(s.shEmpty,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral500)),
             const SizedBox(height: 18),
             _discover(context, s),
@@ -312,7 +312,7 @@ class _SavedRtbReadScreen extends StatelessWidget {
         backgroundColor: AppTheme.surface,
         elevation: 0,
         title: Text(piece.tag,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.neutral700)),
@@ -321,14 +321,14 @@ class _SavedRtbReadScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),
         children: [
           Text(piece.title,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 24,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900)),
           const SizedBox(height: 16),
           Text(piece.body,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 16, height: 1.7, color: const Color(0xFF4A4358))),
         ],
       ),

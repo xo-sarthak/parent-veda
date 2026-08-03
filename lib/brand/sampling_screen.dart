@@ -21,13 +21,13 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_mark.dart';
 import 'brand_models.dart';
 import 'brand_sampling.dart';
 import 'brand_store.dart';
+import '../theme/pv_fonts.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -108,7 +108,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text('Free sample',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 20, fontWeight: FontWeight.w600, color: _ink)),
       ),
       body: ListView(
@@ -122,28 +122,28 @@ class _SamplingScreenState extends State<SamplingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(c.creative.headline,
-                        style: GoogleFonts.fraunces(
+                        style: pvFraunces(
                             fontSize: 23,
                             height: 1.1,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFF2D144C))),
                     const SizedBox(height: 3),
                     Text(c.creative.subline,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13, height: 1.4, color: _soft)),
                   ]),
             ),
           ]),
           const SizedBox(height: 16),
           Text(c.disclosure,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.4,
                   color: const Color(0xFF8B8394))),
           const SizedBox(height: 16),
           Text(c.creative.story,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5, height: 1.6, color: _ink)),
           const SizedBox(height: 20),
           _privacyPanel(brand),
@@ -168,7 +168,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
             const Icon(Icons.lock_outline_rounded, size: 16, color: AppTheme.accentGreen),
             const SizedBox(width: 8),
             Text('Where your details go',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13, fontWeight: FontWeight.w800, color: _ink)),
           ]),
           const SizedBox(height: 10),
@@ -191,7 +191,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(s,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, height: 1.5, color: _soft)),
           ),
         ]),
@@ -201,17 +201,17 @@ class _SamplingScreenState extends State<SamplingScreen> {
 
   List<Widget> _form(Brand brand) => [
         Text('Where should we post it?',
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13.5, fontWeight: FontWeight.w800, color: _ink)),
         const SizedBox(height: 9),
         TextField(
           controller: _address,
           maxLines: 3,
           onChanged: (_) => setState(() {}),
-          style: GoogleFonts.manrope(fontSize: 13.5, color: _ink),
+          style: pvManrope(fontSize: 13.5, color: _ink),
           decoration: InputDecoration(
             hintText: 'Flat / house, street, area, city, PIN',
-            hintStyle: GoogleFonts.manrope(fontSize: 13, color: const Color(0xFFB3ACC0)),
+            hintStyle: pvManrope(fontSize: 13, color: const Color(0xFFB3ACC0)),
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
@@ -240,7 +240,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
             Expanded(
               child: Text(
                 'ParentVeda may use this address to post this sample.',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 12.5, height: 1.45, color: _soft),
               ),
             ),
@@ -263,7 +263,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           borderRadius: BorderRadius.circular(15),
         ),
         child: Text(c.creative.cta,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w800,
                 color: ready ? Colors.white : const Color(0xFF8B8394))),
@@ -286,27 +286,27 @@ class _SamplingScreenState extends State<SamplingScreen> {
               const Icon(Icons.check_circle_rounded, size: 19, color: AppTheme.accentGreen),
               const SizedBox(width: 9),
               Text('You are on the list',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14.5, fontWeight: FontWeight.w800, color: _ink)),
             ]),
             const SizedBox(height: 9),
             Text(
               'We will post it within about two weeks. If stock runs out before '
               'your turn, we will tell you — you will not be left wondering.',
-              style: GoogleFonts.manrope(fontSize: 12.5, height: 1.55, color: _soft),
+              style: pvManrope(fontSize: 12.5, height: 1.55, color: _soft),
             ),
           ]),
         ),
         const SizedBox(height: 22),
         Text('When it arrives',
-            style: GoogleFonts.fraunces(
+            style: pvFraunces(
                 fontSize: 19, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C))),
         const SizedBox(height: 6),
         Text(
           'Our question, not ${brand.name}\'s. What you say here shapes whether '
           'we run a sampling campaign with them again — it is not passed on as '
           'a testimonial.',
-          style: GoogleFonts.manrope(fontSize: 12.5, height: 1.55, color: _soft),
+          style: pvManrope(fontSize: 12.5, height: 1.55, color: _soft),
         ),
         const SizedBox(height: 14),
         Row(
@@ -333,7 +333,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         if (_rating != null) ...[
           const SizedBox(height: 12),
           Text('Thank you — noted.',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: AppTheme.accentGreen)),
         ],
       ];

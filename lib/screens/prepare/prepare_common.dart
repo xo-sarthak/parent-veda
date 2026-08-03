@@ -13,11 +13,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../booking/booking_catalog.dart';
 import '../../services/prepare_store.dart';
 import '../post_pregnancy/booking_sheet.dart';
+import '../../theme/pv_fonts.dart';
 
 // ---- palette (mirrors the design's hexes; AppTheme holds the same base) -----
 const Color kCanvas = Color(0xFFFBF9FE);
@@ -35,13 +35,13 @@ const Color kStripeA = Color(0xFFEFE7F5);
 const Color kStripeB = Color(0xFFF6F0FA);
 
 // ---- text styles ------------------------------------------------------------
-TextStyle pvHeroStyle() => GoogleFonts.fraunces(
+TextStyle pvHeroStyle() => pvFraunces(
     fontSize: 33, fontWeight: FontWeight.w400, height: 1.12, letterSpacing: -0.5, color: kInk);
-TextStyle pvSubStyle() => GoogleFonts.manrope(fontSize: 15, height: 1.6, color: kSoft);
+TextStyle pvSubStyle() => pvManrope(fontSize: 15, height: 1.6, color: kSoft);
 TextStyle pvTitleStyle([double size = 16]) =>
-    GoogleFonts.plusJakartaSans(fontSize: size, fontWeight: FontWeight.w700, color: kInk);
+    pvJakarta(fontSize: size, fontWeight: FontWeight.w700, color: kInk);
 TextStyle pvBody([Color c = kSoft, double size = 13]) =>
-    GoogleFonts.manrope(fontSize: size, height: 1.5, color: c);
+    pvManrope(fontSize: size, height: 1.5, color: c);
 
 // ---- soft purple card shadow ------------------------------------------------
 const List<BoxShadow> pvCardShadow = [
@@ -55,7 +55,7 @@ Widget pvLangToggle() => Text.rich(
         TextSpan(text: ' · ', style: TextStyle(color: Color(0xFFC7BBD6))),
         TextSpan(text: 'हिं', style: TextStyle(color: kMuted, fontWeight: FontWeight.w600)),
       ]),
-      style: GoogleFonts.manrope(fontSize: 12),
+      style: pvManrope(fontSize: 12),
     );
 
 // ---- top bar: hub shows a title, sub-screens show a back row ----------------
@@ -67,7 +67,7 @@ Widget pvTopBar(BuildContext context, {String? title, String? backLabel}) {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             const Icon(Icons.arrow_back, size: 20, color: kSoft),
             const SizedBox(width: 12),
-            Text(backLabel, style: GoogleFonts.manrope(fontSize: 14, color: kSoft)),
+            Text(backLabel, style: pvManrope(fontSize: 14, color: kSoft)),
           ]),
         )
       : Text(title ?? '', style: pvTitleStyle(15));
@@ -80,7 +80,7 @@ Widget pvTopBar(BuildContext context, {String? title, String? backLabel}) {
 // ---- small parts ------------------------------------------------------------
 Widget pvEyebrow(String text, {Color color = kCoral}) => Text(
       text.toUpperCase(),
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.3, color: color),
     );
 
@@ -88,14 +88,14 @@ Widget pvFooterNote(String text) => Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Text(text,
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(fontSize: 12, height: 1.55, color: kMuted)),
+          style: pvManrope(fontSize: 12, height: 1.55, color: kMuted)),
     );
 
 Widget pvPill(String text, {Color bg = kPanel, Color fg = kPurple}) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
       child: Text(text,
-          style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: fg)),
+          style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: fg)),
     );
 
 // Rounded lavender info/context banner.
@@ -110,7 +110,7 @@ Widget pvBanner({IconData? icon, required List<InlineSpan> spans}) => Container(
         ],
         Expanded(
           child: Text.rich(TextSpan(children: spans),
-              style: GoogleFonts.manrope(fontSize: 13, height: 1.5, color: kInk)),
+              style: pvManrope(fontSize: 13, height: 1.5, color: kInk)),
         ),
       ]),
     );
@@ -133,7 +133,7 @@ Widget pvPrimaryButton(String label, VoidCallback onTap,
         child: Padding(
           padding: padding,
           child: Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
         ),
       ),
@@ -150,7 +150,7 @@ Widget pvOutlineButton(String label, VoidCallback onTap) => Material(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           child: Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13, fontWeight: FontWeight.w700, color: kPurple)),
         ),
       ),
@@ -176,13 +176,13 @@ Widget pvSearchField({
           child: TextField(
             controller: controller,
             onChanged: onChanged,
-            style: GoogleFonts.manrope(fontSize: 14, color: kInk),
+            style: pvManrope(fontSize: 14, color: kInk),
             cursorColor: kPurple,
             decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,
               hintText: hint,
-              hintStyle: GoogleFonts.manrope(fontSize: 14, color: kMuted),
+              hintStyle: pvManrope(fontSize: 14, color: kMuted),
               contentPadding: const EdgeInsets.symmetric(vertical: 14),
             ),
           ),
@@ -363,7 +363,7 @@ class _BookingSheetState extends State<_BookingSheet> {
   Widget _confirm() {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
       _handle(),
-      Text(widget.heading, style: GoogleFonts.fraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
+      Text(widget.heading, style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
       const SizedBox(height: 16),
       Container(
         padding: const EdgeInsets.all(16),
@@ -396,7 +396,7 @@ class _BookingSheetState extends State<_BookingSheet> {
             },
             child: Center(
               child: Text(widget.cta,
-                  style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
         ),
@@ -419,7 +419,7 @@ class _BookingSheetState extends State<_BookingSheet> {
       const SizedBox(height: 16),
       Center(
         child: Text("You're all set!",
-            style: GoogleFonts.fraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
+            style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
       ),
       const SizedBox(height: 8),
       Center(
@@ -441,7 +441,7 @@ class _BookingSheetState extends State<_BookingSheet> {
             },
             child: Center(
               child: Text('Done',
-                  style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
         ),
@@ -498,7 +498,7 @@ class PvStickyCta extends StatelessWidget {
                           onTap: () => _confirmCancel(context),
                           child: Center(
                             child: Text('✓  $bookedLabel',
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 15, fontWeight: FontWeight.w700, color: kPurple)),
                           ),
                         ),
@@ -511,7 +511,7 @@ class PvStickyCta extends StatelessWidget {
                           onTap: onBook,
                           child: Center(
                             child: Text(label,
-                                style: GoogleFonts.manrope(
+                                style: pvManrope(
                                     fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
                           ),
                         ),

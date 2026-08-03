@@ -12,7 +12,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 import '../localization/app_language.dart';
@@ -22,6 +22,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
 import 'bump_book_screen.dart';
+import '../theme/pv_fonts.dart';
 
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
@@ -59,7 +60,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.bumpTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
         actions: [
           if (all.length >= 2)
@@ -132,17 +133,17 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(s.weekOf(p.currentWeek, 40),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary900)),
                 const SizedBox(height: 3),
                 Text(s.bumpPhotosAdded(all.length),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5, color: AppTheme.neutral600)),
                 const SizedBox(height: 2),
                 Text(s.journeyPercentComplete(p.progressPercent),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.secondary700)),
@@ -162,7 +163,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                   const Icon(Icons.compare_rounded, size: 16, color: Colors.white),
                   const SizedBox(width: 6),
                   Text(s.bumpThenNow,
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
@@ -211,7 +212,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               children: [
                 Text(
                   en ? 'My Bump Journey Book' : 'Meri Bump Journey Book',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: Colors.white),
@@ -221,7 +222,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                   en
                       ? 'Flip through your weeks - view, download or print'
                       : 'Apne hafte flip karein - view, download ya print',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 12,
                       height: 1.3,
                       color: Colors.white.withValues(alpha: 0.9)),
@@ -251,13 +252,13 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(s.bumpCaptureThisWeek(p.currentWeek),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13, color: AppTheme.primary800)),
           ),
           TextButton(
             onPressed: () => _addFlow(s),
             child: Text(s.bumpAddPhoto,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontWeight: FontWeight.w800,
                     color: AppTheme.secondary600)),
           ),
@@ -294,7 +295,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                   boxShadow: _filter == c.$1 ? null : _soft,
                 ),
                 child: Text(c.$2,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: _filter == c.$1
@@ -318,7 +319,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
           child: Center(
             child: Text(s.bumpNothingForFilter,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5, color: AppTheme.neutral500)),
           ),
         ),
@@ -353,7 +354,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                   size: 14, color: AppTheme.primary400),
               const SizedBox(width: 6),
               Text(label,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.primary500)),
@@ -379,12 +380,12 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
             child: Row(children: [
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.jrWeekLabel(b.weekNumber),
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primary900)),
                 Text('${s.formatShortDate(b.date)} · ${s.trimesterName(b.weekNumber)}',
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 11.5, color: AppTheme.neutral500)),
               ]),
               const Spacer(),
@@ -425,13 +426,13 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                 ? GestureDetector(
                     onTap: () => _editCaption(s, b),
                     child: Text(s.jrCaptionHint,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 13,
                             fontStyle: FontStyle.italic,
                             color: AppTheme.neutral400)),
                   )
                 : Text(b.caption,
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 15,
                         fontStyle: FontStyle.italic,
                         height: 1.4,
@@ -461,14 +462,14 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               const SizedBox(height: 18),
               Text(s.bumpEmptyTitle,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.fraunces(
+                  style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primary900)),
               const SizedBox(height: 8),
               Text(s.bumpEmptyBody,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14, height: 1.5, color: AppTheme.neutral600)),
               const SizedBox(height: 22),
               FilledButton.icon(
@@ -508,7 +509,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               leading: const Icon(Icons.camera_alt_rounded,
                   color: AppTheme.secondary500),
               title: Text(s.bumpTakePhoto,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               onTap: () {
@@ -520,7 +521,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               leading: const Icon(Icons.photo_library_rounded,
                   color: AppTheme.secondary500),
               title: Text(s.bumpUpload,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
               onTap: () {
@@ -584,7 +585,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                 // week stepper
                 Row(children: [
                   Text(s.jrWeekLabel(week),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -624,7 +625,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                               color: AppTheme.secondary50,
                               borderRadius: BorderRadius.circular(99)),
                           child: Text(sug,
-                              style: GoogleFonts.manrope(
+                              style: pvManrope(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.secondary700)),
@@ -782,7 +783,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.bumpThenNow,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: ListView(
@@ -811,7 +812,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
   Widget _slot(S s, String label, BumpPhoto b) => Column(
         children: [
           Text(label,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.4,
@@ -824,7 +825,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
           ),
           const SizedBox(height: 6),
           Text(s.jrWeekLabel(b.weekNumber),
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -837,7 +838,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.neutral500)),
@@ -860,7 +861,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
                         borderRadius: BorderRadius.circular(99),
                       ),
                       child: Text(s.jrWeekLabel(b.weekNumber),
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: b.id == selected.id

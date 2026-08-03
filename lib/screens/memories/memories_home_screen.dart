@@ -7,7 +7,6 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../memories/memories_store.dart';
 import '../../memories/memory_analytics.dart';
@@ -17,6 +16,7 @@ import '../../theme/app_theme.dart';
 import 'memory_card.dart';
 import 'memory_personalize_screen.dart';
 import 'memory_preview_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 class MemoriesHomeScreen extends StatefulWidget {
   const MemoriesHomeScreen({super.key});
@@ -58,21 +58,21 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
             _back(context),
             const SizedBox(height: 18),
             Text('MEMORIES',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 2.4,
                     color: AppTheme.primary500)),
             const SizedBox(height: 8),
             Text('Keepsakes to treasure',
-                style: GoogleFonts.fraunces(
+                style: pvFraunces(
                     fontSize: 30,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF3A352E),
                     height: 1.1)),
             const SizedBox(height: 6),
             Text('Make a beautiful card for the moments that matter most.',
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 14, color: const Color(0xFF857D70), height: 1.5)),
             const SizedBox(height: 24),
 
@@ -90,7 +90,7 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
                 if (items.isEmpty) return const SizedBox.shrink();
                 return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('MY MEMORIES',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.4,
@@ -140,13 +140,13 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(type.label,
-                    style: GoogleFonts.fraunces(
+                    style: pvFraunces(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF3A352E))),
                 const SizedBox(height: 3),
                 Text(type.blurb,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5, color: const Color(0xFF857D70))),
               ]),
             ),
@@ -172,7 +172,7 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
           const Icon(Icons.arrow_back_rounded, size: 20, color: Color(0xFF857D70)),
           const SizedBox(width: 6),
           Text('Back',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF857D70))),

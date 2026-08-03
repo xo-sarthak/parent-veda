@@ -7,13 +7,13 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/medication.dart';
 import '../../services/medicine_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 class MedicineTrackerScreen extends StatefulWidget {
   const MedicineTrackerScreen({super.key, required this.controller});
@@ -94,7 +94,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.medTitle,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
       body: store.isEmpty ? _setup(s) : _main(s, store),
@@ -105,7 +105,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               backgroundColor: _accent,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
               label: Text(s.medAddNew,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontWeight: FontWeight.w700, color: Colors.white)),
             ),
     );
@@ -127,14 +127,14 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           const SizedBox(height: 18),
           Text(s.medSetupTitle,
               textAlign: TextAlign.center,
-              style: GoogleFonts.fraunces(
+              style: pvFraunces(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.primary900)),
           const SizedBox(height: 8),
           Text(s.medSetupBody,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 14, height: 1.5, color: AppTheme.neutral600)),
           const SizedBox(height: 22),
           _presetWrap(s),
@@ -169,7 +169,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   const Icon(Icons.add_rounded, size: 16, color: _accent),
                   const SizedBox(width: 6),
                   Text(s.medPresetName(k),
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary800)),
@@ -217,7 +217,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(tabs[i],
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: _tab == i ? Colors.white : AppTheme.neutral600)),
@@ -246,7 +246,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(s.medTodayNourishment,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -262,7 +262,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           ),
           const SizedBox(height: 8),
           Text(s.medProgress(done, total),
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.neutral600)),
@@ -310,13 +310,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(m.name,
-                        style: GoogleFonts.plusJakartaSans(
+                        style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primary900)),
                     if (sub.isNotEmpty)
                       Text(sub,
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 12, color: AppTheme.neutral500)),
                   ],
                 ),
@@ -340,7 +340,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         size: 16, color: taken ? Colors.white : _accent),
                     const SizedBox(width: 6),
                     Text(taken ? s.medTakenDone : s.medTaken,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
                             color: taken ? Colors.white : _accent)),
@@ -375,7 +375,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
             Expanded(
               child: Text(
                 _alarmSummary(a),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: a.enabled ? AppTheme.primary800 : AppTheme.neutral500,
@@ -405,7 +405,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
     final meds = store.activeMeds;
     return [
       Text(s.medWeekOverview,
-          style: GoogleFonts.plusJakartaSans(
+          style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppTheme.primary900)),
@@ -422,13 +422,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           child: Row(children: [
             Expanded(
               child: Text(m.name,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
             ),
             Text(s.medDaysOf7(store.weeklyDays(m.id)),
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: _accent)),
@@ -442,7 +442,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(s.medConsistency(store.consistencyDays30),
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 13, height: 1.5, color: AppTheme.primary800)),
       ),
     ];
@@ -454,7 +454,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: Text(s.medDisclaimer,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 11.5, color: AppTheme.neutral500)),
         ),
       ]);
@@ -486,7 +486,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               ),
               const SizedBox(height: 16),
               Text(s.medSetupBody,
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 13, color: AppTheme.neutral600)),
               const SizedBox(height: 12),
               _presetWrap(s),
@@ -565,7 +565,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(existing != null ? 'Edit medication' : s.medAddTitle,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -647,7 +647,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           const Icon(Icons.alarm_rounded, size: 18, color: _accent),
           const SizedBox(width: 8),
           Text('Alarms',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary900)),
@@ -677,13 +677,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                           : getDefaultTitle().isNotEmpty
                               ? getDefaultTitle()
                               : 'Alarm',
-                      style: GoogleFonts.manrope(
+                      style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary800),
                     ),
                     Text(_alarmSummary(alarms[i]),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 11.5, color: AppTheme.neutral500)),
                   ],
                 ),
@@ -776,7 +776,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(existing != null ? 'Edit alarm' : 'New alarm',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary900)),
@@ -812,7 +812,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                               : () => setSheet(() => times.removeAt(i)),
                           backgroundColor:
                               _accent.withValues(alpha: 0.10),
-                          labelStyle: GoogleFonts.manrope(
+                          labelStyle: pvManrope(
                               fontWeight: FontWeight.w700, color: _accent),
                         ),
                       ActionChip(
@@ -865,7 +865,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   Row(children: [
                     Expanded(
                       child: Text('Alarm enabled',
-                          style: GoogleFonts.manrope(
+                          style: pvManrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.primary800)),
@@ -912,7 +912,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   }
 
   Widget _alarmLabel(String text) => Text(text,
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 12.5,
           fontWeight: FontWeight.w700,
           color: AppTheme.neutral600));
@@ -945,7 +945,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(labels[i],
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: current == opts[i]
@@ -983,7 +983,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Text(_wdShort[wd - 1],
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: selected.contains(wd)
@@ -1026,13 +1026,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(label,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primary800)),
           ),
           Text(has ? _fmtDate(iso) : 'Not set',
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: has ? _accent : AppTheme.neutral400)),
@@ -1076,7 +1076,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               ),
               const SizedBox(height: 16),
               Text(m.name,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
@@ -1087,13 +1087,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     [m.dose, m.time, m.frequency]
                         .where((x) => x.trim().isNotEmpty)
                         .join(' · '),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 12.5, color: AppTheme.neutral500)),
               ],
               if (m.presetKey != null) ...[
                 const SizedBox(height: 12),
                 Text(s.medPresetInfo(m.presetKey!),
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13.5,
                         height: 1.5,
                         color: AppTheme.neutral700)),
@@ -1101,7 +1101,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               if (m.notes.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(m.notes,
-                    style: GoogleFonts.manrope(
+                    style: pvManrope(
                         fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
               ],
               if (m.alarms.isNotEmpty) ...[
@@ -1117,7 +1117,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(_alarmSummary(a),
-                            style: GoogleFonts.manrope(
+                            style: pvManrope(
                                 fontSize: 12.5,
                                 color: a.enabled
                                     ? AppTheme.primary800
@@ -1140,7 +1140,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         size: 20, color: _accent),
                     const SizedBox(width: 12),
                     Text('Edit',
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: _accent)),
@@ -1160,7 +1160,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         size: 20, color: AppTheme.danger),
                     const SizedBox(width: 12),
                     Text(s.delete,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.danger)),

@@ -13,7 +13,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_analytics.dart';
 import 'brand_context.dart';
@@ -22,6 +21,7 @@ import 'brand_models.dart';
 import 'brand_store.dart';
 import 'brand_studio.dart';
 import 'sampling_screen.dart';
+import '../theme/pv_fonts.dart';
 
 class SamplingCard extends StatefulWidget {
   const SamplingCard({
@@ -92,7 +92,7 @@ class _SamplingCardState extends State<SamplingCard> {
                     children: [
                       Text(
                         claimed ? 'ON THE LIST' : c.creative.eyebrow.toUpperCase(),
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.3,
@@ -104,7 +104,7 @@ class _SamplingCardState extends State<SamplingCard> {
                         c.creative.headline,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.manrope(
+                        style: pvManrope(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFF2F2C30)),
@@ -125,12 +125,12 @@ class _SamplingCardState extends State<SamplingCard> {
                   : c.creative.subline,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                   fontSize: 12.5, height: 1.45, color: const Color(0xFF69636C)),
             ),
             const SizedBox(height: 8),
             Text(c.disclosure,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.4,

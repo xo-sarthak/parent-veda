@@ -15,9 +15,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_models.dart';
+import '../theme/pv_fonts.dart';
 
 /// The letters shown when a brand has no logo asset: the capitals in its name
 /// ("NestlingCo" -> "NC", "PureStart" -> "PS"), else its first letter.
@@ -61,7 +61,7 @@ class BrandMark extends StatelessWidget {
         ),
         child: Text(
           brandMonogram(brand.name),
-          style: GoogleFonts.manrope(
+          style: pvManrope(
             fontSize: size * 0.40,
             height: 1,
             fontWeight: FontWeight.w800,
@@ -97,7 +97,7 @@ class BrandLockup extends StatelessWidget {
             child: Text(
               brand.name,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.manrope(
+              style: pvManrope(
                 fontSize: nameSize,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.1,

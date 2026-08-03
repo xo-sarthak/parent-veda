@@ -12,21 +12,22 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/father/father_read_data.dart';
 import '../../models/read_item.dart';
 import '../../theme/father_skin.dart';
 import 'father_stories_screen.dart';
+import '../../theme/pv_fonts.dart';
 
 class FatherReadsScreen extends StatelessWidget {
   const FatherReadsScreen({super.key});
 
   TextStyle _body(double s,
           {FontWeight w = FontWeight.w400, Color c = kFInk, double h = 1.5}) =>
-      GoogleFonts.plusJakartaSans(fontSize: s, fontWeight: w, color: c, height: h);
-  TextStyle _eyebrow(Color c) => GoogleFonts.plusJakartaSans(
+      pvJakarta(fontSize: s, fontWeight: w, color: c, height: h);
+  TextStyle _eyebrow(Color c) => pvJakarta(
       fontSize: 11, fontWeight: FontWeight.w700, color: c, letterSpacing: 1.4);
 
   @override
@@ -219,7 +220,7 @@ class FatherReadsScreen extends StatelessWidget {
               Icon(icon, size: 15, color: filled ? kFCream : kFAccent),
               const SizedBox(width: 6),
               Text(label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: pvJakarta(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: filled ? kFCream : kFAccent)),
@@ -348,7 +349,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
         elevation: 0,
         foregroundColor: pal.ink,
         title: Text(r.category,
-            style: GoogleFonts.plusJakartaSans(
+            style: pvJakarta(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1,
@@ -384,14 +385,14 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
                   .copyWith(color: pal.ink)),
           const SizedBox(height: 9),
           Text('${r.readingTime} · ${r.category}',
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 12.5 * _fs,
                   fontWeight: FontWeight.w500,
                   color: pal.muted)),
           const SizedBox(height: 18),
           for (final para in paras) ...[
             Text(para,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 15.5 * _fs,
                     height: 1.62,
                     color: pal.ink.withValues(alpha: 0.9))),
@@ -425,14 +426,14 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
             Icon(icon, size: 17, color: kFAccent),
             const SizedBox(width: 8),
             Text(title,
-                style: GoogleFonts.plusJakartaSans(
+                style: pvJakarta(
                     fontSize: 14 * _fs,
                     fontWeight: FontWeight.w800,
                     color: pal.ink)),
           ]),
           const SizedBox(height: 10),
           Text(body,
-              style: GoogleFonts.plusJakartaSans(
+              style: pvJakarta(
                   fontSize: 14.5 * _fs,
                   height: 1.6,
                   color: pal.ink.withValues(alpha: 0.9))),
@@ -472,14 +473,14 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(tag,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 11 * _fs,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1,
                           color: accent)),
                   const SizedBox(height: 4),
                   Text(text,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 14 * _fs,
                           height: 1.5,
                           color: pal.ink.withValues(alpha: 0.9))),
@@ -505,7 +506,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
             for (final t in _toc)
               ListTile(
                 title: Text(t.label,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: pvJakarta(
                         fontSize: 15, color: pal.ink)),
                 trailing: Icon(Icons.arrow_forward_rounded,
                     size: 18, color: pal.muted),
@@ -548,7 +549,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
                     border: Border.all(color: active ? kFAccent : pal.line),
                   ),
                   child: Text(label,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: pvJakarta(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: active ? kFCream : pal.ink)),
