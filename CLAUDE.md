@@ -142,28 +142,27 @@ it belongs in the answer rather than the screen, it belongs there.
   calmly to a doctor. The app must never contradict a user's own clinician.
 - **Money and seats are decided server-side**, always.
 
-### The Hindi migration is half-done, and the identifiers still say `hinglish`
+### The Hindi migration is in progress, and only in Pregnancy
 
-Hinglish-in-Latin was dropped in favour of Hindi in Devanagari. The **content**
-moved before the **names** did, so the code reads as a contradiction until the
-rename lands. Both facts matter:
+**Write new strings in Devanagari.** That is the whole rule.
 
-- The enum value is still `AppLanguage.hinglish` and `_p`'s second parameter is
-  still literally named `hinglish`. Grep for `hinglish`, not `hindi`, when
-  looking for the language plumbing.
-- Prefer **`lang.isHindi`** in new code. It is an alias for the same value and
-  will survive the rename; `isHinglish` will not.
+Three facts that stop the obvious mistakes:
 
-What has actually moved, so nobody assumes a finished-looking file is finished:
+- **The identifiers still say `hinglish`.** `AppLanguage.hinglish` is the enum
+  value and `_p`'s second parameter is literally named `hinglish`. Grep for
+  `hinglish`, not `hindi`. Prefer **`lang.isHindi`** in new code — it is an
+  alias for the same value and survives the coming rename.
+- **Only the Pregnancy stage is being migrated.** TTC and Parenting still hold
+  Hinglish or no Hindi at all, on purpose. Do not "finish the job" there.
+- **Migrated so far:** `weekContent.json` (all 37 weeks) and the type system
+  (`lib/theme/pv_fonts.dart` + its pregnancy call sites). Everything else in
+  Pregnancy is still Hinglish.
 
-| Migrated | Not yet |
-|---|---|
-| `lib/data/weekContent.json` — all 37 weeks, 1,642 strings | `app_language.dart` (~1,827), `ttc_strings.dart` (392), enterprise screens (~92), inline `bool hinglish` in `lib/ttc/` |
-| Type: `lib/theme/pv_fonts.dart` + the call sites in pregnancy | Parenting call sites — deliberate; that content has no Hindi at all yet |
-
-⚠️ **`T _p<T>` is generic.** Some call sites return icons, colours and widgets,
-not strings. A regex sweep over `_p(` will corrupt them silently and the
-analyzer will not always catch it. Partition by return type before translating.
+⚠️ When translating `_p(...)` strings, **the placeholders are the trap.** A
+string that loses its `$n` or `$w` still compiles and still passes tests — it
+just shows the mother the wrong number. Diff the placeholder set before and
+after, and translate the plural branches (`n == 1 ? '1 entry' : '$n entries'`)
+by hand.
 
 The pre-migration Hinglish is kept verbatim in `lib/data/weekContent.hinglish.json`
 — JSON cannot hold comments, so a sibling file is how *comment out, never delete*
