@@ -113,6 +113,50 @@ def find_calls(src, marker='_p('):
         pos = close + 1
 
 
+def find_localized(src, ctor='LocalizedText('):
+    """Every `LocalizedText(en: '…', hi: '…')` in file order.
+
+    Same contract as find_calls: ordinal index is the identity, and `simple`
+    means the hi value is one plain literal that can be rewritten mechanically.
+    Named arguments may appear in either order, so both are matched by label
+    rather than by position.
+    """
+    out, idx, pos = [], 0, 0
+    while True:
+        m = src.find(ctor, pos)
+        if m < 0:
+            return out
+        op = m + len(ctor) - 1
+        try:
+            spans, close = _scan_args(src, op)
+        except ValueError:
+            pos = m + len(ctor)
+            continue
+        named = {}
+        for a, b in spans:
+            frag = src[a:b]
+            lbl = frag.lstrip()[:3]
+            if lbl.startswith('en:'):
+                off = frag.index('en:') + 3
+                named['en'] = (a + off, b)
+            elif lbl.startswith('hi:'):
+                off = frag.index('hi:') + 3
+                named['hi'] = (a + off, b)
+        if 'en' in named and 'hi' in named:
+            en_src = src[named['en'][0]:named['en'][1]].strip()
+            hi_src = src[named['hi'][0]:named['hi'][1]].strip()
+            out.append(dict(
+                idx=idx,
+                en_span=named['en'], hi_span=named['hi'],
+                en_src=en_src, hi_src=hi_src,
+                simple=_is_literal(hi_src) and _is_literal(en_src),
+                text_en=_literal_value(en_src),
+                text_hi=_literal_value(hi_src),
+            ))
+            idx += 1
+        pos = close + 1
+
+
 def _is_literal(s):
     """True when s is exactly ONE quoted Dart string literal."""
     if len(s) < 2 or s[0] not in "'\"" or s[-1] != s[0]:

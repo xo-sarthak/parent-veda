@@ -64,7 +64,7 @@ class _Organ {
 /// Hearing -> "Active", Lungs -> "Maturing", ...).
 final List<_Organ> _organs = [
   _Organ(
-    label: LocalizedText(en: 'Heart', hi: 'Dil'),
+    label: LocalizedText(en: 'Heart', hi: 'दिल'),
     onset: 5,
     mature: 20,
     words: [
@@ -75,7 +75,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Brain', hi: 'Dimaag'),
+    label: LocalizedText(en: 'Brain', hi: 'दिमाग़'),
     onset: 4,
     mature: 40,
     words: [
@@ -86,7 +86,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Lungs', hi: 'Phephde'),
+    label: LocalizedText(en: 'Lungs', hi: 'फेफड़े'),
     onset: 10,
     mature: 38,
     words: [
@@ -97,7 +97,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Bones', hi: 'Haddiyan'),
+    label: LocalizedText(en: 'Bones', hi: 'हड्डियाँ'),
     onset: 6,
     mature: 38,
     words: [
@@ -108,7 +108,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Hearing', hi: 'Sunna'),
+    label: LocalizedText(en: 'Hearing', hi: 'सुनना'),
     onset: 16,
     mature: 26,
     words: [
@@ -119,7 +119,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Vision', hi: 'Drishti'),
+    label: LocalizedText(en: 'Vision', hi: 'देखना'),
     onset: 16,
     mature: 34,
     words: [
@@ -130,7 +130,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Muscles', hi: 'Maanspeshiyan'),
+    label: LocalizedText(en: 'Muscles', hi: 'मांसपेशियाँ'),
     onset: 7,
     mature: 34,
     words: [
@@ -141,7 +141,7 @@ final List<_Organ> _organs = [
     ],
   ),
   _Organ(
-    label: LocalizedText(en: 'Immune system', hi: 'Rog-pratirodhak tantra'),
+    label: LocalizedText(en: 'Immune system', hi: 'रोग-प्रतिरोधक तंत्र'),
     onset: 12,
     mature: 40,
     words: [

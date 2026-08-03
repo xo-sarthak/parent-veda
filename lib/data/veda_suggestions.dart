@@ -31,88 +31,88 @@ class VedaSuggestionSection {
 const List<VedaSuggestionSection> kVedaSuggestions = [
   // --- Pregnancy (the live stage) -------------------------------------------
   VedaSuggestionSection(
-    title: LocalizedText(en: 'Pregnancy', hi: 'Pregnancy'),
+    title: LocalizedText(en: 'Pregnancy', hi: 'गर्भावस्था'),
     emoji: '🤰',
     active: true,
     questions: [
       LocalizedText(
           en: 'When should I have my anomaly scan?',
-          hi: 'Mera anomaly scan kab hona chahiye?'),
+          hi: 'मेरा anomaly scan कब होना चाहिए?'),
       LocalizedText(
           en: 'What are the early signs of labour?',
-          hi: 'Labour ke early signs kya hote hain?'),
+          hi: 'प्रसव के शुरुआती संकेत क्या होते हैं?'),
       LocalizedText(
           en: 'What foods boost my iron?',
-          hi: 'Iron badhane ke liye kya khaaun?'),
+          hi: 'Iron बढ़ाने के लिए क्या खाऊँ?'),
       LocalizedText(
           en: "What's the best sleeping position?",
-          hi: 'Sone ki best position kya hai?'),
+          hi: 'सोने की सबसे अच्छी मुद्रा क्या है?'),
       LocalizedText(
           en: 'What should I do about reduced movements?',
-          hi: 'Reduced movements hon to kya karun?'),
+          hi: 'हलचल कम हो तो क्या करूँ?'),
       LocalizedText(
           en: 'Can I eat papaya in pregnancy?',
-          hi: 'Kya pregnancy mein papaya kha sakti hoon?'),
+          hi: 'क्या गर्भावस्था में पपीता खा सकती हूँ?'),
       LocalizedText(
           en: 'I have back pain - what helps?',
-          hi: 'Mujhe kamar dard hai - kya help karega?'),
+          hi: 'मुझे कमर दर्द है — क्या मदद करेगा?'),
       LocalizedText(
           en: 'What should I pack in my hospital bag?',
-          hi: 'Hospital bag mein kya pack karun?'),
+          hi: 'अस्पताल बैग में क्या रखूँ?'),
     ],
   ),
   // --- Newborn (coming as the journey grows) --------------------------------
   VedaSuggestionSection(
-    title: LocalizedText(en: 'Newborn', hi: 'Newborn'),
+    title: LocalizedText(en: 'Newborn', hi: 'नवजात'),
     emoji: '👶',
     active: false,
     questions: [
       LocalizedText(
           en: 'How often should I feed my newborn?',
-          hi: 'Newborn ko kitni baar feed karun?'),
+          hi: 'नवजात को कितनी बार दूध पिलाऊँ?'),
       LocalizedText(
           en: 'How much should a newborn sleep?',
-          hi: 'Newborn ko kitna sona chahiye?'),
+          hi: 'नवजात को कितना सोना चाहिए?'),
       LocalizedText(
           en: 'Why does my baby cry so much?',
-          hi: 'Mera baby itna kyun rota hai?'),
+          hi: 'मेरा शिशु इतना क्यों रोता है?'),
       LocalizedText(
           en: 'Is my baby gaining enough weight?',
-          hi: 'Kya mera baby theek weight gain kar raha hai?'),
+          hi: 'क्या मेरे शिशु का वज़न ठीक बढ़ रहा है?'),
     ],
   ),
   // --- Toddler --------------------------------------------------------------
   VedaSuggestionSection(
-    title: LocalizedText(en: 'Toddler', hi: 'Toddler'),
+    title: LocalizedText(en: 'Toddler', hi: 'छोटा बच्चा'),
     emoji: '🧒',
     active: false,
     questions: [
       LocalizedText(
           en: 'How do I handle toddler tantrums?',
-          hi: 'Toddler ke tantrums kaise handle karun?'),
+          hi: 'छोटे बच्चे के नख़रे कैसे सँभालूँ?'),
       LocalizedText(
           en: 'When should my toddler start talking?',
-          hi: 'Mera toddler kab bolna shuru karega?'),
+          hi: 'मेरा बच्चा कब बोलना शुरू करेगा?'),
       LocalizedText(
           en: 'How do I start potty training?',
-          hi: 'Potty training kaise shuru karun?'),
+          hi: 'पॉटी ट्रेनिंग कैसे शुरू करूँ?'),
     ],
   ),
   // --- Parenting ------------------------------------------------------------
   VedaSuggestionSection(
-    title: LocalizedText(en: 'Parenting', hi: 'Parenting'),
+    title: LocalizedText(en: 'Parenting', hi: 'परवरिश'),
     emoji: '👪',
     active: false,
     questions: [
       LocalizedText(
           en: 'How much screen time is okay?',
-          hi: 'Kitna screen time theek hai?'),
+          hi: 'कितना स्क्रीन टाइम ठीक है?'),
       LocalizedText(
           en: 'How do I get my child ready for school?',
-          hi: 'Apne bachche ko school ke liye kaise taiyaar karun?'),
+          hi: 'अपने बच्चे को स्कूल के लिए कैसे तैयार करूँ?'),
       LocalizedText(
           en: 'How do I manage difficult behaviour?',
-          hi: 'Difficult behaviour kaise manage karun?'),
+          hi: 'मुश्किल व्यवहार कैसे सँभालूँ?'),
     ],
   ),
 ];

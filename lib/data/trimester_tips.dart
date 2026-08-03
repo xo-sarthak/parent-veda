@@ -28,28 +28,28 @@ const Map<int, List<TrimesterTip>> kTrimesterTipsV2 = {
       emoji: '🔍',
       title: LocalizedText(
           en: 'Make the most of your anomaly scan',
-          hi: 'Apne anomaly scan ka poora laabh lein'),
+          hi: 'अपने anomaly scan का पूरा फ़ायदा लीजिए'),
       body: LocalizedText(
           en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs, and how they're growing. You can usually bring your partner - and it's perfectly fine to ask the sonographer to explain what they're measuring. Most findings are reassuring.",
-          hi: 'Lagbhag 18–22 hafte mein yeh detailed scan baby ke dil, dimaag, reedh aur organs ki growth check karta hai. Aap apne partner ko saath la sakti hain - aur sonographer se poochna bilkul theek hai ki woh kya maap rahe hain. Zyaadatar findings rahat dene wale hote hain.'),
+          hi: 'लगभग 18–22 हफ़्ते में यह विस्तृत स्कैन शिशु के दिल, दिमाग़, रीढ़ और अंगों की बढ़त जाँचता है। आप अपने पार्टनर को साथ ला सकती हैं — और sonographer से यह पूछना बिलकुल ठीक है कि वे क्या माप रहे हैं। ज़्यादातर नतीजे राहत देने वाले होते हैं।'),
     ),
     TrimesterTip(
       emoji: '🛌',
       title: LocalizedText(
           en: 'Start sleeping on your side',
-          hi: 'Karwat par sona shuru karein'),
+          hi: 'करवट पर सोना शुरू कीजिए'),
       body: LocalizedText(
           en: "As your bump grows, sleeping on your side - the left is ideal - helps blood and nutrients reach your baby comfortably. A pillow between your knees or under the bump makes it easier. If you wake up on your back, don't worry; just settle back onto your side.",
-          hi: 'Jaise-jaise bump badhta hai, karwat (khaaskar baayein) par sona blood aur nutrients ko baby tak aaram se pahunchne mein madad karta hai. Ghutno ke beech ya bump ke neeche takiya rakhne se aasaani hoti hai. Agar peeth ke bal jaag jaayein to chinta na karein - bas wapas karwat par aa jaayein.'),
+          hi: 'जैसे-जैसे बंप बढ़ता है, करवट (ख़ासकर बाईं) पर सोना ख़ून और पोषक तत्वों को शिशु तक आराम से पहुँचने में मदद करता है। घुटनों के बीच या बंप के नीचे तकिया रखने से आसानी होती है। अगर पीठ के बल जाग जाएँ तो चिंता मत कीजिए — बस वापस करवट पर आ जाइए।'),
     ),
     TrimesterTip(
       emoji: '🥗',
       title: LocalizedText(
           en: 'Keep iron and calcium on your plate',
-          hi: 'Iron aur calcium apni thaali mein rakhein'),
+          hi: 'Iron और Calcium अपनी थाली में रखिए'),
       body: LocalizedText(
           en: "Your body is busy building your baby's bones and blood right now. Lean on iron (leafy greens, dal, jaggery) and calcium (milk, curd, paneer), and pair iron-rich foods with a little vitamin C - like lemon or orange - to absorb more. Keep taking any supplements your doctor has prescribed.",
-          hi: 'Abhi aapka shareer baby ki haddiyaan aur khoon bana raha hai. Iron (hari sabziyaan, dal, gud) aur calcium (doodh, dahi, paneer) lein, aur iron wale khaane ke saath thoda vitamin C - jaise nimbu ya santra - lein taaki zyaada absorb ho. Doctor ne jo supplements diye hain woh lete rahein.'),
+          hi: 'अभी आपका शरीर शिशु की हड्डियाँ और ख़ून बना रहा है। Iron (हरी सब्ज़ियाँ, दाल, गुड़) और Calcium (दूध, दही, पनीर) लीजिए, और Iron वाले खाने के साथ थोड़ा Vitamin C — जैसे नींबू या संतरा — लीजिए ताकि ज़्यादा सोखा जाए। डॉक्टर ने जो सप्लीमेंट दिए हैं वे लेते रहिए।'),
     ),
   ],
 };
@@ -58,34 +58,34 @@ const Map<int, List<LocalizedText>> kTrimesterTips = {
   4: [
     LocalizedText(
         en: "Take folic acid every day - it protects your baby's developing spine and brain.",
-        hi: 'Rozaana folic acid lein - yeh baby ki banti reedh aur dimaag ki raksha karta hai.'),
+        hi: 'रोज़ाना Folic acid लीजिए — यह शिशु की बनती रीढ़ और दिमाग़ की रक्षा करता है।'),
     LocalizedText(
         en: 'Avoid alcohol, smoking and raw or undercooked foods.',
-        hi: 'Sharaab, dhoomrapaan aur kacche ya adhpake khaane se bachein.'),
+        hi: 'शराब, धूम्रपान और कच्चे या अधपके खाने से बचिए।'),
     LocalizedText(
         en: 'Book your first antenatal visit with your doctor.',
-        hi: 'Apne doctor ke saath pehli antenatal visit book karein.'),
+        hi: 'अपने डॉक्टर के साथ पहली antenatal विज़िट बुक कीजिए।'),
   ],
   5: [
     LocalizedText(
         en: 'Eat small, frequent meals to ease early nausea.',
-        hi: 'Shuruaati matli kam karne ke liye thode-thode, baar-baar khaayein.'),
+        hi: 'शुरुआती मतली कम करने के लिए थोड़ा-थोड़ा, बार-बार खाइए।'),
     LocalizedText(
         en: 'Sip water through the day and rest whenever you feel tired.',
-        hi: 'Din bhar paani piyein aur jab bhi thakaan ho aaram karein.'),
+        hi: 'दिन भर पानी पीजिए और जब भी थकान हो आराम कीजिए।'),
     LocalizedText(
         en: 'Note the first day of your last period - it helps your doctor date the pregnancy.',
-        hi: 'Apne pichhle period ka pehla din note karein - isse doctor pregnancy ki dating mein madad milti hai.'),
+        hi: 'अपने पिछले पीरियड का पहला दिन नोट कीजिए — इससे डॉक्टर को गर्भावस्था की तारीख़ तय करने में मदद मिलती है।'),
   ],
   20: [
     LocalizedText(
         en: "Don't miss your anomaly scan (around 18–22 weeks) - it checks baby's growth and organs.",
-        hi: 'Apna anomaly scan (lagbhag 18–22 hafte) miss na karein - yeh baby ki growth aur organs check karta hai.'),
+        hi: 'अपना anomaly scan (लगभग 18–22 हफ़्ते) मत छोड़िए — यह शिशु की बढ़त और अंग जाँचता है।'),
     LocalizedText(
         en: 'Start sleeping on your side as your bump grows.',
-        hi: 'Bump badhne ke saath karwat (side) par sona shuru karein.'),
+        hi: 'बंप बढ़ने के साथ करवट पर सोना शुरू कीजिए।'),
     LocalizedText(
         en: 'Keep up iron- and calcium-rich foods.',
-        hi: 'Iron aur calcium se bharpoor khaana jaari rakhein.'),
+        hi: 'Iron और Calcium से भरपूर खाना जारी रखिए।'),
   ],
 };

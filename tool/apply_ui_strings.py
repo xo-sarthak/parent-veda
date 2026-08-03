@@ -15,11 +15,15 @@ the file half-translated. Two guards:
 """
 
 import sys
-from ui_strings import find_calls, placeholders, dart_literal, quote_of
+from ui_strings import (find_calls, find_localized, placeholders, dart_literal,
+                        quote_of)
 
-path, tsv = sys.argv[1], sys.argv[2]
+args = [a for a in sys.argv[1:] if a != '--localized']
+find = find_localized if '--localized' in sys.argv else find_calls
+
+path, tsv = args[0], args[1]
 src = open(path, encoding='utf-8').read()
-calls = {c['idx']: c for c in find_calls(src)}
+calls = {c['idx']: c for c in find(src)}
 
 rows, errors = [], []
 for ln, raw in enumerate(open(tsv, encoding='utf-8'), 1):

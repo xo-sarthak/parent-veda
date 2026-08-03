@@ -9,11 +9,15 @@ not through the applier.
 """
 
 import sys
-from ui_strings import find_calls
+from ui_strings import find_calls, find_localized
 
-path = sys.argv[1]
-lo = int(sys.argv[2]) if len(sys.argv) > 2 else 0
-hi = int(sys.argv[3]) if len(sys.argv) > 3 else 10 ** 9
+args = [a for a in sys.argv[1:] if a != '--localized']
+localized = '--localized' in sys.argv
+find = find_localized if localized else find_calls
+
+path = args[0]
+lo = int(args[1]) if len(args) > 1 else 0
+hi = int(args[2]) if len(args) > 2 else 10 ** 9
 
 src = open(path, encoding='utf-8').read()
 line_of = [0]
@@ -21,7 +25,7 @@ for ch in src:
     line_of.append(line_of[-1] + (1 if ch == '\n' else 0))
 
 shown = 0
-for c in find_calls(src):
+for c in find(src):
     ln = line_of[c['en_span'][0]] + 1
     if not (lo <= ln <= hi):
         continue
