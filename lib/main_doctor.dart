@@ -58,6 +58,7 @@ import 'screens/doctor/doctor_scaffold.dart';
 import 'services/notification_service.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
+import 'localization/app_language.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -110,7 +111,7 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ParentVeda+',
+      title: S.now.uiParentveda,
       debugShowCheckedModeBanner: false,
       // ONE BRAND, TWO AUDIENCES. This used to be its own dark slate/teal
       // theme, on the argument that a clinician should never wonder which app
