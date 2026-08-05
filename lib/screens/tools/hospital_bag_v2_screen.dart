@@ -1001,10 +1001,17 @@ class _ProductExperience extends StatelessWidget {
   }
 
   Widget _why(TextTheme text, S s, BagProduct p) =>
-      _bullets(text, s.hb2v2WhyRec, p.why.isEmpty ? const ['Chosen for quality & comfort'] : p.why,
+      _bullets(
+          text,
+          s.hb2v2WhyRec,
+          p.why.isEmpty
+              ? [LocalizedText(en: 'Chosen for quality & comfort',
+                  hi: 'गुणवत्ता और आराम देखकर चुना गया')]
+              : p.why,
           Icons.favorite_rounded);
 
-  Widget _bullets(TextTheme text, String title, List<String> items, IconData icon) =>
+  Widget _bullets(TextTheme text, String title, List<LocalizedText> items,
+          IconData icon) =>
       Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -1019,7 +1026,7 @@ class _ProductExperience extends StatelessWidget {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Icon(icon, size: 15, color: AppTheme.primary400),
                 const SizedBox(width: 8),
-                Expanded(child: Text(b, style: text.bodyMedium)),
+                Expanded(child: Text(b.now, style: text.bodyMedium)),
               ]),
             ),
         ]),

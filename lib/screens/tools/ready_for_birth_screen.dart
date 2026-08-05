@@ -1151,7 +1151,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('✓  ', style: TextStyle(color: AppTheme.tertiary600, fontSize: 13)),
-                    Expanded(child: Text(w, style: t.bodyMedium)),
+                    Expanded(child: Text(w.now, style: t.bodyMedium)),
                   ]),
                 ),
             ],
@@ -1164,7 +1164,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('•  '),
-                    Expanded(child: Text(c, style: t.bodyMedium)),
+                    Expanded(child: Text(c.now, style: t.bodyMedium)),
                   ]),
                 ),
             ],
