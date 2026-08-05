@@ -140,8 +140,19 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
       );
 
   // ---- steps ----------------------------------------------------------------
+  //
+  // EVERY STEP COLUMN IS `stretch`, and it has to be. A Column defaults to
+  // crossAxisAlignment.center. A _field child fills the available width because
+  // the TextField inside it expands, so its label landed hard against the left
+  // margin; a _chips child is a Wrap, which shrinks to fit its chips, so the
+  // whole block — label and all — got centred instead. The result was TITLE and
+  // LANGUAGES sitting visibly indented from FULL NAME on the same form.
+  //
+  // Stretching makes every child full-width, so the labels share one margin.
 
-  Widget _basics() => Column(children: [
+  Widget _basics() => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _field('Full name', 'Dr. …'),
         _field('Years of experience', 'e.g. 9'),
         _chips('Title', const ['Dr.', 'Mr.', 'Mrs.', 'Ms.']),
@@ -150,7 +161,9 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
             multi: true),
       ]);
 
-  Widget _qualifications() => Column(children: [
+  Widget _qualifications() => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _field('Qualification', 'MBBS, MD …'),
         _field('College / University', 'e.g. AIIMS, New Delhi'),
         _field('Year of completion', 'e.g. 2016'),
@@ -165,7 +178,9 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
         ], multi: true),
       ]);
 
-  Widget _registration() => Column(children: [
+  Widget _registration() => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _field('Registration number', 'e.g. 2254785558'),
         _field('Medical council', 'e.g. Delhi Medical Council'),
         _field('Registration year', 'e.g. 2017'),
@@ -175,7 +190,9 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
         ),
       ]);
 
-  Widget _documents() => Column(children: [
+  Widget _documents() => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _upload('Proof of qualification', 'Degree certificate'),
         _upload('Registration proof', 'Council registration certificate'),
         _upload('Identity proof', 'Aadhaar, PAN, passport or driving licence'),
@@ -185,9 +202,11 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
         ),
       ]);
 
-  Widget _payouts() => Column(children: [
+  Widget _payouts() => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _field('Account holder name', 'As printed on the passbook'),
-        _field('Account number', ''),
+        _field('Account number', 'The number on your passbook or cheque'),
         _field('IFSC', 'e.g. HDFC0001234'),
         _field('PAN', 'For TDS and invoices'),
         _note(

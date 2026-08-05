@@ -61,7 +61,7 @@ class RecommendationsScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   _pad(ppEyebrow('ParentVeda Recommendations', color: ppPurple)),
                   const SizedBox(height: 8),
-                  _pad(Text('Chosen for ${child.name}', style: ppFraunces(31, h: 1.1))),
+                  _pad(Text('Chosen for ${child.nameMid}', style: ppFraunces(31, h: 1.1))),
                   const SizedBox(height: 8),
                   _pad(Text('Not a catalogue - a handful of trusted, personalised picks. We researched everything, so you don\'t have to.', style: ppBody(14, h: 1.55))),
 
@@ -85,7 +85,7 @@ class RecommendationsScreen extends StatelessWidget {
 
                   // HERO - recommended today
                   const SizedBox(height: 26),
-                  _pad(_sectionHead(Icons.star_rounded, 'Recommended for ${child.name} today', sub: 'A few things worth your time - and why each one is here.', onMore: () => _openAll(context, 'Recommended today', today))),
+                  _pad(_sectionHead(Icons.star_rounded, 'Recommended for ${child.nameMid} today', sub: 'A few things worth your time - and why each one is here.', onMore: () => _openAll(context, 'Recommended today', today))),
                   const SizedBox(height: 14),
                   _rail(context, today, ctx: ctx, width: 226),
 
@@ -144,8 +144,8 @@ class RecommendationsScreen extends StatelessWidget {
                   // breaks is worse than no promise. What is actually true - and
                   // enforced in rank_floor.dart - is that sponsorship never buys
                   // RANK. Old line kept for revert:
-                  // 'Every recommendation is curated by ParentVeda editors and tuned to ${child.name} - balanced, evidence-first, never sponsored.'
-                  _pad(Text('Every recommendation is curated by ParentVeda editors and tuned to ${child.name} - balanced and evidence-first. Anything a brand has paid for is labelled, and paying never moves a pick up this page.',
+                  // 'Every recommendation is curated by ParentVeda editors and tuned to ${child.nameMid} - balanced, evidence-first, never sponsored.'
+                  _pad(Text('Every recommendation is curated by ParentVeda editors and tuned to ${child.nameMid} - balanced and evidence-first. Anything a brand has paid for is labelled, and paying never moves a pick up this page.',
                       textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
                 ],
               );

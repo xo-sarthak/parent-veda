@@ -490,7 +490,15 @@ class PpProductSnapshotCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(color: c.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Text(ppBadgeEmoji(badge), style: const TextStyle(fontSize: 11.5)),
+        // ppBadgeIcon, not ppBadgeEmoji. The line-icon version already existed
+        // in pp_products_data.dart, written for this exact rule and captioned
+        // "no decorative emoji" - it had simply never been called, so 🏆 and 💰
+        // shipped anyway. A correct helper nobody wired up is the failure this
+        // repo keeps hitting; see the wiring gate in CLAUDE.md.
+        //
+        // Kept for revert:
+        // Text(ppBadgeEmoji(badge), style: const TextStyle(fontSize: 11.5)),
+        Icon(ppBadgeIcon(badge), size: 12, color: c),
         const SizedBox(width: 5),
         Text(badge, style: ppBody(11, color: c, w: FontWeight.w700)),
       ]),
@@ -513,7 +521,7 @@ class PpProductSnapshotCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(color: ppCoralTint, borderRadius: BorderRadius.circular(999)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.star_rounded, size: 14, color: ppCoral),
+          const Icon(Icons.star_rounded, size: 14, color: ppAccentAmber),
           const SizedBox(width: 4),
           Text(p.rating.toStringAsFixed(1), style: ppBody(12, color: ppInk, w: FontWeight.w800)),
           const SizedBox(width: 5),

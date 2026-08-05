@@ -32,6 +32,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'food_mealplan_screen.dart';
 import 'food_recipe_screen.dart';
 import 'pp_common.dart';
@@ -209,7 +211,7 @@ class _RecipesExploreScreenState extends State<RecipesExploreScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -530,7 +532,7 @@ class _RecipeCategoryScreenState extends State<RecipeCategoryScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),

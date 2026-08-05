@@ -122,7 +122,7 @@ class MyChildJournalScreen extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('First half-roll', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text("Milestone added to ${ChildProfileStore.instance.name}'s timeline.", style: ppBody(12)),
+                    Text("Milestone added to ${ChildProfileStore.instance.nameMid}'s timeline.", style: ppBody(12)),
                   ]),
                 ),
               ]),

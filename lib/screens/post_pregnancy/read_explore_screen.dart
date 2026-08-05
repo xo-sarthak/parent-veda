@@ -32,6 +32,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'pp_common.dart';
 import 'pp_explore_kit.dart';
 import 'pp_reading_data.dart';
@@ -41,7 +43,7 @@ import 'reading_reader_screen.dart';
 /// The content-type row. "All" plus the three kinds that exist — nothing
 /// invented, nothing renamed.
 const List<String> _kTypeLabels = [
-  'All',
+  'All types',
   'Articles',
   'Book Summaries',
   'Research Summaries',
@@ -64,8 +66,8 @@ class ReadExploreScreen extends StatefulWidget {
 class _ReadExploreScreenState extends State<ReadExploreScreen> {
   final _search = TextEditingController();
   String _q = '';
-  String _topic = 'All';
-  String _type = 'All';
+  String _topic = 'All topics';
+  String _type = 'All types';
 
   @override
   void dispose() {
@@ -86,7 +88,7 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
     final kind = _kindFor(_type);
     return from.where((a) {
       if (kind != null && a.kind != kind) return false;
-      if (_topic != 'All' && a.collection != _topicId(_topic)) return false;
+      if (_topic != 'All topics' && a.collection != _topicId(_topic)) return false;
       return true;
     }).toList();
   }
@@ -114,7 +116,7 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -133,7 +135,6 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
                 text: 'Every article, book summary and research piece here has '
                     'been vetted by experts and chosen for your child’s current '
                     'age and stage.',
-                icon: Icons.verified_outlined,
                 accent: ppPurple,
               ),
             ),
@@ -151,7 +152,7 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
             // ---- the existing filters, moved to the top ------------------
             const SizedBox(height: 14),
             ExploreFilterChips(
-              labels: ['All', for (final c in kReadCollections) c.title],
+              labels: ['All topics', for (final c in kReadCollections) c.title],
               selected: _topic,
               onSelect: (v) => setState(() => _topic = v),
             ),
@@ -182,7 +183,6 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
     out.add(ExploreSectionHeader(
       title: 'Chosen for you',
       subtitle: 'For this age, this stage, and what you have been reading.',
-      seeMoreLabel: 'View all',
       onSeeMore: chosen.isEmpty
           ? null
           : () => _push(ReadListingScreen(
@@ -200,8 +200,8 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
         icon: Icons.filter_alt_off_outlined,
         cta: 'Clear filters',
         onCta: () => setState(() {
-          _topic = 'All';
-          _type = 'All';
+          _topic = 'All topics';
+          _type = 'All types';
         }),
       ));
     } else {
@@ -219,7 +219,8 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
       ..add(ExploreSectionHeader(
         title: 'Explore by topic',
         subtitle: 'Every topic, as its own reading list.',
-        seeMoreLabel: 'See all',
+        // Was 'See all' — a third label alongside 'See more' and 'View all',
+        // on one screen. The kit's default is the one word for this.
         onSeeMore: () => _push(const AllPlaylistsScreen()),
       ))
       ..add(const SizedBox(height: 12))
@@ -500,7 +501,7 @@ class _TopicPlaylistScreenState extends State<TopicPlaylistScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -548,7 +549,7 @@ class _TopicPlaylistScreenState extends State<TopicPlaylistScreen> {
                     'Everything else in it is one tap away.',
                 icon: Icons.library_books_outlined,
                 cta: 'Show everything',
-                onCta: () => setState(() => _type = 'All'),
+                onCta: () => setState(() => _type = 'All types'),
               )
             else
               // Grouped by kind, which is what makes this a playlist rather
@@ -595,7 +596,7 @@ class AllPlaylistsScreen extends StatelessWidget {
         body: SafeArea(
           bottom: false,
           child: ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -671,7 +672,7 @@ class ReadListingScreen extends StatelessWidget {
         body: SafeArea(
           bottom: false,
           child: ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),

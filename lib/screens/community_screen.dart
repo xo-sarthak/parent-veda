@@ -81,13 +81,25 @@ const List<List<Color>> _commGradients = [
   [Color(0xFFD6478A), Color(0xFFF472B6)],
 ];
 
-/// A two-letter monogram from a community name, skipping leading numbers
-/// ("November 2026 Moms" → "NM", "Delhi Moms" → "DM").
+/// A two-letter monogram from a community name.
+///
+/// ("November 2026 Moms" → "NM", "Delhi Moms" → "DM", "2 Year Olds" → "2Y".)
+///
+/// A NUMBER IS ONLY NOISE WHEN IT IS NOT THE FIRST WORD. The original rule
+/// dropped every word starting with a digit, which is right for the birth-month
+/// rooms — "2026" says nothing you cannot get from "November". It is wrong for
+/// the parenting-stage rooms, where the number is the entire identity: with it
+/// removed, "0–1 Year" monogrammed as YE and "1 Year Olds" and "2 Year Olds"
+/// BOTH became YO — two different rooms wearing the same badge.
+///
+/// Leading digit kept, mid-name digits still dropped, so both families of names
+/// come out distinct.
 String _mono(String name) {
-  final words = name
-      .split(RegExp(r'\s+'))
-      .where((w) => w.isNotEmpty && !RegExp(r'^[0-9]').hasMatch(w))
-      .toList();
+  final all = name.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+  final words = <String>[
+    for (var i = 0; i < all.length; i++)
+      if (i == 0 || !RegExp(r'^[0-9]').hasMatch(all[i])) all[i],
+  ];
   if (words.isEmpty) return name.isNotEmpty ? name[0].toUpperCase() : '?';
   if (words.length == 1) {
     final w = words.first;
@@ -2720,7 +2732,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               child: SwitchListTile.adaptive(
                 value: _wantVerify,
                 onChanged: (v) => setState(() => _wantVerify = v),
-                activeThumbColor: _proPurple,
+                activeTrackColor: _proPurple,
+            activeThumbColor: Colors.white,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                 secondary:

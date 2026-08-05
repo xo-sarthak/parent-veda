@@ -13,6 +13,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'package:google_fonts/google_fonts.dart';
 
 import 'development_area_screen.dart';
@@ -145,7 +147,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
               // leap any more; the retired widgets keep their own.
               final phase = currentPhase(_child);
               return ListView(
-                padding: EdgeInsets.only(top: 12, bottom: widget.home ? 100 : 40),
+                // kAskFabReserve on BOTH branches. The 100/40 split cleared
+                // the nav pill on the home tab and nothing at all when
+                // pushed - neither number knew the Ask Veda FAB existed,
+                // which is why it sat on a Journal tile and the video card.
+                padding: const EdgeInsets.only(top: 12, bottom: kAskFabReserve),
                 children: [
                   // The old top row was a lone hamburger + a "My Child" label —
                   // a whole row spent on nothing. It is now a proper brand
@@ -260,13 +266,22 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // header when an icon is added. Kept for revert:
       // Text('ParentVeda',
       //     style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
-      Flexible(
+      // Expanded, and NO Spacer after it — that pairing is what actually
+      // truncated the wordmark to "Parent…".
+      //
+      // Flexible and Spacer both default to flex: 1, so the free space left
+      // after the mark and the four icons was SPLIT BETWEEN THEM. The wordmark
+      // got half of what was available and ellipsised inside it while an empty
+      // Spacer sat next to it holding the other half. One Expanded takes the
+      // whole remainder, the Text is left-aligned inside it, and the icons
+      // still sit hard against the right edge — the Spacer was never doing any
+      // work the Expanded does not do.
+      Expanded(
         child: Text('ParentVeda',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
       ),
-      const Spacer(),
       // SAVED / COLLECTIONS, beside search — the same placement and the same
       // icon the pregnancy home has had (home_screen_b). The parenting side
       // already had bookmarks scattered across Watch, Learn and the daily
@@ -1338,7 +1353,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
   //  label, not two that happen to rhyme.
   Widget _heroEyebrow() => Padding(
         padding: const EdgeInsets.only(left: 4, bottom: 2),
-        child: Text('How ${_child.name} is today'.toUpperCase(),
+        child: Text('How ${_child.nameMid} is today'.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.manrope(
@@ -1568,7 +1583,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return _pad(ppSectionCard(
       eyebrow: 'Child snapshot',
       icon: Icons.insights_rounded,
-      title: 'How ${_child.name} is doing',
+      title: 'How ${_child.nameMid} is doing',
       child: Column(children: [
         for (final c in cards) ...[
           if (c != cards.first) ppRowDivider(),
@@ -1667,7 +1682,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       eyebrow: 'Coming up',
       icon: Icons.trending_up_rounded,
       accent: ppCoral,
-      title: "What ${_child.name} is preparing for next",
+      title: "What ${_child.nameMid} is preparing for next",
       child: Column(children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 4),
@@ -1852,7 +1867,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       (Icons.auto_awesome_outlined, 'Guided memory', () => _push(const GuidedMemoryScreen())),
       (Icons.bolt_outlined, 'Quick capture', () => _push(const QuickCaptureScreen())),
       (Icons.edit_note_outlined, 'Write a story', () => _push(const WriteStoryScreen())),
-      (Icons.mail_outline_rounded, 'Letter to ${_child.name}', () => _push(const LetterScreen())),
+      (Icons.mail_outline_rounded, 'Letter to ${_child.nameMid}', () => _push(const LetterScreen())),
     ];
     return _pad(ppSectionCard(
       eyebrow: 'Journal',
@@ -1883,7 +1898,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: Row(children: [
               const Icon(Icons.auto_stories_outlined, size: 19, color: ppPurple),
               const SizedBox(width: 12),
-              Expanded(child: Text("Preview ${_child.name}'s storybook…", style: ppBody(14, color: ppInk, w: FontWeight.w600))),
+              Expanded(child: Text("Preview ${_child.nameMid}'s storybook…", style: ppBody(14, color: ppInk, w: FontWeight.w600))),
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),

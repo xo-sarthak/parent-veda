@@ -544,12 +544,12 @@ void main() {
     // the fold. The feed is a lazy ListView.builder, so scroll it into
     // existence rather than expecting it pre-built.
     await tester.scrollUntilVisible(
-      find.text('Today for ${ChildProfileStore.instance.name}'),
+      find.text('Today for ${ChildProfileStore.instance.nameMid}'),
       250,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 20,
     );
-    expect(find.text('Today for ${ChildProfileStore.instance.name}'), findsOneWidget);
+    expect(find.text('Today for ${ChildProfileStore.instance.nameMid}'), findsOneWidget);
     await tester.ensureVisible(find.text('Watch now'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Watch now'));
@@ -568,7 +568,12 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: WatchHomeScreen()));
     await tester.pumpAndSettle();
 
-    // the toggle sits near the top; tapping Quick Learn re-points the picks
+    // The toggle sits BELOW the topic filters, which wrap onto two or three
+    // lines — so on a 390pt phone it starts just off the bottom of the first
+    // screen and tap() has no point to aim at. ensureVisible first, the same
+    // way the "opens a video into the player" test above does.
+    await tester.ensureVisible(find.text('Quick Learn'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Quick Learn'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Quick lessons for you'), 300,
@@ -963,7 +968,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: DevelopmentHomeScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Help ${ChildProfileStore.instance.name} grow'), findsOneWidget);
+    expect(find.text('Help ${ChildProfileStore.instance.nameMid} grow'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('The Development Map'), 250,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('The Development Map'));

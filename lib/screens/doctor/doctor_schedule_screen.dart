@@ -30,6 +30,17 @@ import '../post_pregnancy/pp_common.dart';
 
 const _dayNames = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+/// Month names, so a slot reads "Mon 3 Aug" rather than "Mon 3/8".
+///
+/// d/m is unambiguous only if you already know the convention, and the two
+/// readings of 3/8 are five months apart. On a clinical schedule that is not
+/// a style question - a doctor scanning for a clinic day should never have to
+/// work out which half is the month.
+const _monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+    'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+String _dayMonth(DateTime x) => '${x.day} ${_monthNames[x.month]}';
+
 class DoctorScheduleScreen extends StatefulWidget {
   const DoctorScheduleScreen({super.key});
 
@@ -260,7 +271,8 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
           ),
           Switch(
             value: !_s.paused,
-            activeThumbColor: ppPurple,
+            activeTrackColor: ppPurple,
+            activeThumbColor: Colors.white,
             onChanged: (v) => _update(_s.copyWith(paused: !v)),
           ),
         ]),
@@ -322,7 +334,8 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
             ),
             Switch(
               value: _perDay,
-              activeThumbColor: ppPurple,
+              activeTrackColor: ppPurple,
+            activeThumbColor: Colors.white,
               onChanged: (v) => setState(() => _perDay = v),
             ),
           ]),
@@ -657,7 +670,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
   }
 
   static String _rangeLabel(TimeOff t) {
-    String d(DateTime x) => '${x.day}/${x.month}';
+    String d(DateTime x) => _dayMonth(x);
     return t.fromDate.difference(t.toDate).inDays == 0
         ? d(t.fromDate)
         : '${d(t.fromDate)} — ${d(t.toDate)}';
@@ -728,7 +741,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
               color: Colors.white, borderRadius: BorderRadius.circular(12)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Text('${_dayNames[day.weekday]} ${day.day}/${day.month}',
+              Text('${_dayNames[day.weekday]} ${_dayMonth(day)}',
                   style: ppJakarta(12.5)),
               const Spacer(),
               Text('${slots.length}', style: ppBody(11.5, color: ppMuted)),

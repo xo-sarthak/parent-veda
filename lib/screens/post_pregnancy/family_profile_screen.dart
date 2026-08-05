@@ -54,13 +54,13 @@ class FamilyProfileScreen extends StatelessWidget {
               // profile set the wrong expectation about what was being asked.
               _pad(Text("${_child.name}'s profile", style: ppFraunces(30, h: 1.1))),
               const SizedBox(height: 8),
-              _pad(Text('The more ${_child.name} and your family are known, the more ParentVeda quietly tailors what you see — articles, videos, recipes, products and your daily focus. It never changes where things live.',
+              _pad(Text('The more ${_child.nameMid} and your family are known, the more ParentVeda quietly tailors what you see — articles, videos, recipes, products and your daily focus. It never changes where things live.',
                   style: ppBody(14, h: 1.55))),
               const SizedBox(height: 18),
               _pad(_meter(context)),
 
               const SizedBox(height: 26),
-              _section('Health', "Anything your doctor has mentioned about ${_child.name}."),
+              _section('Health', "Anything your doctor has mentioned about ${_child.nameMid}."),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final c in HealthCondition.values)
                   _chip(c.label, _p.hasCondition(c), () { _p.toggleCondition(c); _p.markAsked(ProfileField.health); }),
@@ -68,7 +68,7 @@ class FamilyProfileScreen extends StatelessWidget {
               ])),
 
               const SizedBox(height: 24),
-              _section('Feeding', 'How ${_child.name} is fed right now.'),
+              _section('Feeding', 'How ${_child.nameMid} is fed right now.'),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final f in FeedingMethod.values)
                   _chip(f.label, _p.feedings.contains(f), () => _p.toggleFeeding(f)),
@@ -76,7 +76,7 @@ class FamilyProfileScreen extends StatelessWidget {
               ])),
 
               const SizedBox(height: 24),
-              _section('Sleep', "How ${_child.name}'s sleep is going."),
+              _section('Sleep', "How ${_child.nameMid}'s sleep is going."),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final s in SleepPattern.values)
                   _chip(s.label, _p.sleeps.contains(s), () => _p.toggleSleep(s)),
@@ -144,7 +144,17 @@ class FamilyProfileScreen extends StatelessWidget {
         const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(99),
-          child: LinearProgressIndicator(value: pct / 100, minHeight: 7, backgroundColor: Colors.white, valueColor: const AlwaysStoppedAnimation(ppPurple)),
+          // The TRACK has to look emptier than the FILL, and white did the
+          // opposite: on this soft pink card a white bar reads as a solid bar,
+          // so "0% personalised" arrived under what looked like a full one.
+          // A tinted track is recessed at 0% and still clearly behind the
+          // purple fill at 100%.
+          child: LinearProgressIndicator(
+            value: pct / 100,
+            minHeight: 7,
+            backgroundColor: ppPurple.withValues(alpha: 0.14),
+            valueColor: const AlwaysStoppedAnimation(ppPurple),
+          ),
         ),
       ]),
     );

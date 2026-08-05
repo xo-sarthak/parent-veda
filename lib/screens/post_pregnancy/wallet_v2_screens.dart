@@ -30,6 +30,8 @@
 
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'package:flutter/services.dart';
 
 import '../../services/reminder_store.dart';
@@ -66,7 +68,7 @@ class WalletV2Home extends StatelessWidget {
           body: SafeArea(
             bottom: false,
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(Row(children: [
                   Expanded(child: ppBack(context, 'Explore')),
@@ -159,33 +161,47 @@ class WalletV2Home extends StatelessWidget {
       (Icons.emergency_outlined, 'Emergency card',
           () => _push(context, const WalletEmergencyCardScreen())),
     ];
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        for (final a in actions)
-          GestureDetector(
-            onTap: a.$3,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: 104,
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: ppBorder),
+    // THREE PER ROW, MEASURED, not a guessed fixed width.
+    //
+    // 104 was picked to look right and happened to fit only twice per row on a
+    // 360dp screen, so five actions laid out 2 + 2 + 1 and "Emergency card" —
+    // the one you would reach for in a hurry — sat alone on its own row looking
+    // like an afterthought. Deriving the width from the row means 3 + 2, the
+    // tiles fill the width, and it stays correct on a narrower or wider phone
+    // instead of being right on exactly one.
+    const spacing = 10.0;
+    return LayoutBuilder(builder: (context, box) {
+      final w = (box.maxWidth - spacing * 2) / 3;
+      return Wrap(
+        spacing: spacing,
+        runSpacing: spacing,
+        children: [
+          for (final a in actions)
+            GestureDetector(
+              onTap: a.$3,
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: w,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: ppBorder),
+                ),
+                child: Column(children: [
+                  Icon(a.$1, size: 21, color: ppPurple),
+                  const SizedBox(height: 9),
+                  Text(a.$2,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
+                ]),
               ),
-              child: Column(children: [
-                Icon(a.$1, size: 21, color: ppPurple),
-                const SizedBox(height: 9),
-                Text(a.$2,
-                    textAlign: TextAlign.center,
-                    style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
-              ]),
             ),
-          ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   Widget _recent(BuildContext context) {
@@ -380,7 +396,7 @@ class _WalletRemindersScreenState extends State<WalletRemindersScreen> {
         body: SafeArea(
           bottom: false,
           child: ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
             children: [
               _pad(ppBack(context, 'Health Wallet')),
               const SizedBox(height: 20),
@@ -428,7 +444,8 @@ class _WalletRemindersScreenState extends State<WalletRemindersScreen> {
         ),
         Switch.adaptive(
           value: on,
-          activeThumbColor: ppPurple,
+          activeTrackColor: ppPurple,
+            activeThumbColor: Colors.white,
           onChanged: (v) async {
             if (v) {
               WalletReminders.add(
@@ -516,7 +533,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Health Wallet')),
             const SizedBox(height: 20),
@@ -699,7 +716,7 @@ class WalletUploadScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Health Wallet')),
             const SizedBox(height: 20),

@@ -80,7 +80,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
             )),
 
             const SizedBox(height: 22),
-            _pad(Text('Where ${ChildProfileStore.instance.name} is right now', style: ppFraunces(30, h: 1.15))),
+            _pad(Text('Where ${ChildProfileStore.instance.nameMid} is right now', style: ppFraunces(30, h: 1.15))),
             const SizedBox(height: 10),
             _pad(Text(
                 'Four windows into a 4-month-old, mid-Leap 4. Every baby moves at his own pace - these are what to look for, not a scorecard.',

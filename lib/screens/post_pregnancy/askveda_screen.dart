@@ -278,7 +278,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             cursorWidth: 2,
             style: GoogleFonts.manrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk),
             decoration: InputDecoration(
-              hintText: 'Ask Veda about ${ChildProfileStore.instance.name}…',
+              hintText: 'Ask Veda about ${ChildProfileStore.instance.nameMid}…',
               filled: false,
               isDense: true,
               border: InputBorder.none,

@@ -69,7 +69,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
             const SizedBox(height: 8),
             _pad(Text('Leap calendar', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Every mental leap of the first two years, mapped to ${child.name}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
+            _pad(Text('Every mental leap of the first two years, mapped to ${child.nameMid}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
                 style: ppBody(14, h: 1.55))),
 
             // horizontal timeline

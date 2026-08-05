@@ -125,7 +125,18 @@ class ExploreSearchBar extends StatelessWidget {
               cursorColor: ppPurple,
               decoration: InputDecoration(
                 isDense: true,
+                // filled:false is LOAD-BEARING. AppTheme sets filled:true with
+                // a lavender fillColor for every TextField in the app, so
+                // clearing the border alone still painted a filled rounded box
+                // INSIDE this white bordered container - a search bar drawn
+                // twice, on every screen that uses this kit. contentPadding
+                // has to go with it: the theme's 18/16 was sized for a field
+                // that owns its own chrome, not one nested in a row.
+                filled: false,
+                contentPadding: EdgeInsets.zero,
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 hintText: hint,
                 hintStyle: ppBody(14, color: ppMuted),
               ),
@@ -320,7 +331,7 @@ class ExploreSectionHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.onSeeMore,
-    this.seeMoreLabel = 'See more',
+    this.seeMoreLabel = 'View all',
     this.anchorKey,
     this.subtitle,
   });

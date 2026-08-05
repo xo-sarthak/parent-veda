@@ -53,7 +53,7 @@ class CoursesScreen extends StatelessWidget {
               Text('Courses', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
               Text(
-                  "Deep, documentary-style guides that unlock stage by stage - you only see what's relevant to ${ChildProfileStore.instance.name} right now, with everything else a tap away.",
+                  "Deep, documentary-style guides that unlock stage by stage - you only see what's relevant to ${ChildProfileStore.instance.nameMid} right now, with everything else a tap away.",
                   style: ppBody(15)),
             ])),
 
@@ -128,7 +128,7 @@ class CoursesScreen extends StatelessWidget {
               decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(20)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  ppEyebrow('Unlocked for ${ChildProfileStore.instance.name} now', color: ppBrown, spacing: 0.8),
+                  ppEyebrow('Unlocked for ${ChildProfileStore.instance.nameMid} now', color: ppBrown, spacing: 0.8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),

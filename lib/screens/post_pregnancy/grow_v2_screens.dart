@@ -29,6 +29,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
@@ -163,7 +165,7 @@ class GrowV2Home extends StatelessWidget {
           body: SafeArea(
             bottom: false,
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(Row(children: [
                   Expanded(child: ppBack(context, 'Explore')),
@@ -443,7 +445,7 @@ class GrowCapabilityScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Grow')),
             const SizedBox(height: 20),
@@ -548,7 +550,7 @@ class GrowAllActivitiesScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Grow')),
             const SizedBox(height: 20),
@@ -646,7 +648,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Grow')),
             const SizedBox(height: 18),

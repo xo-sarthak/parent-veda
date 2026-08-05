@@ -216,9 +216,9 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
           () => _share(ReferralChannel.whatsapp, partner),
         ),
         _action(
-          Icons.link_rounded,
+          Icons.content_copy_rounded,
           'Copy the link',
-          'For your website, bio or an email signature.',
+          'Puts it on your clipboard - for your website, bio or an email signature.',
           () => _copy(
               CarePartnerEngine.linkFor(token, channel: ReferralChannel.link)),
         ),
@@ -234,9 +234,9 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
                   CarePosterScreen(partner: partner, token: token))),
         ),
         _action(
-          Icons.link_rounded,
-          'Share the link',
-          'Send this to whoever prints for your clinic.',
+          Icons.ios_share_rounded,
+          'Send the poster',
+          'Opens your share sheet - send it to whoever prints for your clinic.',
           () => _share(ReferralChannel.qr, partner),
         ),
         const SizedBox(height: 20),

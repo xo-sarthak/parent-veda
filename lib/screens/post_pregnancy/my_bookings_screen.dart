@@ -23,6 +23,8 @@ import '../../booking/call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
+import 'problem_solver_screen.dart';
+import 'yoga_home_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
@@ -366,6 +368,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     );
   }
 
+  void _push(Widget s) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => s));
+
   Widget _emptyUpcoming() => Container(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
         decoration: BoxDecoration(
@@ -382,7 +387,33 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           Text('Classes and sessions you book will show up here.',
               textAlign: TextAlign.center,
               style: ppBody(12.5, color: ppSoft, h: 1.4)),
+          // THE EMPTY STATE IS THE FEATURE'S ADVERTISEMENT (CLAUDE.md). This
+          // card described the emptiness and then stopped, so the one parent
+          // guaranteed to see it - the one who has never booked - had nowhere
+          // to go from it.
+          const SizedBox(height: 14),
+          _emptyCta('Browse classes', () => _push(const YogaHomeScreen())),
         ]),
+      );
+
+  /// The way out of an empty state. Quiet, not a hero button - this is an
+  /// invitation, not a demand.
+  Widget _emptyCta(String label, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          decoration: BoxDecoration(
+            color: ppPanel,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(label,
+                style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+            const SizedBox(width: 6),
+            const Icon(Icons.arrow_forward_rounded, size: 14, color: ppPurple),
+          ]),
+        ),
       );
 
   Widget _emptyPast() => Container(
@@ -402,6 +433,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               'and any prescription they wrote.',
               textAlign: TextAlign.center,
               style: ppBody(12.5, color: ppSoft, h: 1.4)),
+          const SizedBox(height: 14),
+          _emptyCta('Find an expert', () => _push(const ProblemSolverScreen())),
         ]),
       );
 

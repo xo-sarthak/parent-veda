@@ -42,7 +42,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
           const SizedBox(height: 10),
           _pad(Text('Astrology & Numerology', style: ppFraunces(30, h: 1.12))),
           const SizedBox(height: 8),
-          _pad(Text("Off by default. Turn it on to add cosmic notes to ${ChildProfileStore.instance.name}'s world - you can switch it off anytime.",
+          _pad(Text("Off by default. Turn it on to add cosmic notes to ${ChildProfileStore.instance.nameMid}'s world - you can switch it off anytime.",
               style: ppBody(15))),
 
           // toggle card
@@ -65,7 +65,7 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Astrology & Numerology', style: ppJakarta(15)),
                       const SizedBox(height: 2),
-                      Text("AI readings for ${ChildProfileStore.instance.name}, if you'd like them.", style: ppBody(12)),
+                      Text("AI readings for ${ChildProfileStore.instance.nameMid}, if you'd like them.", style: ppBody(12)),
                     ]),
                   ),
                   const SizedBox(width: 12),
@@ -80,7 +80,12 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                 padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Off by default. Turn on to add an Astrology tab to ${ChildProfileStore.instance.name}\'s profile. You can switch it off anytime.',
+                  // The page subtitle a few lines up already says "off by
+                  // default … switch it off anytime". Repeating it verbatim
+                  // inside the card read as the app not trusting you to have
+                  // read its own first paragraph. This says the one thing the
+                  // subtitle does not: WHERE the section shows up once it is on.
+                  child: Text('Turn this on and an Astrology tab appears on ${ChildProfileStore.instance.nameMid}\'s profile.',
                       style: ppBody(12, color: ppMuted, h: 1.55)),
                 ),
               ),

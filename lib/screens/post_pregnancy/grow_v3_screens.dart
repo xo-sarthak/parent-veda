@@ -35,6 +35,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'development_area_screen.dart';
 import 'development_checkin_screen.dart';
 import 'development_map_screen.dart';
@@ -72,7 +74,7 @@ class GrowV3Home extends StatelessWidget {
           body: SafeArea(
             bottom: false,
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(Row(children: [
                   Expanded(child: ppBack(context, 'Explore')),
@@ -379,7 +381,7 @@ class GrowV3CapabilityScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Grow')),
             const SizedBox(height: 20),

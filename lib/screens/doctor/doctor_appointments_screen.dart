@@ -121,6 +121,16 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           '${unwritten > 0 ? ' $unwritten still need a prescription.' : ''}';
     }
     if (later > 0) return 'Nothing today. $later coming up.';
+    // "No consultations booked yet" is only true if there are none AT ALL. It
+    // used to be the fallback for an empty today-and-upcoming, so it sat
+    // directly beneath a tab reading "Past (6)" and told a doctor with a full
+    // history that they had never had a patient.
+    if (past.isNotEmpty) {
+      final n = past.length;
+      return 'Nothing coming up. '
+          '${n == 1 ? '1 past consultation' : '$n past consultations'} on record'
+          '${unwritten > 0 ? ', $unwritten still needing a prescription' : ''}.';
+    }
     return 'No consultations booked yet.';
   }
 
@@ -294,7 +304,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) =>
-                        DoctorPrescriptionScreen(bookingId: b.id, title: b.title),
+                        DoctorPrescriptionScreen(
+                            bookingId: b.id,
+                            title: b.title,
+                            backLabel: 'Appointments'),
                   ),
                 ),
               ),

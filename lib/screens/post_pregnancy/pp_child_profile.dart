@@ -114,6 +114,24 @@ class Child {
   /// time a parent updated the current weight.
   double birthWeightKg;
 
+  /// The placeholder used until a parent saves a real child.
+  ///
+  /// It reads correctly at the START of a sentence and as a standalone title -
+  /// "Your baby", the header on My Child. It reads WRONG anywhere else, and
+  /// almost every use is anywhere else: "How Your baby is doing", "Help Your
+  /// baby grow", "for Your baby's higher education". A capital letter in the
+  /// middle of a sentence is the single most common way a template gives away
+  /// that it is a template.
+  static const placeholder = 'Your baby';
+
+  /// The name as it should appear INSIDE a sentence.
+  ///
+  /// A real name is a proper noun and keeps its capital: "How Aarav is doing".
+  /// The placeholder is not a name at all, so it lowercases: "How your baby is
+  /// doing". One getter rather than a lowercase() at every call site, because
+  /// lowercasing a real name would be worse than the bug it fixed.
+  String get nameMid => name == placeholder ? 'your baby' : name;
+
   Child copyWith({String? id}) => Child(
         id: id ?? this.id,
         name: name,
@@ -216,7 +234,7 @@ class ChildProfileStore extends ChangeNotifier {
   /// honest position for a child we know nothing about yet.
   static final Child _seed = Child(
     id: '',
-    name: 'Your baby',
+    name: Child.placeholder,
     isBoy: true,
     dob: DateTime.now(),
     weightKg: 0,
@@ -413,6 +431,13 @@ class ChildProfileStore extends ChangeNotifier {
   // --- the flat API the screens already use (reads the ACTIVE child) ---------
 
   String get name => active.name;
+
+  /// The active child's name as it should read INSIDE a sentence — see
+  /// [Child.nameMid]. Most screens reach the name through this flat API rather
+  /// than through [active], so it has to exist on both or half the app keeps
+  /// the bug.
+  String get nameMid => active.nameMid;
+
   bool get isBoy => active.isBoy;
   DateTime get dob => active.dob;
   double get weightKg => active.weightKg;

@@ -11,6 +11,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'baby_documents_screen.dart';
 import 'health_doctor_visit_screen.dart';
 import 'health_emergency_screen.dart';
@@ -49,17 +51,24 @@ class HealthHomeScreen extends StatelessWidget {
     final current = growth.latest;
     return Scaffold(
       backgroundColor: ppBg,
-      floatingActionButton: GestureDetector(
-        onTap: () => openPpTab(context, 1),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 56,
-          height: 56,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
-          child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
-        ),
-      ),
+      // LOCAL FAB REMOVED — the same copy-pasted button as vax_tracker_screen,
+      // and the same two problems: it stacks a second identical circle under
+      // the global GlobalAskFab, and it does not open Ask Veda at all. It calls
+      // openPpTab(context, 1) and jumps to the Brain tab.
+      //
+      // Ask Veda's sparkle is a promise about what happens next. Two screens
+      // were breaking it. Kept for revert:
+      // floatingActionButton: GestureDetector(
+      //   onTap: () => openPpTab(context, 1),
+      //   behavior: HitTestBehavior.opaque,
+      //   child: Container(
+      //     width: 56,
+      //     height: 56,
+      //     alignment: Alignment.center,
+      //     decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
+      //     child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
+      //   ),
+      // ),
       // Listens to HealthStore so the moment she enters a measurement or marks a
       // dose, the not-yet-entered states swap for the real thing.
       body: SafeArea(
@@ -75,7 +84,7 @@ class HealthHomeScreen extends StatelessWidget {
             ChildProfileStore.instance,
           ]),
           builder: (context, _) => ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Explore')),
             const SizedBox(height: 18),

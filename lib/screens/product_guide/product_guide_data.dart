@@ -319,7 +319,7 @@ const List<ProductGuide> kProductGuides = [
   ProductGuide(
     id: 'diapers',
     category: 'Diapering',
-    icon: Icons.child_friendly_rounded,
+    icon: Icons.baby_changing_station_outlined,
     brand: 'ParentVeda',
     name: 'Newborn Diapers',
     reco: PgReco.highly,
@@ -345,7 +345,7 @@ const List<ProductGuide> kProductGuides = [
   ProductGuide(
     id: 'baby_wipes',
     category: 'Diapering',
-    icon: Icons.cleaning_services_outlined,
+    icon: Icons.water_drop_outlined,
     brand: 'ParentVeda',
     name: 'Water Wipes',
     reco: PgReco.recommended,

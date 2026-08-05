@@ -26,6 +26,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'pp_common.dart';
 import 'pp_explore_kit.dart';
 import 'pp_reco_data.dart';
@@ -200,7 +202,6 @@ class _RecoExploreScreenState extends State<RecoExploreScreen> {
               text: 'Every recommendation is carefully curated by child '
                   'development experts and personalised for your child’s age, '
                   'developmental stage and interests.',
-              icon: Icons.workspace_premium_outlined,
               accent: ppPurple,
             ),
           ),
@@ -307,7 +308,10 @@ class _RecoExploreScreenState extends State<RecoExploreScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ),
-          const Icon(Icons.favorite, size: 11, color: ppCoral),
+          // A star, not a heart: this number is a RATING, and a filled heart
+          // reads as "saved" or "liked". Amber matches Watch, Products and
+          // the Product Guide - one mark for one meaning.
+          const Icon(Icons.star_rounded, size: 12, color: ppAccentAmber),
           const SizedBox(width: 3),
           Text(r.pvRating.toStringAsFixed(1),
               style: ppBody(10.5, color: ppSoft, w: FontWeight.w700)),
@@ -516,7 +520,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
         child: ListenableBuilder(
           listenable: RecoStore.instance,
           builder: (context, _) => ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 40),
+            padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),

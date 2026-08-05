@@ -9,6 +9,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'development_activity_screen.dart';
@@ -34,15 +36,15 @@ class DevelopmentHomeScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Explore')),
             const SizedBox(height: 18),
             _pad(ppEyebrow('Skill Development', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('Help ${ChildProfileStore.instance.name} grow', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('Help ${ChildProfileStore.instance.nameMid} grow', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 8),
-            _pad(Text('This is where you nurture how ${ChildProfileStore.instance.name} is growing - his thinking, his body, his words and his feelings. Not a checklist to tick off, but a gentle companion: what he is learning right now, and the small, joyful things that help it along.', style: ppBody(14, h: 1.55))),
+            _pad(Text('This is where you nurture how ${ChildProfileStore.instance.nameMid} is growing - his thinking, his body, his words and his feelings. Not a checklist to tick off, but a gentle companion: what he is learning right now, and the small, joyful things that help it along.', style: ppBody(14, h: 1.55))),
 
             // 1 - today's focus
             const SizedBox(height: 24),

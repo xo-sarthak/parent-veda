@@ -421,15 +421,38 @@ class FindHelpNeed {
   final IconData icon;
 }
 
+// LABEL first, CATEGORY second - and only the label changes here. The category
+// is the matching key against Expert.category, so correcting the spelling in
+// place would have silently emptied three of these lists.
+//
+// Indian English is British English: a mother reads "Paediatrician" on the
+// clinic door and on the prescription. Every credential string in this file
+// already said Paediatrician/Gynaecologist; only the browse labels said
+// Pediatrician/Gynecologist, so Find help showed both spellings on one screen.
+// "Child derma" was an abbreviation nobody uses out loud.
 const List<FindHelpNeed> kFindHelpNeeds = [
-  FindHelpNeed('Pediatrician', 'Pediatrician', Icons.medical_services_outlined),
-  FindHelpNeed('Gynecologist', 'Gynecologist', Icons.pregnant_woman_outlined),
+  FindHelpNeed('Paediatrician', 'Pediatrician', Icons.medical_services_outlined),
+  FindHelpNeed('Gynaecologist', 'Gynecologist', Icons.pregnant_woman_outlined),
   FindHelpNeed('Speech therapist', 'Speech therapist', Icons.record_voice_over_outlined),
   FindHelpNeed('Lactation expert', 'Lactation expert', Icons.local_drink_outlined),
-  FindHelpNeed('Child derma', 'Child derma', Icons.healing_outlined),
+  FindHelpNeed('Child dermatologist', 'Child derma', Icons.healing_outlined),
   FindHelpNeed('Child psychologist', 'Child psychologist', Icons.psychology_outlined),
   FindHelpNeed('Special needs expert', 'Special needs expert', Icons.accessibility_new_outlined),
 ];
+
+/// The human label for a category key.
+///
+/// Expert.category is a MATCHING KEY, not display text - it stays
+/// "Pediatrician" so nothing unmaps. Anywhere a category is shown to a
+/// person it goes through here, so the screen says "Paediatrician" while
+/// the lookup keeps working. Falls back to the key, so a category with no
+/// entry still renders something rather than nothing.
+String needLabel(String category) {
+  for (final n in kFindHelpNeeds) {
+    if (n.category.toLowerCase() == category.toLowerCase()) return n.label;
+  }
+  return category;
+}
 
 /// Every expert tagged for a given need [category] (case-insensitive).
 List<Expert> expertsForNeed(String category) {

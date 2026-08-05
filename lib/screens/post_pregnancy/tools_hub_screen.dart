@@ -14,6 +14,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'baby_naming_home_screen.dart';
 // The four "Journey" tools, rebuilt from the Claude Design prompts.
 import 'feeding_journey_screen.dart';
@@ -66,7 +68,14 @@ class ToolsHubScreen extends StatelessWidget {
       backgroundColor: ppBg,
       body: Stack(children: [
         ListView(
-          padding: const EdgeInsets.only(top: 62, bottom: 116),
+          // top: a hardcoded 62 assumed one status-bar height. On a taller
+          // status bar the header scrolled UNDER the clock, so it takes the
+          // real inset and adds the gap. bottom: the nav pill plus the Ask
+          // Veda reserve, which this screen never kept clear - see
+          // kAskFabReserve in global_ask_fab.dart.
+          padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 14,
+              bottom: kAskFabReserve),
           children: [
             // editorial header
             _pad(ppEyebrow('Your toolkit', color: ppMuted, spacing: 1.6)),
@@ -267,7 +276,10 @@ class ToolsHubScreen extends StatelessWidget {
               height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, size: 19, color: ppInk),
+              // ppPurple, not ppInk. Every other icon in the parenting app is
+              // purple in a tinted tile; ppInk rendered these near-black on
+              // pastel, which read as a different app's list.
+              child: Icon(icon, size: 19, color: ppPurple),
             ),
             const SizedBox(width: 14),
             Expanded(

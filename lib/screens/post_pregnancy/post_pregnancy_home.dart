@@ -203,11 +203,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                 Row(children: [
                   Container(width: 6, height: 6, decoration: const BoxDecoration(color: ppCoral, shape: BoxShape.circle)),
                   const SizedBox(width: 7),
-                  Flexible(child: ppEyebrow("Today · ${ChildProfileStore.instance.name} is 4 months", color: ppPurple, spacing: 1.2)),
+                  Flexible(child: ppEyebrow("Today · ${ChildProfileStore.instance.nameMid} is 4 months", color: ppPurple, spacing: 1.2)),
                 ]),
                 const SizedBox(height: 16),
                 Text(
-                  "Today, ${ChildProfileStore.instance.name} is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder - a little slow, narrated play and plenty of eye contact goes a long way.",
+                  "Today, ${ChildProfileStore.instance.nameMid} is working out that the world moves in smooth, connected sequences. Babies his age start reaching with real intent and studying your hands with wonder - a little slow, narrated play and plenty of eye contact goes a long way.",
                   style: ppFraunces(19, h: 1.45),
                 ),
                 const SizedBox(height: 20),
@@ -517,7 +517,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Deals for the day', style: ppJakarta(18)),
             const SizedBox(height: 2),
-            Text("Handpicked for ${ChildProfileStore.instance.name}'s stage - affiliate & ParentVeda picks.", style: ppBody(12)),
+            Text("Handpicked for ${ChildProfileStore.instance.nameMid}'s stage - affiliate & ParentVeda picks.", style: ppBody(12)),
           ]),
         ),
         const SizedBox(width: 10),

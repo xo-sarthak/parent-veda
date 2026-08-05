@@ -387,7 +387,7 @@ class MultiChildSheet extends StatelessWidget {
         if (!context.mounted) return;
         Navigator.of(context).maybePop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Showing ${c.name} now'), behavior: SnackBarBehavior.floating),
+          SnackBar(content: Text('Showing ${c.nameMid} now'), behavior: SnackBarBehavior.floating),
         );
       },
       behavior: HitTestBehavior.opaque,

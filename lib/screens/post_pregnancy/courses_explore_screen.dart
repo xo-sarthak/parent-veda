@@ -30,6 +30,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'learning_detail_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
@@ -122,7 +124,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -142,7 +144,6 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
                 text: 'Every course and masterclass is created or carefully '
                     'vetted by trusted parenting experts, and suggested for '
                     'your baby’s age and stage.',
-                icon: Icons.school_outlined,
                 accent: ppPurple,
               ),
             ),
@@ -229,8 +230,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
       out
         ..add(ExploreSectionHeader(
           title: s.title,
-          seeMoreLabel: 'View all',
-          onSeeMore: () => _push(CourseListingScreen(section: s, topic: _topic)),
+              onSeeMore: () => _push(CourseListingScreen(section: s, topic: _topic)),
         ))
         ..add(const SizedBox(height: 12))
         ..add(ExploreRail(
@@ -468,7 +468,7 @@ class _CourseListingScreenState extends State<CourseListingScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -572,7 +572,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         child: Stack(children: [
           ListView(
             // Room for the sticky bar.
-            padding: const EdgeInsets.only(top: 12, bottom: 116),
+            padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),

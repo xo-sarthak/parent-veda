@@ -8,6 +8,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
@@ -36,8 +38,8 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
       : 'A curated ${widget.category.toLowerCase()} shelf - every pick reviewed by ParentVeda, ranked by expert read and verified-mother ratings.';
 
   String get _note => widget.category == 'Sleep'
-      ? "Relevant for ${ChildProfileStore.instance.name} now - he's in the 4-month regression, so soothers and blackout matter most this month."
-      : 'These picks are chosen for ${ChildProfileStore.instance.name}\'s stage right now - curated and safety-checked by ParentVeda.';
+      ? "Relevant for ${ChildProfileStore.instance.nameMid} now - he's in the 4-month regression, so soothers and blackout matter most this month."
+      : 'These picks are chosen for ${ChildProfileStore.instance.nameMid}\'s stage right now - curated and safety-checked by ParentVeda.';
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
       backgroundColor: ppBg,
       body: Stack(children: [
         ListView(
-          padding: const EdgeInsets.only(top: 58, bottom: 40),
+          padding: EdgeInsets.only(top: 58, bottom: kAskFabReserve),
           children: [
             _pad(_breadcrumb(context)),
 

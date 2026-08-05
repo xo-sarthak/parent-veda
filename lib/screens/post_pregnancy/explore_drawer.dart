@@ -110,7 +110,7 @@ class ExploreDrawer extends StatelessWidget {
                   // drawer row for it was a second door to the screen you are
                   // standing on. Kept for revert:
                   // _section(context, Icons.child_care_outlined, 'My Child',
-                  //     "Who ${ChildProfileStore.instance.name} is today - his whole story.", const MyChildScreen(),
+                  //     "Who ${ChildProfileStore.instance.nameMid} is today - his whole story.", const MyChildScreen(),
                   //     top: true, onTapOverride: () {
                   //   final nav = Navigator.of(context);
                   //   nav.pop();
@@ -198,7 +198,7 @@ class ExploreDrawer extends StatelessWidget {
                   _section(context, Icons.diversity_1_outlined, 'Your Care Circle',
                       'The people supporting you through this.',
                       const CareCircleScreen()),
-                  _section(context, Icons.auto_awesome_outlined, 'Memories',
+                  _section(context, Icons.card_giftcard_outlined, 'Memories',
                       'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
                   // Masterclasses + Cohort Courses + Courses are now one section (above);
                   // "Guides & Tools" is retired. All kept (commented) for easy revert:
@@ -230,7 +230,7 @@ class ExploreDrawer extends StatelessWidget {
                   // visited on purpose, never pushed at anyone
                   // (docs/BRAND-STUDIO.md §3). Moving the door does not change
                   // that — it is still exactly one.
-                  _section(context, Icons.auto_awesome_outlined, 'Launches',
+                  _section(context, Icons.new_releases_outlined, 'Launches',
                       'New, and worth knowing about.',
                       const LaunchHubScreen(stage: BrandStage.parenting)),
                   _section(context, Icons.workspace_premium_outlined, 'Brand Studio',

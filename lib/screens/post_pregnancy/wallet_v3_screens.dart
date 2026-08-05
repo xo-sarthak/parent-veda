@@ -46,6 +46,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'health_records_screen.dart';
 import 'health_timeline_screen.dart';
 import 'pp_child_profile.dart';
@@ -84,7 +86,7 @@ class WalletV3Home extends StatelessWidget {
           body: SafeArea(
             bottom: false,
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(Row(children: [
                   Expanded(child: ppBack(context, 'Explore')),

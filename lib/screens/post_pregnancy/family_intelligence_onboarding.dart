@@ -177,7 +177,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
 
   Widget _child1() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _head('About your child', 'The basics on ${_child.name}', 'We use this to personalise development, growth and age-specific guidance.'),
+      _head('About your child', 'The basics on ${_child.nameMid}', 'We use this to personalise development, growth and age-specific guidance.'),
       _pad(_label('Date of birth')),
       _pad(GestureDetector(
         onTap: () async {
@@ -221,7 +221,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
 
   Widget _health() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _head('Child health', 'Has your doctor mentioned any of these?',
-            'This quietly tailors articles, products, recipes, videos and Ask Veda — so you see what fits ${_child.name}, not generic advice.'),
+            'This quietly tailors articles, products, recipes, videos and Ask Veda — so you see what fits ${_child.nameMid}, not generic advice.'),
         _pad(Wrap(spacing: 8, runSpacing: 8, children: [
           for (final c in HealthCondition.values)
             _toggle(c.label, _p.hasCondition(c), () {
@@ -236,7 +236,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
       ]);
 
   Widget _feeding() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _head('Feeding', 'How is ${_child.name} fed right now?',
+        _head('Feeding', 'How is ${_child.nameMid} fed right now?',
             'Personalises the feeding tracker, recipes, articles and product suggestions.'),
         _pad(Wrap(spacing: 8, runSpacing: 8, children: [
           for (final f in FeedingMethod.values)
@@ -245,7 +245,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
       ]);
 
   Widget _sleep() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _head('Sleep', "How would you describe ${_child.name}'s sleep?",
+        _head('Sleep', "How would you describe ${_child.nameMid}'s sleep?",
             'Shapes the sleep tracker, home, articles, videos and Ask Veda.'),
         _pad(Column(children: [
           for (final s in SleepPattern.values) ...[
@@ -295,7 +295,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
           const SizedBox(height: 10),
           Text('That was quick — and ParentVeda is already smarter.', style: ppFraunces(28, h: 1.2)),
           const SizedBox(height: 14),
-          Text('Your recommendations, articles, recipes and daily focus will now fit ${_child.name}. The more you use ParentVeda — trackers, journal, Ask Veda — the more personal it becomes. You can edit anything any time in My Family Profile.',
+          Text('Your recommendations, articles, recipes and daily focus will now fit ${_child.nameMid}. The more you use ParentVeda — trackers, journal, Ask Veda — the more personal it becomes. You can edit anything any time in My Family Profile.',
               style: ppBody(14.5, h: 1.6)),
           const SizedBox(height: 18),
           Container(

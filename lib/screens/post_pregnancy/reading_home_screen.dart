@@ -11,6 +11,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
@@ -85,7 +87,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
             final continues = store.continueReading;
             final today = todaysRead();
             return ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(ppBack(context, 'Explore')),
                 const SizedBox(height: 18),
@@ -93,7 +95,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                 const SizedBox(height: 8),
                 _pad(Text('What to read today', style: ppFraunces(30, h: 1.1))),
                 const SizedBox(height: 6),
-                _pad(Text('One good read, chosen for where you and ${ChildProfileStore.instance.name} are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
+                _pad(Text('One good read, chosen for where you and ${ChildProfileStore.instance.nameMid} are right now - not a feed to scroll.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 16),
                 _pad(ppSearchField(

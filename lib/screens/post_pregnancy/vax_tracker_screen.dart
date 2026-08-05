@@ -38,17 +38,30 @@ class VaxTrackerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
-      floatingActionButton: GestureDetector(
-        onTap: () => openPpTab(context, 1),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 56,
-          height: 56,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
-          child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
-        ),
-      ),
+      // LOCAL FAB REMOVED. This screen drew its own 56px purple circle with the
+      // Ask Veda sparkle in it, and the global GlobalAskFab draws the real one
+      // over the whole app — so Vaccination showed TWO identical buttons,
+      // stacked.
+      //
+      // The dangerous half is that they did different things. This one never
+      // opened Ask Veda at all: it called openPpTab(context, 1) and jumped to
+      // the Brain tab. Same colour, same size, same icon, different
+      // destination — a parent tapping the sparkle they know would have landed
+      // somewhere they did not ask for.
+      //
+      // If a "go to Brain" shortcut is wanted here, it must not wear Ask Veda's
+      // face. Kept for revert:
+      // floatingActionButton: GestureDetector(
+      //   onTap: () => openPpTab(context, 1),
+      //   behavior: HitTestBehavior.opaque,
+      //   child: Container(
+      //     width: 56,
+      //     height: 56,
+      //     alignment: Alignment.center,
+      //     decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))]),
+      //     child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
+      //   ),
+      // ),
       body: AnimatedBuilder(
         animation: VaxStore.instance,
         builder: (context, _) {

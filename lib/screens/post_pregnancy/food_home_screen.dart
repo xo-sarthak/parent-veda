@@ -17,6 +17,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'food_builder_screen.dart';
@@ -85,13 +87,13 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             final meals = todaysMeals();
             final focus = todaysFocus();
             return ListView(
-          padding: const EdgeInsets.only(top: 12, bottom: 40),
+          padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
           children: [
             _pad(ppBack(context, 'Explore')),
             const SizedBox(height: 18),
             _pad(ppEyebrow('ParentVeda Food', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('What to feed ${ChildProfileStore.instance.name} today', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('What to feed ${ChildProfileStore.instance.nameMid} today', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
             _pad(Text('Not just recipes - what to cook, why it’s good, and how it helps him grow.', style: ppBody(14, h: 1.5))),
 

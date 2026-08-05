@@ -67,7 +67,7 @@ class HealthGuideScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Text('Health Guide', style: ppFraunces(32, h: 1.12)),
               const SizedBox(height: 12),
-              Text("A private, growing memory of ${ChildProfileStore.instance.name}'s health - so the next cough, rash or fever isn't a mystery.",
+              Text("A private, growing memory of ${ChildProfileStore.instance.nameMid}'s health - so the next cough, rash or fever isn't a mystery.",
                   style: ppBody(15)),
             ])),
 
@@ -91,7 +91,7 @@ class HealthGuideScreen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
                 Text(
-                    'Last winter ${ChildProfileStore.instance.name} caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
+                    'Last winter ${ChildProfileStore.instance.nameMid} caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
                     style: ppBody(15, color: ppInk, h: 1.55)),
                 const SizedBox(height: 12),
                 GestureDetector(

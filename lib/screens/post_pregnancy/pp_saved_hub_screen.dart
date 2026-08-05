@@ -25,6 +25,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+
 import 'daily_tip_popup.dart';
 import 'pp_common.dart';
 import 'pp_daily_tips.dart';
@@ -68,7 +70,7 @@ class PpSavedHubScreen extends StatelessWidget {
           body: SafeArea(
             bottom: false,
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 40),
+              padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
               children: [
                 _pad(ppBack(context, 'My Child')),
                 const SizedBox(height: 20),

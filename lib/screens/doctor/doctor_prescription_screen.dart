@@ -16,10 +16,19 @@ class DoctorPrescriptionScreen extends StatefulWidget {
     super.key,
     required this.bookingId,
     required this.title,
+    this.backLabel = 'Dashboard',
   });
 
   final String bookingId;
   final String title;
+
+  /// Where "back" actually goes.
+  ///
+  /// It was hardcoded to 'Dashboard', which is right from the home screen and
+  /// wrong from Appointments - the only other door into this screen, and the
+  /// one a doctor writing up a past consult comes through. A back arrow that
+  /// names the wrong place is worse than an unlabelled one.
+  final String backLabel;
 
   @override
   State<DoctorPrescriptionScreen> createState() =>
@@ -96,7 +105,7 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
               children: [
-                ppBack(context, 'Dashboard'),
+                ppBack(context, widget.backLabel),
                 const SizedBox(height: 16),
                 ppEyebrow('Prescription', color: ppPurple),
                 const SizedBox(height: 8),

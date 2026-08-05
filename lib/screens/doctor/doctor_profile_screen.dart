@@ -13,6 +13,7 @@ import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../post_pregnancy/pp_experts_data.dart' show needLabel;
 import 'doctor_onboarding_screen.dart';
 import 'doctor_referral_kit_screen.dart';
 
@@ -94,6 +95,25 @@ Future<void> _signOut(BuildContext context) async {
   PartnerDashboardStore.instance.reset();
 }
 
+/// The signed-in account's email, or null if there is no backend to ask.
+///
+/// `Supabase.instance` THROWS when initialize() has not run — it does not
+/// return null. That is fine in the app, where main() initialises before any
+/// screen builds, and fatal anywhere else: a widget test that pumps this screen
+/// on its own took the whole test down, and so would any future entry point
+/// that renders a doctor screen before the backend is up.
+///
+/// Which is the house rule anyway — an uninitialised backend must behave
+/// exactly like being logged out, never like a crash. Returning null simply
+/// hides the email line.
+String? _signedInEmail() {
+  try {
+    return Supabase.instance.client.auth.currentUser?.email;
+  } catch (_) {
+    return null;
+  }
+}
+
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
 
@@ -110,6 +130,7 @@ class DoctorProfileScreen extends StatelessWidget {
     final session = DoctorSession.instance;
     final e = session.consults ? doctorInfoById(session.expertId!) : null;
     final partner = PartnerDashboardStore.instance.partner;
+    final email = _signedInEmail();
     final name = e?.name ?? partner?.name ?? 'Your practice';
     final sub = e?.credential ??
         (partner == null ? '' : CarePartnerType.label(partner.type));
@@ -206,6 +227,18 @@ class DoctorProfileScreen extends StatelessWidget {
                   style: ppBody(12.5, color: ppSoft),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis),
+              // WHICH ACCOUNT AM I? Nothing on this screen answered that, and
+              // on a shared clinic phone it is the first thing you need to
+              // know before signing out or handing the phone over. It is also
+              // what made "why does doctor@test.com show Dr. Neha Sharma?"
+              // impossible to answer from inside the app.
+              if (email != null && email.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(email,
+                    style: ppBody(11.5, color: ppMuted),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ],
             ]),
           ),
         ]),
@@ -213,9 +246,13 @@ class DoctorProfileScreen extends StatelessWidget {
         Row(children: [
           // A referral-only partner has no consulting category or rating. It
           // shows what it does have — what kind of partner it is, and the city.
+          // needLabel(), not the raw category. Expert.category is a matching
+          // key that stays spelled "Pediatrician"; the credential two lines
+          // above already said "Paediatrician", so the same screen showed both
+          // spellings of the same word.
           _stat(
               e != null && e.category.isNotEmpty
-                  ? e.category
+                  ? needLabel(e.category)
                   : (partner == null
                       ? 'Partner'
                       : CarePartnerType.label(partner.type)),

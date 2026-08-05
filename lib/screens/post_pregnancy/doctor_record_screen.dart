@@ -56,7 +56,7 @@ class DoctorRecordScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 _pad(Text('Doctor-ready record', style: ppFraunces(28, h: 1.12))),
                 const SizedBox(height: 6),
-                _pad(Text('A clean summary of ${child.name}’s health so far - everything a doctor might ask, in one place.', style: ppBody(14, h: 1.5))),
+                _pad(Text('A clean summary of ${child.nameMid}’s health so far - everything a doctor might ask, in one place.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 20),
                 _pad(_headerCard(child)),

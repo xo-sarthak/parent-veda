@@ -169,7 +169,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
       // 4 - Recommended carousel
       const SizedBox(height: 30),
-      _pad(Text('Recommended for ${ChildProfileStore.instance.name}', style: ppJakarta(16))),
+      _pad(Text('Recommended for ${ChildProfileStore.instance.nameMid}', style: ppJakarta(16))),
       const SizedBox(height: 4),
       _pad(Text('For his age, the season and what he has eaten lately.', style: ppBody(12.5, color: ppMuted))),
       const SizedBox(height: 14),

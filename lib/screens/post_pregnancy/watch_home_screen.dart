@@ -12,6 +12,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'pp_channels_data.dart';
@@ -103,7 +105,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     final interstitialsOn = !_quick && channels.isNotEmpty;
 
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 12, bottom: 48),
+      padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
       // No itemCount = an endless, lazily-built feed (YouTube-style). It loops the
       // catalog; ListView.builder only builds what's on screen, so it's cheap and
       // never spins an animation.
@@ -213,7 +215,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
 
     h.addAll([
       const SizedBox(height: 26),
-      _pad(watchSectionHeader('Today for ${ChildProfileStore.instance.name}')),
+      _pad(watchSectionHeader('Today for ${ChildProfileStore.instance.nameMid}')),
       const SizedBox(height: 14),
       _pad(_todaysHero()),
     ]);
@@ -252,7 +254,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         .where((v) => v.title.toLowerCase().contains(q) || v.topic.toLowerCase().contains(q))
         .toList();
     return ListView(
-      padding: const EdgeInsets.only(top: 12, bottom: 40),
+      padding: EdgeInsets.only(top: 12, bottom: kAskFabReserve),
       children: [
         _pad(ppBack(context, 'Explore')),
         const SizedBox(height: 16),
@@ -300,8 +302,18 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        alignment: Alignment.center,
+        // NO `alignment:` HERE, and that is the whole fix.
+        //
+        // A Container with a non-null alignment wraps its child in an Align,
+        // and an Align with no widthFactor fills the width it is offered. Wrap
+        // offers each child the FULL row width, so every chip became
+        // full-width and Wrap could fit exactly one per line - fifteen
+        // stacked bars that pushed every video about a thousand pixels down
+        // the page. The Row below is already mainAxisSize.min, so removing the
+        // alignment lets the chip size to its label, which is what Wrap needs
+        // to do its job. Vertical padding replaces the height the Align used
+        // to give it.
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(999),
@@ -484,11 +496,11 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               Text(e.backLabel, style: ppBody(12.5, color: ppMuted)),
               const SizedBox(height: 14),
               Row(children: [
-                const Icon(Icons.star_rounded, size: 15, color: Color(0xFFC98A2B)),
+                const Icon(Icons.star_rounded, size: 15, color: ppAccentAmber),
                 const SizedBox(width: 4),
                 Text(e.rating.toString(), style: ppBody(13, color: ppInk, w: FontWeight.w700)),
                 const SizedBox(width: 6),
-                Flexible(child: Text('from ${e.reviewsCount} parents', style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Flexible(child: Text('from ${e.reviewsCount}', style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
               const SizedBox(height: 16),
               Text(e.whyHeading, style: ppJakarta(15)),
@@ -555,7 +567,8 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                     behavior: HitTestBehavior.opaque,
                     child: Row(children: [
                       Flexible(
-                        child: Text(lead.name,
+                        child: Text(
+                            c.title == lead.name ? lead.credential : lead.name,
                             style: ppBody(11.5, color: ppInk, w: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
@@ -566,10 +579,10 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(height: 3),
                 if (lead != null)
                   Row(children: [
-                    const Icon(Icons.star_rounded, size: 12, color: Color(0xFFC98A2B)),
+                    const Icon(Icons.star_rounded, size: 12, color: ppAccentAmber),
                     const SizedBox(width: 3),
                     Flexible(
-                      child: Text('${lead.rating} · ${lead.reviewsCount} parents',
+                      child: Text('${lead.rating} · ${lead.reviewsCount}',
                           style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                   ]),
