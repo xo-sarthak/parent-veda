@@ -222,9 +222,9 @@ class VedaIndex {
             id: 'spir_${trad.id}_${si}_$ri',
             kind: VedaKind.spiritual,
             sourceLabel: '${trad.name} · ${sec.title}',
-            title: sec.reads[ri].title,
-            body: sec.reads[ri].body,
-            keywords: [trad.name, sec.title],
+            title: sec.reads[ri].title.en,
+            body: sec.reads[ri].body.en,
+            keywords: [trad.name.en, sec.title.en],
           ));
         }
       }

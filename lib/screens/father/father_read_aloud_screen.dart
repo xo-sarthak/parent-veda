@@ -165,7 +165,14 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
         if (!_store.isSectionOn(tr.id, i)) continue;
         for (final r in tr.sections[i].reads) {
           out.add(
-              (title: r.title, body: r.body, saveKey: r.title, group: tr.name));
+              (
+                title: r.title.now,
+                body: r.body.now,
+                // .en: the saved hub keys on this. A translated key would
+                // lose her bookmarks on the language toggle.
+                saveKey: r.title.en,
+                group: tr.name.now
+              ));
         }
       }
     }

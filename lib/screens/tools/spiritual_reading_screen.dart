@@ -61,7 +61,11 @@ List<SpiritualRead> _sortedReads(SpiritualTradition t) {
   final indexed = [
     for (var i = 0; i < all.length; i++) (i: i, r: all[i]),
   ]..sort((a, b) {
-      final ra = store.rank(a.r.title), rb = store.rank(b.r.title);
+      // .en everywhere SpiritualPrefsStore is keyed: it persists these
+      // strings to SharedPreferences, so a translated key would drop every
+      // 'interested' mark the moment she switches language - and bring them
+      // back when she switches away. Display uses .now; identity never does.
+      final ra = store.rank(a.r.title.en), rb = store.rank(b.r.title.en);
       return ra != rb ? ra.compareTo(rb) : a.i.compareTo(b.i);
     });
   return [for (final e in indexed) e.r];
@@ -177,7 +181,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
         scrollDirection: Axis.horizontal,
         children: [
           chip(null, hinglish ? 'Sabhi' : 'All', ''),
-          for (final t in traditions) chip(t.id, t.name, t.symbol),
+          for (final t in traditions) chip(t.id, t.name.now, t.symbol),
         ],
       ),
     );
@@ -216,13 +220,13 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t.name,
+                  Text(t.name.now,
                       style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
                   const SizedBox(height: 2),
-                  Text(t.blurb,
+                  Text(t.blurb.now,
                       style: pvManrope(
                           fontSize: 12,
                           height: 1.35,
@@ -267,8 +271,8 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
 Widget _readRow(BuildContext context, PregnancyController controller,
     TextTheme text, SpiritualTradition t, SpiritualRead r) {
   final store = SpiritualPrefsStore.instance;
-  final interested = store.isInterested(r.title);
-  final notInterested = store.isNotInterested(r.title);
+  final interested = store.isInterested(r.title.en);
+  final notInterested = store.isNotInterested(r.title.now);
   return InkWell(
     onTap: () => _openRead(context, controller, t, r),
     child: Opacity(
@@ -285,7 +289,7 @@ Widget _readRow(BuildContext context, PregnancyController controller,
             const SizedBox(width: 8),
           ],
           Expanded(
-            child: Text(r.title,
+            child: Text(r.title.now,
                 style: text.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     height: 1.25,
@@ -334,7 +338,7 @@ class _TraditionDetailScreen extends StatelessWidget {
               for (final sec in tradition.sections) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
-                  child: Text(sec.title,
+                  child: Text(sec.title.now,
                       style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
@@ -355,7 +359,7 @@ class _TraditionDetailScreen extends StatelessWidget {
                   child: Builder(builder: (context) {
                     // Sort this section's reads by interest rank.
                     final reads = [...sec.reads]..sort((a, b) {
-                        final ra = store.rank(a.title), rb = store.rank(b.title);
+                        final ra = store.rank(a.title.en), rb = store.rank(b.title.en);
                         return ra.compareTo(rb);
                       });
                     return Column(children: [
@@ -406,14 +410,14 @@ class _SpiritualReadScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),
         children: [
-          Text(read.title,
+          Text(read.title.now,
               style: pvFraunces(
                   fontSize: 25,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary900)),
           const SizedBox(height: 16),
-          Text(read.body,
+          Text(read.body.now,
               style: pvManrope(
                   fontSize: 15.5,
                   height: 1.7,
@@ -424,13 +428,13 @@ class _SpiritualReadScreen extends StatelessWidget {
             animation: SpiritualPrefsStore.instance,
             builder: (context, _) {
               final store = SpiritualPrefsStore.instance;
-              final interested = store.isInterested(read.title);
-              final notInterested = store.isNotInterested(read.title);
+              final interested = store.isInterested(read.title.en);
+              final notInterested = store.isNotInterested(read.title.now);
               return Row(children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () =>
-                        store.toggleInterested(read.title),
+                        store.toggleInterested(read.title.en),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: interested ? Colors.white : _accent,
                       backgroundColor:
@@ -451,7 +455,7 @@ class _SpiritualReadScreen extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () =>
-                        store.toggleNotInterested(read.title),
+                        store.toggleNotInterested(read.title.now),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: notInterested
                           ? Colors.white

@@ -564,9 +564,10 @@ class ReadModule extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             tooltip: s.rtbSave,
             onPressed: () => ReadToBabySavedStore.instance
-                .toggleSave(piece.title, piece.body, piece.tag),
+                .toggleSave(piece.key, piece.body, piece.tag,
+                    title: piece.title),
             icon: Icon(
-              ReadToBabySavedStore.instance.isSaved(piece.title)
+              ReadToBabySavedStore.instance.isSaved(piece.key)
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               color: AppTheme.secondary500,
@@ -582,12 +583,16 @@ class ReadModule extends StatelessWidget {
 
   // The day's piece, drawn from the mother's chosen categories (stable per day,
   // changes daily via the day index - no randomness).
-  ({String title, String body, String tag}) _todaysPiece(S s) {
+  ({String title, String body, String tag, String key}) _todaysPiece(S s) {
     final store = ReadToBabyStore.instance;
-    final pool = <({String title, String body, String tag})>[];
+    final pool = <({String title, String body, String tag, String key})>[];
     void addCat(String cat, String tag) {
       for (final p in readAloudByCategory(cat)) {
-        pool.add((title: p.title, body: p.body, tag: tag));
+        pool.add((
+            title: p.title.now,
+            body: p.body.now,
+            tag: tag,
+            key: p.saveKey));
       }
     }
 
@@ -602,14 +607,24 @@ class ReadModule extends StatelessWidget {
         for (var i = 0; i < t.sections.length; i++) {
           if (!store.isSectionOn(t.id, i)) continue; // only chosen sub-sections
           for (final r in t.sections[i].reads) {
-            pool.add((title: r.title, body: r.body, tag: t.name));
+            // Spiritual reads are still English-only; when that file gains
+            pool.add((
+                title: r.title.now,
+                body: r.body.now,
+                tag: t.name.now,
+                // .en: identity, not display - see SavedRtbPiece.key.
+                key: r.title.en));
           }
         }
       }
     }
     if (pool.isEmpty) {
       final fb = readAloudByCategory(kRtbStories).first;
-      return (title: fb.title, body: fb.body, tag: s.rtbStories);
+      return (
+          title: fb.title.now,
+          body: fb.body.now,
+          tag: s.rtbStories,
+          key: fb.saveKey);
     }
     return pool[day.day % pool.length];
   }
@@ -723,7 +738,7 @@ class ReadModule extends StatelessWidget {
                           children: [
                             for (var i = 0; i < t.sections.length; i++)
                               FilterChip(
-                                label: Text(t.sections[i].title,
+                                label: Text(t.sections[i].title.now,
                                     style: TextStyle(
                                         fontSize: 11.5,
                                         fontWeight: store.isSectionOn(t.id, i)

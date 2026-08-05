@@ -1,3 +1,5 @@
+import '../localization/app_language.dart';
+
 // =============================================================================
 //  Spiritual Reading - seed content (a gentle, surface-level testing feature)
 // -----------------------------------------------------------------------------
@@ -14,15 +16,17 @@
 //  tradition, and the tool's "View all" + sub-headings absorb them).
 // =============================================================================
 
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class SpiritualRead {
   const SpiritualRead({required this.title, required this.body});
-  final String title;
-  final String body;
+  final LocalizedText title;
+  final LocalizedText body;
 }
 
 class SpiritualSection {
   const SpiritualSection({required this.title, required this.reads});
-  final String title;
+  final LocalizedText title;
   final List<SpiritualRead> reads;
 }
 
@@ -35,9 +39,9 @@ class SpiritualTradition {
     required this.sections,
   });
   final String id;
-  final String name;
+  final LocalizedText name;
   final String symbol; // a neutral faith symbol (emoji)
-  final String blurb;
+  final LocalizedText blurb;
   final List<SpiritualSection> sections;
 
   int get readCount =>
@@ -56,425 +60,425 @@ class SpiritualTradition {
   }
 }
 
-const List<SpiritualTradition> kSpiritualTraditions = [
+final List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   //  HINDUISM
   // ===========================================================================
   SpiritualTradition(
     id: 'hindu',
-    name: 'Hinduism',
+    name: _t('Hinduism', 'हिन्दू धर्म'),
     symbol: '🕉️',
-    blurb: 'Nurturing the bond, calm and blessing.',
+    blurb: _t('Nurturing the bond, calm and blessing.', 'जुड़ाव, शांति और आशीर्वाद को सींचते हुए।'),
     sections: [
-      SpiritualSection(title: 'Reflections inspired by the Gita', reads: [
+      SpiritualSection(title: _t('Reflections inspired by the Gita', 'गीता से मिले कुछ विचार'), reads: [
         SpiritualRead(
-            title: 'Do your part, gently',
+            title: _t('Do your part, gently', 'अपना हिस्सा, धीरे से निभाइए'),
             body:
-                "One idea many people draw from the Gita is to focus on doing your part with care, and to worry less about the outcome you can't fully control. In pregnancy that can be freeing: you nourish yourself, rest, and show up each day, and you let the rest unfold. It is a quiet kind of trust."),
+                _t("One idea many people draw from the Gita is to focus on doing your part with care, and to worry less about the outcome you can't fully control. In pregnancy that can be freeing: you nourish yourself, rest, and show up each day, and you let the rest unfold. It is a quiet kind of trust.", 'गीता से लोग अक्सर एक बात लेकर चलते हैं — अपना हिस्सा मन लगाकर कीजिए, और जो आपके हाथ में नहीं, उसका बोझ मत उठाइए। गर्भावस्था में यही बात मन हल्का कर देती है। आप खाती हैं, आराम करती हैं, हर दिन उठकर उतना करती हैं जितना कर सकती हैं — और बाक़ी अपने समय पर होता रहता है। यह चुपचाप निभाया जाने वाला भरोसा है।')),
         SpiritualRead(
-            title: 'A steady mind',
+            title: _t('A steady mind', 'ठहरा हुआ मन'),
             body:
-                "A calm, steady mind is treasured in this tradition, not as something you force, but as something you return to again and again. When worries rise, you can simply notice them and come back to your breath. Your baby shares in that steadiness."),
+                _t("A calm, steady mind is treasured in this tradition, not as something you force, but as something you return to again and again. When worries rise, you can simply notice them and come back to your breath. Your baby shares in that steadiness.", 'शांत और ठहरा हुआ मन इस परंपरा में बहुत क़ीमती माना गया है — ऐसा नहीं कि आप उसे ज़बरदस्ती बना लें, बल्कि ऐसा कि आप बार-बार उसी की ओर लौट आएँ। जब चिंता उठे, बस उसे देख लीजिए और अपनी साँस पर लौट आइए। आपका यह ठहराव आपके शिशु तक भी पहुँचता है।')),
         SpiritualRead(
-            title: 'Love without keeping score',
+            title: _t('Love without keeping score', 'बिना हिसाब रखे किया गया प्रेम'),
             body:
-                "Acting out of love, rather than for reward, is a thread that runs through this teaching. The care you are already giving your baby, unseen and unthanked, is exactly this kind of love. It asks for nothing back."),
+                _t("Acting out of love, rather than for reward, is a thread that runs through this teaching. The care you are already giving your baby, unseen and unthanked, is exactly this kind of love. It asks for nothing back.", 'प्रेम से काम करना, किसी बदले की उम्मीद से नहीं — यह बात इस सीख में हर जगह बुनी हुई है। जो देखभाल आप अभी अपने शिशु को दे रही हैं, जिसे कोई देखता नहीं और कोई शुक्रिया भी नहीं कहता, वह ठीक इसी तरह का प्रेम है। वह बदले में कुछ नहीं माँगता।')),
         SpiritualRead(
-            title: 'The calm that is already yours',
+            title: _t('The calm that is already yours', 'वह शांति जो पहले से आपकी है'),
             body:
-                "Much of this wisdom points inward: the peace you are looking for is often already within you, under the noise of the day. A few quiet minutes, hand on your bump, can be enough to find it again."),
+                _t("Much of this wisdom points inward: the peace you are looking for is often already within you, under the noise of the day. A few quiet minutes, hand on your bump, can be enough to find it again.", 'इस समझ का बड़ा हिस्सा भीतर की ओर इशारा करता है — जिस सुकून को आप ढूँढ़ रही हैं, वह अक्सर दिन के शोर के नीचे आपके भीतर ही बैठा होता है। कुछ शांत मिनट, पेट पर रखा हुआ हाथ — उसे दोबारा पा लेने के लिए इतना ही काफ़ी है।')),
         SpiritualRead(
-            title: 'Plant the seed, trust the season',
+            title: _t('Plant the seed, trust the season', 'बीज बो दीजिए, मौसम पर भरोसा रखिए'),
             body:
-                "A gentle lesson here is to tend what is in your hands and let time do the rest, the way a gardener plants and then waits. You are doing the tending now, day by day; the growing is not yours to rush."),
+                _t("A gentle lesson here is to tend what is in your hands and let time do the rest, the way a gardener plants and then waits. You are doing the tending now, day by day; the growing is not yours to rush.", 'यहाँ एक नरम-सी सीख यह है कि जो आपके हाथ में है उसे सँभालिए और बाक़ी समय पर छोड़ दीजिए — जैसे माली पौधा लगाकर इंतज़ार करता है। सँभालने का काम आप अभी कर रही हैं, एक-एक दिन; बढ़ना आपके जल्दी करने से नहीं होता।')),
         SpiritualRead(
-            title: 'Your effort is enough',
+            title: _t('Your effort is enough', 'आपकी कोशिश काफ़ी है'),
             body:
-                "This teaching values wholehearted effort over a perfect result. On the days you simply eat well, rest, and get through, that is not 'not enough' - that is exactly the work."),
+                _t("This teaching values wholehearted effort over a perfect result. On the days you simply eat well, rest, and get through, that is not 'not enough' - that is exactly the work.", 'यह सीख पूरे मन से की गई कोशिश को सही नतीजे से ऊपर रखती है। जिन दिनों आप बस ठीक से खा लेती हैं, आराम कर लेती हैं और दिन काट लेती हैं — वह \'कम\' नहीं है, वही तो असली काम है।')),
         SpiritualRead(
-            title: 'Let the worry pass through',
+            title: _t('Let the worry pass through', 'चिंता को गुज़र जाने दीजिए'),
             body:
-                "Thoughts and fears are seen as visitors, not residents; they arrive and, if you let them, they leave. You can notice a worry, breathe, and watch it move on without making it your home."),
+                _t("Thoughts and fears are seen as visitors, not residents; they arrive and, if you let them, they leave. You can notice a worry, breathe, and watch it move on without making it your home.", 'विचार और डर यहाँ मेहमान माने गए हैं, घर के लोग नहीं — वे आते हैं, और अगर आप जाने दें तो चले भी जाते हैं। आप चिंता को देख सकती हैं, साँस ले सकती हैं, और उसे आगे बढ़ जाने दे सकती हैं, बिना उसे अपना घर बनाए।')),
         SpiritualRead(
-            title: 'Devotion in small acts',
+            title: _t('Devotion in small acts', 'छोटे-छोटे कामों में भक्ति'),
             body:
-                "Even ordinary actions can become a kind of devotion when done with love and attention. Pouring that love into the small care you give yourself and your baby turns a quiet day into something tender."),
+                _t("Even ordinary actions can become a kind of devotion when done with love and attention. Pouring that love into the small care you give yourself and your baby turns a quiet day into something tender.", 'साधारण-से काम भी, प्रेम और ध्यान से किए जाएँ तो एक तरह की भक्ति बन जाते हैं। अपनी और अपने शिशु की छोटी-छोटी देखभाल में वही प्रेम उँडेल दीजिए — एक सादा दिन भी कुछ कोमल-सा बन जाता है।')),
         SpiritualRead(
-            title: 'Being, before doing',
+            title: _t('Being, before doing', 'करने से पहले, बस होना'),
             body:
-                "Underneath all the doing, this wisdom points to simply being, resting in the calm that does not depend on getting things done. A few still minutes remind you that you are already enough, exactly as you are."),
+                _t("Underneath all the doing, this wisdom points to simply being, resting in the calm that does not depend on getting things done. A few still minutes remind you that you are already enough, exactly as you are.", 'सारे करने-धरने के नीचे यह समझ बस \'होने\' की ओर इशारा करती है — उस शांति में टिक जाना जो काम निपटने पर निर्भर नहीं होती। कुछ ठहरे हुए मिनट याद दिला देते हैं कि आप जैसी हैं, वैसी ही पूरी हैं।')),
         SpiritualRead(
-            title: 'Even days, uneven days',
+            title: _t('Even days, uneven days', 'बराबर दिन, ऊबड़-खाबड़ दिन'),
             body:
-                "An idea often drawn from the Gita is to meet the good days and the hard days with the same steady heart. Some days you will glow and some you will ache; both are part of the journey, and neither is the whole of it."),
+                _t("An idea often drawn from the Gita is to meet the good days and the hard days with the same steady heart. Some days you will glow and some you will ache; both are part of the journey, and neither is the whole of it.", 'गीता से अक्सर यह बात ली जाती है कि अच्छे दिन और भारी दिन, दोनों को एक-से ठहरे मन से मिलिए। कुछ दिन आप खिली-खिली रहेंगी और कुछ दिन दर्द में — दोनों इसी सफ़र का हिस्सा हैं, और कोई अकेला पूरा सफ़र नहीं है।')),
         SpiritualRead(
-            title: 'The quiet witness',
+            title: _t('The quiet witness', 'चुपचाप देखने वाला'),
             body:
-                "There is a calm part of you that can simply watch your feelings rise and fall, like watching clouds cross the sky. Returning to that watcher, even for a moment, gives the storms less power over you."),
+                _t("There is a calm part of you that can simply watch your feelings rise and fall, like watching clouds cross the sky. Returning to that watcher, even for a moment, gives the storms less power over you.", 'आपके भीतर एक शांत हिस्सा है जो आपकी भावनाओं को उठते-गिरते बस देख सकता है, जैसे आसमान में बादलों को गुज़रते देखना। उस देखने वाले के पास लौट आना, पल भर के लिए भी, तूफ़ानों की ताक़त कम कर देता है।')),
         SpiritualRead(
-            title: 'Each day, an offering',
+            title: _t('Each day, an offering', 'हर दिन, एक भेंट'),
             body:
-                "You can think of a day not as a task to finish but as something to offer, given gently and with care. Even a slow, tired day offered with love is complete in itself."),
+                _t("You can think of a day not as a task to finish but as something to offer, given gently and with care. Even a slow, tired day offered with love is complete in itself.", 'दिन को निपटाने वाला काम मत समझिए — उसे एक भेंट की तरह देखिए, जो प्रेम से और धीरे से दी जाती है। धीमा और थका हुआ दिन भी, प्रेम से भेंट किया जाए तो अपने आप में पूरा है।')),
         SpiritualRead(
-            title: 'Strength that stays gentle',
+            title: _t('Strength that stays gentle', 'वह ताक़त जो कोमल बनी रहती है'),
             body:
-                "True strength here is not hardness but a soft, unshakeable steadiness. The way you are carrying so much while still being tender is exactly this kind of quiet power."),
+                _t("True strength here is not hardness but a soft, unshakeable steadiness. The way you are carrying so much while still being tender is exactly this kind of quiet power.", 'यहाँ असली ताक़त कठोरता नहीं, एक नरम और अडिग ठहराव है। आप इतना कुछ उठाए हुए भी जिस तरह कोमल बनी हुई हैं — यही तो वह चुपचाप वाली ताक़त है।')),
         SpiritualRead(
-            title: 'You are more than the tiredness',
+            title: _t('You are more than the tiredness', 'आप इस थकान से कहीं ज़्यादा हैं'),
             body:
-                "This wisdom reminds us that we are more than our passing states, more than any one heavy day. The exhaustion is real, but it is weather, not who you are."),
+                _t("This wisdom reminds us that we are more than our passing states, more than any one heavy day. The exhaustion is real, but it is weather, not who you are.", 'यह समझ याद दिलाती है कि हम अपनी गुज़रती हुई हालतों से कहीं बड़े हैं, किसी एक भारी दिन से बड़े हैं। थकान सच है, पर वह मौसम है — आप नहीं।')),
         SpiritualRead(
-            title: 'Faith, a little bigger than fear',
+            title: _t('Faith, a little bigger than fear', 'भरोसा, डर से थोड़ा-सा बड़ा'),
             body:
-                "Where fear says 'what if it goes wrong', this teaching gently answers with trust that you are held and that you will meet what comes. You do not have to feel fearless, only to let faith be a little bigger than the fear."),
+                _t("Where fear says 'what if it goes wrong', this teaching gently answers with trust that you are held and that you will meet what comes. You do not have to feel fearless, only to let faith be a little bigger than the fear.", 'जहाँ डर कहता है \'अगर कुछ ग़लत हो गया तो\', वहाँ यह सीख धीरे से जवाब देती है कि आप सँभाली हुई हैं और जो आएगा, उसे आप निभा लेंगी। आपको निडर होने की ज़रूरत नहीं — बस भरोसे को डर से थोड़ा-सा बड़ा रहने दीजिए।')),
         SpiritualRead(
-            title: 'Love that serves',
+            title: _t('Love that serves', 'सेवा करने वाला प्रेम'),
             body:
-                "Caring for another without thought of reward is treasured here, and it is exactly what you are already doing. Every unseen sacrifice for your baby is this kind of quiet, selfless love."),
+                _t("Caring for another without thought of reward is treasured here, and it is exactly what you are already doing. Every unseen sacrifice for your baby is this kind of quiet, selfless love.", 'बिना बदले की चाह के किसी का ख़याल रखना यहाँ बहुत ऊँचा माना गया है — और यही तो आप पहले से कर रही हैं। अपने शिशु के लिए किया गया हर वह त्याग, जिसे कोई देखता तक नहीं, इसी चुपचाप, निःस्वार्थ प्रेम का रूप है।')),
         SpiritualRead(
-            title: 'Make your mind a friend',
+            title: _t('Make your mind a friend', 'मन को अपना दोस्त बना लीजिए'),
             body:
-                "The mind can be a kind companion or a harsh critic, and much of this wisdom is about choosing the friendlier voice. Speak to yourself the way you would speak to someone you love who is growing a baby."),
+                _t("The mind can be a kind companion or a harsh critic, and much of this wisdom is about choosing the friendlier voice. Speak to yourself the way you would speak to someone you love who is growing a baby.", 'मन एक नरम साथी भी हो सकता है और कठोर आलोचक भी — और इस समझ का बड़ा हिस्सा यही है कि आप दोस्ताना आवाज़ चुनें। अपने आप से वैसे ही बात कीजिए जैसे आप किसी अपने से करतीं, जो एक बच्चे को पाल रही हो।')),
         SpiritualRead(
-            title: 'Hold the reins loosely',
+            title: _t('Hold the reins loosely', 'लगाम ढीली रखिए'),
             body:
-                "You can do your best and still hold the outcome with open hands, releasing what was never yours to control. There is a deep relief in that letting-go, especially in the parts of pregnancy you cannot steer."),
+                _t("You can do your best and still hold the outcome with open hands, releasing what was never yours to control. There is a deep relief in that letting-go, especially in the parts of pregnancy you cannot steer.", 'आप अपनी पूरी कोशिश कर सकती हैं और फिर भी नतीजे को खुली हथेली पर रख सकती हैं — जो कभी आपके बस में था ही नहीं, उसे छोड़ते हुए। इस छोड़ने में गहरी राहत है, ख़ासकर गर्भावस्था के उन हिस्सों में जिन्हें आप मोड़ नहीं सकतीं।')),
         SpiritualRead(
-            title: 'A purpose held lightly',
+            title: _t('A purpose held lightly', 'हल्के हाथों से थामा हुआ मक़सद'),
             body:
-                "Having a sense of purpose matters, but holding it lightly keeps it from becoming a burden. Your purpose right now is simply, beautifully, to nurture and to wait."),
+                _t("Having a sense of purpose matters, but holding it lightly keeps it from becoming a burden. Your purpose right now is simply, beautifully, to nurture and to wait.", 'कोई मक़सद होना मायने रखता है, पर उसे हल्के से थामे रहना उसे बोझ बनने से रोकता है। इस समय आपका मक़सद बस इतना-सा और इतना सुंदर है — पालना और इंतज़ार करना।')),
         SpiritualRead(
-            title: 'The light you already carry',
+            title: _t('The light you already carry', 'वह रोशनी जो आप पहले से लिए चल रही हैं'),
             body:
-                "A recurring image is of an inner light that no worry can put out, steady beneath the surface. On the dim days, it is still there; you are still carrying it, and so is your baby."),
+                _t("A recurring image is of an inner light that no worry can put out, steady beneath the surface. On the dim days, it is still there; you are still carrying it, and so is your baby.", 'बार-बार लौटने वाली एक छवि है — भीतर की एक लौ, जिसे कोई चिंता बुझा नहीं सकती, जो सतह के नीचे बराबर जलती रहती है। धुँधले दिनों में भी वह वहीं है; आप उसे अब भी लिए चल रही हैं, और आपका शिशु भी।')),
       ]),
-      SpiritualSection(title: 'Ramayan stories, simply retold', reads: [
+      SpiritualSection(title: _t('Ramayan stories, simply retold', 'रामायण की कहानियाँ, सरल शब्दों में'), reads: [
         SpiritualRead(
-            title: 'A bond that travels any distance',
+            title: _t('A bond that travels any distance', 'वह नाता जो हर दूरी पार कर जाता है'),
             body:
-                "One much-loved story tells of unwavering devotion, a loyal heart that will cross any distance for the people it loves. Retold simply, it is a reminder of how fiercely we can love, and how that love carries us through hard stretches. You already know that love."),
+                _t("One much-loved story tells of unwavering devotion, a loyal heart that will cross any distance for the people it loves. Retold simply, it is a reminder of how fiercely we can love, and how that love carries us through hard stretches. You already know that love.", 'एक बहुत प्यारी कथा अटूट भक्ति की बात कहती है — एक ऐसा मन जो अपनों के लिए कोई भी दूरी पार कर जाए। सादे शब्दों में कहें तो यह याद दिलाती है कि हम कितनी गहराई से प्रेम कर सकते हैं, और वही प्रेम हमें कठिन रास्तों से पार ले जाता है। यह प्रेम आप पहले से जानती हैं।')),
         SpiritualRead(
-            title: 'Patience through the hard stretch',
+            title: _t('Patience through the hard stretch', 'कठिन दौर में धीरज'),
             body:
-                "Many of these stories dwell on patience through long, difficult seasons, and the quiet strength it takes to keep going. Pregnancy has its own long stretches. The stories whisper that steadiness, in time, is its own reward."),
+                _t("Many of these stories dwell on patience through long, difficult seasons, and the quiet strength it takes to keep going. Pregnancy has its own long stretches. The stories whisper that steadiness, in time, is its own reward.", 'इनमें से कई कथाएँ लंबे, मुश्किल दौर में निभाए गए धीरज पर ठहरती हैं, और उस चुपचाप वाली ताक़त पर जो चलते रहने में लगती है। गर्भावस्था के भी अपने लंबे दौर होते हैं। ये कथाएँ धीरे से कहती हैं कि ठहराव, समय के साथ, ख़ुद अपना इनाम बन जाता है।')),
         SpiritualRead(
-            title: 'The joy of homecoming',
+            title: _t('The joy of homecoming', 'घर लौटने की ख़ुशी'),
             body:
-                "These tales often end in a joyful return, lamps lit and a family made whole again. It is a lovely image to hold onto: the day your little one finally arrives, and your own homecoming into motherhood."),
+                _t("These tales often end in a joyful return, lamps lit and a family made whole again. It is a lovely image to hold onto: the day your little one finally arrives, and your own homecoming into motherhood.", 'ये कथाएँ अक्सर एक ख़ुशी भरी वापसी पर ख़त्म होती हैं — दीये जलते हैं और परिवार फिर से पूरा हो जाता है। यह छवि मन में रखने लायक़ है: वह दिन जब आपका नन्हा आख़िरकार आएगा, और माँ बनने के घर में आपकी अपनी वापसी होगी।')),
         SpiritualRead(
-            title: 'Family as a circle of care',
+            title: _t('Family as a circle of care', 'परिवार, यानी देखभाल का एक घेरा'),
             body:
-                "Running through these stories is the idea of family as a circle that protects and uplifts one another. As you prepare to grow your own circle, it is a gentle nudge to lean on the people around you."),
+                _t("Running through these stories is the idea of family as a circle that protects and uplifts one another. As you prepare to grow your own circle, it is a gentle nudge to lean on the people around you.", 'इन कथाओं में एक बात लगातार चलती है — परिवार एक ऐसा घेरा है जो एक-दूसरे को बचाता और उठाता है। जैसे-जैसे आप अपना घेरा बड़ा करने की तैयारी कर रही हैं, यह धीरे से कहती है कि अपने आसपास के लोगों का सहारा लीजिए।')),
         SpiritualRead(
-            title: 'A promise kept',
+            title: _t('A promise kept', 'निभाया गया वचन'),
             body:
-                "One thread in these tales is the weight of a promise kept, even when it costs dearly, because one's word is treated as sacred. There is quiet dignity in that, and a reminder that the gentle promises you are already making to your baby matter deeply."),
+                _t("One thread in these tales is the weight of a promise kept, even when it costs dearly, because one's word is treated as sacred. There is quiet dignity in that, and a reminder that the gentle promises you are already making to your baby matter deeply.", 'इन कथाओं का एक धागा है निभाए गए वचन का भार — तब भी, जब उसकी क़ीमत बहुत भारी हो, क्योंकि दिया हुआ वचन पवित्र माना गया है। इसमें एक चुपचाप गरिमा है, और यह याद भी कि जो कोमल वादे आप अभी से अपने शिशु से कर रही हैं, वे बहुत मायने रखते हैं।')),
         SpiritualRead(
-            title: 'The bridge of small stones',
+            title: _t('The bridge of small stones', 'छोटे-छोटे पत्थरों का पुल'),
             body:
-                "A famous episode tells of a great bridge built across the sea, small stone by small stone, by many willing hands. It is a beautiful image for these months: an enormous thing being built slowly, by small daily acts of love."),
+                _t("A famous episode tells of a great bridge built across the sea, small stone by small stone, by many willing hands. It is a beautiful image for these months: an enormous thing being built slowly, by small daily acts of love.", 'एक प्रसिद्ध प्रसंग समुद्र पर बने एक विशाल पुल की बात कहता है — छोटे-छोटे पत्थर, और कई जोड़ी मददगार हाथ। इन महीनों के लिए यह बहुत सुंदर छवि है: एक बहुत बड़ी चीज़, जो रोज़ के छोटे-छोटे प्रेम भरे कामों से धीरे-धीरे बन रही है।')),
         SpiritualRead(
-            title: 'Courage in a small frame',
+            title: _t('Courage in a small frame', 'छोटी काया में बड़ा साहस'),
             body:
-                "Some of the most loved figures in these stories are humble and small, yet carry astonishing courage and devotion. It is a comfort that strength is not about size, and that your quiet, steady love is a mighty thing."),
+                _t("Some of the most loved figures in these stories are humble and small, yet carry astonishing courage and devotion. It is a comfort that strength is not about size, and that your quiet, steady love is a mighty thing.", 'इन कथाओं के सबसे प्यारे पात्रों में कुछ सीधे-सादे और छोटे हैं, फिर भी उनमें हैरान कर देने वाला साहस और भक्ति है। यह तसल्ली देता है कि ताक़त आकार से नहीं आती, और आपका चुपचाप, बराबर बना रहने वाला प्रेम बहुत बड़ी चीज़ है।')),
         SpiritualRead(
-            title: 'The long road home',
+            title: _t('The long road home', 'घर तक का लंबा रास्ता'),
             body:
-                "Many of these stories are, at heart, about a long separation and a joyful return home. You are on your own long road toward meeting your baby, and the homecoming at the end of it will be worth every mile."),
+                _t("Many of these stories are, at heart, about a long separation and a joyful return home. You are on your own long road toward meeting your baby, and the homecoming at the end of it will be worth every mile.", 'ये कई कथाएँ, मन से देखें तो, एक लंबे बिछोह और एक ख़ुशी भरी वापसी की ही कहानी हैं। आप भी अपने शिशु से मिलने के अपने लंबे रास्ते पर हैं, और उसके आख़िर में जो मिलन है, वह हर क़दम के लायक़ होगा।')),
         SpiritualRead(
-            title: 'Loyalty that does not waver',
+            title: _t('Loyalty that does not waver', 'वह निष्ठा जो डगमगाती नहीं'),
             body:
-                "Unshakeable loyalty, standing by loved ones through every hardship, runs through these tales. It mirrors the fierce, unwavering bond already forming between you and the little one you have not yet met."),
+                _t("Unshakeable loyalty, standing by loved ones through every hardship, runs through these tales. It mirrors the fierce, unwavering bond already forming between you and the little one you have not yet met.", 'हर मुश्किल में अपनों के साथ खड़े रहने वाली अटूट निष्ठा इन कथाओं में हर जगह है। वह उसी गहरे, अडिग नाते जैसी है जो अभी से आपके और उस नन्हे के बीच बन रहा है, जिससे आप अब तक मिली भी नहीं।')),
         SpiritualRead(
-            title: 'Choosing the harder right',
+            title: _t('Choosing the harder right', 'मुश्किल सही रास्ता चुनना'),
             body:
-                "Again and again, characters choose the harder right thing over the easier wrong one. As you step into parenthood, those small honest choices, made with love, become the ground your child will stand on."),
+                _t("Again and again, characters choose the harder right thing over the easier wrong one. As you step into parenthood, those small honest choices, made with love, become the ground your child will stand on.", 'बार-बार, पात्र आसान ग़लत के बजाय मुश्किल सही को चुनते हैं। जैसे-जैसे आप माता-पिता बनने की ओर बढ़ रही हैं, प्रेम से लिए गए वे छोटे-छोटे सच्चे फ़ैसले ही वह ज़मीन बनते हैं जिस पर आपका बच्चा खड़ा होगा।')),
         SpiritualRead(
-            title: 'Hope in a quiet garden',
+            title: _t('Hope in a quiet garden', 'एक शांत बग़ीचे में बची हुई उम्मीद'),
             body:
-                "In one part of the story, hope is kept alive through a long, lonely wait in a faraway garden. It is a tender reminder that even in slow, hard stretches, hope can be quietly tended and kept warm."),
+                _t("In one part of the story, hope is kept alive through a long, lonely wait in a faraway garden. It is a tender reminder that even in slow, hard stretches, hope can be quietly tended and kept warm.", 'कथा के एक हिस्से में उम्मीद एक दूर के बग़ीचे में, लंबे और अकेले इंतज़ार के बीच ज़िंदा रखी जाती है। यह कोमल-सी याद है कि धीमे और कठिन दौर में भी उम्मीद को चुपचाप सींचा और गरम रखा जा सकता है।')),
         SpiritualRead(
-            title: 'Standing together',
+            title: _t('Standing together', 'साथ खड़े रहना'),
             body:
-                "Bonds between brothers and companions, choosing to share each other's burdens, shine through these stories. As your family grows, it is a gentle nudge to let the people who love you carry some of the weight with you."),
+                _t("Bonds between brothers and companions, choosing to share each other's burdens, shine through these stories. As your family grows, it is a gentle nudge to let the people who love you carry some of the weight with you.", 'भाइयों और साथियों के बीच का नाता, और एक-दूसरे का बोझ बाँट लेने का चुनाव — यह इन कथाओं में चमकता है। जैसे-जैसे आपका परिवार बढ़ रहा है, यह धीरे से कहता है कि जो लोग आपसे प्रेम करते हैं, उन्हें कुछ भार उठाने दीजिए।')),
         SpiritualRead(
-            title: 'Strength offered in service',
+            title: _t('Strength offered in service', 'सेवा में दी गई ताक़त'),
             body:
-                "Some characters find their greatest strength simply in serving the people they love, asking nothing back. The care you are giving now, unseen and tireless, is that same quiet strength."),
+                _t("Some characters find their greatest strength simply in serving the people they love, asking nothing back. The care you are giving now, unseen and tireless, is that same quiet strength.", 'कुछ पात्रों को अपनी सबसे बड़ी ताक़त बस अपनों की सेवा में मिलती है, बिना कुछ माँगे। जो देखभाल आप अभी दे रही हैं — बिना थके, और बिना किसी के देखे — वही चुपचाप वाली ताक़त है।')),
         SpiritualRead(
-            title: 'Grace in the simple years',
+            title: _t('Grace in the simple years', 'सादे बरसों में भी सुंदरता'),
             body:
-                "A long stretch of the story unfolds in the forest, in a plainer, simpler life, and grace is found even there. It is a kind reminder that the slow, quiet seasons of pregnancy can hold their own gentle beauty."),
+                _t("A long stretch of the story unfolds in the forest, in a plainer, simpler life, and grace is found even there. It is a kind reminder that the slow, quiet seasons of pregnancy can hold their own gentle beauty.", 'कथा का एक लंबा हिस्सा वन में बीतता है, एक सादे और सीधे जीवन में — और वहाँ भी सुंदरता मिल जाती है। यह नरम-सी याद है कि गर्भावस्था के धीमे, शांत दिनों में भी अपनी एक कोमल सुंदरता होती है।')),
         SpiritualRead(
-            title: 'Held in the heart',
+            title: _t('Held in the heart', 'दिल में सँभाला हुआ'),
             body:
-                "Devotion in these tales is often shown as simply holding a loved one in your heart, no matter the distance. You are already doing this, carrying your baby not only in your body, but in your heart, all day long."),
+                _t("Devotion in these tales is often shown as simply holding a loved one in your heart, no matter the distance. You are already doing this, carrying your baby not only in your body, but in your heart, all day long.", 'इन कथाओं में भक्ति अक्सर इतनी-सी है — अपने किसी प्रिय को दिल में सँभाले रखना, दूरी चाहे कितनी भी हो। यह तो आप कर ही रही हैं: अपने शिशु को सिर्फ़ शरीर में नहीं, दिन भर अपने दिल में लिए घूमती हैं।')),
         SpiritualRead(
-            title: 'Going beyond what was asked',
+            title: _t('Going beyond what was asked', 'जितना कहा गया, उससे कहीं ज़्यादा'),
             body:
-                "In one beloved moment, a devoted helper, asked to bring one small thing, lovingly brings far more than needed. Love does that, it overflows the task, and you will feel it overflow when you meet your child."),
+                _t("In one beloved moment, a devoted helper, asked to bring one small thing, lovingly brings far more than needed. Love does that, it overflows the task, and you will feel it overflow when you meet your child.", 'एक बहुत प्यारे प्रसंग में एक भक्त सेवक से एक छोटी-सी चीज़ लाने को कहा जाता है, और वह प्रेम में कहीं ज़्यादा ले आता है। प्रेम ऐसा ही करता है — वह काम की सीमा से छलक जाता है, और जब आप अपने बच्चे से मिलेंगी, आप उसे छलकते हुए महसूस करेंगी।')),
         SpiritualRead(
-            title: 'A light that leads the way',
+            title: _t('A light that leads the way', 'राह दिखाती एक रोशनी'),
             body:
-                "Faith in these stories is often a steady light that guides through dark and uncertain paths. On the uncertain nights of pregnancy, you can let your own quiet faith be that small, leading light."),
+                _t("Faith in these stories is often a steady light that guides through dark and uncertain paths. On the uncertain nights of pregnancy, you can let your own quiet faith be that small, leading light.", 'इन कथाओं में भरोसा अक्सर एक स्थिर रोशनी की तरह है, जो अँधेरे और अनजाने रास्तों से पार ले जाती है। गर्भावस्था की अनिश्चित रातों में आप अपने चुपचाप भरोसे को वही छोटी-सी, राह दिखाती लौ बनने दे सकती हैं।')),
         SpiritualRead(
-            title: 'A family made whole',
+            title: _t('A family made whole', 'फिर से पूरा हुआ परिवार'),
             body:
-                "The story's heart is a family torn apart and lovingly made whole again. Soon your own family will gain a new member, and a wholeness you have been waiting for will arrive."),
+                _t("The story's heart is a family torn apart and lovingly made whole again. Soon your own family will gain a new member, and a wholeness you have been waiting for will arrive.", 'कथा का दिल यही है — एक परिवार जो बिखरता है और फिर प्रेम से पूरा हो जाता है। जल्द ही आपके अपने परिवार में एक नया सदस्य जुड़ेगा, और वह पूरापन आएगा जिसका आप इंतज़ार कर रही हैं।')),
         SpiritualRead(
-            title: 'Gentleness is not weakness',
+            title: _t('Gentleness is not weakness', 'कोमलता कमज़ोरी नहीं है'),
             body:
-                "Many of the most admired figures pair great strength with great gentleness. It is a lovely model for motherhood, where tenderness and strength turn out to be the very same thing."),
+                _t("Many of the most admired figures pair great strength with great gentleness. It is a lovely model for motherhood, where tenderness and strength turn out to be the very same thing.", 'इनमें सबसे सराहे गए कई पात्रों में बड़ी ताक़त और बड़ी कोमलता, दोनों साथ हैं। माँ बनने के लिए यह बहुत सुंदर मिसाल है, जहाँ नरमी और ताक़त आख़िर में एक ही चीज़ निकलती हैं।')),
         SpiritualRead(
-            title: 'Keeping the lamp lit',
+            title: _t('Keeping the lamp lit', 'दीया जलता रखना'),
             body:
-                "Through long, dark passages of these tales, someone always keeps a small lamp of hope burning. Whatever this stretch of your journey feels like, you can keep your own lamp lit, one day at a time."),
+                _t("Through long, dark passages of these tales, someone always keeps a small lamp of hope burning. Whatever this stretch of your journey feels like, you can keep your own lamp lit, one day at a time.", 'इन कथाओं के लंबे, अँधेरे हिस्सों में कोई न कोई उम्मीद का एक छोटा दीया जलाए रखता है। आपके सफ़र का यह हिस्सा जैसा भी लगे, आप अपना दीया जलाए रख सकती हैं — एक दिन, फिर एक दिन।')),
       ]),
-      SpiritualSection(title: 'The meaning behind common mantras', reads: [
+      SpiritualSection(title: _t('The meaning behind common mantras', 'जाने-पहचाने मंत्रों के पीछे का भाव'), reads: [
         SpiritualRead(
-            title: 'The calm of a single sound',
+            title: _t('The calm of a single sound', 'एक अकेली ध्वनि का सुकून'),
             body:
-                "The sound often written as 'Om' is described by many as a gentle hum, a way to settle the mind and breath. You do not need to chant anything; simply breathing slowly and evenly can bring the same quiet that your baby feels too."),
+                _t("The sound often written as 'Om' is described by many as a gentle hum, a way to settle the mind and breath. You do not need to chant anything; simply breathing slowly and evenly can bring the same quiet that your baby feels too.", 'जिस ध्वनि को अक्सर \'ओम\' लिखा जाता है, उसे बहुत लोग एक कोमल गुंजन की तरह बताते हैं — मन और साँस को थाम लेने का एक तरीक़ा। आपको कुछ जपना ज़रूरी नहीं; धीरे और बराबर साँस लेना भी वही सुकून ले आता है, जिसे आपका शिशु भी महसूस करता है।')),
         SpiritualRead(
-            title: 'A wish for peace',
+            title: _t('A wish for peace', 'शांति की एक कामना'),
             body:
-                "Many simple chants are, at heart, just a repeated wish for peace, for yourself, your family, and all beings. You can make that wish in your own words, in any language, and it counts all the same."),
+                _t("Many simple chants are, at heart, just a repeated wish for peace, for yourself, your family, and all beings. You can make that wish in your own words, in any language, and it counts all the same.", 'कई सीधे-सादे जाप, मन से देखें तो, बस शांति की बार-बार दोहराई गई कामना हैं — अपने लिए, अपने परिवार के लिए, और सब के लिए। वही कामना आप अपने शब्दों में, किसी भी भाषा में कर सकती हैं — बात उतनी ही सच्ची रहती है।')),
         SpiritualRead(
-            title: 'Light over darkness',
+            title: _t('Light over darkness', 'अँधेरे पर रोशनी'),
             body:
-                "A recurring idea is moving from darkness toward light, from worry toward clarity and hope. Lighting a small lamp, or simply turning your thoughts to something hopeful, echoes that gentle intention."),
+                _t("A recurring idea is moving from darkness toward light, from worry toward clarity and hope. Lighting a small lamp, or simply turning your thoughts to something hopeful, echoes that gentle intention.", 'एक बात बार-बार लौटती है — अँधेरे से रोशनी की ओर बढ़ना, चिंता से साफ़ मन और उम्मीद की ओर। एक छोटा दीया जला लेना, या बस अपने विचारों को किसी उम्मीद भरी बात की ओर मोड़ लेना, उसी कोमल भाव को दोहराता है।')),
         SpiritualRead(
-            title: 'Gratitude as a daily note',
+            title: _t('Gratitude as a daily note', 'रोज़ की एक कृतज्ञता'),
             body:
-                "Underneath much of this is gratitude, pausing to be thankful for the ordinary good in a day. A single grateful thought before sleep is a small, real practice anyone can keep."),
+                _t("Underneath much of this is gratitude, pausing to be thankful for the ordinary good in a day. A single grateful thought before sleep is a small, real practice anyone can keep.", 'इस सब के नीचे कृतज्ञता है — दिन की साधारण अच्छाइयों के लिए पल भर रुककर शुक्रिया कहना। सोने से पहले एक अकेला आभार भरा ख़याल भी एक छोटा, सच्चा अभ्यास है जिसे कोई भी निभा सकता है।')),
         SpiritualRead(
-            title: 'Repetition that soothes',
+            title: _t('Repetition that soothes', 'दोहराव जो सुकून देता है'),
             body:
-                "Much of the calm in chanting comes simply from gentle repetition, the way a soft, repeated sound settles a restless mind. You can find the same ease in any phrase you love, said slowly a few times over."),
+                _t("Much of the calm in chanting comes simply from gentle repetition, the way a soft, repeated sound settles a restless mind. You can find the same ease in any phrase you love, said slowly a few times over.", 'जाप का बहुत-सा सुकून बस कोमल दोहराव से आता है — जैसे कोई नरम, बार-बार आती आवाज़ बेचैन मन को बिठा देती है। वही आसानी आपको किसी भी प्यारी पंक्ति में मिल सकती है, जिसे आप धीरे-धीरे कुछ बार दोहरा लें।')),
         SpiritualRead(
-            title: 'An anchor word',
+            title: _t('An anchor word', 'एक टिकने वाला शब्द'),
             body:
-                "Many chants give the mind a single word to return to whenever it wanders. Choosing your own quiet word, 'calm', 'safe', 'love', and coming back to it can steady a racing afternoon."),
+                _t("Many chants give the mind a single word to return to whenever it wanders. Choosing your own quiet word, 'calm', 'safe', 'love', and coming back to it can steady a racing afternoon.", 'कई जाप मन को एक ही शब्द देते हैं, जिस पर वह भटकने के बाद लौट आए। अपना कोई शांत शब्द चुन लेना — \'शांति\', \'सुरक्षित\', \'प्रेम\' — और बार-बार उसी पर लौट आना, एक भागती हुई दोपहर को थाम सकता है।')),
         SpiritualRead(
-            title: 'Breath as the simplest chant',
+            title: _t('Breath as the simplest chant', 'साँस, सबसे सरल जाप'),
             body:
-                "Before any words, there is the breath, and slow even breathing is itself a kind of wordless mantra. Lengthening your out-breath a little is one of the gentlest ways to share calm with your baby."),
+                _t("Before any words, there is the breath, and slow even breathing is itself a kind of wordless mantra. Lengthening your out-breath a little is one of the gentlest ways to share calm with your baby.", 'शब्दों से पहले साँस है, और धीमी, बराबर साँस अपने आप में एक बिना शब्दों वाला मंत्र है। साँस छोड़ने को थोड़ा लंबा कर देना, अपने शिशु के साथ शांति बाँटने के सबसे कोमल तरीक़ों में से एक है।')),
         SpiritualRead(
-            title: 'A wish for all to be well',
+            title: _t('A wish for all to be well', 'सब का भला हो, यही कामना'),
             body:
-                "At their core, many chants are a wide, open wish for peace and wellbeing for everyone. Sending that kind thought out, to your family, your baby, yourself, is a small, warm practice anyone can keep."),
+                _t("At their core, many chants are a wide, open wish for peace and wellbeing for everyone. Sending that kind thought out, to your family, your baby, yourself, is a small, warm practice anyone can keep.", 'गहराई में देखें तो कई जाप एक चौड़ी, खुली कामना हैं — सब के लिए शांति और भलाई की। वह प्यारा ख़याल बाहर भेजना — अपने परिवार को, अपने शिशु को, ख़ुद को — एक छोटा, गरम-सा अभ्यास है जिसे कोई भी निभा सकता है।')),
         SpiritualRead(
-            title: 'Protection, wished gently',
+            title: _t('Protection, wished gently', 'रक्षा की कोमल कामना'),
             body:
-                "Some chants carry the feeling of wrapping a loved one in protection and good will. Whatever your beliefs, silently wishing your baby safety and warmth is a tender thing to do."),
+                _t("Some chants carry the feeling of wrapping a loved one in protection and good will. Whatever your beliefs, silently wishing your baby safety and warmth is a tender thing to do.", 'कुछ जापों में यह भाव होता है, मानो किसी अपने को रक्षा और शुभकामना की चादर में लपेट दिया जाए। आपकी आस्था जो भी हो, चुपचाप अपने शिशु के लिए सुरक्षा और गर्माहट की कामना करना बहुत कोमल बात है।')),
         SpiritualRead(
-            title: 'The heart over the syllables',
+            title: _t('The heart over the syllables', 'अक्षरों से ऊपर, मन'),
             body:
-                "It is widely felt that the sincerity behind a chant matters far more than getting the sounds exactly right. So you can let go of doing it 'properly' and simply mean what you say."),
+                _t("It is widely felt that the sincerity behind a chant matters far more than getting the sounds exactly right. So you can let go of doing it 'properly' and simply mean what you say.", 'यह बात आम तौर पर मानी जाती है कि जाप के पीछे की सच्चाई, ध्वनियों को बिल्कुल ठीक बोलने से कहीं ज़्यादा मायने रखती है। तो \'सही तरीक़े\' से करने की चिंता छोड़ दीजिए और बस वही कहिए जो आप सच में महसूस करती हैं।')),
         SpiritualRead(
-            title: 'A wish for healing',
+            title: _t('A wish for healing', 'आराम की एक कामना'),
             body:
-                "Many gentle chants hold the hope of healing and ease for body and mind. Resting a hand on your bump and quietly wishing comfort for both of you carries that same intention."),
+                _t("Many gentle chants hold the hope of healing and ease for body and mind. Resting a hand on your bump and quietly wishing comfort for both of you carries that same intention.", 'कई कोमल जापों में शरीर और मन के लिए आराम और चैन की उम्मीद बसी होती है। पेट पर हाथ रखकर चुपचाप आप दोनों के लिए सुकून की कामना करना, वही भाव लिए हुए है।')),
         SpiritualRead(
-            title: 'Naming your thanks',
+            title: _t('Naming your thanks', 'अपने शुक्रिया को नाम देना'),
             body:
-                "Some find that softly naming what they are grateful for works like a mantra of its own. 'Thank you for this kick, this day, this little life' is a chant the heart understands."),
+                _t("Some find that softly naming what they are grateful for works like a mantra of its own. 'Thank you for this kick, this day, this little life' is a chant the heart understands.", 'कुछ लोगों को लगता है कि जिन चीज़ों के लिए वे आभारी हैं, उन्हें धीरे से नाम दे देना अपने आप में एक मंत्र जैसा काम करता है। \'इस लात के लिए, इस दिन के लिए, इस नन्ही ज़िंदगी के लिए शुक्रिया\' — यह वह जाप है जिसे दिल समझ लेता है।')),
         SpiritualRead(
-            title: 'A hum your baby feels',
+            title: _t('A hum your baby feels', 'एक गुंजन, जिसे आपका शिशु महसूस करता है'),
             body:
-                "A low, steady hum can be felt as much as heard, and your baby is close enough to feel the gentle vibration of your voice. Humming a tune you love is a simple, lovely way to be near."),
+                _t("A low, steady hum can be felt as much as heard, and your baby is close enough to feel the gentle vibration of your voice. Humming a tune you love is a simple, lovely way to be near.", 'धीमा, बराबर गुनगुनाना सुनाई देने से ज़्यादा महसूस होता है, और आपका शिशु इतने पास है कि आपकी आवाज़ की कोमल थरथराहट को महसूस कर लेता है। कोई पसंदीदा धुन गुनगुनाना, पास होने का बहुत सादा और प्यारा तरीक़ा है।')),
         SpiritualRead(
-            title: 'Steadiness in rhythm',
+            title: _t('Steadiness in rhythm', 'लय में बसा ठहराव'),
             body:
-                "Part of why rhythmic sound calms us is that a steady beat tells the body it is safe to settle. Rocking gently, breathing in time, or repeating a soft phrase all tap into that same steadiness."),
+                _t("Part of why rhythmic sound calms us is that a steady beat tells the body it is safe to settle. Rocking gently, breathing in time, or repeating a soft phrase all tap into that same steadiness.", 'लय वाली आवाज़ हमें इसलिए भी शांत करती है क्योंकि एक बराबर ताल शरीर को बता देती है कि अब बैठ जाना सुरक्षित है। धीरे-धीरे झूलना, ताल में साँस लेना, या कोई नरम पंक्ति दोहराना — सब उसी ठहराव को छूते हैं।')),
         SpiritualRead(
-            title: 'A small prayer for safe arrival',
+            title: _t('A small prayer for safe arrival', 'सुरक्षित आगमन की एक छोटी प्रार्थना'),
             body:
-                "Many quietly repeat a short wish for a safe and gentle birth. You can shape your own, just a sentence, and return to it whenever worry about the day ahead creeps in."),
+                _t("Many quietly repeat a short wish for a safe and gentle birth. You can shape your own, just a sentence, and return to it whenever worry about the day ahead creeps in.", 'बहुत लोग चुपचाप एक छोटी-सी कामना दोहराते हैं — सुरक्षित और कोमल जन्म की। आप अपनी कामना ख़ुद गढ़ सकती हैं, बस एक वाक्य, और जब भी आने वाले दिन की चिंता घेरे, उसी पर लौट आइए।')),
         SpiritualRead(
-            title: 'Releasing on the out-breath',
+            title: _t('Releasing on the out-breath', 'साँस छोड़ते हुए छोड़ देना'),
             body:
-                "A simple practice is to let each out-breath carry a little tension away with it. You might silently say 'I let this go' as you exhale, softening your shoulders and your mind."),
+                _t("A simple practice is to let each out-breath carry a little tension away with it. You might silently say 'I let this go' as you exhale, softening your shoulders and your mind.", 'एक सादा अभ्यास यह है कि हर बार साँस छोड़ते हुए थोड़ा-सा तनाव भी साथ बह जाने दें। साँस छोड़ते हुए आप मन ही मन कह सकती हैं, \'यह मैं छोड़ती हूँ\' — और अपने कंधे और अपना मन ढीला होने दीजिए।')),
         SpiritualRead(
-            title: 'Calling on quiet courage',
+            title: _t('Calling on quiet courage', 'चुपचाप वाली हिम्मत को बुलाना'),
             body:
-                "Some chants are meant to gather courage before something hard. Before a scan or an appointment, a few slow breaths and a steadying word of your own can do the same."),
+                _t("Some chants are meant to gather courage before something hard. Before a scan or an appointment, a few slow breaths and a steadying word of your own can do the same.", 'कुछ जाप किसी कठिन काम से पहले हिम्मत जुटाने के लिए होते हैं। किसी स्कैन या डॉक्टर की मुलाक़ात से पहले, कुछ धीमी साँसें और अपना एक थामने वाला शब्द भी वही काम कर देते हैं।')),
         SpiritualRead(
-            title: 'Welcoming ease',
+            title: _t('Welcoming ease', 'आसानी का स्वागत'),
             body:
-                "Other gentle chants are about inviting ease and abundance into one's life. You might simply, sincerely, invite ease into these months, into your body, your home, your heart."),
+                _t("Other gentle chants are about inviting ease and abundance into one's life. You might simply, sincerely, invite ease into these months, into your body, your home, your heart.", 'कुछ और कोमल जाप जीवन में आसानी और भरपूरी को बुलाने के बारे में हैं। आप भी सीधे-सादे मन से इन महीनों में आसानी को बुला सकती हैं — अपने शरीर में, अपने घर में, अपने दिल में।')),
         SpiritualRead(
-            title: 'Quiet over volume',
+            title: _t('Quiet over volume', 'ऊँची आवाज़ नहीं, ठहराव'),
             body:
-                "It is the stillness a chant creates, not its loudness, that does the soothing. Even a single word said almost silently, with full attention, can settle you."),
+                _t("It is the stillness a chant creates, not its loudness, that does the soothing. Even a single word said almost silently, with full attention, can settle you.", 'सुकून जाप की ऊँची आवाज़ से नहीं, उससे बनने वाले ठहराव से आता है। पूरे ध्यान से कहा गया एक अकेला शब्द, चाहे लगभग चुपचाप ही क्यों न हो, आपको बिठा सकता है।')),
         SpiritualRead(
-            title: 'Your own words always count',
+            title: _t('Your own words always count', 'आपके अपने शब्द हमेशा गिने जाते हैं'),
             body:
-                "There is no special language required for any of this; a heartfelt wish in your own tongue is just as real. Speak to your baby, or to the quiet, however feels natural to you."),
+                _t("There is no special language required for any of this; a heartfelt wish in your own tongue is just as real. Speak to your baby, or to the quiet, however feels natural to you.", 'इसके लिए किसी ख़ास भाषा की ज़रूरत नहीं है; अपनी ही ज़ुबान में दिल से निकली कामना उतनी ही सच्ची है। अपने शिशु से बात कीजिए, या उस ख़ामोशी से — जैसे आपको सहज लगे।')),
       ]),
-      SpiritualSection(title: 'Festivals & rituals', reads: [
+      SpiritualSection(title: _t('Festivals & rituals', 'त्योहार और रीति-रिवाज'), reads: [
         SpiritualRead(
-            title: 'A gathering to bless the mother',
+            title: _t('A gathering to bless the mother', 'माँ को आशीर्वाद देने वाला एक जमावड़ा'),
             body:
-                "Families often hold a warm gathering in later pregnancy to bless and pamper the mother-to-be, with sweets, bangles and good wishes all around. Beyond the ritual, it is a way of saying: you are loved, and you are not doing this alone."),
+                _t("Families often hold a warm gathering in later pregnancy to bless and pamper the mother-to-be, with sweets, bangles and good wishes all around. Beyond the ritual, it is a way of saying: you are loved, and you are not doing this alone.", 'गर्भावस्था के आख़िरी महीनों में परिवार अक्सर एक गरमाहट भरा जमावड़ा करते हैं, जिसमें होने वाली माँ को आशीर्वाद और लाड़ मिलता है — मिठाई, चूड़ियाँ और चारों ओर से शुभकामनाएँ। रीति-रिवाज से परे, यह कहने का एक तरीक़ा है: आप प्यारी हैं, और आप यह सब अकेले नहीं कर रहीं।')),
         SpiritualRead(
-            title: 'Lighting a lamp',
+            title: _t('Lighting a lamp', 'एक दीया जलाना'),
             body:
-                "A small lit lamp is a tender symbol across many homes, standing for warmth, hope and a fresh beginning. Lighting one as you think of your baby can be a quiet, grounding moment in a busy day."),
+                _t("A small lit lamp is a tender symbol across many homes, standing for warmth, hope and a fresh beginning. Lighting one as you think of your baby can be a quiet, grounding moment in a busy day.", 'एक छोटा-सा जलता दीया कई घरों में एक कोमल प्रतीक है — गर्माहट, उम्मीद और नई शुरुआत का। अपने शिशु के बारे में सोचते हुए एक दीया जला देना, भागते दिन में एक शांत, टिकाने वाला पल बन सकता है।')),
         SpiritualRead(
-            title: 'A protective thread',
+            title: _t('A protective thread', 'रक्षा का एक धागा'),
             body:
-                "Tying a simple thread as a gesture of protection and good wishes is a familiar custom. Whatever you believe, the intention behind it, to keep someone safe and loved, is a beautiful one to carry."),
+                _t("Tying a simple thread as a gesture of protection and good wishes is a familiar custom. Whatever you believe, the intention behind it, to keep someone safe and loved, is a beautiful one to carry.", 'रक्षा और शुभकामना के भाव से एक सादा धागा बाँध देना जाना-पहचाना रिवाज है। आप जो भी मानती हों, उसके पीछे का भाव — किसी को सुरक्षित और प्यार में रखना — साथ लिए चलने लायक़ बहुत सुंदर बात है।')),
         SpiritualRead(
-            title: 'Auspicious beginnings',
+            title: _t('Auspicious beginnings', 'शुभ शुरुआतें'),
             body:
-                "Many traditions mark beginnings with care and good wishes, in the hope that what starts well grows well. Your pregnancy is one of life's biggest beginnings; treating it gently honours that."),
+                _t("Many traditions mark beginnings with care and good wishes, in the hope that what starts well grows well. Your pregnancy is one of life's biggest beginnings; treating it gently honours that.", 'कई परंपराएँ शुरुआतों को ध्यान और शुभकामनाओं के साथ मनाती हैं, इस उम्मीद में कि जो अच्छा शुरू होता है वह अच्छा बढ़ता भी है। आपकी गर्भावस्था जीवन की सबसे बड़ी शुरुआतों में से एक है; उसे कोमलता से लेना ही उसका सम्मान है।')),
         SpiritualRead(
-            title: 'The blessing of being pampered',
+            title: _t('The blessing of being pampered', 'लाड़ पाने का आशीर्वाद'),
             body:
-                "In many homes, late pregnancy brings a celebration where the mother is gently pampered and showered with blessings. Letting yourself be cared for like this is not indulgence; it is part of the tradition, and you deserve it."),
+                _t("In many homes, late pregnancy brings a celebration where the mother is gently pampered and showered with blessings. Letting yourself be cared for like this is not indulgence; it is part of the tradition, and you deserve it.", 'कई घरों में गर्भावस्था के आख़िरी महीनों में एक उत्सव होता है, जहाँ माँ को लाड़ लड़ाया जाता है और आशीर्वादों से भर दिया जाता है। इस तरह अपना ख़याल रखवाना नखरा नहीं है; यह परंपरा का हिस्सा है, और आप इसकी हक़दार हैं।')),
         SpiritualRead(
-            title: 'Sweetness, shared',
+            title: _t('Sweetness, shared', 'बाँटी हुई मिठास'),
             body:
-                "Sweets are offered at happy beginnings as a wish that the life ahead will be sweet too. Sharing something sweet with the people you love is a small, joyful way to mark this season."),
+                _t("Sweets are offered at happy beginnings as a wish that the life ahead will be sweet too. Sharing something sweet with the people you love is a small, joyful way to mark this season.", 'ख़ुशी की शुरुआतों पर मिठाई इसलिए बाँटी जाती है कि आगे का जीवन भी मीठा हो। अपनों के साथ कुछ मीठा बाँटना, इस मौसम को मनाने का एक छोटा, ख़ुशनुमा तरीक़ा है।')),
         SpiritualRead(
-            title: 'Bangles and good wishes',
+            title: _t('Bangles and good wishes', 'चूड़ियाँ और शुभकामनाएँ'),
             body:
-                "Gifts like bangles, given to an expectant mother, carry warmth and well-wishing in a simple, beautiful form. Each one is really a loved one saying, 'I am thinking of you and your baby.'"),
+                _t("Gifts like bangles, given to an expectant mother, carry warmth and well-wishing in a simple, beautiful form. Each one is really a loved one saying, 'I am thinking of you and your baby.'", 'चूड़ियों जैसे उपहार, जो होने वाली माँ को दिए जाते हैं, बहुत सादे और सुंदर रूप में गर्माहट और शुभकामना लिए होते हैं। हर एक असल में किसी अपने का यह कहना है, \'मैं आपको और आपके शिशु को याद कर रही हूँ।\'')),
         SpiritualRead(
-            title: 'Lights as a fresh start',
+            title: _t('Lights as a fresh start', 'रोशनी, यानी नई शुरुआत'),
             body:
-                "Festivals of light celebrate the turning from darkness toward hope and new beginnings. Your pregnancy is its own festival of light, a small new life arriving to brighten your world."),
+                _t("Festivals of light celebrate the turning from darkness toward hope and new beginnings. Your pregnancy is its own festival of light, a small new life arriving to brighten your world.", 'रोशनी के त्योहार अँधेरे से उम्मीद और नई शुरुआत की ओर मुड़ने का उत्सव हैं। आपकी गर्भावस्था अपने आप में रोशनी का त्योहार है — एक नन्ही ज़िंदगी, जो आपकी दुनिया को रोशन करने आ रही है।')),
         SpiritualRead(
-            title: 'Marking the months',
+            title: _t('Marking the months', 'महीनों को याद रखना'),
             body:
-                "Many families mark each stage of pregnancy with a small ritual or a shared moment. You might create your own gentle ritual, a candle, a note, a photo, to honour each month as it passes."),
+                _t("Many families mark each stage of pregnancy with a small ritual or a shared moment. You might create your own gentle ritual, a candle, a note, a photo, to honour each month as it passes.", 'कई परिवार गर्भावस्था के हर पड़ाव को किसी छोटे रिवाज या साझा पल से मनाते हैं। आप अपना कोई कोमल रिवाज बना सकती हैं — एक दीया, एक चिट्ठी, एक तस्वीर — ताकि हर बीतता महीना यूँ ही न निकल जाए।')),
         SpiritualRead(
-            title: 'A blessing for the road ahead',
+            title: _t('A blessing for the road ahead', 'आगे के रास्ते के लिए आशीर्वाद'),
             body:
-                "Some customs are simply a way of asking for protection and good fortune for the months to come. Whatever form it takes, being blessed and wished well is a lovely thing to carry into birth."),
+                _t("Some customs are simply a way of asking for protection and good fortune for the months to come. Whatever form it takes, being blessed and wished well is a lovely thing to carry into birth.", 'कुछ रिवाज बस आने वाले महीनों के लिए रक्षा और शुभ की माँग हैं। रूप जो भी हो, आशीर्वाद पाना और शुभकामनाएँ लेकर जन्म की ओर बढ़ना बहुत प्यारी बात है।')),
         SpiritualRead(
-            title: 'Welcoming over the threshold',
+            title: _t('Welcoming over the threshold', 'देहरी पार, स्वागत'),
             body:
-                "Welcoming customs greet a new arrival warmly as they cross into the family home. You are already preparing that welcome, in your heart and in the little corner you are making ready."),
+                _t("Welcoming customs greet a new arrival warmly as they cross into the family home. You are already preparing that welcome, in your heart and in the little corner you are making ready.", 'स्वागत के रिवाज नए आने वाले का गरमजोशी से स्वागत करते हैं, जब वह पहली बार घर की देहरी पार करता है। वह स्वागत आप अभी से तैयार कर रही हैं — अपने दिल में, और उस छोटे कोने में जिसे आप सजा रही हैं।')),
         SpiritualRead(
-            title: 'First foods, in time',
+            title: _t('First foods, in time', 'पहला निवाला, अपने समय पर'),
             body:
-                "Later there will be small ceremonies for a baby's first taste of solid food, full of joy and good wishes. For now, the nourishing food you eat is its own quiet first gift to your child."),
+                _t("Later there will be small ceremonies for a baby's first taste of solid food, full of joy and good wishes. For now, the nourishing food you eat is its own quiet first gift to your child.", 'आगे चलकर शिशु के पहले ठोस निवाले के लिए छोटे-छोटे संस्कार होंगे, ख़ुशी और शुभकामनाओं से भरे। अभी के लिए, जो पौष्टिक खाना आप खाती हैं, वही आपके बच्चे को दिया हुआ पहला चुपचाप उपहार है।')),
         SpiritualRead(
-            title: 'The meaning under the custom',
+            title: _t('The meaning under the custom', 'रिवाज के नीचे का भाव'),
             body:
-                "Behind most rituals is a simple, loving intention, to protect, to bless, to give thanks. You can keep the meaning even where the form does not fit your life: just hold the loving wish."),
+                _t("Behind most rituals is a simple, loving intention, to protect, to bless, to give thanks. You can keep the meaning even where the form does not fit your life: just hold the loving wish.", 'ज़्यादातर रीति-रिवाजों के पीछे एक सीधा, प्रेम भरा भाव होता है — बचाना, आशीर्वाद देना, शुक्रिया कहना। जहाँ रूप आपके जीवन में ठीक न बैठे, वहाँ भी आप भाव रख सकती हैं: बस वह प्रेम भरी कामना थामे रखिए।')),
         SpiritualRead(
-            title: 'A community that shows up',
+            title: _t('A community that shows up', 'साथ आ खड़े होने वाले लोग'),
             body:
-                "Festivals and ceremonies gather people together, so no one carries joy or hardship alone. Letting your own community gather around you now is part of that same gift."),
+                _t("Festivals and ceremonies gather people together, so no one carries joy or hardship alone. Letting your own community gather around you now is part of that same gift.", 'त्योहार और संस्कार लोगों को इकट्ठा करते हैं, ताकि ख़ुशी या मुश्किल कोई अकेला न उठाए। अभी अपने लोगों को अपने आसपास इकट्ठा होने देना उसी उपहार का हिस्सा है।')),
         SpiritualRead(
-            title: 'Colours of joy',
+            title: _t('Colours of joy', 'ख़ुशी के रंग'),
             body:
-                "Bright colours, flowers and decoration are used to mark glad occasions and lift the heart. Bringing a little colour and beauty into your days can be its own small celebration of this time."),
+                _t("Bright colours, flowers and decoration are used to mark glad occasions and lift the heart. Bringing a little colour and beauty into your days can be its own small celebration of this time.", 'चटख़ रंग, फूल और सजावट ख़ुशी के मौक़ों को मनाने और मन को हल्का करने के लिए होते हैं। अपने दिनों में थोड़ा रंग और थोड़ी सुंदरता ले आना, इस समय का अपना छोटा-सा उत्सव है।')),
         SpiritualRead(
-            title: 'The blessings of elders',
+            title: _t('The blessings of elders', 'बड़ों का आशीर्वाद'),
             body:
-                "The good wishes of grandparents and elders are treasured at every milestone. Their blessings, spoken or simply felt, wrap your baby in a love that stretches back through generations."),
+                _t("The good wishes of grandparents and elders are treasured at every milestone. Their blessings, spoken or simply felt, wrap your baby in a love that stretches back through generations.", 'हर पड़ाव पर दादा-दादी और बड़ों की शुभकामनाएँ बहुत क़ीमती मानी जाती हैं। उनका आशीर्वाद, कहा हुआ या बस महसूस किया हुआ, आपके शिशु को उस प्रेम में लपेट देता है जो पीढ़ियों पीछे तक जाता है।')),
         SpiritualRead(
-            title: 'A name chosen with love',
+            title: _t('A name chosen with love', 'प्रेम से चुना गया नाम'),
             body:
-                "Choosing a baby's name is often a small ceremony of its own, full of meaning and hope. As you turn names over in your mind, you are already beginning that loving ritual."),
+                _t("Choosing a baby's name is often a small ceremony of its own, full of meaning and hope. As you turn names over in your mind, you are already beginning that loving ritual.", 'शिशु का नाम चुनना अक्सर अपने आप में एक छोटा संस्कार होता है, अर्थ और उम्मीद से भरा। जैसे-जैसे आप मन में नाम पलटती हैं, आप वह प्रेम भरा रिवाज शुरू कर ही चुकी हैं।')),
         SpiritualRead(
-            title: 'Hopes tied into a thread',
+            title: _t('Hopes tied into a thread', 'धागे में बँधी उम्मीदें'),
             body:
-                "Tying a thread or token is a simple way of binding good wishes and protection to someone you love. You might tie your own quiet hopes to a small keepsake for your baby."),
+                _t("Tying a thread or token is a simple way of binding good wishes and protection to someone you love. You might tie your own quiet hopes to a small keepsake for your baby.", 'धागा या कोई निशानी बाँध देना, किसी अपने से शुभकामनाएँ और रक्षा जोड़ देने का सादा तरीक़ा है। आप भी अपनी चुपचाप उम्मीदें अपने शिशु के लिए रखी किसी छोटी निशानी से बाँध सकती हैं।')),
         SpiritualRead(
-            title: 'Gratitude at harvest',
+            title: _t('Gratitude at harvest', 'फ़सल पर कृतज्ञता'),
             body:
-                "Harvest festivals are, at heart, a thank-you for what has grown and been given. In your own way, you might pause to give thanks for the little life growing within you."),
+                _t("Harvest festivals are, at heart, a thank-you for what has grown and been given. In your own way, you might pause to give thanks for the little life growing within you.", 'फ़सल के त्योहार, मन से देखें तो, जो उगा और जो मिला उसके लिए शुक्रिया हैं। अपने तरीक़े से आप भी पल भर रुककर उस नन्ही ज़िंदगी के लिए शुक्रिया कह सकती हैं जो आपके भीतर बढ़ रही है।')),
         SpiritualRead(
-            title: 'Making room for joy',
+            title: _t('Making room for joy', 'ख़ुशी के लिए जगह बनाना'),
             body:
-                "Rituals carve out time to simply stop and celebrate, instead of rushing past the good. Letting yourself fully feel the joy of this season, even briefly, is a ritual worth keeping."),
+                _t("Rituals carve out time to simply stop and celebrate, instead of rushing past the good. Letting yourself fully feel the joy of this season, even briefly, is a ritual worth keeping.", 'रीति-रिवाज समय निकालकर रुकने और ख़ुश होने का मौक़ा देते हैं, ताकि अच्छी बातें भागदौड़ में छूट न जाएँ। इस मौसम की ख़ुशी को पूरा-पूरा महसूस कर लेना, चाहे थोड़ी देर के लिए ही, अपने आप में निभाने लायक़ रिवाज है।')),
       ]),
-      SpiritualSection(title: 'Calm & wellbeing', reads: [
+      SpiritualSection(title: _t('Calm & wellbeing', 'शांति और सेहत'), reads: [
         SpiritualRead(
-            title: 'Sharing your calm',
+            title: _t('Sharing your calm', 'अपनी शांति बाँटना'),
             body:
-                "A central idea in Garbh Sanskar is that a mother's calm is quietly shared with her baby. So caring for your own peace, with music you love, slow breaths, a little rest, is also caring for your little one."),
+                _t("A central idea in Garbh Sanskar is that a mother's calm is quietly shared with her baby. So caring for your own peace, with music you love, slow breaths, a little rest, is also caring for your little one.", 'गर्भ संस्कार की एक मुख्य बात यह है कि माँ की शांति चुपचाप उसके शिशु तक पहुँच जाती है। तो अपने सुकून का ख़याल रखना — पसंदीदा संगीत, धीमी साँसें, थोड़ा आराम — असल में अपने नन्हे का ही ख़याल रखना है।')),
         SpiritualRead(
-            title: 'Warm food, gentle rhythm',
+            title: _t('Warm food, gentle rhythm', 'गरम खाना, कोमल दिनचर्या'),
             body:
-                "Drawing on Ayurveda, this tradition leans toward warm, nourishing, easy-to-digest food and an unhurried daily rhythm. The aim is balance, a settled body and a settled mind."),
+                _t("Drawing on Ayurveda, this tradition leans toward warm, nourishing, easy-to-digest food and an unhurried daily rhythm. The aim is balance, a settled body and a settled mind.", 'आयुर्वेद से लेते हुए यह परंपरा गरम, पौष्टिक और आसानी से पचने वाले खाने और बिना भागदौड़ वाली दिनचर्या की ओर झुकती है। मक़सद है संतुलन — एक ठहरा हुआ शरीर और एक ठहरा हुआ मन।')),
         SpiritualRead(
-            title: 'Talking and singing to your bump',
+            title: _t('Talking and singing to your bump', 'अपने पेट से बात करना और गाना'),
             body:
-                "Singing or speaking softly to your baby is a loved practice, and your baby really can hear you now. A few minutes a day begins a bond that continues long after birth."),
+                _t("Singing or speaking softly to your baby is a loved practice, and your baby really can hear you now. A few minutes a day begins a bond that continues long after birth.", 'शिशु से धीरे-धीरे बोलना या गाना बहुत प्यारा अभ्यास है, और आपका शिशु अब सच में आपको सुन सकता है। दिन के कुछ मिनट एक ऐसा नाता शुरू कर देते हैं जो जन्म के बाद भी लंबा चलता है।')),
         SpiritualRead(
-            title: 'Rest is not laziness',
+            title: _t('Rest is not laziness', 'आराम आलस नहीं है'),
             body:
-                "This wisdom treats rest as part of the work of growing a baby, not a break from it. When your body asks you to slow down, it is okay, even wise, to listen."),
+                _t("This wisdom treats rest as part of the work of growing a baby, not a break from it. When your body asks you to slow down, it is okay, even wise, to listen.", 'यह समझ आराम को बच्चा पालने के काम का हिस्सा मानती है, उससे छुट्टी नहीं। जब आपका शरीर धीमे होने को कहे, तो सुन लेना ठीक है — बल्कि समझदारी है।')),
         SpiritualRead(
-            title: 'Music for two',
+            title: _t('Music for two', 'दो के लिए संगीत'),
             body:
-                "Soft, soothing music is treasured here for the calm it brings the mother, and that calm reaches the baby too. A favourite gentle song, played often, can become a comfort your little one recognises after birth."),
+                _t("Soft, soothing music is treasured here for the calm it brings the mother, and that calm reaches the baby too. A favourite gentle song, played often, can become a comfort your little one recognises after birth.", 'नरम, सुकून देने वाला संगीत यहाँ इसलिए क़ीमती है कि वह माँ को शांति देता है, और वह शांति शिशु तक भी पहुँचती है। कोई पसंदीदा कोमल गीत, बार-बार सुना जाए, तो जन्म के बाद आपका नन्हा उसे पहचान सकता है।')),
         SpiritualRead(
-            title: 'A slow morning',
+            title: _t('A slow morning', 'एक धीमी सुबह'),
             body:
-                "An unhurried start to the day is treated as good medicine for body and mind. Even ten quiet minutes before the rush, breath, warmth, a hand on your bump, can set a gentler tone for everything after."),
+                _t("An unhurried start to the day is treated as good medicine for body and mind. Even ten quiet minutes before the rush, breath, warmth, a hand on your bump, can set a gentler tone for everything after.", 'बिना भागदौड़ वाली सुबह को शरीर और मन के लिए अच्छी दवा माना गया है। भागमभाग से पहले दस शांत मिनट भी — साँस, गर्माहट, पेट पर रखा हाथ — बाक़ी पूरे दिन का सुर नरम कर देते हैं।')),
         SpiritualRead(
-            title: 'Eating with love',
+            title: _t('Eating with love', 'प्रेम से खाना'),
             body:
-                "There is a belief that how you eat matters as much as what you eat, that food given with calm and care nourishes more deeply. Sitting down, slowing down, and eating warm food with gratitude turns a meal into self-care."),
+                _t("There is a belief that how you eat matters as much as what you eat, that food given with calm and care nourishes more deeply. Sitting down, slowing down, and eating warm food with gratitude turns a meal into self-care.", 'एक मान्यता है कि आप कैसे खाती हैं, यह उतना ही मायने रखता है जितना क्या खाती हैं — शांति और ध्यान से दिया गया खाना ज़्यादा गहराई से पोषण देता है। बैठकर, धीरे-धीरे, आभार के साथ गरम खाना खाना, एक साधारण भोजन को अपनी देखभाल बना देता है।')),
         SpiritualRead(
-            title: 'One kind thought',
+            title: _t('One kind thought', 'एक प्यारा ख़याल'),
             body:
-                "This tradition gently holds that a mother's loving, hopeful thoughts are felt by her baby. You do not need a perfectly positive mind, just to offer your little one one warm thought a day."),
+                _t("This tradition gently holds that a mother's loving, hopeful thoughts are felt by her baby. You do not need a perfectly positive mind, just to offer your little one one warm thought a day.", 'यह परंपरा धीरे से मानती है कि माँ के प्रेम भरे, उम्मीद भरे ख़याल उसके शिशु तक महसूस होते हैं। आपको एकदम सकारात्मक मन की ज़रूरत नहीं — बस दिन में एक गरम-सा ख़याल अपने नन्हे को दे दीजिए।')),
         SpiritualRead(
-            title: 'Gentle movement',
+            title: _t('Gentle movement', 'कोमल हरकत'),
             body:
-                "Soft movement, a slow walk, easy stretches, gentle prenatal yoga, is encouraged to keep body and mind at ease. The aim is not effort but flow, moving in a way that feels kind to you."),
+                _t("Soft movement, a slow walk, easy stretches, gentle prenatal yoga, is encouraged to keep body and mind at ease. The aim is not effort but flow, moving in a way that feels kind to you.", 'नरम हरकत — धीमी सैर, आसान खिंचाव, गर्भावस्था वाला कोमल योग — शरीर और मन को सहज रखने के लिए कही जाती है। मक़सद ज़ोर लगाना नहीं, बहना है — उतना ही और वैसे ही, जैसे आपको अच्छा लगे।')),
         SpiritualRead(
-            title: 'A little time in nature',
+            title: _t('A little time in nature', 'थोड़ा समय क़ुदरत के साथ'),
             body:
-                "Time among trees, sky and fresh air has long been seen as quietly healing. Even sitting by a window in the light counts; let nature do some of the soothing for you."),
+                _t("Time among trees, sky and fresh air has long been seen as quietly healing. Even sitting by a window in the light counts; let nature do some of the soothing for you.", 'पेड़ों, आसमान और खुली हवा के बीच बिताया समय हमेशा से चुपचाप भर देने वाला माना गया है। खिड़की के पास रोशनी में बैठ जाना भी गिना जाता है; कुछ सुकून क़ुदरत को भी देने दीजिए।')),
         SpiritualRead(
-            title: 'Guarding your peace',
+            title: _t('Guarding your peace', 'अपने सुकून की पहरेदारी'),
             body:
-                "Because a mother's calm is shared with her baby, protecting that peace is treated as worthwhile, even necessary. It is okay to step back from noise, news or people that unsettle you right now."),
+                _t("Because a mother's calm is shared with her baby, protecting that peace is treated as worthwhile, even necessary. It is okay to step back from noise, news or people that unsettle you right now.", 'क्योंकि माँ की शांति उसके शिशु तक पहुँचती है, इसलिए उस शांति को बचाना ज़रूरी माना जाता है। अभी उस शोर, उन ख़बरों या उन लोगों से दूर हट जाना बिल्कुल ठीक है जो आपका मन डगमगा देते हैं।')),
         SpiritualRead(
-            title: 'Winding down for sleep',
+            title: _t('Winding down for sleep', 'नींद से पहले धीमे पड़ना'),
             body:
-                "A gentle, predictable wind-down helps both body and mind settle for rest. Dimming the lights, a warm drink, a few slow breaths, these small signals tell you it is safe to let go."),
+                _t("A gentle, predictable wind-down helps both body and mind settle for rest. Dimming the lights, a warm drink, a few slow breaths, these small signals tell you it is safe to let go.", 'एक कोमल, हर रोज़ एक जैसी तैयारी शरीर और मन दोनों को आराम के लिए बिठा देती है। रोशनी मद्धम करना, कुछ गरम पीना, कुछ धीमी साँसें — ये छोटे इशारे बता देते हैं कि अब ढीला छोड़ देना सुरक्षित है।')),
         SpiritualRead(
-            title: 'Breathing room',
+            title: _t('Breathing room', 'साँस भर की जगह'),
             body:
-                "Slow, deep breathing is one of the simplest tools this wisdom offers, calming the body almost at once. A few long breaths, whenever you remember, are a gift you can give yourself anywhere."),
+                _t("Slow, deep breathing is one of the simplest tools this wisdom offers, calming the body almost at once. A few long breaths, whenever you remember, are a gift you can give yourself anywhere.", 'धीमी, गहरी साँस इस समझ के सबसे सरल औज़ारों में से एक है, जो शरीर को लगभग तुरंत शांत कर देती है। कुछ लंबी साँसें, जब भी याद आए — यह तोहफ़ा आप ख़ुद को कहीं भी दे सकती हैं।')),
         SpiritualRead(
-            title: 'Surround yourself with softness',
+            title: _t('Surround yourself with softness', 'अपने चारों ओर नरमी रखिए'),
             body:
-                "Soft sounds, soft light, soft words, this tradition leans toward gentleness in your surroundings. Curating a little softness around you is a quiet way of caring for two."),
+                _t("Soft sounds, soft light, soft words, this tradition leans toward gentleness in your surroundings. Curating a little softness around you is a quiet way of caring for two.", 'नरम आवाज़ें, नरम रोशनी, नरम शब्द — यह परंपरा आपके आसपास की चीज़ों में भी कोमलता की ओर झुकती है। अपने चारों ओर थोड़ी नरमी बुन लेना, दो जनों का ख़याल रखने का एक चुपचाप तरीक़ा है।')),
         SpiritualRead(
-            title: 'Less, but kinder',
+            title: _t('Less, but kinder', 'कम, पर ज़्यादा नरमी से'),
             body:
-                "Wellbeing here is less about doing more and more about doing things gently. Trimming your days down to what truly matters, done with care, is its own kind of nourishment."),
+                _t("Wellbeing here is less about doing more and more about doing things gently. Trimming your days down to what truly matters, done with care, is its own kind of nourishment.", 'यहाँ सेहत का मतलब ज़्यादा करना नहीं, चीज़ों को कोमलता से करना है। अपने दिन को उतने तक छाँट लेना जो सच में ज़रूरी है, और उसे ध्यान से करना — यह अपने आप में एक तरह का पोषण है।')),
         SpiritualRead(
-            title: 'Calm is contagious',
+            title: _t('Calm is contagious', 'ठहराव फैलता है'),
             body:
-                "Just as tension can spread, so can calm, and your settled heart can settle your baby. Tending your own peace is therefore one of the most loving things you can do for your child."),
+                _t("Just as tension can spread, so can calm, and your settled heart can settle your baby. Tending your own peace is therefore one of the most loving things you can do for your child.", 'जैसे तनाव फैलता है, वैसे ही शांति भी — और आपका ठहरा हुआ मन आपके शिशु को भी ठहरा सकता है। इसलिए अपने सुकून का ख़याल रखना उन सबसे प्रेम भरे कामों में से एक है जो आप अपने बच्चे के लिए कर सकती हैं।')),
         SpiritualRead(
-            title: 'A small joy each day',
+            title: _t('A small joy each day', 'हर दिन एक छोटी ख़ुशी'),
             body:
-                "Building in one small, sure joy a day, a warm bath, a favourite tea, a song, keeps the heart light through a long season. These little pleasures are not extras; they are part of staying well."),
+                _t("Building in one small, sure joy a day, a warm bath, a favourite tea, a song, keeps the heart light through a long season. These little pleasures are not extras; they are part of staying well.", 'दिन में एक छोटी, पक्की ख़ुशी तय कर लेना — एक गरम स्नान, पसंदीदा चाय, कोई गाना — लंबे मौसम में मन हल्का रखता है। ये छोटी ख़ुशियाँ फ़ालतू नहीं हैं; ये ठीक बने रहने का हिस्सा हैं।')),
         SpiritualRead(
-            title: 'Closing the day with thanks',
+            title: _t('Closing the day with thanks', 'दिन को शुक्रिया के साथ बंद करना'),
             body:
-                "Ending the day by recalling one good thing settles the mind for sleep and softens the worries. A single grateful thought, hand on your bump, is a lovely way to say goodnight to your baby."),
+                _t("Ending the day by recalling one good thing settles the mind for sleep and softens the worries. A single grateful thought, hand on your bump, is a lovely way to say goodnight to your baby.", 'दिन के आख़िर में एक अच्छी बात याद कर लेना मन को नींद के लिए बिठा देता है और चिंताओं को नरम कर देता है। एक अकेला आभार भरा ख़याल, पेट पर रखा हाथ — अपने शिशु को शुभरात्रि कहने का बहुत प्यारा तरीक़ा है।')),
         SpiritualRead(
-            title: 'Permission to slow down',
+            title: _t('Permission to slow down', 'धीमे होने की इजाज़त'),
             body:
-                "This wisdom treats slowing down not as falling behind but as moving at the right pace for growing a baby. Give yourself full permission to rest; it is exactly what this season asks of you."),
+                _t("This wisdom treats slowing down not as falling behind but as moving at the right pace for growing a baby. Give yourself full permission to rest; it is exactly what this season asks of you.", 'यह समझ धीमे पड़ने को पीछे रह जाना नहीं मानती, बल्कि बच्चा पालने की सही रफ़्तार पर चलना मानती है। ख़ुद को आराम करने की पूरी इजाज़त दीजिए; यह मौसम आपसे यही तो माँग रहा है।')),
         SpiritualRead(
-            title: 'Tending the inner garden',
+            title: _t('Tending the inner garden', 'भीतर के बग़ीचे को सींचना'),
             body:
-                "Caring for your inner world, your thoughts and feelings, is seen as tending a garden your baby will grow in. Be patient and kind with that garden; weeds and all, it is doing beautifully."),
+                _t("Caring for your inner world, your thoughts and feelings, is seen as tending a garden your baby will grow in. Be patient and kind with that garden; weeds and all, it is doing beautifully.", 'अपनी भीतरी दुनिया का — अपने विचारों और भावनाओं का — ख़याल रखना उस बग़ीचे को सँभालने जैसा माना गया है जिसमें आपका शिशु पलेगा। उस बग़ीचे के साथ धीरज और नरमी रखिए; घास-फूस समेत, वह बहुत अच्छा चल रहा है।')),
       ]),
     ],
   ),
@@ -484,337 +488,337 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'islam',
-    name: 'Islam',
+    name: _t('Islam', 'इस्लाम'),
     symbol: '☪️',
-    blurb: 'Gratitude, gentle care for the mother, heartfelt prayer.',
+    blurb: _t('Gratitude, gentle care for the mother, heartfelt prayer.', 'शुक्र, माँ की नरम देखभाल, और दिल से निकली दुआ।'),
     sections: [
-      SpiritualSection(title: 'Gratitude & heartfelt prayer', reads: [
+      SpiritualSection(title: _t('Gratitude & heartfelt prayer', 'शुक्र और दिल से निकली दुआ'), reads: [
         SpiritualRead(
-            title: 'A trust to be grateful for',
+            title: _t('A trust to be grateful for', 'एक अमानत, जिसका शुक्र बनता है'),
             body:
-                "Pregnancy is often received as a gift and a trust, something precious placed in your care. Pausing to feel grateful, even on a tired day, can soften the worry and steady the heart."),
+                _t("Pregnancy is often received as a gift and a trust, something precious placed in your care. Pausing to feel grateful, even on a tired day, can soften the worry and steady the heart.", 'गर्भावस्था को अक्सर एक तोहफ़ा और एक अमानत माना जाता है — कुछ बेशक़ीमती, जो आपके भरोसे सौंपा गया है। थकान भरे दिन में भी दो पल ठहरकर शुक्र कर लेना फ़िक्र को नरम कर देता है और मन को थाम लेता है।')),
         SpiritualRead(
-            title: 'Praying in your own words',
+            title: _t('Praying in your own words', 'अपने ही लफ़्ज़ों में दुआ'),
             body:
-                "Heartfelt prayer does not need to be formal; many simply speak to God from the heart, asking for a healthy baby and a safe delivery. Whatever words come to you, said sincerely, are enough."),
+                _t("Heartfelt prayer does not need to be formal; many simply speak to God from the heart, asking for a healthy baby and a safe delivery. Whatever words come to you, said sincerely, are enough.", 'दुआ के लिए कोई तयशुदा साँचा ज़रूरी नहीं — बहुत लोग बस दिल से ख़ुदा से बात कर लेते हैं, बच्चे की सेहत और सही-सलामत जन्म की दुआ माँग लेते हैं। जो लफ़्ज़ आपके मन से निकलें, सच्चे दिल से कहे जाएँ, वही काफ़ी हैं।')),
         SpiritualRead(
-            title: 'Patience as strength',
+            title: _t('Patience as strength', 'सब्र ही एक ताक़त है'),
             body:
-                "Patience through discomfort and waiting is deeply valued, and seen as a quiet strength rather than weakness. The long days are not wasted; they are part of what you are building."),
+                _t("Patience through discomfort and waiting is deeply valued, and seen as a quiet strength rather than weakness. The long days are not wasted; they are part of what you are building.", 'तकलीफ़ और इंतज़ार में जो सब्र रखा जाता है, उसकी बड़ी क़द्र है — उसे कमज़ोरी नहीं, चुपचाप निभाई गई ताक़त माना जाता है। ये लंबे दिन बेकार नहीं जा रहे; ये भी उसी का हिस्सा हैं जो आप गढ़ रही हैं।')),
         SpiritualRead(
-            title: 'Hope after hardship',
+            title: _t('Hope after hardship', 'मुश्किल के बाद आसानी'),
             body:
-                "A reassuring idea is that ease tends to follow hardship, that hard stretches do not last forever. Holding gently to that hope can carry you through the heavier days."),
+                _t("A reassuring idea is that ease tends to follow hardship, that hard stretches do not last forever. Holding gently to that hope can carry you through the heavier days.", 'एक बात मन को तसल्ली देती है — मुश्किल के पीछे-पीछे आसानी आती है, कठिन दौर हमेशा नहीं रहता। इस उम्मीद को हल्के हाथ से थामे रहना भारी दिनों से पार लगा देता है।')),
         SpiritualRead(
-            title: 'Small thanks, often',
+            title: _t('Small thanks, often', 'छोटा शुक्र, बार-बार'),
             body:
-                "Gratitude is encouraged not as a grand gesture but as a habit, small thanks given often. A whispered thank-you for a kick, a meal, a good scan, all add up."),
+                _t("Gratitude is encouraged not as a grand gesture but as a habit, small thanks given often. A whispered thank-you for a kick, a meal, a good scan, all add up.", 'शुक्र को कोई बड़ा आयोजन नहीं, एक आदत माना गया है — छोटा-छोटा शुक्र, बार-बार। एक लात के लिए, एक थाली के लिए, एक अच्छे स्कैन के लिए धीरे से कहा गया शुक्रिया — सब जुड़ता जाता है।')),
         SpiritualRead(
-            title: 'Thanking your body',
+            title: _t('Thanking your body', 'अपने शरीर का शुक्रिया'),
             body:
-                "Your body is quietly working day and night to grow your baby, and that is worth a moment of thanks. Even when it aches, you can rest a hand where it hurts and gently thank it for carrying on."),
+                _t("Your body is quietly working day and night to grow your baby, and that is worth a moment of thanks. Even when it aches, you can rest a hand where it hurts and gently thank it for carrying on.", 'आपका शरीर दिन-रात चुपचाप आपके बच्चे को बड़ा कर रहा है — इतना तो एक पल के शुक्रिया का हक़ रखता ही है। जहाँ दर्द हो वहीं हाथ रखकर आप धीरे से उसका शुक्रिया कह सकती हैं कि वह फिर भी लगा हुआ है।')),
         SpiritualRead(
-            title: 'A prayer to begin the day',
+            title: _t('A prayer to begin the day', 'दिन की शुरुआत, एक दुआ के साथ'),
             body:
-                "Some like to start the morning with a few heartfelt words, asking for ease and strength for the hours ahead. It need only be a breath and a sentence, offered before the day rushes in."),
+                _t("Some like to start the morning with a few heartfelt words, asking for ease and strength for the hours ahead. It need only be a breath and a sentence, offered before the day rushes in.", 'कुछ लोग सुबह की शुरुआत दिल से कहे दो-चार लफ़्ज़ों से करते हैं — आगे आने वाले घंटों के लिए आसानी और हिम्मत माँग लेते हैं। इसके लिए एक साँस और एक वाक्य ही काफ़ी है, दिन के भागने से पहले कह लीजिए।')),
         SpiritualRead(
-            title: 'A prayer to close the day',
+            title: _t('A prayer to close the day', 'दिन का अंत, एक दुआ के साथ'),
             body:
-                "Ending the day with a quiet word of thanks settles the heart for rest. You might simply name one good thing and hand the rest of your worries over for the night."),
+                _t("Ending the day with a quiet word of thanks settles the heart for rest. You might simply name one good thing and hand the rest of your worries over for the night.", 'दिन को शुक्र के एक शांत लफ़्ज़ के साथ बंद करना मन को आराम के लिए तैयार कर देता है। आप बस एक अच्छी बात का नाम ले लीजिए, और बाक़ी फ़िक्रें रात भर के लिए सौंप दीजिए।')),
         SpiritualRead(
-            title: 'Turning worry into a wish',
+            title: _t('Turning worry into a wish', 'फ़िक्र को दुआ में बदल देना'),
             body:
-                "When anxiety rises, it can help to turn it gently into a prayer, a wish for safety rather than a loop of fear. The worry becomes something you place in kinder hands."),
+                _t("When anxiety rises, it can help to turn it gently into a prayer, a wish for safety rather than a loop of fear. The worry becomes something you place in kinder hands.", 'जब घबराहट उठे, तो उसे धीरे से एक दुआ में बदल देना मदद करता है — डर के चक्कर की जगह सलामती की एक ख़्वाहिश। फिर वह फ़िक्र वह चीज़ बन जाती है जिसे आप किसी नरम हाथों में रख देती हैं।')),
         SpiritualRead(
-            title: 'Grateful for the first flutters',
+            title: _t('Grateful for the first flutters', 'पहली हलचल का शुक्र'),
             body:
-                "The first small movements are an easy thing to give thanks for, a quiet hello from your baby. Pausing to notice them turns an ordinary moment into a small blessing."),
+                _t("The first small movements are an easy thing to give thanks for, a quiet hello from your baby. Pausing to notice them turns an ordinary moment into a small blessing.", 'पहली नन्ही हलचलों का शुक्र करना सबसे आसान है — यह आपके बच्चे का चुपचाप कहा गया नमस्ते है। दो पल ठहरकर उन्हें महसूस कर लेना एक मामूली लम्हे को छोटी-सी रहमत बना देता है।')),
         SpiritualRead(
-            title: 'Thankful for the helpers',
+            title: _t('Thankful for the helpers', 'मदद करने वालों का शुक्र'),
             body:
-                "Gratitude naturally widens to include the people who care for you, the ones who cook, drive, and check in. A silent thank-you for them is part of a grateful heart."),
+                _t("Gratitude naturally widens to include the people who care for you, the ones who cook, drive, and check in. A silent thank-you for them is part of a grateful heart.", 'शुक्र अपने आप फैलकर उन लोगों तक पहुँच जाता है जो आपका ख़याल रखते हैं — जो खाना बनाते हैं, गाड़ी चलाते हैं, हाल पूछ लेते हैं। उनके लिए मन ही मन कहा गया शुक्रिया भी शुक्रगुज़ार दिल का हिस्सा है।')),
         SpiritualRead(
-            title: 'A heart at ease',
+            title: _t('A heart at ease', 'चैन से भरा दिल'),
             body:
-                "It is often felt that a grateful heart is a calmer one, less gripped by what is missing. Counting what is good, even briefly, can loosen the hold of a hard day."),
+                _t("It is often felt that a grateful heart is a calmer one, less gripped by what is missing. Counting what is good, even briefly, can loosen the hold of a hard day.", 'अक्सर कहा जाता है कि शुक्रगुज़ार दिल ज़्यादा शांत रहता है, जो नहीं है उसकी पकड़ में कम आता है। जो अच्छा है उसे थोड़ी देर के लिए भी गिन लेना किसी भारी दिन की जकड़ ढीली कर देता है।')),
         SpiritualRead(
-            title: 'Asking for a gentle birth',
+            title: _t('Asking for a gentle birth', 'आसान जन्म की दुआ'),
             body:
-                "Many quietly ask for a safe and gentle arrival, returning to that hope whenever the day ahead feels daunting. Shaping your own short wish for it can be steadying."),
+                _t("Many quietly ask for a safe and gentle arrival, returning to that hope whenever the day ahead feels daunting. Shaping your own short wish for it can be steadying.", 'बहुत-सी माएँ चुपचाप एक सलामत और आसान आगमन की दुआ माँगती हैं, और जब भी आने वाला दिन डरा दे, उसी उम्मीद पर लौट आती हैं। इसके लिए अपनी एक छोटी-सी दुआ गढ़ लेना मन को थाम लेता है।')),
         SpiritualRead(
-            title: 'Thanks for ordinary days',
+            title: _t('Thanks for ordinary days', 'आम दिनों का शुक्र'),
             body:
-                "Not every day needs a milestone to be worth gratitude; an ordinary, uneventful day is itself a gift in pregnancy. A calm day is a good day, and worth a quiet thank-you."),
+                _t("Not every day needs a milestone to be worth gratitude; an ordinary, uneventful day is itself a gift in pregnancy. A calm day is a good day, and worth a quiet thank-you.", 'हर दिन में कोई बड़ी बात हो तभी शुक्र बनता है — ऐसा नहीं है; गर्भावस्था में तो एक आम, बिना हलचल वाला दिन ख़ुद एक तोहफ़ा है। शांत दिन अच्छा दिन होता है, और एक धीमे शुक्रिया का हक़दार भी।')),
         SpiritualRead(
-            title: 'Prayer in your own language',
+            title: _t('Prayer in your own language', 'अपनी ही ज़बान में दुआ'),
             body:
-                "Heartfelt words count in any language and any form; sincerity matters far more than eloquence. Speak however feels natural, and trust that it is enough."),
+                _t("Heartfelt words count in any language and any form; sincerity matters far more than eloquence. Speak however feels natural, and trust that it is enough.", 'दिल से निकले लफ़्ज़ किसी भी ज़बान में, किसी भी तरह कहे जाएँ, गिने जाते हैं — सच्चाई की क़ीमत सजावट से कहीं ज़्यादा है। जैसे आपको सहज लगे वैसे कहिए, और भरोसा रखिए कि इतना काफ़ी है।')),
         SpiritualRead(
-            title: 'Gratitude for nourishment',
+            title: _t('Gratitude for nourishment', 'खाने का शुक्र'),
             body:
-                "Each meal that nourishes you and your baby is a small mercy worth noticing. Before you eat, a moment of thanks can turn the food into care for two."),
+                _t("Each meal that nourishes you and your baby is a small mercy worth noticing. Before you eat, a moment of thanks can turn the food into care for two.", 'हर वह थाली जो आपको और आपके बच्चे को पोसती है, एक छोटी रहमत है — उसे देख लेना बनता है। खाने से पहले एक पल का शुक्र उस खाने को दो जनों की देखभाल बना देता है।')),
         SpiritualRead(
-            title: 'Patience, asked for gently',
+            title: _t('Patience, asked for gently', 'सब्र, नरमी से माँगा हुआ'),
             body:
-                "On the long days, some ask simply for patience, for the strength to keep waiting well. It is an honest, human thing to request, and a gentle one to grant yourself."),
+                _t("On the long days, some ask simply for patience, for the strength to keep waiting well. It is an honest, human thing to request, and a gentle one to grant yourself.", 'लंबे दिनों में कुछ लोग बस सब्र माँग लेते हैं — इतनी हिम्मत कि इंतज़ार ढंग से कट जाए। यह माँगना बहुत सच्ची और इंसानी बात है, और ख़ुद को देने लायक़ भी।')),
         SpiritualRead(
-            title: 'Held through uncertainty',
+            title: _t('Held through uncertainty', 'अनजानी बातों के बीच भी थामे हुए'),
             body:
-                "A comforting belief is that you are watched over even in the unknowns you cannot control. Resting in that sense of being held can ease a restless mind."),
+                _t("A comforting belief is that you are watched over even in the unknowns you cannot control. Resting in that sense of being held can ease a restless mind.", 'एक तसल्ली देने वाला यक़ीन यह है कि जो आपके बस में नहीं, उन अनजानी बातों में भी कोई आपका ख़याल रख रहा है। थामे जाने के इस एहसास में टिक जाना बेचैन मन को हल्का कर देता है।')),
         SpiritualRead(
-            title: 'A whispered hope for your baby',
+            title: _t('A whispered hope for your baby', 'बच्चे के लिए धीरे से कही गई दुआ'),
             body:
-                "Many like to send a small, sincere hope toward their baby, for health, for peace, for a good life. Whispered with a hand on your bump, it is a tender daily habit."),
+                _t("Many like to send a small, sincere hope toward their baby, for health, for peace, for a good life. Whispered with a hand on your bump, it is a tender daily habit.", 'बहुत-सी माएँ अपने बच्चे की तरफ़ एक छोटी, सच्ची दुआ भेजना पसंद करती हैं — सेहत की, सुकून की, एक अच्छी ज़िंदगी की। पेट पर हाथ रखकर धीरे से कही गई यह बात रोज़ की एक कोमल आदत बन जाती है।')),
         SpiritualRead(
-            title: 'Thankful after the scan',
+            title: _t('Thankful after the scan', 'स्कैन के बाद का शुक्र'),
             body:
-                "A reassuring scan is a natural moment to pause and be grateful, to breathe out and say thank you. Letting relief turn into gratitude makes the good news land more fully."),
+                _t("A reassuring scan is a natural moment to pause and be grateful, to breathe out and say thank you. Letting relief turn into gratitude makes the good news land more fully.", 'तसल्ली देने वाला स्कैन ठहरकर शुक्र करने का सहज मौक़ा है — एक लंबी साँस छोड़िए और शुक्रिया कह दीजिए। राहत को शुक्र में बदल जाने देना अच्छी ख़बर को मन में पूरी तरह बैठा देता है।')),
       ]),
-      SpiritualSection(title: "The Prophet's gentleness (reflections)", reads: [
+      SpiritualSection(title: _t("The Prophet's gentleness (reflections)", 'पैग़ंबर की नरमी (कुछ विचार)'), reads: [
         SpiritualRead(
-            title: 'Gentleness with children',
+            title: _t('Gentleness with children', 'बच्चों के साथ नरमी'),
             body:
-                "The example most often highlighted is one of remarkable gentleness, tenderness toward children and care for mothers. Reflecting on that softness is a lovely model for the parent you are becoming."),
+                _t("The example most often highlighted is one of remarkable gentleness, tenderness toward children and care for mothers. Reflecting on that softness is a lovely model for the parent you are becoming.", 'जिस मिसाल की सबसे ज़्यादा बात होती है, वह गहरी नरमी की है — बच्चों के लिए कोमलता और माँओं का ख़याल। उस नरमी पर थोड़ा ठहरकर सोचना उस माँ के लिए एक प्यारा नमूना है जो आप बन रही हैं।')),
         SpiritualRead(
-            title: 'Mercy first',
+            title: _t('Mercy first', 'पहले रहम'),
             body:
-                "Mercy and compassion are placed above harshness in this tradition. As you imagine raising your child, leading with mercy, patience over perfection, is a gentle north star."),
+                _t("Mercy and compassion are placed above harshness in this tradition. As you imagine raising your child, leading with mercy, patience over perfection, is a gentle north star.", 'इस परंपरा में रहम और करुणा को सख़्ती से ऊपर रखा गया है। जब आप अपने बच्चे को पालने की कल्पना करती हैं, तो पहले रहम — सबकुछ ठीक-ठाक करने से ज़्यादा सब्र — एक नरम ध्रुवतारा बन जाता है।')),
         SpiritualRead(
-            title: 'Honour to mothers',
+            title: _t('Honour to mothers', 'माँओं का मान'),
             body:
-                "Mothers are held in especially high regard, their care for their children deeply honoured. Let that be a reminder that the love and effort you are pouring out right now matters enormously."),
+                _t("Mothers are held in especially high regard, their care for their children deeply honoured. Let that be a reminder that the love and effort you are pouring out right now matters enormously.", 'माँओं को ख़ास ऊँचा दर्जा दिया गया है, और बच्चों के लिए की गई उनकी देखभाल की गहरी क़द्र है। इसे एक याद दिलावा मानिए कि इस वक़्त आप जो प्यार और मेहनत उँडेल रही हैं, उसकी क़ीमत बहुत बड़ी है।')),
         SpiritualRead(
-            title: 'Kindness as worship',
+            title: _t('Kindness as worship', 'नेकी भी इबादत है'),
             body:
-                "Everyday kindness, to family, neighbours and strangers, is treated as a form of devotion. The quiet care you give and receive in these months is part of that same thread."),
+                _t("Everyday kindness, to family, neighbours and strangers, is treated as a form of devotion. The quiet care you give and receive in these months is part of that same thread.", 'रोज़मर्रा की नेकी — घरवालों के लिए, पड़ोसियों के लिए, अनजानों के लिए — इबादत की ही एक शक्ल मानी जाती है। इन महीनों में आप जो चुपचाप देखभाल देती और लेती हैं, वह उसी धागे का हिस्सा है।')),
         SpiritualRead(
-            title: 'A calm household',
+            title: _t('A calm household', 'शांत घर'),
             body:
-                "Calm, kindness and good manners at home are valued highly. Building a gentle, warm atmosphere now is a gift your baby will be born into."),
+                _t("Calm, kindness and good manners at home are valued highly. Building a gentle, warm atmosphere now is a gift your baby will be born into.", 'घर में शांति, नरमी और अच्छे तौर-तरीक़ों की बड़ी क़द्र है। अभी से एक नरम, गर्मजोशी भरा माहौल बना लेना वह तोहफ़ा है जिसमें आपका बच्चा जन्म लेगा।')),
         SpiritualRead(
-            title: 'Leading with tenderness',
+            title: _t('Leading with tenderness', 'कोमलता के साथ आगे'),
             body:
-                "The example most reflected on is one of deep tenderness, meeting others, especially children, with softness. Imagining that gentleness is a lovely way to picture the parent you are becoming."),
+                _t("The example most reflected on is one of deep tenderness, meeting others, especially children, with softness. Imagining that gentleness is a lovely way to picture the parent you are becoming.", 'जिस मिसाल पर सबसे ज़्यादा सोचा जाता है, वह गहरी कोमलता की है — दूसरों से, ख़ासकर बच्चों से, नरमी के साथ मिलना। उस नरमी की कल्पना करना उस माँ को देखने का प्यारा तरीक़ा है जो आप बन रही हैं।')),
         SpiritualRead(
-            title: 'Patience over anger',
+            title: _t('Patience over anger', 'ग़ुस्से पर सब्र'),
             body:
-                "Responding to difficulty with patience rather than anger is a quality often admired. In the harder moments of these months, choosing the calmer response is its own quiet strength."),
+                _t("Responding to difficulty with patience rather than anger is a quality often admired. In the harder moments of these months, choosing the calmer response is its own quiet strength.", 'मुश्किल का जवाब ग़ुस्से से नहीं, सब्र से देना — इस ख़ूबी की अक्सर तारीफ़ होती है। इन महीनों के कठिन पलों में शांत जवाब चुन लेना ख़ुद एक चुपचाप निभाई गई ताक़त है।')),
         SpiritualRead(
-            title: 'A smile as kindness',
+            title: _t('A smile as kindness', 'एक मुस्कान भी नेकी है'),
             body:
-                "Even a warm smile is remembered as a small act of kindness worth giving freely. The gentle warmth you offer others ripples further than you know."),
+                _t("Even a warm smile is remembered as a small act of kindness worth giving freely. The gentle warmth you offer others ripples further than you know.", 'एक गर्मजोशी भरी मुस्कान को भी छोटी-सी नेकी माना गया है, जिसे खुले दिल से बाँटना चाहिए। आप दूसरों को जो नरम अपनापन देती हैं, वह आपकी सोच से कहीं दूर तक फैलता है।')),
         SpiritualRead(
-            title: 'Mothers especially honoured',
+            title: _t('Mothers especially honoured', 'माँओं का ख़ास दर्जा'),
             body:
-                "Mothers are spoken of with particular tenderness and high regard. Let that settle in: the care you are pouring out, unseen, is held as deeply precious."),
+                _t("Mothers are spoken of with particular tenderness and high regard. Let that settle in: the care you are pouring out, unseen, is held as deeply precious.", 'माँओं का ज़िक्र ख़ास कोमलता और ऊँचे मान के साथ किया जाता है। इस बात को मन में बैठ जाने दीजिए — आप जो देखभाल बिना किसी की नज़र में आए उँडेल रही हैं, उसे बहुत क़ीमती माना गया है।')),
         SpiritualRead(
-            title: 'Gentle words',
+            title: _t('Gentle words', 'नरम बोल'),
             body:
-                "Kind, gentle speech is valued over harshness, even when correcting. A soft home, built on gentle words, is a calm place for a baby to arrive into."),
+                _t("Kind, gentle speech is valued over harshness, even when correcting. A soft home, built on gentle words, is a calm place for a baby to arrive into.", 'टोकते वक़्त भी सख़्त लहजे से ज़्यादा नरम, मीठे बोल की क़द्र है। नरम बोल से बना हुआ घर बच्चे के आने के लिए एक शांत जगह होता है।')),
         SpiritualRead(
-            title: 'Forgiving easily',
+            title: _t('Forgiving easily', 'आसानी से माफ़ कर देना'),
             body:
-                "Letting go of small wrongs rather than holding them is treated as a strength. Releasing old irritations makes room for a lighter, calmer heart now."),
+                _t("Letting go of small wrongs rather than holding them is treated as a strength. Releasing old irritations makes room for a lighter, calmer heart now.", 'छोटी-मोटी बातें पकड़कर रखने के बजाय छोड़ देना ताक़त मानी जाती है। पुरानी खीझ को जाने देने से अभी एक हल्के, शांत दिल के लिए जगह बन जाती है।')),
         SpiritualRead(
-            title: 'Care for the vulnerable',
+            title: _t('Care for the vulnerable', 'कमज़ोरों का ख़याल'),
             body:
-                "Special care for the weak, the young and the tired runs through these reflections. In pregnancy, letting yourself be one of the gently-cared-for is entirely fitting."),
+                _t("Special care for the weak, the young and the tired runs through these reflections. In pregnancy, letting yourself be one of the gently-cared-for is entirely fitting.", 'कमज़ोरों, बच्चों और थके हुए लोगों का ख़ास ख़याल इन विचारों में जगह-जगह मिलता है। गर्भावस्था में ख़ुद को भी उन्हीं में गिन लेना, जिनका नरमी से ख़याल रखा जाता है, बिल्कुल ठीक है।')),
         SpiritualRead(
-            title: 'Generosity of spirit',
+            title: _t('Generosity of spirit', 'दिल की दरियादिली'),
             body:
-                "Giving freely, in small ways, without keeping score, is much admired. The open-handed love you are already growing for your baby is this same generous spirit."),
+                _t("Giving freely, in small ways, without keeping score, is much admired. The open-handed love you are already growing for your baby is this same generous spirit.", 'बिना हिसाब रखे, छोटी-छोटी बातों में खुले हाथ से देना बहुत सराहा गया है। अपने बच्चे के लिए आप जो खुले दिल का प्यार अभी से पाल रही हैं, वह इसी दरियादिली का रूप है।')),
         SpiritualRead(
-            title: 'Calm in difficulty',
+            title: _t('Calm in difficulty', 'मुश्किल में भी शांत'),
             body:
-                "Staying steady and gentle even under strain is a quality often highlighted. You are carrying so much and still being tender, which is exactly this kind of grace."),
+                _t("Staying steady and gentle even under strain is a quality often highlighted. You are carrying so much and still being tender, which is exactly this kind of grace.", 'बोझ के बीच भी टिके रहना और नरम बने रहना — इस ख़ूबी की अक्सर बात होती है। आप इतना कुछ उठाए हुए हैं और फिर भी कोमल हैं; यही तो वह ख़ूबसूरती है।')),
         SpiritualRead(
-            title: 'Good character over grand deeds',
+            title: _t('Good character over grand deeds', 'बड़े कामों से बढ़कर अच्छा किरदार'),
             body:
-                "It is everyday good character, honesty, kindness, patience, that is most treasured, not grand gestures. The small, decent choices you make now are quietly shaping your child's world."),
+                _t("It is everyday good character, honesty, kindness, patience, that is most treasured, not grand gestures. The small, decent choices you make now are quietly shaping your child's world.", 'सबसे ज़्यादा क़ीमत रोज़मर्रा के अच्छे किरदार की है — सच्चाई, नेकी, सब्र — न कि बड़े-बड़े कामों की। अभी आप जो छोटे-छोटे भले फ़ैसले लेती हैं, वही चुपचाप आपके बच्चे की दुनिया गढ़ रहे हैं।')),
         SpiritualRead(
-            title: 'Welcoming children close',
+            title: _t('Welcoming children close', 'बच्चों को पास बुलाना'),
             body:
-                "Children were welcomed warmly and kept close, never seen as a nuisance. It is a sweet model for the patient, present parent you are becoming."),
+                _t("Children were welcomed warmly and kept close, never seen as a nuisance. It is a sweet model for the patient, present parent you are becoming.", 'बच्चों का गर्मजोशी से स्वागत होता था और उन्हें पास रखा जाता था, कभी झंझट नहीं समझा गया। यह उस सब्र वाली, हाज़िर माँ के लिए एक प्यारा नमूना है जो आप बन रही हैं।')),
         SpiritualRead(
-            title: 'Humility',
+            title: _t('Humility', 'विनम्रता'),
             body:
-                "Humbleness, never thinking yourself above others, is gently admired. There is rest in it too, the freedom of not having to prove anything."),
+                _t("Humbleness, never thinking yourself above others, is gently admired. There is rest in it too, the freedom of not having to prove anything.", 'विनम्रता — ख़ुद को कभी दूसरों से ऊपर न समझना — को नरमी से सराहा गया है। इसमें एक आराम भी है: कुछ साबित करते रहने से छुट्टी।')),
         SpiritualRead(
-            title: 'Keeping promises',
+            title: _t('Keeping promises', 'वादा निभाना'),
             body:
-                "Keeping one's word, even in small things, is treated as a mark of good character. The quiet promises you are already making to your baby are part of that."),
+                _t("Keeping one's word, even in small things, is treated as a mark of good character. The quiet promises you are already making to your baby are part of that.", 'छोटी-छोटी बातों में भी अपनी बात पर टिके रहना अच्छे किरदार की निशानी माना गया है। अपने बच्चे से आप जो चुपचाप वादे अभी से कर रही हैं, वे भी इसी में आते हैं।')),
         SpiritualRead(
-            title: 'Comfort for the grieving',
+            title: _t('Comfort for the grieving', 'ग़म में साथ'),
             body:
-                "Sitting with those in pain and offering simple comfort is remembered as a kindness. Knowing how to be present for sorrow is a gift you can carry into family life."),
+                _t("Sitting with those in pain and offering simple comfort is remembered as a kindness. Knowing how to be present for sorrow is a gift you can carry into family life.", 'दुख में डूबे किसी के पास बैठ जाना और सीधा-सादा दिलासा दे देना एक नेकी के तौर पर याद किया जाता है। ग़म के वक़्त साथ खड़े होना आना वह तोहफ़ा है जिसे आप अपने परिवार में भी ले जा सकती हैं।')),
         SpiritualRead(
-            title: 'Mercy as the first response',
+            title: _t('Mercy as the first response', 'पहला जवाब रहम'),
             body:
-                "Leading with mercy rather than judgement is a recurring theme. As you imagine raising your child, mercy first is a gentle north star to keep."),
+                _t("Leading with mercy rather than judgement is a recurring theme. As you imagine raising your child, mercy first is a gentle north star to keep.", 'फ़ैसला सुनाने से पहले रहम — यह बात बार-बार लौटकर आती है। बच्चे को पालने की कल्पना करते हुए पहले रहम को एक नरम ध्रुवतारा बनाकर रखिए।')),
       ]),
-      SpiritualSection(title: 'Beautiful names & their meaning', reads: [
+      SpiritualSection(title: _t('Beautiful names & their meaning', 'ख़ूबसूरत नाम और उनके मायने'), reads: [
         SpiritualRead(
-            title: 'Choosing a meaningful name',
+            title: _t('Choosing a meaningful name', 'मायने वाला नाम चुनना'),
             body:
-                "Choosing a baby's name with care and meaning is a cherished part of welcoming a child. It is a small act of hope, a wish in a single word for who they might become."),
+                _t("Choosing a baby's name with care and meaning is a cherished part of welcoming a child. It is a small act of hope, a wish in a single word for who they might become.", 'बच्चे का नाम सोच-समझकर और मायनों के साथ चुनना उसके स्वागत का एक प्यारा हिस्सा है। यह उम्मीद का छोटा-सा काम है — एक ही लफ़्ज़ में यह दुआ कि वह कैसा इंसान बने।')),
         SpiritualRead(
-            title: 'Names of mercy and peace',
+            title: _t('Names of mercy and peace', 'रहम और सुकून वाले नाम'),
             body:
-                "Many beloved names carry meanings like mercy, peace, light and gratitude. Even if you choose a different name entirely, dwelling on qualities you wish for your child is a sweet thing to do."),
+                _t("Many beloved names carry meanings like mercy, peace, light and gratitude. Even if you choose a different name entirely, dwelling on qualities you wish for your child is a sweet thing to do.", 'बहुत-से प्यारे नामों के मायने रहम, सुकून, रौशनी और शुक्र जैसे होते हैं। आप चाहे बिल्कुल कोई और नाम चुनें, अपने बच्चे के लिए जो ख़ूबियाँ चाहती हैं उन पर थोड़ा ठहर जाना अपने आप में मीठा है।')),
         SpiritualRead(
-            title: 'A name as a quiet prayer',
+            title: _t('A name as a quiet prayer', 'नाम, एक चुपचाप कही गई दुआ'),
             body:
-                "For many, a name is a kind of quiet prayer said over a lifetime; every time it is spoken, a good wish goes with it. It is worth choosing something you will love to say a thousand times."),
+                _t("For many, a name is a kind of quiet prayer said over a lifetime; every time it is spoken, a good wish goes with it. It is worth choosing something you will love to say a thousand times.", 'बहुतों के लिए नाम ज़िंदगी भर दोहराई जाने वाली एक चुपचाप दुआ है — जब भी वह पुकारा जाता है, एक नेक ख़्वाहिश उसके साथ चलती है। ऐसा नाम चुनना बनता है जिसे हज़ार बार कहकर भी आपका मन न भरे।')),
         SpiritualRead(
-            title: 'Light and hope',
+            title: _t('Light and hope', 'रौशनी और उम्मीद'),
             body:
-                "Names connected to light and hope are widely loved. Your baby is, in a real sense, a new light coming into your family, a hopeful beginning."),
+                _t("Names connected to light and hope are widely loved. Your baby is, in a real sense, a new light coming into your family, a hopeful beginning.", 'रौशनी और उम्मीद से जुड़े नाम बहुत पसंद किए जाते हैं। सच पूछिए तो आपका बच्चा आपके परिवार में आती हुई एक नई रौशनी ही है — एक उम्मीद भरी शुरुआत।')),
         SpiritualRead(
-            title: 'A family conversation',
+            title: _t('A family conversation', 'घर भर की बात'),
             body:
-                "Picking a name often becomes a warm family conversation, full of stories and meanings. Letting loved ones share in it is part of the joy."),
+                _t("Picking a name often becomes a warm family conversation, full of stories and meanings. Letting loved ones share in it is part of the joy.", 'नाम चुनना अक्सर घर भर की एक गर्मजोशी भरी बातचीत बन जाता है, क़िस्सों और मायनों से भरी हुई। अपनों को इसमें शामिल कर लेना भी उसी ख़ुशी का हिस्सा है।')),
         SpiritualRead(
-            title: 'A wish in one word',
+            title: _t('A wish in one word', 'एक लफ़्ज़ में एक दुआ'),
             body:
-                "A name is often chosen as a small wish for who a child might become. Turning meanings over in your mind is already a loving act of hope."),
+                _t("A name is often chosen as a small wish for who a child might become. Turning meanings over in your mind is already a loving act of hope.", 'नाम अक्सर इसी छोटी दुआ के साथ चुना जाता है कि बच्चा कैसा इंसान बने। मन ही मन मायनों को पलटते रहना ख़ुद उम्मीद से भरा एक प्यार भरा काम है।')),
         SpiritualRead(
-            title: 'Names of peace',
+            title: _t('Names of peace', 'सुकून वाले नाम'),
             body:
-                "Many cherished names carry meanings like peace and calm. Dwelling on the qualities you hope for your child is a sweet way to choose."),
+                _t("Many cherished names carry meanings like peace and calm. Dwelling on the qualities you hope for your child is a sweet way to choose.", 'बहुत-से पसंदीदा नामों के मायने सुकून और शांति जैसे होते हैं। जो ख़ूबियाँ आप अपने बच्चे में देखना चाहती हैं, उन पर ठहरकर सोचना चुनने का एक मीठा तरीक़ा है।')),
         SpiritualRead(
-            title: 'A name you will love to say',
+            title: _t('A name you will love to say', 'वह नाम जिसे पुकारना अच्छा लगे'),
             body:
-                "You will speak this name thousands of times, so choosing one you love the sound of matters. Say your favourites aloud and notice which ones feel like home."),
+                _t("You will speak this name thousands of times, so choosing one you love the sound of matters. Say your favourites aloud and notice which ones feel like home.", 'यह नाम आप हज़ारों बार पुकारेंगी, इसलिए ऐसा चुनना मायने रखता है जिसकी आवाज़ आपको भाए। अपने पसंदीदा नाम ज़ोर से बोलकर देखिए और महसूस कीजिए कि कौन-सा अपने घर जैसा लगता है।')),
         SpiritualRead(
-            title: 'Meaning over fashion',
+            title: _t('Meaning over fashion', 'चलन नहीं, मायने'),
             body:
-                "Choosing for meaning rather than trend is a cherished approach. A name with a tender meaning ages beautifully."),
+                _t("Choosing for meaning rather than trend is a cherished approach. A name with a tender meaning ages beautifully.", 'चलन देखकर नहीं, मायने देखकर चुनना एक प्यारा तरीक़ा माना जाता है। कोमल मायनों वाला नाम उम्र के साथ और ख़ूबसूरत लगता है।')),
         SpiritualRead(
-            title: 'Names of gratitude',
+            title: _t('Names of gratitude', 'शुक्र वाले नाम'),
             body:
-                "Some names carry the sense of a gift received or a prayer answered. If your baby feels like exactly that, such a name can hold the whole story."),
+                _t("Some names carry the sense of a gift received or a prayer answered. If your baby feels like exactly that, such a name can hold the whole story.", 'कुछ नामों में यह एहसास बसा होता है कि कोई तोहफ़ा मिला है, या कोई दुआ क़बूल हुई है। अगर आपका बच्चा आपको ठीक वैसा ही लगता है, तो ऐसा नाम पूरी कहानी अपने अंदर समेट लेता है।')),
         SpiritualRead(
-            title: 'Light coming in',
+            title: _t('Light coming in', 'आती हुई रौशनी'),
             body:
-                "Names linked to light are widely loved. Your baby truly is a new light arriving into your family."),
+                _t("Names linked to light are widely loved. Your baby truly is a new light arriving into your family.", 'रौशनी से जुड़े नाम बहुत पसंद किए जाते हैं। आपका बच्चा सचमुच आपके परिवार में आती हुई एक नई रौशनी है।')),
         SpiritualRead(
-            title: 'A name and a blessing',
+            title: _t('A name and a blessing', 'नाम और दुआ'),
             body:
-                "For many, speaking a child's name is like sending a small good wish each time. Choose something you will be glad to bless again and again."),
+                _t("For many, speaking a child's name is like sending a small good wish each time. Choose something you will be glad to bless again and again.", 'बहुतों के लिए बच्चे का नाम पुकारना हर बार एक छोटी नेक दुआ भेजने जैसा है। ऐसा नाम चुनिए जिसे बार-बार दुआ देते हुए आपको ख़ुशी हो।')),
         SpiritualRead(
-            title: "Grandparents' hopes",
+            title: _t("Grandparents' hopes", 'दादा-दादी, नाना-नानी की उम्मीदें'),
             body:
-                "Inviting grandparents into the naming carries their love forward to the new child. Their blessing, woven into a name, stretches back through generations."),
+                _t("Inviting grandparents into the naming carries their love forward to the new child. Their blessing, woven into a name, stretches back through generations.", 'नाम चुनने में दादा-दादी और नाना-नानी को शामिल करना उनके प्यार को नए बच्चे तक पहुँचा देता है। नाम में गुँथी हुई उनकी दुआ पीढ़ियों पीछे तक जाती है।')),
         SpiritualRead(
-            title: 'Writing it down',
+            title: _t('Writing it down', 'उसे लिखकर देखना'),
             body:
-                "Seeing the name written, beside a tiny due date, can make the coming arrival feel suddenly real. It is a quiet, happy moment to let yourself have."),
+                _t("Seeing the name written, beside a tiny due date, can make the coming arrival feel suddenly real. It is a quiet, happy moment to let yourself have.", 'नाम को लिखा हुआ देखना, उसके बगल में छोटे-से अक्षरों में लिखी डिलीवरी की तारीख़ — और आने वाला दिन अचानक सच लगने लगता है। यह एक शांत, ख़ुशी भरा लम्हा है, इसे ख़ुद से मत छीनिए।')),
         SpiritualRead(
-            title: 'A name that can grow',
+            title: _t('A name that can grow', 'वह नाम जो साथ-साथ बड़ा हो'),
             body:
-                "It is kind to choose a name that suits both a small baby and the grown person they will become. Picturing them at every age can help you choose well."),
+                _t("It is kind to choose a name that suits both a small baby and the grown person they will become. Picturing them at every age can help you choose well.", 'ऐसा नाम चुनना अच्छा होता है जो नन्हे बच्चे पर भी जँचे और उस बड़े इंसान पर भी जो वह बनेगा। हर उम्र में उसे मन में देख लेना सही चुनाव में मदद करता है।')),
         SpiritualRead(
-            title: 'The meaning you give it',
+            title: _t('The meaning you give it', 'वह मायना जो वह ख़ुद भर देगा'),
             body:
-                "In time, your child will fill their name with their own meaning, simply by being themselves. The name is a beginning; they make it theirs."),
+                _t("In time, your child will fill their name with their own meaning, simply by being themselves. The name is a beginning; they make it theirs.", 'वक़्त के साथ आपका बच्चा अपने नाम में अपने ही मायने भर देगा — बस वैसा होकर, जैसा वह है। नाम तो शुरुआत है; उसे अपना वही बनाता है।')),
         SpiritualRead(
-            title: 'Saying it for the first time',
+            title: _t('Saying it for the first time', 'पहली बार पुकारना'),
             body:
-                "There is a particular sweetness in saying your baby's name out loud for the first time. It turns an idea into someone you are waiting for."),
+                _t("There is a particular sweetness in saying your baby's name out loud for the first time. It turns an idea into someone you are waiting for.", 'अपने बच्चे का नाम पहली बार ज़ोर से कहने में एक अलग ही मिठास है। उसी पल एक ख़याल किसी ऐसे इंसान में बदल जाता है जिसका आप इंतज़ार कर रही हैं।')),
         SpiritualRead(
-            title: 'A shortlist of hopes',
+            title: _t('A shortlist of hopes', 'उम्मीदों की एक छोटी-सी सूची'),
             body:
-                "Even a shortlist of names is really a little list of hopes. However you narrow it, each option carries a wish for your child."),
+                _t("Even a shortlist of names is really a little list of hopes. However you narrow it, each option carries a wish for your child.", 'नामों की छोटी सूची असल में उम्मीदों की ही सूची होती है। आप उसे जैसे भी छाँटें, हर नाम में आपके बच्चे के लिए एक दुआ छिपी है।')),
         SpiritualRead(
-            title: 'No rush to decide',
+            title: _t('No rush to decide', 'तय करने की कोई जल्दी नहीं'),
             body:
-                "There is no need to settle on a name before you are ready; some meet their baby first and choose then. Trust that the right one will come."),
+                _t("There is no need to settle on a name before you are ready; some meet their baby first and choose then. Trust that the right one will come.", 'मन तैयार होने से पहले नाम तय कर लेने की कोई ज़रूरत नहीं; कुछ माएँ पहले बच्चे से मिलती हैं, फिर नाम चुनती हैं। भरोसा रखिए, सही नाम अपने आप आ जाएगा।')),
         SpiritualRead(
-            title: 'A sound full of love',
+            title: _t('A sound full of love', 'प्यार से भरी एक आवाज़'),
             body:
-                "However it is chosen, a name becomes beautiful mostly through the love poured into saying it. Yours will be one of the warmest words your child ever hears."),
+                _t("However it is chosen, a name becomes beautiful mostly through the love poured into saying it. Yours will be one of the warmest words your child ever hears.", 'नाम चाहे जैसे भी चुना जाए, ख़ूबसूरत वह ज़्यादातर उस प्यार से होता है जो उसे पुकारते हुए उसमें उँडेला जाता है। आपकी आवाज़ में वह नाम आपके बच्चे के सुने हुए सबसे गर्म लफ़्ज़ों में से एक होगा।')),
       ]),
-      SpiritualSection(title: 'Family & kindness', reads: [
+      SpiritualSection(title: _t('Family & kindness', 'परिवार और नेकी'), reads: [
         SpiritualRead(
-            title: 'Held by community',
+            title: _t('Held by community', 'समुदाय की गोद में'),
             body:
-                "Family and community are encouraged to support an expectant mother, easing her load and treating her gently. Letting people help you is not weakness; it is how this is meant to work."),
+                _t("Family and community are encouraged to support an expectant mother, easing her load and treating her gently. Letting people help you is not weakness; it is how this is meant to work.", 'परिवार और आस-पास के लोगों से कहा गया है कि होने वाली माँ का साथ दें, उसका बोझ हल्का करें और उसके साथ नरमी से पेश आएँ। लोगों को मदद करने देना कमज़ोरी नहीं है — यह सब चलता ही ऐसे है।')),
         SpiritualRead(
-            title: 'Generosity at new life',
+            title: _t('Generosity at new life', 'नई ज़िंदगी पर दरियादिली'),
             body:
-                "New life is often marked with generosity, sharing food, giving to those in need, spreading the joy outward. Kindness has a way of multiplying happiness."),
+                _t("New life is often marked with generosity, sharing food, giving to those in need, spreading the joy outward. Kindness has a way of multiplying happiness.", 'नई ज़िंदगी के आने को अक्सर दरियादिली से मनाया जाता है — खाना बाँटना, ज़रूरतमंदों को देना, ख़ुशी को बाहर तक फैलाना। नेकी में ख़ुशी को बढ़ा देने की आदत होती है।')),
         SpiritualRead(
-            title: 'Good company',
+            title: _t('Good company', 'अच्छा साथ'),
             body:
-                "Keeping calm, good-hearted company is valued, especially in tender times. Surround yourself with people who soothe rather than stress you."),
+                _t("Keeping calm, good-hearted company is valued, especially in tender times. Surround yourself with people who soothe rather than stress you.", 'शांत और नेकदिल लोगों का साथ रखना सराहा जाता है, ख़ासकर ऐसे नाज़ुक दिनों में। अपने इर्द-गिर्द ऐसे लोग रखिए जो मन को सुकून दें, तनाव नहीं।')),
         SpiritualRead(
-            title: 'Caring for yourself counts',
+            title: _t('Caring for yourself counts', 'अपना ख़याल भी गिना जाता है'),
             body:
-                "Looking after your own body and heart, with rest, good food and a peaceful mind, is treated as part of caring for your child, not separate from it. Be as kind to yourself as you would be to someone you love."),
+                _t("Looking after your own body and heart, with rest, good food and a peaceful mind, is treated as part of caring for your child, not separate from it. Be as kind to yourself as you would be to someone you love.", 'अपने शरीर और अपने मन का ख़याल रखना — आराम, अच्छा खाना और शांत मन — बच्चे की देखभाल से अलग नहीं, उसी का हिस्सा माना जाता है। ख़ुद के साथ उतनी ही नरमी बरतिए जितनी आप किसी अपने के साथ बरततीं।')),
         SpiritualRead(
-            title: 'Welcoming with warmth',
+            title: _t('Welcoming with warmth', 'गर्मजोशी से स्वागत'),
             body:
-                "When the baby arrives, traditions of welcome centre on warmth, gratitude and gentle blessing. The thread through it all is simple: this child is loved."),
+                _t("When the baby arrives, traditions of welcome centre on warmth, gratitude and gentle blessing. The thread through it all is simple: this child is loved.", 'बच्चा जब आता है, तो स्वागत के सारे रिवाज गर्मजोशी, शुक्र और नरम दुआओं के इर्द-गिर्द घूमते हैं। इन सबके बीच से गुज़रता धागा एक ही है — इस बच्चे को बहुत चाहा गया है।')),
         SpiritualRead(
-            title: 'Let people carry some weight',
+            title: _t('Let people carry some weight', 'थोड़ा बोझ दूसरों को उठाने दीजिए'),
             body:
-                "Family is encouraged to ease an expectant mother's load, and accepting that help is wise, not weak. Letting others carry a little is how this is meant to work."),
+                _t("Family is encouraged to ease an expectant mother's load, and accepting that help is wise, not weak. Letting others carry a little is how this is meant to work.", 'परिवार से कहा गया है कि होने वाली माँ का बोझ हल्का करे, और उस मदद को क़बूल कर लेना समझदारी है, कमज़ोरी नहीं। थोड़ा बोझ दूसरों को उठाने देना — यह सब चलता ही ऐसे है।')),
         SpiritualRead(
-            title: 'Joy shared widens',
+            title: _t('Joy shared widens', 'बाँटी हुई ख़ुशी बढ़ जाती है'),
             body:
-                "Happy news is meant to be spread, and joy tends to grow when shared. Letting people celebrate with you doubles the gladness."),
+                _t("Happy news is meant to be spread, and joy tends to grow when shared. Letting people celebrate with you doubles the gladness.", 'ख़ुशख़बरी फैलाने के लिए ही होती है, और ख़ुशी बाँटने से बढ़ती है। लोगों को अपने साथ जश्न मनाने देना ख़ुशी को दुगुना कर देता है।')),
         SpiritualRead(
-            title: 'The kindness of neighbours',
+            title: _t('The kindness of neighbours', 'पड़ोसियों की नेकी'),
             body:
-                "Care for neighbours and those nearby is valued, a circle of looking out for one another. Leaning on that circle now is part of belonging to it."),
+                _t("Care for neighbours and those nearby is valued, a circle of looking out for one another. Leaning on that circle now is part of belonging to it.", 'पड़ोसियों और आस-पास वालों का ख़याल रखने की क़द्र है — एक ऐसा घेरा जिसमें सब एक-दूसरे को देखते रहते हैं। अभी उस घेरे का सहारा ले लेना भी उसी में शामिल होने का हिस्सा है।')),
         SpiritualRead(
-            title: 'A meal brought over',
+            title: _t('A meal brought over', 'घर आया हुआ खाना'),
             body:
-                "Sharing food, especially with a tired new family, is a simple, treasured kindness. If someone offers, let them; a warm meal is real care."),
+                _t("Sharing food, especially with a tired new family, is a simple, treasured kindness. If someone offers, let them; a warm meal is real care.", 'खाना बाँटना, ख़ासकर किसी थके हुए नए परिवार के साथ, एक सीधी-सादी और बेशक़ीमती नेकी है। कोई पूछे तो मना मत कीजिए — गरम खाना सचमुच की देखभाल है।')),
         SpiritualRead(
-            title: 'Visiting with gentleness',
+            title: _t('Visiting with gentleness', 'नरमी से मिलने आना'),
             body:
-                "Visiting a new mother gently, briefly, helpfully, is a kindness worth knowing. You can ask for that kind of visit, and decline the draining kind."),
+                _t("Visiting a new mother gently, briefly, helpfully, is a kindness worth knowing. You can ask for that kind of visit, and decline the draining kind.", 'नई माँ से नरमी से, थोड़ी देर के लिए और काम आने के इरादे से मिलने जाना एक ऐसी नेकी है जो सबको आनी चाहिए। आप ऐसी ही मुलाक़ात माँग सकती हैं, और जो थका दे उसे मना भी कर सकती हैं।')),
         SpiritualRead(
-            title: 'Kindness multiplies',
+            title: _t('Kindness multiplies', 'दया बढ़ती जाती है'),
             body:
-                "A small kindness given tends to ripple outward to others. The gentleness you receive now you will pass on, and so it grows."),
+                _t("A small kindness given tends to ripple outward to others. The gentleness you receive now you will pass on, and so it grows.", 'एक छोटी-सी नेकी आगे दूसरों तक लहर बनकर पहुँच जाती है। अभी जो नरमी आपको मिल रही है, वही आप आगे बाँटेंगी — और यूँ ही वह बढ़ती जाती है।')),
         SpiritualRead(
-            title: 'Caring for yourself is caring for your baby',
+            title: _t('Caring for yourself is caring for your baby', 'अपना ख़याल रखना बच्चे का ख़याल रखना है'),
             body:
-                "Looking after your own rest, food and peace is treated as part of caring for your child, not apart from it. Be as gentle with yourself as with someone you love."),
+                _t("Looking after your own rest, food and peace is treated as part of caring for your child, not apart from it. Be as gentle with yourself as with someone you love.", 'अपने आराम, अपने खाने और अपने सुकून का ध्यान रखना बच्चे की देखभाल से अलग नहीं, उसी का हिस्सा माना जाता है। ख़ुद के साथ उतनी ही नरमी बरतिए जितनी किसी अपने के साथ।')),
         SpiritualRead(
-            title: 'A warm home',
+            title: _t('A warm home', 'गर्मजोशी भरा घर'),
             body:
-                "A calm, kind atmosphere at home is valued highly. The gentle mood you build now is the world your baby will be born into."),
+                _t("A calm, kind atmosphere at home is valued highly. The gentle mood you build now is the world your baby will be born into.", 'घर का शांत और नेक माहौल बहुत क़ीमती माना जाता है। अभी आप जो नरम मिज़ाज बना रही हैं, वही वह दुनिया है जिसमें आपका बच्चा जन्म लेगा।')),
         SpiritualRead(
-            title: 'Raising a kind child',
+            title: _t('Raising a kind child', 'एक नेकदिल बच्चा पालना'),
             body:
-                "Children learn kindness most by being surrounded by it. The warmth in your home today is already quietly teaching."),
+                _t("Children learn kindness most by being surrounded by it. The warmth in your home today is already quietly teaching.", 'बच्चे नेकी सबसे ज़्यादा उसी माहौल में रहकर सीखते हैं जहाँ नेकी हो। आपके घर की आज की गर्माहट अभी से चुपचाप सिखा रही है।')),
         SpiritualRead(
-            title: 'Hospitality of the heart',
+            title: _t('Hospitality of the heart', 'दिल की मेहमाननवाज़ी'),
             body:
-                "Welcoming others warmly, making room, offering comfort, is a cherished value. The same open-hearted welcome is what you are preparing for your baby."),
+                _t("Welcoming others warmly, making room, offering comfort, is a cherished value. The same open-hearted welcome is what you are preparing for your baby.", 'दूसरों का गर्मजोशी से स्वागत करना, जगह बना देना, दिलासा देना — इसकी बड़ी क़द्र है। वही खुले दिल वाला स्वागत आप अपने बच्चे के लिए तैयार कर रही हैं।')),
         SpiritualRead(
-            title: 'Asking for help is okay',
+            title: _t('Asking for help is okay', 'मदद माँगना ठीक है'),
             body:
-                "There is no shame in needing help while you grow a baby; it is a season for receiving. Asking is its own quiet courage."),
+                _t("There is no shame in needing help while you grow a baby; it is a season for receiving. Asking is its own quiet courage.", 'बच्चे को पालते हुए मदद की ज़रूरत पड़े तो इसमें शर्म की कोई बात नहीं; यह मौसम ही लेने का है। माँग लेना ख़ुद एक चुपचाप निभाई गई हिम्मत है।')),
         SpiritualRead(
-            title: 'Gratitude to those who love you',
+            title: _t('Gratitude to those who love you', 'अपनों का शुक्रिया'),
             body:
-                "Pausing to thank the people who support you strengthens those bonds. A simple word of thanks is never wasted."),
+                _t("Pausing to thank the people who support you strengthens those bonds. A simple word of thanks is never wasted.", 'जो लोग आपका साथ देते हैं, उन्हें ठहरकर शुक्रिया कह देना रिश्तों को और मज़बूत करता है। शुक्रिया का एक सीधा-सा लफ़्ज़ कभी बेकार नहीं जाता।')),
         SpiritualRead(
-            title: 'Gentle with the tired',
+            title: _t('Gentle with the tired', 'थके हुओं के साथ नरमी'),
             body:
-                "Extra patience for those who are weary, including yourself, is part of this kindness. On low-energy days, soften your expectations."),
+                _t("Extra patience for those who are weary, including yourself, is part of this kindness. On low-energy days, soften your expectations.", 'थके हुए लोगों के लिए थोड़ा ज़्यादा सब्र — और उनमें आप ख़ुद भी शामिल हैं — इसी नेकी का हिस्सा है। जिन दिनों ताक़त कम हो, ख़ुद से उम्मीदें नरम कर लीजिए।')),
         SpiritualRead(
-            title: 'A circle around the cradle',
+            title: _t('A circle around the cradle', 'पालने के चारों ओर एक घेरा'),
             body:
-                "New life is meant to be met by a whole circle of care, not one pair of hands. Letting that circle form around you is a gift to your baby too."),
+                _t("New life is meant to be met by a whole circle of care, not one pair of hands. Letting that circle form around you is a gift to your baby too.", 'नई ज़िंदगी का स्वागत देखभाल के पूरे घेरे से होना चाहिए, सिर्फ़ एक जोड़ी हाथों से नहीं। उस घेरे को अपने चारों ओर बन जाने देना आपके बच्चे के लिए भी एक तोहफ़ा है।')),
         SpiritualRead(
-            title: 'Small acts, big love',
+            title: _t('Small acts, big love', 'छोटे काम, बड़ा प्यार'),
             body:
-                "It is the steady small kindnesses, not grand gestures, that hold a family together. The little daily cares you give and receive are the real thing."),
+                _t("It is the steady small kindnesses, not grand gestures, that hold a family together. The little daily cares you give and receive are the real thing.", 'परिवार को बड़े-बड़े काम नहीं, रोज़ की छोटी-छोटी नेकियाँ जोड़े रखती हैं। रोज़ जो नन्हा-सा ख़याल आप देती और पाती हैं, असली बात वही है।')),
       ]),
     ],
   ),
@@ -824,337 +828,337 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'sikh',
-    name: 'Sikhism',
+    name: _t('Sikhism', 'सिख धर्म'),
     symbol: '🪯',
-    blurb: 'A calm, grateful mind and the dignity of motherhood.',
+    blurb: _t('A calm, grateful mind and the dignity of motherhood.', 'शांत, शुक्रगुज़ार मन और माँ होने का मान।'),
     sections: [
-      SpiritualSection(title: "The Gurus' wisdom", reads: [
+      SpiritualSection(title: _t("The Gurus' wisdom", 'गुरुओं की सीख'), reads: [
         SpiritualRead(
-            title: 'Everyone equal, everyone worthy',
+            title: _t('Everyone equal, everyone worthy', 'सब बराबर, सबका मान'),
             body:
-                "A cornerstone of Sikh teaching is the equal worth and dignity of every person, and women and mothers are honoured fully. Carry yourself with that confidence: what you are doing matters, and you deserve care."),
+                _t("A cornerstone of Sikh teaching is the equal worth and dignity of every person, and women and mothers are honoured fully. Carry yourself with that confidence: what you are doing matters, and you deserve care.", 'सिख सीख की एक बुनियाद यह है कि हर इंसान का मोल और मान बराबर है, और औरतों तथा माँओं का पूरा सम्मान है। उसी भरोसे के साथ चलिए — जो आप कर रही हैं वह मायने रखता है, और आपकी देखभाल होनी ही चाहिए।')),
         SpiritualRead(
-            title: 'Honest, simple living',
+            title: _t('Honest, simple living', 'सादा और सच्चा जीवन'),
             body:
-                "Living honestly and simply, and sharing what you have, is treasured. In pregnancy that can look like a calmer, less cluttered rhythm, fewer demands and more of what truly nourishes."),
+                _t("Living honestly and simply, and sharing what you have, is treasured. In pregnancy that can look like a calmer, less cluttered rhythm, fewer demands and more of what truly nourishes.", 'सच्चाई और सादगी से जीना, और जो है उसे बाँटना — इसकी बड़ी क़द्र है। गर्भावस्था में यह एक शांत, कम भरी-भरी रफ़्तार जैसा दिख सकता है: कम माँगें, और वह ज़्यादा जो सचमुच पोसता है।')),
         SpiritualRead(
-            title: 'Gratitude as a way of life',
+            title: _t('Gratitude as a way of life', 'शुक्र, जीने का ढंग'),
             body:
-                "Thankfulness runs through this tradition like a quiet melody, a habit of noticing the good. A grateful heart tends to be a calmer one, and your baby shares that calm."),
+                _t("Thankfulness runs through this tradition like a quiet melody, a habit of noticing the good. A grateful heart tends to be a calmer one, and your baby shares that calm.", 'इस परंपरा में शुक्र किसी धीमी धुन की तरह बहता है — अच्छाई को देख लेने की आदत। शुक्रगुज़ार मन ज़्यादा शांत रहता है, और आपका बच्चा भी उसी शांति में साँस लेता है।')),
         SpiritualRead(
-            title: 'Courage and grace together',
+            title: _t('Courage and grace together', 'हिम्मत और नरमी, साथ-साथ'),
             body:
-                "There is a beautiful balance here of courage and gentleness, strength held with grace. Pregnancy asks for exactly that mix, and you have more of it than you know."),
+                _t("There is a beautiful balance here of courage and gentleness, strength held with grace. Pregnancy asks for exactly that mix, and you have more of it than you know.", 'यहाँ हिम्मत और नरमी का एक ख़ूबसूरत तालमेल है — ताक़त, जिसे कोमलता के साथ थामा गया हो। गर्भावस्था ठीक यही मेल माँगती है, और यह आपके पास आपकी सोच से कहीं ज़्यादा है।')),
         SpiritualRead(
-            title: 'The sacred in the ordinary',
+            title: _t('The sacred in the ordinary', 'रोज़ के भीतर छिपी पवित्रता'),
             body:
-                "Much of this wisdom finds the sacred in everyday life, in honest work, family and small kindnesses. The ordinary days of these months are quietly holy too."),
+                _t("Much of this wisdom finds the sacred in everyday life, in honest work, family and small kindnesses. The ordinary days of these months are quietly holy too.", 'इस सीख का बड़ा हिस्सा पवित्रता को रोज़मर्रा में ही ढूँढ़ता है — ईमानदार काम में, परिवार में, छोटी-छोटी नेकियों में। इन महीनों के आम दिन भी चुपचाप पवित्र हैं।')),
         SpiritualRead(
-            title: 'Your worth is settled',
+            title: _t('Your worth is settled', 'आपका मोल तय है'),
             body:
-                "A cornerstone here is the equal, unshakeable worth of every person. Whatever the day brings, your value, and your baby's, is never in question."),
+                _t("A cornerstone here is the equal, unshakeable worth of every person. Whatever the day brings, your value, and your baby's, is never in question.", 'यहाँ एक बुनियादी बात यह है कि हर इंसान का मोल बराबर है और अटल है। दिन कैसा भी हो, आपकी और आपके बच्चे की क़ीमत कभी सवालों में नहीं आती।')),
         SpiritualRead(
-            title: 'Honest, simple days',
+            title: _t('Honest, simple days', 'सादे, सच्चे दिन'),
             body:
-                "Living simply and honestly is treasured. In pregnancy that can mean a calmer, less cluttered rhythm, more of what nourishes and less of what drains."),
+                _t("Living simply and honestly is treasured. In pregnancy that can mean a calmer, less cluttered rhythm, more of what nourishes and less of what drains.", 'सादगी और सच्चाई से जीने की बड़ी क़द्र है। गर्भावस्था में इसका मतलब हो सकता है एक शांत, कम भरी-भरी रफ़्तार — वह ज़्यादा जो पोसता है, वह कम जो निचोड़ता है।')),
         SpiritualRead(
-            title: 'Rising spirits',
+            title: _t('Rising spirits', 'हौसला बुलंद रखना'),
             body:
-                "There is a beloved idea of keeping the spirit bright and hopeful even through hardship. On heavy days, gently choosing hope is itself an act of strength."),
+                _t("There is a beloved idea of keeping the spirit bright and hopeful even through hardship. On heavy days, gently choosing hope is itself an act of strength.", 'एक बहुत प्यारा ख़याल यह है कि मुश्किल में भी मन का हौसला चमकता और उम्मीद से भरा रहे। भारी दिनों में धीरे से उम्मीद चुन लेना ख़ुद ताक़त का काम है।')),
         SpiritualRead(
-            title: 'Gratitude woven through',
+            title: _t('Gratitude woven through', 'शुक्र, हर धागे में गुँथा हुआ'),
             body:
-                "Thankfulness runs through this tradition like a quiet melody. A grateful heart tends to be calmer, and your baby shares that calm."),
+                _t("Thankfulness runs through this tradition like a quiet melody. A grateful heart tends to be calmer, and your baby shares that calm.", 'इस परंपरा में शुक्र किसी धीमी धुन की तरह बहता है। शुक्रगुज़ार मन ज़्यादा शांत रहता है, और आपका बच्चा भी उसी शांति में साँस लेता है।')),
         SpiritualRead(
-            title: 'Strength and grace together',
+            title: _t('Strength and grace together', 'ताक़त और नरमी, साथ-साथ'),
             body:
-                "Courage held with gentleness is a beautiful balance here. Pregnancy asks for exactly that mix, and you carry more of it than you know."),
+                _t("Courage held with gentleness is a beautiful balance here. Pregnancy asks for exactly that mix, and you carry more of it than you know.", 'नरमी के साथ थामी गई हिम्मत — यहाँ यही ख़ूबसूरत तालमेल है। गर्भावस्था ठीक यही मेल माँगती है, और यह आप अपनी सोच से कहीं ज़्यादा लिए चल रही हैं।')),
         SpiritualRead(
-            title: 'The holy in plain days',
+            title: _t('The holy in plain days', 'सादे दिनों में पवित्रता'),
             body:
-                "The sacred is found woven through ordinary life here. The unremarkable days of pregnancy hold their own quiet grace."),
+                _t("The sacred is found woven through ordinary life here. The unremarkable days of pregnancy hold their own quiet grace.", 'यहाँ पवित्रता आम ज़िंदगी में ही गुँथी हुई मिलती है। गर्भावस्था के वे दिन, जिनमें कुछ ख़ास नहीं होता, अपनी एक चुपचाप ख़ूबसूरती रखते हैं।')),
         SpiritualRead(
-            title: 'Share what you have',
+            title: _t('Share what you have', 'जो है, बाँटिए'),
             body:
-                "Sharing freely with others is central to this way of life. Even in a tiring season, small generosity keeps the heart open."),
+                _t("Sharing freely with others is central to this way of life. Even in a tiring season, small generosity keeps the heart open.", 'खुले हाथ से बाँटना इस जीवन-ढंग के बीचोंबीच है। थका देने वाले दिनों में भी छोटी-सी दरियादिली दिल को खुला रखती है।')),
         SpiritualRead(
-            title: 'One human family',
+            title: _t('One human family', 'एक ही इंसानी परिवार'),
             body:
-                "A deep theme is the oneness of all people, one human family. Your child is joining a wide circle that stretches far beyond your home."),
+                _t("A deep theme is the oneness of all people, one human family. Your child is joining a wide circle that stretches far beyond your home.", 'एक गहरी बात यह है कि सब लोग एक हैं — एक ही इंसानी परिवार। आपका बच्चा एक ऐसे बड़े घेरे में शामिल हो रहा है जो आपके घर से कहीं दूर तक फैला है।')),
         SpiritualRead(
-            title: 'Women deeply honoured',
+            title: _t('Women deeply honoured', 'औरतों का गहरा मान'),
             body:
-                "This tradition honours women and mothers fully and without reservation. Carry yourself with that dignity; what you are doing is held as precious."),
+                _t("This tradition honours women and mothers fully and without reservation. Carry yourself with that dignity; what you are doing is held as precious.", 'यह परंपरा औरतों और माँओं का पूरा मान करती है, बिना किसी शर्त के। उसी मान के साथ चलिए — जो आप कर रही हैं, उसे बेशक़ीमती माना गया है।')),
         SpiritualRead(
-            title: 'Work, worship, share',
+            title: _t('Work, worship, share', 'मेहनत, सिमरन, बाँटना'),
             body:
-                "A simple rhythm is treasured: honest work, a grateful heart, and sharing with others. It is a gentle frame for an ordinary, meaningful day."),
+                _t("A simple rhythm is treasured: honest work, a grateful heart, and sharing with others. It is a gentle frame for an ordinary, meaningful day.", 'एक सीधी-सादी लय की क़द्र है — ईमानदार मेहनत, शुक्रगुज़ार मन, और दूसरों के साथ बाँटना। यह एक आम लेकिन मायने भरे दिन का नरम ढाँचा है।')),
         SpiritualRead(
-            title: 'Contentment as wealth',
+            title: _t('Contentment as wealth', 'संतोष ही असली दौलत'),
             body:
-                "Being at peace with what is, is seen as a deep kind of richness. Small this-is-enough moments are worth savouring amid the unknowns."),
+                _t("Being at peace with what is, is seen as a deep kind of richness. Small this-is-enough moments are worth savouring amid the unknowns.", 'जो है उसी में चैन पा लेना एक गहरी दौलत माना जाता है। अनजानी बातों के बीच वे छोटे-छोटे पल, जब लगता है इतना काफ़ी है, धीरे-धीरे जीने लायक़ हैं।')),
         SpiritualRead(
-            title: 'Fearless, gentle love',
+            title: _t('Fearless, gentle love', 'निडर, कोमल प्यार'),
             body:
-                "Love here is both fearless and tender, brave and soft at once. That is exactly the love already forming for your baby."),
+                _t("Love here is both fearless and tender, brave and soft at once. That is exactly the love already forming for your baby.", 'यहाँ प्यार निडर भी है और कोमल भी — एक ही साथ बहादुर और नरम। ठीक ऐसा ही प्यार आपके भीतर अपने बच्चे के लिए अभी से बन रहा है।')),
         SpiritualRead(
-            title: 'Truthful living',
+            title: _t('Truthful living', 'सच्चा जीवन'),
             body:
-                "Living truthfully, in word and deed, is valued above show. The honest, steady choices you make now become ground your child will stand on."),
+                _t("Living truthfully, in word and deed, is valued above show. The honest, steady choices you make now become ground your child will stand on.", 'बोल और काम, दोनों में सच्चाई से जीना दिखावे से ऊपर रखा गया है। अभी आप जो ईमानदार, टिके हुए फ़ैसले लेती हैं, वही वह ज़मीन बनते हैं जिस पर आपका बच्चा खड़ा होगा।')),
         SpiritualRead(
-            title: 'Humble and upright',
+            title: _t('Humble and upright', 'विनम्र और सीधा'),
             body:
-                "Humility paired with quiet strength is admired. There is rest in not needing to prove anything, only to live well."),
+                _t("Humility paired with quiet strength is admired. There is rest in not needing to prove anything, only to live well.", 'विनम्रता के साथ चुपचाप वाली ताक़त — इसकी बड़ी सराहना है। कुछ साबित न करना पड़े, बस ढंग से जी लेना हो — इसमें अपना ही आराम है।')),
         SpiritualRead(
-            title: 'Hope as a discipline',
+            title: _t('Hope as a discipline', 'उम्मीद, एक अभ्यास की तरह'),
             body:
-                "Keeping hope alive, almost as a practice, is cherished here. You can return to hope again and again, like coming back to a warm room."),
+                _t("Keeping hope alive, almost as a practice, is cherished here. You can return to hope again and again, like coming back to a warm room.", 'उम्मीद को ज़िंदा रखना, लगभग एक अभ्यास की तरह — यहाँ इसे बहुत माना जाता है। आप बार-बार उम्मीद पर लौट सकती हैं, जैसे किसी गर्म कमरे में लौट आती हों।')),
       ]),
-      SpiritualSection(title: 'Inner calm & remembrance', reads: [
+      SpiritualSection(title: _t('Inner calm & remembrance', 'भीतर की शांति और सिमरन'), reads: [
         SpiritualRead(
-            title: 'Returning to a still centre',
+            title: _t('Returning to a still centre', 'अपने ठहरे हुए केंद्र पर लौटना'),
             body:
-                "Gentle remembrance, quietly bringing the mind back to a still, grateful centre, is a loved practice. It is a bit like meditation: not emptying the mind, just returning to calm whenever it wanders."),
+                _t("Gentle remembrance, quietly bringing the mind back to a still, grateful centre, is a loved practice. It is a bit like meditation: not emptying the mind, just returning to calm whenever it wanders.", 'नरम सिमरन — मन को चुपचाप एक ठहरे हुए, शुक्रगुज़ार केंद्र पर लौटा लाना — बहुत प्यारा अभ्यास माना जाता है। यह कुछ-कुछ ध्यान जैसा है: मन को ख़ाली करना नहीं, बस जब-जब वह भटके, शांति पर लौट आना।')),
         SpiritualRead(
-            title: 'A settled, hopeful mind',
+            title: _t('A settled, hopeful mind', 'ठहरा हुआ, उम्मीद भरा मन'),
             body:
-                "Keeping a steady, hopeful mind is valued over anxious striving. When worry rises, you can let it pass like a cloud and settle again into trust."),
+                _t("Keeping a steady, hopeful mind is valued over anxious striving. When worry rises, you can let it pass like a cloud and settle again into trust.", 'बेचैन भागदौड़ से ज़्यादा क़द्र एक टिके हुए, उम्मीद भरे मन की है। जब फ़िक्र उठे, उसे बादल की तरह गुज़र जाने दीजिए और फिर भरोसे में बैठ जाइए।')),
         SpiritualRead(
-            title: 'Contentment',
+            title: _t('Contentment', 'संतोष'),
             body:
-                "Contentment, being at peace with what is, is held as a deep kind of wealth. Even amid the unknowns of pregnancy, small moments of this-is-enough are worth savouring."),
+                _t("Contentment, being at peace with what is, is held as a deep kind of wealth. Even amid the unknowns of pregnancy, small moments of this-is-enough are worth savouring.", 'संतोष — जो है उसी में चैन पा लेना — एक गहरी दौलत माना गया है। गर्भावस्था की अनजानी बातों के बीच भी वे छोटे पल, जब लगता है इतना काफ़ी है, धीरे-धीरे जीने लायक़ हैं।')),
         SpiritualRead(
-            title: 'Calm you can share',
+            title: _t('Calm you can share', 'वह शांति जो बँट जाती है'),
             body:
-                "A peaceful inner state is not only for you; it ripples outward to those around you, including the little one you carry. Tending your calm is a gift you are already giving."),
+                _t("A peaceful inner state is not only for you; it ripples outward to those around you, including the little one you carry. Tending your calm is a gift you are already giving.", 'भीतर का सुकून सिर्फ़ आपका नहीं रहता; वह लहर बनकर आस-पास वालों तक पहुँचता है, और उस नन्हे तक भी जिसे आप लिए चल रही हैं। अपनी शांति को सँभालना ख़ुद एक तोहफ़ा है, जो आप अभी से दे रही हैं।')),
         SpiritualRead(
-            title: 'Letting go of fear',
+            title: _t('Letting go of fear', 'डर को जाने देना'),
             body:
-                "This tradition gently encourages trust over fear, leaning on something larger than yourself. On heavy days, it can help simply to set a worry down and breathe."),
+                _t("This tradition gently encourages trust over fear, leaning on something larger than yourself. On heavy days, it can help simply to set a worry down and breathe.", 'यह परंपरा नरमी से कहती है कि डर की जगह भरोसा रखिए, और अपने से बड़े किसी सहारे पर टिक जाइए। भारी दिनों में बस एक फ़िक्र नीचे रख देना और साँस ले लेना ही काफ़ी मदद कर देता है।')),
         SpiritualRead(
-            title: 'Coming back to centre',
+            title: _t('Coming back to centre', 'केंद्र पर वापसी'),
             body:
-                "Gently bringing the mind back to a still, grateful centre is a loved practice. Like meditation, it is not about emptying the mind, just returning to calm."),
+                _t("Gently bringing the mind back to a still, grateful centre is a loved practice. Like meditation, it is not about emptying the mind, just returning to calm.", 'मन को नरमी से एक ठहरे हुए, शुक्रगुज़ार केंद्र पर लौटा लाना एक प्यारा अभ्यास है। ध्यान की तरह, इसमें मन को ख़ाली नहीं करना होता — बस शांति पर लौट आना होता है।')),
         SpiritualRead(
-            title: 'A steady, hopeful mind',
+            title: _t('A steady, hopeful mind', 'टिका हुआ, उम्मीद भरा मन'),
             body:
-                "A settled, hopeful mind is valued over anxious striving. When worry rises, you can let it drift past like a cloud and settle again."),
+                _t("A settled, hopeful mind is valued over anxious striving. When worry rises, you can let it drift past like a cloud and settle again.", 'बेचैन भागदौड़ से ज़्यादा क़द्र एक ठहरे हुए, उम्मीद भरे मन की है। जब फ़िक्र उठे, उसे बादल की तरह बहकर निकल जाने दीजिए और फिर से ठहर जाइए।')),
         SpiritualRead(
-            title: 'Remembrance as comfort',
+            title: _t('Remembrance as comfort', 'सिमरन, एक तसल्ली'),
             body:
-                "Quietly remembering what is good and larger than yourself can steady a restless heart. A few calm minutes of it can soften a hard afternoon."),
+                _t("Quietly remembering what is good and larger than yourself can steady a restless heart. A few calm minutes of it can soften a hard afternoon.", 'जो अच्छा है और जो आपसे बड़ा है, उसे चुपचाप याद कर लेना बेचैन मन को थाम लेता है। ऐसे कुछ शांत मिनट किसी भारी दोपहर को नरम कर देते हैं।')),
         SpiritualRead(
-            title: 'Calm that ripples',
+            title: _t('Calm that ripples', 'शांति, जो फैलती है'),
             body:
-                "Your inner peace does not stay with you alone; it reaches the little one you carry. Tending your calm is already a gift to your baby."),
+                _t("Your inner peace does not stay with you alone; it reaches the little one you carry. Tending your calm is already a gift to your baby.", 'आपके भीतर का सुकून सिर्फ़ आप तक नहीं रुकता; वह उस नन्हे तक भी पहुँचता है जिसे आप लिए चल रही हैं। अपनी शांति सँभालना अभी से आपके बच्चे के लिए एक तोहफ़ा है।')),
         SpiritualRead(
-            title: 'Setting fear down',
+            title: _t('Setting fear down', 'डर को नीचे रख देना'),
             body:
-                "Trust over fear is gently encouraged here. On anxious days, simply setting a worry down and breathing can be enough."),
+                _t("Trust over fear is gently encouraged here. On anxious days, simply setting a worry down and breathing can be enough.", 'यहाँ नरमी से कहा गया है कि डर की जगह भरोसा रखिए। घबराहट वाले दिनों में बस एक फ़िक्र नीचे रख देना और साँस ले लेना ही काफ़ी होता है।')),
         SpiritualRead(
-            title: 'The ease of repetition',
+            title: _t('The ease of repetition', 'दोहराने का सुकून'),
             body:
-                "Softly repeating a word or phrase you love can settle a busy mind, much like a lullaby. Choose your own gentle words and return to them."),
+                _t("Softly repeating a word or phrase you love can settle a busy mind, much like a lullaby. Choose your own gentle words and return to them.", 'अपना कोई पसंदीदा शब्द या वाक्य धीरे-धीरे दोहराते रहना भागते हुए मन को बैठा देता है, ठीक किसी लोरी की तरह। अपने नरम शब्द ख़ुद चुन लीजिए और बार-बार उन्हीं पर लौटिए।')),
         SpiritualRead(
-            title: 'Right here, right now',
+            title: _t('Right here, right now', 'यहीं, इसी पल'),
             body:
-                "Returning to the present moment, this breath, this room, is calming and always available. The future will keep; you only have to meet now."),
+                _t("Returning to the present moment, this breath, this room, is calming and always available. The future will keep; you only have to meet now.", 'इसी पल पर लौट आना — इसी साँस पर, इसी कमरे पर — मन को शांत करता है, और यह हमेशा हाथ में रहता है। आने वाला कल रुका रहेगा; आपको बस अभी से मिलना है।')),
         SpiritualRead(
-            title: 'Stillness as strength',
+            title: _t('Stillness as strength', 'ठहराव में ताक़त'),
             body:
-                "Quiet stillness is treasured, not as doing nothing but as gathering yourself. A few still minutes a day strengthen you for the rest."),
+                _t("Quiet stillness is treasured, not as doing nothing but as gathering yourself. A few still minutes a day strengthen you for the rest.", 'शांत ठहराव को क़ीमती माना गया है — कुछ न करना नहीं, बल्कि ख़ुद को समेट लेना। दिन में कुछ ठहरे हुए मिनट बाक़ी सारे दिन के लिए ताक़त दे जाते हैं।')),
         SpiritualRead(
-            title: 'Breath as an anchor',
+            title: _t('Breath as an anchor', 'साँस, एक लंगर की तरह'),
             body:
-                "Slow, even breathing is one of the simplest ways back to calm. Lengthening the out-breath a little quietly shares that ease with your baby."),
+                _t("Slow, even breathing is one of the simplest ways back to calm. Lengthening the out-breath a little quietly shares that ease with your baby.", 'धीमी और बराबर साँस शांति पर लौटने का सबसे आसान रास्ता है। छोड़ी जाने वाली साँस को थोड़ा लंबा कर देना वही सुकून चुपचाप आपके बच्चे तक पहुँचा देता है।')),
         SpiritualRead(
-            title: 'Gratitude as remembrance',
+            title: _t('Gratitude as remembrance', 'शुक्र भी एक सिमरन है'),
             body:
-                "Recalling small blessings is itself a kind of remembrance that lifts the heart. Naming one good thing can shift a whole mood."),
+                _t("Recalling small blessings is itself a kind of remembrance that lifts the heart. Naming one good thing can shift a whole mood.", 'छोटी-छोटी रहमतों को याद कर लेना ख़ुद एक तरह का सिमरन है, जो मन को उठा देता है। एक अच्छी बात का नाम ले लेना पूरा मिज़ाज बदल सकता है।')),
         SpiritualRead(
-            title: 'A quieter morning',
+            title: _t('A quieter morning', 'थोड़ी शांत सुबह'),
             body:
-                "Beginning the day with a little stillness sets a gentler tone for all that follows. Even five quiet minutes before the rush can help."),
+                _t("Beginning the day with a little stillness sets a gentler tone for all that follows. Even five quiet minutes before the rush can help.", 'दिन की शुरुआत थोड़े ठहराव से करना आगे के सारे घंटों का सुर नरम कर देती है। भागदौड़ शुरू होने से पहले के पाँच शांत मिनट भी बहुत हैं।')),
         SpiritualRead(
-            title: 'Peace, not perfection',
+            title: _t('Peace, not perfection', 'सुकून चाहिए, सबकुछ ठीक-ठाक नहीं'),
             body:
-                "The aim is a peaceful heart, not a perfectly tidy mind. Some wandering is normal; the practice is simply coming back."),
+                _t("The aim is a peaceful heart, not a perfectly tidy mind. Some wandering is normal; the practice is simply coming back.", 'मक़सद एक शांत दिल है, पूरी तरह सुलझा हुआ मन नहीं। मन का थोड़ा भटकना आम बात है; अभ्यास तो बस लौट आने का है।')),
         SpiritualRead(
-            title: 'Held by something larger',
+            title: _t('Held by something larger', 'किसी बड़े सहारे में थमा हुआ'),
             body:
-                "Leaning on something larger than yourself can ease the weight you carry. You are not holding all of this alone."),
+                _t("Leaning on something larger than yourself can ease the weight you carry. You are not holding all of this alone.", 'अपने से बड़े किसी सहारे पर टिक जाना उस बोझ को हल्का कर देता है जो आप उठाए हुए हैं। यह सब आप अकेले नहीं थामे हुए हैं।')),
         SpiritualRead(
-            title: 'Letting the day soften',
+            title: _t('Letting the day soften', 'दिन को नरम पड़ने देना'),
             body:
-                "Easing into evening with a calm wind-down helps both body and mind settle. Dimming the lights and slowing your breath signals it is safe to rest."),
+                _t("Easing into evening with a calm wind-down helps both body and mind settle. Dimming the lights and slowing your breath signals it is safe to rest.", 'शाम में धीरे-धीरे उतरना, रफ़्तार कम करते हुए, शरीर और मन दोनों को बैठा देता है। रौशनी मद्धम कर देना और साँस धीमी कर लेना शरीर को बता देता है कि अब आराम करना सुरक्षित है।')),
         SpiritualRead(
-            title: 'Contentment, returned to',
+            title: _t('Contentment, returned to', 'संतोष, जिस पर बार-बार लौटा जाता है'),
             body:
-                "Contentment is less a feeling that arrives and more a place you return to. Each return, however brief, is worth it."),
+                _t("Contentment is less a feeling that arrives and more a place you return to. Each return, however brief, is worth it.", 'संतोष कोई ऐसा एहसास नहीं जो आ जाए — वह एक ऐसी जगह है जहाँ बार-बार लौटा जाता है। हर लौटना, चाहे कितना भी छोटा हो, अपने आप में क़ीमती है।')),
       ]),
-      SpiritualSection(title: 'Seva & community', reads: [
+      SpiritualSection(title: _t('Seva & community', 'सेवा और संगत'), reads: [
         SpiritualRead(
-            title: 'Service with love',
+            title: _t('Service with love', 'प्यार से की गई सेवा'),
             body:
-                "Selfless service, helping others without expecting anything back, is central to Sikh life. The unseen care you give your baby every day is service of the purest kind."),
+                _t("Selfless service, helping others without expecting anything back, is central to Sikh life. The unseen care you give your baby every day is service of the purest kind.", 'निस्वार्थ सेवा — बिना कुछ वापस चाहे दूसरों की मदद करना — सिख जीवन के बीचोंबीच है। अपने बच्चे के लिए आप रोज़ जो अनदेखी देखभाल करती हैं, वह सबसे शुद्ध क़िस्म की सेवा है।')),
         SpiritualRead(
-            title: 'The shared meal',
+            title: _t('The shared meal', 'साझा लंगर'),
             body:
-                "The tradition of a free community kitchen, where all sit together as equals and are fed, is much loved. Its spirit, everyone welcome and everyone cared for, is a beautiful one to bring into your home."),
+                _t("The tradition of a free community kitchen, where all sit together as equals and are fed, is much loved. Its spirit, everyone welcome and everyone cared for, is a beautiful one to bring into your home.", 'लंगर की परंपरा — जहाँ सब बराबरी से एक साथ बैठते हैं और सबको खाना मिलता है — बहुत प्यारी मानी जाती है। उसकी भावना, कि हर कोई अपना है और हर किसी का ख़याल रखा जाए, अपने घर में ले आने लायक़ है।')),
         SpiritualRead(
-            title: 'Lean on your community',
+            title: _t('Lean on your community', 'अपनी संगत का सहारा लीजिए'),
             body:
-                "Just as service is given, it is also meant to be received. Letting your community support you now is part of the same circle of care."),
+                _t("Just as service is given, it is also meant to be received. Letting your community support you now is part of the same circle of care.", 'सेवा जितनी दी जाती है, उतनी ही लेने के लिए भी होती है। अभी अपनी संगत को अपना साथ देने देना उसी देखभाल के घेरे का हिस्सा है।')),
         SpiritualRead(
-            title: 'Small kindnesses',
+            title: _t('Small kindnesses', 'छोटी-छोटी नेकियाँ'),
             body:
-                "Grand gestures are not required; small, steady kindnesses are the heart of it. A warm word, a helping hand, a shared meal, these are enough."),
+                _t("Grand gestures are not required; small, steady kindnesses are the heart of it. A warm word, a helping hand, a shared meal, these are enough.", 'बड़े-बड़े कामों की ज़रूरत नहीं; छोटी और लगातार नेकियाँ ही इसका दिल हैं। एक गर्म बोल, एक मदद का हाथ, एक साथ खाया गया खाना — इतना काफ़ी है।')),
         SpiritualRead(
-            title: 'Raising a kind child',
+            title: _t('Raising a kind child', 'एक नेकदिल बच्चा पालना'),
             body:
-                "Caring for others is something children learn by watching. The gentleness you live now quietly plants those seeds in your little one."),
+                _t("Caring for others is something children learn by watching. The gentleness you live now quietly plants those seeds in your little one.", 'दूसरों का ख़याल रखना बच्चे देखकर सीखते हैं। आप अभी जो नरमी जीती हैं, वह चुपचाप आपके नन्हे में वही बीज बो देती है।')),
         SpiritualRead(
-            title: 'Service, freely given',
+            title: _t('Service, freely given', 'बिना शर्त की सेवा'),
             body:
-                "Selfless service, helping with no thought of reward, is central here. The unseen care you give your baby each day is service of the purest kind."),
+                _t("Selfless service, helping with no thought of reward, is central here. The unseen care you give your baby each day is service of the purest kind.", 'निस्वार्थ सेवा — बिना किसी बदले की सोच के मदद करना — यहाँ सबसे बीच में है। अपने बच्चे के लिए रोज़ की जाने वाली आपकी अनदेखी देखभाल सबसे शुद्ध क़िस्म की सेवा है।')),
         SpiritualRead(
-            title: 'Everyone at one table',
+            title: _t('Everyone at one table', 'सब एक ही पंगत में'),
             body:
-                "The tradition of a shared meal where all sit as equals is much loved. Its spirit, everyone welcome, everyone fed, is a beautiful one to bring home."),
+                _t("The tradition of a shared meal where all sit as equals is much loved. Its spirit, everyone welcome, everyone fed, is a beautiful one to bring home.", 'साझा खाने की वह परंपरा, जहाँ सब बराबरी से एक साथ बैठते हैं, बहुत प्यारी मानी जाती है। उसकी भावना — हर कोई अपना, हर किसी का पेट भरा — घर ले आने लायक़ है।')),
         SpiritualRead(
-            title: 'Receiving is part of it',
+            title: _t('Receiving is part of it', 'लेना भी उसी का हिस्सा है'),
             body:
-                "Service is given, but it is also meant to be received with grace. Letting your community support you now completes the circle."),
+                _t("Service is given, but it is also meant to be received with grace. Letting your community support you now completes the circle.", 'सेवा दी जाती है, पर उसे नरमी से क़बूल भी करना होता है। अभी अपनी संगत को अपना साथ देने देना उस घेरे को पूरा कर देता है।')),
         SpiritualRead(
-            title: 'Small, steady kindness',
+            title: _t('Small, steady kindness', 'छोटी, लगातार नेकी'),
             body:
-                "Grand gestures are not required; small, steady kindnesses are the heart of it. A warm word or a helping hand is enough."),
+                _t("Grand gestures are not required; small, steady kindnesses are the heart of it. A warm word or a helping hand is enough.", 'बड़े-बड़े कामों की ज़रूरत नहीं; छोटी और लगातार नेकियाँ ही इसका दिल हैं। एक गर्म बोल या एक मदद का हाथ ही काफ़ी है।')),
         SpiritualRead(
-            title: 'Kindness, caught not taught',
+            title: _t('Kindness, caught not taught', 'नेकी सिखाई नहीं जाती, देखी जाती है'),
             body:
-                "Children learn care most by watching it lived. The gentleness around your home today is already planting seeds."),
+                _t("Children learn care most by watching it lived. The gentleness around your home today is already planting seeds.", 'बच्चे ख़याल रखना सबसे ज़्यादा उसे जीते हुए देखकर सीखते हैं। आपके घर में आज जो नरमी है, वह अभी से बीज बो रही है।')),
         SpiritualRead(
-            title: 'Serving without a spotlight',
+            title: _t('Serving without a spotlight', 'बिना दिखावे की सेवा'),
             body:
-                "The quiet, unseen service often matters most, given without needing thanks. So much of mothering is exactly this, and it counts."),
+                _t("The quiet, unseen service often matters most, given without needing thanks. So much of mothering is exactly this, and it counts.", 'चुपचाप, बिना किसी की नज़र में आए की गई सेवा अक्सर सबसे बड़ी होती है — जिसमें शुक्रिया की चाह भी नहीं होती। माँ होने का बहुत बड़ा हिस्सा ठीक यही है, और वह गिना जाता है।')),
         SpiritualRead(
-            title: 'A welcome for everyone',
+            title: _t('A welcome for everyone', 'सबके लिए खुला दरवाज़ा'),
             body:
-                "A spirit of welcome, making room for whoever comes, runs through community life. The same open-hearted welcome is what you are preparing for your baby."),
+                _t("A spirit of welcome, making room for whoever comes, runs through community life. The same open-hearted welcome is what you are preparing for your baby.", 'जो भी आए उसके लिए जगह बना देने की भावना संगत के जीवन में हर जगह मिलती है। वही खुले दिल वाला स्वागत आप अपने बच्चे के लिए तैयार कर रही हैं।')),
         SpiritualRead(
-            title: 'Let others help',
+            title: _t('Let others help', 'दूसरों को मदद करने दीजिए'),
             body:
-                "Accepting help while you grow a baby is wise and gracious. People who love you want to serve; let them."),
+                _t("Accepting help while you grow a baby is wise and gracious. People who love you want to serve; let them.", 'बच्चे को पालते हुए मदद क़बूल कर लेना समझदारी भी है और शालीनता भी। जो लोग आपसे प्यार करते हैं, वे सेवा करना चाहते हैं; उन्हें करने दीजिए।')),
         SpiritualRead(
-            title: 'Gratitude to your helpers',
+            title: _t('Gratitude to your helpers', 'मदद करने वालों का शुक्रिया'),
             body:
-                "Pausing to thank those who care for you strengthens the bond. A simple thank-you keeps the circle warm."),
+                _t("Pausing to thank those who care for you strengthens the bond. A simple thank-you keeps the circle warm.", 'जो आपका ख़याल रखते हैं, उन्हें ठहरकर शुक्रिया कह देना रिश्ते को मज़बूत करता है। एक सीधा-सा शुक्रिया पूरे घेरे को गर्म रखता है।')),
         SpiritualRead(
-            title: 'Feeding body and heart',
+            title: _t('Feeding body and heart', 'तन भी भरे, मन भी'),
             body:
-                "Caring for others' simple needs, a meal, a rest, a listening ear, is treasured. Receiving that care now is part of the same goodness."),
+                _t("Caring for others' simple needs, a meal, a rest, a listening ear, is treasured. Receiving that care now is part of the same goodness.", 'दूसरों की सीधी-सादी ज़रूरतों का ख़याल रखना — एक थाली, थोड़ा आराम, सुनने वाला एक कान — बहुत क़ीमती माना जाता है। अभी वही देखभाल पा लेना भी उसी भलाई का हिस्सा है।')),
         SpiritualRead(
-            title: 'No one carries alone',
+            title: _t('No one carries alone', 'कोई अकेले नहीं उठाता'),
             body:
-                "Community exists so that no one bears joy or hardship by themselves. Letting yourself be carried a little is the tradition working as intended."),
+                _t("Community exists so that no one bears joy or hardship by themselves. Letting yourself be carried a little is the tradition working as intended.", 'संगत इसीलिए होती है कि ख़ुशी हो या मुश्किल, कोई उसे अकेले न उठाए। ख़ुद को थोड़ा सहारा लेने देना उस परंपरा का ठीक वैसे ही चलना है, जैसे उसे चलना चाहिए।')),
         SpiritualRead(
-            title: 'The joy of giving',
+            title: _t('The joy of giving', 'देने की ख़ुशी'),
             body:
-                "There is a quiet gladness in giving that the tradition knows well. Even small acts of care lift the giver too."),
+                _t("There is a quiet gladness in giving that the tradition knows well. Even small acts of care lift the giver too.", 'देने में एक चुपचाप ख़ुशी है, जिसे यह परंपरा बख़ूबी जानती है। ख़याल रखने के छोटे काम भी देने वाले का मन उठा देते हैं।')),
         SpiritualRead(
-            title: 'Gentle with the weary',
+            title: _t('Gentle with the weary', 'थके हुओं पर नरमी'),
             body:
-                "Extra kindness for the tired, including yourself, fits this spirit. On low days, soften what you ask of yourself."),
+                _t("Extra kindness for the tired, including yourself, fits this spirit. On low days, soften what you ask of yourself.", 'थके हुए लोगों के लिए थोड़ी ज़्यादा नेकी — और उनमें आप ख़ुद भी हैं — इसी भावना में बैठती है। कमज़ोर दिनों में ख़ुद से जो माँगती हैं, उसे नरम कर लीजिए।')),
         SpiritualRead(
-            title: 'Planting kindness early',
+            title: _t('Planting kindness early', 'नेकी के बीज, अभी से'),
             body:
-                "The care your child sees now becomes the care they give later. You are quietly raising a kind person already."),
+                _t("The care your child sees now becomes the care they give later. You are quietly raising a kind person already.", 'आपका बच्चा अभी जो ख़याल देखता है, वही आगे चलकर वह दूसरों को देता है। आप अभी से चुपचाप एक नेकदिल इंसान पाल रही हैं।')),
         SpiritualRead(
-            title: 'A circle of hands',
+            title: _t('A circle of hands', 'हाथों का एक घेरा'),
             body:
-                "New life is meant to be met by many willing hands, not one. Letting that circle form around you blesses your baby too."),
+                _t("New life is meant to be met by many willing hands, not one. Letting that circle form around you blesses your baby too.", 'नई ज़िंदगी का स्वागत कई तैयार हाथों से होना चाहिए, सिर्फ़ एक से नहीं। उस घेरे को अपने चारों ओर बन जाने देना आपके बच्चे के लिए भी आशीर्वाद है।')),
       ]),
-      SpiritualSection(title: 'Naming & blessings', reads: [
+      SpiritualSection(title: _t('Naming & blessings', 'नाम रखना और आशीर्वाद'), reads: [
         SpiritualRead(
-            title: 'Naming within the community',
+            title: _t('Naming within the community', 'संगत के बीच नाम रखना'),
             body:
-                "A well-loved custom is choosing the baby's name together within the community, in a spirit of blessing. It is a warm, shared welcome for the new child."),
+                _t("A well-loved custom is choosing the baby's name together within the community, in a spirit of blessing. It is a warm, shared welcome for the new child.", 'एक बहुत प्यारा रिवाज यह है कि बच्चे का नाम संगत के बीच, आशीर्वाद के भाव के साथ, मिलकर चुना जाए। यह नए बच्चे के लिए एक गर्मजोशी भरा, साझा स्वागत होता है।')),
         SpiritualRead(
-            title: 'A name with meaning',
+            title: _t('A name with meaning', 'मायने वाला नाम'),
             body:
-                "Names are often chosen for their meaning and the good wishes they carry. Picking something that holds hope for your child is a sweet, lasting gift."),
+                _t("Names are often chosen for their meaning and the good wishes they carry. Picking something that holds hope for your child is a sweet, lasting gift.", 'नाम अक्सर उनके मायनों और उनमें बसी नेक कामनाओं को देखकर चुने जाते हैं। ऐसा नाम चुनना जिसमें आपके बच्चे के लिए उम्मीद हो, एक मीठा और हमेशा साथ रहने वाला तोहफ़ा है।')),
         SpiritualRead(
-            title: 'Blessings all around',
+            title: _t('Blessings all around', 'चारों ओर आशीर्वाद'),
             body:
-                "New life is met with blessings and good wishes from family and community. Receiving them, and believing them, is part of the joy."),
+                _t("New life is met with blessings and good wishes from family and community. Receiving them, and believing them, is part of the joy.", 'नई ज़िंदगी का स्वागत परिवार और संगत के आशीर्वाद और नेक कामनाओं से होता है। उन्हें ले लेना, और उन पर यक़ीन कर लेना, इसी ख़ुशी का हिस्सा है।')),
         SpiritualRead(
-            title: 'Welcomed as equal and whole',
+            title: _t('Welcomed as equal and whole', 'बराबर और पूरा, पहले दिन से'),
             body:
-                "A child is welcomed as a full, equal member of the community from the very start. Your baby belongs, simply by arriving."),
+                _t("A child is welcomed as a full, equal member of the community from the very start. Your baby belongs, simply by arriving.", 'बच्चे का स्वागत पहले ही दिन से संगत के एक पूरे, बराबर सदस्य की तरह होता है। आपका बच्चा बस आ जाने भर से अपना है।')),
         SpiritualRead(
-            title: 'Joy shared widely',
+            title: _t('Joy shared widely', 'दूर तक बाँटी गई ख़ुशी'),
             body:
-                "Happy news is meant to be shared, the joy spread outward. Letting others celebrate with you doubles the gladness."),
+                _t("Happy news is meant to be shared, the joy spread outward. Letting others celebrate with you doubles the gladness.", 'ख़ुशख़बरी बाँटने के लिए ही होती है, ख़ुशी बाहर तक फैलाने के लिए। दूसरों को अपने साथ जश्न मनाने देना ख़ुशी दुगुनी कर देता है।')),
         SpiritualRead(
-            title: 'A name chosen together',
+            title: _t('A name chosen together', 'मिलकर चुना गया नाम'),
             body:
-                "Choosing a baby's name within the warmth of community is a loved custom. It is a shared welcome for the new child."),
+                _t("Choosing a baby's name within the warmth of community is a loved custom. It is a shared welcome for the new child.", 'संगत की गर्माहट के बीच बच्चे का नाम चुनना एक प्यारा रिवाज है। यह नए बच्चे का साझा स्वागत होता है।')),
         SpiritualRead(
-            title: 'Meaning that lasts',
+            title: _t('Meaning that lasts', 'वह मायना जो ठहरता है'),
             body:
-                "Names chosen for their meaning carry quiet wishes for years. Something hopeful is a gift that ages well."),
+                _t("Names chosen for their meaning carry quiet wishes for years. Something hopeful is a gift that ages well.", 'मायने देखकर चुने गए नाम सालों तक चुपचाप कामनाएँ लिए चलते हैं। उम्मीद से भरा नाम ऐसा तोहफ़ा है जो वक़्त के साथ और अच्छा लगता है।')),
         SpiritualRead(
-            title: 'Showered with blessings',
+            title: _t('Showered with blessings', 'आशीर्वादों की बौछार'),
             body:
-                "New life draws blessings from family and community alike. Receiving them, and believing them, is part of the joy."),
+                _t("New life draws blessings from family and community alike. Receiving them, and believing them, is part of the joy.", 'नई ज़िंदगी परिवार और संगत, दोनों से आशीर्वाद खींच लाती है। उन्हें ले लेना, और उन पर यक़ीन कर लेना, इसी ख़ुशी का हिस्सा है।')),
         SpiritualRead(
-            title: 'Belonging from the start',
+            title: _t('Belonging from the start', 'शुरू से ही अपना'),
             body:
-                "A child is welcomed as a full, equal member from the very beginning. Your baby belongs simply by arriving."),
+                _t("A child is welcomed as a full, equal member from the very beginning. Your baby belongs simply by arriving.", 'बच्चे का स्वागत शुरू से ही एक पूरे, बराबर सदस्य की तरह होता है। आपका बच्चा बस आ जाने भर से अपना है।')),
         SpiritualRead(
-            title: 'Joy spread wide',
+            title: _t('Joy spread wide', 'ख़ुशी, दूर तक'),
             body:
-                "Happy news is meant to be shared outward. Letting others rejoice with you multiplies the gladness."),
+                _t("Happy news is meant to be shared outward. Letting others rejoice with you multiplies the gladness.", 'ख़ुशख़बरी बाहर तक बाँटने के लिए होती है। दूसरों को अपने साथ ख़ुश होने देना ख़ुशी को कई गुना कर देता है।')),
         SpiritualRead(
-            title: 'Good wishes in a name',
+            title: _t('Good wishes in a name', 'नाम में बसा आशीर्वाद'),
             body:
-                "A name can hold a quiet good wish, spoken every time it is said. Choose one you will be glad to repeat with love."),
+                _t("A name can hold a quiet good wish, spoken every time it is said. Choose one you will be glad to repeat with love.", 'नाम अपने भीतर एक चुपचाप नेक कामना रख सकता है, जो हर बार पुकारे जाने के साथ कही जाती है। ऐसा नाम चुनिए जिसे प्यार से बार-बार दोहराने में आपको ख़ुशी हो।')),
         SpiritualRead(
-            title: 'Said with love',
+            title: _t('Said with love', 'प्यार से पुकारा गया'),
             body:
-                "The way a name is first spoken, with tenderness, sets the tone. Your baby's name will be one of the softest words you say."),
+                _t("The way a name is first spoken, with tenderness, sets the tone. Your baby's name will be one of the softest words you say.", 'नाम पहली बार जिस कोमलता से कहा जाता है, वही आगे का सुर तय कर देती है। आपके बच्चे का नाम आपके कहे सबसे नरम लफ़्ज़ों में से एक होगा।')),
         SpiritualRead(
-            title: "Elders' blessings",
+            title: _t("Elders' blessings", 'बड़ों का आशीर्वाद'),
             body:
-                "The blessings of grandparents and elders are treasured at every milestone. Their love, spoken or simply felt, wraps your baby warmly."),
+                _t("The blessings of grandparents and elders are treasured at every milestone. Their love, spoken or simply felt, wraps your baby warmly.", 'हर पड़ाव पर दादा-दादी, नाना-नानी और बड़ों का आशीर्वाद बहुत क़ीमती माना जाता है। उनका प्यार, चाहे कहा जाए या बस महसूस हो, आपके बच्चे को गर्म चादर की तरह ढक लेता है।')),
         SpiritualRead(
-            title: 'A warm welcome readied',
+            title: _t('A warm welcome readied', 'तैयार होता हुआ स्वागत'),
             body:
-                "Welcoming customs centre on warmth, gratitude and gentle blessing. You are already preparing that welcome in your heart."),
+                _t("Welcoming customs centre on warmth, gratitude and gentle blessing. You are already preparing that welcome in your heart.", 'स्वागत के रिवाज गर्मजोशी, शुक्र और नरम आशीर्वाद के इर्द-गिर्द घूमते हैं। वह स्वागत आप अपने मन में अभी से तैयार कर रही हैं।')),
         SpiritualRead(
-            title: 'Gratitude at the threshold',
+            title: _t('Gratitude at the threshold', 'दहलीज़ पर शुक्र'),
             body:
-                "New arrivals are met with thankfulness for the gift of life. A grateful heart makes the welcome fuller."),
+                _t("New arrivals are met with thankfulness for the gift of life. A grateful heart makes the welcome fuller.", 'नए आने वालों का स्वागत ज़िंदगी के तोहफ़े के लिए शुक्र के साथ होता है। शुक्रगुज़ार मन उस स्वागत को और भरा-पूरा बना देता है।')),
         SpiritualRead(
-            title: 'A fresh beginning',
+            title: _t('A fresh beginning', 'एक नई शुरुआत'),
             body:
-                "Each new child is a fresh beginning for a whole family. Your baby brings a new chapter, and new hope, to everyone."),
+                _t("Each new child is a fresh beginning for a whole family. Your baby brings a new chapter, and new hope, to everyone.", 'हर नया बच्चा पूरे परिवार के लिए एक नई शुरुआत होता है। आपका बच्चा सबके लिए एक नया अध्याय और नई उम्मीद लेकर आ रहा है।')),
         SpiritualRead(
-            title: 'Celebrating together',
+            title: _t('Celebrating together', 'साथ मिलकर मनाई गई ख़ुशी'),
             body:
-                "Joy is meant to gather people, so no one celebrates alone. Letting your community share the happiness is part of the gift."),
+                _t("Joy is meant to gather people, so no one celebrates alone. Letting your community share the happiness is part of the gift.", 'ख़ुशी लोगों को जोड़ने के लिए होती है, ताकि कोई अकेले जश्न न मनाए। अपनी संगत को इस ख़ुशी में शामिल कर लेना भी उसी तोहफ़े का हिस्सा है।')),
         SpiritualRead(
-            title: 'A name that fits a life',
+            title: _t('A name that fits a life', 'वह नाम जो पूरी ज़िंदगी साथ चले'),
             body:
-                "Choosing a name that suits both a tiny baby and the grown person to come is kind. Picture them at every age as you choose."),
+                _t("Choosing a name that suits both a tiny baby and the grown person to come is kind. Picture them at every age as you choose.", 'ऐसा नाम चुनना अच्छा होता है जो नन्हे बच्चे पर भी जँचे और आगे बनने वाले बड़े इंसान पर भी। चुनते वक़्त उसे हर उम्र में मन में देख लीजिए।')),
         SpiritualRead(
-            title: 'Blessings spoken over you',
+            title: _t('Blessings spoken over you', 'आपके लिए भी आशीर्वाद'),
             body:
-                "Blessings are often spoken over the mother too, wishes for peace and strength. Receiving them, you are reminded you are held."),
+                _t("Blessings are often spoken over the mother too, wishes for peace and strength. Receiving them, you are reminded you are held.", 'आशीर्वाद अक्सर माँ के लिए भी कहे जाते हैं — सुकून और हिम्मत की कामनाएँ। उन्हें लेते हुए आपको याद आ जाता है कि आपको भी थामा गया है।')),
         SpiritualRead(
-            title: 'Wanted and loved',
+            title: _t('Wanted and loved', 'चाहा गया, और बहुत प्यारा'),
             body:
-                "Under every custom is one simple message: this child is wanted and loved. That truth is worth resting in."),
+                _t("Under every custom is one simple message: this child is wanted and loved. That truth is worth resting in.", 'हर रिवाज के नीचे एक ही सीधा-सा संदेश है — इस बच्चे को चाहा गया है और उससे बहुत प्यार किया जाता है। इस सच में टिक जाना अच्छा लगता है।')),
       ]),
     ],
   ),
@@ -1164,337 +1168,337 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'christian',
-    name: 'Christianity',
+    name: _t('Christianity', 'ईसाई धर्म'),
     symbol: '✝️',
-    blurb: 'Hope, gratitude and prayer as a family welcomes new life.',
+    blurb: _t('Hope, gratitude and prayer as a family welcomes new life.', 'आशा, कृतज्ञता और प्रार्थना — जब एक परिवार नए जीवन का स्वागत करता है।'),
     sections: [
-      SpiritualSection(title: 'Reflections & prayer', reads: [
+      SpiritualSection(title: _t('Reflections & prayer', 'मनन और प्रार्थना'), reads: [
         SpiritualRead(
-            title: 'A gift to be thankful for',
+            title: _t('A gift to be thankful for', 'एक उपहार, जिसके लिए मन धन्यवाद कहे'),
             body:
-                "A new pregnancy is often received as a gift and a reason for gratitude and hope. Even on tired days, a quiet thank-you can steady the heart."),
+                _t("A new pregnancy is often received as a gift and a reason for gratitude and hope. Even on tired days, a quiet thank-you can steady the heart.", 'नया गर्भ अक्सर एक उपहार की तरह लिया जाता है — कृतज्ञता और आशा की एक वजह। थकान भरे दिनों में भी मन ही मन कहा गया एक धन्यवाद दिल को थाम लेता है।')),
         SpiritualRead(
-            title: 'Praying simply',
+            title: _t('Praying simply', 'सीधी-सादी प्रार्थना'),
             body:
-                "Prayer here is often just an honest conversation, asking for a healthy baby, a safe delivery and peace of mind. You do not need the perfect words; sincerity is enough."),
+                _t("Prayer here is often just an honest conversation, asking for a healthy baby, a safe delivery and peace of mind. You do not need the perfect words; sincerity is enough.", 'यहाँ प्रार्थना अक्सर एक सच्ची बातचीत भर होती है — स्वस्थ शिशु, सुरक्षित प्रसव और मन की शांति की माँग। सही शब्द ढूँढ़ने की ज़रूरत नहीं; मन की सच्चाई काफ़ी है।')),
         SpiritualRead(
-            title: 'Peace that steadies',
+            title: _t('Peace that steadies', 'वह शांति जो थाम लेती है'),
             body:
-                "Many lean on their faith for a peace that holds them through worry, a calm that does not depend on everything going right. On anxious days, that can be a real anchor."),
+                _t("Many lean on their faith for a peace that holds them through worry, a calm that does not depend on everything going right. On anxious days, that can be a real anchor.", 'बहुत से लोग अपनी आस्था का सहारा लेते हैं — ऐसी शांति के लिए जो चिंता के बीच भी थामे रखे, ऐसा ठहराव जिसके लिए सब कुछ ठीक होना ज़रूरी न हो। घबराहट वाले दिनों में यही मन को टिकाने की ज़मीन बन जाती है।')),
         SpiritualRead(
-            title: 'Hope as a quiet strength',
+            title: _t('Hope as a quiet strength', 'आशा, एक चुपचाप ताक़त'),
             body:
-                "Hope runs through this tradition, the trust that good is being woven even when you cannot see it. Holding gently to hope can lighten the heavier stretches."),
+                _t("Hope runs through this tradition, the trust that good is being woven even when you cannot see it. Holding gently to hope can lighten the heavier stretches.", 'इस परंपरा में आशा हर जगह बहती है — यह भरोसा कि भला कुछ बुना जा रहा है, भले ही वह आपको दिख न रहा हो। आशा को हल्के हाथों से थामे रखना भारी दिनों का बोझ कम कर देता है।')),
         SpiritualRead(
-            title: 'You are held',
+            title: _t('You are held', 'आप सँभाली हुई हैं'),
             body:
-                "A comforting thread is the sense of being known, loved and cared for, just as you are. Whatever you are feeling today, you are not carrying it unseen."),
+                _t("A comforting thread is the sense of being known, loved and cared for, just as you are. Whatever you are feeling today, you are not carrying it unseen.", 'एक तसल्ली देने वाला धागा यह है — कि आप जैसी हैं वैसी ही जानी जाती हैं, चाही जाती हैं, सँभाली जाती हैं। आज आप जो भी महसूस कर रही हैं, उसे किसी की नज़र से छूटकर अकेले नहीं उठा रहीं।')),
         SpiritualRead(
-            title: 'A reason for thanks',
+            title: _t('A reason for thanks', 'धन्यवाद कहने की एक वजह'),
             body:
-                "A new pregnancy is often received as a gift and a cause for gratitude. Even on tired days, a quiet thank-you can steady the heart."),
+                _t("A new pregnancy is often received as a gift and a cause for gratitude. Even on tired days, a quiet thank-you can steady the heart.", 'नया गर्भ अक्सर एक उपहार की तरह लिया जाता है, कृतज्ञता की एक वजह। थके हुए दिनों में भी चुपचाप कहा गया एक धन्यवाद दिल को थाम लेता है।')),
         SpiritualRead(
-            title: 'Honest, simple prayer',
+            title: _t('Honest, simple prayer', 'सच्ची, सीधी प्रार्थना'),
             body:
-                "Prayer here is often just honest conversation, asking for health, a safe birth, and peace. You do not need perfect words; sincerity is enough."),
+                _t("Prayer here is often just honest conversation, asking for health, a safe birth, and peace. You do not need perfect words; sincerity is enough.", 'यहाँ प्रार्थना अक्सर एक सच्ची बातचीत भर होती है — सेहत, सुरक्षित जन्म और शांति की माँग। सही शब्द ज़रूरी नहीं; मन की सच्चाई काफ़ी है।')),
         SpiritualRead(
-            title: 'A peace that holds',
+            title: _t('A peace that holds', 'वह शांति जो टिकी रहती है'),
             body:
-                "Many lean on faith for a calm that does not depend on everything going right. On anxious days, that can be a real anchor."),
+                _t("Many lean on faith for a calm that does not depend on everything going right. On anxious days, that can be a real anchor.", 'बहुत से लोग आस्था का सहारा ऐसे ठहराव के लिए लेते हैं जिसके लिए सब कुछ ठीक होना ज़रूरी न हो। घबराहट वाले दिनों में यही मन को टिकाने की ज़मीन बन जाता है।')),
         SpiritualRead(
-            title: 'Hope that lightens',
+            title: _t('Hope that lightens', 'आशा, जो बोझ हल्का करती है'),
             body:
-                "Hope, the trust that good is being woven even unseen, runs deep here. Holding gently to it lightens the heavier stretches."),
+                _t("Hope, the trust that good is being woven even unseen, runs deep here. Holding gently to it lightens the heavier stretches.", 'आशा — यह भरोसा कि भला कुछ बुना जा रहा है, भले दिखे नहीं — यहाँ बहुत गहरी है। उसे हल्के हाथों से थामे रखना भारी दिनों को हल्का कर देता है।')),
         SpiritualRead(
-            title: 'Casting your cares',
+            title: _t('Casting your cares', 'फ़िक्रें सौंप देना'),
             body:
-                "There is a comforting idea of handing your worries over rather than carrying them all. At night, you might set the day's fears down and rest."),
+                _t("There is a comforting idea of handing your worries over rather than carrying them all. At night, you might set the day's fears down and rest.", 'एक तसल्ली देने वाला ख़याल यह है कि अपनी चिंताएँ सौंप दीजिए, सब ख़ुद ही मत उठाइए। रात को दिन भर के डर नीचे रखकर आराम कर लीजिए।')),
         SpiritualRead(
-            title: 'Thanks in small things',
+            title: _t('Thanks in small things', 'छोटी-छोटी बातों का शुक्रिया'),
             body:
-                "Gratitude is encouraged even in ordinary moments, not only the big ones. A grateful glance at a quiet day counts."),
+                _t("Gratitude is encouraged even in ordinary moments, not only the big ones. A grateful glance at a quiet day counts.", 'कृतज्ञता सिर्फ़ बड़े मौक़ों की नहीं, मामूली पलों की भी होती है। एक शांत दिन पर डाली गई शुक्रगुज़ार नज़र भी गिनी जाती है।')),
         SpiritualRead(
-            title: 'Praying for your baby',
+            title: _t('Praying for your baby', 'अपने शिशु के लिए प्रार्थना'),
             body:
-                "Many like to pray simply over their growing baby, for health and a good life. A hand on your bump and a sincere wish is a tender daily habit."),
+                _t("Many like to pray simply over their growing baby, for health and a good life. A hand on your bump and a sincere wish is a tender daily habit.", 'बहुत सी माएँ अपने बढ़ते शिशु के लिए सीधी-सी प्रार्थना करती हैं — सेहत की, एक अच्छे जीवन की। पेट पर हाथ और मन से निकली एक दुआ — यह रोज़ की एक कोमल आदत है।')),
         SpiritualRead(
-            title: 'Faith a little bigger than fear',
+            title: _t('Faith a little bigger than fear', 'डर से ज़रा-सा बड़ा भरोसा'),
             body:
-                "You do not have to be fearless, only to let trust be a touch larger than the fear. That small margin can carry you a long way."),
+                _t("You do not have to be fearless, only to let trust be a touch larger than the fear. That small margin can carry you a long way.", 'निडर होना ज़रूरी नहीं — बस भरोसा डर से ज़रा-सा बड़ा रहे, इतना काफ़ी है। यही थोड़ा-सा फ़र्क़ आपको बहुत दूर तक ले जाता है।')),
         SpiritualRead(
-            title: 'Rest for the weary',
+            title: _t('Rest for the weary', 'थके हुए मन के लिए आराम'),
             body:
-                "There is a tender invitation to bring your tiredness and find rest. Letting yourself slow down is welcomed, not frowned upon."),
+                _t("There is a tender invitation to bring your tiredness and find rest. Letting yourself slow down is welcomed, not frowned upon.", 'यहाँ एक कोमल न्योता है — अपनी थकान लेकर आइए और आराम पाइए। धीमे पड़ जाना यहाँ स्वीकार है, उस पर कोई भौंहें नहीं चढ़ाता।')),
         SpiritualRead(
-            title: 'Praying with others',
+            title: _t('Praying with others', 'मिलकर की गई प्रार्थना'),
             body:
-                "Sharing your hopes with people who will pray alongside you can ease the load. You are not meant to carry it solo."),
+                _t("Sharing your hopes with people who will pray alongside you can ease the load. You are not meant to carry it solo.", 'अपनी उम्मीदें उन लोगों से बाँटिए जो आपके साथ प्रार्थना करेंगे — बोझ हल्का हो जाता है। यह सब अकेले उठाने के लिए नहीं है।')),
         SpiritualRead(
-            title: 'Grace on the hard days',
+            title: _t('Grace on the hard days', 'मुश्किल दिनों की कृपा'),
             body:
-                "Grace, unearned kindness, is a thread here, meeting you exactly where you are. On the days you feel you fell short, grace says you are still enough."),
+                _t("Grace, unearned kindness, is a thread here, meeting you exactly where you are. On the days you feel you fell short, grace says you are still enough.", 'कृपा — बिना कमाए मिली करुणा — यहाँ एक धागे की तरह चलती है, और आपसे वहीं आकर मिलती है जहाँ आप हैं। जिन दिनों लगे कि आप कम पड़ गईं, कृपा कहती है कि आप फिर भी पूरी हैं।')),
         SpiritualRead(
-            title: 'Gratitude after good news',
+            title: _t('Gratitude after good news', 'अच्छी ख़बर के बाद की कृतज्ञता'),
             body:
-                "A reassuring scan or appointment is a natural moment to pause and give thanks. Letting relief become gratitude makes the joy land fully."),
+                _t("A reassuring scan or appointment is a natural moment to pause and give thanks. Letting relief become gratitude makes the joy land fully.", 'तसल्ली देने वाला कोई scan या डॉक्टर से मुलाक़ात — रुककर धन्यवाद कहने का सहज पल है। राहत को कृतज्ञता बन जाने दीजिए, ख़ुशी तब पूरी तरह उतरती है।')),
         SpiritualRead(
-            title: 'A quiet trust',
+            title: _t('A quiet trust', 'एक चुपचाप भरोसा'),
             body:
-                "Underneath the planning, many rest in a quiet trust that they are cared for. That trust can soften even the unknown parts of birth."),
+                _t("Underneath the planning, many rest in a quiet trust that they are cared for. That trust can soften even the unknown parts of birth.", 'सारी तैयारी के नीचे बहुत से लोग एक चुपचाप भरोसे पर टिके रहते हैं — कि उनका ध्यान रखा जा रहा है। यही भरोसा जन्म के अनजाने हिस्सों को भी नरम कर देता है।')),
         SpiritualRead(
-            title: "A prayer at day's end",
+            title: _t("A prayer at day's end", 'दिन ढलते वक़्त की प्रार्थना'),
             body:
-                "Closing the day with a few honest words settles the heart for sleep. Name one good thing, hand over the rest, and rest."),
+                _t("Closing the day with a few honest words settles the heart for sleep. Name one good thing, hand over the rest, and rest.", 'दिन को कुछ सच्चे शब्दों के साथ बंद कीजिए — मन नींद के लिए बैठ जाता है। एक अच्छी बात का नाम लीजिए, बाक़ी सौंप दीजिए, और सो जाइए।')),
         SpiritualRead(
-            title: 'Bring it all, just as it is',
+            title: _t('Bring it all, just as it is', 'जो है, जैसा है, वैसा ही ले आइए'),
             body:
-                "Whatever is on your heart, joy, fear, or a long list of worries, can be brought to prayer exactly as it is. You do not have to tidy yourself up first."),
+                _t("Whatever is on your heart, joy, fear, or a long list of worries, can be brought to prayer exactly as it is. You do not have to tidy yourself up first.", 'मन पर जो भी है — ख़ुशी, डर, या चिंताओं की लंबी सूची — प्रार्थना में वैसे ही लाया जा सकता है, जैसा है। पहले ख़ुद को सँवारकर आने की कोई ज़रूरत नहीं।')),
       ]),
-      SpiritualSection(title: 'Parables, simply retold', reads: [
+      SpiritualSection(title: _t('Parables, simply retold', 'दृष्टांत, सरल शब्दों में'), reads: [
         SpiritualRead(
-            title: 'Sought and cherished',
+            title: _t('Sought and cherished', 'ढूँढ़ा गया, और सहेजा गया'),
             body:
-                "One much-loved story tells of a shepherd who searches tirelessly for a single lost lamb, a picture of how deeply each one matters. Retold simply, it is a reminder that your little one is treasured beyond counting."),
+                _t("One much-loved story tells of a shepherd who searches tirelessly for a single lost lamb, a picture of how deeply each one matters. Retold simply, it is a reminder that your little one is treasured beyond counting.", 'एक बहुत प्यारी कहानी है — एक गड़रिया, जो एक खोए हुए मेमने को बिना थके ढूँढ़ता रहता है; यह दिखाने के लिए कि हर एक कितना मायने रखता है। सीधे शब्दों में कहें तो यह याद दिलाती है कि आपका नन्हा गिनती से परे क़ीमती है।')),
         SpiritualRead(
-            title: 'Small beginnings, great growth',
+            title: _t('Small beginnings, great growth', 'छोटी शुरुआत, बड़ा बढ़ना'),
             body:
-                "Another favourite likens faith to a tiny seed that grows into something far larger than itself. It is a lovely image for the small cluster of cells now becoming your child."),
+                _t("Another favourite likens faith to a tiny seed that grows into something far larger than itself. It is a lovely image for the small cluster of cells now becoming your child.", 'एक और प्यारा दृष्टांत आस्था को एक नन्हे बीज जैसा बताता है, जो अपने से कहीं बड़ा कुछ बन जाता है। कोशिकाओं का वह नन्हा-सा गुच्छा, जो अभी आपका बच्चा बन रहा है, उसके लिए यह कितनी सुंदर तस्वीर है।')),
         SpiritualRead(
-            title: 'Kindness to a stranger',
+            title: _t('Kindness to a stranger', 'किसी अनजान पर की गई दया'),
             body:
-                "A well-known story praises the one who stops to help a stranger in need, simply out of compassion. Its quiet lesson, that kindness asks no questions, is a gentle one to raise a child by."),
+                _t("A well-known story praises the one who stops to help a stranger in need, simply out of compassion. Its quiet lesson, that kindness asks no questions, is a gentle one to raise a child by.", 'एक जानी-पहचानी कहानी उसकी सराहना करती है जो सिर्फ़ करुणा से रुककर एक अनजान ज़रूरतमंद की मदद करता है। इसकी चुपचाप सीख — कि दया सवाल नहीं पूछती — बच्चे को पालने के लिए बहुत कोमल सीख है।')),
         SpiritualRead(
-            title: 'A joyful welcome home',
+            title: _t('A joyful welcome home', 'घर लौटने पर ख़ुशी भरा स्वागत'),
             body:
-                "One story tells of a parent who runs to welcome a child home with open arms and no conditions. That picture of unconditional welcome is the very love you are already growing."),
+                _t("One story tells of a parent who runs to welcome a child home with open arms and no conditions. That picture of unconditional welcome is the very love you are already growing.", 'एक कहानी है — एक पिता, जो अपने बच्चे को घर लौटता देख दौड़कर बाँहें फैला देते हैं, बिना किसी शर्त के। बिना शर्त स्वागत की यह तस्वीर वही प्यार है जो आपके भीतर पहले से पल रहा है।')),
         SpiritualRead(
-            title: 'Building on something steady',
+            title: _t('Building on something steady', 'मज़बूत नींव पर बनाना'),
             body:
-                "A short tale contrasts a house built on rock with one built on sand, the value of steady foundations. Calm habits and good support are the rock you are building your family on."),
+                _t("A short tale contrasts a house built on rock with one built on sand, the value of steady foundations. Calm habits and good support are the rock you are building your family on.", 'एक छोटी कहानी चट्टान पर बने घर और रेत पर बने घर की तुलना करती है — मज़बूत नींव की क़ीमत बताने के लिए। शांत आदतें और अच्छा साथ ही वह चट्टान है जिस पर आप अपना परिवार बना रही हैं।')),
         SpiritualRead(
-            title: 'The one that mattered',
+            title: _t('The one that mattered', 'वह एक, जो मायने रखता था'),
             body:
-                "A loved story tells of a shepherd searching tirelessly for a single lost lamb. Retold simply, it is a reminder that your little one is treasured beyond counting."),
+                _t("A loved story tells of a shepherd searching tirelessly for a single lost lamb. Retold simply, it is a reminder that your little one is treasured beyond counting.", 'एक प्यारी कहानी है — एक गड़रिया, जो एक खोए हुए मेमने को बिना थके ढूँढ़ता रहता है। सीधे शब्दों में, यह याद दिलाती है कि आपका नन्हा गिनती से परे क़ीमती है।')),
         SpiritualRead(
-            title: 'A tiny seed',
+            title: _t('A tiny seed', 'एक नन्हा बीज'),
             body:
-                "Another likens growth to a tiny seed becoming something far larger than itself. It is a lovely image for the small beginning now becoming your child."),
+                _t("Another likens growth to a tiny seed becoming something far larger than itself. It is a lovely image for the small beginning now becoming your child.", 'एक और दृष्टांत बढ़ने को एक नन्हे बीज जैसा बताता है, जो अपने से कहीं बड़ा कुछ बन जाता है। जो छोटी-सी शुरुआत अभी आपका बच्चा बन रही है, उसके लिए यह कितनी सुंदर तस्वीर है।')),
         SpiritualRead(
-            title: 'Help for a stranger',
+            title: _t('Help for a stranger', 'एक अनजान की मदद'),
             body:
-                "A well-known tale praises the one who stops to help a stranger out of pure compassion. Its lesson, that kindness asks no questions, is a gentle one to raise a child by."),
+                _t("A well-known tale praises the one who stops to help a stranger out of pure compassion. Its lesson, that kindness asks no questions, is a gentle one to raise a child by.", 'एक जानी-पहचानी कहानी उसकी सराहना करती है जो सिर्फ़ करुणा से रुककर एक अनजान की मदद करता है। इसकी सीख — कि दया सवाल नहीं पूछती — बच्चे को पालने के लिए बहुत कोमल सीख है।')),
         SpiritualRead(
-            title: 'Run to welcome',
+            title: _t('Run to welcome', 'दौड़कर गले लगाना'),
             body:
-                "One story shows a parent running to welcome a child home with open arms and no conditions. That picture of unconditional welcome is the love you are already growing."),
+                _t("One story shows a parent running to welcome a child home with open arms and no conditions. That picture of unconditional welcome is the love you are already growing.", 'एक कहानी में एक पिता अपने बच्चे को घर लौटता देख दौड़ पड़ते हैं, बाँहें फैलाए, बिना किसी शर्त के। बिना शर्त स्वागत की यह तस्वीर वही प्यार है जो आपके भीतर पहले से पल रहा है।')),
         SpiritualRead(
-            title: 'Built on rock',
+            title: _t('Built on rock', 'चट्टान पर बना'),
             body:
-                "A short tale weighs a house on rock against one on sand, the worth of steady foundations. Calm habits and good support are the rock under your new family."),
+                _t("A short tale weighs a house on rock against one on sand, the worth of steady foundations. Calm habits and good support are the rock under your new family.", 'एक छोटी कहानी चट्टान पर बने घर को रेत पर बने घर के सामने रखती है — मज़बूत नींव की क़ीमत बताने के लिए। शांत आदतें और अच्छा साथ ही आपके नए परिवार के नीचे की चट्टान हैं।')),
         SpiritualRead(
-            title: 'A lamp set high',
+            title: _t('A lamp set high', 'ऊँचाई पर रखा दीया'),
             body:
-                "One image speaks of a lamp not hidden but set where it gives light to all. The warmth and goodness you carry is meant to be shared, not tucked away."),
+                _t("One image speaks of a lamp not hidden but set where it gives light to all. The warmth and goodness you carry is meant to be shared, not tucked away.", 'एक तस्वीर ऐसे दीये की बात करती है जिसे छिपाया नहीं जाता, बल्कि वहाँ रखा जाता है जहाँ से सबको रोशनी मिले। जो गर्माहट और भलाई आपके भीतर है, वह बाँटने के लिए है, छिपाकर रखने के लिए नहीं।')),
         SpiritualRead(
-            title: 'Good soil',
+            title: _t('Good soil', 'अच्छी मिट्टी'),
             body:
-                "A story of a sower notes how the same seed flourishes in cared-for soil. Tending your own peace and health prepares good ground for your baby."),
+                _t("A story of a sower notes how the same seed flourishes in cared-for soil. Tending your own peace and health prepares good ground for your baby.", 'बीज बोने वाले की एक कहानी बताती है कि वही बीज सँभाली हुई मिट्टी में लहलहा उठता है। अपनी शांति और सेहत का ध्यान रखना आपके शिशु के लिए अच्छी ज़मीन तैयार करना है।')),
         SpiritualRead(
-            title: 'Treasure worth everything',
+            title: _t('Treasure worth everything', 'वह ख़ज़ाना, जिसके आगे सब कम है'),
             body:
-                "A brief tale tells of treasure so precious one gives all to keep it. Your child is exactly that kind of treasure to you."),
+                _t("A brief tale tells of treasure so precious one gives all to keep it. Your child is exactly that kind of treasure to you.", 'एक छोटी कहानी ऐसे ख़ज़ाने की है जो इतना क़ीमती है कि उसे पाने के लिए इंसान सब कुछ दे देता है। आपका बच्चा आपके लिए ठीक वैसा ही ख़ज़ाना है।')),
         SpiritualRead(
-            title: 'A coin found',
+            title: _t('A coin found', 'खोया सिक्का मिल जाना'),
             body:
-                "One story tells of a woman searching her whole house for a single lost coin, then rejoicing when it is found. It is a picture of how one small life can be worth a wholehearted search and a great gladness."),
+                _t("One story tells of a woman searching her whole house for a single lost coin, then rejoicing when it is found. It is a picture of how one small life can be worth a wholehearted search and a great gladness.", 'एक कहानी में एक औरत अपना पूरा घर छान मारती है, एक खोए हुए सिक्के के लिए — और मिल जाने पर ख़ुशी से भर उठती है। यह तस्वीर बताती है कि एक छोटी-सी जान भी पूरे मन की खोज और बड़ी ख़ुशी के क़ाबिल होती है।')),
         SpiritualRead(
-            title: 'Two builders',
+            title: _t('Two builders', 'दो कारीगर'),
             body:
-                "The tale of the wise and foolish builders gently asks what we build upon. Building on patience and love steadies whatever weather comes."),
+                _t("The tale of the wise and foolish builders gently asks what we build upon. Building on patience and love steadies whatever weather comes.", 'समझदार और नादान कारीगरों की कहानी धीरे से पूछती है — हम किस चीज़ पर बना रहे हैं? धीरज और प्यार पर बनाया गया घर हर मौसम में टिका रहता है।')),
         SpiritualRead(
-            title: 'Gifts meant to be used',
+            title: _t('Gifts meant to be used', 'जो मिला है, वह काम आने के लिए है'),
             body:
-                "A story encourages using whatever gifts you are given rather than burying them. The love and care you have to give, you are already putting to beautiful use."),
+                _t("A story encourages using whatever gifts you are given rather than burying them. The love and care you have to give, you are already putting to beautiful use.", 'एक कहानी कहती है कि जो भी क़ाबिलियत आपको मिली है, उसे गाड़कर मत रखिए, काम में लाइए। जो प्यार और देखभाल आपके पास देने को है, उसे तो आप पहले से ही बहुत सुंदर तरीक़े से काम में ला रही हैं।')),
         SpiritualRead(
-            title: 'Faith like a child',
+            title: _t('Faith like a child', 'बच्चे जैसा भरोसा'),
             body:
-                "A tender theme honours the simple, trusting heart of a child. Your baby will teach you that kind of open trust all over again."),
+                _t("A tender theme honours the simple, trusting heart of a child. Your baby will teach you that kind of open trust all over again.", 'एक कोमल भाव बच्चे के सीधे, भरोसा करने वाले मन को सराहता है। आपका शिशु आपको वैसा खुला भरोसा फिर से सिखाएगा।')),
         SpiritualRead(
-            title: 'Branches and vine',
+            title: _t('Branches and vine', 'बेल और उसकी शाखाएँ'),
             body:
-                "One image pictures branches drawing life from the vine they are joined to. Staying close to what nourishes you keeps you steady and growing."),
+                _t("One image pictures branches drawing life from the vine they are joined to. Staying close to what nourishes you keeps you steady and growing.", 'एक तस्वीर ऐसी शाखाओं की है जो अपनी बेल से जुड़ी रहकर जीवन खींचती हैं। जो चीज़ें आपको पोसती हैं, उनके पास बने रहिए — आप टिकी भी रहेंगी और बढ़ती भी।')),
         SpiritualRead(
-            title: 'A little light',
+            title: _t('A little light', 'एक नन्ही रोशनी'),
             body:
-                "A recurring picture is of a small light shining in a dark place. On uncertain nights, your quiet hope can be that small, steady light."),
+                _t("A recurring picture is of a small light shining in a dark place. On uncertain nights, your quiet hope can be that small, steady light.", 'बार-बार लौटकर आने वाली एक तस्वीर है — अँधेरी जगह में जलती एक छोटी-सी रोशनी। जिन रातों में आगे का कुछ साफ़ न दिखे, आपकी चुपचाप उम्मीद ही वह छोटी, टिकी हुई रोशनी है।')),
         SpiritualRead(
-            title: 'Welcomed like a child',
+            title: _t('Welcomed like a child', 'बच्चों-सा स्वागत'),
             body:
-                "One gentle moment shows children being welcomed warmly and held close. Your child is arriving into exactly that kind of welcome."),
+                _t("One gentle moment shows children being welcomed warmly and held close. Your child is arriving into exactly that kind of welcome.", 'एक कोमल पल में बच्चों को गर्मजोशी से बुलाया जाता है और गोद में ले लिया जाता है। आपका बच्चा ठीक वैसे ही स्वागत में आ रहा है।')),
       ]),
-      SpiritualSection(title: 'Figures of faith', reads: [
+      SpiritualSection(title: _t('Figures of faith', 'आस्था की मिसालें'), reads: [
         SpiritualRead(
-            title: "A mother's quiet yes",
+            title: _t("A mother's quiet yes", 'एक माँ की चुपचाप हामी'),
             body:
-                "A figure often reflected on is a young mother who said yes to an unknown, life-changing journey with quiet courage. Every mother's yes to this path carries that same brave tenderness."),
+                _t("A figure often reflected on is a young mother who said yes to an unknown, life-changing journey with quiet courage. Every mother's yes to this path carries that same brave tenderness.", 'जिन पर लोग अक्सर मनन करते हैं, उनमें एक युवा माँ हैं — जिन्होंने चुपचाप हिम्मत के साथ एक अनजान, ज़िंदगी बदल देने वाले सफ़र को हाँ कही। इस राह पर हर माँ की हाँ में वही बहादुर कोमलता होती है।')),
         SpiritualRead(
-            title: 'Treasuring small moments',
+            title: _t('Treasuring small moments', 'छोटे-छोटे पलों को सहेजना'),
             body:
-                "Stories tell of a mother who quietly treasured and pondered the small moments of her child's life. It is a sweet invitation to savour the little wonders, the first flutter, the first scan."),
+                _t("Stories tell of a mother who quietly treasured and pondered the small moments of her child's life. It is a sweet invitation to savour the little wonders, the first flutter, the first scan.", 'कहानियाँ एक ऐसी माँ की बात करती हैं जो अपने बच्चे के जीवन के छोटे-छोटे पलों को चुपचाप सहेजती और उन पर सोचती रहीं। यह एक मीठा न्योता है — नन्हे करिश्मों को जी भरकर महसूस करने का: पहली हलचल, पहला scan।')),
         SpiritualRead(
-            title: 'Faithful through waiting',
+            title: _t('Faithful through waiting', 'इंतज़ार में भी टिका भरोसा'),
             body:
-                "Many honoured figures are remembered for their patience through long waiting. Pregnancy has its own waiting, and steadiness through it is its own kind of faith."),
+                _t("Many honoured figures are remembered for their patience through long waiting. Pregnancy has its own waiting, and steadiness through it is its own kind of faith.", 'बहुत से आदरणीय लोग लंबे इंतज़ार में अपने धीरज के लिए याद किए जाते हैं। गर्भावस्था का अपना इंतज़ार है, और उसमें टिके रहना अपने आप में एक तरह की आस्था है।')),
         SpiritualRead(
-            title: 'Caring hands',
+            title: _t('Caring hands', 'सँभालने वाले हाथ'),
             body:
-                "Tradition is full of people remembered for their gentle, practical care of others. The hands that help you now, and the hands you will offer your child, carry that same goodness."),
+                _t("Tradition is full of people remembered for their gentle, practical care of others. The hands that help you now, and the hands you will offer your child, carry that same goodness.", 'इस परंपरा में ऐसे लोग भरे पड़े हैं जो दूसरों की कोमल, काम आने वाली देखभाल के लिए याद किए जाते हैं। जो हाथ आज आपकी मदद कर रहे हैं, और जो हाथ आप अपने बच्चे को देंगी — दोनों में वही भलाई है।')),
         SpiritualRead(
-            title: 'Welcoming children',
+            title: _t('Welcoming children', 'बच्चों का स्वागत'),
             body:
-                "A tender theme is the special welcome given to children, the sense that they belong close and matter immensely. Your child is arriving into exactly that kind of welcome."),
+                _t("A tender theme is the special welcome given to children, the sense that they belong close and matter immensely. Your child is arriving into exactly that kind of welcome.", 'एक कोमल भाव है — बच्चों को दिया जाने वाला ख़ास स्वागत, यह एहसास कि उनकी जगह बिलकुल पास है और वे बेहद मायने रखते हैं। आपका बच्चा ठीक वैसे ही स्वागत में आ रहा है।')),
         SpiritualRead(
-            title: 'A brave yes',
+            title: _t('A brave yes', 'एक बहादुर हाँ'),
             body:
-                "A figure often reflected on is a young mother who said yes to an unknown, life-changing path with quiet courage. Every mother's yes carries that same brave tenderness."),
+                _t("A figure often reflected on is a young mother who said yes to an unknown, life-changing path with quiet courage. Every mother's yes carries that same brave tenderness.", 'जिन पर लोग अक्सर मनन करते हैं, उनमें एक युवा माँ हैं — जिन्होंने चुपचाप हिम्मत के साथ एक अनजान, ज़िंदगी बदल देने वाली राह को हाँ कही। हर माँ की हाँ में वही बहादुर कोमलता होती है।')),
         SpiritualRead(
-            title: 'Treasuring small wonders',
+            title: _t('Treasuring small wonders', 'नन्हे करिश्मों को सहेजना'),
             body:
-                "Stories tell of a mother who quietly pondered and treasured the small moments of her child's life. It is a sweet invitation to savour the little wonders you are noticing now."),
+                _t("Stories tell of a mother who quietly pondered and treasured the small moments of her child's life. It is a sweet invitation to savour the little wonders you are noticing now.", 'कहानियाँ एक ऐसी माँ की बात करती हैं जो अपने बच्चे के जीवन के छोटे-छोटे पलों पर चुपचाप सोचती और उन्हें सहेजती रहीं। यह एक मीठा न्योता है — आज आप जो नन्हे करिश्मे देख रही हैं, उन्हें जी भरकर महसूस करने का।')),
         SpiritualRead(
-            title: 'Steady through the wait',
+            title: _t('Steady through the wait', 'इंतज़ार में टिके रहना'),
             body:
-                "Many honoured figures are remembered for patience through long waiting. Steadiness through pregnancy's wait is its own quiet faith."),
+                _t("Many honoured figures are remembered for patience through long waiting. Steadiness through pregnancy's wait is its own quiet faith.", 'बहुत से आदरणीय लोग लंबे इंतज़ार के धीरज के लिए याद किए जाते हैं। गर्भावस्था के इंतज़ार में टिके रहना अपने आप में एक चुपचाप आस्था है।')),
         SpiritualRead(
-            title: 'Gentle, practical care',
+            title: _t('Gentle, practical care', 'कोमल, काम आने वाली देखभाल'),
             body:
-                "Tradition is full of people remembered for their humble, hands-on care of others. The hands that help you now carry that same goodness."),
+                _t("Tradition is full of people remembered for their humble, hands-on care of others. The hands that help you now carry that same goodness.", 'इस परंपरा में ऐसे लोग भरे पड़े हैं जो बिना दिखावे के, हाथ बँटाकर दूसरों की देखभाल करने के लिए याद किए जाते हैं। जो हाथ आज आपकी मदद कर रहे हैं, उनमें वही भलाई है।')),
         SpiritualRead(
-            title: 'Children welcomed close',
+            title: _t('Children welcomed close', 'बच्चे, पास बुलाए गए'),
             body:
-                "A tender theme is the warm welcome given to children, the sense that they belong near and matter immensely. Your child is arriving into that welcome."),
+                _t("A tender theme is the warm welcome given to children, the sense that they belong near and matter immensely. Your child is arriving into that welcome.", 'एक कोमल भाव है — बच्चों को दिया जाने वाला गर्मजोशी भरा स्वागत, यह एहसास कि उनकी जगह पास ही है और वे बेहद मायने रखते हैं। आपका बच्चा उसी स्वागत में आ रहा है।')),
         SpiritualRead(
-            title: 'Two expectant mothers',
+            title: _t('Two expectant mothers', 'दो होने वाली माएँ'),
             body:
-                "One warm story tells of two expectant mothers meeting and rejoicing together. It is a lovely picture of how shared joy lightens the wait."),
+                _t("One warm story tells of two expectant mothers meeting and rejoicing together. It is a lovely picture of how shared joy lightens the wait.", 'एक गर्मजोशी भरी कहानी है — दो होने वाली माएँ मिलती हैं और साथ मिलकर ख़ुश होती हैं। यह कितनी सुंदर तस्वीर है कि बाँटी हुई ख़ुशी इंतज़ार को हल्का कर देती है।')),
         SpiritualRead(
-            title: 'A quiet, steady father',
+            title: _t('A quiet, steady father', 'एक चुपचाप, टिका हुआ पिता'),
             body:
-                "Some figures are remembered not for words but for steady, protective care. The calm, dependable love around you now is its own kind of faith."),
+                _t("Some figures are remembered not for words but for steady, protective care. The calm, dependable love around you now is its own kind of faith.", 'कुछ लोग शब्दों के लिए नहीं, अपनी टिकी हुई, सँभालने वाली देखभाल के लिए याद किए जाते हैं। आज आपके आसपास जो शांत, भरोसे वाला प्यार है, वह अपने आप में एक तरह की आस्था है।')),
         SpiritualRead(
-            title: 'Courage in the unknown',
+            title: _t('Courage in the unknown', 'अनजाने रास्ते पर हिम्मत'),
             body:
-                "Many remembered figures stepped into uncertain futures with trust rather than certainty. You are doing the same brave thing, day by day."),
+                _t("Many remembered figures stepped into uncertain futures with trust rather than certainty. You are doing the same brave thing, day by day.", 'याद किए जाने वाले बहुत से लोग अनिश्चित भविष्य में भरोसे के साथ उतरे, पक्के यक़ीन के साथ नहीं। आप भी वही बहादुरी कर रही हैं — एक-एक दिन करके।')),
         SpiritualRead(
-            title: 'Perseverance',
+            title: _t('Perseverance', 'डटे रहना'),
             body:
-                "Stories honour those who kept going through long, hard seasons. Your perseverance through these months is quietly heroic too."),
+                _t("Stories honour those who kept going through long, hard seasons. Your perseverance through these months is quietly heroic too.", 'कहानियाँ उन्हें सराहती हैं जो लंबे, कठिन दौर में भी चलते रहे। इन महीनों में आपका डटे रहना भी चुपचाप एक बहादुरी है।')),
         SpiritualRead(
-            title: 'Hospitality remembered',
+            title: _t('Hospitality remembered', 'जिनकी मेहमाननवाज़ी याद रह गई'),
             body:
-                "Some are remembered simply for opening their homes and hearts. The welcome you are preparing for your baby is that same warmth."),
+                _t("Some are remembered simply for opening their homes and hearts. The welcome you are preparing for your baby is that same warmth.", 'कुछ लोग बस इसलिए याद रहते हैं कि उन्होंने अपने घर और दिल खोल दिए। जो स्वागत आप अपने शिशु के लिए तैयार कर रही हैं, उसमें वही गर्माहट है।')),
         SpiritualRead(
-            title: 'Gentleness as greatness',
+            title: _t('Gentleness as greatness', 'कोमलता ही बड़प्पन'),
             body:
-                "Many honoured figures paired strength with great gentleness. It is a lovely model for motherhood, where tenderness and strength are the same thing."),
+                _t("Many honoured figures paired strength with great gentleness. It is a lovely model for motherhood, where tenderness and strength are the same thing.", 'बहुत से आदरणीय लोगों में ताक़त और गहरी कोमलता साथ-साथ रहीं। माँ बनने के लिए यह कितनी सुंदर मिसाल है, जहाँ नरमी और ताक़त एक ही चीज़ हैं।')),
         SpiritualRead(
-            title: 'Joy at a birth',
+            title: _t('Joy at a birth', 'जन्म की ख़ुशी'),
             body:
-                "Stories often surround a birth with wonder and rejoicing. The joy gathering around your own coming arrival is part of that ancient gladness."),
+                _t("Stories often surround a birth with wonder and rejoicing. The joy gathering around your own coming arrival is part of that ancient gladness.", 'कहानियाँ अक्सर किसी जन्म को अचरज और उत्सव से घेर देती हैं। आपके आने वाले नन्हे के चारों ओर जो ख़ुशी जुट रही है, वह उसी पुरानी ख़ुशी का हिस्सा है।')),
         SpiritualRead(
-            title: 'Trusting the unseen',
+            title: _t('Trusting the unseen', 'जो दिखता नहीं, उस पर भरोसा'),
             body:
-                "Faithful figures are remembered for trusting what they could not yet see. On the days the future feels foggy, that kind of trust can steady you."),
+                _t("Faithful figures are remembered for trusting what they could not yet see. On the days the future feels foggy, that kind of trust can steady you.", 'आस्था वाले लोग इसलिए याद रहते हैं कि उन्होंने उस पर भरोसा किया जो अभी दिख नहीं रहा था। जिन दिनों आगे का रास्ता धुँधला लगे, वैसा भरोसा आपको थाम लेता है।')),
         SpiritualRead(
-            title: 'Caring for the vulnerable',
+            title: _t('Caring for the vulnerable', 'कमज़ोर की देखभाल'),
             body:
-                "A recurring honour goes to those who cared for the small and the weak. In welcoming a tiny, dependent baby, you join that gentle tradition."),
+                _t("A recurring honour goes to those who cared for the small and the weak. In welcoming a tiny, dependent baby, you join that gentle tradition.", 'बार-बार उन्हीं को आदर मिलता है जिन्होंने छोटों और कमज़ोरों का ध्यान रखा। एक नन्हे, आप पर निर्भर शिशु का स्वागत करके आप उसी कोमल परंपरा में शामिल हो रही हैं।')),
         SpiritualRead(
-            title: 'Ordinary people, quiet faith',
+            title: _t('Ordinary people, quiet faith', 'आम लोग, चुपचाप आस्था'),
             body:
-                "Many remembered figures were ordinary people living with quiet faith. Your own ordinary, faithful days are part of the same story."),
+                _t("Many remembered figures were ordinary people living with quiet faith. Your own ordinary, faithful days are part of the same story.", 'याद किए जाने वाले बहुत से लोग आम लोग ही थे, जो चुपचाप अपनी आस्था के साथ जीते रहे। आपके अपने आम, भरोसे से भरे दिन भी उसी कहानी का हिस्सा हैं।')),
       ]),
-      SpiritualSection(title: 'Blessings for mother & baby', reads: [
+      SpiritualSection(title: _t('Blessings for mother & baby', 'माँ और शिशु के लिए आशीर्वाद'), reads: [
         SpiritualRead(
-            title: 'A blessing over you',
+            title: _t('A blessing over you', 'आप पर बरसता आशीर्वाद'),
             body:
-                "Families often speak blessings over an expectant mother, simple wishes for safety, peace and joy. To be wished well, sincerely, is a quiet comfort worth receiving."),
+                _t("Families often speak blessings over an expectant mother, simple wishes for safety, peace and joy. To be wished well, sincerely, is a quiet comfort worth receiving.", 'परिवार अक्सर होने वाली माँ पर आशीर्वाद कहते हैं — सुरक्षा, शांति और ख़ुशी की सीधी-सी दुआएँ। कोई सच्चे मन से आपका भला चाहे — यह एक चुपचाप तसल्ली है, इसे लेने में मत हिचकिए।')),
         SpiritualRead(
-            title: 'Welcomed with love',
+            title: _t('Welcomed with love', 'प्यार से किया गया स्वागत'),
             body:
-                "Many later welcome a baby with a blessing or christening, a celebration of the child joining the family in love. The heart of it is belonging."),
+                _t("Many later welcome a baby with a blessing or christening, a celebration of the child joining the family in love. The heart of it is belonging.", 'बहुत से लोग बाद में शिशु का स्वागत किसी आशीर्वाद या बपतिस्मा की रस्म से करते हैं — इस बात का उत्सव कि बच्चा प्यार के साथ परिवार में शामिल हुआ। इस सबका दिल एक ही बात है: अपनापन।')),
         SpiritualRead(
-            title: 'Held by community',
+            title: _t('Held by community', 'समुदाय की गोद में'),
             body:
-                "Church and community often surround new parents with practical help and encouragement. Letting yourself be carried a little is part of the gift."),
+                _t("Church and community often surround new parents with practical help and encouragement. Letting yourself be carried a little is part of the gift.", 'चर्च और आसपास के लोग अक्सर नए माता-पिता को असली मदद और हौसले से घेर लेते हैं। थोड़ा-सा सहारा ले लेना भी इसी उपहार का हिस्सा है।')),
         SpiritualRead(
-            title: 'A new light',
+            title: _t('A new light', 'एक नई रोशनी'),
             body:
-                "A new child is often spoken of as a light coming into the family. You are, gently, carrying a new light toward the world."),
+                _t("A new child is often spoken of as a light coming into the family. You are, gently, carrying a new light toward the world.", 'नए बच्चे को अक्सर परिवार में आती एक रोशनी कहा जाता है। आप धीरे-धीरे एक नई रोशनी दुनिया की ओर लिए चल रही हैं।')),
         SpiritualRead(
-            title: 'Gratitude and belonging',
+            title: _t('Gratitude and belonging', 'कृतज्ञता और अपनापन'),
             body:
-                "The thread through all of it is gratitude and belonging: this child is wanted, loved and home. That truth is worth resting in."),
+                _t("The thread through all of it is gratitude and belonging: this child is wanted, loved and home. That truth is worth resting in.", 'इस सबसे होकर एक ही धागा गुज़रता है — कृतज्ञता और अपनापन: यह बच्चा चाहा गया है, प्यारा है, और अपने घर आ रहा है। इस सच पर टिककर बैठा जा सकता है।')),
         SpiritualRead(
-            title: 'Wished well',
+            title: _t('Wished well', 'भला चाहा गया'),
             body:
-                "Families often speak simple blessings over an expectant mother, wishes for safety, peace and joy. To be sincerely wished well is a quiet comfort worth receiving."),
+                _t("Families often speak simple blessings over an expectant mother, wishes for safety, peace and joy. To be sincerely wished well is a quiet comfort worth receiving.", 'परिवार अक्सर होने वाली माँ पर सीधे-सादे आशीर्वाद कहते हैं — सुरक्षा, शांति और ख़ुशी की दुआएँ। कोई सच्चे मन से आपका भला चाहे — यह एक चुपचाप तसल्ली है, इसे ले लीजिए।')),
         SpiritualRead(
-            title: 'Welcomed in love',
+            title: _t('Welcomed in love', 'प्यार में स्वागत'),
             body:
-                "Many later welcome a baby with a blessing or christening, celebrating the child joining the family. The heart of it is belonging."),
+                _t("Many later welcome a baby with a blessing or christening, celebrating the child joining the family. The heart of it is belonging.", 'बहुत से लोग बाद में शिशु का स्वागत किसी आशीर्वाद या बपतिस्मा की रस्म से करते हैं, इस बात का उत्सव करते हुए कि बच्चा परिवार में शामिल हुआ। इस सबका दिल एक ही बात है: अपनापन।')),
         SpiritualRead(
-            title: 'Surrounded by help',
+            title: _t('Surrounded by help', 'मदद से घिरा हुआ'),
             body:
-                "Community often surrounds new parents with practical help and encouragement. Letting yourself be carried a little is part of the gift."),
+                _t("Community often surrounds new parents with practical help and encouragement. Letting yourself be carried a little is part of the gift.", 'आसपास के लोग अक्सर नए माता-पिता को असली मदद और हौसले से घेर लेते हैं। थोड़ा-सा सहारा ले लेना भी इसी उपहार का हिस्सा है।')),
         SpiritualRead(
-            title: 'A light arriving',
+            title: _t('A light arriving', 'आती हुई एक रोशनी'),
             body:
-                "A new child is often spoken of as a light coming into the family. You are gently carrying a new light toward the world."),
+                _t("A new child is often spoken of as a light coming into the family. You are gently carrying a new light toward the world.", 'नए बच्चे को अक्सर परिवार में आती एक रोशनी कहा जाता है। आप धीरे से एक नई रोशनी दुनिया की ओर लिए चल रही हैं।')),
         SpiritualRead(
-            title: 'Wanted and home',
+            title: _t('Wanted and home', 'चाहा गया, और अपने घर'),
             body:
-                "A recurring comfort is that this child is wanted, loved and already at home in your heart. That belonging begins long before the birth."),
+                _t("A recurring comfort is that this child is wanted, loved and already at home in your heart. That belonging begins long before the birth.", 'बार-बार लौटने वाली एक तसल्ली यह है कि यह बच्चा चाहा गया है, प्यारा है, और आपके दिल में पहले से ही अपने घर है। यह अपनापन जन्म से बहुत पहले शुरू हो जाता है।')),
         SpiritualRead(
-            title: 'Chosen guardians',
+            title: _t('Chosen guardians', 'चुने हुए रखवाले'),
             body:
-                "Naming godparents or special guardians weaves more love around a child. Your baby will have many hearts looking out for them."),
+                _t("Naming godparents or special guardians weaves more love around a child. Your baby will have many hearts looking out for them.", 'गॉडपैरेंट्स या कोई ख़ास रखवाले चुनना बच्चे के चारों ओर और प्यार बुन देता है। आपके शिशु का ध्यान रखने वाले कई दिल होंगे।')),
         SpiritualRead(
-            title: 'A name blessed',
+            title: _t('A name blessed', 'नाम पर आशीर्वाद'),
             body:
-                "A child's name is often spoken with a blessing, a hope sent with it. Every time it is said, a good wish goes along."),
+                _t("A child's name is often spoken with a blessing, a hope sent with it. Every time it is said, a good wish goes along.", 'बच्चे का नाम अक्सर एक आशीर्वाद के साथ लिया जाता है, उसके साथ एक उम्मीद भेजी जाती है। जब-जब वह नाम पुकारा जाता है, एक दुआ साथ चली जाती है।')),
         SpiritualRead(
-            title: 'Praying for a safe arrival',
+            title: _t('Praying for a safe arrival', 'सुरक्षित आगमन की प्रार्थना'),
             body:
-                "Loved ones often pray simply for a safe, gentle birth. Their quiet hopes are gathering around you and your baby."),
+                _t("Loved ones often pray simply for a safe, gentle birth. Their quiet hopes are gathering around you and your baby.", 'अपने लोग अक्सर बस इतनी-सी प्रार्थना करते हैं — जन्म सुरक्षित हो, कोमल हो। उनकी चुपचाप दुआएँ आपके और आपके शिशु के चारों ओर जुट रही हैं।')),
         SpiritualRead(
-            title: 'A candle lit',
+            title: _t('A candle lit', 'एक जलती मोमबत्ती'),
             body:
-                "Lighting a small candle is a tender way to hold someone in mind with hope. You might light one as you think of your baby."),
+                _t("Lighting a small candle is a tender way to hold someone in mind with hope. You might light one as you think of your baby.", 'एक छोटी मोमबत्ती जलाना किसी को उम्मीद के साथ मन में रखने का बहुत कोमल तरीक़ा है। आप भी अपने शिशु को सोचते हुए एक जला सकती हैं।')),
         SpiritualRead(
-            title: 'Gratitude for the gift',
+            title: _t('Gratitude for the gift', 'उपहार के लिए कृतज्ञता'),
             body:
-                "New life is met with thankfulness for the gift it is. Letting gratitude rise makes the joy fuller."),
+                _t("New life is met with thankfulness for the gift it is. Letting gratitude rise makes the joy fuller.", 'नए जीवन का स्वागत इस कृतज्ञता से होता है कि वह एक उपहार है। कृतज्ञता को उठने दीजिए — ख़ुशी और भर जाती है।')),
         SpiritualRead(
-            title: 'It takes a village',
+            title: _t('It takes a village', 'एक बच्चे को पूरा मोहल्ला पालता है'),
             body:
-                "There is deep wisdom in the idea that a child is raised by a whole community. Letting your village form around you blesses your baby too."),
+                _t("There is deep wisdom in the idea that a child is raised by a whole community. Letting your village form around you blesses your baby too.", 'इस बात में गहरी समझ है कि एक बच्चे को पूरा समाज मिलकर पालता है। अपने आसपास वह घेरा बनने दीजिए — उसका आशीर्वाद आपके शिशु तक भी पहुँचता है।')),
         SpiritualRead(
-            title: 'Hopes for the child',
+            title: _t('Hopes for the child', 'बच्चे के लिए उम्मीदें'),
             body:
-                "Blessings often carry hopes for the child's character, kindness, courage, joy. The hopes you hold now are the first of many."),
+                _t("Blessings often carry hopes for the child's character, kindness, courage, joy. The hopes you hold now are the first of many.", 'आशीर्वादों में अक्सर बच्चे के स्वभाव की उम्मीदें बँधी होती हैं — दया, हिम्मत, ख़ुशी। आज आपके मन में जो उम्मीदें हैं, वे कई में से पहली हैं।')),
         SpiritualRead(
-            title: 'Peace wished over the home',
+            title: _t('Peace wished over the home', 'घर पर शांति की दुआ'),
             body:
-                "Blessings frequently wish peace over the whole household. A calm home is a gift your baby will be born into."),
+                _t("Blessings frequently wish peace over the whole household. A calm home is a gift your baby will be born into.", 'आशीर्वाद अक्सर पूरे घर पर शांति की दुआ देते हैं। एक शांत घर वह उपहार है जिसमें आपका शिशु जन्म लेगा।')),
         SpiritualRead(
-            title: 'Blessed in the waiting',
+            title: _t('Blessed in the waiting', 'इंतज़ार भी आशीर्वाद में'),
             body:
-                "The waiting itself is sometimes blessed, honoured as sacred rather than just endured. Your patient months are part of the gift."),
+                _t("The waiting itself is sometimes blessed, honoured as sacred rather than just endured. Your patient months are part of the gift.", 'कभी-कभी इंतज़ार को भी आशीर्वाद दिया जाता है — उसे बस काटने की चीज़ नहीं, पवित्र माना जाता है। आपके ये धीरज भरे महीने भी उसी उपहार का हिस्सा हैं।')),
         SpiritualRead(
-            title: 'Held and not alone',
+            title: _t('Held and not alone', 'सँभाली हुई, अकेली नहीं'),
             body:
-                "Under every blessing is the reminder that you are held and not alone. Whatever today holds, that remains true."),
+                _t("Under every blessing is the reminder that you are held and not alone. Whatever today holds, that remains true.", 'हर आशीर्वाद के नीचे यही याद दिलाया जाता है कि आप सँभाली हुई हैं, अकेली नहीं। आज जो भी लेकर आए, यह बात सच बनी रहती है।')),
       ]),
     ],
   ),
@@ -1504,173 +1508,173 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'jain',
-    name: 'Jainism',
+    name: _t('Jainism', 'जैन धर्म'),
     symbol: '🤲',
-    blurb: 'Ahimsa, gentleness and a calm, reflective heart.',
+    blurb: _t('Ahimsa, gentleness and a calm, reflective heart.', 'अहिंसा, कोमलता और एक शांत, मनन करता मन।'),
     sections: [
-      SpiritualSection(title: 'Ahimsa & compassion', reads: [
+      SpiritualSection(title: _t('Ahimsa & compassion', 'अहिंसा और करुणा'), reads: [
         SpiritualRead(
-            title: 'Gentleness toward all life',
+            title: _t('Gentleness toward all life', 'हर जीव के प्रति कोमलता'),
             body:
-                "At the heart of Jain thought is ahimsa, a deep gentleness and non-harm toward all living things. As you grow a new life, that reverence for life feels especially close to home."),
+                _t("At the heart of Jain thought is ahimsa, a deep gentleness and non-harm toward all living things. As you grow a new life, that reverence for life feels especially close to home.", 'जैन विचार के केंद्र में अहिंसा है — हर जीव के प्रति गहरी कोमलता और किसी को दुख न पहुँचाने का भाव। जब आप ख़ुद एक नया जीवन पाल रही हों, तो जीवन के प्रति यह आदर और भी अपना-सा लगता है।')),
         SpiritualRead(
-            title: 'A compassionate plate',
+            title: _t('A compassionate plate', 'करुणा से भरी थाली'),
             body:
-                "This compassion often shows up in mindful, vegetarian eating and care not to harm. However you eat, the gentle intention behind it, to do as little harm as you can, is a beautiful one to carry."),
+                _t("This compassion often shows up in mindful, vegetarian eating and care not to harm. However you eat, the gentle intention behind it, to do as little harm as you can, is a beautiful one to carry.", 'यह करुणा अक्सर सोच-समझकर किए गए शाकाहारी भोजन में और किसी को दुख न पहुँचाने की सावधानी में दिखती है। आप जैसा भी खाती हों, उसके पीछे का कोमल भाव — जितना कम हो सके, उतना कम दुख देना — साथ रखने लायक़ सुंदर बात है।')),
         SpiritualRead(
-            title: 'Soft words, soft heart',
+            title: _t('Soft words, soft heart', 'नरम बोल, नरम मन'),
             body:
-                "Non-harm extends to words and thoughts, not just actions, speaking kindly and thinking kindly. A calm, gentle inner world is a soothing place for your baby to grow."),
+                _t("Non-harm extends to words and thoughts, not just actions, speaking kindly and thinking kindly. A calm, gentle inner world is a soothing place for your baby to grow.", 'अहिंसा सिर्फ़ कामों तक नहीं, बोल और विचार तक जाती है — मीठा बोलना और मीठा सोचना। एक शांत, कोमल भीतरी दुनिया आपके शिशु के पलने के लिए बहुत सुकून भरी जगह है।')),
         SpiritualRead(
-            title: 'Doing less harm, gently',
+            title: _t('Doing less harm, gently', 'कम दुख, धीरे-धीरे'),
             body:
-                "Jain practice is realistic: it is about reducing harm with care, not achieving perfection. The same grace applies to pregnancy, small kind choices without pressure."),
+                _t("Jain practice is realistic: it is about reducing harm with care, not achieving perfection. The same grace applies to pregnancy, small kind choices without pressure.", 'जैन साधना ज़मीन से जुड़ी है: बात दुख को ध्यान से घटाने की है, सब कुछ परिपूर्ण कर देने की नहीं। यही छूट गर्भावस्था पर भी लागू होती है — छोटे-छोटे अच्छे चुनाव, बिना किसी दबाव के।')),
         SpiritualRead(
-            title: 'Reverence for the small',
+            title: _t('Reverence for the small', 'छोटे के लिए आदर'),
             body:
-                "There is a tender attention here to even the smallest forms of life. It is a lovely lens for these months, when the smallest of beginnings, your baby, means everything."),
+                _t("There is a tender attention here to even the smallest forms of life. It is a lovely lens for these months, when the smallest of beginnings, your baby, means everything.", 'यहाँ सबसे नन्हे जीवों तक पर एक कोमल ध्यान रखा जाता है। इन महीनों को देखने के लिए यह कितना सुंदर नज़रिया है, जब सबसे छोटी-सी शुरुआत — आपका शिशु — ही सब कुछ है।')),
         SpiritualRead(
-            title: 'Reverence for life',
+            title: _t('Reverence for life', 'जीवन के लिए आदर'),
             body:
-                "At the heart of Jain thought is a deep gentleness toward all living things. As you grow a new life, that reverence feels especially close to home."),
+                _t("At the heart of Jain thought is a deep gentleness toward all living things. As you grow a new life, that reverence feels especially close to home.", 'जैन विचार के केंद्र में हर जीव के प्रति गहरी कोमलता है। जब आप ख़ुद एक नया जीवन पाल रही हों, तो यह आदर और भी अपना-सा लगता है।')),
         SpiritualRead(
-            title: 'A gentle plate',
+            title: _t('A gentle plate', 'एक कोमल थाली'),
             body:
-                "Compassion often shows up in mindful, gentle eating. However you eat, the kind intention, to do as little harm as you can, is a beautiful one to carry."),
+                _t("Compassion often shows up in mindful, gentle eating. However you eat, the kind intention, to do as little harm as you can, is a beautiful one to carry.", 'करुणा अक्सर सोच-समझकर किए गए, कोमल भोजन में दिखती है। आप जैसा भी खाती हों, वह अच्छा भाव — जितना कम हो सके, उतना कम दुख देना — साथ रखने लायक़ सुंदर बात है।')),
         SpiritualRead(
-            title: 'Soft words, soft thoughts',
+            title: _t('Soft words, soft thoughts', 'नरम बोल, नरम विचार'),
             body:
-                "Non-harm reaches into words and thoughts, not just actions. A calm, gentle inner world is a soothing place for your baby to grow."),
+                _t("Non-harm reaches into words and thoughts, not just actions. A calm, gentle inner world is a soothing place for your baby to grow.", 'अहिंसा सिर्फ़ कामों तक नहीं, बोल और विचार तक पहुँचती है। एक शांत, कोमल भीतरी दुनिया आपके शिशु के पलने के लिए बहुत सुकून भरी जगह है।')),
         SpiritualRead(
-            title: 'Gentler, not perfect',
+            title: _t('Gentler, not perfect', 'और कोमल, परिपूर्ण नहीं'),
             body:
-                "Jain practice is realistic: it is about reducing harm with care, not perfection. The same grace fits pregnancy, small kind choices without pressure."),
+                _t("Jain practice is realistic: it is about reducing harm with care, not perfection. The same grace fits pregnancy, small kind choices without pressure.", 'जैन साधना ज़मीन से जुड़ी है: बात दुख को ध्यान से घटाने की है, परिपूर्णता की नहीं। यही छूट गर्भावस्था पर भी बैठती है — छोटे-छोटे अच्छे चुनाव, बिना दबाव के।')),
         SpiritualRead(
-            title: 'Honouring the small',
+            title: _t('Honouring the small', 'छोटे का मान'),
             body:
-                "There is tender attention here to even the smallest forms of life. It is a lovely lens now, when the smallest beginning, your baby, means everything."),
+                _t("There is tender attention here to even the smallest forms of life. It is a lovely lens now, when the smallest beginning, your baby, means everything.", 'यहाँ सबसे नन्हे जीवों तक पर एक कोमल ध्यान है। अभी यह कितना सुंदर नज़रिया है, जब सबसे छोटी शुरुआत — आपका शिशु — ही सब कुछ है।')),
         SpiritualRead(
-            title: 'Compassion for yourself',
+            title: _t('Compassion for yourself', 'अपने लिए भी करुणा'),
             body:
-                "Gentleness toward all beings includes yourself. Be as careful and kind with your own body and heart as you would be with any living thing."),
+                _t("Gentleness toward all beings includes yourself. Be as careful and kind with your own body and heart as you would be with any living thing.", 'हर जीव के प्रति कोमलता में आप भी शामिल हैं। अपने शरीर और अपने मन के साथ उतनी ही सावधानी और नरमी बरतिए, जितनी आप किसी भी जीव के साथ बरततीं।')),
         SpiritualRead(
-            title: 'Careful steps',
+            title: _t('Careful steps', 'सँभलकर रखे क़दम'),
             body:
-                "A mindful awareness of one's effect on the world is treasured. Moving through your days a little more gently is care for two."),
+                _t("A mindful awareness of one's effect on the world is treasured. Moving through your days a little more gently is care for two.", 'यहाँ इस बात का ध्यान रखा जाता है कि हमारा असर दुनिया पर क्या पड़ रहा है। अपने दिनों में ज़रा और कोमलता से चलना — यह दो जनों की देखभाल है।')),
         SpiritualRead(
-            title: 'Kindness to creatures',
+            title: _t('Kindness to creatures', 'जीव-जंतुओं पर दया'),
             body:
-                "Tenderness toward animals and small creatures is part of this gentleness. Noticing and protecting little lives is a sweet habit to model."),
+                _t("Tenderness toward animals and small creatures is part of this gentleness. Noticing and protecting little lives is a sweet habit to model.", 'जानवरों और छोटे जीवों के प्रति नरमी इसी कोमलता का हिस्सा है। नन्ही जानों को देखना और बचाना — बच्चे को दिखाने लायक़ एक मीठी आदत है।')),
         SpiritualRead(
-            title: 'Peace begins within',
+            title: _t('Peace begins within', 'शांति भीतर से शुरू होती है'),
             body:
-                "A peaceful outer life is seen to begin with a peaceful heart. Tending your own calm quietly tends your baby's world."),
+                _t("A peaceful outer life is seen to begin with a peaceful heart. Tending your own calm quietly tends your baby's world.", 'यहाँ माना जाता है कि बाहर की शांति भीतर के शांत मन से शुरू होती है। अपने ठहराव का ध्यान रखना चुपचाप आपके शिशु की दुनिया का ध्यान रखना है।')),
         SpiritualRead(
-            title: 'The path of least harm',
+            title: _t('The path of least harm', 'सबसे कम दुख वाला रास्ता'),
             body:
-                "The aim is to choose, again and again, the path of least harm. In pregnancy that can simply mean gentler choices, made without guilt."),
+                _t("The aim is to choose, again and again, the path of least harm. In pregnancy that can simply mean gentler choices, made without guilt.", 'कोशिश यही रहती है कि बार-बार वही रास्ता चुना जाए जिसमें सबसे कम दुख हो। गर्भावस्था में इसका मतलब बस इतना है — थोड़े और कोमल चुनाव, बिना अपराध-बोध के।')),
         SpiritualRead(
-            title: 'Patience as non-harm',
+            title: _t('Patience as non-harm', 'धीरज भी अहिंसा है'),
             body:
-                "Patience itself is a kind of gentleness, sparing others and yourself sharp edges. On hard days, a patient pause is a small act of care."),
+                _t("Patience itself is a kind of gentleness, sparing others and yourself sharp edges. On hard days, a patient pause is a small act of care.", 'धीरज अपने आप में एक तरह की कोमलता है — दूसरों को और ख़ुद को तीखी चोट से बचा लेना। मुश्किल दिनों में एक धैर्य भरा ठहराव भी देखभाल का छोटा-सा काम है।')),
         SpiritualRead(
-            title: 'Respect woven in',
+            title: _t('Respect woven in', 'आदर, रोज़ में बुना हुआ'),
             body:
-                "Respect for life threads through ordinary actions, how you speak, eat and move. Let that respect include the little life you carry."),
+                _t("Respect for life threads through ordinary actions, how you speak, eat and move. Let that respect include the little life you carry.", 'जीवन के लिए आदर रोज़ के कामों में बुना रहता है — आप कैसे बोलती हैं, खाती हैं, चलती हैं। उस आदर में उस नन्ही जान को भी शामिल कीजिए जिसे आप लिए चल रही हैं।')),
         SpiritualRead(
-            title: 'A gentle home',
+            title: _t('A gentle home', 'एक कोमल घर'),
             body:
-                "Building a calm, harm-light home is a quiet expression of this value. Your baby will be born into the gentleness you create."),
+                _t("Building a calm, harm-light home is a quiet expression of this value. Your baby will be born into the gentleness you create.", 'एक शांत घर बनाना, जहाँ किसी को कम से कम दुख पहुँचे, इसी भाव को चुपचाप जीना है। आप जो कोमलता बना रही हैं, आपका शिशु उसी में जन्म लेगा।')),
         SpiritualRead(
-            title: 'Gratitude for being alive',
+            title: _t('Gratitude for being alive', 'जीने की कृतज्ञता'),
             body:
-                "There is wonder here at the gift of life itself. Pausing in awe that a new life is forming in you is its own gentle practice."),
+                _t("There is wonder here at the gift of life itself. Pausing in awe that a new life is forming in you is its own gentle practice.", 'यहाँ जीवन के उपहार पर ही अचरज है। एक पल ठहरकर यह महसूस करना कि आपके भीतर एक नया जीवन बन रहा है — यह अपने आप में एक कोमल साधना है।')),
         SpiritualRead(
-            title: 'Kindness, repeated',
+            title: _t('Kindness, repeated', 'दया, बार-बार'),
             body:
-                "Compassion is treated as a daily practice, returned to again and again. Each small kind choice strengthens it, and your child will feel that warmth."),
+                _t("Compassion is treated as a daily practice, returned to again and again. Each small kind choice strengthens it, and your child will feel that warmth.", 'करुणा को रोज़ की साधना माना जाता है, जिस पर बार-बार लौटा जाता है। हर छोटा दयालु चुनाव उसे और मज़बूत करता है, और आपका बच्चा उस गर्माहट को महसूस करेगा।')),
       ]),
-      SpiritualSection(title: 'Calm reflections', reads: [
+      SpiritualSection(title: _t('Calm reflections', 'शांत मनन'), reads: [
         SpiritualRead(
-            title: 'Letting go lightly',
+            title: _t('Letting go lightly', 'हल्के हाथों से छोड़ देना'),
             body:
-                "Jain wisdom values non-attachment, holding life's ups and downs a little more lightly. On anxious days, gently loosening your grip on what you cannot control can bring real relief."),
+                _t("Jain wisdom values non-attachment, holding life's ups and downs a little more lightly. On anxious days, gently loosening your grip on what you cannot control can bring real relief.", 'जैन समझ अनासक्ति को मानती है — जीवन के उतार-चढ़ाव को ज़रा हल्के हाथों से थामना। घबराहट वाले दिनों में जो आपके बस में नहीं, उस पर पकड़ धीरे से ढीली कर देना सचमुच राहत देता है।')),
         SpiritualRead(
-            title: 'Stillness as strength',
+            title: _t('Stillness as strength', 'ठहराव में ताक़त'),
             body:
-                "Quiet, reflective stillness is treasured, a settling of the restless mind. A few still minutes a day are a gift to both you and your baby."),
+                _t("Quiet, reflective stillness is treasured, a settling of the restless mind. A few still minutes a day are a gift to both you and your baby.", 'यहाँ चुपचाप, मनन भरे ठहराव को बहुत माना जाता है — बेचैन मन का बैठ जाना। दिन के कुछ ठहरे हुए मिनट आपके और आपके शिशु, दोनों के लिए उपहार हैं।')),
         SpiritualRead(
-            title: 'A kind look inward',
+            title: _t('A kind look inward', 'भीतर की ओर एक नरम नज़र'),
             body:
-                "Looking honestly and kindly at your own heart is encouraged, not to judge but to grow. A gentle nightly check-in can be calming rather than critical."),
+                _t("Looking honestly and kindly at your own heart is encouraged, not to judge but to grow. A gentle nightly check-in can be calming rather than critical.", 'अपने मन को सच्चाई और नरमी से देखना यहाँ अच्छा माना जाता है — ख़ुद को तौलने के लिए नहीं, बढ़ने के लिए। रात को अपने आप से एक कोमल हाल-चाल पूछना डाँट नहीं, तसल्ली बन सकता है।')),
         SpiritualRead(
-            title: 'Forgiveness and a fresh start',
+            title: _t('Forgiveness and a fresh start', 'क्षमा और एक नई शुरुआत'),
             body:
-                "Jain tradition cherishes forgiveness, letting go of grudges and beginning again. Releasing old weight makes room for the new life ahead."),
+                _t("Jain tradition cherishes forgiveness, letting go of grudges and beginning again. Releasing old weight makes room for the new life ahead.", 'जैन परंपरा में क्षमा को बहुत सहेजा जाता है — मन की गाँठें छोड़ देना और फिर से शुरू करना। पुराना बोझ उतार देने से आगे आने वाले नए जीवन के लिए जगह बनती है।')),
         SpiritualRead(
-            title: 'Peace from within',
+            title: _t('Peace from within', 'भीतर से उगी शांति'),
             body:
-                "Lasting peace, in this view, is grown from the inside out. The calm you cultivate now is something you carry into motherhood."),
+                _t("Lasting peace, in this view, is grown from the inside out. The calm you cultivate now is something you carry into motherhood.", 'इस नज़रिए में टिकने वाली शांति भीतर से बाहर की ओर उगती है। जो ठहराव आप अभी उगा रही हैं, वही आप माँ बनकर साथ ले जाएँगी।')),
         SpiritualRead(
-            title: 'Holding lightly',
+            title: _t('Holding lightly', 'हल्के हाथ से थामना'),
             body:
-                "Jain wisdom values holding life's ups and downs a little more lightly. On anxious days, loosening your grip on what you cannot control brings relief."),
+                _t("Jain wisdom values holding life's ups and downs a little more lightly. On anxious days, loosening your grip on what you cannot control brings relief.", 'जैन समझ कहती है कि जीवन के उतार-चढ़ाव को ज़रा हल्के हाथों से थामिए। घबराहट वाले दिनों में जो आपके बस में नहीं, उस पर पकड़ ढीली करना राहत देता है।')),
         SpiritualRead(
-            title: 'The strength in stillness',
+            title: _t('The strength in stillness', 'ठहराव की ताक़त'),
             body:
-                "Quiet, reflective stillness is treasured, a settling of the restless mind. A few still minutes a day are a gift to you and your baby."),
+                _t("Quiet, reflective stillness is treasured, a settling of the restless mind. A few still minutes a day are a gift to you and your baby.", 'चुपचाप, मनन भरे ठहराव को यहाँ बहुत माना जाता है — बेचैन मन का बैठ जाना। दिन के कुछ ठहरे हुए मिनट आपके और आपके शिशु के लिए उपहार हैं।')),
         SpiritualRead(
-            title: 'A gentle look within',
+            title: _t('A gentle look within', 'भीतर एक कोमल झाँक'),
             body:
-                "Looking honestly and gently at your own heart is encouraged, not to judge but to grow. A soft nightly check-in can calm rather than criticise."),
+                _t("Looking honestly and gently at your own heart is encouraged, not to judge but to grow. A soft nightly check-in can calm rather than criticise.", 'अपने मन में सच्चाई और कोमलता से झाँकना यहाँ अच्छा माना जाता है — तौलने के लिए नहीं, बढ़ने के लिए। रात को अपने आप से एक नरम हाल-चाल पूछना आलोचना नहीं, शांति देता है।')),
         SpiritualRead(
-            title: 'The relief of forgiving',
+            title: _t('The relief of forgiving', 'माफ़ कर देने की राहत'),
             body:
-                "Forgiveness, letting go of grudges and beginning again, is cherished. Releasing old weight makes room for the new life ahead."),
+                _t("Forgiveness, letting go of grudges and beginning again, is cherished. Releasing old weight makes room for the new life ahead.", 'क्षमा — मन की गाँठें छोड़ देना और फिर से शुरू करना — यहाँ बहुत सहेजी जाती है। पुराना बोझ उतार देने से आगे आने वाले नए जीवन के लिए जगह बनती है।')),
         SpiritualRead(
-            title: 'Peace grown within',
+            title: _t('Peace grown within', 'भीतर उगाई गई शांति'),
             body:
-                "Lasting peace, in this view, is grown from the inside out. The calm you cultivate now you carry into motherhood."),
+                _t("Lasting peace, in this view, is grown from the inside out. The calm you cultivate now you carry into motherhood.", 'इस नज़रिए में टिकने वाली शांति भीतर से बाहर की ओर उगती है। जो ठहराव आप अभी उगा रही हैं, वही माँ बनकर साथ ले जाएँगी।')),
         SpiritualRead(
-            title: 'Even-hearted days',
+            title: _t('Even-hearted days', 'एक-से मन वाले दिन'),
             body:
-                "Meeting good and hard moments with a steady heart is admired. Some days glow and some ache; both pass, and neither is the whole."),
+                _t("Meeting good and hard moments with a steady heart is admired. Some days glow and some ache; both pass, and neither is the whole.", 'अच्छे और कठिन, दोनों पलों को एक-से मन से मिलना यहाँ सराहा जाता है। कुछ दिन चमकते हैं, कुछ में टीस रहती है; दोनों गुज़र जाते हैं, और कोई भी पूरी कहानी नहीं है।')),
         SpiritualRead(
-            title: 'Simplicity soothes',
+            title: _t('Simplicity soothes', 'सादगी सुकून देती है'),
             body:
-                "A simpler life is seen to quiet the mind. Trimming your days to what truly matters can be its own calm."),
+                _t("A simpler life is seen to quiet the mind. Trimming your days to what truly matters can be its own calm.", 'यहाँ माना जाता है कि सादा जीवन मन को चुप करा देता है। अपने दिनों को छाँटकर उतना ही रखना जो सचमुच मायने रखता है — यह अपने आप में एक शांति है।')),
         SpiritualRead(
-            title: 'Loosening control',
+            title: _t('Loosening control', 'पकड़ ढीली करना'),
             body:
-                "Much suffering is said to come from gripping too tightly. Letting the uncontrollable parts of pregnancy simply be can ease the heart."),
+                _t("Much suffering is said to come from gripping too tightly. Letting the uncontrollable parts of pregnancy simply be can ease the heart.", 'कहा जाता है कि बहुत सारा दुख बहुत कसकर पकड़ लेने से आता है। गर्भावस्था के जो हिस्से आपके हाथ में नहीं, उन्हें बस होने देना मन को हल्का कर देता है।')),
         SpiritualRead(
-            title: 'Contentment within reach',
+            title: _t('Contentment within reach', 'संतोष, हाथ भर की दूरी पर'),
             body:
-                "Contentment, being at peace with what is, is a deep wealth. Small enough-for-now moments are worth pausing on."),
+                _t("Contentment, being at peace with what is, is a deep wealth. Small enough-for-now moments are worth pausing on.", 'संतोष — जो है उससे मन का राज़ी हो जाना — एक गहरी दौलत है। छोटे-छोटे “अभी के लिए इतना काफ़ी है” वाले पलों पर ठहरना बनता है।')),
         SpiritualRead(
-            title: 'Patience practised',
+            title: _t('Patience practised', 'धीरज, अभ्यास से'),
             body:
-                "Patience is treated as something you grow with practice. Each calm pause through a long day strengthens it."),
+                _t("Patience is treated as something you grow with practice. Each calm pause through a long day strengthens it.", 'धीरज को यहाँ ऐसी चीज़ माना जाता है जो अभ्यास से बढ़ती है। लंबे दिन के बीच हर शांत ठहराव उसे और मज़बूत करता है।')),
         SpiritualRead(
-            title: 'Inner freedom',
+            title: _t('Inner freedom', 'भीतर की आज़ादी'),
             body:
-                "A quiet freedom comes from needing less and grasping less. That lightness is a gift you can give yourself now."),
+                _t("A quiet freedom comes from needing less and grasping less. That lightness is a gift you can give yourself now.", 'कम चाहने और कम पकड़ने से एक चुपचाप आज़ादी आती है। यह हल्कापन एक उपहार है जो आप अभी ख़ुद को दे सकती हैं।')),
         SpiritualRead(
-            title: 'Gentle discipline',
+            title: _t('Gentle discipline', 'कोमल अनुशासन'),
             body:
-                "Self-care here is gentle, steady, never harsh. Kind, consistent habits serve you better than strict ones."),
+                _t("Self-care here is gentle, steady, never harsh. Kind, consistent habits serve you better than strict ones.", 'यहाँ अपनी देखभाल कोमल है, टिकी हुई है, कभी कठोर नहीं। नरम और लगातार चलने वाली आदतें सख़्त आदतों से कहीं ज़्यादा काम आती हैं।')),
         SpiritualRead(
-            title: 'Beginning again',
+            title: _t('Beginning again', 'फिर से शुरू करना'),
             body:
-                "There is grace in beginning again after a hard day, without self-blame. Tomorrow is always a fresh page."),
+                _t("There is grace in beginning again after a hard day, without self-blame. Tomorrow is always a fresh page.", 'मुश्किल दिन के बाद बिना ख़ुद को दोष दिए फिर से शुरू कर देने में एक सुंदरता है। कल हमेशा एक कोरा पन्ना होता है।')),
         SpiritualRead(
-            title: 'Quiet over noise',
+            title: _t('Quiet over noise', 'शोर के बजाय चुप्पी'),
             body:
-                "Calm is found by turning down the noise, outer and inner. Choosing a little quiet is choosing peace for two."),
+                _t("Calm is found by turning down the noise, outer and inner. Choosing a little quiet is choosing peace for two.", 'ठहराव शोर को धीमा करने से मिलता है — बाहर का भी, भीतर का भी। थोड़ी-सी चुप्पी चुनना दो जनों के लिए शांति चुनना है।')),
         SpiritualRead(
-            title: 'A settled heart',
+            title: _t('A settled heart', 'एक बैठा हुआ मन'),
             body:
-                "A settled heart is treated as the ground of a good life. Tending yours is among the kindest things you can do for your baby."),
+                _t("A settled heart is treated as the ground of a good life. Tending yours is among the kindest things you can do for your baby.", 'एक बैठे हुए मन को अच्छे जीवन की ज़मीन माना जाता है। अपने मन का ध्यान रखना उन सबसे अच्छी चीज़ों में से है जो आप अपने शिशु के लिए कर सकती हैं।')),
       ]),
     ],
   ),
@@ -1680,255 +1684,255 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'buddhist',
-    name: 'Buddhism',
+    name: _t('Buddhism', 'बौद्ध धर्म'),
     symbol: '☸️',
-    blurb: 'Mindfulness, loving-kindness and gentle calm.',
+    blurb: _t('Mindfulness, loving-kindness and gentle calm.', 'सजगता, मैत्री और एक कोमल ठहराव।'),
     sections: [
-      SpiritualSection(title: 'Mindfulness & calm', reads: [
+      SpiritualSection(title: _t('Mindfulness & calm', 'सजगता और ठहराव'), reads: [
         SpiritualRead(
-            title: 'One breath at a time',
+            title: _t('One breath at a time', 'एक साँस, एक बार में'),
             body:
-                "Mindfulness, simply being present one breath at a time, is at the core of Buddhist practice. When pregnancy feels overwhelming, returning to this breath, right now, is always available to you."),
+                _t("Mindfulness, simply being present one breath at a time, is at the core of Buddhist practice. When pregnancy feels overwhelming, returning to this breath, right now, is always available to you.", 'सजगता — बस एक-एक साँस के साथ यहीं मौजूद रहना — बौद्ध साधना का केंद्र है। जब गर्भावस्था भारी लगने लगे, तो इसी साँस पर, अभी इसी पल में लौट आना हमेशा आपके पास है।')),
         SpiritualRead(
-            title: 'Noticing without judging',
+            title: _t('Noticing without judging', 'देखिए, तौलिए मत'),
             body:
-                "A gentle skill here is noticing feelings as they come and go, without grabbing or fighting them. Emotions, like weather, pass, and you can watch them with kindness."),
+                _t("A gentle skill here is noticing feelings as they come and go, without grabbing or fighting them. Emotions, like weather, pass, and you can watch them with kindness.", 'यहाँ एक कोमल हुनर है — भावनाओं को आते-जाते देखते रहना, न उन्हें पकड़ना, न उनसे लड़ना। मन के भाव मौसम की तरह गुज़र जाते हैं, और आप उन्हें नरमी से देख सकती हैं।')),
         SpiritualRead(
-            title: 'This moment is enough',
+            title: _t('This moment is enough', 'यही पल काफ़ी है'),
             body:
-                "Much of this teaching points to the peace of the present moment rather than the imagined future. A hand on your bump, a slow breath: this moment, just as it is, can be enough."),
+                _t("Much of this teaching points to the peace of the present moment rather than the imagined future. A hand on your bump, a slow breath: this moment, just as it is, can be enough.", 'इस सीख का बड़ा हिस्सा कल्पना के भविष्य की नहीं, इसी पल की शांति की ओर इशारा करता है। पेट पर एक हाथ, एक धीमी साँस — यह पल, जैसा है वैसा ही, काफ़ी हो सकता है।')),
         SpiritualRead(
-            title: 'Calm is contagious',
+            title: _t('Calm is contagious', 'ठहराव फैलता है'),
             body:
-                "A settled, mindful state ripples outward to those near you, including your baby. Tending your own calm is quietly tending theirs."),
+                _t("A settled, mindful state ripples outward to those near you, including your baby. Tending your own calm is quietly tending theirs.", 'एक बैठा हुआ, सजग मन आसपास वालों तक लहर की तरह पहुँचता है — आपके शिशु तक भी। अपने ठहराव का ध्यान रखना चुपचाप उसके ठहराव का ध्यान रखना है।')),
         SpiritualRead(
-            title: 'Back to the breath',
+            title: _t('Back to the breath', 'फिर साँस पर'),
             body:
-                "Mindfulness, being present one breath at a time, is at the core of this practice. When pregnancy feels overwhelming, this breath, right now, is always available."),
+                _t("Mindfulness, being present one breath at a time, is at the core of this practice. When pregnancy feels overwhelming, this breath, right now, is always available.", 'सजगता — एक-एक साँस के साथ यहीं मौजूद रहना — इस साधना का केंद्र है। जब गर्भावस्था भारी लगने लगे, तो यह साँस, अभी इसी पल की, हमेशा मौजूद है।')),
         SpiritualRead(
-            title: 'Noticing, not judging',
+            title: _t('Noticing, not judging', 'देखना, तौलना नहीं'),
             body:
-                "A gentle skill is noticing feelings as they come and go without grabbing or fighting them. Emotions, like weather, pass, and you can watch them kindly."),
+                _t("A gentle skill is noticing feelings as they come and go without grabbing or fighting them. Emotions, like weather, pass, and you can watch them kindly.", 'एक कोमल हुनर यह है — भावनाओं को आते-जाते देखना, न पकड़ना, न लड़ना। मन के भाव मौसम की तरह गुज़र जाते हैं, और आप उन्हें नरमी से देख सकती हैं।')),
         SpiritualRead(
-            title: 'Enough, right now',
+            title: _t('Enough, right now', 'अभी, इतना काफ़ी'),
             body:
-                "Much of this points to the peace of the present rather than the imagined future. A hand on your bump, a slow breath, this moment can be enough."),
+                _t("Much of this points to the peace of the present rather than the imagined future. A hand on your bump, a slow breath, this moment can be enough.", 'इसका बड़ा हिस्सा कल्पना के भविष्य की नहीं, इसी पल की शांति की ओर इशारा करता है। पेट पर एक हाथ, एक धीमी साँस — यह पल काफ़ी हो सकता है।')),
         SpiritualRead(
-            title: 'Calm spreads',
+            title: _t('Calm spreads', 'ठहराव फैल जाता है'),
             body:
-                "A settled, mindful state ripples to those near you, including your baby. Tending your calm is quietly tending theirs."),
+                _t("A settled, mindful state ripples to those near you, including your baby. Tending your calm is quietly tending theirs.", 'एक बैठा हुआ, सजग मन आसपास वालों तक पहुँचता है — आपके शिशु तक भी। अपने ठहराव का ध्यान रखना चुपचाप उसके ठहराव का ध्यान रखना है।')),
         SpiritualRead(
-            title: 'Everything changes',
+            title: _t('Everything changes', 'सब कुछ बदलता है'),
             body:
-                "A core idea is that all things shift and pass, the hard moments too. Remembering this can soften a difficult day."),
+                _t("A core idea is that all things shift and pass, the hard moments too. Remembering this can soften a difficult day.", 'एक मूल बात यह है कि सब कुछ बदलता है और गुज़र जाता है — कठिन पल भी। यह याद रहे तो मुश्किल दिन नरम पड़ जाता है।')),
         SpiritualRead(
-            title: 'A fresh look',
+            title: _t('A fresh look', 'एक नई नज़र'),
             body:
-                "Meeting things with a beginner's openness, as if new, brings wonder back. Each scan and flutter can be met with fresh eyes."),
+                _t("Meeting things with a beginner's openness, as if new, brings wonder back. Each scan and flutter can be met with fresh eyes.", 'हर चीज़ को नौसिखिए के खुलेपन से, नया मानकर मिलना — अचरज लौटा लाता है। हर scan और हर हलचल को नई आँखों से देखा जा सकता है।')),
         SpiritualRead(
-            title: 'A gentle body scan',
+            title: _t('A gentle body scan', 'शरीर पर एक कोमल नज़र'),
             body:
-                "Slowly noticing the body, part by part, with kindness, can release held tension. A few minutes of this is soothing for two."),
+                _t("Slowly noticing the body, part by part, with kindness, can release held tension. A few minutes of this is soothing for two.", 'अपने शरीर को धीरे-धीरे, एक-एक हिस्से से, नरमी के साथ महसूस करना जमा हुआ तनाव छोड़ देता है। इसके कुछ मिनट दो जनों को सुकून देते हैं।')),
         SpiritualRead(
-            title: 'Mindful steps',
+            title: _t('Mindful steps', 'सजग क़दम'),
             body:
-                "Even a slow, attentive walk can become a calming practice. Feeling each step roots you in the present."),
+                _t("Even a slow, attentive walk can become a calming practice. Feeling each step roots you in the present.", 'एक धीमी, ध्यान से चली गई सैर भी शांति की साधना बन सकती है। हर क़दम को महसूस करना आपको इसी पल में जमा देता है।')),
         SpiritualRead(
-            title: 'Thoughts drifting by',
+            title: _t('Thoughts drifting by', 'बहते हुए विचार'),
             body:
-                "Thoughts can be watched like leaves floating past on a stream. You need not chase each one; let them drift."),
+                _t("Thoughts can be watched like leaves floating past on a stream. You need not chase each one; let them drift.", 'विचारों को ऐसे देखा जा सकता है जैसे धारा पर बहती पत्तियाँ। हर एक के पीछे भागने की ज़रूरत नहीं; उन्हें बहने दीजिए।')),
         SpiritualRead(
-            title: 'Kindness to this moment',
+            title: _t('Kindness to this moment', 'इस पल के साथ नरमी'),
             body:
-                "Meeting the present moment gently, whatever it holds, is the practice. Even a tiring moment can be met without resistance."),
+                _t("Meeting the present moment gently, whatever it holds, is the practice. Even a tiring moment can be met without resistance.", 'इस पल में जो भी हो, उससे कोमलता से मिलना ही साधना है। थका देने वाले पल से भी बिना अड़े मिला जा सकता है।')),
         SpiritualRead(
-            title: 'Gentle attention',
+            title: _t('Gentle attention', 'कोमल ध्यान'),
             body:
-                "Bringing soft, curious attention to ordinary things, tea, light, breath, can calm the mind. Small noticing is a doorway to peace."),
+                _t("Bringing soft, curious attention to ordinary things, tea, light, breath, can calm the mind. Small noticing is a doorway to peace.", 'मामूली चीज़ों पर नरम, जिज्ञासु ध्यान ले जाना — चाय, रोशनी, साँस — मन को शांत कर देता है। छोटी-छोटी बातों को देखना शांति का दरवाज़ा है।')),
         SpiritualRead(
-            title: 'Always returning',
+            title: _t('Always returning', 'हमेशा लौट आना'),
             body:
-                "The practice is not to never wander but to keep returning. Each gentle return is the whole of it."),
+                _t("The practice is not to never wander but to keep returning. Each gentle return is the whole of it.", 'साधना यह नहीं कि मन कभी भटके ही नहीं — साधना यह है कि हर बार लौट आइए। हर कोमल वापसी ही पूरी साधना है।')),
         SpiritualRead(
-            title: 'Present with your baby',
+            title: _t('Present with your baby', 'अपने शिशु के साथ, इसी पल में'),
             body:
-                "A few quiet, present minutes with a hand on your bump deepen the bond. Your baby shares in your settled attention."),
+                _t("A few quiet, present minutes with a hand on your bump deepen the bond. Your baby shares in your settled attention.", 'पेट पर हाथ रखकर बिताए कुछ चुप, मौजूद मिनट रिश्ते को गहरा करते हैं। आपका ठहरा हुआ ध्यान आपके शिशु तक भी पहुँचता है।')),
         SpiritualRead(
-            title: 'Ease over effort',
+            title: _t('Ease over effort', 'ज़ोर नहीं, सहजता'),
             body:
-                "Calm is invited, not forced; striving for peace can undo it. Let ease come gently, on its own time."),
+                _t("Calm is invited, not forced; striving for peace can undo it. Let ease come gently, on its own time.", 'ठहराव को बुलाया जाता है, ज़बरदस्ती नहीं लाया जाता; शांति के लिए ज़ोर लगाना उसी को बिगाड़ देता है। सहजता को अपने समय पर, धीरे से आने दीजिए।')),
         SpiritualRead(
-            title: 'A little spaciousness',
+            title: _t('A little spaciousness', 'थोड़ी-सी जगह'),
             body:
-                "Pausing creates a small space between feeling and reacting. In that space, a calmer choice can appear."),
+                _t("Pausing creates a small space between feeling and reacting. In that space, a calmer choice can appear.", 'एक ठहराव महसूस करने और प्रतिक्रिया देने के बीच थोड़ी-सी जगह बना देता है। उसी जगह में एक शांत चुनाव उभर आता है।')),
         SpiritualRead(
-            title: 'Rest in the breath',
+            title: _t('Rest in the breath', 'साँस में आराम'),
             body:
-                "When the mind is busy, the breath is a quiet place to rest. A few slow breaths can settle a whole afternoon."),
+                _t("When the mind is busy, the breath is a quiet place to rest. A few slow breaths can settle a whole afternoon.", 'जब मन उलझा हो, तो साँस आराम करने की एक चुप जगह है। कुछ धीमी साँसें पूरी दोपहर को बैठा देती हैं।')),
       ]),
-      SpiritualSection(title: 'Loving-kindness', reads: [
+      SpiritualSection(title: _t('Loving-kindness', 'मैत्री का भाव'), reads: [
         SpiritualRead(
-            title: 'Wishing yourself well',
+            title: _t('Wishing yourself well', 'अपना भला चाहना'),
             body:
-                "Loving-kindness practice often begins by wishing yourself well, may you be safe, may you be peaceful. It is a tender reminder that you, too, deserve the gentleness you are giving."),
+                _t("Loving-kindness practice often begins by wishing yourself well, may you be safe, may you be peaceful. It is a tender reminder that you, too, deserve the gentleness you are giving.", 'मैत्री की साधना अक्सर अपना ही भला चाहने से शुरू होती है — आप सुरक्षित रहें, आपका मन शांत रहे। यह कोमल याद दिलाती है कि जो नरमी आप दूसरों को दे रही हैं, उसकी हक़दार आप भी हैं।')),
         SpiritualRead(
-            title: 'Widening the circle',
+            title: _t('Widening the circle', 'घेरा फैलाना'),
             body:
-                "From yourself, the good wishes widen, to your baby, your family, and outward to all beings. A simple wish for happiness and safety is a sweet thing to whisper to your bump."),
+                _t("From yourself, the good wishes widen, to your baby, your family, and outward to all beings. A simple wish for happiness and safety is a sweet thing to whisper to your bump.", 'अपने से शुरू होकर ये शुभकामनाएँ फैलती जाती हैं — आपके शिशु तक, परिवार तक, और आगे हर जीव तक। ख़ुशी और सलामती की एक सीधी-सी दुआ अपने पेट के पास धीरे से कह देना कितना मीठा लगता है।')),
         SpiritualRead(
-            title: 'Kindness as practice',
+            title: _t('Kindness as practice', 'दया, एक साधना'),
             body:
-                "Here, kindness is not a mood but a practice you return to daily. Each small, warm choice strengthens it, and your child will feel that warmth."),
+                _t("Here, kindness is not a mood but a practice you return to daily. Each small, warm choice strengthens it, and your child will feel that warmth.", 'यहाँ दया कोई मूड नहीं, एक साधना है जिस पर आप रोज़ लौटती हैं। हर छोटा, गर्म चुनाव उसे मज़बूत करता है, और आपका बच्चा उस गर्माहट को महसूस करेगा।')),
         SpiritualRead(
-            title: 'Begin with yourself',
+            title: _t('Begin with yourself', 'शुरुआत अपने से'),
             body:
-                "Loving-kindness often begins by wishing yourself well, may you be safe, may you be at peace. It is a tender reminder that you deserve the gentleness you give."),
+                _t("Loving-kindness often begins by wishing yourself well, may you be safe, may you be at peace. It is a tender reminder that you deserve the gentleness you give.", 'मैत्री अक्सर अपना ही भला चाहने से शुरू होती है — आप सुरक्षित रहें, आपका मन शांत रहे। यह कोमल याद दिलाती है कि जो नरमी आप देती हैं, उसकी हक़दार आप भी हैं।')),
         SpiritualRead(
-            title: 'The circle grows',
+            title: _t('The circle grows', 'घेरा बढ़ता जाता है'),
             body:
-                "From yourself, good wishes widen to your baby, your family, and outward. A simple wish for happiness is sweet to whisper to your bump."),
+                _t("From yourself, good wishes widen to your baby, your family, and outward. A simple wish for happiness is sweet to whisper to your bump.", 'अपने से शुरू होकर शुभकामनाएँ आपके शिशु, आपके परिवार और उससे आगे तक फैलती जाती हैं। ख़ुशी की एक सीधी-सी दुआ पेट के पास धीरे से कहना बहुत मीठा लगता है।')),
         SpiritualRead(
-            title: 'Kindness, practised daily',
+            title: _t('Kindness, practised daily', 'दया, रोज़ का अभ्यास'),
             body:
-                "Here kindness is not a passing mood but a practice you return to daily. Each warm choice strengthens it, and your child will feel that warmth."),
+                _t("Here kindness is not a passing mood but a practice you return to daily. Each warm choice strengthens it, and your child will feel that warmth.", 'यहाँ दया कोई गुज़र जाने वाला मूड नहीं, एक साधना है जिस पर आप रोज़ लौटती हैं। हर गर्म चुनाव उसे मज़बूत करता है, और आपका बच्चा उस गर्माहट को महसूस करेगा।')),
         SpiritualRead(
-            title: 'A wish for your baby',
+            title: _t('A wish for your baby', 'अपने शिशु के लिए एक दुआ'),
             body:
-                "Sending a gentle wish toward your baby, may you be safe, may you be loved, is a lovely habit. Said with a hand on your bump, it begins a quiet bond."),
+                _t("Sending a gentle wish toward your baby, may you be safe, may you be loved, is a lovely habit. Said with a hand on your bump, it begins a quiet bond.", 'अपने शिशु की ओर एक कोमल दुआ भेजना — तुम सुरक्षित रहो, तुम्हें ख़ूब प्यार मिले — कितनी सुंदर आदत है। पेट पर हाथ रखकर कही गई यह बात एक चुपचाप रिश्ता शुरू कर देती है।')),
         SpiritualRead(
-            title: 'Kindness on hard days',
+            title: _t('Kindness on hard days', 'मुश्किल दिनों की दया'),
             body:
-                "Loving-kindness is most needed on the days you feel least lovable. Offering yourself warmth then is the heart of the practice."),
+                _t("Loving-kindness is most needed on the days you feel least lovable. Offering yourself warmth then is the heart of the practice.", 'मैत्री की सबसे ज़्यादा ज़रूरत उन्हीं दिनों होती है जब आपको ख़ुद पर प्यार सबसे कम आता है। तब ख़ुद को गर्माहट देना ही इस साधना का दिल है।')),
         SpiritualRead(
-            title: 'Soft words to yourself',
+            title: _t('Soft words to yourself', 'अपने आप से नरम बोल'),
             body:
-                "Speaking to yourself as you would to a dear friend is a form of this kindness. Trade the harsh inner voice for a gentler one."),
+                _t("Speaking to yourself as you would to a dear friend is a form of this kindness. Trade the harsh inner voice for a gentler one.", 'अपने आप से वैसे ही बात कीजिए जैसे किसी प्यारी सहेली से करतीं — यह भी इसी दया का रूप है। भीतर की कड़वी आवाज़ की जगह एक नरम आवाज़ रख दीजिए।')),
         SpiritualRead(
-            title: 'Forgiving yourself',
+            title: _t('Forgiving yourself', 'ख़ुद को माफ़ करना'),
             body:
-                "Releasing yourself from yesterday's mistakes is an act of kindness. You are allowed to begin again, gently."),
+                _t("Releasing yourself from yesterday's mistakes is an act of kindness. You are allowed to begin again, gently.", 'कल की ग़लतियों से ख़ुद को छोड़ देना भी दया का ही काम है। आपको फिर से शुरू करने की इजाज़त है — धीरे से।')),
         SpiritualRead(
-            title: 'Warmth toward all',
+            title: _t('Warmth toward all', 'सबके लिए गर्माहट'),
             body:
-                "The practice widens until it includes even strangers and difficult people. A general goodwill lightens your own heart most of all."),
+                _t("The practice widens until it includes even strangers and difficult people. A general goodwill lightens your own heart most of all.", 'यह साधना फैलते-फैलते अनजानों और मुश्किल लोगों तक को अपने में ले लेती है। सबका भला चाहने से सबसे ज़्यादा हल्का आपका अपना मन होता है।')),
         SpiritualRead(
-            title: 'Kindness to the weary',
+            title: _t('Kindness to the weary', 'थके हुओं पर नरमी'),
             body:
-                "Extra gentleness for the tired, including yourself, fits this practice. On low days, soften what you ask of yourself."),
+                _t("Extra gentleness for the tired, including yourself, fits this practice. On low days, soften what you ask of yourself.", 'थके हुए लोगों के लिए थोड़ी और नरमी — और उनमें आप भी हैं — इसी साधना का हिस्सा है। मन उदास हो तो अपने आप से कम माँगिए।')),
         SpiritualRead(
-            title: 'A peaceful wish',
+            title: _t('A peaceful wish', 'एक शांत दुआ'),
             body:
-                "Wishing peace, for yourself and others, is simple and steadying. Even a silent may-all-be-at-ease calms the one who says it."),
+                _t("Wishing peace, for yourself and others, is simple and steadying. Even a silent may-all-be-at-ease calms the one who says it.", 'अपने लिए और सबके लिए शांति चाहना सीधा भी है और मन को थामने वाला भी। मन ही मन कहा गया “सब सुख से रहें” कहने वाले को ही सबसे पहले शांत कर देता है।')),
         SpiritualRead(
-            title: 'Kindness multiplies',
+            title: _t('Kindness multiplies', 'दया बढ़ती जाती है'),
             body:
-                "Warmth given tends to ripple outward and return. The gentleness you offer now grows beyond what you can see."),
+                _t("Warmth given tends to ripple outward and return. The gentleness you offer now grows beyond what you can see.", 'दी हुई गर्माहट लहर बनकर फैलती है और लौट आती है। जो नरमी आप आज दे रही हैं, वह आपकी नज़र से कहीं आगे तक बढ़ती है।')),
         SpiritualRead(
-            title: 'Small kind acts',
+            title: _t('Small kind acts', 'छोटे-छोटे अच्छे काम'),
             body:
-                "Loving-kindness lives in small acts as much as grand ones. A soft word or patient pause carries it."),
+                _t("Loving-kindness lives in small acts as much as grand ones. A soft word or patient pause carries it.", 'मैत्री बड़े कामों जितनी ही छोटे कामों में रहती है। एक नरम बोल या एक धैर्य भरा ठहराव भी उसे साथ लिए चलता है।')),
         SpiritualRead(
-            title: 'A softening heart',
+            title: _t('A softening heart', 'नरम पड़ता मन'),
             body:
-                "The practice gradually softens a guarded heart. As you open to your baby, that tenderness widens to everyone."),
+                _t("The practice gradually softens a guarded heart. As you open to your baby, that tenderness widens to everyone.", 'यह साधना धीरे-धीरे बंद पड़े मन को नरम कर देती है। जैसे-जैसे आप अपने शिशु के लिए खुलती हैं, वही कोमलता सबके लिए फैलती जाती है।')),
         SpiritualRead(
-            title: 'Kindness as calm',
+            title: _t('Kindness as calm', 'दया ही ठहराव है'),
             body:
-                "A kind heart and a calm heart tend to be the same heart. Choosing kindness is also choosing peace for two."),
+                _t("A kind heart and a calm heart tend to be the same heart. Choosing kindness is also choosing peace for two.", 'दयालु मन और शांत मन अक्सर एक ही मन होते हैं। दया चुनना दो जनों के लिए शांति चुनना भी है।')),
         SpiritualRead(
-            title: 'May you be safe',
+            title: _t('May you be safe', 'आप सुरक्षित रहें'),
             body:
-                "A simple repeated wish, may you be safe, may you be well, can settle a restless mind. Offer it first to yourself, then to your baby."),
+                _t("A simple repeated wish, may you be safe, may you be well, can settle a restless mind. Offer it first to yourself, then to your baby.", 'एक सीधी-सी दुआ, बार-बार दोहराई गई — आप सुरक्षित रहें, आप भली रहें — बेचैन मन को बैठा देती है। पहले इसे अपने लिए कहिए, फिर अपने शिशु के लिए।')),
         SpiritualRead(
-            title: 'Holding others gently',
+            title: _t('Holding others gently', 'दूसरों को कोमलता से थामना'),
             body:
-                "Picturing loved ones and silently wishing them well warms the heart. Your baby rides along in that circle of care."),
+                _t("Picturing loved ones and silently wishing them well warms the heart. Your baby rides along in that circle of care.", 'अपने लोगों को मन में देखना और चुपचाप उनका भला चाहना दिल को गर्म कर देता है। देखभाल के उस घेरे में आपका शिशु भी साथ चलता है।')),
         SpiritualRead(
-            title: 'Beginning with warmth',
+            title: _t('Beginning with warmth', 'गर्माहट से शुरुआत'),
             body:
-                "Starting the day with one warm wish sets a gentle tone. A single kind thought, offered sincerely, is enough."),
+                _t("Starting the day with one warm wish sets a gentle tone. A single kind thought, offered sincerely, is enough.", 'दिन की शुरुआत एक गर्म दुआ से कीजिए — पूरा दिन कोमल हो जाता है। सच्चे मन से सोचा गया एक अच्छा ख़याल ही काफ़ी है।')),
       ]),
-      SpiritualSection(title: 'Stories, simply retold', reads: [
+      SpiritualSection(title: _t('Stories, simply retold', 'कहानियाँ, सरल शब्दों में'), reads: [
         SpiritualRead(
-            title: 'The middle path',
+            title: _t('The middle path', 'बीच का रास्ता'),
             body:
-                "A well-known idea is the middle way, avoiding harsh extremes and choosing balance. In pregnancy that is wise and freeing: not too much pressure, not too little care, just gentle, steady balance."),
+                _t("A well-known idea is the middle way, avoiding harsh extremes and choosing balance. In pregnancy that is wise and freeing: not too much pressure, not too little care, just gentle, steady balance.", 'एक जानी-पहचानी बात है मध्यम मार्ग — कठोर छोर छोड़कर संतुलन चुनना। गर्भावस्था में यह समझदारी भी है और राहत भी: न बहुत दबाव, न बहुत लापरवाही — बस कोमल, टिका हुआ संतुलन।')),
         SpiritualRead(
-            title: 'Comfort in shared humanity',
+            title: _t('Comfort in shared humanity', 'साझे दुख में तसल्ली'),
             body:
-                "A tender old story tells of a grieving mother who learns, gently, that loss has touched every household, and finds comfort in that shared humanity. Simply retold, it is a reminder that you are never as alone in your feelings as they seem."),
+                _t("A tender old story tells of a grieving mother who learns, gently, that loss has touched every household, and finds comfort in that shared humanity. Simply retold, it is a reminder that you are never as alone in your feelings as they seem.", 'एक कोमल पुरानी कहानी है — एक दुखी माँ, जिसे धीरे-धीरे यह समझ आता है कि किसी न किसी का जाना हर घर ने देखा है, और इसी साझे दुख में उसे तसल्ली मिलती है। सीधे शब्दों में, यह याद दिलाती है कि अपनी भावनाओं में आप उतनी अकेली कभी नहीं होतीं जितनी लगती हैं।')),
         SpiritualRead(
-            title: 'A lamp passed on',
+            title: _t('A lamp passed on', 'एक दीया, आगे बढ़ता हुआ'),
             body:
-                "Stories often picture wisdom as a lamp passed from one person to the next, losing none of its light. The love and calm you carry now is a light you will pass to your child."),
+                _t("Stories often picture wisdom as a lamp passed from one person to the next, losing none of its light. The love and calm you carry now is a light you will pass to your child.", 'कहानियाँ अक्सर समझ को ऐसा दीया बताती हैं जो एक हाथ से दूसरे हाथ जाता है और उसकी रोशनी ज़रा भी कम नहीं होती। जो प्यार और ठहराव आज आपके पास है, वही रोशनी आप अपने बच्चे को सौंपेंगी।')),
         SpiritualRead(
-            title: 'The second arrow',
+            title: _t('The second arrow', 'दूसरा तीर'),
             body:
-                "A teaching describes how pain is like one arrow, but worrying about it is a second arrow we fire at ourselves. In pregnancy, you can feel the real discomfort without adding the extra arrow of fear."),
+                _t("A teaching describes how pain is like one arrow, but worrying about it is a second arrow we fire at ourselves. In pregnancy, you can feel the real discomfort without adding the extra arrow of fear.", 'एक सीख कहती है कि दर्द एक तीर की तरह है, पर उसकी चिंता वह दूसरा तीर है जो हम ख़ुद अपने ऊपर चला लेते हैं। गर्भावस्था में असली तकलीफ़ को महसूस कीजिए, पर डर का दूसरा तीर उसमें मत जोड़िए।')),
         SpiritualRead(
-            title: 'Setting down the load',
+            title: _t('Setting down the load', 'बोझ नीचे रख देना'),
             body:
-                "An old story tells of a traveller who carried someone across a river, then walked on, while his companion kept carrying the memory for miles. It gently asks: what are you still carrying that you could set down?"),
+                _t("An old story tells of a traveller who carried someone across a river, then walked on, while his companion kept carrying the memory for miles. It gently asks: what are you still carrying that you could set down?", 'एक पुरानी कहानी है — एक राही किसी को नदी पार करा देता है और आगे बढ़ जाता है, जबकि उसका साथी उस बात को मीलों तक मन में ढोता रहता है। यह धीरे से पूछती है: आप अब भी क्या ढो रही हैं, जिसे नीचे रखा जा सकता है?')),
         SpiritualRead(
-            title: 'The cup already full',
+            title: _t('The cup already full', 'पहले से भरा प्याला'),
             body:
-                "A well-known tale tells of a teacher pouring tea into a cup until it overflows, to show that a full mind cannot receive. Making a little empty space, a quiet pause, lets new calm in."),
+                _t("A well-known tale tells of a teacher pouring tea into a cup until it overflows, to show that a full mind cannot receive. Making a little empty space, a quiet pause, lets new calm in.", 'एक जानी-पहचानी कहानी है — एक गुरु प्याले में चाय उँडेलते जाते हैं जब तक वह छलक न पड़े, यह दिखाने के लिए कि भरा हुआ मन कुछ नहीं ले सकता। थोड़ी-सी ख़ाली जगह बना लीजिए, एक चुप ठहराव — नया सुकून वहीं से भीतर आता है।')),
         SpiritualRead(
-            title: 'Who knows what is good',
+            title: _t('Who knows what is good', 'क्या पता, यह अच्छा है या बुरा'),
             body:
-                "A gentle story follows a farmer who meets each turn of fortune with who knows whether this is good or bad. It is freeing in pregnancy, where not every surprise can be judged at once."),
+                _t("A gentle story follows a farmer who meets each turn of fortune with who knows whether this is good or bad. It is freeing in pregnancy, where not every surprise can be judged at once.", 'एक कोमल कहानी एक किसान की है, जो क़िस्मत के हर मोड़ पर बस इतना कहता है — क्या पता, यह अच्छा है या बुरा। गर्भावस्था में यह बात मन हल्का कर देती है, जहाँ हर अचानक बात को उसी वक़्त तौला नहीं जा सकता।')),
         SpiritualRead(
-            title: 'The cracked pot',
+            title: _t('The cracked pot', 'चटका हुआ घड़ा'),
             body:
-                "One tale tells of a cracked water pot that, leaking along the path, unknowingly watered a row of flowers. Our imperfections, too, can quietly bring beauty we never planned."),
+                _t("One tale tells of a cracked water pot that, leaking along the path, unknowingly watered a row of flowers. Our imperfections, too, can quietly bring beauty we never planned.", 'एक कहानी है — एक चटका हुआ घड़ा, जो रास्ते भर रिसता रहा और अनजाने में फूलों की एक पूरी क़तार सींच गया। हमारी कमियाँ भी चुपचाप ऐसी सुंदरता ले आती हैं जिसकी हमने कभी योजना ही नहीं बनाई।')),
         SpiritualRead(
-            title: 'A single candle',
+            title: _t('A single candle', 'एक अकेली लौ'),
             body:
-                "A loved image shows one candle lighting many others without losing any of its own flame. The love and calm you carry can be shared endlessly and never run out."),
+                _t("A loved image shows one candle lighting many others without losing any of its own flame. The love and calm you carry can be shared endlessly and never run out.", 'एक प्यारी तस्वीर है — एक मोमबत्ती कई और मोमबत्तियाँ जला देती है और उसकी अपनी लौ ज़रा भी कम नहीं होती। जो प्यार और ठहराव आपके पास है, वह जितना बाँटिए, कभी ख़त्म नहीं होता।')),
         SpiritualRead(
-            title: 'The raft you can put down',
+            title: _t('The raft you can put down', 'वह बेड़ा, जिसे रखा जा सकता है'),
             body:
-                "A teaching likens helpful practices to a raft for crossing a river, useful, but not meant to be carried on your back forever. Hold your routines lightly; keep what helps, release the rest."),
+                _t("A teaching likens helpful practices to a raft for crossing a river, useful, but not meant to be carried on your back forever. Hold your routines lightly; keep what helps, release the rest.", 'एक सीख काम आने वाली आदतों को नदी पार करने के बेड़े जैसा बताती है — ज़रूरी, पर हमेशा पीठ पर ढोने के लिए नहीं। अपनी दिनचर्या को हल्के हाथों से थामिए; जो काम आए उसे रखिए, बाक़ी छोड़ दीजिए।')),
         SpiritualRead(
-            title: 'The blind men and the elephant',
+            title: _t('The blind men and the elephant', 'हाथी और उसे टटोलते लोग'),
             body:
-                "An old story tells of several people each touching one part of an elephant and describing something different. It is a gentle reminder to hold our own view humbly, especially amid so much pregnancy advice."),
+                _t("An old story tells of several people each touching one part of an elephant and describing something different. It is a gentle reminder to hold our own view humbly, especially amid so much pregnancy advice.", 'एक पुरानी कहानी है — कई लोग हाथी के अलग-अलग हिस्सों को छूते हैं और हर एक कुछ अलग बताता है। यह धीरे से याद दिलाती है कि अपनी राय को थोड़ी विनम्रता से थामिए — ख़ासकर तब, जब गर्भावस्था को लेकर इतनी सलाहें चारों ओर हों।')),
         SpiritualRead(
-            title: 'A handful of leaves',
+            title: _t('A handful of leaves', 'मुट्ठी भर पत्ते'),
             body:
-                "One tale pictures a teacher holding a few leaves, saying what truly matters is small and simple compared to a whole forest of ideas. For you, the essentials are few: rest, nourish, love."),
+                _t("One tale pictures a teacher holding a few leaves, saying what truly matters is small and simple compared to a whole forest of ideas. For you, the essentials are few: rest, nourish, love.", 'एक कहानी में एक गुरु मुट्ठी में कुछ पत्ते लिए कहते हैं कि विचारों के पूरे जंगल के सामने जो सचमुच काम का है, वह थोड़ा-सा और सीधा-सा है। आपके लिए भी ज़रूरी बातें गिनी-चुनी हैं: आराम, पोषण, प्यार।')),
         SpiritualRead(
-            title: 'The wise response',
+            title: _t('The wise response', 'समझदारी भरा जवाब'),
             body:
-                "A story tells of a calm man who, offered an insult, simply did not accept it, so it stayed with the giver. You can let unkind or anxious words pass without taking them in."),
+                _t("A story tells of a calm man who, offered an insult, simply did not accept it, so it stayed with the giver. You can let unkind or anxious words pass without taking them in.", 'एक कहानी है — एक शांत आदमी, जिसे किसी ने अपशब्द कहे, और उसने उन्हें लिया ही नहीं, तो वे कहने वाले के पास ही रह गए। कड़वी या डराने वाली बातों को भी ऐसे ही गुज़र जाने दीजिए, भीतर मत उतारिए।')),
         SpiritualRead(
-            title: 'Drop by drop',
+            title: _t('Drop by drop', 'बूँद-बूँद'),
             body:
-                "A simple image notes that a water pot fills drop by drop, and so does goodness. Your small daily acts of care are quietly filling something beautiful."),
+                _t("A simple image notes that a water pot fills drop by drop, and so does goodness. Your small daily acts of care are quietly filling something beautiful.", 'एक सीधी-सी तस्वीर कहती है कि घड़ा बूँद-बूँद भरता है, और भलाई भी वैसे ही। रोज़ की आपकी छोटी-छोटी देखभालें चुपचाप कुछ बहुत सुंदर भर रही हैं।')),
         SpiritualRead(
-            title: 'The strawberry on the cliff',
+            title: _t('The strawberry on the cliff', 'चट्टान पर लगी वह स्ट्रॉबेरी'),
             body:
-                "An old story tells of a traveller in danger who pauses to taste a wild strawberry, sweet, right then. It is a tender nudge to taste the good moments even in an uncertain stretch."),
+                _t("An old story tells of a traveller in danger who pauses to taste a wild strawberry, sweet, right then. It is a tender nudge to taste the good moments even in an uncertain stretch.", 'एक पुरानी कहानी है — ख़तरे में फँसा एक राही रुककर एक जंगली स्ट्रॉबेरी चख लेता है, जो उसी पल मीठी है। यह कोमल इशारा है कि अनिश्चित दौर में भी अच्छे पलों का स्वाद ले लीजिए।')),
         SpiritualRead(
-            title: 'Carrying less',
+            title: _t('Carrying less', 'कम ढोना'),
             body:
-                "A tale honours a wanderer who travelled light and was free because of it. Letting go of a few worries lightens your own road too."),
+                _t("A tale honours a wanderer who travelled light and was free because of it. Letting go of a few worries lightens your own road too.", 'एक कहानी उस घुमक्कड़ को सराहती है जो हल्का चलता था और इसीलिए आज़ाद था। कुछ चिंताएँ छोड़ देने से आपका रास्ता भी हल्का हो जाता है।')),
         SpiritualRead(
-            title: 'The echo',
+            title: _t('The echo', 'गूँज'),
             body:
-                "One story likens the world to an echo that returns what we call into it. The gentleness you send out tends to come back to you."),
+                _t("One story likens the world to an echo that returns what we call into it. The gentleness you send out tends to come back to you.", 'एक कहानी दुनिया को गूँज जैसा बताती है — हम जो पुकारते हैं, वही लौटकर आता है। जो कोमलता आप बाहर भेजती हैं, वह आपके पास लौट आती है।')),
         SpiritualRead(
-            title: 'A quiet teacher',
+            title: _t('A quiet teacher', 'एक चुपचाप गुरु'),
             body:
-                "Some stories show wisdom taught not by words but by a calm, steady presence. The calm you embody now teaches your baby before a single word is spoken."),
+                _t("Some stories show wisdom taught not by words but by a calm, steady presence. The calm you embody now teaches your baby before a single word is spoken.", 'कुछ कहानियों में समझ शब्दों से नहीं, एक शांत और टिकी हुई मौजूदगी से सिखाई जाती है। आज आप जो ठहराव जी रही हैं, वह आपके शिशु को एक भी शब्द कहे बिना सिखा देता है।')),
         SpiritualRead(
-            title: 'The melting snow',
+            title: _t('The melting snow', 'पिघलती बर्फ़'),
             body:
-                "A gentle image watches snow melt in its own time, with no need to rush it. Your body and baby are unfolding at their own pace; you need not hurry them."),
+                _t("A gentle image watches snow melt in its own time, with no need to rush it. Your body and baby are unfolding at their own pace; you need not hurry them.", 'एक कोमल तस्वीर बर्फ़ को अपने समय पर पिघलते देखती है, बिना कोई जल्दी मचाए। आपका शरीर और आपका शिशु अपनी रफ़्तार से खुल रहे हैं; उन्हें जल्दी करने की ज़रूरत नहीं।')),
         SpiritualRead(
-            title: 'Footprints on water',
+            title: _t('Footprints on water', 'पानी पर पड़े निशान'),
             body:
-                "One reflection notes that troubles, like footprints on water, can close over and fade. Many of today's worries will quietly smooth away in time."),
+                _t("One reflection notes that troubles, like footprints on water, can close over and fade. Many of today's worries will quietly smooth away in time.", 'एक मनन कहता है कि परेशानियाँ पानी पर पड़े निशानों की तरह होती हैं — भर जाती हैं, मिट जाती हैं। आज की बहुत सी चिंताएँ समय के साथ चुपचाप बैठ जाएँगी।')),
       ]),
     ],
   ),
@@ -1939,35 +1943,35 @@ const List<SpiritualTradition> kSpiritualTraditions = [
   // ===========================================================================
   SpiritualTradition(
     id: 'others',
-    name: 'Others',
+    name: _t('Others', 'अन्य'),
     symbol: '🕊️',
-    blurb: 'Universal, gentle reflections beyond any one tradition.',
+    blurb: _t('Universal, gentle reflections beyond any one tradition.', 'सबके लिए कोमल बातें — किसी एक परंपरा से परे।'),
     sections: [
-      SpiritualSection(title: 'Calm for everyone', reads: [
+      SpiritualSection(title: _t('Calm for everyone', 'सबके लिए ठहराव'), reads: [
         SpiritualRead(
-            title: 'A quiet worth all its own',
+            title: _t('A quiet worth all its own', 'एक चुप्पी, अपने आप में क़ीमती'),
             body:
-                "Whatever you believe, or if you hold no faith at all, a few still minutes are their own gentle gift. Peace does not require a tradition; it only asks for a pause."),
+                _t("Whatever you believe, or if you hold no faith at all, a few still minutes are their own gentle gift. Peace does not require a tradition; it only asks for a pause.", 'आप जो भी मानती हों, या कुछ भी न मानती हों — कुछ ठहरे हुए मिनट अपने आप में एक कोमल उपहार हैं। शांति के लिए किसी परंपरा की ज़रूरत नहीं; वह बस एक ठहराव माँगती है।')),
         SpiritualRead(
-            title: 'Kindness needs no label',
+            title: _t('Kindness needs no label', 'दया को किसी नाम की ज़रूरत नहीं'),
             body:
-                "The wish to be gentle with yourself and your baby belongs to everyone. You can offer it freely, in your own words, without borrowing anyone's language."),
+                _t("The wish to be gentle with yourself and your baby belongs to everyone. You can offer it freely, in your own words, without borrowing anyone's language.", 'अपने साथ और अपने शिशु के साथ कोमल रहने की चाह सबकी है। इसे आप खुलकर, अपने ही शब्दों में दे सकती हैं — किसी और की भाषा उधार लिए बिना।')),
         SpiritualRead(
-            title: 'Gratitude, plainly felt',
+            title: _t('Gratitude, plainly felt', 'कृतज्ञता, सीधे-सादे ढंग से'),
             body:
-                "Noticing one good thing in a day is a comfort available to anyone. A warm cup, a small kick, a soft light: these are enough to be thankful for."),
+                _t("Noticing one good thing in a day is a comfort available to anyone. A warm cup, a small kick, a soft light: these are enough to be thankful for.", 'दिन में एक अच्छी बात पर नज़र डाल लेना — यह तसल्ली किसी को भी मिल सकती है। एक गर्म प्याला, एक छोटी-सी लात, एक नरम रोशनी: शुक्रिया कहने के लिए इतना काफ़ी है।')),
         SpiritualRead(
-            title: 'Held by the ordinary',
+            title: _t('Held by the ordinary', 'रोज़मर्रा का सहारा'),
             body:
-                "Sometimes steadiness comes not from anything grand but from the plain, reliable rhythm of a day. Let the ordinary hold you when the big questions feel heavy."),
+                _t("Sometimes steadiness comes not from anything grand but from the plain, reliable rhythm of a day. Let the ordinary hold you when the big questions feel heavy.", 'कभी-कभी टिकाव किसी बड़ी चीज़ से नहीं, दिन की सीधी-सादी, भरोसेमंद लय से आता है। जब बड़े सवाल भारी लगें, तो रोज़मर्रा को अपना सहारा बन जाने दीजिए।')),
         SpiritualRead(
-            title: 'Your own gentle ritual',
+            title: _t('Your own gentle ritual', 'अपनी एक कोमल रीत'),
             body:
-                "You are free to make a small ritual entirely your own, a candle, a breath, a hand on your bump. What matters is the care you put into it, not where it came from."),
+                _t("You are free to make a small ritual entirely your own, a candle, a breath, a hand on your bump. What matters is the care you put into it, not where it came from.", 'आप अपनी एक छोटी-सी रीत बिलकुल अपने ढंग से बना सकती हैं — एक मोमबत्ती, एक साँस, पेट पर रखा एक हाथ। मायने यह रखता है कि आपने उसमें कितना मन लगाया, यह नहीं कि वह कहाँ से आई।')),
         SpiritualRead(
-            title: 'Breathing is universal',
+            title: _t('Breathing is universal', 'साँस सबकी एक जैसी है'),
             body:
-                "Across every tradition and none, the slow breath calms the body the same way. A few long, even breaths are a practice anyone can keep, anywhere."),
+                _t("Across every tradition and none, the slow breath calms the body the same way. A few long, even breaths are a practice anyone can keep, anywhere.", 'हर परंपरा में, और बिना किसी परंपरा के भी, धीमी साँस शरीर को एक ही तरह शांत करती है। कुछ लंबी, एक-सी साँसें — यह अभ्यास कोई भी, कहीं भी कर सकता है।')),
       ]),
     ],
   ),

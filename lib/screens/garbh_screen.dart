@@ -1213,10 +1213,11 @@ class _SamvadScreenState extends State<SamvadScreen>
         if (!_store.isSectionOn(tr.id, i)) continue;
         for (final r in tr.sections[i].reads) {
           out.add((
-            title: r.title,
-            body: r.body,
-            saveKey: r.title,
-            group: tr.name
+            title: r.title.now,
+            body: r.body.now,
+            // .en: the saved hub keys on this - see SavedRtbPiece.key.
+            saveKey: r.title.en,
+            group: tr.name.now
           ));
         }
       }
@@ -1495,7 +1496,7 @@ class _SamvadScreenState extends State<SamvadScreen>
                         children: [
                           for (var i = 0; i < tr.sections.length; i++)
                             FilterChip(
-                              label: Text(tr.sections[i].title,
+                              label: Text(tr.sections[i].title.now,
                                   style: TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: store.isSectionOn(tr.id, i)

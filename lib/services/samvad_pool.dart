@@ -100,7 +100,7 @@ List<SamvadPiece> samvadDailyPool(ReadToBabyStore store, int trimester) {
       for (var i = 0; i < t.sections.length; i++) {
         if (!store.isSectionOn(t.id, i)) continue;
         for (final r in t.sections[i].reads) {
-          pool.add(SamvadPiece(title: r.title, body: r.body, group: t.name));
+          pool.add(SamvadPiece(title: r.title.now, body: r.body.now, group: t.name.now));
         }
       }
     }
@@ -165,7 +165,7 @@ List<SamvadGroup> samvadLibraryGroups(ReadToBabyStore store, int trimester) {
             heading: '${t.symbol} ${t.name} · ${t.sections[i].title}',
             pieces: [
               for (final r in reads)
-                SamvadPiece(title: r.title, body: r.body, group: t.name)
+                SamvadPiece(title: r.title.now, body: r.body.now, group: t.name.now)
             ]));
       }
     }
