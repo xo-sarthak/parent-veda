@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'brand/brand_store.dart';
@@ -86,6 +87,21 @@ import 'widgets/global_ask_fab.dart';
 Future<void> main() async {
   // Flutter must be ready before we do async work like connecting to Supabase.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // PORTRAIT, and say so rather than assume it.
+  //
+  // Every screen in this app is laid out for one column — the floating bottom
+  // nav, the single-card sections, the full-width heroes. In landscape the nav
+  // eats the content and the hero titles take half the height, which is what a
+  // phone rotating on a bedside table actually produced.
+  //
+  // The one intentional exception manages itself: the video player asks for
+  // landscape when it goes fullscreen and restores portrait on the way out
+  // (pv_video_player.dart). A later setPreferredOrientations call wins, so this
+  // does not fight it — it just stops every OTHER screen from being rotated
+  // into a layout nobody designed.
+  await SystemChrome.setPreferredOrientations(
+      const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   // Connect to the Supabase backend BEFORE the app starts, using the values
   // from lib/supabase_config.dart. By the time any screen loads, the backend

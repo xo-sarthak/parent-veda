@@ -120,12 +120,25 @@ List<CommunityPost> ppCommentedPosts() =>
 List<CommunityComment> ppSeedComments(String postId) =>
     kParentingComments[postId] ?? const [];
 
-/// A two-letter monogram, skipping leading numbers ("1 Year Olds" -> "YO").
+/// A two-letter monogram from a community name.
+///
+/// ("November 2026 Moms" → "NM", "Delhi Moms" → "DM", "2 Year Olds" → "2Y".)
+///
+/// A NUMBER IS ONLY NOISE WHEN IT IS NOT THE FIRST WORD. Dropping every word
+/// that starts with a digit is right for the birth-month rooms — "2026" adds
+/// nothing to "November". It is wrong for the parenting-stage rooms, where the
+/// number is the entire identity: without it, "0–1 Year" came out YE, and
+/// "1 Year Olds" and "2 Year Olds" BOTH came out YO. Three rooms, two badges.
+///
+/// The doc comment above this function used to give "1 Year Olds" -> "YO" as
+/// the worked example, which is how the collision survived review: the wrong
+/// answer was written down as the intended one.
 String ppMono(String name) {
-  final words = name
-      .split(RegExp(r'\s+'))
-      .where((w) => w.isNotEmpty && !RegExp(r'^[0-9]').hasMatch(w))
-      .toList();
+  final all = name.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+  final words = <String>[
+    for (var i = 0; i < all.length; i++)
+      if (i == 0 || !RegExp(r'^[0-9]').hasMatch(all[i])) all[i],
+  ];
   if (words.isEmpty) return name.isNotEmpty ? name[0].toUpperCase() : '?';
   if (words.length == 1) {
     final w = words.first;
@@ -975,21 +988,33 @@ class _CommunityScreenState extends State<CommunityScreen> {
           IconButton(
             tooltip: 'My bookmarks',
             visualDensity: VisualDensity.compact,
-            color: ppInk,
+            // ppPurple, like every other header icon in the app. ppInk
+            // rendered these near-black, which is why the Community header
+            // looked borrowed from a different product than the tab bar
+            // underneath it.
+            color: ppPurple,
             icon: const Icon(Icons.bookmark_border_rounded, size: 22),
             onPressed: () => ppPush(context, const PpMyBookmarksScreen()),
           ),
           IconButton(
             tooltip: 'My activity',
             visualDensity: VisualDensity.compact,
-            color: ppInk,
+            // ppPurple, like every other header icon in the app. ppInk
+            // rendered these near-black, which is why the Community header
+            // looked borrowed from a different product than the tab bar
+            // underneath it.
+            color: ppPurple,
             icon: const Icon(Icons.person_outline_rounded, size: 22),
             onPressed: () => ppPush(context, const PpMyActivityScreen()),
           ),
           IconButton(
             tooltip: 'Search',
             visualDensity: VisualDensity.compact,
-            color: ppInk,
+            // ppPurple, like every other header icon in the app. ppInk
+            // rendered these near-black, which is why the Community header
+            // looked borrowed from a different product than the tab bar
+            // underneath it.
+            color: ppPurple,
             icon: const Icon(Icons.search_rounded, size: 22),
             onPressed: () =>
                 showSearch<void>(context: context, delegate: _PpSearchDelegate()),
@@ -1000,7 +1025,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _header() => Padding(
         padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ppEyebrow('Community', color: ppCoral),
+          // Purple, like every other section eyebrow. This is a plain page
+          // label, not a warm accent — coral here just made Community look
+          // like it came from a different app than the tab beside it.
+          ppEyebrow('Community'),
           const SizedBox(height: 6),
           Text('Walking together.', style: ppFraunces(32, w: FontWeight.w600)),
           const SizedBox(height: 6),

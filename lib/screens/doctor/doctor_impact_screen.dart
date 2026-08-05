@@ -110,19 +110,23 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
       ('Vaccinations completed', i?.vaccinationsCompleted ?? 0, Icons.vaccines_rounded),
       ('Guides read', i?.contentConsumed ?? 0, Icons.menu_book_rounded),
     ];
+    // An ODD COUNT gets a full-width last tile, not a half one next to a hole.
+    //
+    // Pairing every row and filling the gap with SizedBox.shrink() left the
+    // seventh stat — "Guides read" — sitting at half width beside empty space,
+    // which reads as a tile that failed to load rather than as the end of a
+    // list. Spanning it makes the last row look intended.
     return Column(children: [
       for (var r = 0; r < tiles.length; r += 2)
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
-          child: Row(children: [
-            Expanded(child: _tile(tiles[r])),
-            const SizedBox(width: 10),
-            Expanded(
-              child: r + 1 < tiles.length
-                  ? _tile(tiles[r + 1])
-                  : const SizedBox.shrink(),
-            ),
-          ]),
+          child: r + 1 < tiles.length
+              ? Row(children: [
+                  Expanded(child: _tile(tiles[r])),
+                  const SizedBox(width: 10),
+                  Expanded(child: _tile(tiles[r + 1])),
+                ])
+              : _tile(tiles[r]),
         ),
     ]);
   }

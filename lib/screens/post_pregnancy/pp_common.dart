@@ -73,7 +73,20 @@ TextStyle ppBody(double size,
     GoogleFonts.manrope(fontSize: size, height: h, color: color, fontWeight: w);
 
 // ---- small parts ------------------------------------------------------------
-Widget ppEyebrow(String t, {Color color = ppCoral, double spacing = 1.4}) => Text(
+/// The small uppercase label above a section title.
+///
+/// THE DEFAULT IS PURPLE because that is what the app actually does: 105 call
+/// sites pass ppPurple explicitly and twelve took the default, which was coral
+/// — so the twelve that never made a choice were the only ones that looked
+/// different. That is backwards, and it is why the Explore drawer, Community
+/// and Find help wore a coral eyebrow while every screen around them wore
+/// purple.
+///
+/// The other colours stay available and stay deliberate: ppMuted for a quiet
+/// in-card label, ppBrown for the Ayurvedic and money sections, ppSoft, and
+/// coral where a section really is meant to run warm. Passing one is now a
+/// decision rather than an accident.
+Widget ppEyebrow(String t, {Color color = ppPurple, double spacing = 1.4}) => Text(
       t.toUpperCase(),
       style: GoogleFonts.manrope(
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: spacing, color: color),

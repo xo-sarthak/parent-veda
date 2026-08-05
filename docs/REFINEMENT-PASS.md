@@ -150,7 +150,7 @@ screen does. That single omission is every FAB overlap in the app.
 | P14 | Five eyebrow colours — purple, coral, amber, grey | UI |
 | P15 | Four back-button treatments + Care Circle's bare bold title | UI |
 | P16 | Community initials collide — "0–1 Year" → YE, "1 Year Olds" and "2 Year Olds" both → YO | UI |
-| P17 | "Awaiting … verification" pill sits above one post, below another | UI |
+| P17 | ~~"Awaiting … verification" pill sits above one post, below another~~ — **not a defect.** The tag renders at the bottom of the post it belongs to, consistently. What looked like a pill above Ishita's post was the *previous* post's tag, sitting just above the divider at the top of a mid-scroll screenshot. | — |
 | P18 | Fabricated view counts (18.2K, 18.6K, 14.3K) | HOLD |
 | P19 | Tools list scrolls under the status bar | UI |
 | P20 | Three black cards + coral/blue/cream surfaces in a purple app | UI |

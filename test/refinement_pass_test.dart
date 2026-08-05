@@ -18,6 +18,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:parentveda/screens/post_pregnancy/community_screen.dart'
+    show ppMono;
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_experts_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_products_data.dart';
@@ -70,24 +72,16 @@ void main() {
   //  for "November 2026 Moms" and catastrophic for the age rooms: "1 Year Olds"
   //  and "2 Year Olds" both monogrammed as YO. Two rooms, one badge.
   //
-  //  _mono is private, so this asserts the PROPERTY that matters — no two
-  //  community names in the catalogue may share a monogram — against the rule
-  //  as re-implemented here. If the screen's rule changes and this does not,
-  //  the duplicate-detection below still fails loudly.
+  //  The rule lives in TWO files — the pregnancy Community screen and the
+  //  parenting one, which is a deliberate replica. Both had the bug.
   group('community monograms', () {
-    String mono(String name) {
-      final all = name.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
-      final words = <String>[
-        for (var i = 0; i < all.length; i++)
-          if (i == 0 || !RegExp(r'^[0-9]').hasMatch(all[i])) all[i],
-      ];
-      if (words.isEmpty) return name.isNotEmpty ? name[0].toUpperCase() : '?';
-      if (words.length == 1) {
-        final w = words.first;
-        return (w.length >= 2 ? w.substring(0, 2) : w).toUpperCase();
-      }
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
+    // CALLS THE REAL FUNCTION. An earlier version of this test re-implemented
+    // the rule locally and passed while the parenting screen — the one actually
+    // showing YE / YO / YO on a phone — was still broken. There are two
+    // community screens with two copies of this logic, and a test that owns its
+    // own copy cannot tell you that. This is the wiring gate: assert against
+    // what ships, not against a description of it.
+    const mono = ppMono;
 
     test('the parenting age rooms do not collide', () {
       final names = ['0–1 Year', '1 Year Olds', '2 Year Olds', '3 Year Olds'];

@@ -49,6 +49,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'doctor/doctor_schedule_store.dart';
@@ -62,6 +63,13 @@ import 'localization/app_language.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Portrait, for the same reason as the parent app: every doctor screen is a
+  // single column and the bottom nav in landscape covers the row you were
+  // reading. A clinician checking a schedule one-handed should not have the
+  // layout change under them because the phone tilted.
+  await SystemChrome.setPreferredOrientations(
+      const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   await Supabase.initialize(
     url: SupabaseConfig.url,
