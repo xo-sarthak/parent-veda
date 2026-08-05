@@ -30,14 +30,36 @@ import 'read_to_baby_store.dart';
 /// One read-aloud piece. [title] is null for the bare speaking cards (which are
 /// just a line to say); stories / rhymes / spiritual reads carry a title.
 class SamvadPiece {
-  const SamvadPiece({this.title, required this.body, required this.group});
+  const SamvadPiece(
+      {this.title,
+      required this.body,
+      required this.group,
+      String? saveKey})
+      // The lint suggests `this._saveKey`, which does not compile: a named
+      // parameter cannot be private, so the field and the parameter have to
+      // be spelled differently. Call sites keep the readable `saveKey:`.
+      // ignore: prefer_initializing_formals
+      : _saveKey = saveKey;
+
   final String? title;
   final String body;
   final String group; // the group label this piece belongs to
+  final String? _saveKey;
 
-  /// A stable key for bookmarking (saved hub keys by title).
+  /// A stable key for bookmarking, invariant across languages.
+  ///
+  /// This is a VIEW record - [title] and [body] are already resolved to the
+  /// language on screen, so neither can identify anything. Callers whose
+  /// source data is bilingual pass the English string as [saveKey].
+  ///
+  /// The fallback below is the pre-migration behaviour, and it is sharper than
+  /// it looks: an untitled speaking card keys on its ENTIRE BODY. That is
+  /// harmless only while those cards are still English-only. Any data file
+  /// feeding this must pass an explicit [saveKey] as it gains Hindi, or every
+  /// bookmark in it silently re-keys on the language toggle.
   String get saveKey =>
-      (title != null && title!.trim().isNotEmpty) ? title! : body;
+      _saveKey ??
+      ((title != null && title!.trim().isNotEmpty) ? title! : body);
 }
 
 /// A labelled, segregated group for the Tools library view.
@@ -54,12 +76,16 @@ List<SamvadPiece> samvadDailyPool(ReadToBabyStore store, int trimester) {
   final pool = <SamvadPiece>[];
   if (store.isCategoryOn(kRtbSpeaking)) {
     for (final p in samvadForTrimester(trimester)) {
-      pool.add(SamvadPiece(body: p.text, group: 'Speaking cards'));
+      pool.add(SamvadPiece(body: p.text.now, group: 'Speaking cards'));
     }
   }
   void addCat(String cat, String group) {
     for (final p in readAloudByCategory(cat)) {
-      pool.add(SamvadPiece(title: p.title, body: p.body, group: group));
+      pool.add(SamvadPiece(
+          title: p.title.now,
+          body: p.body.now,
+          group: group,
+          saveKey: p.saveKey));
     }
   }
 
@@ -91,19 +117,19 @@ List<SamvadGroup> samvadLibraryGroups(ReadToBabyStore store, int trimester) {
         heading: 'Affirmations',
         pieces: [
           for (final p in kSamvadT1)
-            SamvadPiece(body: p.text, group: 'Affirmations')
+            SamvadPiece(body: p.text.now, group: 'Affirmations')
         ]));
     groups.add(SamvadGroup(
         heading: 'Read-aloud scripts',
         pieces: [
           for (final p in kSamvadT2)
-            SamvadPiece(body: p.text, group: 'Read-aloud scripts')
+            SamvadPiece(body: p.text.now, group: 'Read-aloud scripts')
         ]));
     groups.add(SamvadGroup(
         heading: 'Visualizations',
         pieces: [
           for (final p in kSamvadT3)
-            SamvadPiece(body: p.text, group: 'Visualizations')
+            SamvadPiece(body: p.text.now, group: 'Visualizations')
         ]));
   }
   void addGroup(String cat, String heading) {
@@ -113,7 +139,11 @@ List<SamvadGroup> samvadLibraryGroups(ReadToBabyStore store, int trimester) {
         heading: heading,
         pieces: [
           for (final p in items)
-            SamvadPiece(title: p.title, body: p.body, group: heading)
+            SamvadPiece(
+                title: p.title.now,
+                body: p.body.now,
+                group: heading,
+                saveKey: p.saveKey)
         ]));
   }
 

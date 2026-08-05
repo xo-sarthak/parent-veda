@@ -1847,7 +1847,7 @@ class HomeScreenB extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             _garbhPillarRow(context, s.gsShravan, s.gsShravanTag,
-                shravanForDay(cd).title, '🎵', const Color(0xFFBE9C4E),
+                shravanForDay(cd).title.now, '🎵', const Color(0xFFBE9C4E),
                 store.isDone('shravan'),
                 () => ShravanScreen(controller: pregnancy, daily: true)),
             // Standalone Vichara removed — its reflection now lives inside
@@ -1857,12 +1857,12 @@ class HomeScreenB extends StatelessWidget {
             //     store.isDone('vichara'),
             //     () => VicharaScreen(controller: pregnancy, daily: true)),
             _garbhPillarRow(context, s.gsSamvadVichara, s.gsSamvadTag,
-                promptForDay(cd, garbhTrimester(pregnancy.currentWeek)).text,
+                promptForDay(cd, garbhTrimester(pregnancy.currentWeek)).text.now,
                 '🎙️', const Color(0xFFB98A7E),
                 store.isDone('samvad'),
                 () => SamvadScreen(controller: pregnancy, daily: true)),
             _garbhPillarRow(context, s.gsKriya, s.gsKriyaTag,
-                kriyaForDay(cd).title, '🌿', const Color(0xFF5E8B7E),
+                kriyaForDay(cd).title.now, '🌿', const Color(0xFF5E8B7E),
                 store.isDone('kriya'),
                 () => KriyaScreen(controller: pregnancy, daily: true)),
             // Ahara (nourishment) commented out per request - kept for revert.

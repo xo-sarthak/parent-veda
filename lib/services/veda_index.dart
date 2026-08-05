@@ -236,8 +236,14 @@ class VedaIndex {
         id: 'rtb_$i',
         kind: VedaKind.readToBaby,
         sourceLabel: 'Read to your baby',
-        title: kReadAloudPieces[i].title,
-        body: kReadAloudPieces[i].body,
+        // English deliberately, not the language on screen: this index is
+        // rebuilt once and its docs are matched against a typed query, so
+        // resolving here would silently re-index on every language change.
+        // The gap it leaves - a Hindi query cannot match a Hindi body - is
+        // pre-existing and app-wide, and belongs to the retrieval service
+        // rather than to this offline showcase index.
+        title: kReadAloudPieces[i].title.en,
+        body: kReadAloudPieces[i].body.en,
         keywords: [kReadAloudPieces[i].category],
       ));
     }
@@ -248,9 +254,9 @@ class VedaIndex {
         id: 'garbh_${g.id}',
         kind: VedaKind.garbh,
         sourceLabel: 'Garbh Sanskar',
-        title: g.title,
+        title: g.title.en,
         body: '${g.blurb} ${g.body}',
-        keywords: [g.theme],
+        keywords: [g.theme.en],
       ));
     }
     for (final a in kShravan) {
@@ -258,8 +264,8 @@ class VedaIndex {
         id: 'shravan_${a.id}',
         kind: VedaKind.garbh,
         sourceLabel: 'Garbh Sanskar · Listening',
-        title: a.title,
-        body: a.subtitle,
+        title: a.title.en,
+        body: a.subtitle.en,
         keywords: const ['raga', 'music', 'listening', 'calm', 'relax'],
       ));
     }
@@ -270,7 +276,7 @@ class VedaIndex {
         id: 'kriya_${k.id}',
         kind: VedaKind.garbh,
         sourceLabel: 'Garbh Sanskar · Breath',
-        title: k.title,
+        title: k.title.en,
         body: '${k.blurb}. ${k.phases.map((ph) => ph.label).join(', ')}.',
         keywords: const [
           'kriya', 'breath', 'breathing', 'pranayama', 'calm', 'relax',
@@ -280,7 +286,9 @@ class VedaIndex {
     }
     // Samvad - womb-connection speaking cards, one doc per trimester set
     // (affirmations / read-aloud scripts / visualizations).
-    const samvadSets = <(String, String, List<GarbhPrompt>)>[
+    // `final`, not `const`: kSamvadT1..T3 hold _t() calls now, and Dart has no
+    // const functions, so anything referencing them stops being a constant.
+    final samvadSets = <(String, String, List<GarbhPrompt>)>[
       ('samvad_t1', 'Speaking to your baby - affirmations', kSamvadT1),
       ('samvad_t2', 'Speaking to your baby - read-aloud scripts', kSamvadT2),
       ('samvad_t3', 'Speaking to your baby - visualizations', kSamvadT3),
@@ -305,7 +313,7 @@ class VedaIndex {
         id: 'insight_$i',
         kind: VedaKind.garbh,
         sourceLabel: 'Garbh Sanskar · Insight',
-        title: insights[i].sloka,
+        title: insights[i].sloka.en,
         body: '${insights[i].meaning} ${insights[i].lesson}',
         keywords: const ['insight', 'calm', 'mindful', 'peace', 'reflection', 'wisdom'],
       ));

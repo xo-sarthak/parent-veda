@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../localization/app_language.dart';
 
 /// Shravan sub-kinds (just for the small label/icon).
 enum GarbhKind { raga, nature, guided }
@@ -28,8 +29,8 @@ class GarbhAudio {
     required this.kind,
   });
   final String id;
-  final String title;
-  final String subtitle;
+  final LocalizedText title;
+  final LocalizedText subtitle;
   final String emoji;
   final int minutes;
   final GarbhKind kind;
@@ -47,11 +48,11 @@ class GarbhStory {
     this.minutes = 3,
   });
   final String id;
-  final String theme; // "Curiosity", "Patience", …
-  final String title;
-  final String blurb; // one-line description on the card
-  final String body; // the reflection itself
-  final String reflection; // closing question
+  final LocalizedText theme; // "Curiosity", "Patience", …
+  final LocalizedText title;
+  final LocalizedText blurb; // one-line description on the card
+  final LocalizedText body; // the reflection itself
+  final LocalizedText reflection; // closing question
   final int minutes;
 }
 
@@ -60,7 +61,7 @@ class GarbhStory {
 @immutable
 class BreathPhase {
   const BreathPhase(this.label, this.seconds, this.scale);
-  final String label; // "Breathe in", "Hold", "Breathe out", "Rest"
+  final LocalizedText label; // "Breathe in", "Hold", "Breathe out", "Rest"
   final int seconds;
   final double scale;
 }
@@ -76,8 +77,8 @@ class GarbhPractice {
     required this.phases,
   });
   final String id;
-  final String title;
-  final String blurb;
+  final LocalizedText title;
+  final LocalizedText blurb;
   final String emoji;
   final int minutes;
   final List<BreathPhase> phases; // one breath cycle, looped
@@ -87,7 +88,7 @@ class GarbhPractice {
 class GarbhPrompt {
   const GarbhPrompt(this.id, this.text);
   final String id;
-  final String text;
+  final LocalizedText text;
 }
 
 // ---- Vichara: Sacred Insights (Tab A) ----
@@ -99,19 +100,19 @@ class GarbhInsight {
     required this.lesson,
     required this.reflection,
   });
-  final String sloka; // a gentle line (no heavy religious language)
-  final String meaning; // simple interpretation
-  final String lesson; // life lesson
-  final String reflection; // reflection prompt
+  final LocalizedText sloka; // a gentle line (no heavy religious language)
+  final LocalizedText meaning; // simple interpretation
+  final LocalizedText lesson; // life lesson
+  final LocalizedText reflection; // reflection prompt
 }
 
 // ---- Vichara: Brain Fitness (Tab B) ----
 @immutable
 class GarbhPuzzle {
   const GarbhPuzzle(this.title, this.emoji, this.blurb);
-  final String title;
+  final LocalizedText title;
   final String emoji;
-  final String blurb;
+  final LocalizedText blurb;
 }
 
 // ---- Ahara: Nourishment (Pillar 5) ----
@@ -124,9 +125,9 @@ class GarbhNutrition {
     required this.swap,
     required this.habit,
   });
-  final String tip; // today's nutrition tip (what to do)
-  final String why; // why it matters
-  final String recipe; // recommended recipe
-  final String swap; // food swap
-  final String habit; // lifestyle habit
+  final LocalizedText tip; // today's nutrition tip (what to do)
+  final LocalizedText why; // why it matters
+  final LocalizedText recipe; // recommended recipe
+  final LocalizedText swap; // food swap
+  final LocalizedText habit; // lifestyle habit
 }

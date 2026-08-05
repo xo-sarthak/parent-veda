@@ -122,9 +122,9 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
   List<_FSP> _affirmations() => [
         for (final p in readAloudFatherAffirmations())
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Affirmations & Blessings'
           ),
       ];
@@ -132,9 +132,9 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
   List<_FSP> _stories() => [
         for (final p in readAloudByCategory(kRtbStories))
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Stories & Fables'
           ),
       ];
@@ -143,15 +143,15 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
         for (final p in samvadForTrimester(_t))
           (
             title: null,
-            body: p.text,
+            body: p.text.now,
             saveKey: 'mantra_${p.id}',
             group: 'Mantras & Lullabies'
           ),
         for (final p in readAloudByCategory(kRtbRhymes))
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Mantras & Lullabies'
           ),
       ];

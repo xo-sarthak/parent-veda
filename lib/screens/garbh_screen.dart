@@ -48,7 +48,10 @@ void _push(BuildContext c, Widget w) =>
 // Route a Vichara brain-fitness puzzle card to its real game.
 Widget _gameFor(GarbhPuzzle p, PregnancyController c,
     {bool markComplete = true}) {
-  switch (p.title) {
+  // .en: this switch DISPATCHES to a game widget, so it must match the
+  // English name whatever is on screen. Matching the displayed title would
+  // fall through to the default in Hindi and open Word Search every time.
+  switch (p.title.en) {
     case 'Sudoku':
       return SudokuGame(controller: c, markComplete: markComplete);
     case 'Logic Puzzle':
@@ -286,7 +289,7 @@ class _RagaHero extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(audio.title,
+              Text(audio.title.now,
                   textAlign: TextAlign.center,
                   style: pvFraunces(
                       fontSize: 22,
@@ -581,9 +584,9 @@ class ShravanScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _ShravanHero(audio: audio, s: s),
           const SizedBox(height: 16),
-          _WhyCard(label: s.gsWhyToday, text: shravanWhy(t), accent: _accShravan),
+          _WhyCard(label: s.gsWhyToday, text: shravanWhy(t).now, accent: _accShravan),
           const SizedBox(height: 16),
-          RagaPlayer(title: audio.title, subtitle: '${audio.minutes} min'),
+          RagaPlayer(title: audio.title.now, subtitle: '${audio.minutes} min'),
           const SizedBox(height: 8),
           Text(s.gsSampleAudio,
               textAlign: TextAlign.center,
@@ -622,7 +625,7 @@ class _ShravanHero extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 16),
-      Text(audio.title,
+      Text(audio.title.now,
           textAlign: TextAlign.center,
           style: text.headlineSmall
               ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
@@ -649,7 +652,7 @@ class _ShravanDetailScreen extends StatelessWidget {
         children: [
           _ShravanHero(audio: audio, s: s),
           const SizedBox(height: 16),
-          RagaPlayer(title: audio.title, subtitle: '${audio.minutes} min'),
+          RagaPlayer(title: audio.title.now, subtitle: '${audio.minutes} min'),
           const SizedBox(height: 8),
           Text(s.gsSampleAudio,
               textAlign: TextAlign.center,
@@ -800,7 +803,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
                   ),
                   title: Row(children: [
                     Flexible(
-                      child: Text(a.title,
+                      child: Text(a.title.now,
                           style: text.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700, color: _ink)),
                     ),
@@ -914,11 +917,11 @@ class _SacredTab extends StatelessWidget {
                 fontWeight: FontWeight.w600)),
       ),
       const SizedBox(height: 16),
-      _miniSection(context, s.gsMeaning, ins.meaning),
-      _miniSection(context, s.gsLesson, ins.lesson),
+      _miniSection(context, s.gsMeaning, ins.meaning.now),
+      _miniSection(context, s.gsLesson, ins.lesson.now),
       const SizedBox(height: 6),
       _WhyCard(
-          label: s.gsReflectMoment, text: ins.reflection, accent: _accVichara),
+          label: s.gsReflectMoment, text: ins.reflection.now, accent: _accVichara),
       const SizedBox(height: 18),
     ]);
   }
@@ -969,8 +972,8 @@ class _BrainTab extends StatelessWidget {
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(p.title, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                  Text(p.blurb, style: text.labelSmall?.copyWith(color: _muted)),
+                  Text(p.title.now, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                  Text(p.blurb.now, style: text.labelSmall?.copyWith(color: _muted)),
                 ]),
               ),
               TextButton(
@@ -1022,14 +1025,14 @@ class _UpliftingTab extends StatelessWidget {
                     color: _accVichara.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: Text(story.theme,
+                  child: Text(story.theme.now,
                       style: text.labelSmall?.copyWith(color: _accVichara, fontWeight: FontWeight.w800)),
                 ),
                 const SizedBox(height: 10),
-                Text(story.title,
+                Text(story.title.now,
                     style: text.titleLarge?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 6),
-                Text(story.blurb, style: text.bodyMedium?.copyWith(color: _muted, height: 1.4)),
+                Text(story.blurb.now, style: text.bodyMedium?.copyWith(color: _muted, height: 1.4)),
                 const SizedBox(height: 10),
                 Row(children: [
                   Text(s.gsRead,
@@ -1059,20 +1062,20 @@ class _VicharaReader extends StatelessWidget {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
     return _PillarScaffold(
-      title: story.theme,
+      title: story.theme.now,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(22, 6, 22, 32),
         children: [
-          Text(story.title,
+          Text(story.title.now,
               style: text.headlineMedium?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           Text(s.gsMinRead(story.minutes), style: text.labelSmall?.copyWith(color: _muted)),
           const SizedBox(height: 18),
-          for (final para in story.body.split('\n\n')) ...[
+          for (final para in story.body.now.split('\n\n')) ...[
             Text(para, style: text.bodyLarge?.copyWith(color: _ink, height: 1.7, fontSize: 17)),
             const SizedBox(height: 16),
           ],
-          _WhyCard(label: s.gsReflectMoment, text: story.reflection, accent: _accVichara),
+          _WhyCard(label: s.gsReflectMoment, text: story.reflection.now, accent: _accVichara),
           const SizedBox(height: 18),
           // Mark-complete only in DAILY mode (Tools library = no "today's done").
           if (daily)
@@ -1166,9 +1169,9 @@ class _SamvadScreenState extends State<SamvadScreen>
   List<_SP> _affirmationPieces() => [
         for (final p in readAloudByCategory(kRtbAffirmations))
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Affirmations & Blessings'
           ),
       ];
@@ -1176,9 +1179,9 @@ class _SamvadScreenState extends State<SamvadScreen>
   List<_SP> _storyPieces() => [
         for (final p in readAloudByCategory(kRtbStories))
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Stories & Fables'
           ),
       ];
@@ -1188,15 +1191,15 @@ class _SamvadScreenState extends State<SamvadScreen>
         for (final p in samvadForTrimester(_trimester))
           (
             title: null,
-            body: p.text,
+            body: p.text.now,
             saveKey: 'mantra_${p.id}',
             group: 'Mantras & Lullabies'
           ),
         for (final p in readAloudByCategory(kRtbRhymes))
           (
-            title: p.title,
-            body: p.body,
-            saveKey: p.title,
+            title: p.title.now,
+            body: p.body.now,
+            saveKey: p.saveKey,
             group: 'Mantras & Lullabies'
           ),
       ];
@@ -1251,7 +1254,7 @@ class _SamvadScreenState extends State<SamvadScreen>
             const SizedBox(height: 12),
             _WhyCard(
                 label: s.gsWhyMatters,
-                text: samvadThemeForTrimester(_trimester),
+                text: samvadThemeForTrimester(_trimester).now,
                 accent: _accSamvad),
             const SizedBox(height: 6),
             _MarkComplete(
@@ -1289,7 +1292,7 @@ class _SamvadScreenState extends State<SamvadScreen>
           children.add(const SizedBox(height: 12));
           children.add(_WhyCard(
               label: s.gsWhyMatters,
-              text: samvadThemeForTrimester(_trimester),
+              text: samvadThemeForTrimester(_trimester).now,
               accent: _accSamvad));
           children.add(const SizedBox(height: 6));
           children.add(_MarkComplete(
@@ -1670,7 +1673,7 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     ],
     Center(child: Text(practice.emoji, style: const TextStyle(fontSize: 52))),
     const SizedBox(height: 10),
-    Text(practice.title,
+    Text(practice.title.now,
         textAlign: TextAlign.center,
         style: text.headlineSmall
             ?.copyWith(color: _ink, fontWeight: FontWeight.w800)),
@@ -1678,7 +1681,7 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
         textAlign: TextAlign.center,
         style: text.bodyMedium?.copyWith(color: _muted)),
     const SizedBox(height: 16),
-    _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t), accent: _accKriya),
+    _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t).now, accent: _accKriya),
     const SizedBox(height: 16),
     SizedBox(
       width: double.infinity,
@@ -1712,7 +1715,7 @@ class _KriyaDetailScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final t = garbhTrimester(controller.currentWeek);
     return _PillarScaffold(
-      title: practice.title,
+      title: practice.title.now,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: _kriyaPracticeBody(context, s, text, t, practice, lang,
@@ -1767,7 +1770,7 @@ class _KriyaBreathingList extends StatelessWidget {
                       children: [
                         Row(children: [
                           Expanded(
-                            child: Text(p.title,
+                            child: Text(p.title.now,
                                 style: text.titleMedium?.copyWith(
                                     color: _ink, fontWeight: FontWeight.w800)),
                           ),
@@ -1775,7 +1778,7 @@ class _KriyaBreathingList extends StatelessWidget {
                               style: text.labelSmall?.copyWith(color: _muted)),
                         ]),
                         const SizedBox(height: 4),
-                        Text(p.blurb,
+                        Text(p.blurb.now,
                             style: text.bodyMedium
                                 ?.copyWith(color: _muted, height: 1.4)),
                       ]),
@@ -1838,13 +1841,13 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(p.title,
+                              Text(p.title.now,
                                   style: text.titleSmall?.copyWith(
                                       color: _ink,
                                       fontWeight: FontWeight.w800)),
                               const SizedBox(height: 3),
                               Expanded(
-                                child: Text(p.blurb,
+                                child: Text(p.blurb.now,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: text.labelSmall?.copyWith(
@@ -1911,7 +1914,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
     _scale = Tween<double>(begin: _current, end: p.scale)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
     _current = p.scale;
-    _label = p.label;
+    _label = p.label.now;
     _ctrl
       ..duration = Duration(seconds: p.seconds)
       ..reset()
@@ -1930,7 +1933,7 @@ class _BreathingScreenState extends State<_BreathingScreen>
     final s = S(widget.lang);
     final text = Theme.of(context).textTheme;
     return _PillarScaffold(
-      title: widget.practice.title,
+      title: widget.practice.title.now,
       child: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           AnimatedBuilder(
@@ -2023,18 +2026,18 @@ class AharaScreen extends StatelessWidget {
                 const Text('🍲', style: TextStyle(fontSize: 28)),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(n.tip,
+                  child: Text(n.tip.now,
                       style: text.titleMedium?.copyWith(color: _ink, fontWeight: FontWeight.w700, height: 1.3)),
                 ),
               ]),
             ]),
           ),
           const SizedBox(height: 14),
-          _WhyCard(label: s.gsWhyMatters, text: n.why, accent: _accAhara),
+          _WhyCard(label: s.gsWhyMatters, text: n.why.now, accent: _accAhara),
           const SizedBox(height: 14),
-          _aharaRow(context, '🍽️', s.gsRecipe, n.recipe),
-          _aharaRow(context, '🔄', s.gsFoodSwap, n.swap),
-          _aharaRow(context, '🌙', s.gsLifestyleHabit, n.habit),
+          _aharaRow(context, '🍽️', s.gsRecipe, n.recipe.now),
+          _aharaRow(context, '🔄', s.gsFoodSwap, n.swap.now),
+          _aharaRow(context, '🌙', s.gsLifestyleHabit, n.habit.now),
           const SizedBox(height: 14),
           _MarkComplete(pillarId: 'ahara', accent: _accAhara, lang: lang),
           _LearnMore(controller: controller),
