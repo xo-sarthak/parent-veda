@@ -895,8 +895,11 @@ const List<_FScan> _fScans = [
         en: 'Her 20-week anomaly scan', hi: 'Uska 20-hafte ka anomaly scan'),
     LocalizedText(en: 'Weeks 18–22', hi: 'Hafte 18–22'),
     LocalizedText(
-        en: "This detailed scan checks the baby's heart, brain, spine and organs - and often shows the sex, if you both want to know. A big, emotional moment, and most findings are reassuring.",
-        hi: "Yeh detailed scan baby ke dil, dimaag, reedh aur organs check karta hai - aur agar aap dono jaanna chaahein to aksar sex bhi dikha deta hai. Ek bada, bhaavuk pal, aur zyaadatar findings rahat dene wale hote hain."),
+        // PCPNDT: dropped "and often shows the sex, if you both want to know".
+        // Disclosing it is illegal in India, so promising it here only sets a
+        // couple up to ask the sonographer and be refused.
+        en: "This detailed scan checks the baby's heart, brain, spine and organs. A big, emotional moment, and most findings are reassuring.",
+        hi: "यह विस्तृत स्कैन शिशु के दिल, दिमाग़, रीढ़ और अंगों की जाँच करता है। एक बड़ा, भावुक पल — और ज़्यादातर नतीजे राहत देने वाले होते हैं।"),
     LocalizedText(
         en: "Go with her if you possibly can. Write your questions down together beforehand, and just be the calm beside her in the room.",
         hi: "Ho sake to zaroor uske saath jaayein. Sawaal pehle se saath likh lein, aur room mein uske paas bas shaant maujoodgi banein."),

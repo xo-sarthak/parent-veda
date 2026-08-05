@@ -51,7 +51,7 @@ const List<WeekArticle> kWeekArticles = [
     readMins: 4,
     body:
         "Around now, most mothers have their mid-pregnancy scan - often called the anatomy or anomaly scan. It's usually the most detailed look at your baby in the whole pregnancy, so it's normal to feel both excited and a little nervous.\n\n"
-        "During it, the sonographer checks your baby's growth and carefully examines the developing organs - the heart, brain, spine, kidneys and more - along with the placenta, the fluid around the baby, and the umbilical cord. It's a thorough, reassuring check that everything is coming along as expected. In many places this is also the scan where you can find out the baby's sex, if you'd like to.\n\n"
+        "During it, the sonographer checks your baby's growth and carefully examines the developing organs - the heart, brain, spine, kidneys and more - along with the placenta, the fluid around the baby, and the umbilical cord. It's a thorough, reassuring check that everything is coming along as expected.\n\n"
         "It can take a while, and the sonographer may go quiet as they concentrate - that's routine, not a warning sign. Bring your partner if you can; it's a special one to share. And if the results raise any questions, your doctor will walk you through them - that's exactly what they're there for.",
   ),
   WeekArticle(

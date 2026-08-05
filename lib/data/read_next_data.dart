@@ -490,7 +490,11 @@ const List<ReadItem> kReadItems = [
           summary: 'Often the easier stretch as energy returns, with chapters shifting toward development milestones and early practical planning.',
           keyPoints: [
             BookPointGroup(label: 'Baby\'s Development', points: [
-              'The anatomy scan around week 20 checks organ development and can reveal the baby\'s sex. Soft markers noted on the scan are usually normal variants, not diagnoses.',
+              // PCPNDT: this said the scan "can reveal the baby's sex". In
+              // India disclosing it is illegal, so no sonographer will — the
+              // line only set a mother up to ask and be refused. The app says
+              // as much in tests_scans_reports_data and ttc_daily_data.
+              'The anatomy scan around week 20 checks organ development. Soft markers noted on the scan are usually normal variants, not diagnoses.',
             ]),
             BookPointGroup(label: 'Your Body', points: [
               'Round ligament pain (sharp groin twinges from the uterus stretching) and mild back pain are explained mechanically rather than treated as concerning.',
