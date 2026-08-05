@@ -5,8 +5,14 @@
 //  (Soft-solid treatment: a radial purple→white wash, glass cards, floating
 //  dots, Plus Jakarta Sans). Eight screens with internal navigation:
 //    welcome → login / signup → profile → success, plus forgot → otp → reset.
-//  No backend - buttons just navigate. [onDone] fires when auth completes
-//  (Success → "Get started"), so the caller can enter the app.
+//  BACKED BY SUPABASE. Email+password (signUp / signInWithPassword) and the
+//  three social buttons (see lib/services/auth/social_auth.dart) all end in a
+//  real Supabase session; the profile step writes to `profiles`. [onDone] fires
+//  when auth completes, so the caller can enter the app.
+//
+//  Social sign-in needs console setup to work — see docs/AUTH-SETUP.md. Until
+//  the ids in lib/auth_config.dart are filled in, each social button explains
+//  itself instead of failing; nothing here crashes on an unconfigured backend.
 // =============================================================================
 
 import 'dart:async';
@@ -28,6 +34,7 @@ import '../../referral/referral_analytics.dart';
 import '../referral/enter_code_sheet.dart';
 import '../enterprise/activation_flow_screen.dart';
 import '../../services/entitlement_store.dart';
+import '../../services/auth/social_auth.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
@@ -311,6 +318,84 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  // === Social sign-in (Google / Apple / Facebook) ===========================
+  //
+  // Social login collapses sign-UP and log-IN into a single tap, which is the
+  // one structural difference from the email flow above. With email we know
+  // which one the user meant, because they chose a different screen to get
+  // here. With Google we cannot know and must not ask — "do you already have an
+  // account?" is a question the provider has already answered for us.
+  //
+  // So the branch happens AFTER the session exists, and it reads the database
+  // rather than any local flag: a profile row with a `role` means onboarding was
+  // finished before, so go straight in; a row without one means this is a new
+  // account (or an abandoned onboarding) and the remaining steps still owe us a
+  // role and a due date. Deriving it from the row rather than asking honours the
+  // repo's "derive, never ask" rule, and it also survives a reinstall — the
+  // local flag would not.
+  Future<void> _socialSignIn(SocialProvider provider, String label) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final result = await SocialAuth.signIn(provider);
+      if (!mounted) return;
+
+      // Backed out of the picker. Not an error; show nothing at all.
+      if (result.cancelled) return;
+
+      if (!result.ok) {
+        _toast(result.message ?? S.now.socialSignInFailed(label), ms: 5000);
+        return;
+      }
+      await _routeAfterSocial();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Decide where a freshly signed-in social user lands.
+  Future<void> _routeAfterSocial() async {
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
+    if (user == null) {
+      _toast(S.now.socialNoSession, ms: 6000);
+      return;
+    }
+
+    // The provider already told us her name — carrying it across means the
+    // profile step opens filled in rather than asking for something we were
+    // just handed. Never overwrite something she typed herself.
+    final meta = user.userMetadata ?? const <String, dynamic>{};
+    final fromProvider =
+        (meta['full_name'] ?? meta['name'] ?? '').toString().trim();
+    if (fromProvider.isNotEmpty && _name.text.trim().isEmpty) {
+      _name.text = fromProvider;
+    }
+
+    Map<String, dynamic>? row;
+    try {
+      row = await client.from('profiles').select().eq('id', user.id).maybeSingle();
+    } catch (e) {
+      // A read failure must not strand her on the welcome screen with a valid
+      // session. Falling through with a null row sends her into onboarding,
+      // which is the recoverable direction: worst case she re-picks a role.
+      debugPrint('social profile read failed: $e');
+    }
+    if (!mounted) return;
+
+    final role = row?['role'];
+    if (role == null) {
+      _go('role'); // new account → finish onboarding
+      return;
+    }
+
+    final due = row?['due_date'];
+    widget.onDone(
+      due == null ? null : DateTime.tryParse(due.toString()),
+      role == 'father',
+    );
   }
 
   // Marks the current account as the father, then enters the app. (The real
@@ -2069,19 +2154,25 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       );
 
   Widget _socialRow() => Row(children: [
-        Expanded(child: _socialBtn('Google', _googleSvg)),
+        Expanded(
+            child: _socialBtn('Google', _googleSvg, SocialProvider.google)),
         const SizedBox(width: 10),
-        Expanded(child: _socialBtn('Apple', _appleSvg)),
+        Expanded(child: _socialBtn('Apple', _appleSvg, SocialProvider.apple)),
         const SizedBox(width: 10),
-        Expanded(child: _socialBtn('Facebook', _facebookSvg)),
+        Expanded(
+            child: _socialBtn('Facebook', _facebookSvg, SocialProvider.facebook)),
       ]);
 
-  Widget _socialBtn(String label, String svg) => Material(
+  Widget _socialBtn(String label, String svg, SocialProvider provider) =>
+      Material(
         color: const Color(0xBFFFFFFF),
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          onTap: () => _soon(label),
+          // Disabled while any auth request is in flight. A second tap during
+          // the Google picker would start a parallel sign-in whose result races
+          // the first one's routing.
+          onTap: _busy ? null : () => _socialSignIn(provider, label),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(

@@ -50,6 +50,7 @@ import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 import 'saved_hub_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../services/auth/social_auth.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -574,6 +575,12 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     final nav = Navigator.of(context);
     try {
+      // Google caches "this app uses this account" inside Play Services, quite
+      // separately from our session. Without this, the next Google tap silently
+      // re-signs-in the same person with no picker — so on a shared phone,
+      // signing out and handing it over would land the next person straight
+      // back in the first person's account.
+      await SocialAuth.signOutGoogle();
       await Supabase.instance.client.auth.signOut(); // clear the real session
       await (await SharedPreferences.getInstance())
           .setBool(kAuthCompletedKey, false);

@@ -103,6 +103,17 @@ dependencies:
   flutter_svg: ^2.0.10+1
   supabase_flutter: ^2.15.0
 
+  # Native Google sign-in (lib/services/auth/social_auth.dart). Play Services
+  # draws the account picker in-process and returns an ID token, which we hand
+  # to Supabase via signInWithIdToken - no browser, no redirect.
+  #
+  # Facebook needs NO package: it runs Supabase's browser redirect flow, so the
+  # only app-side requirement is the deep-link intent-filter in
+  # android/app/src/parent/AndroidManifest.xml. Adding the Facebook SDK would
+  # buy us a marginally slicker prompt in exchange for a tracking-heavy
+  # dependency and a second place for the App ID to drift.
+  google_sign_in: ^7.2.0
+
   # AskVeda RAG chatbot backend — the app's Ask Veda screen POSTs a question to
   # the AskVeda service (/ask) and shows the grounded answer. Plain REST over http.
   http: ^1.2.2

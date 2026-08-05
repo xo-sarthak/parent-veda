@@ -1,0 +1,45 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      OAuth callback for the PARENT app only.
+
+      WHY THIS FILE EXISTS AT ALL, rather than adding the filter to the main
+      manifest: `main/` is merged into BOTH flavors, so an intent-filter placed
+      there would also be claimed by ParentVeda+ (the doctor build, which
+      installs alongside via the `.doctor` applicationId suffix). Two installed
+      apps advertising the same scheme means Android cannot tell which one asked
+      — it shows the user a "Complete action using…" chooser in the middle of
+      signing in, and picking wrong drops the session on the floor. Flavor
+      source sets are Gradle's answer to exactly this: `src/parent/` merges only
+      into the parent build. The doctor app signs in with email + password and
+      needs no callback.
+
+      This is only used by the BROWSER-REDIRECT providers (Facebook now, Apple
+      later). Google's native flow never leaves the app and needs nothing here.
+
+      The path back:
+        Custom Tab → facebook.com → Supabase /auth/v1/callback
+                   → com.parentveda.app://login-callback/  → this filter → app
+
+      supabase_flutter listens for the incoming link itself and completes the
+      session, which is what fires the `signedIn` event SocialAuth waits on.
+
+      NOTE: `android:exported="true"` is required — the whole point is that an
+      external app (the browser) can start this activity. And the scheme must
+      match AuthConfig.oauthRedirectScheme exactly, in both spelling and case;
+      Android does not normalise it, so a capital letter here silently means the
+      redirect is never delivered.
+    -->
+    <application>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.parentveda.app"
+                      android:host="login-callback" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

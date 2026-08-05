@@ -2461,6 +2461,23 @@ class S {
 
   String opensSoon(String what) => _p('$what opens soon', '$what जल्द खुलेगा');
 
+  // Social sign-in (Google / Apple / Facebook). Brand names stay Latin — she
+  // is looking for the word on the button, and "गूगल" is not what it says.
+  String socialNotSetUp(String what) => _p(
+      '$what sign-in isn\'t set up yet. Please use email for now.',
+      '$what साइन-इन अभी तैयार नहीं है। फ़िलहाल email से आइए।');
+  String socialSignInFailed(String what) => _p(
+      '$what sign-in failed. Please try again.',
+      '$what साइन-इन नहीं हो पाया। फिर कोशिश कीजिए।');
+  String get socialAppleSoon => _p(
+      'Sign in with Apple is coming soon. Please use Google or email.',
+      'Apple से साइन-इन जल्द आ रहा है। अभी Google या email से आइए।');
+  String get socialNoSession => _p(
+      'Signed in, but no session was created. Please try again.',
+      'साइन-इन तो हुआ, पर session नहीं बना। फिर कोशिश कीजिए।');
+  String get socialCouldNotOpen => _p(
+      'Couldn\'t open the sign-in page.', 'साइन-इन पेज नहीं खुल पाया।');
+
   String get whatsappUpdatesOn =>
       _p('WhatsApp updates on', 'WhatsApp अपडेट चालू');
   String get whatsappUpdatesOff =>

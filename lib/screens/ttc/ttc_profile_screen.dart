@@ -36,6 +36,7 @@ import '../../services/life_stage_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../auth/auth_flow_screen.dart' show kAuthCompletedKey;
+import '../../services/auth/social_auth.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
@@ -242,6 +243,10 @@ class TtcProfileScreen extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     final nav = Navigator.of(context);
     try {
+      // Same reason as the pregnancy Profile's sign-out: Play Services keeps
+      // its own cached account, so dropping only our session would let the next
+      // Google tap re-enter the same account with no picker.
+      await SocialAuth.signOutGoogle();
       await Supabase.instance.client.auth.signOut();
       await (await SharedPreferences.getInstance())
           .setBool(kAuthCompletedKey, false);
