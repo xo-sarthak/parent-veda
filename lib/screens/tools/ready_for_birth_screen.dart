@@ -7,7 +7,7 @@
 //  ready status, % ready, today's focus, minutes left — over four simple
 //  categories (Mom · Baby · Documents · Partner & Extras). Progressive
 //  disclosure: items only appear inside a category. The primary action is
-//  "Let's Pack Together" (a guided, small-wins flow); a persistent "Labour
+//  S.now.rfbPackTogether (a guided, small-wins flow); a persistent "Labour
 //  started?" opens a calm emergency grab-list. Contextual ParentVeda insights
 //  replace articles. Reuses the existing bag data (HospitalBagV2Store + catalogue
 //  + seed); personalisation lives in ReadyBirthContextStore. Replaces the old
@@ -69,11 +69,13 @@ class _Readiness {
   /// The single next step for the hero.
   String focusLine() {
     final left = kGuidedOrder.where((c) => remainingIn(c) > 0).toList();
-    if (left.isEmpty) return "You're fully packed — beautifully ready.";
-    if (left.length == 1) {
-      return 'Only your ${kReadyCatMeta[left.first]!.label.toLowerCase()} remain.';
-    }
-    return 'Next up: your ${kReadyCatMeta[left.first]!.label.toLowerCase()}.';
+    if (left.isEmpty) return S.now.rfbFullyPacked;
+    // Lowercasing is an English habit — Devanagari has no case, and the
+    // category name reads correctly as-is in Hindi.
+    final name = kReadyCatMeta[left.first]!.label;
+    return left.length == 1
+        ? S.now.rfbOnlyLeft(name.now, name.en.toLowerCase())
+        : S.now.rfbNextUp(name.now, name.en.toLowerCase());
   }
 }
 
@@ -177,8 +179,8 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     final dueLine = due == null
         ? null
         : (due > 0
-            ? '$due days to your due date'
-            : (due == 0 ? 'Your due date is today' : 'A little past your due date — any day now'));
+            ? S.now.rfbDaysToDue(due)
+            : (due == 0 ? S.now.rfbDueToday : S.now.rfbPastDue));
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -189,7 +191,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
         border: Border.all(color: AppTheme.outlineVariant),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('WEEK $w'.toUpperCase(),
+        Text(S.now.rfbWeekCaps(w).toUpperCase(),
             style: _t.labelSmall?.copyWith(color: AppTheme.primary, letterSpacing: 1.4, fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
         Row(children: [
@@ -197,7 +199,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           const SizedBox(width: 18),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(r.isReady ? 'Ready for birth' : 'Getting ready',
+              Text(r.isReady ? S.now.rfbReadyForBirth : S.now.rfbGettingReady,
                   style: _t.headlineSmall?.copyWith(height: 1.05)),
               const SizedBox(height: 6),
               Text(r.focusLine(),
@@ -205,7 +207,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
               const SizedBox(height: 10),
               Row(children: [
                 _chip(Icons.timelapse_rounded,
-                    r.remaining == 0 ? 'All done' : '~${estMinutesFor(r.remaining)} min left'),
+                    r.remaining == 0 ? S.now.rfbAllDone : S.now.rfbMinLeft(estMinutesFor(r.remaining))),
                 if (dueLine != null) ...[
                   const SizedBox(width: 8),
                   Flexible(child: _chip(Icons.event_rounded, dueLine, soft: true)),
@@ -283,7 +285,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           const SizedBox(width: 10),
           Text(S.now.uiLetSPackTogether, style: _t.titleMedium?.copyWith(color: Colors.white)),
           const SizedBox(width: 8),
-          Text('~${estMinutesFor(r.remaining)} min',
+          Text(S.now.rfbMin(estMinutesFor(r.remaining)),
               style: _t.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85))),
         ]),
       ),
@@ -349,9 +351,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(meta.label, style: _t.titleMedium),
+              Text(meta.label.now, style: _t.titleMedium),
               const SizedBox(height: 3),
-              Text(done ? 'All packed' : '$packed packed · $remaining to go',
+              Text(done ? S.now.rfbAllPacked : S.now.rfbPackedToGo(packed, remaining),
                   style: _t.bodySmall?.copyWith(color: done ? AppTheme.tertiary600 : AppTheme.neutral600)),
               const SizedBox(height: 8),
               ClipRRect(
@@ -531,7 +533,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
     final t = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(meta.label)),
+      appBar: AppBar(title: Text(meta.label.now)),
       body: AnimatedBuilder(
         animation: Listenable.merge([_bag, _ctx]),
         builder: (context, _) {
@@ -555,9 +557,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(meta.blurb, style: t.bodyMedium?.copyWith(color: AppTheme.neutral700)),
+                    Text(meta.blurb.now, style: t.bodyMedium?.copyWith(color: AppTheme.neutral700)),
                     const SizedBox(height: 2),
-                    Text('$packed of ${items.length} packed',
+                    Text(S.now.rfbPackedOf(packed, items.length),
                         style: t.labelMedium?.copyWith(color: AppTheme.neutral600)),
                   ]),
                 ),
@@ -707,7 +709,7 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: Text('Step ${_step + 1} of ${steps.length}'),
+        title: Text(S.now.rfbStepOf(_step + 1, steps.length)),
       ),
       body: AnimatedBuilder(
         animation: _bag,
@@ -747,8 +749,8 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(meta.label, style: t.titleLarge),
-                        Text(remaining == 0 ? 'All done here' : '$remaining left to pack',
+                        Text(meta.label.now, style: t.titleLarge),
+                        Text(remaining == 0 ? S.now.rfbAllDoneHere : S.now.rfbLeftToPack(remaining),
                             style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
                       ]),
                     ),
@@ -769,7 +771,7 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: Text(
-                  _step == steps.length - 1 ? 'Finish' : (remaining == 0 ? 'Done · next' : 'Next'),
+                  _step == steps.length - 1 ? S.now.rfbFinish : (remaining == 0 ? S.now.rfbDoneNext : 'Next'),
                   style: t.titleMedium?.copyWith(color: Colors.white),
                 ),
               ),
@@ -856,9 +858,9 @@ class _EmergencyScreen extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(g.title, style: t.titleSmall),
+                    Text(g.title.now, style: t.titleSmall),
                     const SizedBox(height: 2),
-                    Text(g.sub, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                    Text(g.sub.now, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
                   ]),
                 ),
               ]),
@@ -909,9 +911,9 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           Text(S.now.uiFewDetailsMakeSuggestions, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
           const SizedBox(height: 20),
 
-          _label('Delivery type', t),
+          _label(S.now.rfbDeliveryType, t),
           Row(children: [
-            _pick('Not sure', _ctx.delivery == DeliveryType.unsure, () => _set(() => _ctx.setDelivery(DeliveryType.unsure))),
+            _pick(S.now.rfbNotSure, _ctx.delivery == DeliveryType.unsure, () => _set(() => _ctx.setDelivery(DeliveryType.unsure))),
             const SizedBox(width: 8),
             _pick('Vaginal', _ctx.delivery == DeliveryType.vaginal, () => _set(() => _ctx.setDelivery(DeliveryType.vaginal))),
             const SizedBox(width: 8),
@@ -919,7 +921,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           ]),
           const SizedBox(height: 18),
 
-          _label('Season of your due date', t),
+          _label(S.now.rfbSeasonOfDue, t),
           Wrap(spacing: 8, runSpacing: 8, children: [
             _pick('Auto', _ctx.seasonOverride == null, () => _set(() => _ctx.setSeasonOverride(null)), expand: false),
             for (final s in Season.values)
@@ -936,10 +938,10 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           ]),
           const SizedBox(height: 8),
 
-          _label('My hospital already provides', t),
+          _label(S.now.rfbHospitalProvides, t),
           Wrap(spacing: 8, runSpacing: 8, children: [
             for (final e in kHospitalProvidableLabel.entries)
-              _pick(e.value, _ctx.providesFor(e.key), () => _set(() => _ctx.toggleProvides(e.key)), expand: false),
+              _pick(e.value.now, _ctx.providesFor(e.key), () => _set(() => _ctx.toggleProvides(e.key)), expand: false),
           ]),
           const SizedBox(height: 22),
           FilledButton(
@@ -1001,7 +1003,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final name = _bag.byId(widget.itemId)?.name.of(_lang) ?? 'Options';
+    final name = _bag.byId(widget.itemId)?.name.of(_lang) ?? S.now.rfbOptions;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(title: Text(name)),
@@ -1023,7 +1025,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(S.now.uiHowChoose, style: t.labelLarge?.copyWith(color: AppTheme.primary700)),
                   const SizedBox(height: 6),
-                  Text('${whyPack(item)} Our picks below balance comfort, safety and value — or grab one from a store you already trust.',
+                  Text(S.now.rfbWhyThenPicks(whyPack(item)),
                       style: t.bodyMedium?.copyWith(color: AppTheme.primary900, height: 1.5)),
                 ]),
               ),
@@ -1127,7 +1129,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                     Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
                   else if (p.topPick)
                     Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
-                  Text(affiliate ? 'Buy on ${p.store}' : p.name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                 ]),

@@ -80,11 +80,19 @@ void main() {
     // A string that loses its $n still compiles and still passes every other
     // test. It just shows the mother the wrong number.
     final interp = RegExp(r'\$\{[^}]*\}|\$\w+');
-    // One deliberate exception: a call site may hold the language-specific
-    // fragment in a local named `en` and its twin in one named `hi`, so the
-    // two sides legitimately interpolate different variables. Treating them
-    // as the same slot keeps this test honest without special-casing a name.
-    String slot(String s) => s == r'$en' || s == r'$hi' ? r'$lang' : s;
+    // One deliberate exception, and it is narrow on purpose.
+    //
+    // A pair may interpolate a DIFFERENT variable on each side when the value
+    // itself is language-specific: an English fragment lowercased (English
+    // sentence case is a convention Devanagari does not have) beside the Hindi
+    // word. Those are the same slot filled from two sources, not a lost
+    // placeholder.
+    //
+    // Only these names qualify. Anything else that differs is the failure this
+    // test exists for: a translation that dropped its $n and now shows the
+    // mother a number that is not hers.
+    const languageSlots = {r'$en', r'$hi', r'$enLower', r'$hiLower'};
+    String slot(String s) => languageSlots.contains(s) ? r'$lang' : s;
     final mismatched = <String>[];
     for (final (en, hi) in pairs) {
       final a = interp.allMatches(en).map((m) => slot(m.group(0)!)).toList()

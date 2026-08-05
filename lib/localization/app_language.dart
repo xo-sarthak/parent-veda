@@ -47,6 +47,18 @@ class LocalizedText {
   }
 
   String of(AppLanguage lang) => lang.isEnglish ? en : hi;
+
+  /// The text in the language the app is currently rendering in.
+  ///
+  /// The companion to [S.now], and for the same reason: a `const` data table
+  /// has no controller in scope, so `meta.label.of(controller.language)` means
+  /// threading a controller into every data read. `meta.label.now` is the same
+  /// answer without the plumbing.
+  ///
+  /// Use `of(lang)` where a language is genuinely at hand — a widget already
+  /// holding one, or a test asserting both sides. Reach for `now` when the
+  /// alternative is passing a language through three layers to reach a string.
+  String get now => of(S.current);
 }
 
 /// Fixed UI strings (chrome). Construct with the active language and read the
@@ -2423,6 +2435,62 @@ class S {
     final i = (m - 1).clamp(0, 11);
     return _p(en[i], hi[i]);
   }
+
+  // ---- Ready for Birth ----------------------------------------------------
+  // The category name arrives twice: `hi` for the Hindi sentence and a
+  // lowercased `en` for the English one. Lowercasing is an English habit —
+  // Devanagari has no case at all — so doing it at the call site would either
+  // be wrong in Hindi or need a language check inside a widget.
+
+  String get rfbFullyPacked => _p("You're fully packed — beautifully ready.",
+      'आपका सब कुछ पैक है — बिलकुल तैयार।');
+
+  String rfbOnlyLeft(String hi, String enLower) =>
+      _p('Only your $enLower remain.', 'बस आपका $hi बाक़ी है।');
+
+  String rfbNextUp(String hi, String enLower) =>
+      _p('Next up: your $enLower.', 'अगला: आपका $hi।');
+
+  String rfbDaysToDue(int n) =>
+      _p('$n days to your due date', 'डिलीवरी की तारीख़ में $n दिन');
+  String get rfbDueToday =>
+      _p('Your due date is today', 'आज आपकी डिलीवरी की तारीख़ है');
+  String get rfbPastDue => _p('A little past your due date — any day now',
+      'डिलीवरी की तारीख़ थोड़ी निकल गई — अब कभी भी');
+  String rfbWeekCaps(int w) => _p('WEEK $w', 'हफ़्ता $w');
+  String get rfbReadyForBirth => _p('Ready for birth', 'जन्म के लिए तैयार');
+  String get rfbGettingReady => _p('Getting ready', 'तैयारी चल रही है');
+  String get rfbAllDone => _p('All done', 'सब हो गया');
+  String rfbMinLeft(int m) => _p('~$m min left', '~$m मिनट बाक़ी');
+  String rfbMin(int m) => _p('~$m min', '~$m मिनट');
+  String get rfbAllPacked => _p('All packed', 'सब पैक');
+  String rfbPackedToGo(int packed, int remaining) =>
+      _p('$packed packed · $remaining to go',
+          '$packed पैक · $remaining बाक़ी');
+  String rfbPackedOf(int packed, int total) =>
+      _p('$packed of $total packed', '$total में से $packed पैक');
+  String rfbStepOf(int step, int total) =>
+      _p('Step $step of $total', 'क़दम $step / $total');
+  String get rfbAllDoneHere => _p('All done here', 'यहाँ सब हो गया');
+  String rfbLeftToPack(int n) =>
+      _p('$n left to pack', '$n पैक करने बाक़ी');
+  String get rfbFinish => _p('Finish', 'ख़त्म करें');
+  String get rfbDoneNext => _p('Done · next', 'हो गया · अगला');
+  String get rfbDeliveryType => _p('Delivery type', 'डिलीवरी का तरीक़ा');
+  String get rfbNotSure => _p('Not sure', 'पक्का नहीं');
+  String get rfbSeasonOfDue =>
+      _p('Season of your due date', 'आपकी डिलीवरी का मौसम');
+  String get rfbHospitalProvides =>
+      _p('My hospital already provides', 'मेरा अस्पताल यह पहले से देता है');
+  String get rfbOptions => _p('Options', 'विकल्प');
+  String rfbWhyThenPicks(String why) => _p(
+      '$why Our picks below balance comfort, safety and value — or grab one '
+          'from a store you already trust.',
+      '$why नीचे हमारी पसंद आराम, सुरक्षा और दाम — तीनों में संतुलन रखती है। '
+          'या किसी ऐसी दुकान से ले लीजिए जिस पर आप पहले से भरोसा करती हैं।');
+  String rfbBuyOn(String store) => _p('Buy on $store', '$store पर ख़रीदें');
+  String get rfbPackTogether =>
+      _p("Let's Pack Together", 'आइए साथ में पैक करें');
 
   // ---- Notifications ------------------------------------------------------
   // A notification is read on a lock screen, hours after the app was last
