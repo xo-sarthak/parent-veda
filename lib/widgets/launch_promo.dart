@@ -28,7 +28,7 @@ Future<void> showLaunchPromo(BuildContext context) async {
     context: context,
     barrierDismissible: true,
     barrierColor: Colors.black.withValues(alpha: 0.55),
-    builder: (_) => const _LaunchPromoDialog(slides: kLaunchPromos),
+    builder: (_) => _LaunchPromoDialog(slides: kLaunchPromos),
   );
 }
 
@@ -181,7 +181,7 @@ class _Slide extends StatelessWidget {
                 _tag(),
                 const Spacer(),
                 Text(
-                  slide.headline,
+                  slide.headline.now,
                   style: pvJakarta(
                     fontSize: 30,
                     height: 1.05,
@@ -202,12 +202,12 @@ class _Slide extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final o in slide.offers) ...[
-                    _offerPill(o),
+                    _offerPill(o.now),
                     const SizedBox(height: 12),
                   ],
                   const SizedBox(height: 2),
                   Text(
-                    slide.subline,
+                    slide.subline.now,
                     style: pvManrope(
                       fontSize: 13.5,
                       height: 1.5,
@@ -300,7 +300,7 @@ class _Slide extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                slide.cta,
+                slide.cta.now,
                 style: pvJakarta(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
