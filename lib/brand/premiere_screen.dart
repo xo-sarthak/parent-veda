@@ -25,6 +25,7 @@ import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
 import 'outbound.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 /// TESTING: show the Premiere on EVERY app open, ignoring the once-per-campaign
 /// cap.
@@ -181,7 +182,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
           child: IconButton(
             onPressed: _close,
             icon: const Icon(Icons.close_rounded, color: Colors.white70),
-            tooltip: 'Close',
+            tooltip: S.now.uiClose,
           ),
         ),
 
@@ -318,7 +319,7 @@ class _PremiereScreenState extends State<PremiereScreen> with SingleTickerProvid
                 child: TextButton(
                   onPressed: _close,
                   child: Text(
-                    'Not now',
+                    S.now.uiNotNow,
                     style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,

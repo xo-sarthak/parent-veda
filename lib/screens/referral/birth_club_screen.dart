@@ -23,6 +23,7 @@ import '../../referral/birth_club_store.dart';
 import '../../referral/referral_notifications.dart';
 import 'reward_celebration.dart';
 import 'invite_friends_screen.dart';
+import '../../localization/app_language.dart';
 
 /// The ladder. Reached by inviting mothers who actually join.
 class ClubMilestone {
@@ -121,7 +122,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
             backgroundColor: ppBg,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
-            title: Text('Birth Club', style: ppJakarta(16)),
+            title: Text(S.now.uiBirthClub, style: ppJakarta(16)),
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
@@ -144,7 +145,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
         child: Column(children: [
           const Icon(Icons.event_outlined, size: 26, color: ppMuted),
           const SizedBox(height: 12),
-          Text('Set your due date first', style: ppJakarta(14)),
+          Text(S.now.uiSetDueDateFirst, style: ppJakarta(14)),
           const SizedBox(height: 6),
           Text(
             'Your Birth Club is the group of mothers due the same month as you, '
@@ -184,7 +185,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
                   const Icon(Icons.workspace_premium_rounded,
                       size: 14, color: ppPurple),
                   const SizedBox(width: 6),
-                  Text('Founding member',
+                  Text(S.now.uiFoundingMember,
                       style: ppJakarta(11, color: ppPurple)),
                 ]),
               ),
@@ -211,9 +212,9 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Expert Q&A is open to you', style: ppJakarta(13.5)),
+                      Text(S.now.uiExpertQOpen, style: ppJakarta(13.5)),
                       const SizedBox(height: 2),
-                      Text('Your club puts questions to a specialist monthly.',
+                      Text(S.now.uiClubPutsQuestionsSpecialist,
                           style: ppBody(11.5, h: 1.4)),
                     ]),
               ),
@@ -221,7 +222,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
           ),
         ],
         const SizedBox(height: 22),
-        Text('What you unlock', style: ppJakarta(15)),
+        Text(S.now.uiWhatUnlock, style: ppJakarta(15)),
         const SizedBox(height: 12),
         for (final m in kClubMilestones) _milestone(m),
         const SizedBox(height: 18),

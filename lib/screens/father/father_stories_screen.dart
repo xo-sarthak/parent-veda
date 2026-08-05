@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/father/father_tales.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 // ---- Slate palette (mirrors the Father Daily _slate look) -----------------
 const _bg = Color(0xFFF4EFE8);
@@ -72,14 +73,14 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('FOR YOU TO READ ALOUD',
+                  Text(S.now.uiReadAloud,
                       style: pvJakarta(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.14 * 11,
                           color: _muted)),
                   const SizedBox(height: 2),
-                  Text('Stories, Fables & Mythology',
+                  Text(S.now.uiStoriesFablesMythology,
                       style: _serif(21, _ink, w: FontWeight.w600)),
                 ]),
               ),
@@ -240,7 +241,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.auto_stories_rounded, size: 16, color: _muted),
                   const SizedBox(width: 7),
-                  Text('Read it aloud - let your voice rise and fall',
+                  Text(S.now.uiReadAloudLetVoice,
                       style: _body(12.5, _muted, w: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 20),
@@ -255,7 +256,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('THE LESSON',
+                          Text(S.now.uiLesson,
                               style: pvJakarta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
@@ -280,7 +281,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('FROM DAD',
+                          Text(S.now.uiFromDad,
                               style: pvJakarta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,

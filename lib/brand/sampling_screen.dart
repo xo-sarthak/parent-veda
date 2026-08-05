@@ -28,6 +28,7 @@ import 'brand_models.dart';
 import 'brand_sampling.dart';
 import 'brand_store.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -87,9 +88,9 @@ class _SamplingScreenState extends State<SamplingScreen> {
         BrandAnalytics.instance.event(c, BrandEvent.completed);
         setState(() {});
       case SampleClaimResult.notSignedIn:
-        _say('Sign in first, so we know where to send it.');
+        _say(S.now.signInFirstToSend);
       case SampleClaimResult.failed:
-        _say('Could not save that — check your connection and try again.');
+        _say(S.now.couldNotSaveConnection);
     }
   }
 
@@ -107,7 +108,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         backgroundColor: _bg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: Text('Free sample',
+        title: Text(S.now.uiFreeSample,
             style: pvFraunces(
                 fontSize: 20, fontWeight: FontWeight.w600, color: _ink)),
       ),
@@ -167,7 +168,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           Row(children: [
             const Icon(Icons.lock_outline_rounded, size: 16, color: AppTheme.accentGreen),
             const SizedBox(width: 8),
-            Text('Where your details go',
+            Text(S.now.uiWhereDetailsGo,
                 style: pvManrope(
                     fontSize: 13, fontWeight: FontWeight.w800, color: _ink)),
           ]),
@@ -200,7 +201,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
   // ---- registration ---------------------------------------------------------
 
   List<Widget> _form(Brand brand) => [
-        Text('Where should we post it?',
+        Text(S.now.uiWhereShouldWePost,
             style: pvManrope(
                 fontSize: 13.5, fontWeight: FontWeight.w800, color: _ink)),
         const SizedBox(height: 9),
@@ -210,7 +211,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           onChanged: (_) => setState(() {}),
           style: pvManrope(fontSize: 13.5, color: _ink),
           decoration: InputDecoration(
-            hintText: 'Flat / house, street, area, city, PIN',
+            hintText: S.now.uiFlatHouseStreetArea,
             hintStyle: pvManrope(fontSize: 13, color: const Color(0xFFB3ACC0)),
             filled: true,
             fillColor: Colors.white,
@@ -239,7 +240,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'ParentVeda may use this address to post this sample.',
+                S.now.uiParentvedaMayUseAddress,
                 style: pvManrope(
                     fontSize: 12.5, height: 1.45, color: _soft),
               ),
@@ -285,7 +286,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
             Row(children: [
               const Icon(Icons.check_circle_rounded, size: 19, color: AppTheme.accentGreen),
               const SizedBox(width: 9),
-              Text('You are on the list',
+              Text(S.now.uiAreList,
                   style: pvManrope(
                       fontSize: 14.5, fontWeight: FontWeight.w800, color: _ink)),
             ]),
@@ -298,7 +299,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
           ]),
         ),
         const SizedBox(height: 22),
-        Text('When it arrives',
+        Text(S.now.uiWhenArrives,
             style: pvFraunces(
                 fontSize: 19, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C))),
         const SizedBox(height: 6),
@@ -332,7 +333,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         ),
         if (_rating != null) ...[
           const SizedBox(height: 12),
-          Text('Thank you — noted.',
+          Text(S.now.uiThankNoted,
               style: pvManrope(
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: AppTheme.accentGreen)),
         ],

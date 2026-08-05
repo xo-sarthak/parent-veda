@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'masterclass_detail_screen.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 class MasterclassesScreen extends StatelessWidget {
   const MasterclassesScreen({super.key});
@@ -31,13 +32,13 @@ class MasterclassesScreen extends StatelessWidget {
             const SizedBox(height: 22),
             pvEyebrow('Live with an expert'),
             const SizedBox(height: 10),
-            Text('Masterclasses', style: pvHeroStyle()),
+            Text(S.now.uiMasterclasses, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('Deep-dive live sessions with experts, on the moments that matter.', style: pvSubStyle()),
+            Text(S.now.uiDeepDiveLiveSessions, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText("You're "),
+              pvText(S.now.uiRe),
               pvBold('30 weeks'),
-              pvText(' - birth is on your mind. Start here.'),
+              pvText(S.now.uiBirthMindStartHere),
             ]),
 
             // featured
@@ -100,7 +101,7 @@ class MasterclassesScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 28),
-            Text('More masterclasses', style: pvTitleStyle(16)),
+            Text(S.now.uiMoreMasterclasses, style: pvTitleStyle(16)),
             const SizedBox(height: 6),
             for (int i = 0; i < more.length; i++)
               _row(more[i], () => open(more[i]), bottom: i == more.length - 1),
@@ -146,7 +147,7 @@ class MasterclassesScreen extends StatelessWidget {
                   bg: chipBgFor(m.listChipIsCoral), fg: chipColorFor(m.listChipIsCoral)),
               const SizedBox(width: 8),
             ],
-            Text('live + recording', style: pvBody(kMuted, 12)),
+            Text(S.now.uiLiveRecording, style: pvBody(kMuted, 12)),
           ]),
         ]),
       ),

@@ -71,7 +71,7 @@ class RemindersScreen extends StatelessWidget {
         title: Text(s.rmdTitle),
         actions: [
           IconButton(
-            tooltip: 'Send a test notification now',
+            tooltip: S.now.uiSendTestNotificationNow,
             icon: const Icon(Icons.notifications_active_outlined),
             onPressed: () async {
               await NotificationService.instance.requestPermission();
@@ -79,14 +79,14 @@ class RemindersScreen extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context)
                   ..clearSnackBars()
-                  ..showSnackBar(const SnackBar(
+                  ..showSnackBar(SnackBar(
                       content: Text(
-                          'Test notification sent - check your tray')));
+                          S.now.uiTestNotificationSentCheck)));
               }
             },
           ),
           IconButton(
-            tooltip: 'Schedule a test for 1 min from now',
+            tooltip: S.now.uiScheduleTestMinFrom,
             icon: const Icon(Icons.alarm_add_outlined),
             onPressed: () async {
               await NotificationService.instance.requestPermission();

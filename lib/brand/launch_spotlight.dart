@@ -24,6 +24,7 @@ import 'brand_models.dart';
 import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 class LaunchSpotlight extends StatefulWidget {
   const LaunchSpotlight({
@@ -100,7 +101,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'A PARENTVEDA LAUNCH',
+                        S.now.uiParentvedaLaunch,
                         style: pvManrope(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,

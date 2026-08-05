@@ -39,6 +39,7 @@ import '../week_flow_screen.dart';
 import 'father_journal_screen.dart';
 import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 // ---- palettes ---------------------------------------------------------------
 class _Pal {
@@ -100,11 +101,11 @@ class _Detail {
   final List<String> paras, list;
 }
 
-const Map<String, _Detail> _kDetails = {
+Map<String, _Detail> _kDetails = {
   'tip': _Detail(
     id: 'tip',
     eyebrow: 'Daily tip for Dad',
-    title: "Tonight, don't fix it - just sit with her",
+    title: S.now.uiTonightDonTFix2,
     meta: '2 min · showing up',
     paras: [
       "When she can't sleep, the instinct is to solve it. Resist that. You don't need the right words.",
@@ -121,7 +122,7 @@ const Map<String, _Detail> _kDetails = {
   'partner': _Detail(
     id: 'partner',
     eyebrow: 'Support your partner',
-    title: "Week 20 - what she's carrying",
+    title: S.now.uiWeekWhatSheS,
     paras: [
       'Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.',
       'Small, specific help lands bigger than grand gestures right now. You do not have to be asked - noticing first is the whole gift.',
@@ -144,7 +145,7 @@ const Map<String, _Detail> _kDetails = {
   'read': _Detail(
     id: 'read',
     eyebrow: "Today's read",
-    title: 'What your baby can hear at 20 weeks',
+    title: S.now.uiWhatBabyCanHear,
     meta: '4 min read · ParentVeda Reads',
     paras: [
       'Around now the tiny bones of the inner ear finish forming - and your voice, lower and slower than hers, carries especially well through the body.',
@@ -156,7 +157,7 @@ const Map<String, _Detail> _kDetails = {
   'talk': _Detail(
     id: 'talk',
     eyebrow: 'Read to your baby',
-    title: 'Read to your baby tonight',
+    title: S.now.uiReadBabyTonight,
     meta: 'Read aloud · 1 min',
     // [script] is injected at render time from the mother's Samvad read-aloud
     // set (see _readAloudToday) so Mom and Dad share the same words.
@@ -170,7 +171,7 @@ const Map<String, _Detail> _kDetails = {
   'story': _Detail(
     id: 'story',
     eyebrow: 'Stories, fables & mythology',
-    title: 'The Churning of the Ocean',
+    title: S.now.uiChurningOcean,
     meta: 'A 3-minute myth · read aloud',
     paras: [
       'Long ago, gods and demons gripped the same great rope, coiled it around a mountain, and churned the sea of milk for the nectar of immortality.',
@@ -182,7 +183,7 @@ const Map<String, _Detail> _kDetails = {
   'journal': _Detail(
     id: 'journal',
     eyebrow: 'Your journal',
-    title: 'A note to your baby',
+    title: S.now.uiNoteBaby,
   ),
 };
 
@@ -390,7 +391,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   _weeklySnapshot(p),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                    child: Text('TODAY FOR YOU',
+                    child: Text(S.now.uiToday,
                         style: _eyebrow(p.muted, 0.14)),
                   ),
                   Padding(
@@ -580,7 +581,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
-          child: Text('WEEKLY SNAPSHOT', style: _eyebrow(p.muted, 0.14)),
+          child: Text(S.now.uiWeeklySnapshot, style: _eyebrow(p.muted, 0.14)),
         ),
         GestureDetector(
           onTap: () => AppNav.instance.goWeekly(),
@@ -636,7 +637,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                                       const SizedBox(height: 12),
                                       Row(mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Text('Open her week',
+                                            Text(S.now.uiOpenHerWeek,
                                                 style: _body(12.5, p.cream,
                                                     w: FontWeight.w700)),
                                             Icon(Icons.chevron_right_rounded,
@@ -846,7 +847,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 4),
-                        child: Text('DAILY TIP FOR DAD',
+                        child: Text(S.now.uiDailyTipDad,
                             style: _eyebrow(
                                 p.cream.withValues(alpha: 0.72), 0.14)),
                       ),
@@ -863,11 +864,11 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     ),
                   ]),
               const SizedBox(height: 10),
-              Text("Tonight, don't fix it. Just sit with her.",
+              Text(S.now.uiTonightDonTFix,
                   style: _serif(24, p.cream)),
               const SizedBox(height: 9),
               Text(
-                  "When she can't sleep, presence beats solutions. A hand on her back says more than any advice.",
+                  S.now.uiWhenSheCanT,
                   style: _body(14, p.cream.withValues(alpha: 0.84))),
               const SizedBox(height: 16),
               Container(
@@ -876,7 +877,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     color: Colors.white.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(999)),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text("Read today's tip · 2 min",
+                  Text(S.now.uiReadTodaySTip,
                       style: _body(13, p.cream, w: FontWeight.w600)),
                   const SizedBox(width: 8),
                   Text('→', style: _body(15, p.cream)),
@@ -900,17 +901,17 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('SUPPORT YOUR PARTNER',
+                      Text(S.now.uiSupportPartner,
                           style: _eyebrow(p.accent, 0.12)),
                       const SizedBox(height: 3),
-                      Text("Week 20 - what she's carrying",
+                      Text(S.now.uiWeekWhatSheS,
                           style: _serif(19, p.ink, w: FontWeight.w600)),
                     ]),
               ),
             ]),
             const SizedBox(height: 11),
             Text(
-                'Her lower back is taking the strain this week, and by evening it aches.',
+                S.now.uiHerLowerBackTaking,
                 style: _body(14, p.muted)),
             const SizedBox(height: 13),
             Container(
@@ -921,10 +922,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('DO THIS TODAY', style: _eyebrow(p.accent2, 0.12)),
+                    Text(S.now.uiDoToday, style: _eyebrow(p.accent2, 0.12)),
                     const SizedBox(height: 4),
                     Text(
-                        'Take dinner off her plate - cook her favourite, or order it before she has to ask.',
+                        S.now.uiTakeDinnerOffHer,
                         style: _body(13.5, p.ink, h: 1.45)),
                   ]),
             ),
@@ -980,7 +981,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   _iconTileSm(
                       p, Icons.menu_book_rounded, p.accentSoft, p.accent),
                   const SizedBox(width: 8),
-                  Text("TODAY'S READ", style: _eyebrow(p.accent, 0.12)),
+                  Text(S.now.uiTodaySRead, style: _eyebrow(p.accent, 0.12)),
                 ]),
                 const SizedBox(height: 9),
                 Text(r.title,
@@ -1034,9 +1035,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('READ TO YOUR BABY', style: _eyebrow(p.accent, 0.12)),
+                      Text(S.now.uiReadBaby, style: _eyebrow(p.accent, 0.12)),
                       const SizedBox(height: 3),
-                      Text('Read to your baby tonight',
+                      Text(S.now.uiReadBabyTonight,
                           style: _serif(19, p.ink, w: FontWeight.w600)),
                     ]),
               ),
@@ -1135,17 +1136,17 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('SCANS & APPOINTMENTS',
+                        Text(S.now.uiScansAppointments,
                             style: _eyebrow(p.accent, 0.12)),
                         const SizedBox(height: 3),
-                        Text('Coming up for her',
+                        Text(S.now.uiComingUpHer,
                             style: _serif(19, p.ink, w: FontWeight.w600)),
                       ]),
                 ),
               ]),
               const SizedBox(height: 13),
               if (due.isEmpty && appts.isEmpty)
-                Text("Nothing due right now - you're both up to date.",
+                Text(S.now.uiNothingDueRightNow,
                     style: _body(14, p.muted))
               else ...[
                 for (final m in due) _fScanRow(p, m),
@@ -1192,7 +1193,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: p.accent, width: 1.4),
               ),
-              child: Text('Already done',
+              child: Text(S.now.uiAlreadyDone,
                   style: _body(12, p.accent, w: FontWeight.w700)),
             ),
           ),
@@ -1220,12 +1221,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         ]),
       );
 
-  static const _scanMonths = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
+  
   String _fmtApptDate(DateTime d) =>
-      '${d.day} ${_scanMonths[d.month - 1]} ${d.year}';
+      '${d.day} ${S.now.monthShort(d.month)} ${d.year}';
 
   // "View all scans" - a Slate sheet of every scan with a done tick, so he can
   // also clear older ones (handy if they joined the app late).
@@ -1256,10 +1254,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                               color: p.line,
                               borderRadius: BorderRadius.circular(999)))),
                   const SizedBox(height: 16),
-                  Text('All scans', style: _serif(20, p.ink)),
+                  Text(S.now.uiAllScans, style: _serif(20, p.ink)),
                   const SizedBox(height: 4),
                   Text(
-                      'Tick off the ones already done - even older ones, if you joined late.',
+                      S.now.uiTickOffOnesAlready,
                       style: _body(13, p.muted)),
                   const SizedBox(height: 14),
                   Expanded(
@@ -1352,7 +1350,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         p, Icons.history_edu_rounded, p.warmSoft, p.accent2),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text('STORIES, FABLES & MYTH',
+                      child: Text(S.now.uiStoriesFablesMyth,
                           style: _eyebrow(p.accent2, 0.1)),
                     ),
                     GestureDetector(
@@ -1432,10 +1430,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('What would you like to read?', style: _serif(20, p.ink)),
+                  Text(S.now.uiWhatWouldLikeRead, style: _serif(20, p.ink)),
                   const SizedBox(height: 6),
                   Text(
-                      'Pick the kinds you want. Leave all off for a mix of everything.',
+                      S.now.uiPickKindsWantLeave,
                       style: _body(13, p.muted)),
                   const SizedBox(height: 16),
                   for (final k in FatherTaleKind.values) tile(k),
@@ -1460,9 +1458,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('YOUR JOURNAL', style: _eyebrow(p.accent, 0.12)),
+                    Text(S.now.uiJournal, style: _eyebrow(p.accent, 0.12)),
                     const SizedBox(height: 3),
-                    Text('A note to your baby',
+                    Text(S.now.uiNoteBaby,
                         style: _serif(19, p.ink, w: FontWeight.w600)),
                   ]),
             ),
@@ -1566,10 +1564,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Your journal', style: _serif(20, p.ink)),
+              Text(S.now.uiJournal2, style: _serif(20, p.ink)),
               const SizedBox(height: 8),
               Text(
-                  'Your memories, photos and voice notes will live here. Tap a circle above to add one - a memory, a note to your baby, a photo or a voice note.',
+                  S.now.uiMemoriesPhotosVoiceNotes,
                   style: _body(14, p.muted, h: 1.5)),
             ]),
       ),
@@ -1787,10 +1785,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         decoration: BoxDecoration(
             color: p.warmSoft, borderRadius: BorderRadius.circular(18)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('DO THIS TODAY', style: _eyebrow(p.accent2, 0.12)),
+          Text(S.now.uiDoToday, style: _eyebrow(p.accent2, 0.12)),
           const SizedBox(height: 5),
           Text(
-              'Take dinner off her plate - cook her favourite, or order it before she has to ask. Then rub her lower back for five minutes, no phone.',
+              S.now.uiTakeDinnerOffHer2,
               style: _body(15, p.ink)),
         ]),
       ));
@@ -1809,7 +1807,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     // Support-your-partner: a longer list of concrete ways to help this week.
     if (d.id == 'partner' && d.list.isNotEmpty) {
       out.add(const SizedBox(height: 6));
-      out.add(Text('MORE WAYS TO HELP THIS WEEK', style: _eyebrow(p.muted, 0.12)));
+      out.add(Text(S.now.uiMoreWaysHelpWeek, style: _eyebrow(p.muted, 0.12)));
       out.add(const SizedBox(height: 12));
       out.add(Container(
         decoration: BoxDecoration(
@@ -1932,7 +1930,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             minLines: 4,
             style: _body(15, p.ink, h: 1.55),
             decoration: InputDecoration.collapsed(
-              hintText: "Write to your baby, or just jot today's thought…",
+              hintText: S.now.uiWriteBabyJustJot,
               hintStyle: _body(15, p.muted),
             ),
           ),
@@ -1948,12 +1946,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(Icons.add_rounded, color: p.cream, size: 18),
               const SizedBox(width: 8),
-              Text('Save entry', style: _body(14.5, p.cream, w: FontWeight.w600)),
+              Text(S.now.uiSaveEntry, style: _body(14.5, p.cream, w: FontWeight.w600)),
             ]),
           ),
         ),
         const SizedBox(height: 24),
-        Text('RECENT ENTRIES', style: _eyebrow(p.muted, 0.12)),
+        Text(S.now.uiRecentEntries, style: _eyebrow(p.muted, 0.12)),
         const SizedBox(height: 12),
         for (final e in _entries)
           Container(
@@ -2031,17 +2029,17 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Switch to Mom's view",
+                            Text(S.now.uiSwitchMomSView,
                                 style: _serif(20, p.ink, w: FontWeight.w600)),
                             const SizedBox(height: 2),
-                            Text("You'll both stay in sync.",
+                            Text(S.now.uiLlBothStaySync,
                                 style: _body(13, p.muted)),
                           ]),
                     ),
                   ]),
                   const SizedBox(height: 16),
                   Text(
-                      "Mom's daily space - her body this week, cravings, kicks and her own journal - lives one tap away. Anything you mark here shows up for her too.",
+                      S.now.uiMomSDailySpace,
                       style: _body(14.5, p.ink.withValues(alpha: 0.85), h: 1.55)),
                   const SizedBox(height: 20),
                   GestureDetector(
@@ -2056,7 +2054,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       decoration: BoxDecoration(
                           color: const Color(0xFF6A30B6),
                           borderRadius: BorderRadius.circular(16)),
-                      child: Text("Open Mom's view",
+                      child: Text(S.now.uiOpenMomSView,
                           style: _body(15, Colors.white, w: FontWeight.w600)),
                     ),
                   ),
@@ -2067,7 +2065,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(13),
                       alignment: Alignment.center,
-                      child: Text("Stay in Dad's view",
+                      child: Text(S.now.uiStayDadSView,
                           style: _body(14, p.muted, w: FontWeight.w600)),
                     ),
                   ),
@@ -2220,7 +2218,7 @@ class _FatherScanDetail extends StatelessWidget {
               style: _b(12.5, c: kFMuted)),
           const SizedBox(height: 16),
           Text(
-              "Here's what this scan is - so you can be there for it with her, and understand what you're looking at together.",
+              S.now.uiHereSWhatScan,
               style: _b(13.5, c: kFMuted)),
           const SizedBox(height: 16),
           if (guide != null) ...[
@@ -2237,12 +2235,12 @@ class _FatherScanDetail extends StatelessWidget {
             decoration: BoxDecoration(
                 color: kFAccentSoft, borderRadius: BorderRadius.circular(14)),
             child: Text(
-                'General guidance to help you support her - every pregnancy is different, so always follow her doctor.',
+                S.now.uiGeneralGuidanceHelpSupport,
                 style: _b(12.5, c: kFInk)),
           ),
           if (guide != null && guide.interpret.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text('HOW TO READ THE REPORT',
+            Text(S.now.uiHowReadReport,
                 style: pvJakarta(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -2254,7 +2252,7 @@ class _FatherScanDetail extends StatelessWidget {
               decoration: BoxDecoration(
                   color: kFWarmSoft, borderRadius: BorderRadius.circular(14)),
               child: Text(
-                  "Plain-language explanations, not a diagnosis. Numbers only mean something in full context - read the report with her doctor.",
+                  S.now.uiPlainLanguageExplanationsNot,
                   style: _b(12.5, c: kFInk)),
             ),
             const SizedBox(height: 12),
@@ -2277,7 +2275,7 @@ class _FatherScanDetail extends StatelessWidget {
           Row(children: [
             const Icon(Icons.info_outline_rounded, size: 18, color: kFAccent),
             const SizedBox(width: 8),
-            Text('What is this scan?',
+            Text(S.now.uiWhatScan,
                 style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w800,

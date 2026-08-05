@@ -646,7 +646,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         Row(children: [
           const Icon(Icons.alarm_rounded, size: 18, color: _accent),
           const SizedBox(width: 8),
-          Text('Alarms',
+          Text(S.now.uiAlarms,
               style: pvJakarta(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
@@ -724,7 +724,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               },
             ),
             icon: const Icon(Icons.add_alarm_rounded, size: 18),
-            label: const Text('Add alarm'),
+            label: Text(S.now.uiAddAlarm),
           ),
         ),
       ],
@@ -785,7 +785,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   TextField(
                     controller: titleCtrl,
                     decoration: InputDecoration(
-                      labelText: 'Alarm title',
+                      labelText: S.now.uiAlarmTitle,
                       hintText: defaultTitle.isNotEmpty
                           ? defaultTitle
                           : 'e.g. Iron tablet',
@@ -818,7 +818,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       ActionChip(
                         avatar: const Icon(Icons.add_rounded,
                             size: 16, color: _accent),
-                        label: const Text('Add time'),
+                        label: Text(S.now.uiAddTime),
                         onPressed: () async {
                           final picked = await showTimePicker(
                             context: ctx,
@@ -864,7 +864,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   // Enable toggle
                   Row(children: [
                     Expanded(
-                      child: Text('Alarm enabled',
+                      child: Text(S.now.uiAlarmEnabled,
                           style: pvManrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -899,7 +899,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                               ));
                               Navigator.pop(ctx);
                             },
-                      child: const Text('Save alarm'),
+                      child: Text(S.now.uiSaveAlarm),
                     ),
                   ),
                 ],
@@ -1139,7 +1139,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     const Icon(Icons.edit_outlined,
                         size: 20, color: _accent),
                     const SizedBox(width: 12),
-                    Text('Edit',
+                    Text(S.now.uiEdit,
                         style: pvManrope(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

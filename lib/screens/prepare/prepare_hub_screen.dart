@@ -33,6 +33,7 @@ import '../post_pregnancy/yoga_home_screen.dart';
 // import 'prenatal_yoga_screen.dart'; // retired — replaced by YogaHomeScreen
 import 'prepare_common.dart';
 import 'program_detail_screen.dart';
+import '../../localization/app_language.dart';
 
 class PrepareHubScreen extends StatelessWidget {
   const PrepareHubScreen({super.key});
@@ -55,21 +56,21 @@ class PrepareHubScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 120),
           children: [
-            pad(pvTopBar(context, title: 'Prepare')),
+            pad(pvTopBar(context, title: S.now.uiPrepare)),
             const SizedBox(height: 22),
 
             // hero
             pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               pvEyebrow('30 weeks · third trimester'),
               const SizedBox(height: 12),
-              Text('Prepare for your baby,\none guided step at a time.', style: pvHeroStyle()),
+              Text(S.now.uiPrepareBabyNoneGuided, style: pvHeroStyle()),
               const SizedBox(height: 14),
-              Text('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.',
+              Text(S.now.uiCoursesLiveCohortsExpert,
                   style: pvSubStyle()),
             ])),
 
             const SizedBox(height: 26),
-            pad(Text('RECOMMENDED AT 30 WEEKS',
+            pad(Text(S.now.uiRecommendedWeeks,
                 style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1))),
             const SizedBox(height: 14),
 
@@ -157,7 +158,7 @@ class PrepareHubScreen extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      pvText('Most of this is free with '),
+                      pvText(S.now.uiMostFree),
                       pvPurple('ParentVeda+'),
                       pvText('.'),
                     ]),

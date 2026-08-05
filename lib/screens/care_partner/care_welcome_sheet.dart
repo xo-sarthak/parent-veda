@@ -21,6 +21,7 @@ import '../../care_partner/care_config.dart';
 import '../../care_partner/care_partner_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_partner_card.dart';
+import '../../localization/app_language.dart';
 
 /// Show the welcome if — and only if — this family has a Care Partner.
 /// Safe to call unconditionally.
@@ -54,11 +55,11 @@ class _CareWelcomeDialog extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Welcome to ParentVeda',
+          Text(S.now.uiWelcomeParentveda,
               textAlign: TextAlign.center, style: ppFraunces(23, h: 1.15)),
           const SizedBox(height: 8),
           Text(
-            'Someone who looks after you brought you here.',
+            S.now.uiSomeoneWhoLooksAfter,
             textAlign: TextAlign.center,
             style: ppBody(12.5, h: 1.5),
           ),
@@ -79,7 +80,7 @@ class _CareWelcomeDialog extends StatelessWidget {
                 store.recordEvent('welcome_continued');
                 Navigator.of(context).pop();
               },
-              child: Text('Continue',
+              child: Text(S.now.uiContinue,
                   style: ppJakarta(14, color: Colors.white)),
             ),
           ),

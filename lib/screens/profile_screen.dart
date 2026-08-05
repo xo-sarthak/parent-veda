@@ -153,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Partner account',
+                        Text(S.now.uiPartnerAccount,
                             style: text.titleSmall
                                 ?.copyWith(fontWeight: FontWeight.w800)),
                         const SizedBox(height: 3),
@@ -272,7 +272,7 @@ class ProfileScreen extends StatelessWidget {
               final p = FamilyProfileStore.instance;
               final pct = p.completenessPercent;
               return _VaultCard(
-                title: 'Personalise ParentVeda',
+                title: S.now.uiPersonaliseParentveda,
                 subtitle: pct == 0
                     ? 'Tell us a little about your pregnancy and we will surface what matters to you first.'
                     : 'Your profile is $pct% complete - the more we know, the more useful ParentVeda gets.',
@@ -296,7 +296,7 @@ class ProfileScreen extends StatelessWidget {
           AnimatedBuilder(
             animation: ProfileAnalytics.instance,
             builder: (context, _) => _VaultCard(
-              title: 'Personalization analytics',
+              title: S.now.uiPersonalizationAnalytics,
               subtitle:
                   'How the ask strips are doing - which questions land, and where.',
               trailing: '${ProfileAnalytics.instance.recent.length}',
@@ -348,13 +348,13 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Invite a friend',
+                        Text(S.now.uiInviteFriend,
                             style: pvManrope(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white)),
                         const SizedBox(height: 2),
-                        Text('You both get a free consultation.',
+                        Text(S.now.uiBothGetFreeConsultation,
                             style: pvManrope(
                                 fontSize: 12,
                                 height: 1.4,
@@ -397,12 +397,12 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Memories',
+                        Text(S.now.uiMemories3,
                             style: pvFraunces(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF3A352E))),
-                        Text('Announce your pregnancy or baby, beautifully.',
+                        Text(S.now.uiAnnouncePregnancyBabyBeautifully,
                             style: pvManrope(
                                 fontSize: 12, color: const Color(0xFF6B6154))),
                       ]),
@@ -421,7 +421,7 @@ class ProfileScreen extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _resetForTesting(context),
             icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text('Reset to Week 20 · testing'),
+            label: Text(S.now.uiResetWeekTesting),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.neutral700,
               side: const BorderSide(color: AppTheme.outlineVariant),
@@ -438,7 +438,7 @@ class ProfileScreen extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _pickDoctor(context),
             icon: const Icon(Icons.medical_services_outlined, size: 18),
-            label: const Text('Enter doctor mode · testing'),
+            label: Text(S.now.uiEnterDoctorModeTesting),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.primary600,
               side: BorderSide(color: AppTheme.primary500.withValues(alpha: 0.35)),
@@ -500,7 +500,7 @@ class ProfileScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(2))),
               ),
               const SizedBox(height: 16),
-              const Text('Log in as which doctor?',
+              Text(S.now.uiLogAsWhichDoctor,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               _docGroup(ctx, 'Pregnancy side', DoctorStage.pregnancy),
               _docGroup(ctx, 'Parenting side', DoctorStage.parenting),
@@ -565,8 +565,8 @@ class ProfileScreen extends StatelessWidget {
     await ScansStore.instance.clearAllForTesting();
     AppNav.instance.goToday();
     nav.popUntil((r) => r.isFirst); // back to the main scaffold (Today)
-    messenger.showSnackBar(const SnackBar(
-        content: Text('Reset to Week 20 - due date & pregnancy map cleared')));
+    messenger.showSnackBar(SnackBar(
+        content: Text(S.now.uiResetWeekDueDate)));
   }
 
   /// "Sign out" - clears the local auth flag and replays the auth flow over the
@@ -651,9 +651,8 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
     final code = _code;
     if (code == null) return;
     Share.share(
-      'Join me on ParentVeda 💜  Download the app, choose "I\'m the father", '
-      'and enter my pairing code: $code',
-      subject: 'Your ParentVeda pairing code',
+      S.now.pairingShareText(code),
+      subject: S.now.pairingShareSubject,
     );
   }
 
@@ -662,7 +661,7 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
     if (code == null) return;
     Clipboard.setData(ClipboardData(text: code));
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pairing code copied')));
+        SnackBar(content: Text(S.now.uiPairingCodeCopied)));
   }
 
   @override
@@ -681,11 +680,11 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
           const Icon(Icons.favorite_rounded,
               color: AppTheme.primary500, size: 20),
           const SizedBox(width: 8),
-          Text('Invite your partner',
+          Text(S.now.uiInvitePartner,
               style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 6),
-        Text('Share this code so your partner can pair with your journey.',
+        Text(S.now.uiShareCodeSoPartner,
             style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
         const SizedBox(height: 12),
         Container(
@@ -709,14 +708,14 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
             child: FilledButton.icon(
               onPressed: _share,
               icon: const Icon(Icons.share_rounded, size: 18),
-              label: const Text('Share'),
+              label: Text(S.now.uiShare),
             ),
           ),
           const SizedBox(width: 10),
           OutlinedButton.icon(
             onPressed: _copy,
             icon: const Icon(Icons.copy_rounded, size: 18),
-            label: const Text('Copy'),
+            label: Text(S.now.uiCopy),
           ),
         ]),
       ]),
@@ -830,7 +829,7 @@ class _EmployerBenefitsCard extends StatelessWidget {
           // purpose: it is what HR calls it in the email an employee will have
           // already received, and matching that wording is worth more here
           // than translating it.
-          title: 'Employer benefits',
+          title: S.now.uiEmployerBenefits,
           subtitle: active
               ? (hinglish
                   ? 'ParentVeda Premium — ${sponsor.name} ki taraf se.'
@@ -918,8 +917,8 @@ class _WhatsAppCardState extends State<_WhatsAppCard> {
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
         content: Text(ok
-            ? (optIn ? 'WhatsApp updates on' : 'WhatsApp updates off')
-            : 'Could not save - please try again'),
+            ? (optIn ? S.now.whatsappUpdatesOn : S.now.whatsappUpdatesOff)
+            : S.now.couldNotSaveRetry),
         duration: const Duration(milliseconds: 1400),
       ));
   }
@@ -957,9 +956,9 @@ class _WhatsAppCardState extends State<_WhatsAppCard> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('WhatsApp updates', style: text.titleMedium),
+                  Text(S.now.uiWhatsappUpdates, style: text.titleMedium),
                   const SizedBox(height: 2),
-                  Text('Weekly guide & reminders. Turn off anytime.',
+                  Text(S.now.uiWeeklyGuideRemindersTurn,
                       style:
                           text.bodySmall?.copyWith(color: AppTheme.neutral600)),
                 ]),
@@ -1001,7 +1000,7 @@ class _WhatsAppCardState extends State<_WhatsAppCard> {
             ),
           ),
           const SizedBox(height: 7),
-          Text('We only message this number for updates you turn on.',
+          Text(S.now.uiWeOnlyMessageNumber,
               style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
         ],
       ]),
@@ -1159,7 +1158,7 @@ class _OrgSignInGroupState extends State<_OrgSignInGroup> {
     if (_orgs.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const SizedBox(height: 14),
-      Text('ORGANISATIONS',
+      Text(S.now.uiOrganisations,
           style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w800,

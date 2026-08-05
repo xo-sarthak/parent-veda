@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'consultation_detail_screen.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 // ---------------------------------------------------------------------------
 //  Step 1 - Assessment
@@ -45,12 +46,12 @@ class _NutritionScreenState extends State<NutritionScreen> {
             const SizedBox(height: 22),
             pvEyebrow('Eat well, for two'),
             const SizedBox(height: 10),
-            Text('Nutrition', style: pvHeroStyle()),
+            Text(S.now.uiNutrition, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('A two-minute check-in, then a plan built around you - and a nutritionist to make it yours.',
+            Text(S.now.uiTwoMinuteCheckThen,
                 style: pvSubStyle()),
             pvBanner(icon: Icons.eco_outlined, spans: [
-              pvText('Answer a few questions and we\'ll match you to the right plan and expert.'),
+              pvText(S.now.uiAnswerFewQuestionsWe),
             ]),
 
             const SizedBox(height: 26),
@@ -74,8 +75,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
               child: pvPrimaryButton(
                 _goal == null ? 'Pick a focus to continue' : 'See my recommended plans',
                 _goal == null
-                    ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Choose a main focus first'), behavior: SnackBarBehavior.floating))
+                    ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(S.now.uiChooseMainFocusFirst), behavior: SnackBarBehavior.floating))
                     : () => Navigator.of(context).push(MaterialPageRoute<void>(
                         builder: (_) => NutritionPlansScreen(goalId: _goal))),
                 padding: const EdgeInsets.symmetric(vertical: 15),
@@ -135,9 +136,9 @@ class NutritionPlansScreen extends StatelessWidget {
             const SizedBox(height: 22),
             pvEyebrow('Matched to you'),
             const SizedBox(height: 10),
-            Text('Your recommended plans', style: pvHeroStyle().copyWith(fontSize: 28)),
+            Text(S.now.uiRecommendedPlans, style: pvHeroStyle().copyWith(fontSize: 28)),
             const SizedBox(height: 12),
-            Text('Based on your answers - each one is a starting point a nutritionist will personalise.',
+            Text(S.now.uiBasedAnswersEachOne,
                 style: pvSubStyle()),
             const SizedBox(height: 22),
             for (final p in plans) _planCard(context, p),
@@ -179,7 +180,7 @@ class NutritionPlansScreen extends StatelessWidget {
                     TextSpan(text: '  ·  ${p.priceNote}', style: const TextStyle(color: kMuted)),
                   ]), style: pvBody(kInk, 13)),
                   const Spacer(),
-                  Text('Preview →', style: pvBody(kPurple, 13).copyWith(fontWeight: FontWeight.w700)),
+                  Text(S.now.uiPreview, style: pvBody(kPurple, 13).copyWith(fontWeight: FontWeight.w700)),
                 ]),
               ]),
             ),
@@ -231,7 +232,7 @@ class NutritionTrailerScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(color: kInk.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(999)),
-                      child: Text('Trailer · 60 sec', style: pvBody(Colors.white, 11).copyWith(fontWeight: FontWeight.w700)),
+                      child: Text(S.now.uiTrailerSec, style: pvBody(Colors.white, 11).copyWith(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ]),
@@ -243,14 +244,14 @@ class NutritionTrailerScreen extends StatelessWidget {
               Text(p.tagline, style: pvSubStyle()),
 
               const SizedBox(height: 22),
-              Text("What's inside", style: pvTitleStyle(16)),
+              Text(S.now.uiWhatSInside, style: pvTitleStyle(16)),
               const SizedBox(height: 12),
               for (final h in p.highlights) _check(h),
 
               const SizedBox(height: 22),
-              Text('A day on this plan', style: pvTitleStyle(16)),
+              Text(S.now.uiDayPlan, style: pvTitleStyle(16)),
               const SizedBox(height: 4),
-              Text('A sample - your nutritionist tailors it to your body and tastes.', style: pvBody(kMuted, 12)),
+              Text(S.now.uiSampleNutritionistTailorsBody, style: pvBody(kMuted, 12)),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
@@ -262,9 +263,9 @@ class NutritionTrailerScreen extends StatelessWidget {
               ),
 
               pvBanner(icon: Icons.verified_outlined, spans: [
-                pvText('Every plan is finalised with a '),
+                pvText(S.now.uiEveryPlanFinalised),
                 pvPurple('registered nutritionist'),
-                pvText(' in a 1:1 consult - so it truly fits you.'),
+                pvText(S.now.uiConsultSoTrulyFits),
               ]),
             ],
           ),
@@ -279,7 +280,7 @@ class NutritionTrailerScreen extends StatelessWidget {
             child: Row(children: [
               Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.price, style: pvBody(kInk, 16).copyWith(fontWeight: FontWeight.w700)),
-                Text('with a 1:1 consult', style: pvBody(kPurple, 11).copyWith(fontWeight: FontWeight.w600)),
+                Text(S.now.uiConsult, style: pvBody(kPurple, 11).copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(width: 14),
               Expanded(
@@ -369,7 +370,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Center(child: Text('Your personalized diet plan', textAlign: TextAlign.center, style: pvHeroStyle().copyWith(fontSize: 26))),
+            Center(child: Text(S.now.uiPersonalizedDietPlan, textAlign: TextAlign.center, style: pvHeroStyle().copyWith(fontSize: 26))),
             const SizedBox(height: 10),
             Center(
               child: Text(
@@ -386,7 +387,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
                 const Icon(Icons.event_available_outlined, size: 20, color: kPurple),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text('Consult booked. Your nutritionist will fine-tune this plan on the call, then it lands here in full.',
+                  child: Text(S.now.uiConsultBookedNutritionistWill,
                       style: pvBody(kInk, 13.5).copyWith(height: 1.5)),
                 ),
               ]),
@@ -422,7 +423,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 22),
-            Text('Your focus this plan', style: pvTitleStyle(16)),
+            Text(S.now.uiFocusPlan, style: pvTitleStyle(16)),
             const SizedBox(height: 12),
             for (final h in p.highlights)
               Padding(

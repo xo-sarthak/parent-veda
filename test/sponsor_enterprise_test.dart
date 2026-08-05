@@ -741,7 +741,17 @@ void main() {
 
     test('skipping is one tap and says so', () {
         expect(auth, contains('Skip — my company does not'));
-        expect(auth, contains('You can do this later from Profile.'));
+        // This line moved into the string table so it can be translated; the
+        // screen now reads it as a getter. Assert the table still carries the
+        // exact words AND that this screen is what shows them.
+        final table =
+            File('lib/localization/app_language.dart').readAsStringSync();
+        final getter = RegExp('String get (ui\\w+) =>\\s*_p\\((["\'])'
+                '${RegExp.escape('You can do this later from Profile.')}\\2')
+            .firstMatch(table);
+        expect(getter, isNotNull,
+            reason: 'the reassurance line is no longer in the string table');
+        expect(auth, contains('S.now.${getter!.group(1)}'));
       });
     });
 

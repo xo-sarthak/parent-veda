@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 class ConsultationDetailScreen extends StatefulWidget {
   const ConsultationDetailScreen({super.key, required this.specialist, this.onBooked});
@@ -80,7 +81,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
               _divider(),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 _title('Choose a time'),
-                Text('Today, 8 Jul', style: pvBody(kMuted, 12)),
+                Text(S.now.uiTodayJul, style: pvBody(kMuted, 12)),
               ]),
               const SizedBox(height: 12),
               SizedBox(
@@ -93,7 +94,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
               _divider(),
               _title("From mothers she's seen"),
               const SizedBox(height: 4),
-              Text('Bedside manner, rated by mothers.', style: pvBody(kMuted, 12)),
+              Text(S.now.uiBedsideMannerRatedBy, style: pvBody(kMuted, 12)),
               const SizedBox(height: 14),
               for (int i = 0; i < s.reviews.length; i++)
                 _review(s.reviews[i], top: true, bottom: i == s.reviews.length - 1),
@@ -105,7 +106,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   pvEyebrow('How it works', color: kPurple),
                   const SizedBox(height: 8),
-                  Text('Pick a slot → private video call → notes saved to your health record.',
+                  Text(S.now.uiPickSlotPrivateVideo,
                       style: pvBody(kInk, 14).copyWith(height: 1.6)),
                 ]),
               ),

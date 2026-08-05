@@ -139,7 +139,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
               // app_language.dart; the bodies reuse existing bilingual strings
               // where they fit (kegelHowBody, whyAmIDoingThisBody).
               _IntroCard(
-                title: 'What is Kegel?',
+                title: S.now.uiWhatKegel,
                 body:
                     'A Kegel is a simple exercise that squeezes and lifts the '
                     'pelvic-floor muscles - the sling of muscles supporting your '
@@ -149,12 +149,12 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
               ),
               const SizedBox(height: 12),
               _IntroCard(
-                title: 'Why should I do Kegel?',
+                title: S.now.uiWhyShouldIDo,
                 body: s.whyAmIDoingThisBody,
               ),
               const SizedBox(height: 12),
               _IntroCard(
-                title: 'How to do Kegel?',
+                title: S.now.uiHowDoKegel,
                 body: s.kegelHowBody,
                 // Placeholder for the animated instructional video (no asset yet).
                 footer: _videoPlaceholder(context, s),
@@ -235,7 +235,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
         onTap: () => ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(
-              const SnackBar(content: Text('Animated guide - coming soon'))),
+              SnackBar(content: Text(S.now.uiAnimatedGuideComingSoon))),
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: Container(
@@ -274,7 +274,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                   decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.88),
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text('Animated guide - coming soon',
+                  child: Text(S.now.uiAnimatedGuideComingSoon,
                       style: text.labelSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.3,

@@ -250,11 +250,11 @@ class HomeScreenB extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Post-Pregnancy',
+              Text(S.now.uiPostPregnancy,
                   style: pvJakarta(
                       fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 2),
-              Text("Baby's arrived? Step into the parenting app",
+              Text(S.now.uiBabySArrivedStep,
                   style: pvManrope(
                       fontSize: 12, color: Colors.white.withValues(alpha: 0.9))),
             ]),
@@ -1120,15 +1120,15 @@ class HomeScreenB extends StatelessWidget {
   ({String label, Color color})? _badgeMeta(ProductBadge b) {
     switch (b) {
       case ProductBadge.bestOverall:
-        return (label: 'BEST', color: AppTheme.primary500);
+        return (label: S.now.uiBest, color: AppTheme.primary500);
       case ProductBadge.bestBudget:
-        return (label: 'BUDGET', color: const Color(0xFF4F7A52));
+        return (label: S.now.uiBudget, color: const Color(0xFF4F7A52));
       case ProductBadge.bestPremium:
-        return (label: 'PREMIUM', color: AppTheme.tertiary500);
+        return (label: S.now.uiPremium, color: AppTheme.tertiary500);
       case ProductBadge.sensitiveSkin:
-        return (label: 'GENTLE', color: const Color(0xFF4A7BC8));
+        return (label: S.now.uiGentle, color: const Color(0xFF4A7BC8));
       case ProductBadge.newborns:
-        return (label: 'NEWBORN', color: AppTheme.secondary500);
+        return (label: S.now.uiNewborn, color: AppTheme.secondary500);
       case ProductBadge.none:
         return null;
     }

@@ -11,9 +11,15 @@ not through the applier.
 import sys
 from ui_strings import find_calls, find_localized
 
-args = [a for a in sys.argv[1:] if a != '--localized']
-localized = '--localized' in sys.argv
-find = find_localized if localized else find_calls
+marker = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--marker=')),
+              '_p(')
+args = [a for a in sys.argv[1:]
+        if a != '--localized' and not a.startswith('--marker=')]
+if '--localized' in sys.argv:
+    find = find_localized
+else:
+    def find(src):
+        return find_calls(src, marker=marker)
 
 path = args[0]
 lo = int(args[1]) if len(args) > 1 else 0

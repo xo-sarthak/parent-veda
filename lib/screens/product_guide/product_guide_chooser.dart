@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'product_guide_data.dart';
 import 'product_guide_screen.dart';
 import 'product_guide_style.dart';
+import '../../localization/app_language.dart';
 
 /// Open a tapped product. If a Product Guide exists for it (by [id] or [name]),
 /// ask the parent which view they'd like; otherwise just [onOpenNormal].
@@ -49,9 +50,9 @@ void showProductViewChooser(
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: pgLine, borderRadius: BorderRadius.circular(99)))),
           const SizedBox(height: 16),
-          Text('How would you like to see this?', style: pgTitle(18)),
+          Text(S.now.uiHowWouldLikeSee, style: pgTitle(18)),
           const SizedBox(height: 6),
-          Text('This is a product parents often research — we can go deep, or keep it quick.',
+          Text(S.now.uiProductParentsOftenResearch,
               style: pgBody(13, color: pgSoft, h: 1.5)),
           const SizedBox(height: 18),
 
@@ -59,7 +60,7 @@ void showProductViewChooser(
             context,
             icon: Icons.menu_book_rounded,
             accent: pgPurple,
-            title: 'ParentVeda Product Guide',
+            title: S.now.uiParentvedaProductGuide,
             sub: 'Is it right for your child? Recommendation, verdict, experts, ingredients — in 10 seconds or deep.',
             featured: true,
             onTap: () {
@@ -72,7 +73,7 @@ void showProductViewChooser(
             context,
             icon: Icons.sell_outlined,
             accent: pgSoft,
-            title: 'Quick product page',
+            title: S.now.uiQuickProductPage,
             sub: 'Price, specs and buy — the usual view.',
             featured: false,
             onTap: () {
@@ -121,7 +122,7 @@ Widget _choice(
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(color: pgPurple, borderRadius: BorderRadius.circular(999)),
-                    child: Text('TRUSTED', style: pgEyebrow(Colors.white).copyWith(fontSize: 8.5)),
+                    child: Text(S.now.uiTrusted, style: pgEyebrow(Colors.white).copyWith(fontSize: 8.5)),
                   ),
                 ],
               ]),
@@ -158,9 +159,9 @@ Widget productGuideBanner(BuildContext context, ProductGuide guide, {EdgeInsets 
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Read the ParentVeda Product Guide', style: pgTitle(13.5)),
+                Text(S.now.uiReadParentvedaProductGuide, style: pgTitle(13.5)),
                 const SizedBox(height: 1),
-                Text('Is it right for your child? Decide in 10 seconds.', style: pgBody(11.5, color: pgSoft)),
+                Text(S.now.uiRightChildDecideSeconds, style: pgBody(11.5, color: pgSoft)),
               ]),
             ),
             const Icon(Icons.arrow_forward_rounded, size: 16, color: pgPurple),

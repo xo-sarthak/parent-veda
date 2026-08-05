@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'cohort_detail_screen.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 class CohortsScreen extends StatelessWidget {
   const CohortsScreen({super.key});
@@ -31,13 +32,13 @@ class CohortsScreen extends StatelessWidget {
             const SizedBox(height: 22),
             pvEyebrow('Together, guided'),
             const SizedBox(height: 10),
-            Text('Cohort Programs', style: pvHeroStyle()),
+            Text(S.now.uiCohortPrograms, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('Small groups, a real coach, and mums due when you are.', style: pvSubStyle()),
+            Text(S.now.uiSmallGroupsRealCoach, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText("You're "),
+              pvText(S.now.uiRe),
               pvBold('30 weeks'),
-              pvText(' - the Birth-Ready cohort starts Monday.'),
+              pvText(S.now.uiBirthReadyCohortStarts),
             ]),
 
             // featured cohort
@@ -70,11 +71,11 @@ class CohortsScreen extends StatelessWidget {
                     Expanded(
                       child: Text.rich(
                         TextSpan(children: [
-                          pvText('with '),
+                          pvText(S.now.uiWith),
                           TextSpan(
                               text: featured.coachName ?? 'your coach',
                               style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                          pvText(', childbirth educator'),
+                          pvText(S.now.uiChildbirthEducator),
                         ]),
                         style: pvBody(kSoft, 13),
                       ),
@@ -92,7 +93,7 @@ class CohortsScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 28),
-            Text('More programs', style: pvTitleStyle(16)),
+            Text(S.now.uiMorePrograms, style: pvTitleStyle(16)),
             const SizedBox(height: 6),
             for (int i = 0; i < more.length; i++)
               _row(more[i], () => open(more[i]), bottom: i == more.length - 1),
@@ -104,11 +105,11 @@ class CohortsScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 pvEyebrow("What's inside every cohort", color: kPurple),
                 const SizedBox(height: 10),
-                Text('Live sessions · a small peer group · weekly homework · a private WhatsApp group.',
+                Text(S.now.uiLiveSessionsSmallPeer,
                     style: pvBody(kInk, 14).copyWith(height: 1.7)),
                 const SizedBox(height: 10),
                 Text.rich(
-                  TextSpan(children: [pvPurple('₹500 credit'), pvText(' for ParentVeda+.')]),
+                  TextSpan(children: [pvPurple('₹500 credit'), pvText(S.now.uiParentveda2)]),
                   style: pvBody(kSoft, 13),
                 ),
               ]),

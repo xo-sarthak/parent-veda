@@ -14,8 +14,16 @@
 import '../localization/app_language.dart';
 import '../models/report_finding.dart';
 
-LocalizedText _t(String s) => LocalizedText(en: s, hi: s);
-List<LocalizedText> _l(List<String> xs) => xs.map(_t).toList();
+/// `_t('English')` mirrors, `_t('English', 'हिन्दी')` translates.
+///
+/// The second argument is optional so the file can be translated a section at
+/// a time without a flag day: anything not yet given Hindi still renders its
+/// English rather than a blank, which is the failure mode that matters when
+/// the subject is a mother reading her own test report.
+LocalizedText _t(String en, [String? hi]) =>
+    LocalizedText(en: en, hi: hi ?? en);
+
+List<LocalizedText> _l(List<String> xs) => xs.map((s) => _t(s)).toList();
 
 /// Popular-topic chips on the home (entry ids, per the spec's six).
 const List<String> kReportPopular = [

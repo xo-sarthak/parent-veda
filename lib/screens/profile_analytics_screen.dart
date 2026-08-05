@@ -20,6 +20,7 @@ import '../services/family_profile.dart';
 import '../services/profile_analytics.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 class ProfileAnalyticsScreen extends StatelessWidget {
   const ProfileAnalyticsScreen({super.key});
@@ -32,7 +33,7 @@ class ProfileAnalyticsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         elevation: 0,
-        title: const Text('Personalization analytics'),
+        title: Text(S.now.uiPersonalizationAnalytics),
       ),
       body: AnimatedBuilder(
         animation: a,
@@ -44,14 +45,14 @@ class ProfileAnalyticsScreen extends StatelessWidget {
               _card(
                 child:
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Recording',
+                  Text(S.now.uiRecording,
                       style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary900)),
                   const SizedBox(height: 6),
                   Text(
-                    'Always on. Open a tool with an ask strip and events appear below. Nothing leaves this device.',
+                    S.now.uiAlwaysOpenToolAsk,
                     style: pvManrope(
                         fontSize: 12.5, height: 1.45, color: AppTheme.neutral500),
                   ),
@@ -61,13 +62,13 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                           fontSize: 11, color: AppTheme.neutral500)),
                   const SizedBox(height: 8),
                   Text(
-                    'Both ids are random and anonymous - never a hardware identifier. The session id is new each launch; the install id persists, so a completion rate can be counted per mother rather than per view.',
+                    S.now.uiBothIdsAreRandom,
                     style: pvManrope(
                         fontSize: 12, height: 1.5, color: AppTheme.neutral500),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'This measures our questions, not you: whether a strip is worded well and placed well. It is never used to chase anyone into finishing a profile.',
+                    S.now.uiMeasuresOurQuestionsNot,
                     style: pvManrope(
                         fontSize: 12.5, height: 1.5, color: AppTheme.neutral500),
                   ),
@@ -79,7 +80,7 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Expanded(
-                      child: Text('Profile completeness',
+                      child: Text(S.now.uiProfileCompleteness,
                           style: pvJakarta(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
@@ -111,14 +112,14 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                 if (events.isNotEmpty)
                   TextButton(
                     onPressed: a.clearRecent,
-                    child: const Text('Clear'),
+                    child: Text(S.now.uiClear),
                   ),
               ]),
               const SizedBox(height: 6),
               if (events.isEmpty)
                 _card(
                   child: Text(
-                    'No events yet. Open Symptom Companion, the Weight Tracker, Tests & Scans or the Tools hub — the ask strip fires as soon as it renders.',
+                    S.now.uiNoEventsYetOpen,
                     style: pvManrope(
                         fontSize: 13, height: 1.5, color: AppTheme.neutral500),
                   ),

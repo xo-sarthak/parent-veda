@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 class CohortDetailScreen extends StatelessWidget {
   const CohortDetailScreen({super.key, required this.cohort});
@@ -71,7 +72,7 @@ class CohortDetailScreen extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(c.coachName!, style: pvTitleStyle(15)),
                       const SizedBox(height: 2),
-                      Text('Leads every live session and the group.',
+                      Text(S.now.uiLeadsEveryLiveSession,
                           style: pvBody(kSoft, 13).copyWith(height: 1.5)),
                     ]),
                   ),
@@ -93,7 +94,7 @@ class CohortDetailScreen extends StatelessWidget {
                 child: Text.rich(
                   TextSpan(children: [
                     pvPurple('₹500 credit'),
-                    pvText(' for ParentVeda+ members on any cohort.'),
+                    pvText(S.now.uiParentvedaMembersAnyCohort),
                   ]),
                   style: pvBody(kInk, 14).copyWith(height: 1.5),
                 ),
@@ -112,7 +113,7 @@ class CohortDetailScreen extends StatelessWidget {
             price: c.price,
             note: c.duration,
             noteColor: kMuted,
-            label: 'Join the next cohort',
+            label: S.now.uiJoinNextCohort,
             bookedLabel: 'Enrolled',
             onBook: () => showPrepareBooking(
               context,

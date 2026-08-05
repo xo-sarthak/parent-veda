@@ -60,6 +60,7 @@ import 'package:livekit_client/livekit_client.dart';
 
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
+import '../localization/app_language.dart';
 
 // ---- palette -----------------------------------------------------------------
 // A call screen is dark whatever the rest of the app does — video reads better
@@ -393,7 +394,7 @@ class _CallScreenState extends State<CallScreen> {
                     decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12)),
-                    child: const Text('Close',
+                    child: Text(S.now.uiClose,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -656,10 +657,10 @@ class _CallScreenState extends State<CallScreen> {
                 decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(20)),
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.mic_off_rounded, size: 13, color: Colors.white),
                   SizedBox(width: 5),
-                  Text('Muted',
+                  Text(S.now.uiMuted,
                       style: TextStyle(color: Colors.white, fontSize: 11.5)),
                 ]),
               ),
@@ -723,7 +724,7 @@ class _CallScreenState extends State<CallScreen> {
                     const SizedBox(width: 6),
                     Semantics(
                       button: true,
-                      label: 'Leave call',
+                      label: S.now.uiLeaveCall,
                       child: GestureDetector(
                         onTap: _leave,
                         behavior: HitTestBehavior.opaque,

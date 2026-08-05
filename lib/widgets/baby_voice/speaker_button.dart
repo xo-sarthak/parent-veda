@@ -54,7 +54,7 @@ class SpeakerButton extends StatelessWidget {
             : (playing ? Icons.volume_up_rounded : Icons.volume_up_outlined);
         return Semantics(
           button: true,
-          label: 'Play baby voice',
+          label: S.now.uiPlayBabyVoice,
           child: GestureDetector(
             onTap: muted
                 ? null

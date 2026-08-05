@@ -36,6 +36,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import 'care_partner_models.dart';
+import '../localization/app_language.dart';
 
 class CarePosterPdf {
   CarePosterPdf._();
@@ -229,12 +230,12 @@ class CarePosterPdf {
           ),
 
           pw.SizedBox(height: 20 * scale),
-          pw.Text('Scan to join ParentVeda',
+          pw.Text(S.now.uiScanJoinParentveda,
               style: pw.TextStyle(
                   font: sansBold, fontSize: 15 * scale, color: _ink)),
           pw.SizedBox(height: 6 * scale),
           pw.Text(
-            'Week-by-week guidance for pregnancy and the early years.',
+            S.now.uiWeekByWeekGuidance,
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(
                 font: sans, fontSize: 11 * scale, color: _soft),

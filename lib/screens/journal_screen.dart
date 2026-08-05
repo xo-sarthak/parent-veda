@@ -993,7 +993,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     ),
                     if (combined) ...[
                       const SizedBox(height: 10),
-                      Text('You + Dad',
+                      Text(S.now.uiDad2,
                           style: pvManrope(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,

@@ -22,6 +22,7 @@ import 'brand_mark.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 /// A quiet `Presented by <Brand>` line for a sponsored surface.
 ///
@@ -175,7 +176,7 @@ void showSponsorSheet(BuildContext context, BrandCampaign c) {
         SponsorDisclosure(campaign: c, color: c.brand.colour),
         const SizedBox(height: 14),
         Text(
-          'What that means',
+          S.now.uiWhatMeans,
           style: pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, color: const Color(0xFF2D144C)),
         ),
         const SizedBox(height: 10),

@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'program_detail_screen.dart';
+import '../../localization/app_language.dart';
 
 class CoursesCohortsScreen extends StatefulWidget {
   const CoursesCohortsScreen({super.key, this.topic});
@@ -66,10 +67,10 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
             _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               pvEyebrow('Learn with the experts'),
               const SizedBox(height: 10),
-              Text('Courses & Cohorts', style: pvHeroStyle()),
+              Text(S.now.uiCoursesCohorts, style: pvHeroStyle()),
               const SizedBox(height: 12),
               Text(
-                  'Self-paced courses, small live cohorts and one-evening masterclasses - all in one place. Search a topic, or browse everything below.',
+                  S.now.uiSelfPacedCoursesSmall,
                   style: pvSubStyle()),
             ])),
 
@@ -124,7 +125,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
               _pad(Column(children: [for (final p in results) _card(p)])),
 
             const SizedBox(height: 22),
-            _pad(Text('Every program is led by a verified expert. Free or included with ParentVeda+.',
+            _pad(Text(S.now.uiEveryProgramLedBy,
                 textAlign: TextAlign.center, style: pvBody(kMuted, 12).copyWith(height: 1.55))),
           ],
         ),
@@ -249,9 +250,9 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
         child: Column(children: [
           const Icon(Icons.search_off_rounded, size: 30, color: kMuted),
           const SizedBox(height: 12),
-          Text('No programs match', style: pvTitleStyle(16)),
+          Text(S.now.uiNoProgramsMatch, style: pvTitleStyle(16)),
           const SizedBox(height: 6),
-          Text('Try another topic or clear your filters.', textAlign: TextAlign.center, style: pvBody(kSoft, 13)),
+          Text(S.now.uiTryAnotherTopicClear, textAlign: TextAlign.center, style: pvBody(kSoft, 13)),
           const SizedBox(height: 16),
           pvPrimaryButton('Clear filters', () => setState(() {
                 _query = '';

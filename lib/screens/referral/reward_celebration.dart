@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 
 import '../post_pregnancy/pp_common.dart';
+import '../../localization/app_language.dart';
 
 class RewardCelebration extends StatelessWidget {
   const RewardCelebration({
@@ -93,7 +94,7 @@ class RewardCelebration extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
                 color: ppPurple, borderRadius: BorderRadius.circular(14)),
-            child: Text('Lovely', style: ppJakarta(14, color: Colors.white)),
+            child: Text(S.now.uiLovely, style: ppJakarta(14, color: Colors.white)),
           ),
         ),
       ]),

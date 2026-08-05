@@ -42,6 +42,7 @@ import '../../referral/referral_links.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_circle_screen.dart';
+import '../../localization/app_language.dart';
 
 class CareDebugScreen extends StatefulWidget {
   const CareDebugScreen({super.key});
@@ -146,7 +147,7 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
             backgroundColor: ppBg,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
-            title: Text('Care Partner (debug)', style: ppJakarta(16)),
+            title: Text(S.now.uiCarePartnerDebug, style: ppJakarta(16)),
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 40),

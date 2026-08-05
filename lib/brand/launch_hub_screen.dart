@@ -19,6 +19,7 @@ import 'brand_models.dart';
 import 'brand_studio.dart';
 import 'outbound.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -65,12 +66,12 @@ class LaunchHubScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
         children: [
-          Text('LAUNCHES', style: _eyebrow()),
+          Text(S.now.uiLaunches, style: _eyebrow()),
           const SizedBox(height: 10),
-          Text('New, and worth knowing about', style: _serif(30)),
+          Text(S.now.uiNewWorthKnowingAbout, style: _serif(30)),
           const SizedBox(height: 10),
           Text(
-            'Products we think are genuinely new, introduced by the people who made them and read honestly by a ParentVeda expert. Brands pay to launch here. They do not pay for what the expert says.',
+            S.now.uiProductsWeThinkAre,
             style: _body(14),
           ),
           const SizedBox(height: 24),
@@ -93,10 +94,10 @@ class LaunchHubScreen extends StatelessWidget {
         child: Column(children: [
           const Icon(Icons.auto_awesome_outlined, color: _soft, size: 22),
           const SizedBox(height: 12),
-          Text('No launches right now', style: _serif(18, color: _ink)),
+          Text(S.now.uiNoLaunchesRightNow, style: _serif(18, color: _ink)),
           const SizedBox(height: 6),
           Text(
-            'We only run these a few times a year. An empty page here means nothing new is worth your attention yet.',
+            S.now.uiWeOnlyRunThese,
             textAlign: TextAlign.center,
             style: _body(13),
           ),
@@ -159,7 +160,7 @@ class _LaunchCard extends StatelessWidget {
                 Text(c.creative.subline, style: _body(13.5), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 12),
                 Row(children: [
-                  Text('Read the launch', style: _body(12.5, color: c.brand.colour, w: FontWeight.w800)),
+                  Text(S.now.uiReadLaunch, style: _body(12.5, color: c.brand.colour, w: FontWeight.w800)),
                   const SizedBox(width: 3),
                   Icon(Icons.arrow_forward_rounded, size: 14, color: c.brand.colour),
                 ]),
@@ -209,15 +210,15 @@ class LaunchDetailScreen extends StatelessWidget {
               ],
               if (cr.highlights.isNotEmpty) ...[
                 const SizedBox(height: 26),
-                Text('WHAT IT ACTUALLY IS', style: _eyebrow()),
+                Text(S.now.uiWhatActually, style: _eyebrow()),
                 const SizedBox(height: 12),
                 for (final h in cr.highlights) _highlight(h),
               ],
               if (cr.resources.isNotEmpty) ...[
                 const SizedBox(height: 26),
-                Text('LEARN THIS PROPERLY', style: _eyebrow()),
+                Text(S.now.uiLearnProperly, style: _eyebrow()),
                 const SizedBox(height: 6),
-                Text('ParentVeda\'s own guides on the subject. Free, and not about this product.', style: _body(12.5)),
+                Text(S.now.uiParentvedaSOwnGuides, style: _body(12.5)),
                 const SizedBox(height: 12),
                 for (final r in cr.resources) _resource(context, r),
               ],
@@ -225,7 +226,7 @@ class LaunchDetailScreen extends StatelessWidget {
               _cta(context),
               const SizedBox(height: 14),
               Text(
-                'A launch is not an endorsement. Nothing here changes a product\'s ParentVeda rating, and no brand can buy one.',
+                S.now.uiLaunchNotEndorsementNothing,
                 style: _body(11.5),
               ),
             ]),
@@ -286,7 +287,7 @@ class LaunchDetailScreen extends StatelessWidget {
           Row(children: [
             const Icon(Icons.verified_outlined, size: 15, color: Color(0xFF6A30B6)),
             const SizedBox(width: 7),
-            Text('PARENTVEDA\'S EXPERT', style: _eyebrow(color: const Color(0xFF6A30B6))),
+            Text(S.now.uiParentvedaSExpert, style: _eyebrow(color: const Color(0xFF6A30B6))),
           ]),
           const SizedBox(height: 11),
           Text('"${c.creative.expertHook}"', style: pvFraunces(fontSize: 15, height: 1.55, color: _ink)),
@@ -327,7 +328,7 @@ class LaunchDetailScreen extends StatelessWidget {
           onTap: () {
             BrandAnalytics.instance.event(c, BrandEvent.resourceOpened, meta: {'resource': r.label});
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${r.label} — coming soon'), behavior: SnackBarBehavior.floating),
+              SnackBar(content: Text(S.now.comingSoonLabel(r.label)), behavior: SnackBarBehavior.floating),
             );
           },
           child: Container(
@@ -367,7 +368,7 @@ class LaunchDetailScreen extends StatelessWidget {
             final url = c.brand.landingUrl;
             if (url == null || url.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Brand link coming soon'), behavior: SnackBarBehavior.floating),
+                SnackBar(content: Text(S.now.uiBrandLinkComingSoon), behavior: SnackBarBehavior.floating),
               );
               return;
             }

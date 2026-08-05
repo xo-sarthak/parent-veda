@@ -35,6 +35,7 @@ import '../../services/life_stage_store.dart';
 import '../../services/whatsapp_prefs.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -144,7 +145,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   void _soon(String label) => ScaffoldMessenger.of(context)
     ..clearSnackBars()
     ..showSnackBar(SnackBar(
-        content: Text('$label - coming soon'),
+        content: Text(S.now.comingSoonLabel(label)),
         duration: const Duration(milliseconds: 1100)));
 
   // Shows a message at the bottom of the screen (errors, hints). Pass a larger
@@ -490,7 +491,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           SizedBox(
             width: 300,
             child: Text(
-              'Gentle, expert guidance for pregnancy and every milestone after.',
+              S.now.uiGentleExpertGuidancePregnancy,
               style: pvJakarta(
                   fontSize: 15,
                   height: 1.55,
@@ -535,7 +536,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             ]),
           ),
           const SizedBox(width: 9),
-          Text('Loved by 50,000+ parents',
+          Text(S.now.uiLovedByParents,
               style: pvJakarta(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -627,7 +628,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: 14),
         _glass(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('I AM CURRENTLY',
+            Text(S.now.uiIAmCurrently,
                 style: pvJakarta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -658,7 +659,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               const SizedBox(height: 10),
               Center(
                 child: Text(
-                  'Add the date above to continue — everything else is built around it.',
+                  S.now.uiAddDateAboveContinue,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12.5, height: 1.45, color: _label),
                 ),
@@ -716,7 +717,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             showLogo: false),
         const SizedBox(height: 26),
         _roleCard(
-          title: "I'm the mother",
+          title: S.now.uiIMMother,
           subtitle: 'Track your pregnancy & journey',
           icon: Icons.pregnant_woman_rounded,
           accent: _purple,
@@ -725,7 +726,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: 13),
         _roleCard(
-          title: "I'm the father",
+          title: S.now.uiIMFather,
           subtitle: 'I have a partner code',
           icon: Icons.favorite_rounded,
           accent: _teal,
@@ -736,7 +737,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         // Third role — the expert. For testing it asks WHICH doctor; a live
         // build would recognise a verified doctor account instead.
         _roleCard(
-          title: "I'm a doctor",
+          title: S.now.uiIMDoctor,
           subtitle: 'Manage my consults & sessions',
           icon: Icons.medical_services_rounded,
           accent: _purple,
@@ -763,7 +764,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             shrinkWrap: true,
             children: [
-              const Text('Sign in as which doctor?',
+              Text(S.now.uiSignAsWhichDoctor,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               _docGroup(ctx, 'Pregnancy side', DoctorStage.pregnancy),
@@ -896,7 +897,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
   Widget _codeField() =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Pairing code',
+        Text(S.now.uiPairingCode,
             style: pvJakarta(
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: _label)),
         const SizedBox(height: 7),
@@ -912,7 +913,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               letterSpacing: 2.2,
               color: _ink),
           decoration: InputDecoration(
-            hintText: 'e.g. 0XOS1U',
+            hintText: S.now.uiEGXosU,
             hintStyle: pvJakarta(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -973,7 +974,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     valueColor: AlwaysStoppedAnimation(_purple)),
               ),
               const SizedBox(height: 26),
-              Text('Pairing you with your partner…',
+              Text(S.now.uiPairingPartner,
                   textAlign: TextAlign.center,
                   style: pvJakarta(
                       fontSize: 17, fontWeight: FontWeight.w800, color: _ink)),
@@ -1009,7 +1010,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 _legendDot(_purple, 'You'),
               ]),
               const SizedBox(height: 26),
-              Text("You're now paired with\nyour partner.",
+              Text(S.now.uiReNowPairedNyour,
                   textAlign: TextAlign.center,
                   style: pvJakarta(
                       fontSize: 25,
@@ -1021,7 +1022,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               SizedBox(
                 width: 280,
                 child: Text(
-                  "We're here to help you support her and understand her journey better.",
+                  S.now.uiWeReHereHelp,
                   textAlign: TextAlign.center,
                   style: pvJakarta(
                       fontSize: 15,
@@ -1247,7 +1248,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             children: [
               const _SuccessBadge(),
               const SizedBox(height: 24),
-              Text("You're all set!",
+              Text(S.now.uiReAllSet,
                   style: pvJakarta(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -1257,7 +1258,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               SizedBox(
                 width: 270,
                 child: Text(
-                  'Welcome to the ParentVeda family. Your journey begins now. 💜',
+                  S.now.uiWelcomeParentvedaFamilyJourney,
                   textAlign: TextAlign.center,
                   style: pvJakarta(
                       fontSize: 15,
@@ -1319,7 +1320,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text(
-                      'Have an invite code?',
+                      S.now.uiHaveInviteCode,
                       style: pvJakarta(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
@@ -1395,7 +1396,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   /// the app is broken, where a message teaches them what to do next.
   void _nudgeForDate() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please add the due date or birthday first.')),
+      SnackBar(content: Text(S.now.uiPleaseAddDueDate)),
     );
   }
 
@@ -1531,13 +1532,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     if (picked != null) setState(() => _pickedDue = picked);
   }
 
-  static String _fmtDate(DateTime d) {
-    const m = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${d.day} ${m[d.month - 1]} ${d.year}';
-  }
+  static String _fmtDate(DateTime d) =>
+      '${d.day} ${S.now.monthShort(d.month)} ${d.year}';
 
   // ===========================================================================
   //  EMPLOYER BENEFIT  -  the second door, and the one most people arrive by
@@ -1654,7 +1650,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             const SizedBox(height: 12),
             Center(
               child: Text(
-                'You can do this later from Profile.',
+                S.now.uiCanDoLaterFrom,
                 style: pvJakarta(
                     fontSize: 12, fontWeight: FontWeight.w600, color: _label),
               ),
@@ -1672,13 +1668,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('WhatsApp updates',
+                  Text(S.now.uiWhatsappUpdates,
                       style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
                           color: _ink)),
                   const SizedBox(height: 2),
-                  Text('Get your weekly guide on WhatsApp. Optional.',
+                  Text(S.now.uiGetWeeklyGuideWhatsapp,
                       style: pvJakarta(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w500,
@@ -1707,7 +1703,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             const Icon(Icons.auto_awesome_rounded, size: 15, color: _purple),
             const SizedBox(width: 6),
-            Text("Don't know it? Calculate your due date",
+            Text(S.now.uiDonTKnowCalculate,
                 style: pvJakarta(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
@@ -1901,7 +1897,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Embryo age at transfer', style: lbl),
+                          Text(S.now.uiEmbryoAgeTransfer, style: lbl),
                           const SizedBox(height: 8),
                           Row(children: [
                             pill(3, 'Day 3', embryoDay,
@@ -1917,7 +1913,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               return Column(children: [
                 dateRow('Ultrasound date', scan, (d) => scan = d),
                 const SizedBox(height: 14),
-                Text('Gestational age at scan', style: lbl),
+                Text(S.now.uiGestationalAgeScan, style: lbl),
                 const SizedBox(height: 8),
                 stepRow('Weeks', gaWeeks,
                     () => gaWeeks = (gaWeeks - 1).clamp(4, 40),
@@ -1954,7 +1950,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Calculate your due date',
+                  child: Text(S.now.uiCalculateDueDate,
                       style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -1963,14 +1959,14 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                 const SizedBox(height: 3),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Tell us what you know - we'll do the math.",
+                  child: Text(S.now.uiTellUsWhatKnow,
                       style: pvJakarta(
                           fontSize: 12.5, color: _muted)),
                 ),
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('WHAT DO YOU KNOW?',
+                  child: Text(S.now.uiWhatDoKnow,
                       style: pvJakarta(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -2006,7 +2002,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('ESTIMATED DUE DATE',
+                              Text(S.now.uiEstimatedDueDate,
                                   style: pvJakarta(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w700,
@@ -2036,7 +2032,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                         decoration: BoxDecoration(
                             color: _purple,
                             borderRadius: BorderRadius.circular(14)),
-                        child: Text('Use this date',
+                        child: Text(S.now.uiUseDate,
                             style: pvJakarta(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,

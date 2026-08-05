@@ -28,6 +28,7 @@ import '../post_pregnancy/watch_quicklearn_screen.dart';
 import 'product_guide_data.dart';
 import 'product_guide_style.dart';
 import 'product_guide_votes.dart';
+import '../../localization/app_language.dart';
 
 
 class ProductGuideScreen extends StatelessWidget {
@@ -61,7 +62,7 @@ class ProductGuideScreen extends StatelessWidget {
               Expanded(child: Container(height: 1, color: pgLine)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('EXPLORE MORE IF YOU\'D LIKE', style: pgEyebrow(pgMuted)),
+                child: Text(S.now.uiExploreMoreIfD, style: pgEyebrow(pgMuted)),
               ),
               Expanded(child: Container(height: 1, color: pgLine)),
             ])),
@@ -81,7 +82,7 @@ class ProductGuideScreen extends StatelessWidget {
             _pad(_askVedaRow(context, g)),
             const SizedBox(height: 22),
 
-            _pad(Text('Guidance to help you decide — always follow your doctor\'s advice for your child.',
+            _pad(Text(S.now.uiGuidanceHelpDecideAlways,
                 textAlign: TextAlign.center, style: pgBody(11.5, color: pgMuted, h: 1.55))),
           ],
         ),
@@ -104,7 +105,7 @@ class ProductGuideScreen extends StatelessWidget {
               child: const Icon(Icons.arrow_back, size: 18, color: pgInk),
             ),
           ),
-          Expanded(child: Center(child: Text('PRODUCT GUIDE', style: pgEyebrow(pgMuted)))),
+          Expanded(child: Center(child: Text(S.now.uiProductGuide, style: pgEyebrow(pgMuted)))),
           const SizedBox(width: 36),
         ]),
       );
@@ -149,7 +150,7 @@ class ProductGuideScreen extends StatelessWidget {
       const SizedBox(height: 16),
 
       // best-for chips
-      Text('BEST FOR', style: pgEyebrow(pgMuted)),
+      Text(S.now.uiBest2, style: pgEyebrow(pgMuted)),
       const SizedBox(height: 8),
       // LEVEL 1 personalization. A chip that matches something she has actually
       // told us about her child is marked - so "Dry skin" carries weight for a
@@ -170,7 +171,7 @@ class ProductGuideScreen extends StatelessWidget {
             // used to be a snackbar sitting next to a working feature.
             onPressed: () => _openCompare(context, g),
             icon: const Icon(Icons.compare_arrows_rounded, size: 18),
-            label: const Text('Compare'),
+            label: Text(S.now.uiCompare),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               foregroundColor: pgPurple,
@@ -184,7 +185,7 @@ class ProductGuideScreen extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: () => _openBuySheet(context, g),
             icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-            label: const Text('Buy now'),
+            label: Text(S.now.uiBuyNow),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               backgroundColor: pgPurple,
@@ -284,7 +285,7 @@ class ProductGuideScreen extends StatelessWidget {
               Text('${g.parentScore}', style: pgTitle(26, c: pgInk)),
               Text(' /100', style: pgBody(12, color: pgMuted)),
             ]),
-            Text('ParentVeda score', style: pgBody(10, color: pgMuted)),
+            Text(S.now.uiParentvedaScore, style: pgBody(10, color: pgMuted)),
           ]),
         ]),
         const SizedBox(height: 12),
@@ -298,7 +299,7 @@ class ProductGuideScreen extends StatelessWidget {
           _consensus('${g.rating.community.toStringAsFixed(1)}★', 'community rating'),
         ]),
         const SizedBox(height: 14),
-        Text('YOUR TAKE', style: pgEyebrow(pgMuted).copyWith(fontSize: 9.5)),
+        Text(S.now.uiTake, style: pgEyebrow(pgMuted).copyWith(fontSize: 9.5)),
         const SizedBox(height: 8),
         AnimatedBuilder(
           animation: ProductGuideVotes.instance,
@@ -358,7 +359,7 @@ class ProductGuideScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('BEFORE YOU BUY', style: pgEyebrow(pgPurple)),
+              Text(S.now.uiBeforeBuy, style: pgEyebrow(pgPurple)),
               const SizedBox(height: 6),
               Text(g.beforeYouBuy, style: pgBody(14, color: pgInk, h: 1.55)),
             ]),
@@ -375,7 +376,7 @@ class ProductGuideScreen extends StatelessWidget {
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(color: const Color(0xFFEFF6F1), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFD6E7DD))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [const Icon(Icons.thumb_up_alt_outlined, size: 15, color: pgGreen), const SizedBox(width: 7), Text("WHAT'S GOOD", style: pgEyebrow(pgGreen))]),
+            Row(children: [const Icon(Icons.thumb_up_alt_outlined, size: 15, color: pgGreen), const SizedBox(width: 7), Text(S.now.uiWhatSGood, style: pgEyebrow(pgGreen))]),
             const SizedBox(height: 10),
             for (final w in g.whyLike)
               Padding(
@@ -394,10 +395,10 @@ class ProductGuideScreen extends StatelessWidget {
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(color: const Color(0xFFFBF3E8), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFEEDFC7))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [const Icon(Icons.info_outline_rounded, size: 15, color: pgAmber), const SizedBox(width: 7), Text('WORTH CONSIDERING', style: pgEyebrow(pgAmber))]),
+            Row(children: [const Icon(Icons.info_outline_rounded, size: 15, color: pgAmber), const SizedBox(width: 7), Text(S.now.uiWorthConsidering, style: pgEyebrow(pgAmber))]),
             const SizedBox(height: 10),
             if (g.watchOut.isEmpty)
-              Text('No real downsides stood out for this one.', style: pgBody(13.5, color: pgInk, h: 1.45))
+              Text(S.now.uiNoRealDownsidesStood, style: pgBody(13.5, color: pgInk, h: 1.45))
             else
               for (final w in g.watchOut)
                 Padding(
@@ -417,7 +418,7 @@ class ProductGuideScreen extends StatelessWidget {
   void _openExpertVideo(BuildContext context, PgExpert e) {
     final id = e.videoId;
     if (id == null) {
-      _soon(context, 'This explainer is still being filmed.');
+      _soon(context, S.now.explainerBeingFilmed);
       return;
     }
     final v = watchVideoById(id);
@@ -492,7 +493,7 @@ class ProductGuideScreen extends StatelessWidget {
               Row(children: [
                 const Icon(Icons.shopping_bag_outlined, size: 20, color: pgPurple),
                 const SizedBox(width: 9),
-                Expanded(child: Text('Heading to Amazon', style: pgSerif(22, h: 1.15))),
+                Expanded(child: Text(S.now.uiHeadingAmazon, style: pgSerif(22, h: 1.15))),
               ]),
               const SizedBox(height: 12),
               Text('${g.brand} ${g.name}', style: pgBody(14.5, color: pgInk, w: FontWeight.w700)),
@@ -509,7 +510,7 @@ class ProductGuideScreen extends StatelessWidget {
                     openOutbound(_buyUrl(g), productId: g.id);
                   },
                   icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                  label: const Text('Continue to Amazon'),
+                  label: Text(S.now.uiContinueAmazon),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     backgroundColor: pgPurple,
@@ -521,7 +522,7 @@ class ProductGuideScreen extends StatelessWidget {
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text('Stay here', style: pgBody(13.5, color: pgMuted, w: FontWeight.w700)),
+                  child: Text(S.now.uiStayHere, style: pgBody(13.5, color: pgMuted, w: FontWeight.w700)),
                 ),
               ),
             ]),
@@ -557,7 +558,7 @@ class ProductGuideScreen extends StatelessWidget {
             const SizedBox(width: 11),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Still deciding?', style: pgSerif(16, c: pgInk, h: 1.2)),
+                Text(S.now.uiStillDeciding, style: pgSerif(16, c: pgInk, h: 1.2)),
                 const SizedBox(height: 3),
                 Text('Ask Veda anything about ${g.category.toLowerCase()} for your child.',
                     style: pgBody(12.5, color: pgMuted, h: 1.45)),
@@ -746,7 +747,7 @@ class ProductGuideScreen extends StatelessWidget {
           Text(st.source, style: pgBody(11, color: pgMuted, w: FontWeight.w600)),
         ],
         const SizedBox(height: 10),
-        Text('WHAT THIS MEANS FOR YOU', style: pgEyebrow(pgGreen).copyWith(fontSize: 9.5)),
+        Text(S.now.uiWhatMeans2, style: pgEyebrow(pgGreen).copyWith(fontSize: 9.5)),
         const SizedBox(height: 5),
         Text(st.meaning, style: pgBody(13, color: pgSoft, h: 1.5)),
         if (st.detail.isNotEmpty) ...[
@@ -755,7 +756,7 @@ class ProductGuideScreen extends StatelessWidget {
             onTap: () => _readMore(context, st),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('Read more', style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
+              Text(S.now.uiReadMore, style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
               const Icon(Icons.chevron_right_rounded, size: 16, color: pgPurple),
             ]),
           ),
@@ -788,7 +789,7 @@ class ProductGuideScreen extends StatelessWidget {
               const SizedBox(height: 14),
               Text(st.detail, style: pgBody(14, color: pgInk, h: 1.65)),
               const SizedBox(height: 16),
-              Text('Summarised in plain language from independent sources. Always confirm anything important with your paediatrician.',
+              Text(S.now.uiSummarisedPlainLanguageFrom,
                   style: pgBody(11.5, color: pgMuted, h: 1.5)),
             ],
           ),
@@ -941,7 +942,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
                   child: const Icon(Icons.arrow_back, size: 16, color: pgInk),
                 ),
               ),
-              Expanded(child: Center(child: Text('ALL RATINGS', style: pgEyebrow(pgMuted)))),
+              Expanded(child: Center(child: Text(S.now.uiAllRatings, style: pgEyebrow(pgMuted)))),
               const SizedBox(width: 34),
             ]),
             const SizedBox(height: 18),
@@ -967,7 +968,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(16)),
-                child: Text('No ratings match this filter yet.', textAlign: TextAlign.center, style: pgBody(13.5, color: pgInk)),
+                child: Text(S.now.uiNoRatingsMatchFilter, textAlign: TextAlign.center, style: pgBody(13.5, color: pgInk)),
               )
             else
               for (final e in shown) pgExperienceCard(e),

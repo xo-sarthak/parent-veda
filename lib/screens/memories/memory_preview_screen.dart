@@ -18,6 +18,7 @@ import '../../memories/memory_templates.dart';
 import '../../theme/app_theme.dart';
 import 'memory_card.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class MemoryPreviewScreen extends StatefulWidget {
   const MemoryPreviewScreen({
@@ -76,8 +77,8 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
     MemoryAnalytics.saved(t.id);
     setState(() => _busy = false);
     _snack(ok
-        ? 'Saved to your gallery and My Memories.'
-        : 'Saved to My Memories. Allow photo access to save to your gallery.');
+        ? S.now.savedToGalleryAndMemories
+        : S.now.savedToMemoriesAllowPhoto);
   }
 
   Future<void> _share() async {
@@ -87,7 +88,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (bytes == null) {
-      _snack('Could not prepare the image. Try again.');
+      _snack(S.now.couldNotPrepareImage);
       return;
     }
     // Keep a copy in My Memories too — sharing implies keeping.
@@ -117,7 +118,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                     size: 22, color: _soft),
               ),
               const SizedBox(width: 12),
-              Text('Choose a template',
+              Text(S.now.uiChooseTemplate,
                   style: pvFraunces(
                       fontSize: 20, fontWeight: FontWeight.w600, color: _ink)),
             ]),
@@ -204,7 +205,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                   Icon(Icons.download_rounded,
                       size: 18, color: AppTheme.primary500),
                   const SizedBox(width: 7),
-                  Text('Save',
+                  Text(S.now.uiSave,
                       style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,

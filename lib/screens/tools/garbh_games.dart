@@ -320,7 +320,7 @@ class _WordSearchGameState extends State<WordSearchGame> {
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     return _GameChrome(
-      title: 'Word Search',
+      title: S.now.uiWordSearch,
       controller: widget.controller,
       done: _done,
       onAgain: _newPuzzle,
@@ -501,7 +501,7 @@ class _SudokuGameState extends State<SudokuGame> {
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     return _GameChrome(
-      title: 'Sudoku',
+      title: S.now.uiSudoku,
       controller: widget.controller,
       done: _done,
       onAgain: _newPuzzle,
@@ -682,7 +682,7 @@ class _LogicGameState extends State<LogicGame> {
     final s = S(widget.controller.language);
     final q = _kLogic[_i];
     return _GameChrome(
-      title: 'Logic Puzzle',
+      title: S.now.uiLogicPuzzle,
       controller: widget.controller,
       done: _done,
       onAgain: _reload,
@@ -832,7 +832,7 @@ class _MemoryMatchGameState extends State<MemoryMatchGame> {
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     return _GameChrome(
-      title: 'Memory Match',
+      title: S.now.uiMemoryMatch,
       controller: widget.controller,
       done: _done,
       onAgain: _reset,

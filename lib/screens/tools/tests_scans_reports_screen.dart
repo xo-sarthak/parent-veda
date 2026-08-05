@@ -204,7 +204,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
   Widget _empty() => Padding(
         padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
         child: Center(
-          child: Text('Nothing in this filter yet.',
+          child: Text(S.now.uiNothingFilterYet,
               textAlign: TextAlign.center,
               style: pvManrope(
                   fontSize: 13.5, color: AppTheme.neutral500)),
@@ -326,18 +326,18 @@ class TestScanDetailScreen extends StatelessWidget {
               badge: info.tag.badge),
           const SizedBox(height: 16),
           _ExpandableSection(
-              title: 'What it is', body: info.whatItIs, initiallyOpen: true),
-          _ExpandableSection(title: 'Why it\'s done', body: info.why),
-          _ExpandableSection(title: 'When', body: info.when),
-          _ExpandableSection(title: 'Preparation', body: info.preparation),
-          _ExpandableSection(title: 'Procedure', body: info.procedure),
+              title: S.now.uiWhat, body: info.whatItIs, initiallyOpen: true),
+          _ExpandableSection(title: S.now.uiWhySDone, body: info.why),
+          _ExpandableSection(title: S.now.uiWhen, body: info.when),
+          _ExpandableSection(title: S.now.uiPreparation, body: info.preparation),
+          _ExpandableSection(title: S.now.uiProcedure, body: info.procedure),
           // Renamed per the review, from 'Understanding Your Report'. It never
           // explained the report — it explained each PARAMETER on it, one at a
           // time, which is a different and narrower thing. The title now says
           // which of the two it is, and the section below is the one that does
           // the other job.
           _ExpandableSection(
-            title: 'Understanding your report parameters',
+            title: S.now.uiUnderstandingReportParameters,
             body: info.understandingReport,
             children: [
               for (final param in info.parameters) _ParameterCard(param),
@@ -350,7 +350,7 @@ class TestScanDetailScreen extends StatelessWidget {
           // and your doctor is who interprets it.
           if (info.interpretation.isNotEmpty)
             _ExpandableSection(
-              title: 'How do I interpret the test results?',
+              title: S.now.uiHowDoIInterpret,
               body: info.interpretation,
               children: [
                 for (final pointer in info.interpretPointers)
@@ -476,24 +476,24 @@ class FindingDetailScreen extends StatelessWidget {
               badge: info.tag.badge),
           const SizedBox(height: 16),
           _ExpandableSection(
-              title: 'What is it?',
+              title: S.now.uiWhat2,
               body: info.whatIsIt,
               initiallyOpen: true),
           _ExpandableSection(
-              title: 'Why does it happen?', body: info.whyHappens),
+              title: S.now.uiWhyDoesHappen, body: info.whyHappens),
           _ExpandableSection(
-              title: 'Symptoms', bullets: info.symptoms),
-          _ExpandableSection(title: 'Diagnosis', body: info.diagnosis),
+              title: S.now.uiSymptoms, bullets: info.symptoms),
+          _ExpandableSection(title: S.now.uiDiagnosis, body: info.diagnosis),
           _ExpandableSection(
-              title: 'Pregnancy implications', body: info.implications),
-          _ExpandableSection(title: 'Management', body: info.management),
+              title: S.now.uiPregnancyImplications, body: info.implications),
+          _ExpandableSection(title: S.now.uiManagement, body: info.management),
           _ExpandableSection(
-              title: 'When to contact your doctor',
+              title: S.now.uiWhenContactDoctor,
               bullets: info.whenToContact,
               highlight: true),
           if (info.faqs.isNotEmpty)
             _ExpandableSection(
-              title: 'FAQ',
+              title: S.now.uiFaq,
               children: [for (final f in info.faqs) _FaqCard(f)],
             ),
           const SizedBox(height: 4),
@@ -725,7 +725,7 @@ class MedicalDisclaimerCard extends StatelessWidget {
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Medical disclaimer',
+                Text(S.now.uiMedicalDisclaimer,
                     style: pvJakarta(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,

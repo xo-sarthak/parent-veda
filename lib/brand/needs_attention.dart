@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 /// Everything currently flagged. The single list the preview screen renders.
 enum BrandFlag {
@@ -53,9 +54,9 @@ class BrandFlagInfo {
   final String where;
 }
 
-const Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
+Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
   BrandFlag.productGuideSponsorship: BrandFlagInfo(
-    title: 'Sponsorship on a research page',
+    title: S.now.uiSponsorshipResearchPage,
     what:
         'A brand can sponsor the Product Guide\'s expert videos and Research Corner. It is labelled, it cannot touch the ParentVeda rating, and the research shown is still chosen by us.',
     tension:
@@ -65,7 +66,7 @@ const Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
     where: 'Product Guide → Expert videos + Research Corner',
   ),
   BrandFlag.compareSponsorship: BrandFlagInfo(
-    title: 'Sponsorship on the Compare tool',
+    title: S.now.uiSponsorshipCompareTool,
     what:
         'A brand can sponsor an educational note beneath a comparison. The comparison data itself is untouched — no spec, no rating, no ordering, and the sponsor cannot be one of the two products being compared.',
     tension:
@@ -75,7 +76,7 @@ const Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
     where: 'Compare products → below the table',
   ),
   BrandFlag.placeholderBrands: BrandFlagInfo(
-    title: 'Every brand here is invented',
+    title: S.now.uiEveryBrandHereInvented,
     what:
         'NestlingCo, MamaBloom, PureStart and TinyToes are not real companies. Their launches, studies and expert quotes are written by us to show the shape of the product.',
     tension:
@@ -84,7 +85,7 @@ const Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
     where: 'Everywhere brand content appears',
   ),
   BrandFlag.noBrandFilm: BrandFlagInfo(
-    title: 'Premiere has no brand film',
+    title: S.now.uiPremiereHasNoBrand,
     what:
         'Premiere is specced around a 10–20s brand video. No brand has supplied one, so it renders a title sequence we built instead.',
     tension: 'What you are seeing is the fallback, not the product. The real thing is a film; this is the frame around it.',
@@ -92,7 +93,7 @@ const Map<BrandFlag, BrandFlagInfo> kBrandFlags = {
     where: 'App open → Premiere',
   ),
   BrandFlag.samplingFulfilment: BrandFlagInfo(
-    title: 'Sampling collects requests it cannot fulfil',
+    title: S.now.uiSamplingCollectsRequestsCannot,
     what:
         'Parents can register interest in a free sample, and the request is stored locally with their consent recorded.',
     tension:
@@ -174,7 +175,7 @@ void showBrandFlagSheet(BuildContext context, BrandFlag flag) {
             const Icon(Icons.flag_rounded, size: 15, color: Color(0xFFD92D20)),
             const SizedBox(width: 8),
             Text(
-              'NEEDS A DECISION',
+              S.now.uiNeedsDecision,
               style: pvManrope(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -195,7 +196,7 @@ void showBrandFlagSheet(BuildContext context, BrandFlag flag) {
           _block('WHERE IT SHOWS', info.where),
           const SizedBox(height: 8),
           Text(
-            'This note is only visible in debug builds. Parents never see it.',
+            S.now.uiNoteOnlyVisibleDebug,
             style: pvManrope(fontSize: 11, color: const Color(0xFFA99CBB)),
           ),
         ]),

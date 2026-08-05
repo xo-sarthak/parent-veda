@@ -952,7 +952,7 @@ class _BrainTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
-        Text('A few quiet minutes of focused calm.',
+        Text(S.now.uiFewQuietMinutesFocused,
             style: text.bodyMedium?.copyWith(color: _muted)),
         const SizedBox(height: 14),
         for (final p in kPuzzles)
@@ -1343,7 +1343,7 @@ class _SamvadScreenState extends State<SamvadScreen>
           border: Border.all(color: _accSamvad.withValues(alpha: 0.2)),
         ),
         child: Text(
-            'Nothing selected yet. Tap Customize to choose what to read to your baby.',
+            S.now.uiNothingSelectedYetTap,
             style: text.bodyMedium?.copyWith(color: _ink, height: 1.5)),
       );
 
@@ -1587,7 +1587,7 @@ class _MemorySavedScreen extends StatelessWidget {
                   backgroundColor: _accSamvad,
                   padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 13)),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Done'),
+              child: Text(S.now.uiDone),
             ),
           ]),
         ),

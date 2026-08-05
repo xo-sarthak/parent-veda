@@ -12,6 +12,7 @@ import '../post_pregnancy/products_compare_screen.dart';
 import 'product_guide_data.dart';
 import 'product_guide_screen.dart';
 import 'product_guide_style.dart';
+import '../../localization/app_language.dart';
 
 class ProductGuideHubScreen extends StatefulWidget {
   const ProductGuideHubScreen({super.key});
@@ -65,7 +66,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
                   child: const Icon(Icons.arrow_back, size: 16, color: pgInk),
                 ),
               ),
-              Expanded(child: Center(child: Text('PRODUCT GUIDE', style: pgEyebrow(pgMuted)))),
+              Expanded(child: Center(child: Text(S.now.uiProductGuide, style: pgEyebrow(pgMuted)))),
               const SizedBox(width: 34),
             ])),
             const SizedBox(height: 22),
@@ -74,7 +75,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
               TextSpan(text: 'confidence.', style: pgSerif(30, c: pgPurple, h: 1.2)),
             ]), style: pgSerif(30, h: 1.2))),
             const SizedBox(height: 10),
-            _pad(Text('Honest, evidence-informed guides for the products parents actually research — understand in 10 seconds, go deeper only if you want to.',
+            _pad(Text(S.now.uiHonestEvidenceInformedGuides,
                 style: pgBody(14, h: 1.55))),
             const SizedBox(height: 20),
             _pad(_searchBar()),
@@ -93,7 +94,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
             if (searching) ..._searchResults() else ..._browse(),
 
             const SizedBox(height: 20),
-            _pad(Text('Guidance to help you choose — never a substitute for your doctor\'s advice.',
+            _pad(Text(S.now.uiGuidanceHelpChooseNever,
                 textAlign: TextAlign.center, style: pgBody(11.5, color: pgMuted, h: 1.55))),
           ],
         ),
@@ -123,9 +124,9 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Compare products', style: pgSerif(16, h: 1.2)),
+                Text(S.now.uiCompareProducts, style: pgSerif(16, h: 1.2)),
                 const SizedBox(height: 3),
-                Text('Two picks, side by side.',
+                Text(S.now.uiTwoPicksSideBy,
                     style: pgBody(12.5, color: pgMuted)),
               ]),
             ),
@@ -148,7 +149,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
               cursorColor: pgPurple,
               decoration: InputDecoration(
                 isDense: true, border: InputBorder.none,
-                hintText: 'Search — lotion, diapers, stroller…',
+                hintText: S.now.uiSearchLotionDiapersStroller,
                 hintStyle: pgBody(14.5, color: pgMuted),
               ),
             ),
@@ -177,7 +178,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
             const SizedBox(height: 10),
             Text('No guide for “$_q” yet.', textAlign: TextAlign.center, style: pgBody(14, color: pgInk, w: FontWeight.w600)),
             const SizedBox(height: 4),
-            Text('We only guide products worth researching — more are on the way.',
+            Text(S.now.uiWeOnlyGuideProducts,
                 textAlign: TextAlign.center, style: pgBody(12.5, color: pgMuted, h: 1.5)),
           ]),
         )),

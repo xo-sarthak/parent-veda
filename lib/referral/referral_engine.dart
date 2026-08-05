@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'referral_models.dart';
+import '../localization/app_language.dart';
 
 class ReferralEngine {
   ReferralEngine._();
@@ -138,7 +139,7 @@ class ReferralEngine {
     final c = normalise(code);
     if (!isWellFormed(c)) return 'That code does not look right';
     if (!config.isLiveAt(now ?? DateTime.now())) {
-      return 'This referral offer is not running right now';
+      return S.now.referralNotRunning;
     }
     // Self-referral: the single most common attempt, and the easiest to catch.
     if (ownCode.isNotEmpty && c == ownCode.toUpperCase()) {
@@ -158,16 +159,16 @@ class ReferralEngine {
     DateTime? now,
   }) {
     if (!config.isLiveAt(now ?? DateTime.now())) {
-      return 'This referral offer is not running right now';
+      return S.now.referralNotRunning;
     }
     if (sentToday >= config.maxInvitesPerDay) {
-      return 'You have hit today\'s invite limit. Try again tomorrow.';
+      return S.now.inviteLimitToday;
     }
     if (sentThisMonth >= config.maxInvitesPerMonth) {
-      return 'You have hit this month\'s invite limit.';
+      return S.now.inviteLimitMonth;
     }
     if (rewardsEarned >= config.maxRewardsPerUser) {
-      return 'You have earned the maximum rewards for this campaign.';
+      return S.now.maxRewardsEarned;
     }
     return null;
   }
@@ -203,10 +204,7 @@ class ReferralEngine {
     final y = int.tryParse(parts[0]);
     final m = int.tryParse(parts[1]);
     if (y == null || m == null || m < 1 || m > 12) return 'Birth Club';
-    const names = [
-      '', 'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return '${names[m]} $y Birth Club';
+    
+    return '${S.now.monthLong(m)} $y Birth Club';
   }
 }

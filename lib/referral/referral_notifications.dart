@@ -21,6 +21,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../services/notification_service.dart';
+import '../localization/app_language.dart';
 
 class ReferralNotifications {
   ReferralNotifications._();
@@ -32,11 +33,11 @@ class ReferralNotifications {
 
   /// A friend finished signing up.
   Future<void> friendJoined({required String inviteId, String? name}) async {
-    final who = (name ?? '').trim().isEmpty ? 'Your friend' : name!.trim();
+    final who = (name ?? '').trim().isEmpty ? S.now.someFriend : name!.trim();
     await _now(
       id: _id(inviteId, 0),
-      title: '$who joined ParentVeda',
-      body: 'Because of you. Your reward unlocks once she finishes setting up.',
+      title: S.now.friendJoinedTitle(who),
+      body: S.now.friendJoinedBody,
     );
   }
 
@@ -47,8 +48,8 @@ class ReferralNotifications {
   }) async {
     await _now(
       id: _id(rewardId, 1),
-      title: 'You have earned $label',
-      body: 'It is in your account, ready whenever you need it.',
+      title: S.now.rewardEarnedTitle(label),
+      body: S.now.rewardReadyBody,
     );
   }
 
@@ -60,8 +61,8 @@ class ReferralNotifications {
   }) async {
     await _now(
       id: _id('$club-$rung', 2),
-      title: 'Unlocked: $what',
-      body: 'Your Birth Club just got a little better.',
+      title: S.now.unlockedTitle(what),
+      body: S.now.birthClubBetter,
     );
   }
 

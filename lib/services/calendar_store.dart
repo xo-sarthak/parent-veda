@@ -278,7 +278,7 @@ class CalendarStore extends ChangeNotifier {
     if (prep.isBooked('course_birthing')) {
       out.add(CalendarEvent(
         id: 'cp_course_birthing',
-        title: 'Complete Birthing Course',
+        title: S.now.uiCompleteBirthingCourse,
         description: '6 classes · self-paced + monthly live Q&A',
         category: CalEventCategory.program,
         date: today,

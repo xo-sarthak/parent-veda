@@ -289,14 +289,14 @@ class _FruitBabyToggle extends StatelessWidget {
         children: [
           Expanded(
             child: _seg(context,
-                label: 'Fruit',
+                label: S.now.uiFruit,
                 icon: Icons.eco_rounded,
                 selected: !baby,
                 onTap: () => onChanged(false)),
           ),
           Expanded(
             child: _seg(context,
-                label: 'Baby',
+                label: S.now.uiBaby,
                 icon: Icons.child_care_rounded,
                 selected: baby,
                 onTap: () => onChanged(true)),

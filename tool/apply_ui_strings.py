@@ -18,8 +18,15 @@ import sys
 from ui_strings import (find_calls, find_localized, placeholders, dart_literal,
                         quote_of)
 
-args = [a for a in sys.argv[1:] if a != '--localized']
-find = find_localized if '--localized' in sys.argv else find_calls
+marker = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--marker=')),
+              '_p(')
+args = [a for a in sys.argv[1:]
+        if a != '--localized' and not a.startswith('--marker=')]
+if '--localized' in sys.argv:
+    find = find_localized
+else:
+    def find(src):
+        return find_calls(src, marker=marker)
 
 path, tsv = args[0], args[1]
 src = open(path, encoding='utf-8').read()

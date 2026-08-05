@@ -1042,21 +1042,18 @@ class _WeekBarState extends State<_WeekBar> {
   }
 }
 
-const _months = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-];
+
 
 /// Compact "22–28 Oct" (same month) or "29 Oct – 4 Nov".
 String _fmtRange(DateTime a, DateTime b) {
   if (a.month == b.month) {
-    return '${a.day}–${b.day} ${_months[a.month - 1]}';
+    return '${a.day}–${b.day} ${S.now.monthShort(a.month)}';
   }
-  return '${a.day} ${_months[a.month - 1]} – ${b.day} ${_months[b.month - 1]}';
+  return '${a.day} ${S.now.monthShort(a.month)} – ${b.day} ${S.now.monthShort(b.month)}';
 }
 
 /// Full "18 Jun 2026" - used for the booklet completion date.
-String _fmtFull(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
+String _fmtFull(DateTime d) => '${d.day} ${S.now.monthShort(d.month)} ${d.year}';
 
 /// A single circular week marker - just the number. The selected week is a
 /// filled, slightly larger disc; the rest are soft and faint.

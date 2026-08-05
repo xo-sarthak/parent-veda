@@ -24,6 +24,7 @@ import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/care_partner_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_partner_card.dart';
+import '../../localization/app_language.dart';
 
 class CareCircleScreen extends StatefulWidget {
   const CareCircleScreen({super.key});
@@ -53,7 +54,7 @@ class _CareCircleScreenState extends State<CareCircleScreen> {
             backgroundColor: ppBg,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
-            title: Text('Your Care Circle', style: ppJakarta(16)),
+            title: Text(S.now.uiCareCircle, style: ppJakarta(16)),
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
@@ -122,7 +123,7 @@ class _CareCircleScreenState extends State<CareCircleScreen> {
                 children: [
                   Text('ParentVeda', style: ppJakarta(15)),
                   const SizedBox(height: 2),
-                  Text('Evidence-based support, every week of the journey.',
+                  Text(S.now.uiEvidenceBasedSupportEvery,
                       style: ppBody(11.5, h: 1.4)),
                 ]),
           ),

@@ -10,6 +10,7 @@ import '../../data/prepare_data.dart';
 import '../../services/prepare_store.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
+import '../../localization/app_language.dart';
 
 class BirthingClassesScreen extends StatelessWidget {
   const BirthingClassesScreen({super.key});
@@ -24,7 +25,7 @@ class BirthingClassesScreen extends StatelessWidget {
     void enroll() => showPrepareBooking(
           context,
           id: courseId,
-          title: 'Complete Birthing Course',
+          title: S.now.uiCompleteBirthingCourse,
           priceLabel: '₹1,499 · free on ParentVeda+',
           whenLabel: '6 classes · self-paced + monthly live Q&A',
           heading: 'Enroll in this course',
@@ -46,13 +47,13 @@ class BirthingClassesScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 pvEyebrow('For the big day'),
                 const SizedBox(height: 10),
-                Text('Birthing Classes', style: pvHeroStyle()),
+                Text(S.now.uiBirthingClasses, style: pvHeroStyle()),
                 const SizedBox(height: 12),
-                Text('Everything for the big day, taught by a childbirth educator.', style: pvSubStyle()),
+                Text(S.now.uiEverythingBigDayTaught, style: pvSubStyle()),
                 pvBanner(spans: [
-                  pvText("You're "),
+                  pvText(S.now.uiRe),
                   pvBold('30 weeks'),
-                  pvText(' - exactly when most mums prepare for birth.'),
+                  pvText(S.now.uiExactlyWhenMostMums),
                 ]),
 
                 // overview card
@@ -66,9 +67,9 @@ class BirthingClassesScreen extends StatelessWidget {
                     boxShadow: pvCardShadow,
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Complete Birthing Course', style: pvTitleStyle(20)),
+                    Text(S.now.uiCompleteBirthingCourse, style: pvTitleStyle(20)),
                     const SizedBox(height: 6),
-                    Text('6 classes · self-paced video + a monthly live Q&A', style: pvBody(kSoft, 13)),
+                    Text(S.now.uiClassesSelfPacedVideo, style: pvBody(kSoft, 13)),
                     const SizedBox(height: 14),
                     Row(children: [
                       pvAvatar(34),
@@ -123,7 +124,7 @@ class BirthingClassesScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 28),
-                Text('The 6 classes', style: pvTitleStyle(16)),
+                Text(S.now.uiClasses, style: pvTitleStyle(16)),
                 const SizedBox(height: 6),
                 for (int i = 0; i < kBirthingClasses.length; i++)
                   _classRow(

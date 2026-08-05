@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'consultation_detail_screen.dart';
 import 'prepare_common.dart';
+import '../../localization/app_language.dart';
 
 class ConsultationsScreen extends StatelessWidget {
   const ConsultationsScreen({super.key});
@@ -28,11 +29,11 @@ class ConsultationsScreen extends StatelessWidget {
             const SizedBox(height: 22),
             pvEyebrow('Private & personal'),
             const SizedBox(height: 10),
-            Text('1:1 Consultations', style: pvHeroStyle()),
+            Text(S.now.uiConsultations, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('A private session with the right expert, whenever you need one.', style: pvSubStyle()),
+            Text(S.now.uiPrivateSessionRightExpert, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText('Something on your mind after your 30-week scan? Talk it through.'),
+              pvText(S.now.uiSomethingMindAfterWeek),
             ]),
             const SizedBox(height: 22),
 
@@ -47,7 +48,7 @@ class ConsultationsScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 pvEyebrow('How it works', color: kPurple),
                 const SizedBox(height: 8),
-                Text('Pick an expert → pick a slot → private video call. Notes saved to your health record.',
+                Text(S.now.uiPickExpertPickSlot,
                     style: pvBody(kInk, 14).copyWith(height: 1.6)),
               ]),
             ),
@@ -107,7 +108,7 @@ class ConsultationsScreen extends StatelessWidget {
               Row(children: [
                 Text(s.rating, style: pvBody(kCoral, 12).copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(width: 10),
-                Text('Hindi / English', style: pvBody(kMuted, 12)),
+                Text(S.now.uiHindiEnglish, style: pvBody(kMuted, 12)),
                 if (s.next != null) ...[
                   const SizedBox(width: 10),
                   Flexible(

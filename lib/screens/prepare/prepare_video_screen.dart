@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'prepare_common.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class PrepareVideoScreen extends StatelessWidget {
   const PrepareVideoScreen({
@@ -67,7 +68,7 @@ class PrepareVideoScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: kInk.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(999)),
-                      child: Text('Video coming soon',
+                      child: Text(S.now.uiVideoComingSoon,
                           style: pvManrope(
                               fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
@@ -98,7 +99,7 @@ class PrepareVideoScreen extends StatelessWidget {
                   const Icon(Icons.movie_outlined, size: 18, color: kPurple),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text('The full video lands here soon. We\'ll notify you when it\'s ready to watch.',
+                    child: Text(S.now.uiFullVideoLandsHere,
                         style: pvBody(kInk, 13).copyWith(height: 1.5)),
                   ),
                 ]),

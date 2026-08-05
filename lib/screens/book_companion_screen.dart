@@ -29,6 +29,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 // ---- palette (light-only, matching the app) ---------------------------------
 const _bg = Color(0xFFFBF9FE);
@@ -180,7 +181,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
               constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.arrow_back_rounded, color: _ink),
-              tooltip: 'Back',
+              tooltip: S.now.uiBack,
             ),
           ),
           const SizedBox(height: 4),
@@ -233,7 +234,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 ),
                 onPressed: () => _jump(_sections.length > 1 ? _sections[1].id : 'overview'),
                 child: Text(
-                  'Read summary',
+                  S.now.uiReadSummary,
                   style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               ),
@@ -417,7 +418,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             _anchor('ideas'),
             _pad(_sectionTitle('The most important ideas')),
             const SizedBox(height: 6),
-            _pad(Text('Tap any idea to open it.', style: _subStyle())),
+            _pad(Text(S.now.uiTapAnyIdeaOpen, style: _subStyle())),
             const SizedBox(height: 16),
             for (var i = 0; i < c.ideas.length; i++) _pad(_IdeaCard(
                   key: ValueKey('idea$i'),
@@ -432,7 +433,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             _anchor('chapters'),
             _pad(_sectionTitle('Chapter by chapter')),
             const SizedBox(height: 6),
-            _pad(Text('Tap a chapter for its key points.', style: _subStyle())),
+            _pad(Text(S.now.uiTapChapterItsKey, style: _subStyle())),
             const SizedBox(height: 16),
             for (var i = 0; i < c.chapters.length; i++) _pad(_ChapterCard(
                   key: ValueKey('chapter$i'),
@@ -572,7 +573,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             const Icon(Icons.eco_rounded, size: 16, color: Color(0xFF3FA56A)),
             const SizedBox(width: 8),
             Text(
-              "PARENTVEDA'S TAKE",
+              S.now.uiParentvedaSTake,
               style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -850,7 +851,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                 Container(height: 1, color: _line),
                 const SizedBox(height: 16),
                 Text(
-                  'KEY POINTS COVERED',
+                  S.now.uiKeyPointsCovered,
                   style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, color: _muted),
                 ),
                 const SizedBox(height: 14),

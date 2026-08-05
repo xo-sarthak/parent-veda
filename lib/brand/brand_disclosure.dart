@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import 'brand_models.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 /// `Presented by <Brand>` — for takeover and destination surfaces.
 ///
@@ -99,7 +100,7 @@ class SponsoredTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
-        'SPONSORED',
+        S.now.uiSponsored,
         style: pvManrope(
           fontSize: 8.5,
           fontWeight: FontWeight.w800,

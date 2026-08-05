@@ -224,7 +224,7 @@ class _SplashScreenState extends State<SplashScreen>
                       // no longer repeat it as text - just one clean tagline.
                       const SizedBox(height: 22),
                       Text(
-                        'Your trusted parenting companion',
+                        S.now.uiTrustedParentingCompanion,
                         textAlign: TextAlign.center,
                         style: pvFraunces(
                           fontSize: 17,

@@ -16,6 +16,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../models/medication.dart';
 import '../models/reminder.dart';
+import '../localization/app_language.dart';
 
 class NotificationService {
   NotificationService._();
@@ -98,7 +99,7 @@ class NotificationService {
   /// undiagnosed. Now the failure (or the success time) is on screen.
   Future<String> scheduleTestIn1Min() async {
     if (!_ready) await init();
-    if (!_ready) return 'Notifications are not ready on this device.';
+    if (!_ready) return S.now.notifNotReady;
 
     // Whether the OS will actually honour an EXACT alarm. On Android 12+ this
     // can be off even with the manifest permission — it is a per-app toggle in
@@ -129,13 +130,12 @@ class NotificationService {
       debugPrint('[reminders] TEST scheduled for $when '
           '(now=${tz.TZDateTime.now(tz.local)}, tz=${tz.local.name})');
       final gap = canExact == false
-          ? ' — but exact alarms are OFF for this app, so it may be delayed or '
-              'dropped. Turn on "Alarms & reminders" in the app settings.'
+          ? S.now.notifExactAlarmsOff
           : '';
-      return 'Scheduled for ${_hhmm(when)}. Lock the phone and wait a minute.$gap';
+      return S.now.notifScheduledFor(_hhmm(when), gap);
     } catch (e) {
       debugPrint('[reminders] TEST schedule FAILED: $e');
-      return 'Scheduling FAILED: $e';
+      return S.now.notifSchedulingFailed(e);
     }
   }
 
@@ -237,9 +237,7 @@ class NotificationService {
       final start = _dayOf(a.startDateIso);
       final end = _dayOf(a.endDateIso);
       final title = a.title.trim().isNotEmpty ? a.title.trim() : m.name;
-      final body = m.dose.trim().isNotEmpty
-          ? "It's time for your ${m.name} (${m.dose})"
-          : "It's time for your ${m.name}";
+      final body = S.now.medicationDue(m.name, m.dose.trim());
 
       for (int d = 0; d <= _medHorizonDays && index < _medMaxOcc; d++) {
         final day = today.add(Duration(days: d));

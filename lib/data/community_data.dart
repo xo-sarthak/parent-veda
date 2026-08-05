@@ -7,6 +7,7 @@
 // =============================================================================
 
 import '../models/community_models.dart';
+import '../localization/app_language.dart';
 
 // Stable id used for the Community Pulse "question of the week" poll.
 const String kPulseKicksPollId = 'pulse_kicks';
@@ -468,10 +469,6 @@ const List<String> _monthSlugs = [
   '', 'jan', 'feb', 'mar', 'apr', 'may', 'jun',
   'jul', 'aug', 'sep', 'oct', 'nov', 'dec'
 ];
-const List<String> _monthNames = [
-  '', 'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
 
 /// 'nov2026' for a due date in November 2026 — matching the seeded room's id
 /// so the generated one and the hand-written one are the same room.
@@ -489,11 +486,9 @@ Community birthClubCommunity(int year, int month) {
   }
   return Community(
     id: id,
-    name: '${_monthNames[month]} $year Moms',
+    name: S.now.birthClubName(month, year),
     emoji: '🤰',
-    description:
-        'Mothers due in ${_monthNames[month]} $year, going through it together '
-        '- week by week.',
+    description: S.now.birthClubDescription(month, year),
     // Honest: a freshly derived club has nobody in it but her. Inventing a
     // member count would be the kind of small lie that makes everything else
     // in the app suspect.

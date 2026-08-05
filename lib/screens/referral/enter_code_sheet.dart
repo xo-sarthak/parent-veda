@@ -27,6 +27,7 @@ import '../../referral/referral_analytics.dart';
 import '../../referral/referral_engine.dart';
 import '../../referral/referral_store.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../localization/app_language.dart';
 
 /// Returns true when a code was accepted.
 Future<bool> showEnterCodeSheet(BuildContext context, {String? dueMonth}) async {
@@ -107,7 +108,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
                 color: ppLine, borderRadius: BorderRadius.circular(2)),
           ),
           const SizedBox(height: 20),
-          Text('Have an invite code?', style: ppFraunces(23, h: 1.1)),
+          Text(S.now.uiHaveInviteCode, style: ppFraunces(23, h: 1.1)),
           const SizedBox(height: 7),
           Text(
             'If a friend invited you, enter her code and you both get $reward.',
@@ -161,7 +162,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
                     borderRadius: BorderRadius.circular(13),
                     border: Border.all(color: ppBorder),
                   ),
-                  child: Text('Paste', style: ppJakarta(13, color: ppPurple)),
+                  child: Text(S.now.uiPaste, style: ppJakarta(13, color: ppPurple)),
                 ),
               ),
             ),
@@ -184,7 +185,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
                           height: 18,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                      : Text('Apply code',
+                      : Text(S.now.uiApplyCode,
                           style: ppJakarta(13.5, color: Colors.white)),
                 ),
               ),
@@ -196,7 +197,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text('I do not have one',
+              child: Text(S.now.uiIDoNotHave,
                   style: ppJakarta(12.5, color: ppSoft)),
             ),
           ),

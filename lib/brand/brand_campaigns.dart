@@ -21,6 +21,7 @@
 import 'package:flutter/material.dart';
 
 import 'brand_models.dart';
+import '../localization/app_language.dart';
 
 // ---- brands -----------------------------------------------------------------
 // `certified` stays false everywhere. Certification is an editorial judgement
@@ -127,7 +128,7 @@ final BrandCampaign _calmBalmLaunch = BrandCampaign(
   // Reaches both stages, matching the Premiere that announces it — a launch a
   // parent was just shown must not vanish when they tap through to it.
   audience: BrandAudience.everyone,
-  creative: const BrandCreative(
+  creative: BrandCreative(
     eyebrow: 'New from Cetaphil',
     headline: 'Calm Balm',
     subline: 'A daily balm for babies whose skin flares up.',
@@ -150,7 +151,7 @@ final BrandCampaign _calmBalmLaunch = BrandCampaign(
         icon: Icons.air_rounded,
       ),
       BrandHighlight(
-        title: 'A maker\'s own study is a starting point',
+        title: S.now.uiMakerSOwnStudy,
         body: 'Any brand-run trial — this category is full of them — is a reason to look closer, never proof on its own.',
         icon: Icons.science_outlined,
       ),
@@ -217,7 +218,7 @@ final BrandCampaign _nursingLaunch = BrandCampaign(
     stage: BrandStage.parenting,
     anySignal: {'breastfeeding', 'mixed', 'expressed'},
   ),
-  creative: const BrandCreative(
+  creative: BrandCreative(
     eyebrow: 'New from Philips Avent',
     headline: 'The Night Layer',
     subline: 'Nursing clothes designed for 3 a.m., not for a photograph.',
@@ -255,7 +256,7 @@ final BrandCampaign _diaperLaunch = BrandCampaign(
   slot: BrandSlot.launchHub,
   schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
   audience: const BrandAudience(stage: BrandStage.parenting, childAgeMonthsMax: 24),
-  creative: const BrandCreative(
+  creative: BrandCreative(
     eyebrow: 'New from Pampers',
     headline: 'SoftFit',
     subline: 'A diaper that changed its waistband, and not much else.',

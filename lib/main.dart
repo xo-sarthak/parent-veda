@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'brand/brand_store.dart';
+import 'localization/app_language.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
 import 'screens/post_pregnancy/pp_development_data.dart';
 import 'screens/post_pregnancy/daily_tip_popup.dart';
@@ -359,10 +360,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        // Mirror the language for inline call sites that style themselves
-        // without reading the text theme. Set before the tree builds so the
-        // first frame in a new language is already correct.
+        // Mirror the language for inline call sites that style or word
+        // themselves without reading the text theme or holding the controller.
+        // Set before the tree builds so the first frame in a new language is
+        // already correct, in type and in copy.
         PvType.setLanguage(_controller.language);
+        S.current = _controller.language;
         return _app(context);
       },
     );

@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
+import '../../localization/app_language.dart';
 
 // TODO: derive the current pregnancy month from the saved due date / week.
 // 30 weeks ≈ month 7, matching the rest of the Prepare tab's "Priya · 30 weeks".
@@ -63,14 +64,14 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             const SizedBox(height: 22),
             pvEyebrow('Move with your month'),
             const SizedBox(height: 10),
-            Text('Yoga', style: pvHeroStyle()),
+            Text(S.now.uiYoga, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text('Trimester-safe movement to feel strong, calm, and ready - matched to exactly where you are.',
+            Text(S.now.uiTrimesterSafeMovementFeel,
                 style: pvSubStyle()),
             pvBanner(icon: Icons.self_improvement_rounded, spans: [
-              pvText("You're in "),
+              pvText(S.now.uiRe2),
               pvBold('month $_kCurrentMonth'),
-              pvText(" - we've opened your yoga here. Every session is filtered safe for your stage."),
+              pvText(S.now.uiWeVeOpenedYoga),
             ]),
 
             // program card
@@ -89,9 +90,9 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Pregnancy Yoga Program', style: pvTitleStyle(18)),
+                    Text(S.now.uiPregnancyYogaProgram, style: pvTitleStyle(18)),
                     const SizedBox(height: 6),
-                    Text('9-month journey · with Sana Kapoor, certified prenatal instructor',
+                    Text(S.now.uiMonthJourneySanaKapoor,
                         style: pvBody(kSoft, 13)),
                     const SizedBox(height: 12),
                     Text.rich(
@@ -111,7 +112,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
 
             // month tabs
             const SizedBox(height: 22),
-            Text('CHOOSE A MONTH',
+            Text(S.now.uiChooseMonth,
                 style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1)),
             const SizedBox(height: 12),
             SizedBox(
@@ -136,7 +137,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             if (sessions.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Text('Sessions for this month are coming soon.',
+                child: Text(S.now.uiSessionsMonthAreComing,
                     style: pvBody(kSoft, 14).copyWith(fontStyle: FontStyle.italic)),
               )
             else
@@ -144,7 +145,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
                 _session(sessions[i], bottom: i == sessions.length - 1),
 
             const SizedBox(height: 18),
-            Text('Every session is filtered for your month - nothing unsafe for where you are ever surfaces.',
+            Text(S.now.uiEverySessionFilteredMonth,
                 style: pvBody(kSoft, 13).copyWith(fontStyle: FontStyle.italic, height: 1.6)),
             pvFooterNote('Certified prenatal instructor. A calm, safe practice for all nine months.'),
           ],

@@ -19,6 +19,7 @@ import '../../memories/memory_photos.dart';
 import '../../theme/app_theme.dart';
 import 'memory_preview_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class MemoryPersonalizeScreen extends StatefulWidget {
   const MemoryPersonalizeScreen({super.key, required this.type});
@@ -58,7 +59,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text('Could not add photo: $e')));
+          ..showSnackBar(SnackBar(content: Text(S.now.couldNotAddPhoto(e))));
       }
     }
   }
@@ -87,7 +88,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                     style: pvFraunces(
                         fontSize: 28, fontWeight: FontWeight.w600, color: _ink)),
                 const SizedBox(height: 4),
-                Text('Add your details — everything is optional except a name.',
+                Text(S.now.uiAddDetailsEverythingOptional,
                     style: pvManrope(fontSize: 13, color: _soft)),
                 const SizedBox(height: 22),
 
@@ -152,13 +153,13 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           Icon(Icons.add_a_photo_outlined,
               size: 26, color: AppTheme.primary500),
           const SizedBox(height: 8),
-          Text('Add a photo (optional)',
+          Text(S.now.uiAddPhotoOptional,
               style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primary500)),
           const SizedBox(height: 2),
-          Text('You can zoom & position it after',
+          Text(S.now.uiCanZoomPositionAfter,
               style: pvManrope(fontSize: 11, color: _soft)),
           const SizedBox(height: 14),
           Row(children: [
@@ -195,12 +196,12 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
       ),
       const SizedBox(height: 8),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text('Pinch to zoom · drag to position',
+        Text(S.now.uiPinchZoomDragPosition,
             style: pvManrope(fontSize: 11.5, color: _soft)),
         Row(children: [
           GestureDetector(
             onTap: () => _pick(ImageSource.gallery),
-            child: Text('Replace',
+            child: Text(S.now.uiReplace,
                 style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
@@ -209,7 +210,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           const SizedBox(width: 16),
           GestureDetector(
             onTap: () => setState(() => _data.photo = null),
-            child: Text('Remove',
+            child: Text(S.now.uiRemove,
                 style: pvManrope(
                     fontSize: 12.5, fontWeight: FontWeight.w700, color: _soft)),
           ),
@@ -300,7 +301,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                 color: AppTheme.primary500,
                 borderRadius: BorderRadius.circular(16)),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('Preview templates',
+              Text(S.now.uiPreviewTemplates,
                   style: pvManrope(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -319,7 +320,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.arrow_back_rounded, size: 20, color: _soft),
           const SizedBox(width: 6),
-          Text('Back',
+          Text(S.now.uiBack,
               style: pvManrope(
                   fontSize: 13.5, fontWeight: FontWeight.w700, color: _soft)),
         ]),

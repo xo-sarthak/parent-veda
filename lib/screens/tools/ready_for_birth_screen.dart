@@ -122,15 +122,15 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('Ready for Birth'),
+        title: Text(S.now.uiReadyBirth),
         actions: [
           IconButton(
-            tooltip: 'Personalise',
+            tooltip: S.now.uiPersonalise,
             icon: const Icon(Icons.tune_rounded),
             onPressed: _booting ? null : () => _openPersonalize(context, _ctx),
           ),
           IconButton(
-            tooltip: 'Start again',
+            tooltip: S.now.uiStartAgain2,
             icon: const Icon(Icons.refresh_rounded),
             onPressed: _booting ? null : _confirmRestart,
           ),
@@ -152,9 +152,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
                     const SizedBox(height: 22),
                     ..._insightCards(r),
                     const SizedBox(height: 8),
-                    Text('Four simple parts', style: _t.titleMedium),
+                    Text(S.now.uiFourSimpleParts, style: _t.titleMedium),
                     const SizedBox(height: 4),
-                    Text('Tap any one to continue — items only appear inside.',
+                    Text(S.now.uiTapAnyOneContinue,
                         style: _t.bodySmall?.copyWith(color: AppTheme.neutral600)),
                     const SizedBox(height: 14),
                     for (final c in kReadyOrder) ...[
@@ -227,7 +227,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text('$percent%',
                   style: _t.titleLarge?.copyWith(color: AppTheme.primary900, fontWeight: FontWeight.w800)),
-              Text('ready', style: _t.labelSmall?.copyWith(color: AppTheme.neutral600)),
+              Text(S.now.uiReady, style: _t.labelSmall?.copyWith(color: AppTheme.neutral600)),
             ]),
           ),
         ),
@@ -263,7 +263,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           Icon(Icons.check_circle_rounded, color: AppTheme.tertiary600),
           const SizedBox(width: 12),
           Expanded(
-            child: Text('Everything is packed. If your baby comes tonight, you know exactly what to grab.',
+            child: Text(S.now.uiEverythingPackedIfBaby,
                 style: _t.bodyMedium?.copyWith(color: AppTheme.tertiary900, height: 1.4)),
           ),
         ]),
@@ -281,7 +281,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.auto_awesome_rounded, size: 20),
           const SizedBox(width: 10),
-          Text("Let's pack together", style: _t.titleMedium?.copyWith(color: Colors.white)),
+          Text(S.now.uiLetSPackTogether, style: _t.titleMedium?.copyWith(color: Colors.white)),
           const SizedBox(width: 8),
           Text('~${estMinutesFor(r.remaining)} min',
               style: _t.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85))),
@@ -388,7 +388,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(Icons.notifications_active_rounded, size: 19, color: AppTheme.secondary600),
             const SizedBox(width: 10),
-            Text('Labour started?', style: _t.titleSmall?.copyWith(color: AppTheme.secondary700)),
+            Text(S.now.uiLabourStarted, style: _t.titleSmall?.copyWith(color: AppTheme.secondary700)),
           ]),
         ),
       );
@@ -397,11 +397,11 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Start again?'),
-        content: const Text(
-            'This clears everything — packed items, anything you set aside, and your product choices — and brings back the full default list. This can\'t be undone.'),
+        title: Text(S.now.uiStartAgain),
+        content: Text(
+            S.now.uiClearsEverythingPackedItems),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(S.now.uiCancel3)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppTheme.primary),
             onPressed: () async {
@@ -409,10 +409,10 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
               await _bag.createBag(generateDefaultBag(_ctx.delivery), _ctx.delivery);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fresh start — the full list is back.')));
+                    SnackBar(content: Text(S.now.uiFreshStartFullList)));
               }
             },
-            child: const Text('Start again'),
+            child: Text(S.now.uiStartAgain2),
           ),
         ],
       ),
@@ -469,14 +469,14 @@ class _ItemCard extends StatelessWidget {
                   InkWell(
                     onTap: onNeedOne,
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text('Need one?', style: t.labelMedium?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.w700)),
+                      Text(S.now.uiNeedOne, style: t.labelMedium?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.w700)),
                       const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.primary),
                     ]),
                   ),
                 if (onNotNeeded != null)
                   InkWell(
                     onTap: onNotNeeded,
-                    child: Text("I don't need this", style: t.labelMedium?.copyWith(color: AppTheme.neutral500, fontWeight: FontWeight.w600)),
+                    child: Text(S.now.uiIDonTNeed, style: t.labelMedium?.copyWith(color: AppTheme.neutral500, fontWeight: FontWeight.w600)),
                   ),
               ]),
             ],
@@ -575,9 +575,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 ),
               if (notNeeded.isNotEmpty) ...[
                 const SizedBox(height: 6),
-                Text('Not for us', style: t.titleSmall?.copyWith(color: AppTheme.neutral600)),
+                Text(S.now.uiNotUs, style: t.titleSmall?.copyWith(color: AppTheme.neutral600)),
                 const SizedBox(height: 2),
-                Text('Set aside and not counted. Tap to add back any time.',
+                Text(S.now.uiSetAsideNotCounted,
                     style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
                 const SizedBox(height: 10),
                 for (final i in notNeeded)
@@ -591,7 +591,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                       TextButton(
                         onPressed: () => _bag.restore(i.id),
                         style: TextButton.styleFrom(foregroundColor: AppTheme.primary, visualDensity: VisualDensity.compact),
-                        child: const Text('Add back'),
+                        child: Text(S.now.uiAddBack),
                       ),
                     ]),
                   ),
@@ -599,7 +599,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
               ],
               if (provided.isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text('Your hospital provides these — no need to pack',
+                Text(S.now.uiHospitalProvidesTheseNo,
                     style: t.labelMedium?.copyWith(color: AppTheme.neutral500)),
                 const SizedBox(height: 8),
                 for (final i in provided)
@@ -617,7 +617,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
               OutlinedButton.icon(
                 onPressed: _addOwn,
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Add your own'),
+                label: Text(S.now.uiAddOwn),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(48),
                   foregroundColor: AppTheme.primary,
@@ -649,13 +649,13 @@ class _CategoryScreenState extends State<_CategoryScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(99)))),
               const SizedBox(height: 16),
-              Text('Add your own', style: t.titleLarge),
+              Text(S.now.uiAddOwn, style: t.titleLarge),
               const SizedBox(height: 12),
               TextField(
                 controller: ctrl,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: 'What would you like to add?',
+                  hintText: S.now.uiWhatWouldLikeAdd,
                   filled: true,
                   fillColor: AppTheme.surface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppTheme.outlineVariant)),
@@ -669,7 +669,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                   Navigator.of(ctx).pop();
                 },
                 style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppTheme.primary),
-                child: const Text('Add to my bag'),
+                child: Text(S.now.uiAddMyBag),
               ),
             ]),
           ),
@@ -793,15 +793,15 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
                 child: Icon(Icons.check_rounded, size: 44, color: AppTheme.tertiary600),
               ),
               const SizedBox(height: 22),
-              Text('That’s a big step done', style: t.headlineSmall, textAlign: TextAlign.center),
+              Text(S.now.uiSBigStepDone, style: t.headlineSmall, textAlign: TextAlign.center),
               const SizedBox(height: 10),
-              Text('You’ve moved through everything for now. Come back any time to add the last few things — you’re close.',
+              Text(S.now.uiVeMovedThroughEverything,
                   style: t.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.5), textAlign: TextAlign.center),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: FilledButton.styleFrom(minimumSize: const Size(200, 52), backgroundColor: AppTheme.primary),
-                child: const Text('Back to my readiness'),
+                child: Text(S.now.uiBackMyReadiness),
               ),
             ]),
           ),
@@ -820,7 +820,7 @@ class _EmergencyScreen extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: const Text('Labour started?')),
+      appBar: AppBar(title: Text(S.now.uiLabourStarted)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(22, 12, 22, 28),
         children: [
@@ -833,14 +833,14 @@ class _EmergencyScreen extends StatelessWidget {
               border: Border.all(color: AppTheme.secondary100),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('First — take a breath.', style: t.headlineSmall?.copyWith(color: AppTheme.secondary900)),
+              Text(S.now.uiFirstTakeBreath, style: t.headlineSmall?.copyWith(color: AppTheme.secondary900)),
               const SizedBox(height: 8),
-              Text('You have time. Call your doctor or hospital, then take these with you. Everything else can follow later.',
+              Text(S.now.uiHaveTimeCallDoctor,
                   style: t.bodyMedium?.copyWith(color: AppTheme.secondary900, height: 1.5)),
             ]),
           ),
           const SizedBox(height: 22),
-          Text('Take these first', style: t.titleMedium),
+          Text(S.now.uiTakeTheseFirst, style: t.titleMedium),
           const SizedBox(height: 12),
           for (final g in kEmergencyGrab)
             Container(
@@ -871,7 +871,7 @@ class _EmergencyScreen extends StatelessWidget {
             child: Row(children: [
               Icon(Icons.directions_car_rounded, color: AppTheme.tertiary600),
               const SizedBox(width: 12),
-              Expanded(child: Text('Then leave for the hospital. You’ve got this.',
+              Expanded(child: Text(S.now.uiThenLeaveHospitalVe,
                   style: t.bodyMedium?.copyWith(color: AppTheme.tertiary900, height: 1.4))),
             ]),
           ),
@@ -904,9 +904,9 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(99)))),
           const SizedBox(height: 16),
-          Text('Personalise your bag', style: t.titleLarge),
+          Text(S.now.uiPersonaliseBag, style: t.titleLarge),
           const SizedBox(height: 4),
-          Text('A few details make the suggestions smarter.', style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+          Text(S.now.uiFewDetailsMakeSuggestions, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
           const SizedBox(height: 20),
 
           _label('Delivery type', t),
@@ -929,8 +929,8 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
 
           Row(children: [
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Expecting twins', style: t.titleSmall),
-              Text('We’ll suggest a few extras', style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+              Text(S.now.uiExpectingTwins, style: t.titleSmall),
+              Text(S.now.uiWeLlSuggestFew, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
             ])),
             Switch(value: _ctx.twins, onChanged: (v) => _set(() => _ctx.setTwins(v)), activeThumbColor: AppTheme.primary),
           ]),
@@ -945,7 +945,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppTheme.primary),
-            child: const Text('Done'),
+            child: Text(S.now.uiDone),
           ),
         ]),
       ),
@@ -1021,7 +1021,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(color: AppTheme.primary50, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.primary100)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('How to choose', style: t.labelLarge?.copyWith(color: AppTheme.primary700)),
+                  Text(S.now.uiHowChoose, style: t.labelLarge?.copyWith(color: AppTheme.primary700)),
                   const SizedBox(height: 6),
                   Text('${whyPack(item)} Our picks below balance comfort, safety and value — or grab one from a store you already trust.',
                       style: t.bodyMedium?.copyWith(color: AppTheme.primary900, height: 1.5)),
@@ -1029,15 +1029,15 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
               ),
               const SizedBox(height: 20),
               if (picks.isNotEmpty) ...[
-                Text('Our picks', style: t.titleMedium),
+                Text(S.now.uiOurPicks, style: t.titleMedium),
                 const SizedBox(height: 12),
                 for (final p in picks) _optionCard(item, p),
               ],
               if (elsewhere.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('Also available elsewhere', style: t.titleMedium),
+                Text(S.now.uiAlsoAvailableElsewhere, style: t.titleMedium),
                 const SizedBox(height: 4),
-                Text('Prefer a store you know? These open the shop directly.',
+                Text(S.now.uiPreferStoreKnowThese,
                     style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
                 const SizedBox(height: 12),
                 for (final p in elsewhere) _optionCard(item, p),
@@ -1051,7 +1051,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   Navigator.of(context).pop();
                 },
                 style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: const Text("I've already got one"),
+                child: Text(S.now.uiIVeAlreadyGot),
               ),
               const SizedBox(height: 10),
               TextButton(
@@ -1060,7 +1060,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(foregroundColor: AppTheme.neutral600),
-                child: const Text("I don't need this"),
+                child: Text(S.now.uiIDonTNeed),
               ),
             ],
           );
@@ -1126,7 +1126,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   if (affiliate)
                     Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
                   else if (p.topPick)
-                    Text('Best overall', style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
+                    Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
                   Text(affiliate ? 'Buy on ${p.store}' : p.name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
@@ -1142,7 +1142,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
               if (p.topPick)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: Text('Why we recommend it', style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
+                  child: Text(S.now.uiWhyWeRecommend, style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
                 ),
               for (final w in p.why)
                 Padding(
@@ -1155,7 +1155,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
             ],
             if (p.consider.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text('Things to consider', style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
+              Text(S.now.uiThingsConsider, style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               for (final c in p.consider)
                 Padding(

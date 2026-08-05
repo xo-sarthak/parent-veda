@@ -20,6 +20,7 @@ import '../../models/read_item.dart';
 import '../../theme/father_skin.dart';
 import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class FatherReadsScreen extends StatelessWidget {
   const FatherReadsScreen({super.key});
@@ -41,31 +42,31 @@ class FatherReadsScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 120),
           children: [
-            Text('FOR YOU, DAD', style: _eyebrow(kFMuted)),
+            Text(S.now.uiDad, style: _eyebrow(kFMuted)),
             const SizedBox(height: 4),
-            Text('Reads', style: fatherSerif(26, weight: FontWeight.w600)),
+            Text(S.now.uiReads, style: fatherSerif(26, weight: FontWeight.w600)),
             const SizedBox(height: 4),
-            Text('Short reads about her, the baby, and how to show up.',
+            Text(S.now.uiShortReadsAboutHer,
                 style: _body(13, c: kFMuted)),
             const SizedBox(height: 16),
             // Tales entry - the Stories, Fables & Mythology collection.
             _talesCard(context),
             const SizedBox(height: 18),
             // ---- Articles ----
-            Text('ARTICLES', style: _eyebrow(kFAccent)),
+            Text(S.now.uiArticles, style: _eyebrow(kFAccent)),
             const SizedBox(height: 10),
             for (final r in kFatherArticles) _readCard(context, r),
             // ---- Research Summaries ----
             if (research.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text('RESEARCH SUMMARIES', style: _eyebrow(kFAccent)),
+              Text(S.now.uiResearchSummaries, style: _eyebrow(kFAccent)),
               const SizedBox(height: 10),
               for (final r in research) _readCard(context, r),
             ],
             // ---- Book Summaries ----
             if (books.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text('BOOK SUMMARIES', style: _eyebrow(kFAccent)),
+              Text(S.now.uiBookSummaries, style: _eyebrow(kFAccent)),
               const SizedBox(height: 10),
               for (final r in books) _bookCard(context, r),
             ],
@@ -100,10 +101,10 @@ class FatherReadsScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Stories, Fables & Mythology',
+                    Text(S.now.uiStoriesFablesMythology,
                         style: fatherSerif(17, color: kFCream)),
                     const SizedBox(height: 3),
-                    Text('Tales to read aloud to the bump',
+                    Text(S.now.uiTalesReadAloudBump,
                         style: _body(12.5,
                             c: kFCream.withValues(alpha: 0.85))),
                   ]),
@@ -321,11 +322,11 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
   List<({String label, GlobalKey key})> get _toc {
     final r = widget.read;
     return [
-      (label: 'The read', key: _kArticle),
-      if (r.hasWhyThisMatters) (label: 'Why this matters', key: _kWhy),
+      (label: S.now.uiRead, key: _kArticle),
+      if (r.hasWhyThisMatters) (label: S.now.uiWhyMatters, key: _kWhy),
       if (r.hasResearchSimplified)
-        (label: 'Research simplified', key: _kResearch),
-      if (r.hasMythFact) (label: 'Myth vs fact', key: _kMyth),
+        (label: S.now.uiResearchSimplified, key: _kResearch),
+      if (r.hasMythFact) (label: S.now.uiMythVsFact, key: _kMyth),
     ];
   }
 
@@ -357,11 +358,11 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
         actions: [
           if (_toc.length > 1)
             IconButton(
-                tooltip: 'Contents',
+                tooltip: S.now.uiContents,
                 icon: const Icon(Icons.list_rounded),
                 onPressed: _showToc),
           IconButton(
-              tooltip: 'Reading settings',
+              tooltip: S.now.uiReadingSettings,
               icon: const Icon(Icons.text_fields_rounded),
               onPressed: _showSettings),
         ],
@@ -500,7 +501,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
         return SafeArea(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             const SizedBox(height: 14),
-            Text('Contents',
+            Text(S.now.uiContents,
                 style: fatherSerif(18).copyWith(color: pal.ink)),
             const SizedBox(height: 8),
             for (final t in _toc)
@@ -562,7 +563,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text('Reading', style: fatherSerif(18).copyWith(color: pal.ink)),
+                Text(S.now.uiReading, style: fatherSerif(18).copyWith(color: pal.ink)),
                 const SizedBox(height: 16),
                 Row(children: [
                   Text('A', style: TextStyle(fontSize: 14, color: pal.muted)),

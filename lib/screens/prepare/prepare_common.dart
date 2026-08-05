@@ -18,6 +18,7 @@ import '../../booking/booking_catalog.dart';
 import '../../services/prepare_store.dart';
 import '../post_pregnancy/booking_sheet.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 // ---- palette (mirrors the design's hexes; AppTheme holds the same base) -----
 const Color kCanvas = Color(0xFFFBF9FE);
@@ -243,7 +244,7 @@ class _StripePainter extends CustomPainter {
 // A gentle placeholder action for CTAs that don't have a real backend yet.
 void pvComingSoon(BuildContext context, [String what = 'Booking']) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('$what opens soon'), behavior: SnackBarBehavior.floating),
+    SnackBar(content: Text(S.now.opensSoon(what)), behavior: SnackBarBehavior.floating),
   );
 }
 
@@ -379,7 +380,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         ]),
       ),
       const SizedBox(height: 14),
-      Text("We'll hold your spot and remind you before it starts. Payments aren't live yet - nothing is charged now.",
+      Text(S.now.uiWeLlHoldSpot,
           style: pvBody(kMuted, 12).copyWith(height: 1.5)),
       const SizedBox(height: 18),
       SizedBox(
@@ -418,7 +419,7 @@ class _BookingSheetState extends State<_BookingSheet> {
       ),
       const SizedBox(height: 16),
       Center(
-        child: Text("You're all set!",
+        child: Text(S.now.uiReAllSet,
             style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
       ),
       const SizedBox(height: 8),
@@ -440,7 +441,7 @@ class _BookingSheetState extends State<_BookingSheet> {
               widget.onConfirmed?.call();
             },
             child: Center(
-              child: Text('Done',
+              child: Text(S.now.uiDone,
                   style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
@@ -529,16 +530,16 @@ class PvStickyCta extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: kCanvas,
-        title: Text('Cancel this?', style: pvTitleStyle(18)),
-        content: Text('This will remove it from your Prepare list.', style: pvBody(kSoft, 14)),
+        title: Text(S.now.uiCancel, style: pvTitleStyle(18)),
+        content: Text(S.now.uiWillRemoveFromPrepare, style: pvBody(kSoft, 14)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Keep')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(S.now.uiKeep)),
           TextButton(
             onPressed: () {
               PrepareStore.instance.cancel(id);
               Navigator.of(context).pop();
             },
-            child: const Text('Cancel it', style: TextStyle(color: kCoral)),
+            child: Text(S.now.uiCancel2, style: TextStyle(color: kCoral)),
           ),
         ],
       ),

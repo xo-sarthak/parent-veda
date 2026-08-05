@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import '../../referral/referral_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'invite_friends_screen.dart';
+import '../../localization/app_language.dart';
 
 enum InviteNudgeShape { banner, row }
 
@@ -90,7 +91,7 @@ class _InviteNudgeCardState extends State<InviteNudgeCard> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Going through this with a friend?',
+                    Text(S.now.uiGoingThroughFriend,
                         style: ppJakarta(14, color: Colors.white)),
                     const SizedBox(height: 2),
                     Text('Invite her and you both get $reward.',
@@ -127,7 +128,7 @@ class _InviteNudgeCardState extends State<InviteNudgeCard> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Invite a friend', style: ppJakarta(13.5)),
+                    Text(S.now.uiInviteFriend, style: ppJakarta(13.5)),
                     const SizedBox(height: 2),
                     Text('You both get $reward.', style: ppBody(11.5, h: 1.4)),
                   ]),

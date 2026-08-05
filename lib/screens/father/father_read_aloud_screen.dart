@@ -19,6 +19,7 @@ import '../../services/read_to_baby_saved_store.dart';
 import '../../services/read_to_baby_store.dart';
 import '../../theme/father_skin.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 // One read-aloud piece (optional title + body) + a stable save key + group.
 typedef _FSP = ({String? title, String body, String saveKey, String group});
@@ -70,13 +71,13 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('READ TO YOUR BABY', style: _eyebrow(kFMuted)),
+                  Text(S.now.uiReadBaby, style: _eyebrow(kFMuted)),
                   const SizedBox(height: 4),
-                  Text('Read to your baby',
+                  Text(S.now.uiReadBaby2,
                       style: fatherSerif(26, weight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   Text(
-                      "The same words she's reading - say them aloud to the bump. Your voice is one they already know.",
+                      S.now.uiSameWordsSheS,
                       style: _body(13, c: kFMuted)),
                 ],
               ),
@@ -197,7 +198,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
                     border: Border.all(color: kFLine),
                   ),
                   child: Text(
-                      "Nothing chosen yet - she picks the spiritual reading in her app, and it shows up here for you.",
+                      S.now.uiNothingChosenYetShe,
                       style: _body(14, c: kFInk)),
                 ),
               ],
@@ -242,7 +243,7 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
                 saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                 size: 18,
                 color: kFAccent),
-            label: Text('Save', style: _body(13, w: FontWeight.w700, c: kFAccent)),
+            label: Text(S.now.uiSave, style: _body(13, w: FontWeight.w700, c: kFAccent)),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               minimumSize: Size.zero,

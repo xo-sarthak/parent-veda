@@ -32,6 +32,7 @@ import 'post_pregnancy/recommendations_screen.dart';
 import 'post_pregnancy/sleep_journey_screen.dart';
 import 'prepare/prepare_hub_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -59,41 +60,41 @@ const List<_Product> _products = [
       'Fires on app open, both apps', stars: 5),
   _Product(2, BrandSlot.launchHub, 'Exclusive Launch Hub',
       'A launch\'s permanent home - story, expert introduction, highlights, resources. An Apple Event, not a catalogue.',
-      'Tools -> Launches', stars: 5),
+      'Tools → Launches', stars: 5),
   _Product(3, BrandSlot.sponsoredEducation, 'Sponsored Educational Experiences',
-      'A brand funds a ParentVeda collection existing. It never touches what the collection says.',
-      'Explore -> READ -> a collection', stars: 5),
+      'A brand pays for a ParentVeda collection to exist. It never touches what the collection says.',
+      'Explore → READ → a collection', stars: 5),
   _Product(4, BrandSlot.productGuideExpert, 'Product Guide Sponsorship',
       'Expert videos and the research corner inside a Product Guide can be sponsored. Ratings are untouchable.',
-      'Tools -> Product Guide -> any guide'),
+      'Tools → Product Guide → any guide'),
   _Product(5, BrandSlot.recoFeatured, 'Recommendation Sponsorship',
       'A featured pick inside the recommendation engine. Money buys the right to be CONSIDERED - never a rank bonus.',
-      'Explore -> Recommendations', stars: 5),
+      'Explore → Recommendations', stars: 5),
   _Product(6, BrandSlot.compareGuide, 'Compare Tool Sponsorship',
       'Buying guides and comparison notes may be sponsored. The comparison data itself never moves.',
-      'Explore -> Products -> Compare'),
+      'Explore → Products → Compare'),
   _Product(7, BrandSlot.sponsoredJourney, 'Sponsored Parenting Journeys',
       'A multi-day guided journey a brand supports. The journey stays ParentVeda\'s content.',
-      'Explore -> Guided journeys'),
+      'Explore → Guided journeys'),
   _Product(8, BrandSlot.sponsoredTool, 'Tool Sponsorship',
       'A quiet supported-by line on a tool a parent chose to open. Never dominates the screen.',
-      'Tools -> Sleep journey'),
+      'Tools → Sleep journey'),
   _Product(9, BrandSlot.sponsoredCollection, 'Product Collections',
       'Curated collections a brand sponsors. ParentVeda still decides what is in them.',
-      'Recommendations -> a collection'),
+      'Recommendations → a collection'),
   _Product(10, BrandSlot.liveSession, 'Live Expert Sessions',
       'Webinars, AMAs and expert talks a brand supports. The doctor stays independent.',
-      'Pregnancy -> Prepare', stars: 5),
+      'Pregnancy → Prepare', stars: 5),
   _Product(11, BrandSlot.communityCampaign, 'Community Campaigns',
       'A sponsored challenge in the community feed. Participation stays the focus.',
-      'Community -> the feed'),
+      'Community → the feed'),
   _Product(12, BrandSlot.productSampling, 'Product Sampling',
       'Free samples and trial packs: eligibility, registration, then feedback.',
-      'Explore -> Recommendations', 
+      'Explore → Recommendations', 
       note: 'Eligibility, registration and feedback are live. Real fulfilment (who actually posts the parcel) is an ops question, not an app one.'),
   _Product(13, BrandSlot.sponsoredMilestone, 'Milestone Sponsorship',
       'A brand supports the content around a milestone (6 months, 1 year). The milestone content stays editorial.',
-      'My Child -> a milestone journey'),
+      'My Child → a milestone journey'),
   _Product(14, BrandSlot.nativeDiscovery, 'Native Discovery',
       'A product named naturally inside content links to its Product Guide. Never an advertisement.',
       'Recipes, Ready for Birth, product cards',
@@ -169,7 +170,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         backgroundColor: _bg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: Text('Brand Studio',
+        title: Text(S.now.uiBrandStudio,
             style: pvFraunces(
                 fontSize: 21, fontWeight: FontWeight.w600, color: _ink)),
       ),
@@ -177,7 +178,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         padding: const EdgeInsets.fromLTRB(18, 4, 18, 40),
         children: [
           Text(
-            'Fifteen premium brand products, plus Certification. Every one is a real placement in the real app - tap "Show me" to go and see it in context.',
+            S.now.uiFifteenPremiumBrandProducts,
             style: pvManrope(fontSize: 13.5, height: 1.55, color: _soft),
           ),
           const SizedBox(height: 14),
@@ -220,14 +221,15 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
           ),
           Switch(
             value: on,
-            activeThumbColor: _purple,
+            activeTrackColor: _purple,
+            activeThumbColor: Colors.white,
             onChanged: (v) => setState(() => BrandStudio.instance.demoMode = v),
           ),
         ]),
       );
 
   Widget _partners() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('DEMO PARTNERS',
+        Text(S.now.uiDemoPartners,
             style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -240,7 +242,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
           children: [for (final b in kBrands) BrandLockup(brand: b, markSize: 26)],
         ),
         const SizedBox(height: 8),
-        Text('Not real partnerships - placeholders for review.',
+        Text(S.now.uiNotRealPartnershipsPlaceholders,
             style: pvManrope(fontSize: 11, color: _soft)),
       ]);
 
@@ -308,7 +310,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                   decoration: BoxDecoration(
                       color: _purple, borderRadius: BorderRadius.circular(9)),
-                  child: Text('Show me',
+                  child: Text(S.now.uiShowMe,
                       style: pvManrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w800,
@@ -321,7 +323,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                 decoration: BoxDecoration(
                     color: const Color(0xFFF0EEF3),
                     borderRadius: BorderRadius.circular(8)),
-                child: Text('Not built',
+                child: Text(S.now.uiNotBuilt,
                     style: pvManrope(
                         fontSize: 10.5, fontWeight: FontWeight.w800, color: _soft)),
               ),

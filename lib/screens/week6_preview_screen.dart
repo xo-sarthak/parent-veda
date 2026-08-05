@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
+import '../localization/app_language.dart';
 
 class Week6PreviewScreen extends StatelessWidget {
   const Week6PreviewScreen({super.key});
@@ -91,7 +92,7 @@ class _TopBar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text('Week 6 of 40',
+          Text(S.now.uiWeek2,
               style: text.bodyMedium?.copyWith(color: AppTheme.neutral500)),
         ],
       ),
@@ -115,7 +116,7 @@ class _TrimesterBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Trimester 1',
+            Text(S.now.uiTrimester,
                 style: text.headlineSmall?.copyWith(
                     color: AppTheme.primary600, fontWeight: FontWeight.w700)),
             Text('WEEK 6 · ${(progress * 100).round()}%',
@@ -144,7 +145,7 @@ class _DateRange extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     return Center(
-      child: Text('12 – 18 FEB',
+      child: Text(S.now.uiFeb,
           style: text.labelMedium?.copyWith(
               color: AppTheme.neutral500,
               letterSpacing: 1.0,
@@ -172,7 +173,7 @@ class _WeekStrip extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        Text('WEEKS',
+        Text(S.now.uiWeeks,
             style: text.labelSmall?.copyWith(
                 color: AppTheme.neutral400, letterSpacing: 2)),
       ],
@@ -284,11 +285,11 @@ class _SizeCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text('THIS WEEK',
+          Text(S.now.uiWeek3,
               style: text.labelSmall?.copyWith(
                   color: AppTheme.neutral400, letterSpacing: 1.4)),
           const SizedBox(height: 4),
-          Text('How big am I?',
+          Text(S.now.uiHowBigAmI,
               style: text.headlineMedium?.copyWith(
                   color: AppTheme.primary600, fontWeight: FontWeight.w800)),
           const SizedBox(height: 14),
@@ -302,7 +303,7 @@ class _SizeCard extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.flag_rounded, size: 14, color: AppTheme.secondary500),
               const SizedBox(width: 6),
-              Text('THE BEATING HEART',
+              Text(S.now.uiBeatingHeart,
                   style: text.labelSmall?.copyWith(
                       color: AppTheme.secondary600,
                       fontWeight: FontWeight.w700,
@@ -315,28 +316,28 @@ class _SizeCard extends StatelessWidget {
           const Center(child: _FruitBabyToggle()),
           const SizedBox(height: 18),
           Center(
-            child: Text('I am about the size of',
+            child: Text(S.now.uiIAmAboutSize,
                 style: text.bodyMedium?.copyWith(color: AppTheme.neutral600)),
           ),
           const SizedBox(height: 4),
           Center(
-            child: Text('a pomegranate seed',
+            child: Text(S.now.uiPomegranateSeed,
                 textAlign: TextAlign.center,
                 style: text.headlineMedium?.copyWith(
                     color: AppTheme.primary600, fontWeight: FontWeight.w800)),
           ),
           const SizedBox(height: 18),
-          Row(children: const [
+          Row(children: [
             Expanded(
                 child: _Metric(
                     icon: Icons.straighten_rounded,
-                    label: 'LENGTH',
+                    label: S.now.uiLength,
                     value: '4–6 mm')),
             SizedBox(width: 12),
             Expanded(
                 child: _Metric(
                     icon: Icons.hourglass_empty_rounded,
-                    label: 'WEIGHT',
+                    label: S.now.uiWeight,
                     value: '< 1 g')),
           ]),
           const SizedBox(height: 16),
@@ -352,13 +353,13 @@ class _SizeCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your heart is now beating rhythmically, and major organs are beginning to take shape.',
+                  S.now.uiHeartNowBeatingRhythmically,
                   style: text.bodyMedium?.copyWith(
                       color: AppTheme.primary900, height: 1.45),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '“Maa, my little heart is beating steadily and helping me grow stronger every day.”',
+                  S.now.uiMaaMyLittleHeart,
                   style: text.bodyMedium?.copyWith(
                       color: AppTheme.primary600,
                       fontStyle: FontStyle.italic,
@@ -521,29 +522,29 @@ class _MilestonesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Upcoming Milestones',
+          Text(S.now.uiUpcomingMilestones,
               style: text.headlineSmall?.copyWith(
                   color: AppTheme.neutral900, fontWeight: FontWeight.w700)),
           const SizedBox(height: 18),
-          const _MilestoneRow(
+          _MilestoneRow(
             week: 'WEEK 7',
-            title: 'Tiny Features Begin',
+            title: S.now.uiTinyFeaturesBegin,
             body:
                 "Your baby's face is beginning to take shape and tiny arms and legs continue developing.",
             active: true,
             isLast: false,
           ),
-          const _MilestoneRow(
+          _MilestoneRow(
             week: 'WEEK 8',
-            title: 'Officially A Baby',
+            title: S.now.uiOfficiallyBaby,
             body:
                 'Your baby has completed the embryonic stage and is now officially considered a fetus.',
             active: false,
             isLast: false,
           ),
-          const _MilestoneRow(
+          _MilestoneRow(
             week: 'WEEK 12',
-            title: 'First Trimester Complete',
+            title: S.now.uiFirstTrimesterComplete,
             body:
                 "Your baby's organs are formed and the first trimester is coming to an end.",
             active: false,
@@ -560,7 +561,7 @@ class _MilestonesCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
               ),
-              child: Text('VIEW FULL TIMELINE',
+              child: Text(S.now.uiViewFullTimeline,
                   style: text.labelMedium?.copyWith(
                       color: AppTheme.primary600,
                       fontWeight: FontWeight.w700,
@@ -677,11 +678,11 @@ class _DailyReadCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('DAILY READ · NUTRITION',
+                    Text(S.now.uiDailyReadNutrition,
                         style: text.labelSmall?.copyWith(
                             color: AppTheme.neutral400, letterSpacing: 1.2)),
                     const SizedBox(height: 4),
-                    Text('Surviving Morning Sickness',
+                    Text(S.now.uiSurvivingMorningSickness,
                         style: text.titleMedium?.copyWith(
                             color: AppTheme.neutral900,
                             fontWeight: FontWeight.w700,
@@ -693,7 +694,7 @@ class _DailyReadCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Eat before you feel hungry. An empty stomach often makes nausea worse.',
+            S.now.uiEatBeforeFeelHungry,
             style: text.bodyMedium
                 ?.copyWith(color: AppTheme.neutral600, height: 1.45),
           ),
@@ -748,11 +749,11 @@ class _BottomNav extends StatelessWidget {
         top: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: const [
-            _NavItem(icon: Icons.home_rounded, label: 'MAIN', selected: true),
-            _NavItem(icon: Icons.list_rounded, label: 'LIST'),
-            _NavItem(icon: Icons.timer_outlined, label: 'COUNTERS'),
-            _NavItem(icon: Icons.settings_outlined, label: 'SETTINGS'),
+          children: [
+            _NavItem(icon: Icons.home_rounded, label: S.now.uiMain, selected: true),
+            _NavItem(icon: Icons.list_rounded, label: S.now.uiList),
+            _NavItem(icon: Icons.timer_outlined, label: S.now.uiCounters),
+            _NavItem(icon: Icons.settings_outlined, label: S.now.uiSettings),
           ],
         ),
       ),

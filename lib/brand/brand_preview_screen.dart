@@ -21,6 +21,7 @@ import 'brand_store.dart';
 import 'brand_studio.dart';
 import 'needs_attention.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -54,7 +55,7 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
         backgroundColor: _bg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: Text('Brand Studio', style: _t(17, w: FontWeight.w800)),
+        title: Text(S.now.uiBrandStudio, style: _t(17, w: FontWeight.w800)),
       ),
       body: AnimatedBuilder(
         animation: Listenable.merge([studio, BrandStudioStore.instance]),
@@ -67,7 +68,7 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 40),
             children: [
               Text(
-                'An engine whose job is to show almost nothing. This page is the only way to see it working.',
+                S.now.uiEngineWhoseJobShow,
                 style: _t(13, c: _soft, h: 1.55),
               ),
               const SizedBox(height: 18),
@@ -75,19 +76,19 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
               const SizedBox(height: 18),
               _context(ctx, live, campaigns.length),
               const SizedBox(height: 22),
-              Text('CAMPAIGNS', style: _t(10, w: FontWeight.w800, c: _soft)),
+              Text(S.now.uiCampaigns, style: _t(10, w: FontWeight.w800, c: _soft)),
               const SizedBox(height: 4),
               Text(
-                'Tap a slot name to learn what it is. A blocked campaign says exactly why.',
+                S.now.uiTapSlotNameLearn,
                 style: _t(11.5, c: _soft),
               ),
               const SizedBox(height: 12),
               for (final c in campaigns) _campaignCard(c, ctx),
               const SizedBox(height: 24),
-              Text('FLAGGED FOR YOU', style: _t(10, w: FontWeight.w800, c: _red)),
+              Text(S.now.uiFlagged, style: _t(10, w: FontWeight.w800, c: _red)),
               const SizedBox(height: 4),
               Text(
-                'Things that got built despite a real argument against them. Each one is a decision waiting on you.',
+                S.now.uiThingsGotBuiltDespite,
                 style: _t(11.5, c: _soft),
               ),
               const SizedBox(height: 12),
@@ -127,9 +128,9 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
           Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Replay everything', style: _t(14, w: FontWeight.w700)),
+                Text(S.now.uiReplayEverything, style: _t(14, w: FontWeight.w700)),
                 const SizedBox(height: 3),
-                Text('Clears impressions and dismissals so a Premiere can be watched again.', style: _t(11.5, c: _soft)),
+                Text(S.now.uiClearsImpressionsDismissalsSo, style: _t(11.5, c: _soft)),
               ]),
             ),
             const SizedBox(width: 12),
@@ -138,14 +139,14 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
                 BrandStudioStore.instance.replayAll();
                 setState(() {});
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Reset — restart the app to see the Premiere'), behavior: SnackBarBehavior.floating),
+                  SnackBar(content: Text(S.now.uiResetRestartAppSee), behavior: SnackBarBehavior.floating),
                 );
               },
-              child: Text('Reset', style: _t(12.5, w: FontWeight.w800, c: _purple)),
+              child: Text(S.now.uiReset, style: _t(12.5, w: FontWeight.w800, c: _purple)),
             ),
           ]),
           const Divider(height: 26, color: _line),
-          Text('Preview as', style: _t(14, w: FontWeight.w700)),
+          Text(S.now.uiPreviewAs, style: _t(14, w: FontWeight.w700)),
           const SizedBox(height: 8),
           Row(children: [
             for (final s in BrandStage.values)
@@ -173,7 +174,8 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
             ]),
           ),
           const SizedBox(width: 12),
-          Switch(value: value, activeThumbColor: _purple, onChanged: onChanged),
+          Switch(value: value, activeTrackColor: _purple,
+            activeThumbColor: Colors.white, onChanged: onChanged),
         ],
       );
 
@@ -183,10 +185,10 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: const Color(0xFFF3EEF7), borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('WHAT THE STUDIO KNOWS ABOUT YOU', style: _t(10, w: FontWeight.w800, c: _purple)),
+          Text(S.now.uiWhatStudioKnowsAbout, style: _t(10, w: FontWeight.w800, c: _purple)),
           const SizedBox(height: 10),
           Text(
-            'This is everything targeting can see. It is read from your family profile — nothing else.',
+            S.now.uiEverythingTargetingCanSee,
             style: _t(11.5, c: _soft, h: 1.45),
           ),
           const SizedBox(height: 12),
@@ -321,10 +323,10 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: _line)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('EVERY PLACEMENT', style: _t(10, w: FontWeight.w800, c: _soft)),
+          Text(S.now.uiEveryPlacement, style: _t(10, w: FontWeight.w800, c: _soft)),
           const SizedBox(height: 4),
           Text(
-            'The complete list. A closed set — a placement cannot exist unless it is here.',
+            S.now.uiCompleteListClosedSet,
             style: _t(11.5, c: _soft),
           ),
           const SizedBox(height: 12),

@@ -31,6 +31,25 @@ String _code(String src) => src
     .where((l) => !l.trimLeft().startsWith('//'))
     .join('\n');
 
+/// Does `screen` still put this copy on the page?
+///
+/// Copy that used to sit inline as `Text('Compare products')` now lives in the
+/// string table so it can be translated, and the screen reads it as
+/// `S.now.uiCompareProducts`. Searching the screen for the words alone would
+/// report a regression that has not happened.
+///
+/// Both halves are asserted, because either one alone is a weaker test than
+/// the literal was: the string table must still carry these exact English
+/// words, AND this screen must still be the thing that shows them.
+bool _showsCopy(String screen, String english) {
+  final table = _read('lib/localization/app_language.dart');
+  final quoted = RegExp.escape(english);
+  final getter = RegExp('String get (ui\\w+) =>\\s*_p\\((["\'])$quoted\\2')
+      .firstMatch(table);
+  if (getter == null) return false;
+  return screen.contains('S.now.${getter.group(1)}');
+}
+
 void main() {
   dailyPopupAndSaved();
   productTemplateAcrossApps();
@@ -168,7 +187,7 @@ void main() {
 
     test('Compare now lives in the Product Guide', () {
       expect(guide.contains('ProductsCompareScreen()'), isTrue);
-      expect(guide.contains("'Compare products'"), isTrue);
+      expect(_showsCopy(guide, 'Compare products'), isTrue);
     });
   });
 
@@ -334,12 +353,12 @@ void main() {
         _code(_read('lib/screens/tools/tests_scans_reports_screen.dart'));
 
     test('the parameters section is renamed', () {
-      expect(screen.contains("'Understanding your report parameters'"), isTrue);
+      expect(_showsCopy(screen, 'Understanding your report parameters'), isTrue);
       expect(screen.contains("title: 'Understanding Your Report',"), isFalse);
     });
 
     test('the closing interpretation section exists', () {
-      expect(screen.contains("'How do I interpret the test results?'"), isTrue);
+      expect(_showsCopy(screen, 'How do I interpret the test results?'), isTrue);
     });
 
     test('every test with parameters also explains how to read the whole '

@@ -25,6 +25,7 @@ import '../../services/pregnancy_controller.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'birth_club_screen.dart';
 import 'reward_celebration.dart';
+import '../../localization/app_language.dart';
 
 class InviteFriendsScreen extends StatefulWidget {
   const InviteFriendsScreen({super.key, this.controller});
@@ -52,10 +53,9 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
         if (!mounted) return;
         await showRewardCelebration(
           context,
-          title: 'You earned $label',
-          body: 'A friend you invited finished setting up. It is in your '
-              'account, ready whenever you need it.',
-          footnote: 'Spend it on a consultation with any ParentVeda expert.',
+          title: S.now.rewardEarnedTitle(label),
+          body: S.now.rewardEarnedBody,
+          footnote: S.now.rewardEarnedFootnote,
         );
       }
     });
@@ -72,16 +72,14 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
       return;
     }
     final reward = _store.config.inviteeReward.label;
-    final text = 'I am using ParentVeda through my pregnancy — it has been '
-        'genuinely useful. Join with my code ${_store.code} and you get '
-        '$reward to start with.\n\n${_store.link}';
+    final text = S.now.inviteShareText(_store.code, reward, _store.link);
 
     _store.recordShare(channel: channel);
     ReferralAnalytics.shared(channel);
 
     if (channel == 'copy') {
       await Clipboard.setData(ClipboardData(text: text));
-      if (mounted) _toast('Invite copied. Paste it wherever you like.');
+      if (mounted) _toast(S.now.inviteCopied);
       return;
     }
     await Share.share(text);
@@ -104,7 +102,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             backgroundColor: ppBg,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
-            title: Text('Invite friends', style: ppJakarta(16)),
+            title: Text(S.now.uiInviteFriends, style: ppJakarta(16)),
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
@@ -132,7 +130,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
   Widget _hero() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ppEyebrow('BOTH OF YOU GET SOMETHING', color: ppPurple),
         const SizedBox(height: 8),
-        Text('Going through this with\na friend makes it easier',
+        Text(S.now.uiGoingThroughNaFriend,
             style: ppFraunces(26, h: 1.15)),
         const SizedBox(height: 8),
         Text(
@@ -154,7 +152,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
           border: Border.all(color: ppPanelDiv),
         ),
         child: Column(children: [
-          Text('YOUR CODE',
+          Text(S.now.uiCode,
               style: ppJakarta(10.5, color: ppSoft)),
           const SizedBox(height: 10),
           Text(
@@ -175,7 +173,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.copy_rounded, size: 14, color: ppPurple),
                 const SizedBox(width: 7),
-                Text('Copy code', style: ppJakarta(12, color: ppPurple)),
+                Text(S.now.uiCopyCode, style: ppJakarta(12, color: ppPurple)),
               ]),
             ),
           ),
@@ -243,9 +241,9 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Your Birth Club', style: ppJakarta(13.5)),
+                    Text(S.now.uiBirthClub2, style: ppJakarta(13.5)),
                     const SizedBox(height: 2),
-                    Text('Invite mothers due the same month as you.',
+                    Text(S.now.uiInviteMothersDueSame,
                         style: ppBody(11.5, h: 1.4)),
                   ]),
             ),
@@ -291,10 +289,10 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
         child: Column(children: [
           const Icon(Icons.favorite_border_rounded, size: 24, color: ppMuted),
           const SizedBox(height: 10),
-          Text('No invites yet', style: ppJakarta(13.5)),
+          Text(S.now.uiNoInvitesYet, style: ppJakarta(13.5)),
           const SizedBox(height: 4),
           Text(
-            'Think of one friend who is pregnant too. That is usually all it takes.',
+            S.now.uiThinkOneFriendWho,
             textAlign: TextAlign.center,
             style: ppBody(12, h: 1.45),
           ),
@@ -302,7 +300,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
       );
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Your invites', style: ppJakarta(15)),
+      Text(S.now.uiInvites, style: ppJakarta(15)),
       const SizedBox(height: 12),
       for (final i in _store.invites) _inviteRow(i),
     ]);

@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import 'veda_core.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 /// The per-app palette for the shared result UI.
 class VedaViewTheme {
@@ -161,7 +162,7 @@ class VedaResultView extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.warning_amber_rounded, size: 14, color: theme.coral),
               const SizedBox(width: 6),
-              Text('Worth checking with a doctor',
+              Text(S.now.uiWorthCheckingDoctor,
                   style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, color: theme.coral)),
             ]),
           ),

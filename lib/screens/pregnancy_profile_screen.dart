@@ -20,6 +20,7 @@ import '../services/family_profile.dart';
 import '../services/profile_analytics.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import '../localization/app_language.dart';
 
 class PregnancyProfileScreen extends StatefulWidget {
   const PregnancyProfileScreen({super.key});
@@ -46,7 +47,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
         elevation: 0,
-        title: const Text('Personalise ParentVeda'),
+        title: Text(S.now.uiPersonaliseParentveda),
       ),
       body: AnimatedBuilder(
         animation: _p,
@@ -91,7 +92,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
           ]),
           const SizedBox(height: 10),
           Text(
-            'Nothing here is required, and you can change any of it later. Every answer just helps ParentVeda put the right things in front of you first - it never hides anything or moves things around.',
+            S.now.uiNothingHereRequiredCan,
             style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral500),
           ),
@@ -101,7 +102,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
   Widget _footer() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Text(
-          'Your answers stay on your device and in your own ParentVeda account. They are used to choose what to show you - never to decide which features you get.',
+          S.now.uiAnswersStayDeviceOwn,
           style: pvManrope(
               fontSize: 12, height: 1.5, color: AppTheme.neutral500),
         ),

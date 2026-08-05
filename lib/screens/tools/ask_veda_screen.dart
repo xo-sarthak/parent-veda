@@ -581,7 +581,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Row(children: [
           const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
           const SizedBox(width: 14),
-          Text('Asking Veda…', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
+          Text(S.now.uiAskingVeda, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
         ]),
       );
 
@@ -592,10 +592,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Row(children: [
             const Icon(Icons.wifi_off_rounded, size: 20, color: _vCoral),
             const SizedBox(width: 9),
-            Expanded(child: Text('Connect to the internet', style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk))),
+            Expanded(child: Text(S.now.uiConnectInternet, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk))),
           ]),
           const SizedBox(height: 10),
-          Text('Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.',
+          Text(S.now.uiAskVedaNeedsConnection,
               style: pvManrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
           const SizedBox(height: 16),
           GestureDetector(
@@ -603,7 +603,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
               decoration: BoxDecoration(color: _vPurple, borderRadius: BorderRadius.circular(99)),
-              child: Text('Retry', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
+              child: Text(S.now.uiRetry, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
           ),
         ]),
@@ -692,7 +692,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: Row(children: [
             const Icon(Icons.play_circle_outline_rounded, size: 19, color: _vPurple2),
             const SizedBox(width: 9),
-            Text('Videos', style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
+            Text(S.now.uiVideos, style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
           ]),
         ),
         if (f.videos.isEmpty)
@@ -777,7 +777,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       return;
     }
     if (kind == 'video') {
-      _snack('This video is coming soon'); // wired in a later job
+      _snack(S.now.videoComingSoon); // wired in a later job
       return;
     }
     _openReader(it); // articles / reads / guides / experts → the reader
@@ -1480,7 +1480,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('WEEK',
+          Text(S.now.uiWeek,
               style: pvManrope(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,

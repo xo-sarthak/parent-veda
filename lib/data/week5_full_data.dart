@@ -158,13 +158,13 @@ class Week5Full {
 //  THE CONTENT
 // =============================================================================
 final Week5Full week5Full = Week5Full(
-  trimesterMonth: _t('Trimester 1 · Month 3', 'Trimester 1 · Month 3'),
+  trimesterMonth: _t('Trimester 1 · Month 3', 'तिमाही 1 · महीना 3'),
 
   // ---- 1 · Opening Snapshot -------------------------------------------------
   snapshot: W5Snapshot(
-    fruit: _t('Strawberry', 'Strawberry'),
-    length: _t('3.1 to 3.2 cm', '3.1 se 3.2 cm'),
-    weight: _t('About 4 g', 'Lagbhag 4 g'),
+    fruit: _t('Strawberry', 'स्ट्रॉबेरी'),
+    length: _t('3.1 to 3.2 cm', '3.1 से 3.2 cm'),
+    weight: _t('About 4 g', 'लगभग 4 g'),
   ),
 
   // ---- 2 · About Your Baby --------------------------------------------------
@@ -188,7 +188,7 @@ final Week5Full week5Full = Week5Full(
     // Shown inline as a heading + description, not a tappable card.
     behaviour: [
       W5Card(
-        title: _t("I'm swallowing and kicking", 'Main nigal raha hoon aur laat maar raha hoon'),
+        title: _t("I'm swallowing and kicking", 'मैं निगल रहा हूँ और लात मार रहा हूँ'),
         body: _t(
           "This week I'm becoming a little more active, swallowing tiny sips of the fluid around me and kicking my legs. These movements help my muscles, joints and nervous system develop, even though I don't need them for feeding or moving around just yet. You can't feel any of it, but if you had a scan now, you might just catch me in action.",
           'Is hafte main thoda aur active ho raha hoon, apne aaspaas ke fluid ke nanhe ghoont nigalta hua aur apni taangein chalata hua. Yeh harkatein mere muscles, joints aur nervous system ko develop hone mein madad karti hain, halaanki abhi mujhe inki khaane ya ghoomne ke liye zaroorat nahi hai. Tum inmein se kuch bhi mehsoos nahi kar sakti, par agar abhi scan hota, to shayad tum mujhe action mein pakad leti.',
@@ -200,49 +200,49 @@ final Week5Full week5Full = Week5Full(
   // ---- 3 · Baby Science -----------------------------------------------------
   science: [
     W5Card(
-      title: _t('My fingers and toes are free', 'Meri ungliyan aur pairon ki ungliyan aazaad hain'),
+      title: _t('My fingers and toes are free', 'मेरी उँगलियाँ अब अलग-अलग हो गई हैं'),
       body: _t(
         "This week my fingers and toes have fully separated, with the webbing between them completely gone. My thumbs have rotated into place, ready for gripping and holding one day. For now, I'm simply getting used to having my own separate fingers and toes.",
         'Is hafte meri ungliyan aur pairon ki ungliyan poori tarah alag ho gayi hain, aur unke beech ki jaali bilkul khatam ho gayi hai. Mere angoothe apni jagah par ghoom gaye hain, ek din pakadne aur thaamne ke liye taiyaar. Filhaal, main bas apni alag-alag ungliyon ka aadi ho raha hoon.',
       ),
     ),
     W5Card(
-      title: _t('My nails are starting to grow', 'Mere naakhun ugna shuru ho rahe hain'),
+      title: _t('My nails are starting to grow', 'मेरे नाख़ून बनने लगे हैं'),
       body: _t(
         "Tiny nails are just beginning to grow at the ends of my fingers and toes this week. They're barely there for now, more like the faintest suggestion of a nail than anything you'd recognise. Over the coming weeks and months, they'll keep growing, all the way until the day you first trim them.",
         'Is hafte meri ungliyon aur pairon ki ungliyon ke siron par nanhe naakhun abhi ugna shuru hue hain. Filhaal woh mushkil se hain, kisi naakhun ki sabse halki jhalak jaise, na ki kuch aisa jise tum pehchaan sako. Aane waale hafton aur mahinon mein woh badhte rahenge, us din tak jab tum pehli baar unhe kaatogi.',
       ),
     ),
     W5Card(
-      title: _t('My skeleton keeps turning to bone', 'Mera skeleton haddi mein badalta ja raha hai'),
+      title: _t('My skeleton keeps turning to bone', 'मेरा ढाँचा धीरे-धीरे हड्डी बनता जा रहा है'),
       body: _t(
         "My skeleton keeps turning to bone this week, with ossification now underway in many more places than before. Bit by bit, the soft cartilage that has held my shape so far is being replaced by harder, stronger bone. It's a slow process that will continue quietly for months, long after I'm born.",
         'Is hafte mera skeleton haddi mein badalta ja raha hai, aur ossification ab pehle se kai zyada jagahon par chal rahi hai. Thoda-thoda karke, jo naram cartilage ab tak mera aakaar sambhaale hue tha, uski jagah zyada sakht aur mazboot haddi le rahi hai. Yeh ek dheemi prakriya hai jo mahinon tak chupchaap chalti rahegi, mere paida hone ke bahut baad tak.',
       ),
     ),
     W5Card(
-      title: _t('My ears are taking their outer shape', 'Mere kaan apna bahri aakaar le rahe hain'),
+      title: _t('My ears are taking their outer shape', 'मेरे कानों की बाहरी बनावट उभर रही है'),
       body: _t(
         "The outer shape of my ears is coming together this week, slowly moving into the familiar shell-like form you'll recognise. They still have some settling to do, gradually shifting into their final position on the sides of my head. One day soon, they'll be ready to catch every sound around them.",
         'Is hafte mere kaanon ka bahri aakaar ban raha hai, dheere-dheere us jaani-pehchaani shell jaisi shakal mein aata hua. Unhe abhi thoda aur set hona hai, dheere-dheere mere sar ke kinaron par apni aakhri jagah par pahunchte hue. Ek din jald hi, woh aaspaas ki har aawaaz pakadne ke liye taiyaar honge.',
       ),
     ),
     W5Card(
-      title: _t('My kidneys are building their filters', 'Meri kidneys apne filters bana rahi hain'),
+      title: _t('My kidneys are building their filters', 'मेरी kidney अपने छन्ने बना रही हैं'),
       body: _t(
         "The tiny filtering units inside my kidneys are continuing to develop this week. They're not ready to do their real job yet, but this is important groundwork being laid. In time, these filters will help keep my blood clean and support the fluid around me.",
         'Is hafte meri kidneys ke andar ke nanhe filtering units develop hote ja rahe hain. Woh abhi apna asli kaam karne ke liye taiyaar nahi hain, par yeh zaroori neenv rakhi ja rahi hai. Aage chalkar, yeh filters mera blood saaf rakhne aur mere aaspaas ke fluid ko support karne mein madad karenge.',
       ),
     ),
     W5Card(
-      title: _t('My organs are starting to work together', 'Mere organs saath kaam karna shuru kar rahe hain'),
+      title: _t('My organs are starting to work together', 'मेरे अंग आपस में तालमेल बिठाने लगे हैं'),
       body: _t(
         "By now, all of my major organs have formed, and this week they're beginning to work together as a team. None of them can do their full jobs on their own yet, but this teamwork is an important step. From here, it's less about building new parts and more about everything maturing together.",
         'Ab tak mere sabhi bade organs ban chuke hain, aur is hafte woh ek team ki tarah saath kaam karna shuru kar rahe hain. Koi bhi abhi akela apna poora kaam nahi kar sakta, par yeh teamwork ek zaroori kadam hai. Yahan se, baat naye hisse banane se zyada sab kuch saath-saath pakne ki hai.',
       ),
     ),
     W5Card(
-      title: _t('My brain is producing millions of nerve cells', 'Mera brain lakhon nerve cells bana raha hai'),
+      title: _t('My brain is producing millions of nerve cells', 'मेरा दिमाग़ लाखों तंत्रिका कोशिकाएँ बना रहा है'),
       body: _t(
         "My brain keeps producing new nerve cells at an incredible rate this week, roughly 250,000 every single minute. This pace will continue throughout the rest of pregnancy, eventually building the complex web of connections behind everything I'll one day think, feel and do.",
         'Is hafte mera brain gazab ki raftaar se naye nerve cells banata ja raha hai, lagbhag 2,50,000 har ek minute. Yeh raftaar baaki pregnancy bhar jaari rahegi, aur aage chalkar connections ka woh pecheeda jaal banayegi jo mere har sochne, mehsoos karne aur karne ke peeche hoga.',
@@ -266,7 +266,7 @@ final Week5Full week5Full = Week5Full(
     ),
     highlights: [
       W5Highlight(
-        title: _t('Round ligament twinges', 'Round ligament ki chubhan'),
+        title: _t('Round ligament twinges', 'Round ligament का खिंचाव'),
         teaser: _t(
           'Sharp, quick twinges low in your belly as your womb stretches.',
           'Womb ke khinchne par pet ke neeche tez, jhatpat chubhan.',
@@ -277,7 +277,7 @@ final Week5Full week5Full = Week5Full(
         ),
       ),
       W5Highlight(
-        title: _t('Your visible veins', 'Tumhari dikhti nasein'),
+        title: _t('Your visible veins', 'आपकी उभरी नसें'),
         teaser: _t(
           'More visible veins on your breasts and belly are common now.',
           'Breasts aur pet par nason ka zyada dikhna ab aam hai.',
@@ -288,7 +288,7 @@ final Week5Full week5Full = Week5Full(
         ),
       ),
       W5Highlight(
-        title: _t('Your changing skin', 'Tumhari badalti skin'),
+        title: _t('Your changing skin', 'आपकी बदलती त्वचा'),
         teaser: _t(
           'Dryness, spots, or fine red lines are all common right now.',
           'Rookhapan, daane, ya baareek laal lakeerein, sab abhi aam hain.',
@@ -308,7 +308,7 @@ final Week5Full week5Full = Week5Full(
   // ---- 5 · Health · Symptoms ------------------------------------------------
   symptoms: [
     W5Symptom(
-      name: _t('Nausea', 'Matli (Nausea)'),
+      name: _t('Nausea', 'मतली'),
       teaser: _t(
         'That queasy feeling that can come at any time of day. Many women begin noticing improvement from around this stage, though for others it continues into the second trimester.',
         'Woh ubkai jaisa ehsaas jo din ke kisi bhi waqt aa sakta hai. Bahut si mahilaayein is stage ke aaspaas sudhaar dekhna shuru karti hain, halaanki kuch ke liye yeh doosre trimester tak chalta hai.',
@@ -322,10 +322,10 @@ final Week5Full week5Full = Week5Full(
         'Badhte pregnancy hormones, khaaskar hCG, is ubkai ke peeche rahe hain. Jab hCG apne peak se neeche aata hai, matli bhi aksar peeche-peeche halki ho jaati hai.',
       ),
       helps: [
-        _t('Eat small, frequent meals through the day', 'Din bhar chhote-chhote, baar-baar meals khao'),
-        _t('Keep plain snacks like crackers or toast nearby', 'Crackers ya toast jaise simple snacks paas rakho'),
-        _t('Sip ginger tea, lemon water or nimbu paani', 'Adrak ki chai, lemon water ya nimbu paani sip karo'),
-        _t('Avoid smells that set off your nausea', 'Jo smells matli badhaayein unse door raho'),
+        _t('Eat small, frequent meals through the day', 'दिन भर थोड़ा-थोड़ा, बार-बार खाइए'),
+        _t('Keep plain snacks like crackers or toast nearby', 'सादा नाश्ता जैसे बिस्किट या टोस्ट पास रखिए'),
+        _t('Sip ginger tea, lemon water or nimbu paani', 'अदरक की चाय, नींबू पानी या शिकंजी पीजिए'),
+        _t('Avoid smells that set off your nausea', 'जिन गंधों से मतली बढ़े, उनसे दूर रहिए'),
       ],
       whenDoctor: _t(
         'If you cannot keep food or fluids down, or are losing weight, call your doctor.',
@@ -333,7 +333,7 @@ final Week5Full week5Full = Week5Full(
       ),
     ),
     W5Symptom(
-      name: _t('Fatigue', 'Thakaan (Fatigue)'),
+      name: _t('Fatigue', 'थकान'),
       teaser: _t(
         'A heavy tiredness that can hit even after a full night\'s sleep. Common through this trimester.',
         'Ek bhaari thakaan jo poori raat sone ke baad bhi aa sakti hai. Is trimester bhar aam hai.',
@@ -347,10 +347,10 @@ final Week5Full week5Full = Week5Full(
         'Badhta progesterone tumhein zyada neend mein rakh sakta hai, jabki tumhara body placenta banane aur pregnancy ko support karne mein extra energy lagata hai.',
       ),
       helps: [
-        _t('Rest whenever you can, even short naps', 'Jab bhi ho sake aaram karo, chhoti jhapki bhi'),
-        _t('Go to bed a little earlier than usual', 'Aam se thoda pehle so jao'),
-        _t('Stay hydrated and eat regular, balanced meals', 'Paani peete raho aur regular, balanced meals khao'),
-        _t('Gentle movement like a short walk can help', 'Halki harkat, jaise chhoti walk, madad kar sakti hai'),
+        _t('Rest whenever you can, even short naps', 'जब भी मौक़ा मिले आराम कीजिए, छोटी झपकी भी'),
+        _t('Go to bed a little earlier than usual', 'रोज़ से थोड़ा पहले सो जाइए'),
+        _t('Stay hydrated and eat regular, balanced meals', 'पानी पीती रहिए और समय पर संतुलित खाना खाइए'),
+        _t('Gentle movement like a short walk can help', 'हल्की हलचल, जैसे थोड़ी देर टहलना, मदद करती है'),
       ],
       whenDoctor: _t(
         'If tiredness feels extreme, or comes with breathlessness or dizziness, mention it to your doctor.',
@@ -358,7 +358,7 @@ final Week5Full week5Full = Week5Full(
       ),
     ),
     W5Symptom(
-      name: _t('Tender breasts', 'Breast mein narmi'),
+      name: _t('Tender breasts', 'स्तनों में नरमी और दर्द'),
       teaser: _t(
         'Fuller, heavier breasts with more visible veins as blood flow increases.',
         'Blood flow badhne ke saath bhare, bhaari breasts aur zyada dikhti nasein.',
@@ -372,10 +372,10 @@ final Week5Full week5Full = Week5Full(
         'Badhte hormones tumhare breasts mein blood flow badhaate hain, jisse woh zyada bhare aur sensitive lag sakte hain, aur skin ke neeche nasein zyada dikhti hain.',
       ),
       helps: [
-        _t('Wear a soft, well-fitting supportive bra', 'Naram, sahi fitting waali supportive bra pehno'),
-        _t('Try a wireless or sleep bra at night', 'Raat mein wireless ya sleep bra try karo'),
-        _t('Avoid tight clothing that presses on the area', 'Tight kapde jo us jagah dabaayein, unse bacho'),
-        _t('Warm or cool compresses can ease soreness', 'Garam ya thanda compress dard halka kar sakta hai'),
+        _t('Wear a soft, well-fitting supportive bra', 'नरम, सही नाप की सहारा देने वाली ब्रा पहनिए'),
+        _t('Try a wireless or sleep bra at night', 'रात में बिना तार वाली या स्लीप ब्रा आज़माइए'),
+        _t('Avoid tight clothing that presses on the area', 'तंग कपड़ों से बचिए जो वहाँ दबाव डालें'),
+        _t('Warm or cool compresses can ease soreness', 'गुनगुनी या ठंडी सिंकाई से आराम मिलता है'),
       ],
       whenDoctor: _t(
         'If you feel a lump, or notice unusual discharge, have it checked by your doctor.',
@@ -383,7 +383,7 @@ final Week5Full week5Full = Week5Full(
       ),
     ),
     W5Symptom(
-      name: _t('Headaches', 'Sar dard'),
+      name: _t('Headaches', 'सिर दर्द'),
       teaser: _t(
         'A dull ache in the head, often linked to hormones and blood flow. Common at this stage.',
         'Sar mein halka dard, aksar hormones aur blood flow se juda. Is stage par aam hai.',
@@ -397,10 +397,10 @@ final Week5Full week5Full = Week5Full(
         'Badhte hormones, badha hua blood volume, bhookh aur paani ki kami, sab pregnancy ke is stage par sar dard shuru kar sakte hain.',
       ),
       helps: [
-        _t('Drink water and eat small, regular meals', 'Paani piyo aur chhote, regular meals khao'),
-        _t('Rest in a cool, quiet, dark room', 'Thande, shaant, andhere kamre mein aaram karo'),
-        _t('Try a warm or cool compress on your head', 'Sar par garam ya thanda compress try karo'),
-        _t('Get enough sleep and manage stress where you can', 'Poori neend lo aur jahan ho sake stress kam karo'),
+        _t('Drink water and eat small, regular meals', 'पानी पीजिए और थोड़ा-थोड़ा, समय पर खाइए'),
+        _t('Rest in a cool, quiet, dark room', 'ठंडे, शांत, अँधेरे कमरे में आराम कीजिए'),
+        _t('Try a warm or cool compress on your head', 'सिर पर गुनगुनी या ठंडी सिंकाई आज़माइए'),
+        _t('Get enough sleep and manage stress where you can', 'पूरी नींद लीजिए और जितना हो सके तनाव कम रखिए'),
       ],
       whenDoctor: _t(
         'If a headache is severe, will not go away, or comes with vision changes, call your doctor.',
@@ -408,7 +408,7 @@ final Week5Full week5Full = Week5Full(
       ),
     ),
     W5Symptom(
-      name: _t('Increased discharge', 'Discharge ka badhna'),
+      name: _t('Increased discharge', 'स्राव का बढ़ना'),
       teaser: _t(
         'More vaginal discharge than usual. Very common and usually a healthy sign.',
         'Aam se zyada vaginal discharge. Bahut aam, aur aksar ek healthy sanket.',
@@ -422,10 +422,10 @@ final Week5Full week5Full = Week5Full(
         'Badhta estrogen us jagah blood flow badhaata hai, jisse zyada discharge hota hai, jise leukorrhea kehte hain. Yeh tumhare body ka normal, bachaav waala jawaab hai.',
       ),
       helps: [
-        _t('Wear a panty liner if it feels more comfortable', 'Agar zyada comfortable lage to panty liner pehno'),
-        _t('Wear breathable, cotton underwear', 'Saans lene waali, cotton underwear pehno'),
-        _t('Keep the area clean with water only', 'Us jagah ko sirf paani se saaf rakho'),
-        _t('Avoid scented soaps or douching', 'Khushbu waale soap ya douching se bacho'),
+        _t('Wear a panty liner if it feels more comfortable', 'ज़्यादा आराम लगे तो पैंटी लाइनर लगाइए'),
+        _t('Wear breathable, cotton underwear', 'सूती, हवा आने-जाने वाला अंतर्वस्त्र पहनिए'),
+        _t('Keep the area clean with water only', 'उस जगह की सफ़ाई सिर्फ़ पानी से कीजिए'),
+        _t('Avoid scented soaps or douching', 'ख़ुशबूदार साबुन या douching से बचिए'),
       ],
       whenDoctor: _t(
         'If it smells strong, changes colour, or causes itching, tell your doctor.',
@@ -437,12 +437,12 @@ final Week5Full week5Full = Week5Full(
   // ---- 6 · Health · Diet ----------------------------------------------------
   diet: W5Diet(
     superfood: W5Superfood(
-      food: _t('Paneer (Cottage Cheese)', 'Paneer'),
+      food: _t('Paneer (Cottage Cheese)', 'पनीर'),
       benefit: _t(
         "Rich in calcium and complete protein, supporting your baby's bones and your own health.",
         'Calcium aur poore protein se bharpoor, jo tumhare baby ki haddiyon aur tumhari apni sehat ko support karta hai.',
       ),
-      tryAs: _t('Try it as: palak paneer or grilled paneer cubes.', 'Aise try karo: palak paneer ya grilled paneer cubes.'),
+      tryAs: _t('Try it as: palak paneer or grilled paneer cubes.', 'ऐसे खाइए: पालक पनीर या सिंके हुए पनीर के टुकड़े।'),
       note: _t(
         "Choose paneer made from pasteurised milk, and cook it well, especially if you're unsure how it was made.",
         'Pasteurised doodh se bana paneer chuno, aur use acche se pakao, khaaskar agar tumhein pata na ho ki woh kaise bana hai.',
@@ -450,49 +450,49 @@ final Week5Full week5Full = Week5Full(
     ),
     favour: [
       W5Card(
-        title: _t('Paneer & dairy', 'Paneer aur dairy'),
+        title: _t('Paneer & dairy', 'पनीर और दूध से बनी चीज़ें'),
         body: _t(
           "Rich in calcium and protein, good for your baby's bones and your own health.",
           'Calcium aur protein se bharpoor, tumhare baby ki haddiyon aur tumhari sehat ke liye accha.',
         ),
       ),
       W5Card(
-        title: _t('Curd & buttermilk', 'Dahi aur chhaas'),
+        title: _t('Curd & buttermilk', 'दही और छाछ'),
         body: _t(
           'Cooling and easy on the stomach, with calcium and gentle probiotics for your gut.',
           'Thanda aur pet par halka, calcium aur naram probiotics ke saath tumhare gut ke liye.',
         ),
       ),
       W5Card(
-        title: _t('Whole grains & oats', 'Sabut anaaj aur oats'),
+        title: _t('Whole grains & oats', 'साबुत अनाज और ओट्स'),
         body: _t(
           'Steady, slow-release energy that helps with digestion and keeps hunger in check.',
           'Sthir, dheere-dheere milne waali energy jo hazme mein madad karti hai aur bhookh ko kaabu mein rakhti hai.',
         ),
       ),
       W5Card(
-        title: _t('Citrus & amla', 'Khatte phal aur amla'),
+        title: _t('Citrus & amla', 'खट्टे फल और आँवला'),
         body: _t(
           'Vitamin C from oranges, sweet lime and amla helps your body absorb iron better.',
           'Santra, mosambi aur amla se milne waala Vitamin C tumhare body ko iron behtar absorb karne mein madad karta hai.',
         ),
       ),
       W5Card(
-        title: _t('Bananas & simple fruit', 'Kele aur simple phal'),
+        title: _t('Bananas & simple fruit', 'केला और सादे फल'),
         body: _t(
           "A gentle, quick source of energy that's easy to manage on queasy days.",
           'Energy ka ek naram, turant zariya jo matli waale dinon mein aasaan rehta hai.',
         ),
       ),
       W5Card(
-        title: _t('Nuts & seeds', 'Mewe aur beej'),
+        title: _t('Nuts & seeds', 'मेवे और बीज'),
         body: _t(
           'A small handful of almonds or walnuts adds healthy fats, folate and protein.',
           'Badaam ya akhrot ki ek chhoti mutthi healthy fats, folate aur protein deti hai.',
         ),
       ),
       W5Card(
-        title: _t('Spinach & leafy greens', 'Palak aur hari sabziyan'),
+        title: _t('Spinach & leafy greens', 'पालक और हरी पत्तेदार सब्ज़ियाँ'),
         body: _t(
           'Palak and methi provide folate, iron and other important nutrients.',
           'Palak aur methi folate, iron aur doosre zaroori nutrients dete hain.',
@@ -501,35 +501,35 @@ final Week5Full week5Full = Week5Full(
     ],
     avoid: [
       W5Card(
-        title: _t('Raw or undercooked meat & eggs', 'Kaccha ya adhpaka meat aur ande'),
+        title: _t('Raw or undercooked meat & eggs', 'कच्चा या अधपका माँस और अंडे'),
         body: _t(
           'Can carry bacteria like salmonella or listeria, so cook everything thoroughly before eating.',
           'Insme salmonella ya listeria jaise bacteria ho sakte hain, isliye khaane se pehle sab kuch acche se pakao.',
         ),
       ),
       W5Card(
-        title: _t('Unpasteurised dairy', 'Bina pasteurise kiya dairy'),
+        title: _t('Unpasteurised dairy', 'बिना pasteurise किया दूध'),
         body: _t(
           'Avoid unpasteurised milk, paneer, and soft cheese, which may carry listeria bacteria; choose pasteurised options instead.',
           'Bina pasteurise kiya doodh, paneer aur soft cheese se bacho, inmein listeria bacteria ho sakta hai; iske badle pasteurised options chuno.',
         ),
       ),
       W5Card(
-        title: _t('High-mercury fish', 'Zyada mercury waali machhli'),
+        title: _t('High-mercury fish', 'ज़्यादा Mercury वाली मछली'),
         body: _t(
           "Limit shark, swordfish and king mackerel, as mercury can affect your baby's developing brain.",
           'Shark, swordfish aur king mackerel kam karo, kyunki mercury tumhare baby ke ban rahe brain ko nuksaan pahuncha sakta hai.',
         ),
       ),
       W5Card(
-        title: _t('Too much caffeine', 'Zyada caffeine'),
+        title: _t('Too much caffeine', 'बहुत ज़्यादा caffeine'),
         body: _t(
           'Keep caffeine below 200 mg a day, about one to two small cups of coffee.',
           'Caffeine ek din mein 200 mg se kam rakho, lagbhag ek se do chhote cup coffee.',
         ),
       ),
       W5Card(
-        title: _t('Alcohol', 'Alcohol'),
+        title: _t('Alcohol', 'शराब'),
         body: _t(
           'No amount is considered safe in pregnancy, so it is best avoided completely.',
           'Pregnancy mein koi bhi maatra surakshit nahi maani jaati, isliye ise poori tarah chhod dena hi behtar hai.',
@@ -541,63 +541,63 @@ final Week5Full week5Full = Week5Full(
   // ---- 7 · Trimester Tips (T1 · Weeks 1–13) ---------------------------------
   tips: [
     W5Tip(
-      oneLine: _t('Take your folic acid every single day.', 'Apna folic acid har din lo.'),
+      oneLine: _t('Take your folic acid every single day.', 'Folic acid हर एक दिन लीजिए।'),
       readMore: _t(
         "Folic acid is one of the most important things you can take right now. In these early weeks, it helps your baby's brain and spine form properly. Most doctors suggest 400 micrograms a day, ideally from before pregnancy through the first trimester. Take it at the same time each day so it becomes a habit.",
         'Folic acid abhi tum jo le sakti ho usme sabse zaroori cheezon mein se ek hai. In shuruaati hafton mein yeh tumhare baby ke brain aur spine ko theek se banne mein madad karta hai. Zyadatar doctor din mein 400 microgram salaah dete hain, behtar hai pregnancy se pehle se pehle trimester tak. Ise har din ek hi waqt lo taaki aadat ban jaaye.',
       ),
     ),
     W5Tip(
-      oneLine: _t("Book your first doctor's visit as early as you can.", 'Apni pehli doctor visit jitni jaldi ho sake book karo.'),
+      oneLine: _t("Book your first doctor's visit as early as you can.", 'डॉक्टर के पास पहली बार जितनी जल्दी हो सके जाइए।'),
       readMore: _t(
         "Once you know you are pregnant, book your first appointment with a doctor or gynaecologist. This first visit sets up your care for the months ahead. Your doctor will confirm your pregnancy, talk through your health, and guide you on tests, diet and supplements. Do not worry if you have many questions. That is exactly what this visit is for.",
         'Jaise hi pata chale ki tum pregnant ho, doctor ya gynaecologist se pehli appointment book karo. Yeh pehli visit aane waale mahinon ki dekhbhaal tay karti hai. Tumhara doctor pregnancy confirm karega, tumhari sehat par baat karega, aur tests, diet tatha supplements par maargdarshan dega. Agar bahut sawaal hain to fikr mat karo. Yeh visit isi ke liye hai.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Eat small, frequent meals to ease nausea.', 'Matli kam karne ke liye chhote, baar-baar meals khao.'),
+      oneLine: _t('Eat small, frequent meals to ease nausea.', 'मतली कम करने के लिए थोड़ा-थोड़ा, बार-बार खाइए।'),
       readMore: _t(
         "Morning sickness can strike at any time of day, and an empty stomach often makes it worse. Instead of three big meals, try eating small amounts every few hours. Keep simple snacks like biscuits, toast or a banana close by, even next to your bed. Ginger and nimbu paani help many women feel a little settled.",
         'Morning sickness din ke kisi bhi waqt aa sakti hai, aur khaali pet ise aksar badha deta hai. Teen bade meals ke bajaay, har kuch ghante mein thoda-thoda khaane ki koshish karo. Biscuit, toast ya kela jaise simple snacks paas rakho, apne bistar ke paas bhi. Adrak aur nimbu paani bahut si mahilaon ko thoda behtar mehsoos karaate hain.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Rest as much as your body needs.', 'Jitna tumhare body ko chahiye utna aaram karo.'),
+      oneLine: _t('Rest as much as your body needs.', 'शरीर जितना आराम माँगे, उतना दीजिए।'),
       readMore: _t(
         "First-trimester tiredness is real, and it can feel heavier than any tiredness before. Your body is doing huge work behind the scenes, so give yourself permission to slow down. Sleep a little earlier, take short naps when you can, and let some chores wait. Rest is not being lazy. It is part of looking after your baby.",
         'Pehle trimester ki thakaan sach hoti hai, aur yeh pehle ki kisi bhi thakaan se bhaari lag sakti hai. Tumhara body parde ke peeche bahut bada kaam kar raha hai, isliye khud ko dheema hone ki ijaazat do. Thoda jaldi so jao, jab ho sake chhoti jhapki lo, aur kuch kaam ko intezaar karne do. Aaram karna aalas nahi hai. Yeh apne baby ki dekhbhaal ka hissa hai.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Drink plenty of water through the day.', 'Din bhar khoob paani piyo.'),
+      oneLine: _t('Drink plenty of water through the day.', 'दिन भर ख़ूब पानी पीजिए।'),
       readMore: _t(
         "Staying well hydrated helps with many early pregnancy small discomforts, from tiredness to headaches to constipation. Aim to sip water steadily through the day rather than a lot at once. If plain water feels dull, try coconut water, buttermilk or nimbu paani. On queasy days, cool drinks are sometimes easier to manage than food.",
         'Achhe se hydrated rehna shuruaati pregnancy ki kai chhoti takleefon mein madad karta hai — thakaan se lekar sardard aur constipation tak. Ek saath bahut zyada ke bajaay din bhar thoda-thoda paani piyo. Agar saada paani boring lage, to nariyal paani, chhaach ya nimbu paani try karo. Matli waale din, thande drinks kabhi khaane se aasaan hote hain.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Cook food well and wash fruits and vegetables.', 'Khaana achhe se pakao aur fal-sabzi dhoyo.'),
+      oneLine: _t('Cook food well and wash fruits and vegetables.', 'खाना अच्छी तरह पकाइए और फल-सब्ज़ियाँ धोइए।'),
       readMore: _t(
         "In pregnancy, your body fights off infections less easily, so food safety matters more than usual. Cook meat, fish and eggs fully, and choose pasteurised milk and dairy. Wash fruits and vegetables well before eating. Avoid raw or undercooked items and unpasteurised foods for now. These simple habits lower the chance of an upset that could affect you both.",
         'Pregnancy mein tumhara body infections se kam aasaani se ladta hai, isliye food safety aam se zyada mayne rakhti hai. Meat, machhli aur ande poore pakao, aur pasteurised doodh aur dairy chuno. Khaane se pehle fal aur sabziyan achhe se dhoyo. Kacchi ya adhpaki cheezein aur bina-pasteurised khaane abhi ke liye chhodo. Yeh simple aadatein us gadbadi ka khatra kam karti hain jo tum dono ko prabhaavit kar sakti hai.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Limit caffeine, and skip alcohol and smoking.', 'Caffeine seemit karo, aur sharaab tatha smoking chhodo.'),
+      oneLine: _t('Limit caffeine, and skip alcohol and smoking.', 'Caffeine कम कीजिए, और शराब व धूम्रपान बिलकुल नहीं।'),
       readMore: _t(
         "A little caffeine is fine, but try to keep it under about 200 milligrams a day, roughly one cup of coffee, counting tea and cola too. Alcohol has no known safe amount in pregnancy, so it is best left. If you smoke, or are around smoke, this is a good time to step away, for you both.",
         'Thodi caffeine theek hai, par ise din mein lagbhag 200 milligram ke neeche rakhne ki koshish karo — mote taur par ek cup coffee, chai aur cola ko bhi ginte hue. Pregnancy mein sharaab ki koi surakshit maatra nahi maani jaati, isliye ise chhod dena behtar hai. Agar tum smoke karti ho, ya smoke ke aaspaas ho, to yeh door hat-ne ka accha waqt hai, tum dono ke liye.',
       ),
     ),
     W5Tip(
-      oneLine: _t("Keep moving gently, with your doctor's okay.", 'Doctor ki ijaazat se, halki movement jaari rakho.'),
+      oneLine: _t("Keep moving gently, with your doctor's okay.", 'डॉक्टर की मंज़ूरी से, हल्की हलचल जारी रखिए।'),
       readMore: _t(
         "Unless your doctor advises otherwise, gentle movement is good for you now. A daily walk, light stretching or prenatal yoga can lift your mood, help you sleep and ease early aches. There is no need to push hard. Move at a pace where you can still chat comfortably. Always check with your doctor before starting anything new.",
         'Jab tak tumhara doctor mana na kare, halki movement abhi tumhare liye acchi hai. Roz ki walk, halki stretching ya prenatal yoga tumhara mood behtar kar sakti hai, neend mein madad kar sakti hai aur shuruaati dard kam kar sakti hai. Zor lagaane ki zaroorat nahi. Us raftaar par chalo jahaan tum aaraam se baat bhi kar sako. Kuch naya shuru karne se pehle hamesha apne doctor se poochho.',
       ),
     ),
     W5Tip(
-      oneLine: _t('Share how you feel with someone you trust.', 'Apni bhavnaayein kisi bharose waale ke saath baanto.'),
+      oneLine: _t('Share how you feel with someone you trust.', 'अपना मन किसी अपने के साथ बाँटिए।'),
       readMore: _t(
         "Early pregnancy can bring a mix of joy, worry and mood swings, often all at once. This is normal, and hormones play a big part. You do not have to carry it alone. Talking to your partner, a close friend or family member can lighten the load. If low feelings stay for long, tell your doctor.",
         'Shuruaati pregnancy khushi, fikr aur mood swings ka mishran la sakti hai, aksar sab ek saath. Yeh normal hai, aur hormones badi bhoomika nibhaate hain. Ise akele uthaane ki zaroorat nahi. Apne partner, kisi kareebi dost ya parivaar se baat karna bojh halka kar sakta hai. Agar udaasi lambe samay tak rahe, to apne doctor ko bataao.',
@@ -617,19 +617,19 @@ final Week5Full week5Full = Week5Full(
     ),
     // Current week to week+4; scans whose window has already closed are dropped.
     scans: [
-      W5Scan(name: _t('NT scan', 'NT scan'), window: _t('Week 11 to 14', 'Week 11 se 14')),
+      W5Scan(name: _t('NT scan', 'NT scan'), window: _t('Week 11 to 14', 'हफ़्ता 11 से 14')),
       W5Scan(
         name: _t('Double marker test', 'Double marker test'),
-        window: _t('Week 11 to 14 · usually with the NT scan', 'Week 11 se 14 · aksar NT scan ke saath'),
+        window: _t('Week 11 to 14 · usually with the NT scan', 'हफ़्ता 11 से 14 · आम तौर पर NT scan के साथ'),
       ),
     ],
     help: [
-      _t('Be patient with any lingering symptoms.', 'Jo symptoms abhi bhi hain, unke saath sabr rakho.'),
-      _t('Take on more of the cooking and chores.', 'Khaana banane aur ghar ke kaam ka zyada hissa apne upar lo.'),
-      _t('Help her move slowly if twinges strike.', 'Agar chubhan ho to use dheere chalne mein madad karo.'),
-      _t('Keep supportive, comfortable clothing handy.', 'Supportive, comfortable kapde paas rakho.'),
-      _t('Ask about the upcoming NT scan together.', 'Aane waale NT scan ke baare mein saath mein poocho.'),
-      _t('Celebrate how close you are to trimester two.', 'Khushi manao ki tum trimester do ke kitne kareeb ho.'),
+      _t('Be patient with any lingering symptoms.', 'बचे हुए लक्षणों को लेकर धीरज रखिए।'),
+      _t('Take on more of the cooking and chores.', 'रसोई और घर के काम ज़्यादा अपने ज़िम्मे लीजिए।'),
+      _t('Help her move slowly if twinges strike.', 'खिंचाव उठे तो उन्हें धीरे-धीरे चलने में मदद कीजिए।'),
+      _t('Keep supportive, comfortable clothing handy.', 'आरामदायक, सहारा देने वाले कपड़े पास रखिए।'),
+      _t('Ask about the upcoming NT scan together.', 'आने वाले NT scan के बारे में साथ मिलकर पूछिए।'),
+      _t('Celebrate how close you are to trimester two.', 'दूसरी तिमाही कितनी क़रीब है, यह साथ में मनाइए।'),
     ],
   ),
 );

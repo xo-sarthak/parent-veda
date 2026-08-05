@@ -18,6 +18,7 @@ import '../../services/prepare_store.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class ProgramDetailScreen extends StatelessWidget {
   const ProgramDetailScreen({super.key, required this.program});
@@ -32,8 +33,8 @@ class ProgramDetailScreen extends StatelessWidget {
   void _onCta(BuildContext context, PrepCta cta) {
     final p = program;
     if (!cta.enabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('This cohort has already started - reserve the next intake.'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(S.now.uiCohortHasAlreadyStarted),
           behavior: SnackBarBehavior.floating));
       return;
     }
@@ -175,9 +176,9 @@ class ProgramDetailScreen extends StatelessWidget {
               // recorded-course lessons
               if (p.lessons.isNotEmpty) ...[
                 _divider(),
-                _pad(Text("What you'll learn", style: pvTitleStyle(17))),
+                _pad(Text(S.now.uiWhatLlLearn, style: pvTitleStyle(17))),
                 const SizedBox(height: 4),
-                _pad(Text('Short lessons, in order - start anywhere.', style: pvBody(kMuted, 12.5))),
+                _pad(Text(S.now.uiShortLessonsOrderStart, style: pvBody(kMuted, 12.5))),
                 const SizedBox(height: 12),
                 _pad(Column(children: [
                   for (int i = 0; i < p.lessons.length; i++)
@@ -204,7 +205,7 @@ class ProgramDetailScreen extends StatelessWidget {
               // what this covers
               if (p.covers.isNotEmpty) ...[
                 _divider(),
-                _pad(Text('What this covers', style: pvTitleStyle(18))),
+                _pad(Text(S.now.uiWhatCovers, style: pvTitleStyle(18))),
                 const SizedBox(height: 6),
                 _pad(Column(children: [
                   for (int i = 0; i < p.covers.length; i++) _coversRow(p.covers[i], top: i == 0),
@@ -417,7 +418,7 @@ class ProgramDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               onTap: () => PrepareStore.instance.cancel(program.id),
                               child: Center(
-                                child: Text('✓  Booked',
+                                child: Text(S.now.uiBooked,
                                     style: pvManrope(
                                         fontSize: 15, fontWeight: FontWeight.w700, color: kPurple)),
                               ),

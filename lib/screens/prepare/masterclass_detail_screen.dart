@@ -10,6 +10,7 @@ import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class MasterclassDetailScreen extends StatelessWidget {
   const MasterclassDetailScreen({super.key, required this.m});
@@ -79,7 +80,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                         color: kInk.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(999)),
-                    child: Text('Watch the 90-sec intro',
+                    child: Text(S.now.uiWatchSecIntro,
                         style: pvManrope(
                             fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
@@ -153,7 +154,7 @@ class MasterclassDetailScreen extends StatelessWidget {
             price: m.price,
             note: 'free on ParentVeda+',
             noteColor: kPurple,
-            label: 'Reserve a seat',
+            label: S.now.uiReserveSeat,
             bookedLabel: 'Reserved',
             onBook: () => showPrepareBooking(
               context,

@@ -55,6 +55,23 @@ class S {
   const S(this.lang);
   final AppLanguage lang;
 
+  /// The language the app is currently rendering in.
+  ///
+  /// `S(lang)` needs a language, which means a call site needs the controller
+  /// in scope. Most screens have it — but a string inside a helper method, a
+  /// `showDialog` builder or a widget file that never touches the controller
+  /// does not, and those are exactly the places hardcoded English survived.
+  ///
+  /// `main.dart` keeps this in sync on every rebuild, in the same place it
+  /// tells `PvType` which language to draw. That makes `S.now` correct
+  /// wherever it is read, at the cost of being a global — the same trade the
+  /// rest of this codebase already makes with its singleton stores.
+  ///
+  /// Prefer `S(p.language)` when a controller is already at hand; reach for
+  /// `S.now` when threading one through would be the only reason to.
+  static AppLanguage current = AppLanguage.english;
+  static S get now => S(current);
+
   bool get _e => lang.isEnglish;
   T _p<T>(T en, T hi) => _e ? en : hi;
 
@@ -2389,6 +2406,190 @@ class S {
     return _p(en[i], hi[i]);
   }
 
+  /// Month names, 1-indexed (`monthShort(1) == 'Jan'`).
+  ///
+  /// Six screens each carried their own `['Jan', 'Feb', …]` array, so a date
+  /// stayed English on a Hindi phone in six different places. One helper means
+  /// the next screen that needs a month cannot reintroduce the problem.
+  ///
+  /// The numerals stay Western (4, not ४) — that is what an Indian reader
+  /// expects on a date, a price and a phone screen, and mixing scripts inside
+  /// one date string reads worse than either choice alone.
+  String monthShort(int m) {
+    const en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const hi = ['जन', 'फ़र', 'मार्च', 'अप्रैल', 'मई', 'जून',
+                'जुल', 'अग', 'सित', 'अक्तू', 'नव', 'दिस'];
+    final i = (m - 1).clamp(0, 11);
+    return _p(en[i], hi[i]);
+  }
+
+  // ---- Notifications ------------------------------------------------------
+  // A notification is read on a lock screen, hours after the app was last
+  // open. It is the one place the app speaks to her without her asking, so an
+  // English alarm from a Hindi app is jarring in a way an English button is
+  // not.
+
+  String medicationDue(String name, String dose) => _p(
+      dose.isEmpty ? "It's time for your $name" : "It's time for your $name ($dose)",
+      dose.isEmpty ? '$name का समय हो गया' : '$name ($dose) का समय हो गया');
+
+  String get notifNotReady => _p(
+      'Notifications are not ready on this device.',
+      'इस फ़ोन पर सूचनाएँ अभी तैयार नहीं हैं।');
+
+  String get notifExactAlarmsOff => _p(
+      ' — but exact alarms are OFF for this app, so it may be delayed or '
+          'dropped. Turn on "Alarms & reminders" in the app settings.',
+      ' — पर इस ऐप के लिए exact alarms बंद हैं, इसलिए यह देर से आ सकता है या '
+          'छूट सकता है। ऐप सेटिंग में "Alarms & reminders" चालू कीजिए।');
+
+  String notifScheduledFor(String time, String gap) => _p(
+      'Scheduled for $time. Lock the phone and wait a minute.$gap',
+      '$time के लिए तय हो गया। फ़ोन लॉक कीजिए और एक मिनट रुकिए।$gap');
+
+  String notifSchedulingFailed(Object e) =>
+      _p('Scheduling FAILED: $e', 'तय नहीं हो पाया: $e');
+
+  // ---- Transient messages: SnackBars, toasts, failures --------------------
+  // These appear for three seconds and vanish, which is exactly why they were
+  // the last English left: nobody screenshots a SnackBar. They are also where
+  // a mother is most often being told something went wrong.
+
+  String comingSoonLabel(String what) =>
+      _p('$what — coming soon', '$what — जल्द आ रहा है');
+
+  String opensSoon(String what) => _p('$what opens soon', '$what जल्द खुलेगा');
+
+  String get whatsappUpdatesOn =>
+      _p('WhatsApp updates on', 'WhatsApp अपडेट चालू');
+  String get whatsappUpdatesOff =>
+      _p('WhatsApp updates off', 'WhatsApp अपडेट बंद');
+  String get couldNotSaveRetry => _p(
+      'Could not save - please try again', 'सेव नहीं हो पाया — फिर कोशिश कीजिए');
+
+  String get videoComingSoon =>
+      _p('This video is coming soon', 'यह वीडियो जल्द आ रहा है');
+  String get explainerBeingFilmed => _p(
+      'This explainer is still being filmed.',
+      'इसकी वीडियो अभी बन रही है।');
+
+  String get signInFirstToSend => _p(
+      'Sign in first, so we know where to send it.',
+      'पहले साइन इन कीजिए, ताकि हमें पता हो कहाँ भेजना है।');
+  String get couldNotSaveConnection => _p(
+      'Could not save that — check your connection and try again.',
+      'यह सेव नहीं हो पाया — अपना इंटरनेट देखिए और फिर कोशिश कीजिए।');
+
+  String get savedToGalleryAndMemories => _p(
+      'Saved to your gallery and My Memories.',
+      'आपकी गैलरी और "मेरी यादें" में सेव हो गया।');
+  String get savedToMemoriesAllowPhoto => _p(
+      'Saved to My Memories. Allow photo access to save to your gallery.',
+      '"मेरी यादें" में सेव हो गया। गैलरी में सेव करने के लिए फ़ोटो की अनुमति दीजिए।');
+  String get couldNotPrepareImage => _p(
+      'Could not prepare the image. Try again.',
+      'तस्वीर तैयार नहीं हो पाई। फिर कोशिश कीजिए।');
+  String couldNotAddPhoto(Object e) =>
+      _p('Could not add photo: $e', 'फ़ोटो नहीं जुड़ पाई: $e');
+
+  String get referralNotRunning => _p(
+      'This referral offer is not running right now',
+      'यह निमंत्रण वाला ऑफ़र अभी चालू नहीं है');
+  String get inviteLimitToday => _p(
+      'You have hit today\'s invite limit. Try again tomorrow.',
+      'आज के निमंत्रण की सीमा पूरी हो गई। कल फिर कोशिश कीजिए।');
+  String get inviteLimitMonth => _p(
+      'You have hit this month\'s invite limit.',
+      'इस महीने के निमंत्रण की सीमा पूरी हो गई।');
+  String get maxRewardsEarned => _p(
+      'You have earned the maximum rewards for this campaign.',
+      'इस कैंपेन के सारे इनाम आपको मिल चुके हैं।');
+
+  // ---- Text that LEAVES the app -------------------------------------------
+  // These reach people who have not installed ParentVeda, so they are read by
+  // someone with no context at all. A mother who reads the app in Hindi should
+  // be able to forward something her family reads in Hindi too — an English
+  // invite from a Hindi app is the moment the localisation stops being real.
+
+  String inviteShareText(String code, String reward, String link) => _p(
+      'I am using ParentVeda through my pregnancy — it has been genuinely '
+          'useful. Join with my code $code and you get $reward to start '
+          'with.\n\n$link',
+      'मैं अपनी गर्भावस्था में ParentVeda इस्तेमाल कर रही हूँ — सच में काम आया है। '
+          'मेरे कोड $code से जुड़िए, शुरुआत में आपको $reward मिलेगा।\n\n$link');
+
+  String get inviteCopied =>
+      _p('Invite copied. Paste it wherever you like.',
+          'निमंत्रण कॉपी हो गया। जहाँ चाहें चिपका दीजिए।');
+
+  String pairingShareText(String code) => _p(
+      'Join me on ParentVeda 💜  Download the app, choose "I\'m the father", '
+          'and enter my pairing code: $code',
+      'ParentVeda पर मेरे साथ जुड़िए 💜  ऐप डाउनलोड कीजिए, "मैं पिता हूँ" चुनिए, '
+          'और मेरा कोड डालिए: $code');
+
+  String get pairingShareSubject =>
+      _p('Your ParentVeda pairing code', 'आपका ParentVeda जोड़ने वाला कोड');
+
+  String rewardEarnedTitle(String label) =>
+      _p('You earned $label', 'आपको $label मिला');
+
+  String get rewardEarnedBody => _p(
+      'A friend you invited finished setting up. It is in your account, '
+          'ready whenever you need it.',
+      'आपकी बुलाई सहेली ने अपना सेटअप पूरा कर लिया। यह आपके खाते में है, जब '
+          'चाहें इस्तेमाल कीजिए।');
+
+  String get rewardEarnedFootnote => _p(
+      'Spend it on a consultation with any ParentVeda expert.',
+      'इसे ParentVeda के किसी भी विशेषज्ञ से परामर्श पर इस्तेमाल कीजिए।');
+
+  /// Stands in for a name when an invite has none — so the notification reads
+  /// as a sentence rather than starting with a blank.
+  String get someFriend => _p('Your friend', 'आपकी सहेली');
+
+  String friendJoinedTitle(String who) =>
+      _p('$who joined ParentVeda', '$who ParentVeda से जुड़ीं');
+
+  String get friendJoinedBody => _p(
+      'Because of you. Your reward unlocks once she finishes setting up.',
+      'आपकी वजह से। उनका सेटअप पूरा होते ही आपका इनाम खुल जाएगा।');
+
+  String get rewardReadyBody => _p(
+      'It is in your account, ready whenever you need it.',
+      'यह आपके खाते में है, जब चाहें इस्तेमाल कीजिए।');
+
+  String unlockedTitle(String what) => _p('Unlocked: $what', 'खुल गया: $what');
+
+  String get birthClubBetter => _p(
+      'Your Birth Club just got a little better.',
+      'आपका Birth Club अभी थोड़ा और बेहतर हो गया।');
+
+  /// A derived Birth Club room, e.g. "November 2026 Moms".
+  ///
+  /// Built at read time rather than stored, so the room a mother sees follows
+  /// the language she is reading in — the same room, named in her words.
+  String birthClubName(int month, int year) =>
+      _p('${monthLong(month)} $year Moms',
+          '${monthLong(month)} $year की माँएँ');
+
+  String birthClubDescription(int month, int year) => _p(
+      'Mothers due in ${monthLong(month)} $year, going through it together '
+          '- week by week.',
+      'वे माँएँ जिनकी डिलीवरी ${monthLong(month)} $year में है — हफ़्ते-दर-हफ़्ते, '
+          'यह सफ़र साथ में।');
+
+  String monthLong(int m) {
+    const en = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November',
+                'December'];
+    const hi = ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
+                'जुलाई', 'अगस्त', 'सितंबर', 'अक्तूबर', 'नवंबर', 'दिसंबर'];
+    final i = (m - 1).clamp(0, 11);
+    return _p(en[i], hi[i]);
+  }
+
   // Suggested reminder presets.
   String get rmdSugKegel => _p('Time for your Kegels 🌸', 'Kegel का समय 🌸');
   String get rmdSugVitamin =>
@@ -3424,4 +3625,500 @@ class S {
         return id;
     }
   }
+
+  // =========================================================================
+  //  INLINE UI COPY - lifted out of widgets so it can be translated
+  // =========================================================================
+  String get uiWorthCheckingDoctor => _p('Worth checking with a doctor', 'डॉक्टर से पूछ लेना बेहतर है');
+  String get uiClose => _p('Close', 'बंद करें');
+  String get uiMuted => _p('Muted', 'आवाज़ बंद');
+  String get uiLeaveCall => _p('Leave call', 'कॉल छोड़ें');
+  String get uiReadIngredientList => _p('Read the ingredient list', 'सामग्री की सूची पढ़िए');
+  String get uiFragranceFreeBeatsLightly => _p('Fragrance-free beats lightly scented', 'बिना ख़ुशबू वाला, हल्की ख़ुशबू वाले से बेहतर');
+  String get uiMakerSOwnStudy => _p('A maker\'s own study is a starting point', 'कंपनी का अपना अध्ययन शुरुआत भर है');
+  String get uiUnderstandingBabySkin => _p('Understanding baby skin', 'शिशु की त्वचा को समझना');
+  String get uiHowPatchTestAnything => _p('How to patch-test anything', 'किसी भी चीज़ को थोड़ा लगाकर कैसे जाँचें');
+  String get uiTimingYoursChoose => _p('Timing is yours to choose', 'समय आप चुनिए');
+  String get uiCheckFolateDose => _p('Check the folate dose', 'Folate की मात्रा जाँचिए');
+  String get uiWhyFolateWhyNow => _p('Why folate, why now', 'Folate क्यों, और अभी क्यों');
+  String get uiOneHandedWholeTest => _p('One-handed is the whole test', 'एक हाथ से चल जाए — बस यही परख है');
+  String get uiPrettyOnesStayDrawer => _p('Pretty ones stay in the drawer', 'सुंदर वाले दराज़ में ही पड़े रह जाते हैं');
+  String get uiSurvivingNightFeeds => _p('Surviving night feeds', 'रात की फ़ीड से पार पाना');
+  String get uiTrySizeUpFirst => _p('Try a size up first', 'पहले एक साइज़ बड़ा आज़माइए');
+  String get uiReadingNappyRash => _p('Reading a nappy rash', 'नैपी रैश को पढ़ना');
+  String get uiSponsored => _p('SPONSORED', 'प्रायोजित');
+  String get uiBrandStudio => _p('Brand Studio', 'Brand Studio');
+  String get uiEngineWhoseJobShow => _p('An engine whose job is to show almost nothing. This page is the only way to see it working.', 'एक इंजन जिसका काम है लगभग कुछ न दिखाना। यह पन्ना ही उसे काम करते देखने का एकमात्र तरीक़ा है।');
+  String get uiCampaigns => _p('CAMPAIGNS', 'कैंपेन');
+  String get uiTapSlotNameLearn => _p('Tap a slot name to learn what it is. A blocked campaign says exactly why.', 'किसी स्लॉट का नाम दबाइए और जानिए वह क्या है। रुका हुआ कैंपेन साफ़ बताता है कि क्यों।');
+  String get uiFlagged => _p('FLAGGED FOR YOU', 'आपके लिए चिह्नित');
+  String get uiThingsGotBuiltDespite => _p('Things that got built despite a real argument against them. Each one is a decision waiting on you.', 'जो चीज़ें एक असली विरोध के बावजूद बनीं। हर एक पर आपका फ़ैसला बाक़ी है।');
+  String get uiReplayEverything => _p('Replay everything', 'सब दोबारा चलाएँ');
+  String get uiClearsImpressionsDismissalsSo => _p('Clears impressions and dismissals so a Premiere can be watched again.', 'impressions और dismissals हटा देता है, ताकि Premiere दोबारा देखा जा सके।');
+  String get uiResetRestartAppSee => _p('Reset — restart the app to see the Premiere', 'रीसेट — Premiere देखने के लिए ऐप दोबारा खोलिए');
+  String get uiReset => _p('Reset', 'रीसेट');
+  String get uiPreviewAs => _p('Preview as', 'इस रूप में देखें');
+  String get uiWhatStudioKnowsAbout => _p('WHAT THE STUDIO KNOWS ABOUT YOU', 'स्टूडियो आपके बारे में क्या जानता है');
+  String get uiEverythingTargetingCanSee => _p('This is everything targeting can see. It is read from your family profile — nothing else.', 'targeting को बस इतना ही दिखता है। यह आपकी family profile से पढ़ा जाता है — और कहीं से नहीं।');
+  String get uiEveryPlacement => _p('EVERY PLACEMENT', 'हर प्लेसमेंट');
+  String get uiCompleteListClosedSet => _p('The complete list. A closed set — a placement cannot exist unless it is here.', 'पूरी सूची। एक बंद सूची — कोई प्लेसमेंट यहाँ हुए बिना हो ही नहीं सकता।');
+  String get uiLaunches => _p('LAUNCHES', 'लॉन्च');
+  String get uiNewWorthKnowingAbout => _p('New, and worth knowing about', 'नया, और जानने लायक़');
+  String get uiProductsWeThinkAre => _p('Products we think are genuinely new, introduced by the people who made them and read honestly by a ParentVeda expert. Brands pay to launch here. They do not pay for what the expert says.', 'वे प्रोडक्ट जो हमें सचमुच नए लगते हैं — बनाने वालों की ज़ुबानी, और ParentVeda के विशेषज्ञ की ईमानदार राय के साथ। ब्रांड यहाँ लॉन्च करने के पैसे देते हैं। विशेषज्ञ क्या कहेंगे, उसके नहीं।');
+  String get uiNoLaunchesRightNow => _p('No launches right now', 'अभी कोई लॉन्च नहीं');
+  String get uiWeOnlyRunThese => _p('We only run these a few times a year. An empty page here means nothing new is worth your attention yet.', 'हम ये साल में कुछ ही बार चलाते हैं। यहाँ ख़ाली पन्ने का मतलब है कि अभी कुछ भी आपका ध्यान माँगने लायक़ नहीं।');
+  String get uiReadLaunch => _p('Read the launch', 'लॉन्च पढ़ें');
+  String get uiWhatActually => _p('WHAT IT ACTUALLY IS', 'यह असल में है क्या');
+  String get uiLearnProperly => _p('LEARN THIS PROPERLY', 'इसे ठीक से समझिए');
+  String get uiParentvedaSOwnGuides => _p('ParentVeda\'s own guides on the subject. Free, and not about this product.', 'इस विषय पर ParentVeda की अपनी गाइड। मुफ़्त, और इस प्रोडक्ट के बारे में नहीं।');
+  String get uiLaunchNotEndorsementNothing => _p('A launch is not an endorsement. Nothing here changes a product\'s ParentVeda rating, and no brand can buy one.', 'लॉन्च का मतलब सिफ़ारिश नहीं। यहाँ कुछ भी किसी प्रोडक्ट की ParentVeda रेटिंग नहीं बदलता, और कोई ब्रांड रेटिंग ख़रीद नहीं सकता।');
+  String get uiParentvedaSExpert => _p('PARENTVEDA\'S EXPERT', 'ParentVeda के विशेषज्ञ');
+  String get uiBrandLinkComingSoon => _p('Brand link coming soon', 'ब्रांड का लिंक जल्द');
+  String get uiParentvedaLaunch => _p('A PARENTVEDA LAUNCH', 'एक ParentVeda लॉन्च');
+  String get uiNeedsDecision => _p('NEEDS A DECISION', 'फ़ैसला चाहिए');
+  String get uiNoteOnlyVisibleDebug => _p('This note is only visible in debug builds. Parents never see it.', 'यह नोट सिर्फ़ debug build में दिखता है। माता-पिता इसे कभी नहीं देखते।');
+  String get uiSponsorshipResearchPage => _p('Sponsorship on a research page', 'शोध वाले पन्ने पर प्रायोजन');
+  String get uiSponsorshipCompareTool => _p('Sponsorship on the Compare tool', 'Compare टूल पर प्रायोजन');
+  String get uiEveryBrandHereInvented => _p('Every brand here is invented', 'यहाँ हर ब्रांड काल्पनिक है');
+  String get uiPremiereHasNoBrand => _p('Premiere has no brand film', 'Premiere के पास कोई ब्रांड फ़िल्म नहीं');
+  String get uiSamplingCollectsRequestsCannot => _p('Sampling collects requests it cannot fulfil', 'Sampling ऐसी माँगें जमा करता है जो पूरी नहीं हो सकतीं');
+  String get uiNotNow => _p('Not now', 'अभी नहीं');
+  String get uiWhatMeans => _p('What that means', 'इसका मतलब क्या है');
+  String get uiFreeSample => _p('Free sample', 'मुफ़्त नमूना');
+  String get uiWhereDetailsGo => _p('Where your details go', 'आपकी जानकारी कहाँ जाती है');
+  String get uiWhereShouldWePost => _p('Where should we post it?', 'हम इसे कहाँ भेजें?');
+  String get uiParentvedaMayUseAddress => _p('ParentVeda may use this address to post this sample.', 'ParentVeda इस पते का इस्तेमाल यह नमूना भेजने के लिए कर सकता है।');
+  String get uiAreList => _p('You are on the list', 'आप सूची में हैं');
+  String get uiWhenArrives => _p('When it arrives', 'कब पहुँचेगा');
+  String get uiThankNoted => _p('Thank you — noted.', 'शुक्रिया — दर्ज कर लिया।');
+  String get uiFlatHouseStreetArea => _p('Flat / house, street, area, city, PIN', 'मकान/फ़्लैट, गली, इलाक़ा, शहर, PIN');
+  String get uiScanJoinParentveda => _p('Scan to join ParentVeda', 'ParentVeda से जुड़ने के लिए स्कैन कीजिए');
+  String get uiWeekByWeekGuidance => _p('Week-by-week guidance for pregnancy and the early years.', 'गर्भावस्था और शुरुआती सालों के लिए हफ़्ते-दर-हफ़्ते मार्गदर्शन।');
+  String get uiParentveda => _p('ParentVeda+', 'ParentVeda+');
+  String get uiFreeConsultation => _p('1 free consultation', '1 मुफ़्त परामर्श');
+  String get uiGentleExpertGuidancePregnancy => _p('Gentle, expert guidance for pregnancy and every milestone after.', 'गर्भावस्था और उसके बाद के हर पड़ाव के लिए सौम्य, विशेषज्ञ मार्गदर्शन।');
+  String get uiLovedByParents => _p('Loved by 50,000+ parents', '50,000+ माता-पिता की पसंद');
+  String get uiIAmCurrently => _p('I AM CURRENTLY', 'मैं अभी हूँ');
+  String get uiAddDateAboveContinue => _p('Add the date above to continue — everything else is built around it.', 'ऊपर तारीख़ डालिए — बाक़ी सब उसी के हिसाब से बनता है।');
+  String get uiSignAsWhichDoctor => _p('Sign in as which doctor?', 'किस डॉक्टर के रूप में साइन इन करें?');
+  String get uiPairingCode => _p('Pairing code', 'जोड़ने का कोड');
+  String get uiPairingPartner => _p('Pairing you with your partner…', 'आपको आपके पार्टनर से जोड़ा जा रहा है…');
+  String get uiReNowPairedNyour => _p("You're now paired with\nyour partner.",
+      'अब आप अपने पार्टनर से\nजुड़ गई हैं।');
+  String get uiWeReHereHelp => _p('We\'re here to help you support her and understand her journey better.', 'हम यहाँ हैं ताकि आप उनका साथ दे सकें और उनके सफ़र को बेहतर समझ सकें।');
+  String get uiReAllSet => _p('You\'re all set!', 'सब तैयार है!');
+  String get uiWelcomeParentvedaFamilyJourney => _p('Welcome to the ParentVeda family. Your journey begins now. 💜', 'ParentVeda परिवार में स्वागत है। आपका सफ़र अभी से शुरू। 💜');
+  String get uiHaveInviteCode => _p('Have an invite code?', 'कोई निमंत्रण कोड है?');
+  String get uiPleaseAddDueDate => _p('Please add the due date or birthday first.', 'पहले डिलीवरी की तारीख़ या जन्मदिन डालिए।');
+  String get uiCanDoLaterFrom => _p('You can do this later from Profile.', 'यह आप बाद में Profile से भी कर सकती हैं।');
+  String get uiWhatsappUpdates => _p('WhatsApp updates', 'WhatsApp पर अपडेट');
+  String get uiGetWeeklyGuideWhatsapp => _p('Get your weekly guide on WhatsApp. Optional.', 'अपनी साप्ताहिक गाइड WhatsApp पर पाइए। आपकी मर्ज़ी।');
+  String get uiDonTKnowCalculate => _p('Don\'t know it? Calculate your due date', 'पता नहीं? अपनी डिलीवरी की तारीख़ निकालिए');
+  String get uiEmbryoAgeTransfer => _p('Embryo age at transfer', 'ट्रांसफ़र के समय embryo की उम्र');
+  String get uiGestationalAgeScan => _p('Gestational age at scan', 'स्कैन के समय gestational age');
+  String get uiCalculateDueDate => _p('Calculate your due date', 'अपनी डिलीवरी की तारीख़ निकालिए');
+  String get uiTellUsWhatKnow => _p('Tell us what you know - we\'ll do the math.', 'आपको जो पता है वह बताइए — हिसाब हम लगा देंगे।');
+  String get uiWhatDoKnow => _p('WHAT DO YOU KNOW?', 'आपको क्या पता है?');
+  String get uiEstimatedDueDate => _p('ESTIMATED DUE DATE', 'अनुमानित डिलीवरी तारीख़');
+  String get uiUseDate => _p('Use this date', 'यही तारीख़ रखें');
+  String get uiIMMother => _p('I\'m the mother', 'मैं माँ हूँ');
+  String get uiIMFather => _p('I\'m the father', 'मैं पिता हूँ');
+  String get uiIMDoctor => _p('I\'m a doctor', 'मैं डॉक्टर हूँ');
+  String get uiEGXosU => _p('e.g. 0XOS1U', 'जैसे 0XOS1U');
+  String get uiReadSummary => _p('Read summary', 'सार पढ़ें');
+  String get uiTapAnyIdeaOpen => _p('Tap any idea to open it.', 'किसी भी विचार को खोलने के लिए टैप कीजिए।');
+  String get uiTapChapterItsKey => _p('Tap a chapter for its key points.', 'किसी अध्याय की मुख्य बातें देखने के लिए टैप कीजिए।');
+  String get uiParentvedaSTake => _p('PARENTVEDA\'S TAKE', 'ParentVeda की राय');
+  String get uiKeyPointsCovered => _p('KEY POINTS COVERED', 'मुख्य बातें');
+  String get uiBack => _p('Back', 'वापस');
+  String get uiFifteenPremiumBrandProducts => _p('Fifteen premium brand products, plus Certification. Every one is a real placement in the real app - tap "Show me" to go and see it in context.', 'पंद्रह प्रीमियम ब्रांड प्रोडक्ट, साथ में Certification। हर एक असली ऐप में असली जगह पर है — "दिखाइए" दबाकर उसे वहीं जाकर देखिए।');
+  String get uiDemoPartners => _p('DEMO PARTNERS', 'डेमो पार्टनर');
+  String get uiNotRealPartnershipsPlaceholders => _p('Not real partnerships - placeholders for review.', 'असली साझेदारी नहीं — समीक्षा के लिए रखे गए नमूने।');
+  String get uiShowMe => _p('Show me', 'दिखाइए');
+  String get uiNotBuilt => _p('Not built', 'अभी बना नहीं');
+  String get uiCareCircle => _p('Your Care Circle', 'आपका देखभाल का घेरा');
+  String get uiEvidenceBasedSupportEvery => _p('Evidence-based support, every week of the journey.', 'हर हफ़्ते, प्रमाण पर टिका साथ।');
+  String get uiCarePartnerDebug => _p('Care Partner (debug)', 'Care Partner (debug)');
+  String get uiWelcomeParentveda => _p('Welcome to ParentVeda', 'ParentVeda में स्वागत है');
+  String get uiSomeoneWhoLooksAfter => _p('Someone who looks after you brought you here.', 'आपका ख़याल रखने वाले किसी ने आपको यहाँ भेजा है।');
+  String get uiContinue => _p('Continue', 'आगे बढ़ें');
+  String get uiToday => _p('TODAY FOR YOU', 'आज आपके लिए');
+  String get uiWeeklySnapshot => _p('WEEKLY SNAPSHOT', 'हफ़्ते की झलक');
+  String get uiOpenHerWeek => _p('Open her week', 'उनका हफ़्ता खोलिए');
+  String get uiDailyTipDad => _p('DAILY TIP FOR DAD', 'पापा के लिए आज की बात');
+  String get uiTonightDonTFix => _p('Tonight, don\'t fix it. Just sit with her.', 'आज रात हल मत ढूँढिए। बस उनके पास बैठिए।');
+  String get uiWhenSheCanT => _p('When she can\'t sleep, presence beats solutions. A hand on her back says more than any advice.', 'जब नींद नहीं आती, तब सलाह से ज़्यादा साथ काम आता है। पीठ पर रखा एक हाथ किसी भी नसीहत से ज़्यादा कहता है।');
+  String get uiReadTodaySTip => _p('Read today\'s tip · 2 min', 'आज की बात पढ़िए · 2 मिनट');
+  String get uiSupportPartner => _p('SUPPORT YOUR PARTNER', 'अपनी पार्टनर का साथ');
+  String get uiWeekWhatSheS => _p('Week 20 - what she\'s carrying', 'हफ़्ता 20 — वे क्या सँभाल रही हैं');
+  String get uiHerLowerBackTaking => _p('Her lower back is taking the strain this week, and by evening it aches.', 'इस हफ़्ते सारा ज़ोर उनकी कमर पर है, और शाम तक दर्द बढ़ जाता है।');
+  String get uiDoToday => _p('DO THIS TODAY', 'आज यह कीजिए');
+  String get uiTakeDinnerOffHer => _p('Take dinner off her plate - cook her favourite, or order it before she has to ask.', 'रात का खाना उनके ज़िम्मे से हटा दीजिए — उनकी पसंद का बनाइए, या माँगने से पहले मँगा लीजिए।');
+  String get uiTodaySRead => _p('TODAY\'S READ', 'आज का पाठ');
+  String get uiReadBaby => _p('READ TO YOUR BABY', 'अपने शिशु को सुनाइए');
+  String get uiReadBabyTonight => _p('Read to your baby tonight', 'आज रात अपने शिशु को सुनाइए');
+  String get uiScansAppointments => _p('SCANS & APPOINTMENTS', 'स्कैन और अपॉइंटमेंट');
+  String get uiComingUpHer => _p('Coming up for her', 'उनके लिए आगे क्या');
+  String get uiNothingDueRightNow => _p('Nothing due right now - you\'re both up to date.', 'अभी कुछ बाक़ी नहीं — आप दोनों अप-टू-डेट हैं।');
+  String get uiAlreadyDone => _p('Already done', 'पहले से हो गया');
+  String get uiAllScans => _p('All scans', 'सारे स्कैन');
+  String get uiTickOffOnesAlready => _p('Tick off the ones already done - even older ones, if you joined late.', 'जो पहले हो चुके हैं उन्हें टिक कर दीजिए — पुराने भी, अगर आप बीच में जुड़े हैं।');
+  String get uiStoriesFablesMyth => _p('STORIES, FABLES & MYTH', 'कहानियाँ, नीति-कथाएँ और पुराण');
+  String get uiWhatWouldLikeRead => _p('What would you like to read?', 'आप क्या पढ़ना चाहेंगे?');
+  String get uiPickKindsWantLeave => _p('Pick the kinds you want. Leave all off for a mix of everything.', 'जो पसंद हो चुन लीजिए। सब बंद छोड़ देंगे तो सबका मिला-जुला मिलेगा।');
+  String get uiJournal => _p('YOUR JOURNAL', 'आपका जर्नल');
+  String get uiNoteBaby => _p('A note to your baby', 'शिशु के नाम एक नोट');
+  String get uiJournal2 => _p('Your journal', 'आपका जर्नल');
+  String get uiMemoriesPhotosVoiceNotes => _p('Your memories, photos and voice notes will live here. Tap a circle above to add one - a memory, a note to your baby, a photo or a voice note.', 'आपकी यादें, फ़ोटो और वॉइस नोट यहाँ रहेंगे। ऊपर किसी गोले पर टैप करके एक जोड़िए — कोई याद, शिशु के नाम नोट, फ़ोटो या वॉइस नोट।');
+  String get uiTakeDinnerOffHer2 => _p('Take dinner off her plate - cook her favourite, or order it before she has to ask. Then rub her lower back for five minutes, no phone.', 'रात का खाना उनके ज़िम्मे से हटा दीजिए — उनकी पसंद का बनाइए, या माँगने से पहले मँगा लीजिए। फिर पाँच मिनट उनकी कमर सहलाइए, बिना फ़ोन के।');
+  String get uiMoreWaysHelpWeek => _p('MORE WAYS TO HELP THIS WEEK', 'इस हफ़्ते मदद के और तरीक़े');
+  String get uiSaveEntry => _p('Save entry', 'एंट्री सेव करें');
+  String get uiRecentEntries => _p('RECENT ENTRIES', 'हाल की एंट्री');
+  String get uiSwitchMomSView => _p('Switch to Mom\'s view', 'माँ वाला रूप देखिए');
+  String get uiLlBothStaySync => _p('You\'ll both stay in sync.', 'आप दोनों साथ-साथ रहेंगे।');
+  String get uiMomSDailySpace => _p('Mom\'s daily space - her body this week, cravings, kicks and her own journal - lives one tap away. Anything you mark here shows up for her too.', 'माँ की रोज़ की जगह — इस हफ़्ते उनका शरीर, क्रेविंग, हलचल और उनका अपना जर्नल — बस एक टैप दूर है। आप यहाँ जो भी दर्ज करेंगे, वह उन्हें भी दिखेगा।');
+  String get uiOpenMomSView => _p('Open Mom\'s view', 'माँ वाला रूप खोलिए');
+  String get uiStayDadSView => _p('Stay in Dad\'s view', 'पापा वाले रूप में रहिए');
+  String get uiHereSWhatScan => _p('Here\'s what this scan is - so you can be there for it with her, and understand what you\'re looking at together.', 'यह स्कैन क्या है — ताकि आप उनके साथ वहाँ रह सकें, और दोनों समझ सकें कि सामने क्या है।');
+  String get uiGeneralGuidanceHelpSupport => _p('General guidance to help you support her - every pregnancy is different, so always follow her doctor.', 'उनका साथ देने के लिए सामान्य मार्गदर्शन — हर गर्भावस्था अलग होती है, इसलिए हमेशा उनके डॉक्टर की सलाह मानिए।');
+  String get uiHowReadReport => _p('HOW TO READ THE REPORT', 'रिपोर्ट कैसे पढ़ें');
+  String get uiPlainLanguageExplanationsNot => _p('Plain-language explanations, not a diagnosis. Numbers only mean something in full context - read the report with her doctor.', 'आसान भाषा में समझाइश, निदान नहीं। नंबर का मतलब पूरे संदर्भ में ही निकलता है — रिपोर्ट उनके डॉक्टर के साथ पढ़िए।');
+  String get uiWhatScan => _p('What is this scan?', 'यह स्कैन क्या है?');
+  String get uiTonightDonTFix2 => _p('Tonight, don\'t fix it - just sit with her', 'आज रात हल मत ढूँढिए — बस उनके पास बैठिए');
+  String get uiWhatBabyCanHear => _p('What your baby can hear at 20 weeks', '20 हफ़्ते में आपका शिशु क्या सुन सकता है');
+  String get uiChurningOcean => _p('The Churning of the Ocean', 'समुद्र मंथन');
+  String get uiWriteBabyJustJot => _p('Write to your baby, or just jot today\'s thought…', 'शिशु को लिखिए, या बस आज का ख़याल दर्ज कीजिए…');
+  String get uiMemories => _p('YOUR MEMORIES', 'आपकी यादें');
+  String get uiFatherSJournal => _p('Father\'s Journal', 'पिता का जर्नल');
+  String get uiStartJournal => _p('Start your journal', 'अपना जर्नल शुरू कीजिए');
+  String get uiWriteMemoryNoteSomething => _p('Write a memory, note something for your baby, add a photo or record your voice. It all stays here for you.', 'कोई याद लिखिए, शिशु के लिए कुछ नोट कीजिए, फ़ोटो जोड़िए या अपनी आवाज़ रिकॉर्ड कीजिए। सब यहीं आपके पास रहेगा।');
+  String get uiVoiceNote => _p('Voice note', 'वॉइस नोट');
+  String get uiReadBaby2 => _p('Read to your baby', 'अपने शिशु को सुनाइए');
+  String get uiSameWordsSheS => _p('The same words she\'s reading - say them aloud to the bump. Your voice is one they already know.', 'वही शब्द जो वे पढ़ रही हैं — उन्हें बंप के पास बोलकर सुनाइए। आपकी आवाज़ शिशु पहले से पहचानता है।');
+  String get uiNothingChosenYetShe => _p('Nothing chosen yet - she picks the spiritual reading in her app, and it shows up here for you.', 'अभी कुछ नहीं चुना — आध्यात्मिक पाठ वे अपने ऐप में चुनती हैं, और वह यहाँ आपके लिए आ जाता है।');
+  String get uiSave => _p('Save', 'सेव करें');
+  String get uiDad => _p('FOR YOU, DAD', 'आपके लिए, पापा');
+  String get uiReads => _p('Reads', 'पाठ');
+  String get uiShortReadsAboutHer => _p('Short reads about her, the baby, and how to show up.', 'उनके बारे में, शिशु के बारे में, और साथ कैसे देना है — छोटे पाठ।');
+  String get uiArticles => _p('ARTICLES', 'लेख');
+  String get uiResearchSummaries => _p('RESEARCH SUMMARIES', 'शोध का सार');
+  String get uiBookSummaries => _p('BOOK SUMMARIES', 'किताबों का सार');
+  String get uiStoriesFablesMythology => _p('Stories, Fables & Mythology', 'कहानियाँ, नीति-कथाएँ और पुराण');
+  String get uiTalesReadAloudBump => _p('Tales to read aloud to the bump', 'बंप के पास बोलकर सुनाने की कहानियाँ');
+  String get uiContents => _p('Contents', 'विषय-सूची');
+  String get uiReading => _p('Reading', 'पढ़ रहे हैं');
+  String get uiRead => _p('The read', 'पाठ');
+  String get uiWhyMatters => _p('Why this matters', 'यह क्यों मायने रखता है');
+  String get uiResearchSimplified => _p('Research simplified', 'शोध आसान भाषा में');
+  String get uiMythVsFact => _p('Myth vs fact', 'मिथक बनाम सच');
+  String get uiReadingSettings => _p('Reading settings', 'पढ़ने की सेटिंग');
+  String get uiReadAloud => _p('FOR YOU TO READ ALOUD', 'आपके बोलकर सुनाने के लिए');
+  String get uiReadAloudLetVoice => _p('Read it aloud - let your voice rise and fall', 'बोलकर पढ़िए — आवाज़ को चढ़ने-उतरने दीजिए');
+  String get uiLesson => _p('THE LESSON', 'सीख');
+  String get uiFromDad => _p('FROM DAD', 'पापा की ओर से');
+  String get uiFewQuietMinutesFocused => _p('A few quiet minutes of focused calm.', 'कुछ शांत मिनट, पूरी तरह ठहरे हुए।');
+  String get uiNothingSelectedYetTap => _p('Nothing selected yet. Tap Customize to choose what to read to your baby.', 'अभी कुछ नहीं चुना। शिशु को क्या सुनाना है, यह चुनने के लिए "अपने हिसाब से" दबाइए।');
+  String get uiDone => _p('Done', 'हो गया');
+  String get uiPostPregnancy => _p('Post-Pregnancy', 'जन्म के बाद');
+  String get uiBabySArrivedStep => _p('Baby\'s arrived? Step into the parenting app', 'शिशु आ गया? परवरिश वाले ऐप में चलिए');
+  String get uiBest => _p('BEST', 'सबसे बेहतर');
+  String get uiBudget => _p('BUDGET', 'कम दाम');
+  String get uiPremium => _p('PREMIUM', 'प्रीमियम');
+  String get uiGentle => _p('GENTLE', 'कोमल');
+  String get uiNewborn => _p('NEWBORN', 'नवजात');
+  String get uiDad2 => _p('You + Dad', 'आप + पापा');
+  String get uiMemories2 => _p('MEMORIES', 'यादें');
+  String get uiKeepsakesTreasure => _p('Keepsakes to treasure', 'सहेजने लायक़ निशानियाँ');
+  String get uiMakeBeautifulCardMoments => _p('Make a beautiful card for the moments that matter most.', 'सबसे ख़ास पलों के लिए एक सुंदर कार्ड बनाइए।');
+  String get uiMyMemories => _p('MY MEMORIES', 'मेरी यादें');
+  String get uiAddDetailsEverythingOptional => _p('Add your details — everything is optional except a name.', 'अपनी जानकारी भरिए — नाम के अलावा सब कुछ आपकी मर्ज़ी।');
+  String get uiAddPhotoOptional => _p('Add a photo (optional)', 'फ़ोटो जोड़िए (ज़रूरी नहीं)');
+  String get uiCanZoomPositionAfter => _p('You can zoom & position it after', 'बाद में ज़ूम और जगह ठीक कर सकते हैं');
+  String get uiPinchZoomDragPosition => _p('Pinch to zoom · drag to position', 'ज़ूम के लिए दो उँगलियाँ · जगह बदलने के लिए खींचिए');
+  String get uiReplace => _p('Replace', 'बदलिए');
+  String get uiRemove => _p('Remove', 'हटाइए');
+  String get uiPreviewTemplates => _p('Preview templates', 'टेम्पलेट देखिए');
+  String get uiChooseTemplate => _p('Choose a template', 'टेम्पलेट चुनिए');
+  String get uiPersonaliseParentveda => _p('Personalise ParentVeda', 'ParentVeda को अपने हिसाब से बनाइए');
+  String get uiNothingHereRequiredCan => _p('Nothing here is required, and you can change any of it later. Every answer just helps ParentVeda put the right things in front of you first - it never hides anything or moves things around.', 'यहाँ कुछ भी ज़रूरी नहीं, और सब कुछ बाद में बदला जा सकता है। हर जवाब बस ParentVeda को यह तय करने में मदद करता है कि पहले क्या दिखाए — यह कभी कुछ छिपाता नहीं, न चीज़ें इधर-उधर करता है।');
+  String get uiAnswersStayDeviceOwn => _p('Your answers stay on your device and in your own ParentVeda account. They are used to choose what to show you - never to decide which features you get.', 'आपके जवाब आपके फ़ोन और आपके अपने ParentVeda खाते में रहते हैं। इनसे बस यह चुना जाता है कि आपको क्या दिखाया जाए — यह कभी तय नहीं करता कि आपको कौन से फ़ीचर मिलेंगे।');
+  String get uiBirthingClasses => _p('Birthing Classes', 'जन्म की तैयारी की क्लास');
+  String get uiEverythingBigDayTaught => _p('Everything for the big day, taught by a childbirth educator.', 'बड़े दिन के लिए सब कुछ, एक childbirth educator से सीखिए।');
+  String get uiRe => _p('You\'re ', 'आप');
+  String get uiExactlyWhenMostMums => _p(' - exactly when most mums prepare for birth.', 'पर हैं — ठीक वही समय जब ज़्यादातर माँएँ जन्म की तैयारी करती हैं।');
+  String get uiCompleteBirthingCourse => _p('Complete Birthing Course', 'पूरा Birthing कोर्स');
+  String get uiClassesSelfPacedVideo => _p('6 classes · self-paced video + a monthly live Q&A', '6 क्लास · अपनी रफ़्तार से वीडियो + हर महीने एक लाइव सवाल-जवाब');
+  String get uiClasses => _p('The 6 classes', 'छह क्लास');
+  String get uiLeadsEveryLiveSession => _p('Leads every live session and the group.', 'हर लाइव सेशन और ग्रुप वही चलाती हैं।');
+  String get uiParentvedaMembersAnyCohort => _p(' for ParentVeda+ members on any cohort.', '— किसी भी cohort पर ParentVeda+ सदस्यों के लिए।');
+  String get uiJoinNextCohort => _p('Join the next cohort', 'अगले cohort में जुड़िए');
+  String get uiCohortPrograms => _p('Cohort Programs', 'Cohort प्रोग्राम');
+  String get uiSmallGroupsRealCoach => _p('Small groups, a real coach, and mums due when you are.', 'छोटे समूह, एक असली कोच, और वे माँएँ जिनकी डिलीवरी आपके साथ है।');
+  String get uiBirthReadyCohortStarts => _p(' - the Birth-Ready cohort starts Monday.', 'पर हैं — Birth-Ready cohort सोमवार से शुरू है।');
+  String get uiWith => _p('with ', 'साथ:');
+  String get uiChildbirthEducator => _p(', childbirth educator', '— childbirth educator');
+  String get uiMorePrograms => _p('More programs', 'और प्रोग्राम');
+  String get uiLiveSessionsSmallPeer => _p('Live sessions · a small peer group · weekly homework · a private WhatsApp group.', 'लाइव सेशन · एक छोटा साथी-समूह · हर हफ़्ते अभ्यास · एक निजी WhatsApp ग्रुप।');
+  String get uiParentveda2 => _p(' for ParentVeda+.', '— ParentVeda+ के लिए।');
+  String get uiTodayJul => _p('Today, 8 Jul', 'आज, 8 जुलाई');
+  String get uiBedsideMannerRatedBy => _p('Bedside manner, rated by mothers.', 'माँओं ने बताया, वे कैसे पेश आते हैं।');
+  String get uiPickSlotPrivateVideo => _p('Pick a slot → private video call → notes saved to your health record.', 'स्लॉट चुनिए → निजी वीडियो कॉल → नोट आपके हेल्थ रिकॉर्ड में सेव।');
+  String get uiConsultations => _p('1:1 Consultations', '1:1 परामर्श');
+  String get uiPrivateSessionRightExpert => _p('A private session with the right expert, whenever you need one.', 'सही विशेषज्ञ के साथ एक निजी सेशन, जब भी ज़रूरत हो।');
+  String get uiSomethingMindAfterWeek => _p('Something on your mind after your 30-week scan? Talk it through.', '30-हफ़्ते के स्कैन के बाद कुछ मन में है? बात कर लीजिए।');
+  String get uiPickExpertPickSlot => _p('Pick an expert → pick a slot → private video call. Notes saved to your health record.', 'विशेषज्ञ चुनिए → स्लॉट चुनिए → निजी वीडियो कॉल। नोट आपके हेल्थ रिकॉर्ड में सेव।');
+  String get uiHindiEnglish => _p('Hindi / English', 'हिंदी / English');
+  String get uiCoursesCohorts => _p('Courses & Cohorts', 'कोर्स और Cohort');
+  String get uiSelfPacedCoursesSmall => _p('Self-paced courses, small live cohorts and one-evening masterclasses - all in one place. Search a topic, or browse everything below.', 'अपनी रफ़्तार वाले कोर्स, छोटे लाइव cohort और एक शाम की masterclass — सब एक जगह। कोई विषय खोजिए, या नीचे सब देखिए।');
+  String get uiEveryProgramLedBy => _p('Every program is led by a verified expert. Free or included with ParentVeda+.', 'हर प्रोग्राम एक सत्यापित विशेषज्ञ चलाते हैं। मुफ़्त, या ParentVeda+ में शामिल।');
+  String get uiNoProgramsMatch => _p('No programs match', 'कोई प्रोग्राम नहीं मिला');
+  String get uiTryAnotherTopicClear => _p('Try another topic or clear your filters.', 'दूसरा विषय आज़माइए या फ़िल्टर हटाइए।');
+  String get uiWatchSecIntro => _p('Watch the 90-sec intro', '90 सेकंड का परिचय देखिए');
+  String get uiReserveSeat => _p('Reserve a seat', 'सीट रोकिए');
+  String get uiMasterclasses => _p('Masterclasses', 'Masterclass');
+  String get uiDeepDiveLiveSessions => _p('Deep-dive live sessions with experts, on the moments that matter.', 'उन पलों पर विशेषज्ञों के साथ गहरे लाइव सेशन जो सबसे ज़्यादा मायने रखते हैं।');
+  String get uiBirthMindStartHere => _p(' - birth is on your mind. Start here.', '— जन्म आपके मन में है। यहीं से शुरू कीजिए।');
+  String get uiMoreMasterclasses => _p('More masterclasses', 'और masterclass');
+  String get uiLiveRecording => _p('live + recording', 'लाइव + रिकॉर्डिंग');
+  String get uiNutrition => _p('Nutrition', 'पोषण');
+  String get uiTwoMinuteCheckThen => _p('A two-minute check-in, then a plan built around you - and a nutritionist to make it yours.', 'दो मिनट की जाँच, फिर आपके हिसाब से बना एक प्लान — और उसे आपका बनाने के लिए एक nutritionist।');
+  String get uiAnswerFewQuestionsWe => _p('Answer a few questions and we\'ll match you to the right plan and expert.', 'कुछ सवालों के जवाब दीजिए और हम आपको सही प्लान और विशेषज्ञ से मिला देंगे।');
+  String get uiChooseMainFocusFirst => _p('Choose a main focus first', 'पहले एक मुख्य लक्ष्य चुनिए');
+  String get uiRecommendedPlans => _p('Your recommended plans', 'आपके लिए सुझाए प्लान');
+  String get uiBasedAnswersEachOne => _p('Based on your answers - each one is a starting point a nutritionist will personalise.', 'आपके जवाबों के आधार पर — हर एक शुरुआत भर है, जिसे nutritionist आपके हिसाब से बनाएँगी।');
+  String get uiPreview => _p('Preview →', 'झलक →');
+  String get uiTrailerSec => _p('Trailer · 60 sec', 'ट्रेलर · 60 सेकंड');
+  String get uiWhatSInside => _p('What\'s inside', 'इसमें क्या है');
+  String get uiDayPlan => _p('A day on this plan', 'इस प्लान का एक दिन');
+  String get uiSampleNutritionistTailorsBody => _p('A sample - your nutritionist tailors it to your body and tastes.', 'एक नमूना — आपकी nutritionist इसे आपके शरीर और स्वाद के हिसाब से ढालेंगी।');
+  String get uiEveryPlanFinalised => _p('Every plan is finalised with a ', 'हर प्लान आख़िरी रूप लेता है एक');
+  String get uiConsultSoTrulyFits => _p(' in a 1:1 consult - so it truly fits you.', 'में, 1:1 परामर्श के दौरान — ताकि यह सचमुच आप पर बैठे।');
+  String get uiConsult => _p('with a 1:1 consult', '1:1 परामर्श के साथ');
+  String get uiPersonalizedDietPlan => _p('Your personalized diet plan', 'आपके हिसाब से बना खानपान प्लान');
+  String get uiConsultBookedNutritionistWill => _p('Consult booked. Your nutritionist will fine-tune this plan on the call, then it lands here in full.', 'परामर्श बुक हो गया। आपकी nutritionist कॉल पर इस प्लान को ठीक करेंगी, फिर यह पूरा यहाँ आ जाएगा।');
+  String get uiFocusPlan => _p('Your focus this plan', 'इस प्लान में आपका लक्ष्य');
+  String get uiYoga => _p('Yoga', 'योग');
+  String get uiTrimesterSafeMovementFeel => _p('Trimester-safe movement to feel strong, calm, and ready - matched to exactly where you are.', 'तिमाही के हिसाब से सुरक्षित हलचल — मज़बूत, शांत और तैयार महसूस करने के लिए, ठीक वहीं से जहाँ आप हैं।');
+  String get uiRe2 => _p('You\'re in ', 'आप');
+  String get uiWeVeOpenedYoga => _p(' - we\'ve opened your yoga here. Every session is filtered safe for your stage.', 'में हैं — आपका योग यहीं खोल दिया है। हर सेशन आपके चरण के लिए सुरक्षित छाँटा गया है।');
+  String get uiPregnancyYogaProgram => _p('Pregnancy Yoga Program', 'गर्भावस्था योग प्रोग्राम');
+  String get uiMonthJourneySanaKapoor => _p('9-month journey · with Sana Kapoor, certified prenatal instructor', '9 महीने का सफ़र · Sana Kapoor के साथ, प्रमाणित prenatal प्रशिक्षक');
+  String get uiChooseMonth => _p('CHOOSE A MONTH', 'महीना चुनिए');
+  String get uiSessionsMonthAreComing => _p('Sessions for this month are coming soon.', 'इस महीने के सेशन जल्द आ रहे हैं।');
+  String get uiEverySessionFilteredMonth => _p('Every session is filtered for your month - nothing unsafe for where you are ever surfaces.', 'हर सेशन आपके महीने के हिसाब से छाँटा जाता है — जो आपके लिए सुरक्षित नहीं, वह कभी सामने नहीं आता।');
+  String get uiWeLlHoldSpot => _p('We\'ll hold your spot and remind you before it starts. Payments aren\'t live yet - nothing is charged now.', 'हम आपकी जगह रोक लेंगे और शुरू होने से पहले याद दिला देंगे। भुगतान अभी चालू नहीं है — अभी कुछ नहीं कटेगा।');
+  String get uiCancel => _p('Cancel this?', 'इसे रद्द करें?');
+  String get uiWillRemoveFromPrepare => _p('This will remove it from your Prepare list.', 'यह आपकी Prepare सूची से हट जाएगा।');
+  String get uiKeep => _p('Keep', 'रहने दें');
+  String get uiCancel2 => _p('Cancel it', 'रद्द कर दें');
+  String get uiPrepareBabyNoneGuided => _p(
+      'Prepare for your baby,\none guided step at a time.',
+      'अपने शिशु के लिए तैयार होइए,\nएक-एक क़दम, साथ-साथ।');
+  String get uiCoursesLiveCohortsExpert => _p('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.', 'कोर्स, लाइव cohort, विशेषज्ञ सेशन और सौम्य हलचल — ठीक वहीं के लिए चुने गए जहाँ आप हैं।');
+  String get uiRecommendedWeeks => _p('RECOMMENDED AT 30 WEEKS', '30 हफ़्ते पर सुझाया गया');
+  String get uiMostFree => _p('Most of this is free with ', 'इसमें से ज़्यादातर मुफ़्त है —');
+  String get uiPrepare => _p('Prepare', 'तैयारी');
+  String get uiVideoComingSoon => _p('Video coming soon', 'वीडियो जल्द आ रहा है');
+  String get uiFullVideoLandsHere => _p('The full video lands here soon. We\'ll notify you when it\'s ready to watch.', 'पूरा वीडियो जल्द यहाँ आएगा। देखने लायक़ होते ही हम बता देंगे।');
+  String get uiCohortHasAlreadyStarted => _p('This cohort has already started - reserve the next intake.', 'यह cohort शुरू हो चुका है — अगली बार के लिए जगह रोक लीजिए।');
+  String get uiWhatLlLearn => _p('What you\'ll learn', 'आप क्या सीखेंगी');
+  String get uiShortLessonsOrderStart => _p('Short lessons, in order - start anywhere.', 'छोटे पाठ, क्रम में — कहीं से भी शुरू कीजिए।');
+  String get uiWhatCovers => _p('What this covers', 'इसमें क्या शामिल है');
+  String get uiBooked => _p('✓  Booked', '✓  बुक हो गया');
+  String get uiHowWouldLikeSee => _p('How would you like to see this?', 'आप इसे कैसे देखना चाहेंगी?');
+  String get uiProductParentsOftenResearch => _p('This is a product parents often research — we can go deep, or keep it quick.', 'यह वह प्रोडक्ट है जिस पर माता-पिता अक्सर पढ़ते हैं — हम गहराई में जा सकते हैं, या बात छोटी रख सकते हैं।');
+  String get uiTrusted => _p('TRUSTED', 'भरोसेमंद');
+  String get uiReadParentvedaProductGuide => _p('Read the ParentVeda Product Guide', 'ParentVeda Product Guide पढ़िए');
+  String get uiRightChildDecideSeconds => _p('Is it right for your child? Decide in 10 seconds.', 'क्या यह आपके बच्चे के लिए सही है? 10 सेकंड में तय कीजिए।');
+  String get uiParentvedaProductGuide => _p('ParentVeda Product Guide', 'ParentVeda Product Guide');
+  String get uiQuickProductPage => _p('Quick product page', 'छोटा प्रोडक्ट पन्ना');
+  String get uiProductGuide => _p('PRODUCT GUIDE', 'PRODUCT GUIDE');
+  String get uiHonestEvidenceInformedGuides => _p('Honest, evidence-informed guides for the products parents actually research — understand in 10 seconds, go deeper only if you want to.', 'उन प्रोडक्ट के लिए ईमानदार, प्रमाण पर टिकी गाइड जिन पर माता-पिता सचमुच पढ़ते हैं — 10 सेकंड में समझिए, और चाहें तो ही गहराई में जाइए।');
+  String get uiGuidanceHelpChooseNever => _p('Guidance to help you choose — never a substitute for your doctor\'s advice.', 'चुनने में मदद के लिए मार्गदर्शन — आपके डॉक्टर की सलाह का विकल्प कभी नहीं।');
+  String get uiCompareProducts => _p('Compare products', 'प्रोडक्ट की तुलना');
+  String get uiTwoPicksSideBy => _p('Two picks, side by side.', 'दो पसंद, आमने-सामने।');
+  String get uiWeOnlyGuideProducts => _p('We only guide products worth researching — more are on the way.', 'हम सिर्फ़ उन्हीं प्रोडक्ट पर गाइड देते हैं जिन पर पढ़ना बनता है — और आ रहे हैं।');
+  String get uiSearchLotionDiapersStroller => _p('Search — lotion, diapers, stroller…', 'खोजिए — लोशन, डायपर, स्ट्रोलर…');
+  String get uiExploreMoreIfD =>
+      _p("EXPLORE MORE IF YOU'D LIKE", "चाहें तो और देखिए");
+  String get uiGuidanceHelpDecideAlways => _p('Guidance to help you decide — always follow your doctor\'s advice for your child.', 'तय करने में मदद के लिए मार्गदर्शन — अपने बच्चे के लिए हमेशा डॉक्टर की सलाह मानिए।');
+  String get uiBest2 => _p('BEST FOR', 'किसके लिए बेहतर');
+  String get uiCompare => _p('Compare', 'तुलना');
+  String get uiBuyNow => _p('Buy now', 'अभी ख़रीदें');
+  String get uiParentvedaScore => _p('ParentVeda score', 'ParentVeda स्कोर');
+  String get uiTake => _p('YOUR TAKE', 'आपकी राय');
+  String get uiBeforeBuy => _p('BEFORE YOU BUY', 'ख़रीदने से पहले');
+  String get uiWhatSGood => _p('WHAT\'S GOOD', 'क्या अच्छा है');
+  String get uiWorthConsidering => _p('WORTH CONSIDERING', 'सोचने लायक़');
+  String get uiNoRealDownsidesStood => _p('No real downsides stood out for this one.', 'इसमें कोई ख़ास कमी सामने नहीं आई।');
+  String get uiHeadingAmazon => _p('Heading to Amazon', 'Amazon पर जा रहे हैं');
+  String get uiContinueAmazon => _p('Continue to Amazon', 'Amazon पर जाइए');
+  String get uiStayHere => _p('Stay here', 'यहीं रहिए');
+  String get uiStillDeciding => _p('Still deciding?', 'अभी तय नहीं कर पाईं?');
+  String get uiWhatMeans2 => _p('WHAT THIS MEANS FOR YOU', 'आपके लिए इसका मतलब');
+  String get uiReadMore => _p('Read more', 'और पढ़ें');
+  String get uiSummarisedPlainLanguageFrom => _p('Summarised in plain language from independent sources. Always confirm anything important with your paediatrician.', 'स्वतंत्र स्रोतों से आसान भाषा में सार। कुछ भी ज़रूरी हो तो अपने बाल-रोग विशेषज्ञ से ज़रूर पुष्टि कीजिए।');
+  String get uiAllRatings => _p('ALL RATINGS', 'सारी रेटिंग');
+  String get uiNoRatingsMatchFilter => _p('No ratings match this filter yet.', 'इस फ़िल्टर से अभी कोई रेटिंग नहीं मिली।');
+  String get uiPersonalizationAnalytics => _p('Personalization analytics', 'Personalization analytics');
+  String get uiRecording => _p('Recording', 'दर्ज हो रहा है');
+  String get uiAlwaysOpenToolAsk => _p('Always on. Open a tool with an ask strip and events appear below. Nothing leaves this device.', 'हमेशा चालू। कोई ask strip वाला टूल खोलिए और नीचे घटनाएँ दिखेंगी। कुछ भी इस फ़ोन से बाहर नहीं जाता।');
+  String get uiBothIdsAreRandom => _p('Both ids are random and anonymous - never a hardware identifier. The session id is new each launch; the install id persists, so a completion rate can be counted per mother rather than per view.', 'दोनों id बेतरतीब और गुमनाम हैं — कभी कोई hardware पहचान नहीं। session id हर बार नई बनती है; install id बनी रहती है, ताकि पूरा होने की दर हर बार देखने के बजाय हर माँ के हिसाब से गिनी जा सके।');
+  String get uiMeasuresOurQuestionsNot => _p('This measures our questions, not you: whether a strip is worded well and placed well. It is never used to chase anyone into finishing a profile.', 'यह हमारे सवालों को नापता है, आपको नहीं: कि कोई strip ठीक शब्दों में और ठीक जगह पर है या नहीं। इसका इस्तेमाल कभी किसी को profile पूरा करने के पीछे भगाने के लिए नहीं होता।');
+  String get uiProfileCompleteness => _p('Profile completeness', 'प्रोफ़ाइल कितनी पूरी है');
+  String get uiClear => _p('Clear', 'साफ़ करें');
+  String get uiNoEventsYetOpen => _p('No events yet. Open Symptom Companion, the Weight Tracker, Tests & Scans or the Tools hub — the ask strip fires as soon as it renders.', 'अभी कोई घटना नहीं। लक्षण साथी, वज़न ट्रैकर, टेस्ट व स्कैन या Tools hub खोलिए — ask strip दिखते ही चल जाती है।');
+  String get uiPartnerAccount => _p('Partner account', 'पार्टनर खाता');
+  String get uiInviteFriend => _p('Invite a friend', 'किसी सहेली को बुलाइए');
+  String get uiBothGetFreeConsultation => _p('You both get a free consultation.', 'आप दोनों को एक मुफ़्त परामर्श मिलेगा।');
+  String get uiMemories3 => _p('Memories', 'यादें');
+  String get uiAnnouncePregnancyBabyBeautifully => _p('Announce your pregnancy or baby, beautifully.', 'अपनी गर्भावस्था या शिशु की ख़बर, ख़ूबसूरती से सुनाइए।');
+  String get uiResetWeekTesting => _p('Reset to Week 20 · testing', 'हफ़्ता 20 पर रीसेट · टेस्टिंग');
+  String get uiEnterDoctorModeTesting => _p('Enter doctor mode · testing', 'डॉक्टर मोड में जाइए · टेस्टिंग');
+  String get uiLogAsWhichDoctor => _p('Log in as which doctor?', 'किस डॉक्टर के रूप में लॉग इन करें?');
+  String get uiResetWeekDueDate => _p('Reset to Week 20 - due date & pregnancy map cleared', 'हफ़्ता 20 पर रीसेट — डिलीवरी की तारीख़ और गर्भावस्था का नक़्शा हटा दिया गया');
+  String get uiPairingCodeCopied => _p('Pairing code copied', 'जोड़ने का कोड कॉपी हो गया');
+  String get uiInvitePartner => _p('Invite your partner', 'अपने पार्टनर को जोड़िए');
+  String get uiShareCodeSoPartner => _p('Share this code so your partner can pair with your journey.', 'यह कोड साझा कीजिए ताकि आपके पार्टनर आपके सफ़र से जुड़ सकें।');
+  String get uiShare => _p('Share', 'साझा करें');
+  String get uiCopy => _p('Copy', 'कॉपी करें');
+  String get uiWeeklyGuideRemindersTurn => _p('Weekly guide & reminders. Turn off anytime.', 'साप्ताहिक गाइड और रिमाइंडर। जब चाहें बंद कर दीजिए।');
+  String get uiWeOnlyMessageNumber => _p('We only message this number for updates you turn on.', 'हम इस नंबर पर सिर्फ़ वही अपडेट भेजते हैं जो आप चालू करती हैं।');
+  String get uiOrganisations => _p('ORGANISATIONS', 'संस्थाएँ');
+  String get uiEmployerBenefits => _p('Employer benefits', 'कंपनी की सुविधाएँ');
+  String get uiBirthClub => _p('Birth Club', 'Birth Club');
+  String get uiSetDueDateFirst => _p('Set your due date first', 'पहले अपनी डिलीवरी की तारीख़ डालिए');
+  String get uiFoundingMember => _p('Founding member', 'संस्थापक सदस्य');
+  String get uiExpertQOpen => _p('Expert Q&A is open to you', 'विशेषज्ञ से सवाल-जवाब आपके लिए खुला है');
+  String get uiClubPutsQuestionsSpecialist => _p('Your club puts questions to a specialist monthly.', 'आपका क्लब हर महीने किसी विशेषज्ञ से सवाल पूछता है।');
+  String get uiWhatUnlock => _p('What you unlock', 'आपको क्या मिलता है');
+  String get uiPaste => _p('Paste', 'चिपकाइए');
+  String get uiApplyCode => _p('Apply code', 'कोड लगाइए');
+  String get uiIDoNotHave => _p('I do not have one', 'मेरे पास नहीं है');
+  String get uiInviteFriends => _p('Invite friends', 'सहेलियों को बुलाइए');
+  String get uiGoingThroughNaFriend => _p(
+      'Going through this with\na friend makes it easier',
+      'किसी सहेली के साथ\nयह सफ़र आसान लगता है');
+  String get uiCode => _p('YOUR CODE', 'आपका कोड');
+  String get uiCopyCode => _p('Copy code', 'कोड कॉपी करें');
+  String get uiBirthClub2 => _p('Your Birth Club', 'आपका Birth Club');
+  String get uiInviteMothersDueSame => _p('Invite mothers due the same month as you.', 'उन माँओं को बुलाइए जिनकी डिलीवरी आपके ही महीने है।');
+  String get uiNoInvitesYet => _p('No invites yet', 'अभी कोई निमंत्रण नहीं');
+  String get uiThinkOneFriendWho => _p('Think of one friend who is pregnant too. That is usually all it takes.', 'किसी एक सहेली के बारे में सोचिए जो गर्भवती है। आम तौर पर इतना ही काफ़ी है।');
+  String get uiInvites => _p('Your invites', 'आपके निमंत्रण');
+  String get uiGoingThroughFriend => _p('Going through this with a friend?', 'किसी सहेली के साथ यह सफ़र?');
+  String get uiLovely => _p('Lovely', 'बहुत अच्छा');
+  String get uiTestNotificationSentCheck => _p('Test notification sent - check your tray', 'टेस्ट सूचना भेज दी — अपनी सूचनाओं में देखिए');
+  String get uiSendTestNotificationNow => _p('Send a test notification now', 'अभी एक टेस्ट सूचना भेजिए');
+  String get uiScheduleTestMinFrom => _p('Schedule a test for 1 min from now', '1 मिनट बाद के लिए एक टेस्ट तय कीजिए');
+  String get uiTrustedParentingCompanion => _p('Your trusted parenting companion', 'परवरिश में आपका भरोसेमंद साथी');
+  String get uiAskingVeda => _p('Asking Veda…', 'वेदा से पूछ रहे हैं…');
+  String get uiConnectInternet => _p('Connect to the internet', 'इंटरनेट से जुड़िए');
+  String get uiAskVedaNeedsConnection => _p('Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.', 'आपके हिसाब से और ताज़ा जवाब देने के लिए Ask Veda को इंटरनेट चाहिए। कृपया अपना इंटरनेट जाँचिए और फिर कोशिश कीजिए।');
+  String get uiRetry => _p('Retry', 'फिर कोशिश करें');
+  String get uiVideos => _p('Videos', 'वीडियो');
+  String get uiWeek => _p('WEEK', 'हफ़्ता');
+  String get uiWordSearch => _p('Word Search', 'शब्द खोज');
+  String get uiSudoku => _p('Sudoku', 'सुडोकू');
+  String get uiLogicPuzzle => _p('Logic Puzzle', 'तर्क पहेली');
+  String get uiMemoryMatch => _p('Memory Match', 'याद मिलान');
+  String get uiAnimatedGuideComingSoon => _p('Animated guide - coming soon', 'चलती-फिरती गाइड — जल्द आ रही है');
+  String get uiWhatKegel => _p('What is Kegel?', 'Kegel क्या है?');
+  String get uiWhyShouldIDo => _p('Why should I do Kegel?', 'मैं Kegel क्यों करूँ?');
+  String get uiHowDoKegel => _p('How to do Kegel?', 'Kegel कैसे करें?');
+  String get uiAlarms => _p('Alarms', 'अलार्म');
+  String get uiAddAlarm => _p('Add alarm', 'अलार्म जोड़ें');
+  String get uiAddTime => _p('Add time', 'समय जोड़ें');
+  String get uiAlarmEnabled => _p('Alarm enabled', 'अलार्म चालू');
+  String get uiSaveAlarm => _p('Save alarm', 'अलार्म सेव करें');
+  String get uiEdit => _p('Edit', 'बदलें');
+  String get uiAlarmTitle => _p('Alarm title', 'अलार्म का नाम');
+  String get uiReadyBirth => _p('Ready for Birth', 'जन्म के लिए तैयार');
+  String get uiFourSimpleParts => _p('Four simple parts', 'चार आसान हिस्से');
+  String get uiTapAnyOneContinue => _p('Tap any one to continue — items only appear inside.', 'किसी एक पर टैप कीजिए — चीज़ें अंदर ही दिखती हैं।');
+  String get uiReady => _p('ready', 'तैयार');
+  String get uiEverythingPackedIfBaby => _p('Everything is packed. If your baby comes tonight, you know exactly what to grab.', 'सब पैक है। अगर आपका शिशु आज रात आ जाए, तो आपको ठीक पता है क्या उठाना है।');
+  String get uiLetSPackTogether => _p('Let\'s pack together', 'आइए साथ में पैक करें');
+  String get uiLabourStarted => _p('Labour started?', 'प्रसव शुरू हो गया?');
+  String get uiStartAgain => _p('Start again?', 'फिर से शुरू करें?');
+  String get uiClearsEverythingPackedItems => _p('This clears everything — packed items, anything you set aside, and your product choices — and brings back the full default list. This can\'t be undone.', 'यह सब कुछ हटा देगा — पैक की हुई चीज़ें, जो आपने अलग रखी थीं, और आपकी प्रोडक्ट पसंद — और पूरी शुरुआती सूची वापस ले आएगा। यह वापस नहीं हो सकता।');
+  String get uiCancel3 => _p('Cancel', 'रहने दें');
+  String get uiFreshStartFullList => _p('Fresh start — the full list is back.', 'नई शुरुआत — पूरी सूची वापस आ गई।');
+  String get uiStartAgain2 => _p('Start again', 'फिर से शुरू करें');
+  String get uiNeedOne => _p('Need one?', 'चाहिए?');
+  String get uiIDonTNeed => _p('I don\'t need this', 'मुझे इसकी ज़रूरत नहीं');
+  String get uiNotUs => _p('Not for us', 'हमारे लिए नहीं');
+  String get uiSetAsideNotCounted => _p('Set aside and not counted. Tap to add back any time.', 'अलग रख दिया और गिनती से बाहर। जब चाहें वापस जोड़ लीजिए।');
+  String get uiAddBack => _p('Add back', 'वापस जोड़ें');
+  String get uiHospitalProvidesTheseNo => _p('Your hospital provides these — no need to pack', 'ये आपका अस्पताल देता है — पैक करने की ज़रूरत नहीं');
+  String get uiAddOwn => _p('Add your own', 'अपनी चीज़ जोड़िए');
+  String get uiAddMyBag => _p('Add to my bag', 'मेरे बैग में जोड़िए');
+  String get uiSBigStepDone => _p('That’s a big step done', 'एक बड़ा काम पूरा हुआ');
+  String get uiVeMovedThroughEverything => _p('You’ve moved through everything for now. Come back any time to add the last few things — you’re close.', 'अभी के लिए आप सब देख चुकी हैं। आख़िरी कुछ चीज़ें जोड़ने कभी भी लौट आइए — बस थोड़ा ही बाक़ी है।');
+  String get uiBackMyReadiness => _p('Back to my readiness', 'अपनी तैयारी पर वापस');
+  String get uiFirstTakeBreath => _p('First — take a breath.', 'पहले — एक गहरी साँस लीजिए।');
+  String get uiHaveTimeCallDoctor => _p('You have time. Call your doctor or hospital, then take these with you. Everything else can follow later.', 'आपके पास वक़्त है। अपने डॉक्टर या अस्पताल को फ़ोन कीजिए, फिर ये चीज़ें साथ ले लीजिए। बाक़ी सब बाद में आ सकता है।');
+  String get uiTakeTheseFirst => _p('Take these first', 'ये पहले ले लीजिए');
+  String get uiThenLeaveHospitalVe => _p('Then leave for the hospital. You’ve got this.', 'फिर अस्पताल के लिए निकलिए। आप कर लेंगी।');
+  String get uiPersonaliseBag => _p('Personalise your bag', 'अपना बैग अपने हिसाब से बनाइए');
+  String get uiFewDetailsMakeSuggestions => _p('A few details make the suggestions smarter.', 'कुछ जानकारी से सुझाव और बेहतर हो जाते हैं।');
+  String get uiExpectingTwins => _p('Expecting twins', 'जुड़वाँ की उम्मीद');
+  String get uiWeLlSuggestFew => _p('We’ll suggest a few extras', 'हम कुछ और चीज़ें सुझा देंगे');
+  String get uiHowChoose => _p('How to choose', 'कैसे चुनें');
+  String get uiOurPicks => _p('Our picks', 'हमारी पसंद');
+  String get uiAlsoAvailableElsewhere => _p('Also available elsewhere', 'कहीं और भी उपलब्ध');
+  String get uiPreferStoreKnowThese => _p('Prefer a store you know? These open the shop directly.', 'कोई जाना-पहचाना स्टोर पसंद है? ये सीधे दुकान खोलते हैं।');
+  String get uiIVeAlreadyGot => _p('I\'ve already got one', 'मेरे पास पहले से है');
+  String get uiBestOverall => _p('Best overall', 'सबसे बेहतर');
+  String get uiWhyWeRecommend => _p('Why we recommend it', 'हम इसे क्यों सुझाते हैं');
+  String get uiThingsConsider => _p('Things to consider', 'ध्यान देने की बातें');
+  String get uiPersonalise => _p('Personalise', 'अपने हिसाब से');
+  String get uiWhatWouldLikeAdd => _p('What would you like to add?', 'आप क्या जोड़ना चाहेंगी?');
+  String get uiNothingFilterYet => _p('Nothing in this filter yet.', 'इस फ़िल्टर में अभी कुछ नहीं।');
+  String get uiMedicalDisclaimer => _p('Medical disclaimer', 'मेडिकल सूचना');
+  String get uiWhat => _p('What it is', 'यह क्या है');
+  String get uiWhySDone => _p('Why it\'s done', 'यह क्यों किया जाता है');
+  String get uiWhen => _p('When', 'कब');
+  String get uiPreparation => _p('Preparation', 'तैयारी');
+  String get uiProcedure => _p('Procedure', 'प्रक्रिया');
+  String get uiUnderstandingReportParameters => _p('Understanding your report parameters', 'अपनी रिपोर्ट के मानक समझिए');
+  String get uiHowDoIInterpret => _p('How do I interpret the test results?', 'टेस्ट के नतीजे कैसे समझूँ?');
+  String get uiWhat2 => _p('What is it?', 'यह क्या है?');
+  String get uiWhyDoesHappen => _p('Why does it happen?', 'यह क्यों होता है?');
+  String get uiSymptoms => _p('Symptoms', 'लक्षण');
+  String get uiDiagnosis => _p('Diagnosis', 'निदान');
+  String get uiPregnancyImplications => _p('Pregnancy implications', 'गर्भावस्था पर असर');
+  String get uiManagement => _p('Management', 'सँभाल');
+  String get uiWhenContactDoctor => _p('When to contact your doctor', 'डॉक्टर से कब संपर्क करें');
+  String get uiFaq => _p('FAQ', 'आम सवाल');
+  String get uiWeek2 => _p('Week 6 of 40', 'हफ़्ता 6 / 40');
+  String get uiTrimester => _p('Trimester 1', 'पहली तिमाही');
+  String get uiFeb => _p('12 – 18 FEB', '12 – 18 फ़रवरी');
+  String get uiWeeks => _p('WEEKS', 'हफ़्ते');
+  String get uiWeek3 => _p('THIS WEEK', 'इस हफ़्ते');
+  String get uiHowBigAmI => _p('How big am I?', 'मैं कितना बड़ा हूँ?');
+  String get uiBeatingHeart => _p('THE BEATING HEART', 'धड़कता हुआ दिल');
+  String get uiIAmAboutSize => _p('I am about the size of', 'मैं लगभग इतना बड़ा हूँ');
+  String get uiPomegranateSeed => _p('a pomegranate seed', 'अनार का एक दाना');
+  String get uiHeartNowBeatingRhythmically => _p('Your heart is now beating rhythmically, and major organs are beginning to take shape.', 'शिशु का दिल अब एक लय में धड़क रहा है, और मुख्य अंग आकार लेने लगे हैं।');
+  String get uiMaaMyLittleHeart => _p('“Maa, my little heart is beating steadily and helping me grow stronger every day.”', '“माँ, मेरा नन्हा दिल लगातार धड़क रहा है और हर दिन मुझे और मज़बूत बना रहा है।”');
+  String get uiUpcomingMilestones => _p('Upcoming Milestones', 'आने वाले पड़ाव');
+  String get uiViewFullTimeline => _p('VIEW FULL TIMELINE', 'पूरी टाइमलाइन देखिए');
+  String get uiDailyReadNutrition => _p('DAILY READ · NUTRITION', 'आज का पाठ · पोषण');
+  String get uiSurvivingMorningSickness => _p('Surviving Morning Sickness', 'सुबह की मतली से पार पाना');
+  String get uiEatBeforeFeelHungry => _p('Eat before you feel hungry. An empty stomach often makes nausea worse.', 'भूख लगने से पहले खा लीजिए। ख़ाली पेट अक्सर मतली बढ़ा देता है।');
+  String get uiLength => _p('LENGTH', 'लंबाई');
+  String get uiWeight => _p('WEIGHT', 'वज़न');
+  String get uiTinyFeaturesBegin => _p('Tiny Features Begin', 'नन्हे नक़्श बनने लगे');
+  String get uiOfficiallyBaby => _p('Officially A Baby', 'अब आधिकारिक रूप से शिशु');
+  String get uiFirstTrimesterComplete => _p('First Trimester Complete', 'पहली तिमाही पूरी');
+  String get uiMain => _p('MAIN', 'मुख्य');
+  String get uiList => _p('LIST', 'सूची');
+  String get uiCounters => _p('COUNTERS', 'गिनती');
+  String get uiSettings => _p('SETTINGS', 'सेटिंग');
+  String get uiHowShowUp => _p('HOW TO SHOW UP', 'साथ कैसे दें');
+  String get uiNew => _p('NEW', 'नया');
+  String get uiPlayBabyVoice => _p('Play baby voice', 'शिशु की आवाज़ चलाइए');
+  String get uiFruit => _p('Fruit', 'फल');
+  String get uiBaby => _p('Baby', 'शिशु');
 }

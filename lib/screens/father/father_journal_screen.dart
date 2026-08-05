@@ -19,6 +19,7 @@ import '../../theme/father_skin.dart';
 import '../../widgets/journal/journal_create.dart';
 import '../../widgets/storage_image.dart';
 import '../../theme/pv_fonts.dart';
+import '../../localization/app_language.dart';
 
 class FatherJournalScreen extends StatefulWidget {
   const FatherJournalScreen(
@@ -111,14 +112,14 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('YOUR MEMORIES',
+                      Text(S.now.uiMemories,
                           style: pvJakarta(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.14 * 11,
                               color: kFMuted)),
                       const SizedBox(height: 2),
-                      Text("Father's Journal", style: _serif(21)),
+                      Text(S.now.uiFatherSJournal, style: _serif(21)),
                     ]),
               ),
             ]),
@@ -208,7 +209,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
   }
 
   String _rangeLabel(DateTime a, DateTime b) {
-    String md(DateTime d) => '${d.day} ${_months[d.month - 1]}';
+    String md(DateTime d) => '${d.day} ${S.now.monthShort(d.month)}';
     if (a.year == b.year && a.month == b.month && a.day == b.day) return md(a);
     return '${md(a)} – ${md(b)}';
   }
@@ -251,10 +252,10 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                     color: kFAccent, size: 30),
               ),
               const SizedBox(height: 16),
-              Text('Start your journal', style: _serif(20)),
+              Text(S.now.uiStartJournal, style: _serif(20)),
               const SizedBox(height: 8),
               Text(
-                  'Write a memory, note something for your baby, add a photo or record your voice. It all stays here for you.',
+                  S.now.uiWriteMemoryNoteSomething,
                   textAlign: TextAlign.center,
                   style: _body(13.5, c: kFMuted)),
             ],
@@ -326,7 +327,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                     color: kFAccent,
                     size: 26),
                 const SizedBox(width: 10),
-                Text('Voice note', style: _body(13.5, w: FontWeight.w600)),
+                Text(S.now.uiVoiceNote, style: _body(13.5, w: FontWeight.w600)),
               ]),
             ),
           ),
@@ -348,15 +349,12 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
     }
   }
 
-  static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
+  
   String _dateLabel(DateTime d) {
     final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
     final m = d.minute.toString().padLeft(2, '0');
     final ap = d.hour < 12 ? 'AM' : 'PM';
-    return '${d.day} ${_months[d.month - 1]} ${d.year} · $h:$m $ap';
+    return '${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap';
   }
 }
 
