@@ -56,9 +56,26 @@ def analyze():
     rows = []
     pat = re.compile(r'- ([^ ]+\.dart):(\d+):(\d+) - (\w+)$')
     for line in (out.stdout or '').split('\n'):
-        m = pat.search(line.strip())
+        line = line.strip()
+        m = pat.search(line)
         if not m or m.group(4).lower() not in WANTED:
             continue
+        # DIRECTION MATTERS. argument_type_not_assignable fires both ways:
+        #
+        #   LocalizedText where String is wanted  -> a read site, add .now/.en
+        #   String where LocalizedText is wanted  -> a DATA file that has not
+        #                                            been converted yet
+        #
+        # Only the code was checked once, so the second kind was "fixed" by
+        # appending .now to string literals - producing `.now.now'text'` and
+        # `_t(...).now`, 227 of them across two data files, and a loop that
+        # reported the same count every pass because it never converged.
+        # A data file needs its literals WRAPPED, which is a different job.
+        if "'LocalizedText'" not in line:
+            continue
+        if line.index("'LocalizedText'") > line.index('assigned') \
+                and 'return' not in m.group(4):
+            continue    # LocalizedText is the TARGET type, not the source
         rows.append({'file': m.group(1), 'line': int(m.group(2)),
                      'col': int(m.group(3)), 'code': m.group(4).lower()})
     return rows
@@ -95,6 +112,13 @@ def main():
         by_file.setdefault(r['file'], []).append(r)
 
     for path, items in by_file.items():
+        # NEVER patch a data file. It holds the source content; a type error
+        # there means the MODEL has not widened yet, and appending .now would
+        # resolve a value at its definition - throwing the other language away
+        # at the one place that is supposed to hold both.
+        if '/data/' in path.replace(chr(92), '/'):
+            print(path + ': skipped - widen the model field instead')
+            continue
         suffix = '.en' if path.endswith('veda_index.dart') else '.now'
         src = open(path, encoding='utf-8').read()
         starts = [0]

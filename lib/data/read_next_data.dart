@@ -7,626 +7,667 @@
 // =============================================================================
 
 import '../models/read_item.dart';
+import '../localization/app_language.dart';
 
-const List<ReadItem> kReadItems = [
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
+final List<ReadItem> kReadItems = [
   // ---- Articles ----
   ReadItem(
     id: 'managing_nausea',
     whyThisMatters:
-        'Nausea can quietly wear you down and make eating feel impossible. Knowing it is common, usually harmless, and manageable protects both your comfort and your baby\'s steady nourishment through these early weeks.',
+        _t('Nausea can quietly wear you down and make eating feel impossible. Knowing it is common, usually harmless, and manageable protects both your comfort and your baby\'s steady nourishment through these early weeks.', 'मिचली चुपचाप आपको थका देती है और खाना खाना नामुमकिन-सा लगने लगता है। यह जानना कि यह आम है, आमतौर पर नुकसान नहीं करती और सँभाली जा सकती है, इन शुरुआती हफ़्तों में आपके आराम और शिशु के लगातार पोषण, दोनों को बचाता है।'),
     researchSimplified:
-        'Morning sickness is linked to the rapid rise of pregnancy hormones like hCG. Studies consistently find ginger and vitamin B6 ease mild-to-moderate nausea. It typically peaks around weeks 9–11 and settles by the second trimester for most mothers.',
-    myth: 'Morning sickness only happens in the morning.',
+        _t('Morning sickness is linked to the rapid rise of pregnancy hormones like hCG. Studies consistently find ginger and vitamin B6 ease mild-to-moderate nausea. It typically peaks around weeks 9–11 and settles by the second trimester for most mothers.', 'सुबह की मिचली का नाता hCG जैसे गर्भावस्था के हॉर्मोन के तेज़ी से बढ़ने से है। अध्ययन बार-बार पाते हैं कि अदरक और Vitamin B6 हल्की से मध्यम मिचली को कम करते हैं। यह आमतौर पर 9–11 हफ़्ते के आसपास सबसे तेज़ होती है और ज़्यादातर माँओं में दूसरी तिमाही तक शांत हो जाती है।'),
+    myth: _t('Morning sickness only happens in the morning.', 'सुबह की मिचली सिर्फ़ सुबह ही होती है।'),
     fact:
-        'It can strike at any time of day or night - many mothers feel most queasy in the evening. The name is simply misleading.',
-    title: 'Managing Morning Sickness',
+        _t('It can strike at any time of day or night - many mothers feel most queasy in the evening. The name is simply misleading.', 'यह दिन या रात किसी भी वक़्त आ सकती है — कई माँओं को शाम को सबसे ज़्यादा जी मिचलाता है। नाम ही भ्रम पैदा करता है।'),
+    title: _t('Managing Morning Sickness', 'सुबह की मिचली को सँभालना'),
     type: ReadType.article,
     weekStart: 5,
     weekEnd: 14,
     priority: 'high',
-    reason: 'Nausea is common in the first trimester - small, gentle changes help.',
-    readingTime: '4 min',
-    category: 'Mother Changes',
+    reason: _t('Nausea is common in the first trimester - small, gentle changes help.', 'पहली तिमाही में मिचली आम है — छोटे, नरम बदलाव मदद करते हैं।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Mother Changes', 'माँ में बदलाव'),
     emoji: '🤢',
     body:
-        'Morning sickness affects many mothers in the first trimester, and despite the name it can strike at any time of day.\n\n'
+        _t('Morning sickness affects many mothers in the first trimester, and despite the name it can strike at any time of day.\n\n'
         'Small, frequent meals keep your stomach from getting empty, which often makes nausea worse. Dry foods like toast or crackers before getting out of bed can help. Ginger - in tea, or a little ginger-honey water - is one of the better-studied natural settlers.\n\n'
         'Stay hydrated in small sips, and rest when you can. For most mothers this eases by the second trimester. If you cannot keep fluids down, tell your doctor - there is safe, effective help available.',
+        'पहली तिमाही में कई माँओं को सुबह की मिचली होती है, और नाम के बावजूद यह दिन के किसी भी वक़्त आ सकती है।\n\n'
+        'थोड़ा-थोड़ा और बार-बार खाने से पेट खाली नहीं रहता, और खाली पेट अक्सर मिचली बढ़ा देता है। बिस्तर से उठने से पहले toast या सूखे बिस्किट जैसी चीज़ें मदद करती हैं। अदरक — चाय में, या थोड़े अदरक-शहद के पानी में — सबसे ज़्यादा जाँचे-परखे प्राकृतिक उपायों में से एक है।\n\n'
+        'घूँट-घूँट पानी पीती रहें, और जब मौका मिले आराम करें। ज़्यादातर माँओं में यह दूसरी तिमाही तक कम हो जाती है। अगर पानी भी पेट में नहीं टिक रहा, तो डॉक्टर को बताएँ — सुरक्षित और असरदार मदद मौजूद है।'),
   ),
   ReadItem(
     id: 'first_scan',
     whyThisMatters:
-        'This scan turns an abstract idea into a real, beating heartbeat - and confirms your due date, which shapes every milestone ahead. Knowing what happens removes the nervousness of the unknown.',
+        _t('This scan turns an abstract idea into a real, beating heartbeat - and confirms your due date, which shapes every milestone ahead. Knowing what happens removes the nervousness of the unknown.', 'यह scan एक अनजानी-सी बात को असली, धड़कते दिल में बदल देता है — और आपकी due date पक्की करता है, जिस पर आगे का हर पड़ाव टिका है। क्या होने वाला है यह पता हो तो अनजाने की घबराहट चली जाती है।'),
     researchSimplified:
-        'An early dating scan measures the baby crown-to-rump. Before about 13 weeks this size predicts gestational age more accurately than the date of your last period, which is why your due date may be gently adjusted.',
-    title: 'Your First Scan, Explained',
+        _t('An early dating scan measures the baby crown-to-rump. Before about 13 weeks this size predicts gestational age more accurately than the date of your last period, which is why your due date may be gently adjusted.', 'शुरुआती dating scan में शिशु को सिर से कमर तक नापा जाता है। लगभग 13 हफ़्ते से पहले यह माप, आख़िरी माहवारी की तारीख़ से ज़्यादा सही तरीके से गर्भ की उम्र बताता है — इसीलिए आपकी due date थोड़ी बदल भी सकती है।'),
+    title: _t('Your First Scan, Explained', 'आपका पहला scan, आसान भाषा में'),
     type: ReadType.article,
     weekStart: 7,
     weekEnd: 13,
     priority: 'medium',
-    reason: 'Your early dating scan is around now - here is what to expect.',
-    readingTime: '3 min',
-    category: 'Preparation',
+    reason: _t('Your early dating scan is around now - here is what to expect.', 'आपका शुरुआती dating scan इन्हीं दिनों में है — क्या होगा, यह रहा।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🩻',
     body:
-        'The first scan, often called the dating scan, confirms your due date and checks the early heartbeat.\n\n'
+        _t('The first scan, often called the dating scan, confirms your due date and checks the early heartbeat.\n\n'
         'You may be asked to come with a comfortably full bladder, which helps the image. The scan is painless. Many parents find hearing or seeing the heartbeat a deeply moving first moment.\n\n'
         'Write down any questions beforehand, and remember it is perfectly normal to feel both excited and nervous.',
+        'पहला scan, जिसे अक्सर dating scan कहते हैं, आपकी due date पक्की करता है और शुरुआती धड़कन जाँचता है।\n\n'
+        'आपसे कहा जा सकता है कि पानी पीकर, बिना पेशाब किए आएँ — इससे तस्वीर साफ़ आती है। scan में दर्द नहीं होता। धड़कन सुनना या देखना कई माता-पिता के लिए बेहद भावुक कर देने वाला पहला पल होता है।\n\n'
+        'जो भी सवाल हों, पहले से लिख लें — और याद रखें, उत्साह और घबराहट दोनों एक साथ महसूस होना बिलकुल सामान्य है।'),
   ),
   ReadItem(
     id: 'first_trimester',
     whyThisMatters:
-        'So much of the first trimester is invisible, which can make the exhaustion and worry feel unearned. Understanding the enormous work happening inside lets you rest without guilt.',
+        _t('So much of the first trimester is invisible, which can make the exhaustion and worry feel unearned. Understanding the enormous work happening inside lets you rest without guilt.', 'पहली तिमाही का बहुत कुछ बाहर से दिखता ही नहीं, इसलिए थकान और चिंता बेवजह-सी लगने लगती है। अंदर कितना बड़ा काम चल रहा है, यह समझ लें तो बिना अपराधबोध के आराम कर पाएँगी।'),
     researchSimplified:
-        'By the end of the first trimester all major organs have begun forming and the heart is beating. This is also when the risk of miscarriage falls sharply, which is why many families wait until around 12 weeks to share their news.',
-    title: 'Understanding the First Trimester',
+        _t('By the end of the first trimester all major organs have begun forming and the heart is beating. This is also when the risk of miscarriage falls sharply, which is why many families wait until around 12 weeks to share their news.', 'पहली तिमाही ख़त्म होते-होते सभी बड़े अंग बनने लगते हैं और दिल धड़कने लगता है। यही वह समय है जब गर्भपात का ख़तरा तेज़ी से घटता है — इसीलिए कई परिवार 12 हफ़्ते के आसपास तक ख़बर बाँटने का इंतज़ार करते हैं।'),
+    title: _t('Understanding the First Trimester', 'पहली तिमाही को समझना'),
     type: ReadType.article,
     weekStart: 4,
     weekEnd: 13,
     priority: 'medium',
-    reason: 'So much is happening quietly in these early weeks.',
-    readingTime: '5 min',
-    category: 'Baby Development',
+    reason: _t('So much is happening quietly in these early weeks.', 'इन शुरुआती हफ़्तों में चुपचाप बहुत कुछ हो रहा है।'),
+    readingTime: _t('5 min', '5 मिनट'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '🌱',
     body:
-        'The first trimester is a time of enormous, mostly invisible change. Your baby grows from a tiny cluster of cells to a recognisable form with a beating heart.\n\n'
+        _t('The first trimester is a time of enormous, mostly invisible change. Your baby grows from a tiny cluster of cells to a recognisable form with a beating heart.\n\n'
         'You may feel tired, queasy or emotional - your body is doing remarkable work. Rest is not laziness; it is part of the process. Be gentle with yourself, and know that energy often returns in the second trimester.',
+        'पहली तिमाही बहुत बड़े, पर ज़्यादातर न दिखने वाले बदलावों का समय है। आपका शिशु कोशिकाओं के नन्हे गुच्छे से बढ़कर एक पहचानी जा सकने वाली आकृति बन जाता है, जिसका दिल धड़कता है।\n\n'
+        'थकान, मिचली या भावुकता महसूस हो सकती है — आपका शरीर कमाल का काम कर रहा है। आराम आलस नहीं है, यह इसी सफ़र का हिस्सा है। अपने साथ नरमी बरतें, और जान लें कि दूसरी तिमाही में ऊर्जा अक्सर लौट आती है।'),
   ),
   ReadItem(
     id: 'halfway',
     whyThisMatters:
-        'The halfway mark is a natural moment to pause, celebrate, and gently shift from surviving early symptoms to preparing. First kicks also begin a two-way bond.',
+        _t('The halfway mark is a natural moment to pause, celebrate, and gently shift from surviving early symptoms to preparing. First kicks also begin a two-way bond.', 'आधा रास्ता एक ऐसा पड़ाव है जहाँ रुककर, ख़ुशी मनाकर, शुरुआती तकलीफ़ों से निकलकर धीरे-धीरे तैयारी की ओर बढ़ा जा सकता है। पहली किक से रिश्ता दोतरफ़ा भी हो जाता है।'),
     researchSimplified:
-        'Around week 20 the baby\'s hearing is developing and the detailed anomaly scan checks anatomy. Feeling movement (quickening) typically begins between weeks 18–24, often earlier in second pregnancies.',
-    myth: 'You should be "eating for two" by now.',
+        _t('Around week 20 the baby\'s hearing is developing and the detailed anomaly scan checks anatomy. Feeling movement (quickening) typically begins between weeks 18–24, often earlier in second pregnancies.', '20वें हफ़्ते के आसपास शिशु की सुनने की शक्ति बन रही होती है, और विस्तृत anomaly scan शरीर की बनावट जाँचता है। हलचल महसूस होना (quickening) आमतौर पर 18–24 हफ़्ते के बीच शुरू होता है, दूसरी गर्भावस्था में अक्सर उससे भी पहले।'),
+    myth: _t('You should be "eating for two" by now.', 'अब तक तो आपको "दो लोगों के लिए खाना" चाहिए।'),
     fact:
-        'Most mothers need only about 300 extra calories a day in the second trimester - roughly a glass of milk and a fruit. Quality matters far more than quantity.',
-    title: 'You Are Halfway - What Changes Now',
+        _t('Most mothers need only about 300 extra calories a day in the second trimester - roughly a glass of milk and a fruit. Quality matters far more than quantity.', 'दूसरी तिमाही में ज़्यादातर माँओं को दिन भर में सिर्फ़ करीब 300 अतिरिक्त calories चाहिए — लगभग एक गिलास दूध और एक फल जितनी। मात्रा से कहीं ज़्यादा मायने रखती है गुणवत्ता।'),
+    title: _t('You Are Halfway - What Changes Now', 'आप आधे रास्ते पर हैं — अब क्या बदलता है'),
     type: ReadType.article,
     weekStart: 18,
     weekEnd: 22,
     priority: 'high',
-    reason: 'Around week 20 you reach the halfway point of your journey.',
-    readingTime: '4 min',
-    category: 'Mother Changes',
+    reason: _t('Around week 20 you reach the halfway point of your journey.', '20वें हफ़्ते के आसपास आप अपने सफ़र के आधे रास्ते पर पहुँच जाती हैं।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Mother Changes', 'माँ में बदलाव'),
     emoji: '🌗',
     body:
-        'Reaching the halfway mark is a real milestone. Many mothers feel more energetic now, the bump becomes visible, and the first kicks often arrive.\n\n'
+        _t('Reaching the halfway mark is a real milestone. Many mothers feel more energetic now, the bump becomes visible, and the first kicks often arrive.\n\n'
         'This is a lovely window to connect - talk or sing to your baby, who is beginning to hear sounds. It is also a practical time to start thinking gently about the months ahead, without rushing.',
+        'आधा रास्ता पूरा करना सचमुच एक बड़ा पड़ाव है। कई माँओं को अब ज़्यादा ऊर्जा महसूस होती है, पेट दिखने लगता है, और पहली किक भी अक्सर इसी दौरान आती है।\n\n'
+        'जुड़ने के लिए यह बहुत प्यारा समय है — शिशु से बात करें या गाकर सुनाएँ, वह अब आवाज़ें सुनने लगा है। आने वाले महीनों के बारे में बिना जल्दबाज़ी के, आराम से सोचना शुरू करने का भी यही सही वक़्त है।'),
   ),
   ReadItem(
     id: 'anomaly_scan',
     whyThisMatters:
-        'This is the most detailed look at your baby\'s development you will get. Knowing what is checked - and that most findings are reassuring - helps you go in calm rather than anxious.',
+        _t('This is the most detailed look at your baby\'s development you will get. Knowing what is checked - and that most findings are reassuring - helps you go in calm rather than anxious.', 'आपके शिशु के विकास को इतने विस्तार से देखने का यही सबसे बड़ा मौका है। क्या-क्या जाँचा जाता है — और यह कि ज़्यादातर नतीजे राहत देने वाले होते हैं — पता हो तो आप घबराहट की जगह शांति के साथ जाती हैं।'),
     researchSimplified:
-        'The mid-pregnancy anatomy scan (weeks 18–22) systematically checks the brain, heart, spine, kidneys, limbs and the placenta\'s position. It can detect many structural conditions early enough to plan care.',
-    title: 'Making the Most of the Anomaly Scan',
+        _t('The mid-pregnancy anatomy scan (weeks 18–22) systematically checks the brain, heart, spine, kidneys, limbs and the placenta\'s position. It can detect many structural conditions early enough to plan care.', 'गर्भावस्था के बीच का anatomy scan (18–22 हफ़्ते) सिलसिलेवार तरीके से दिमाग़, दिल, रीढ़, गुर्दे, हाथ-पैर और placenta की जगह जाँचता है। यह बनावट से जुड़ी कई बातें इतनी जल्दी पकड़ लेता है कि इलाज की योजना बनाई जा सके।'),
+    title: _t('Making the Most of the Anomaly Scan', 'Anomaly scan का पूरा फ़ायदा कैसे लें'),
     type: ReadType.article,
     weekStart: 18,
     weekEnd: 22,
     priority: 'high',
-    reason: 'The detailed anatomy scan usually happens around weeks 18–22.',
-    readingTime: '4 min',
-    category: 'Preparation',
+    reason: _t('The detailed anatomy scan usually happens around weeks 18–22.', 'विस्तृत anatomy scan आमतौर पर 18–22 हफ़्ते के आसपास होता है।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🔍',
     body:
-        'The anomaly scan is a detailed look at how your baby is developing - the heart, brain, spine, limbs and organs.\n\n'
+        _t('The anomaly scan is a detailed look at how your baby is developing - the heart, brain, spine, limbs and organs.\n\n'
         'It takes longer than earlier scans. You can usually bring your partner. It is okay to ask the sonographer to explain what they are measuring. If anything needs a closer look, your doctor will guide the next steps calmly - most findings are reassuring.',
+        'Anomaly scan में विस्तार से देखा जाता है कि आपका शिशु कैसे बढ़ रहा है — दिल, दिमाग़, रीढ़, हाथ-पैर और बाकी अंग।\n\n'
+        'यह पहले वाले scan से ज़्यादा वक़्त लेता है। आप आमतौर पर अपने साथी को साथ ला सकती हैं। sonographer से यह पूछना बिलकुल ठीक है कि वे क्या नाप रहे हैं। अगर किसी चीज़ को और ध्यान से देखना हो, तो आपके डॉक्टर आराम से अगला कदम बताएँगे — ज़्यादातर नतीजे राहत देने वाले ही होते हैं।'),
   ),
   ReadItem(
     id: 'baby_sound',
     whyThisMatters:
-        'Your voice is your baby\'s first familiar comfort. A few quiet minutes of talking or singing each day genuinely begins the bond that continues after birth.',
+        _t('Your voice is your baby\'s first familiar comfort. A few quiet minutes of talking or singing each day genuinely begins the bond that continues after birth.', 'आपकी आवाज़ आपके शिशु का पहला जाना-पहचाना सुकून है। रोज़ कुछ शांत मिनट बात करने या गाने में बिताना, वह रिश्ता सचमुच शुरू कर देता है जो जन्म के बाद भी चलता रहता है।'),
     researchSimplified:
-        'The inner ear and hearing pathways mature around weeks 18–25. Studies show newborns prefer their mother\'s voice, and can even recognise songs or stories heard repeatedly in the womb.',
-    title: 'How Babies Begin Responding to Sound',
+        _t('The inner ear and hearing pathways mature around weeks 18–25. Studies show newborns prefer their mother\'s voice, and can even recognise songs or stories heard repeatedly in the womb.', 'भीतरी कान और सुनने के रास्ते 18–25 हफ़्ते के आसपास तैयार हो जाते हैं। अध्ययन बताते हैं कि नवजात अपनी माँ की आवाज़ को सबसे ऊपर रखते हैं, और गर्भ में बार-बार सुने गए गाने या कहानियाँ तक पहचान लेते हैं।'),
+    title: _t('How Babies Begin Responding to Sound', 'शिशु आवाज़ों पर जवाब देना कैसे शुरू करते हैं'),
     type: ReadType.article,
     weekStart: 20,
     weekEnd: 28,
     priority: 'high',
-    reason: 'Your baby is becoming increasingly responsive to sounds during this stage.',
-    readingTime: '5 min',
-    category: 'Baby Development',
+    reason: _t('Your baby is becoming increasingly responsive to sounds during this stage.', 'इस दौर में आपका शिशु आवाज़ों पर पहले से कहीं ज़्यादा जवाब देने लगता है।'),
+    readingTime: _t('5 min', '5 मिनट'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '🎵',
     body:
-        'Around the middle of pregnancy, your baby\'s hearing develops quickly. They begin to pick up sounds - your heartbeat, your voice, and music from the world outside.\n\n'
+        _t('Around the middle of pregnancy, your baby\'s hearing develops quickly. They begin to pick up sounds - your heartbeat, your voice, and music from the world outside.\n\n'
         'This is why talking, reading or singing to your bump is more than sweet ritual: your baby is genuinely starting to recognise the rhythm and tone of familiar voices. A few quiet minutes each day is a beautiful way to begin your bond.',
+        'गर्भावस्था के बीच के दिनों में आपके शिशु की सुनने की शक्ति तेज़ी से बनती है। वह आवाज़ें पकड़ने लगता है — आपके दिल की धड़कन, आपकी आवाज़, और बाहर की दुनिया का संगीत।\n\n'
+        'इसीलिए पेट से बात करना, पढ़कर सुनाना या गाना सिर्फ़ एक प्यारी रस्म नहीं है: आपका शिशु सचमुच जानी-पहचानी आवाज़ों की लय और सुर पहचानने लगता है। रोज़ कुछ शांत मिनट आपके रिश्ते की बहुत सुंदर शुरुआत हैं।'),
   ),
   ReadItem(
     id: 'talking_baby',
     whyThisMatters:
-        'You don\'t need a script or a special time - simply sharing your day lowers your own stress and lays the first thread of connection your baby will recognise at birth.',
+        _t('You don\'t need a script or a special time - simply sharing your day lowers your own stress and lays the first thread of connection your baby will recognise at birth.', 'न कोई तय बातें चाहिए, न कोई ख़ास वक़्त — बस अपने दिन की बात कह देना आपका तनाव कम करता है और उस रिश्ते का पहला धागा बुन देता है जिसे आपका शिशु जन्म के समय पहचान लेगा।'),
     researchSimplified:
-        'Research on prenatal bonding links talking and reading aloud to lower maternal stress hormones, and to newborns\' clear preference for familiar voices soon after birth.',
-    title: 'Talking to Your Baby Before Birth',
+        _t('Research on prenatal bonding links talking and reading aloud to lower maternal stress hormones, and to newborns\' clear preference for familiar voices soon after birth.', 'गर्भ में रिश्ता बनने पर हुए शोध बताते हैं कि बात करने और पढ़कर सुनाने से माँ के तनाव वाले हॉर्मोन कम होते हैं, और जन्म के तुरंत बाद नवजात साफ़ तौर पर जानी-पहचानी आवाज़ों की ओर खिंचते हैं।'),
+    title: _t('Talking to Your Baby Before Birth', 'जन्म से पहले अपने शिशु से बात करना'),
     type: ReadType.article,
     weekStart: 18,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Your voice is becoming familiar to your baby.',
-    readingTime: '3 min',
-    category: 'Emotional Wellbeing',
+    reason: _t('Your voice is becoming familiar to your baby.', 'आपकी आवाज़ आपके शिशु के लिए जानी-पहचानी होती जा रही है।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Emotional Wellbeing', 'मन का सुकून'),
     emoji: '💬',
     body:
-        'You do not need a script. Tell your baby about your day, describe the people who cannot wait to meet them, or simply share what you are feeling.\n\n'
+        _t('You do not need a script. Tell your baby about your day, describe the people who cannot wait to meet them, or simply share what you are feeling.\n\n'
         'These small moments lower your own stress and begin a connection that continues after birth, when your familiar voice becomes an instant comfort.',
+        'कुछ तय करके बोलने की ज़रूरत नहीं। शिशु को अपने दिन के बारे में बताएँ, उन लोगों के बारे में कहें जो उससे मिलने को बेताब हैं, या बस जो महसूस हो रहा है वही कह दें।\n\n'
+        'ये छोटे-छोटे पल आपका अपना तनाव कम करते हैं और एक ऐसा रिश्ता शुरू करते हैं जो जन्म के बाद भी चलता है — तब आपकी जानी-पहचानी आवाज़ पल भर में सुकून बन जाती है।'),
   ),
   ReadItem(
     id: 'back_pain',
     whyThisMatters:
-        'Back comfort shapes your sleep, mood and mobility. Small posture habits now stop the discomfort from taking over your day as the bump grows.',
+        _t('Back comfort shapes your sleep, mood and mobility. Small posture habits now stop the discomfort from taking over your day as the bump grows.', 'पीठ का आराम आपकी नींद, मन और चलने-फिरने तीनों पर असर डालता है। बैठने-उठने की छोटी आदतें अभी बना लें तो पेट बढ़ने पर भी तकलीफ़ पूरे दिन पर हावी नहीं होगी।'),
     researchSimplified:
-        'The hormone relaxin loosens your ligaments and the growing uterus shifts your centre of gravity, straining the lower back. Trials find gentle prenatal exercise and physiotherapy reduce pregnancy back pain safely.',
-    title: 'Easing Back Pain in Pregnancy',
+        _t('The hormone relaxin loosens your ligaments and the growing uterus shifts your centre of gravity, straining the lower back. Trials find gentle prenatal exercise and physiotherapy reduce pregnancy back pain safely.', 'Relaxin हॉर्मोन आपके ligaments को ढीला करता है और बढ़ता हुआ गर्भाशय शरीर का संतुलन आगे खींच देता है, जिससे कमर पर ज़ोर पड़ता है। अध्ययन बताते हैं कि हल्का prenatal व्यायाम और physiotherapy गर्भावस्था के कमर दर्द को सुरक्षित तरीके से कम करते हैं।'),
+    title: _t('Easing Back Pain in Pregnancy', 'गर्भावस्था में कमर दर्द को कम करना'),
     type: ReadType.article,
     weekStart: 20,
     weekEnd: 36,
     priority: 'medium',
-    reason: 'As the bump grows, back comfort becomes more important.',
-    readingTime: '3 min',
-    category: 'Mother Changes',
+    reason: _t('As the bump grows, back comfort becomes more important.', 'पेट बढ़ने के साथ पीठ का आराम और ज़्यादा मायने रखने लगता है।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Mother Changes', 'माँ में बदलाव'),
     emoji: '🧘',
     body:
-        'A growing bump shifts your posture and can strain your lower back. Gentle prenatal yoga, a supportive pillow, warm (not hot) compresses, and being mindful of how you sit and lift all help.\n\n'
+        _t('A growing bump shifts your posture and can strain your lower back. Gentle prenatal yoga, a supportive pillow, warm (not hot) compresses, and being mindful of how you sit and lift all help.\n\n'
         'Avoid standing for very long stretches, and bend at the knees. If pain is severe or sudden, mention it to your doctor.',
+        'बढ़ता पेट आपके बैठने-खड़े होने का ढंग बदल देता है और कमर पर ज़ोर डाल सकता है। हल्का prenatal योग, सहारा देने वाला तकिया, गुनगुनी (गर्म नहीं) सिकाई, और बैठते-उठाते वक़्त थोड़ा ध्यान — ये सब मदद करते हैं।\n\n'
+        'बहुत देर तक खड़े रहने से बचें, और झुकते समय घुटनों से झुकें। दर्द तेज़ हो या अचानक हो, तो अपने डॉक्टर को बताएँ।'),
   ),
   ReadItem(
     id: 'nutrition_t2',
     whyThisMatters:
-        'With nausea easing, this is the window to build the iron, calcium and protein stores your baby draws on for rapid growth - nourishing you both.',
+        _t('With nausea easing, this is the window to build the iron, calcium and protein stores your baby draws on for rapid growth - nourishing you both.', 'मिचली कम होने के साथ यही वह समय है जब Iron, Calcium और protein का भंडार बनाया जा सके, जिससे आपका शिशु तेज़ी से बढ़ता है — और आप दोनों को पोषण मिलता है।'),
     researchSimplified:
-        'Iron needs rise sharply in the second trimester to support the baby\'s blood supply, and adequate calcium protects your own bones. Balanced meals plus prescribed supplements meet these needs.',
-    myth: 'You need to eat twice as much now.',
+        _t('Iron needs rise sharply in the second trimester to support the baby\'s blood supply, and adequate calcium protects your own bones. Balanced meals plus prescribed supplements meet these needs.', 'दूसरी तिमाही में Iron की ज़रूरत तेज़ी से बढ़ती है ताकि शिशु का ख़ून बनता रहे, और पर्याप्त Calcium आपकी अपनी हड्डियों को बचाता है। संतुलित खाना और डॉक्टर के बताए supplements मिलकर यह ज़रूरत पूरी कर देते हैं।'),
+    myth: _t('You need to eat twice as much now.', 'अब आपको दोगुना खाना पड़ेगा।'),
     fact:
-        'Quality outweighs quantity. A modest ~300 extra calories of nutrient-dense food supports your baby better than simply eating more.',
-    title: 'Eating Well in the Second Trimester',
+        _t('Quality outweighs quantity. A modest ~300 extra calories of nutrient-dense food supports your baby better than simply eating more.', 'मात्रा से ज़्यादा मायने रखती है गुणवत्ता। पोषण से भरे खाने की करीब 300 अतिरिक्त calories, यूँ ही ज़्यादा खा लेने से कहीं बेहतर सहारा देती हैं।'),
+    title: _t('Eating Well in the Second Trimester', 'दूसरी तिमाही में अच्छा खाना'),
     type: ReadType.article,
     weekStart: 14,
     weekEnd: 27,
     priority: 'medium',
-    reason: 'Your appetite often returns now - a good time to nourish well.',
-    readingTime: '4 min',
-    category: 'Nutrition',
+    reason: _t('Your appetite often returns now - a good time to nourish well.', 'भूख अक्सर अब लौटती है — अच्छे पोषण के लिए यही सही समय है।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Nutrition', 'पोषण'),
     emoji: '🥗',
     body:
-        'With nausea easing, the second trimester is a great time to focus on balanced, nourishing meals - iron-rich greens and dal, calcium from dairy, fruit, and steady hydration.\n\n'
+        _t('With nausea easing, the second trimester is a great time to focus on balanced, nourishing meals - iron-rich greens and dal, calcium from dairy, fruit, and steady hydration.\n\n'
         'You do not need to eat for two; quality matters more than quantity. Keep taking your prescribed supplements, and enjoy your food.',
+        'मिचली कम होने के साथ, दूसरी तिमाही संतुलित और पोषण भरे खाने पर ध्यान देने का बहुत अच्छा समय है — Iron से भरी हरी सब्ज़ियाँ और दाल, दूध-दही से Calcium, फल, और दिन भर पानी।\n\n'
+        'दो लोगों के लिए खाने की ज़रूरत नहीं है, मात्रा से ज़्यादा गुणवत्ता मायने रखती है। डॉक्टर के बताए supplements लेती रहें, और खाने का आनंद लें।'),
   ),
   ReadItem(
     id: 'third_tri_prep',
     whyThisMatters:
-        'A gentle heads-up lets you pace preparation calmly, rather than scrambling when energy dips and the bump slows you down.',
+        _t('A gentle heads-up lets you pace preparation calmly, rather than scrambling when energy dips and the bump slows you down.', 'पहले से थोड़ी जानकारी हो तो तैयारी आराम से, अपनी रफ़्तार में हो जाती है — बजाय इसके कि ऊर्जा घटने और पेट भारी होने पर आपाधापी मचे।'),
     researchSimplified:
-        'In the third trimester the baby gains most of its birth weight and the lungs and brain mature rapidly. Growth scans and, if needed, birth planning usually begin around this stage.',
-    title: 'Getting Ready for the Third Trimester',
+        _t('In the third trimester the baby gains most of its birth weight and the lungs and brain mature rapidly. Growth scans and, if needed, birth planning usually begin around this stage.', 'तीसरी तिमाही में शिशु अपना ज़्यादातर जन्म-वज़न बढ़ाता है, और फेफड़े व दिमाग़ तेज़ी से तैयार होते हैं। Growth scan और, ज़रूरत हो तो, प्रसव की योजना आमतौर पर इसी दौर में शुरू होती है।'),
+    title: _t('Getting Ready for the Third Trimester', 'तीसरी तिमाही की तैयारी'),
     type: ReadType.article,
     weekStart: 24,
     weekEnd: 30,
     priority: 'medium',
-    reason: 'The third trimester is coming up - a gentle heads-up helps.',
-    readingTime: '4 min',
-    category: 'Preparation',
+    reason: _t('The third trimester is coming up - a gentle heads-up helps.', 'तीसरी तिमाही आने वाली है — थोड़ी पहले से जानकारी काम आती है।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🗓️',
     body:
-        'The third trimester brings a bigger bump, more movement, and the first thoughts of birth. Energy can dip again, and rest becomes important.\n\n'
+        _t('The third trimester brings a bigger bump, more movement, and the first thoughts of birth. Energy can dip again, and rest becomes important.\n\n'
         'There is no need to rush - but knowing what is ahead, from growth scans to birth planning, helps you feel calm and prepared.',
+        'तीसरी तिमाही में पेट और बड़ा होता है, हलचल बढ़ती है, और प्रसव के बारे में पहले ख़याल आने लगते हैं। ऊर्जा फिर से कम हो सकती है, और आराम ज़रूरी हो जाता है।\n\n'
+        'जल्दबाज़ी की कोई ज़रूरत नहीं — पर आगे क्या है, growth scan से लेकर प्रसव की योजना तक, यह पता होना आपको शांत और तैयार महसूस कराता है।'),
   ),
   ReadItem(
     id: 'movement_awareness',
     whyThisMatters:
-        'Getting to know your baby\'s normal movement pattern now is the foundation for one of the simplest, most powerful ways to check on their wellbeing later.',
+        _t('Getting to know your baby\'s normal movement pattern now is the foundation for one of the simplest, most powerful ways to check on their wellbeing later.', 'अभी अपने शिशु की हलचल का सामान्य ढर्रा पहचान लेना, आगे चलकर उसकी सेहत जाँचने के सबसे आसान और सबसे भरोसेमंद तरीकों में से एक की नींव है।'),
     researchSimplified:
-        'There is no fixed "normal" number of kicks - what matters is your baby\'s individual pattern. Guidance advises getting to know it and reporting any clear reduction, rather than counting to a set target.',
-    title: 'Preparing for Baby Movement Awareness',
+        _t('There is no fixed "normal" number of kicks - what matters is your baby\'s individual pattern. Guidance advises getting to know it and reporting any clear reduction, rather than counting to a set target.', 'किक की कोई तय "सामान्य" गिनती नहीं होती — मायने आपके अपने शिशु का ढर्रा रखता है। सलाह यही है कि उसे पहचानें और साफ़ तौर पर कम होने पर बताएँ, न कि किसी तय आँकड़े तक गिनती करें।'),
+    title: _t('Preparing for Baby Movement Awareness', 'शिशु की हलचल पहचानने की तैयारी'),
     type: ReadType.article,
     weekStart: 24,
     weekEnd: 30,
     priority: 'medium',
-    reason: 'Tracking your baby\'s movements becomes important soon.',
-    readingTime: '3 min',
-    category: 'Baby Development',
+    reason: _t('Tracking your baby\'s movements becomes important soon.', 'आपके शिशु की हलचल पर नज़र रखना जल्द ही ज़रूरी हो जाएगा।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '👣',
     body:
-        'As you move through pregnancy, you will get to know your baby\'s unique pattern of movement. Later on, noticing changes in that pattern becomes an important way to check on their wellbeing.\n\n'
+        _t('As you move through pregnancy, you will get to know your baby\'s unique pattern of movement. Later on, noticing changes in that pattern becomes an important way to check on their wellbeing.\n\n'
         'For now, simply enjoy getting familiar with when and how your baby likes to move.',
+        'गर्भावस्था आगे बढ़ने के साथ आप अपने शिशु की हलचल का अपना ही ढर्रा पहचानने लगेंगी। आगे चलकर उस ढर्रे में बदलाव को भाँप लेना, उसकी सेहत जाँचने का एक अहम तरीका बन जाता है।\n\n'
+        'फ़िलहाल बस यह जानने का आनंद लें कि आपका शिशु कब और कैसे हिलना-डुलना पसंद करता है।'),
   ),
   ReadItem(
     id: 'partner_support',
     whyThisMatters:
-        'Feeling supported measurably lowers stress and lifts wellbeing for both you and your baby. Sharing this helps your partner know exactly how to help.',
+        _t('Feeling supported measurably lowers stress and lifts wellbeing for both you and your baby. Sharing this helps your partner know exactly how to help.', 'साथ मिलने का एहसास तनाव सचमुच कम करता है और आपकी व शिशु दोनों की सेहत को बेहतर करता है। यह साझा करने से आपके साथी को साफ़ पता चलेगा कि मदद कैसे करनी है।'),
     researchSimplified:
-        'Studies consistently link strong partner support in pregnancy with lower maternal stress, better mental health, and improved birth outcomes.',
-    title: 'How Your Partner Can Support You Now',
+        _t('Studies consistently link strong partner support in pregnancy with lower maternal stress, better mental health, and improved birth outcomes.', 'अध्ययन बार-बार जोड़ते हैं कि गर्भावस्था में साथी का मज़बूत साथ माँ का तनाव कम करता है, मन की सेहत बेहतर रखता है, और प्रसव के नतीजे भी बेहतर होते हैं।'),
+    title: _t('How Your Partner Can Support You Now', 'आपका साथी अभी आपका सहारा कैसे बन सकता है'),
     type: ReadType.article,
     weekStart: 12,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Support makes the journey lighter - share this with your partner.',
-    readingTime: '3 min',
-    category: 'Partner Support',
+    reason: _t('Support makes the journey lighter - share this with your partner.', 'साथ मिलने से सफ़र हल्का हो जाता है — यह अपने साथी के साथ बाँटें।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Partner Support', 'साथी का साथ'),
     emoji: '🤝',
     body:
-        'Partners often want to help but are not sure how. Small, specific acts matter most: coming to scans, taking a task off your plate, listening without trying to fix, and learning alongside you.\n\n'
+        _t('Partners often want to help but are not sure how. Small, specific acts matter most: coming to scans, taking a task off your plate, listening without trying to fix, and learning alongside you.\n\n'
         'Becoming a parent is a shared journey - and feeling supported is good for both you and your baby.',
+        'साथी अक्सर मदद करना चाहते हैं, पर समझ नहीं पाते कैसे। छोटी और साफ़ बातें सबसे ज़्यादा मायने रखती हैं: scan पर साथ आना, एक काम अपने ज़िम्मे ले लेना, हल सुझाए बिना बस सुनना, और आपके साथ-साथ सीखना।\n\n'
+        'माता-पिता बनना एक साझा सफ़र है — और साथ मिलने का एहसास आपके और आपके शिशु, दोनों के लिए अच्छा है।'),
   ),
   ReadItem(
     id: 'hospital_bag',
     whyThisMatters:
-        'Packing early trades last-minute panic for calm. When labour begins, everything you and your baby need is simply ready to go.',
+        _t('Packing early trades last-minute panic for calm. When labour begins, everything you and your baby need is simply ready to go.', 'बैग पहले से तैयार कर लेने पर आख़िरी वक़्त की घबराहट की जगह सुकून मिलता है। जब प्रसव शुरू हो, तब आपकी और शिशु की हर ज़रूरत बस तैयार रखी होती है।'),
     researchSimplified:
-        'Labour can begin any time from around week 37 (full term). Having essentials ready by then is why antenatal guidance suggests packing in the mid-third trimester.',
-    title: 'Preparing Your Hospital Bag',
+        _t('Labour can begin any time from around week 37 (full term), Having essentials ready by then is why antenatal guidance suggests packing in the mid-third trimester.', 'प्रसव 37वें हफ़्ते (पूरा समय) के आसपास कभी भी शुरू हो सकता है। इसीलिए सलाह दी जाती है कि तीसरी तिमाही के बीच तक ज़रूरी सामान बाँधकर रख लें।'),
+    title: _t('Preparing Your Hospital Bag', 'अपना अस्पताल बैग तैयार करना'),
     type: ReadType.article,
     weekStart: 32,
     weekEnd: 40,
     priority: 'high',
-    reason: 'You are entering the final weeks before delivery.',
-    readingTime: '4 min',
-    category: 'Preparation',
+    reason: _t('You are entering the final weeks before delivery.', 'आप प्रसव से पहले के आख़िरी हफ़्तों में पहुँच रही हैं।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🧳',
     body:
-        'Packing your bag a few weeks early brings real peace of mind. Think in three parts: things for labour, things for after delivery, and things for your baby.\n\n'
+        _t('Packing your bag a few weeks early brings real peace of mind. Think in three parts: things for labour, things for after delivery, and things for your baby.\n\n'
         'ParentVeda\'s Hospital Bag planner can build the full checklist for you - this is a good time to start it.',
+        'कुछ हफ़्ते पहले बैग बाँध लेना सचमुच मन को शांत रखता है। तीन हिस्सों में सोचें: प्रसव के लिए सामान, प्रसव के बाद के लिए सामान, और शिशु के लिए सामान।\n\n'
+        'ParentVeda का Hospital Bag planner आपके लिए पूरी सूची बना सकता है — इसे शुरू करने का यही सही समय है।'),
   ),
   ReadItem(
     id: 'labour_prep',
     whyThisMatters:
-        'Fear of the unknown makes labour harder. Understanding the stages replaces dread with confidence, so you know what is happening and when to head in.',
+        _t('Fear of the unknown makes labour harder. Understanding the stages replaces dread with confidence, so you know what is happening and when to head in.', 'अनजाने का डर प्रसव को और मुश्किल बना देता है। चरणों को समझ लेने पर डर की जगह भरोसा आ जाता है — आपको पता होता है कि क्या हो रहा है और कब अस्पताल निकलना है।'),
     researchSimplified:
-        'Labour unfolds in three stages - dilation, delivery of the baby, and delivery of the placenta. Evidence links continuous support and understanding of the process with calmer, more positive birth experiences.',
-    title: 'Labour, Step by Step',
+        _t('Labour unfolds in three stages - dilation, delivery of the baby, and delivery of the placenta. Evidence links continuous support and understanding of the process with calmer, more positive birth experiences.', 'प्रसव तीन चरणों में होता है — गर्भाशय का मुँह खुलना, शिशु का जन्म, और placenta का बाहर आना। प्रमाण बताते हैं कि लगातार साथ और प्रक्रिया की समझ, प्रसव के अनुभव को शांत और बेहतर बनाते हैं।'),
+    title: _t('Labour, Step by Step', 'प्रसव, कदम दर कदम'),
     type: ReadType.article,
     weekStart: 34,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Knowing the stages of labour helps you feel calmer.',
-    readingTime: '6 min',
-    category: 'Preparation',
+    reason: _t('Knowing the stages of labour helps you feel calmer.', 'प्रसव के चरण जान लेने से मन ज़्यादा शांत रहता है।'),
+    readingTime: _t('6 min', '6 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🌅',
     body:
-        'Labour usually unfolds in stages, often more gradually than films suggest. Understanding early signs, when to head in, and what each stage feels like can replace fear with confidence.\n\n'
+        _t('Labour usually unfolds in stages, often more gradually than films suggest. Understanding early signs, when to head in, and what each stage feels like can replace fear with confidence.\n\n'
         'Your birth plan is a guide, not a rulebook - staying flexible and trusting your care team matters most.',
+        'प्रसव आमतौर पर चरणों में होता है, और अक्सर फ़िल्मों में दिखाए जाने से कहीं धीरे-धीरे। शुरुआती संकेत, कब निकलना है, और हर चरण कैसा महसूस होता है — यह समझ लेना डर की जगह भरोसा दे देता है।\n\n'
+        'आपकी birth plan एक राह है, नियमों की किताब नहीं — लचीला रहना और अपनी care team पर भरोसा रखना सबसे ज़्यादा मायने रखता है।'),
   ),
   ReadItem(
     id: 'first_24h',
     whyThisMatters:
-        'Knowing the first day is a blur of sleepy firsts sets gentle expectations, so you can rest and bond rather than worry that something is wrong.',
+        _t('Knowing the first day is a blur of sleepy firsts sets gentle expectations, so you can rest and bond rather than worry that something is wrong.', 'पहला दिन नींद भरे पहले-पहले पलों की एक धुँधली-सी झलक होता है — यह पता हो तो उम्मीदें नरम रहती हैं, और आप कुछ गड़बड़ होने की चिंता करने के बजाय आराम कर पाती हैं और रिश्ता बना पाती हैं।'),
     researchSimplified:
-        'Immediate skin-to-skin contact and early feeding support bonding, temperature regulation and breastfeeding. Newborns are often very sleepy in the first 24 hours, which is entirely normal.',
-    title: 'The First 24 Hours After Birth',
+        _t('Immediate skin-to-skin contact and early feeding support bonding, temperature regulation and breastfeeding. Newborns are often very sleepy in the first 24 hours, which is entirely normal.', 'जन्म के तुरंत बाद त्वचा से त्वचा का स्पर्श और जल्दी दूध पिलाना, रिश्ते, शरीर के तापमान और स्तनपान — तीनों में मदद करते हैं। नवजात पहले 24 घंटों में अक्सर बहुत नींद में रहते हैं, और यह बिलकुल सामान्य है।'),
+    title: _t('The First 24 Hours After Birth', 'जन्म के बाद के पहले 24 घंटे'),
     type: ReadType.article,
     weekStart: 36,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'A gentle picture of what the first day with your baby looks like.',
-    readingTime: '5 min',
-    category: 'Preparation',
+    reason: _t('A gentle picture of what the first day with your baby looks like.', 'शिशु के साथ पहला दिन कैसा होता है, उसकी एक नरम-सी झलक।'),
+    readingTime: _t('5 min', '5 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '👶',
     body:
-        'The first day is a blur of firsts - skin-to-skin, the first feed, tiny checks by the team. Your baby may be sleepy, and that is normal.\n\n'
+        _t('The first day is a blur of firsts - skin-to-skin, the first feed, tiny checks by the team. Your baby may be sleepy, and that is normal.\n\n'
         'Rest whenever you can, accept help, and know that you and your baby are learning each other. There is no need to have everything figured out at once.',
+        'पहला दिन पहले-पहले पलों की धुँधली-सी लड़ी होता है — त्वचा से त्वचा का स्पर्श, पहला दूध, टीम की छोटी-छोटी जाँचें। आपका शिशु नींद में हो सकता है, और यह सामान्य है।\n\n'
+        'जब भी मौका मिले आराम करें, मदद लेने में झिझकें नहीं, और याद रखें कि आप और आपका शिशु एक-दूसरे को सीख रहे हैं। सब कुछ एक ही बार में समझ लेने की कोई ज़रूरत नहीं।'),
   ),
 
   // ---- Research summaries ----
   ReadItem(
     id: 'res_voices',
     whyThisMatters:
-        'It is a lovely, evidence-backed reason to talk and read aloud now - you are already building a comfort your newborn will reach for.',
+        _t('It is a lovely, evidence-backed reason to talk and read aloud now - you are already building a comfort your newborn will reach for.', 'अभी बात करने और पढ़कर सुनाने की यह एक प्यारी, प्रमाण पर टिकी वजह है — आप अभी से वह सुकून बना रही हैं जिसकी ओर आपका नवजात जाएगा।'),
     researchSimplified:
-        'In the final months, babies can hear and begin recognising frequently-heard voices - especially the mother\'s. After birth, newborns turn toward and are soothed by these familiar voices.',
-    title: 'Babies Recognise Familiar Voices Before Birth',
+        _t('In the final months, babies can hear and begin recognising frequently-heard voices - especially the mother\'s. After birth, newborns turn toward and are soothed by these familiar voices.', 'आख़िरी महीनों में शिशु सुन सकते हैं और बार-बार सुनी आवाज़ें पहचानने लगते हैं — ख़ासकर माँ की। जन्म के बाद नवजात इन जानी-पहचानी आवाज़ों की ओर मुड़ते हैं और उनसे शांत हो जाते हैं।'),
+    title: _t('Babies Recognise Familiar Voices Before Birth', 'शिशु जन्म से पहले ही जानी-पहचानी आवाज़ें पहचान लेते हैं'),
     type: ReadType.research,
     weekStart: 20,
     weekEnd: 32,
     priority: 'high',
-    reason: 'Your baby is increasingly able to hear sounds around this stage.',
-    readingTime: '2 min',
-    category: 'Baby Development',
+    reason: _t('Your baby is increasingly able to hear sounds around this stage.', 'इस दौर में आपका शिशु आवाज़ें पहले से कहीं बेहतर सुनने लगता है।'),
+    readingTime: _t('2 min', '2 मिनट'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '🔬',
     body:
-        'Research suggests that in the later months, babies begin to recognise voices and sounds they hear often - especially their mother\'s.\n\n'
+        _t('Research suggests that in the later months, babies begin to recognise voices and sounds they hear often - especially their mother\'s.\n\n'
         'After birth, newborns tend to turn toward familiar voices and can be soothed by them. It is a lovely reason to talk and read aloud now.',
+        'शोध बताते हैं कि आख़िरी महीनों में शिशु उन आवाज़ों और ध्वनियों को पहचानने लगते हैं जो वे अक्सर सुनते हैं — ख़ासकर अपनी माँ की।\n\n'
+        'जन्म के बाद नवजात जानी-पहचानी आवाज़ों की ओर मुड़ते हैं और उनसे शांत हो जाते हैं। अभी बात करने और पढ़कर सुनाने की यह बहुत प्यारी वजह है।'),
   ),
   ReadItem(
     id: 'res_music',
     whyThisMatters:
-        'It frees you from any pressure to find a "brain-boosting" playlist. What helps your baby is simply what helps you relax.',
+        _t('It frees you from any pressure to find a "brain-boosting" playlist. What helps your baby is simply what helps you relax.', 'यह आपको किसी "दिमाग़ तेज़ करने वाली" playlist ढूँढ़ने के दबाव से आज़ाद कर देता है। जो आपको सुकून देता है, वही आपके शिशु के काम आता है।'),
     researchSimplified:
-        'Reviews of music in pregnancy find the main benefit is maternal relaxation, which the baby shares. There is no evidence that any particular music makes babies smarter.',
-    myth: 'Playing classical music to your bump makes your baby smarter.',
+        _t('Reviews of music in pregnancy find the main benefit is maternal relaxation, which the baby shares. There is no evidence that any particular music makes babies smarter.', 'गर्भावस्था में संगीत पर हुई समीक्षाएँ बताती हैं कि सबसे बड़ा फ़ायदा माँ का सुकून है, जो शिशु तक भी पहुँचता है। ऐसा कोई प्रमाण नहीं कि किसी ख़ास संगीत से शिशु ज़्यादा तेज़ बनते हैं।'),
+    myth: _t('Playing classical music to your bump makes your baby smarter.', 'पेट के पास classical संगीत बजाने से शिशु ज़्यादा तेज़ बनता है।'),
     fact:
-        'There is no good evidence for a "Mozart effect" in the womb. The real benefit is that calming music relaxes you, and that calm is shared with your baby.',
-    title: 'What Research Says About Music and the Womb',
+        _t('There is no good evidence for a "Mozart effect" in the womb. The real benefit is that calming music relaxes you, and that calm is shared with your baby.', 'गर्भ में "Mozart effect" जैसा कुछ होने का कोई ठोस प्रमाण नहीं है। असली फ़ायदा यह है कि शांत संगीत आपको सुकून देता है, और वह सुकून आपके शिशु तक पहुँचता है।'),
+    title: _t('What Research Says About Music and the Womb', 'संगीत और गर्भ के बारे में शोध क्या कहता है'),
     type: ReadType.research,
     weekStart: 18,
     weekEnd: 36,
     priority: 'medium',
-    reason: 'Gentle sound and music can be calming for you and your baby.',
-    readingTime: '3 min',
-    category: 'Baby Development',
+    reason: _t('Gentle sound and music can be calming for you and your baby.', 'कोमल आवाज़ और संगीत आपको और आपके शिशु, दोनों को शांत कर सकते हैं।'),
+    readingTime: _t('3 min', '3 मिनट'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '🎶',
     body:
-        'Studies on music in pregnancy point to a simple, reassuring idea: calm, gentle sound is soothing - mostly because it helps the mother relax, and that calm is shared.\n\n'
+        _t('Studies on music in pregnancy point to a simple, reassuring idea: calm, gentle sound is soothing - mostly because it helps the mother relax, and that calm is shared.\n\n'
         'There is no magic playlist that makes babies smarter. Choose what relaxes you.',
+        'गर्भावस्था में संगीत पर हुए अध्ययन एक सीधी, राहत देने वाली बात कहते हैं: शांत, कोमल आवाज़ सुकून देती है — ज़्यादातर इसलिए कि इससे माँ को आराम मिलता है, और वह शांति शिशु तक भी पहुँचती है।\n\n'
+        'ऐसी कोई जादुई playlist नहीं है जो शिशु को ज़्यादा तेज़ बना दे। वही चुनें जो आपको सुकून दे।'),
   ),
   ReadItem(
     id: 'res_stress',
     whyThisMatters:
-        'You do not need to be perfectly serene - but small, repeated calming habits genuinely support both your wellbeing and your baby\'s.',
+        _t('You do not need to be perfectly serene - but small, repeated calming habits genuinely support both your wellbeing and your baby\'s.', 'पूरी तरह शांत रहना ज़रूरी नहीं — पर सुकून देने वाली छोटी आदतें, बार-बार दोहराई जाएँ तो आपकी और आपके शिशु की सेहत, दोनों को सचमुच सहारा देती हैं।'),
     researchSimplified:
-        'Occasional stress is normal and harmless. Research links only high, sustained stress with pregnancy risks, and finds simple habits - rest, breathing, connection and support - effective at easing it.',
-    title: 'Calm Matters: Stress and Pregnancy',
+        _t('Occasional stress is normal and harmless. Research links only high, sustained stress with pregnancy risks, and finds simple habits - rest, breathing, connection and support - effective at easing it.', 'कभी-कभी का तनाव सामान्य है और नुकसान नहीं करता। शोध सिर्फ़ लंबे समय तक बने रहने वाले भारी तनाव को गर्भावस्था के ख़तरों से जोड़ते हैं, और पाते हैं कि आसान आदतें — आराम, साँस, अपनों का साथ और मदद — इसे कम करने में असरदार हैं।'),
+    title: _t('Calm Matters: Stress and Pregnancy', 'सुकून मायने रखता है: तनाव और गर्भावस्था'),
     type: ReadType.research,
     weekStart: 6,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Looking after your own calm is good for your baby too.',
-    readingTime: '2 min',
-    category: 'Emotional Wellbeing',
+    reason: _t('Looking after your own calm is good for your baby too.', 'अपने सुकून का ध्यान रखना आपके शिशु के लिए भी अच्छा है।'),
+    readingTime: _t('2 min', '2 मिनट'),
+    category: _t('Emotional Wellbeing', 'मन का सुकून'),
     emoji: '🌿',
     body:
-        'Some stress in pregnancy is completely normal. What research highlights is the value of everyday calming habits - rest, breathing, connection, and asking for support.\n\n'
+        _t('Some stress in pregnancy is completely normal. What research highlights is the value of everyday calming habits - rest, breathing, connection, and asking for support.\n\n'
         'You do not need to be perfectly serene. Small moments of calm, repeated, are what matter.',
+        'गर्भावस्था में थोड़ा तनाव बिलकुल सामान्य है। शोध जिस बात पर ज़ोर देते हैं वह है रोज़ की सुकून देने वाली आदतों की क़ीमत — आराम, साँस, अपनों से जुड़ाव, और मदद माँग लेना।\n\n'
+        'पूरी तरह शांत रहना ज़रूरी नहीं। सुकून के छोटे-छोटे पल, बार-बार — यही मायने रखते हैं।'),
   ),
 
   // ---- Books ----
   ReadItem(
     id: 'book_what_to_expect',
-    title: 'What to Expect When You\'re Expecting',
+    title: _t('What to Expect When You\'re Expecting', 'What to Expect When You\'re Expecting'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 44,
     reason:
-        'A calm, month-by-month reference for the 2 a.m. question every expectant parent asks — "is this normal?" — useful right through pregnancy and the fourth trimester.',
-    readingTime: '8 min',
-    category: 'Pregnancy Guide',
+        _t('A calm, month-by-month reference for the 2 a.m. question every expectant parent asks — "is this normal?" — useful right through pregnancy and the fourth trimester.', 'हर होने वाले माता-पिता के रात 2 बजे वाले सवाल — "क्या यह सामान्य है?" — का शांत, महीने-दर-महीने जवाब देने वाली किताब, जो पूरी गर्भावस्था और चौथी तिमाही तक काम आती है।'),
+    readingTime: _t('8 min', '8 मिनट'),
+    category: _t('Pregnancy Guide', 'गर्भावस्था गाइड'),
     emoji: '📖',
     author: 'Heidi Murkoff',
     why:
-        'The classic month-by-month pregnancy reference — reassuring, practical, and honest about when to actually worry. Best used as a patient companion you consult by symptom and stage, not read cover to cover.',
+        _t('The classic month-by-month pregnancy reference — reassuring, practical, and honest about when to actually worry. Best used as a patient companion you consult by symptom and stage, not read cover to cover.', 'गर्भावस्था की वह क्लासिक महीने-दर-महीने किताब — भरोसा देने वाली, काम की, और इस बारे में ईमानदार कि सचमुच चिंता कब करनी चाहिए। इसे शुरू से आख़िर तक पढ़ने के बजाय, लक्षण और चरण के हिसाब से देखने वाली एक धैर्यवान साथी की तरह इस्तेमाल करें।'),
     rating: 4.6,
     ratingCount: 15000,
     companion: BookCompanion(
       recommendedFor: [
-        'First-time expectant parents',
-        'Anxious pregnancy trackers',
-        'Anyone wanting a month-by-month reference',
+        _t('First-time expectant parents', 'पहली बार माता-पिता बनने जा रहे लोग'),
+        _t('Anxious pregnancy trackers', 'गर्भावस्था को लेकर चिंता में रहने वाले'),
+        _t('Anyone wanting a month-by-month reference', 'वे सब जिन्हें महीने-दर-महीने चलने वाली किताब चाहिए'),
       ],
-      themes: ['Pregnancy', 'Nutrition', 'Prenatal health', 'Labour & delivery', 'Postpartum'],
+      themes: [_t('Pregnancy', 'गर्भावस्था'), _t('Nutrition', 'पोषण'), _t('Prenatal health', 'Prenatal सेहत'), _t('Labour & delivery', 'प्रसव और डिलीवरी'), _t('Postpartum', 'प्रसव के बाद')],
       authorIntro:
-          'Heidi Murkoff created and leads the What to Expect franchise, one of the best-selling pregnancy guide series in publishing history.',
+          _t('Heidi Murkoff created and leads the What to Expect franchise, one of the best-selling pregnancy guide series in publishing history.', 'Heidi Murkoff ने What to Expect श्रृंखला बनाई और उसे आगे बढ़ाया — प्रकाशन के इतिहास की सबसे ज़्यादा बिकने वाली गर्भावस्था गाइड श्रृंखलाओं में से एक।'),
       otherBooks: [
-        'What to Expect the First Year',
-        'What to Expect the Toddler Years',
-        "What to Expect Before You're Expecting",
+        _t('What to Expect the First Year', 'What to Expect the First Year'),
+        _t('What to Expect the Toddler Years', 'What to Expect the Toddler Years'),
+        _t("What to Expect Before You're Expecting", 'What to Expect Before You\'re Expecting'),
       ],
       about:
-          'Pregnancy floods parents with fear of the unknown: every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast, treating uncertainty itself as pregnancy\'s real enemy.',
+          _t('Pregnancy floods parents with fear of the unknown: every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast, treating uncertainty itself as pregnancy\'s real enemy.', 'गर्भावस्था माता-पिता को अनजाने के डर से भर देती है: हर हल्की-सी टीस या न दिखने वाला लक्षण किसी संकट जैसा लग सकता है। What to Expect When You\'re Expecting इसीलिए हर घर के सिरहाने रखी किताब बन गई, क्योंकि यह रात 2 बजे परेशान मन के उसी सवाल का जवाब देती है: क्या यह सामान्य है? एक कहानी की तरह नहीं, बल्कि महीने-दर-महीने सजी होने से यह चिंतित माता-पिता को उनकी अपनी हालत तुरंत ढूँढ़ लेने देती है — क्योंकि इसके हिसाब से गर्भावस्था का असली दुश्मन अनिश्चितता ही है।'),
       philosophy:
-          'If a parent remembers only one idea from this book, it\'s this: the changes themselves aren\'t what make pregnancy frightening; not knowing what\'s normal is. A cramp or craving isn\'t alarming on its own. Not having an answer is what turns it into panic. Murkoff closes that gap with a month-by-month, symptom-by-symptom structure, meant to be consulted like a patient nurse who\'s heard every question before, pairing each reassurance with a clear boundary for when concern really is appropriate.',
+          _t('If a parent remembers only one idea from this book, it\'s this: the changes themselves aren\'t what make pregnancy frightening; not knowing what\'s normal is. A cramp or craving isn\'t alarming on its own. Not having an answer is what turns it into panic. Murkoff closes that gap with a month-by-month, symptom-by-symptom structure, meant to be consulted like a patient nurse who\'s heard every question before, pairing each reassurance with a clear boundary for when concern really is appropriate.', 'अगर इस किताब से सिर्फ़ एक बात याद रखनी हो तो यह: गर्भावस्था को डरावना उसके बदलाव नहीं बनाते, यह न पता होना बनाता है कि सामान्य क्या है। ऐंठन या कुछ खाने का मन अपने आप में डरने की बात नहीं। जवाब न मिलना ही उसे घबराहट में बदल देता है। Murkoff इसी खाई को महीने-दर-महीने, लक्षण-दर-लक्षण ढाँचे से पाटती हैं — जिसे एक ऐसी धैर्यवान नर्स की तरह देखा जाए जिसने हर सवाल पहले भी सुना है, और जो हर तसल्ली के साथ यह भी साफ़ बताती है कि चिंता सचमुच कब जायज़ है।'),
       // Five ideas, hard cap: one flowing paragraph in the author's voice plus
       // 2-3 short unlabelled pointers. Collapsed by default in the reader.
       ideas: [
         BookKeyIdea(
-          title: 'Every Pregnancy Is Its Own Story',
+          title: _t('Every Pregnancy Is Its Own Story', 'हर गर्भावस्था की अपनी कहानी होती है'),
           body:
-              'No two pregnancies unfold the same way, even across a single woman\'s own children. Symptom timing, intensity, bump size, and cravings vary enormously between individuals, and none of it predicts anything going wrong. The book discourages comparing notes with other parents or matching an app\'s average timeline, since normal variation is often mistaken for a warning sign.',
+              _t('No two pregnancies unfold the same way, even across a single woman\'s own children. Symptom timing, intensity, bump size, and cravings vary enormously between individuals, and none of it predicts anything going wrong. The book discourages comparing notes with other parents or matching an app\'s average timeline, since normal variation is often mistaken for a warning sign.', 'कोई दो गर्भावस्थाएँ एक जैसी नहीं होतीं — एक ही महिला के अलग-अलग बच्चों में भी नहीं। लक्षण कब आते हैं, कितने तेज़ हैं, पेट कितना बड़ा है, क्या खाने का मन करता है — यह सब एक इंसान से दूसरे में बहुत बदलता है, और इनमें से कुछ भी यह नहीं बताता कि कुछ गड़बड़ है। किताब दूसरों से तुलना करने या किसी app की औसत timeline से मिलान करने से रोकती है, क्योंकि सामान्य फ़र्क़ को अक्सर ख़तरे का संकेत मान लिया जाता है।'),
           pointers: [
-            'A missing symptom, like nausea, isn\'t a bad sign; some women simply don\'t experience it.',
-            'The only comparison worth acting on is a change from your own baseline, not someone else\'s.',
+            _t('A missing symptom, like nausea, isn\'t a bad sign; some women simply don\'t experience it.', 'कोई लक्षण न होना, जैसे मिचली, बुरी बात नहीं है — कुछ महिलाओं को यह होती ही नहीं।'),
+            _t('The only comparison worth acting on is a change from your own baseline, not someone else\'s.', 'तुलना करने लायक़ सिर्फ़ एक चीज़ है — आपका अपना पहले जैसा हाल कितना बदला, किसी और का नहीं।'),
           ],
         ),
         BookKeyIdea(
-          title: 'Nutrition Is About Consistency, Not Perfection',
+          title: _t('Nutrition Is About Consistency, Not Perfection', 'पोषण नियमितता की बात है, परफ़ेक्शन की नहीं'),
           body:
-              'The book frames pregnancy nutrition as steady, moderate habits rather than a single perfect diet followed exactly every day. It emphasises balanced meals with adequate protein and key nutrients like folate and iron, while acknowledging that nausea can make eating well genuinely hard some weeks.',
+              _t('The book frames pregnancy nutrition as steady, moderate habits rather than a single perfect diet followed exactly every day. It emphasises balanced meals with adequate protein and key nutrients like folate and iron, while acknowledging that nausea can make eating well genuinely hard some weeks.', 'किताब गर्भावस्था के पोषण को रोज़ एक जैसा परफ़ेक्ट diet निभाने के बजाय, टिकाऊ और संतुलित आदतों की तरह देखती है। यह पर्याप्त protein और Folate व Iron जैसे ज़रूरी पोषक तत्वों वाले संतुलित खाने पर ज़ोर देती है, और यह भी मानती है कि कुछ हफ़्तों में मिचली की वजह से ठीक से खाना सचमुच मुश्किल हो जाता है।'),
           pointers: [
-            'Folate, iron, and calcium are flagged as the nutrients most worth prioritising.',
-            'Small, frequent meals are recommended over three large ones, especially early on.',
+            _t('Folate, iron, and calcium are flagged as the nutrients most worth prioritising.', 'Folate, Iron और Calcium को सबसे पहले ध्यान देने लायक़ पोषक तत्व बताया गया है।'),
+            _t('Small, frequent meals are recommended over three large ones, especially early on.', 'तीन बड़े खानों के बजाय थोड़ा-थोड़ा और बार-बार खाने की सलाह है, ख़ासकर शुरुआती दिनों में।'),
           ],
         ),
         BookKeyIdea(
-          title: 'Most Symptoms Have an Ordinary Explanation',
+          title: _t('Most Symptoms Have an Ordinary Explanation', 'ज़्यादातर लक्षणों की वजह बहुत आम होती है'),
           body:
-              'For nearly every uncomfortable symptom, the book supplies the underlying physiological reason: hormonal shifts, blood volume changes, a growing uterus pressing on organs. It pairs each explanation with a clear boundary, describing the rarer version of that same symptom that does warrant a call to the provider.',
+              _t('For nearly every uncomfortable symptom, the book supplies the underlying physiological reason: hormonal shifts, blood volume changes, a growing uterus pressing on organs. It pairs each explanation with a clear boundary, describing the rarer version of that same symptom that does warrant a call to the provider.', 'लगभग हर असहज लक्षण के पीछे किताब शरीर की वजह बताती है: हॉर्मोन का बदलना, ख़ून की मात्रा बढ़ना, बढ़ते गर्भाशय का अंगों पर दबाव। हर वजह के साथ वह एक साफ़ हद भी खींचती है — उसी लक्षण का वह कम दिखने वाला रूप बताती है जिसमें डॉक्टर को फ़ोन करना सचमुच ज़रूरी है।'),
           pointers: [
-            'Round ligament pain and swelling are explained mechanically, not treated as alarming by default.',
-            'Bleeding, severe headaches, and reduced fetal movement are named as exceptions that warrant a same-day call.',
+            _t('Round ligament pain and swelling are explained mechanically, not treated as alarming by default.', 'Round ligament का दर्द और सूजन शरीर की बनावट से समझाए गए हैं, उन्हें अपने आप में डरावना नहीं माना गया।'),
+            _t('Bleeding, severe headaches, and reduced fetal movement are named as exceptions that warrant a same-day call.', 'ख़ून आना, तेज़ सिरदर्द और शिशु की हलचल कम होना — ये अपवाद बताए गए हैं, जिनमें उसी दिन डॉक्टर को फ़ोन करना चाहिए।'),
           ],
         ),
         BookKeyIdea(
-          title: 'You\'re Allowed to Advocate for Yourself',
+          title: _t('You\'re Allowed to Advocate for Yourself', 'अपनी बात रखने का हक़ आपका है'),
           body:
-              'The book repeatedly encourages readers to ask questions, seek second opinions, and choose a provider they trust. It treats the parent as an active participant in care decisions, not a passive patient, and insists no question is too small to ask.',
+              _t('The book repeatedly encourages readers to ask questions, seek second opinions, and choose a provider they trust. It treats the parent as an active participant in care decisions, not a passive patient, and insists no question is too small to ask.', 'किताब बार-बार कहती है कि सवाल पूछें, दूसरी राय लें, और ऐसा डॉक्टर चुनें जिस पर भरोसा हो। यह माता-पिता को इलाज के फ़ैसलों में चुपचाप बैठे मरीज़ नहीं, बल्कि बराबर का हिस्सेदार मानती है — और कहती है कि कोई सवाल इतना छोटा नहीं कि पूछा न जाए।'),
           pointers: [
-            'What you discuss with your provider is confidential, to encourage full honesty.',
-            'A second opinion is framed as reasonable, not an insult to your first provider.',
+            _t('What you discuss with your provider is confidential, to encourage full honesty.', 'डॉक्टर से जो भी बात होती है वह गोपनीय रहती है, ताकि आप पूरी ईमानदारी से कह सकें।'),
+            _t('A second opinion is framed as reasonable, not an insult to your first provider.', 'दूसरी राय लेना जायज़ बताया गया है, पहले डॉक्टर का अपमान नहीं।'),
           ],
         ),
         BookKeyIdea(
-          title: 'The Fourth Trimester Deserves as Much Attention as the First Three',
+          title: _t('The Fourth Trimester Deserves as Much Attention as the First Three', 'चौथी तिमाही उतने ही ध्यान की हक़दार है जितनी पहली तीन'),
           body:
-              'The book extends meaningfully past delivery. Physical recovery, mood changes, breastfeeding challenges, and the emotional adjustment of early parenthood all get dedicated space rather than a single closing chapter, with warning signs of postpartum depression and anxiety named explicitly.',
+              _t('The book extends meaningfully past delivery. Physical recovery, mood changes, breastfeeding challenges, and the emotional adjustment of early parenthood all get dedicated space rather than a single closing chapter, with warning signs of postpartum depression and anxiety named explicitly.', 'किताब प्रसव के बाद तक भी ठीक-ठाक चलती है। शरीर का ठीक होना, मन के उतार-चढ़ाव, स्तनपान की दिक़्क़तें, और माता-पिता बनने के शुरुआती दिनों का भावनात्मक तालमेल — इन सबको आख़िरी एक अध्याय में निपटाने के बजाय अलग जगह दी गई है, और postpartum depression व घबराहट के संकेत साफ़-साफ़ बताए गए हैं।'),
           pointers: [
-            'Physical recovery is described separately for vaginal birth and C-section, since timelines differ.',
-            'The baby blues is distinguished from postpartum depression by duration and severity.',
+            _t('Physical recovery is described separately for vaginal birth and C-section, since timelines differ.', 'सामान्य प्रसव और C-section के बाद शरीर के ठीक होने की बात अलग-अलग बताई गई है, क्योंकि दोनों में लगने वाला समय अलग है।'),
+            _t('The baby blues is distinguished from postpartum depression by duration and severity.', 'Baby blues को postpartum depression से अलग पहचाना गया है — कितने दिन रहता है और कितना गहरा है, इसी से।'),
           ],
         ),
       ],
       chapters: [
         BookChapter(
-          title: 'Before You Conceive',
-          summary: 'Covers preconception health: timing, prenatal vitamins, and lifestyle adjustments before trying to get pregnant.',
+          title: _t('Before You Conceive', 'गर्भधारण से पहले'),
+          summary: _t('Covers preconception health: timing, prenatal vitamins, and lifestyle adjustments before trying to get pregnant.', 'गर्भधारण से पहले की सेहत: सही समय, prenatal vitamins, और कोशिश शुरू करने से पहले रोज़मर्रा में किए जाने वाले बदलाव।'),
           keyPoints: [
             BookPointGroup(points: [
-              'Most couples conceive within 6 to 12 months of trying; a fertility evaluation is generally suggested after a year, or 6 months for women over 35.',
-              'Folic acid (400 to 800 mcg) is recommended before conception, since neural tube development begins before many women know they\'re pregnant.',
-              'Cutting back alcohol, tobacco, and certain medications is advised in the months before trying, not just after a positive test.',
-              'The first prenatal visit typically includes a full health history, bloodwork, and calculating a due date from the last period.',
+              _t('Most couples conceive within 6 to 12 months of trying; a fertility evaluation is generally suggested after a year, or 6 months for women over 35.', 'ज़्यादातर जोड़ों को कोशिश शुरू करने के 6 से 12 महीनों में गर्भ ठहर जाता है; एक साल बाद fertility जाँच की सलाह दी जाती है, और 35 से ऊपर की महिलाओं के लिए 6 महीने बाद।'),
+              _t('Folic acid (400 to 800 mcg) is recommended before conception, since neural tube development begins before many women know they\'re pregnant.', 'गर्भधारण से पहले ही Folic acid (400 से 800 mcg) की सलाह है, क्योंकि neural tube बनना कई महिलाओं को गर्भ का पता चलने से पहले ही शुरू हो जाता है।'),
+              _t('Cutting back alcohol, tobacco, and certain medications is advised in the months before trying, not just after a positive test.', 'शराब, तंबाकू और कुछ दवाओं को कम करने की सलाह कोशिश शुरू करने से महीनों पहले दी गई है, सिर्फ़ test पॉज़िटिव आने के बाद नहीं।'),
+              _t('The first prenatal visit typically includes a full health history, bloodwork, and calculating a due date from the last period.', 'पहली prenatal मुलाक़ात में आमतौर पर पूरी सेहत की जानकारी, ख़ून की जाँच, और आख़िरी माहवारी से due date निकालना शामिल होता है।'),
             ]),
           ],
         ),
         BookChapter(
-          title: 'First Trimester (Months 1–3)',
-          summary: 'Confirms pregnancy and covers the most symptom-heavy, emotionally uncertain stretch, with early testing and the first prenatal visits.',
+          title: _t('First Trimester (Months 1–3)', 'पहली तिमाही (महीने 1–3)'),
+          summary: _t('Confirms pregnancy and covers the most symptom-heavy, emotionally uncertain stretch, with early testing and the first prenatal visits.', 'गर्भ की पुष्टि, और वह दौर जिसमें लक्षण सबसे ज़्यादा और मन सबसे अनिश्चित होता है — साथ में शुरुआती जाँचें और पहली prenatal मुलाक़ातें।'),
           keyPoints: [
-            BookPointGroup(label: 'Baby\'s Development', points: [
-              'By the end of month 3, major organs have formed and the fetus is roughly the size of a lime, with a heartbeat typically detectable by week 10 to 12.',
+            BookPointGroup(label: _t('Baby\'s Development', 'शिशु का विकास'), points: [
+              _t('By the end of month 3, major organs have formed and the fetus is roughly the size of a lime, with a heartbeat typically detectable by week 10 to 12.', 'तीसरे महीने के आख़िर तक बड़े अंग बन चुके होते हैं और शिशु लगभग एक नींबू जितना बड़ा होता है; धड़कन आमतौर पर 10 से 12 हफ़्ते तक सुनाई देने लगती है।'),
             ]),
-            BookPointGroup(label: 'Your Body and Emotions', points: [
-              'Nausea is driven by rising hCG and oestrogen, usually peaking around week 9 and easing by week 14. Small, frequent, bland meals help most women manage it.',
-              'Fatigue is explained by rising progesterone and increased blood volume.',
+            BookPointGroup(label: _t('Your Body and Emotions', 'आपका शरीर और आपका मन'), points: [
+              _t('Nausea is driven by rising hCG and oestrogen, usually peaking around week 9 and easing by week 14. Small, frequent, bland meals help most women manage it.', 'मिचली की वजह hCG और oestrogen का बढ़ना है; यह आमतौर पर 9वें हफ़्ते के आसपास सबसे तेज़ होती है और 14वें हफ़्ते तक कम हो जाती है। थोड़ा-थोड़ा, बार-बार और सादा खाना ज़्यादातर महिलाओं को इसे सँभालने में मदद करता है।'),
+              _t('Fatigue is explained by rising progesterone and increased blood volume.', 'थकान की वजह progesterone का बढ़ना और शरीर में ख़ून की मात्रा बढ़ना बताई गई है।'),
             ]),
-            BookPointGroup(label: 'Testing', points: [
-              'First-trimester screening combines bloodwork with a nuchal translucency scan to assess chromosomal risk. The result is a probability, not a diagnosis.',
+            BookPointGroup(label: _t('Testing', 'जाँचें'), points: [
+              _t('First-trimester screening combines bloodwork with a nuchal translucency scan to assess chromosomal risk. The result is a probability, not a diagnosis.', 'पहली तिमाही की screening में ख़ून की जाँच और nuchal translucency scan मिलकर chromosomal ख़तरे का अंदाज़ा लगाते हैं। नतीजा एक संभावना है, कोई निदान नहीं।'),
             ]),
             BookPointGroup(points: [
-              'Miscarriage risk drops significantly once a heartbeat is confirmed around week 8, a fact the book uses directly to help calibrate anxiety.',
+              _t('Miscarriage risk drops significantly once a heartbeat is confirmed around week 8, a fact the book uses directly to help calibrate anxiety.', '8वें हफ़्ते के आसपास धड़कन पक्की हो जाने पर गर्भपात का ख़तरा काफ़ी घट जाता है — किताब इसी बात से चिंता को नाप-तौल में लाती है।'),
             ]),
           ],
         ),
         BookChapter(
-          title: 'Second Trimester (Months 4–6)',
-          summary: 'Often the easier stretch as energy returns, with chapters shifting toward development milestones and early practical planning.',
+          title: _t('Second Trimester (Months 4–6)', 'दूसरी तिमाही (महीने 4–6)'),
+          summary: _t('Often the easier stretch as energy returns, with chapters shifting toward development milestones and early practical planning.', 'अक्सर यह आसान दौर होता है क्योंकि ऊर्जा लौट आती है; अध्याय भी विकास के पड़ावों और शुरुआती व्यावहारिक तैयारी की ओर मुड़ जाते हैं।'),
           keyPoints: [
-            BookPointGroup(label: 'Baby\'s Development', points: [
+            BookPointGroup(label: _t('Baby\'s Development', 'शिशु का विकास'), points: [
               // PCPNDT: this said the scan "can reveal the baby's sex". In
               // India disclosing it is illegal, so no sonographer will — the
               // line only set a mother up to ask and be refused. The app says
               // as much in tests_scans_reports_data and ttc_daily_data.
-              'The anatomy scan around week 20 checks organ development. Soft markers noted on the scan are usually normal variants, not diagnoses.',
+              _t('The anatomy scan around week 20 checks organ development. Soft markers noted on the scan are usually normal variants, not diagnoses.', 'हफ़्ता 20 के आस-पास होने वाला anatomy scan अंगों के विकास की जाँच करता है। स्कैन में दिखे soft markers आम तौर पर सामान्य भिन्नताएँ होती हैं, कोई निदान नहीं।'),
             ]),
-            BookPointGroup(label: 'Your Body', points: [
-              'Round ligament pain (sharp groin twinges from the uterus stretching) and mild back pain are explained mechanically rather than treated as concerning.',
+            BookPointGroup(label: _t('Your Body', 'आपका शरीर'), points: [
+              _t('Round ligament pain (sharp groin twinges from the uterus stretching) and mild back pain are explained mechanically rather than treated as concerning.', 'Round ligament का दर्द (गर्भाशय के खिंचने से जाँघ के जोड़ में तेज़ टीस) और हल्का कमर दर्द शरीर की बनावट से समझाए गए हैं, चिंता की बात की तरह नहीं।'),
             ]),
             BookPointGroup(points: [
-              'Quickening, or feeling first movements, typically occurs between weeks 16 to 22, often earlier in later pregnancies.',
+              _t('Quickening, or feeling first movements, typically occurs between weeks 16 to 22, often earlier in later pregnancies.', 'Quickening यानी पहली हलचल महसूस होना आमतौर पर 16 से 22 हफ़्ते के बीच होता है, बाद की गर्भावस्थाओं में अक्सर उससे पहले।'),
             ]),
-            BookPointGroup(label: 'Practical Planning', points: [
-              'This is the window the book suggests for announcing the pregnancy, discussing maternity leave, and starting nursery planning.',
+            BookPointGroup(label: _t('Practical Planning', 'व्यावहारिक तैयारी'), points: [
+              _t('This is the window the book suggests for announcing the pregnancy, discussing maternity leave, and starting nursery planning.', 'किताब के मुताबिक़ यही वह समय है जब गर्भावस्था की ख़बर सुनाई जाए, maternity leave पर बात हो, और शिशु के कमरे की तैयारी शुरू की जाए।'),
             ]),
           ],
         ),
         BookChapter(
-          title: 'Third Trimester (Months 7–9)',
-          summary: 'Focuses on managing physical discomfort while building toward concrete birth preparation.',
+          title: _t('Third Trimester (Months 7–9)', 'तीसरी तिमाही (महीने 7–9)'),
+          summary: _t('Focuses on managing physical discomfort while building toward concrete birth preparation.', 'शरीर की तकलीफ़ों को सँभालने पर ध्यान, और साथ-साथ प्रसव की ठोस तैयारी की ओर बढ़ना।'),
           keyPoints: [
             BookPointGroup(points: [
-              'Braxton Hicks contractions (irregular, non-progressing practice contractions) are distinguished clearly from true labour contractions, which grow closer, longer, and more intense over time.',
-              'Hospital bag essentials are narrowed to a short practical list: ID, insurance information, comfortable clothes, rather than everything possible.',
-              'True labour signs include regular strengthening contractions, water breaking, or losing the mucus plug, with explicit guidance on which one justifies calling the provider immediately versus waiting.',
-              'Choosing a paediatrician before delivery is recommended so the decision isn\'t rushed after birth.',
+              _t('Braxton Hicks contractions (irregular, non-progressing practice contractions) are distinguished clearly from true labour contractions, which grow closer, longer, and more intense over time.', 'Braxton Hicks संकुचन (बेतरतीब, आगे न बढ़ने वाले अभ्यास संकुचन) को असली प्रसव संकुचनों से साफ़ अलग बताया गया है — असली संकुचन समय के साथ पास-पास, लंबे और तेज़ होते जाते हैं।'),
+              _t('Hospital bag essentials are narrowed to a short practical list: ID, insurance information, comfortable clothes, rather than everything possible.', 'अस्पताल के बैग की ज़रूरी चीज़ों को एक छोटी, काम की सूची तक समेटा गया है: पहचान पत्र, insurance की जानकारी, आरामदेह कपड़े — न कि हर मुमकिन चीज़।'),
+              _t('True labour signs include regular strengthening contractions, water breaking, or losing the mucus plug, with explicit guidance on which one justifies calling the provider immediately versus waiting.', 'असली प्रसव के संकेत हैं — नियमित और तेज़ होते संकुचन, पानी की थैली फटना, या mucus plug निकलना; साथ में साफ़ बताया गया है कि किसमें तुरंत डॉक्टर को फ़ोन करना है और किसमें इंतज़ार किया जा सकता है।'),
+              _t('Choosing a paediatrician before delivery is recommended so the decision isn\'t rushed after birth.', 'प्रसव से पहले ही शिशु रोग विशेषज्ञ चुन लेने की सलाह है, ताकि जन्म के बाद जल्दबाज़ी में फ़ैसला न करना पड़े।'),
             ]),
           ],
         ),
         BookChapter(
-          title: 'Labour, Delivery & Special Circumstances',
-          summary: 'Walks through labour stage by stage, with dedicated sections for multiples, high-risk pregnancy, and pregnancy loss.',
+          title: _t('Labour, Delivery & Special Circumstances', 'प्रसव, डिलीवरी और ख़ास हालात'),
+          summary: _t('Walks through labour stage by stage, with dedicated sections for multiples, high-risk pregnancy, and pregnancy loss.', 'प्रसव को चरण दर चरण समझाता है, और एक से ज़्यादा शिशु, high-risk गर्भावस्था, और गर्भ खो जाने पर अलग हिस्से देता है।'),
           keyPoints: [
-            BookPointGroup(label: 'Stage 1 — Early, Active and Transition Labour', points: [
-              'The longest stage, covering cervical dilation from 0 to 10 cm. Early labour can last hours to over a day, while transition (8 to 10 cm) is typically the shortest but most intense part.',
+            BookPointGroup(label: _t('Stage 1 — Early, Active and Transition Labour', 'चरण 1 — शुरुआती, सक्रिय और संक्रमण वाला प्रसव'), points: [
+              _t('The longest stage, covering cervical dilation from 0 to 10 cm. Early labour can last hours to over a day, while transition (8 to 10 cm) is typically the shortest but most intense part.', 'सबसे लंबा चरण, जिसमें गर्भाशय का मुँह 0 से 10 cm तक खुलता है। शुरुआती प्रसव कुछ घंटों से लेकर एक दिन से भी ज़्यादा चल सकता है, जबकि संक्रमण वाला हिस्सा (8 से 10 cm) आमतौर पर सबसे छोटा पर सबसे तेज़ होता है।'),
             ]),
-            BookPointGroup(label: 'Stage 2 — Pushing and Birth', points: [
-              'Begins at full dilation and ends with delivery, lasting anywhere from minutes to a few hours, with pushing technique and positioning covered directly.',
+            BookPointGroup(label: _t('Stage 2 — Pushing and Birth', 'चरण 2 — ज़ोर लगाना और जन्म'), points: [
+              _t('Begins at full dilation and ends with delivery, lasting anywhere from minutes to a few hours, with pushing technique and positioning covered directly.', 'पूरा मुँह खुलने पर शुरू होकर जन्म पर ख़त्म होता है; यह कुछ मिनटों से लेकर कुछ घंटों तक चल सकता है, और इसमें ज़ोर लगाने का तरीका और शरीर की स्थिति सीधे-सीधे बताई गई है।'),
             ]),
-            BookPointGroup(label: 'Stage 3 — Delivering the Placenta', points: [
-              'Typically the shortest stage, usually complete within 5 to 30 minutes after birth.',
+            BookPointGroup(label: _t('Stage 3 — Delivering the Placenta', 'चरण 3 — Placenta का बाहर आना'), points: [
+              _t('Typically the shortest stage, usually complete within 5 to 30 minutes after birth.', 'आमतौर पर सबसे छोटा चरण, जो जन्म के 5 से 30 मिनट के भीतर पूरा हो जाता है।'),
             ]),
             BookPointGroup(points: [
-              'Pain-management options are presented on a spectrum from unmedicated techniques to epidurals, without favouring one as universally better.',
-              'Multiples, high-risk pregnancy, and pregnancy loss are addressed directly, not as footnotes.',
+              _t('Pain-management options are presented on a spectrum from unmedicated techniques to epidurals, without favouring one as universally better.', 'दर्द सँभालने के तरीके बिना दवा वाले उपायों से लेकर epidural तक, एक पूरी क़तार की तरह रखे गए हैं — किसी एक को सबके लिए बेहतर नहीं बताया गया।'),
+              _t('Multiples, high-risk pregnancy, and pregnancy loss are addressed directly, not as footnotes.', 'एक से ज़्यादा शिशु, high-risk गर्भावस्था, और गर्भ खो जाना — इन पर सीधे बात हुई है, किसी कोने के नोट की तरह नहीं।'),
             ]),
           ],
         ),
         BookChapter(
-          title: 'Postpartum & Beyond',
-          summary: 'Covers physical recovery, feeding decisions, and the emotional adjustment of early parenthood.',
+          title: _t('Postpartum & Beyond', 'प्रसव के बाद और उससे आगे'),
+          summary: _t('Covers physical recovery, feeding decisions, and the emotional adjustment of early parenthood.', 'शरीर का ठीक होना, दूध पिलाने के फ़ैसले, और माता-पिता बनने के शुरुआती दिनों का भावनात्मक तालमेल।'),
           keyPoints: [
-            BookPointGroup(label: 'Physical Recovery', points: [
-              'Vaginal birth recovery is generally faster in the first days. C-section recovery involves incision care and longer activity restrictions; both are given separate timelines.',
+            BookPointGroup(label: _t('Physical Recovery', 'शरीर का ठीक होना'), points: [
+              _t('Vaginal birth recovery is generally faster in the first days. C-section recovery involves incision care and longer activity restrictions; both are given separate timelines.', 'सामान्य प्रसव के बाद शुरुआती दिनों में शरीर आमतौर पर जल्दी सँभलता है। C-section के बाद टाँकों की देखभाल और ज़्यादा दिनों तक कामकाज पर रोक रहती है; दोनों के लिए अलग-अलग समय बताए गए हैं।'),
             ]),
-            BookPointGroup(label: 'Feeding', points: [
-              'Breastfeeding, formula, and combination feeding are each covered with practical troubleshooting rather than one best method being pushed.',
+            BookPointGroup(label: _t('Feeding', 'दूध पिलाना'), points: [
+              _t('Breastfeeding, formula, and combination feeding are each covered with practical troubleshooting rather than one best method being pushed.', 'स्तनपान, formula और दोनों को मिलाकर पिलाना — तीनों पर काम की सलाह दी गई है, किसी एक को सबसे अच्छा बताकर थोपा नहीं गया।'),
             ]),
-            BookPointGroup(label: 'Emotional Adjustment', points: [
-              'The baby blues (mood dips in the first two weeks) are distinguished from postpartum depression and anxiety by duration and severity. Symptoms lasting beyond two weeks, or intensifying, are flagged as warranting a call to a provider.',
+            BookPointGroup(label: _t('Emotional Adjustment', 'मन का तालमेल'), points: [
+              _t('The baby blues (mood dips in the first two weeks) are distinguished from postpartum depression and anxiety by duration and severity. Symptoms lasting beyond two weeks, or intensifying, are flagged as warranting a call to a provider.', 'Baby blues (पहले दो हफ़्तों में मन का उतरना) को postpartum depression और घबराहट से अलग पहचाना गया है — कितने दिन रहता है और कितना गहरा है, इसी से। दो हफ़्तों से ज़्यादा चलने वाले या बढ़ते लक्षणों में डॉक्टर को फ़ोन करने के लिए कहा गया है।'),
             ]),
             BookPointGroup(points: [
-              'Readers are encouraged to line up practical support for the first two weeks before delivery, not after.',
+              _t('Readers are encouraged to line up practical support for the first two weeks before delivery, not after.', 'पाठकों से कहा गया है कि पहले दो हफ़्तों की मदद का इंतज़ाम प्रसव से पहले ही कर लें, बाद में नहीं।'),
             ]),
           ],
         ),
       ],
       // Closing note — deliberately after the chapters, never before.
       perspective:
-          'This is one of the steadiest, most reassuring books in the category. Its real strength is calming panic with plain, physiological explanations rather than pushing one parenting philosophy. Where it holds up less well is specificity: some diet and weight-gain guidance reads as more rigid than current medical advice, which now varies more by individual factors than a single fixed target. Read it for the mindset (ordinary explanations, self-advocacy, real fourth-trimester attention) and treat exact numbers as a prompt to ask your own provider, not a rule.',
+          _t('This is one of the steadiest, most reassuring books in the category. Its real strength is calming panic with plain, physiological explanations rather than pushing one parenting philosophy. Where it holds up less well is specificity: some diet and weight-gain guidance reads as more rigid than current medical advice, which now varies more by individual factors than a single fixed target. Read it for the mindset (ordinary explanations, self-advocacy, real fourth-trimester attention) and treat exact numbers as a prompt to ask your own provider, not a rule.', 'यह अपनी तरह की सबसे टिकाऊ और भरोसा देने वाली किताबों में से एक है। इसकी असली ताक़त यह है कि यह किसी एक परवरिश-दर्शन को थोपने के बजाय, शरीर की सीधी-सादी वजहें बताकर घबराहट शांत करती है। जहाँ यह कमज़ोर पड़ती है वह है बारीक़ी: खाने और वज़न बढ़ने की कुछ सलाहें आज की चिकित्सा राय से ज़्यादा सख़्त लगती हैं, जो अब एक तय आँकड़े के बजाय हर महिला के अपने हालात पर ज़्यादा निर्भर करती है। इसे उसके नज़रिए के लिए पढ़ें (आम वजहें, अपनी बात रखना, चौथी तिमाही को असली जगह देना) और सटीक आँकड़ों को नियम नहीं, अपने डॉक्टर से पूछने का इशारा मानें।'),
       quotes: [
-        '"You will want a copilot in whom you have complete faith." (On choosing a healthcare provider you trust.)',
-        '"What you tell your doctor is confidential; no one else will know." (On being honest with your provider without fear of judgement.)',
+        _t('"You will want a copilot in whom you have complete faith." (On choosing a healthcare provider you trust.)', '"आपको ऐसा सहयात्री चाहिए जिस पर आपका पूरा भरोसा हो।" (ऐसा डॉक्टर चुनने पर जिस पर आप भरोसा कर सकें।)'),
+        _t('"What you tell your doctor is confidential; no one else will know." (On being honest with your provider without fear of judgement.)', '"जो आप अपने डॉक्टर को बताती हैं वह गोपनीय रहता है; किसी और को पता नहीं चलेगा।" (बिना किसी डर या झिझक के डॉक्टर से सच कहने पर।)'),
       ],
     ),
   ),
   ReadItem(
     id: 'book_whole_brain',
-    title: 'The Whole-Brain Child',
+    title: _t('The Whole-Brain Child', 'The Whole-Brain Child'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 44,
-    reason: 'A gentle look ahead at how your child will grow and learn.',
-    readingTime: 'Book',
-    category: 'Baby Development',
+    reason: _t('A gentle look ahead at how your child will grow and learn.', 'आपका बच्चा कैसे बढ़ेगा और सीखेगा, उसकी एक नरम-सी झलक।'),
+    readingTime: _t('Book', 'किताब'),
+    category: _t('Baby Development', 'शिशु का विकास'),
     emoji: '📘',
     author: 'Daniel J. Siegel & Tina Payne Bryson',
     why:
-        'A practical, parent-friendly guide to how a child\'s brain develops, with simple everyday strategies to nurture calm, connection and learning. Written by a neuropsychiatrist and a parenting expert, it stays warm and readable rather than academic. Most useful from late pregnancy through the early years, so it keeps giving long after birth.',
+        _t('A practical, parent-friendly guide to how a child\'s brain develops, with simple everyday strategies to nurture calm, connection and learning. Written by a neuropsychiatrist and a parenting expert, it stays warm and readable rather than academic. Most useful from late pregnancy through the early years, so it keeps giving long after birth.', 'बच्चे का दिमाग़ कैसे बनता है, इस पर एक काम की और माता-पिता के लिए आसान गाइड — साथ में सुकून, जुड़ाव और सीखने को बढ़ाने वाले रोज़मर्रा के सरल तरीके। एक neuropsychiatrist और एक परवरिश विशेषज्ञ की लिखी यह किताब भारी-भरकम नहीं, गर्मजोशी से भरी और आसानी से पढ़ी जाने वाली है। गर्भावस्था के आख़िरी दिनों से लेकर शुरुआती सालों तक सबसे काम की, इसलिए जन्म के बाद भी लंबे समय तक साथ देती है।'),
     rating: 4.7,
     ratingCount: 3200,
   ),
   ReadItem(
     id: 'book_expecting_better',
-    title: 'Expecting Better',
+    title: _t('Expecting Better', 'Expecting Better'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,
-    reason: 'A calm, evidence-based companion for pregnancy questions.',
-    readingTime: 'Book',
-    category: 'Mother Changes',
+    reason: _t('A calm, evidence-based companion for pregnancy questions.', 'गर्भावस्था के सवालों के लिए एक शांत, प्रमाण पर टिकी साथी।'),
+    readingTime: _t('Book', 'किताब'),
+    category: _t('Mother Changes', 'माँ में बदलाव'),
     emoji: '📗',
     author: 'Emily Oster',
     why:
-        'An economist calmly weighs the evidence behind the common dos and don\'ts of pregnancy, so you can make confident decisions instead of worrying about conflicting advice. Honest about where the data is strong and where it is not. Ideal if you like understanding the "why" behind a recommendation.',
+        _t('An economist calmly weighs the evidence behind the common dos and don\'ts of pregnancy, so you can make confident decisions instead of worrying about conflicting advice. Honest about where the data is strong and where it is not. Ideal if you like understanding the "why" behind a recommendation.', 'एक अर्थशास्त्री गर्भावस्था के आम "करें और न करें" के पीछे के प्रमाण शांति से तौलती हैं, ताकि आप उलझी हुई सलाहों में परेशान होने के बजाय भरोसे के साथ फ़ैसले ले सकें। कहाँ आँकड़े मज़बूत हैं और कहाँ नहीं, इस बारे में ईमानदार। अगर आपको हर सलाह के पीछे का "क्यों" समझना अच्छा लगता है, तो यह किताब आपके लिए है।'),
     rating: 4.6,
     ratingCount: 2800,
   ),
   ReadItem(
     id: 'book_first_forty',
-    title: 'The First Forty Days',
+    title: _t('The First Forty Days', 'The First Forty Days'),
     type: ReadType.book,
     weekStart: 28,
     weekEnd: 44,
-    reason: 'Worth reading before birth - nourishing yourself afterwards.',
-    readingTime: 'Book',
-    category: 'Preparation',
+    reason: _t('Worth reading before birth - nourishing yourself afterwards.', 'जन्म से पहले पढ़ने लायक़ — बाद में ख़ुद को पोषण देने के बारे में।'),
+    readingTime: _t('Book', 'किताब'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '📙',
     author: 'Heng Ou',
     why:
-        'A warm guide to the often-overlooked first weeks after birth - rest, recovery and nourishing food - so you feel cared for, not just the baby. It blends traditional postpartum wisdom with practical recipes. Best read before delivery, while you still have time to prepare.',
+        _t('A warm guide to the often-overlooked first weeks after birth - rest, recovery and nourishing food - so you feel cared for, not just the baby. It blends traditional postpartum wisdom with practical recipes. Best read before delivery, while you still have time to prepare.', 'जन्म के बाद के उन शुरुआती हफ़्तों पर एक गर्मजोशी भरी गाइड जिन्हें अक्सर अनदेखा कर दिया जाता है — आराम, सेहत का लौटना और पोषण भरा खाना — ताकि सिर्फ़ शिशु ही नहीं, आपका भी ख़याल रखा जाए। यह प्रसव के बाद की पारंपरिक समझ को काम की रेसिपी के साथ जोड़ती है। सबसे अच्छा यही है कि इसे प्रसव से पहले पढ़ लें, जब तैयारी का वक़्त बचा हो।'),
     rating: 4.5,
     ratingCount: 1100,
   ),
   ReadItem(
     id: 'book_garbh',
-    title: 'Garbh Sanskar',
+    title: _t('Garbh Sanskar', 'Garbh Sanskar'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,
-    reason: 'A traditional perspective on bonding and calm during pregnancy.',
-    readingTime: 'Book',
-    category: 'Emotional Wellbeing',
+    reason: _t('A traditional perspective on bonding and calm during pregnancy.', 'गर्भावस्था में जुड़ाव और सुकून पर एक पारंपरिक नज़रिया।'),
+    readingTime: _t('Book', 'किताब'),
+    category: _t('Emotional Wellbeing', 'मन का सुकून'),
     emoji: '📕',
     author: 'Dr. Balaji Tambe',
     why:
-        'A well-loved Indian perspective on bonding, diet, music and calm during pregnancy, blending Ayurvedic wisdom with day-to-day practices many families value. Gentle and ritual-focused rather than clinical. A comforting companion if you would like a traditional lens alongside modern guidance.',
+        _t('A well-loved Indian perspective on bonding, diet, music and calm during pregnancy, blending Ayurvedic wisdom with day-to-day practices many families value. Gentle and ritual-focused rather than clinical. A comforting companion if you would like a traditional lens alongside modern guidance.', 'गर्भावस्था में जुड़ाव, खान-पान, संगीत और सुकून पर एक ख़ूब सराहा गया भारतीय नज़रिया, जो आयुर्वेदिक समझ को उन रोज़मर्रा की बातों से जोड़ता है जिन्हें कई परिवार मानते हैं। यह क्लिनिकल कम, और कोमल व रस्मों से जुड़ी ज़्यादा है। अगर आप आधुनिक सलाह के साथ-साथ एक पारंपरिक नज़र भी चाहती हैं, तो यह सुकून देने वाली साथी है।'),
     rating: 4.4,
     ratingCount: 1500,
   ),
@@ -634,39 +675,43 @@ const List<ReadItem> kReadItems = [
   // ---- Expert picks ----
   ReadItem(
     id: 'exp_priya',
-    title: 'Building Emotional Connection Before Birth',
+    title: _t('Building Emotional Connection Before Birth', 'जन्म से पहले भावनात्मक रिश्ता बनाना'),
     type: ReadType.expert,
     weekStart: 16,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'Connecting now helps many families feel more confident.',
-    readingTime: '4 min',
-    category: 'Emotional Wellbeing',
+    reason: _t('Connecting now helps many families feel more confident.', 'अभी से जुड़ाव बना लेने से कई परिवार ज़्यादा भरोसे में महसूस करते हैं।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Emotional Wellbeing', 'मन का सुकून'),
     emoji: '👩‍⚕️',
     author: 'Dr. Priya Sharma',
-    authorRole: 'Pediatrician',
-    why: 'Understanding emotional connection before birth helps many families feel more confident.',
+    authorRole: _t('Pediatrician', 'शिशु रोग विशेषज्ञ'),
+    why: _t('Understanding emotional connection before birth helps many families feel more confident.', 'जन्म से पहले के भावनात्मक रिश्ते को समझ लेने से कई परिवार ज़्यादा भरोसे में महसूस करते हैं।'),
     body:
-        'Bonding does not begin at birth - it begins now. Talking to your baby, responding to movements, and taking quiet moments together build a foundation of security.\n\n'
+        _t('Bonding does not begin at birth - it begins now. Talking to your baby, responding to movements, and taking quiet moments together build a foundation of security.\n\n'
         'Parents who connect during pregnancy often feel more confident and calm when their baby arrives.',
+        'रिश्ता जन्म से नहीं, अभी से शुरू होता है। शिशु से बात करना, उसकी हलचल का जवाब देना, और साथ में कुछ शांत पल बिताना — यही सुरक्षा की नींव रखते हैं।\n\n'
+        'जो माता-पिता गर्भावस्था में जुड़ाव बना लेते हैं, वे शिशु के आने पर अक्सर ज़्यादा भरोसे और सुकून में रहते हैं।'),
   ),
   ReadItem(
     id: 'exp_meera',
-    title: 'Why Early Breastfeeding Prep Helps',
+    title: _t('Why Early Breastfeeding Prep Helps', 'स्तनपान की तैयारी पहले से क्यों काम आती है'),
     type: ReadType.expert,
     weekStart: 28,
     weekEnd: 40,
     priority: 'medium',
-    reason: 'A little preparation now makes the first week far smoother.',
-    readingTime: '4 min',
-    category: 'Preparation',
+    reason: _t('A little preparation now makes the first week far smoother.', 'अभी थोड़ी तैयारी कर लें तो पहला हफ़्ता कहीं आसान बीतता है।'),
+    readingTime: _t('4 min', '4 मिनट'),
+    category: _t('Preparation', 'तैयारी'),
     emoji: '🤱',
     author: 'Dr. Meera Nair',
-    authorRole: 'Lactation Consultant',
-    why: 'Learning the basics before birth makes those first days much easier.',
+    authorRole: _t('Lactation Consultant', 'स्तनपान सलाहकार'),
+    why: _t('Learning the basics before birth makes those first days much easier.', 'जन्म से पहले बुनियादी बातें सीख लेने से वे पहले दिन कहीं आसान हो जाते हैं।'),
     body:
-        'Breastfeeding is natural, but it is also a skill that both you and your baby learn together. Knowing the basics of positioning and latch before birth removes a lot of first-week stress.\n\n'
+        _t('Breastfeeding is natural, but it is also a skill that both you and your baby learn together. Knowing the basics of positioning and latch before birth removes a lot of first-week stress.\n\n'
         'You do not have to master it now - just gently familiarise yourself.',
+        'स्तनपान स्वाभाविक है, पर यह एक हुनर भी है जिसे आप और आपका शिशु साथ मिलकर सीखते हैं। जन्म से पहले शिशु को गोद में सही तरह पकड़ने और latch की बुनियादी बातें जान लेने से पहले हफ़्ते का बहुत सारा तनाव कम हो जाता है।\n\n'
+        'अभी इसमें माहिर होने की ज़रूरत नहीं — बस आराम से जान-पहचान बना लें।'),
   ),
 ];
 
@@ -698,7 +743,7 @@ ReadItem? heroForWeek(int week) {
   return rec.isEmpty ? null : rec.first;
 }
 
-/// Items that become relevant soon (start within the next ~8 weeks).
+/// Items that become relevant soon (start within the next ~8 weeks),
 List<ReadItem> lookingAhead(int week) {
   final list = kReadItems
       .where((r) =>
@@ -754,9 +799,15 @@ List<ReadItem> readSearch(String query) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return const [];
   return kReadItems
+      // Search BOTH languages, not the one on screen: a mother reading in
+      // Hindi may still type an English title she saw elsewhere, and a
+      // Devanagari query must match Devanagari content. Matching only 
+      // would make results depend on a setting she is not thinking about.
       .where((r) =>
-          r.title.toLowerCase().contains(q) ||
-          r.category.toLowerCase().contains(q) ||
+          r.title.en.toLowerCase().contains(q) ||
+          r.title.hi.toLowerCase().contains(q) ||
+          r.category.en.toLowerCase().contains(q) ||
+          r.category.hi.toLowerCase().contains(q) ||
           r.author.toLowerCase().contains(q))
       .toList();
 }

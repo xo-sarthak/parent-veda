@@ -186,7 +186,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
           for (final r in reads)
             ListTile(
               leading: _leadEmoji(r.emoji),
-              title: Text(r.title),
+              title: Text(r.title.now),
               subtitle: Text('${r.category} · ${r.readingTime}'),
               onTap: () => _go(
                   context, ReadItemScreen(item: r, controller: controller)),

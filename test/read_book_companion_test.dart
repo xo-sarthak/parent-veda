@@ -66,23 +66,29 @@ void main() {
   test('the companion carries every section the Bible requires', () {
     final c = _book.companion!;
     expect(_book.hasCompanion, isTrue);
-    expect(_book.readingTime, '8 min');
+    // .en throughout this contract: it asserts the SHAPE the writing Bible
+    // requires - a section exists, a cap is respected - and that must hold
+    // identically in both languages. Asserting the rendered language would
+    // make the contract depend on a setting.
+    expect(_book.readingTime.en, '8 min');
     expect(c.recommendedFor, isNotEmpty);
     expect(c.themes, isNotEmpty);
-    expect(c.about, isNotEmpty);
-    expect(c.authorIntro, isNotEmpty, reason: 'About the Author is part of the hierarchy');
+    expect(c.about.en, isNotEmpty);
+    expect(c.authorIntro.en, isNotEmpty,
+        reason: 'About the Author is part of the hierarchy');
     expect(c.otherBooks.length, 3);
-    expect(c.philosophy, isNotEmpty);
+    expect(c.philosophy.en, isNotEmpty);
     expect(c.ideas.length, 5, reason: 'five ideas is a hard cap');
     expect(c.chapters.length, 6);
-    expect(c.perspective, isNotEmpty);
+    expect(c.perspective.en, isNotEmpty);
     expect(c.quotes.length, 2);
     for (final i in c.ideas) {
-      expect(i.body, isNotEmpty);
+      expect(i.body.en, isNotEmpty);
       expect(i.pointers.length, inInclusiveRange(2, 3));
     }
     for (final ch in c.chapters) {
-      expect(ch.keyPoints, isNotEmpty, reason: '${ch.title} has no key points');
+      expect(ch.keyPoints, isNotEmpty,
+          reason: '${ch.title.en} has no key points');
     }
   });
 

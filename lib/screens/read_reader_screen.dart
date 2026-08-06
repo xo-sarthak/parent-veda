@@ -137,11 +137,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     final out = <(String, String)>[];
     if (a.hasCompanion) {
       final c = a.companion!;
-      if (c.about.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
-      if (c.philosophy.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
+      if (c.about.en.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
+      if (c.philosophy.en.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
       if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'Zaroori ideas')));
       if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'Chapter dar chapter')));
-      if (c.perspective.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
+      if (c.perspective.en.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
       if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'Yaadgaar baatein')));
       return out;
     }
@@ -190,13 +190,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
 
   List<Widget> _content(_RTheme t, S s) {
     final isBook = a.type == ReadType.book;
-    final bodyText = a.body.trim().isNotEmpty ? a.body : a.why;
+    final bodyText = a.body.now.trim().isNotEmpty ? a.body : a.why;
     return [
-      _pad(Text(a.category.toUpperCase(),
+      _pad(Text(a.category.now.toUpperCase(),
           style: pvManrope(
               fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: t.accent))),
       const SizedBox(height: 12),
-      _pad(Text(a.title,
+      _pad(Text(a.title.now,
           style: pvFraunces(
               fontSize: 30 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink))),
       const SizedBox(height: 14),
@@ -220,7 +220,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       else ...[
         // Main body.
         _anchor('read'),
-        for (final para in bodyText.split('\n\n'))
+        for (final para in bodyText.now.split('\n\n'))
           Padding(
             padding: const EdgeInsets.only(bottom: 18),
             child: _pad(Text(para.trim(), style: _bodyStyle(t))),
@@ -238,7 +238,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           _pad(_infoBlock(t,
               icon: Icons.favorite_border_rounded,
               title: _tr('Why this matters', 'Yeh kyun zaroori hai'),
-              body: a.whyThisMatters,
+              body: a.whyThisMatters.now,
               tint: t.accent)),
           const SizedBox(height: 20),
         ],
@@ -247,7 +247,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           _pad(_infoBlock(t,
               icon: Icons.science_outlined,
               title: _tr('Research simplified', 'Research aasan bhaasha mein'),
-              body: a.researchSimplified,
+              body: a.researchSimplified.now,
               tint: const Color(0xFF3FA56A))),
           const SizedBox(height: 20),
         ],
@@ -297,7 +297,9 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
 
   Widget _byline(_RTheme t) {
     final has = a.author.isNotEmpty;
-    final label = has ? a.author : a.category;
+    // Resolve to String here: author is a plain name and category is
+    // bilingual, so the ternary would otherwise infer Object.
+    final label = has ? a.author : a.category.now;
     final initial = (label.replaceAll('Dr. ', '').trim().isNotEmpty
             ? label.replaceAll('Dr. ', '').trim()[0]
             : 'P')
@@ -317,15 +319,15 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         child: Text.rich(
           TextSpan(children: [
             TextSpan(text: label, style: TextStyle(color: t.ink, fontWeight: FontWeight.w700)),
-            if (has && a.authorRole.isNotEmpty)
-              TextSpan(text: '  ·  ${a.authorRole}', style: TextStyle(color: t.soft)),
+            if (has && a.authorRole.en.isNotEmpty)
+              TextSpan(text: '  ·  ${a.authorRole.now}', style: TextStyle(color: t.soft)),
           ]),
           style: pvManrope(fontSize: 12.5),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      Text(a.readingTime,
+      Text(a.readingTime.now,
           style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: t.soft)),
     ]);
   }
@@ -369,7 +371,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                     color: const Color(0xFF9A7A14))),
           ]),
           const SizedBox(height: 8),
-          Text(a.reason,
+          Text(a.reason.now,
               style: pvManrope(fontSize: 14.5 * _fs, height: 1.55, color: t.ink)),
         ]),
       );
@@ -426,7 +428,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: _progressColor)),
               const SizedBox(width: 14),
               Expanded(
-                  child: Text(a.myth,
+                  child: Text(a.myth.now,
                       style: pvManrope(
                           fontSize: 14 * _fs, height: 1.55, color: t.ink, fontStyle: FontStyle.italic))),
             ]),
@@ -440,7 +442,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                       fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
               const SizedBox(width: 16),
               Expanded(
-                  child: Text(a.fact,
+                  child: Text(a.fact.now,
                       style: pvManrope(
                           fontSize: 14 * _fs, height: 1.6, color: t.ink, fontWeight: FontWeight.w600))),
             ]),
@@ -457,16 +459,16 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         const SizedBox(height: 20),
       ],
       if (a.hasRating) ...[_pad(_ratingRow(t)), const SizedBox(height: 18)],
-      if (c.about.isNotEmpty) ...[
+      if (c.about.en.isNotEmpty) ...[
         _anchor('about'),
         _pad(_secTitle(t, _tr('What this book is about', 'Yeh book kis baare mein hai'))),
         const SizedBox(height: 10),
-        _pad(Text(c.about, style: _bodyStyle(t))),
+        _pad(Text(c.about.now, style: _bodyStyle(t))),
         const SizedBox(height: 22),
       ],
-      if (c.philosophy.isNotEmpty) ...[
+      if (c.philosophy.en.isNotEmpty) ...[
         _anchor('philosophy'),
-        _pad(_infoBlock(t, icon: Icons.auto_awesome_outlined, title: _tr('Core philosophy', 'Mool vichaar'), body: c.philosophy, tint: t.accent)),
+        _pad(_infoBlock(t, icon: Icons.auto_awesome_outlined, title: _tr('Core philosophy', 'Mool vichaar'), body: c.philosophy.now, tint: t.accent)),
         const SizedBox(height: 22),
       ],
       if (c.ideas.isNotEmpty) ...[
@@ -490,16 +492,16 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         for (var i = 0; i < c.chapters.length; i++) _pad(_chapterCard(t, i, c.chapters[i])),
         const SizedBox(height: 12),
       ],
-      if (c.perspective.isNotEmpty) ...[
+      if (c.perspective.en.isNotEmpty) ...[
         _anchor('perspective'),
-        _pad(_takeBlock(t, c.perspective)),
+        _pad(_takeBlock(t, c.perspective.now)),
         const SizedBox(height: 22),
       ],
       if (c.quotes.isNotEmpty) ...[
         _anchor('quotes'),
         _pad(_secTitle(t, _tr('Memorable lines', 'Yaadgaar baatein'))),
         const SizedBox(height: 12),
-        for (final q in c.quotes) _pad(_quoteCard(t, q)),
+        for (final q in c.quotes) _pad(_quoteCard(t, q.now)),
       ],
     ];
   }
@@ -515,13 +517,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           if (c.recommendedFor.isNotEmpty) ...[
             Text(_tr('BEST FOR', 'KISKE LIYE'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
-            Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _metaChip(t, r, t.accent)]),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _metaChip(t, r.now, t.accent)]),
           ],
           if (c.recommendedFor.isNotEmpty && c.themes.isNotEmpty) const SizedBox(height: 14),
           if (c.themes.isNotEmpty) ...[
             Text(_tr('THEMES', 'VISHAY'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
-            Wrap(spacing: 7, runSpacing: 7, children: [for (final th in c.themes) _metaChip(t, th, t.soft)]),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final th in c.themes) _metaChip(t, th.now, t.soft)]),
           ],
         ]),
       );
@@ -580,7 +582,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             color: _companionCardBg,
             padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(idea.body, style: pvManrope(fontSize: 14 * _fs, height: 1.6, color: t.ink)),
+              Text(idea.body.now, style: pvManrope(fontSize: 14 * _fs, height: 1.6, color: t.ink)),
               if (idea.pointers.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 for (final p in idea.pointers)
@@ -592,7 +594,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                         child: Container(width: 4.5, height: 4.5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle)),
                       ),
                       const SizedBox(width: 10),
-                      Expanded(child: Text(p, style: pvManrope(fontSize: 13.5 * _fs, height: 1.5, color: t.soft))),
+                      Expanded(child: Text(p.now, style: pvManrope(fontSize: 13.5 * _fs, height: 1.5, color: t.soft))),
                     ]),
                   ),
               ],
@@ -647,11 +649,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           ),
           const SizedBox(width: 11),
           Expanded(
-              child: Text(ch.title,
+              child: Text(ch.title.now,
                   style: pvJakarta(fontSize: 14.5 * _fs, fontWeight: FontWeight.w700, color: t.ink, height: 1.2))),
         ]),
         const SizedBox(height: 10),
-        Text(ch.summary,
+        Text(ch.summary.now,
             maxLines: open ? null : 2,
             overflow: open ? TextOverflow.visible : TextOverflow.ellipsis,
             style: pvManrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
@@ -662,21 +664,21 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           // Chapters with a natural sub-structure ("Baby's Development", the
           // three stages of labour) group their points under a bold sub-label.
           for (final g in ch.keyPoints) ...[
-            if (g.label.isNotEmpty) ...[
+            if (g.label.en.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(g.label,
+                child: Text(g.label.now,
                     style: pvJakarta(
                         fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.ink, height: 1.3)),
               ),
             ],
             for (final p in g.points)
               Padding(
-                padding: EdgeInsets.only(bottom: 6, left: g.label.isEmpty ? 0 : 2),
+                padding: EdgeInsets.only(bottom: 6, left: g.label.en.isEmpty ? 0 : 2),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Padding(padding: const EdgeInsets.only(top: 7), child: Container(width: 5, height: 5, decoration: BoxDecoration(color: t.accent, shape: BoxShape.circle))),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(p, style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
+                  Expanded(child: Text(p.now, style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.ink))),
                 ]),
               ),
             const SizedBox(height: 4),
@@ -817,11 +819,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${na.category.toUpperCase()} · ${na.readingTime.toUpperCase()}',
+                  Text('${na.category.now.toUpperCase()} · ${na.readingTime.now.toUpperCase()}',
                       style: pvManrope(
                           fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
                   const SizedBox(height: 3),
-                  Text(na.title,
+                  Text(na.title.now,
                       style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis),

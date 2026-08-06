@@ -159,10 +159,10 @@ class VedaIndex {
       docs.add(VedaDoc(
         id: 'read_${r.id}',
         kind: VedaKind.read,
-        sourceLabel: r.category.isEmpty ? 'Read' : r.category,
-        title: r.title,
-        body: r.body.isNotEmpty ? r.body : r.reason,
-        keywords: [r.category],
+        sourceLabel: r.category.en.isEmpty ? 'Read' : r.category.en,
+        title: r.title.en,
+        body: r.body.en.isNotEmpty ? r.body.en : r.reason.en,
+        keywords: [r.category.en],
       ));
     }
 

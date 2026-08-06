@@ -219,7 +219,7 @@ class _HeroCard extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(item.title,
+                Text(item.title.now,
                     style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.2)),
                 const SizedBox(height: 4),
                 Text('${item.category} · ${item.readingTime}',
@@ -228,7 +228,7 @@ class _HeroCard extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 14),
-          _WhyNow(reason: item.reason, lang: controller.language),
+          _WhyNow(reason: item.reason.now, lang: controller.language),
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
@@ -295,7 +295,7 @@ class _ReadCard extends StatelessWidget {
                 ),
               Row(children: [
                 Expanded(
-                  child: Text(item.title,
+                  child: Text(item.title.now,
                       style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 ),
                 if (status != null) ...[
@@ -344,7 +344,7 @@ class _BookCard extends StatelessWidget {
             _SaveHeart(id: item.id),
           ]),
           const SizedBox(height: 8),
-          Text(item.title,
+          Text(item.title.now,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.2)),
@@ -366,7 +366,7 @@ class _BookCard extends StatelessWidget {
           ],
           const SizedBox(height: 8),
           Expanded(
-            child: Text(item.why,
+            child: Text(item.why.now,
                 maxLines: 5,
                 overflow: TextOverflow.ellipsis,
                 style: text.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.35)),
@@ -438,7 +438,7 @@ class _ExpertCard extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('${s.rnRecommendedBy} ${item.author}',
                     style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-                Text(item.authorRole,
+                Text(item.authorRole.now,
                     style: text.labelSmall?.copyWith(
                         color: _accent, fontWeight: FontWeight.w700)),
               ]),
@@ -446,10 +446,10 @@ class _ExpertCard extends StatelessWidget {
             _SaveHeart(id: item.id),
           ]),
           const SizedBox(height: 12),
-          Text(item.title,
+          Text(item.title.now,
               style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          Text(item.why,
+          Text(item.why.now,
               style: text.bodyMedium?.copyWith(color: AppTheme.neutral700, height: 1.4)),
         ]),
       ),
@@ -540,7 +540,7 @@ class ReadItemScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Text(item.title.now, maxLines: 1, overflow: TextOverflow.ellipsis),
         actions: [_SaveHeart(id: item.id), const SizedBox(width: 8)],
       ),
       body: AnimatedBuilder(
@@ -555,7 +555,7 @@ class ReadItemScreen extends StatelessWidget {
             children: [
               Center(child: Text(item.emoji, style: const TextStyle(fontSize: 56))),
               const SizedBox(height: 12),
-              Text(item.title,
+              Text(item.title.now,
                   textAlign: TextAlign.center,
                   style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
@@ -566,19 +566,19 @@ class ReadItemScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
               const SizedBox(height: 18),
-              _WhyNow(reason: item.reason, lang: controller.language),
+              _WhyNow(reason: item.reason.now, lang: controller.language),
               const SizedBox(height: 18),
-              if (item.authorRole.isNotEmpty)
+              if (item.authorRole.en.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Text('${s.rnRecommendedBy} ${item.author} · ${item.authorRole}',
                       style: text.labelMedium?.copyWith(
                           color: _accent, fontWeight: FontWeight.w700)),
                 ),
-              if (isBook || item.why.isNotEmpty && item.body.isEmpty)
-                _sectionCard(context, s.rnWhyRecommend, item.why)
+              if (isBook || item.why.en.isNotEmpty && item.body.en.isEmpty)
+                _sectionCard(context, s.rnWhyRecommend, item.why.now)
               else
-                for (final para in item.body.split('\n\n'))
+                for (final para in item.body.now.split('\n\n'))
                   Padding(
                     padding: const EdgeInsets.only(bottom: 14),
                     child: Text(para,
@@ -702,7 +702,7 @@ class ReadNextHomeCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(hero.title,
+                  Text(hero.title.now,
                       style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800, height: 1.2)),
                   const SizedBox(height: 2),
                   Text('${hero.category} · ${hero.readingTime}',
@@ -920,7 +920,7 @@ class DailyReadsHomeCard extends StatelessWidget {
                       height: 54,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _readTint(r.category),
+                        color: _readTint(r.category.now),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child:
@@ -932,7 +932,7 @@ class DailyReadsHomeCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            r.title,
+                            r.title.now,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             // "Read" is now shown by a small tick on the right
@@ -1037,7 +1037,7 @@ class DailyReadsHomeCard extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(r.title)));
+          .showSnackBar(SnackBar(content: Text(r.title.now)));
     }
   }
 }
@@ -1071,7 +1071,7 @@ class _ReadSearchDelegate extends SearchDelegate<void> {
         for (final r in results)
           ListTile(
             leading: Text(r.emoji, style: const TextStyle(fontSize: 24)),
-            title: Text(r.title),
+            title: Text(r.title.now),
             subtitle: Text('${r.category} · ${r.readingTime}',
                 style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
             onTap: () {

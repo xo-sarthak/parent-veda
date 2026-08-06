@@ -140,7 +140,7 @@ class FatherReadsScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(r.title,
+                    Text(r.title.now,
                         style: fatherSerif(16, weight: FontWeight.w600)),
                     const SizedBox(height: 5),
                     Text('${r.readingTime} · ${r.category}',
@@ -176,7 +176,7 @@ class FatherReadsScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(r.title,
+                    Text(r.title.now,
                         style: fatherSerif(16, weight: FontWeight.w600)),
                     const SizedBox(height: 5),
                     Row(children: [
@@ -244,7 +244,7 @@ class FatherReadsScreen extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(r.title)));
+          .showSnackBar(SnackBar(content: Text(r.title.now)));
     }
   }
 }
@@ -342,14 +342,14 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
   Widget build(BuildContext context) {
     final r = widget.read;
     final pal = _paletteFor(_FatherReaderPrefs.mode);
-    final paras = r.body.split('\n\n');
+    final paras = r.body.now.split('\n\n');
     return Scaffold(
       backgroundColor: pal.bg,
       appBar: AppBar(
         backgroundColor: pal.bg,
         elevation: 0,
         foregroundColor: pal.ink,
-        title: Text(r.category,
+        title: Text(r.category.now,
             style: pvJakarta(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -380,7 +380,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
         controller: _scroll,
         padding: const EdgeInsets.fromLTRB(22, 6, 22, 48),
         children: [
-          Text(r.title,
+          Text(r.title.now,
               key: _kArticle,
               style: fatherSerif(27 * _fs, weight: FontWeight.w600)
                   .copyWith(color: pal.ink)),
@@ -400,10 +400,10 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
             const SizedBox(height: 16),
           ],
           if (r.hasWhyThisMatters)
-            _block(pal, _kWhy, 'Why This Matters', r.whyThisMatters,
+            _block(pal, _kWhy, 'Why This Matters', r.whyThisMatters.now,
                 Icons.favorite_rounded),
           if (r.hasResearchSimplified)
-            _block(pal, _kResearch, 'Research Simplified', r.researchSimplified,
+            _block(pal, _kResearch, 'Research Simplified', r.researchSimplified.now,
                 Icons.science_rounded),
           if (r.hasMythFact) _mythFact(pal, r),
         ],
@@ -450,9 +450,9 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
           border: Border.all(color: pal.line),
         ),
         child: Column(children: [
-          _mfRow(pal, 'MYTH', r.myth, kFMuted, Icons.close_rounded),
+          _mfRow(pal, 'MYTH', r.myth.now, kFMuted, Icons.close_rounded),
           Divider(height: 1, color: pal.line),
-          _mfRow(pal, 'FACT', r.fact, kFAccent, Icons.check_rounded),
+          _mfRow(pal, 'FACT', r.fact.now, kFAccent, Icons.check_rounded),
         ]),
       );
 

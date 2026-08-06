@@ -984,7 +984,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   Text(S.now.uiTodaySRead, style: _eyebrow(p.accent, 0.12)),
                 ]),
                 const SizedBox(height: 9),
-                Text(r.title,
+                Text(r.title.now,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: _serif(18, p.ink, w: FontWeight.w600)),
@@ -1726,9 +1726,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final isRead = d.id == 'read';
     final r = isRead ? _todayRead : null;
     final out = <Widget>[
-      Text(isRead ? r!.title : d.title, style: _serif(27, p.ink)),
+      Text(isRead ? r!.title.now : d.title, style: _serif(27, p.ink)),
     ];
-    final metaStr = isRead ? '${r!.readingTime} · ${r.category}' : d.meta;
+    final metaStr =
+        isRead ? '${r!.readingTime.now} · ${r.category.now}' : d.meta;
     if (metaStr.isNotEmpty) {
       out.add(const SizedBox(height: 9));
       out.add(Text(metaStr, style: _body(13, p.muted, w: FontWeight.w500)));
@@ -1739,7 +1740,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
       out.add(ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(height: 170, child: _SoundRippleArt(pal: p))));
-      for (final para in rr.body.split('\n\n')) {
+      for (final para in rr.body.now.split('\n\n')) {
         out.add(const SizedBox(height: 16));
         out.add(Text(para,
             style: _body(15.5, p.ink.withValues(alpha: 0.9), h: 1.62)));

@@ -7,6 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
+import '../localization/app_language.dart';
 
 enum ReadType { article, book, research, expert, reflection }
 
@@ -16,9 +17,9 @@ enum ReadType { article, book, research, expert, reflection }
 @immutable
 class BookKeyIdea {
   const BookKeyIdea({required this.title, required this.body, this.pointers = const []});
-  final String title;
-  final String body; // one paragraph — no labelled sub-sections
-  final List<String> pointers; // 2-3 short dot lines
+  final LocalizedText title;
+  final LocalizedText body; // one paragraph — no labelled sub-sections
+  final List<LocalizedText> pointers; // 2-3 short dot lines
 }
 
 /// A run of "Key Points Covered" under an optional bolded sub-label. Chapters
@@ -26,9 +27,9 @@ class BookKeyIdea {
 /// group their points; an empty [label] means plain, ungrouped bullets.
 @immutable
 class BookPointGroup {
-  const BookPointGroup({this.label = '', required this.points});
-  final String label;
-  final List<String> points;
+  const BookPointGroup({this.label = const LocalizedText(en: '', hi: ''), required this.points});
+  final LocalizedText label;
+  final List<LocalizedText> points;
 }
 
 /// One chapter (or chapter group) of the book: a short teaser summary plus the
@@ -36,8 +37,8 @@ class BookPointGroup {
 @immutable
 class BookChapter {
   const BookChapter({required this.title, required this.summary, this.keyPoints = const []});
-  final String title;
-  final String summary;
+  final LocalizedText title;
+  final LocalizedText summary;
   final List<BookPointGroup> keyPoints;
 }
 
@@ -49,24 +50,24 @@ class BookCompanion {
   const BookCompanion({
     this.recommendedFor = const [],
     this.themes = const [],
-    this.authorIntro = '',
+    this.authorIntro = const LocalizedText(en: '', hi: ''),
     this.otherBooks = const [],
     this.parentVedaRating,
-    this.about = '',
-    this.philosophy = '',
+    this.about = const LocalizedText(en: '', hi: ''),
+    this.philosophy = const LocalizedText(en: '', hi: ''),
     this.ideas = const [],
-    this.perspective = '',
+    this.perspective = const LocalizedText(en: '', hi: ''),
     this.chapters = const [],
     this.quotes = const [],
   });
-  final List<String> recommendedFor;
-  final List<String> themes;
+  final List<LocalizedText> recommendedFor;
+  final List<LocalizedText> themes;
 
   /// "About the author" — one compact line, never a biography.
-  final String authorIntro;
+  final LocalizedText authorIntro;
 
   /// The author's other notable books, rendered as chips.
-  final List<String> otherBooks;
+  final List<LocalizedText> otherBooks;
 
   /// FUTURE READY, deliberately not rendered: a ParentVeda Rating for the book
   /// itself. The hero keeps room for it so adding one later is a data change,
@@ -75,14 +76,18 @@ class BookCompanion {
   /// thing the Product Guide work was careful to avoid.
   final double? parentVedaRating;
 
-  final String about; // "What this book is about"
-  final String philosophy; // "Core Philosophy"
+  final LocalizedText about; // "What this book is about"
+  final LocalizedText philosophy; // "Core Philosophy"
   final List<BookKeyIdea> ideas; // "The book's most important ideas"
-  final String perspective; // "ParentVeda's Take"
+  final LocalizedText perspective; // "ParentVeda's Take"
   final List<BookChapter> chapters; // chapter-by-chapter
-  final List<String> quotes; // memorable quotes
+  final List<LocalizedText> quotes; // memorable quotes
 
-  bool get isEmpty => about.isEmpty && ideas.isEmpty && chapters.isEmpty;
+  // .en: this asks whether a companion EXISTS at all. Presence must not
+  // depend on the language on screen, or a book would show its companion in
+  // English and a bare blurb in Hindi.
+  bool get isEmpty =>
+      about.en.isEmpty && ideas.isEmpty && chapters.isEmpty;
 }
 
 @immutable
@@ -98,20 +103,20 @@ class ReadItem {
     required this.category,
     this.emoji = '📄',
     this.priority = 'medium',
-    this.body = '',
+    this.body = const LocalizedText(en: '', hi: ''),
     this.author = '',
-    this.authorRole = '',
-    this.why = '',
+    this.authorRole = const LocalizedText(en: '', hi: ''),
+    this.why = const LocalizedText(en: '', hi: ''),
     this.rating = 0.0,
     this.ratingCount = 0,
     // ---- Learn V2 reader blocks (additive, optional) --------------------
     // Distinct, styled sections in the premium reader. Left empty here => the
     // reader simply omits the block. All optional so every existing consumer
     // (home DailyReadsHomeCard, father daily screen) keeps compiling unchanged.
-    this.whyThisMatters = '',
-    this.researchSimplified = '',
-    this.myth = '',
-    this.fact = '',
+    this.whyThisMatters = const LocalizedText(en: '', hi: ''),
+    this.researchSimplified = const LocalizedText(en: '', hi: ''),
+    this.myth = const LocalizedText(en: '', hi: ''),
+    this.fact = const LocalizedText(en: '', hi: ''),
     // Optional store link for a book summary's "Buy Book" CTA. Empty => the CTA
     // falls back to a web search for the title + author.
     this.buyUrl = '',
@@ -121,22 +126,22 @@ class ReadItem {
   });
 
   final String id;
-  final String title;
+  final LocalizedText title;
   final ReadType type;
   final int weekStart;
   final int weekEnd;
 
   /// "Why this matters now" - shown on every recommendation.
-  final String reason;
-  final String readingTime; // "5 min"
-  final String category; // Baby Development, Mother Changes, …
+  final LocalizedText reason;
+  final LocalizedText readingTime; // "5 min"
+  final LocalizedText category; // Baby Development, Mother Changes, …
   final String emoji; // cover stand-in
   final String priority; // 'high' | 'medium'
 
-  final String body; // article / research summary text
+  final LocalizedText body; // article / research summary text
   final String author; // book author / nothing
-  final String authorRole; // expert role (Pediatrician, …)
-  final String why; // book / expert "why ParentVeda recommends it"
+  final LocalizedText authorRole; // expert role (Pediatrician, …)
+  final LocalizedText why; // book / expert "why ParentVeda recommends it"
 
   final double rating; // reader rating out of 5 (books)
   final int ratingCount; // number of ratings
@@ -144,14 +149,14 @@ class ReadItem {
   // ---- Learn V2 reader blocks (optional, default empty) -------------------
   /// "Why This Matters" - a deeper, styled block on the meaning/impact for
   /// mother & baby (distinct from [reason], which is the week-timing hook).
-  final String whyThisMatters;
+  final LocalizedText whyThisMatters;
 
   /// "Research Simplified" - the evidence, in plain, reassuring language.
-  final String researchSimplified;
+  final LocalizedText researchSimplified;
 
   /// Optional myth-vs-fact pair. Both must be non-empty for the block to show.
-  final String myth;
-  final String fact;
+  final LocalizedText myth;
+  final LocalizedText fact;
 
   /// Optional purchase link for book summaries ("Buy Book").
   final String buyUrl;
@@ -165,7 +170,11 @@ class ReadItem {
   bool get isHigh => priority == 'high';
   bool get hasRating => rating > 0;
 
-  bool get hasWhyThisMatters => whyThisMatters.trim().isNotEmpty;
-  bool get hasResearchSimplified => researchSimplified.trim().isNotEmpty;
-  bool get hasMythFact => myth.trim().isNotEmpty && fact.trim().isNotEmpty;
+  bool get hasWhyThisMatters => whyThisMatters.en.trim().isNotEmpty;
+  bool get hasResearchSimplified => researchSimplified.en.trim().isNotEmpty;
+  // .en: presence, not content. Asking whether a block EXISTS must give the
+  // same answer in both languages, or a myth-vs-fact card would appear in
+  // English and vanish in Hindi.
+  bool get hasMythFact =>
+      myth.en.trim().isNotEmpty && fact.en.trim().isNotEmpty;
 }

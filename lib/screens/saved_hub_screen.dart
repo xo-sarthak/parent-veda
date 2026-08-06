@@ -107,7 +107,7 @@ class SavedHubScreen extends StatelessWidget {
                   _tile(
                     emoji: r.emoji,
                     color: AppTheme.primary500,
-                    title: r.title,
+                    title: r.title.now,
                     subtitle: '${r.category} · ${r.readingTime}',
                     date: _date(s, ReadNextStore.instance.savedAt(r.id)),
                     onTap: () => _push(context,

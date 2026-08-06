@@ -76,7 +76,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
     const _Section('overview', 'Overview'),
     if (c.ideas.isNotEmpty) const _Section('ideas', 'Ideas'),
     if (c.chapters.isNotEmpty) const _Section('chapters', 'Chapters'),
-    if (c.perspective.isNotEmpty) const _Section('take', 'ParentVeda Take'),
+    if (c.perspective.en.isNotEmpty) const _Section('take', 'ParentVeda Take'),
     if (c.quotes.isNotEmpty) const _Section('quotes', 'Quotes'),
   ];
 
@@ -191,7 +191,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
-                  a.title,
+                  a.title.now,
                   style: pvFraunces(
                     fontSize: 25,
                     height: 1.1,
@@ -206,7 +206,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 Row(children: [
                   const Icon(Icons.schedule_rounded, size: 13, color: _muted),
                   const SizedBox(width: 5),
-                  Text(a.readingTime, style: pvManrope(fontSize: 12, color: _muted, fontWeight: FontWeight.w700)),
+                  Text(a.readingTime.now, style: pvManrope(fontSize: 12, color: _muted, fontWeight: FontWeight.w700)),
                 ]),
               ]),
             ),
@@ -215,13 +215,13 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           if (c.recommendedFor.isNotEmpty) ...[
             _label('RECOMMENDED FOR'),
             const SizedBox(height: 8),
-            Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _chip(r)]),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _chip(r.now)]),
             const SizedBox(height: 16),
           ],
           if (c.themes.isNotEmpty) ...[
             _label('THEMES'),
             const SizedBox(height: 8),
-            Wrap(spacing: 7, runSpacing: 7, children: [for (final t in c.themes) _chip(t, quiet: true)]),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final t in c.themes) _chip(t.now, quiet: true)]),
             const SizedBox(height: 20),
           ],
           Row(children: [
@@ -289,7 +289,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           Container(width: 22, height: 2, color: Colors.white.withValues(alpha: 0.55)),
           const Spacer(),
           Text(
-            a.title,
+            a.title.now,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
             style: pvFraunces(fontSize: 11.5, height: 1.2, color: Colors.white, fontWeight: FontWeight.w600),
@@ -399,18 +399,18 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
         padding: const EdgeInsets.only(top: 26, bottom: 60),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _anchor('overview'),
-          if (c.about.isNotEmpty) ...[
+          if (c.about.en.isNotEmpty) ...[
             _pad(_sectionTitle('What this book is about')),
             const SizedBox(height: 12),
             // Light on purpose: no card, no border. One editorial paragraph.
-            _pad(Text(c.about, style: _bodyStyle())),
+            _pad(Text(c.about.now, style: _bodyStyle())),
             const SizedBox(height: 30),
           ],
-          if (c.authorIntro.isNotEmpty) ...[
+          if (c.authorIntro.en.isNotEmpty) ...[
             _pad(_author()),
             const SizedBox(height: 30),
           ],
-          if (c.philosophy.isNotEmpty) ...[
+          if (c.philosophy.en.isNotEmpty) ...[
             _pad(_philosophy()),
             const SizedBox(height: 34),
           ],
@@ -444,7 +444,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 )),
             const SizedBox(height: 34),
           ],
-          if (c.perspective.isNotEmpty) ...[
+          if (c.perspective.en.isNotEmpty) ...[
             _anchor('take'),
             _pad(_take()),
             const SizedBox(height: 34),
@@ -453,7 +453,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             _anchor('quotes'),
             _pad(_sectionTitle('Memorable lines')),
             const SizedBox(height: 18),
-            for (final q in c.quotes) _pad(_quote(q)),
+            for (final q in c.quotes) _pad(_quote(q.now)),
           ],
         ]),
       );
@@ -500,10 +500,10 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
   Widget _author() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _label('ABOUT THE AUTHOR'),
         const SizedBox(height: 10),
-        Text(c.authorIntro, style: pvManrope(fontSize: 14, height: 1.6, color: _soft)),
+        Text(c.authorIntro.now, style: pvManrope(fontSize: 14, height: 1.6, color: _soft)),
         if (c.otherBooks.isNotEmpty) ...[
           const SizedBox(height: 14),
-          Wrap(spacing: 8, runSpacing: 8, children: [for (final b in c.otherBooks) _bookChip(b)]),
+          Wrap(spacing: 8, runSpacing: 8, children: [for (final b in c.otherBooks) _bookChip(b.now)]),
         ],
       ]);
 
@@ -547,7 +547,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           // Large type, generous height. This is the one paragraph a reader
           // should remember if they read nothing else.
           Text(
-            c.philosophy,
+            c.philosophy.now,
             style: pvFraunces(
               fontSize: 19,
               height: 1.58,
@@ -584,7 +584,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           ]),
           const SizedBox(height: 14),
           Text(
-            c.perspective,
+            c.perspective.now,
             style: pvFraunces(fontSize: 16, height: 1.65, color: _ink),
           ),
         ]),
@@ -710,7 +710,7 @@ class _IdeaCardState extends State<_IdeaCard> {
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  widget.idea.title,
+                  widget.idea.title.now,
                   style: pvJakarta(
                     fontSize: 14.5,
                     height: 1.3,
@@ -738,7 +738,7 @@ class _IdeaCardState extends State<_IdeaCard> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // The paragraph is dominant; the pointers are supplementary.
               Text(
-                widget.idea.body,
+                widget.idea.body.now,
                 style: pvManrope(fontSize: 14.5, height: 1.72, color: _ink),
               ),
               if (widget.idea.pointers.isNotEmpty) ...[
@@ -755,7 +755,7 @@ class _IdeaCardState extends State<_IdeaCard> {
                       ),
                       const SizedBox(width: 11),
                       Expanded(
-                        child: Text(p, style: pvManrope(fontSize: 13, height: 1.55, color: _soft)),
+                        child: Text(p.now, style: pvManrope(fontSize: 13, height: 1.55, color: _soft)),
                       ),
                     ]),
                   ),
@@ -808,7 +808,7 @@ class _ChapterCardState extends State<_ChapterCard> {
               Row(children: [
                 Expanded(
                   child: Text(
-                    ch.title,
+                    ch.title.now,
                     style: pvJakarta(fontSize: 14.5, height: 1.3, fontWeight: FontWeight.w700, color: _ink),
                   ),
                 ),
@@ -828,7 +828,7 @@ class _ChapterCardState extends State<_ChapterCard> {
               if (!_open) ...[
                 const SizedBox(height: 7),
                 Text(
-                  ch.summary,
+                  ch.summary.now,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: pvManrope(fontSize: 13, height: 1.5, color: _muted),
@@ -845,7 +845,7 @@ class _ChapterCardState extends State<_ChapterCard> {
               ? Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(ch.summary, style: pvManrope(fontSize: 14.5, height: 1.72, color: _ink)),
+              Text(ch.summary.now, style: pvManrope(fontSize: 14.5, height: 1.72, color: _ink)),
               if (ch.keyPoints.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 Container(height: 1, color: _line),
@@ -856,11 +856,11 @@ class _ChapterCardState extends State<_ChapterCard> {
                 ),
                 const SizedBox(height: 14),
                 for (final g in ch.keyPoints) ...[
-                  if (g.label.isNotEmpty) ...[
+                  if (g.label.en.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.only(bottom: 7),
                       child: Text(
-                        g.label,
+                        g.label.now,
                         style: pvJakarta(fontSize: 12.5, fontWeight: FontWeight.w800, color: _ink),
                       ),
                     ),
@@ -874,7 +874,7 @@ class _ChapterCardState extends State<_ChapterCard> {
                           child: Container(width: 4, height: 4, decoration: const BoxDecoration(color: _muted, shape: BoxShape.circle)),
                         ),
                         const SizedBox(width: 11),
-                        Expanded(child: Text(p, style: pvManrope(fontSize: 13.5, height: 1.6, color: _soft))),
+                        Expanded(child: Text(p.now, style: pvManrope(fontSize: 13.5, height: 1.6, color: _soft))),
                       ]),
                     ),
                   const SizedBox(height: 6),
