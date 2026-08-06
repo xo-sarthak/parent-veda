@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
+import '../localization/app_language.dart';
 
 /// Post content types (a subset of the spec's list, enough for the prototype).
 enum PostType { question, experience, poll, photo, milestone, expert, parentVeda }
@@ -29,9 +30,9 @@ class Community {
   });
 
   final String id;
-  final String name;
+  final LocalizedText name;
   final String emoji;
-  final String description;
+  final LocalizedText description;
   final int members;
 
   /// Auto-joined for the user's stage (cohort / trimester / location).

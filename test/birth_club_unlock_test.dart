@@ -36,7 +36,7 @@ void main() {
       expect(id, 'oct2026');
       expect(communityById(id), isNotNull,
           reason: 'a joined room that resolves to null renders as nothing');
-      expect(communityById(id)!.name, 'October 2026 Moms');
+      expect(communityById(id)!.name.en, 'October 2026 Moms');
     });
 
     test('a joined birth club appears in her joined list', () {
@@ -48,7 +48,7 @@ void main() {
     test('a month that WAS hand-seeded resolves to that same room', () {
       // 'nov2026' is in kCommunities; deriving it must not create a duplicate.
       expect(birthClubRoomId('2026-11'), 'nov2026');
-      expect(communityById('nov2026')!.name, 'November 2026 Moms');
+      expect(communityById('nov2026')!.name.en, 'November 2026 Moms');
       expect(allCommunities(dueDate: DateTime(2026, 11, 20)).length,
           kCommunities.length,
           reason: 'a seeded month must not be listed twice');

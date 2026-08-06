@@ -120,7 +120,7 @@ void main() {
     testWidgets('Community holds a room for loss, not only for hope',
         (tester) async {
       final names =
-          TtcCommunityScreen.rooms.map((r) => r.name.toLowerCase()).toList();
+          TtcCommunityScreen.rooms.map((r) => r.name.en.toLowerCase()).toList();
       expect(names.any((n) => n.contains('loss')), isTrue);
       // And the partner is a room of his own, not a footnote in hers.
       expect(names.any((n) => n.contains('partner')), isTrue);

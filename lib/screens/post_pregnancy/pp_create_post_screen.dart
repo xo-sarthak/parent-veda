@@ -290,7 +290,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                   _chip('Your feed', _communityId == '',
                       () => setState(() => _communityId = '')),
                   for (final c in joined)
-                    _chip(c.name, _communityId == c.id,
+                    _chip(c.name.now, _communityId == c.id,
                         () => setState(() => _communityId = c.id)),
                 ]),
                 const SizedBox(height: 18),

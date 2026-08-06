@@ -180,7 +180,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                             decoration: BoxDecoration(
                                 color: ppPurple.withValues(alpha: 0.10),
                                 borderRadius: BorderRadius.circular(12)),
-                            child: Text(ppMono(c.name),
+                            child: Text(ppMono(c.name.now),
                                 style: ppJakarta(14, color: ppPurple)),
                           ),
                           const SizedBox(width: 12),
@@ -188,7 +188,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(c.name,
+                                  Text(c.name.now,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: ppBody(14,

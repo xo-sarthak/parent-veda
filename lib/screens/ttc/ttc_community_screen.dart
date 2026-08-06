@@ -241,7 +241,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                               color: target == c.id ? ttcPurple : ttcPanel,
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: Text(c.name,
+                            child: Text(c.name.now,
                                 style: ttcBody(12,
                                     color: target == c.id
                                         ? Colors.white
@@ -414,15 +414,15 @@ class _RoomCard extends StatelessWidget {
           height: 42,
           alignment: Alignment.center,
           decoration: const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
-          child: Text(community.name.characters.first.toUpperCase(),
+          child: Text(community.name.now.characters.first.toUpperCase(),
               style: ttcJakarta(16, color: ttcPurple)),
         ),
         const SizedBox(width: 13),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(community.name, style: ttcJakarta(14.5)),
+            Text(community.name.now, style: ttcJakarta(14.5)),
             const SizedBox(height: 3),
-            Text(community.description,
+            Text(community.description.now,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: ttcBody(12, h: 1.45)),
@@ -494,7 +494,7 @@ class _RoomFilter extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         children: [
           chip(t.communityAll, null),
-          for (final c in kTtcCommunities) chip(c.name, c.id),
+          for (final c in kTtcCommunities) chip(c.name.now, c.id),
         ],
       ),
     );
@@ -547,7 +547,7 @@ class _PostCard extends StatelessWidget {
                     Text(post.cred,
                         style: ttcBody(11, color: ttcMuted, w: FontWeight.w600))
                   else if (room.isNotEmpty)
-                    Text(room.first.name,
+                    Text(room.first.name.now,
                         style: ttcBody(11, color: ttcMuted, w: FontWeight.w600)),
                 ]),
           ),

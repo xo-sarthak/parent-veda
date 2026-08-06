@@ -1,0 +1,44 @@
+# Strings that must STAY ENGLISH because code reads them, not mothers.
+#
+# Every line here was found the hard way or flagged before it shipped. They look
+# like copy - they are words, in English, sitting in a data file - so a worklist
+# offers them up and a translator dutifully translates them. Nothing then fails
+# to compile and no test goes red; the feature just quietly stops working.
+#
+# Format: one string per line, tab, then the reason. tool/apply_glossary.py
+# reads column 1 and excludes these from both the applier and the worklist, so
+# they stop being re-offered every round.
+#
+# ---- community_data.dart -----------------------------------------------------
+# _topicKeywords values (line ~534), matched with `t.contains` inside
+# inferTopics(). Auto-tagging is invisible when it fails: posts simply stop
+# being categorised, and nobody notices for months.
+weight gain	_topicKeywords - matched with contains(), never rendered
+milk supply	_topicKeywords - matched with contains(), never rendered
+hospital bag	_topicKeywords - matched with contains(), never rendered
+c-section	_topicKeywords - matched with contains(), never rendered
+due date	_topicKeywords - matched with contains(), never rendered
+blood pressure	_topicKeywords - matched with contains(), never rendered
+talk to baby	_topicKeywords - matched with contains(), never rendered
+read to	_topicKeywords - matched with contains(), never rendered
+flu shot	_topicKeywords - matched with contains(), never rendered
+# stage: values, compared with == in three post-pregnancy screens.
+Trying	stage: value compared with ==
+Parenting	stage: value compared with ==
+#
+# ---- prepare_data.dart -------------------------------------------------------
+# A RegExp SOURCE (line ~998) that strips an English prefix off c.schedule[i].
+# Translate the schedule strings and this stops matching, so the prefix shows
+# through to the mother - the same family as the _fromCohort bug.
+^Week \d+ · 	RegExp source, strips an English prefix
+#
+# ---- ids built or parsed by code ---------------------------------------------
+# birthClubCommunityId composes this and communityById parses it back with
+# RegExp(r'^([a-z]{3})(\d{4})$').
+${_monthSlugs[month]}$year	composes a room id parsed back by RegExp
+prog_${m.id}	id, not copy
+prog_${c.id}	id, not copy
+#
+# ---- garbh_data.dart ---------------------------------------------------------
+# Lowercased and matched against English keyword hints in ragaTimeBadge().
+${a.id} ${a.title} ${a.subtitle}	ragaTimeBadge hint, matched against English

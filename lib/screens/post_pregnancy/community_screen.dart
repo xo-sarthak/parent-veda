@@ -1293,7 +1293,7 @@ class _PpCommunityCard extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: gradient),
                     borderRadius: BorderRadius.circular(14)),
-                child: Text(ppMono(community.name),
+                child: Text(ppMono(community.name.now),
                     style: ppJakarta(15, color: Colors.white)),
               ),
               Positioned(
@@ -1321,7 +1321,7 @@ class _PpCommunityCard extends StatelessWidget {
               ),
           ]),
           const SizedBox(height: 12),
-          Text(community.name,
+          Text(community.name.now,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: ppBody(14.5, color: ppInk, w: FontWeight.w800)),
@@ -1371,11 +1371,11 @@ class _PpRecommendedCard extends StatelessWidget {
             decoration: BoxDecoration(
                 color: ppPurple.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(14)),
-            child: Text(ppMono(community.name),
+            child: Text(ppMono(community.name.now),
                 style: ppJakarta(15, color: ppPurple)),
           ),
           const SizedBox(height: 10),
-          Text(community.name,
+          Text(community.name.now,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: ppBody(14.5, color: ppInk, w: FontWeight.w800)),
@@ -1386,7 +1386,7 @@ class _PpRecommendedCard extends StatelessWidget {
               style: ppBody(11.5, color: ppMuted)),
           const SizedBox(height: 8),
           Expanded(
-            child: Text(community.description,
+            child: Text(community.description.now,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: ppBody(12, color: ppSoft, h: 1.35)),
@@ -1462,7 +1462,7 @@ class _PpSearchDelegate extends SearchDelegate<void> {
     if (q.isEmpty) return const SizedBox.shrink();
     final comms = kParentingCommunities
         .where((c) =>
-            c.name.toLowerCase().contains(q) ||
+            c.name.now.toLowerCase().contains(q) ||
             c.topics.any((t) => t.toLowerCase().contains(q)))
         .toList();
     final posts = ppFeed()
@@ -1484,10 +1484,10 @@ class _PpSearchDelegate extends SearchDelegate<void> {
                 decoration: BoxDecoration(
                     color: ppPurple.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(12)),
-                child: Text(ppMono(c.name),
+                child: Text(ppMono(c.name.now),
                     style: ppJakarta(14, color: ppPurple)),
               ),
-              title: Text(c.name, style: ppBody(14.5, color: ppInk, w: FontWeight.w700)),
+              title: Text(c.name.now, style: ppBody(14.5, color: ppInk, w: FontWeight.w700)),
               subtitle: Text('${ppMembers(c.members)} members',
                   style: ppBody(12, color: ppMuted)),
               onTap: () {

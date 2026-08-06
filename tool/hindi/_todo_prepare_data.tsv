@@ -1,0 +1,6 @@
+from ₹699	₹699 से
+${m.facts[1].big} · ${m.facts[1].small}	${m.facts[1].big} · ${m.facts[1].small}
+${m.facts.first.big} ${m.facts.first.small}	${m.facts.first.big} ${m.facts.first.small}
+prog_${m.id}	prog_${m.id}
+prog_${c.id}	prog_${c.id}
+^Week \d+ · 	^Week \d+ · 

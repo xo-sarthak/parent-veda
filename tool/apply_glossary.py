@@ -34,7 +34,46 @@ import sys
 #
 # Match everything, then filter with skip(). The same note is on the LITERAL in
 # tool/hindi_progress.py, where this was found first.
-LITERAL = re.compile(r"""(?<!_t\()(['"])((?:\\.|(?!\1).)*?)\1""")
+#
+# The `(?<!_t\()` lookbehind this used to carry was the SAME MISTAKE in another
+# form. It existed to leave already-converted `_t('en', 'hi')` alone, but a
+# lookbehind skips the OPENING quote - which strands the scanner inside the
+# string, so that string's CLOSING quote becomes the next match's opening one
+# and the Dart between two literals is captured as content. can_i_data.dart,
+# which uses single-argument `_t('…')`, produced worklist rows reading
+# `), why: _t(` and `), aliases: [` - fragments of source code offered up for
+# translation, and one bad applier run away from being replaced by Hindi.
+#
+# Never skip a quote. Match every literal so the scan stays in phase, then use
+# already_converted() to decide what to leave alone.
+LITERAL = re.compile(r"""(['"])((?:\\.|(?!\1).)*?)\1""")
+
+
+NEVER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          'hindi', '_never_translate.tsv')
+
+
+def never_translate():
+    """Strings code reads rather than renders - see the file for each reason."""
+    out = set()
+    try:
+        for line in open(NEVER_PATH, encoding='utf-8'):
+            if line.startswith('#') or not line.strip():
+                continue
+            out.add(line.rstrip('\n').partition('\t')[0])
+    except FileNotFoundError:
+        pass
+    return out
+
+
+NEVER = never_translate()
+
+
+def already_converted(src, start):
+    """Is the literal at [start] the first argument of a `_t(` call?"""
+    return src[max(0, start - 3):start] == '_t('
+
+
 HAS_WORD = re.compile(r'[A-Za-z]{3,}')
 DEVANAGARI = re.compile(r'[ऀ-ॿ]')
 IDENT = re.compile(r'^[a-z][a-z0-9_]*$')
@@ -59,7 +98,8 @@ def literal(text, quote="'"):
 
 def skip(text):
     """Not copy: ids, paths, urls, bare numbers, already-Hindi."""
-    return (not HAS_WORD.search(text)
+    return (text in NEVER
+            or not HAS_WORD.search(text)
             or DEVANAGARI.search(text)
             or IDENT.match(text)
             or text.startswith(('package:', 'http', 'assets/'))
@@ -118,7 +158,7 @@ def untranslated(path, glossary):
     comments = comment_spans(src)
     out = []
     for m in LITERAL.finditer(src):
-        if in_any(m.start(), comments):
+        if in_any(m.start(), comments) or already_converted(src, m.start()):
             continue
         text = unescape(m.group(2), m.group(1))
         if skip(text) or text in glossary or text in out:
@@ -161,7 +201,7 @@ def main():
     comments = comment_spans(src)
 
     def one(m):
-        if in_any(m.start(), comments):
+        if in_any(m.start(), comments) or already_converted(src, m.start()):
             return m.group(0)
         quote, raw = m.group(1), m.group(2)
         text = unescape(raw, quote)

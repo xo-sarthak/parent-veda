@@ -1333,7 +1333,7 @@ class _CommunityCard extends StatelessWidget {
                       colors: gradient),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Text(_mono(community.name),
+                child: Text(_mono(community.name.now),
                     style: pvFraunces(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -1367,7 +1367,7 @@ class _CommunityCard extends StatelessWidget {
               ),
           ]),
           const SizedBox(height: 14),
-          Text(community.name,
+          Text(community.name.now,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.titleSmall
@@ -1427,7 +1427,7 @@ class _RecommendedCard extends StatelessWidget {
             child: Text(community.emoji, style: const TextStyle(fontSize: 22)),
           ),
           const SizedBox(height: 10),
-          Text(community.name,
+          Text(community.name.now,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.titleSmall
@@ -1439,7 +1439,7 @@ class _RecommendedCard extends StatelessWidget {
               style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
           const SizedBox(height: 8),
           Expanded(
-            child: Text(community.description,
+            child: Text(community.description.now,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: text.bodySmall
@@ -2283,7 +2283,7 @@ class CommunityDetailScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(community.name)),
+      appBar: AppBar(title: Text(community.name.now)),
       body: AnimatedBuilder(
         animation: CommunityStore.instance,
         builder: (context, _) {
@@ -2309,12 +2309,12 @@ class CommunityDetailScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(community.emoji, style: const TextStyle(fontSize: 44)),
                   const SizedBox(height: 10),
-                  Text(community.name,
+                  Text(community.name.now,
                       style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
                   Text(s.cmMembers(community.members),
                       style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
                   const SizedBox(height: 10),
-                  Text(community.description,
+                  Text(community.description.now,
                       style: text.bodyMedium?.copyWith(color: AppTheme.neutral700, height: 1.45)),
                   const SizedBox(height: 14),
                   SizedBox(
@@ -2530,7 +2530,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 for (final c in suggested)
                   ListTile(
                     leading: Text(c.emoji, style: const TextStyle(fontSize: 22)),
-                    title: Text(c.name, style: text.titleSmall),
+                    title: Text(c.name.now, style: text.titleSmall),
                     subtitle: Text(s.cmMembers(c.members),
                         style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
                     trailing: TextButton(
@@ -3094,7 +3094,7 @@ class _CommunitySearchDelegate extends SearchDelegate<void> {
     final comms = allCommunities(
             dueDate: controller.isDueDateSet ? controller.dueDate : null)
         .where((c) =>
-            c.name.toLowerCase().contains(q) ||
+            c.name.now.toLowerCase().contains(q) ||
             c.topics.any((t) => t.toLowerCase().contains(q)))
         .toList();
     final posts = CommunityStore.instance
@@ -3109,7 +3109,7 @@ class _CommunitySearchDelegate extends SearchDelegate<void> {
         for (final c in comms)
           ListTile(
             leading: Text(c.emoji, style: const TextStyle(fontSize: 22)),
-            title: Text(c.name),
+            title: Text(c.name.now),
             subtitle: Text(S(lang).cmMembers(c.members),
                 style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
             onTap: () {

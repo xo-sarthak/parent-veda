@@ -10,11 +10,19 @@ import '../models/community_models.dart';
 import '../localization/app_language.dart';
 
 // Stable id used for the Community Pulse "question of the week" poll.
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
+/// Deliberately the same in both languages: acronyms and proper nouns a
+/// mother reads in Latin either way (PCOS, IVF, IUI). Distinct from the
+/// _en() marker used elsewhere, which means 'English for now, Hindi
+/// pending' - these are finished, not outstanding.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 const String kPulseKicksPollId = 'pulse_kicks';
 
 /// Specialties a mother can request when she asks for expert verification - so
 /// the request reaches the right kind of doctor (curating the doctor feed).
-const List<String> kVerifySpecialties = [
+final List<String> kVerifySpecialties = [
   'all',
   'gynae',
   'pediatric',
@@ -24,31 +32,31 @@ const List<String> kVerifySpecialties = [
   'mental',
 ];
 
-const List<Community> kCommunities = [
+final List<Community> kCommunities = [
   // --- Auto-joined for a pregnancy user (cohort / trimester / location) ---
   Community(
     id: 'nov2026',
-    name: 'November 2026 Moms',
+    name: _t('November 2026 Moms', 'नवंबर 2026 की माँएँ'),
     emoji: '🤰',
-    description: 'Mothers due in November 2026, going through it together - week by week.',
+    description: _t('Mothers due in November 2026, going through it together - week by week.', 'वे माँएँ जिनकी डिलीवरी नवंबर 2026 में है — हफ़्ते-दर-हफ़्ते, यह सफ़र साथ में।'),
     members: 1284,
     auto: true,
     topics: ['Pregnancy Symptoms', 'Labor', 'Nutrition'],
   ),
   Community(
     id: 'second_tri',
-    name: 'Second Trimester',
+    name: _t('Second Trimester', 'दूसरी तिमाही'),
     emoji: '🌸',
-    description: 'The golden trimester - energy returns, the bump grows, the kicks begin.',
+    description: _t('The golden trimester - energy returns, the bump grows, the kicks begin.', 'सुनहरी तिमाही — ताक़त लौटती है, पेट बढ़ता है, और हलचल शुरू हो जाती है।'),
     members: 8640,
     auto: true,
     topics: ['Pregnancy Symptoms', 'Brain Development'],
   ),
   Community(
     id: 'delhi_moms',
-    name: 'Delhi Moms',
+    name: _t('Delhi Moms', 'Delhi की माँएँ'),
     emoji: '📍',
-    description: 'Local mothers in Delhi - hospitals, doctors, services and meetups.',
+    description: _t('Local mothers in Delhi - hospitals, doctors, services and meetups.', 'Delhi की माँएँ — अस्पताल, डॉक्टर, सेवाएँ और मिलना-जुलना।'),
     members: 5120,
     auto: true,
     topics: ['Labor'],
@@ -56,79 +64,79 @@ const List<Community> kCommunities = [
   // --- Recommended / opt-in (no gender communities during pregnancy) ---
   Community(
     id: 'first_time',
-    name: 'First Time Moms',
+    name: _t('First Time Moms', 'पहली बार माँ बनने वाली'),
     emoji: '🌷',
-    description: 'Everything is new - ask anything, no question is too small here.',
+    description: _t('Everything is new - ask anything, no question is too small here.', 'सब कुछ नया है — कुछ भी पूछिए, यहाँ कोई सवाल छोटा नहीं होता।'),
     members: 12400,
     topics: ['Pregnancy Symptoms', 'Labor', 'Breastfeeding'],
   ),
   Community(
     id: 'preg_nutrition',
-    name: 'Pregnancy Nutrition',
+    name: _t('Pregnancy Nutrition', 'गर्भावस्था में खानपान'),
     emoji: '🥗',
-    description: 'What to eat, what to skip, and real meal ideas for every trimester.',
+    description: _t('What to eat, what to skip, and real meal ideas for every trimester.', 'क्या खाएँ, किससे बचें, और हर तिमाही के लिए असली खाने के आइडिया।'),
     members: 9300,
     topics: ['Nutrition'],
   ),
   Community(
     id: 'working_moms',
-    name: 'Working Moms',
+    name: _t('Working Moms', 'नौकरी करने वाली माँएँ'),
     emoji: '💼',
-    description: 'Balancing pregnancy and work - leave, comfort and the road back.',
+    description: _t('Balancing pregnancy and work - leave, comfort and the road back.', 'गर्भावस्था और काम, दोनों साथ — छुट्टी, आराम और वापसी की राह।'),
     members: 7100,
     topics: ['Pregnancy Symptoms'],
   ),
   Community(
     id: 'preg_fitness',
-    name: 'Pregnancy Fitness',
+    name: _t('Pregnancy Fitness', 'गर्भावस्था में fitness'),
     emoji: '🧘',
-    description: 'Gentle, safe movement - prenatal yoga, walking and staying strong.',
+    description: _t('Gentle, safe movement - prenatal yoga, walking and staying strong.', 'हल्की, सुरक्षित हलचल — prenatal योग, टहलना और मज़बूत बने रहना।'),
     members: 4200,
     topics: ['Pregnancy Fitness'],
   ),
   Community(
     id: 'breastfeeding_prep',
-    name: 'Breastfeeding Prep',
+    name: _t('Breastfeeding Prep', 'स्तनपान की तैयारी'),
     emoji: '🤱',
-    description: 'Get ready before baby arrives - latch, supply and the first week.',
+    description: _t('Get ready before baby arrives - latch, supply and the first week.', 'शिशु के आने से पहले तैयारी — latch, दूध की supply और पहला हफ़्ता।'),
     members: 6800,
     topics: ['Breastfeeding'],
   ),
   Community(
     id: 'twin_preg',
-    name: 'Twin Pregnancy',
+    name: _t('Twin Pregnancy', 'जुड़वाँ गर्भावस्था'),
     emoji: '👯',
-    description: 'Two at once - extra scans, extra love, and parents who get it.',
+    description: _t('Two at once - extra scans, extra love, and parents who get it.', 'एक साथ दो — ज़्यादा scan, ज़्यादा प्यार, और वे माता-पिता जो यह समझते हैं।'),
     members: 1900,
     topics: ['Pregnancy Symptoms'],
   ),
   Community(
     id: 'high_risk',
-    name: 'High Risk Pregnancy',
+    name: _t('High Risk Pregnancy', 'High Risk गर्भावस्था'),
     emoji: '💗',
-    description: 'Extra care, extra support - a gentle space to share and lean on others.',
+    description: _t('Extra care, extra support - a gentle space to share and lean on others.', 'ज़्यादा देखभाल, ज़्यादा सहारा — कहने और टिक जाने की एक नरम जगह।'),
     members: 2600,
     topics: ['Pregnancy Symptoms'],
   ),
   Community(
     id: 'ivf',
-    name: 'IVF Pregnancy',
+    name: _t('IVF Pregnancy', 'IVF गर्भावस्था'),
     emoji: '🌱',
-    description: 'The long road that led here - a community that understands the journey.',
+    description: _t('The long road that led here - a community that understands the journey.', 'वह लंबा रास्ता जो यहाँ तक लाया — एक ऐसा group जो यह सफ़र समझता है।'),
     members: 2100,
     topics: ['Pregnancy Symptoms'],
   ),
   Community(
     id: 'brain_dev',
-    name: 'Brain Development',
+    name: _t('Brain Development', 'दिमाग़ का विकास'),
     emoji: '🧠',
-    description: 'Nurturing your baby mind before birth and in the early years.',
+    description: _t('Nurturing your baby mind before birth and in the early years.', 'जन्म से पहले और शुरुआती सालों में शिशु के दिमाग़ को सँवारना।'),
     members: 5400,
     topics: ['Brain Development'],
   ),
 ];
 
-const List<CommunityPost> kSeedPosts = [
+final List<CommunityPost> kSeedPosts = [
   CommunityPost(
     id: 'p1',
     communityId: 'nov2026',
@@ -375,7 +383,7 @@ typedef CommunityExpert = ({String name, String cred, String specialty});
 
 /// The pool of verified experts shown in the "who verified this" sheet.
 /// All fictional - placeholder data until real doctor accounts exist.
-const List<CommunityExpert> kCommunityExperts = [
+final List<CommunityExpert> kCommunityExperts = [
   (name: 'Dr. Meera Nair', cred: 'IBCLC', specialty: 'Lactation'),
   (name: 'Dr. Priya Sharma', cred: 'MD', specialty: 'Pediatrics'),
   (name: 'Dr. Ananya Rao', cred: 'OB-GYN', specialty: 'Obstetrics'),
@@ -402,7 +410,7 @@ const List<CommunityExpert> kCommunityExperts = [
   (name: 'Dr. Ramya Krishnan', cred: 'OB-GYN', specialty: 'Fetal Medicine'),
 ];
 
-const Map<String, List<CommunityComment>> kSeedComments = {
+final Map<String, List<CommunityComment>> kSeedComments = {
   'p1': [
     CommunityComment(author: 'Meera', emoji: '🙂', text: 'Yes! Week 25 here. A warm compress and a pregnancy pillow helped me a lot.', likes: 14),
     CommunityComment(author: 'Ritu', emoji: '🌸', text: 'Prenatal yoga changed everything for my back. Gentle cat-cow stretches every morning.', likes: 9),
@@ -422,7 +430,7 @@ const Map<String, List<CommunityComment>> kSeedComments = {
   ],
 };
 
-const List<PulseCard> kPulse = [
+final List<PulseCard> kPulse = [
   PulseCard(
     type: PulseType.cohort,
     title: 'You are not alone',
@@ -465,7 +473,7 @@ const List<PulseCard> kPulse = [
 //  id convention the seeded one already used ('nov2026'). Content fills in as
 //  her club posts; the room itself always exists.
 
-const List<String> _monthSlugs = [
+final List<String> _monthSlugs = [
   '', 'jan', 'feb', 'mar', 'apr', 'may', 'jun',
   'jul', 'aug', 'sep', 'oct', 'nov', 'dec'
 ];
@@ -486,9 +494,15 @@ Community birthClubCommunity(int year, int month) {
   }
   return Community(
     id: id,
-    name: S.now.birthClubName(month, year),
+    name: LocalizedText(
+      en: S(AppLanguage.english).birthClubName(month, year),
+      hi: S(AppLanguage.hinglish).birthClubName(month, year),
+    ),
     emoji: '🤰',
-    description: S.now.birthClubDescription(month, year),
+    description: LocalizedText(
+      en: S(AppLanguage.english).birthClubDescription(month, year),
+      hi: S(AppLanguage.hinglish).birthClubDescription(month, year),
+    ),
     // Honest: a freshly derived club has nobody in it but her. Inventing a
     // member count would be the kind of small lie that makes everything else
     // in the app suspect.
@@ -530,7 +544,7 @@ List<CommunityComment> seedCommentsFor(String postId) =>
 //  Auto-tagging: guess topic hashtags from a post's text (keyword match).
 //  Powers the recommendation/feed metadata without asking the user to tag.
 // ---------------------------------------------------------------------------
-const Map<String, List<String>> _topicKeywords = {
+final Map<String, List<String>> _topicKeywords = {
   'Nutrition': ['eat', 'food', 'diet', 'nutrition', 'craving', 'fried', 'water', 'meal', 'hungry', 'snack', 'weight gain'],
   'Sleep': ['sleep', 'nap', 'insomnia', 'awake', 'rest', 'night'],
   'Breastfeeding': ['breastfeed', 'breast', 'latch', 'milk supply', 'nursing', 'pump', 'feeding'],
@@ -567,34 +581,34 @@ List<String> inferTopics(String text) {
 //
 //  `emoji` is blank: the TTC UI renders monogram avatars, never emojis.
 // ===========================================================================
-const List<Community> kTtcCommunities = [
+final List<Community> kTtcCommunities = [
   // --- Auto-joined: where almost everyone starts ---
-  Community(id: 'ttc_naturally', name: 'Trying Naturally', emoji: '', description: 'The largest room, and the quietest. Months one to many - no advice unless it is asked for.', members: 18600, auto: true, topics: ['Cycles', 'Emotional']),
-  Community(id: 'ttc_first_month', name: 'First Month', emoji: '', description: 'Just started. Everything is new, and nobody here will tell you to relax.', members: 5200, auto: true, topics: ['Cycles']),
+  Community(id: 'ttc_naturally', name: _t('Trying Naturally', 'क़ुदरती तरीक़े से कोशिश'), emoji: '', description: _t('The largest room, and the quietest. Months one to many - no advice unless it is asked for.', 'सबसे बड़ा कमरा, और सबसे शांत भी। पहला महीना हो या कई — जब तक कोई माँगे नहीं, कोई सलाह नहीं।'), members: 18600, auto: true, topics: ['Cycles', 'Emotional']),
+  Community(id: 'ttc_first_month', name: _t('First Month', 'पहला महीना'), emoji: '', description: _t('Just started. Everything is new, and nobody here will tell you to relax.', 'अभी-अभी शुरुआत हुई है। सब कुछ नया है, और यहाँ कोई आपसे "बस relax कर लो" नहीं कहेगा।'), members: 5200, auto: true, topics: ['Cycles']),
   // --- Conditions ---
-  Community(id: 'ttc_pcos', name: 'PCOS', emoji: '', description: 'Cycles, weight, medication and what actually helps - from people living it.', members: 13400, topics: ['PCOS', 'Nutrition']),
-  Community(id: 'ttc_endo', name: 'Endometriosis', emoji: '', description: 'Pain, diagnosis, and the long road to being believed.', members: 6900, topics: ['Endometriosis']),
-  Community(id: 'ttc_male', name: 'Male Fertility', emoji: '', description: 'Half the picture, and rarely talked about. Semen analyses, lifestyle, and what changed.', members: 4800, topics: ['Male fertility']),
+  Community(id: 'ttc_pcos', name: _same('PCOS'), emoji: '', description: _t('Cycles, weight, medication and what actually helps - from people living it.', 'मासिक चक्र, वज़न, दवाइयाँ और सच में क्या काम आता है — उन्हीं से जो यह रोज़ जी रहे हैं।'), members: 13400, topics: ['PCOS', 'Nutrition']),
+  Community(id: 'ttc_endo', name: _same('Endometriosis'), emoji: '', description: _t('Pain, diagnosis, and the long road to being believed.', 'दर्द, diagnosis, और उस लंबे रास्ते की बात जहाँ जाकर कोई यक़ीन करता है।'), members: 6900, topics: ['Endometriosis']),
+  Community(id: 'ttc_male', name: _t('Male Fertility', 'पुरुष fertility'), emoji: '', description: _t('Half the picture, and rarely talked about. Semen analyses, lifestyle, and what changed.', 'आधी तस्वीर, जिस पर बात कम ही होती है। Semen analysis, रोज़मर्रा की आदतें, और क्या बदला।'), members: 4800, topics: ['Male fertility']),
   // --- Treatment ---
-  Community(id: 'ttc_ivf', name: 'IVF', emoji: '', description: 'Preparing, cycles, transfers, waiting - and the costs nobody quotes upfront.', members: 11700, topics: ['IVF']),
-  Community(id: 'ttc_iui', name: 'IUI', emoji: '', description: 'A gentler first step. What to expect, and what it actually felt like.', members: 5100, topics: ['IUI']),
+  Community(id: 'ttc_ivf', name: _same('IVF'), emoji: '', description: _t('Preparing, cycles, transfers, waiting - and the costs nobody quotes upfront.', 'तैयारी, cycles, transfer, इंतज़ार — और वे खर्चे जो कोई पहले नहीं बताता।'), members: 11700, topics: ['IVF']),
+  Community(id: 'ttc_iui', name: _same('IUI'), emoji: '', description: _t('A gentler first step. What to expect, and what it actually felt like.', 'एक नरम पहला क़दम। क्या उम्मीद रखें, और सच में कैसा लगा।'), members: 5100, topics: ['IUI']),
   // --- The hard rooms ---
-  Community(id: 'ttc_loss', name: 'Loss & Recovery', emoji: '', description: 'Held gently. No timelines, no silver linings, no advice unless it is asked for.', members: 7400, topics: ['Loss', 'Emotional']),
-  Community(id: 'ttc_emotional', name: 'Emotional Support', emoji: '', description: 'For the days that are simply hard, and the family gatherings that make them harder.', members: 9300, topics: ['Emotional']),
+  Community(id: 'ttc_loss', name: _t('Loss & Recovery', 'खोना, और उससे उबरना'), emoji: '', description: _t('Held gently. No timelines, no silver linings, no advice unless it is asked for.', 'यहाँ सब कुछ नरमी से थामा जाता है। कोई समय-सीमा नहीं, कोई "अच्छा ही हुआ" नहीं, और जब तक कोई माँगे नहीं, कोई सलाह नहीं।'), members: 7400, topics: ['Loss', 'Emotional']),
+  Community(id: 'ttc_emotional', name: _t('Emotional Support', 'मन का सहारा'), emoji: '', description: _t('For the days that are simply hard, and the family gatherings that make them harder.', 'उन दिनों के लिए जो बस भारी होते हैं, और उन पारिवारिक समारोहों के लिए जो उन्हें और भारी कर देते हैं।'), members: 9300, topics: ['Emotional']),
   // --- Living well ---
-  Community(id: 'ttc_nutrition', name: 'Nutrition', emoji: '', description: 'Indian kitchens, real food, no diet culture and no miracle powders.', members: 8100, topics: ['Nutrition']),
-  Community(id: 'ttc_partners', name: 'Partner Lounge', emoji: '', description: 'For partners, in their own words. Not a support group for supporting her.', members: 3600, topics: ['Partner']),
-  Community(id: 'ttc_ask_doctor', name: 'Ask the Doctor', emoji: '', description: 'Verified specialists answer, publicly, so the answer helps more than one person.', members: 15200, topics: ['Medical']),
+  Community(id: 'ttc_nutrition', name: _t('Nutrition', 'पोषण'), emoji: '', description: _t('Indian kitchens, real food, no diet culture and no miracle powders.', 'भारतीय रसोई, असली खाना — न diet का दिखावा, न चमत्कारी powder।'), members: 8100, topics: ['Nutrition']),
+  Community(id: 'ttc_partners', name: _t('Partner Lounge', 'साथी का कोना'), emoji: '', description: _t('For partners, in their own words. Not a support group for supporting her.', 'साथियों के लिए, उनके अपने शब्दों में। यह "उसका साथ कैसे दें" वाला group नहीं है।'), members: 3600, topics: ['Partner']),
+  Community(id: 'ttc_ask_doctor', name: _t('Ask the Doctor', 'डॉक्टर से पूछिए'), emoji: '', description: _t('Verified specialists answer, publicly, so the answer helps more than one person.', 'जाँचे-परखे विशेषज्ञ खुलकर जवाब देते हैं, ताकि एक जवाब कई लोगों के काम आए।'), members: 15200, topics: ['Medical']),
 ];
 
-const Set<String> kTtcCommunityIds = {
+final Set<String> kTtcCommunityIds = {
   'ttc_naturally', 'ttc_first_month', 'ttc_pcos', 'ttc_endo', 'ttc_male',
   'ttc_ivf', 'ttc_iui', 'ttc_loss', 'ttc_emotional', 'ttc_nutrition',
   'ttc_partners', 'ttc_ask_doctor',
 };
 
 /// Specialties a couple can ask for when requesting expert verification.
-const List<String> kTtcVerifySpecialties = [
+final List<String> kTtcVerifySpecialties = [
   'all',
   'fertility',
   'gynae',
@@ -604,7 +618,7 @@ const List<String> kTtcVerifySpecialties = [
 ];
 
 /// Fictional placeholder experts until real doctor accounts exist.
-const List<CommunityExpert> kTtcExperts = [
+final List<CommunityExpert> kTtcExperts = [
   (name: 'Dr. Anjali Menon', cred: 'MD, Reproductive Medicine', specialty: 'Fertility'),
   (name: 'Dr. Sandeep Rao', cred: 'MS, Andrology', specialty: 'Male Fertility'),
   (name: 'Dr. Kavya Nair', cred: 'MD, Obstetrics & Gynaecology', specialty: 'PCOS'),
@@ -613,7 +627,7 @@ const List<CommunityExpert> kTtcExperts = [
   (name: 'Dr. Tanvi Shah', cred: 'MD, Reproductive Endocrinology', specialty: 'IVF'),
 ];
 
-const List<CommunityPost> kTtcPosts = [
+final List<CommunityPost> kTtcPosts = [
   CommunityPost(
     id: 'ttcp1',
     communityId: 'ttc_naturally',
@@ -765,28 +779,28 @@ const List<CommunityPost> kTtcPosts = [
 //  communities are fine now (unlike during pregnancy). `emoji` is left blank -
 //  the parenting UI renders monogram/icon avatars, never emojis.
 // ===========================================================================
-const List<Community> kParentingCommunities = [
+final List<Community> kParentingCommunities = [
   // --- Auto-joined for the scenario child (Aarav · 4-mo boy · Delhi NCR) ---
-  Community(id: 'infants_0_1', name: '0–1 Year', emoji: '', description: 'The whole first year - feeding, sleep, milestones and the fourth-trimester fog, together.', members: 14200, auto: true, topics: ['Sleep', 'Feeding', 'Milestones']),
-  Community(id: 'boy_moms', name: 'Boy Moms', emoji: '', description: 'Raising boys - the mess, the cuddles and everything in between.', members: 9800, auto: true, topics: ['Behaviour']),
-  Community(id: 'delhi_parents', name: 'Delhi Parents', emoji: '', description: 'Local parents in Delhi NCR - paediatricians, daycares, classes and meetups.', members: 6400, auto: true, topics: ['Health']),
+  Community(id: 'infants_0_1', name: _t('0–1 Year', '0–1 साल'), emoji: '', description: _t('The whole first year - feeding, sleep, milestones and the fourth-trimester fog, together.', 'पूरा पहला साल — दूध-खाना, नींद, milestones और चौथी तिमाही की धुंध, सब साथ में।'), members: 14200, auto: true, topics: ['Sleep', 'Feeding', 'Milestones']),
+  Community(id: 'boy_moms', name: _t('Boy Moms', 'बेटों की माँएँ'), emoji: '', description: _t('Raising boys - the mess, the cuddles and everything in between.', 'बेटों की परवरिश — बिखरा घर, गले लगना, और बीच का सब कुछ।'), members: 9800, auto: true, topics: ['Behaviour']),
+  Community(id: 'delhi_parents', name: _t('Delhi Parents', 'Delhi के माता-पिता'), emoji: '', description: _t('Local parents in Delhi NCR - paediatricians, daycares, classes and meetups.', 'Delhi NCR के माता-पिता — बच्चों के डॉक्टर, daycare, classes और मिलना-जुलना।'), members: 6400, auto: true, topics: ['Health']),
   // --- Recommended · the ages that come next ---
-  Community(id: 'ones', name: '1 Year Olds', emoji: '', description: 'First steps, first words, first birthday - life with a one-year-old.', members: 11200, topics: ['Milestones', 'Feeding']),
-  Community(id: 'twos', name: '2 Year Olds', emoji: '', description: 'Big feelings, big words and the famous twos - you are not alone.', members: 10600, topics: ['Behaviour']),
-  Community(id: 'threes', name: '3 Year Olds', emoji: '', description: 'Preschool, endless “why?”, and a little person with big opinions.', members: 7300, topics: ['Behaviour', 'Development']),
-  Community(id: 'toddlers', name: 'Toddler Life', emoji: '', description: 'The 1–3 whirlwind - tantrums, milestones and tiny triumphs.', members: 13400, topics: ['Behaviour', 'Development']),
+  Community(id: 'ones', name: _t('1 Year Olds', '1 साल के बच्चे'), emoji: '', description: _t('First steps, first words, first birthday - life with a one-year-old.', 'पहला क़दम, पहला शब्द, पहला जन्मदिन — एक साल के बच्चे के साथ ज़िंदगी।'), members: 11200, topics: ['Milestones', 'Feeding']),
+  Community(id: 'twos', name: _t('2 Year Olds', '2 साल के बच्चे'), emoji: '', description: _t('Big feelings, big words and the famous twos - you are not alone.', 'बड़ी भावनाएँ, बड़े शब्द और वही मशहूर दो साल — आप अकेली नहीं हैं।'), members: 10600, topics: ['Behaviour']),
+  Community(id: 'threes', name: _t('3 Year Olds', '3 साल के बच्चे'), emoji: '', description: _t('Preschool, endless “why?”, and a little person with big opinions.', 'Preschool, बार-बार का “क्यों?”, और एक छोटा सा इंसान जिसकी अपनी बड़ी राय है।'), members: 7300, topics: ['Behaviour', 'Development']),
+  Community(id: 'toddlers', name: _t('Toddler Life', 'छोटे बच्चों की दुनिया'), emoji: '', description: _t('The 1–3 whirlwind - tantrums, milestones and tiny triumphs.', '1–3 साल का तूफ़ान — ज़िद, milestones और छोटी-छोटी जीतें।'), members: 13400, topics: ['Behaviour', 'Development']),
   // --- Topics that only matter once baby is here ---
-  Community(id: 'first_foods', name: 'Starting Solids', emoji: '', description: 'First foods, weaning and fussy eating - recipes and reassurance.', members: 8900, topics: ['Feeding']),
-  Community(id: 'baby_sleep', name: 'Baby Sleep', emoji: '', description: 'Regressions, naps and nights - gentle, no-judgement sleep support.', members: 12800, topics: ['Sleep']),
-  Community(id: 'milestones', name: 'Milestones & Development', emoji: '', description: 'Rolling, sitting, crawling, talking - celebrate and compare notes.', members: 9100, topics: ['Milestones', 'Development']),
-  Community(id: 'working_parents', name: 'Working Parents', emoji: '', description: 'Daycare, nannies, pumping and the juggle of going back to work.', members: 7600, topics: ['Health']),
-  Community(id: 'potty', name: 'Potty Training', emoji: '', description: 'When to start, what worked, and surviving the accidents.', members: 4300, topics: ['Behaviour']),
+  Community(id: 'first_foods', name: _t('Starting Solids', 'ऊपरी आहार की शुरुआत'), emoji: '', description: _t('First foods, weaning and fussy eating - recipes and reassurance.', 'पहला खाना, दूध छुड़ाना और खाने के नखरे — recipes भी, तसल्ली भी।'), members: 8900, topics: ['Feeding']),
+  Community(id: 'baby_sleep', name: _t('Baby Sleep', 'शिशु की नींद'), emoji: '', description: _t('Regressions, naps and nights - gentle, no-judgement sleep support.', 'Regression, दिन की झपकी और रातें — नरम, बिना किसी टोका-टाकी के नींद का साथ।'), members: 12800, topics: ['Sleep']),
+  Community(id: 'milestones', name: _t('Milestones & Development', 'पड़ाव और विकास'), emoji: '', description: _t('Rolling, sitting, crawling, talking - celebrate and compare notes.', 'करवट, बैठना, रेंगना, बोलना — जश्न भी मनाइए, अनुभव भी बाँटिए।'), members: 9100, topics: ['Milestones', 'Development']),
+  Community(id: 'working_parents', name: _t('Working Parents', 'नौकरी करने वाले माता-पिता'), emoji: '', description: _t('Daycare, nannies, pumping and the juggle of going back to work.', 'Daycare, आया, pumping और काम पर लौटने की भागदौड़।'), members: 7600, topics: ['Health']),
+  Community(id: 'potty', name: _same('Potty Training'), emoji: '', description: _t('When to start, what worked, and surviving the accidents.', 'कब शुरू करें, किसे क्या काम आया, और बीच के हादसों से कैसे निपटें।'), members: 4300, topics: ['Behaviour']),
   // --- Gender + more city groups (fine now that baby is here) ---
-  Community(id: 'girl_moms', name: 'Girl Moms', emoji: '', description: 'Raising girls - the giggles, the grit and everything in between.', members: 9200, topics: ['Behaviour']),
-  Community(id: 'mumbai_parents', name: 'Mumbai Parents', emoji: '', description: 'Local parents in Mumbai - paediatricians, daycares, classes and meetups.', members: 5300, topics: ['Health']),
+  Community(id: 'girl_moms', name: _t('Girl Moms', 'बेटियों की माँएँ'), emoji: '', description: _t('Raising girls - the giggles, the grit and everything in between.', 'बेटियों की परवरिश — खिलखिलाहट, हिम्मत, और बीच का सब कुछ।'), members: 9200, topics: ['Behaviour']),
+  Community(id: 'mumbai_parents', name: _t('Mumbai Parents', 'Mumbai के माता-पिता'), emoji: '', description: _t('Local parents in Mumbai - paediatricians, daycares, classes and meetups.', 'Mumbai के माता-पिता — बच्चों के डॉक्टर, daycare, classes और मिलना-जुलना।'), members: 5300, topics: ['Health']),
 ];
 
-const Set<String> kParentingCommunityIds = {
+final Set<String> kParentingCommunityIds = {
   'infants_0_1', 'boy_moms', 'delhi_parents', 'ones', 'twos', 'threes',
   'toddlers', 'first_foods', 'baby_sleep', 'milestones', 'working_parents', 'potty',
   'girl_moms', 'mumbai_parents',
@@ -794,7 +808,7 @@ const Set<String> kParentingCommunityIds = {
 
 /// Verified experts a parent can reach when asking for verification - so the
 /// request lands with the right kind of specialist (curating the doctor feed).
-const List<String> kParentingVerifySpecialties = [
+final List<String> kParentingVerifySpecialties = [
   'all',
   'pediatric',
   'lactation',
@@ -806,7 +820,7 @@ const List<String> kParentingVerifySpecialties = [
 
 /// The pool of verified experts shown in the parenting "who verified this" sheet.
 /// All fictional - placeholder data until real doctor accounts exist.
-const List<CommunityExpert> kParentingExperts = [
+final List<CommunityExpert> kParentingExperts = [
   (name: 'Dr. Ananya Rao', cred: 'Paediatrician', specialty: 'Child Health'),
   (name: 'Dr. Neha Sharma', cred: 'MD, Paediatrics', specialty: 'Paediatrics'),
   (name: 'Dr. Priya Menon', cred: 'IBCLC', specialty: 'Lactation'),
@@ -821,7 +835,7 @@ const List<CommunityExpert> kParentingExperts = [
   (name: 'Dr. Ritu Agarwal', cred: 'Developmental Paed', specialty: 'Milestones'),
 ];
 
-const List<CommunityPost> kParentingPosts = [
+final List<CommunityPost> kParentingPosts = [
   CommunityPost(
     id: 'pp1',
     communityId: 'baby_sleep',
@@ -1134,7 +1148,7 @@ const List<CommunityPost> kParentingPosts = [
   ),
 ];
 
-const Map<String, List<CommunityComment>> kParentingComments = {
+final Map<String, List<CommunityComment>> kParentingComments = {
   'pp1': [
     CommunityComment(author: 'Anjali', emoji: '', text: 'Thank you for this. Night 4 here and I needed to read it.', likes: 11),
     CommunityComment(author: 'Priya', emoji: '', text: 'The darker room made the biggest difference for us too. Blackout curtains were worth every rupee.', likes: 7),

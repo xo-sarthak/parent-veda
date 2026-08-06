@@ -302,8 +302,9 @@ void main() {
       expect(TtcCommunityScreen.rooms, same(kTtcCommunities));
       for (final c in kTtcCommunities) {
         expect(c, isA<Community>());
-        expect(c.name, isNotEmpty);
-        expect(c.description, isNotEmpty);
+        // .en: presence of a room's copy, which must hold in both.
+        expect(c.name.en, isNotEmpty);
+        expect(c.description.en, isNotEmpty);
       }
     });
 
@@ -343,7 +344,11 @@ void main() {
     });
 
     test('the hard rooms exist - loss, and a room of his own', () {
-      final names = kTtcCommunities.map((c) => c.name.toLowerCase()).toList();
+      // .en: this asserts a room EXISTS, which must hold in either
+      // language. Matching the rendered name would make the contract
+      // depend on a setting.
+      final names =
+          kTtcCommunities.map((c) => c.name.en.toLowerCase()).toList();
       expect(names.any((n) => n.contains('loss')), isTrue);
       expect(names.any((n) => n.contains('partner')), isTrue);
       expect(names.any((n) => n.contains('male fertility')), isTrue);
