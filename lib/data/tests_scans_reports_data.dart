@@ -1,3 +1,5 @@
+import '../localization/app_language.dart';
+
 // =============================================================================
 //  Tests, Scans & Reports - content library (Section 16)
 // -----------------------------------------------------------------------------
@@ -23,31 +25,42 @@
 
 /// Which part of pregnancy a test/finding usually belongs to. Drives the top
 /// filter chips: All / Trimester 1 / Trimester 2 / Trimester 3 / Any Time.
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
+/// A search alias that is the same in both scripts - acronyms and report
+/// words a mother types in Latin either way (iugr, fgr, tsh, previa).
+/// Deliberately not _t(x, x): an identical pair reads as finished
+/// translation work to anything counting pairs.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 enum TrimesterTag { t1, t2, t3, anytime }
 
 extension TrimesterTagLabel on TrimesterTag {
-  String get chipLabel => switch (this) {
-        TrimesterTag.t1 => 'Trimester 1',
-        TrimesterTag.t2 => 'Trimester 2',
-        TrimesterTag.t3 => 'Trimester 3',
-        TrimesterTag.anytime => 'Any Time',
+  LocalizedText get chipLabel => switch (this) {
+        TrimesterTag.t1 => _t('Trimester 1', 'तिमाही 1'),
+        TrimesterTag.t2 => _t('Trimester 2', 'तिमाही 2'),
+        TrimesterTag.t3 => _t('Trimester 3', 'तिमाही 3'),
+        TrimesterTag.anytime => _t('Any Time', 'कभी भी'),
       };
 
   /// Short badge shown on a card.
-  String get badge => switch (this) {
-        TrimesterTag.t1 => 'Trimester 1',
-        TrimesterTag.t2 => 'Trimester 2',
-        TrimesterTag.t3 => 'Trimester 3',
-        TrimesterTag.anytime => 'Throughout',
+  LocalizedText get badge => switch (this) {
+        TrimesterTag.t1 => _t('Trimester 1', 'तिमाही 1'),
+        TrimesterTag.t2 => _t('Trimester 2', 'तिमाही 2'),
+        TrimesterTag.t3 => _t('Trimester 3', 'तिमाही 3'),
+        TrimesterTag.anytime => _t('Throughout', 'पूरे सफ़र में'),
       };
 }
 
 /// The standard educational disclaimer shown on EVERY detail page.
-const String kMedicalDisclaimer =
-    'This information is educational only and is not medical advice, a diagnosis '
+const LocalizedText kMedicalDisclaimer =
+    LocalizedText(
+  en: 'This information is educational only and is not medical advice, a diagnosis '
     'or a prediction. Normal values vary from person to person and from lab to '
     'lab, and a single reading is only one part of the picture. Always read your '
-    'report together with your own doctor, who knows your full history.';
+    'report together with your own doctor, who knows your full history.',
+  hi: 'यह जानकारी सिर्फ़ समझाने के लिए है — न यह चिकित्सकीय सलाह है, न निदान, न कोई भविष्यवाणी। सामान्य values हर व्यक्ति और हर lab में अलग होती हैं, और अकेली एक reading पूरी तस्वीर का बस एक हिस्सा है। अपनी रिपोर्ट हमेशा अपने डॉक्टर के साथ बैठकर पढ़िए, जो आपका पूरा इतिहास जानते हैं।',
+);
 
 // ---------------------------------------------------------------------------
 //  Models
@@ -67,26 +80,26 @@ class ReportParameter {
   });
 
   /// e.g. "Hb (Haemoglobin)".
-  final String name;
+  final LocalizedText name;
 
   /// What it measures.
-  final String measures;
+  final LocalizedText measures;
 
   /// Why it is important.
-  final String whyImportant;
+  final LocalizedText whyImportant;
 
   /// Typical pregnancy range (optional - some parameters are descriptive, not
   /// numeric, e.g. placenta position).
-  final String? typicalRange;
+  final LocalizedText? typicalRange;
 
   /// What a LOW value can mean (optional).
-  final String? ifLow;
+  final LocalizedText? ifLow;
 
   /// What a HIGH value can mean (optional).
-  final String? ifHigh;
+  final LocalizedText? ifHigh;
 
   /// A general note for descriptive (non-numeric) parameters.
-  final String? note;
+  final LocalizedText? note;
 }
 
 /// A single pregnancy test or scan.
@@ -103,25 +116,25 @@ class TestScanInfo {
     required this.procedure,
     required this.understandingReport,
     this.parameters = const [],
-    this.interpretation = '',
+    this.interpretation = const LocalizedText(en: '', hi: ''),
     this.interpretPointers = const [],
     this.disclaimer = kMedicalDisclaimer,
     this.aliases = const [],
   });
 
   final String id;
-  final String name;
-  final String? altName;
+  final LocalizedText name;
+  final LocalizedText? altName;
   final TrimesterTag tag;
 
-  final String whatItIs; // What it is
-  final String why; // Why it's done
-  final String when; // When (gestational timing)
-  final String preparation; // Preparation
-  final String procedure; // Procedure
+  final LocalizedText whatItIs; // What it is
+  final LocalizedText why; // Why it's done
+  final LocalizedText when; // When (gestational timing)
+  final LocalizedText preparation; // Preparation
+  final LocalizedText procedure; // Procedure
 
   /// Free-text lead-in for "Understanding your report parameters".
-  final String understandingReport;
+  final LocalizedText understandingReport;
 
   /// The parameter-by-parameter breakdown under that heading.
   final List<ReportParameter> parameters;
@@ -141,21 +154,21 @@ class TestScanInfo {
   /// one. See CLAUDE.md's clinical invariants.
   ///
   /// Optional. A test without it simply does not render the section.
-  final String interpretation;
+  final LocalizedText interpretation;
 
   /// Short pointers under the summary — the "what can throw this off" and
   /// "what happens next" lines that a paragraph buries.
-  final List<String> interpretPointers;
+  final List<LocalizedText> interpretPointers;
 
-  final String disclaimer;
-  final List<String> aliases;
+  final LocalizedText disclaimer;
+  final List<LocalizedText> aliases;
 }
 
 /// A question/answer pair for a finding's FAQ.
 class Faq {
   const Faq(this.q, this.a);
-  final String q;
-  final String a;
+  final LocalizedText q;
+  final LocalizedText a;
 }
 
 /// A common finding or condition.
@@ -178,21 +191,21 @@ class FindingInfo {
   });
 
   final String id;
-  final String name;
-  final String? altName;
+  final LocalizedText name;
+  final LocalizedText? altName;
   final TrimesterTag tag;
 
-  final String whatIsIt; // What is it?
-  final String whyHappens; // Why does it happen?
-  final List<String> symptoms; // Symptoms
-  final String diagnosis; // Diagnosis
-  final String implications; // Pregnancy implications
-  final String management; // Management
-  final List<String> whenToContact; // When to contact doctor
+  final LocalizedText whatIsIt; // What is it?
+  final LocalizedText whyHappens; // Why does it happen?
+  final List<LocalizedText> symptoms; // Symptoms
+  final LocalizedText diagnosis; // Diagnosis
+  final LocalizedText implications; // Pregnancy implications
+  final LocalizedText management; // Management
+  final List<LocalizedText> whenToContact; // When to contact doctor
   final List<Faq> faqs; // FAQ
 
-  final String disclaimer;
-  final List<String> aliases;
+  final LocalizedText disclaimer;
+  final List<LocalizedText> aliases;
 }
 
 // ===========================================================================
@@ -203,707 +216,707 @@ final List<TestScanInfo> kTestsScans = [
   // -- Booking blood panel ---------------------------------------------------
   TestScanInfo(
     id: 'blood_tests',
-    name: 'Blood Tests',
-    altName: 'Booking / Routine Antenatal Panel',
+    name: _t('Blood Tests', 'ख़ून की जाँचें'),
+    altName: _t('Booking / Routine Antenatal Panel', 'पहली विज़िट / रूटीन Antenatal Panel'),
     tag: TrimesterTag.anytime,
     whatItIs:
-        'A group of blood tests done through pregnancy - a larger panel at your '
+        _t('A group of blood tests done through pregnancy - a larger panel at your '
         'first (booking) visit and a few repeats later. Together they check your '
         'blood count, iron stores, key vitamins and minerals, thyroid, blood '
-        'group and blood sugar.',
+        'group and blood sugar.', 'गर्भावस्था के दौरान होने वाली ख़ून की जाँचों का एक समूह — पहली विज़िट पर एक बड़ा panel और आगे चलकर कुछ दोबारा। मिलकर ये आपका blood count, iron का भंडार, ज़रूरी vitamins और minerals, thyroid, blood group और blood sugar जाँचती हैं।'),
     why:
-        'Pregnancy places extra demands on your body. These tests find simple, '
+        _t('Pregnancy places extra demands on your body. These tests find simple, '
         'correctable things early - like low iron or a thyroid that needs '
-        'support - so you and your baby stay well through the months ahead.',
+        'support - so you and your baby stay well through the months ahead.', 'गर्भावस्था आपके शरीर से ज़्यादा माँगती है। ये जाँचें छोटी, आसानी से ठीक हो जाने वाली बातें जल्दी पकड़ लेती हैं — जैसे iron की कमी या thyroid को थोड़े सहारे की ज़रूरत — ताकि आने वाले महीनों में आप और आपका शिशु दोनों ठीक रहें।'),
     when:
-        'A full panel is usually taken at the first antenatal visit (first '
+        _t('A full panel is usually taken at the first antenatal visit (first '
         'trimester). Haemoglobin and a few others are repeated in the second and '
-        'third trimesters, and more often if a value needs watching.',
+        'third trimesters, and more often if a value needs watching.', 'पूरा panel आमतौर पर पहली antenatal विज़िट पर होता है (पहली तिमाही)। Haemoglobin और कुछ और जाँचें दूसरी और तीसरी तिमाही में दोहराई जाती हैं, और किसी value पर नज़र रखनी हो तो उससे भी ज़्यादा बार।'),
     preparation:
-        'Most of these need no special preparation. If a fasting blood sugar or '
+        _t('Most of these need no special preparation. If a fasting blood sugar or '
         'lipid test is included, you may be asked not to eat for 8-10 hours '
-        '(water is fine). Your lab or doctor will tell you if fasting is needed.',
+        '(water is fine). Your lab or doctor will tell you if fasting is needed.', 'ज़्यादातर जाँचों के लिए कोई ख़ास तैयारी नहीं चाहिए। अगर fasting blood sugar या lipid test शामिल है, तो 8-10 घंटे कुछ न खाने को कहा जा सकता है (पानी चलेगा)। fasting चाहिए या नहीं, यह आपकी lab या डॉक्टर बता देंगे।'),
     procedure:
-        'A nurse or technician draws a small sample of blood from a vein in your '
+        _t('A nurse or technician draws a small sample of blood from a vein in your '
         'arm. It takes a minute or two. You can eat and carry on as normal '
-        'afterwards; results usually come within a day or two.',
+        'afterwards; results usually come within a day or two.', 'nurse या technician आपकी बाँह की नस से ख़ून का छोटा सा sample लेते हैं। एक-दो मिनट लगते हैं। उसके बाद आप खा सकती हैं और दिन सामान्य रूप से चला सकती हैं; रिपोर्ट आमतौर पर एक-दो दिन में आ जाती है।'),
     understandingReport:
-        'Your report lists several values, each with the lab\'s reference range '
+        _t('Your report lists several values, each with the lab\'s reference range '
         'beside it. Ranges differ slightly between labs, and pregnancy shifts '
-        'some of them. Here is what the common ones mean.',
+        'some of them. Here is what the common ones mean.', 'आपकी रिपोर्ट में कई values होती हैं, हर एक के साथ lab की reference range। हर lab की range थोड़ी अलग होती है, और गर्भावस्था कुछ को बदल भी देती है। आम values का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: 'Hb (Haemoglobin)',
+        name: _t('Hb (Haemoglobin)', 'Hb (Haemoglobin)'),
         measures:
-            'The protein in red blood cells that carries oxygen around your body '
-            'and to your baby.',
+            _t('The protein in red blood cells that carries oxygen around your body '
+            'and to your baby.', 'red blood cells में मौजूद वह protein जो आपके शरीर में और शिशु तक oxygen पहुँचाता है।'),
         whyImportant:
-            'Good haemoglobin means your blood is carrying oxygen well and you '
-            'are less likely to feel very tired or breathless.',
+            _t('Good haemoglobin means your blood is carrying oxygen well and you '
+            'are less likely to feel very tired or breathless.', 'haemoglobin ठीक हो तो आपका ख़ून oxygen अच्छी तरह पहुँचाता है और बहुत थकान या साँस फूलने की शिकायत कम होती है।'),
         typicalRange:
-            'In pregnancy, roughly 11 g/dL or above is generally considered '
+            _t('In pregnancy, roughly 11 g/dL or above is generally considered '
             'adequate (a little lower than outside pregnancy, because blood '
-            'volume rises).',
+            'volume rises).', 'गर्भावस्था में लगभग 11 g/dL या उससे ऊपर आमतौर पर पर्याप्त माना जाता है (गर्भावस्था के बाहर से थोड़ा कम, क्योंकि ख़ून की मात्रा बढ़ जाती है)।'),
         ifLow:
-            'Low Hb is anaemia - very common in pregnancy and usually due to low '
-            'iron. It is typically improved with iron-rich food and supplements.',
+            _t('Low Hb is anaemia - very common in pregnancy and usually due to low '
+            'iron. It is typically improved with iron-rich food and supplements.', 'Hb कम होना anaemia है — गर्भावस्था में बहुत आम, और आमतौर पर iron की कमी से। iron वाले खाने और supplements से यह ठीक हो जाता है।'),
         ifHigh:
-            'A higher Hb is less common; your doctor may simply check your '
-            'hydration and overall picture.',
+            _t('A higher Hb is less common; your doctor may simply check your '
+            'hydration and overall picture.', 'Hb ज़्यादा होना कम देखने को मिलता है; डॉक्टर बस आपके पानी के स्तर और पूरी तस्वीर को देख लेंगे।'),
       ),
       ReportParameter(
-        name: 'Serum Iron',
-        measures: 'The amount of iron circulating in your blood right now.',
+        name: _t('Serum Iron', 'Serum Iron'),
+        measures: _t('The amount of iron circulating in your blood right now.', 'इस वक़्त आपके ख़ून में घूम रहे iron की मात्रा।'),
         whyImportant:
-            'Iron is the building block your body needs to make haemoglobin and '
-            'to support your baby\'s growth and brain development.',
+            _t('Iron is the building block your body needs to make haemoglobin and '
+            'to support your baby\'s growth and brain development.', 'haemoglobin बनाने और शिशु की बढ़त तथा दिमाग़ के विकास के लिए iron ही बुनियादी ईंट है।'),
         typicalRange:
-            'Reported against the lab range; it can fluctuate with recent meals '
-            'and is read alongside ferritin.',
-        ifLow: 'Low serum iron points towards iron deficiency.',
+            _t('Reported against the lab range; it can fluctuate with recent meals '
+            'and is read alongside ferritin.', 'lab की range के साथ बताई जाती है; हाल के खाने से यह ऊपर-नीचे हो सकती है और इसे ferritin के साथ पढ़ा जाता है।'),
+        ifLow: _t('Low serum iron points towards iron deficiency.', 'serum iron कम होना iron की कमी की ओर इशारा करता है।'),
         ifHigh:
-            'A high value is uncommon and is interpreted with your other iron '
-            'tests.',
+            _t('A high value is uncommon and is interpreted with your other iron '
+            'tests.', 'value ज़्यादा आना कम होता है और इसे बाक़ी iron जाँचों के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: 'Ferritin',
-        measures: 'Your body\'s stored iron - the "reserve tank".',
+        name: _t('Ferritin', 'Ferritin'),
+        measures: _t('Your body\'s stored iron - the "reserve tank".', 'आपके शरीर में जमा iron — यानी "reserve tank"।'),
         whyImportant:
-            'Ferritin shows iron reserves before haemoglobin drops, so it catches '
-            'low iron early.',
+            _t('Ferritin shows iron reserves before haemoglobin drops, so it catches '
+            'low iron early.', 'haemoglobin गिरने से पहले ही ferritin जमा iron दिखा देता है, इसलिए कमी जल्दी पकड़ में आ जाती है।'),
         typicalRange:
-            'Above about 30 ng/mL is usually considered adequate stores in '
-            'pregnancy.',
+            _t('Above about 30 ng/mL is usually considered adequate stores in '
+            'pregnancy.', 'गर्भावस्था में लगभग 30 ng/mL से ऊपर का भंडार आमतौर पर पर्याप्त माना जाता है।'),
         ifLow:
-            'Low ferritin means iron stores are running down - the earliest sign '
-            'of iron deficiency, easily managed with iron.',
+            _t('Low ferritin means iron stores are running down - the earliest sign '
+            'of iron deficiency, easily managed with iron.', 'ferritin कम होने का मतलब है iron का भंडार घट रहा है — कमी का सबसे पहला संकेत, जो iron से आसानी से सँभल जाता है।'),
         ifHigh:
-            'Ferritin can rise temporarily with infection or inflammation, so it '
-            'is read in context.',
+            _t('Ferritin can rise temporarily with infection or inflammation, so it '
+            'is read in context.', 'infection या सूजन में ferritin कुछ समय के लिए बढ़ सकता है, इसलिए इसे पूरे संदर्भ में देखा जाता है।'),
       ),
       ReportParameter(
-        name: 'Calcium',
-        measures: 'The level of calcium in your blood.',
+        name: _t('Calcium', 'Calcium'),
+        measures: _t('The level of calcium in your blood.', 'आपके ख़ून में calcium का स्तर।'),
         whyImportant:
-            'Calcium supports your baby\'s bones and teeth and your own bone '
-            'health, muscles and nerves.',
-        typicalRange: 'Reported against the lab range (often around 8.5-10.5 mg/dL).',
+            _t('Calcium supports your baby\'s bones and teeth and your own bone '
+            'health, muscles and nerves.', 'calcium शिशु की हड्डियों और दाँतों के साथ आपकी अपनी हड्डियों, मांसपेशियों और नसों को सँभालता है।'),
+        typicalRange: _t('Reported against the lab range (often around 8.5-10.5 mg/dL).', 'lab की range के साथ बताई जाती है (अक्सर लगभग 8.5-10.5 mg/dL)।'),
         ifLow:
-            'Low calcium may prompt advice on calcium-rich food or a supplement, '
-            'often alongside vitamin D.',
-        ifHigh: 'A high value is uncommon and would simply be looked into.',
+            _t('Low calcium may prompt advice on calcium-rich food or a supplement, '
+            'often alongside vitamin D.', 'calcium कम हो तो calcium वाले खाने या supplement की सलाह मिल सकती है, अक्सर vitamin D के साथ।'),
+        ifHigh: _t('A high value is uncommon and would simply be looked into.', 'value ज़्यादा आना कम होता है और डॉक्टर बस इसे देख लेंगे।'),
       ),
       ReportParameter(
-        name: 'Vitamin D',
-        measures: 'Your vitamin D level (25-hydroxy vitamin D).',
+        name: _t('Vitamin D', 'Vitamin D'),
+        measures: _t('Your vitamin D level (25-hydroxy vitamin D).', 'आपका vitamin D स्तर (25-hydroxy vitamin D)।'),
         whyImportant:
-            'Vitamin D helps your body use calcium for your baby\'s bones. Low '
-            'levels are very common in India.',
+            _t('Vitamin D helps your body use calcium for your baby\'s bones. Low '
+            'levels are very common in India.', 'vitamin D शरीर को calcium इस्तेमाल करने में मदद करता है, जो शिशु की हड्डियों के लिए ज़रूरी है। भारत में इसकी कमी बहुत आम है।'),
         typicalRange:
-            'Around 30 ng/mL or above is generally considered sufficient; below '
-            '20 is often called deficient.',
+            _t('Around 30 ng/mL or above is generally considered sufficient; below '
+            '20 is often called deficient.', 'लगभग 30 ng/mL या उससे ऊपर आमतौर पर पर्याप्त माना जाता है; 20 से नीचे को अक्सर कमी कहा जाता है।'),
         ifLow:
-            'Low vitamin D is common and easily corrected with a supplement your '
-            'doctor prescribes and some safe sun exposure.',
+            _t('Low vitamin D is common and easily corrected with a supplement your '
+            'doctor prescribes and some safe sun exposure.', 'vitamin D की कमी आम है और डॉक्टर के लिखे supplement तथा थोड़ी सुरक्षित धूप से आसानी से ठीक हो जाती है।'),
         ifHigh:
-            'Very high levels only occur with over-supplementation, so doses are '
-            'kept sensible.',
+            _t('Very high levels only occur with over-supplementation, so doses are '
+            'kept sensible.', 'बहुत ज़्यादा स्तर तभी होता है जब supplement ज़रूरत से ज़्यादा लिया जाए, इसलिए dose सोच-समझकर रखी जाती है।'),
       ),
       ReportParameter(
-        name: 'TSH (Thyroid)',
+        name: _t('TSH (Thyroid)', 'TSH (Thyroid)'),
         measures:
-            'Thyroid Stimulating Hormone - a signal that reflects how your '
-            'thyroid gland is working.',
+            _t('Thyroid Stimulating Hormone - a signal that reflects how your '
+            'thyroid gland is working.', 'Thyroid Stimulating Hormone — एक संकेत जो बताता है कि आपकी thyroid ग्रंथि कैसे काम कर रही है।'),
         whyImportant:
-            'A well-balanced thyroid supports your energy and your baby\'s brain '
-            'development, especially early in pregnancy.',
+            _t('A well-balanced thyroid supports your energy and your baby\'s brain '
+            'development, especially early in pregnancy.', 'thyroid संतुलित हो तो आपकी ऊर्जा और शिशु के दिमाग़ के विकास, दोनों को सहारा मिलता है — ख़ासकर शुरुआती गर्भावस्था में।'),
         typicalRange:
-            'Pregnancy has its own targets, often roughly 0.1-4.0 mIU/L with '
-            'trimester-specific cut-offs your doctor uses.',
+            _t('Pregnancy has its own targets, often roughly 0.1-4.0 mIU/L with '
+            'trimester-specific cut-offs your doctor uses.', 'गर्भावस्था के अपने लक्ष्य होते हैं, अक्सर लगभग 0.1-4.0 mIU/L, और डॉक्टर हर तिमाही के अलग cut-off इस्तेमाल करते हैं।'),
         ifLow:
-            'A low TSH can suggest an overactive thyroid (hyperthyroidism), which '
-            'your doctor will assess further.',
+            _t('A low TSH can suggest an overactive thyroid (hyperthyroidism), which '
+            'your doctor will assess further.', 'TSH कम होना thyroid के ज़्यादा सक्रिय होने (hyperthyroidism) की ओर इशारा कर सकता है, जिसे डॉक्टर आगे जाँचेंगे।'),
         ifHigh:
-            'A high TSH suggests an underactive thyroid (hypothyroidism) - common '
-            'and easily supported with a small daily tablet.',
+            _t('A high TSH suggests an underactive thyroid (hypothyroidism) - common '
+            'and easily supported with a small daily tablet.', 'TSH ज़्यादा होना thyroid के कम सक्रिय होने (hypothyroidism) की ओर इशारा करता है — आम बात, और रोज़ की एक छोटी tablet से आसानी से सँभल जाती है।'),
       ),
     ],
     interpretation:
-        'Most first-visit bloods come back in range, and that is what the lab is checking for: enough haemoglobin and iron to carry oxygen for two, a thyroid working normally, and no infection that needs treating before it matters. A value outside the range is common in pregnancy and usually means a supplement or a repeat test, not a problem with the baby.',
+        _t('Most first-visit bloods come back in range, and that is what the lab is checking for: enough haemoglobin and iron to carry oxygen for two, a thyroid working normally, and no infection that needs treating before it matters. A value outside the range is common in pregnancy and usually means a supplement or a repeat test, not a problem with the baby.', 'पहली विज़िट की ज़्यादातर जाँचें range के अंदर ही आती हैं, और lab यही देख रही होती है: दो लोगों तक oxygen पहुँचाने के लिए पर्याप्त haemoglobin और iron, ठीक चल रही thyroid, और कोई ऐसा infection नहीं जिसका इलाज पहले ज़रूरी हो। कोई value range से बाहर आना गर्भावस्था में आम है और आमतौर पर इसका मतलब एक supplement या दोबारा जाँच होता है, शिशु में कोई दिक़्क़त नहीं।'),
     interpretPointers: [
-      'Low haemoglobin or ferritin most often means iron is needed - the commonest abnormal result in Indian pregnancies, and among the most treatable.',
-      'A thyroid value outside range is usually managed with a daily tablet and a repeat test a few weeks later.',
-      'Eating before a fasting test, a recent illness, or being poorly hydrated can each skew a result enough to need it repeated.',
-      'Your doctor reads these together, not one at a time. A single number outside range rarely means anything on its own.',
+      _t('Low haemoglobin or ferritin most often means iron is needed - the commonest abnormal result in Indian pregnancies, and among the most treatable.', 'haemoglobin या ferritin कम होने का मतलब अक्सर बस इतना है कि iron चाहिए — भारत में गर्भावस्था का सबसे आम असामान्य नतीजा, और सबसे आसानी से ठीक होने वालों में।'),
+      _t('A thyroid value outside range is usually managed with a daily tablet and a repeat test a few weeks later.', 'thyroid की value range से बाहर हो तो आमतौर पर रोज़ की एक tablet और कुछ हफ़्तों बाद दोबारा जाँच से बात सँभल जाती है।'),
+      _t('Eating before a fasting test, a recent illness, or being poorly hydrated can each skew a result enough to need it repeated.', 'fasting जाँच से पहले कुछ खा लेना, हाल की कोई बीमारी, या पानी की कमी — इनमें से कोई भी नतीजे को इतना बदल सकता है कि जाँच दोबारा करनी पड़े।'),
+      _t('Your doctor reads these together, not one at a time. A single number outside range rarely means anything on its own.', 'डॉक्टर इन सबको एक साथ पढ़ते हैं, एक-एक करके नहीं। अकेला एक number range से बाहर होने का अपने आप में शायद ही कोई मतलब होता है।'),
     ],
   ),
 
   // -- Dating scan -----------------------------------------------------------
   TestScanInfo(
     id: 'dating_scan',
-    name: 'Dating Scan',
-    altName: 'Viability / First-Trimester Ultrasound',
+    name: _t('Dating Scan', 'Dating Scan'),
+    altName: _t('Viability / First-Trimester Ultrasound', 'Viability / पहली तिमाही का Ultrasound'),
     tag: TrimesterTag.t1,
     whatItIs:
-        'Your first ultrasound in pregnancy. It confirms the pregnancy is in the '
+        _t('Your first ultrasound in pregnancy. It confirms the pregnancy is in the '
         'right place, checks for a heartbeat, sees how many babies there are, and '
-        'measures your baby to give an accurate due date.',
+        'measures your baby to give an accurate due date.', 'गर्भावस्था का आपका पहला ultrasound। यह पक्का करता है कि गर्भ सही जगह ठहरा है, धड़कन देखता है, कितने शिशु हैं यह बताता है, और शिशु को नापकर सही due date देता है।'),
     why:
-        'It confirms a healthy start and sets your due date accurately, which '
-        'every later scan and test is timed from.',
+        _t('It confirms a healthy start and sets your due date accurately, which '
+        'every later scan and test is timed from.', 'यह स्वस्थ शुरुआत की पुष्टि करता है और आपकी due date सही तय करता है — आगे का हर scan और जाँच इसी से समय पर होते हैं।'),
     when:
-        'Usually between about 6 and 9 weeks, sometimes up to 13 weeks. An early '
-        'scan may be done if you have pain, bleeding, or are unsure of dates.',
+        _t('Usually between about 6 and 9 weeks, sometimes up to 13 weeks. An early '
+        'scan may be done if you have pain, bleeding, or are unsure of dates.', 'आमतौर पर लगभग 6 से 9 हफ़्तों के बीच, कभी-कभी 13 हफ़्तों तक। दर्द हो, ख़ून आए, या तारीख़ों को लेकर संशय हो तो scan जल्दी भी किया जा सकता है।'),
     preparation:
-        'For an early (transvaginal) scan you may not need a full bladder. For an '
+        _t('For an early (transvaginal) scan you may not need a full bladder. For an '
         'abdominal scan you may be asked to drink water and hold urine so the '
-        'uterus is easier to see. Wear comfortable, two-piece clothing.',
+        'uterus is easier to see. Wear comfortable, two-piece clothing.', 'शुरुआती (transvaginal) scan के लिए शायद bladder भरा होना ज़रूरी न हो। पेट के ऊपर से होने वाले scan के लिए पानी पीकर पेशाब रोकने को कहा जा सकता है, ताकि बच्चेदानी साफ़ दिखे। आरामदेह, दो हिस्सों वाले कपड़े पहनिए।'),
     procedure:
-        'A probe (either on your tummy with gel, or a slim internal probe early '
+        _t('A probe (either on your tummy with gel, or a slim internal probe early '
         'on) sends harmless sound waves to build an image. It is painless and '
-        'takes about 10-20 minutes.',
+        'takes about 10-20 minutes.', 'एक probe (या तो gel लगाकर आपके पेट पर, या शुरुआत में एक पतला अंदरूनी probe) बिना नुक़सान वाली ध्वनि तरंगों से तस्वीर बनाता है। इसमें दर्द नहीं होता और लगभग 10-20 मिनट लगते हैं।'),
     understandingReport:
-        'The report notes a few early measurements and observations. Here is what '
-        'they mean.',
+        _t('The report notes a few early measurements and observations. Here is what '
+        'they mean.', 'रिपोर्ट में शुरुआत के कुछ माप और observations लिखे होते हैं। उनका मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: 'Gestational sac',
-        measures: 'The fluid-filled space your baby grows in.',
+        name: _t('Gestational sac', 'Gestational sac'),
+        measures: _t('The fluid-filled space your baby grows in.', 'पानी से भरी वह जगह जिसमें आपका शिशु बढ़ता है।'),
         whyImportant:
-            'Seeing it inside the uterus confirms the pregnancy is in the right '
-            'place.',
-        note: 'A normal early finding; its size helps confirm dates.',
+            _t('Seeing it inside the uterus confirms the pregnancy is in the right '
+            'place.', 'इसका बच्चेदानी के अंदर दिखना पुष्टि करता है कि गर्भ सही जगह ठहरा है।'),
+        note: _t('A normal early finding; its size helps confirm dates.', 'शुरुआत की एक सामान्य बात; इसका आकार तारीख़ें पक्की करने में मदद करता है।'),
       ),
       ReportParameter(
-        name: 'CRL (Crown-Rump Length)',
-        measures: 'Your baby\'s length from head to bottom.',
+        name: _t('CRL (Crown-Rump Length)', 'CRL (Crown-Rump Length)'),
+        measures: _t('Your baby\'s length from head to bottom.', 'सिर से कूल्हे तक आपके शिशु की लंबाई।'),
         whyImportant:
-            'This is the most accurate way to date a pregnancy this early.',
-        note: 'Used to set or confirm your estimated due date.',
+            _t('This is the most accurate way to date a pregnancy this early.', 'इतनी जल्दी गर्भावस्था की तारीख़ तय करने का यही सबसे सटीक तरीक़ा है।'),
+        note: _t('Used to set or confirm your estimated due date.', 'इसी से आपकी अनुमानित due date तय या पक्की की जाती है।'),
       ),
       ReportParameter(
-        name: 'FHR / Cardiac activity',
-        measures: 'Your baby\'s heartbeat.',
-        whyImportant: 'A heartbeat is a reassuring sign of a healthy start.',
+        name: _t('FHR / Cardiac activity', 'FHR / Cardiac activity'),
+        measures: _t('Your baby\'s heartbeat.', 'आपके शिशु की धड़कन।'),
+        whyImportant: _t('A heartbeat is a reassuring sign of a healthy start.', 'धड़कन का दिखना स्वस्थ शुरुआत का भरोसा देने वाला संकेत है।'),
         typicalRange:
-            'Often visible from around 6 weeks; a rate of roughly 110-160 beats '
-            'per minute is typical as pregnancy progresses.',
+            _t('Often visible from around 6 weeks; a rate of roughly 110-160 beats '
+            'per minute is typical as pregnancy progresses.', 'अक्सर लगभग 6 हफ़्तों से दिखने लगती है; गर्भावस्था आगे बढ़ने पर लगभग 110-160 धड़कन प्रति मिनट सामान्य है।'),
         note:
-            'Before about 6 weeks it can simply be too early to see - not a cause '
-            'for worry on its own.',
+            _t('Before about 6 weeks it can simply be too early to see - not a cause '
+            'for worry on its own.', 'लगभग 6 हफ़्तों से पहले इसका न दिखना सिर्फ़ जल्दी होने की बात हो सकती है — अपने आप में चिंता की वजह नहीं।'),
       ),
       ReportParameter(
-        name: 'EDD (Estimated Due Date)',
-        measures: 'Your expected delivery date, from the measurements.',
+        name: _t('EDD (Estimated Due Date)', 'EDD (Estimated Due Date)'),
+        measures: _t('Your expected delivery date, from the measurements.', 'मापों से निकली आपकी अनुमानित delivery की तारीख़।'),
         whyImportant:
-            'It anchors the timing of every future scan, test and milestone.',
-        note: 'It may be adjusted slightly from the date based on your period.',
+            _t('It anchors the timing of every future scan, test and milestone.', 'आगे का हर scan, जाँच और पड़ाव इसी तारीख़ के हिसाब से तय होता है।'),
+        note: _t('It may be adjusted slightly from the date based on your period.', 'आपके period से निकली तारीख़ से यह थोड़ी अलग हो सकती है।'),
       ),
     ],
     interpretation:
-        'A normal dating scan means one pregnancy, in the right place, with a heartbeat and a size that gives a due date. From here the scan date is the one that counts - it is measured, where a date from your last period is estimated, and this is the most accurate dating scan you will have.',
+        _t('A normal dating scan means one pregnancy, in the right place, with a heartbeat and a size that gives a due date. From here the scan date is the one that counts - it is measured, where a date from your last period is estimated, and this is the most accurate dating scan you will have.', 'सामान्य dating scan का मतलब है — एक गर्भ, सही जगह, धड़कन के साथ, और ऐसा आकार जिससे due date निकल आती है। यहाँ से scan वाली तारीख़ ही मानी जाती है — वह नापी गई है, जबकि पिछले period से निकली तारीख़ सिर्फ़ अंदाज़ा है, और यही सबसे सटीक dating scan आपको मिलेगा।'),
     interpretPointers: [
-      'If the scan date differs from your period date by more than about a week, the scan usually wins and your notes are updated.',
-      'No heartbeat at a very early scan often means it is simply too early. A repeat in one to two weeks is the normal next step, not bad news.',
-      'A very early scan, an unusual position of the uterus, or a full bladder can all make measuring harder.',
-      'Your sonographer will not usually discuss findings during the scan. The report goes to your doctor, who explains it.',
+      _t('If the scan date differs from your period date by more than about a week, the scan usually wins and your notes are updated.', 'अगर scan की तारीख़ आपके period वाली तारीख़ से लगभग एक हफ़्ते से ज़्यादा अलग हो, तो आमतौर पर scan की मानी जाती है और आपके records बदल दिए जाते हैं।'),
+      _t('No heartbeat at a very early scan often means it is simply too early. A repeat in one to two weeks is the normal next step, not bad news.', 'बहुत शुरुआती scan में धड़कन न दिखने का मतलब अक्सर सिर्फ़ इतना होता है कि अभी जल्दी है। एक-दो हफ़्ते बाद दोबारा scan सामान्य अगला क़दम है, बुरी ख़बर नहीं।'),
+      _t('A very early scan, an unusual position of the uterus, or a full bladder can all make measuring harder.', 'बहुत जल्दी किया गया scan, बच्चेदानी का कुछ अलग झुकाव, या भरा हुआ bladder — ये सब नापना मुश्किल कर सकते हैं।'),
+      _t('Your sonographer will not usually discuss findings during the scan. The report goes to your doctor, who explains it.', 'scan के दौरान sonographer आमतौर पर नतीजों पर बात नहीं करते। रिपोर्ट आपके डॉक्टर के पास जाती है, वही इसे समझाते हैं।'),
     ],
   ),
 
   // -- NT scan ---------------------------------------------------------------
   TestScanInfo(
     id: 'nt_scan',
-    name: 'NT Scan',
-    altName: 'Nuchal Translucency + Double Marker',
+    name: _t('NT Scan', 'NT Scan'),
+    altName: _t('Nuchal Translucency + Double Marker', 'Nuchal Translucency + Double Marker'),
     tag: TrimesterTag.t1,
     whatItIs:
-        'A first-trimester screening test. An ultrasound measures a small pocket '
+        _t('A first-trimester screening test. An ultrasound measures a small pocket '
         'of fluid at the back of your baby\'s neck (the nuchal translucency), '
-        'usually combined with a blood test (the "double marker") and your age.',
+        'usually combined with a blood test (the "double marker") and your age.', 'पहली तिमाही की एक screening जाँच। ultrasound में शिशु की गर्दन के पीछे भरे थोड़े से पानी (nuchal translucency) को नापा जाता है, और उसके साथ आमतौर पर एक ख़ून की जाँच ("double marker") और आपकी उम्र जोड़ी जाती है।'),
     why:
-        'Together these give a CHANCE (a likelihood) for conditions such as '
+        _t('Together these give a CHANCE (a likelihood) for conditions such as '
         'Down\'s syndrome. It is a screening test - it estimates a probability, '
-        'it does not diagnose anything.',
+        'it does not diagnose anything.', 'ये मिलकर Down\'s syndrome जैसी स्थितियों की एक संभावना (chance) बताते हैं। यह screening जाँच है — यह संभावना का अंदाज़ा लगाती है, किसी बात का निदान नहीं करती।'),
     when:
-        'Between 11 and 13 weeks 6 days, when the NT measurement is most reliable.',
+        _t('Between 11 and 13 weeks 6 days, when the NT measurement is most reliable.', '11 हफ़्ते से 13 हफ़्ते 6 दिन के बीच, जब NT का माप सबसे भरोसेमंद होता है।'),
     preparation:
-        'A moderately full bladder can help the scan. The blood sample for the '
-        'double marker can usually be given the same day; no fasting is needed.',
+        _t('A moderately full bladder can help the scan. The blood sample for the '
+        'double marker can usually be given the same day; no fasting is needed.', 'bladder थोड़ा भरा हो तो scan में मदद मिलती है। double marker के लिए ख़ून का sample आमतौर पर उसी दिन दिया जा सकता है; fasting की ज़रूरत नहीं।'),
     procedure:
-        'A standard abdominal ultrasound measures the neck fluid and confirms '
+        _t('A standard abdominal ultrasound measures the neck fluid and confirms '
         'dates, plus a simple blood draw for the markers. Painless, about 20-30 '
-        'minutes in total.',
+        'minutes in total.', 'पेट के ऊपर से होने वाला सामान्य ultrasound गर्दन का पानी नापता है और तारीख़ें पक्की करता है, साथ में markers के लिए ख़ून का एक आसान sample। दर्द नहीं होता, कुल मिलाकर लगभग 20-30 मिनट।'),
     understandingReport:
-        'Your result combines the scan and blood values into an overall chance. '
-        'Here is what the pieces mean.',
+        _t('Your result combines the scan and blood values into an overall chance. '
+        'Here is what the pieces mean.', 'आपका नतीजा scan और ख़ून की values को मिलाकर एक कुल संभावना बताता है। हर हिस्से का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: 'NT measurement (mm)',
-        measures: 'The fluid at the back of your baby\'s neck.',
-        whyImportant: 'It is the main scan marker used in the calculation.',
-        typicalRange: 'Most babies measure under about 3.0-3.5 mm.',
+        name: _t('NT measurement (mm)', 'NT measurement (mm)'),
+        measures: _t('The fluid at the back of your baby\'s neck.', 'आपके शिशु की गर्दन के पीछे का पानी।'),
+        whyImportant: _t('It is the main scan marker used in the calculation.', 'गणना में इस्तेमाल होने वाला यह मुख्य scan marker है।'),
+        typicalRange: _t('Most babies measure under about 3.0-3.5 mm.', 'ज़्यादातर शिशुओं का माप लगभग 3.0-3.5 mm से नीचे रहता है।'),
         ifHigh:
-            'A higher value raises the calculated chance but does NOT confirm '
-            'anything - many babies with a slightly higher NT are perfectly well.',
+            _t('A higher value raises the calculated chance but does NOT confirm '
+            'anything - many babies with a slightly higher NT are perfectly well.', 'value ज़्यादा होने से निकाली गई संभावना बढ़ जाती है, पर इससे कुछ भी पक्का नहीं होता — थोड़े ज़्यादा NT वाले कई शिशु पूरी तरह स्वस्थ होते हैं।'),
       ),
       ReportParameter(
-        name: 'Nasal bone',
-        measures: 'Whether the nasal bone is seen (present or absent).',
-        whyImportant: 'It is one of several soft markers considered together.',
+        name: _t('Nasal bone', 'Nasal bone'),
+        measures: _t('Whether the nasal bone is seen (present or absent).', 'nasal bone दिख रहा है या नहीं (present या absent)।'),
+        whyImportant: _t('It is one of several soft markers considered together.', 'यह उन कई soft markers में से एक है जिन्हें साथ मिलाकर देखा जाता है।'),
         note:
-            'An absent nasal bone can slightly raise the calculated chance; on '
-            'its own it is not a diagnosis.',
+            _t('An absent nasal bone can slightly raise the calculated chance; on '
+            'its own it is not a diagnosis.', 'nasal bone न दिखे तो निकाली गई संभावना थोड़ी बढ़ सकती है; अकेले इसका मतलब कोई निदान नहीं।'),
       ),
       ReportParameter(
-        name: 'Free β-hCG / PAPP-A',
-        measures: 'Two pregnancy hormones/proteins from the blood sample.',
-        whyImportant: 'They feed into your overall screening chance.',
+        name: _t('Free β-hCG / PAPP-A', 'Free β-hCG / PAPP-A'),
+        measures: _t('Two pregnancy hormones/proteins from the blood sample.', 'ख़ून के sample से निकले गर्भावस्था के दो hormones/proteins।'),
+        whyImportant: _t('They feed into your overall screening chance.', 'ये आपकी कुल screening संभावना में जुड़ते हैं।'),
         note:
-            'Usually reported as "MoM" (multiples of the median) rather than raw '
-            'numbers.',
+            _t('Usually reported as "MoM" (multiples of the median) rather than raw '
+            'numbers.', 'आमतौर पर सीधे numbers के बजाय "MoM" (multiples of the median) में बताए जाते हैं।'),
       ),
       ReportParameter(
-        name: 'Risk / chance (e.g. 1 in 1500)',
-        measures: 'Your combined screening result.',
-        whyImportant: 'It tells you whether a further test is worth considering.',
+        name: _t('Risk / chance (e.g. 1 in 1500)', 'Risk / chance (जैसे 1 in 1500)'),
+        measures: _t('Your combined screening result.', 'आपका मिला-जुला screening नतीजा।'),
+        whyImportant: _t('It tells you whether a further test is worth considering.', 'यह बताता है कि आगे कोई जाँच सोचने लायक़ है या नहीं।'),
         note:
-            'A "low chance" (a big number, like 1 in 1500) is reassuring. A '
+            _t('A "low chance" (a big number, like 1 in 1500) is reassuring. A '
             '"higher chance" may lead to an offer of NIPT or a diagnostic test - '
-            'it is a next step, not a conclusion.',
+            'it is a next step, not a conclusion.', '"low chance" (बड़ा number, जैसे 1 in 1500) भरोसा देने वाला है। "higher chance" पर NIPT या कोई diagnostic जाँच सुझाई जा सकती है — यह अगला क़दम है, कोई नतीजा नहीं।'),
       ),
     ],
     interpretation:
-        'This scan estimates a CHANCE, not an answer, and that distinction is the whole of it. A low-chance result means the probability of a chromosomal condition is small - not that it is zero. A high-chance result is not a finding either; most babies in that group turn out to be fine, and it is an invitation to a further test.',
+        _t('This scan estimates a CHANCE, not an answer, and that distinction is the whole of it. A low-chance result means the probability of a chromosomal condition is small - not that it is zero. A high-chance result is not a finding either; most babies in that group turn out to be fine, and it is an invitation to a further test.', 'यह scan एक संभावना बताता है, जवाब नहीं — और यही इसकी पूरी बात है। low-chance नतीजे का मतलब है कि किसी chromosomal स्थिति की संभावना कम है — यह नहीं कि शून्य है। high-chance भी कोई नतीजा नहीं; उस समूह के ज़्यादातर शिशु ठीक ही निकलते हैं, और यह आगे एक जाँच का न्योता भर है।'),
     interpretPointers: [
-      'The result is a probability, written as a ratio. Both 1 in 900 and 1 in 90 are ordinary outcomes of a normal scan.',
-      'A raised nuchal measurement on its own is not a diagnosis of anything.',
-      'The baby\'s position, where you are in the 11-13 week window, and your own build can each affect the measurement.',
-      'If the chance comes back raised, NIPT or a diagnostic test is the usual next conversation - one your doctor will walk you through.',
+      _t('The result is a probability, written as a ratio. Both 1 in 900 and 1 in 90 are ordinary outcomes of a normal scan.', 'नतीजा एक संभावना है, अनुपात में लिखी हुई। 1 in 900 और 1 in 90, दोनों एक सामान्य scan के आम नतीजे हैं।'),
+      _t('A raised nuchal measurement on its own is not a diagnosis of anything.', 'nuchal माप का बढ़ा होना अकेले में किसी बात का निदान नहीं।'),
+      _t('The baby\'s position, where you are in the 11-13 week window, and your own build can each affect the measurement.', 'शिशु की स्थिति, 11-13 हफ़्ते की खिड़की में आप कहाँ हैं, और आपका अपना शरीर — इनमें से हर एक माप पर असर डाल सकता है।'),
+      _t('If the chance comes back raised, NIPT or a diagnostic test is the usual next conversation - one your doctor will walk you through.', 'संभावना बढ़ी हुई आए तो आमतौर पर अगली बात NIPT या किसी diagnostic जाँच की होती है — जिसे आपके डॉक्टर आपको पूरा समझाएँगे।'),
     ],
   ),
 
   // -- NIPT ------------------------------------------------------------------
   TestScanInfo(
     id: 'nipt',
-    name: 'NIPT',
-    altName: 'Non-Invasive Prenatal Test',
+    name: _t('NIPT', 'NIPT'),
+    altName: _t('Non-Invasive Prenatal Test', 'Non-Invasive Prenatal Test'),
     tag: TrimesterTag.t1,
     whatItIs:
-        'An advanced blood test that looks at small fragments of your baby\'s DNA '
+        _t('An advanced blood test that looks at small fragments of your baby\'s DNA '
         'circulating in your blood, to screen for common chromosomal conditions '
-        'such as Down\'s syndrome.',
+        'such as Down\'s syndrome.', 'एक उन्नत ख़ून की जाँच, जो आपके ख़ून में घूम रहे शिशु के DNA के छोटे टुकड़ों को देखकर Down\'s syndrome जैसी आम chromosomal स्थितियों की screening करती है।'),
     why:
-        'It is a more precise screening test than the combined NT test. It may be '
+        _t('It is a more precise screening test than the combined NT test. It may be '
         'offered as a first choice, or after a "higher chance" NT result, to give '
-        'clearer information before deciding on any diagnostic test.',
+        'clearer information before deciding on any diagnostic test.', 'यह मिली-जुली NT जाँच से ज़्यादा सटीक screening है। यह पहली पसंद के तौर पर भी दी जा सकती है, या NT में "higher chance" आने के बाद — ताकि कोई diagnostic जाँच तय करने से पहले तस्वीर साफ़ हो।'),
     when:
-        'From 10 weeks onward (there needs to be enough of your baby\'s DNA in '
-        'your blood). It can be done at any point after that.',
+        _t('From 10 weeks onward (there needs to be enough of your baby\'s DNA in '
+        'your blood). It can be done at any point after that.', '10 हफ़्तों के बाद से (आपके ख़ून में शिशु का DNA पर्याप्त होना चाहिए)। उसके बाद यह किसी भी समय की जा सकती है।'),
     preparation:
-        'No preparation and no fasting. It is a simple blood draw from your arm.',
+        _t('No preparation and no fasting. It is a simple blood draw from your arm.', 'न कोई तैयारी, न fasting। बाँह से ख़ून का एक आसान sample भर है।'),
     procedure:
-        'One blood sample is taken and sent to a specialised lab. Results usually '
-        'take about a week to ten days.',
+        _t('One blood sample is taken and sent to a specialised lab. Results usually '
+        'take about a week to ten days.', 'ख़ून का एक sample लेकर विशेष lab भेजा जाता है। नतीजे आमतौर पर एक हफ़्ते से दस दिन में आते हैं।'),
     understandingReport:
-        'NIPT is reported as a screening result, not a yes/no diagnosis. Here is '
-        'how to read it.',
+        _t('NIPT is reported as a screening result, not a yes/no diagnosis. Here is '
+        'how to read it.', 'NIPT का नतीजा screening के रूप में आता है, हाँ/ना वाले निदान के रूप में नहीं। इसे ऐसे पढ़िए।'),
     parameters: [
       ReportParameter(
-        name: 'Low risk / High risk',
+        name: _t('Low risk / High risk', 'Low risk / High risk'),
         measures:
-            'The screening result for each condition tested (e.g. trisomy 21).',
-        whyImportant: 'It guides whether a diagnostic test is worth discussing.',
+            _t('The screening result for each condition tested (e.g. trisomy 21).', 'जाँची गई हर स्थिति का screening नतीजा (जैसे trisomy 21)।'),
+        whyImportant: _t('It guides whether a diagnostic test is worth discussing.', 'यह बताता है कि किसी diagnostic जाँच पर बात करना ज़रूरी है या नहीं।'),
         note:
-            'A "low risk" result is very reassuring. A "high risk" result still '
+            _t('A "low risk" result is very reassuring. A "high risk" result still '
             'needs a diagnostic test (like amniocentesis) to confirm - screening '
-            'is not the final answer.',
+            'is not the final answer.', '"low risk" नतीजा बहुत भरोसा देने वाला है। "high risk" आने पर भी पुष्टि के लिए एक diagnostic जाँच (जैसे amniocentesis) चाहिए — screening आख़िरी जवाब नहीं है।'),
       ),
       ReportParameter(
-        name: 'Fetal fraction',
-        measures: 'How much of your baby\'s DNA was in the sample.',
+        name: _t('Fetal fraction', 'Fetal fraction'),
+        measures: _t('How much of your baby\'s DNA was in the sample.', 'sample में आपके शिशु का DNA कितना था।'),
         whyImportant:
-            'Enough fetal fraction is needed for a reliable result.',
+            _t('Enough fetal fraction is needed for a reliable result.', 'भरोसेमंद नतीजे के लिए fetal fraction का पर्याप्त होना ज़रूरी है।'),
         note:
-            'If it is too low, the test may simply be repeated - it does not mean '
-            'anything is wrong.',
+            _t('If it is too low, the test may simply be repeated - it does not mean '
+            'anything is wrong.', 'बहुत कम हो तो जाँच बस दोबारा कर ली जाती है — इसका मतलब यह नहीं कि कुछ ग़लत है।'),
       ),
       ReportParameter(
-        name: 'Fetal sex (optional)',
-        measures: 'Your baby\'s sex, if analysed.',
+        name: _t('Fetal sex (optional)', 'Fetal sex (वैकल्पिक)'),
+        measures: _t('Your baby\'s sex, if analysed.', 'जाँचा गया हो तो आपके शिशु का लिंग।'),
         whyImportant:
-            'Sometimes relevant medically (for sex-linked conditions).',
+            _t('Sometimes relevant medically (for sex-linked conditions).', 'कभी-कभी चिकित्सकीय रूप से मायने रखता है (sex-linked स्थितियों के लिए)।'),
         note:
-            'Note: in India, disclosing the baby\'s sex is not permitted under '
-            'the PCPNDT Act, so labs here withhold it.',
+            _t('Note: in India, disclosing the baby\'s sex is not permitted under '
+            'the PCPNDT Act, so labs here withhold it.', 'ध्यान दें: भारत में PCPNDT Act के तहत शिशु का लिंग बताना मना है, इसलिए यहाँ की labs इसे नहीं बतातीं।'),
       ),
     ],
     interpretation:
-        'NIPT screens with very high accuracy, which still is not the same as diagnosing. A low-chance result is strongly reassuring for the conditions it looks at. A high-chance result has to be confirmed by a diagnostic test before anything is concluded, and a proportion of them turn out to be false alarms.',
+        _t('NIPT screens with very high accuracy, which still is not the same as diagnosing. A low-chance result is strongly reassuring for the conditions it looks at. A high-chance result has to be confirmed by a diagnostic test before anything is concluded, and a proportion of them turn out to be false alarms.', 'NIPT बहुत ऊँची सटीकता से screening करता है, फिर भी यह निदान नहीं है। जिन स्थितियों को यह देखता है, उनके लिए low-chance नतीजा गहरा भरोसा देता है। high-chance नतीजे पर कोई निष्कर्ष निकालने से पहले diagnostic जाँच से पुष्टि करनी होती है, और इनमें से कुछ झूठे अलार्म निकलते हैं।'),
     interpretPointers: [
-      'It screens for specific conditions only. A low-chance result says nothing about anything it did not test for.',
-      'A no-result happens occasionally - usually too little fetal DNA in the sample, and usually solved by repeating it a week or two later.',
-      'Twins, an IVF pregnancy, a very early sample and higher maternal weight can each affect whether a result can be given at all.',
-      'No decision should ever rest on NIPT alone. Confirmation comes from a diagnostic test, arranged and explained by your doctor.',
+      _t('It screens for specific conditions only. A low-chance result says nothing about anything it did not test for.', 'यह सिर्फ़ कुछ तय स्थितियों की screening करता है। जो जाँचा ही नहीं गया, low-chance नतीजा उसके बारे में कुछ नहीं कहता।'),
+      _t('A no-result happens occasionally - usually too little fetal DNA in the sample, and usually solved by repeating it a week or two later.', 'कभी-कभी कोई नतीजा नहीं आता — आमतौर पर sample में शिशु का DNA कम होने से, और एक-दो हफ़्ते बाद दोबारा करने से बात बन जाती है।'),
+      _t('Twins, an IVF pregnancy, a very early sample and higher maternal weight can each affect whether a result can be given at all.', 'जुड़वाँ, IVF से हुई गर्भावस्था, बहुत जल्दी लिया गया sample और माँ का ज़्यादा वज़न — इनमें से हर एक इस बात पर असर डाल सकता है कि नतीजा आ भी पाएगा या नहीं।'),
+      _t('No decision should ever rest on NIPT alone. Confirmation comes from a diagnostic test, arranged and explained by your doctor.', 'कोई भी फ़ैसला अकेले NIPT पर नहीं टिकना चाहिए। पुष्टि diagnostic जाँच से होती है, जिसे आपके डॉक्टर करवाते और समझाते हैं।'),
     ],
   ),
 
   // -- Anomaly / TIFFA scan --------------------------------------------------
   TestScanInfo(
     id: 'anomaly_scan',
-    name: 'Anomaly Scan',
-    altName: 'TIFFA / Level 2 / 20-Week Scan',
+    name: _t('Anomaly Scan', 'Anomaly Scan'),
+    altName: _t('TIFFA / Level 2 / 20-Week Scan', 'TIFFA / Level 2 / 20 हफ़्ते का Scan'),
     tag: TrimesterTag.t2,
     whatItIs:
-        'A detailed ultrasound (Targeted Imaging for Fetal Anomalies) that looks '
+        _t('A detailed ultrasound (Targeted Imaging for Fetal Anomalies) that looks '
         'closely at your baby\'s brain, face, spine, heart, chest, tummy, kidneys '
         'and limbs, and checks the placenta, the fluid and how your baby is '
-        'growing.',
+        'growing.', 'एक विस्तृत ultrasound (Targeted Imaging for Fetal Anomalies), जो आपके शिशु के दिमाग़, चेहरे, रीढ़, दिल, छाती, पेट, गुर्दों और हाथ-पैरों को क़रीब से देखता है, और साथ में placenta, पानी तथा शिशु की बढ़त भी जाँचता है।'),
     why:
-        'It is the main check of your baby\'s physical development, and reassures '
+        _t('It is the main check of your baby\'s physical development, and reassures '
         'you and your doctor that organs are forming as expected. It also records '
-        'the placenta position and growth measurements.',
+        'the placenta position and growth measurements.', 'यह आपके शिशु के शारीरिक विकास की मुख्य जाँच है, और आपको तथा डॉक्टर को भरोसा देती है कि अंग उम्मीद के मुताबिक़ बन रहे हैं। इसमें placenta की स्थिति और बढ़त के माप भी दर्ज होते हैं।'),
     when:
-        'Between 18 and 22 weeks, when the organs are large enough to see clearly '
-        'but there is still room to view everything.',
+        _t('Between 18 and 22 weeks, when the organs are large enough to see clearly '
+        'but there is still room to view everything.', '18 से 22 हफ़्तों के बीच, जब अंग साफ़ दिखने लायक़ बड़े हो चुके होते हैं पर सब कुछ देखने की जगह भी बची होती है।'),
     preparation:
-        'A moderately full bladder can help early views. Wear two-piece, '
-        'comfortable clothing. The scan takes longer than others, so allow time.',
+        _t('A moderately full bladder can help early views. Wear two-piece, '
+        'comfortable clothing. The scan takes longer than others, so allow time.', 'bladder थोड़ा भरा हो तो शुरुआती views में मदद मिलती है। दो हिस्सों वाले, आरामदेह कपड़े पहनिए। यह scan बाक़ियों से लंबा चलता है, इसलिए समय लेकर जाइए।'),
     procedure:
-        'An abdominal ultrasound with gel, moving the probe to view each part in '
+        _t('An abdominal ultrasound with gel, moving the probe to view each part in '
         'turn. It usually takes 30-45 minutes; the sonographer may pause if your '
-        'baby is lying in an awkward position and ask you to move or walk.',
+        'baby is lying in an awkward position and ask you to move or walk.', 'gel लगाकर पेट के ऊपर से ultrasound, जिसमें probe घुमाकर एक-एक हिस्सा देखा जाता है। आमतौर पर 30-45 मिनट लगते हैं; शिशु किसी टेढ़ी स्थिति में लेटा हो तो sonographer रुककर आपको हिलने या थोड़ा चलने को कह सकते हैं।'),
     understandingReport:
-        'The report lists organ-by-organ observations plus growth measurements '
-        '(biometry). Here are the measurements you will see.',
+        _t('The report lists organ-by-organ observations plus growth measurements '
+        '(biometry). Here are the measurements you will see.', 'रिपोर्ट में एक-एक अंग की observations के साथ बढ़त के माप (biometry) होते हैं। जो माप आपको दिखेंगे, वे ये हैं।'),
     parameters: [
       ReportParameter(
-        name: 'BPD (Biparietal Diameter)',
-        measures: 'The width of your baby\'s head, side to side.',
-        whyImportant: 'One of the core measurements used to track head growth.',
+        name: _t('BPD (Biparietal Diameter)', 'BPD (Biparietal Diameter)'),
+        measures: _t('The width of your baby\'s head, side to side.', 'आपके शिशु के सिर की चौड़ाई, एक तरफ़ से दूसरी तरफ़।'),
+        whyImportant: _t('One of the core measurements used to track head growth.', 'सिर की बढ़त पर नज़र रखने वाले मुख्य मापों में से एक।'),
         note:
-            'Compared against the expected size for your weeks; read as a trend, '
-            'not a single number.',
+            _t('Compared against the expected size for your weeks; read as a trend, '
+            'not a single number.', 'आपके हफ़्तों के हिसाब से उम्मीद के आकार से मिलाया जाता है; इसे अकेले एक number की तरह नहीं, रुझान की तरह पढ़िए।'),
       ),
       ReportParameter(
-        name: 'HC (Head Circumference)',
-        measures: 'The distance around your baby\'s head.',
-        whyImportant: 'Helps confirm the head is growing as expected.',
-        note: 'Used with BPD to assess head growth and dating.',
+        name: _t('HC (Head Circumference)', 'HC (Head Circumference)'),
+        measures: _t('The distance around your baby\'s head.', 'आपके शिशु के सिर की गोलाई।'),
+        whyImportant: _t('Helps confirm the head is growing as expected.', 'यह पक्का करने में मदद करता है कि सिर उम्मीद के मुताबिक़ बढ़ रहा है।'),
+        note: _t('Used with BPD to assess head growth and dating.', 'सिर की बढ़त और तारीख़ें आँकने के लिए BPD के साथ इस्तेमाल होता है।'),
       ),
       ReportParameter(
-        name: 'AC (Abdominal Circumference)',
-        measures: 'The distance around your baby\'s tummy.',
+        name: _t('AC (Abdominal Circumference)', 'AC (Abdominal Circumference)'),
+        measures: _t('The distance around your baby\'s tummy.', 'आपके शिशु के पेट की गोलाई।'),
         whyImportant:
-            'The most useful single measure of your baby\'s overall growth and '
-            'nourishment.',
+            _t('The most useful single measure of your baby\'s overall growth and '
+            'nourishment.', 'शिशु की कुल बढ़त और पोषण का सबसे काम का अकेला माप।'),
         note:
-            'Estimated weight is calculated mainly from AC together with the '
-            'other measurements.',
+            _t('Estimated weight is calculated mainly from AC together with the '
+            'other measurements.', 'अनुमानित वज़न मुख्य रूप से AC और बाक़ी मापों को मिलाकर निकाला जाता है।'),
       ),
       ReportParameter(
-        name: 'FL (Femur Length)',
-        measures: 'The length of your baby\'s thigh bone.',
-        whyImportant: 'Reflects the growth of your baby\'s long bones.',
-        note: 'Read alongside HC and AC to build the growth picture.',
+        name: _t('FL (Femur Length)', 'FL (Femur Length)'),
+        measures: _t('The length of your baby\'s thigh bone.', 'आपके शिशु की जाँघ की हड्डी की लंबाई।'),
+        whyImportant: _t('Reflects the growth of your baby\'s long bones.', 'यह आपके शिशु की लंबी हड्डियों की बढ़त दिखाता है।'),
+        note: _t('Read alongside HC and AC to build the growth picture.', 'बढ़त की पूरी तस्वीर बनाने के लिए इसे HC और AC के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: 'Placenta',
-        measures: 'Where the placenta is lying (e.g. anterior, posterior, fundal).',
+        name: _t('Placenta', 'Placenta'),
+        measures: _t('Where the placenta is lying (e.g. anterior, posterior, fundal).', 'placenta कहाँ लगा है (जैसे anterior, posterior, fundal)।'),
         whyImportant:
-            'Its position matters for delivery planning if it sits low near the '
-            'cervix.',
+            _t('Its position matters for delivery planning if it sits low near the '
+            'cervix.', 'अगर यह नीचे cervix के पास बैठा हो तो delivery की योजना के लिए इसकी स्थिति मायने रखती है।'),
         note:
-            'If it is low now, a later scan usually shows it has moved up as the '
-            'uterus grows - this is the common outcome.',
+            _t('If it is low now, a later scan usually shows it has moved up as the '
+            'uterus grows - this is the common outcome.', 'अभी नीचे है तो आगे के scan में आमतौर पर दिखता है कि बच्चेदानी बढ़ने के साथ यह ऊपर खिसक गया — यही आम नतीजा है।'),
       ),
       ReportParameter(
-        name: 'Amniotic Fluid (AFI)',
-        measures: 'The amount of fluid around your baby.',
+        name: _t('Amniotic Fluid (AFI)', 'Amniotic Fluid (AFI)'),
+        measures: _t('The amount of fluid around your baby.', 'आपके शिशु के आसपास पानी की मात्रा।'),
         whyImportant:
-            'Fluid cushions your baby and reflects wellbeing and kidney function.',
+            _t('Fluid cushions your baby and reflects wellbeing and kidney function.', 'यह पानी शिशु को गद्दी देता है और उसकी सेहत तथा गुर्दों के काम को दर्शाता है।'),
         typicalRange:
-            'An AFI of roughly 8-18 cm is commonly considered normal in the '
-            'second half of pregnancy.',
+            _t('An AFI of roughly 8-18 cm is commonly considered normal in the '
+            'second half of pregnancy.', 'गर्भावस्था के दूसरे आधे हिस्से में लगभग 8-18 cm का AFI आमतौर पर सामान्य माना जाता है।'),
         ifLow:
-            'A lower level (oligohydramnios) may prompt extra hydration and '
-            'closer monitoring.',
+            _t('A lower level (oligohydramnios) may prompt extra hydration and '
+            'closer monitoring.', 'स्तर कम (oligohydramnios) हो तो ज़्यादा पानी पीने और नज़दीकी निगरानी की सलाह मिल सकती है।'),
         ifHigh:
-            'A higher level (polyhydramnios) is often mild and simply followed '
-            'up.',
+            _t('A higher level (polyhydramnios) is often mild and simply followed '
+            'up.', 'स्तर ज़्यादा (polyhydramnios) हो तो अक्सर यह हल्का होता है और बस उस पर नज़र रखी जाती है।'),
       ),
     ],
     interpretation:
-        'A normal anomaly scan means the structures visible at this stage look as expected - brain, heart, spine, kidneys, limbs, and where the placenta is sitting. It cannot rule everything out: some conditions are not visible before birth and some develop later. It is the most detailed look you get, not a complete one.',
+        _t('A normal anomaly scan means the structures visible at this stage look as expected - brain, heart, spine, kidneys, limbs, and where the placenta is sitting. It cannot rule everything out: some conditions are not visible before birth and some develop later. It is the most detailed look you get, not a complete one.', 'सामान्य anomaly scan का मतलब है कि इस पड़ाव पर जो दिख सकता है — दिमाग़, दिल, रीढ़, गुर्दे, हाथ-पैर, और placenta कहाँ बैठा है — वह सब उम्मीद के मुताबिक़ लगता है। यह हर बात को नकार नहीं सकता: कुछ स्थितियाँ जन्म से पहले दिखती ही नहीं और कुछ बाद में बनती हैं। यह सबसे विस्तृत नज़र है, पूरी नहीं।'),
     interpretPointers: [
-      'Soft markers are minor findings that often mean nothing on their own. They are noted so they can be watched.',
-      'A low-lying placenta at this scan usually moves up as the uterus grows, and is simply rechecked later.',
-      'The baby\'s position, your build, and where you are in the 18-22 week window can each limit what is visible. An incomplete scan is often just rebooked.',
-      'Anything flagged goes to your doctor with a plan attached. Wait for that conversation rather than searching the words.',
+      _t('Soft markers are minor findings that often mean nothing on their own. They are noted so they can be watched.', 'soft markers छोटी-मोटी बातें हैं जिनका अकेले अक्सर कोई मतलब नहीं होता। इन्हें दर्ज इसलिए किया जाता है ताकि नज़र रखी जा सके।'),
+      _t('A low-lying placenta at this scan usually moves up as the uterus grows, and is simply rechecked later.', 'इस scan में placenta नीचे हो तो बच्चेदानी बढ़ने के साथ आमतौर पर ऊपर खिसक जाता है, और बाद में बस दोबारा देख लिया जाता है।'),
+      _t('The baby\'s position, your build, and where you are in the 18-22 week window can each limit what is visible. An incomplete scan is often just rebooked.', 'शिशु की स्थिति, आपका अपना शरीर, और 18-22 हफ़्ते की खिड़की में आप कहाँ हैं — इनमें से हर एक दिखने वाली चीज़ों को सीमित कर सकता है। scan अधूरा रह जाए तो अक्सर बस दोबारा तारीख़ ले ली जाती है।'),
+      _t('Anything flagged goes to your doctor with a plan attached. Wait for that conversation rather than searching the words.', 'जो भी बात उठाई जाती है, वह एक योजना के साथ आपके डॉक्टर तक जाती है। उन शब्दों को इंटरनेट पर खोजने के बजाय उस बातचीत का इंतज़ार कीजिए।'),
     ],
   ),
 
   // -- OGTT / glucose --------------------------------------------------------
   TestScanInfo(
     id: 'ogtt',
-    name: 'OGTT (Glucose Test)',
-    altName: 'Glucose Tolerance Test / GTT',
+    name: _t('OGTT (Glucose Test)', 'OGTT (Glucose Test)'),
+    altName: _t('Glucose Tolerance Test / GTT', 'Glucose Tolerance Test / GTT'),
     tag: TrimesterTag.t2,
     whatItIs:
-        'A blood test that checks how your body handles sugar during pregnancy. '
+        _t('A blood test that checks how your body handles sugar during pregnancy. '
         'You drink a measured glucose solution and your blood sugar is checked at '
-        'set times.',
+        'set times.', 'ख़ून की एक जाँच, जो देखती है कि गर्भावस्था में आपका शरीर शक्कर को कैसे सँभालता है। आप एक नापा हुआ glucose घोल पीती हैं और तय समय पर आपका blood sugar जाँचा जाता है।'),
     why:
-        'It screens for gestational diabetes (raised blood sugar in pregnancy), '
+        _t('It screens for gestational diabetes (raised blood sugar in pregnancy), '
         'which is common, usually has no symptoms, and is very manageable when '
-        'found early.',
+        'found early.', 'यह gestational diabetes (गर्भावस्था में शक्कर का बढ़ना) की screening करती है, जो आम है, आमतौर पर बिना किसी लक्षण के होती है, और जल्दी पकड़ में आ जाए तो बहुत आसानी से सँभल जाती है।'),
     when:
-        'Usually between 24 and 28 weeks. It may be done earlier if you have risk '
-        'factors such as a family history of diabetes or a previous large baby.',
+        _t('Usually between 24 and 28 weeks. It may be done earlier if you have risk '
+        'factors such as a family history of diabetes or a previous large baby.', 'आमतौर पर 24 से 28 हफ़्तों के बीच। परिवार में diabetes का इतिहास या पिछली बार बड़ा शिशु जैसी बातें हों तो यह पहले भी की जा सकती है।'),
     preparation:
-        'For the standard test you fast overnight (about 8-10 hours; water is '
+        _t('For the standard test you fast overnight (about 8-10 hours; water is '
         'fine). Carry something to eat for afterwards. Allow 2-3 hours as you '
-        'wait between samples.',
+        'wait between samples.', 'सामान्य जाँच के लिए रात भर खाली पेट रहना होता है (लगभग 8-10 घंटे; पानी चलेगा)। बाद में खाने के लिए कुछ साथ रखिए। samples के बीच इंतज़ार के लिए 2-3 घंटे का समय लेकर चलिए।'),
     procedure:
-        'A fasting blood sample is taken first. You then drink the glucose (often '
+        _t('A fasting blood sample is taken first. You then drink the glucose (often '
         '75 g) and further samples are taken at 1 hour and 2 hours. In India the '
         'single-step DIPSI method (75 g, one 2-hour sample, non-fasting) is also '
-        'widely used.',
+        'widely used.', 'पहले खाली पेट ख़ून का sample लिया जाता है। फिर आप glucose (अक्सर 75 g) पीती हैं और 1 घंटे तथा 2 घंटे पर और samples लिए जाते हैं। भारत में single-step DIPSI तरीक़ा (75 g, सिर्फ़ 2 घंटे वाला एक sample, बिना खाली पेट) भी ख़ूब इस्तेमाल होता है।'),
     understandingReport:
-        'Your report shows blood sugar values at each time point against the '
-        'lab\'s cut-offs. Here is what they mean.',
+        _t('Your report shows blood sugar values at each time point against the '
+        'lab\'s cut-offs. Here is what they mean.', 'आपकी रिपोर्ट हर समय-बिंदु की blood sugar value lab के cut-off के साथ दिखाती है। उनका मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: 'Fasting glucose',
-        measures: 'Your blood sugar before the glucose drink.',
-        whyImportant: 'A raised fasting value is one way GDM is picked up.',
+        name: _t('Fasting glucose', 'Fasting glucose'),
+        measures: _t('Your blood sugar before the glucose drink.', 'glucose पीने से पहले आपका blood sugar।'),
+        whyImportant: _t('A raised fasting value is one way GDM is picked up.', 'fasting value का बढ़ा होना GDM पकड़ में आने के तरीक़ों में से एक है।'),
         typicalRange:
-            'Commonly below about 92 mg/dL is considered normal for the fasting '
-            'value (cut-offs vary by protocol).',
-        ifHigh: 'A raised value may point to gestational diabetes.',
+            _t('Commonly below about 92 mg/dL is considered normal for the fasting '
+            'value (cut-offs vary by protocol).', 'fasting value के लिए आमतौर पर लगभग 92 mg/dL से नीचे सामान्य माना जाता है (cut-off हर protocol में अलग होते हैं)।'),
+        ifHigh: _t('A raised value may point to gestational diabetes.', 'value बढ़ी हो तो यह gestational diabetes की ओर इशारा कर सकती है।'),
       ),
       ReportParameter(
-        name: '1-hour value',
-        measures: 'Your blood sugar one hour after the drink.',
-        whyImportant: 'Shows the peak rise in sugar.',
-        typicalRange: 'Often below about 180 mg/dL is considered normal.',
-        ifHigh: 'A raised value contributes to a GDM diagnosis.',
+        name: _t('1-hour value', '1 घंटे की value'),
+        measures: _t('Your blood sugar one hour after the drink.', 'पीने के एक घंटे बाद आपका blood sugar।'),
+        whyImportant: _t('Shows the peak rise in sugar.', 'दिखाता है कि शक्कर सबसे ऊपर कहाँ तक गई।'),
+        typicalRange: _t('Often below about 180 mg/dL is considered normal.', 'अक्सर लगभग 180 mg/dL से नीचे सामान्य माना जाता है।'),
+        ifHigh: _t('A raised value contributes to a GDM diagnosis.', 'value बढ़ी हो तो यह GDM के निदान में जुड़ती है।'),
       ),
       ReportParameter(
-        name: '2-hour value',
-        measures: 'Your blood sugar two hours after the drink.',
-        whyImportant: 'Shows how well your body has brought the sugar back down.',
+        name: _t('2-hour value', '2 घंटे की value'),
+        measures: _t('Your blood sugar two hours after the drink.', 'पीने के दो घंटे बाद आपका blood sugar।'),
+        whyImportant: _t('Shows how well your body has brought the sugar back down.', 'दिखाता है कि आपके शरीर ने शक्कर को कितनी अच्छी तरह वापस नीचे लाया।'),
         typicalRange:
-            'Often below about 153 mg/dL (or 140 mg/dL by DIPSI) is considered '
-            'normal.',
+            _t('Often below about 153 mg/dL (or 140 mg/dL by DIPSI) is considered '
+            'normal.', 'अक्सर लगभग 153 mg/dL (या DIPSI से 140 mg/dL) से नीचे सामान्य माना जाता है।'),
         ifHigh:
-            'A raised value suggests gestational diabetes - manageable with diet, '
-            'monitoring and sometimes medication.',
+            _t('A raised value suggests gestational diabetes - manageable with diet, '
+            'monitoring and sometimes medication.', 'value बढ़ी हो तो यह gestational diabetes की ओर इशारा करती है — जो खानपान, निगरानी और कभी-कभी दवा से सँभल जाती है।'),
       ),
       ReportParameter(
-        name: 'HbA1c',
-        measures: 'Your average blood sugar over the past few weeks.',
-        whyImportant: 'Sometimes added to give a fuller picture.',
-        note: 'Not the main test for GDM but useful background context.',
+        name: _t('HbA1c', 'HbA1c'),
+        measures: _t('Your average blood sugar over the past few weeks.', 'पिछले कुछ हफ़्तों का आपका औसत blood sugar।'),
+        whyImportant: _t('Sometimes added to give a fuller picture.', 'पूरी तस्वीर के लिए कभी-कभी इसे भी जोड़ लिया जाता है।'),
+        note: _t('Not the main test for GDM but useful background context.', 'GDM की मुख्य जाँच यह नहीं है, पर पृष्ठभूमि समझने में काम आती है।'),
       ),
     ],
     interpretation:
-        'A normal result means your body is handling the sugar load as expected. A raised value means gestational diabetes - which is common, is about the pregnancy rather than about anything you did, and in most cases is managed with diet and monitoring alone.',
+        _t('A normal result means your body is handling the sugar load as expected. A raised value means gestational diabetes - which is common, is about the pregnancy rather than about anything you did, and in most cases is managed with diet and monitoring alone.', 'सामान्य नतीजे का मतलब है कि आपका शरीर शक्कर के इस भार को उम्मीद के मुताबिक़ सँभाल रहा है। value बढ़ी हो तो यह gestational diabetes है — जो आम है, गर्भावस्था की वजह से है न कि आपके किए किसी काम की, और ज़्यादातर मामलों में सिर्फ़ खानपान और निगरानी से सँभल जाती है।'),
     interpretPointers: [
-      'Only one of the timed values needs to be above threshold for the test to be positive.',
-      'Not fasting properly, being unwell on the day, or vomiting the drink will invalidate the test and mean repeating it.',
-      'A positive result leads to a diet plan and home glucose monitoring first. Only a minority need insulin.',
-      'It usually resolves after birth, but it does raise later risk, so your doctor will normally arrange a follow-up test a few months postpartum.',
+      _t('Only one of the timed values needs to be above threshold for the test to be positive.', 'जाँच positive होने के लिए तय समय वाली values में से सिर्फ़ एक का सीमा से ऊपर होना काफ़ी है।'),
+      _t('Not fasting properly, being unwell on the day, or vomiting the drink will invalidate the test and mean repeating it.', 'ठीक से खाली पेट न रहना, उस दिन तबीयत ख़राब होना, या घोल पीकर उल्टी हो जाना — इनसे जाँच बेकार हो जाती है और दोबारा करनी पड़ती है।'),
+      _t('A positive result leads to a diet plan and home glucose monitoring first. Only a minority need insulin.', 'नतीजा positive आए तो पहले एक diet plan और घर पर blood sugar की निगरानी शुरू होती है। बहुत कम महिलाओं को insulin की ज़रूरत पड़ती है।'),
+      _t('It usually resolves after birth, but it does raise later risk, so your doctor will normally arrange a follow-up test a few months postpartum.', 'जन्म के बाद यह आमतौर पर चली जाती है, पर आगे का ख़तरा बढ़ा देती है, इसलिए डॉक्टर आमतौर पर प्रसव के कुछ महीने बाद एक follow-up जाँच करवाते हैं।'),
     ],
   ),
 
   // -- Growth scan -----------------------------------------------------------
   TestScanInfo(
     id: 'growth_scan',
-    name: 'Growth Scan',
-    altName: 'Third-Trimester Ultrasound',
+    name: _t('Growth Scan', 'Growth Scan'),
+    altName: _t('Third-Trimester Ultrasound', 'तीसरी तिमाही का Ultrasound'),
     tag: TrimesterTag.t3,
     whatItIs:
-        'An ultrasound, usually from around 28 weeks and only when advised, that '
+        _t('An ultrasound, usually from around 28 weeks and only when advised, that '
         'measures your baby\'s size, the fluid around them, the position, and the '
-        'blood flow in the cord and placenta (Doppler).',
+        'blood flow in the cord and placenta (Doppler).', 'एक ultrasound, आमतौर पर लगभग 28 हफ़्तों से और तभी जब सलाह दी जाए, जो आपके शिशु का आकार, उसके आसपास का पानी, उसकी स्थिति, और गर्भनाल तथा placenta में ख़ून के बहाव (Doppler) को नापता है।'),
     why:
-        'It checks your baby is growing steadily and getting enough nourishment '
+        _t('It checks your baby is growing steadily and getting enough nourishment '
         'as the due date nears - useful if there is any question about growth, '
-        'fluid or blood pressure.',
+        'fluid or blood pressure.', 'यह देखता है कि due date पास आते हुए आपका शिशु लगातार बढ़ रहा है और उसे पर्याप्त पोषण मिल रहा है — बढ़त, पानी या blood pressure को लेकर कोई सवाल हो तो यह काम आता है।'),
     when:
-        'Typically from 28 weeks onward, repeated every 2-4 weeks if your doctor '
-        'is tracking growth closely.',
+        _t('Typically from 28 weeks onward, repeated every 2-4 weeks if your doctor '
+        'is tracking growth closely.', 'आमतौर पर 28 हफ़्तों से आगे, और अगर डॉक्टर बढ़त पर क़रीब से नज़र रख रहे हों तो हर 2-4 हफ़्ते में दोबारा।'),
     preparation:
-        'No special preparation and no fasting. Wear comfortable, two-piece '
-        'clothing.',
+        _t('No special preparation and no fasting. Wear comfortable, two-piece '
+        'clothing.', 'न कोई ख़ास तैयारी, न fasting। आरामदेह, दो हिस्सों वाले कपड़े पहनिए।'),
     procedure:
-        'A standard abdominal ultrasound. The measurements are plotted on a '
+        _t('A standard abdominal ultrasound. The measurements are plotted on a '
         'growth chart so your baby\'s trend can be seen over time. Takes about '
-        '20-30 minutes.',
+        '20-30 minutes.', 'पेट के ऊपर से सामान्य ultrasound। माप एक growth chart पर लगाए जाते हैं ताकि समय के साथ आपके शिशु का रुझान दिख सके। लगभग 20-30 मिनट लगते हैं।'),
     understandingReport:
-        'The report focuses on size, fluid and blood flow. Here is what to look '
-        'at.',
+        _t('The report focuses on size, fluid and blood flow. Here is what to look '
+        'at.', 'रिपोर्ट में मुख्य रूप से आकार, पानी और ख़ून के बहाव की बात होती है। देखने लायक़ बातें ये हैं।'),
     parameters: [
       ReportParameter(
-        name: 'EFW (Estimated Fetal Weight)',
-        measures: 'An estimate of your baby\'s weight from the measurements.',
-        whyImportant: 'The headline number people focus on.',
+        name: _t('EFW (Estimated Fetal Weight)', 'EFW (Estimated Fetal Weight)'),
+        measures: _t('An estimate of your baby\'s weight from the measurements.', 'मापों से निकला आपके शिशु के वज़न का अनुमान।'),
+        whyImportant: _t('The headline number people focus on.', 'वही number जिस पर सबकी नज़र सबसे पहले जाती है।'),
         note:
-            'It is an estimate, not an exact figure - it can be off by around '
-            '10-15%. The trend over scans matters more than one value.',
+            _t('It is an estimate, not an exact figure - it can be off by around '
+            '10-15%. The trend over scans matters more than one value.', 'यह अनुमान है, पक्का आँकड़ा नहीं — इसमें लगभग 10-15% का फ़र्क़ आ सकता है। किसी एक value से ज़्यादा मायने scans के रुझान का है।'),
       ),
       ReportParameter(
-        name: 'Centile (e.g. 50th)',
-        measures: 'Where your baby sits compared with others at the same weeks.',
-        whyImportant: 'Helps judge whether growth is on track.',
+        name: _t('Centile (e.g. 50th)', 'Centile (जैसे 50th)'),
+        measures: _t('Where your baby sits compared with others at the same weeks.', 'उतने ही हफ़्तों के बाक़ी शिशुओं के मुक़ाबले आपका शिशु कहाँ है।'),
+        whyImportant: _t('Helps judge whether growth is on track.', 'यह आँकने में मदद करता है कि बढ़त सही राह पर है या नहीं।'),
         note:
-            'Following your baby\'s OWN curve over time matters more than a single '
+            _t('Following your baby\'s OWN curve over time matters more than a single '
             'centile. A steadily-growing small baby is often simply naturally '
-            'small.',
+            'small.', 'किसी एक centile से ज़्यादा मायने इसका है कि समय के साथ आपका शिशु अपनी ही curve पर चल रहा है। लगातार बढ़ता हुआ छोटा शिशु अक्सर बस स्वभाव से ही छोटा होता है।'),
       ),
       ReportParameter(
-        name: 'AFI / Liquor',
-        measures: 'The amount of fluid around your baby.',
-        whyImportant: 'Reflects wellbeing and kidney function.',
-        typicalRange: 'An AFI of roughly 8-18 cm is commonly considered normal.',
-        ifLow: 'A lower level may prompt hydration and closer monitoring.',
-        ifHigh: 'A higher level is often mild and simply followed up.',
+        name: _t('AFI / Liquor', 'AFI / Liquor'),
+        measures: _t('The amount of fluid around your baby.', 'आपके शिशु के आसपास पानी की मात्रा।'),
+        whyImportant: _t('Reflects wellbeing and kidney function.', 'यह सेहत और गुर्दों के काम को दर्शाता है।'),
+        typicalRange: _t('An AFI of roughly 8-18 cm is commonly considered normal.', 'लगभग 8-18 cm का AFI आमतौर पर सामान्य माना जाता है।'),
+        ifLow: _t('A lower level may prompt hydration and closer monitoring.', 'स्तर कम हो तो ज़्यादा पानी पीने और नज़दीकी निगरानी की सलाह मिल सकती है।'),
+        ifHigh: _t('A higher level is often mild and simply followed up.', 'स्तर ज़्यादा हो तो अक्सर यह हल्का होता है और बस उस पर नज़र रखी जाती है।'),
       ),
       ReportParameter(
-        name: 'Doppler (PI / RI)',
-        measures: 'Blood-flow readings in the cord and key vessels.',
+        name: _t('Doppler (PI / RI)', 'Doppler (PI / RI)'),
+        measures: _t('Blood-flow readings in the cord and key vessels.', 'गर्भनाल और मुख्य नसों में ख़ून के बहाव की readings।'),
         whyImportant:
-            'Normal flow is reassuring about the placenta and your baby\'s '
-            'nourishment.',
+            _t('Normal flow is reassuring about the placenta and your baby\'s '
+            'nourishment.', 'बहाव सामान्य हो तो placenta और शिशु के पोषण को लेकर भरोसा मिलता है।'),
         note:
-            'Reported as indices (PI/RI); your doctor reads them against the '
-            'expected range for your weeks.',
+            _t('Reported as indices (PI/RI); your doctor reads them against the '
+            'expected range for your weeks.', 'ये indices (PI/RI) के रूप में बताए जाते हैं; डॉक्टर इन्हें आपके हफ़्तों की उम्मीद वाली range से मिलाकर पढ़ते हैं।'),
       ),
       ReportParameter(
-        name: 'Presentation',
-        measures: 'Which way up your baby is lying (cephalic / breech).',
-        whyImportant: 'Relevant for delivery planning closer to term.',
+        name: _t('Presentation', 'Presentation'),
+        measures: _t('Which way up your baby is lying (cephalic / breech).', 'आपका शिशु किस ओर लेटा है (cephalic / breech)।'),
+        whyImportant: _t('Relevant for delivery planning closer to term.', 'पूरे महीनों के पास आते-आते delivery की योजना के लिए यह मायने रखता है।'),
         note:
-            'Many babies are still turning at this stage and settle head-down '
-            '(cephalic) by term.',
+            _t('Many babies are still turning at this stage and settle head-down '
+            '(cephalic) by term.', 'इस पड़ाव पर कई शिशु अब भी करवट बदल रहे होते हैं और पूरे महीनों तक सिर नीचे (cephalic) हो जाते हैं।'),
       ),
     ],
     interpretation:
-        'A growth scan places the baby\'s estimated weight on a centile chart. Anywhere between the 10th and 90th centile is the expected range, and a small baby is not automatically a worrying one - some babies are simply small. The TREND across scans matters more than any single number.',
+        _t('A growth scan places the baby\'s estimated weight on a centile chart. Anywhere between the 10th and 90th centile is the expected range, and a small baby is not automatically a worrying one - some babies are simply small. The TREND across scans matters more than any single number.', 'growth scan शिशु के अनुमानित वज़न को centile chart पर रखता है। 10th और 90th centile के बीच कहीं भी होना उम्मीद वाली range है, और छोटा शिशु अपने आप में चिंता की बात नहीं — कुछ शिशु बस छोटे होते हैं। किसी एक number से कहीं ज़्यादा मायने scans के रुझान का है।'),
     interpretPointers: [
-      'Estimated fetal weight carries a real margin of error, commonly around 10-15%. It is an estimate, not a weighing.',
-      'A drop across centiles between two scans matters more than one measurement on its own.',
-      'The baby\'s position, reduced fluid, and later gestation all make measuring less precise.',
-      'If growth is a concern, your doctor will usually respond with closer monitoring - more scans and Dopplers - rather than an immediate decision.',
+      _t('Estimated fetal weight carries a real margin of error, commonly around 10-15%. It is an estimate, not a weighing.', 'अनुमानित वज़न में सचमुच फ़र्क़ की गुंजाइश रहती है, आमतौर पर लगभग 10-15%। यह अनुमान है, तराज़ू पर तौलना नहीं।'),
+      _t('A drop across centiles between two scans matters more than one measurement on its own.', 'दो scans के बीच centile का गिरना अकेले किसी एक माप से ज़्यादा मायने रखता है।'),
+      _t('The baby\'s position, reduced fluid, and later gestation all make measuring less precise.', 'शिशु की स्थिति, पानी का कम होना, और गर्भावस्था के आख़िरी हफ़्ते — ये सब नापने की सटीकता घटा देते हैं।'),
+      _t('If growth is a concern, your doctor will usually respond with closer monitoring - more scans and Dopplers - rather than an immediate decision.', 'बढ़त को लेकर चिंता हो तो डॉक्टर आमतौर पर तुरंत कोई फ़ैसला लेने के बजाय और क़रीब से निगरानी रखते हैं — और scans तथा Doppler।'),
     ],
   ),
 
   // -- Doppler ---------------------------------------------------------------
   TestScanInfo(
     id: 'doppler',
-    name: 'Doppler Scan',
-    altName: 'Colour Doppler / Umbilical Artery Doppler',
+    name: _t('Doppler Scan', 'Doppler Scan'),
+    altName: _t('Colour Doppler / Umbilical Artery Doppler', 'Colour Doppler / Umbilical Artery Doppler'),
     tag: TrimesterTag.t3,
     whatItIs:
-        'A special ultrasound setting that measures the speed and pattern of '
-        'blood flow through the umbilical cord and your baby\'s key vessels.',
+        _t('A special ultrasound setting that measures the speed and pattern of '
+        'blood flow through the umbilical cord and your baby\'s key vessels.', 'ultrasound की एक ख़ास setting, जो गर्भनाल और आपके शिशु की मुख्य नसों में ख़ून के बहाव की रफ़्तार और तरीक़ा नापती है।'),
     why:
-        'It checks that the placenta is delivering blood and nourishment well. '
+        _t('It checks that the placenta is delivering blood and nourishment well. '
         'It is especially useful when a baby is measuring small or when blood '
-        'pressure is being watched.',
+        'pressure is being watched.', 'यह जाँचता है कि placenta ख़ून और पोषण ठीक से पहुँचा रहा है। शिशु का नाप छोटा आ रहा हो या blood pressure पर नज़र रखी जा रही हो, तब यह ख़ासतौर पर काम आता है।'),
     when:
-        'Usually in the third trimester, often as part of a growth scan, and '
-        'repeated as your doctor advises.',
+        _t('Usually in the third trimester, often as part of a growth scan, and '
+        'repeated as your doctor advises.', 'आमतौर पर तीसरी तिमाही में, अक्सर growth scan के ही हिस्से के तौर पर, और डॉक्टर की सलाह के मुताबिक़ दोबारा।'),
     preparation:
-        'No preparation and no fasting. It is done as part of, or just like, a '
-        'normal ultrasound.',
+        _t('No preparation and no fasting. It is done as part of, or just like, a '
+        'normal ultrasound.', 'न कोई तैयारी, न fasting। यह सामान्य ultrasound के हिस्से के तौर पर, या बिल्कुल उसी तरह, किया जाता है।'),
     procedure:
-        'The same probe as a regular scan, switched to Doppler mode. It is '
-        'painless and adds only a few minutes to a scan.',
+        _t('The same probe as a regular scan, switched to Doppler mode. It is '
+        'painless and adds only a few minutes to a scan.', 'वही probe जो सामान्य scan में होता है, बस Doppler mode पर। इसमें दर्द नहीं होता और scan में कुछ ही मिनट जुड़ते हैं।'),
     understandingReport:
-        'Doppler is reported as flow indices. Here is what they reflect.',
+        _t('Doppler is reported as flow indices. Here is what they reflect.', 'Doppler का नतीजा बहाव के indices में आता है। वे क्या दिखाते हैं, यह रहा।'),
     parameters: [
       ReportParameter(
-        name: 'Umbilical artery PI / RI',
-        measures: 'Resistance to blood flow in the cord.',
-        whyImportant: 'A key indicator of how well the placenta is working.',
+        name: _t('Umbilical artery PI / RI', 'Umbilical artery PI / RI'),
+        measures: _t('Resistance to blood flow in the cord.', 'गर्भनाल में ख़ून के बहाव के सामने आने वाली रुकावट।'),
+        whyImportant: _t('A key indicator of how well the placenta is working.', 'यह बताने वाला अहम संकेत कि placenta कितना अच्छा काम कर रहा है।'),
         note:
-            'Read against the expected range for your weeks; normal flow is '
-            'reassuring.',
+            _t('Read against the expected range for your weeks; normal flow is '
+            'reassuring.', 'आपके हफ़्तों की उम्मीद वाली range से मिलाकर पढ़ा जाता है; बहाव सामान्य हो तो भरोसा मिलता है।'),
       ),
       ReportParameter(
-        name: 'MCA (Middle Cerebral Artery)',
-        measures: 'Blood flow to your baby\'s brain.',
+        name: _t('MCA (Middle Cerebral Artery)', 'MCA (Middle Cerebral Artery)'),
+        measures: _t('Blood flow to your baby\'s brain.', 'आपके शिशु के दिमाग़ तक ख़ून का बहाव।'),
         whyImportant:
-            'Helps assess how your baby is coping, together with the cord '
-            'reading.',
-        note: 'Interpreted alongside the umbilical artery result.',
+            _t('Helps assess how your baby is coping, together with the cord '
+            'reading.', 'गर्भनाल की reading के साथ मिलकर यह आँकने में मदद करता है कि आपका शिशु कैसे सँभाल रहा है।'),
+        note: _t('Interpreted alongside the umbilical artery result.', 'इसे umbilical artery के नतीजे के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: 'End-diastolic flow',
-        measures: 'Whether blood keeps flowing forward between heartbeats.',
-        whyImportant: 'Present forward flow is a reassuring sign.',
+        name: _t('End-diastolic flow', 'End-diastolic flow'),
+        measures: _t('Whether blood keeps flowing forward between heartbeats.', 'दो धड़कनों के बीच ख़ून आगे बहता रहता है या नहीं।'),
+        whyImportant: _t('Present forward flow is a reassuring sign.', 'आगे की ओर बहाव बना रहना भरोसा देने वाला संकेत है।'),
         note:
-            'If it is reduced or absent, your doctor will monitor more closely '
+            _t('If it is reduced or absent, your doctor will monitor more closely '
             'and guide the plan - it is a signal to watch, and it is acted on '
-            'carefully.',
+            'carefully.', 'यह कम हो या न हो, तो डॉक्टर और क़रीब से निगरानी रखेंगे और आगे की योजना बताएँगे — यह नज़र रखने का संकेत है, और इस पर सावधानी से क़दम उठाए जाते हैं।'),
       ),
     ],
     interpretation:
-        'Doppler checks blood flow rather than size: how well the placenta is delivering to the baby. Normal flow is reassuring even when a baby measures small, which is exactly why it is done alongside a growth scan. Abnormal flow is the finding that changes what happens next.',
+        _t('Doppler checks blood flow rather than size: how well the placenta is delivering to the baby. Normal flow is reassuring even when a baby measures small, which is exactly why it is done alongside a growth scan. Abnormal flow is the finding that changes what happens next.', 'Doppler आकार नहीं, ख़ून का बहाव देखता है: placenta शिशु तक कितना अच्छा पहुँचा रहा है। शिशु का नाप छोटा हो तब भी बहाव सामान्य होना भरोसा देता है — इसीलिए इसे growth scan के साथ किया जाता है। बहाव असामान्य आना ही वह बात है जो आगे का रास्ता बदलती है।'),
     interpretPointers: [
-      'A small baby with normal Dopplers is usually a constitutionally small baby - watched, rather than acted on.',
-      'Abnormal or reversed flow means closer monitoring, and sometimes earlier delivery. It is the finding a team acts on quickly.',
-      'Fetal movement or breathing during the scan, and the baby\'s position, can each affect the reading.',
-      'Dopplers are read as a set alongside growth and fluid. No single one of the three decides anything by itself.',
+      _t('A small baby with normal Dopplers is usually a constitutionally small baby - watched, rather than acted on.', 'छोटा शिशु और Doppler सामान्य — यह आमतौर पर स्वभाव से ही छोटा शिशु होता है; उस पर नज़र रखी जाती है, कोई क़दम नहीं उठाया जाता।'),
+      _t('Abnormal or reversed flow means closer monitoring, and sometimes earlier delivery. It is the finding a team acts on quickly.', 'बहाव असामान्य या उल्टा हो तो निगरानी और क़रीब से होती है, और कभी-कभी प्रसव पहले करना पड़ता है। यही वह बात है जिस पर टीम तेज़ी से क़दम उठाती है।'),
+      _t('Fetal movement or breathing during the scan, and the baby\'s position, can each affect the reading.', 'scan के दौरान शिशु का हिलना या साँस लेना, और उसकी स्थिति — इनमें से हर एक reading पर असर डाल सकता है।'),
+      _t('Dopplers are read as a set alongside growth and fluid. No single one of the three decides anything by itself.', 'Doppler को बढ़त और पानी के साथ एक सेट की तरह पढ़ा जाता है। इन तीनों में से कोई एक अपने आप में कुछ तय नहीं करता।'),
     ],
   ),
 
   // -- GBS -------------------------------------------------------------------
   TestScanInfo(
     id: 'gbs',
-    name: 'Group B Strep',
-    altName: 'GBS Swab',
+    name: _t('Group B Strep', 'Group B Strep'),
+    altName: _t('GBS Swab', 'GBS Swab'),
     tag: TrimesterTag.t3,
     whatItIs:
-        'A simple swab test for Group B Streptococcus, a common bacterium that '
-        'many healthy women carry naturally without any symptoms.',
+        _t('A simple swab test for Group B Streptococcus, a common bacterium that '
+        'many healthy women carry naturally without any symptoms.', 'Group B Streptococcus के लिए एक आसान swab जाँच — यह एक आम बैक्टीरिया है, जो कई स्वस्थ महिलाओं में बिना किसी लक्षण के प्राकृतिक रूप से रहता है।'),
     why:
-        'If you are carrying GBS near your due date, antibiotics during labour '
+        _t('If you are carrying GBS near your due date, antibiotics during labour '
         'greatly reduce the small chance of passing it to your baby. Carrying it '
-        'is common and is not an infection in you.',
-    when: 'Usually around 35-37 weeks, close to your due date.',
+        'is common and is not an infection in you.', 'अगर due date के आसपास आपमें GBS है, तो प्रसव के दौरान antibiotics इसके शिशु तक पहुँचने की छोटी सी आशंका को काफ़ी घटा देते हैं। इसका होना आम बात है और यह आपमें कोई infection नहीं है।'),
+    when: _t('Usually around 35-37 weeks, close to your due date.', 'आमतौर पर लगभग 35-37 हफ़्तों पर, आपकी due date के क़रीब।'),
     preparation:
-        'No preparation needed. Avoid using vaginal creams or douches just '
-        'before, as they can affect the sample.',
+        _t('No preparation needed. Avoid using vaginal creams or douches just '
+        'before, as they can affect the sample.', 'कोई तैयारी नहीं चाहिए। ठीक पहले vaginal creams या douche इस्तेमाल मत कीजिए, इनसे sample पर असर पड़ सकता है।'),
     procedure:
-        'A gentle swab of the lower vagina and rectum - quick and painless, and '
-        'you can often take the swab yourself if you prefer.',
+        _t('A gentle swab of the lower vagina and rectum - quick and painless, and '
+        'you can often take the swab yourself if you prefer.', 'vagina के निचले हिस्से और मलद्वार से हल्का सा swab — जल्दी हो जाता है और दर्द नहीं होता, और चाहें तो अक्सर आप ख़ुद भी swab ले सकती हैं।'),
     understandingReport:
-        'The result is simply positive or negative. Here is what each means.',
+        _t('The result is simply positive or negative. Here is what each means.', 'नतीजा बस positive या negative आता है। दोनों का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: 'Positive / Carrier',
-        measures: 'GBS was found on this swab.',
-        whyImportant: 'It tells your team to plan a simple precaution at delivery.',
+        name: _t('Positive / Carrier', 'Positive / Carrier'),
+        measures: _t('GBS was found on this swab.', 'इस swab में GBS मिला।'),
+        whyImportant: _t('It tells your team to plan a simple precaution at delivery.', 'यह आपकी टीम को बताता है कि delivery पर एक आसान सी एहतियात की योजना बनानी है।'),
         note:
-            'It is common and not an infection in you - you would be offered '
-            'antibiotics during labour as a precaution.',
+            _t('It is common and not an infection in you - you would be offered '
+            'antibiotics during labour as a precaution.', 'यह आम है और आपमें कोई infection नहीं — एहतियातन प्रसव के दौरान आपको antibiotics दिए जाएँगे।'),
       ),
       ReportParameter(
-        name: 'Negative',
-        measures: 'GBS was not found on this swab.',
-        whyImportant: 'No GBS precaution is needed based on this result.',
-        note: 'Reassuring; routine care continues.',
+        name: _t('Negative', 'Negative'),
+        measures: _t('GBS was not found on this swab.', 'इस swab में GBS नहीं मिला।'),
+        whyImportant: _t('No GBS precaution is needed based on this result.', 'इस नतीजे के आधार पर GBS को लेकर कोई एहतियात ज़रूरी नहीं।'),
+        note: _t('Reassuring; routine care continues.', 'भरोसा देने वाली बात; सामान्य देखभाल जारी रहती है।'),
       ),
     ],
     interpretation:
-        'This is not a test of illness. Group B Strep is a bacterium many healthy women carry with no symptoms at all, and a positive result simply means antibiotics during labour to protect the baby at birth. Positive is not an infection, and it is not something you did.',
+        _t('This is not a test of illness. Group B Strep is a bacterium many healthy women carry with no symptoms at all, and a positive result simply means antibiotics during labour to protect the baby at birth. Positive is not an infection, and it is not something you did.', 'यह बीमारी की जाँच नहीं है। Group B Strep एक बैक्टीरिया है जो कई स्वस्थ महिलाओं में बिना किसी लक्षण के रहता है, और positive नतीजे का मतलब बस इतना है कि जन्म के समय शिशु की सुरक्षा के लिए प्रसव के दौरान antibiotics दिए जाएँगे। positive होना infection नहीं है, और यह आपके किए किसी काम की वजह से भी नहीं है।'),
     interpretPointers: [
-      'Around one in five women carry it. Carrying it changes the plan for labour and nothing else.',
-      'A positive result means antibiotics through a drip once labour starts, which is highly effective at preventing transmission.',
-      'Carriage comes and goes, so a swab close to your due date is the useful one - an early result can be out of date by delivery.',
-      'Recent antibiotics can produce a false negative, so tell your doctor if you have taken any.',
+      _t('Around one in five women carry it. Carrying it changes the plan for labour and nothing else.', 'लगभग पाँच में से एक महिला में यह होता है। इसका होना सिर्फ़ प्रसव की योजना बदलता है, और कुछ नहीं।'),
+      _t('A positive result means antibiotics through a drip once labour starts, which is highly effective at preventing transmission.', 'positive नतीजे का मतलब है कि प्रसव शुरू होते ही drip से antibiotics दिए जाएँगे, जो इसे शिशु तक पहुँचने से रोकने में बहुत असरदार हैं।'),
+      _t('Carriage comes and goes, so a swab close to your due date is the useful one - an early result can be out of date by delivery.', 'यह बैक्टीरिया आता-जाता रहता है, इसलिए due date के क़रीब लिया गया swab ही काम का होता है — बहुत पहले का नतीजा delivery तक पुराना पड़ सकता है।'),
+      _t('Recent antibiotics can produce a false negative, so tell your doctor if you have taken any.', 'हाल में लिए गए antibiotics से नतीजा झूठा negative आ सकता है, इसलिए अगर आपने कोई लिया हो तो डॉक्टर को बता दीजिए।'),
     ],
   ),
 ];
@@ -916,471 +929,471 @@ final List<FindingInfo> kFindings = [
   // -- Low-lying placenta ----------------------------------------------------
   FindingInfo(
     id: 'low_lying_placenta',
-    name: 'Low-Lying Placenta',
+    name: _t('Low-Lying Placenta', 'नीचे लगा हुआ Placenta'),
     tag: TrimesterTag.t2,
     whatIsIt:
-        'The placenta is sitting lower in the uterus than usual, close to the '
-        'cervix (the opening of the womb). It is often noted on the anomaly scan.',
+        _t('The placenta is sitting lower in the uterus than usual, close to the '
+        'cervix (the opening of the womb). It is often noted on the anomaly scan.', 'placenta बच्चेदानी में आम से नीचे बैठा है, cervix (बच्चेदानी के मुँह) के पास। यह अक्सर anomaly scan में दिखता है।'),
     whyHappens:
-        'It is simply where the placenta happened to implant early on. As '
+        _t('It is simply where the placenta happened to implant early on. As '
         'pregnancy continues and the uterus grows upward, the placenta usually '
-        'moves higher and away from the cervix on its own.',
+        'moves higher and away from the cervix on its own.', 'यह बस इस बात पर है कि शुरुआत में placenta कहाँ जाकर टिका। गर्भावस्था आगे बढ़ने और बच्चेदानी के ऊपर की ओर बढ़ने के साथ placenta आमतौर पर ख़ुद ही ऊपर, cervix से दूर खिसक जाता है।'),
     symptoms: [
-      'Usually none - it is typically a scan finding, not something you feel.',
-      'Occasionally painless bleeding; always report any bleeding to your doctor.',
+      _t('Usually none - it is typically a scan finding, not something you feel.', 'आमतौर पर कोई नहीं — यह scan में दिखने वाली बात है, महसूस होने वाली नहीं।'),
+      _t('Occasionally painless bleeding; always report any bleeding to your doctor.', 'कभी-कभी बिना दर्द के ख़ून आना; ख़ून आए तो हमेशा अपने डॉक्टर को बताइए।'),
     ],
     diagnosis:
-        'Seen on ultrasound, most often the 18-22 week anomaly scan. A follow-up '
-        'scan later in pregnancy checks whether it has moved up.',
+        _t('Seen on ultrasound, most often the 18-22 week anomaly scan. A follow-up '
+        'scan later in pregnancy checks whether it has moved up.', 'ultrasound में दिखता है, सबसे ज़्यादा 18-22 हफ़्ते के anomaly scan में। आगे चलकर एक follow-up scan देखता है कि यह ऊपर खिसका या नहीं।'),
     implications:
-        'In the large majority of cases the placenta moves up and there is no '
+        _t('In the large majority of cases the placenta moves up and there is no '
         'effect on delivery. Only if it stays low near or over the cervix later '
-        'on (placenta previa) does it change delivery plans.',
+        'on (placenta previa) does it change delivery plans.', 'ज़्यादातर मामलों में placenta ऊपर खिसक जाता है और delivery पर कोई असर नहीं पड़ता। सिर्फ़ तभी delivery की योजना बदलती है, जब यह आगे भी cervix के पास या उस पर बना रहे (placenta previa)।'),
     management:
-        'A follow-up scan (often around 32 weeks) to re-check the position. Your '
+        _t('A follow-up scan (often around 32 weeks) to re-check the position. Your '
         'doctor may advise avoiding heavy lifting or intercourse if there has '
         'been any bleeding, and will make a delivery plan based on the later '
-        'scan.',
+        'scan.', 'स्थिति दोबारा देखने के लिए एक follow-up scan (अक्सर लगभग 32 हफ़्तों पर)। अगर कभी ख़ून आया हो तो डॉक्टर भारी सामान उठाने या संबंध बनाने से मना कर सकते हैं, और बाद वाले scan के आधार पर delivery की योजना बनाएँगे।'),
     whenToContact: [
-      'Any vaginal bleeding, even if painless.',
-      'Cramping or tightening with bleeding.',
-      'Any sudden gush of fluid.',
+      _t('Any vaginal bleeding, even if painless.', 'vagina से कैसा भी ख़ून आना, चाहे दर्द न हो।'),
+      _t('Cramping or tightening with bleeding.', 'ख़ून के साथ मरोड़ या पेट का कसना।'),
+      _t('Any sudden gush of fluid.', 'अचानक पानी का बह जाना।'),
     ],
     faqs: [
-      Faq('Will it move up?',
-          'Most low-lying placentas do move up as the uterus grows. That is the usual, expected outcome.'),
-      Faq('Does it mean I need a caesarean?',
-          'Not usually. Only if it stays low over the cervix at the later scan would your doctor discuss a planned caesarean.'),
-      Faq('Should I be on bed rest?',
-          'Complete bed rest is not routinely advised. Your doctor will give personal advice, especially if there has been any bleeding.'),
+      Faq(_t('Will it move up?', 'क्या यह ऊपर खिसक जाएगा?'),
+          _t('Most low-lying placentas do move up as the uterus grows. That is the usual, expected outcome.', 'नीचे लगे ज़्यादातर placenta बच्चेदानी बढ़ने के साथ ऊपर खिसक जाते हैं। यही आम और अपेक्षित नतीजा है।')),
+      Faq(_t('Does it mean I need a caesarean?', 'क्या इसका मतलब मुझे C-section करवाना पड़ेगा?'),
+          _t('Not usually. Only if it stays low over the cervix at the later scan would your doctor discuss a planned caesarean.', 'आमतौर पर नहीं। सिर्फ़ तभी, जब बाद वाले scan में यह cervix पर ही नीचे बना रहे, आपके डॉक्टर पहले से तय C-section पर बात करेंगे।')),
+      Faq(_t('Should I be on bed rest?', 'क्या मुझे bed rest पर रहना चाहिए?'),
+          _t('Complete bed rest is not routinely advised. Your doctor will give personal advice, especially if there has been any bleeding.', 'पूरा bed rest आमतौर पर नहीं कहा जाता। आपके डॉक्टर आपके हिसाब से सलाह देंगे, ख़ासकर अगर कभी ख़ून आया हो।')),
     ],
-    aliases: ['placenta', 'low placenta', 'placenta position'],
+    aliases: [_same('placenta'), _t('low placenta', 'नीचे लगा placenta'), _t('placenta position', 'placenta की जगह')],
   ),
 
   // -- Placenta previa -------------------------------------------------------
   FindingInfo(
     id: 'placenta_previa',
-    name: 'Placenta Previa',
+    name: _t('Placenta Previa', 'Placenta Previa'),
     tag: TrimesterTag.t3,
     whatIsIt:
-        'The placenta is partly or fully covering the cervix in the later part of '
+        _t('The placenta is partly or fully covering the cervix in the later part of '
         'pregnancy. It is essentially a low-lying placenta that has stayed low '
-        'rather than moving up.',
+        'rather than moving up.', 'गर्भावस्था के आख़िरी हिस्से में placenta cervix को कुछ हद तक या पूरी तरह ढके हुए है। असल में यह नीचे लगा placenta ही है, जो ऊपर खिसकने के बजाय नीचे ही रह गया।'),
     whyHappens:
-        'The placenta implanted low and did not migrate upward as the uterus '
+        _t('The placenta implanted low and did not migrate upward as the uterus '
         'grew. It is more likely after a previous caesarean, in twin '
-        'pregnancies, or with certain uterine features.',
+        'pregnancies, or with certain uterine features.', 'placenta नीचे जाकर टिका और बच्चेदानी के बढ़ने पर ऊपर नहीं खिसका। पहले C-section हो चुका हो, जुड़वाँ गर्भ हो, या बच्चेदानी की बनावट कुछ ख़ास हो तो इसकी आशंका बढ़ जाती है।'),
     symptoms: [
-      'Painless, bright-red vaginal bleeding in the second half of pregnancy is the classic sign.',
-      'Often no symptoms until a bleed; sometimes found only on a scan.',
+      _t('Painless, bright-red vaginal bleeding in the second half of pregnancy is the classic sign.', 'गर्भावस्था के दूसरे आधे हिस्से में vagina से बिना दर्द के चमकीला लाल ख़ून आना इसकी पहचान है।'),
+      _t('Often no symptoms until a bleed; sometimes found only on a scan.', 'अक्सर ख़ून आने तक कोई लक्षण नहीं; कभी-कभी पता सिर्फ़ scan में ही चलता है।'),
     ],
     diagnosis:
-        'Confirmed on ultrasound, usually a transvaginal scan which is safe and '
-        'gives the clearest view of the placenta\'s relationship to the cervix.',
+        _t('Confirmed on ultrasound, usually a transvaginal scan which is safe and '
+        'gives the clearest view of the placenta\'s relationship to the cervix.', 'ultrasound से पुष्टि होती है, आमतौर पर transvaginal scan से, जो सुरक्षित है और cervix के साथ placenta की स्थिति सबसे साफ़ दिखाता है।'),
     implications:
-        'It needs a planned delivery, usually by caesarean, to avoid bleeding '
+        _t('It needs a planned delivery, usually by caesarean, to avoid bleeding '
         'during labour. With modern monitoring and planning, it is managed '
-        'safely.',
+        'safely.', 'इसमें प्रसव पहले से तय करना पड़ता है, आमतौर पर C-section से, ताकि प्रसव के दौरान ख़ून बहने से बचा जा सके। आज की निगरानी और योजना के साथ इसे सुरक्षित तरीक़े से सँभाला जाता है।'),
     management:
-        'Closer monitoring, avoiding intercourse and heavy activity, and a '
+        _t('Closer monitoring, avoiding intercourse and heavy activity, and a '
         'planned caesarean (often before labour starts). If there is significant '
-        'bleeding, hospital admission may be advised for observation.',
+        'bleeding, hospital admission may be advised for observation.', 'क़रीब से निगरानी, संबंध और भारी काम से परहेज़, और पहले से तय C-section (अक्सर प्रसव शुरू होने से पहले)। ज़्यादा ख़ून आए तो निगरानी के लिए अस्पताल में भर्ती होने की सलाह दी जा सकती है।'),
     whenToContact: [
-      'Any vaginal bleeding - contact your doctor or go to hospital promptly.',
-      'Contractions or tightening.',
-      'Reduced baby movements.',
+      _t('Any vaginal bleeding - contact your doctor or go to hospital promptly.', 'vagina से कैसा भी ख़ून आना — तुरंत अपने डॉक्टर से संपर्क कीजिए या अस्पताल जाइए।'),
+      _t('Contractions or tightening.', 'दर्द उठना या पेट का कसना।'),
+      _t('Reduced baby movements.', 'शिशु की हलचल कम होना।'),
     ],
     faqs: [
-      Faq('Is my baby in danger?',
-          'With planning and monitoring, most pregnancies with previa reach a safe delivery. The main aim is to avoid heavy bleeding, which is why a planned caesarean is used.'),
-      Faq('Can I still have a normal delivery?',
-          'If the placenta covers the cervix, a caesarean is the safe route. If it is only close but not covering, your doctor will advise based on the exact position.'),
-      Faq('What can I do at home?',
-          'Rest as advised, avoid intercourse and heavy lifting, keep your scan appointments, and report any bleeding immediately.'),
+      Faq(_t('Is my baby in danger?', 'क्या मेरा शिशु ख़तरे में है?'),
+          _t('With planning and monitoring, most pregnancies with previa reach a safe delivery. The main aim is to avoid heavy bleeding, which is why a planned caesarean is used.', 'योजना और निगरानी के साथ previa वाली ज़्यादातर गर्भावस्थाएँ सुरक्षित प्रसव तक पहुँचती हैं। मुख्य मक़सद ज़्यादा ख़ून बहने से बचना है, इसीलिए पहले से तय C-section किया जाता है।')),
+      Faq(_t('Can I still have a normal delivery?', 'क्या मैं फिर भी सामान्य प्रसव कर सकती हूँ?'),
+          _t('If the placenta covers the cervix, a caesarean is the safe route. If it is only close but not covering, your doctor will advise based on the exact position.', 'अगर placenta cervix को ढके हुए है, तो सुरक्षित रास्ता C-section ही है। अगर यह सिर्फ़ पास है पर ढक नहीं रहा, तो डॉक्टर सटीक स्थिति देखकर सलाह देंगे।')),
+      Faq(_t('What can I do at home?', 'घर पर मैं क्या कर सकती हूँ?'),
+          _t('Rest as advised, avoid intercourse and heavy lifting, keep your scan appointments, and report any bleeding immediately.', 'सलाह के मुताबिक़ आराम कीजिए, संबंध और भारी सामान उठाने से बचिए, अपने scan की तारीख़ें मत छोड़िए, और ख़ून आए तो तुरंत बताइए।')),
     ],
-    aliases: ['previa', 'placenta covering cervix'],
+    aliases: [_same('previa'), _t('placenta covering cervix', 'cervix को ढकता placenta')],
   ),
 
   // -- Anaemia ---------------------------------------------------------------
   FindingInfo(
     id: 'anaemia',
-    name: 'Anaemia',
-    altName: 'Low Haemoglobin',
+    name: _t('Anaemia', 'ख़ून की कमी (Anaemia)'),
+    altName: _t('Low Haemoglobin', 'Haemoglobin की कमी'),
     tag: TrimesterTag.anytime,
     whatIsIt:
-        'Your blood has fewer healthy red cells or less haemoglobin than ideal. '
-        'In pregnancy it is most often due to low iron, and it is very common.',
+        _t('Your blood has fewer healthy red cells or less haemoglobin than ideal. '
+        'In pregnancy it is most often due to low iron, and it is very common.', 'आपके ख़ून में स्वस्थ लाल कण या haemoglobin ज़रूरत से कम हैं। गर्भावस्था में यह सबसे ज़्यादा iron की कमी से होता है, और बहुत आम है।'),
     whyHappens:
-        'Your body makes a lot more blood in pregnancy to support your baby, '
+        _t('Your body makes a lot more blood in pregnancy to support your baby, '
         'which can dilute and use up your iron stores. Diets low in iron, close '
-        'pregnancies, or heavy periods before pregnancy add to it.',
+        'pregnancies, or heavy periods before pregnancy add to it.', 'शिशु को सँभालने के लिए गर्भावस्था में आपका शरीर कहीं ज़्यादा ख़ून बनाता है, जिससे iron का भंडार पतला भी पड़ता है और ख़र्च भी होता है। iron कम वाला खानपान, दो गर्भों के बीच कम अंतर, या गर्भ से पहले ज़्यादा रक्तस्राव वाले period इसे और बढ़ा देते हैं।'),
     symptoms: [
-      'Tiredness and low energy.',
-      'Looking pale; pale inner eyelids or nails.',
-      'Breathlessness on mild effort.',
-      'Dizziness or a fast heartbeat.',
-      'Often mild anaemia causes no clear symptoms at all.',
+      _t('Tiredness and low energy.', 'थकान और ऊर्जा की कमी।'),
+      _t('Looking pale; pale inner eyelids or nails.', 'चेहरे का पीला पड़ना; पलकों के अंदर या नाखूनों का फीका दिखना।'),
+      _t('Breathlessness on mild effort.', 'थोड़े से काम में साँस फूलना।'),
+      _t('Dizziness or a fast heartbeat.', 'चक्कर आना या दिल का तेज़ धड़कना।'),
+      _t('Often mild anaemia causes no clear symptoms at all.', 'हल्की कमी में अक्सर कोई साफ़ लक्षण होता ही नहीं।'),
     ],
     diagnosis:
-        'A routine blood test (haemoglobin), usually supported by ferritin (iron '
-        'stores) and other red-cell indices to confirm iron deficiency.',
+        _t('A routine blood test (haemoglobin), usually supported by ferritin (iron '
+        'stores) and other red-cell indices to confirm iron deficiency.', 'ख़ून की एक सामान्य जाँच (haemoglobin), जिसके साथ आमतौर पर ferritin (iron का भंडार) और लाल कणों के कुछ और indices देखकर iron की कमी पक्की की जाती है।'),
     implications:
-        'Mild anaemia is very common and usually improves quickly with treatment. '
+        _t('Mild anaemia is very common and usually improves quickly with treatment. '
         'If left unaddressed, more significant anaemia can add to tiredness and, '
         'rarely, affect the pregnancy - which is exactly why it is checked and '
-        'corrected early.',
+        'corrected early.', 'हल्की कमी बहुत आम है और इलाज से जल्दी ठीक हो जाती है। अनदेखी रह जाए तो ज़्यादा कमी थकान बढ़ा सकती है और कभी-कभार गर्भावस्था पर असर डाल सकती है — इसीलिए इसे जल्दी जाँचा और ठीक किया जाता है।'),
     management:
-        'Iron-rich foods (green leafy vegetables, dates, jaggery, pulses, and for '
+        _t('Iron-rich foods (green leafy vegetables, dates, jaggery, pulses, and for '
         'non-vegetarians eggs and meat), an iron supplement, and vitamin C (like '
         'lemon or citrus) to help absorption. Levels are re-checked after a few '
-        'weeks. Very low levels may need iron given through a vein.',
+        'weeks. Very low levels may need iron given through a vein.', 'iron वाला खाना (हरी पत्तेदार सब्ज़ियाँ, खजूर, गुड़, दालें, और मांसाहार लेने वालों के लिए अंडे और मीट), एक iron supplement, और अवशोषण बढ़ाने के लिए vitamin C (जैसे नींबू या खट्टे फल)। कुछ हफ़्तों बाद स्तर दोबारा जाँचा जाता है। बहुत कम होने पर iron नस के ज़रिए देना पड़ सकता है।'),
     whenToContact: [
-      'Severe tiredness, fainting, or breathlessness at rest.',
-      'A fast or pounding heartbeat.',
-      'If iron tablets upset your stomach - your doctor can adjust the type or dose.',
+      _t('Severe tiredness, fainting, or breathlessness at rest.', 'बहुत ज़्यादा थकान, बेहोशी, या आराम करते हुए भी साँस फूलना।'),
+      _t('A fast or pounding heartbeat.', 'दिल का तेज़ या ज़ोर-ज़ोर से धड़कना।'),
+      _t('If iron tablets upset your stomach - your doctor can adjust the type or dose.', 'iron की गोलियों से पेट ख़राब हो — डॉक्टर उनका प्रकार या dose बदल सकते हैं।'),
     ],
     faqs: [
-      Faq('Will it harm my baby?',
-          'Mild anaemia, treated, rarely causes problems. Your body prioritises your baby\'s iron needs, which is part of why yours can run low.'),
-      Faq('The iron tablets make me constipated - what can I do?',
-          'This is common. More water, fibre and fruit help, and your doctor can switch to a gentler iron formulation.'),
-      Faq('Can I fix it with food alone?',
-          'Diet helps, but pregnancy iron needs are high, so a supplement is usually needed alongside iron-rich food.'),
+      Faq(_t('Will it harm my baby?', 'क्या इससे मेरे शिशु को नुक़सान होगा?'),
+          _t('Mild anaemia, treated, rarely causes problems. Your body prioritises your baby\'s iron needs, which is part of why yours can run low.', 'हल्की कमी का इलाज हो जाए तो शायद ही कोई दिक़्क़त होती है। आपका शरीर पहले शिशु की iron की ज़रूरत पूरी करता है — यही एक वजह है कि आपका अपना स्तर गिर जाता है।')),
+      Faq(_t('The iron tablets make me constipated - what can I do?', 'iron की गोलियों से मुझे क़ब्ज़ हो जाती है — मैं क्या करूँ?'),
+          _t('This is common. More water, fibre and fruit help, and your doctor can switch to a gentler iron formulation.', 'यह आम बात है। ज़्यादा पानी, रेशेदार खाना और फल मदद करते हैं, और डॉक्टर iron का कोई हल्का रूप भी दे सकते हैं।')),
+      Faq(_t('Can I fix it with food alone?', 'क्या सिर्फ़ खाने से यह ठीक हो सकती है?'),
+          _t('Diet helps, but pregnancy iron needs are high, so a supplement is usually needed alongside iron-rich food.', 'खानपान मदद करता है, पर गर्भावस्था में iron की ज़रूरत ज़्यादा होती है, इसलिए iron वाले खाने के साथ आमतौर पर supplement भी लेना पड़ता है।')),
     ],
-    aliases: ['anemia', 'low hb', 'low haemoglobin', 'iron deficiency'],
+    aliases: [_same('anemia'), _t('low hb', 'कम hb'), _t('low haemoglobin', 'haemoglobin की कमी'), _t('iron deficiency', 'iron की कमी')],
   ),
 
   // -- Breech ----------------------------------------------------------------
   FindingInfo(
     id: 'breech',
-    name: 'Breech Presentation',
-    altName: 'Breech Baby',
+    name: _t('Breech Presentation', 'Breech स्थिति'),
+    altName: _t('Breech Baby', 'Breech शिशु'),
     tag: TrimesterTag.t3,
     whatIsIt:
-        'Your baby is lying bottom-down or feet-down instead of head-down. Many '
-        'babies are breech earlier on and turn head-down before birth.',
+        _t('Your baby is lying bottom-down or feet-down instead of head-down. Many '
+        'babies are breech earlier on and turn head-down before birth.', 'आपका शिशु सिर नीचे होने के बजाय कूल्हा या पैर नीचे किए लेटा है। कई शिशु शुरू में breech होते हैं और जन्म से पहले सिर नीचे कर लेते हैं।'),
     whyHappens:
-        'Often there is no particular reason - it is just how your baby is lying. '
+        _t('Often there is no particular reason - it is just how your baby is lying. '
         'It can be more likely with extra or low fluid, a low placenta, twins, or '
-        'the shape of the uterus.',
+        'the shape of the uterus.', 'अक्सर कोई ख़ास वजह नहीं होती — बस शिशु ऐसे ही लेटा है। पानी ज़्यादा या कम हो, placenta नीचे हो, जुड़वाँ हों, या बच्चेदानी की बनावट अलग हो तो इसकी आशंका बढ़ जाती है।'),
     symptoms: [
-      'Usually none - it is a position found on examination or scan.',
-      'You may feel kicks lower down and a firm, round head up near your ribs.',
+      _t('Usually none - it is a position found on examination or scan.', 'आमतौर पर कोई नहीं — यह जाँच या scan में पता चलने वाली स्थिति है।'),
+      _t('You may feel kicks lower down and a firm, round head up near your ribs.', 'आपको लातें नीचे की ओर महसूस हो सकती हैं और पसलियों के पास ऊपर एक सख़्त, गोल सिर।'),
     ],
     diagnosis:
-        'Felt by your doctor examining your tummy and confirmed on ultrasound, '
-        'which shows the exact position.',
+        _t('Felt by your doctor examining your tummy and confirmed on ultrasound, '
+        'which shows the exact position.', 'डॉक्टर आपके पेट को छूकर पहचानते हैं और ultrasound से पुष्टि होती है, जो सटीक स्थिति दिखाता है।'),
     implications:
-        'Before about 36 weeks it often does not matter, as there is still time '
+        _t('Before about 36 weeks it often does not matter, as there is still time '
         'to turn. If your baby stays breech near term, your doctor will discuss '
-        'options for a safe birth.',
+        'options for a safe birth.', 'लगभग 36 हफ़्तों से पहले इससे अक्सर फ़र्क़ नहीं पड़ता, क्योंकि करवट बदलने का समय बाक़ी होता है। पूरे महीनों के क़रीब भी शिशु breech ही रहे, तो डॉक्टर सुरक्षित जन्म के विकल्पों पर बात करेंगे।'),
     management:
-        'Watchful waiting, as many babies turn on their own. Near term, options '
+        _t('Watchful waiting, as many babies turn on their own. Near term, options '
         'may include ECV (a doctor gently turning the baby from outside), a '
         'planned caesarean, or in selected cases a vaginal breech birth with an '
-        'experienced team. Your doctor will guide the safest choice for you.',
+        'experienced team. Your doctor will guide the safest choice for you.', 'इंतज़ार और नज़र, क्योंकि कई शिशु ख़ुद ही करवट बदल लेते हैं। पूरे महीनों के पास विकल्पों में ECV (डॉक्टर बाहर से शिशु को धीरे-धीरे घुमाते हैं), पहले से तय C-section, या चुनिंदा मामलों में अनुभवी टीम के साथ breech में सामान्य प्रसव शामिल हो सकते हैं। आपके डॉक्टर आपके लिए सबसे सुरक्षित रास्ता बताएँगे।'),
     whenToContact: [
-      'Your waters break while the baby is breech - go to hospital, as the cord needs checking.',
-      'Strong regular contractions before your planned date.',
-      'Reduced baby movements.',
+      _t('Your waters break while the baby is breech - go to hospital, as the cord needs checking.', 'शिशु breech हो और आपका पानी टूट जाए — अस्पताल जाइए, क्योंकि गर्भनाल को जँचवाना ज़रूरी है।'),
+      _t('Strong regular contractions before your planned date.', 'तय तारीख़ से पहले तेज़, नियमित दर्द उठना।'),
+      _t('Reduced baby movements.', 'शिशु की हलचल कम होना।'),
     ],
     faqs: [
-      Faq('Is there still time for the baby to turn?',
-          'Yes - many babies turn head-down by 36-37 weeks. The chance falls as term approaches but turning still happens.'),
-      Faq('Are the exercises I read about safe?',
-          'Some gentle positional techniques are popular; check with your doctor before trying anything, and never force a position.'),
-      Faq('Does breech always mean a caesarean?',
-          'No. ECV can turn many babies, and vaginal breech birth is possible in the right situation. Your doctor will talk through what is safest for you.'),
+      Faq(_t('Is there still time for the baby to turn?', 'क्या शिशु के करवट बदलने के लिए अभी समय है?'),
+          _t('Yes - many babies turn head-down by 36-37 weeks. The chance falls as term approaches but turning still happens.', 'हाँ — कई शिशु 36-37 हफ़्तों तक सिर नीचे कर लेते हैं। पूरे महीने पास आते-आते यह कम होता जाता है, पर तब भी होता है।')),
+      Faq(_t('Are the exercises I read about safe?', 'जिन exercises के बारे में मैंने पढ़ा है, क्या वे सुरक्षित हैं?'),
+          _t('Some gentle positional techniques are popular; check with your doctor before trying anything, and never force a position.', 'कुछ हल्की positional तरकीबें चलन में हैं; कुछ भी आज़माने से पहले अपने डॉक्टर से पूछ लीजिए, और किसी स्थिति के लिए ज़ोर कभी मत लगाइए।')),
+      Faq(_t('Does breech always mean a caesarean?', 'क्या breech का मतलब हमेशा C-section होता है?'),
+          _t('No. ECV can turn many babies, and vaginal breech birth is possible in the right situation. Your doctor will talk through what is safest for you.', 'नहीं। ECV से कई शिशु घूम जाते हैं, और सही हालात में breech में सामान्य प्रसव भी हो सकता है। आपके डॉक्टर बताएँगे कि आपके लिए सबसे सुरक्षित क्या है।')),
     ],
-    aliases: ['breech baby', 'baby position', 'footling', 'bottom down'],
+    aliases: [_t('breech baby', 'breech शिशु'), _t('baby position', 'शिशु की स्थिति'), _same('footling'), _t('bottom down', 'उल्टा शिशु')],
   ),
 
   // -- Low AFI ---------------------------------------------------------------
   FindingInfo(
     id: 'low_afi',
-    name: 'Low Amniotic Fluid',
-    altName: 'Oligohydramnios',
+    name: _t('Low Amniotic Fluid', 'Amniotic fluid की कमी'),
+    altName: _t('Oligohydramnios', 'Oligohydramnios'),
     tag: TrimesterTag.t3,
     whatIsIt:
-        'The amount of fluid around your baby is on the lower side. Fluid levels '
+        _t('The amount of fluid around your baby is on the lower side. Fluid levels '
         'can change from one scan to the next, so it is read alongside how your '
-        'baby is growing and moving.',
+        'baby is growing and moving.', 'आपके शिशु के आसपास पानी की मात्रा कुछ कम है। पानी का स्तर एक scan से दूसरे scan में बदल सकता है, इसलिए इसे शिशु की बढ़त और हलचल के साथ मिलाकर देखा जाता है।'),
     whyHappens:
-        'Sometimes there is no clear cause. It can relate to the due date '
+        _t('Sometimes there is no clear cause. It can relate to the due date '
         'passing, the placenta working a little less efficiently, a leak of '
-        'fluid, or your own hydration.',
+        'fluid, or your own hydration.', 'कभी-कभी कोई साफ़ वजह नहीं होती। यह due date निकल जाने, placenta के थोड़ा कम असरदार काम करने, पानी के रिसने, या आपके अपने पानी पीने से जुड़ा हो सकता है।'),
     symptoms: [
-      'Usually none - it is a scan finding.',
-      'You may notice your bump measuring small, or leaking fluid if the waters have broken.',
+      _t('Usually none - it is a scan finding.', 'आमतौर पर कोई नहीं — यह scan में दिखने वाली बात है।'),
+      _t('You may notice your bump measuring small, or leaking fluid if the waters have broken.', 'आपको अपना पेट नाप में छोटा लग सकता है, या पानी टूट चुका हो तो रिसाव महसूस हो सकता है।'),
     ],
     diagnosis:
-        'Measured on ultrasound as the AFI (amniotic fluid index) or the deepest '
-        'pocket of fluid, and confirmed by re-checking.',
+        _t('Measured on ultrasound as the AFI (amniotic fluid index) or the deepest '
+        'pocket of fluid, and confirmed by re-checking.', 'ultrasound में AFI (amniotic fluid index) या पानी की सबसे गहरी जेब नापकर, और दोबारा जाँचकर पुष्टि की जाती है।'),
     implications:
-        'Mild reductions are often managed with hydration and closer monitoring. '
+        _t('Mild reductions are often managed with hydration and closer monitoring. '
         'Lower levels, especially near term, may lead your doctor to plan an '
-        'earlier delivery to keep your baby safe.',
+        'earlier delivery to keep your baby safe.', 'थोड़ी कमी अक्सर पानी पीने और नज़दीकी निगरानी से सँभल जाती है। स्तर ज़्यादा कम हो, ख़ासकर पूरे महीनों के क़रीब, तो डॉक्टर शिशु की सुरक्षा के लिए प्रसव पहले करवाने की योजना बना सकते हैं।'),
     management:
-        'Drinking plenty of water, more frequent scans and monitoring of your '
+        _t('Drinking plenty of water, more frequent scans and monitoring of your '
         'baby\'s movements and heartbeat. Depending on your weeks and how your '
-        'baby is doing, your doctor may advise delivery.',
+        'baby is doing, your doctor may advise delivery.', 'ख़ूब पानी पीना, ज़्यादा बार scan, और आपके शिशु की हलचल तथा धड़कन पर नज़र। आपके हफ़्तों और शिशु की हालत को देखते हुए डॉक्टर प्रसव की सलाह दे सकते हैं।'),
     whenToContact: [
-      'A gush or steady trickle of fluid (your waters may have broken).',
-      'Reduced or changed baby movements.',
-      'Any bleeding or strong contractions.',
+      _t('A gush or steady trickle of fluid (your waters may have broken).', 'पानी का एकदम बह जाना या लगातार रिसना (आपका पानी टूट चुका हो सकता है)।'),
+      _t('Reduced or changed baby movements.', 'शिशु की हलचल कम होना या बदल जाना।'),
+      _t('Any bleeding or strong contractions.', 'कैसा भी ख़ून आना या तेज़ दर्द उठना।'),
     ],
     faqs: [
-      Faq('Will drinking more water help?',
-          'Staying well hydrated can help and is usually advised. Your doctor will still re-check the level to be sure.'),
-      Faq('Does low fluid mean something is wrong with my baby?',
-          'Not necessarily. Often the baby is well and simply needs closer monitoring; the trend and your baby\'s movements matter most.'),
-      Faq('How often will it be checked?',
-          'That depends on the level and your weeks - it may be every few days to weekly, and your doctor will tell you the plan.'),
+      Faq(_t('Will drinking more water help?', 'क्या ज़्यादा पानी पीने से मदद मिलेगी?'),
+          _t('Staying well hydrated can help and is usually advised. Your doctor will still re-check the level to be sure.', 'शरीर में पानी बनाए रखना मदद करता है और आमतौर पर यही सलाह दी जाती है। फिर भी डॉक्टर पक्का करने के लिए स्तर दोबारा जाँचेंगे।')),
+      Faq(_t('Does low fluid mean something is wrong with my baby?', 'क्या पानी कम होने का मतलब मेरे शिशु में कुछ गड़बड़ है?'),
+          _t('Not necessarily. Often the baby is well and simply needs closer monitoring; the trend and your baby\'s movements matter most.', 'ज़रूरी नहीं। अक्सर शिशु ठीक होता है और बस नज़दीकी निगरानी चाहिए; सबसे ज़्यादा मायने रुझान और आपके शिशु की हलचल का है।')),
+      Faq(_t('How often will it be checked?', 'यह कितनी बार जाँचा जाएगा?'),
+          _t('That depends on the level and your weeks - it may be every few days to weekly, and your doctor will tell you the plan.', 'यह स्तर और आपके हफ़्तों पर निर्भर है — कुछ दिनों में एक बार से लेकर हफ़्ते में एक बार तक हो सकता है, और डॉक्टर आपको योजना बता देंगे।')),
     ],
-    aliases: ['low fluid', 'oligohydramnios', 'afi low', 'low water', 'liquor'],
+    aliases: [_t('low fluid', 'पानी की कमी'), _same('oligohydramnios'), _t('afi low', 'afi कम'), _t('low water', 'गर्भ का पानी कम'), _same('liquor')],
   ),
 
   // -- Hypothyroidism --------------------------------------------------------
   FindingInfo(
     id: 'hypothyroid',
-    name: 'Hypothyroidism',
-    altName: 'Underactive Thyroid',
+    name: _t('Hypothyroidism', 'Hypothyroidism'),
+    altName: _t('Underactive Thyroid', 'कम सक्रिय Thyroid'),
     tag: TrimesterTag.anytime,
     whatIsIt:
-        'Your thyroid gland is making a little less thyroid hormone than your '
+        _t('Your thyroid gland is making a little less thyroid hormone than your '
         'body needs. It is common in pregnancy and shows as a raised TSH on your '
-        'blood test.',
+        'blood test.', 'आपकी thyroid ग्रंथि शरीर की ज़रूरत से थोड़ा कम thyroid hormone बना रही है। गर्भावस्था में यह आम है और ख़ून की जाँच में TSH बढ़ा हुआ दिखता है।'),
     whyHappens:
-        'Often the thyroid simply cannot keep up with pregnancy\'s extra demand, '
+        _t('Often the thyroid simply cannot keep up with pregnancy\'s extra demand, '
         'sometimes due to an autoimmune cause (Hashimoto\'s) or low iodine. Many '
-        'women first learn of it in pregnancy.',
+        'women first learn of it in pregnancy.', 'अक्सर thyroid गर्भावस्था की बढ़ी हुई माँग के साथ चल ही नहीं पाती, कभी किसी autoimmune वजह (Hashimoto\'s) या iodine की कमी से। कई महिलाओं को इसका पता गर्भावस्था में ही चलता है।'),
     symptoms: [
-      'Tiredness and feeling cold.',
-      'Weight gain or puffiness.',
-      'Dry skin, constipation.',
-      'Often mild cases have no clear symptoms and are found on the blood test.',
+      _t('Tiredness and feeling cold.', 'थकान और ठंड लगना।'),
+      _t('Weight gain or puffiness.', 'वज़न बढ़ना या शरीर पर सूजन।'),
+      _t('Dry skin, constipation.', 'रूखी त्वचा, क़ब्ज़।'),
+      _t('Often mild cases have no clear symptoms and are found on the blood test.', 'हल्के मामलों में अक्सर कोई साफ़ लक्षण नहीं होता और पता ख़ून की जाँच में चलता है।'),
     ],
     diagnosis:
-        'A blood test showing raised TSH (with T4 sometimes checked). Pregnancy '
-        'uses its own, tighter target ranges, especially in the first trimester.',
+        _t('A blood test showing raised TSH (with T4 sometimes checked). Pregnancy '
+        'uses its own, tighter target ranges, especially in the first trimester.', 'ख़ून की जाँच में TSH का बढ़ा होना (कभी-कभी T4 भी देखा जाता है)। गर्भावस्था की अपनी, ज़्यादा कसी हुई target ranges होती हैं, ख़ासकर पहली तिमाही में।'),
     implications:
-        'Well-treated hypothyroidism has little effect on pregnancy. Because '
+        _t('Well-treated hypothyroidism has little effect on pregnancy. Because '
         'thyroid hormone supports your baby\'s early brain development, doctors '
-        'treat it promptly and keep levels in the pregnancy target.',
+        'treat it promptly and keep levels in the pregnancy target.', 'इलाज ठीक चल रहा हो तो hypothyroidism का गर्भावस्था पर ख़ास असर नहीं पड़ता। चूँकि thyroid hormone शिशु के शुरुआती दिमाग़ी विकास को सँभालता है, डॉक्टर इसका इलाज बिना देर किए करते हैं और स्तर गर्भावस्था वाले target में रखते हैं।'),
     management:
-        'A small daily tablet of thyroid hormone (levothyroxine), taken on an '
+        _t('A small daily tablet of thyroid hormone (levothyroxine), taken on an '
         'empty stomach, with the dose adjusted as pregnancy progresses. TSH is '
-        're-checked regularly, often every 4-6 weeks early on.',
+        're-checked regularly, often every 4-6 weeks early on.', 'thyroid hormone (levothyroxine) की रोज़ की एक छोटी tablet, ख़ाली पेट लेनी होती है, और गर्भावस्था बढ़ने के साथ dose बदलती रहती है। TSH नियमित रूप से दोबारा जाँचा जाता है, शुरुआत में अक्सर हर 4-6 हफ़्ते में।'),
     whenToContact: [
-      'If you miss doses or run out of tablets.',
-      'Strong new symptoms such as a racing heart (may mean the dose needs review).',
-      'Before stopping or changing the dose yourself - always check first.',
+      _t('If you miss doses or run out of tablets.', 'अगर dose छूट जाए या गोलियाँ ख़त्म हो जाएँ।'),
+      _t('Strong new symptoms such as a racing heart (may mean the dose needs review).', 'कोई नया तेज़ लक्षण, जैसे दिल का बहुत तेज़ धड़कना (हो सकता है dose देखनी पड़े)।'),
+      _t('Before stopping or changing the dose yourself - always check first.', 'dose ख़ुद से बंद या कम-ज़्यादा करने से पहले — हमेशा पहले पूछ लीजिए।'),
     ],
     faqs: [
-      Faq('Is the tablet safe for my baby?',
-          'Yes. Levothyroxine replaces the hormone your body should be making and is considered safe and important in pregnancy.'),
-      Faq('Will I need it forever?',
-          'Sometimes. Some women need it only in pregnancy; others continue after. Your doctor will re-check after delivery.'),
-      Faq('Why must I take it on an empty stomach?',
-          'Food, iron and calcium reduce absorption. Take it first thing, and keep iron/calcium a few hours apart.'),
+      Faq(_t('Is the tablet safe for my baby?', 'क्या यह tablet मेरे शिशु के लिए सुरक्षित है?'),
+          _t('Yes. Levothyroxine replaces the hormone your body should be making and is considered safe and important in pregnancy.', 'हाँ। Levothyroxine वही hormone देती है जो आपका शरीर बना रहा होता, और गर्भावस्था में इसे सुरक्षित और ज़रूरी माना जाता है।')),
+      Faq(_t('Will I need it forever?', 'क्या यह मुझे हमेशा लेनी पड़ेगी?'),
+          _t('Sometimes. Some women need it only in pregnancy; others continue after. Your doctor will re-check after delivery.', 'कभी-कभी। कुछ महिलाओं को सिर्फ़ गर्भावस्था में इसकी ज़रूरत होती है; कुछ बाद में भी लेती रहती हैं। प्रसव के बाद डॉक्टर दोबारा जाँचेंगे।')),
+      Faq(_t('Why must I take it on an empty stomach?', 'इसे ख़ाली पेट लेना क्यों ज़रूरी है?'),
+          _t('Food, iron and calcium reduce absorption. Take it first thing, and keep iron/calcium a few hours apart.', 'खाना, iron और calcium इसका अवशोषण घटा देते हैं। इसे सुबह सबसे पहले लीजिए, और iron/calcium को कुछ घंटों के फ़ासले पर रखिए।')),
     ],
-    aliases: ['thyroid', 'hypothyroid', 'high tsh', 'underactive thyroid'],
+    aliases: [_same('thyroid'), _same('hypothyroid'), _t('high tsh', 'tsh ज़्यादा'), _t('underactive thyroid', 'कम सक्रिय thyroid')],
   ),
 
   // -- Hyperthyroidism -------------------------------------------------------
   FindingInfo(
     id: 'hyperthyroid',
-    name: 'Hyperthyroidism',
-    altName: 'Overactive Thyroid',
+    name: _t('Hyperthyroidism', 'Hyperthyroidism'),
+    altName: _t('Overactive Thyroid', 'ज़्यादा सक्रिय Thyroid'),
     tag: TrimesterTag.anytime,
     whatIsIt:
-        'Your thyroid gland is making more thyroid hormone than your body needs. '
-        'It is less common than an underactive thyroid and shows as a low TSH.',
+        _t('Your thyroid gland is making more thyroid hormone than your body needs. '
+        'It is less common than an underactive thyroid and shows as a low TSH.', 'आपकी thyroid ग्रंथि शरीर की ज़रूरत से ज़्यादा thyroid hormone बना रही है। यह कम सक्रिय thyroid के मुक़ाबले कम आम है और जाँच में TSH कम दिखता है।'),
     whyHappens:
-        'Most often an autoimmune cause (Graves\' disease). Early pregnancy '
+        _t('Most often an autoimmune cause (Graves\' disease). Early pregnancy '
         'hormones can also mildly and temporarily raise thyroid activity, '
-        'sometimes with severe morning sickness.',
+        'sometimes with severe morning sickness.', 'सबसे ज़्यादा किसी autoimmune वजह से (Graves\' disease)। शुरुआती गर्भावस्था के hormones भी thyroid की सक्रियता को हल्का और कुछ समय के लिए बढ़ा सकते हैं, कभी-कभी तेज़ उल्टियों के साथ।'),
     symptoms: [
-      'A fast or pounding heartbeat.',
-      'Feeling hot, sweaty or anxious.',
-      'Weight loss despite eating well; trembling hands.',
-      'Severe nausea and vomiting (in the early, temporary form).',
+      _t('A fast or pounding heartbeat.', 'दिल का तेज़ या ज़ोर-ज़ोर से धड़कना।'),
+      _t('Feeling hot, sweaty or anxious.', 'गर्मी लगना, पसीना आना या बेचैनी।'),
+      _t('Weight loss despite eating well; trembling hands.', 'अच्छा खाने के बावजूद वज़न घटना; हाथों का काँपना।'),
+      _t('Severe nausea and vomiting (in the early, temporary form).', 'तेज़ मिचली और उल्टियाँ (शुरुआती, कुछ समय वाले रूप में)।'),
     ],
     diagnosis:
-        'A blood test showing low TSH with raised thyroid hormones (T4/T3). Your '
+        _t('A blood test showing low TSH with raised thyroid hormones (T4/T3). Your '
         'doctor distinguishes true hyperthyroidism from the mild, temporary rise '
-        'of early pregnancy.',
+        'of early pregnancy.', 'ख़ून की जाँच में TSH कम और thyroid hormones (T4/T3) बढ़े हुए। डॉक्टर असली hyperthyroidism को शुरुआती गर्भावस्था की हल्की, कुछ समय की बढ़त से अलग पहचानते हैं।'),
     implications:
-        'Mild, temporary cases often settle by mid-pregnancy. True '
+        _t('Mild, temporary cases often settle by mid-pregnancy. True '
         'hyperthyroidism is treated to keep you and your baby well, and is '
-        'managed successfully with the right medication and monitoring.',
+        'managed successfully with the right medication and monitoring.', 'हल्के, कुछ समय वाले मामले अक्सर बीच की गर्भावस्था तक ख़ुद शांत हो जाते हैं। असली hyperthyroidism का इलाज किया जाता है ताकि आप और आपका शिशु दोनों ठीक रहें, और सही दवा तथा निगरानी से यह अच्छी तरह सँभल जाता है।'),
     management:
-        'Anti-thyroid medication chosen carefully for pregnancy, at the lowest '
+        _t('Anti-thyroid medication chosen carefully for pregnancy, at the lowest '
         'effective dose, with regular blood tests. A specialist '
-        '(endocrinologist) is often involved.',
+        '(endocrinologist) is often involved.', 'गर्भावस्था के लिए सोच-समझकर चुनी गई anti-thyroid दवा, सबसे कम असरदार dose में, और साथ में नियमित ख़ून की जाँचें। अक्सर एक विशेषज्ञ (endocrinologist) भी साथ जुड़ते हैं।'),
     whenToContact: [
-      'A very fast heartbeat, fever, or feeling severely unwell.',
-      'Persistent vomiting and inability to keep fluids down.',
-      'Before changing or stopping medication yourself.',
+      _t('A very fast heartbeat, fever, or feeling severely unwell.', 'दिल का बहुत तेज़ धड़कना, बुख़ार, या तबीयत का बहुत ख़राब लगना।'),
+      _t('Persistent vomiting and inability to keep fluids down.', 'लगातार उल्टियाँ और पानी तक पेट में न टिकना।'),
+      _t('Before changing or stopping medication yourself.', 'दवा ख़ुद से बदलने या बंद करने से पहले।'),
     ],
     faqs: [
-      Faq('Will it settle on its own?',
-          'The mild early-pregnancy form often does by mid-pregnancy. Graves\' disease needs treatment, which works well.'),
-      Faq('Is the medication safe?',
-          'The medicines used are chosen specifically for pregnancy safety, at the lowest dose that works, with monitoring.'),
-      Faq('Do I need a specialist?',
-          'Often yes - your obstetrician usually works with an endocrinologist to fine-tune treatment.'),
+      Faq(_t('Will it settle on its own?', 'क्या यह अपने आप ठीक हो जाएगा?'),
+          _t('The mild early-pregnancy form often does by mid-pregnancy. Graves\' disease needs treatment, which works well.', 'शुरुआती गर्भावस्था वाला हल्का रूप अक्सर बीच की गर्भावस्था तक ख़ुद शांत हो जाता है। Graves\' disease का इलाज ज़रूरी है, जो अच्छा काम करता है।')),
+      Faq(_t('Is the medication safe?', 'क्या दवा सुरक्षित है?'),
+          _t('The medicines used are chosen specifically for pregnancy safety, at the lowest dose that works, with monitoring.', 'जो दवाएँ दी जाती हैं, वे ख़ासतौर पर गर्भावस्था में सुरक्षा देखकर चुनी जाती हैं, सबसे कम असरदार dose में, और निगरानी के साथ।')),
+      Faq(_t('Do I need a specialist?', 'क्या मुझे किसी विशेषज्ञ की ज़रूरत है?'),
+          _t('Often yes - your obstetrician usually works with an endocrinologist to fine-tune treatment.', 'अक्सर हाँ — इलाज को ठीक-ठीक बिठाने के लिए आपकी obstetrician आमतौर पर endocrinologist के साथ मिलकर काम करती हैं।')),
     ],
-    aliases: ['thyroid', 'hyperthyroid', 'low tsh', 'overactive thyroid', 'graves'],
+    aliases: [_same('thyroid'), _same('hyperthyroid'), _t('low tsh', 'tsh कम'), _t('overactive thyroid', 'ज़्यादा सक्रिय thyroid'), _same('graves')],
   ),
 
   // -- Gestational diabetes --------------------------------------------------
   FindingInfo(
     id: 'gdm',
-    name: 'Gestational Diabetes',
-    altName: 'GDM',
+    name: _t('Gestational Diabetes', 'Gestational Diabetes'),
+    altName: _t('GDM', 'GDM'),
     tag: TrimesterTag.t2,
     whatIsIt:
-        'Raised blood sugar that appears during pregnancy. Your body is having '
+        _t('Raised blood sugar that appears during pregnancy. Your body is having '
         'some trouble keeping sugar in the normal range, usually because '
-        'pregnancy hormones make insulin work less well.',
+        'pregnancy hormones make insulin work less well.', 'गर्भावस्था के दौरान शक्कर का बढ़ जाना। आपके शरीर को शक्कर सामान्य दायरे में रखने में कुछ दिक़्क़त हो रही है, आमतौर पर इसलिए कि गर्भावस्था के hormones insulin का काम कम असरदार बना देते हैं।'),
     whyHappens:
-        'Pregnancy hormones from the placenta reduce how well insulin works '
+        _t('Pregnancy hormones from the placenta reduce how well insulin works '
         '(insulin resistance). If your body cannot make enough extra insulin to '
         'keep up, blood sugar rises. It is more likely with a family history, '
-        'higher weight, PCOS, or a previous large baby.',
+        'higher weight, PCOS, or a previous large baby.', 'placenta से आने वाले गर्भावस्था के hormones insulin के काम को कम कर देते हैं (insulin resistance)। अगर आपका शरीर उतना ज़्यादा insulin नहीं बना पाता, तो शक्कर बढ़ जाती है। परिवार में इतिहास, ज़्यादा वज़न, PCOS, या पिछली बार बड़ा शिशु हो तो आशंका बढ़ जाती है।'),
     symptoms: [
-      'Usually none - which is exactly why the glucose test is routine.',
-      'Occasionally increased thirst or passing more urine.',
+      _t('Usually none - which is exactly why the glucose test is routine.', 'आमतौर पर कोई नहीं — इसीलिए glucose की जाँच सबकी होती है।'),
+      _t('Occasionally increased thirst or passing more urine.', 'कभी-कभी ज़्यादा प्यास लगना या बार-बार पेशाब आना।'),
     ],
     diagnosis:
-        'The glucose test (OGTT/GTT), usually at 24-28 weeks, comparing your '
-        'blood sugar values against pregnancy cut-offs.',
+        _t('The glucose test (OGTT/GTT), usually at 24-28 weeks, comparing your '
+        'blood sugar values against pregnancy cut-offs.', 'glucose की जाँच (OGTT/GTT), आमतौर पर 24-28 हफ़्तों पर, जिसमें आपकी blood sugar values गर्भावस्था के cut-off से मिलाई जाती हैं।'),
     implications:
-        'Well-controlled GDM usually leads to a healthy pregnancy and baby. '
+        _t('Well-controlled GDM usually leads to a healthy pregnancy and baby. '
         'Uncontrolled high sugar can make a baby grow large or affect the baby\'s '
         'sugar after birth - which is why control matters, and why it works so '
-        'well.',
+        'well.', 'GDM क़ाबू में रहे तो गर्भावस्था और शिशु आमतौर पर स्वस्थ रहते हैं। शक्कर बेक़ाबू रहे तो शिशु बड़ा हो सकता है या जन्म के बाद उसकी शक्कर पर असर पड़ सकता है — इसीलिए क़ाबू रखना मायने रखता है, और इसीलिए यह इतना अच्छा काम करता है।'),
     management:
-        'A balanced diet (steady carbohydrates, more fibre, portion control), '
+        _t('A balanced diet (steady carbohydrates, more fibre, portion control), '
         'gentle activity like walking after meals, and home blood-sugar '
         'monitoring. Some mothers also need tablets or insulin. It most often '
-        'resolves after birth, with a check later to confirm.',
+        'resolves after birth, with a check later to confirm.', 'संतुलित खानपान (एक-सा carbohydrate, ज़्यादा रेशा, नपी हुई मात्रा), खाने के बाद टहलने जैसी हल्की गतिविधि, और घर पर blood sugar की निगरानी। कुछ माँओं को गोलियाँ या insulin भी चाहिए होता है। यह ज़्यादातर जन्म के बाद चली जाती है, और बाद में एक जाँच से पुष्टि कर ली जाती है।'),
     whenToContact: [
-      'Sugar readings staying above your target despite diet.',
-      'Very high or very low readings, or feeling shaky/sweaty (possible low sugar on medication).',
-      'Reduced baby movements.',
+      _t('Sugar readings staying above your target despite diet.', 'खानपान सँभालने पर भी शक्कर की readings आपके target से ऊपर बनी रहें।'),
+      _t('Very high or very low readings, or feeling shaky/sweaty (possible low sugar on medication).', 'बहुत ज़्यादा या बहुत कम readings, या कँपकँपी/पसीना महसूस होना (दवा पर शक्कर कम हो सकती है)।'),
+      _t('Reduced baby movements.', 'शिशु की हलचल कम होना।'),
     ],
     faqs: [
-      Faq('Did I cause this?',
-          'No. GDM is driven mainly by pregnancy hormones and your own body\'s response, not by anything you did wrong.'),
-      Faq('Will it go away after birth?',
-          'For most women, yes. A follow-up test after delivery confirms it, and it flags a higher future risk to watch.'),
-      Faq('Will I definitely need insulin?',
-          'Many women manage with diet and activity alone. Medication is added only if needed, and it is safe in pregnancy.'),
+      Faq(_t('Did I cause this?', 'क्या यह मेरी वजह से हुआ?'),
+          _t('No. GDM is driven mainly by pregnancy hormones and your own body\'s response, not by anything you did wrong.', 'नहीं। GDM मुख्य रूप से गर्भावस्था के hormones और आपके शरीर की प्रतिक्रिया से होता है, आपके किसी ग़लत काम से नहीं।')),
+      Faq(_t('Will it go away after birth?', 'क्या यह जन्म के बाद चला जाएगा?'),
+          _t('For most women, yes. A follow-up test after delivery confirms it, and it flags a higher future risk to watch.', 'ज़्यादातर महिलाओं में हाँ। प्रसव के बाद एक follow-up जाँच इसकी पुष्टि करती है, और आगे के लिए थोड़ा बढ़ा हुआ ख़तरा दर्ज कर देती है, जिस पर नज़र रखनी होती है।')),
+      Faq(_t('Will I definitely need insulin?', 'क्या मुझे insulin ज़रूर लेना पड़ेगा?'),
+          _t('Many women manage with diet and activity alone. Medication is added only if needed, and it is safe in pregnancy.', 'कई महिलाएँ सिर्फ़ खानपान और गतिविधि से सँभाल लेती हैं। दवा तभी जोड़ी जाती है जब ज़रूरत हो, और यह गर्भावस्था में सुरक्षित है।')),
     ],
-    aliases: ['gdm', 'gestational diabetes', 'sugar', 'high sugar', 'diabetes'],
+    aliases: [_same('gdm'), _t('gestational diabetes', 'गर्भावस्था की diabetes'), _same('sugar'), _t('high sugar', 'शक्कर ज़्यादा'), _same('diabetes')],
   ),
 
   // -- Pre-eclampsia ---------------------------------------------------------
   FindingInfo(
     id: 'preeclampsia',
-    name: 'Pre-eclampsia',
-    altName: 'High Blood Pressure in Pregnancy',
+    name: _t('Pre-eclampsia', 'Pre-eclampsia'),
+    altName: _t('High Blood Pressure in Pregnancy', 'गर्भावस्था में बढ़ा हुआ Blood Pressure'),
     tag: TrimesterTag.t3,
     whatIsIt:
-        'A pregnancy condition with raised blood pressure, usually after 20 '
+        _t('A pregnancy condition with raised blood pressure, usually after 20 '
         'weeks, often with protein in the urine or other signs that your body '
-        'needs closer attention.',
+        'needs closer attention.', 'गर्भावस्था की एक स्थिति जिसमें blood pressure बढ़ जाता है, आमतौर पर 20 हफ़्तों के बाद, और अक्सर पेशाब में protein या ऐसे और संकेत मिलते हैं जो बताते हैं कि आपके शरीर पर ज़्यादा ध्यान चाहिए।'),
     whyHappens:
-        'It is thought to start with how the placenta\'s blood vessels formed '
+        _t('It is thought to start with how the placenta\'s blood vessels formed '
         'early in pregnancy, which later affects your blood pressure and organs. '
         'It is more likely in a first pregnancy, with a family history, twins, or '
-        'existing high blood pressure or diabetes.',
+        'existing high blood pressure or diabetes.', 'माना जाता है कि इसकी शुरुआत इस बात से होती है कि गर्भावस्था के शुरू में placenta की नसें कैसे बनीं, जिसका असर आगे चलकर आपके blood pressure और अंगों पर पड़ता है। पहली गर्भावस्था, परिवार में इतिहास, जुड़वाँ, या पहले से बढ़ा blood pressure या diabetes हो तो आशंका ज़्यादा होती है।'),
     symptoms: [
-      'Often none early on - which is why blood pressure and urine are checked at every visit.',
-      'A bad, persistent headache.',
-      'Vision changes - blurring or flashing lights.',
-      'Pain just below the ribs, on the right side.',
-      'Sudden swelling of the face, hands or feet.',
+      _t('Often none early on - which is why blood pressure and urine are checked at every visit.', 'शुरू में अक्सर कोई नहीं — इसीलिए हर विज़िट पर blood pressure और पेशाब जाँचे जाते हैं।'),
+      _t('A bad, persistent headache.', 'तेज़ सिरदर्द जो जाता ही न हो।'),
+      _t('Vision changes - blurring or flashing lights.', 'नज़र में बदलाव — धुंधलापन या रोशनी के झटके दिखना।'),
+      _t('Pain just below the ribs, on the right side.', 'पसलियों के ठीक नीचे, दाईं ओर दर्द।'),
+      _t('Sudden swelling of the face, hands or feet.', 'चेहरे, हाथों या पैरों में अचानक सूजन।'),
     ],
     diagnosis:
-        'Raised blood pressure readings plus protein in the urine and/or blood '
+        _t('Raised blood pressure readings plus protein in the urine and/or blood '
         'tests, at your routine antenatal checks. This is why those simple checks '
-        'are done every time.',
+        'are done every time.', 'आपकी सामान्य antenatal जाँचों में blood pressure का बढ़ा आना, और साथ में पेशाब में protein और/या ख़ून की जाँचें। इन्हीं छोटी-छोटी जाँचों के लिए हर बार यह सब किया जाता है।'),
     implications:
-        'Closely monitored and managed, most women and babies do well. It is '
+        _t('Closely monitored and managed, most women and babies do well. It is '
         'taken seriously because, untreated, it can affect your organs and your '
         'baby\'s growth - so the aim is early detection and the right timing of '
-        'delivery, which is the definitive treatment.',
+        'delivery, which is the definitive treatment.', 'क़रीब से निगरानी और इलाज के साथ ज़्यादातर माँएँ और शिशु ठीक रहते हैं। इसे गंभीरता से इसलिए लिया जाता है कि बिना इलाज यह आपके अंगों और शिशु की बढ़त पर असर डाल सकती है — इसलिए मक़सद है जल्दी पकड़ना और प्रसव का सही समय चुनना, जो इसका पक्का इलाज है।'),
     management:
-        'More frequent checks, blood-pressure medication if needed, blood tests, '
+        _t('More frequent checks, blood-pressure medication if needed, blood tests, '
         'and monitoring your baby\'s growth. The timing and plan for a safe '
-        'delivery are decided by your doctor; rest and follow-up are part of it.',
+        'delivery are decided by your doctor; rest and follow-up are part of it.', 'ज़्यादा बार जाँच, ज़रूरत हो तो blood pressure की दवा, ख़ून की जाँचें, और आपके शिशु की बढ़त पर नज़र। सुरक्षित प्रसव का समय और योजना आपके डॉक्टर तय करते हैं; आराम और follow-up भी इसी का हिस्सा हैं।'),
     whenToContact: [
-      'A severe or persistent headache.',
-      'Vision changes - blurring, spots or flashing lights.',
-      'Upper-tummy pain below the ribs.',
-      'Sudden swelling of face/hands, or reduced baby movements - contact your doctor urgently.',
+      _t('A severe or persistent headache.', 'तेज़ सिरदर्द, या ऐसा सिरदर्द जो जाता न हो।'),
+      _t('Vision changes - blurring, spots or flashing lights.', 'नज़र में बदलाव — धुंधलापन, धब्बे या रोशनी के झटके।'),
+      _t('Upper-tummy pain below the ribs.', 'पसलियों के नीचे, ऊपरी पेट में दर्द।'),
+      _t('Sudden swelling of face/hands, or reduced baby movements - contact your doctor urgently.', 'चेहरे/हाथों में अचानक सूजन, या शिशु की हलचल कम होना — तुरंत अपने डॉक्टर से संपर्क कीजिए।'),
     ],
     faqs: [
-      Faq('Can I prevent it?',
-          'Sometimes low-dose aspirin is advised from early pregnancy if you are higher risk. Keeping every antenatal appointment is the key to catching it early.'),
-      Faq('Will I need an early delivery?',
-          'Sometimes. Delivery is the definitive treatment, and your doctor balances the timing carefully for you and your baby.'),
-      Faq('Does it go away after birth?',
-          'It usually resolves after delivery, though blood pressure is watched for a while afterwards.'),
+      Faq(_t('Can I prevent it?', 'क्या मैं इसे रोक सकती हूँ?'),
+          _t('Sometimes low-dose aspirin is advised from early pregnancy if you are higher risk. Keeping every antenatal appointment is the key to catching it early.', 'अगर आपका ख़तरा ज़्यादा हो तो कभी-कभी शुरुआती गर्भावस्था से कम dose की aspirin की सलाह दी जाती है। हर antenatal appointment पर जाना ही इसे जल्दी पकड़ने की असली कुंजी है।')),
+      Faq(_t('Will I need an early delivery?', 'क्या मेरा प्रसव जल्दी करना पड़ेगा?'),
+          _t('Sometimes. Delivery is the definitive treatment, and your doctor balances the timing carefully for you and your baby.', 'कभी-कभी। प्रसव ही इसका पक्का इलाज है, और आपके डॉक्टर आपके तथा शिशु के लिए समय बहुत सोच-समझकर तय करते हैं।')),
+      Faq(_t('Does it go away after birth?', 'क्या यह जन्म के बाद चली जाती है?'),
+          _t('It usually resolves after delivery, though blood pressure is watched for a while afterwards.', 'आमतौर पर प्रसव के बाद यह ठीक हो जाती है, हालाँकि blood pressure पर कुछ समय तक नज़र रखी जाती है।')),
     ],
-    aliases: ['preeclampsia', 'pre eclampsia', 'high bp', 'pih', 'protein in urine', 'blood pressure'],
+    aliases: [_same('preeclampsia'), _t('pre eclampsia', 'गर्भावस्था का high bp'), _t('high bp', 'bp ज़्यादा'), _same('pih'), _t('protein in urine', 'पेशाब में protein'), _same('blood pressure')],
   ),
 
   // -- IUGR ------------------------------------------------------------------
   FindingInfo(
     id: 'iugr',
-    name: 'Growth Restriction',
-    altName: 'IUGR / FGR',
+    name: _t('Growth Restriction', 'बढ़त में रुकावट'),
+    altName: _t('IUGR / FGR', 'IUGR / FGR'),
     tag: TrimesterTag.t3,
     whatIsIt:
-        'Your baby is growing more slowly than expected and measuring smaller '
+        _t('Your baby is growing more slowly than expected and measuring smaller '
         'than they should for the number of weeks - not simply a constitutionally '
-        'small baby, but one whose growth has slowed.',
+        'small baby, but one whose growth has slowed.', 'आपका शिशु उम्मीद से धीमा बढ़ रहा है और हफ़्तों के हिसाब से नाप में छोटा है — यह स्वभाव से छोटे शिशु की बात नहीं, बल्कि उस शिशु की है जिसकी बढ़त धीमी पड़ गई है।'),
     whyHappens:
-        'Most often the placenta is not delivering quite enough nourishment and '
+        _t('Most often the placenta is not delivering quite enough nourishment and '
         'oxygen. It can also relate to high blood pressure, certain infections, '
-        'smoking, or (less often) a problem with the baby.',
+        'smoking, or (less often) a problem with the baby.', 'सबसे ज़्यादा तब, जब placenta पर्याप्त पोषण और oxygen नहीं पहुँचा पा रहा हो। यह बढ़े हुए blood pressure, कुछ infections, धूम्रपान, या (कम बार) शिशु से जुड़ी किसी बात से भी हो सकता है।'),
     symptoms: [
-      'Usually none you can feel.',
-      'Your bump may measure small on examination.',
-      'Sometimes reduced baby movements later on.',
+      _t('Usually none you can feel.', 'आमतौर पर ऐसा कुछ नहीं जो आपको महसूस हो।'),
+      _t('Your bump may measure small on examination.', 'जाँच में आपका पेट नाप में छोटा लग सकता है।'),
+      _t('Sometimes reduced baby movements later on.', 'कभी-कभी आगे चलकर शिशु की हलचल कम होना।'),
     ],
     diagnosis:
-        'Growth scans plotting your baby\'s size over time, with Doppler '
+        _t('Growth scans plotting your baby\'s size over time, with Doppler '
         'blood-flow studies and fluid measurement to judge how your baby is '
-        'coping - the trend matters more than a single scan.',
+        'coping - the trend matters more than a single scan.', 'growth scans, जो समय के साथ आपके शिशु का आकार chart पर लगाते हैं, साथ में Doppler से ख़ून के बहाव की जाँच और पानी का माप — ताकि देखा जा सके कि शिशु कैसे सँभाल रहा है। किसी एक scan से ज़्यादा मायने रुझान का है।'),
     implications:
-        'With close monitoring, many babies are delivered safely at the right '
+        _t('With close monitoring, many babies are delivered safely at the right '
         'time. It is watched carefully because a baby getting less nourishment '
         'needs the right timing of delivery - which is exactly what monitoring '
-        'ensures.',
+        'ensures.', 'क़रीब से निगरानी के साथ कई शिशु सही समय पर सुरक्षित जन्म लेते हैं। इस पर ध्यान इसलिए रखा जाता है कि कम पोषण पा रहे शिशु के लिए प्रसव का सही समय चुनना ज़रूरी होता है — और निगरानी ठीक यही सुनिश्चित करती है।'),
     management:
-        'More frequent growth and Doppler scans, monitoring of movements and '
+        _t('More frequent growth and Doppler scans, monitoring of movements and '
         'heartbeat (sometimes CTG), managing any blood pressure, and planning '
         'delivery at the safest time. You may be advised to rest and to track '
-        'movements closely.',
+        'movements closely.', 'ज़्यादा बार growth और Doppler scans, हलचल तथा धड़कन पर नज़र (कभी-कभी CTG), blood pressure को सँभालना, और सबसे सुरक्षित समय पर प्रसव की योजना। आपको आराम करने और हलचल पर क़रीब से नज़र रखने को कहा जा सकता है।'),
     whenToContact: [
-      'Reduced or changed baby movements - report promptly, do not wait.',
-      'Any bleeding, strong contractions, or a headache/vision changes.',
-      'If you cannot make a monitoring appointment, call to rearrange soon.',
+      _t('Reduced or changed baby movements - report promptly, do not wait.', 'शिशु की हलचल कम होना या बदल जाना — तुरंत बताइए, इंतज़ार मत कीजिए।'),
+      _t('Any bleeding, strong contractions, or a headache/vision changes.', 'कैसा भी ख़ून आना, तेज़ दर्द उठना, या सिरदर्द/नज़र में बदलाव।'),
+      _t('If you cannot make a monitoring appointment, call to rearrange soon.', 'निगरानी वाली किसी appointment पर न जा पाएँ, तो जल्दी फ़ोन करके नई तारीख़ ले लीजिए।'),
     ],
     faqs: [
-      Faq('Is my baby just naturally small?',
-          'Some small babies are simply constitutionally small and well. Growth restriction is when the growth trend slows and Doppler/fluid suggest the placenta is the cause - your doctor distinguishes the two.'),
-      Faq('What can I do to help?',
-          'Attend all monitoring, track movements, avoid smoking and second-hand smoke, rest, and follow your doctor\'s plan. There is no food that "fixes" it, but good nutrition and rest help.'),
-      Faq('Will I need an early delivery?',
-          'Possibly. If monitoring shows your baby would be better out than in, your doctor will plan delivery at the safest time.'),
+      Faq(_t('Is my baby just naturally small?', 'क्या मेरा शिशु बस स्वभाव से ही छोटा है?'),
+          _t('Some small babies are simply constitutionally small and well. Growth restriction is when the growth trend slows and Doppler/fluid suggest the placenta is the cause - your doctor distinguishes the two.', 'कुछ छोटे शिशु बस स्वभाव से छोटे और स्वस्थ होते हैं। बढ़त में रुकावट तब कही जाती है जब बढ़त का रुझान धीमा पड़े और Doppler/पानी बताएँ कि इसकी वजह placenta है — दोनों में फ़र्क़ आपके डॉक्टर पहचानते हैं।')),
+      Faq(_t('What can I do to help?', 'मैं मदद के लिए क्या कर सकती हूँ?'),
+          _t('Attend all monitoring, track movements, avoid smoking and second-hand smoke, rest, and follow your doctor\'s plan. There is no food that "fixes" it, but good nutrition and rest help.', 'हर निगरानी पर जाइए, हलचल पर नज़र रखिए, धूम्रपान और उसके धुएँ से दूर रहिए, आराम कीजिए, और अपने डॉक्टर की योजना मानिए। ऐसा कोई खाना नहीं जो इसे "ठीक" कर दे, पर अच्छा पोषण और आराम मदद करते हैं।')),
+      Faq(_t('Will I need an early delivery?', 'क्या मेरा प्रसव जल्दी करना पड़ेगा?'),
+          _t('Possibly. If monitoring shows your baby would be better out than in, your doctor will plan delivery at the safest time.', 'हो सकता है। अगर निगरानी बताए कि शिशु के लिए बाहर आना अंदर रहने से बेहतर है, तो आपके डॉक्टर सबसे सुरक्षित समय पर प्रसव की योजना बनाएँगे।')),
     ],
-    aliases: ['iugr', 'fgr', 'growth restriction', 'small baby', 'sga', 'baby small'],
+    aliases: [_same('iugr'), _same('fgr'), _t('growth restriction', 'बढ़त में रुकावट'), _t('small baby', 'छोटा शिशु'), _same('sga'), _t('baby small', 'शिशु छोटा')],
   ),
 ];
 

@@ -174,9 +174,9 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       for (final t in items)
         _LibraryCard(
           icon: Icons.biotech_rounded,
-          title: t.name,
-          subtitle: t.altName,
-          badge: t.tag.badge,
+          title: t.name.now,
+          subtitle: t.altName?.now,
+          badge: t.tag.badge.now,
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) =>
                   TestScanDetailScreen(info: t, controller: p))),
@@ -191,9 +191,9 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       for (final f in items)
         _LibraryCard(
           icon: Icons.description_outlined,
-          title: f.name,
-          subtitle: f.altName,
-          badge: f.tag.badge,
+          title: f.name.now,
+          subtitle: f.altName?.now,
+          badge: f.tag.badge.now,
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) =>
                   FindingDetailScreen(info: f, controller: p))),
@@ -312,7 +312,7 @@ class TestScanDetailScreen extends StatelessWidget {
       backgroundColor: AppTheme.surfaceContainer,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
-        title: Text(info.name,
+        title: Text(info.name.now,
             style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
@@ -321,16 +321,16 @@ class TestScanDetailScreen extends StatelessWidget {
         children: [
           _DetailHeader(
               icon: Icons.biotech_rounded,
-              title: info.name,
-              subtitle: info.altName,
-              badge: info.tag.badge),
+              title: info.name.now,
+              subtitle: info.altName?.now,
+              badge: info.tag.badge.now),
           const SizedBox(height: 16),
           _ExpandableSection(
-              title: S.now.uiWhat, body: info.whatItIs, initiallyOpen: true),
-          _ExpandableSection(title: S.now.uiWhySDone, body: info.why),
-          _ExpandableSection(title: S.now.uiWhen, body: info.when),
-          _ExpandableSection(title: S.now.uiPreparation, body: info.preparation),
-          _ExpandableSection(title: S.now.uiProcedure, body: info.procedure),
+              title: S.now.uiWhat, body: info.whatItIs.now, initiallyOpen: true),
+          _ExpandableSection(title: S.now.uiWhySDone, body: info.why.now),
+          _ExpandableSection(title: S.now.uiWhen, body: info.when.now),
+          _ExpandableSection(title: S.now.uiPreparation, body: info.preparation.now),
+          _ExpandableSection(title: S.now.uiProcedure, body: info.procedure.now),
           // Renamed per the review, from 'Understanding Your Report'. It never
           // explained the report — it explained each PARAMETER on it, one at a
           // time, which is a different and narrower thing. The title now says
@@ -338,7 +338,7 @@ class TestScanDetailScreen extends StatelessWidget {
           // the other job.
           _ExpandableSection(
             title: S.now.uiUnderstandingReportParameters,
-            body: info.understandingReport,
+            body: info.understandingReport.now,
             children: [
               for (final param in info.parameters) _ParameterCard(param),
             ],
@@ -348,17 +348,17 @@ class TestScanDetailScreen extends StatelessWidget {
           // what the report SAYS. This is the cumulative summary — normal
           // means this, abnormal can point at that, here is what throws it off,
           // and your doctor is who interprets it.
-          if (info.interpretation.isNotEmpty)
+          if (info.interpretation.en.isNotEmpty)
             _ExpandableSection(
               title: S.now.uiHowDoIInterpret,
-              body: info.interpretation,
+              body: info.interpretation.now,
               children: [
                 for (final pointer in info.interpretPointers)
-                  _InterpretPointer(pointer),
+                  _InterpretPointer(pointer.now),
               ],
             ),
           const SizedBox(height: 4),
-          MedicalDisclaimerCard(text: info.disclaimer),
+          MedicalDisclaimerCard(text: info.disclaimer.now),
         ],
       ),
     );
@@ -412,19 +412,19 @@ class _ParameterCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineVariant),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(param.name,
+        Text(param.name.now,
             style: pvJakarta(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w800,
                 color: _accent)),
         const SizedBox(height: 8),
-        _kv('What it measures', param.measures),
-        _kv('Why it\'s important', param.whyImportant),
+        _kv('What it measures', param.measures.now),
+        _kv('Why it\'s important', param.whyImportant.now),
         if (param.typicalRange != null)
-          _kv('Typical pregnancy range', param.typicalRange!),
-        if (param.ifLow != null) _kv('If it\'s low', param.ifLow!),
-        if (param.ifHigh != null) _kv('If it\'s high', param.ifHigh!),
-        if (param.note != null) _kv('Good to know', param.note!),
+          _kv('Typical pregnancy range', param.typicalRange!.now),
+        if (param.ifLow != null) _kv('If it\'s low', param.ifLow!.now),
+        if (param.ifHigh != null) _kv('If it\'s high', param.ifHigh!.now),
+        if (param.note != null) _kv('Good to know', param.note!.now),
       ]),
     );
   }
@@ -462,7 +462,7 @@ class FindingDetailScreen extends StatelessWidget {
       backgroundColor: AppTheme.surfaceContainer,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
-        title: Text(info.name,
+        title: Text(info.name.now,
             style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
@@ -471,25 +471,26 @@ class FindingDetailScreen extends StatelessWidget {
         children: [
           _DetailHeader(
               icon: Icons.description_outlined,
-              title: info.name,
-              subtitle: info.altName,
-              badge: info.tag.badge),
+              title: info.name.now,
+              subtitle: info.altName?.now,
+              badge: info.tag.badge.now),
           const SizedBox(height: 16),
           _ExpandableSection(
               title: S.now.uiWhat2,
-              body: info.whatIsIt,
+              body: info.whatIsIt.now,
               initiallyOpen: true),
           _ExpandableSection(
-              title: S.now.uiWhyDoesHappen, body: info.whyHappens),
+              title: S.now.uiWhyDoesHappen, body: info.whyHappens.now),
           _ExpandableSection(
-              title: S.now.uiSymptoms, bullets: info.symptoms),
-          _ExpandableSection(title: S.now.uiDiagnosis, body: info.diagnosis),
+              title: S.now.uiSymptoms,
+              bullets: [for (final b in info.symptoms) b.now]),
+          _ExpandableSection(title: S.now.uiDiagnosis, body: info.diagnosis.now),
           _ExpandableSection(
-              title: S.now.uiPregnancyImplications, body: info.implications),
-          _ExpandableSection(title: S.now.uiManagement, body: info.management),
+              title: S.now.uiPregnancyImplications, body: info.implications.now),
+          _ExpandableSection(title: S.now.uiManagement, body: info.management.now),
           _ExpandableSection(
               title: S.now.uiWhenContactDoctor,
-              bullets: info.whenToContact,
+              bullets: [for (final b in info.whenToContact) b.now],
               highlight: true),
           if (info.faqs.isNotEmpty)
             _ExpandableSection(
@@ -497,7 +498,7 @@ class FindingDetailScreen extends StatelessWidget {
               children: [for (final f in info.faqs) _FaqCard(f)],
             ),
           const SizedBox(height: 4),
-          MedicalDisclaimerCard(text: info.disclaimer),
+          MedicalDisclaimerCard(text: info.disclaimer.now),
         ],
       ),
     );
@@ -518,13 +519,13 @@ class _FaqCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineVariant),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(faq.q,
+        Text(faq.q.now,
             style: pvJakarta(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary900)),
         const SizedBox(height: 5),
-        Text(faq.a,
+        Text(faq.a.now,
             style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
       ]),
@@ -704,8 +705,12 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
 
 /// Reusable medical disclaimer - shown on EVERY detail page.
 class MedicalDisclaimerCard extends StatelessWidget {
-  const MedicalDisclaimerCard({super.key, this.text = kMedicalDisclaimer});
-  final String text;
+  // `text` defaults to null rather than to a resolved string: a const
+  // default cannot read the current language, and resolving it once at
+  // construction would freeze the disclaimer in whatever language was
+  // live when the widget was built.
+  const MedicalDisclaimerCard({super.key, this.text});
+  final String? text;
 
   @override
   Widget build(BuildContext context) {
@@ -731,7 +736,7 @@ class MedicalDisclaimerCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFFB36B12))),
                 const SizedBox(height: 4),
-                Text(text,
+                Text(text ?? kMedicalDisclaimer.now,
                     style: pvManrope(
                         fontSize: 12.5,
                         height: 1.5,

@@ -74,6 +74,54 @@ def already_converted(src, start):
     return src[max(0, start - 3):start] == '_t('
 
 
+def literal_runs(src, comments):
+    """Adjacent string literals grouped into ONE unit, as Dart reads them.
+
+    Dart concatenates adjacent literals, which is how long prose is written
+    here:
+
+        whyImportant:
+            'A scan does not give a diagnosis '
+            'or a prediction. It gives a measurement.',
+
+    That is ONE sentence to a mother and one row in a glossary, but three
+    matches to a literal-by-literal scan. So a worklist built naively asks for
+    translations of ' or a prediction. ' as a standalone phrase, and a glossary
+    keyed on whole sentences matches nothing at all.
+
+    It cost a full agent run: 399 of 414 fragments already had committed Hindi
+    in g_tests_scans.tsv, keyed on the joined sentence, and the applier could
+    not see it.
+
+    Yields (start, end, text, raw) where [text] is the joined, unescaped
+    sentence and [raw] is the original source slice, so the applier can keep
+    the author's line breaks in the English half.
+    """
+    runs = []
+    current = []
+    for m in LITERAL.finditer(src):
+        if in_any(m.start(), comments) or already_converted(src, m.start()):
+            if current:
+                runs.append(current)
+                current = []
+            continue
+        # Only whitespace between two literals means Dart joins them. Anything
+        # else - a comma, a bracket - makes them separate arguments.
+        if current and src[current[-1].end():m.start()].strip():
+            runs.append(current)
+            current = []
+        current.append(m)
+    if current:
+        runs.append(current)
+
+    out = []
+    for group in runs:
+        text = ''.join(unescape(m.group(2), m.group(1)) for m in group)
+        out.append((group[0].start(), group[-1].end(), text,
+                    src[group[0].start():group[-1].end()]))
+    return out
+
+
 HAS_WORD = re.compile(r'[A-Za-z]{3,}')
 DEVANAGARI = re.compile(r'[ऀ-ॿ]')
 IDENT = re.compile(r'^[a-z][a-z0-9_]*$')
@@ -155,12 +203,8 @@ def untranslated(path, glossary):
     applier about what is left to do.
     """
     src = open(path, encoding='utf-8').read()
-    comments = comment_spans(src)
     out = []
-    for m in LITERAL.finditer(src):
-        if in_any(m.start(), comments) or already_converted(src, m.start()):
-            continue
-        text = unescape(m.group(2), m.group(1))
+    for _s, _e, text, _raw in literal_runs(src, comment_spans(src)):
         if skip(text) or text in glossary or text in out:
             continue
         out.append(text)
@@ -198,26 +242,27 @@ def main():
     src = open(path, encoding='utf-8').read()
     hit, unmatched = [], []
 
-    comments = comment_spans(src)
-
-    def one(m):
-        if in_any(m.start(), comments) or already_converted(src, m.start()):
-            return m.group(0)
-        quote, raw = m.group(1), m.group(2)
-        text = unescape(raw, quote)
+    # Runs, not single literals: adjacent literals are one sentence to Dart and
+    # one row in a glossary. Rewritten back-to-front so earlier offsets stay
+    # valid while the string is being spliced.
+    out = src
+    for start, end, text, raw in reversed(literal_runs(src, comment_spans(src))):
         if skip(text):
-            return m.group(0)
+            continue
         # Both sides are real text by now (see the loader), so this is a
         # straight comparison - no escape-form guessing, which is what made
         # the old two-attempt lookup silently miss.
         hi = glossary.get(text)
         if hi is None:
             unmatched.append(text)
-            return m.group(0)
+            continue
         hit.append(text)
-        return f'_t({quote}{raw}{quote}, {literal(hi)})'
-
-    out = LITERAL.sub(one, src)
+        # [raw] keeps the author's own line breaks in the English half; the
+        # Hindi becomes one literal, because re-splitting a translation across
+        # the English fragment boundaries would put the breaks in the wrong
+        # places for a different language.
+        out = out[:start] + f'_t({raw}, {literal(hi)})' + out[end:]
+    unmatched.reverse()
 
     print(f'{path}')
     print(f'  glossary entries : {len(glossary)}')

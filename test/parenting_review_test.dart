@@ -364,9 +364,10 @@ void main() {
     test('every test with parameters also explains how to read the whole '
         'report', () {
       for (final t in kTestsScans.where((t) => t.parameters.isNotEmpty)) {
-        expect(t.interpretation.trim(), isNotEmpty,
-            reason: '${t.name} explains each parameter and never the report');
-        expect(t.interpretPointers, isNotEmpty, reason: t.name);
+        expect(t.interpretation.en.trim(), isNotEmpty,
+            reason: '${t.name.en} explains each parameter and never the '
+                'report');
+        expect(t.interpretPointers, isNotEmpty, reason: t.name.en);
       }
     });
 
@@ -374,13 +375,19 @@ void main() {
       // It may say what a finding CAN point at. It may never say what it does
       // mean for this person — the app explains a report, it never reads one.
       for (final t in kTestsScans) {
-        if (t.interpretation.isEmpty) continue;
+        // .en, because the banned phrases below are English. That is a
+        // REAL LIMIT of this guard, not an oversight: after the Hindi
+        // migration a Devanagari interpretation could state a diagnosis
+        // and pass here. The Hindi side needs its own phrase list before
+        // this rule is as strong in both languages as it reads.
+        if (t.interpretation.en.isEmpty) continue;
         // Negations are stripped first. "is not a diagnosis of anything" is
         // exactly the sentence this rule WANTS, and a bare substring search
         // fails it — which is how a well-written line ends up looking like the
         // violation it is guarding against.
         final all =
-            '${t.interpretation} ${t.interpretPointers.join(' ')}'
+            '${t.interpretation.en} '
+                    '${t.interpretPointers.map((p) => p.en).join(' ')}'
                 .toLowerCase()
                 .replaceAll('not a diagnosis', '')
                 .replaceAll('not the same as diagnosing', '')
@@ -407,9 +414,15 @@ void main() {
 
     test('every interpretation ends up at a clinician', () {
       for (final t in kTestsScans) {
-        if (t.interpretation.isEmpty) continue;
+        // .en, because the banned phrases below are English. That is a
+        // REAL LIMIT of this guard, not an oversight: after the Hindi
+        // migration a Devanagari interpretation could state a diagnosis
+        // and pass here. The Hindi side needs its own phrase list before
+        // this rule is as strong in both languages as it reads.
+        if (t.interpretation.en.isEmpty) continue;
         final all =
-            '${t.interpretation} ${t.interpretPointers.join(' ')}'.toLowerCase();
+            '${t.interpretation.en} '
+                    '${t.interpretPointers.map((p) => p.en).join(' ')}'.toLowerCase();
         expect(
             all.contains('doctor') ||
                 all.contains('paediatrician') ||
