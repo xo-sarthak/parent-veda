@@ -84,26 +84,26 @@ class ConsultationsScreen extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Expanded(child: Text(s.role, style: pvTitleStyle(16))),
+                Expanded(child: Text(s.role.now, style: pvTitleStyle(16))),
                 const SizedBox(width: 8),
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: Text(s.fromPrice, style: pvBody(kSoft, 13)),
+                  child: Text(s.fromPrice.now, style: pvBody(kSoft, 13)),
                 ),
               ]),
               const SizedBox(height: 3),
               Text.rich(
                 TextSpan(children: [
                   TextSpan(
-                      text: s.name,
+                      text: s.name.now,
                       style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 13)),
                   TextSpan(
-                      text: '  ·  ${s.cred.split(' · ').first}',
+                      text: '  ·  ${s.cred.now.split(' · ').first}',
                       style: const TextStyle(color: kMuted, fontSize: 13)),
                 ]),
               ),
               const SizedBox(height: 2),
-              Text(s.desc, style: pvBody(kSoft, 13)),
+              Text(s.desc.now, style: pvBody(kSoft, 13)),
               const SizedBox(height: 8),
               Row(children: [
                 Text(s.rating, style: pvBody(kCoral, 12).copyWith(fontWeight: FontWeight.w700)),
@@ -112,7 +112,7 @@ class ConsultationsScreen extends StatelessWidget {
                 if (s.next != null) ...[
                   const SizedBox(width: 10),
                   Flexible(
-                    child: Text(s.next!,
+                    child: Text(s.next!.now,
                         style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis),
                   ),

@@ -20,7 +20,7 @@ class BirthingClassesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void playClass(BirthingClass c) => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PrepareVideoScreen(title: c.title, subtitle: c.duration, blurb: c.blurb)));
+        builder: (_) => PrepareVideoScreen(title: c.title.now, subtitle: c.duration.now, blurb: c.blurb.now)));
 
     void enroll() => showPrepareBooking(
           context,
@@ -176,9 +176,9 @@ class BirthingClassesScreen extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(c.title, style: pvBody(kInk, 15).copyWith(fontWeight: FontWeight.w600, height: 1.3)),
+              Text(c.title.now, style: pvBody(kInk, 15).copyWith(fontWeight: FontWeight.w600, height: 1.3)),
               const SizedBox(height: 2),
-              Text(c.duration, style: pvBody(kMuted, 12)),
+              Text(c.duration.now, style: pvBody(kMuted, 12)),
             ]),
           ),
           const SizedBox(width: 10),

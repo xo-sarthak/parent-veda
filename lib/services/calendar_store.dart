@@ -249,12 +249,12 @@ class CalendarStore extends ChangeNotifier {
     final prep = PrepareStore.instance;
     for (final c in kCohorts) {
       if (!prep.isBooked(c.id)) continue;
-      final desc = (c.start != null && c.start!.trim().isNotEmpty)
-          ? '${c.duration} · ${c.start}'
-          : c.duration;
+      final desc = (c.start != null && c.start!.en.trim().isNotEmpty)
+          ? '${c.duration.now} · ${c.start!.now}'
+          : c.duration.now;
       out.add(CalendarEvent(
         id: 'cp_${c.id}',
-        title: c.name,
+        title: c.name.now,
         description: desc,
         category: CalEventCategory.program,
         date: today,

@@ -91,7 +91,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   _kindPill(null, 'All'),
-                  for (final k in PrepKind.values) _kindPill(k, k.filterLabel),
+                  for (final k in PrepKind.values) _kindPill(k, k.filterLabel.now),
                 ],
               ),
             ),
@@ -105,7 +105,9 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   _topicChip(null, 'All topics'),
-                  for (final t in kPrepTopics) _topicChip(t, t),
+                  // Key on .en, label with .now: the chip must FILTER by a
+                  // language-invariant value while READING in her language.
+                  for (final t in kPrepTopics) _topicChip(t.en, t.now),
                 ],
               ),
             ),
@@ -200,7 +202,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                   decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.92), borderRadius: BorderRadius.circular(999)),
-                  child: Text(p.kind.label, style: pvBody(a, 10.5).copyWith(fontWeight: FontWeight.w800)),
+                  child: Text(p.kind.label.now, style: pvBody(a, 10.5).copyWith(fontWeight: FontWeight.w800)),
                 ),
               ),
               // live / duration corner
@@ -212,7 +214,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                   decoration: BoxDecoration(
                       color: p.isLive ? kCoral : kInk.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(7)),
-                  child: Text(p.isLive ? 'LIVE' : p.durationLabel,
+                  child: Text(p.isLive ? 'LIVE' : p.durationLabel.now,
                       style: pvBody(Colors.white, 10).copyWith(fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -224,7 +226,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p.title, style: pvTitleStyle(16), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(p.title.now, style: pvTitleStyle(16), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text('${p.instructorName} · ${_metaLine(p)}',
                     style: pvBody(kSoft, 12.5), maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -239,8 +241,12 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
   }
 
   String _metaLine(PrepProgram p) {
-    if (p.isLive && p.startLabel != null) return p.startLabel!;
-    return p.durationLabel.isNotEmpty ? p.durationLabel : p.topics.first;
+    if (p.isLive && p.startLabel != null) return p.startLabel!.now;
+    // .en for the emptiness CHECK (presence must not vary), .now for what
+    // is actually shown.
+    return p.durationLabel.en.isNotEmpty
+        ? p.durationLabel.now
+        : p.topics.first.now;
   }
 
   Widget _emptyState() => Container(

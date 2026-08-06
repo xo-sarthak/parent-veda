@@ -92,12 +92,12 @@ class MasterclassDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (m.badge != null)
-                  pvPill(m.badge!,
+                  pvPill(m.badge!.now,
                       bg: m.badgeIsCoral ? kCoralTint : kPanel, fg: m.badgeIsCoral ? kCoral : kPurple),
                 if (m.badge != null) const SizedBox(height: 14),
-                Text(m.title, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.15)),
+                Text(m.title.now, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.15)),
                 const SizedBox(height: 12),
-                Text(m.longDesc, style: pvSubStyle()),
+                Text(m.longDesc.now, style: pvSubStyle()),
                 const SizedBox(height: 18),
                 Row(children: [
                   for (int i = 0; i < m.facts.length; i++) ...[
@@ -109,7 +109,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                 _divider(),
                 _sectionTitle("What you'll walk away with"),
                 const SizedBox(height: 12),
-                for (final l in m.learn) _check(l),
+                for (final l in m.learn) _check(l.now),
 
                 _divider(),
                 _sectionTitle(m.coaches.length > 1 ? 'Meet your coaches' : 'Meet your coach'),
@@ -135,8 +135,8 @@ class MasterclassDetailScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   for (int i = 0; i < m.faqs.length; i++)
                     m.faqs[i].a != null
-                        ? _faqOpen(m.faqs[i].q, m.faqs[i].a!)
-                        : _faqClosed(m.faqs[i].q, bottom: i == m.faqs.length - 1),
+                        ? _faqOpen(m.faqs[i].q.now, m.faqs[i].a!.now)
+                        : _faqClosed(m.faqs[i].q.now, bottom: i == m.faqs.length - 1),
                 ],
 
                 pvFooterNote('Led by a verified expert. Free with ParentVeda+.'),
@@ -159,7 +159,7 @@ class MasterclassDetailScreen extends StatelessWidget {
             onBook: () => showPrepareBooking(
               context,
               id: m.id,
-              title: m.title,
+              title: m.title.now,
               priceLabel: '${m.price} · free on ParentVeda+',
               whenLabel: when,
               heading: 'Reserve your seat',
@@ -184,9 +184,9 @@ class MasterclassDetailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
           decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(14)),
           child: Column(children: [
-            Text(f.big, style: pvTitleStyle(14), textAlign: TextAlign.center),
+            Text(f.big.now, style: pvTitleStyle(14), textAlign: TextAlign.center),
             const SizedBox(height: 2),
-            Text(f.small, style: pvBody(kMuted, 11)),
+            Text(f.small.now, style: pvBody(kMuted, 11)),
           ]),
         ),
       );
@@ -218,11 +218,11 @@ class MasterclassDetailScreen extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(c.name, style: pvTitleStyle(15)),
+              Text(c.name.now, style: pvTitleStyle(15)),
               const SizedBox(height: 1),
-              Text(c.role, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
+              Text(c.role.now, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: 7),
-              Text(c.bio, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
+              Text(c.bio.now, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
             ]),
           ),
         ],
@@ -234,10 +234,10 @@ class MasterclassDetailScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Text('★★★★★', style: TextStyle(color: kCoral, fontSize: 13)),
           const SizedBox(height: 8),
-          Text(t.quote, style: pvFraunces(fontSize: 16, height: 1.5, color: kInk)),
+          Text(t.quote.now, style: pvFraunces(fontSize: 16, height: 1.5, color: kInk)),
           const SizedBox(height: 12),
           Text.rich(TextSpan(children: [
-            TextSpan(text: t.who, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
+            TextSpan(text: t.who.now, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
             TextSpan(text: ' · ${t.when}', style: const TextStyle(color: kSoft)),
           ]), style: pvBody(kSoft, 12)),
         ]),

@@ -59,7 +59,7 @@ class MasterclassesScreen extends StatelessWidget {
                       Positioned(
                         top: 14,
                         left: 14,
-                        child: pvPill(featured.badge!, bg: kCoral, fg: Colors.white),
+                        child: pvPill(featured.badge!.now, bg: kCoral, fg: Colors.white),
                       ),
                   ]),
                   Container(
@@ -67,9 +67,9 @@ class MasterclassesScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     width: double.infinity,
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(featured.title, style: pvTitleStyle(20)),
+                      Text(featured.title.now, style: pvTitleStyle(20)),
                       const SizedBox(height: 10),
-                      Text(featured.listDesc, style: pvBody(kSoft, 14)),
+                      Text(featured.listDesc.now, style: pvBody(kSoft, 14)),
                       const SizedBox(height: 14),
                       Row(children: [
                         pvAvatar(36),
@@ -117,7 +117,7 @@ class MasterclassesScreen extends StatelessWidget {
   String _coachLine(Masterclass m) {
     if (m.coaches.isEmpty) return '';
     if (m.coaches.length == 1) return 'With ${m.coaches.first.name}';
-    return 'With ${m.coaches[0].name} & ${m.coaches[1].name.split(' ').first}';
+    return 'With ${m.coaches[0].name} & ${m.coaches[1].name.now.split(' ').first}';
   }
 
   Widget _row(Masterclass m, VoidCallback onTap, {bool bottom = false}) {
@@ -134,16 +134,16 @@ class MasterclassesScreen extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: Text(m.title, style: pvTitleStyle(16))),
+            Expanded(child: Text(m.title.now, style: pvTitleStyle(16))),
             const SizedBox(width: 10),
             Text(m.price, style: pvBody(kInk, 14).copyWith(fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 5),
-          Text(m.listDesc, style: pvBody(kSoft, 13)),
+          Text(m.listDesc.now, style: pvBody(kSoft, 13)),
           const SizedBox(height: 9),
           Row(children: [
             if (m.listChip != null) ...[
-              pvPill(m.listChip!,
+              pvPill(m.listChip!.now,
                   bg: chipBgFor(m.listChipIsCoral), fg: chipColorFor(m.listChipIsCoral)),
               const SizedBox(width: 8),
             ],

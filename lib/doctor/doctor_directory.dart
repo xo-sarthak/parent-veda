@@ -52,10 +52,10 @@ List<DoctorInfo> allDoctors() => [
       for (final s in kSpecialists)
         DoctorInfo(
           id: s.id,
-          name: s.name,
-          credential: s.cred,
-          category: s.role,
-          blurb: s.about,
+          name: s.name.now,
+          credential: s.cred.now,
+          category: s.role.now,
+          blurb: s.about.now,
           rating: s.rating,
           stage: DoctorStage.pregnancy,
         ),

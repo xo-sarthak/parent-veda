@@ -73,7 +73,12 @@ def analyze():
         # A data file needs its literals WRAPPED, which is a different job.
         if "'LocalizedText'" not in line:
             continue
-        if line.index("'LocalizedText'") > line.index('assigned') \
+        # Only assignment-shaped messages name a source and a target in that
+        # order. A `return_of_invalid_type` reads "can't be returned from",
+        # with no 'assigned' at all - indexing for it threw ValueError and took
+        # the whole run down.
+        marker = line.find('assigned')
+        if marker != -1 and line.index("'LocalizedText'") > marker \
                 and 'return' not in m.group(4):
             continue    # LocalizedText is the TARGET type, not the source
         rows.append({'file': m.group(1), 'line': int(m.group(2)),

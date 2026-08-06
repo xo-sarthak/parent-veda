@@ -9,6 +9,11 @@ import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
+/// Stripped off a cohort's start label. English-only by design: the
+/// Hindi start labels are written without the prefix, so there is
+/// nothing to remove there.
+final RegExp _kStartsPrefix = RegExp(r'^starts ');
+
 class CohortDetailScreen extends StatelessWidget {
   const CohortDetailScreen({super.key, required this.cohort});
 
@@ -29,20 +34,22 @@ class CohortDetailScreen extends StatelessWidget {
 
               const SizedBox(height: 22),
               Row(children: [
-                if (c.recommended != null) pvPill(c.recommended!),
+                if (c.recommended != null) pvPill(c.recommended!.now),
                 const Spacer(),
-                if (c.seats != null) Text(c.seats!, style: pvBody(kSoft, 11)),
+                if (c.seats != null) Text(c.seats!.now, style: pvBody(kSoft, 11)),
               ]),
               const SizedBox(height: 12),
-              Text(c.name, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.15)),
+              Text(c.name.now, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.15)),
               const SizedBox(height: 12),
-              Text(c.desc, style: pvSubStyle()),
+              Text(c.desc.now, style: pvSubStyle()),
 
               const SizedBox(height: 18),
               Row(children: [
-                _fact(c.duration, 'programme'),
+                _fact(c.duration.now, 'programme'),
                 const SizedBox(width: 10),
-                _fact(c.start != null ? c.start!.replaceFirst('starts ', '') : (c.forWhen ?? 'Flexible'),
+                _fact(c.start != null
+            ? c.start!.now.replaceFirst(_kStartsPrefix, '')
+            : (c.forWhen?.now ?? 'Flexible'),
                     c.start != null ? 'start' : 'timing'),
                 const SizedBox(width: 10),
                 _fact('Live', '+ peer group'),
@@ -51,14 +58,14 @@ class CohortDetailScreen extends StatelessWidget {
               _divider(),
               _title("What's inside"),
               const SizedBox(height: 12),
-              for (final w in c.whatsInside) _check(w),
+              for (final w in c.whatsInside) _check(w.now),
 
               if (c.schedule.isNotEmpty) ...[
                 _divider(),
                 _title('The plan'),
                 const SizedBox(height: 8),
                 for (int i = 0; i < c.schedule.length; i++)
-                  _weekRow(i + 1, c.schedule[i], bottom: i == c.schedule.length - 1),
+                  _weekRow(i + 1, c.schedule[i].now, bottom: i == c.schedule.length - 1),
               ],
 
               if (c.coachName != null) ...[
@@ -70,7 +77,7 @@ class CohortDetailScreen extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(c.coachName!, style: pvTitleStyle(15)),
+                      Text(c.coachName!.now, style: pvTitleStyle(15)),
                       const SizedBox(height: 2),
                       Text(S.now.uiLeadsEveryLiveSession,
                           style: pvBody(kSoft, 13).copyWith(height: 1.5)),
@@ -111,16 +118,16 @@ class CohortDetailScreen extends StatelessWidget {
           child: PvStickyCta(
             id: c.id,
             price: c.price,
-            note: c.duration,
+            note: c.duration.now,
             noteColor: kMuted,
             label: S.now.uiJoinNextCohort,
             bookedLabel: 'Enrolled',
             onBook: () => showPrepareBooking(
               context,
               id: c.id,
-              title: c.name,
+              title: c.name.now,
               priceLabel: '${c.price} · ${c.duration}',
-              whenLabel: c.start,
+              whenLabel: c.start?.now,
               heading: 'Join this cohort',
               cta: 'Join cohort',
             ),
@@ -197,13 +204,13 @@ class CohortDetailScreen extends StatelessWidget {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text.rich(TextSpan(children: [
               TextSpan(
-                  text: r.who, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 14)),
+                  text: r.who.now, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 14)),
               TextSpan(text: ' · ${r.when}', style: const TextStyle(color: kSoft, fontSize: 14)),
             ])),
             const Text('★★★★★', style: TextStyle(color: kCoral, fontSize: 13)),
           ]),
           const SizedBox(height: 8),
-          Text(r.quote, style: pvBody(kSoft, 14).copyWith(height: 1.55)),
+          Text(r.quote.now, style: pvBody(kSoft, 14).copyWith(height: 1.55)),
         ]),
       );
 }

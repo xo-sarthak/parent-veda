@@ -46,7 +46,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(s.name, style: pvTitleStyle(22)),
+                    Text(s.name.now, style: pvTitleStyle(22)),
                     const SizedBox(height: 2),
                     Text('${s.role} · ${s.cred}',
                         style: pvBody(kPurple, 13).copyWith(fontWeight: FontWeight.w600)),
@@ -69,14 +69,14 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
               ]),
 
               _divider(),
-              _title('About ${s.name.split(' ').take(2).join(' ')}'),
+              _title('About ${s.name.now.split(' ').take(2).join(' ')}'),
               const SizedBox(height: 10),
-              Text(s.about, style: pvBody(kSoft, 14).copyWith(height: 1.65)),
+              Text(s.about.now, style: pvBody(kSoft, 14).copyWith(height: 1.65)),
 
               _divider(),
               _title('She can help with'),
               const SizedBox(height: 12),
-              for (final h in s.helps) _check(h),
+              for (final h in s.helps) _check(h.now),
 
               _divider(),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -199,13 +199,13 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text.rich(TextSpan(children: [
               TextSpan(
-                  text: r.who, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 14)),
+                  text: r.who.now, style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 14)),
               TextSpan(text: ' · ${r.when}', style: const TextStyle(color: kSoft, fontSize: 14)),
             ])),
             const Text('★★★★★', style: TextStyle(color: kCoral, fontSize: 13)),
           ]),
           const SizedBox(height: 8),
-          Text(r.quote, style: pvBody(kSoft, 14).copyWith(height: 1.55)),
+          Text(r.quote.now, style: pvBody(kSoft, 14).copyWith(height: 1.55)),
         ]),
       );
 }

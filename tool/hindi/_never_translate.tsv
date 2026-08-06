@@ -42,3 +42,7 @@ prog_${c.id}	id, not copy
 # ---- garbh_data.dart ---------------------------------------------------------
 # Lowercased and matched against English keyword hints in ragaTimeBadge().
 ${a.id} ${a.title} ${a.subtitle}	ragaTimeBadge hint, matched against English
+#
+# ---- prepare_data.dart, interpolation-only -----------------------------------
+${m.facts[1].big} · ${m.facts[1].small}	pure interpolation, no prose
+${m.facts.first.big} ${m.facts.first.small}	pure interpolation, no prose

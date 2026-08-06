@@ -225,8 +225,8 @@ class BookingCatalog {
           kind: OfferingKind.masterclass,
           format: SessionFormat.liveGroup,
           catalogId: p.id,
-          title: p.title,
-          expertId: _slug(p.instructorName),
+          title: p.title.now,
+          expertId: _slug(p.instructorName.now),
           priceMinor: _minor(p.price),
           grant: const EntitlementGrant(
               credits: 1, recordingAccess: true, discussionThread: true),
@@ -238,8 +238,8 @@ class BookingCatalog {
           kind: OfferingKind.cohort,
           format: SessionFormat.liveGroup,
           catalogId: p.id,
-          title: p.title,
-          expertId: _slug(p.instructorName),
+          title: p.title.now,
+          expertId: _slug(p.instructorName.now),
           priceMinor: _minor(p.price),
           grant: const EntitlementGrant(
               credits: 1, discussionThread: true, validFor: Duration(days: 60)),

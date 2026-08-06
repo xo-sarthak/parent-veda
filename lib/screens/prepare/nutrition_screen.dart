@@ -106,7 +106,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: o.id == selected ? kPurple : kBorder),
                 ),
-                child: Text(o.label,
+                child: Text(o.label.now,
                     style: pvBody(o.id == selected ? Colors.white : kInk, 13.5)
                         .copyWith(fontWeight: FontWeight.w600)),
               ),
@@ -168,11 +168,11 @@ class NutritionPlansScreen extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Expanded(child: Text(p.name, style: pvTitleStyle(18))),
-                  pvPill(p.weeks),
+                  Expanded(child: Text(p.name.now, style: pvTitleStyle(18))),
+                  pvPill(p.weeks.now),
                 ]),
                 const SizedBox(height: 6),
-                Text(p.tagline, style: pvBody(kSoft, 13.5).copyWith(height: 1.5)),
+                Text(p.tagline.now, style: pvBody(kSoft, 13.5).copyWith(height: 1.5)),
                 const SizedBox(height: 14),
                 Row(children: [
                   Text.rich(TextSpan(children: [
@@ -239,14 +239,14 @@ class NutritionTrailerScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-              Row(children: [Expanded(child: Text(p.name, style: pvHeroStyle().copyWith(fontSize: 26))), pvPill(p.weeks)]),
+              Row(children: [Expanded(child: Text(p.name.now, style: pvHeroStyle().copyWith(fontSize: 26))), pvPill(p.weeks.now)]),
               const SizedBox(height: 10),
-              Text(p.tagline, style: pvSubStyle()),
+              Text(p.tagline.now, style: pvSubStyle()),
 
               const SizedBox(height: 22),
               Text(S.now.uiWhatSInside, style: pvTitleStyle(16)),
               const SizedBox(height: 12),
-              for (final h in p.highlights) _check(h),
+              for (final h in p.highlights) _check(h.now),
 
               const SizedBox(height: 22),
               Text(S.now.uiDayPlan, style: pvTitleStyle(16)),
@@ -258,7 +258,7 @@ class NutritionTrailerScreen extends StatelessWidget {
                 decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
                 child: Column(children: [
                   for (int i = 0; i < p.sampleDay.length; i++)
-                    _mealRow(p.sampleDay[i].meal, p.sampleDay[i].food, bottom: i == p.sampleDay.length - 1),
+                    _mealRow(p.sampleDay[i].meal.now, p.sampleDay[i].food.now, bottom: i == p.sampleDay.length - 1),
                 ]),
               ),
 
@@ -412,11 +412,11 @@ class NutritionDietPlanScreen extends StatelessWidget {
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       SizedBox(
                         width: 96,
-                        child: Text(p.sampleDay[i].meal,
+                        child: Text(p.sampleDay[i].meal.now,
                             style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w700)),
                       ),
                       const SizedBox(width: 10),
-                      Expanded(child: Text(p.sampleDay[i].food, style: pvBody(kInk, 13.5).copyWith(height: 1.4))),
+                      Expanded(child: Text(p.sampleDay[i].food.now, style: pvBody(kInk, 13.5).copyWith(height: 1.4))),
                     ]),
                   ),
               ]),
@@ -431,7 +431,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Icon(Icons.check_rounded, size: 18, color: kPurple),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(h, style: pvBody(kInk, 14).copyWith(height: 1.5))),
+                  Expanded(child: Text(h.now, style: pvBody(kInk, 14).copyWith(height: 1.5))),
                 ]),
               ),
 

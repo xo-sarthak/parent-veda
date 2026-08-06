@@ -95,7 +95,7 @@ class PrepareHubScreen extends StatelessWidget {
                     _railCard(
                       tag: 'Masterclass',
                       tagColor: kPurple,
-                      title: railMasterclass.title,
+                      title: railMasterclass.title.now,
                       meta: '${railMasterclass.durationLabel} · ${railMasterclass.price}',
                       onTap: () => openSection(ProgramDetailScreen(program: railMasterclass)),
                     ),
@@ -104,7 +104,7 @@ class PrepareHubScreen extends StatelessWidget {
                     _railCard(
                       tag: 'Cohort · starts Mon',
                       tagColor: kCoral,
-                      title: railCohort.title,
+                      title: railCohort.title.now,
                       meta: '${railCohort.durationLabel} · ${railCohort.price}',
                       onTap: () => openSection(ProgramDetailScreen(program: railCohort)),
                     ),

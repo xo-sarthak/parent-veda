@@ -410,3 +410,9 @@ A small guava or apple	एक छोटा अमरूद या सेब
 Millet roti, dal, lots of sabzi, salad	मोटे अनाज की रोटी, दाल, ख़ूब सब्ज़ी, सलाद
 Buttermilk + roasted chana	छाछ + भुना चना
 Grilled paneer/chicken + veg, no rice	ग्रिल्ड पनीर/चिकन + सब्ज़ी, चावल नहीं
+from ₹699	₹699 से
+${m.facts[1].big} · ${m.facts[1].small}	${m.facts[1].big} · ${m.facts[1].small}
+${m.facts.first.big} ${m.facts.first.small}	${m.facts.first.big} ${m.facts.first.small}
+prog_${m.id}	prog_${m.id}
+prog_${c.id}	prog_${c.id}
+^Week \d+ · 	^Week \d+ · 

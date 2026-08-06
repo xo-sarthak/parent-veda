@@ -55,15 +55,15 @@ class CohortsScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                     if (featured.recommended != null)
-                      pvPill(featured.recommended!, bg: Colors.white, fg: kPurple),
-                    if (featured.seats != null) Text(featured.seats!, style: pvBody(kSoft, 11)),
+                      pvPill(featured.recommended!.now, bg: Colors.white, fg: kPurple),
+                    if (featured.seats != null) Text(featured.seats!.now, style: pvBody(kSoft, 11)),
                   ]),
                   const SizedBox(height: 14),
-                  Text(featured.name, style: pvTitleStyle(22)),
+                  Text(featured.name.now, style: pvTitleStyle(22)),
                   const SizedBox(height: 6),
                   Text('${featured.duration} · ${featured.start ?? ''}'.trim(), style: pvBody(kSoft, 13)),
                   const SizedBox(height: 12),
-                  Text(featured.desc, style: pvBody(kSoft, 14)),
+                  Text(featured.desc.now, style: pvBody(kSoft, 14)),
                   const SizedBox(height: 14),
                   Row(children: [
                     pvAvatar(34),
@@ -73,7 +73,7 @@ class CohortsScreen extends StatelessWidget {
                         TextSpan(children: [
                           pvText(S.now.uiWith),
                           TextSpan(
-                              text: featured.coachName ?? 'your coach',
+                              text: featured.coachName?.now ?? 'your coach',
                               style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
                           pvText(S.now.uiChildbirthEducator),
                         ]),
@@ -122,7 +122,9 @@ class CohortsScreen extends StatelessWidget {
   }
 
   Widget _row(Cohort c, VoidCallback onTap, {bool bottom = false}) {
-    final meta = c.forWhen != null ? '${c.duration} · ${c.forWhen}' : c.duration;
+    final meta = c.forWhen != null
+        ? '${c.duration.now} · ${c.forWhen!.now}'
+        : c.duration.now;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -136,12 +138,12 @@ class CohortsScreen extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: Text(c.name, style: pvTitleStyle(16))),
+            Expanded(child: Text(c.name.now, style: pvTitleStyle(16))),
             const SizedBox(width: 10),
             Text(c.price, style: pvBody(kInk, 14).copyWith(fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 5),
-          Text(c.desc, style: pvBody(kSoft, 13)),
+          Text(c.desc.now, style: pvBody(kSoft, 13)),
           const SizedBox(height: 8),
           Text(meta, style: pvBody(kMuted, 12)),
         ]),

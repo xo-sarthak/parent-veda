@@ -41,20 +41,20 @@ class ProgramDetailScreen extends StatelessWidget {
     if (cta.watch) {
       if (p.lessons.isNotEmpty) {
         final l = p.lessons.first;
-        _play(context, l.title, subtitle: '${l.minutes} min', blurb: p.subtitle);
+        _play(context, l.title.now, subtitle: '${l.minutes} min', blurb: p.subtitle.now);
       } else {
-        _play(context, p.title, subtitle: p.durationLabel, blurb: p.subtitle);
+        _play(context, p.title.now, subtitle: p.durationLabel.now, blurb: p.subtitle.now);
       }
       return;
     }
     showPrepareBooking(
       context,
       id: p.id,
-      title: p.title,
+      title: p.title.now,
       priceLabel: '${p.price} · ${p.priceNote}',
-      whenLabel: p.isLive ? p.startLabel : null,
+      whenLabel: p.isLive ? p.startLabel?.now : null,
       heading: p.isLive ? 'Reserve your spot' : 'Add to your library',
-      cta: cta.label,
+      cta: cta.label.now,
     );
   }
 
@@ -64,21 +64,25 @@ class ProgramDetailScreen extends StatelessWidget {
     switch (p.kind) {
       case PrepKind.cohort:
         return [
-          (p.durationLabel.split(' ·').first, 'programme'),
+          (p.durationLabel.now.split(' ·').first, 'programme'),
           ('Live', '+ peer group'),
           (p.seatsLeft != null ? '${p.seatsLeft}' : '20', 'seats left'),
         ];
       case PrepKind.masterclass:
         if (p.isLiveScheduled) {
-          return [(p.durationLabel, 'live'), ('Live Q&A', 'included'), ('Forever', 'recording')];
+          return [
+      (p.durationLabel.now, 'live'),
+      ('Live Q&A', 'included'),
+      ('Forever', 'recording')
+    ];
         }
-        return [(p.durationLabel, 'recorded'), ('★ ${p.rating}', 'rated'), ('Forever', 'yours')];
+        return [(p.durationLabel.now, 'recorded'), ('★ ${p.rating}', 'rated'), ('Forever', 'yours')];
       case PrepKind.course:
         if (p.lessons.isNotEmpty) {
           final mins = p.lessons.fold<int>(0, (s, l) => s + l.minutes);
           return [('${p.lessons.length}', 'lessons'), ('~$mins', 'minutes'), ('∞', 'lifetime')];
         }
-        return [(p.durationLabel, 'course'), ('★ ${p.rating}', 'rated'), ('∞', 'lifetime')];
+        return [(p.durationLabel.now, 'course'), ('★ ${p.rating}', 'rated'), ('∞', 'lifetime')];
     }
   }
 
@@ -117,7 +121,7 @@ class ProgramDetailScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: p.isLive ? kCoral : kInk.withValues(alpha: 0.55),
                             borderRadius: BorderRadius.circular(999)),
-                        child: Text(p.heroTag,
+                        child: Text(p.heroTag.now,
                             style: pvBody(Colors.white, 11).copyWith(fontWeight: FontWeight.w700)),
                       ),
                     ),
@@ -128,13 +132,13 @@ class ProgramDetailScreen extends StatelessWidget {
               // badges
               const SizedBox(height: 18),
               _pad(Wrap(spacing: 8, runSpacing: 8, children: [
-                _pill(p.kind.label, a, filled: true),
-                for (final t in p.topics.take(2)) _pill(t, a),
+                _pill(p.kind.label.now, a, filled: true),
+                for (final t in p.topics.take(2)) _pill(t.now, a),
               ])),
               const SizedBox(height: 12),
-              _pad(Text(p.title, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.14))),
+              _pad(Text(p.title.now, style: pvHeroStyle().copyWith(fontSize: 30, height: 1.14))),
               const SizedBox(height: 10),
-              _pad(Text(p.subtitle, style: pvBody(kInk, 15).copyWith(height: 1.5))),
+              _pad(Text(p.subtitle.now, style: pvBody(kInk, 15).copyWith(height: 1.5))),
 
               // quick facts
               const SizedBox(height: 20),
@@ -150,7 +154,7 @@ class ProgramDetailScreen extends StatelessWidget {
               _pad(Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(color: a.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(16)),
-                child: Text(p.about, style: pvBody(kInk, 14).copyWith(height: 1.6)),
+                child: Text(p.about.now, style: pvBody(kInk, 14).copyWith(height: 1.6)),
               )),
 
               // instructor
@@ -162,12 +166,12 @@ class ProgramDetailScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(p.instructorName, style: pvTitleStyle(16)),
+                    Text(p.instructorName.now, style: pvTitleStyle(16)),
                     const SizedBox(height: 2),
-                    Text(p.instructorRole, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
-                    if (p.instructorBio.isNotEmpty) ...[
+                    Text(p.instructorRole.now, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
+                    if (p.instructorBio.en.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Text(p.instructorBio, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
+                      Text(p.instructorBio.now, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
                     ],
                   ]),
                 ),
@@ -208,7 +212,7 @@ class ProgramDetailScreen extends StatelessWidget {
                 _pad(Text(S.now.uiWhatCovers, style: pvTitleStyle(18))),
                 const SizedBox(height: 6),
                 _pad(Column(children: [
-                  for (int i = 0; i < p.covers.length; i++) _coversRow(p.covers[i], top: i == 0),
+                  for (int i = 0; i < p.covers.length; i++) _coversRow(p.covers[i].now, top: i == 0),
                 ])),
               ],
 
@@ -227,7 +231,7 @@ class ProgramDetailScreen extends StatelessWidget {
                         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           const Icon(Icons.check_rounded, size: 18, color: kPurple),
                           const SizedBox(width: 10),
-                          Expanded(child: Text(t, style: pvBody(kInk, 14).copyWith(height: 1.5))),
+                          Expanded(child: Text(t.now, style: pvBody(kInk, 14).copyWith(height: 1.5))),
                         ]),
                       ),
                   ]),
@@ -240,7 +244,7 @@ class ProgramDetailScreen extends StatelessWidget {
                 _pad(Row(children: [
                   Text('★ ${p.rating}', style: pvBody(kCoral, 15).copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(width: 8),
-                  Text(p.reviewsLabel, style: pvBody(kMuted, 13)),
+                  Text(p.reviewsLabel.now, style: pvBody(kMuted, 13)),
                 ])),
                 const SizedBox(height: 12),
                 _pad(Container(
@@ -250,7 +254,7 @@ class ProgramDetailScreen extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('★★★★★', style: TextStyle(color: kCoral, fontSize: 13)),
                     const SizedBox(height: 10),
-                    Text(review.quote, style: pvBody(kInk, 15).copyWith(height: 1.55)),
+                    Text(review.quote.now, style: pvBody(kInk, 15).copyWith(height: 1.55)),
                     const SizedBox(height: 10),
                     Text.rich(TextSpan(children: [
                       TextSpan(text: '${review.who} ', style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 13)),
@@ -261,7 +265,7 @@ class ProgramDetailScreen extends StatelessWidget {
               ],
 
               const SizedBox(height: 20),
-              _pad(Text('Led by a verified expert. ${p.priceNote[0].toUpperCase()}${p.priceNote.substring(1)}.',
+              _pad(Text('Led by a verified expert. ${p.priceNote.now[0].toUpperCase()}${p.priceNote.now.substring(1)}.',
                   textAlign: TextAlign.center, style: pvBody(kMuted, 12).copyWith(height: 1.55))),
             ],
           ),
@@ -300,7 +304,7 @@ class ProgramDetailScreen extends StatelessWidget {
 
   Widget _lessonRow(BuildContext context, PrepLesson l, {bool first = false, required Color accent}) =>
       GestureDetector(
-        onTap: () => _play(context, l.title, subtitle: '${l.minutes} min'),
+        onTap: () => _play(context, l.title.now, subtitle: '${l.minutes} min'),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -318,7 +322,7 @@ class ProgramDetailScreen extends StatelessWidget {
             const SizedBox(width: 13),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(l.title, style: pvBody(kInk, 14).copyWith(fontWeight: FontWeight.w600),
+                Text(l.title.now, style: pvBody(kInk, 14).copyWith(fontWeight: FontWeight.w600),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
                 Text(l.locked ? '${l.minutes} min · unlocks later, open anyway' : '${l.minutes} min',
@@ -335,13 +339,13 @@ class ProgramDetailScreen extends StatelessWidget {
         decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(20)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            pvEyebrow(s.label, color: a),
+            pvEyebrow(s.label.now, color: a),
             const Spacer(),
-            if (s.when.isNotEmpty) ...[
+            if (s.when.en.isNotEmpty) ...[
               const Icon(Icons.schedule_rounded, size: 14, color: kSoft),
               const SizedBox(width: 5),
               Flexible(
-                  child: Text(s.when,
+                  child: Text(s.when.now,
                       textAlign: TextAlign.right,
                       style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w600),
                       maxLines: 1,
@@ -349,7 +353,7 @@ class ProgramDetailScreen extends StatelessWidget {
             ],
           ]),
           const SizedBox(height: 8),
-          Text(s.title, style: pvTitleStyle(16)),
+          Text(s.title.now, style: pvTitleStyle(16)),
           if (s.points.isNotEmpty) const SizedBox(height: 10),
           for (final t in s.points)
             Padding(
@@ -361,7 +365,7 @@ class ProgramDetailScreen extends StatelessWidget {
                     height: 5,
                     decoration: BoxDecoration(color: a, shape: BoxShape.circle)),
                 const SizedBox(width: 11),
-                Expanded(child: Text(t, style: pvBody(kInk, 13).copyWith(height: 1.5))),
+                Expanded(child: Text(t.now, style: pvBody(kInk, 13).copyWith(height: 1.5))),
               ]),
             ),
         ]),
@@ -393,7 +397,7 @@ class ProgramDetailScreen extends StatelessWidget {
               if (cta.note != null && !showBooked)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(cta.note!,
+                  child: Text(cta.note!.now,
                       textAlign: TextAlign.center,
                       style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w600),
                       maxLines: 1,
@@ -403,7 +407,7 @@ class ProgramDetailScreen extends StatelessWidget {
                 Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(cta.watch ? 'Included' : program.price,
                       style: pvBody(kInk, 16).copyWith(fontWeight: FontWeight.w700)),
-                  Text(cta.watch ? 'on ParentVeda+' : program.priceNote,
+                  Text(cta.watch ? 'on ParentVeda+' : program.priceNote.now,
                       style: pvBody(kPurple, 11).copyWith(fontWeight: FontWeight.w600)),
                 ]),
                 const SizedBox(width: 14),
@@ -437,7 +441,7 @@ class ProgramDetailScreen extends StatelessWidget {
                                     const SizedBox(width: 7),
                                   ],
                                   Flexible(
-                                    child: Text(cta.label,
+                                    child: Text(cta.label.now,
                                         style: pvManrope(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,

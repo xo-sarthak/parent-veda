@@ -53,8 +53,14 @@ def main():
         head, block, tail = src[:span[0]], src[span[0]:span[1]], src[span[1]:]
 
         before = block
+        # Nullable first: `String? x` must not be matched by the `String x`
+        # pattern, which would leave a stray `?` behind.
+        block = re.sub(r'\bfinal String\? (' + re.escape(field) + r');',
+                       r'final LocalizedText? \1;', block)
         block = re.sub(r'\bfinal String (' + re.escape(field) + r');',
                        r'final LocalizedText \1;', block)
+        block = re.sub(r'\bfinal List<String>\? (' + re.escape(field) + r');',
+                       r'final List<LocalizedText>? \1;', block)
         block = re.sub(r'\bfinal List<String> (' + re.escape(field) + r');',
                        r'final List<LocalizedText> \1;', block)
         block = block.replace(
