@@ -1,0 +1,17 @@
+# lib/data/journey_milestones.dart - leftovers glossary
+#
+# NOTHING OUTSTANDING. All 195 pairs are translated; the scanner finds 0 loose
+# literals.
+#
+# The 19 pairs that still mirror English are:
+#   * 14 CardSection labels that are deliberately EMPTY ('' / '') - the
+#     achievement and pvJourney cards show body prose with no heading.
+#   * 5 milestone titles that are the clinic's own name for the appointment,
+#     kept Latin to match what is already shipped:
+#       NT Scan, Anomaly Scan          -> identical rows in g_tests_scans.tsv
+#       Glucose Screening, Group B Strep Test
+#       Kegel Care                     -> app_language.dart kegelToolTitle is
+#                                         _p('Kegel Care', 'Kegel Care')
+#     The file's own pattern confirms this: the TITLE stays the clinic's name
+#     ('Growth Scan (if advised)' -> 'Growth Scan (अगर सलाह हो)' - only the
+#     English adjunct moved), while the PROSE says स्कैन in Devanagari.

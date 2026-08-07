@@ -1,0 +1,13 @@
+# lib/data/symptom_data.dart - leftovers glossary
+#
+# NOTHING OUTSTANDING. Every LocalizedText in this file has a Devanagari hi.
+#
+# The 6 pairs that still mirror English are:
+#   * 5 `why:` fields deliberately left EMPTY ('' / '') on the urgent symptoms -
+#     an urgent card shows commonness + doctorGuidance only, no "why it happens".
+#   * name: LocalizedText(en: 'Braxton Hicks', hi: 'Braxton Hicks') - CLAUDE.md
+#     rule 3 names Braxton Hicks explicitly as a stays-Latin term.
+#
+# The 25 literals flagged with "no Hindi slot" are `keywords:` search synonyms
+# (lowercase English + Hinglish, e.g. 'kamar dard', 'achaanak soojan') and the
+# enum-shaped ids ('backPain', 'legCramps', 'braxtonHicks'). Not copy.

@@ -697,6 +697,8 @@ class _SessionScreen extends StatefulWidget {
 
 class _SessionScreenState extends State<_SessionScreen>
     with SingleTickerProviderStateMixin {
+  S get _s => S(widget.controller.language);
+
   late final AnimationController _ctrl;
   final FlutterTts _tts = FlutterTts();
   bool _holding = true; // hold phase vs relax
@@ -737,7 +739,17 @@ class _SessionScreenState extends State<_SessionScreen>
       await _tts.setPitch(1.0);
       await _tts.setSpeechRate(0.5);
       await _tts.setVolume(1.0);
-      await _tts.setLanguage('en-IN');
+      // Follow the reading language, with an English fallback if the
+      // device has no Hindi voice pack - the same shape the
+      // contraction timer already uses. Hardcoding en-IN meant a
+      // screen that is entirely Devanagari still counted her
+      // through the exercise in English.
+      try {
+        await _tts.setLanguage(
+            widget.controller.language.isHindi ? 'hi-IN' : 'en-IN');
+      } catch (_) {
+        await _tts.setLanguage('en-IN');
+      }
     } catch (_) {/* audio is an enhancement, never fatal */}
   }
 
@@ -753,7 +765,7 @@ class _SessionScreenState extends State<_SessionScreen>
     _ctrl.duration = Duration(seconds: _phaseSeconds);
     _ctrl.forward(from: 0);
     HapticFeedback.lightImpact();
-    _speak(_holding ? 'Hold' : 'Relax');
+    _speak(_holding ? _s.holdLabel : _s.relaxLabel);
   }
 
   void _onStatus(AnimationStatus status) {

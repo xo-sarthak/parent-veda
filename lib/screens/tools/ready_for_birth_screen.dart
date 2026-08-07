@@ -1094,7 +1094,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
           openProductWithGuideCheck(
             context,
             id: p.id,
-            name: p.name,
+            name: p.name.now,
             onOpenNormal: () => openOutbound(p.link, productId: p.id),
           );
         }
@@ -1129,7 +1129,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                     Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
                   else if (p.topPick)
                     Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
-                  Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name.now, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                 ]),

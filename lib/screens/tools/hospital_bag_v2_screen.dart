@@ -958,7 +958,7 @@ class _ProductExperience extends StatelessWidget {
           Text(p.emoji, style: const TextStyle(fontSize: 30)),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(p.name,
+            child: Text(p.name.now,
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
           ),
         ]),
@@ -987,7 +987,7 @@ class _ProductExperience extends StatelessWidget {
               _choose(context, item, p);
               showSingleBuyNow(context, controller,
                   productId: p.id,
-                  name: p.name,
+                  name: p.name.now,
                   emoji: p.emoji,
                   unitPrice: p.price.toDouble(),
                   title: s.hb2v2Title);
@@ -1083,7 +1083,7 @@ class _ProductExperience extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(p.isAffiliate ? '${p.store} 🔗' : p.name,
+              Text(p.isAffiliate ? '${p.store} 🔗' : p.name.now,
                   style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
               Text('₹${p.price}',
                   style: text.labelMedium?.copyWith(color: AppTheme.neutral600)),

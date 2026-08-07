@@ -68,9 +68,9 @@ final List<_Organ> _organs = [
     onset: 5,
     mature: 20,
     words: [
-      _Word(0.0, 'Forming', 'Ban raha'),
-      _Word(0.55, 'Beating', 'Dhadak raha'),
-      _Word(0.95, 'Strong', 'Mazboot'),
+      _Word(0.0, 'Forming', 'बनना शुरू'),
+      _Word(0.55, 'Beating', 'धड़क रहा है'),
+      _Word(0.95, 'Strong', 'मज़बूत'),
       _Word(1.0, '100%', '100%'),
     ],
   ),
@@ -79,10 +79,10 @@ final List<_Organ> _organs = [
     onset: 4,
     mature: 40,
     words: [
-      _Word(0.0, 'Forming', 'Ban raha'),
-      _Word(0.65, 'Still developing', 'Abhi vikas ho raha'),
-      _Word(0.9, 'Maturing', 'Pak raha'),
-      _Word(1.0, 'Highly active', 'Bahut sakriya'),
+      _Word(0.0, 'Forming', 'बनना शुरू'),
+      _Word(0.65, 'Still developing', 'अभी विकास जारी'),
+      _Word(0.9, 'Maturing', 'लगभग तैयार'),
+      _Word(1.0, 'Highly active', 'बहुत सक्रिय'),
     ],
   ),
   _Organ(
@@ -90,10 +90,10 @@ final List<_Organ> _organs = [
     onset: 10,
     mature: 38,
     words: [
-      _Word(0.0, 'Not yet', 'Abhi nahi'),
-      _Word(0.3, 'Developing', 'Vikas ho rahe'),
-      _Word(0.85, 'Maturing', 'Pak rahe'),
-      _Word(1.0, 'Ready', 'Taiyaar'),
+      _Word(0.0, 'Not yet', 'अभी नहीं'),
+      _Word(0.3, 'Developing', 'विकास जारी'),
+      _Word(0.85, 'Maturing', 'लगभग तैयार'),
+      _Word(1.0, 'Ready', 'तैयार'),
     ],
   ),
   _Organ(
@@ -101,10 +101,10 @@ final List<_Organ> _organs = [
     onset: 6,
     mature: 38,
     words: [
-      _Word(0.0, 'Cartilage', 'Naram haddi'),
-      _Word(0.4, 'Hardening', 'Sakht ho rahi'),
-      _Word(0.9, 'Strengthening', 'Mazboot ho rahi'),
-      _Word(1.0, 'Strong', 'Mazboot'),
+      _Word(0.0, 'Cartilage', 'नरम हड्डी'),
+      _Word(0.4, 'Hardening', 'सख़्त हो रही'),
+      _Word(0.9, 'Strengthening', 'मज़बूत हो रही'),
+      _Word(1.0, 'Strong', 'मज़बूत'),
     ],
   ),
   _Organ(
@@ -112,10 +112,10 @@ final List<_Organ> _organs = [
     onset: 16,
     mature: 26,
     words: [
-      _Word(0.0, 'Not yet', 'Abhi nahi'),
-      _Word(0.4, 'Forming', 'Ban raha'),
-      _Word(0.9, 'Active', 'Sakriya'),
-      _Word(1.0, 'Sharp', 'Tez'),
+      _Word(0.0, 'Not yet', 'अभी नहीं'),
+      _Word(0.4, 'Forming', 'बनना शुरू'),
+      _Word(0.9, 'Active', 'सक्रिय'),
+      _Word(1.0, 'Sharp', 'तेज़'),
     ],
   ),
   _Organ(
@@ -123,10 +123,10 @@ final List<_Organ> _organs = [
     onset: 16,
     mature: 34,
     words: [
-      _Word(0.0, 'Not yet', 'Abhi nahi'),
-      _Word(0.55, 'Developing', 'Vikas ho rahi'),
-      _Word(0.9, 'Eyes opening', 'Aankhein khul rahi'),
-      _Word(1.0, 'Focusing', 'Focus kar raha'),
+      _Word(0.0, 'Not yet', 'अभी नहीं'),
+      _Word(0.55, 'Developing', 'विकास जारी'),
+      _Word(0.9, 'Eyes opening', 'आँखें खुल रही हैं'),
+      _Word(1.0, 'Focusing', 'नज़र टिक रही'),
     ],
   ),
   _Organ(
@@ -134,10 +134,10 @@ final List<_Organ> _organs = [
     onset: 7,
     mature: 34,
     words: [
-      _Word(0.0, 'Forming', 'Ban rahi'),
-      _Word(0.7, 'Growing', 'Badh rahi'),
-      _Word(0.92, 'Strengthening', 'Mazboot ho rahi'),
-      _Word(1.0, 'Strong', 'Mazboot'),
+      _Word(0.0, 'Forming', 'बनना शुरू'),
+      _Word(0.7, 'Growing', 'बढ़ रही'),
+      _Word(0.92, 'Strengthening', 'मज़बूत हो रही'),
+      _Word(1.0, 'Strong', 'मज़बूत'),
     ],
   ),
   _Organ(
@@ -145,10 +145,10 @@ final List<_Organ> _organs = [
     onset: 12,
     mature: 40,
     words: [
-      _Word(0.0, 'Not yet', 'Abhi nahi'),
-      _Word(0.6, 'Developing', 'Vikas ho raha'),
-      _Word(0.9, 'Building', 'Ban raha'),
-      _Word(1.0, 'Ready', 'Taiyaar'),
+      _Word(0.0, 'Not yet', 'अभी नहीं'),
+      _Word(0.6, 'Developing', 'विकास जारी'),
+      _Word(0.9, 'Building', 'बनता जा रहा'),
+      _Word(1.0, 'Ready', 'तैयार'),
     ],
   ),
 ];

@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
+import '../localization/app_language.dart';
 
 /// The badge a pick carries (🏆 Best Overall, 💰 Best Budget, …).
 enum ProductBadge { bestOverall, bestBudget, bestPremium, sensitiveSkin, newborns, none }
@@ -23,11 +24,11 @@ class ProductReview {
     required this.watchOut,
     this.wouldBuyAgain = true,
   });
-  final String author;
-  final String role; // "Mother of Aarav", "First-time mother"
-  final String usedDuring; // "Week 22 → Delivery"
-  final String liked;
-  final String watchOut;
+  final LocalizedText author;
+  final LocalizedText role; // "Mother of Aarav", "First-time mother"
+  final LocalizedText usedDuring; // "Week 22 → Delivery"
+  final LocalizedText liked;
+  final LocalizedText watchOut;
   final bool wouldBuyAgain;
 }
 
@@ -39,9 +40,9 @@ class ReviewSummary {
     required this.drawback,
     required this.wouldBuyAgainPct,
   });
-  final String mostLoved;
-  final String praise;
-  final String drawback;
+  final LocalizedText mostLoved;
+  final LocalizedText praise;
+  final LocalizedText drawback;
   final int wouldBuyAgainPct;
 }
 
@@ -66,7 +67,7 @@ class Product {
   });
   final String id;
   final String categoryId;
-  final String name;
+  final LocalizedText name;
   final String emoji;
   // Affiliate product (sold elsewhere, e.g. Amazon) → Buy opens the external
   // site, NO in-app cart. ParentVeda products (false) get Add-to-cart + Buy now.
@@ -74,13 +75,13 @@ class Product {
   // Real product photo URL. Empty → callers fall back to a stable placeholder
   // photo (see productImageUrl) or the emoji.
   final String imageUrl;
-  final String summary; // one line
-  final String bestFor; // "Most mothers"
+  final LocalizedText summary; // one line
+  final LocalizedText bestFor; // "Most mothers"
   final String price; // "₹1,899"
   final ProductBadge badge;
   final double score; // ParentVeda Score, x/10
-  final List<String> why; // ✓ up to 3
-  final List<String> consider; // • up to 2
+  final List<LocalizedText> why; // ✓ up to 3
+  final List<LocalizedText> consider; // • up to 2
   final ReviewSummary? reviewSummary;
   final List<ProductReview> reviews;
 }
@@ -99,17 +100,21 @@ class ProductCategory {
     required this.totalCount,
   });
   final String id;
-  final String name;
+  final LocalizedText name;
   final String emoji;
-  final String guidance; // one-line decision help
-  final List<String> lookFor; // ✓
-  final List<String> avoid; // ✗
+  final LocalizedText guidance; // one-line decision help
+  final List<LocalizedText> lookFor; // ✓
+  final List<LocalizedText> avoid; // ✗
   final int fromWeek; // start of "useful during"
-  final String toLabel; // "Birth" / "Postpartum"
+  final LocalizedText toLabel; // "Birth" / "Postpartum"
   final int totalCount; // "Browse all 18"
 
   /// Numeric end week for the relevance timeline.
-  int get toWeek => toLabel == 'Postpartum' ? 44 : 40;
+  // .en: a comparison, not display. Once toLabel widened this read
+  // `LocalizedText == String`, which is always false - so every postpartum
+  // category quietly ended at week 40 instead of 44. The analyzer reported
+  // it as an INFO, not an error, so nothing would have stopped it shipping.
+  int get toWeek => toLabel.en == 'Postpartum' ? 44 : 40;
 
   /// Is this category relevant at [week]?
   bool relevantAt(int week) => week >= fromWeek - 2 && week <= toWeek;

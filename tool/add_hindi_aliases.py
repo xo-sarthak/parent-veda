@@ -23,7 +23,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from apply_glossary import comment_spans, in_any, literal, load  # noqa: E402
 
-ALIASES = re.compile(r"aliases: \[([^\]]*)\]")
+# `aliases:` in can_i/report_findings, `keywords:` in veda_showcase and
+# symptom_data - the same thing under two names, both matched with
+# contains() and never rendered.
+ALIASES = re.compile(r"(?:aliases|keywords): \[([^\]]*)\]")
 LIT = re.compile(r"(['\"])((?:\\.|(?!\1).)*?)\1")
 
 
@@ -60,7 +63,7 @@ def main():
         if not extra:
             return m.group(0)
         added += len(extra)
-        return ('aliases: [' + body.rstrip().rstrip(',') + ', '
+        return (m.group(0).split('[')[0] + '[' + body.rstrip().rstrip(',') + ', '
                 + ', '.join(literal(h) for h in extra) + ']')
 
     out = ALIASES.sub(one, src)

@@ -1,0 +1,16 @@
+# lib/data/hospital_bag_catalog.dart - leftovers glossary
+# 2 rows. Both are plain `String name` on BagProduct, so applying these needs
+# the field widened to LocalizedText - and note _valueName() does prefix surgery
+# on that same string ('ParentVeda ' -> 'Everyday '), so that read site has to
+# be hand-fixed rather than folded.
+#
+# NOT translated, deliberately:
+#   * The ~35 product brand names ('ParentVeda Birthing Gown', 'ParentVeda
+#     Muslin Swaddle', …). Brand names stay Latin - the shipped g_product.tsv
+#     mirrors 'ComfyBump Full-Body Pillow', 'VedaGlow Belly Butter' etc. for the
+#     same reason, and 'Everyday <Brand>' is derived from them by string surgery.
+#   * Store names 'Amazon' / 'FirstCry'.
+#   * 'Best Overall' - already in the string table as hbBestOverall
+#     ('Best Overall', 'सबसे बेहतर'); this file's occurrences are comments.
+ParentVeda pick	ParentVeda की पसंद
+# dropped: its siblings (Everyday Birthing Gown) stay Latin, and _valueName never reaches it

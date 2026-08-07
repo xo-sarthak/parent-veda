@@ -3874,7 +3874,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('HOW TO SHOW UP',
+                          Text(S.now.uiHowShowUp,
                               style: pvManrope(
                                   fontSize: 11,
                                   letterSpacing: 0.4,
@@ -4139,7 +4139,7 @@ Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
                 decoration: BoxDecoration(
                     color: AppTheme.secondary500,
                     borderRadius: BorderRadius.circular(99)),
-                child: const Text('NEW',
+                child: Text(S.now.uiNew,
                     style: TextStyle(
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,

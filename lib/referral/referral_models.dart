@@ -204,13 +204,21 @@ class ReferralConfig {
     this.inviterReward = const RewardSpec(
       kind: RewardKind.consultCredit,
       value: 1,
-      label: '1 free consultation',
+      // A literal, not S.now.uiFreeConsultation: this is a const DEFAULT
+      // parameter value, and a getter can never be a constant expression.
+      // Localising it means giving RewardSpec a LocalizedText label and
+      // resolving at the render site - a real change, not a lift.
+      label: 'Free consultation',
       description: 'Yours when a friend joins and finishes setting up.',
     ),
     this.inviteeReward = const RewardSpec(
       kind: RewardKind.consultCredit,
       value: 1,
-      label: '1 free consultation',
+      // A literal, not S.now.uiFreeConsultation: this is a const DEFAULT
+      // parameter value, and a getter can never be a constant expression.
+      // Localising it means giving RewardSpec a LocalizedText label and
+      // resolving at the render site - a real change, not a lift.
+      label: 'Free consultation',
       description: 'A welcome gift for joining through a friend.',
     ),
     this.rules = const QualificationRules(),

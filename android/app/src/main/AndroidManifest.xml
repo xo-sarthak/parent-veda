@@ -130,5 +130,21 @@
         <intent>
             <action android:name="android.speech.RecognitionService"/>
         </intent>
+        <!--
+            Android 11+ package visibility for TEXT-TO-SPEECH engines.
+
+            Without this the app cannot see any TTS engine package, so
+            isLanguageAvailable('hi-IN') cannot answer truthfully even when a
+            Hindi voice pack IS installed - and a missing pack fails SILENTLY
+            rather than throwing, so a try/catch around setLanguage never runs.
+
+            This is what makes it possible to tell a mother her phone has no
+            Hindi voice, instead of playing nothing and leaving her to guess.
+            The sibling entry above covers speech-to-text; this one was simply
+            never added.
+        -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE"/>
+        </intent>
     </queries>
 </manifest>

@@ -149,7 +149,16 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       if (_scroll.hasClients) _scroll.jumpTo(0);
     });
 
-    final res = await AskVedaService.ask(t, week: p.currentWeek);
+    // lang is a two-repo contract: the service uses it to pick which
+    // language's content cards to return. Omitting it meant a mother
+    // reading the whole app in Hindi was never TOLD to be reading Hindi,
+    // so Ask Veda answered her in English. The TTC screen already passed
+    // it; this one did not.
+    final res = await AskVedaService.ask(
+      t,
+      week: p.currentWeek,
+      lang: p.language.isHindi ? 'hi' : 'en',
+    );
     if (!mounted || _query != t) return; // ignore stale / superseded replies
     setState(() {
       _loading = false;
@@ -1598,7 +1607,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Product? _matchProduct(String label) {
     final l = label.toLowerCase();
     for (final pr in kProducts) {
-      final n = pr.name.toLowerCase();
+      final n = pr.name.now.toLowerCase();
       if (l.contains(n) || n.contains(l)) return pr;
     }
     return null;
@@ -1635,7 +1644,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(11, 11, 13, 13),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(prod?.name ?? label.of(lang),
+            Text(prod?.name.of(lang) ?? label.of(lang),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: pvManrope(

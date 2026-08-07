@@ -65,6 +65,25 @@ def covered(src):
     return spans
 
 
+def hollow_pairs(src):
+    """Pairs that HAVE a Hindi half which contains no Devanagari.
+
+    The column this audit was missing, and the one that matters most. A pair
+    is not finished because it exists: week5_full_data.dart carries 67 perfectly
+    well-formed `_t(english, hinglish)` pairs whose second half is Latin-script
+    Hinglish - the house style dropped on 2026-08-03. Every pair-counting audit
+    called that file done, including this one until now.
+    """
+    n = 0
+    for start, end, args in calls(src, '_t('):
+        if len(args) != 2:
+            continue
+        hi = src[args[1][0]:args[1][1]]
+        if not DEV.search(hi) and re.search(r'[A-Za-z]{3}', hi):
+            n += 1
+    return n
+
+
 def main():
     files = sorted(glob.glob('lib/data/*.dart')) \
         + sorted(glob.glob('lib/data/father/*.dart'))
@@ -76,18 +95,20 @@ def main():
                  if not skip(t)
                  and not any(a <= s and e <= b for a, b in spans)]
         owed = src.count('_en(') - (1 if '_en(String s)' in src else 0)
-        if not loose and not owed and not DEV.search(src):
+        hollow = hollow_pairs(src)
+        if not loose and not owed and not hollow and not DEV.search(src):
             continue
-        rows.append((os.path.basename(path)[:-5], len(loose), owed))
+        rows.append((os.path.basename(path)[:-5], len(loose), owed, hollow))
 
-    print(f'{"file":<34}{"no twin":>9}{"_en() owed":>12}')
-    print('-' * 55)
-    for name, loose, owed in sorted(rows, key=lambda r: -r[1]):
-        if loose or owed:
-            print(f'{name:<34}{loose:>9}{owed:>12}')
-    print('-' * 55)
-    print(f'{"TOTAL":<34}{sum(r[1] for r in rows):>9}'
-          f'{sum(r[2] for r in rows):>12}')
+    print(f'{"file":<32}{"no twin":>9}{"_en()":>7}{"hollow pair":>13}')
+    print('-' * 61)
+    for name, loose, owed, hollow in sorted(rows,
+                                            key=lambda r: -(r[1] + r[3])):
+        if loose or owed or hollow:
+            print(f'{name:<32}{loose:>9}{owed:>7}{hollow:>13}')
+    print('-' * 61)
+    print(f'{"TOTAL":<32}{sum(r[1] for r in rows):>9}'
+          f'{sum(r[2] for r in rows):>7}{sum(r[3] for r in rows):>13}')
 
 
 if __name__ == '__main__':

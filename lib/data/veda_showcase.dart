@@ -58,8 +58,7 @@ const List<VedaShowcase> kVedaShowcase = [
       'scan timing',
       // Hinglish
       'anomaly scan kab',
-      'scan kab hona',
-    ],
+      'scan kab hona', '20 हफ्ते का स्कैन', 'गर्भावस्था के बीच का स्कैन', 'स्कैन कब', 'स्कैन कब होता है', 'स्कैन कब कराना है'],
     answer: LocalizedText(
       en: "Your anomaly scan (the '20-week scan') is usually done between 18 and 21 weeks. It's a detailed ~30-minute ultrasound that checks your baby's growth and looks closely at the brain, heart, spine, face, kidneys and other organs, plus the placenta. It's offered to everyone, and it's your choice.",
       hi: "आपका anomaly scan (जिसे '20-week scan' कहते हैं) आम तौर पर 18 से 21 हफ़्ते के बीच होता है। यह एक विस्तृत ~30 मिनट का अल्ट्रासाउंड है जो शिशु की बढ़त देखता है और दिमाग़, दिल, रीढ़, चेहरा, kidney और दूसरे अंगों के साथ placenta को ग़ौर से जाँचता है। यह सबको दिया जाता है, और यह आपकी मर्ज़ी है।",
@@ -123,8 +122,7 @@ const List<VedaShowcase> kVedaShowcase = [
       'labour shuru',
       'labour ke signs',
       'labour kab',
-      'delivery ke signs',
-    ],
+      'delivery ke signs', 'लेबर के लक्षण', 'प्रसव के लक्षण', 'संकुचन शुरू', 'क्या मेरा लेबर शुरू हो गया', 'अस्पताल कब जाना है', 'लेबर शुरू', 'प्रसव शुरू होने के संकेत', 'लेबर कब', 'डिलीवरी के लक्षण'],
     answer: LocalizedText(
       en: "Common early signs of labour: a 'show' (a pinkish, jelly-like plug of mucus), contractions that get longer, stronger and closer together, backache or a heavy period-like ache, and your waters breaking (a trickle or a gush). Practice 'Braxton Hicks' tightenings are usually painless, irregular and don't build up.",
       hi: "प्रसव के आम शुरुआती संकेत: एक 'show' (गुलाबी, जेली जैसा mucus plug), संकुचन जो लंबे, तेज़ और पास-पास होते जाते हैं, कमर दर्द या भारी पीरियड जैसा दर्द, और पानी का टूटना (धीरे या एकदम)। अभ्यास वाले 'Braxton Hicks' कसाव आम तौर पर दर्द-रहित, अनियमित होते हैं और बढ़ते नहीं।",
@@ -188,8 +186,7 @@ const List<VedaShowcase> kVedaShowcase = [
       // Hinglish
       'iron badhane',
       'iron wale food',
-      'khoon ki kami',
-    ],
+      'khoon ki kami', 'आयरन वाला खाना', 'आयरन की कमी', 'आयरन बढ़ाना', 'आयरन कैसे बढ़ाएँ', 'आयरन वाली चीजें', 'खून की कमी'],
     answer: LocalizedText(
       en: "In pregnancy you need about 27 mg of iron a day. Iron-rich foods include lean red meat, chicken, fish, eggs, lentils, beans, chickpeas, tofu, dark leafy greens like spinach, and iron-fortified cereals. Pair them with vitamin C (orange, lemon, tomato, bell pepper, amla) to absorb more iron - and keep tea/coffee away from mealtimes, as they reduce absorption.",
       hi: "गर्भावस्था में आपको रोज़ लगभग 27 mg Iron चाहिए। Iron से भरपूर खानों में हैं: lean red meat, चिकन, मछली, अंडे, दाल, बीन्स, छोले, tofu, गहरी हरी सब्ज़ियाँ जैसे पालक, और Iron-fortified cereals। इन्हें Vitamin C (संतरा, नींबू, टमाटर, शिमला मिर्च, आँवला) के साथ खाइए ताकि Iron ज़्यादा सोखा जाए — और चाय/कॉफ़ी को खाने के समय से दूर रखिए, क्योंकि वे सोखना कम करते हैं।",
@@ -249,8 +246,7 @@ const List<VedaShowcase> kVedaShowcase = [
       'peeth ke bal',
       'peeth ke bal sona',
       'kis karwat sona',
-      'kis taraf sona',
-    ],
+      'kis taraf sona', 'पीठ के बल सोना', 'सोने की मुद्रा', 'सोने का तरीका', 'सीधा लेटकर सोना', 'कौन सी करवट सही है', 'करवट लेकर सोना', 'पीठ के बल', 'कमर के बल सोना', 'किस करवट सोना', 'किस तरफ सोना'],
     answer: LocalizedText(
       en: "Up to about 28 weeks, back-sleeping is generally fine. From 28 weeks (third trimester), the advice is to GO TO SLEEP ON YOUR SIDE - research links going to sleep on your back in the third trimester with a higher stillbirth risk, because the womb can press on a major blood vessel and reduce blood flow to your baby. Either side is fine. If you wake up on your back, don't panic - just roll onto your side.",
       hi: "लगभग 28 हफ़्ते तक, पीठ के बल सोना आम तौर पर ठीक है। 28 हफ़्ते से (तीसरी तिमाही), सलाह है कि करवट लेकर सोइए — शोध तीसरी तिमाही में पीठ के बल सोने को ज़्यादा stillbirth ख़तरे से जोड़ता है, क्योंकि गर्भ एक बड़ी blood vessel पर दबाव डाल सकता है और शिशु तक ख़ून का बहाव कम कर सकता है। कोई भी करवट ठीक है। अगर आप पीठ के बल जाग जाएँ, तो घबराइए मत — बस करवट ले लीजिए।",
@@ -306,8 +302,7 @@ const List<VedaShowcase> kVedaShowcase = [
       'kam move',
       'baby kam move',
       'kam hil',
-      'movement kam',
-    ],
+      'movement kam', 'शिशु कम हिल रहा है', 'हलचल कम होना', 'कम हलचल', 'शिशु हिल नहीं रहा', 'लातें कम', 'शिशु की हलचल कम', 'कम हिलना', 'बच्चा कम हिल रहा', 'कम हिल', 'हलचल कम'],
     answer: LocalizedText(
       en: "If your baby is moving less than usual, contact your maternity unit straight away - do not wait, even in the middle of the night. Reduced movements can be an important sign that needs checking. Do NOT rely on cold drinks, sugar or home tricks to make baby move - get checked.",
       hi: "अगर आपका शिशु आम से कम हिल रहा है, तो तुरंत अपनी मैटरनिटी यूनिट से संपर्क कीजिए — रुकिए मत, चाहे आधी रात हो। कम हलचल एक ज़रूरी संकेत हो सकता है जिसे जाँचना ज़रूरी है। शिशु को हिलाने के लिए ठंडे पेय, चीनी या घरेलू नुस्ख़ों पर भरोसा मत कीजिए — जाकर जाँच करवाइए।",

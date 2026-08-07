@@ -46,3 +46,13 @@ ${a.id} ${a.title} ${a.subtitle}	ragaTimeBadge hint, matched against English
 # ---- prepare_data.dart, interpolation-only -----------------------------------
 ${m.facts[1].big} · ${m.facts[1].small}	pure interpolation, no prose
 ${m.facts.first.big} ${m.facts.first.small}	pure interpolation, no prose
+#
+# ---- hospital_bag_catalog.dart -----------------------------------------------
+ParentVeda 	brand PREFIX; _valueName() does startsWith/replaceFirst on it
+Amazon	compared with store == 'Amazon' to pick the affiliate URL
+FirstCry	store id, compared not rendered
+${itemId}_pv	composed product id
+${itemId}_value	composed product id
+${itemId}_$key	composed product id
+Evening	ragaTimeBadge return token, compared with ==
+Morning	ragaTimeBadge return token, compared with ==

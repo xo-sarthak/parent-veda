@@ -52,31 +52,47 @@ class BagRecommendation {
   });
 
   /// e.g. "Best Overall".
-  final String? title;
+  final LocalizedText? title;
 
   /// ParentVeda price in ₹ (null = no price shown).
   final int? price;
 
   /// "Why ParentVeda recommends this" - max 3.
-  final List<String> why;
+  final List<LocalizedText> why;
 
   /// "Things to consider".
-  final List<String> consider;
+  final List<LocalizedText> consider;
+
+  // BOTH halves are persisted, matching how BagItem.name already stores itself.
+  //
+  // This is not optional tidiness. LocalizedText.toString() returns `.now`, so
+  // the old `map((e) => e.toString())` would have written whichever language
+  // happened to be on screen at save time and thrown the other away - silently,
+  // permanently, and differently depending on when the row was written.
+  // A store must never resolve language; it caches every column the model
+  // holds, both languages, and lets the screen choose.
+  static Map<String, String> _pair(LocalizedText t) => {'en': t.en, 'hi': t.hi};
 
   Map<String, dynamic> toJson() => {
-        'title': title,
+        'title': title == null ? null : _pair(title!),
         'price': price,
-        'why': why,
-        'consider': consider,
+        'why': why.map(_pair).toList(),
+        'consider': consider.map(_pair).toList(),
       };
 
   factory BagRecommendation.fromJson(Map<String, dynamic> j) =>
       BagRecommendation(
-        title: j['title']?.toString(),
+        // LocalizedText.fromJson already accepts a bare string, so rows written
+        // before this change - which hold plain English - still load, with the
+        // English standing in for both halves rather than orphaning the item.
+        title: j['title'] == null ? null : LocalizedText.fromJson(j['title']),
         price: (j['price'] as num?)?.toInt(),
-        why: ((j['why'] as List?) ?? []).map((e) => e.toString()).toList(),
-        consider:
-            ((j['consider'] as List?) ?? []).map((e) => e.toString()).toList(),
+        why: ((j['why'] as List?) ?? [])
+            .map(LocalizedText.fromJson)
+            .toList(),
+        consider: ((j['consider'] as List?) ?? [])
+            .map(LocalizedText.fromJson)
+            .toList(),
       );
 }
 

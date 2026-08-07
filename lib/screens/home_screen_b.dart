@@ -942,7 +942,7 @@ class HomeScreenB extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(p.name,
+                  Text(p.name.now,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: text.titleSmall?.copyWith(
@@ -992,7 +992,7 @@ class HomeScreenB extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p.name,
+                    Text(p.name.now,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: text.titleSmall?.copyWith(
@@ -1006,7 +1006,7 @@ class HomeScreenB extends StatelessWidget {
                               color: AppTheme.primary600)),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(p.summary,
+                        child: Text(p.summary.now,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: text.labelSmall
@@ -1080,7 +1080,7 @@ class HomeScreenB extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
               child:
                   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p.name,
+                Text(p.name.now,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: pvJakarta(

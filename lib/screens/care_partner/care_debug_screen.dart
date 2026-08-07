@@ -173,7 +173,7 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
                 controller: _token,
                 textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
-                  hintText: 'KM7QX2PDVR',
+                  hintText: S.now.uiKmQxPdvr,
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(

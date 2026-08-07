@@ -1,0 +1,17 @@
+# lib/data/report_findings_data.dart - leftovers glossary
+#
+# NOTHING OUTSTANDING. Every user-visible string in this file already sits in a
+# _t(en, hi) pair whose Hindi side is Devanagari.
+#
+# The 14 pairs that still mirror English are all `altName` / `name` fields
+# holding the term printed verbatim on her report, which the register keeps
+# Latin on purpose (CLAUDE.md rule 3):
+#   Placenta Previa, Nuchal Cord, GDM, Oligohydramnios, Preeclampsia,
+#   Polyhydramnios, Gestational Hypertension, SGA, LGA, Subchorionic Hematoma,
+#   Two-Vessel Cord, EIF, Group B Strep, GBS
+# Where the alt name carried an everyday word, the file already translated it
+# ('Breech Baby' -> 'Breech शिशु', 'Rh Negative Blood' -> 'Rh Negative ख़ून').
+#
+# The 78 literals the scanner flags with "no Hindi slot" are the `aliases:`
+# lists - lowercase search keywords that match a mother's typed query. They
+# must NOT be translated.

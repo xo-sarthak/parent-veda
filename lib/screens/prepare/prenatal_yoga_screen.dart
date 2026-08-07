@@ -191,7 +191,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => PrepareVideoScreen(
-              title: y.title.now, subtitle: '${y.duration} · ${y.focus}', blurb: y.blurb.now))),
+              title: y.title.now, subtitle: '${y.duration.now} · ${y.focus.now}', blurb: y.blurb.now))),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -214,7 +214,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(y.title.now, style: pvBody(kInk, 15).copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
-              Text('${y.duration} · ${y.focus}', style: pvBody(kMuted, 12)),
+              Text('${y.duration.now} · ${y.focus.now}', style: pvBody(kMuted, 12)),
             ]),
           ),
           const SizedBox(width: 10),

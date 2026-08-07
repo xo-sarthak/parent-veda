@@ -97,14 +97,17 @@ def literal_runs(src, comments):
     sentence and [raw] is the original source slice, so the applier can keep
     the author's line breaks in the English half.
     """
+    # Group by ADJACENCY FIRST, then discard whole runs - never mid-run.
+    #
+    # Skipping literal-by-literal looks equivalent and is not: in an already
+    # converted `_t('a ' 'b ' 'c', 'हिन्दी')` only the FIRST literal sits right
+    # after `_t(`, so a per-literal skip dropped it and let 'b ' start a fresh
+    # run. The audit then reported mid-sentence fragments - "correctable things
+    # early - like low iron or a thyroid that needs suppo" - as untranslated
+    # strings, 149 of them in one finished file.
     runs = []
     current = []
     for m in LITERAL.finditer(src):
-        if in_any(m.start(), comments) or already_converted(src, m.start()):
-            if current:
-                runs.append(current)
-                current = []
-            continue
         # Only whitespace between two literals means Dart joins them. Anything
         # else - a comma, a bracket - makes them separate arguments.
         if current and src[current[-1].end():m.start()].strip():
@@ -116,6 +119,9 @@ def literal_runs(src, comments):
 
     out = []
     for group in runs:
+        head = group[0].start()
+        if in_any(head, comments) or already_converted(src, head):
+            continue
         text = ''.join(unescape(m.group(2), m.group(1)) for m in group)
         out.append((group[0].start(), group[-1].end(), text,
                     src[group[0].start():group[-1].end()]))
@@ -228,8 +234,18 @@ def load(tsv):
         if not line.strip() or line.startswith('#'):
             continue
         en, _, hi = line.partition('\t')
+        # Deliberately NOT stripped. Edge whitespace is load-bearing: Dart
+        # concatenates adjacent literals, so `'Everyday '` carries the space
+        # that separates it from the product name spliced on after it. Strip
+        # it and the Hindi welds into `साधारणनरम तौलिया`, which compiles, passes
+        # every test, and is visibly wrong to exactly one person.
+        #
+        # The cost of not stripping is that a glossary with accidental stray
+        # whitespace simply fails to match - reported as unmatched, loudly,
+        # rather than matching the wrong thing quietly. That is the better
+        # trade for a tool that rewrites source.
         if hi.strip():
-            glossary[unescape_tsv(en.strip())] = unescape_tsv(hi.strip())
+            glossary[unescape_tsv(en)] = unescape_tsv(hi)
     return glossary
 
 

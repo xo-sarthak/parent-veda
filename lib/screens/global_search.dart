@@ -174,7 +174,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
           for (final p in products)
             ListTile(
               leading: _leadEmoji(p.emoji),
-              title: Text(p.name),
+              title: Text(p.name.now),
               subtitle: Text('${p.price} · ${p.summary}',
                   maxLines: 1, overflow: TextOverflow.ellipsis),
               onTap: () => _go(

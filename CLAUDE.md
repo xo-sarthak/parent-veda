@@ -154,9 +154,51 @@ Three facts that stop the obvious mistakes:
   alias for the same value and survives the coming rename.
 - **Only the Pregnancy stage is being migrated.** TTC and Parenting still hold
   Hinglish or no Hindi at all, on purpose. Do not "finish the job" there.
-- **Migrated so far:** `weekContent.json` (all 37 weeks) and the type system
-  (`lib/theme/pv_fonts.dart` + its pregnancy call sites). Everything else in
-  Pregnancy is still Hinglish.
+- **Migrated so far:** `weekContent.json` (all 37 weeks), the type system
+  (`lib/theme/pv_fonts.dart`), the `S` string table, and the data files —
+  `read_to_baby`, `garbh`, `spiritual_reading`, `read_next`, `product`,
+  `tests_scans_reports`, `prepare`, and the community *rooms*. `can_i_data` is
+  the last one outstanding. `grep -c '_en('` counts what is English-on-purpose
+  and still owed.
+
+- **`tool/hindi/_never_translate.tsv`** lists strings code *reads* rather than
+  renders — `contains()` keywords, `stage:` values, RegExp sources, composed
+  ids. They look exactly like copy. Add to it rather than rediscovering them.
+- **A field that round-trips through JSON is not copy**, whatever it looks like.
+  Community *posts* stay `String` for this reason: the same model carries what
+  a mother typed herself, and there is no second language for that.
+
+⚠️ **The rule that this migration keeps breaking: `.en` is identity, `.now` is
+display.** Once a field is `LocalizedText`, `.now` is the obvious suffix
+everywhere and it is WRONG anywhere the value is persisted, compared, switched
+on, used as a map key, or sent to an external system. Both sides are
+`LocalizedText`, so the type system cannot tell them apart — it is a review
+question. It has been got wrong eight times: a bookmark keyed on its own title,
+`ragaTimeBadge` matching English hints, a `switch` dispatching to a game widget,
+`SpiritualPrefsStore`, `toLabel == 'Postpartum'` (always false — that one is now
+an analyzer *error*, see `analysis_options.yaml`), and a topic filter that
+matched nothing in Hindi. None of them fail to compile; none fail a test; the
+only symptom reaches the mother. `test/localized_identity_test.dart` guards the
+store-key cases.
+
+Three conventions worth knowing before writing a bilingual pair:
+
+  | helper | means |
+  |---|---|
+  | `_t(en, hi)` | a real translation |
+  | `_same(s)` | identical in both **by nature** — PCOS, IVF, a person's name |
+  | `_en(s)` | **English for now, Hindi owed** — a greppable backlog |
+
+  Never write `_t(x, x)`. An identical pair reads as finished work to anything
+  counting pairs, which is how `can_i_data` was once reported done with 302
+  strings still English.
+
+- **`tool/hindi/_never_translate.tsv`** lists strings code *reads* rather than
+  renders — `contains()` keywords, `stage:` values, RegExp sources, composed
+  ids. They look exactly like copy. Add to it rather than rediscovering them.
+- **A field that round-trips through JSON is not copy**, whatever it looks like.
+  Community *posts* stay `String` for this reason: the same model carries what
+  a mother typed herself, and there is no second language for that.
 
 ⚠️ When translating `_p(...)` strings, **the placeholders are the trap.** A
 string that loses its `$n` or `$w` still compiles and still passes tests — it

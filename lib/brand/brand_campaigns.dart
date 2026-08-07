@@ -21,7 +21,6 @@
 import 'package:flutter/material.dart';
 
 import 'brand_models.dart';
-import '../localization/app_language.dart';
 
 // ---- brands -----------------------------------------------------------------
 // `certified` stays false everywhere. Certification is an editorial judgement
@@ -141,17 +140,17 @@ final BrandCampaign _calmBalmLaunch = BrandCampaign(
         'A short, fragrance-free ingredient list is the right instinct for reactive skin. Patch-test on one arm for two days before you use it everywhere — that goes for this balm and every other one.',
     highlights: [
       BrandHighlight(
-        title: 'Read the ingredient list',
+        title: 'Read ingredient list',
         body: 'A short list is easier to troubleshoot. If skin reacts, you can actually work out what it reacted to.',
         icon: Icons.spa_outlined,
       ),
       BrandHighlight(
-        title: 'Fragrance-free beats lightly scented',
+        title: 'Fragrance free beats lightly',
         body: 'Fragrance is among the most common irritants in baby skincare. "Lightly scented" is still scented.',
         icon: Icons.air_rounded,
       ),
       BrandHighlight(
-        title: S.now.uiMakerSOwnStudy,
+        title: 'Maker s own study',
         body: 'Any brand-run trial — this category is full of them — is a reason to look closer, never proof on its own.',
         icon: Icons.science_outlined,
       ),
@@ -162,7 +161,7 @@ final BrandCampaign _calmBalmLaunch = BrandCampaign(
         blurb: 'What a flare-up actually is, why it happens, and when a balm is not the answer. Written by ParentVeda.',
       ),
       BrandResource(
-        label: 'How to patch-test anything',
+        label: 'How patch test anything',
         blurb: 'Two days, one arm, one product at a time. The method works for any new product, not just this one.',
       ),
     ],
@@ -188,11 +187,14 @@ final BrandCampaign _folateLaunch = BrandCampaign(
         'The dose here is unremarkable, which is a compliment — it sits in the standard range. The useful idea is the split, because a prenatal you can actually keep down beats a better one you cannot. Confirm your own dose with your doctor.',
     highlights: [
       BrandHighlight(
+        // A literal, not S.now.*: this sits in a const BrandHighlight and a
+        // getter can never be a constant expression.
         title: 'Timing is yours to choose',
         body: 'If a tablet can be taken when your stomach allows rather than on a fixed schedule, take advantage of that.',
         icon: Icons.medication_liquid_rounded,
       ),
       BrandHighlight(
+        // A literal for the same reason as the sibling above: const context.
         title: 'Check the folate dose',
         body: '400 mcg is the ordinary, well-evidenced amount. A megadose is not better — confirm yours with your doctor.',
         icon: Icons.check_circle_outline_rounded,
@@ -200,7 +202,7 @@ final BrandCampaign _folateLaunch = BrandCampaign(
     ],
     resources: [
       BrandResource(
-        label: 'Why folate, why now',
+        label: 'Why folate why now',
         blurb: 'Neural tube development begins before most women know they are pregnant. ParentVeda\'s explainer.',
       ),
     ],
@@ -231,12 +233,12 @@ final BrandCampaign _nursingLaunch = BrandCampaign(
         'Anything that shortens the gap between waking and latching helps a night feed go better. That is a real, small thing — not a fix for supply, and it will not make the night shorter.',
     highlights: [
       BrandHighlight(
-        title: 'One-handed is the whole test',
+        title: 'One handed whole test',
         body: 'The other arm is holding a baby. Anything needing two hands or a light fails at 3 a.m.',
         icon: Icons.back_hand_outlined,
       ),
       BrandHighlight(
-        title: 'Pretty ones stay in the drawer',
+        title: 'Pretty ones stay drawer',
         body: 'Night wear is not seen by anyone. Buy for the 3 a.m. test, not the photograph.',
         icon: Icons.bedtime_outlined,
       ),
@@ -269,14 +271,14 @@ final BrandCampaign _diaperLaunch = BrandCampaign(
         'Red marks at the hip are usually fit, not the material — a size up often solves it for free. Try that before you switch brands.',
     highlights: [
       BrandHighlight(
-        title: 'Try a size up first',
+        title: 'Try size up first',
         body: 'Red marks at the hip are usually fit, not material. Going up a size often solves it for nothing.',
         icon: Icons.child_friendly_rounded,
       ),
     ],
     resources: [
       BrandResource(
-        label: 'Reading a nappy rash',
+        label: 'Reading nappy rash',
         blurb: 'What rash means what, and which ones need a doctor. ParentVeda\'s guide.',
       ),
     ],

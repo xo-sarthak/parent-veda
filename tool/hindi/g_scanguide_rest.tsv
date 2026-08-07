@@ -1,0 +1,15 @@
+# lib/data/scan_guide_data.dart - leftovers glossary
+# 2 rows.
+#
+# The other 18 `term` rows that still mirror English are the words printed
+# verbatim on her report, kept Latin by CLAUDE.md rule 3 and by this file's own
+# shipped pattern (only the everyday half of a term ever moves:
+# 'FHR / cardiac activity' -> 'FHR / धड़कन', 'Placenta (position)' ->
+# 'Placenta (स्थिति)', 'Centile (e.g. 50th)' -> 'Centile (जैसे 50th)'):
+#   Gestational sac, CRL (Crown–Rump Length), Yolk sac, EDD (Estimated Due
+#   Date), Nasal bone, Free β-hCG / PAPP-A, "Appears normal" / NAD, Amniotic
+#   fluid (AFI / liquor), Biometry (BPD, HC, AC, FL), Soft markers, Fasting
+#   glucose, HbA1c, EFW (Estimated Fetal Weight), AFI / liquor, Doppler
+#   (PI / RI), Presentation (cephalic / breech), Positive / carrier, Negative
+NT measurement (mm)	NT नाप (mm)
+1-hour / 2-hour value	1-hour / 2-hour मान

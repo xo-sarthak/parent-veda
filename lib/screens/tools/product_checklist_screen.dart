@@ -52,8 +52,10 @@ void _openUrl(String url) {
 // --- resolve a checklist item (catalog product OR custom) to display fields ---
 Product? _itemProduct(ChecklistItem i) =>
     i.isCustom ? null : productById(i.productId);
+// Display only - the card keys off product.id, not this. Resolved here so
+// the ternary does not infer Object from a LocalizedText and a String.
 String _itemName(ChecklistItem i) =>
-    _itemProduct(i)?.name ?? (i.name.isEmpty ? 'Item' : i.name);
+    _itemProduct(i)?.name.now ?? (i.name.isEmpty ? 'Item' : i.name);
 String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
 String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
 
@@ -62,7 +64,7 @@ String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
 // stand-in from the first token of the name (e.g. "ComfyBump Full-Body
 // Pillow" -> "ComfyBump"). TODO: replace with a real Product.brand field.
 String _productBrand(Product p) {
-  final first = p.name.trim().split(RegExp(r'\s+')).first;
+  final first = p.name.now.trim().split(RegExp(r'\s+')).first;
   return first;
 }
 
@@ -88,7 +90,9 @@ bool _productMatchesTopFilter(Product p, String filter) {
     case 'Trimester 3': // weeks ~28-40
       return cat.fromWeek <= 40 && cat.toWeek >= 28;
     case 'Post Birth':
-      return cat.toLabel == 'Postpartum';
+      // .en - see ProductCategory.toWeek. This filter returned nothing at
+      // all while the comparison was against the wrong type.
+      return cat.toLabel.en == 'Postpartum';
     case 'Hospital Bag / Essentials':
       // TODO: no "essentials" flag — approximate with the near-birth +
       // newborn kit categories a mother typically packs.
@@ -553,7 +557,7 @@ class ProductChecklistScreen extends StatelessWidget {
                     ListTile(
                       leading:
                           Text(e.product!.emoji, style: const TextStyle(fontSize: 24)),
-                      title: Text(e.product!.name,
+                      title: Text(e.product!.name.now,
                           style: pvJakarta(
                               fontSize: 14, fontWeight: FontWeight.w700)),
                       subtitle: Text(
@@ -803,7 +807,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
       CartStore.instance.add(
         kProductsCartId,
         productId: p.id,
-        name: p.name,
+        name: p.name.now,
         emoji: p.emoji,
         unitPrice: parsePriceString(p.price),
       );
@@ -1046,7 +1050,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
       CartStore.instance.add(
         kProductsCartId,
         productId: p.id,
-        name: p.name,
+        name: p.name.now,
         emoji: p.emoji,
         unitPrice: parsePriceString(p.price),
       );
@@ -1298,7 +1302,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                           letterSpacing: 0.4,
                           color: AppTheme.neutral500)),
                   const SizedBox(height: 1),
-                  Text(p.name,
+                  Text(p.name.now,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: pvJakarta(
@@ -1504,7 +1508,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
         CartStore.instance.add(
           kProductsCartId,
           productId: p.id,
-          name: p.name,
+          name: p.name.now,
           emoji: p.emoji,
           unitPrice: parsePriceString(p.price),
         );

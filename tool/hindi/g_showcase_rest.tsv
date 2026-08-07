@@ -1,0 +1,5 @@
+# lib/data/veda_showcase.dart - leftovers glossary
+# 2 rows. Everything else is translated; the 41 "no Hindi slot" literals are
+# `keywords:` match terms (lowercase English + Hinglish) and must stay as typed.
+# dropped: the file's other profession row keeps both halves Latin (gynaecologist / obstetrician)
+# dropped: the same card already says "pregnancy pillow" in Latin in its action line

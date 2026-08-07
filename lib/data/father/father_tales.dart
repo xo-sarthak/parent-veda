@@ -1,3 +1,5 @@
+import '../../localization/app_language.dart';
+
 // =============================================================================
 //  Father Tales - "Stories, Fables & Mythology" for the Father Daily screen
 // -----------------------------------------------------------------------------
@@ -15,6 +17,8 @@
 //  are public domain; all wording here is original (no copied translations).
 // =============================================================================
 
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 enum FatherTaleKind { story, fable, myth }
 
 class FatherTale {
@@ -23,37 +27,37 @@ class FatherTale {
     required this.kind,
     required this.title,
     required this.body,
-    this.moral = '',
-    this.dadNote = '',
+    this.moral = const LocalizedText(en: '', hi: ''),
+    this.dadNote = const LocalizedText(en: '', hi: ''),
   });
 
   final String id;
   final FatherTaleKind kind;
-  final String title;
-  final String body; // the read-aloud text
-  final String moral; // fables: the lesson (one line); '' for story/myth
-  final String dadNote; // a short father-perspective framing line
+  final LocalizedText title;
+  final LocalizedText body; // the read-aloud text
+  final LocalizedText moral; // fables: the lesson (one line); '' for story/myth
+  final LocalizedText dadNote; // a short father-perspective framing line
 }
 
-String fatherTaleKindLabel(FatherTaleKind k) {
+LocalizedText fatherTaleKindLabel(FatherTaleKind k) {
   switch (k) {
     case FatherTaleKind.story:
-      return 'Stories';
+      return _t('Stories', 'कहानियाँ');
     case FatherTaleKind.fable:
-      return 'Fables';
+      return _t('Fables', 'नीति-कथाएँ');
     case FatherTaleKind.myth:
-      return 'Mythology';
+      return _t('Mythology', 'पौराणिक कथाएँ');
   }
 }
 
-String fatherTaleKindTag(FatherTaleKind k) {
+LocalizedText fatherTaleKindTag(FatherTaleKind k) {
   switch (k) {
     case FatherTaleKind.story:
-      return 'Story';
+      return _t('Story', 'कहानी');
     case FatherTaleKind.fable:
-      return 'Fable';
+      return _t('Fable', 'नीति-कथा');
     case FatherTaleKind.myth:
-      return 'Myth';
+      return _t('Myth', 'पौराणिक कथा');
   }
 }
 
@@ -75,14 +79,14 @@ FatherTale fatherTaleForDay(int day, Set<FatherTaleKind> kinds) {
 // =============================================================================
 //  The library - 20 stories, 20 fables, 20 myths.
 // =============================================================================
-const List<FatherTale> kFatherTales = [
+final List<FatherTale> kFatherTales = [
   // ========================================================== STORIES (20) ===
   FatherTale(
     id: 'st1',
     kind: FatherTaleKind.story,
-    title: 'The Lighthouse Keeper',
+    title: _t('The Lighthouse Keeper', 'दीपस्तंभ का रखवाला'),
     body:
-        "On a rocky shore stood a lighthouse, and in it lived a keeper who lit "
+        _t("On a rocky shore stood a lighthouse, and in it lived a keeper who lit "
         "the lamp every single night. Some nights the sea was calm and no ships "
         "passed at all. \"Why bother?\" a gull once asked him. \"No one is even "
         "out there.\" The keeper smiled and lit it anyway. \"A light is not for "
@@ -90,17 +94,17 @@ const List<FatherTale> kFatherTales = [
         "ship needs it - and you never know which night that is.\" So he kept his "
         "light steady, year after year, for travellers he would never meet. And "
         "every sailor who found their way home in a storm owed it to a small, "
-        "faithful flame that simply refused to go out.",
+        "faithful flame that simply refused to go out.", 'चट्टानी किनारे पर एक दीपस्तंभ खड़ा था, और उसमें रहता था एक रखवाला, जो हर रात दीया जलाता था। कुछ रातें समंदर बिलकुल शांत रहता, कोई जहाज़ गुज़रता ही नहीं। एक बार एक समुद्री पंछी ने पूछा, "इतनी मेहनत क्यों? यहाँ तो कोई है ही नहीं।" रखवाला मुस्कुराया और दीया फिर भी जला दिया। "रोशनी उन रातों के लिए नहीं होती जब जहाज़ दिख रहे हों," उसने कहा। "वह उस एक रात के लिए होती है जब किसी जहाज़ को उसकी ज़रूरत पड़ जाए — और वो कौन-सी रात होगी, यह कभी पता नहीं चलता।" तो साल दर साल वह अपनी रोशनी जलाए रखता रहा, उन मुसाफ़िरों के लिए जिनसे वह कभी मिला भी नहीं। और तूफ़ान में जिस भी नाविक को घर का रास्ता मिला, वह उस छोटी-सी, सच्ची लौ का कर्ज़दार था, जिसने बुझना बस मंज़ूर नहीं किया।'),
     dadNote:
-        "I'll be your steady light, little one - lit every night, whether you "
-        "think you need it or not.",
+        _t("I'll be your steady light, little one - lit every night, whether you "
+        "think you need it or not.", 'मैं तुम्हारी वो अटल रोशनी रहूँगा, नन्ही जान — हर रात जलती हुई, चाहे तुम्हें उसकी ज़रूरत लगे या न लगे।'),
   ),
   FatherTale(
     id: 'st2',
     kind: FatherTaleKind.story,
-    title: 'The Boy Who Planted a Slow Tree',
+    title: _t('The Boy Who Planted a Slow Tree', 'जिस लड़के ने धीमा पेड़ लगाया'),
     body:
-        "A boy once asked his grandfather for a tree that would grow tall in a "
+        _t("A boy once asked his grandfather for a tree that would grow tall in a "
         "single week. The old man only smiled and handed him a small, slow seed "
         "instead. \"This one takes a hundred years,\" he said. \"Then plant it "
         "now,\" the boy laughed, \"so it isn't even later!\" So they dug "
@@ -108,17 +112,17 @@ const List<FatherTale> kFatherTales = [
         "life. He never saw it reach its full height - but his children climbed "
         "it, and their children rested in its shade. The best things, the "
         "grandfather had known, are the ones we begin without needing to see "
-        "them finished.",
+        "them finished.", 'एक लड़के ने अपने दादा से ऐसा पेड़ माँगा जो एक ही हफ़्ते में ऊँचा हो जाए। बूढ़े दादा बस मुस्कुराए और उसे एक छोटा-सा, धीरे उगने वाला बीज थमा दिया। "इसे सौ साल लगते हैं," उन्होंने कहा। "तो अभी लगा देते हैं," लड़का हँसा, "ताकि और देर न हो!" दोनों ने मिलकर मिट्टी खोदी, पानी दिया, और लड़का ज़िंदगी की हर बहार में उस पेड़ से मिलने आता रहा। उसने उसे पूरी ऊँचाई तक पहुँचते कभी नहीं देखा — पर उसके बच्चे उस पर चढ़े, और उनके बच्चे उसकी छाँव में सुस्ताए। सबसे अच्छी चीज़ें, दादा जानते थे, वही होती हैं जिन्हें हम शुरू कर देते हैं, बिना इस ज़िद के कि उन्हें पूरा होते हुए भी देखें।'),
     dadNote:
-        "I'm planting slow trees for you, little one - things you'll enjoy long "
-        "after you've forgotten who started them.",
+        _t("I'm planting slow trees for you, little one - things you'll enjoy long "
+        "after you've forgotten who started them.", 'मैं तुम्हारे लिए धीमे पेड़ लगा रहा हूँ, नन्ही जान — ऐसी चीज़ें जिनका मज़ा तुम्हें तब भी मिलेगा, जब यह याद भी न रहेगा कि शुरू किसने की थीं।'),
   ),
   FatherTale(
     id: 'st3',
     kind: FatherTaleKind.story,
-    title: 'The First Word',
+    title: _t('The First Word', 'पहला शब्द'),
     body:
-        "In a quiet village lived a man who collected first words - the very "
+        _t("In a quiet village lived a man who collected first words - the very "
         "first sound each child ever spoke. He kept them in a little book: a "
         "giggle, a 'ba', a name. People thought it odd, until they grew old and "
         "came to him, asking to hear their own first word again. \"Why does it "
@@ -126,34 +130,34 @@ const List<FatherTale> kFatherTales = [
         "said. \"It is the moment a person decides the world is worth talking "
         "to.\" He waited all his life for the children who hadn't spoken yet, "
         "certain that every new voice was a story the world had never heard "
-        "before.",
+        "before.", 'एक शांत गाँव में एक आदमी रहता था जो पहले शब्द जमा करता था — हर बच्चे की सबसे पहली आवाज़। उन्हें वह एक छोटी-सी किताब में लिख लेता: कोई खिलखिलाहट, कोई \'बा\', कोई नाम। लोगों को यह अजीब लगता, जब तक वे बूढ़े होकर ख़ुद उसके पास न आते, अपना पहला शब्द दोबारा सुनने की गुज़ारिश लेकर। "इससे फ़र्क़ क्या पड़ता है?" एक मुसाफ़िर ने पूछा। "क्योंकि पहला शब्द एक दरवाज़ा होता है," आदमी ने कहा। "वह वो पल है जब कोई तय करता है कि यह दुनिया बात करने लायक़ है।" वह ज़िंदगी भर उन बच्चों का इंतज़ार करता रहा जो अभी बोले ही नहीं थे — उसे यक़ीन था कि हर नई आवाज़ एक ऐसी कहानी है जो दुनिया ने पहले कभी सुनी नहीं।'),
     dadNote:
-        "I can't wait to hear your first word, little one, whatever it is. I'll "
-        "keep it forever.",
+        _t("I can't wait to hear your first word, little one, whatever it is. I'll "
+        "keep it forever.", 'तुम्हारा पहला शब्द सुनने का बेसब्री से इंतज़ार है, नन्ही जान — जो भी हो। मैं उसे हमेशा के लिए सँभालकर रखूँगा।'),
   ),
   FatherTale(
     id: 'st4',
     kind: FatherTaleKind.story,
-    title: 'The Keeper of Names',
+    title: _t('The Keeper of Names', 'नामों का रखवाला'),
     body:
-        "High on a hill lived a keeper who remembered every name that had ever "
+        _t("High on a hill lived a keeper who remembered every name that had ever "
         "passed through the town. When a child was born, the parents climbed to "
         "him and whispered the new name, and he would repeat it back slowly, as "
         "if tasting something precious. \"A name is a promise,\" he told them. "
         "\"It says: there will only ever be one of you, and we were waiting.\" "
         "Years later, when those children felt lost or small, they would climb "
         "the hill just to hear their own name spoken aloud - and somehow, "
-        "hearing it, they remembered they belonged.",
+        "hearing it, they remembered they belonged.", 'पहाड़ी के ऊपर एक रखवाला रहता था, जिसे उस क़स्बे से गुज़रा हर नाम याद था। जब कोई बच्चा जन्म लेता, माँ-बाप चढ़ाई करके उसके पास जाते और नया नाम धीरे से कहते, और वह उसे दोहराता — धीरे-धीरे, जैसे कोई क़ीमती चीज़ चख रहा हो। "नाम एक वादा होता है," वह उनसे कहता। "वह कहता है: तुम जैसा कोई दूसरा कभी नहीं होगा, और हम तुम्हारा इंतज़ार कर रहे थे।" बरसों बाद, जब वही बच्चे ख़ुद को खोया हुआ या छोटा महसूस करते, वे बस अपना नाम ज़ोर से सुनने के लिए वह पहाड़ी चढ़ जाते — और उसे सुनते ही, न जाने कैसे, उन्हें याद आ जाता कि वे किसी के हैं।'),
     dadNote:
-        "We chose your name carefully, and I'll say it like it matters - because "
-        "it does. There will only ever be one you.",
+        _t("We chose your name carefully, and I'll say it like it matters - because "
+        "it does. There will only ever be one you.", 'तुम्हारा नाम हमने बहुत सोचकर चुना है, और मैं उसे ऐसे पुकारूँगा जैसे उसके मायने हैं — क्योंकि हैं। तुम्हारे जैसा दूसरा कोई कभी नहीं होगा।'),
   ),
   FatherTale(
     id: 'st5',
     kind: FatherTaleKind.story,
-    title: 'The Smallest Lantern',
+    title: _t('The Smallest Lantern', 'सबसे छोटी लालटेन'),
     body:
-        "A great procession set out to cross a dark mountain, every traveller "
+        _t("A great procession set out to cross a dark mountain, every traveller "
         "carrying a bright torch - all but a small child, who held only a tiny "
         "lantern barely brighter than a firefly. \"You'll be no help with "
         "that,\" the others said. But high on the pass a fierce wind rose and "
@@ -161,17 +165,17 @@ const List<FatherTale> kFatherTales = [
         "close to the child's chest and sheltered by two careful hands, kept "
         "burning. By its little light, the whole procession found the path and "
         "came down safely. It was not the biggest light that saved them - it was "
-        "the one that was guarded most gently.",
+        "the one that was guarded most gently.", 'एक बड़ा क़ाफ़िला अँधेरे पहाड़ को पार करने निकला, हर मुसाफ़िर के हाथ में जलती मशाल — सिवाय एक छोटे बच्चे के, जिसके पास बस एक नन्ही लालटेन थी, जुगनू से ज़रा ही ज़्यादा रोशन। "इससे तुम किसी काम के नहीं," बाक़ी लोगों ने कहा। पर ऊपर दर्रे पर तेज़ हवा उठी और एक ही झोंके में सारी बड़ी मशालें बुझ गईं। बची तो बस वो नन्ही लालटेन, जो बच्चे ने सीने से लगाकर, दो सँभली हुई हथेलियों की आड़ में जलती रखी थी। उसी छोटी-सी रोशनी के सहारे पूरा क़ाफ़िला रास्ता पा गया और सही-सलामत नीचे उतर आया। उन्हें सबसे बड़ी रोशनी ने नहीं बचाया — बचाया उस रोशनी ने, जिसे सबसे नरमी से सँभाला गया था।'),
     dadNote:
-        "Your light doesn't have to be the brightest, little one. It only has to "
-        "be yours, and kept burning. I'll help you guard it.",
+        _t("Your light doesn't have to be the brightest, little one. It only has to "
+        "be yours, and kept burning. I'll help you guard it.", 'तुम्हारी रोशनी को सबसे तेज़ होने की ज़रूरत नहीं, नन्ही जान। बस इतना कि वो तुम्हारी हो, और जलती रहे। उसे सँभालने में मैं साथ रहूँगा।'),
   ),
   FatherTale(
     id: 'st6',
     kind: FatherTaleKind.story,
-    title: 'The River That Found the Sea',
+    title: _t('The River That Found the Sea', 'वो नदी जिसे समंदर मिला'),
     body:
-        "A young river tumbled down from the mountains, sure it would reach the "
+        _t("A young river tumbled down from the mountains, sure it would reach the "
         "sea by nightfall. But the land was long, and it met deserts that drank "
         "it, rocks that split it, and plains that slowed it to a crawl. Many "
         "times it nearly gave up. \"Keep going,\" whispered the rain. \"You "
@@ -179,34 +183,34 @@ const List<FatherTale> kFatherTales = [
         "pressed on, gathering smaller streams as friends along the way. When at "
         "last it reached the sea, it was no longer a thin mountain trickle but "
         "something wide and deep and unstoppable - made, in the end, of "
-        "everywhere it had been.",
+        "everywhere it had been.", 'एक जवान नदी पहाड़ों से उछलती-कूदती उतरी, इस भरोसे के साथ कि शाम तक समंदर पहुँच जाएगी। पर ज़मीन लंबी निकली — रेगिस्तान मिले जो उसे पी गए, चट्टानें मिलीं जिन्होंने उसे बाँट दिया, और मैदान मिले जिन्होंने उसकी चाल रेंगने जितनी कर दी। कई बार उसने लगभग हार मान ली। "चलती रहो," बारिश ने धीरे से कहा। "एक ही बार में पहुँचना ज़रूरी नहीं।" तो नदी मुड़ी, रुकी, और आगे बढ़ती रही, रास्ते में छोटी धाराओं को दोस्त बनाती हुई। आख़िर जब वह समंदर तक पहुँची, तो वह पहाड़ की पतली-सी धार नहीं रह गई थी — वह चौड़ी, गहरी और न रुकने वाली हो चुकी थी; बनी हुई, आख़िर में, उन सब जगहों से जहाँ-जहाँ से वो गुज़री थी।'),
     dadNote:
-        "Your road may be longer than you'd like, little one. Keep going. Every "
-        "detour is making you wider and deeper than you know.",
+        _t("Your road may be longer than you'd like, little one. Keep going. Every "
+        "detour is making you wider and deeper than you know.", 'हो सकता है तुम्हारा रास्ता तुम्हारी चाह से लंबा निकले, नन्ही जान। चलते रहना। हर मोड़ तुम्हारे भीतर उससे कहीं ज़्यादा गहराई और चौड़ाई भर रहा है, जितनी तुम्हें ख़बर है।'),
   ),
   FatherTale(
     id: 'st7',
     kind: FatherTaleKind.story,
-    title: 'The Carpenter and the Crooked Board',
+    title: _t('The Carpenter and the Crooked Board', 'बढ़ई और टेढ़ा तख़्ता'),
     body:
-        "A carpenter's apprentice threw a crooked board onto the fire pile. "
+        _t("A carpenter's apprentice threw a crooked board onto the fire pile. "
         "\"It's bent and useless,\" he said. The old carpenter picked it up, "
         "turned it slowly in the light, and set it aside. Weeks later he built a "
         "curved doorway - the most beautiful in the town - and the crooked board "
         "fit its arch perfectly, as though it had been waiting all along. "
         "\"There is no useless wood,\" the carpenter said. \"Only wood whose "
         "purpose you haven't found yet.\" The apprentice never looked at a "
-        "crooked thing the same way again.",
+        "crooked thing the same way again.", 'बढ़ई के शागिर्द ने एक टेढ़ा तख़्ता जलावन के ढेर पर फेंक दिया। "यह मुड़ा हुआ है, किसी काम का नहीं," उसने कहा। बूढ़े बढ़ई ने उसे उठाया, रोशनी में धीरे-धीरे घुमाकर देखा, और अलग रख दिया। कुछ हफ़्तों बाद उसने एक गोल दरवाज़ा बनाया — पूरे क़स्बे में सबसे ख़ूबसूरत — और वही टेढ़ा तख़्ता उसकी मेहराब में ऐसे बैठा, जैसे कब से उसी का इंतज़ार कर रहा हो। "बेकार लकड़ी होती ही नहीं," बढ़ई ने कहा। "बस ऐसी लकड़ी होती है, जिसका काम तुम्हें अभी मिला नहीं।" उस दिन के बाद शागिर्द ने किसी टेढ़ी चीज़ को फिर उसी नज़र से नहीं देखा।'),
     dadNote:
-        "If the world ever calls some part of you crooked or wrong, come find "
-        "me. I'll help you see the doorway you were shaped for.",
+        _t("If the world ever calls some part of you crooked or wrong, come find "
+        "me. I'll help you see the doorway you were shaped for.", 'अगर दुनिया कभी तुम्हारे किसी हिस्से को टेढ़ा या ग़लत कहे, तो मेरे पास आ जाना। मैं तुम्हें वो दरवाज़ा दिखाऊँगा, जिसके लिए यही आकार बना है।'),
   ),
   FatherTale(
     id: 'st8',
     kind: FatherTaleKind.story,
-    title: 'The Night the Stars Went Out',
+    title: _t('The Night the Stars Went Out', 'जिस रात तारे बुझ गए'),
     body:
-        "One strange night, the stars all dimmed at once, and the whole world "
+        _t("One strange night, the stars all dimmed at once, and the whole world "
         "held its breath in the dark. Children cried, and even grown-ups grew "
         "afraid. But in one small house, a father lit a single candle and told "
         "his frightened child, \"The stars haven't gone - they're only resting. "
@@ -214,17 +218,17 @@ const List<FatherTale> kFatherTales = [
         "candle by candle, house by house, the people kept small flames burning. "
         "And when dawn came and the stars returned, they shone - people said - a "
         "little brighter, as if grateful they had not been the only light after "
-        "all.",
+        "all.", 'एक अजीब रात, सारे तारे एक साथ मद्धम पड़ गए, और पूरी दुनिया ने अँधेरे में साँस रोक ली। बच्चे रोने लगे, बड़े भी डर गए। पर एक छोटे-से घर में एक पिता ने एक मोमबत्ती जलाई और अपने डरे हुए बच्चे से कहा, "तारे गए नहीं हैं — बस सुस्ता रहे हैं। और जब तक वे जागें, हम एक-दूसरे की रोशनी रहेंगे।" पूरी रात, एक-एक मोमबत्ती, एक-एक घर, लोग छोटी-छोटी लौ जलाए बैठे रहे। और जब सुबह हुई और तारे लौट आए, तो लोग कहते हैं वे ज़रा और चमक रहे थे — जैसे इस बात के शुक्रगुज़ार हों कि रोशनी अकेले उन्हीं की नहीं थी।'),
     dadNote:
-        "When your sky goes dark, I'll light a candle and sit with you until the "
-        "stars come back. We'll be each other's light.",
+        _t("When your sky goes dark, I'll light a candle and sit with you until the "
+        "stars come back. We'll be each other's light.", 'जब तुम्हारा आसमान अँधेरा हो जाए, मैं एक मोमबत्ती जलाकर तुम्हारे पास बैठ जाऊँगा, जब तक तारे लौट न आएँ। हम एक-दूसरे की रोशनी रहेंगे।'),
   ),
   FatherTale(
     id: 'st9',
     kind: FatherTaleKind.story,
-    title: 'Learning to Fall',
+    title: _t('Learning to Fall', 'गिरना सीखना'),
     body:
-        "Before a young acrobat was ever allowed to climb the high rope, her "
+        _t("Before a young acrobat was ever allowed to climb the high rope, her "
         "teacher spent a whole month teaching her just one thing: how to fall. "
         "\"I came to learn to fly,\" she protested. \"You will,\" said the "
         "teacher, \"but first you must stop being afraid of the ground.\" So she "
@@ -232,205 +236,205 @@ const List<FatherTale> kFatherTales = [
         "longer frightened her at all. And when at last she climbed the rope and "
         "slipped, as everyone does, she landed soft and laughing - and climbed "
         "straight back up. The ones who fly highest, her teacher said, are "
-        "simply the ones who've made friends with falling.",
+        "simply the ones who've made friends with falling.", 'किसी जवान नटनी को ऊँची रस्सी पर चढ़ने की इजाज़त मिलने से पहले, उसकी उस्ताद ने पूरा एक महीना उसे बस एक ही चीज़ सिखाई: गिरना कैसे है। "मैं तो उड़ना सीखने आई थी," उसने शिकायत की। "सीखोगी," उस्ताद ने कहा, "पर पहले ज़मीन से डरना छोड़ना होगा।" तो वह गिरती रही, लुढ़कती रही, उठती रही — दिन में सौ बार — जब तक गिरने का डर पूरी तरह उतर न गया। और आख़िर जब वह रस्सी पर चढ़ी और फिसली, जैसे सब फिसलते हैं, तो वह नरमी से उतरी, हँसती हुई — और सीधे वापस ऊपर चढ़ गई। जो सबसे ऊँचा उड़ते हैं, उसकी उस्ताद कहती थी, वे बस वही हैं जिन्होंने गिरने से दोस्ती कर ली।'),
     dadNote:
-        "You're going to fall, little one - everyone does. I won't always catch "
-        "you, but I'll teach you how to land, and how to climb back up.",
+        _t("You're going to fall, little one - everyone does. I won't always catch "
+        "you, but I'll teach you how to land, and how to climb back up.", 'तुम्हें गिरना भी पड़ेगा, नन्ही जान — सब गिरते हैं। मैं हर बार थाम नहीं पाऊँगा, पर उतरना कैसे है और दोबारा चढ़ना कैसे है, यह ज़रूर सिखाऊँगा।'),
   ),
   FatherTale(
     id: 'st10',
     kind: FatherTaleKind.story,
-    title: 'The Empty Chair Kept Warm',
+    title: _t('The Empty Chair Kept Warm', 'वो ख़ाली कुर्सी, जो गरम रखी गई'),
     body:
-        "In a small house by the road, a family always set one extra chair at "
+        _t("In a small house by the road, a family always set one extra chair at "
         "the table, with a cushion and a warm bowl, though no one sat in it yet. "
         "\"Who is it for?\" a guest once asked. \"For the one still on their "
         "way,\" the mother said. \"So that when they arrive, they'll know they "
         "were expected - that there was always a place saved.\" Travellers "
         "passing through that house never forgot it: the feeling of walking in "
-        "cold and tired, and finding a seat already warm, kept just for them.",
+        "cold and tired, and finding a seat already warm, kept just for them.", 'सड़क किनारे एक छोटे-से घर में परिवार हमेशा मेज़ पर एक कुर्सी ज़्यादा लगाता था — गद्दी के साथ, और एक गरम कटोरा भी, जबकि उस पर अभी कोई बैठता नहीं था। "यह किसके लिए है?" एक मेहमान ने पूछा। "उसके लिए जो अभी रास्ते में है," माँ ने कहा। "ताकि जब वह पहुँचे, तो जान जाए कि उसका इंतज़ार था — कि जगह हमेशा से रखी हुई थी।" उस घर से गुज़रे मुसाफ़िर उसे कभी नहीं भूले: ठंड और थकान लिए अंदर आना, और अपने लिए पहले से गरम की हुई एक जगह पा जाना।'),
     dadNote:
-        "There's a chair at our table with your name on it, already warm. You "
-        "were expected, little one. You always had a place.",
+        _t("There's a chair at our table with your name on it, already warm. You "
+        "were expected, little one. You always had a place.", 'हमारी मेज़ पर एक कुर्सी तुम्हारे नाम की है, अभी से गरम। तुम्हारा इंतज़ार था, नन्ही जान। तुम्हारी जगह हमेशा से थी।'),
   ),
   FatherTale(
     id: 'st11',
     kind: FatherTaleKind.story,
-    title: "The Clockmaker's Son",
+    title: _t("The Clockmaker's Son", 'घड़ीसाज़ का बेटा'),
     body:
-        "A famous clockmaker could build any machine to measure time, yet he was "
+        _t("A famous clockmaker could build any machine to measure time, yet he was "
         "always too busy to spend it. His small son would tug his sleeve, and he "
         "would say, \"Later - I'm making something important.\" One evening the "
         "boy left a gift on the workbench: a clock with no hands at all, and a "
         "note that read, \"This one is for the time we spend together - it "
         "doesn't need counting.\" The clockmaker set down his tools, and from "
         "that day kept the handless clock above his bench, to remind him which "
-        "hours were the ones that truly mattered.",
+        "hours were the ones that truly mattered.", 'एक मशहूर घड़ीसाज़ वक़्त नापने की कोई भी मशीन बना सकता था, पर उसे बिताने की फ़ुरसत उसके पास कभी नहीं थी। उसका छोटा बेटा उसकी आस्तीन खींचता, और वह कहता, "बाद में — अभी कुछ ज़रूरी बना रहा हूँ।" एक शाम बेटे ने काम की मेज़ पर एक तोहफ़ा रख दिया: बिना सुइयों वाली एक घड़ी, और एक परची जिस पर लिखा था, "यह उस वक़्त के लिए है जो हम साथ बिताते हैं — इसे गिनने की ज़रूरत नहीं।" घड़ीसाज़ ने अपने औज़ार रख दिए, और उस दिन से वो बिना सुइयों वाली घड़ी अपनी मेज़ के ऊपर टँगी रखी — ख़ुद को याद दिलाने के लिए कि असल में कौन-से घंटे मायने रखते थे।'),
     dadNote:
-        "I'll be busy sometimes, little one - but never too busy for you. Some "
-        "hours don't need counting; they just need to be spent.",
+        _t("I'll be busy sometimes, little one - but never too busy for you. Some "
+        "hours don't need counting; they just need to be spent.", 'कभी-कभी मैं उलझा हुआ रहूँगा, नन्ही जान — पर तुम्हारे लिए इतना कभी नहीं। कुछ घंटे गिनने के लिए नहीं होते; वे बस साथ बिताने के लिए होते हैं।'),
   ),
   FatherTale(
     id: 'st12',
     kind: FatherTaleKind.story,
-    title: 'The Boy Who Carried the Mountain',
+    title: _t('The Boy Who Carried the Mountain', 'वो लड़का जिसने पहाड़ उठाया'),
     body:
-        "A boy was told he must move a mountain of stones from one field to "
+        _t("A boy was told he must move a mountain of stones from one field to "
         "another before he could grow up. \"That's impossible,\" he wept. An old "
         "woman passing by said, \"Then don't move the mountain. Move one "
         "stone.\" So each morning the boy carried a single stone across the "
         "field, and each morning the mountain looked exactly the same. But years "
         "later he stood in the cleared field, looked back at the great pile he "
         "had built stone by stone, and understood: impossible things are only "
-        "possible things, carried one at a time.",
+        "possible things, carried one at a time.", 'एक लड़के से कहा गया कि बड़ा होने से पहले उसे पत्थरों का एक पूरा पहाड़ एक खेत से दूसरे खेत तक ले जाना होगा। "यह तो नामुमकिन है," वह रो पड़ा। पास से गुज़रती एक बूढ़ी औरत ने कहा, "तो पहाड़ मत हटाओ। एक पत्थर हटाओ।" तो हर सुबह लड़का एक पत्थर उठाकर खेत पार कराता, और हर सुबह पहाड़ बिलकुल वैसा ही दिखता। पर बरसों बाद वह ख़ाली हो चुके खेत में खड़ा था; उसने पलटकर उस बड़े ढेर को देखा, जो उसने एक-एक पत्थर से बनाया था, और समझ गया: नामुमकिन चीज़ें बस मुमकिन चीज़ें होती हैं, जिन्हें एक-एक करके उठाया जाता है।'),
     dadNote:
-        "When something feels too big to face, little one, we won't move the "
-        "mountain. We'll just move one stone, together, today.",
+        _t("When something feels too big to face, little one, we won't move the "
+        "mountain. We'll just move one stone, together, today.", 'जब कोई चीज़ सामने से बहुत बड़ी लगे, नन्ही जान, तो हम पहाड़ नहीं हटाएँगे। हम बस आज, साथ मिलकर, एक पत्थर हटाएँगे।'),
   ),
   FatherTale(
     id: 'st13',
     kind: FatherTaleKind.story,
-    title: 'The Bridge Builder',
+    title: _t('The Bridge Builder', 'पुल बनाने वाला'),
     body:
-        "An old traveller crossed a deep, cold river at great difficulty, then "
+        _t("An old traveller crossed a deep, cold river at great difficulty, then "
         "sat down on the far bank and began to build a bridge. A younger man "
         "laughed. \"You've already crossed. You'll never need this bridge "
         "again.\" The old man kept working. \"This morning a child like you may "
         "come this way,\" he said, \"and the river will be just as deep for them "
         "as it was for me. I build for the one who comes after.\" And so the "
         "bridge stood, long after the old man was gone, carrying strangers "
-        "safely over water they never even feared.",
+        "safely over water they never even feared.", 'एक बूढ़ा मुसाफ़िर बड़ी मुश्किल से एक गहरी, ठंडी नदी पार करके उस पार बैठा — और पुल बनाने लगा। एक जवान आदमी हँसा। "तुम तो पार कर आए। अब इस पुल की तुम्हें कभी ज़रूरत नहीं पड़ेगी।" बूढ़ा काम करता रहा। "आज ही तुम्हारी उम्र का कोई बच्चा इधर आ सकता है," उसने कहा, "और नदी उसके लिए उतनी ही गहरी होगी जितनी मेरे लिए थी। मैं उसके लिए बना रहा हूँ जो बाद में आएगा।" और वह पुल बूढ़े के जाने के बहुत बाद तक खड़ा रहा — अनजान लोगों को उस पानी के ऊपर से सही-सलामत पार कराता रहा, जिससे उन्हें कभी डर लगा ही नहीं।'),
     dadNote:
-        "I'm building bridges you'll never see me build, little one - so the "
-        "rivers that were hard for me will be easy for you.",
+        _t("I'm building bridges you'll never see me build, little one - so the "
+        "rivers that were hard for me will be easy for you.", 'मैं कुछ ऐसे पुल बना रहा हूँ, नन्ही जान, जिनका बनना तुम्हें कभी दिखेगा नहीं — ताकि जो नदियाँ मेरे लिए मुश्किल थीं, वे तुम्हारे लिए आसान हो जाएँ।'),
   ),
   FatherTale(
     id: 'st14',
     kind: FatherTaleKind.story,
-    title: 'The Gardener Who Talked to Seeds',
+    title: _t('The Gardener Who Talked to Seeds', 'वो माली जो बीजों से बात करता था'),
     body:
-        "A gardener was famous for the richest garden in the land, and people "
+        _t("A gardener was famous for the richest garden in the land, and people "
         "begged to know his secret. \"I talk to my seeds,\" he said simply. They "
         "laughed - until they noticed he visited each seed while it was still "
         "buried, unseen, with nothing yet to show. \"Anyone can praise a "
         "flower,\" he told them. \"I speak to them in the dark, before they've "
         "done a single thing, so they grow knowing they were loved first.\" And "
         "his garden, people swore, bloomed as though it had something to live up "
-        "to.",
+        "to.", 'एक माली पूरे इलाक़े के सबसे भरे-पूरे बग़ीचे के लिए मशहूर था, और लोग उसका राज़ जानने के लिए गिड़गिड़ाते। "मैं अपने बीजों से बात करता हूँ," उसने सीधा-सा कहा। लोग हँसे — जब तक उन्होंने ग़ौर नहीं किया कि वह हर बीज के पास तब जाता था, जब वह अभी मिट्टी में दबा था, किसी को दिखता नहीं था, और दिखाने को उसके पास कुछ था भी नहीं। "फूल की तारीफ़ तो कोई भी कर लेता है," उसने कहा। "मैं उनसे अँधेरे में बात करता हूँ, इससे पहले कि उन्होंने कुछ भी किया हो — ताकि वे यह जानते हुए उगें कि उन्हें प्यार पहले मिला था।" और उसका बग़ीचा, लोग क़सम खाते थे, ऐसे खिलता था जैसे उसे किसी भरोसे पर खरा उतरना हो।'),
     dadNote:
-        "I'm talking to you now, in the dark, before you've done a single thing "
-        "- so you'll grow up knowing you were loved first.",
+        _t("I'm talking to you now, in the dark, before you've done a single thing "
+        "- so you'll grow up knowing you were loved first.", 'मैं तुमसे अभी बात कर रहा हूँ, अँधेरे में, इससे पहले कि तुमने कुछ भी किया हो — ताकि बड़े होने पर यह पता हो कि प्यार तुम्हें सबसे पहले मिला था।'),
   ),
   FatherTale(
     id: 'st15',
     kind: FatherTaleKind.story,
-    title: 'The Kite and the String',
+    title: _t('The Kite and the String', 'पतंग और डोर'),
     body:
-        "A kite climbed high into the wind and felt the tug of the string below. "
+        _t("A kite climbed high into the wind and felt the tug of the string below. "
         "\"Let me go!\" it cried. \"I could touch the clouds if you'd only "
         "release me!\" The child holding the string loosened her grip - and at "
         "once the kite tumbled, spun, and fell. She caught the string just in "
         "time and let it climb again. \"The string isn't holding you down,\" she "
         "said gently. \"It's what lets you rise.\" And the kite understood: it "
         "was not trapped by the hand that held it, but lifted - free precisely "
-        "because it was not alone.",
+        "because it was not alone.", 'पतंग हवा में ऊँची चढ़ी और उसे नीचे से डोर का खिंचाव महसूस हुआ। "मुझे छोड़ दो!" वह चिल्लाई। "बस छोड़ दो, तो मैं बादल छू लूँ!" डोर थामे बच्ची ने पकड़ ढीली कर दी — और पतंग तुरंत लड़खड़ाई, घूमी, और गिरने लगी। बच्ची ने ऐन वक़्त पर डोर सँभाली और उसे फिर से ऊपर चढ़ने दिया। "डोर तुम्हें नीचे नहीं रोक रही," उसने नरमी से कहा। "यही तो तुम्हें ऊपर उठाती है।" और पतंग समझ गई: जो हाथ उसे थामे था, उसने उसे बाँधा नहीं था, उठाया था — वह आज़ाद इसीलिए थी, क्योंकि वह अकेली नहीं थी।'),
     dadNote:
-        "I'll hold your string, little one - not to keep you low, but to help "
-        "you climb. And when you're ready, I'll let it run.",
+        _t("I'll hold your string, little one - not to keep you low, but to help "
+        "you climb. And when you're ready, I'll let it run.", 'मैं तुम्हारी डोर थामे रहूँगा, नन्ही जान — नीचे रोकने के लिए नहीं, ऊपर चढ़ाने के लिए। और जब तुम तैयार हो जाओ, मैं उसे खुला छोड़ दूँगा।'),
   ),
   FatherTale(
     id: 'st16',
     kind: FatherTaleKind.story,
-    title: 'The Old Dog and the New Pup',
+    title: _t('The Old Dog and the New Pup', 'बूढ़ा कुत्ता और नया पिल्ला'),
     body:
-        "An old farm dog watched a clumsy new pup trip over its own paws, bark "
+        _t("An old farm dog watched a clumsy new pup trip over its own paws, bark "
         "at its own tail, and tumble into the water trough. The other animals "
         "snickered. But the old dog only walked beside the pup each day, slow "
         "and patient, showing it where the soft grass was, how to listen for the "
         "farmer's whistle, when to rest. He never scolded the stumbles. \"I was "
         "clumsy once too,\" he said. \"Someone walked slow for me.\" And in time "
         "the pup grew sure-footed and wise, and walked slow, one day, for a "
-        "clumsy pup of its own.",
+        "clumsy pup of its own.", 'खेत का एक बूढ़ा कुत्ता देखता रहा कि नया अनाड़ी पिल्ला अपने ही पंजों में उलझकर गिरता है, अपनी ही पूँछ पर भौंकता है, और पानी की नाँद में लुढ़क जाता है। बाक़ी जानवर हँसते थे। पर बूढ़ा कुत्ता बस हर दिन उसके साथ-साथ चलता — धीरे और सब्र से — उसे दिखाता कि नरम घास कहाँ है, किसान की सीटी कैसे पहचाननी है, कब सुस्ताना है। उसने लड़खड़ाहटों पर कभी नहीं डाँटा। "मैं भी कभी अनाड़ी था," उसने कहा। "किसी ने मेरे लिए भी धीरे चलना क़ुबूल किया था।" और वक़्त के साथ पिल्ला मज़बूत क़दमों वाला और समझदार हो गया — और एक दिन, किसी अपने अनाड़ी पिल्ले के लिए, ख़ुद धीरे चला।'),
     dadNote:
-        "You'll stumble, and I'll never laugh. I'll just walk slow beside you, "
-        "the way someone once did for me.",
+        _t("You'll stumble, and I'll never laugh. I'll just walk slow beside you, "
+        "the way someone once did for me.", 'तुमसे भी क़दम लड़खड़ाएँगे, और मैं कभी नहीं हँसूँगा। मैं बस तुम्हारे साथ धीरे चलूँगा, जैसे कभी किसी ने मेरे लिए चला था।'),
   ),
   FatherTale(
     id: 'st17',
     kind: FatherTaleKind.story,
-    title: "The Fisherman's Patience",
+    title: _t("The Fisherman's Patience", 'मछुआरे का सब्र'),
     body:
-        "A boy went fishing with his father and grew restless within minutes. "
+        _t("A boy went fishing with his father and grew restless within minutes. "
         "\"Nothing's biting! This is boring!\" The father only smiled and kept "
         "his line in the still water. \"Fishing isn't about the fish,\" he said. "
         "\"It's about learning to be quiet enough to notice everything else.\" "
         "So the boy went quiet - and slowly began to see: the heron stalking the "
         "reeds, the dragonfly stitching the air, the morning light lying gold "
         "across the water. They caught nothing that day. It was, the boy would "
-        "say long afterward, one of the best days of his life.",
+        "say long afterward, one of the best days of his life.", 'एक लड़का अपने पिता के साथ मछली पकड़ने गया और मिनटों में ऊबने लगा। "कुछ फँस ही नहीं रहा! कितनी बोरियत है!" पिता बस मुस्कुराए और अपनी डोर ठहरे हुए पानी में डाले रखी। "मछली पकड़ना मछली के बारे में है ही नहीं," उन्होंने कहा। "यह इतना चुप होना सीखने के बारे में है कि बाक़ी सब दिखने लगे।" तो लड़का चुप हो गया — और धीरे-धीरे उसे दिखने लगा: सरकंडों में दबे पाँव चलता बगुला, हवा में टाँके भरता एक नन्हा उड़ता कीड़ा, पानी पर सुनहरी फैली सुबह की रोशनी। उस दिन उन्होंने कुछ नहीं पकड़ा। और बरसों बाद तक वह लड़का कहता रहा कि वह उसकी ज़िंदगी के सबसे अच्छे दिनों में से एक था।'),
     dadNote:
-        "I'll teach you to fish, little one - and more than that, to sit still "
-        "enough to notice the whole quiet world while you wait.",
+        _t("I'll teach you to fish, little one - and more than that, to sit still "
+        "enough to notice the whole quiet world while you wait.", 'मैं तुम्हें मछली पकड़ना सिखाऊँगा, नन्ही जान — और उससे भी ज़्यादा, इतना ठहरकर बैठना कि इंतज़ार करते-करते यह पूरी चुपचाप दुनिया दिखने लगे।'),
   ),
   FatherTale(
     id: 'st18',
     kind: FatherTaleKind.story,
-    title: 'The Boy and the Echo',
+    title: _t('The Boy and the Echo', 'लड़का और गूँज'),
     body:
-        "A small boy, angry one morning, ran to the edge of a valley and "
+        _t("A small boy, angry one morning, ran to the edge of a valley and "
         "shouted, \"I hate you!\" Back came the voice: \"I hate you... hate "
         "you...\" Frightened, he ran to his father. \"There's a mean boy in the "
         "mountains!\" The father walked him back and said, \"Now call out "
         "something kind.\" The boy cupped his hands and shouted, \"I'm sorry! I "
         "love you!\" And the whole valley answered, warm and ringing: \"I love "
         "you... love you...\" \"The mountain only gives back what you give it,\" "
-        "his father said. \"So does the world. So does a heart.\"",
+        "his father said. \"So does the world. So does a heart.\"", 'एक छोटा लड़का, एक सुबह ग़ुस्से में, घाटी के किनारे तक भागा और चिल्लाया, "मुझे तुमसे नफ़रत है!" आवाज़ लौटकर आई: "मुझे तुमसे नफ़रत है... नफ़रत है..." डरकर वह अपने पिता के पास भागा। "पहाड़ों में कोई बदतमीज़ लड़का है!" पिता उसे वापस ले गए और बोले, "अब कुछ अच्छा पुकारकर देखो।" लड़के ने हथेलियाँ मुँह पर रखकर पुकारा, "माफ़ करना! मुझे तुमसे प्यार है!" और पूरी घाटी गूँज उठी, गरम और भरी हुई: "मुझे तुमसे प्यार है... प्यार है..." "पहाड़ वही लौटाता है जो तुम उसे देते हो," पिता ने कहा। "दुनिया भी। और दिल भी।"'),
     dadNote:
-        "The world tends to echo what you give it, little one. Send out "
-        "kindness, and listen for how it comes home to you.",
+        _t("The world tends to echo what you give it, little one. Send out "
+        "kindness, and listen for how it comes home to you.", 'दुनिया अक्सर वही लौटाती है जो उसे दिया जाए, नन्ही जान। नरमी भेजो, और सुनते रहो कि वो तुम तक कैसे लौटकर आती है।'),
   ),
   FatherTale(
     id: 'st19',
     kind: FatherTaleKind.story,
-    title: "The Watchmaker's Promise",
+    title: _t("The Watchmaker's Promise", 'घड़ीसाज़ का वादा'),
     body:
-        "A watchmaker promised his daughter he would be home before the last "
+        _t("A watchmaker promised his daughter he would be home before the last "
         "bell each night, and for years he kept it - though it meant leaving "
         "fine work unfinished and rich customers waiting. \"Why turn away "
         "gold,\" they asked, \"for a child who's already asleep?\" \"Because a "
         "promise isn't kept only when it's seen,\" he said. \"She'll grow up "
         "sure of one thing: that when her father gives his word, the world "
         "itself comes second.\" And she did grow up sure of it - so sure that "
-        "she gave her own word carefully all her life, and kept it the same way.",
+        "she gave her own word carefully all her life, and kept it the same way.", 'एक घड़ीसाज़ ने अपनी बेटी से वादा किया था कि वह हर रात आख़िरी घंटी से पहले घर आ जाएगा, और बरसों तक उसने वह वादा निभाया — चाहे इसके लिए बढ़िया काम अधूरा छोड़ना पड़ा हो और अमीर ग्राहकों को इंतज़ार कराना पड़ा हो। "एक बच्ची के लिए, जो वैसे भी सो चुकी होगी, सोना क्यों ठुकराते हो?" लोगों ने पूछा। "क्योंकि वादा सिर्फ़ तब नहीं निभाया जाता जब कोई देख रहा हो," उसने कहा। "वह एक बात पर पक्का यक़ीन लेकर बड़ी होगी: कि जब उसके पिता ज़बान देते हैं, तो दुनिया दूसरे नंबर पर आ जाती है।" और सच में वह उसी यक़ीन के साथ बड़ी हुई — इतने यक़ीन के साथ कि उसने ज़िंदगी भर अपनी ज़बान सोच-समझकर दी, और उसी तरह निभाई भी।'),
     dadNote:
-        "When I give you my word, little one, I'll keep it - even the small "
-        "ones, even when no one's watching. Especially then.",
+        _t("When I give you my word, little one, I'll keep it - even the small "
+        "ones, even when no one's watching. Especially then.", 'जब मैं तुम्हें ज़बान दूँ, नन्ही जान, तो निभाऊँगा — छोटे-छोटे वादे भी, तब भी जब कोई देख न रहा हो। ख़ासकर तब।'),
   ),
   FatherTale(
     id: 'st20',
     kind: FatherTaleKind.story,
-    title: "The Stonecutter's Hundredth Blow",
+    title: _t("The Stonecutter's Hundredth Blow", 'पत्थर तोड़ने वाले की सौवीं चोट'),
     body:
-        "A stonecutter struck a great boulder once, twice, fifty times, and not "
+        _t("A stonecutter struck a great boulder once, twice, fifty times, and not "
         "a crack appeared. A passer-by shook his head. \"You're wasting your "
         "strength; that stone will never break.\" The stonecutter said nothing "
         "and kept swinging. On the hundredth blow the boulder split clean in "
         "two. \"It wasn't the last blow that broke it,\" he said, wiping his "
         "brow, \"but all the ones before that no one thought were working.\" The "
         "watcher had seen only the failure. The stonecutter had trusted the "
-        "unseen cracks growing quietly with every strike.",
+        "unseen cracks growing quietly with every strike.", 'एक पत्थर तोड़ने वाले ने एक बड़ी चट्टान पर एक बार वार किया, दो बार, पचास बार — और एक दरार तक नहीं आई। पास से गुज़रते एक आदमी ने सिर हिलाया। "अपनी ताक़त बरबाद कर रहे हो; यह पत्थर कभी नहीं टूटेगा।" पत्थर तोड़ने वाले ने कुछ नहीं कहा और वार करता रहा। सौवीं चोट पर चट्टान बीच से साफ़ दो टुकड़े हो गई। "इसे आख़िरी चोट ने नहीं तोड़ा," उसने माथे का पसीना पोंछते हुए कहा, "बल्कि उन सारी चोटों ने, जिनके बारे में किसी को लगा ही नहीं कि वे काम कर रही हैं।" देखने वाले को सिर्फ़ नाकामी दिखी थी। पत्थर तोड़ने वाले ने उन दरारों पर भरोसा किया था, जो हर वार के साथ चुपचाप भीतर बढ़ रही थीं।'),
     dadNote:
-        "Most of the work that matters won't show, little one. Keep swinging. "
-        "The hundredth blow only lands because of the ninety-nine before it.",
+        _t("Most of the work that matters won't show, little one. Keep swinging. "
+        "The hundredth blow only lands because of the ninety-nine before it.", 'जो काम असल में मायने रखता है, उसका ज़्यादातर हिस्सा दिखता नहीं, नन्ही जान। वार करते रहना। सौवीं चोट भी इसीलिए बैठती है, क्योंकि उससे पहले निन्यानवे पड़ चुकी होती हैं।'),
   ),
 
   // =========================================================== FABLES (20) ===
   FatherTale(
     id: 'fa1',
     kind: FatherTaleKind.fable,
-    title: 'The Sparrow and the Storm',
+    title: _t('The Sparrow and the Storm', 'गौरैया और तूफ़ान'),
     body:
-        "Two sparrows built nests in the same tall tree. One spent the sunny "
+        _t("Two sparrows built nests in the same tall tree. One spent the sunny "
         "days singing and feasting, while the other quietly carried twig after "
         "twig, weaving her nest deep and strong. \"You work too hard,\" laughed "
         "the first. \"The sun will shine forever!\" But one evening the sky "
@@ -438,18 +442,18 @@ const List<FatherTale> kFatherTales = [
         "careless sparrow's nest scattered like dust - while the other sat dry "
         "and safe inside her sturdy home, watching the rain. When morning came, "
         "she shared her shelter without a word, and the first sparrow never "
-        "laughed at hard work again.",
-    moral: 'The work we do in calm weather is what keeps us safe in the storm.',
+        "laughed at hard work again.", 'दो गौरैयों ने एक ही ऊँचे पेड़ पर घोंसले बनाए। एक धूप वाले दिनों में गाती और दावत उड़ाती रही, और दूसरी चुपचाप एक-एक तिनका ढोकर अपना घोंसला गहरा और मज़बूत बुनती रही। "तुम बहुत मेहनत करती हो," पहली हँसी। "धूप तो हमेशा रहेगी!" पर एक शाम आसमान भूरा पड़ गया, और एक तेज़ हवा टहनियों में गरजती हुई आई। लापरवाह गौरैया का घोंसला धूल की तरह बिखर गया — जबकि दूसरी अपने मज़बूत घर के भीतर सूखी और महफ़ूज़ बैठी बारिश देखती रही। सुबह हुई तो उसने बिना कुछ कहे अपनी छत बाँट दी, और पहली गौरैया ने मेहनत का मज़ाक़ फिर कभी नहीं उड़ाया।'),
+    moral: _t('The work we do in calm weather is what keeps us safe in the storm.', 'जो काम हम शांत मौसम में करते हैं, वही तूफ़ान में हमें बचाता है।'),
     dadNote:
-        "I'm building our nest now, before you arrive - so whatever weather "
-        "comes, you'll always have somewhere safe.",
+        _t("I'm building our nest now, before you arrive - so whatever weather "
+        "comes, you'll always have somewhere safe.", 'मैं अभी से अपना घोंसला बुन रहा हूँ, तुम्हारे आने से पहले — ताकि मौसम कैसा भी आए, तुम्हारे पास हमेशा एक महफ़ूज़ जगह हो।'),
   ),
   FatherTale(
     id: 'fa2',
     kind: FatherTaleKind.fable,
-    title: 'The Two Streams',
+    title: _t('The Two Streams', 'दो धाराएँ'),
     body:
-        "Two little streams trickled down opposite sides of a hill, each certain "
+        _t("Two little streams trickled down opposite sides of a hill, each certain "
         "it would reach the great river first. They raced and rushed and wore "
         "themselves thin against the rocks, until both nearly dried up under the "
         "summer sun. Then a wise old willow whispered, \"Why race? Join, and "
@@ -457,212 +461,212 @@ const List<FatherTale> kFatherTales = [
         "streams wound toward each other and merged into one. Together they ran "
         "deep and strong, past the dust that had nearly stopped them, all the "
         "way to the shining river - arriving, in the end, at the very same "
-        "moment.",
-    moral: 'We go farther together than we ever could apart.',
+        "moment.", 'दो नन्ही धाराएँ एक पहाड़ी के दो अलग-अलग ढलानों से उतरीं, और दोनों को पक्का यक़ीन था कि बड़ी नदी तक पहले वही पहुँचेगी। वे दौड़ीं, भागीं, और चट्टानों से टकराकर ख़ुद को पतला करती चली गईं, यहाँ तक कि गरमी की धूप में दोनों लगभग सूख गईं। तभी एक समझदार बूढ़े पेड़ ने धीरे से कहा, "दौड़ क्यों? मिल जाओ, तो समंदर तक पहुँचने लायक़ पानी हो जाएगा।" अपना अहंकार निगलकर दोनों धाराएँ एक-दूसरे की तरफ़ मुड़ीं और एक हो गईं। साथ मिलकर वे गहरी और मज़बूत बहीं, उस धूल के पार जिसने उन्हें लगभग रोक दिया था, सीधे चमकती नदी तक — और आख़िर में पहुँचीं भी ठीक एक ही पल में।'),
+    moral: _t('We go farther together than we ever could apart.', 'साथ चलकर हम उससे कहीं दूर पहुँचते हैं, जितना अकेले कभी पहुँच पाते।'),
     dadNote:
-        "You don't have to race anyone, little one. Find the ones worth joining, "
-        "and go far together.",
+        _t("You don't have to race anyone, little one. Find the ones worth joining, "
+        "and go far together.", 'तुम्हें किसी से दौड़ लगाने की ज़रूरत नहीं, नन्ही जान। ऐसे लोग ढूँढो जिनके साथ जुड़ना बनता हो, और साथ मिलकर दूर तक जाओ।'),
   ),
   FatherTale(
     id: 'fa3',
     kind: FatherTaleKind.fable,
-    title: 'The Peacock and the Crow',
+    title: _t('The Peacock and the Crow', 'मोर और कौआ'),
     body:
-        "A peacock spread his dazzling tail and mocked a plain black crow. "
+        _t("A peacock spread his dazzling tail and mocked a plain black crow. "
         "\"Look at me - a living jewel! And you? Drab as a shadow.\" The crow "
         "simply ruffled her wings and flew, high and free, over fields and "
         "rivers and far blue hills. The peacock tried to follow and could not "
         "lift his heavy, glittering tail more than a hop off the ground. \"Your "
         "beauty is lovely to look at,\" the crow called down, \"but mine carries "
-        "me to the sky.\" The peacock, for once, had nothing to say.",
-    moral: 'What shines on the outside is not the same as what carries you forward.',
+        "me to the sky.\" The peacock, for once, had nothing to say.", 'एक मोर ने अपनी चमकदार पूँछ फैलाई और एक सादे काले कौए का मज़ाक़ उड़ाया। "मुझे देखो — चलता-फिरता गहना! और तुम? परछाईं जैसे फीके।" कौए ने बस अपने पंख झाड़े और उड़ चला — ऊँचा और आज़ाद — खेतों, नदियों और दूर की नीली पहाड़ियों के ऊपर से। मोर ने पीछे जाने की कोशिश की, पर अपनी भारी, चमकीली पूँछ लेकर ज़मीन से एक फुदक से ज़्यादा उठ ही नहीं पाया। "तुम्हारी ख़ूबसूरती देखने में बहुत अच्छी है," कौए ने ऊपर से पुकारा, "पर मेरी ख़ूबसूरती मुझे आसमान तक ले जाती है।" मोर के पास, पहली बार, कहने को कुछ नहीं था।'),
+    moral: _t('What shines on the outside is not the same as what carries you forward.', 'जो बाहर से चमकता है, ज़रूरी नहीं कि वही आगे भी ले जाए।'),
     dadNote:
-        "Don't be fooled by what only looks impressive, little one - or worried "
-        "that you don't. Ask instead what gives you wings.",
+        _t("Don't be fooled by what only looks impressive, little one - or worried "
+        "that you don't. Ask instead what gives you wings.", 'जो सिर्फ़ देखने में शानदार लगे, उससे धोखा मत खाना, नन्ही जान — और अपनी सादगी से घबराना भी मत। पूछना यह कि उड़ान किससे मिलती है।'),
   ),
   FatherTale(
     id: 'fa4',
     kind: FatherTaleKind.fable,
-    title: 'The Ant Who Shared a Crumb',
+    title: _t('The Ant Who Shared a Crumb', 'वो चींटी जिसने टुकड़ा बाँटा'),
     body:
-        "On a cold morning a tiny ant found a single crumb and, though hungry "
+        _t("On a cold morning a tiny ant found a single crumb and, though hungry "
         "herself, broke it in half to share with a shivering beetle by the path. "
         "\"Foolish,\" said a passing grasshopper. \"Keep it all!\" Weeks later a "
         "flood swept through the meadow and the little ant was carried off on a "
         "leaf, spinning helplessly toward the rapids. From the bank, the beetle "
         "she had fed flung out a blade of grass and pulled her to safety. \"A "
         "kindness,\" the beetle said, \"is a seed. You never know when it will "
-        "grow back to shelter you.\"",
-    moral: 'Kindness given quietly has a way of coming home.',
+        "grow back to shelter you.\"", 'एक ठंडी सुबह एक नन्ही चींटी को रोटी का एक टुकड़ा मिला, और ख़ुद भूखी होने के बावजूद उसने वह टुकड़ा आधा तोड़कर रास्ते के किनारे ठिठुरते एक भृंग को दे दिया। "बेवक़ूफ़ी है," पास से गुज़रते एक टिड्डे ने कहा। "पूरा अपने पास रखो!" कुछ हफ़्तों बाद मैदान में बाढ़ आई और वह नन्ही चींटी एक पत्ते पर बहती चली गई, तेज़ धारा की तरफ़ बेबस घूमती हुई। किनारे से, उसी भृंग ने — जिसे उसने खिलाया था — घास का एक तिनका फेंककर उसे खींच लिया। "नरमी," भृंग ने कहा, "एक बीज होती है। पता नहीं कब वह उगकर तुम्हें छाँव दे दे।"'),
+    moral: _t('Kindness given quietly has a way of coming home.', 'चुपचाप की गई नरमी लौटकर घर आ ही जाती है।'),
     dadNote:
-        "Give what you can, little one, even when it's small. Kindness is a seed "
-        "- and it grows in directions you'll never expect.",
+        _t("Give what you can, little one, even when it's small. Kindness is a seed "
+        "- and it grows in directions you'll never expect.", 'जो दे सको, दे देना, नन्ही जान, चाहे थोड़ा ही हो। नरमी एक बीज है — और वह ऐसी दिशाओं में उगती है, जिनका अंदाज़ा भी नहीं होता।'),
   ),
   FatherTale(
     id: 'fa5',
     kind: FatherTaleKind.fable,
-    title: 'The Tortoise Who Truly Listened',
+    title: _t('The Tortoise Who Truly Listened', 'वो कछुआ जिसने सचमुच सुना'),
     body:
-        "The animals held a council to solve a great problem, and everyone spoke "
+        _t("The animals held a council to solve a great problem, and everyone spoke "
         "at once - the loud monkey, the proud stag, the clever fox - each in "
         "love with his own voice. Only the old tortoise stayed silent, "
         "listening. When at last she spoke, she gently wove together the one "
         "good idea hidden in each loud speech, and the council marvelled at her "
         "wisdom. \"How did you grow so wise?\" they asked. \"I didn't,\" said the "
-        "tortoise. \"I only listened while you were all busy talking.\"",
-    moral: 'We learn far more from listening than from waiting to speak.',
+        "tortoise. \"I only listened while you were all busy talking.\"", 'जानवरों ने एक बड़ी मुश्किल सुलझाने के लिए सभा बुलाई, और सब एक साथ बोलने लगे — शोर मचाता बंदर, घमंडी बारहसिंगा, चालाक लोमड़ी — हर कोई अपनी ही आवाज़ पर मोहित। बस बूढ़ा कछुआ चुप बैठा सुनता रहा। आख़िर में जब उसने कहा, तो हर शोर भरे भाषण में छिपे एक-एक काम के विचार को उसने नरमी से आपस में बुन दिया, और सभा उसकी समझ पर हैरान रह गई। "तुममें इतनी समझ आई कैसे?" उन्होंने पूछा। "आई नहीं," कछुए ने कहा। "जब तुम सब बोलने में लगे थे, मैं बस सुन रहा था।"'),
+    moral: _t('We learn far more from listening than from waiting to speak.', 'बोलने की बारी के इंतज़ार से कहीं ज़्यादा हम सुनने से सीखते हैं।'),
     dadNote:
-        "You were born with two ears and one mouth, little one. I'll try to "
-        "remember that too - especially when I'm listening to you.",
+        _t("You were born with two ears and one mouth, little one. I'll try to "
+        "remember that too - especially when I'm listening to you.", 'तुम्हें दो कान मिले हैं और एक मुँह, नन्ही जान। यह बात मैं भी याद रखने की कोशिश करूँगा — ख़ासकर तब, जब मैं तुम्हें सुन रहा हूँ।'),
   ),
   FatherTale(
     id: 'fa6',
     kind: FatherTaleKind.fable,
-    title: 'The Firefly Who Wanted to Be the Sun',
+    title: _t('The Firefly Who Wanted to Be the Sun', 'वो जुगनू जो सूरज बनना चाहता था'),
     body:
-        "A little firefly grew ashamed of her tiny glow. \"What use is my speck "
+        _t("A little firefly grew ashamed of her tiny glow. \"What use is my speck "
         "of light next to the great golden sun?\" she sighed, and hid herself "
         "away in the day, refusing to shine. But that night the woods were "
         "caught in deep darkness, and a lost fawn could not find its mother. No "
         "sun could help in the dark - but one small firefly, coaxed out at last, "
         "lit a soft path through the trees, and the fawn followed her glow "
         "safely home. \"The sun has its hour,\" she learned, \"and I have "
-        "mine.\"",
-    moral: 'Your light is not too small - it is needed where the great lights cannot reach.',
+        "mine.\"", 'एक नन्हे जुगनू को अपनी हल्की-सी चमक पर शर्म आने लगी। "उस बड़े सुनहरे सूरज के आगे मेरी इस ज़रा-सी रोशनी का क्या काम?" उसने आह भरी, और दिन में कहीं छिप गया, चमकने से इनकार करके। पर उस रात जंगल गहरे अँधेरे में डूब गया, और एक खोया हुआ हिरन का बच्चा अपनी माँ तक नहीं पहुँच पा रहा था। अँधेरे में सूरज किसी काम नहीं आ सकता था — पर एक नन्हा जुगनू, जिसे बड़ी मुश्किल से बाहर बुलाया गया, पेड़ों के बीच एक नरम रास्ता जगा गया, और हिरन का बच्चा उसी चमक के पीछे सही-सलामत घर पहुँच गया। "सूरज का अपना वक़्त है," उसने सीखा, "और मेरा अपना।"'),
+    moral: _t('Your light is not too small - it is needed where the great lights cannot reach.', 'तुम्हारी रोशनी छोटी नहीं है — उसकी ज़रूरत वहाँ है, जहाँ बड़ी रोशनियाँ पहुँच ही नहीं पातीं।'),
     dadNote:
-        "Never wish your light away because someone else's seems bigger. The "
-        "dark places of this world are waiting for exactly your glow.",
+        _t("Never wish your light away because someone else's seems bigger. The "
+        "dark places of this world are waiting for exactly your glow.", 'किसी और की रोशनी बड़ी दिखे, तो अपनी रोशनी को कभी मत कोसना। इस दुनिया की अँधेरी जगहें ठीक तुम्हारी ही चमक का इंतज़ार कर रही हैं।'),
   ),
   FatherTale(
     id: 'fa7',
     kind: FatherTaleKind.fable,
-    title: 'The Bamboo and the Oak',
+    title: _t('The Bamboo and the Oak', 'बाँस और बलूत'),
     body:
-        "A proud oak laughed at the slender bamboo bending in the breeze. \"Have "
+        _t("A proud oak laughed at the slender bamboo bending in the breeze. \"Have "
         "some backbone! I never bow to any wind.\" That night a tremendous storm "
         "tore down from the hills. The bamboo bent low, low, almost to the "
         "ground, letting the gale pass over it. The mighty oak stood stiff and "
         "proud against the wind - until, with a great groan, it cracked and "
         "crashed to the earth. In the calm morning the bamboo rose again, "
         "unbroken and green. \"There is strength in standing firm,\" it "
-        "whispered, \"and a deeper strength in knowing when to bend.\"",
-    moral: 'What bends in the storm often outlasts what refuses to.',
+        "whispered, \"and a deeper strength in knowing when to bend.\"", 'एक घमंडी बलूत हवा में झूलते पतले बाँस पर हँसा। "थोड़ी रीढ़ रखो! मैं तो किसी हवा के आगे नहीं झुकता।" उस रात पहाड़ियों से एक ज़बरदस्त तूफ़ान उतरा। बाँस झुकता गया — नीचे, और नीचे, लगभग ज़मीन तक — और आँधी को अपने ऊपर से गुज़र जाने दिया। ताक़तवर बलूत हवा के सामने अकड़कर, तनकर खड़ा रहा, जब तक एक ज़ोरदार कराह के साथ वह चटका और ज़मीन पर आ गिरा। शांत सुबह में बाँस फिर से उठ खड़ा हुआ, बिना टूटे, हरा-भरा। "डटे रहने में ताक़त होती है," उसने धीरे से कहा, "और झुकना कब है, यह जानने में उससे भी गहरी ताक़त।"'),
+    moral: _t('What bends in the storm often outlasts what refuses to.', 'जो तूफ़ान में झुक जाता है, वह अक्सर उससे ज़्यादा टिकता है जो झुकने से इनकार कर दे।'),
     dadNote:
-        "Be strong, little one - but not so stiff you break. Sometimes the "
-        "bravest thing is to bend, then rise again.",
+        _t("Be strong, little one - but not so stiff you break. Sometimes the "
+        "bravest thing is to bend, then rise again.", 'मज़बूत रहना, नन्ही जान — पर इतना अकड़ना नहीं कि टूट जाओ। कभी-कभी सबसे बहादुरी की बात यही होती है: झुक जाना, और फिर उठ खड़े होना।'),
   ),
   FatherTale(
     id: 'fa8',
     kind: FatherTaleKind.fable,
-    title: 'The Woodcutter and the River',
+    title: _t('The Woodcutter and the River', 'लकड़हारा और नदी'),
     body:
-        "A poor woodcutter dropped his only axe into a deep river and wept. The "
+        _t("A poor woodcutter dropped his only axe into a deep river and wept. The "
         "river spirit rose and offered first a golden axe, then a silver one. "
         "\"Neither is mine,\" the woodcutter said honestly, though he was poor "
         "enough to long for them. \"Mine was only worn old iron.\" Pleased by his "
         "honesty, the spirit returned his plain iron axe - and the gold and "
         "silver besides, as a gift. A greedy neighbour heard of it, threw in his "
         "own axe on purpose, and claimed the gold one as his. The river gave him "
-        "nothing back at all - not even the axe he came with.",
-    moral: 'Honesty may cost you something today, but it pays in ways a lie never can.',
+        "nothing back at all - not even the axe he came with.", 'एक ग़रीब लकड़हारे की इकलौती कुल्हाड़ी गहरी नदी में गिर गई और वह रो पड़ा। नदी की देवी प्रकट हुईं और पहले सोने की कुल्हाड़ी दिखाई, फिर चाँदी की। "दोनों में से कोई मेरी नहीं है," लकड़हारे ने सच बोल दिया, हालाँकि वह इतना ग़रीब था कि उन्हें पाने की चाह होना लाज़मी था। "मेरी तो बस घिसे हुए लोहे की थी।" उसकी ईमानदारी से ख़ुश होकर देवी ने उसकी सादी लोहे की कुल्हाड़ी लौटा दी — और तोहफ़े में सोने और चाँदी वाली भी। एक लालची पड़ोसी ने यह सुना, जान-बूझकर अपनी कुल्हाड़ी नदी में फेंकी, और सोने वाली को अपना बता दिया। नदी ने उसे कुछ भी नहीं लौटाया — वो कुल्हाड़ी तक नहीं, जो वह ख़ुद लेकर आया था।'),
+    moral: _t('Honesty may cost you something today, but it pays in ways a lie never can.', 'ईमानदारी आज कुछ ले सकती है, पर वह ऐसे लौटाती है जैसे झूठ कभी नहीं लौटा सकता।'),
     dadNote:
-        "Tell the truth, little one, even when a lie looks like gold. What "
-        "honesty earns, no one can ever take from you.",
+        _t("Tell the truth, little one, even when a lie looks like gold. What "
+        "honesty earns, no one can ever take from you.", 'सच बोलना, नन्ही जान, तब भी जब झूठ सोने जैसा चमके। ईमानदारी से जो मिलता है, उसे कोई तुमसे छीन नहीं सकता।'),
   ),
   FatherTale(
     id: 'fa9',
     kind: FatherTaleKind.fable,
-    title: 'The Elephant and the Thorn-Bird',
+    title: _t('The Elephant and the Thorn-Bird', 'हाथी और काँटा-चिड़िया'),
     body:
-        "A great elephant got a sharp thorn lodged deep in his foot and could "
+        _t("A great elephant got a sharp thorn lodged deep in his foot and could "
         "barely limp. The big animals all backed away - too busy, too important "
         "to help. But a tiny thorn-bird hopped up, worked the thorn loose with "
         "her small sharp beak, and freed him. \"How could one so small help one "
         "so great?\" the others scoffed. Seasons later, hunters set a net for "
         "the elephant in the night, and it was the little thorn-bird's shrill, "
         "frantic cry that woke him in time to escape. \"No friend is too "
-        "small,\" the elephant said, \"to be the one who saves you.\"",
-    moral: 'Never measure a friend, or a kindness, by its size.',
+        "small,\" the elephant said, \"to be the one who saves you.\"", 'एक बड़े हाथी के पैर में गहरा काँटा धँस गया और वह मुश्किल से लँगड़ाकर चल पा रहा था। बड़े जानवर सब पीछे हट गए — बहुत व्यस्त, बहुत बड़े, मदद के लिए फ़ुरसत कहाँ। पर एक नन्ही काँटा-चिड़िया फुदकती हुई आई, अपनी छोटी तेज़ चोंच से काँटा ढीला किया, और उसे आज़ाद कर दिया। "इतना छोटा जीव इतने बड़े जीव की मदद कैसे कर सकता है?" बाक़ी लोगों ने ताना मारा। कई मौसम बाद, शिकारियों ने रात में हाथी के लिए जाल बिछाया, और उसी नन्ही काँटा-चिड़िया की तीखी, बेचैन चीख़ ने उसे वक़्त रहते जगा दिया कि वह बच निकले। "कोई दोस्त इतना छोटा नहीं होता," हाथी ने कहा, "कि वह तुम्हें बचाने वाला न बन सके।"'),
+    moral: _t('Never measure a friend, or a kindness, by its size.', 'किसी दोस्त को, या किसी नरमी को, उसके आकार से मत नापना।'),
     dadNote:
-        "Be kind to everyone, little one, big or small. The smallest hand is "
-        "often the one that lifts you when you fall.",
+        _t("Be kind to everyone, little one, big or small. The smallest hand is "
+        "often the one that lifts you when you fall.", 'सबके साथ नरमी से पेश आना, नन्ही जान — छोटे हों या बड़े। गिरने पर अक्सर सबसे छोटा हाथ ही उठाता है।'),
   ),
   FatherTale(
     id: 'fa10',
     kind: FatherTaleKind.fable,
-    title: 'The Squirrel and the Feast',
+    title: _t('The Squirrel and the Feast', 'गिलहरी और दावत'),
     body:
-        "All autumn a squirrel gathered acorns while a careless mouse feasted "
+        _t("All autumn a squirrel gathered acorns while a careless mouse feasted "
         "and played. \"Why work when the woods are full?\" laughed the mouse. "
         "\"Eat! Enjoy!\" But winter came hard and white, and the woods went bare "
         "and silent. The shivering mouse crept to the squirrel's door, and the "
         "squirrel - who had worked and saved - opened it, and shared. \"I won't "
         "scold you,\" she said, setting out acorns. \"But come spring, gather a "
         "little while you feast. The kindest thing you can do for your future "
-        "self is to think of him today.\"",
-    moral: 'A little saved in good times is a kindness to the self who meets hard ones.',
+        "self is to think of him today.\"", 'पूरी पतझड़ एक गिलहरी बलूत के फल जमा करती रही, जबकि एक लापरवाह चूहा खाता-खेलता रहा। "जब जंगल भरा हुआ है तो मेहनत क्यों?" चूहा हँसा। "खाओ! मज़े करो!" पर जाड़ा कड़ा और सफ़ेद होकर आया, और जंगल ख़ाली और चुप पड़ गया। ठिठुरता चूहा गिलहरी के दरवाज़े तक पहुँचा, और गिलहरी ने — जिसने मेहनत की थी और बचाया था — दरवाज़ा खोला, और बाँट दिया। "मैं तुम्हें डाँटूँगी नहीं," उसने फल निकालते हुए कहा। "पर बसंत आए, तो दावत के साथ-साथ थोड़ा जमा भी करना। अपने आने वाले कल के लिए तुम जो सबसे बड़ी नरमी कर सकते हो, वो यही है कि आज उसका ख़याल रखो।"'),
+    moral: _t('A little saved in good times is a kindness to the self who meets hard ones.', 'अच्छे दिनों में थोड़ा बचा लेना, उस अपने के लिए नरमी है जिसे आगे मुश्किल दिन देखने हैं।'),
     dadNote:
-        "Enjoy the good days fully, little one - but tuck a little away too. "
-        "Your future self is someone worth looking after.",
+        _t("Enjoy the good days fully, little one - but tuck a little away too. "
+        "Your future self is someone worth looking after.", 'अच्छे दिनों का पूरा मज़ा लेना, नन्ही जान — पर थोड़ा सँभालकर भी रखना। तुम्हारा आने वाला कल भी किसी अपने का है, जिसका ख़याल रखना बनता है।'),
   ),
   FatherTale(
     id: 'fa11',
     kind: FatherTaleKind.fable,
-    title: 'The Clever Mouse and the Bell',
+    title: _t('The Clever Mouse and the Bell', 'चालाक चूहा और घंटी'),
     body:
-        "The mice lived in terror of the cat, until a young one had a bold idea: "
+        _t("The mice lived in terror of the cat, until a young one had a bold idea: "
         "\"Let's tie a bell around the cat's neck, so we'll always hear it "
         "coming!\" The mice cheered - until an old grey mouse asked quietly, \"A "
         "fine plan. Now, which of us will hang the bell?\" The cheering stopped. "
         "Not one mouse stepped forward. \"A clever idea,\" said the old mouse, "
         "\"is only worth as much as the courage to carry it out. Do not mistake "
-        "the wish for the deed.\"",
-    moral: 'An idea is only as good as the courage that puts it to work.',
+        "the wish for the deed.\"", 'चूहे बिल्ली के डर में जीते थे, तब तक कि एक जवान चूहे को एक बहादुर तरकीब सूझी: "क्यों न बिल्ली के गले में एक घंटी बाँध दें, ताकि उसके आने की आवाज़ हमेशा सुनाई दे!" चूहों ने ख़ुशी में शोर मचाया — जब तक एक बूढ़े सलेटी चूहे ने धीरे से नहीं पूछा, "बढ़िया तरकीब है। अब बताओ, घंटी बाँधने कौन जाएगा?" शोर थम गया। एक भी चूहा आगे नहीं बढ़ा। "चालाक तरकीब की क़ीमत," बूढ़े चूहे ने कहा, "उतनी ही होती है जितनी उसे कर दिखाने की हिम्मत। इरादे को काम समझने की भूल मत करना।"'),
+    moral: _t('An idea is only as good as the courage that puts it to work.', 'किसी तरकीब की क़ीमत उतनी ही है, जितनी उसे कर दिखाने की हिम्मत।'),
     dadNote:
-        "Dream up bold plans, little one - then be the one brave enough to act "
-        "on them. Wishing and doing are different things.",
+        _t("Dream up bold plans, little one - then be the one brave enough to act "
+        "on them. Wishing and doing are different things.", 'बड़ी-बड़ी तरकीबें सोचना, नन्ही जान — और फिर उन्हें कर दिखाने की हिम्मत भी ख़ुद करना। चाहना और करना, दो अलग बातें हैं।'),
   ),
   FatherTale(
     id: 'fa12',
     kind: FatherTaleKind.fable,
-    title: 'The Two Goats on the Narrow Log',
+    title: _t('The Two Goats on the Narrow Log', 'पतली लकड़ी पर दो बकरे'),
     body:
-        "Two stubborn goats met in the middle of a narrow log crossing a deep "
+        _t("Two stubborn goats met in the middle of a narrow log crossing a deep "
         "ravine, each facing the other. \"Move aside! I was here first!\" "
         "bellowed one. \"Never! Move yourself!\" snapped the other. They locked "
         "horns, pushed and shoved - and both tumbled together into the rushing "
         "water below. A third goat watched from the bank, then crossed by simply "
         "lying down to let her neighbour step gently over. \"I lost a moment's "
-        "pride,\" she said, shaking off the dust, \"and kept everything else.\"",
-    moral: 'A little yielding can carry you across what stubbornness only sinks.',
+        "pride,\" she said, shaking off the dust, \"and kept everything else.\"", 'दो ज़िद्दी बकरे एक गहरी खाई पर पड़ी पतली लकड़ी के बीचोबीच आमने-सामने आ गए। "हट जाओ! मैं पहले आया था!" एक गरजा। "कभी नहीं! ख़ुद हटो!" दूसरे ने झिड़का। दोनों सींग भिड़ाकर धकियाते रहे — और साथ ही नीचे बहते पानी में जा गिरे। एक तीसरी बकरी किनारे से यह सब देख रही थी; उसने आगे चलकर बस लेट जाना चुना और अपने पड़ोसी को धीरे से ऊपर से गुज़र जाने दिया। "मैंने एक पल का घमंड खोया," उसने धूल झाड़ते हुए कहा, "और बाक़ी सब बचा लिया।"'),
+    moral: _t('A little yielding can carry you across what stubbornness only sinks.', 'थोड़ा-सा झुक जाना वहाँ पार करा देता है, जहाँ ज़िद सिर्फ़ डुबोती है।'),
     dadNote:
-        "Standing your ground matters, little one - but so does knowing when to "
-        "let someone pass. Pride is a costly bridge.",
+        _t("Standing your ground matters, little one - but so does knowing when to "
+        "let someone pass. Pride is a costly bridge.", 'अपनी बात पर टिके रहना ज़रूरी है, नन्ही जान — पर यह जानना भी कि किसी को रास्ता कब देना है। घमंड बहुत महँगा पुल है।'),
   ),
   FatherTale(
     id: 'fa13',
     kind: FatherTaleKind.fable,
-    title: 'The Caterpillar Who Was Teased',
+    title: _t('The Caterpillar Who Was Teased', 'वो इल्ली जिसे चिढ़ाया गया'),
     body:
-        "A plump caterpillar inched slowly along a branch while the swift "
+        _t("A plump caterpillar inched slowly along a branch while the swift "
         "insects mocked her. \"Look at the slow, fat crawler! She'll never go "
         "anywhere!\" The caterpillar said nothing. Quietly she spun herself a "
         "small silk room and disappeared inside, and the teasing insects forgot "
         "all about her. Then one bright morning the cocoon split, and out "
         "climbed a butterfly with wings like stained glass, lifting on the "
         "breeze far above them all. \"You only saw what I was,\" she called down "
-        "softly, \"never what I was becoming.\"",
-    moral: 'Never judge anyone - or yourself - by an unfinished chapter.',
+        "softly, \"never what I was becoming.\"", 'एक मोटी इल्ली एक टहनी पर धीरे-धीरे सरक रही थी, और तेज़ उड़ने वाले कीड़े उसका मज़ाक़ उड़ा रहे थे। "देखो इस सुस्त, मोटी रेंगने वाली को! यह कहीं नहीं पहुँचेगी!" इल्ली ने कुछ नहीं कहा। उसने चुपचाप अपने चारों ओर रेशम का एक छोटा कमरा बुना और भीतर ग़ायब हो गई, और चिढ़ाने वाले कीड़े उसे भूल ही गए। फिर एक चमकीली सुबह वह ख़ोल फटा, और भीतर से एक तितली निकली — रंगीन काँच जैसे पंखों वाली — हवा पर उठकर उन सबसे कहीं ऊपर। "तुमने बस वो देखा जो मैं थी," उसने ऊपर से नरमी से पुकारा, "वो कभी नहीं जो मैं बन रही थी।"'),
+    moral: _t('Never judge anyone - or yourself - by an unfinished chapter.', 'किसी को — और ख़ुद को भी — अधूरे अध्याय से मत आँकना।'),
     dadNote:
-        "If anyone mocks who you are right now, little one, remember: they can't "
-        "see who you're becoming. But I can.",
+        _t("If anyone mocks who you are right now, little one, remember: they can't "
+        "see who you're becoming. But I can.", 'अगर कोई इस बात का मज़ाक़ उड़ाए कि तुम अभी क्या हो, नन्ही जान, तो याद रखना: उन्हें यह नहीं दिखता कि तुम्हारे भीतर क्या बन रहा है। पर मुझे दिखता है।'),
   ),
   FatherTale(
     id: 'fa14',
     kind: FatherTaleKind.fable,
-    title: 'The Jackal in Borrowed Colours',
+    title: _t('The Jackal in Borrowed Colours', 'उधार के रंग वाला गीदड़'),
     body:
-        "A jackal fell into a dyer's vat and climbed out stained a brilliant "
+        _t("A jackal fell into a dyer's vat and climbed out stained a brilliant "
         "blue. The other animals, having never seen such a creature, bowed and "
         "made him their king. He strutted and ruled and pretended to be "
         "something rare - until one night, hearing a distant pack, he forgot "
@@ -670,123 +674,123 @@ const List<FatherTale> kFatherTales = [
         "after all. His borrowed colours could not hide his true voice, and his "
         "little kingdom scattered, laughing. \"I might have been loved as I truly "
         "was,\" he realised too late, \"instead of feared as something I was "
-        "not.\"",
-    moral: 'Pretending to be more than you are costs the chance to be loved for who you are.',
+        "not.\"", 'एक गीदड़ रंगरेज़ के कुंड में गिर पड़ा और बाहर निकला तो चमकीले नीले रंग में रंगा हुआ था। बाक़ी जानवरों ने ऐसा जीव पहले कभी नहीं देखा था, सो उन्होंने सिर झुकाकर उसे अपना राजा बना लिया। वह अकड़कर चलता, हुकुम चलाता, और कोई दुर्लभ चीज़ होने का नाटक करता रहा — जब तक एक रात, दूर कहीं अपने झुंड की आवाज़ सुनकर, वह ख़ुद को भूल गया और हुआँ-हुआँ कर बैठा। उसी पल हर जानवर वह आवाज़ पहचान गया: आख़िर में गीदड़ ही तो था। उधार के रंग उसकी असली आवाज़ नहीं छिपा सके, और उसकी छोटी-सी बादशाहत हँसती हुई बिखर गई। "जो मैं सचमुच था, उसी रूप में शायद मुझे प्यार मिल जाता," उसे बहुत देर से समझ आया, "उस चीज़ की तरह डराए जाने से बेहतर, जो मैं था ही नहीं।"'),
+    moral: _t('Pretending to be more than you are costs the chance to be loved for who you are.', 'ख़ुद से बड़ा दिखने का नाटक, जो तुम हो उसी के लिए प्यार पाने का मौक़ा छीन लेता है।'),
     dadNote:
-        "You never have to paint yourself blue to matter, little one. The real "
-        "you is more than enough - and far easier to carry.",
+        _t("You never have to paint yourself blue to matter, little one. The real "
+        "you is more than enough - and far easier to carry.", 'मायने रखने के लिए ख़ुद पर नीला रंग पोतने की कभी ज़रूरत नहीं, नन्ही जान। तुम जैसे हो, वही काफ़ी से ज़्यादा है — और उसे ढोना कहीं आसान भी।'),
   ),
   FatherTale(
     id: 'fa15',
     kind: FatherTaleKind.fable,
-    title: 'The Bee and the Idle Drone',
+    title: _t('The Bee and the Idle Drone', 'मेहनती मधुमक्खी और निठल्ला नर'),
     body:
-        "All summer a worker bee flew from blossom to blossom while an idle "
+        _t("All summer a worker bee flew from blossom to blossom while an idle "
         "drone lounged in the sun. \"You'll wear your wings out,\" the drone "
         "yawned. \"The hive will feed me anyway.\" But when the cold set in and "
         "food grew scarce, the hive could no longer spare a share for one who "
         "had given nothing. The worker bee, though, was warm and welcome, fed "
         "gladly by all. \"I didn't gather only for myself,\" she said. \"I "
-        "gathered for the hive - and the hive remembers who carried it.\"",
-    moral: 'What we give to those around us comes back to hold us up.',
+        "gathered for the hive - and the hive remembers who carried it.\"", 'पूरी गरमी एक मेहनती मधुमक्खी फूल-फूल उड़ती रही, जबकि एक निठल्ला नर धूप में पड़ा रहा। "तुम्हारे पंख घिस जाएँगे," उसने जम्हाई लेते हुए कहा। "छत्ता तो मुझे वैसे भी खिला ही देगा।" पर जब ठंड उतरी और खाना कम पड़ा, तो छत्ते के पास ऐसे किसी के लिए हिस्सा नहीं बचा जिसने कुछ दिया ही नहीं था। मेहनती मधुमक्खी को, इसके उलट, सब गरमजोशी से और ख़ुशी से खिलाते रहे। "मैंने सिर्फ़ अपने लिए जमा नहीं किया था," उसने कहा। "मैंने छत्ते के लिए किया था — और छत्ता याद रखता है कि उसे किसने सँभाला।"'),
+    moral: _t('What we give to those around us comes back to hold us up.', 'जो हम अपने आसपास वालों को देते हैं, वही लौटकर हमें थाम लेता है।'),
     dadNote:
-        "Do your share, little one, and a little more. The ones you help in "
-        "summer are the ones who'll keep you warm in winter.",
+        _t("Do your share, little one, and a little more. The ones you help in "
+        "summer are the ones who'll keep you warm in winter.", 'अपना हिस्सा ज़रूर करना, नन्ही जान, और उससे थोड़ा ज़्यादा भी। गरमियों में जिनका साथ दो, सर्दियों में वही तुम्हें गरम रखते हैं।'),
   ),
   FatherTale(
     id: 'fa16',
     kind: FatherTaleKind.fable,
-    title: 'The Hawk and the Contented Hen',
+    title: _t('The Hawk and the Contented Hen', 'बाज़ और संतुष्ट मुर्गी'),
     body:
-        "A hawk soared above a farmyard and sneered at a hen scratching in the "
+        _t("A hawk soared above a farmyard and sneered at a hen scratching in the "
         "dirt. \"What a small, dull life - pecking at seeds while I command the "
         "sky!\" The hen looked up calmly. \"You hunt all day, alone and hungry, "
         "and sleep with one eye open. I have warm straw, full grain, and chicks "
         "who tuck under my wing each night. Your sky is wide, friend - but my "
         "small yard is full.\" The hawk flew on, and found, somewhere over the "
-        "cold hills, that he had nothing to say.",
-    moral: 'A life is measured not by how high it flies, but by how full it is.',
+        "cold hills, that he had nothing to say.", 'एक बाज़ खलिहान के ऊपर उड़ता हुआ मिट्टी कुरेदती एक मुर्गी पर तंज़ कस बैठा। "कितनी छोटी, कितनी फीकी ज़िंदगी — दाने चुगती रहती हो, और मैं पूरे आसमान पर राज करता हूँ!" मुर्गी ने शांति से ऊपर देखा। "तुम दिन भर शिकार करते हो, अकेले और भूखे, और एक आँख खोलकर सोते हो। मेरे पास गरम पुआल है, भरपूर दाना है, और चूज़े हैं जो हर रात मेरे पंख के नीचे दुबक जाते हैं। तुम्हारा आसमान चौड़ा है, दोस्त — पर मेरा छोटा आँगन भरा हुआ है।" बाज़ आगे उड़ गया, और कहीं ठंडी पहाड़ियों के ऊपर उसे लगा कि कहने को उसके पास कुछ नहीं है।'),
+    moral: _t('A life is measured not by how high it flies, but by how full it is.', 'ज़िंदगी इससे नहीं नापी जाती कि वो कितनी ऊँची उड़ी, बल्कि इससे कि वो कितनी भरी हुई थी।'),
     dadNote:
-        "Don't envy anyone's sky, little one. A small life, full of warmth and "
-        "the ones you love, is a rich life indeed.",
+        _t("Don't envy anyone's sky, little one. A small life, full of warmth and "
+        "the ones you love, is a rich life indeed.", 'किसी के आसमान से जलना मत, नन्ही जान। एक छोटी-सी ज़िंदगी, गरमाहट और अपनों से भरी हुई, सच में अमीर ज़िंदगी होती है।'),
   ),
   FatherTale(
     id: 'fa17',
     kind: FatherTaleKind.fable,
-    title: 'The Spider Who Began Again',
+    title: _t('The Spider Who Began Again', 'वो मकड़ी जिसने फिर से शुरू किया'),
     body:
-        "A spider strung her web between two reeds, and the wind tore it down. "
+        _t("A spider strung her web between two reeds, and the wind tore it down. "
         "She spun it again; a deer brushed past and broke it. A third time, and "
         "the rain washed it away. A beetle watching shook his head. \"Give up - "
         "the world is against you.\" But the spider only set her first silk "
         "thread once more. By dawn her web hung perfect and jewelled with dew, "
         "catching the morning light and her breakfast besides. \"The world "
         "wasn't against me,\" she said. \"It was only seeing whether I meant "
-        "it.\"",
-    moral: 'Begin again often enough, and what kept stopping you finally steps aside.',
+        "it.\"", 'एक मकड़ी ने दो सरकंडों के बीच जाला बुना, और हवा ने उसे तोड़ दिया। उसने फिर बुना; एक हिरन छूकर निकल गया और जाला फट गया। तीसरी बार बुना, और बारिश उसे बहा ले गई। देख रहे एक भृंग ने सिर हिलाया। "छोड़ दो — दुनिया तुम्हारे ख़िलाफ़ है।" पर मकड़ी ने बस अपना पहला रेशमी धागा एक बार और बाँध दिया। सुबह होते-होते उसका जाला बेदाग़ लटक रहा था, ओस के मोतियों से जड़ा, सुबह की रोशनी के साथ-साथ अपना नाश्ता भी पकड़े हुए। "दुनिया मेरे ख़िलाफ़ नहीं थी," उसने कहा। "वह बस देख रही थी कि मेरा इरादा सच्चा है या नहीं।"'),
+    moral: _t('Begin again often enough, and what kept stopping you finally steps aside.', 'बार-बार फिर से शुरू करो, तो जो रोकता रहा है, वह आख़िर में रास्ता छोड़ देता है।'),
     dadNote:
-        "You'll have webs torn down, little one. Spin the next thread anyway. "
-        "Persistence is just love that refuses to quit.",
+        _t("You'll have webs torn down, little one. Spin the next thread anyway. "
+        "Persistence is just love that refuses to quit.", 'तुम्हारे जाले भी टूटेंगे, नन्ही जान। फिर भी अगला धागा बुन देना। लगे रहना बस वो प्यार है, जो हार मानने से इनकार कर दे।'),
   ),
   FatherTale(
     id: 'fa18',
     kind: FatherTaleKind.fable,
-    title: 'The Fox and the Overfull Belly',
+    title: _t('The Fox and the Overfull Belly', 'लोमड़ी और भरा हुआ पेट'),
     body:
-        "A hungry fox squeezed through a narrow gap into a granary and ate, and "
+        _t("A hungry fox squeezed through a narrow gap into a granary and ate, and "
         "ate, and ate, until his belly was round and tight. But when he tried to "
         "leave, he was far too full to fit back through the gap. Stuck and "
         "groaning, he had to wait, hungry and uncomfortable, until his belly "
         "shrank back to the size it had been when he came in. \"All that "
         "feasting,\" he sighed, crawling out at last, \"and I leave exactly as I "
-        "arrived. Enough would have served me better than too much.\"",
-    moral: 'Enough is a feast; too much is its own kind of trap.',
+        "arrived. Enough would have served me better than too much.\"", 'एक भूखी लोमड़ी एक तंग झिरी से अनाज के गोदाम में घुस गई और खाती रही, खाती रही, खाती रही — जब तक उसका पेट गोल और तना हुआ न हो गया। पर जब निकलने चली, तो वह उसी झिरी से वापस निकलने के लिए कहीं ज़्यादा भरी हुई थी। फँसी और कराहती हुई, उसे तब तक इंतज़ार करना पड़ा — भूखी और बेचैन — जब तक उसका पेट वापस उतना ही न हो गया, जितना अंदर आते वक़्त था। "इतनी दावत," उसने आख़िर बाहर रेंगते हुए आह भरी, "और मैं ठीक वैसी ही लौट रही हूँ जैसी आई थी। ज़रूरत भर मेरे कहीं ज़्यादा काम आता, इस हद से ज़्यादा के बजाय।"'),
+    moral: _t('Enough is a feast; too much is its own kind of trap.', 'ज़रूरत भर ही दावत है; हद से ज़्यादा अपने आप में एक जाल है।'),
     dadNote:
-        "Enjoy good things, little one - but know when enough is enough. More "
-        "isn't always more; sometimes it just gets you stuck.",
+        _t("Enjoy good things, little one - but know when enough is enough. More "
+        "isn't always more; sometimes it just gets you stuck.", 'अच्छी चीज़ों का मज़ा लेना, नन्ही जान — पर यह जानना भी कि बस, इतना काफ़ी है। ज़्यादा हमेशा ज़्यादा नहीं होता; कभी-कभी वो बस फँसा देता है।'),
   ),
   FatherTale(
     id: 'fa19',
     kind: FatherTaleKind.fable,
-    title: 'The Owl Who Judged in Haste',
+    title: _t('The Owl Who Judged in Haste', 'वो उल्लू जिसने जल्दबाज़ी में फ़ैसला सुनाया'),
     body:
-        "An owl saw a young fox digging frantically at the roots of a tree and "
+        _t("An owl saw a young fox digging frantically at the roots of a tree and "
         "snapped, \"Lazy, destructive creature, ruining the forest!\" and told "
         "all the animals so. But the fox had smelled smoke; he was digging a "
         "firebreak to stop a blaze creeping up the valley. By the time the owl "
         "understood, the fox had already saved a whole stretch of woodland - and "
         "the owl's hasty words. \"I judged what I saw,\" the owl admitted, "
-        "ashamed, \"before I understood what I was looking at.\"",
-    moral: 'Understand first; judge later - or you may scold the very one who is saving you.',
+        "ashamed, \"before I understood what I was looking at.\"", 'एक उल्लू ने देखा कि एक जवान लोमड़ी पेड़ की जड़ों के पास बेतहाशा खोद रही है, और वह झिड़क उठा, "आलसी, तोड़-फोड़ करने वाली, जंगल बरबाद कर रही है!" — और यही बात उसने सब जानवरों को बता दी। पर लोमड़ी को धुएँ की गंध आ गई थी; वह घाटी में ऊपर चढ़ती आग रोकने के लिए एक ख़ाई खोद रही थी। जब तक उल्लू को समझ आया, लोमड़ी जंगल का एक पूरा हिस्सा बचा चुकी थी — और उल्लू के जल्दबाज़ी में कहे शब्द भी। "मैंने जो देखा, उस पर फ़ैसला सुना दिया," उल्लू ने शर्मिंदा होकर माना, "यह समझने से पहले कि मैं देख क्या रहा था।"'),
+    moral: _t('Understand first; judge later - or you may scold the very one who is saving you.', 'पहले समझो, फ़ैसला बाद में — वरना डाँट उसी को पड़ जाएगी, जो तुम्हें बचा रहा है।'),
     dadNote:
-        "Before you decide what someone is, little one, find out what they're "
-        "doing and why. Most stories look different up close.",
+        _t("Before you decide what someone is, little one, find out what they're "
+        "doing and why. Most stories look different up close.", 'किसी के बारे में राय बनाने से पहले, नन्ही जान, यह पता करना कि वो कर क्या रहा है और क्यों। ज़्यादातर कहानियाँ पास से अलग दिखती हैं।'),
   ),
   FatherTale(
     id: 'fa20',
     kind: FatherTaleKind.fable,
-    title: 'The Drummer Ants',
+    title: _t('The Drummer Ants', 'ताल पर चलती चींटियाँ'),
     body:
-        "A colony of ants faced a stream too wide to cross, and they pushed and "
+        _t("A colony of ants faced a stream too wide to cross, and they pushed and "
         "scrambled in a panicked, useless crowd. Then one small ant began to tap "
         "a steady rhythm - tap, tap, tap - and the others, almost without "
         "thinking, began to move in time. Together, in rhythm, they linked legs "
         "and bodies into a living bridge and crossed the water as one. \"We were "
         "the same ants a moment ago,\" they marvelled. \"All that changed was "
-        "that we moved together.\"",
-    moral: 'A crowd becomes a force the moment it moves as one.',
+        "that we moved together.\"", 'चींटियों की एक बस्ती के सामने एक ऐसी धारा आ गई जो पार करने के लिए बहुत चौड़ी थी, और वे घबराई हुई, बेकार की भीड़ बनकर धक्का-मुक्की करने लगीं। तभी एक नन्ही चींटी ने एक ठहरी हुई ताल पीटनी शुरू की — टप, टप, टप — और बाक़ी सब, लगभग बिना सोचे, उसी ताल पर चलने लगीं। साथ-साथ, एक ही लय में, उन्होंने अपने पैर और शरीर जोड़कर एक ज़िंदा पुल बनाया और पानी को एक होकर पार कर लिया। "अभी थोड़ी देर पहले हम वही चींटियाँ थीं," उन्होंने हैरान होकर कहा। "बदला बस इतना कि हम साथ चलने लगे।"'),
+    moral: _t('A crowd becomes a force the moment it moves as one.', 'भीड़ उसी पल ताक़त बन जाती है, जब वो एक होकर चलती है।'),
     dadNote:
-        "Alone you are strong, little one. In step with others, you can build a "
-        "bridge across almost anything.",
+        _t("Alone you are strong, little one. In step with others, you can build a "
+        "bridge across almost anything.", 'अकेले भी तुममें ताक़त है, नन्ही जान। और औरों के साथ क़दम मिल जाएँ, तो लगभग किसी भी चीज़ पर पुल बन सकता है।'),
   ),
 
   // ============================================================ MYTHS (20) ===
   FatherTale(
     id: 'my1',
     kind: FatherTaleKind.myth,
-    title: 'The Leap of Hanuman',
+    title: _t('The Leap of Hanuman', 'हनुमान की छलांग'),
     body:
-        "Long ago, a mighty figure named Hanuman stood at the edge of the sea, "
+        _t("Long ago, a mighty figure named Hanuman stood at the edge of the sea, "
         "which stretched so far that no shore could be seen on the other side. "
         "His friends needed him to cross it, but the water was endless and his "
         "heart filled with doubt. Then a wise voice reminded him of who he truly "
@@ -794,17 +798,17 @@ const List<FatherTale> kFatherTales = [
         "only to be remembered. Hanuman breathed deep, grew vast as a mountain, "
         "and leapt. He flew over the whole ocean in a single bound, clearing "
         "clouds and crests, because once he believed in his own strength, "
-        "nothing could hold him back.",
+        "nothing could hold him back.", 'बहुत पुरानी बात है। हनुमान नाम का एक बलशाली वीर समंदर के किनारे खड़ा था — समंदर इतना फैला हुआ कि दूसरा किनारा कहीं दिखता ही नहीं था। उसके साथियों को उसका पार जाना ज़रूरी था, पर पानी अंतहीन था और उसका मन शक से भर गया। तभी एक समझदार आवाज़ ने उसे याद दिलाया कि वह असल में है कौन — कि नाप से बाहर की ताक़त हमेशा से उसके भीतर सोई थी, बस याद किए जाने का इंतज़ार करती हुई। हनुमान ने गहरी साँस ली, पहाड़ जितना विशाल हुआ, और छलांग लगा दी। वह पूरे समंदर के ऊपर से एक ही छलांग में उड़ गया, बादलों और लहरों को चीरता हुआ — क्योंकि जिस पल उसने अपनी ताक़त पर भरोसा किया, उसे कोई रोक नहीं सका।'),
     dadNote:
-        "One day you'll face your own ocean, little one. I'll be the voice that "
-        "reminds you how strong you already are.",
+        _t("One day you'll face your own ocean, little one. I'll be the voice that "
+        "reminds you how strong you already are.", 'एक दिन तुम्हारे सामने भी तुम्हारा अपना समंदर होगा, नन्ही जान। मैं वो आवाज़ रहूँगा, जो याद दिलाएगी कि तुममें कितनी ताक़त पहले से है।'),
   ),
   FatherTale(
     id: 'my2',
     kind: FatherTaleKind.myth,
-    title: 'Abhimanyu, Who Listened in the Womb',
+    title: _t('Abhimanyu, Who Listened in the Womb', 'अभिमन्यु, जिसने माँ के गर्भ में सुना'),
     body:
-        "Long ago, before the brave warrior Abhimanyu was even born, his father "
+        _t("Long ago, before the brave warrior Abhimanyu was even born, his father "
         "told his mother the secret of breaking into a great spiral battle "
         "formation. Curled and listening inside her, the unborn child drank in "
         "every word - how to enter, how to fight his way in, ring by ring. But "
@@ -812,51 +816,51 @@ const List<FatherTale> kFatherTales = [
         "again, and so the child learned only half. Years later, grown and bold, "
         "Abhimanyu broke into that very formation exactly as he had heard in the "
         "dark before his birth. Even before they are born, the old tellers said, "
-        "children are listening - and what we say around them takes root.",
+        "children are listening - and what we say around them takes root.", 'बहुत पुरानी बात है — वीर योद्धा अभिमन्यु के जन्म से भी पहले, उसके पिता ने उसकी माँ को एक बड़े चक्रव्यूह में घुसने का रहस्य सुनाया। माँ के भीतर सिमटा हुआ, सुनता हुआ, वह अजन्मा बच्चा एक-एक शब्द पी गया — कैसे घुसना है, कैसे घेरा दर घेरा लड़ते हुए भीतर बढ़ना है। पर उसकी माँ को नींद आ गई, इससे पहले कि बाहर निकलने का तरीक़ा बताया जाता, और इसलिए बच्चे ने बस आधा ही सीखा। बरसों बाद, बड़ा और निडर, अभिमन्यु उसी व्यूह में ठीक वैसे ही घुसा, जैसे उसने जन्म से पहले अँधेरे में सुना था। पुराने क़िस्सागो कहते थे: जन्म से पहले भी बच्चे सुन रहे होते हैं — और जो हम उनके आसपास कहते हैं, वह जड़ पकड़ लेता है।'),
     dadNote:
-        "You're listening to me right now, little one, long before you can "
-        "understand. So I'll fill these days with words worth keeping.",
+        _t("You're listening to me right now, little one, long before you can "
+        "understand. So I'll fill these days with words worth keeping.", 'मेरी आवाज़ अभी इसी वक़्त तुम तक पहुँच रही है, नन्ही जान, समझ आने से बहुत पहले। इसलिए मैं इन दिनों को ऐसे शब्दों से भरूँगा, जो सँभालने लायक़ हों।'),
   ),
   FatherTale(
     id: 'my3',
     kind: FatherTaleKind.myth,
-    title: 'Ganesha Circles His Parents',
+    title: _t('Ganesha Circles His Parents', 'गणेश ने माँ-बाप की परिक्रमा की'),
     body:
-        "Two divine brothers were set a contest: whoever could circle the whole "
+        _t("Two divine brothers were set a contest: whoever could circle the whole "
         "world three times would win the prize. The swift one leapt upon his "
         "mount and sped off around the earth, sure of victory. But round little "
         "Ganesha simply walked three slow circles around his mother and father, "
         "then bowed. \"The contest was the world,\" the judges said. \"And you "
         "are my whole world,\" answered Ganesha, gesturing to his parents. He was "
         "given the prize - not for speed, but for wisdom. Sometimes the greatest "
-        "journey is the small circle you make around the ones you love.",
+        "journey is the small circle you make around the ones you love.", 'दो देव भाइयों के बीच एक होड़ रखी गई: जो भी पूरी दुनिया के तीन चक्कर पहले लगा ले, इनाम उसी का। तेज़ चलने वाला भाई अपने वाहन पर सवार होकर धरती के चक्कर लगाने निकल पड़ा, जीत का पूरा भरोसा लिए। पर गोल-मटोल छोटे गणेश ने बस अपनी माँ और अपने पिता के चारों ओर तीन धीमे चक्कर लगाए, और सिर झुका दिया। "होड़ तो दुनिया की थी," फ़ैसला करने वालों ने कहा। "और मेरी पूरी दुनिया यही हैं," गणेश ने अपने माँ-बाप की ओर इशारा करते हुए जवाब दिया। इनाम उन्हें ही मिला — तेज़ी के लिए नहीं, समझ के लिए। कभी-कभी सबसे बड़ी यात्रा वही छोटा-सा घेरा होती है, जो हम अपने चाहने वालों के चारों ओर बनाते हैं।'),
     dadNote:
-        "You don't have to race around the world to make me proud, little one. "
-        "Some of the wisest journeys are the short ones, made with love.",
+        _t("You don't have to race around the world to make me proud, little one. "
+        "Some of the wisest journeys are the short ones, made with love.", 'मुझे गर्व महसूस कराने के लिए तुम्हें दुनिया के चक्कर लगाने की ज़रूरत नहीं, नन्ही जान। सबसे समझदार यात्राओं में कई छोटी ही होती हैं, प्यार से तय की हुई।'),
   ),
   FatherTale(
     id: 'my4',
     kind: FatherTaleKind.myth,
-    title: 'Krishna Lifts the Hill',
+    title: _t('Krishna Lifts the Hill', 'कृष्ण ने पहाड़ उठाया'),
     body:
-        "When fierce storms came to flood a village, the people trembled, for "
+        _t("When fierce storms came to flood a village, the people trembled, for "
         "they had always begged the sky for mercy and still the rains came. A "
         "young cowherd named Krishna told them to look instead to their own hill, "
         "which sheltered and fed them all year. Then, as the skies broke open, he "
         "lifted the entire hill upon one finger and held it high like a great "
         "umbrella, and the whole village - people, cattle, and all - sheltered "
         "beneath it, dry and safe, until the storm wore itself out. He asked for "
-        "no worship, only that they remember who truly shelters them.",
+        "no worship, only that they remember who truly shelters them.", 'जब भयंकर तूफ़ान एक गाँव को डुबोने आए, तो लोग काँप उठे — वे हमेशा आसमान से दया माँगते आए थे, और फिर भी बारिश आती ही रही। कृष्ण नाम के एक जवान ग्वाले ने उनसे कहा कि वे अपने ही पहाड़ की तरफ़ देखें, जो साल भर उन्हें आसरा और खाना देता है। फिर, जैसे ही आसमान फटा, उसने पूरा पहाड़ एक उँगली पर उठा लिया और किसी बड़े छाते की तरह ऊपर थाम लिया, और पूरा गाँव — लोग, गाय-बैल, सब — उसके नीचे सूखा और महफ़ूज़ बैठा रहा, जब तक तूफ़ान ख़ुद थक न गया। उसने पूजा नहीं माँगी, बस इतना कि लोग याद रखें कि उन्हें असल में आसरा कौन देता है।'),
     dadNote:
-        "If the storms ever come for you, little one, I'll be your hill - "
-        "holding the sky off you until the worst has passed.",
+        _t("If the storms ever come for you, little one, I'll be your hill - "
+        "holding the sky off you until the worst has passed.", 'अगर कभी तूफ़ान तुम्हारी तरफ़ आएँ, नन्ही जान, तो मैं तुम्हारा पहाड़ बनूँगा — तुम्हारे ऊपर आसमान थामे हुए, जब तक सबसे बुरा गुज़र न जाए।'),
   ),
   FatherTale(
     id: 'my5',
     kind: FatherTaleKind.myth,
-    title: 'Shravan and His Parents',
+    title: _t('Shravan and His Parents', 'श्रवण और उसके माँ-बाप'),
     body:
-        "Long ago a devoted son named Shravan cared for his aged, blind parents, "
+        _t("Long ago a devoted son named Shravan cared for his aged, blind parents, "
         "who longed to visit the holy rivers before they grew too old. Too poor "
         "for a cart, Shravan made a sling of bamboo, seated his mother and "
         "father in baskets on either end, balanced the pole across his own "
@@ -864,17 +868,17 @@ const List<FatherTale> kFatherTales = [
         "sacred place they wished to see. He never once complained of the "
         "weight. The old tellers held him up forever after as the very picture "
         "of a child's love - proof that the care our parents give us is meant, "
-        "one day, to be gently carried back.",
+        "one day, to be gently carried back.", 'बहुत पुरानी बात है। श्रवण नाम का एक भक्त बेटा अपने बूढ़े, नेत्रहीन माँ-बाप की सेवा करता था, जिनकी इच्छा थी कि बहुत बूढ़े होने से पहले वे पवित्र नदियों के दर्शन कर लें। गाड़ी के लिए पैसे नहीं थे, तो श्रवण ने बाँस की एक कावड़ बनाई, माँ और पिता को दोनों सिरों की टोकरियों में बिठाया, बाँस अपने कंधों पर सँभाला, और उन्हें पैदल ही जंगलों और पहाड़ों के पार, हर उस तीर्थ तक ले गया जो वे देखना चाहते थे। उसने वज़न की शिकायत एक बार भी नहीं की। पुराने क़िस्सागो हमेशा उसे संतान के प्रेम की सबसे साफ़ तस्वीर बताते रहे — इस बात का सबूत कि माँ-बाप जो सेवा हमें देते हैं, वह एक दिन नरमी से लौटाई जाने के लिए ही होती है।'),
     dadNote:
-        "I'll carry you when you're small, little one. Whatever you do with your "
-        "life, I hope you carry kindness the way Shravan did.",
+        _t("I'll carry you when you're small, little one. Whatever you do with your "
+        "life, I hope you carry kindness the way Shravan did.", 'जब तक तुम्हारे क़दम छोटे हैं, तुम्हें मैं उठाकर चलूँगा, नन्ही जान। आगे ज़िंदगी में जो भी करना, बस उम्मीद है कि नरमी को वैसे ही साथ लिए चलना, जैसे श्रवण ने ली थी।'),
   ),
   FatherTale(
     id: 'my6',
     kind: FatherTaleKind.myth,
-    title: "Eklavya's Devotion",
+    title: _t("Eklavya's Devotion", 'एकलव्य की लगन'),
     body:
-        "A forest boy named Eklavya longed to learn archery from the greatest "
+        _t("A forest boy named Eklavya longed to learn archery from the greatest "
         "teacher in the land, but the master would not take him. Undefeated, "
         "Eklavya shaped a humble statue of the teacher from clay, set it before "
         "him, and practised every single day with that silent image as his "
@@ -882,51 +886,51 @@ const List<FatherTale> kFatherTales = [
         "himself a skill to rival the finest archers in any kingdom. The tellers "
         "remembered him not for any prize, for his story holds its share of "
         "sorrow - but for a truth that outshone it: a heart set fully on its "
-        "purpose can teach itself almost anything.",
+        "purpose can teach itself almost anything.", 'एकलव्य नाम का एक वनवासी लड़का देश के सबसे बड़े गुरु से धनुर्विद्या सीखना चाहता था, पर गुरु ने उसे शिष्य बनाने से मना कर दिया। हार माने बिना, एकलव्य ने मिट्टी से गुरु की एक सादी मूरत गढ़ी, उसे अपने सामने रखा, और उसी ख़ामोश मूरत को अपना मार्गदर्शक मानकर हर एक दिन अभ्यास किया। सिर्फ़ लगन और लगातार मेहनत के दम पर उसने ख़ुद को ऐसा हुनर सिखा लिया, जो किसी भी राज्य के सबसे बेहतरीन धनुर्धरों के बराबर था। क़िस्सागो उसे किसी इनाम के लिए याद नहीं रखते — क्योंकि उसकी कहानी में दुख का अपना हिस्सा है — बल्कि उस सच के लिए, जो उस दुख से भी ज़्यादा चमकता है: जो मन पूरी तरह अपने मक़सद पर टिक जाए, वह ख़ुद को लगभग कुछ भी सिखा सकता है।'),
     dadNote:
-        "If a door you knock on won't open, little one, you can still teach "
-        "yourself wonders. Devotion is its own kind of teacher.",
+        _t("If a door you knock on won't open, little one, you can still teach "
+        "yourself wonders. Devotion is its own kind of teacher.", 'जिस दरवाज़े पर दस्तक दो और वो न खुले, नन्ही जान, तो भी ख़ुद को कमाल की चीज़ें सिखाई जा सकती हैं। लगन ख़ुद में एक गुरु होती है।'),
   ),
   FatherTale(
     id: 'my7',
     kind: FatherTaleKind.myth,
-    title: 'Arjuna and the Eye of the Bird',
+    title: _t('Arjuna and the Eye of the Bird', 'अर्जुन और चिड़िया की आँख'),
     body:
-        "A teacher set a wooden bird high in a tree and asked each young archer "
+        _t("A teacher set a wooden bird high in a tree and asked each young archer "
         "what he saw before he drew his bow. \"I see the tree, the branches, the "
         "leaves, the bird,\" said one. \"I see the garden and the sky,\" said "
         "another. He told them all to lower their bows. Then he came to Arjuna. "
         "\"What do you see?\" \"Only the eye of the bird,\" said Arjuna. "
         "\"Nothing else - not the tree, not the branch, not even the whole "
         "bird.\" \"Then shoot,\" said the teacher. The arrow flew true. \"That,\" "
-        "he told the others, \"is what it means to truly aim.\"",
+        "he told the others, \"is what it means to truly aim.\"", 'एक गुरु ने पेड़ पर ऊँचाई पर लकड़ी की एक चिड़िया टाँग दी और हर नौजवान धनुर्धर से पूछा कि तीर चढ़ाने से पहले उसे क्या दिख रहा है। "मुझे पेड़ दिखता है, टहनियाँ, पत्ते, और चिड़िया," एक ने कहा। "मुझे बग़ीचा और आसमान दिखता है," दूसरे ने कहा। गुरु ने सबसे धनुष नीचे करा दिए। फिर वे अर्जुन के पास आए। "तुम्हें क्या दिखता है?" "बस चिड़िया की आँख," अर्जुन ने कहा। "और कुछ नहीं — न पेड़, न टहनी, न पूरी चिड़िया तक।" "तो चलाओ," गुरु ने कहा। तीर सीधा जा लगा। "यही," उन्होंने बाक़ी सबसे कहा, "सचमुच निशाना लगाना कहलाता है।"'),
     dadNote:
-        "When something matters, little one, give it your whole gaze. The world "
-        "quiets, and the target comes clear, for those who truly look.",
+        _t("When something matters, little one, give it your whole gaze. The world "
+        "quiets, and the target comes clear, for those who truly look.", 'जब कोई चीज़ सचमुच मायने रखे, नन्ही जान, तो उस पर पूरी नज़र टिका देना। जो सचमुच देखते हैं, उनके लिए दुनिया शांत हो जाती है और निशाना साफ़ दिखने लगता है।'),
   ),
   FatherTale(
     id: 'my8',
     kind: FatherTaleKind.myth,
-    title: 'Dhruva and the Pole Star',
+    title: _t('Dhruva and the Pole Star', 'ध्रुव और ध्रुवतारा'),
     body:
-        "A small prince named Dhruva, turned away and told he was not worthy of "
+        _t("A small prince named Dhruva, turned away and told he was not worthy of "
         "his father's lap, did not sulk or rage. Instead he set off alone to "
         "seek something no one could ever take from him. With astonishing "
         "steadiness for one so young, he held to his purpose through cold and "
         "hunger and fear, refusing to be moved. So unshakable was his resolve "
         "that, the old stories say, he was lifted to the night sky and set there "
         "as the Pole Star - the one star that never wanders, around which all "
-        "the others turn. Travellers have steered by his steadiness ever since.",
+        "the others turn. Travellers have steered by his steadiness ever since.", 'ध्रुव नाम का एक नन्हा राजकुमार, जिसे पिता की गोद से हटाकर कह दिया गया कि वह उसके लायक़ नहीं, न रूठा और न ग़ुस्सा हुआ। उसके बजाय वह अकेला ही कुछ ऐसा खोजने निकल पड़ा, जिसे कोई उससे कभी छीन न सके। इतनी छोटी उम्र में हैरान कर देने वाली दृढ़ता के साथ, वह ठंड, भूख और डर के बीच अपने इरादे पर टिका रहा, टस से मस हुए बिना। उसका संकल्प इतना अटल था कि, पुरानी कहानियाँ कहती हैं, उसे रात के आसमान में उठाकर ध्रुवतारे की तरह जड़ दिया गया — वह इकलौता तारा जो कभी नहीं भटकता, और जिसके चारों ओर बाक़ी सब घूमते हैं। तब से मुसाफ़िर उसी की स्थिरता के सहारे रास्ता तय करते आए हैं।'),
     dadNote:
-        "Find the thing in you that won't be moved, little one, and hold it. The "
-        "whole sky learns to turn around a steady heart.",
+        _t("Find the thing in you that won't be moved, little one, and hold it. The "
+        "whole sky learns to turn around a steady heart.", 'अपने भीतर वो चीज़ ढूँढ लेना जो हिलती नहीं, नन्ही जान, और उसे थामे रखना। पूरा आसमान एक ठहरे हुए दिल के चारों ओर घूमना सीख जाता है।'),
   ),
   FatherTale(
     id: 'my9',
     kind: FatherTaleKind.myth,
-    title: 'Bhagiratha Brings the River',
+    title: _t('Bhagiratha Brings the River', 'भगीरथ नदी को धरती पर लाए'),
     body:
-        "A king named Bhagiratha set himself an impossible task: to bring the "
+        _t("A king named Bhagiratha set himself an impossible task: to bring the "
         "great heavenly river down to the parched earth to heal his people. It "
         "could not be done in a single lifetime, nor two. He gave years to it, "
         "and when he could give no more, those who came after took up his "
@@ -934,17 +938,17 @@ const List<FatherTale> kFatherTales = [
         "river came thundering down from the heavens to bless the land - and it "
         "has flowed ever since. The tellers gave his name to any great effort "
         "carried across generations, begun by one who knew he might never see it "
-        "done.",
+        "done.", 'भगीरथ नाम के एक राजा ने अपने सामने एक नामुमकिन काम रखा: स्वर्ग की महान नदी को सूखी धरती पर उतार लाना, ताकि उनके लोगों को जीवन मिले। यह एक जीवन में नहीं हो सकता था, न दो में। उन्होंने इसे बरसों दिए, और जब और नहीं दे सके, तो उनके बाद आने वालों ने वह अधूरा काम उठा लिया, और उनके बाद वालों ने फिर — जब तक आख़िर में वह विशाल नदी गरजती हुई आसमान से उतरकर धरती को हरा न कर गई; और वह तब से बहती चली आ रही है। क़िस्सागो उनका नाम हर उस बड़े काम को देते रहे, जो पीढ़ियों तक चलता है और जिसे किसी ऐसे इंसान ने शुरू किया हो, जो जानता था कि शायद वह उसे पूरा होते नहीं देखेगा।'),
     dadNote:
-        "Some of what I begin for you, little one, I may never see finished. "
-        "I'll begin it anyway. That's what fathers are for.",
+        _t("Some of what I begin for you, little one, I may never see finished. "
+        "I'll begin it anyway. That's what fathers are for.", 'तुम्हारे लिए मैं जो कुछ शुरू कर रहा हूँ, नन्ही जान, शायद उसमें से कुछ पूरा होते मैं देख भी न पाऊँ। फिर भी शुरू करूँगा। पिता इसीलिए तो होते हैं।'),
   ),
   FatherTale(
     id: 'my10',
     kind: FatherTaleKind.myth,
-    title: "Nachiketa's Brave Questions",
+    title: _t("Nachiketa's Brave Questions", 'नचिकेता के निडर सवाल'),
     body:
-        "A boy named Nachiketa was sent, through a hasty word, to the house of "
+        _t("A boy named Nachiketa was sent, through a hasty word, to the house of "
         "Death itself. Most would have trembled. But Nachiketa waited patiently "
         "at the door for three days, and when Death returned and offered him any "
         "gift to make amends, the boy did not ask for riches or long life. He "
@@ -952,51 +956,51 @@ const List<FatherTale> kFatherTales = [
         "fades? Death tried to tempt him with treasures instead, but the boy "
         "would not be turned aside. Impressed by such courage, Death taught him "
         "the deepest wisdom - given, in the end, only because the boy was brave "
-        "enough to ask.",
+        "enough to ask.", 'नचिकेता नाम का एक लड़का, एक जल्दबाज़ी में कहे शब्द की वजह से, ख़ुद मृत्यु के घर भेज दिया गया। ज़्यादातर लोग काँप जाते। पर नचिकेता तीन दिन तक सब्र से दरवाज़े पर बैठा इंतज़ार करता रहा, और जब मृत्यु लौटी और भरपाई के तौर पर उसे कोई भी वरदान माँगने को कहा, तो लड़के ने न धन माँगा, न लंबी उम्र। उसने सबसे कठिन सवाल पूछा: सब कुछ मिट जाने के बाद भी असल में टिकता क्या है? मृत्यु ने उसे ख़ज़ानों का लालच देकर बहलाना चाहा, पर लड़का टस से मस नहीं हुआ। इतनी हिम्मत से प्रभावित होकर मृत्यु ने उसे सबसे गहरा ज्ञान दिया — जो आख़िर में उसे सिर्फ़ इसलिए मिला, क्योंकि उस लड़के में पूछने की हिम्मत थी।'),
     dadNote:
-        "Never be afraid of the big questions, little one. Ask them boldly. The "
-        "bravest minds are the ones still curious in the dark.",
+        _t("Never be afraid of the big questions, little one. Ask them boldly. The "
+        "bravest minds are the ones still curious in the dark.", 'बड़े सवालों से कभी मत डरना, नन्ही जान। उन्हें डटकर पूछना। सबसे बहादुर दिमाग़ वही हैं, जो अँधेरे में भी जिज्ञासु रहते हैं।'),
   ),
   FatherTale(
     id: 'my11',
     kind: FatherTaleKind.myth,
-    title: "Prahlada's Unshaken Heart",
+    title: _t("Prahlada's Unshaken Heart", 'प्रह्लाद का अडिग मन'),
     body:
-        "Young Prahlada believed quietly but completely in a goodness greater "
+        _t("Young Prahlada believed quietly but completely in a goodness greater "
         "than any king, even when his powerful father forbade it and tried every "
         "threat to frighten him out of it. Through every storm of anger sent his "
         "way, the boy stayed calm and kind, never hating his father in return, "
         "simply holding to what he knew in his heart was true. In the end no "
         "force could shake him, and goodness itself, the old stories say, rose "
         "up to protect the child who had trusted it. His name became a byword "
-        "for a heart that bends to no fear.",
+        "for a heart that bends to no fear.", 'नन्हा प्रह्लाद चुपचाप, पर पूरी तरह, एक ऐसी अच्छाई पर भरोसा करता था जो किसी भी राजा से बड़ी है — तब भी, जब उसके ताक़तवर पिता ने इसे मना किया और उसे डराने के लिए हर तरह की धमकी आज़मा ली। अपनी ओर आए ग़ुस्से के हर तूफ़ान के बीच लड़का शांत और नरम बना रहा, बदले में अपने पिता से कभी नफ़रत नहीं की, बस उसी को थामे रहा जिसे उसका मन सच जानता था। आख़िर में कोई ताक़त उसे हिला न सकी, और पुरानी कहानियाँ कहती हैं कि अच्छाई ख़ुद उस बच्चे की रक्षा करने उठ खड़ी हुई, जिसने उस पर भरोसा किया था। उसका नाम ऐसे मन की मिसाल बन गया, जो किसी डर के आगे नहीं झुकता।'),
     dadNote:
-        "Hold to what you know is good, little one, even if you must hold it "
-        "alone. A steady, kind heart is stronger than any threat.",
+        _t("Hold to what you know is good, little one, even if you must hold it "
+        "alone. A steady, kind heart is stronger than any threat.", 'जिसे तुम सही जानो, उसे थामे रखना, नन्ही जान, चाहे अकेले ही थामना पड़े। एक ठहरा हुआ, नरम मन हर धमकी से ज़्यादा मज़बूत होता है।'),
   ),
   FatherTale(
     id: 'my12',
     kind: FatherTaleKind.myth,
-    title: 'Markandeya and the Gift of Time',
+    title: _t('Markandeya and the Gift of Time', 'मार्कंडेय और समय का वरदान'),
     body:
-        "A boy named Markandeya was blessed with brilliance but destined for a "
+        _t("A boy named Markandeya was blessed with brilliance but destined for a "
         "very short life. As his final hour drew near, he did not despair; he "
         "gave himself wholly, with his whole heart, to what he loved and "
         "believed in. When Death came for him, the boy held so fully to the "
         "source of all life, with such pure devotion, that even Death was "
         "stayed - and the stories say the boy was granted to remain ever young, "
         "untouched by time. It is not the length of a life that makes it great, "
-        "the tellers said, but the wholeness with which it is lived.",
+        "the tellers said, but the wholeness with which it is lived.", 'मार्कंडेय नाम का एक लड़का असाधारण प्रतिभा लेकर जन्मा था, पर उसकी उम्र बहुत छोटी लिखी थी। जब उसकी आख़िरी घड़ी पास आई, तो वह टूटा नहीं; उसने ख़ुद को पूरे मन से उसी को सौंप दिया, जिससे वह प्रेम करता था और जिस पर उसका भरोसा था। जब मृत्यु उसे लेने आई, तो लड़का जीवन के मूल स्रोत को इतनी पूरी तरह, इतनी सच्ची भक्ति से थामे हुए था कि मृत्यु तक ठहर गई — और कहानियाँ कहती हैं कि उस लड़के को हमेशा युवा रहने का वरदान मिला, समय की पहुँच से बाहर। क़िस्सागो कहते थे: जीवन को महान उसकी लंबाई नहीं बनाती, बल्कि वो पूर्णता बनाती है जिससे उसे जिया जाए।'),
     dadNote:
-        "However long your days, little one, live them whole and bright. A life "
-        "is measured by its depth, never only its length.",
+        _t("However long your days, little one, live them whole and bright. A life "
+        "is measured by its depth, never only its length.", 'तुम्हारे दिन जितने भी हों, नन्ही जान, उन्हें पूरा और रोशन जीना। ज़िंदगी उसकी गहराई से नापी जाती है, कभी सिर्फ़ उसकी लंबाई से नहीं।'),
   ),
   FatherTale(
     id: 'my13',
     kind: FatherTaleKind.myth,
-    title: 'The Churning of the Ocean',
+    title: _t('The Churning of the Ocean', 'समुद्र मंथन'),
     body:
-        "Long ago, gods and demons both wanted the nectar of life, hidden deep "
+        _t("Long ago, gods and demons both wanted the nectar of life, hidden deep "
         "in the sea of milk. Alone, neither side could reach it. So - enemies "
         "though they were - they wound a great serpent around a mountain and "
         "used it as a rope, one side pulling, then the other, churning the vast "
@@ -1004,18 +1008,18 @@ const List<FatherTale> kFatherTales = [
         "and at long last the nectar itself. The old tellers loved this tale for "
         "its quiet lesson: even those who pull in different directions can, by "
         "working the same rope together, bring forth something neither could "
-        "have won alone.",
+        "have won alone.", 'बहुत पुरानी बात है। देवता और दैत्य, दोनों को जीवन का अमृत चाहिए था, जो क्षीरसागर की गहराई में छिपा था। अकेले, कोई भी पक्ष उस तक नहीं पहुँच सकता था। तो — दुश्मन होते हुए भी — उन्होंने एक विशाल नाग को एक पहाड़ के चारों ओर लपेटा और उसे रस्सी की तरह इस्तेमाल किया: एक तरफ़ से खींचते, फिर दूसरी तरफ़ से; और युगों तक साथ मिलकर उस विशाल सागर को मथते रहे। घूमते पानी से कई अनमोल चीज़ें निकलीं, और बहुत देर बाद अमृत भी। पुराने क़िस्सागो इस कथा को उसके शांत सबक़ के लिए चाहते थे: जो अलग-अलग दिशाओं में खींचते हैं, वे भी एक ही रस्सी साथ मिलकर खींचकर कुछ ऐसा निकाल सकते हैं, जो अकेले कोई नहीं पा सकता था।'),
     dadNote:
-        "Great things often need many hands, little one - even hands that "
+        _t("Great things often need many hands, little one - even hands that "
         "disagree. Learn to pull the same rope, and oceans give up their "
-        "treasure.",
+        "treasure.", 'बड़े काम अक्सर बहुत सारे हाथ माँगते हैं, नन्ही जान — उन हाथों को भी जो आपस में सहमत नहीं। एक ही रस्सी खींचना सीख लो, तो समंदर भी अपना ख़ज़ाना दे देते हैं।'),
   ),
   FatherTale(
     id: 'my14',
     kind: FatherTaleKind.myth,
-    title: "Savitri's Resolve",
+    title: _t("Savitri's Resolve", 'सावित्री का संकल्प'),
     body:
-        "Savitri loved her husband so dearly that when Death came to carry him "
+        _t("Savitri loved her husband so dearly that when Death came to carry him "
         "away, she would not turn back. She followed Death down the long road, "
         "step for step, speaking with such wisdom and such steady devotion that "
         "Death, impressed, offered her any boon - except her husband's life. "
@@ -1023,34 +1027,34 @@ const List<FatherTale> kFatherTales = [
         "true if her husband lived. Caught by her quick heart and her unbending "
         "love, Death at last relented and gave him back. Love joined to wisdom, "
         "the tellers said, can walk right up to the impossible and turn it "
-        "around.",
+        "around.", 'सावित्री अपने पति से इतना गहरा प्रेम करती थी कि जब मृत्यु उसे ले जाने आई, तो वह पीछे नहीं लौटी। वह मृत्यु के पीछे उस लंबे रास्ते पर चलती रही, क़दम से क़दम मिलाकर, और इतनी समझदारी और इतनी अडिग भक्ति से बात करती रही कि मृत्यु ने प्रभावित होकर उसे कोई भी वरदान माँगने को कहा — उसके पति के जीवन के सिवाय। बड़ी चतुराई और बड़े प्रेम से उसने ऐसे वरदान माँगे, जो तभी सच हो सकते थे जब उसका पति जीवित हो। उसके तेज़ मन और उसके न झुकने वाले प्रेम में फँसकर, मृत्यु आख़िर पिघल गई और पति को लौटा दिया। क़िस्सागो कहते थे: प्रेम जब समझ के साथ मिल जाए, तो वह नामुमकिन के ठीक सामने जाकर उसे पलट सकता है।'),
     dadNote:
-        "Love hard, little one, and think clearly while you do. A devoted heart "
-        "with a quick mind can soften the hardest road.",
+        _t("Love hard, little one, and think clearly while you do. A devoted heart "
+        "with a quick mind can soften the hardest road.", 'दिल खोलकर प्रेम करना, नन्ही जान, और करते हुए दिमाग़ भी साफ़ रखना। भक्ति से भरा दिल और तेज़ दिमाग़ मिलकर सबसे कठिन रास्ता भी नरम कर देते हैं।'),
   ),
   FatherTale(
     id: 'my15',
     kind: FatherTaleKind.myth,
-    title: 'Prometheus and the Gift of Fire',
+    title: _t('Prometheus and the Gift of Fire', 'प्रोमेथियस और आग का तोहफ़ा'),
     body:
-        "In the old Greek tales, people shivered in the cold and the dark, for "
+        _t("In the old Greek tales, people shivered in the cold and the dark, for "
         "fire belonged only to the gods. One bold spirit named Prometheus could "
         "not bear to see them suffer. He carried a single spark down from the "
         "heavens, hidden in a hollow reed, and gave it to humankind. With it "
         "came warmth, and light, and the beginning of every craft and comfort we "
         "know. He paid dearly for his daring - but he never regretted it, for he "
         "had given a gift that would warm the world for all time. Some gifts, "
-        "the tellers said, are worth any cost to the one who gives them.",
+        "the tellers said, are worth any cost to the one who gives them.", 'पुरानी यूनानी कथाओं में, लोग ठंड और अँधेरे में ठिठुरते थे, क्योंकि आग सिर्फ़ देवताओं की थी। प्रोमेथियस नाम का एक निडर जीव उन्हें यूँ तकलीफ़ में देख नहीं सका। वह एक चिंगारी आसमान से नीचे ले आया, एक पोले सरकंडे में छिपाकर, और इंसानों को दे दी। उसी के साथ आई गरमाहट, रोशनी, और हर उस हुनर और आराम की शुरुआत जो हम आज जानते हैं। अपनी इस हिम्मत की उसने बहुत भारी क़ीमत चुकाई — पर उसे कभी अफ़सोस नहीं हुआ, क्योंकि उसने ऐसा तोहफ़ा दिया था जो दुनिया को हमेशा गरम रखेगा। क़िस्सागो कहते थे: कुछ तोहफ़े देने वाले के लिए हर क़ीमत के लायक़ होते हैं।'),
     dadNote:
-        "I'd carry fire down a mountain for you, little one. There's almost "
-        "nothing a father won't give to keep his child warm.",
+        _t("I'd carry fire down a mountain for you, little one. There's almost "
+        "nothing a father won't give to keep his child warm.", 'तुम्हारे लिए मैं पहाड़ से आग उतार लाऊँ, नन्ही जान। अपने बच्चे को गरम रखने के लिए एक पिता लगभग सब कुछ दे देता है।'),
   ),
   FatherTale(
     id: 'my16',
     kind: FatherTaleKind.myth,
-    title: 'Icarus and the Wax Wings',
+    title: _t('Icarus and the Wax Wings', 'इकारस और मोम के पंख'),
     body:
-        "A clever maker named Daedalus built wings of feathers and wax so that "
+        _t("A clever maker named Daedalus built wings of feathers and wax so that "
         "he and his son Icarus could escape across the sea. \"Fly the middle "
         "path,\" he warned. \"Too low, and the sea-spray will weigh your wings; "
         "too high, and the sun will melt the wax.\" For a while they soared "
@@ -1058,51 +1062,51 @@ const List<FatherTale> kFatherTales = [
         "father's words and climbed higher and higher toward the sun - until the "
         "wax softened and he fell. The tellers kept the tale not to forbid us "
         "the sky, but to remind us that even soaring needs a steady, listening "
-        "heart.",
+        "heart.", 'डेडेलस नाम के एक होशियार कारीगर ने परों और मोम से पंख बनाए, ताकि वह और उसका बेटा इकारस समंदर पार भाग सकें। "बीच का रास्ता उड़ना," उसने चेताया। "बहुत नीचे उड़े तो समंदर के छींटे पंख भारी कर देंगे; बहुत ऊपर उड़े तो सूरज मोम पिघला देगा।" कुछ देर वे साथ-साथ उड़ते रहे। पर जवान इकारस उड़ान की ख़ुशी में ऐसा डूबा कि पिता की बात भूल गया और सूरज की तरफ़ ऊँचा, और ऊँचा चढ़ता गया — जब तक मोम नरम न पड़ गया और वह गिर गया। क़िस्सागो यह कथा हमें आसमान से रोकने के लिए नहीं सँभालते रहे, बल्कि यह याद दिलाने के लिए कि ऊँची उड़ान को भी एक ठहरा हुआ, सुनने वाला मन चाहिए।'),
     dadNote:
-        "Fly, little one - fly high and bold. But keep a corner of your heart "
-        "for the wisdom of those who've flown before you.",
+        _t("Fly, little one - fly high and bold. But keep a corner of your heart "
+        "for the wisdom of those who've flown before you.", 'उड़ना, नन्ही जान — ऊँचा और बेख़ौफ़ उड़ना। पर दिल का एक कोना उनकी समझ के लिए भी बचाकर रखना, जो तुमसे पहले उड़ चुके हैं।'),
   ),
   FatherTale(
     id: 'my17',
     kind: FatherTaleKind.myth,
-    title: 'The Phoenix Reborn',
+    title: _t('The Phoenix Reborn', 'फ़ीनिक्स का फिर से जन्म'),
     body:
-        "In old tales there lived a wondrous bird called the phoenix, with "
+        _t("In old tales there lived a wondrous bird called the phoenix, with "
         "feathers of flame, that lived for hundreds of years. When at last its "
         "long life drew to a close, it did not simply vanish. It built a nest of "
         "fragrant branches, settled into it, and let itself be wrapped in fire - "
         "and from the ashes of what it had been, a new young phoenix rose, "
         "bright and whole, to begin again. People told the story whenever a "
         "thing seemed truly ended, to remember that some endings are only the "
-        "doorway to a new beginning.",
+        "doorway to a new beginning.", 'पुरानी कथाओं में एक अनोखा पंछी होता था, जिसे फ़ीनिक्स कहते थे — आग जैसे परों वाला, सैकड़ों साल जीने वाला। जब आख़िर उसकी लंबी उम्र पूरी होने को आती, तो वह यूँ ही ग़ायब नहीं हो जाता। वह ख़ुशबूदार टहनियों का एक घोंसला बनाता, उसमें बैठ जाता, और ख़ुद को आग में लिपट जाने देता — और जो वह था उसकी राख से एक नया, जवान फ़ीनिक्स उठ खड़ा होता, चमकीला और पूरा, फिर से शुरू करने के लिए। लोग यह कहानी तब सुनाते थे, जब कोई चीज़ सचमुच ख़त्म लगती — यह याद रखने के लिए कि कुछ अंत बस एक नई शुरुआत का दरवाज़ा होते हैं।'),
     dadNote:
-        "Endings will come, little one, even hard ones. But you carry the "
-        "phoenix in you - the power to rise from the ash and begin again.",
+        _t("Endings will come, little one, even hard ones. But you carry the "
+        "phoenix in you - the power to rise from the ash and begin again.", 'अंत आएँगे, नन्ही जान, मुश्किल अंत भी। पर फ़ीनिक्स तुम्हारे भीतर है — राख से उठकर फिर शुरू कर देने की ताक़त।'),
   ),
   FatherTale(
     id: 'my18',
     kind: FatherTaleKind.myth,
-    title: 'Atlas Who Held the Sky',
+    title: _t('Atlas Who Held the Sky', 'एटलस, जिसने आसमान थामा'),
     body:
-        "In the Greek tales there was a mighty figure named Atlas whose task it "
+        _t("In the Greek tales there was a mighty figure named Atlas whose task it "
         "was to hold the great weight of the sky upon his shoulders, so that it "
         "would not come crashing down upon the earth. Day and night he stood, "
         "strong and steady, bearing a burden no one else could carry, asking for "
         "no praise and taking no rest. People looking up at the unbroken sky "
         "rarely thought of him at all - yet it stayed up because of him. The "
         "tellers remembered Atlas whenever someone quietly carried a great "
-        "weight so that others could live easy beneath it.",
+        "weight so that others could live easy beneath it.", 'यूनानी कथाओं में एटलस नाम का एक बलशाली जीव था, जिसका काम था पूरे आसमान का भारी बोझ अपने कंधों पर थामे रखना, ताकि वह धरती पर आ न गिरे। दिन हो या रात, वह खड़ा रहता — मज़बूत और अडिग — ऐसा बोझ उठाए जिसे और कोई नहीं उठा सकता था; न किसी तारीफ़ की चाह, न ज़रा-सा आराम। ऊपर बिना दरार के फैले आसमान को देखने वाले लोग उसके बारे में शायद ही कभी सोचते — फिर भी आसमान टिका उसी की वजह से था। जब भी कोई चुपचाप कोई बड़ा बोझ उठाता है, ताकि बाक़ी लोग उसके नीचे आराम से जी सकें, क़िस्सागो एटलस को याद कर लेते हैं।'),
     dadNote:
-        "There's a kind of strength that holds up the sky so others can live "
-        "easy beneath it. I'll carry what I can, so your sky stays clear.",
+        _t("There's a kind of strength that holds up the sky so others can live "
+        "easy beneath it. I'll carry what I can, so your sky stays clear.", 'एक ताक़त ऐसी भी होती है जो आसमान थामे रखती है, ताकि बाक़ी लोग उसके नीचे आराम से जी सकें। जितना मुझसे होगा, उठाऊँगा — ताकि तुम्हारा आसमान साफ़ रहे।'),
   ),
   FatherTale(
     id: 'my19',
     kind: FatherTaleKind.myth,
-    title: 'Anansi and the Box of Stories',
+    title: _t('Anansi and the Box of Stories', 'अनांसी और कहानियों की पेटी'),
     body:
-        "In the old West African tales, all the world's stories belonged to the "
+        _t("In the old West African tales, all the world's stories belonged to the "
         "sky-god and were locked away in a single box. A small, clever spider "
         "named Anansi longed to share them with everyone below. He could not win "
         "them by strength, for he had little - but by cleverness, patience, and "
@@ -1110,26 +1114,26 @@ const List<FatherTale> kFatherTales = [
         "the sky-god set, and earned the box. Then he opened it, and the stories "
         "spilled out across the whole world, where they have lived ever since. "
         "That is why stories belong to everyone now - because a little spider "
-        "thought they should.",
+        "thought they should.", 'पश्चिमी अफ़्रीका की पुरानी कथाओं में, दुनिया की सारी कहानियाँ आसमान के देवता की थीं और एक ही पेटी में बंद रखी थीं। अनांसी नाम की एक छोटी, चालाक मकड़ी चाहती थी कि ये कहानियाँ नीचे सबको मिल जाएँ। वह उन्हें ताक़त से नहीं जीत सकती थी, क्योंकि ताक़त तो उसमें थी ही कम — पर चतुराई, सब्र और ख़ूब सारी होशियारी से उसने वे लगभग नामुमकिन काम पूरे कर दिए जो आसमान के देवता ने रखे थे, और पेटी जीत ली। फिर उसने पेटी खोली, और कहानियाँ पूरी दुनिया में बिखर गईं, जहाँ वे तब से रहती आई हैं। इसीलिए आज कहानियाँ सबकी हैं — क्योंकि एक नन्ही मकड़ी को लगा कि उन्हें सबकी होना चाहिए।'),
     dadNote:
-        "Stories are for everyone, little one - and I'll fill yours with as many "
-        "as I can. Cleverness and heart can unlock almost anything.",
+        _t("Stories are for everyone, little one - and I'll fill yours with as many "
+        "as I can. Cleverness and heart can unlock almost anything.", 'कहानियाँ सबकी होती हैं, नन्ही जान — और तुम्हारी झोली मैं जितनी भर सकूँ, उतनी कहानियों से भर दूँगा। चतुराई और दिल मिलकर लगभग कोई भी ताला खोल लेते हैं।'),
   ),
   FatherTale(
     id: 'my20',
     kind: FatherTaleKind.myth,
-    title: 'Daedalus the Maker',
+    title: _t('Daedalus the Maker', 'डेडेलस, कारीगर'),
     body:
-        "In the Greek tales, Daedalus was the greatest maker and inventor of his "
+        _t("In the Greek tales, Daedalus was the greatest maker and inventor of his "
         "age - a builder of wonders, a solver of puzzles no one else could "
         "solve. When he and his son were trapped on an island with the sea all "
         "around and no ship to take them, he did not surrender to the walls of "
         "his prison. He looked up at the birds, studied the lift of their wings, "
         "and built a way out of nothing but feathers, thread, and a bold idea. "
         "The tellers loved him as the friend of every craftsman: proof that a "
-        "curious, patient maker can find a door where others see only a wall.",
+        "curious, patient maker can find a door where others see only a wall.", 'यूनानी कथाओं में डेडेलस अपने ज़माने का सबसे बड़ा कारीगर और आविष्कारक था — अजूबों का बनाने वाला, ऐसी पहेलियाँ सुलझाने वाला जो और कोई नहीं सुलझा पाता। जब वह और उसका बेटा एक ऐसे टापू पर फँस गए, जिसके चारों ओर समंदर था और ले जाने को कोई जहाज़ नहीं, तो उसने अपनी क़ैद की दीवारों के आगे हार नहीं मानी। उसने ऊपर पंछियों की तरफ़ देखा, उनके पंखों के उठने का तरीक़ा समझा, और परों, धागे और एक निडर ख़याल के सिवा कुछ भी न होते हुए बाहर निकलने का रास्ता बना लिया। क़िस्सागो उसे हर कारीगर का दोस्त मानते थे: इस बात का सबूत कि जिज्ञासु, सब्र वाले हाथ वहाँ दरवाज़ा ढूँढ लेते हैं, जहाँ बाक़ी सबको सिर्फ़ दीवार दिखती है।'),
     dadNote:
-        "When you're hemmed in with no way out, little one, look up and make "
-        "one. A patient maker's hands can build wings from almost nothing.",
+        _t("When you're hemmed in with no way out, little one, look up and make "
+        "one. A patient maker's hands can build wings from almost nothing.", 'जब चारों तरफ़ से घिर जाओ और कोई रास्ता न दिखे, नन्ही जान, तो ऊपर देखना और रास्ता ख़ुद बना लेना। सब्र वाले कारीगर के हाथ लगभग कुछ भी नहीं से पंख बना लेते हैं।'),
   ),
 ];

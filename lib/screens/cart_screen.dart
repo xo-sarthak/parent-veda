@@ -101,7 +101,7 @@ Future<void> showAddToCartFlow(
   CartStore.instance.add(
     kProductsCartId,
     productId: p.id,
-    name: p.name,
+    name: p.name.now,
     emoji: p.emoji,
     unitPrice: parsePriceString(p.price),
     size: size,
@@ -441,7 +441,7 @@ void showSingleItemBuyNow(
   CartStore.instance.add(
     kBuyNowCartId,
     productId: p.id,
-    name: p.name,
+    name: p.name.now,
     emoji: p.emoji,
     unitPrice: parsePriceString(p.price),
   );

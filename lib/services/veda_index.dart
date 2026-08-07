@@ -148,7 +148,7 @@ class VedaIndex {
         id: 'prod_${pr.id}',
         kind: VedaKind.product,
         sourceLabel: 'Product',
-        title: pr.name,
+        title: pr.name.en,
         body: '${pr.summary} For ${pr.bestFor}. ${pr.why.join('. ')}',
         keywords: [pr.categoryId.replaceAll('_', ' ')],
       ));

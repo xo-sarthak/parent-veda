@@ -59,6 +59,24 @@ class LocalizedText {
   /// holding one, or a test asserting both sides. Reach for `now` when the
   /// alternative is passing a language through three layers to reach a string.
   String get now => of(S.current);
+
+  /// Renders as the language on screen when interpolated into a string.
+  ///
+  /// Without this, `'${y.duration} · ${y.focus}'` compiles, passes every test,
+  /// and puts **Instance of 'LocalizedText'** in front of a mother — which is
+  /// exactly what the prenatal yoga screen did after its model widened. An
+  /// interpolated LocalizedText is valid Dart, so neither the analyzer nor a
+  /// grep can find these; the only reliable fix is at the type itself.
+  ///
+  /// The trade-off, stated plainly: this makes interpolation DISPLAY-correct,
+  /// and therefore makes it silently language-dependent. That is wrong in the
+  /// one place it has always been wrong — building a key, an id, or anything
+  /// persisted. `.en` remains the answer there, and
+  /// test/localized_identity_test.dart guards it. Choosing this direction
+  /// because a wrong key is a bug we can test for, while "Instance of" is a
+  /// bug only the user ever sees.
+  @override
+  String toString() => now;
 }
 
 /// Fixed UI strings (chrome). Construct with the active language and read the
@@ -4206,4 +4224,10 @@ class S {
   String get uiPlayBabyVoice => _p('Play baby voice', 'शिशु की आवाज़ चलाइए');
   String get uiFruit => _p('Fruit', 'फल');
   String get uiBaby => _p('Baby', 'शिशु');
+
+  // =========================================================================
+  //  INLINE UI COPY - lifted out of widgets so it can be translated
+  // =========================================================================
+  String get uiKmQxPdvr => _p('KM7QX2PDVR', 'KM7QX2PDVR');
+  String get uiAbcd => _p('ABCD234', 'ABCD234');
 }

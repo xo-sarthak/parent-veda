@@ -15,7 +15,7 @@ const List<Symptom> kSymptoms = [
     id: 'nausea',
     category: SymptomCategory.digestive,
     trimesters: [1, 2],
-    keywords: ['morning sickness', 'vomiting', 'ulti', 'matli'],
+    keywords: ['morning sickness', 'vomiting', 'ulti', 'matli', 'सुबह की मिचली'],
     name: LocalizedText(en: 'Nausea', hi: 'मतली'),
     commonness: LocalizedText(
         en: 'Very common, especially in the first trimester.',
@@ -88,7 +88,7 @@ const List<Symptom> kSymptoms = [
     id: 'fatigue',
     category: SymptomCategory.physical,
     trimesters: [1, 3],
-    keywords: ['tiredness', 'thakaan', 'low energy'],
+    keywords: ['tiredness', 'thakaan', 'low energy', 'थकान'],
     name: LocalizedText(en: 'Fatigue', hi: 'थकान'),
     commonness: LocalizedText(
         en: 'Very common, especially early and late in pregnancy.',
@@ -111,7 +111,7 @@ const List<Symptom> kSymptoms = [
     id: 'backPain',
     category: SymptomCategory.physical,
     trimesters: [2, 3],
-    keywords: ['back ache', 'kamar dard'],
+    keywords: ['back ache', 'kamar dard', 'कमर दर्द', 'पीठ दर्द'],
     name: LocalizedText(en: 'Back Pain', hi: 'कमर दर्द'),
     commonness: LocalizedText(
         en: 'Common as your bump grows.', hi: 'बंप बढ़ने के साथ आम।'),
@@ -130,7 +130,7 @@ const List<Symptom> kSymptoms = [
   Symptom(
     id: 'headache',
     category: SymptomCategory.physical,
-    keywords: ['sir dard', 'migraine'],
+    keywords: ['sir dard', 'migraine', 'सिर दर्द'],
     name: LocalizedText(en: 'Headache', hi: 'सिर दर्द'),
     commonness: LocalizedText(
         en: 'Fairly common, often early in pregnancy.',
@@ -223,7 +223,7 @@ const List<Symptom> kSymptoms = [
     id: 'legCramps',
     category: SymptomCategory.circulation,
     trimesters: [2, 3],
-    keywords: ['cramp', 'leg cramp', 'cramps'],
+    keywords: ['cramp', 'leg cramp', 'cramps', 'पैर में ऐंठन'],
     name: LocalizedText(en: 'Leg Cramps', hi: 'टाँग की ऐंठन'),
     commonness: LocalizedText(
         en: 'Common, often at night in later pregnancy.',
@@ -246,7 +246,7 @@ const List<Symptom> kSymptoms = [
     id: 'babyHiccups',
     category: SymptomCategory.movement,
     trimesters: [3],
-    keywords: ['hiccups', 'baby movement', 'fluttering'],
+    keywords: ['hiccups', 'baby movement', 'fluttering', 'शिशु की हलचल'],
     name: LocalizedText(en: "Baby's Hiccups", hi: 'शिशु की हिचकी'),
     commonness: LocalizedText(
         en: 'Common and usually a healthy sign in the third trimester.',
@@ -269,7 +269,7 @@ const List<Symptom> kSymptoms = [
     id: 'braxtonHicks',
     category: SymptomCategory.labour,
     trimesters: [3],
-    keywords: ['practice contractions', 'false labour', 'tightening'],
+    keywords: ['practice contractions', 'false labour', 'tightening', 'झूठे संकुचन', 'झूठा दर्द'],
     name: LocalizedText(en: 'Braxton Hicks', hi: 'Braxton Hicks'),
     commonness: LocalizedText(
         en: 'Common in the third trimester.', hi: 'तीसरी तिमाही में आम।'),
@@ -306,7 +306,7 @@ const List<Symptom> kSymptoms = [
     id: 'u_movement',
     category: SymptomCategory.urgent,
     urgent: true,
-    keywords: ['reduced movement', 'no movement', 'harkat'],
+    keywords: ['reduced movement', 'no movement', 'harkat', 'हलचल कम', 'हलचल नहीं'],
     name: LocalizedText(
         en: "Reduced Baby Movement", hi: 'शिशु की हलचल कम'),
     commonness: LocalizedText(
@@ -322,7 +322,7 @@ const List<Symptom> kSymptoms = [
     id: 'u_headache',
     category: SymptomCategory.urgent,
     urgent: true,
-    keywords: ['severe headache', 'vision', 'tej sir dard'],
+    keywords: ['severe headache', 'vision', 'tej sir dard', 'तेज सिर दर्द', 'सिर में तेज दर्द'],
     name: LocalizedText(en: 'Severe Headache', hi: 'तेज़ सिर दर्द'),
     commonness: LocalizedText(
         en: 'Especially with vision changes or swelling.',
@@ -337,7 +337,7 @@ const List<Symptom> kSymptoms = [
     id: 'u_swelling',
     category: SymptomCategory.urgent,
     urgent: true,
-    keywords: ['sudden swelling', 'face swelling', 'achaanak soojan'],
+    keywords: ['sudden swelling', 'face swelling', 'achaanak soojan', 'अचानक सूजन', 'चेहरे पर सूजन', 'अचानक सूजना'],
     name: LocalizedText(en: 'Sudden Swelling', hi: 'अचानक सूजन'),
     commonness: LocalizedText(
         en: 'Sudden swelling of the face, hands or feet.',
@@ -352,7 +352,7 @@ const List<Symptom> kSymptoms = [
     id: 'u_fluid',
     category: SymptomCategory.urgent,
     urgent: true,
-    keywords: ['water broke', 'fluid leak', 'paani'],
+    keywords: ['water broke', 'fluid leak', 'paani', 'पानी फटना', 'पानी रिसना'],
     name: LocalizedText(en: 'Fluid Leakage', hi: 'तरल का रिसाव'),
     commonness: LocalizedText(
         en: 'A gush or steady leak of fluid.',

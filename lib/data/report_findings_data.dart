@@ -58,7 +58,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Follow-up scans for this are very common.', 'इसके लिए आगे स्कैन कराना बहुत आम है।'),
       _t('Your provider will keep an eye on it over time.', 'आपके डॉक्टर समय के साथ इस पर नज़र रखेंगे।'),
     ],
-    aliases: ['placenta', 'previa', 'placenta previa', 'low placenta'],
+    aliases: ['placenta', 'previa', 'placenta previa', 'low placenta', 'cervix को ढकता placenta', 'नीचे लगा placenta'],
   ),
   ReportFinding(
     id: 'breech',
@@ -79,7 +79,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Position is checked again as you get closer to term.', 'पूरे समय के क़रीब मुद्रा दोबारा जाँची जाती है।'),
       _t('There are safe options if your baby stays breech.', 'अगर शिशु breech रहे, तब भी सुरक्षित विकल्प मौजूद हैं।'),
     ],
-    aliases: ['breech', 'breech baby', 'baby position', 'footling'],
+    aliases: ['breech', 'breech baby', 'baby position', 'footling', 'breech शिशु', 'शिशु की स्थिति'],
   ),
   ReportFinding(
     id: 'nuchal_cord',
@@ -99,7 +99,7 @@ final List<ReportFinding> kReportFindings = [
       _t('The cord keeps supplying oxygen throughout.', 'गर्भनाल पूरे समय ऑक्सीजन पहुँचाती रहती है।'),
       _t('Your team monitors the baby closely during labour.', 'प्रसव के दौरान आपकी टीम शिशु पर क़रीबी नज़र रखती है।'),
     ],
-    aliases: ['cord', 'nuchal cord', 'cord around neck', 'cord around baby'],
+    aliases: ['cord', 'nuchal cord', 'cord around neck', 'cord around baby', 'गर्दन में लिपटी गर्भनाल', 'गर्दन के चारों ओर गर्भनाल', 'शिशु के चारों ओर गर्भनाल'],
   ),
   ReportFinding(
     id: 'gestational_diabetes',
@@ -120,7 +120,7 @@ final List<ReportFinding> kReportFindings = [
       _t('It most often resolves after birth.', 'ज़्यादातर यह जन्म के बाद ठीक हो जाती है।'),
       _t('Your care team will support you through it.', 'आपकी देखभाल करने वाली टीम पूरे समय साथ रहेगी।'),
     ],
-    aliases: ['gestational diabetes', 'gdm', 'diabetes', 'sugar', 'high sugar', 'gtt'],
+    aliases: ['gestational diabetes', 'gdm', 'diabetes', 'sugar', 'high sugar', 'gtt', 'गर्भावस्था की diabetes', 'शक्कर ज़्यादा'],
   ),
   ReportFinding(
     id: 'low_fluid',
@@ -141,7 +141,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Extra monitoring is a common, careful step.', 'ज़्यादा निगरानी एक आम, सावधानी भरा क़दम है।'),
       _t('Staying well hydrated is often advised.', 'पर्याप्त पानी पीते रहने की सलाह अक्सर दी जाती है।'),
     ],
-    aliases: ['low fluid', 'amniotic fluid', 'oligohydramnios', 'low water', 'afi', 'liquor'],
+    aliases: ['low fluid', 'amniotic fluid', 'oligohydramnios', 'low water', 'afi', 'liquor', 'पानी की कमी', 'गर्भ का पानी', 'गर्भ का पानी कम'],
   ),
   ReportFinding(
     id: 'preeclampsia',
@@ -160,7 +160,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Closer monitoring helps your team manage it well.', 'क़रीबी निगरानी से आपकी टीम इसे अच्छी तरह सँभालती है।'),
       _t('Your provider will guide every next step.', 'आपके डॉक्टर हर अगले क़दम पर मार्गदर्शन देंगे।'),
     ],
-    aliases: ['preeclampsia', 'pre eclampsia', 'high bp', 'blood pressure', 'pih', 'protein in urine'],
+    aliases: ['preeclampsia', 'pre eclampsia', 'high bp', 'blood pressure', 'pih', 'protein in urine', 'गर्भावस्था का high bp', 'bp ज़्यादा', 'पेशाब में protein'],
   ),
   ReportFinding(
     id: 'high_fluid',
@@ -181,7 +181,7 @@ final List<ReportFinding> kReportFindings = [
       _t('A clear cause is not always found, and that is okay.', 'साफ़ वजह हमेशा नहीं मिलती, और यह ठीक है।'),
       _t('Follow-up keeps everything monitored.', 'आगे की जाँच से सब कुछ नज़र में रहता है।'),
     ],
-    aliases: ['high fluid', 'polyhydramnios', 'excess fluid', 'too much water', 'afi high'],
+    aliases: ['high fluid', 'polyhydramnios', 'excess fluid', 'too much water', 'afi high', 'गर्भ का पानी ज़्यादा', 'ज़रूरत से ज़्यादा पानी', 'पानी बहुत ज़्यादा', 'afi ज़्यादा'],
   ),
   ReportFinding(
     id: 'short_cervix',
@@ -201,7 +201,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Follow-up measurements are common.', 'आगे दोबारा नाप लेना आम बात है।'),
       _t('Your provider will personalise the plan.', 'आपके डॉक्टर योजना आपके हिसाब से बनाएँगे।'),
     ],
-    aliases: ['short cervix', 'cervix', 'cervical length', 'cervical'],
+    aliases: ['short cervix', 'cervix', 'cervical length', 'cervical', 'छोटा cervix', 'cervix की लंबाई'],
   ),
   ReportFinding(
     id: 'placental_calcification',
@@ -221,7 +221,7 @@ final List<ReportFinding> kReportFindings = [
       _t('It is commonly seen on later scans.', 'बाद के स्कैन में यह आम तौर पर दिखता है।'),
       _t('Routine monitoring usually continues as normal.', 'सामान्य निगरानी आम तौर पर जारी रहती है।'),
     ],
-    aliases: ['placental calcification', 'calcification', 'placenta grade', 'grade 3 placenta', 'placenta'],
+    aliases: ['placental calcification', 'calcification', 'placenta grade', 'grade 3 placenta', 'placenta', 'placenta में calcification', 'placenta का grade', 'grade 3 वाला placenta'],
   ),
   ReportFinding(
     id: 'twin_pregnancy',
@@ -241,7 +241,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Extra scans are a normal, supportive step.', 'अतिरिक्त स्कैन एक सामान्य, सहारा देने वाला क़दम है।'),
       _t('Your team will guide you the whole way.', 'आपकी टीम पूरे रास्ते साथ रहेगी।'),
     ],
-    aliases: ['twin', 'twins', 'twin pregnancy', 'multiple', 'two babies'],
+    aliases: ['twin', 'twins', 'twin pregnancy', 'multiple', 'two babies', 'जुड़वाँ गर्भावस्था', 'दो शिशु'],
   ),
   ReportFinding(
     id: 'anemia',
@@ -259,7 +259,7 @@ final List<ReportFinding> kReportFindings = [
       _t('It usually improves with iron and diet.', 'Iron और खानपान से यह आम तौर पर सुधर जाती है।'),
       _t('Levels are simply re-checked after treatment.', 'इलाज के बाद बस स्तर दोबारा जाँच लिया जाता है।'),
     ],
-    aliases: ['anemia', 'anaemia', 'low hemoglobin', 'low hb', 'iron', 'haemoglobin'],
+    aliases: ['anemia', 'anaemia', 'low hemoglobin', 'low hb', 'iron', 'haemoglobin', 'haemoglobin की कमी', 'कम hb'],
   ),
   ReportFinding(
     id: 'reduced_movements',
@@ -278,7 +278,7 @@ final List<ReportFinding> kReportFindings = [
       _t('A reassurance check is quick and very common.', 'तसल्ली वाली जाँच जल्दी होती है और बहुत आम है।'),
       _t('You know your baby\'s usual pattern best.', 'अपने शिशु का रोज़ का ढंग आप सबसे बेहतर जानती हैं।'),
     ],
-    aliases: ['reduced movements', 'baby not moving', 'less movement', 'fetal movements', 'kicks'],
+    aliases: ['reduced movements', 'baby not moving', 'less movement', 'fetal movements', 'kicks', 'हलचल कम होना', 'शिशु हिल नहीं रहा', 'कम हलचल', 'शिशु की हलचल'],
   ),
   ReportFinding(
     id: 'braxton_hicks',
@@ -297,7 +297,7 @@ final List<ReportFinding> kReportFindings = [
       _t('They tend to be irregular and ease with rest.', 'ये अक्सर अनियमित होते हैं और आराम से कम हो जाते हैं।'),
       _t('Your provider will explain the signs of real labour.', 'आपके डॉक्टर असली प्रसव के संकेत समझा देंगे।'),
     ],
-    aliases: ['braxton hicks', 'practice contractions', 'false labour', 'tightening', 'contractions'],
+    aliases: ['braxton hicks', 'practice contractions', 'false labour', 'tightening', 'contractions', 'Braxton Hicks संकुचन', 'अभ्यास वाले संकुचन', 'झूठा प्रसव दर्द'],
   ),
   ReportFinding(
     id: 'high_bp',
@@ -317,7 +317,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Closer monitoring helps keep it well managed.', 'क़रीबी निगरानी से यह अच्छी तरह क़ाबू में रहता है।'),
       _t('Your provider will guide each step.', 'आपके डॉक्टर हर क़दम पर मार्गदर्शन देंगे।'),
     ],
-    aliases: ['high blood pressure', 'bp', 'hypertension', 'gestational hypertension', 'pih'],
+    aliases: ['high blood pressure', 'bp', 'hypertension', 'gestational hypertension', 'pih', 'ज़्यादा ब्लड प्रेशर', 'गर्भावस्था का hypertension'],
   ),
   ReportFinding(
     id: 'placenta_resolved',
@@ -338,7 +338,7 @@ final List<ReportFinding> kReportFindings = [
       _t('This is the usual outcome.', 'आम तौर पर यही नतीजा निकलता है।'),
       _t('Normal care typically continues.', 'सामान्य देखभाल आम तौर पर वैसे ही चलती रहती है।'),
     ],
-    aliases: ['placenta moved', 'low lying placenta resolved', 'placenta', 'previa resolved'],
+    aliases: ['placenta moved', 'low lying placenta resolved', 'placenta', 'previa resolved', 'placenta ऊपर चला गया', 'नीचे लगा placenta ठीक हो गया', 'previa ठीक हो गया'],
   ),
   ReportFinding(
     id: 'small_baby',
@@ -359,7 +359,7 @@ final List<ReportFinding> kReportFindings = [
       _t('The growth trend matters more than one measurement.', 'एक अकेली नाप से ज़्यादा मायने बढ़त का रुझान रखता है।'),
       _t('Follow-up scans keep it monitored.', 'आगे के स्कैन से इस पर नज़र बनी रहती है।'),
     ],
-    aliases: ['small baby', 'sga', 'iugr', 'fgr', 'growth restriction', 'baby small'],
+    aliases: ['small baby', 'sga', 'iugr', 'fgr', 'growth restriction', 'baby small', 'छोटा शिशु', 'बढ़त में रुकावट', 'शिशु छोटा'],
   ),
   ReportFinding(
     id: 'large_baby',
@@ -380,7 +380,7 @@ final List<ReportFinding> kReportFindings = [
       _t('A larger baby is often simply well-grown.', 'बड़ा शिशु अक्सर बस अच्छी तरह बढ़ा हुआ शिशु होता है।'),
       _t('Your team will plan a safe delivery with you.', 'आपकी टीम आपके साथ मिलकर सुरक्षित डिलीवरी की योजना बनाएगी।'),
     ],
-    aliases: ['large baby', 'lga', 'big baby', 'macrosomia', 'baby big'],
+    aliases: ['large baby', 'lga', 'big baby', 'macrosomia', 'baby big', 'बड़ा शिशु', 'ज़्यादा वज़न वाला शिशु', 'शिशु बड़ा'],
   ),
   ReportFinding(
     id: 'subchorionic_hematoma',
@@ -400,7 +400,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Most resolve on their own.', 'ज़्यादातर अपने आप ठीक हो जाते हैं।'),
       _t('A follow-up scan keeps it monitored.', 'आगे एक स्कैन से इस पर नज़र बनी रहती है।'),
     ],
-    aliases: ['subchorionic hematoma', 'haematoma', 'bleed near sac', 'sch', 'clot'],
+    aliases: ['subchorionic hematoma', 'haematoma', 'bleed near sac', 'sch', 'clot', 'बच्चेदानी की दीवार के पास ख़ून जमना', 'थैली के पास ख़ून जमना'],
   ),
   ReportFinding(
     id: 'vanishing_twin',
@@ -420,7 +420,7 @@ final List<ReportFinding> kReportFindings = [
       _t('This happens very early on.', 'यह बहुत शुरुआती दौर में होता है।'),
       _t('It is okay to have mixed emotions.', 'मन में मिले-जुले भाव आना बिलकुल ठीक है।'),
     ],
-    aliases: ['vanishing twin', 'lost twin', 'twin', 'one sac'],
+    aliases: ['vanishing twin', 'lost twin', 'twin', 'one sac', 'जुड़वाँ में से एक का न बढ़ना', 'जुड़वाँ में से एक का रुक जाना', 'एक ही थैली'],
   ),
   ReportFinding(
     id: 'marginal_cord',
@@ -440,7 +440,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Babies with it usually grow normally.', 'इसके साथ शिशु आम तौर पर सामान्य रूप से बढ़ते हैं।'),
       _t('A growth scan or two keeps it monitored.', 'एक-दो बढ़त वाले स्कैन से इस पर नज़र बनी रहती है।'),
     ],
-    aliases: ['marginal cord insertion', 'cord insertion', 'cord', 'marginal cord'],
+    aliases: ['marginal cord insertion', 'cord insertion', 'cord', 'marginal cord', 'किनारे पर जुड़ी गर्भनाल', 'गर्भनाल का जुड़ाव', 'किनारे वाली गर्भनाल'],
   ),
   ReportFinding(
     id: 'single_umbilical_artery',
@@ -461,7 +461,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Many babies with it develop normally.', 'इसके साथ बहुत से शिशु सामान्य रूप से विकसित होते हैं।'),
       _t('A detailed scan confirms the rest is on track.', 'एक विस्तृत स्कैन पुष्टि कर देता है कि बाक़ी सब ठीक है।'),
     ],
-    aliases: ['single umbilical artery', 'sua', 'two vessel cord', 'cord', 'one artery'],
+    aliases: ['single umbilical artery', 'sua', 'two vessel cord', 'cord', 'one artery', 'गर्भनाल में एक ही धमनी', 'दो नली वाली गर्भनाल', 'एक ही धमनी'],
   ),
   ReportFinding(
     id: 'ventriculomegaly',
@@ -481,7 +481,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Follow-up scans track the measurement.', 'आगे के स्कैन से माप पर नज़र रहती है।'),
       _t('Your team will explain each step.', 'आपकी टीम हर क़दम समझा देगी।'),
     ],
-    aliases: ['ventriculomegaly', 'brain ventricles', 'fluid in brain', 'mild ventriculomegaly'],
+    aliases: ['ventriculomegaly', 'brain ventricles', 'fluid in brain', 'mild ventriculomegaly', 'दिमाग़ के ventricles', 'दिमाग़ में तरल', 'हल्का ventriculomegaly'],
   ),
   ReportFinding(
     id: 'eif',
@@ -502,7 +502,7 @@ final List<ReportFinding> kReportFindings = [
       _t('It does not affect how the heart works.', 'इससे दिल के काम पर असर नहीं पड़ता।'),
       _t('It usually fades over time.', 'यह आम तौर पर समय के साथ मिट जाता है।'),
     ],
-    aliases: ['echogenic intracardiac focus', 'eif', 'bright spot heart', 'soft marker', 'heart spot'],
+    aliases: ['echogenic intracardiac focus', 'eif', 'bright spot heart', 'soft marker', 'heart spot', 'दिल में चमकीला बिंदु', 'दिल में चमकीला धब्बा', 'स्कैन का soft marker', 'दिल में धब्बा'],
   ),
   ReportFinding(
     id: 'soft_markers',
@@ -522,7 +522,7 @@ final List<ReportFinding> kReportFindings = [
       _t('They are not abnormalities by themselves.', 'ये अपने आप में कोई गड़बड़ी नहीं हैं।'),
       _t('Context from your whole scan matters most.', 'सबसे ज़्यादा मायने आपके पूरे स्कैन का संदर्भ रखता है।'),
     ],
-    aliases: ['soft markers', 'soft marker', 'scan markers', 'marker'],
+    aliases: ['soft markers', 'soft marker', 'scan markers', 'marker', 'स्कैन में soft markers', 'स्कैन का soft marker', 'स्कैन के marker'],
   ),
   ReportFinding(
     id: 'fibroids',
@@ -542,7 +542,7 @@ final List<ReportFinding> kReportFindings = [
       _t('Most pregnancies with fibroids go smoothly.', 'Fibroid वाली ज़्यादातर गर्भावस्थाएँ आराम से चलती हैं।'),
       _t('Your team will monitor them if needed.', 'ज़रूरत हुई तो आपकी टीम इन पर नज़र रखेगी।'),
     ],
-    aliases: ['fibroid', 'fibroids', 'myoma', 'uterus growth'],
+    aliases: ['fibroid', 'fibroids', 'myoma', 'uterus growth', 'बच्चेदानी में गाँठ'],
   ),
   ReportFinding(
     id: 'group_b_strep',
@@ -563,7 +563,7 @@ final List<ReportFinding> kReportFindings = [
       _t('A simple precaution at delivery handles it.', 'डिलीवरी के समय एक आसान एहतियात से यह सँभल जाता है।'),
       _t('It usually causes no symptoms for you.', 'आम तौर पर आपको इसके कोई लक्षण नहीं होते।'),
     ],
-    aliases: ['group b strep', 'gbs', 'strep', 'streptococcus'],
+    aliases: ['group b strep', 'gbs', 'strep', 'streptococcus', 'Group B Strep का bacteria'],
   ),
   ReportFinding(
     id: 'rh_negative',
@@ -583,7 +583,7 @@ final List<ReportFinding> kReportFindings = [
       _t('The care for it is simple and routine.', 'इसकी देखभाल आसान और रोज़ की बात है।'),
       _t('A preventive injection is the usual step.', 'एक बचाव वाला इंजेक्शन ही आम क़दम है।'),
     ],
-    aliases: ['rh negative', 'rh-negative', 'negative blood', 'anti d', 'rhesus', 'blood group'],
+    aliases: ['rh negative', 'rh-negative', 'negative blood', 'anti d', 'rhesus', 'blood group', 'Rh negative ख़ून', 'Rh-negative गर्भावस्था', 'negative ब्लड ग्रुप', 'anti-D इंजेक्शन', 'ब्लड ग्रुप'],
   ),
 ];
 

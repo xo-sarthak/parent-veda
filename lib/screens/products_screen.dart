@@ -165,7 +165,7 @@ class _CategoryCard extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Flexible(
-                  child: Text(category.name,
+                  child: Text(category.name.now,
                       style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                 ),
                 if (relevant) ...[
@@ -183,7 +183,7 @@ class _CategoryCard extends StatelessWidget {
                 ],
               ]),
               const SizedBox(height: 4),
-              Text(category.guidance,
+              Text(category.guidance.now,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: text.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.35)),
@@ -325,10 +325,10 @@ class _ProductCard extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(product.name,
+                Text(product.name.now,
                     style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 2),
-                Text(product.summary,
+                Text(product.summary.now,
                     style: text.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.35)),
               ]),
             ),
@@ -349,13 +349,13 @@ class _ProductCard extends StatelessWidget {
           if (product.why.isNotEmpty) ...[
             _trustHeading(context, s.prWhy),
             const SizedBox(height: 6),
-            for (final w in product.why) _whyRow(context, w),
+            for (final w in product.why) _whyRow(context, w.now),
           ],
           if (product.consider.isNotEmpty) ...[
             const SizedBox(height: 10),
             _trustHeading(context, s.prConsider),
             const SizedBox(height: 6),
-            for (final c in product.consider) _considerRow(context, c),
+            for (final c in product.consider) _considerRow(context, c.now),
           ],
           const SizedBox(height: 12),
           Row(children: [
@@ -500,7 +500,7 @@ class _GuidanceCard extends StatelessWidget {
           const Text('❤️', style: TextStyle(fontSize: 14)),
         ]),
         const SizedBox(height: 8),
-        Text(category.guidance, style: text.bodyLarge?.copyWith(height: 1.45)),
+        Text(category.guidance.now, style: text.bodyLarge?.copyWith(height: 1.45)),
         const SizedBox(height: 14),
         Text(s.prLookFor.toUpperCase(),
             style: text.labelSmall?.copyWith(
@@ -512,7 +512,7 @@ class _GuidanceCard extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Icon(Icons.check_rounded, size: 16, color: Color(0xFF3FA56A)),
               const SizedBox(width: 8),
-              Expanded(child: Text(l, style: text.bodyMedium)),
+              Expanded(child: Text(l.now, style: text.bodyMedium)),
             ]),
           ),
         const SizedBox(height: 10),
@@ -526,7 +526,7 @@ class _GuidanceCard extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Icon(Icons.close_rounded, size: 16, color: Color(0xFFD64545)),
               const SizedBox(width: 8),
-              Expanded(child: Text(a, style: text.bodyMedium)),
+              Expanded(child: Text(a.now, style: text.bodyMedium)),
             ]),
           ),
       ]),
@@ -665,7 +665,7 @@ class ProductCategoryScreen extends StatelessWidget {
     final picks = productsForCategory(category.id);
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(category.name)),
+      appBar: AppBar(title: Text(category.name.now)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
         children: [
@@ -681,7 +681,7 @@ class ProductCategoryScreen extends StatelessWidget {
             child: _WeekTimeline(
               fromWeek: category.fromWeek,
               toWeek: category.toWeek,
-              toLabel: category.toLabel,
+              toLabel: category.toLabel.now,
               currentWeek: controller.currentWeek,
               lang: lang,
             ),
@@ -722,7 +722,7 @@ class ProductDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Text(product.name.now, maxLines: 1, overflow: TextOverflow.ellipsis),
         actions: [
           IconButton(
             tooltip: s.pclAddToChecklist,
@@ -741,7 +741,7 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           // If this product has a ParentVeda Product Guide, offer it up top.
           ...() {
-            final g = guideForProduct(id: product.id, name: product.name);
+            final g = guideForProduct(id: product.id, name: product.name.now);
             return g == null
                 ? const <Widget>[]
                 : [productGuideBanner(context, g, padding: EdgeInsets.zero), const SizedBox(height: 14)];
@@ -789,11 +789,11 @@ class ProductDetailScreen extends StatelessWidget {
                       style: text.labelMedium?.copyWith(color: bv.color, fontWeight: FontWeight.w800)),
                 ),
               const SizedBox(height: 10),
-              Text(product.name,
+              Text(product.name.now,
                   textAlign: TextAlign.center,
                   style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
-              Text(product.summary,
+              Text(product.summary.now,
                   textAlign: TextAlign.center,
                   style: text.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.4)),
             ]),
@@ -821,7 +821,7 @@ class ProductDetailScreen extends StatelessWidget {
               _WeekTimeline(
                 fromWeek: category.fromWeek,
                 toWeek: category.toWeek,
-                toLabel: category.toLabel,
+                toLabel: category.toLabel.now,
                 currentWeek: controller.currentWeek,
                 lang: lang,
               ),
@@ -842,7 +842,7 @@ class ProductDetailScreen extends StatelessWidget {
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Icon(Icons.check_rounded, size: 17, color: Color(0xFF3FA56A)),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(w, style: text.bodyMedium?.copyWith(height: 1.4))),
+                  Expanded(child: Text(w.now, style: text.bodyMedium?.copyWith(height: 1.4))),
                 ]),
               ),
             if (product.consider.isNotEmpty) ...[
@@ -862,7 +862,7 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(c,
+                      child: Text(c.now,
                           style: text.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.4)),
                     ),
                   ]),
@@ -880,9 +880,9 @@ class ProductDetailScreen extends StatelessWidget {
                 const Text(' ❤️'),
               ]),
               const SizedBox(height: 10),
-              _summaryRow(context, s.prMostLoved, sum.mostLoved),
-              _summaryRow(context, s.prPraise, sum.praise),
-              _summaryRow(context, s.prDrawback, sum.drawback),
+              _summaryRow(context, s.prMostLoved, sum.mostLoved.now),
+              _summaryRow(context, s.prPraise, sum.praise.now),
+              _summaryRow(context, s.prDrawback, sum.drawback.now),
               const SizedBox(height: 6),
               Row(children: [
                 Text('${s.prWouldBuyAgain}: ',
@@ -1079,23 +1079,23 @@ Widget _reviewCard(BuildContext context, ProductReview r, S s) {
         CircleAvatar(
           radius: 16,
           backgroundColor: _accent.withValues(alpha: 0.12),
-          child: Text(r.author.isNotEmpty ? r.author[0] : '🙂',
+          child: Text(r.author.now.isNotEmpty ? r.author.now[0] : '🙂',
               style: const TextStyle(fontWeight: FontWeight.w800, color: _accent)),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(r.author, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-            Text(r.role, style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+            Text(r.author.now, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+            Text(r.role.now, style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
           ]),
         ),
         if (r.wouldBuyAgain)
           const Icon(Icons.verified_rounded, size: 18, color: Color(0xFF3FA56A)),
       ]),
       const SizedBox(height: 10),
-      _reviewLine(context, s.prUsedDuring, r.usedDuring),
-      _reviewLine(context, s.prLiked, r.liked),
-      _reviewLine(context, s.prWatchOut, r.watchOut),
+      _reviewLine(context, s.prUsedDuring, r.usedDuring.now),
+      _reviewLine(context, s.prLiked, r.liked.now),
+      _reviewLine(context, s.prWatchOut, r.watchOut.now),
     ]),
   );
 }
@@ -1142,8 +1142,8 @@ class _ProductSearchDelegate extends SearchDelegate<void> {
       for (final c in cats)
         ListTile(
           leading: Text(c.emoji, style: const TextStyle(fontSize: 22)),
-          title: Text(c.name),
-          subtitle: Text(c.guidance,
+          title: Text(c.name.now),
+          subtitle: Text(c.guidance.now,
               maxLines: 1, overflow: TextOverflow.ellipsis,
               style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
           onTap: () {
@@ -1154,8 +1154,8 @@ class _ProductSearchDelegate extends SearchDelegate<void> {
       for (final p in prods)
         ListTile(
           leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
-          title: Text(p.name),
-          subtitle: Text(p.summary,
+          title: Text(p.name.now),
+          subtitle: Text(p.summary.now,
               maxLines: 1, overflow: TextOverflow.ellipsis,
               style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
           onTap: () {

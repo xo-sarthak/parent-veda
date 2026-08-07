@@ -82,25 +82,69 @@ class BabyVoiceService extends ChangeNotifier {
 
   String _localeFor(AppLanguage lang) => lang.isHinglish ? 'hi-IN' : 'en-IN';
 
+  /// Whether the DEVICE can actually speak Hindi.
+  ///
+  /// null until asked once. This is the difference between requesting a voice
+  /// and having one: on many budget Android phones the Hindi pack is simply
+  /// not installed, `setLanguage('hi-IN')` does NOT throw, and `speak()` then
+  /// plays silence. Asking for a voice we cannot get produced a Listen button
+  /// that did nothing at all and explained nothing.
+  ///
+  /// Needs the TTS_SERVICE entry in AndroidManifest `<queries>`; without it
+  /// Android 11+ hides every engine and this answers false however many voices
+  /// are installed.
+  bool? _hindiVoice;
+  bool get hindiVoiceMissing => _hindiVoice == false;
+
+  Future<bool> _canSpeak(AppLanguage lang) async {
+    if (!lang.isHindi) return true;
+    if (_hindiVoice != null) return _hindiVoice!;
+    try {
+      final ok = await _tts.isLanguageAvailable('hi-IN');
+      _hindiVoice = ok == true;
+    } catch (_) {
+      _hindiVoice = false;
+    }
+    return _hindiVoice!;
+  }
+
   /// Speak [text] for [cardKey]. Returns immediately if muted.
+  /// [englishText] is the same passage in English, used only when the device
+  /// has no Hindi voice. Reading Devanagari with an en-IN voice produces
+  /// noise, so the fallback has to swap the TEXT as well as the locale -
+  /// falling back on locale alone would just mispronounce everything.
   Future<void> speak(String text, {
     required String cardKey,
     required AppLanguage lang,
+    String? englishText,
     VoiceScope scope = VoiceScope.journey,
   }) async {
     if (isMutedFor(scope) || text.trim().isEmpty) return;
     await init();
+
+    var speakLang = lang;
+    var body = text;
+    if (!await _canSpeak(lang)) {
+      // No Hindi voice on this phone. Play the English passage rather than
+      // silence, and let hindiVoiceMissing tell the screen to say why.
+      speakLang = AppLanguage.english;
+      if (englishText != null && englishText.trim().isNotEmpty) {
+        body = englishText;
+      }
+      notifyListeners();
+    }
+
     try {
       await _tts.stop();
       try {
-        await _tts.setLanguage(_localeFor(lang));
+        await _tts.setLanguage(_localeFor(speakLang));
       } catch (_) {
         await _tts.setLanguage('en-IN');
       }
       _playingKey = cardKey;
       _playingScope = scope;
       notifyListeners();
-      await _tts.speak(text);
+      await _tts.speak(body);
     } catch (_) {
       _playingKey = null;
       _playingScope = null;

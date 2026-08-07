@@ -17,6 +17,21 @@ analyzer:
   exclude:
     - build/**
 
+  errors:
+    # Promoted from INFO to ERROR by the Hindi migration.
+    #
+    # Widening a field to LocalizedText turns any surviving `field == 'literal'`
+    # into a comparison between two unrelated types, which Dart does not reject
+    # - it just answers false, forever. That shipped once: ProductCategory
+    # `toLabel == 'Postpartum'` silently ended every postpartum category at week
+    # 40 instead of 44, and emptied the "Post Birth" filter. `flutter analyze`
+    # was clean by the usual reading and all 2,108 tests passed, with the
+    # feature broken.
+    #
+    # There is no legitimate use of this in a codebase mid-migration: the whole
+    # point of the warning is that the comparison cannot ever be true.
+    unrelated_type_equality_checks: error
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

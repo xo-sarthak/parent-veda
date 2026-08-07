@@ -229,12 +229,18 @@ class StoryReaderScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 12),
                   child: TextButton.icon(
                     onPressed: () => BabyVoiceService.instance.toggleCard(
-                      // Always narrate the English text with an English voice -
-                      // TTS can't read Roman-script Hinglish. (UI text below
-                      // still follows the selected language.)
-                      story.body.en,
+                      // Narrate in the language she is READING in.
+                      //
+                      // This used to force English, with the note "TTS can't
+                      // read Roman-script Hinglish". That was true, and it was
+                      // the whole reason for the Devanagari migration. Now
+                      // that weekContent.json is 99% Devanagari the hi-IN
+                      // voice can read it, so the workaround has outlived its
+                      // cause - a mother reading in Hindi was tapping listen
+                      // and hearing English.
+                      story.body.of(lang),
                       cardKey: _key,
-                      lang: AppLanguage.english,
+                      lang: lang,
                       scope: VoiceScope.home,
                     ),
                     icon: Icon(playing ? Icons.stop_rounded : Icons.graphic_eq_rounded, size: 18),

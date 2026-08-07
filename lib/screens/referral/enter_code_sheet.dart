@@ -127,7 +127,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
               if (_error != null) setState(() => _error = null);
             },
             decoration: InputDecoration(
-              hintText: 'ABCD234',
+              hintText: S.now.uiAbcd,
               hintStyle: ppFraunces(22, h: 1.1)
                   .copyWith(letterSpacing: 3, color: ppMuted),
               filled: true,

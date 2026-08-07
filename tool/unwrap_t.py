@@ -52,6 +52,21 @@ def calls(src, marker='_t('):
                 arg_start = i + 1
             i += 1
         if depth == 0:
+            # Drop a trailing empty argument. Dart allows - and dartfmt adds -
+            # a comma before the closing paren:
+            #
+            #     _t(
+            #       'English',
+            #       'हिन्दी',
+            #     )
+            #
+            # which this parser reads as a third, empty argument. Callers that
+            # ask "is this a two-argument call?" then answer no, and 67 of the
+            # 140 pairs in week5_full_data.dart were reported as untranslated
+            # when they were fine. An audit that over-reports is as useless as
+            # one that under-reports; it just wastes the other direction.
+            if args and not src[args[-1][0]:args[-1][1]].strip():
+                args.pop()
             out.append((m.start(), i, args))
     return out
 

@@ -71,6 +71,28 @@ void main() {
     );
   });
 
+  test('no identity-bearing call is built by interpolation', () {
+    // LocalizedText.toString() returns .now, so `'$title'` renders correctly -
+    // and silently resolves to the language on screen. That is right for
+    // display and wrong for a key, so the two must not meet.
+    final pattern = RegExp(
+      '(${_identityCalls.join('|')})' r'\([^)]*\$\{?\w',
+    );
+    final offenders = <String>[];
+    for (final file in _dartFiles('lib')) {
+      final lines = file.readAsStringSync().split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        if (pattern.hasMatch(lines[i])) {
+          offenders.add('${file.path}:${i + 1}  ${lines[i].trim()}');
+        }
+      }
+    }
+    expect(offenders, isEmpty,
+        reason: 'An interpolated key resolves to whatever language is on '
+            'screen. Build keys from .en explicitly.\n'
+            '${offenders.join('\n')}');
+  });
+
   test('the saved-piece key is documented as language-invariant', () {
     // The comment is the only thing telling the next person WHY a key sits
     // beside a title that looks like it would do. If it goes, the next
