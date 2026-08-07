@@ -1361,7 +1361,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     ),
                   ]),
                   const SizedBox(height: 9),
-                  Text(tale.title,
+                  Text(tale.title.now,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: _serif(18, p.ink, w: FontWeight.w600)),
@@ -1411,7 +1411,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 ),
                 child: Row(children: [
                   Expanded(
-                      child: Text(fatherTaleKindLabel(k),
+                      child: Text(fatherTaleKindLabel(k).now,
                           style: _body(15, p.ink, w: FontWeight.w600))),
                   Icon(
                       on

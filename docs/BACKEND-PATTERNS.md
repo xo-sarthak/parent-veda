@@ -886,7 +886,155 @@ migration, and a migration nobody can run protects nothing.
 
 ---
 
-## 13. Reading list, in order
+## 13. Widening a field that is already persisted
+
+The Hindi migration turned hundreds of `String` fields into `LocalizedText`
+(`{en, hi}`). Most of that was mechanical. The parts that were not are all the
+same shape — **the field was already in a database or a preferences blob** —
+and they generalise to any schema change, in any language.
+
+### The value that is both shown and looked up
+
+A bookmark was found by comparing the title it displayed:
+
+```dart
+bool isSaved(String title) => _items.any((p) => p.title == title);
+```
+
+Correct until the title is translated. Then one piece answers to a different
+name per language: marks made in English vanish in Hindi, come back on
+switching, and saving again writes a second row for one item. This store syncs
+to Supabase, so the duplicate follows the user onto every device.
+
+The fix is to split the two jobs the string was doing:
+
+```dart
+final String key;    // what it IS       — never changes
+final String title;  // what she READS   — may
+```
+
+**The general rule: identity must be invariant under presentation.** The moment
+one value is both rendered and used to look something up, any change to how it
+renders is a data bug. This is not a translation problem — renaming a product,
+fixing a typo in a label, or reformatting a date does exactly the same damage.
+
+It was got wrong eight times in one migration, and never once failed to
+compile: both sides had the same type, so only a human could see it. When a
+distinction matters and the type system cannot carry it, it needs a test —
+`test/localized_identity_test.dart` scans the source for identity-bearing calls
+handed a display value.
+
+### Choosing a key so the migration is free
+
+Given the split, which string becomes the key? English — **because every key
+already persisted IS an English title.** That makes the reader migrate itself:
+
+```dart
+key: j['k'] as String? ?? title,   // rows written before 'k' existed
+```
+
+No migration script, no version column, no backfill, and nothing to run against
+the cloud copy. Rows written by the old code load correctly under the new code
+because the new field's fallback is exactly what the old field held.
+
+The cost is stated rather than hidden: editing the English still orphans a
+bookmark. Stable synthetic ids would fix that too and would need a real
+two-sided migration — worth doing the day content ids exist, not worth blocking
+a release on.
+
+**The pattern: when adding a field, look for a value already in the old rows
+that can serve as its default.** If one exists, the migration is a `??`.
+
+### A field that round-trips through JSON is not copy
+
+`apply_glossary` converted all 490 strings in `community_data.dart`. Only 118
+should have been:
+
+| | |
+|---|---|
+| `Community` | a static room definition, never serialised — safe to widen |
+| `CommunityPost` | `toJson`/`fromJson` to prefs **and** Supabase |
+| `CommunityComment` | same model carries what a mother typed herself |
+
+Widening `text` on a persisted record changes a schema that already has rows in
+it — and a post she wrote has no second language and never will.
+
+**`text` reads exactly like display copy until you notice `fromJson` on the
+other side of it.** Before widening any field, grep for its name in a codec.
+
+### The codec that silently kept one language
+
+`BagRecommendation` persisted its lists like this:
+
+```dart
+'why': why,                                    // toJson
+why: (j['why'] as List).map((e) => e.toString())   // fromJson
+```
+
+Once `why` became `LocalizedText` **and** `LocalizedText.toString()` returned
+the current language, that codec wrote whichever language happened to be on
+screen at save time and threw the other away. Permanently, and differently
+depending on when the row was written. It compiles. It round-trips. It passes
+tests, because a test that writes and reads in one language sees what it
+expects.
+
+```dart
+static Map<String, String> _pair(LocalizedText t) => {'en': t.en, 'hi': t.hi};
+```
+
+**A store must never resolve a language.** It caches every column the model
+holds — both halves — and lets the screen choose. The same rule already exists
+in `content_store.dart` as a fixed defect; this is the second time it has been
+learned.
+
+Note the interaction: adding `toString()` was a good change for display and a
+trap for persistence. **A convenience on a type reaches every place that type
+is used, including the ones you were not thinking about.**
+
+### The lint that was only an `info`
+
+Widening a field turns any surviving `field == 'literal'` into a comparison
+between unrelated types. Dart does not reject that — it answers `false`,
+forever:
+
+```dart
+int get toWeek => toLabel == 'Postpartum' ? 44 : 40;   // now always 40
+```
+
+Every postpartum category quietly ended at week 40 instead of 44 and the
+"Post Birth" filter returned nothing. `flutter analyze` read clean and all
+2,108 tests passed, because `unrelated_type_equality_checks` is an **info** and
+nobody stops for an info.
+
+```yaml
+analyzer:
+  errors:
+    unrelated_type_equality_checks: error
+```
+
+**After a type changes, the infos are where the behaviour changes hide** — the
+compiler has no opinion about comparing two unrelated types. If a warning
+describes something that can never be correct, make it fatal; it costs nothing
+and it would have caught this in seconds.
+
+### What this cost, as a checklist
+
+Before widening a field that already exists in a store:
+
+1. Is it in a `toJson`/`fromJson`? Then the schema changes — plan the read side
+   first, and give it a fallback that makes old rows load.
+2. Is it compared, switched on, or used as a map key anywhere? Those sites need
+   the invariant half, not the displayed one.
+3. Does any code do surgery on its text — a prefix strip, a regex, a
+   `split`? Those run per-language now (`_valueName()` strips `'ParentVeda '`
+   from both halves; a schedule prefix needed one regex per script).
+4. Does it leave the app — a URL, a search query, an external API? That is
+   identity, not display.
+5. Re-read the analyzer's **infos**, not just its errors.
+
+---
+
+## 14. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.

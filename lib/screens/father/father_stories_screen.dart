@@ -134,7 +134,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
                   ]
                 : null,
           ),
-          child: Text(fatherTaleKindLabel(k),
+          child: Text(fatherTaleKindLabel(k).now,
               style: _body(13, active ? _accent : _muted,
                   w: active ? FontWeight.w700 : FontWeight.w600)),
         ),
@@ -159,7 +159,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                     color: _accentSoft, borderRadius: BorderRadius.circular(999)),
-                child: Text(fatherTaleKindTag(t.kind).toUpperCase(),
+                child: Text(fatherTaleKindTag(t.kind).now.toUpperCase(),
                     style: pvJakarta(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
@@ -170,9 +170,9 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
               const Icon(Icons.chevron_right_rounded, color: _muted, size: 20),
             ]),
             const SizedBox(height: 10),
-            Text(t.title, style: _serif(18, _ink, w: FontWeight.w600)),
+            Text(t.title.now, style: _serif(18, _ink, w: FontWeight.w600)),
             const SizedBox(height: 6),
-            Text(t.body,
+            Text(t.body.now,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: _body(13.5, _muted, h: 1.45)),
@@ -223,7 +223,7 @@ class FatherTaleReadScreen extends StatelessWidget {
               ),
               const SizedBox(width: 13),
               Expanded(
-                child: Text(fatherTaleKindTag(tale.kind).toUpperCase(),
+                child: Text(fatherTaleKindTag(tale.kind).now.toUpperCase(),
                     style: pvJakarta(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -236,7 +236,7 @@ class FatherTaleReadScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(22, 6, 22, 36),
               children: [
-                Text(tale.title, style: _serif(27, _ink)),
+                Text(tale.title.now, style: _serif(27, _ink)),
                 const SizedBox(height: 10),
                 Row(children: [
                   const Icon(Icons.auto_stories_rounded, size: 16, color: _muted),
@@ -245,8 +245,8 @@ class FatherTaleReadScreen extends StatelessWidget {
                       style: _body(12.5, _muted, w: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 20),
-                Text(tale.body, style: _body(16.5, _ink.withValues(alpha: 0.92), h: 1.7)),
-                if (tale.moral.isNotEmpty) ...[
+                Text(tale.body.now, style: _body(16.5, _ink.withValues(alpha: 0.92), h: 1.7)),
+                if (tale.moral.en.isNotEmpty) ...[
                   const SizedBox(height: 22),
                   Container(
                     width: double.infinity,
@@ -263,12 +263,12 @@ class FatherTaleReadScreen extends StatelessWidget {
                                   letterSpacing: 0.12 * 11,
                                   color: _accent2)),
                           const SizedBox(height: 5),
-                          Text(tale.moral,
+                          Text(tale.moral.now,
                               style: _body(14.5, _ink, w: FontWeight.w500, h: 1.45)),
                         ]),
                   ),
                 ],
-                if (tale.dadNote.isNotEmpty) ...[
+                if (tale.dadNote.en.isNotEmpty) ...[
                   const SizedBox(height: 18),
                   Container(
                     width: double.infinity,
@@ -288,7 +288,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                                   letterSpacing: 0.12 * 11,
                                   color: _accent)),
                           const SizedBox(height: 6),
-                          Text(tale.dadNote,
+                          Text(tale.dadNote.now,
                               style: pvFraunces(
                                   fontSize: 15.5,
                                   fontStyle: FontStyle.italic,
