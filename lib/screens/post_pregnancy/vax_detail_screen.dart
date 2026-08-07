@@ -56,7 +56,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             return ListView(
               padding: const EdgeInsets.only(top: 60, bottom: 120),
               children: [
-                _pad(ppCircleBack(context, eyebrow: '${_visit.ageLabel} · ${_visit.date}')),
+                _pad(ppCircleBack(context, eyebrow: '${_visit.ageLabel} · ${VaxStore.instance.dateLabelFor(_visit)}')),
 
                 const SizedBox(height: 22),
                 _pad(ppEyebrow(vaxStatusLabel(status) == 'Done' ? 'Completed' : (status == VaxStatus.due ? 'Recommended now' : 'Coming up'), color: ppPurple, spacing: 1.2)),
@@ -315,7 +315,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
         title: 'Vaccine reminder - ${_vax.shortName}',
         body: daysBefore == 0
             ? "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due today."
-            : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${_visit.date}.",
+            : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(_visit)}.",
         when: when.subtract(Duration(days: daysBefore)),
       );
       messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));
@@ -334,7 +334,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             const SizedBox(height: 16),
             Text('Remind me about this vaccine', style: ppJakarta(17)),
             const SizedBox(height: 4),
-            Text('Due ${_visit.date} · we\'ll send a gentle nudge.', style: ppBody(12.5, color: ppMuted)),
+            Text('Due ${VaxStore.instance.dateLabelFor(_visit)} · we\'ll send a gentle nudge.', style: ppBody(12.5, color: ppMuted)),
             const SizedBox(height: 14),
             _reminderOption('The day before', () => set(1, '1 day before')),
             _reminderOption('3 days before', () => set(3, '3 days before')),

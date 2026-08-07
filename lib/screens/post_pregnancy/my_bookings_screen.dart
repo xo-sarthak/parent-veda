@@ -25,6 +25,8 @@ import '../../services/notification_service.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'problem_solver_screen.dart';
 import 'yoga_home_screen.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../auth/auth_flow_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
@@ -416,27 +418,59 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         ),
       );
 
-  Widget _emptyPast() => Container(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: ppHair),
-        ),
-        child: Column(children: [
-          const Icon(Icons.history_rounded, size: 26, color: ppMuted),
-          const SizedBox(height: 10),
-          Text('No past sessions yet', style: ppJakarta(15, color: ppTitleInk)),
-          const SizedBox(height: 4),
-          Text(
-              'Every session you attend stays here — with the doctor, the date, '
-              'and any prescription they wrote.',
-              textAlign: TextAlign.center,
-              style: ppBody(12.5, color: ppSoft, h: 1.4)),
-          const SizedBox(height: 14),
-          _emptyCta('Find an expert', () => _push(const ProblemSolverScreen())),
-        ]),
-      );
+  /// "No history" and "cannot see your history" are different sentences, and
+  /// this card used to say the first when it meant the second.
+  ///
+  /// The history lives in `booking_bookings`, and _hydrateFromServer() opens
+  /// with `if (!SupabaseRepo.isLoggedIn) return;` — so a signed-out phone reads
+  /// only what that device happens to have cached locally. A parent who booked
+  /// on another device, or who reinstalled, was told flatly that she had never
+  /// had a consultation, while the doctor's app listed six with her.
+  ///
+  /// The store is right to return nothing; a booking is not the app's to show
+  /// without an account. What was wrong was the sentence on top of it.
+  Widget _emptyPast() {
+    final signedIn = SupabaseRepo.isLoggedIn;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ppHair),
+      ),
+      child: Column(children: [
+        Icon(signedIn ? Icons.history_rounded : Icons.cloud_off_rounded,
+            size: 26, color: ppMuted),
+        const SizedBox(height: 10),
+        Text(signedIn ? 'No past sessions yet' : 'Sign in to see your history',
+            style: ppJakarta(15, color: ppTitleInk),
+            textAlign: TextAlign.center),
+        const SizedBox(height: 4),
+        Text(
+            signedIn
+                ? 'Every session you attend stays here — with the doctor, the '
+                    'date, and any prescription they wrote.'
+                : 'Consultations you booked on another device are kept against '
+                    'your account, not this phone. Signing in brings them back.',
+            textAlign: TextAlign.center,
+            style: ppBody(12.5, color: ppSoft, h: 1.4)),
+        const SizedBox(height: 14),
+        signedIn
+            ? _emptyCta('Find an expert', () => _push(const ProblemSolverScreen()))
+            : _emptyCta(
+                'Sign in',
+                () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      // onDone just closes it. Signing in is the whole job
+                      // here; the store's own listener repopulates the list,
+                      // and this screen already refreshes from the server when
+                      // it rebuilds.
+                      builder: (_) => AuthFlowScreen(
+                        onDone: (_, _) => Navigator.of(context).maybePop(),
+                      ),
+                    ))),
+      ]),
+    );
+  }
 
   Future<void> _confirmCancel(Booking b) async {
     final yes = await showModalBottomSheet<bool>(

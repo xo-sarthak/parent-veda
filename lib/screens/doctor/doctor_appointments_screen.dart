@@ -322,6 +322,15 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
   /// A doctor should never have to guess what happens to the parent's money.
   Future<void> _openActions(Booking b) async {
     final canNoShow = ConsultPolicy.mayMarkNoShow(b);
+    // WHAT YOU MAY DO DEPENDS ON WHETHER IT HAS HAPPENED YET.
+    //
+    // Before the slot ends, the open question is whether the consultation
+    // will go ahead, so cancelling is the action. After it ends, the open
+    // question is what happened, so the actions are no-show and the
+    // prescription. Offering "cancel · use this if you cannot make it" on a
+    // consultation that finished days ago is how a doctor refunds a parent
+    // for a call they actually took.
+    final canCancel = ConsultPolicy.mayCancel(b);
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: ppBg,
@@ -338,18 +347,20 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 decoration: BoxDecoration(
                     color: ppLine, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 18),
-            _sheetAction(
-              icon: Icons.event_busy_rounded,
-              colour: ppCoral,
-              title: 'Cancel this consultation',
-              body: 'The parent gets their full credit back straight away and '
-                  'can book any other time. Use this if you cannot make it.',
-              onTap: () {
-                Navigator.of(sheetCtx).pop();
-                _cancelAsDoctor(b);
-              },
-            ),
-            const SizedBox(height: 12),
+            if (canCancel) ...[
+              _sheetAction(
+                icon: Icons.event_busy_rounded,
+                colour: ppCoral,
+                title: 'Cancel this consultation',
+                body: 'The parent gets their full credit back straight away and '
+                    'can book any other time. Use this if you cannot make it.',
+                onTap: () {
+                  Navigator.of(sheetCtx).pop();
+                  _cancelAsDoctor(b);
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
             _sheetAction(
               icon: Icons.person_off_outlined,
               colour: canNoShow ? ppBrown : ppMuted,
@@ -367,6 +378,34 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                     }
                   : null,
             ),
+            // The prescription is the thing still owed on a finished
+            // consultation, so on the Past tab it belongs in this sheet rather
+            // than only on the card behind it.
+            if (!canCancel) ...[
+              const SizedBox(height: 12),
+              _sheetAction(
+                icon: PrescriptionStore.instance.hasFor(b.id)
+                    ? Icons.description_outlined
+                    : Icons.edit_note_rounded,
+                colour: ppPurple,
+                title: PrescriptionStore.instance.hasFor(b.id)
+                    ? 'View the prescription'
+                    : 'Write the prescription',
+                body: PrescriptionStore.instance.hasFor(b.id)
+                    ? 'What you sent the parent after this consultation.'
+                    : 'This consultation is finished but has no prescription '
+                        'against it yet.',
+                onTap: () {
+                  Navigator.of(sheetCtx).pop();
+                  Navigator.of(context).push(MaterialPageRoute<void>(
+                    builder: (_) => DoctorPrescriptionScreen(
+                        bookingId: b.id,
+                        title: b.title,
+                        backLabel: 'Appointments'),
+                  ));
+                },
+              ),
+            ],
           ]),
         ),
       ),

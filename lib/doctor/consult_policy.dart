@@ -91,6 +91,22 @@ class ConsultPolicy {
   static bool mayMarkNoShow(Booking b, {DateTime? now}) =>
       (now ?? DateTime.now()).toUtc().isAfter(b.startsUtc.add(kNoShowGrace));
 
+  /// Whether this consultation can still be CANCELLED.
+  ///
+  /// Only before its slot has finished. Cancelling is a statement about
+  /// something that has not happened yet — "I cannot make it" — and once the
+  /// slot has passed the question is no longer whether it will happen but what
+  /// happened: it was completed, or the parent did not attend. Those are
+  /// different outcomes with different money attached, and no-show is the one
+  /// that records the second.
+  ///
+  /// The Past tab was offering "Cancel this consultation · use this if you
+  /// cannot make it" on a consultation that finished days ago, which reads as
+  /// an app that has not noticed time passing — and would have refunded a
+  /// parent for a call the doctor actually took.
+  static bool mayCancel(Booking b, {DateTime? now}) =>
+      (now ?? DateTime.now()).toUtc().isBefore(b.endsUtc);
+
   /// The doctor cancelling. Unconditional, at any notice.
   static ConsultResolution doctorCancels(Booking b) => const ConsultResolution(
         outcome: ConsultOutcome.doctorCancelled,

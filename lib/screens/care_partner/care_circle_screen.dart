@@ -50,15 +50,32 @@ class _CareCircleScreenState extends State<CareCircleScreen> {
         final partner = _store.partner;
         return Scaffold(
           backgroundColor: ppBg,
-          appBar: AppBar(
-            backgroundColor: ppBg,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            title: Text(S.now.uiCareCircle, style: ppJakarta(16)),
-          ),
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
+          // THE EDITORIAL HEADER, like every other screen reached from Explore.
+          //
+          // This was a Material AppBar with a 16pt Jakarta title, which made it
+          // the only page in the parenting app that announced itself in a bar
+          // rather than with an eyebrow and a serif hero. Walking in from the
+          // drawer, it read as a screen from a different product — and it was
+          // the one page with no visible way back except the system gesture.
+          //
+          // Kept for revert:
+          // appBar: AppBar(
+          //   backgroundColor: ppBg,
+          //   surfaceTintColor: Colors.transparent,
+          //   elevation: 0,
+          //   title: Text(S.now.uiCareCircle, style: ppJakarta(16)),
+          // ),
+          body: SafeArea(
+            bottom: false,
+            child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
             children: [
+              ppBack(context, 'Explore'),
+              const SizedBox(height: 16),
+              ppEyebrow('Your people'),
+              const SizedBox(height: 8),
+              Text(S.now.uiCareCircle, style: ppFraunces(30, h: 1.1)),
+              const SizedBox(height: 6),
               Text(
                 partner == null
                     ? 'The people supporting you through this.'
@@ -92,6 +109,7 @@ class _CareCircleScreenState extends State<CareCircleScreen> {
               const SizedBox(height: 22),
               if (partner == null) _organicNote(),
             ],
+          ),
           ),
         );
       },

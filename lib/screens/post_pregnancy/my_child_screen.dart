@@ -639,8 +639,18 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 overflow: TextOverflow.ellipsis),
           ),
           const SizedBox(width: 10),
+          // AXIS LABELS, not a second copy of the sentence below.
+          //
+          // This said "Next · <phase>" while the line nine pixels underneath
+          // said "Next: <phase>, around <age>." — the same fact twice, and the
+          // top one had to share its row with the previous-phase label so it
+          // ellipsised: "Next · The peak, and the first s…". A truncated
+          // duplicate of a sentence you can already read in full.
+          //
+          // The two ends of a progress bar should say where the journey starts
+          // and where it finishes. The sentence below carries what happens next.
           Expanded(
-            child: Text(next != null ? 'Next · ${next.name}' : '5 years',
+            child: Text('5 years',
                 textAlign: TextAlign.right,
                 style: ppBody(10.5,
                     color: Colors.white.withValues(alpha: 0.85),

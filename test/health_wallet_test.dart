@@ -142,11 +142,40 @@ void main() {
   });
 
   group('the status card — the line that matters most', () {
-    test("the brief's version says Healthy, unaltered", () {
+    test("the brief's version says Healthy, unaltered — once there IS a record",
+        () {
+      // Seeding matters now. V2 keeps the brief's claim exactly, but only
+      // where the claim can mean anything: with something in the record.
+      //
+      // HealthStore is a singleton and this file has no setUp, so the seed is
+      // removed again on the way out. Without that it leaks into the
+      // empty-record test below and quietly makes it pass for the wrong reason.
+      HealthStore.instance
+          .addSymptom(const SymptomEntry('Mild cough', '2026-08-01', ''));
+      addTearDown(() => HealthStore.instance.removeSymptom(0));
       final s = walletStatusDoc();
       expect(s.headline, 'Healthy',
           reason: 'V2 must keep the brief\'s claim or the comparison is fake');
       expect(s.tone, 'good');
+    });
+
+    test('NEITHER version calls a child healthy on an empty record', () {
+      // The one line of the brief that could not survive contact with a real
+      // parent: "Healthy · Everything looks fine" above no visits, no reports,
+      // no medications and no allergies. The app had been told nothing and was
+      // reassuring her anyway.
+      //
+      // This is not the V2-vs-V3 softening the pair exists to compare — that
+      // question is untouched, and the test above still holds V2 to the brief.
+      // It is the floor beneath both.
+      for (final s in [walletStatusDoc(), walletStatusRecord()]) {
+        final all = '${s.headline} ${s.sub}'.toLowerCase();
+        for (final claim in ['healthy', 'everything looks fine']) {
+          expect(all.contains(claim), isFalse,
+              reason: 'claimed "$claim" with nothing recorded');
+        }
+      }
+      expect(walletStatusDoc().headline, 'Nothing recorded yet');
     });
 
     test('V3 never asserts the child is healthy or fine', () {

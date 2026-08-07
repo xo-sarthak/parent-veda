@@ -148,12 +148,29 @@ class WalletStatus {
 /// Left as the brief wrote it deliberately. Softening it here would produce a
 /// V2 that is really V3, and the whole reason for building both is that this
 /// specific line is the thing worth deciding.
-WalletStatus walletStatusDoc() => WalletStatus(
-      headline: 'Healthy',
-      sub: 'Everything looks fine.',
-      tone: 'good',
-      tiles: kHealthSnapshot,
-    );
+/// ONE EXCEPTION, and it is not a softening: an EMPTY record.
+///
+/// The brief's line is a claim about the child, and with nothing entered there
+/// is nothing behind it — the card read "Healthy · Everything looks fine" above
+/// no visits, no reports, no medications and no allergies. A parent who has
+/// recorded nothing was being told her child is fine, by an app that had not
+/// been told anything.
+///
+/// Once there is something in the record the brief's card returns untouched, so
+/// the V2-vs-V3 question this pair exists to answer is still the same question.
+WalletStatus walletStatusDoc() => walletRecordCount() == 0
+    ? const WalletStatus(
+        headline: 'Nothing recorded yet',
+        sub: 'Add a visit, a report or a medicine and this fills in.',
+        tone: 'neutral',
+        tiles: kHealthSnapshot,
+      )
+    : WalletStatus(
+        headline: 'Healthy',
+        sub: 'Everything looks fine.',
+        tone: 'good',
+        tiles: kHealthSnapshot,
+      );
 
 /// How many records the wallet is holding.
 ///

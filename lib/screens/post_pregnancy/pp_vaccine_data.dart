@@ -582,10 +582,46 @@ class VaxStore extends ChangeNotifier {
   /// is our demo history, so for a real parent it reads as `due`: the dose is
   /// in the past and she has not recorded it yet. That is true, and it invites
   /// her to record it instead of telling her it already happened.
+  /// The comment above was half right, and the half it got wrong is the whole
+  /// problem: the schedule's `status` does NOT derive from the child's age. It
+  /// is a literal baked into each seed entry. So a newborn's tracker announced
+  /// "At birth · Due now · 8 Mar 2026" — a date five months in the past, for a
+  /// child born today — and every "upcoming" was upcoming for the demo baby
+  /// rather than for hers.
+  ///
+  /// AGE DECIDES. A visit whose scheduled age has arrived is due; one that has
+  /// not is upcoming; recorded always wins. Now the answer changes with the
+  /// child instead of with the seed file.
+  ///
+  /// Kept for revert:
+  /// VaxStatus statusOf(VaxVisit v) {
+  ///   if (_done.contains(v.id)) return VaxStatus.done;
+  ///   return v.status == VaxStatus.done ? VaxStatus.due : v.status;
+  /// }
   VaxStatus statusOf(VaxVisit v) {
     if (_done.contains(v.id)) return VaxStatus.done;
-    return v.status == VaxStatus.done ? VaxStatus.due : v.status;
+    return v.ageDays <= ChildProfileStore.instance.ageInDays
+        ? VaxStatus.due
+        : VaxStatus.upcoming;
   }
+
+  /// When this visit falls for THIS child: date of birth plus the scheduled age.
+  ///
+  /// VaxVisit.date is a display string in the seed ('8 Mar 2026'), which is one
+  /// demo baby's calendar. Every screen printed it verbatim, so a parent read
+  /// somebody else's appointment dates as her own.
+  String dateLabelFor(VaxVisit v) {
+    final d = ChildProfileStore.instance.dob.add(Duration(days: v.ageDays));
+    const m = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+      'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${d.day} ${m[d.month]} ${d.year}';
+  }
+
+  /// True when the parent has recorded nothing at all.
+  ///
+  /// The one thing every "how are we doing?" line on this screen and in the
+  /// Health Wallet has to know before it says anything reassuring.
+  bool get nothingRecorded => _done.isEmpty;
 
   // ---- snapshot ----
   int get completedVaccineCount =>

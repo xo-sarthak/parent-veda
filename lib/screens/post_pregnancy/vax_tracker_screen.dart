@@ -76,12 +76,56 @@ class VaxTrackerScreen extends StatelessWidget {
               _pad(ppCircleBack(context, eyebrow: 'Vaccinations')),
 
               const SizedBox(height: 22),
-              _pad(ppEyebrow('${ChildProfileStore.instance.name} · 4 months', color: ppMuted, spacing: 1.4)),
+              // ageLabel, not a literal "4 months".
+              //
+              // The store already derives the age from the recorded date of
+              // birth and every other screen reads it — so this one line was
+              // the whole reason Vaccination announced a four-month-old while
+              // the phase card two taps away said 0–4 weeks and Growth journey
+              // said 0 weeks. Not a disagreement about which source is right:
+              // this screen was not asking any source at all.
+              _pad(ppEyebrow(
+                  '${ChildProfileStore.instance.name} · ${ChildProfileStore.instance.ageLabel}',
+                  color: ppMuted,
+                  spacing: 1.4)),
               const SizedBox(height: 8),
-              _pad(Text.rich(TextSpan(children: [
-                const TextSpan(text: 'On track, '),
-                TextSpan(text: 'and protected.', style: ppFraunces(34, color: ppPurple, h: 1.1).copyWith(fontStyle: FontStyle.italic)),
-              ]), style: ppFraunces(34, h: 1.1))),
+              // THE HERO SAYS WHAT THE RECORD SAYS, and nothing more.
+              //
+              // It used to read "On track, and protected." unconditionally —
+              // sitting directly above "0 of 23 done". That is a protective
+              // health claim made from an empty record, which is the wrong
+              // direction for this app to fail in: a parent who has recorded
+              // nothing is told she is covered.
+              //
+              // With nothing recorded it now states the record and invites her
+              // to fill it. The reassurance is kept for when there is something
+              // to base it on.
+              _pad(store.nothingRecorded
+                  ? Text.rich(
+                      TextSpan(children: [
+                        const TextSpan(text: 'Nothing '),
+                        TextSpan(
+                            text: 'recorded yet.',
+                            style: ppFraunces(34, color: ppPurple, h: 1.1)
+                                .copyWith(fontStyle: FontStyle.italic)),
+                      ]),
+                      style: ppFraunces(34, h: 1.1))
+                  : Text.rich(
+                      TextSpan(children: [
+                        const TextSpan(text: 'On track, '),
+                        TextSpan(
+                            text: 'and protected.',
+                            style: ppFraunces(34, color: ppPurple, h: 1.1)
+                                .copyWith(fontStyle: FontStyle.italic)),
+                      ]),
+                      style: ppFraunces(34, h: 1.1))),
+              if (store.nothingRecorded) ...[
+                const SizedBox(height: 8),
+                _pad(Text(
+                    'Mark what ${ChildProfileStore.instance.nameMid} has already had, '
+                    'and this becomes a record you can hand to any doctor.',
+                    style: ppBody(13.5, h: 1.55))),
+              ],
 
               // snapshot hero
               const SizedBox(height: 22),
@@ -253,7 +297,7 @@ class VaxTrackerScreen extends StatelessWidget {
               ]),
             ),
             const SizedBox(width: 10),
-            _statChip('Due ${v.date.split(' ').take(2).join(' ')}', ppPurple),
+            _statChip('Due ${VaxStore.instance.dateLabelFor(v).split(' ').take(2).join(' ')}', ppPurple),
           ]),
           const SizedBox(height: 14),
           const Divider(height: 1, color: ppHair),
@@ -261,12 +305,16 @@ class VaxTrackerScreen extends StatelessWidget {
           // alarm on its own row, so nothing crowds it
           Row(children: [_alarmChip(context, v), const Spacer()]),
           const SizedBox(height: 10),
-          Row(children: [
-            if (v.govtFree) ...[
-              Flexible(child: _pill('Free at govt centre', fg: _green, bg: _greenTint)),
-              const SizedBox(width: 8),
-            ],
-            const Spacer(),
+          // spaceBetween, NOT Flexible + Spacer. Both default to flex: 1, so
+          // the row's free space was SPLIT between the pill and an empty
+          // Spacer - the pill got half of what was there and ellipsised to
+          // "Free at govt cen…" while blank space sat next to it. Same shape
+          // as the truncated wordmark on the My Child header.
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            if (v.govtFree)
+              Flexible(child: _pill('Free at govt centre', fg: _green, bg: _greenTint))
+            else
+              const SizedBox.shrink(),
             Text('Learn why →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ]),
         ]),
@@ -305,7 +353,7 @@ class VaxTrackerScreen extends StatelessWidget {
         title: 'Vaccine reminder - ${lead.shortName}',
         body: daysBefore == 0
             ? "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due today."
-            : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${v.date}.",
+            : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
         when: base.subtract(Duration(days: daysBefore)),
       );
       messenger.showSnackBar(SnackBar(content: Text('Alarm set - $label'), behavior: SnackBarBehavior.floating));
@@ -324,7 +372,7 @@ class VaxTrackerScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Set a vaccination alarm', style: ppJakarta(17)),
             const SizedBox(height: 4),
-            Text('${lead.shortName} · due ${v.date}. We\'ll send a gentle reminder.', style: ppBody(12.5, color: ppMuted)),
+            Text('${lead.shortName} · due ${VaxStore.instance.dateLabelFor(v)}. We\'ll send a gentle reminder.', style: ppBody(12.5, color: ppMuted)),
             const SizedBox(height: 14),
             _alarmOption('The day before', () => set(1, '1 day before')),
             _alarmOption('3 days before', () => set(3, '3 days before')),
@@ -397,7 +445,7 @@ class VaxTrackerScreen extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('${v.ageLabel} · ${v.vaccines.map((x) => x.shortName).join(', ')}', style: ppBody(13.5, color: txt, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 2),
-              Text('${vaxStatusLabel(status)} · ${v.date}', style: ppBody(11.5, color: ppMuted)),
+              Text('${vaxStatusLabel(status)} · ${VaxStore.instance.dateLabelFor(v)}', style: ppBody(11.5, color: ppMuted)),
             ]),
           ),
           const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),

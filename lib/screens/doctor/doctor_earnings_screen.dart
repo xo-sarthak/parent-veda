@@ -172,7 +172,25 @@ class DoctorEarningsScreen extends StatelessWidget {
         child: Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(e.booking.title,
+              // WHO PAID, not what the parent bought.
+              //
+              // This was booking.title, which for a consult reads
+              // 'Consult · <the doctor's own name>' — so every row of a
+              // doctor's own earnings statement was their own name, repeated.
+              // The same trap the appointment card had, and ConsultPatient was
+              // built to solve it; Earnings simply never used it.
+              //
+              // Falls back to the title when the server has no parent for this
+              // booking, so an unresolved row still says what it was rather
+              // than going blank.
+              Text(
+                  DoctorRoster.instance
+                          .patientFor(e.booking.id, stage: e.booking.stage)
+                          .hasName
+                      ? DoctorRoster.instance
+                          .patientFor(e.booking.id, stage: e.booking.stage)
+                          .displayName
+                      : e.booking.title,
                   style: ppBody(13.5, color: ppInk, w: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),

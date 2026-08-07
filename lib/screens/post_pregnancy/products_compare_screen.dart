@@ -274,7 +274,8 @@ class ProductsCompareScreen extends StatelessWidget {
                 const Icon(Icons.child_care_outlined, size: 15, color: ppPurple),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Comparing ${ps.length} $noun for ${ChildProfileStore.instance.nameMid} · 4 months - tuned to his stage.',
+                  child: Text('Comparing ${ps.length} $noun for ${ChildProfileStore.instance.nameMid} · '
+                      '${ChildProfileStore.instance.ageLabel} - tuned to his stage.',
                       style: ppBody(12.5, color: ppSoft, h: 1.4)),
                 ),
               ])),

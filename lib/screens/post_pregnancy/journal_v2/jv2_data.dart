@@ -61,13 +61,58 @@ class JvMilestone {
   final String date;
 }
 
-// ---- the child / parent -----------------------------------------------------
+// ============================================================================
+//  THE DEMO / REAL SWAP
+// ----------------------------------------------------------------------------
+//  The journal ships as a DEMO for now, by decision: it greets "Priya" about a
+//  two-year-old called Aarav with entries dated 2025, none of which belongs to
+//  the parent holding the phone.
+//
+//  So that going live is not a rewrite, the REAL implementation is written out
+//  directly beneath each demo value, commented. Shipping is a swap: comment the
+//  demo line, uncomment the real one. Nothing else in the journal needs to
+//  change, because every screen already reads through these names.
+//
+//  WHAT IS ALREADY REAL: jvChild. It has always been a getter on
+//  ChildProfileStore, which is why "Letter to X" and "X's Story" follow the
+//  real child even in demo mode.
+//
+//  WHAT THE MEMORY LIST STILL NEEDS, and why it is not a one-line swap like the
+//  rest: jvMemories is a list of JvMemory with title/date/age/body/media, while
+//  MemoryStore holds JournalEntry (id, week, dateIso, source, text) and
+//  PhotoMemory. The mapping is real work — an entry has no title, and `week` is
+//  a pregnancy concept that has to become an age for a born child. That
+//  adapter is the actual task; these constants are not.
+// ============================================================================
+
 /// The active child's name. A getter, not a const, so every "Letter to X"
 /// and "X's Story" across the journal follows the real child.
 String get jvChild => ChildProfileStore.instance.name;
+
+// ---- the parent's own name --------------------------------------------------
 const String jvParent = 'Priya';
+// REAL — the signed-in account's display name, falling back to a warm neutral
+// rather than a stranger's:
+// String get jvParent {
+//   final n = Supabase.instance.client.auth.currentUser?.userMetadata?['name'];
+//   final s = (n as String?)?.trim() ?? '';
+//   return s.isEmpty ? 'you' : s;
+// }
+
+// ---- the child's age --------------------------------------------------------
 const String jvChildAge = '2 years, 4 months old';
+// REAL — already derived and already correct everywhere else in the app:
+// String get jvChildAge => '${ChildProfileStore.instance.ageLabel} old';
+
+// ---- when the story starts --------------------------------------------------
 const String jvBornSince = 'Since 18 Jan 2023';
+// REAL — the recorded date of birth:
+// String get jvBornSince {
+//   final d = ChildProfileStore.instance.dob;
+//   const m = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+//     'Sep', 'Oct', 'Nov', 'Dec'];
+//   return 'Since ${d.day} ${m[d.month]} ${d.year}';
+// }
 
 // ---- memories ---------------------------------------------------------------
 const JvMemory jvFeatured = JvMemory(

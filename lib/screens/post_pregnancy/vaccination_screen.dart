@@ -146,12 +146,14 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 const SizedBox(height: 14),
                 const Divider(height: 1, color: ppHair),
                 const SizedBox(height: 14),
+                // No Spacer beside the Flexibles. Spacer is Expanded(flex: 1),
+                // so it competed with them for the row's free space and both
+                // labels ellipsised while blank space sat between them.
                 Row(children: [
                   Flexible(child: _pill('Free at govt centre', fg: _green, bg: _greenTint)),
                   const SizedBox(width: 8),
                   Flexible(child: Text('Private ₹3,800–5,500', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   const SizedBox(width: 8),
-                  const Spacer(),
                   Text('View →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
                 ]),
               ]),

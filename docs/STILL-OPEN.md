@@ -1832,3 +1832,74 @@ Kept so the reasoning survives.
 | Website invite validator accepted `4-12 [A-Z0-9]` | Tightened to exactly 7 from the restricted alphabet | 2026-07-27 |
 | App package was `com.example.parentveda` | Renamed `com.parentveda.app` — Play rejects `example` | 2026-07-25 |
 | Black screen across the app | `GlobalAskFab` collapsed the root Stack when hidden | 2026-07-25 |
+
+---
+
+# 12. Deferred out of the 2026-08-04 refinement pass
+
+The device walk in `docs/REFINEMENT-PASS.md` produced fourteen questions. Most
+were answered and built. These are the ones deliberately parked, recorded here
+so they are not lost between now and launch.
+
+## 12.1 Child Snapshot and the Grow domain cards are hardcoded for a 4-month-old
+
+`my_child_screen.dart` (`_snapshot()`) and the four Grow domain cards carry
+literal prose — "a first roll any day now", "coos stretching into aah-goo",
+"solids open up around 6 months" — regardless of the child's actual age. On a
+newborn's profile they sat directly beneath a phase card correctly reading
+"0–4 weeks".
+
+**Parked on purpose.** The age-banded content for the parenting stage does not
+exist yet; that writing is ongoing. Hardcoding is the honest interim, because
+the alternative is deriving prose we do not have.
+
+The *numbers* were a different problem and are fixed: Vaccination and the
+product comparison had the age typed in as "4 months" while
+`ChildProfileStore.ageLabel` already derived it correctly. Those now ask.
+
+**When the content lands:** the shape needed is one entry per domain per age
+band, keyed the way `pp_phases_data.dart` already keys phases. The snapshot then
+reads the band for `ageInMonths` instead of a literal list.
+
+Also still literal: `journal_v2/jv2_data.dart` → `jvChildAge = '2 years, 4
+months old'`, part of the Journal demo world (see 12.2).
+
+## 12.2 My Journal is a demo, with the real path written and commented
+
+Greets "Priya", child "Aarav", entries dated 2025. **Decision: it stays a demo
+for now**, but the real-data code sits beside it commented out, so shipping is a
+comment swap rather than a rewrite. See `journal_v2/jv2_data.dart`.
+
+## 12.3 Doctor practice setup is a walkthrough, and stays one
+
+`doctor_onboarding_screen.dart` has no controllers: nothing typed is saved, the
+chips do not select, the three Uploads are dead, and Finish pops silently. Text
+also bleeds between steps, because the fields are bare `TextField`s at the same
+position in the same list and Flutter reuses their editing state.
+
+**Decision: leave it.** Real state is only worth building against a place for
+the submissions to go, and that is the admin panel.
+
+**Blocked on `docs/ADMIN-PANEL.md`.** What it needs from there:
+
+| The app must send | The panel must provide |
+|---|---|
+| Profile, qualifications, council registration | A queue with approve / reject / request-changes |
+| Three document uploads (degree, council, identity) | Storage + a viewer, and a rejection reason |
+| Payout details (account, IFSC, PAN) | A verification step separate from the profile one |
+
+Until that exists, uploading is a submission to nowhere. The screen's own header
+comment already says approval "must never live in the app the applicant
+controls" — which is right, and is exactly why this waits.
+
+## 12.4 Still open from the pass, untouched
+
+- **Placeholder art and video.** Every Products/Recipes/Watch thumbnail, and the
+  one playable clip. Waiting on the Cloud Player/CDN setup.
+- **Demo signals kept deliberately:** community view counts, a pre-set
+  "Following", the Nuskhe review-panel claim, "ParentVeda-verified purchase
+  reviews". All must become true or go before launch.
+- **Brand Studio's real brand names** in the user-facing Explore drawer.
+- `kPremiereAlwaysShow` and `kDailyPopupAlwaysShow` are still `true`.
+- **Pregnancy tools inside the parenting app** — Memories' "We're Expecting",
+  Yoga leading with prenatal/IVF, Baby names. No restructuring for now.

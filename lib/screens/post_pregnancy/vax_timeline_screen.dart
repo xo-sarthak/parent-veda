@@ -83,7 +83,7 @@ class VaxTimelineScreen extends StatelessWidget {
                   _statusPill(status),
                 ]),
                 const SizedBox(height: 4),
-                Text(v.date, style: ppBody(11.5, color: ppMuted)),
+                Text(VaxStore.instance.dateLabelFor(v), style: ppBody(11.5, color: ppMuted)),
                 const SizedBox(height: 12),
                 Wrap(spacing: 7, runSpacing: 7, children: [for (final vax in v.vaccines) _vaxChip(vax.shortName)]),
                 const SizedBox(height: 12),
