@@ -4,11 +4,11 @@
  "father_insight": {
   "title": {
    "en": "Your job on the day",
-   "hi": "Us din aapka kaam"
+   "hi": "उस दिन आपका काम"
   },
   "body": {
    "en": "You are not the patient and you are not the doctor. You are the one who knows what she wanted, keeps the room calm, and asks the question she is too tired to ask.",
-   "hi": "Aap na mareez hain na doctor. Aap woh hain jise pata hai ki usne kya chaaha tha, jo kamre ko shaant rakhta hai, aur woh sawaal poochta hai jo poochne ki taakat us mein nahi bachi."
+   "hi": "न आप मरीज़ हैं, न डॉक्टर। आप वह हैं जिसे पता है कि उन्होंने क्या चाहा था, जो कमरे को शांत रखता है, और वह सवाल पूछता है जो पूछने की ताक़त उनमें नहीं बची।"
   }
  }
 }

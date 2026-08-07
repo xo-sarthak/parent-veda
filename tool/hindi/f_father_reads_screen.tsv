@@ -1,0 +1,6 @@
+${r.readingTime} · ${r.category}	${r.readingTime} · ${r.category}
+Read summary	सारांश पढ़ें
+Buy Book	किताब ख़रीदें
+${r.title} ${r.author} book buy	${r.title} ${r.author} book buy
+MYTH	मिथक
+FACT	सच

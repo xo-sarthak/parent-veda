@@ -24,6 +24,12 @@ import '../../localization/app_language.dart';
 // One read-aloud piece (optional title + body) + a stable save key + group.
 typedef _FSP = ({String? title, String body, String saveKey, String group});
 
+/// Named _lt, not _t: this State already has `int get _t` (the trimester),
+/// which shadows a top-level `_t` and makes every call resolve to an int -
+/// reported as "the expression doesn't evaluate to a function", which does
+/// not obviously mean "your helper is shadowed".
+LocalizedText _lt(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class FatherReadAloudScreen extends StatefulWidget {
   const FatherReadAloudScreen({super.key, required this.controller});
   final PregnancyController controller;
@@ -93,11 +99,13 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
                   fontWeight: FontWeight.w700, fontSize: 13),
               unselectedLabelStyle: pvJakarta(
                   fontWeight: FontWeight.w600, fontSize: 13),
-              tabs: const [
-                Tab(text: 'Affirmations & Blessings'),
-                Tab(text: 'Stories & Fables'),
-                Tab(text: 'Mantras & Lullabies'),
-                Tab(text: 'Spiritual Reading'),
+              // Not const: _t() is a function call, and Dart has no const
+              // functions.
+              tabs: [
+                Tab(text: _lt('Affirmations & Blessings', 'संकल्प और आशीर्वाद').now),
+                Tab(text: _lt('Stories & Fables', 'कहानियाँ और नीति-कथाएँ').now),
+                Tab(text: _lt('Mantras & Lullabies', 'मंत्र और लोरियाँ').now),
+                Tab(text: _lt('Spiritual Reading', 'आध्यात्मिक पाठ').now),
               ],
             ),
             Expanded(

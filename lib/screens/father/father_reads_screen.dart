@@ -22,6 +22,8 @@ import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class FatherReadsScreen extends StatelessWidget {
   const FatherReadsScreen({super.key});
 
@@ -143,7 +145,7 @@ class FatherReadsScreen extends StatelessWidget {
                     Text(r.title.now,
                         style: fatherSerif(16, weight: FontWeight.w600)),
                     const SizedBox(height: 5),
-                    Text('${r.readingTime} · ${r.category}',
+                    Text(_t('${r.readingTime} · ${r.category}', '${r.readingTime} · ${r.category}').now,
                         style: _body(12, c: kFMuted)),
                   ]),
             ),
@@ -198,10 +200,10 @@ class FatherReadsScreen extends StatelessWidget {
           ]),
           const SizedBox(height: 12),
           Row(children: [
-            _miniBtn(Icons.menu_book_rounded, 'Read summary',
+            _miniBtn(Icons.menu_book_rounded, _t('Read summary', 'सारांश पढ़ें').now,
                 filled: false, () => _openReader(context, r)),
             const SizedBox(width: 8),
-            _miniBtn(Icons.shopping_bag_rounded, 'Buy Book',
+            _miniBtn(Icons.shopping_bag_rounded, _t('Buy Book', 'किताब ख़रीदें').now,
                 filled: true, () => _openBuy(context, r)),
           ]),
         ]),
@@ -235,7 +237,7 @@ class FatherReadsScreen extends StatelessWidget {
           MaterialPageRoute(builder: (_) => _FatherReadReader(read: r)));
 
   Future<void> _openBuy(BuildContext context, ReadItem r) async {
-    final query = Uri.encodeComponent('${r.title} ${r.author} book buy'.trim());
+    final query = Uri.encodeComponent(_t('${r.title} ${r.author} book buy', '${r.title} ${r.author} book buy').now.trim());
     final url = r.buyUrl.trim().isNotEmpty
         ? r.buyUrl.trim()
         : 'https://www.google.com/search?q=$query';
@@ -385,7 +387,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
               style: fatherSerif(27 * _fs, weight: FontWeight.w600)
                   .copyWith(color: pal.ink)),
           const SizedBox(height: 9),
-          Text('${r.readingTime} · ${r.category}',
+          Text(_t('${r.readingTime} · ${r.category}', '${r.readingTime} · ${r.category}').now,
               style: pvJakarta(
                   fontSize: 12.5 * _fs,
                   fontWeight: FontWeight.w500,
@@ -400,10 +402,10 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
             const SizedBox(height: 16),
           ],
           if (r.hasWhyThisMatters)
-            _block(pal, _kWhy, 'Why This Matters', r.whyThisMatters.now,
+            _block(pal, _kWhy, S.now.uiWhyMatters, r.whyThisMatters.now,
                 Icons.favorite_rounded),
           if (r.hasResearchSimplified)
-            _block(pal, _kResearch, 'Research Simplified', r.researchSimplified.now,
+            _block(pal, _kResearch, S.now.uiResearchSimplified, r.researchSimplified.now,
                 Icons.science_rounded),
           if (r.hasMythFact) _mythFact(pal, r),
         ],
@@ -450,9 +452,9 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
           border: Border.all(color: pal.line),
         ),
         child: Column(children: [
-          _mfRow(pal, 'MYTH', r.myth.now, kFMuted, Icons.close_rounded),
+          _mfRow(pal, _t('MYTH', 'मिथक').now, r.myth.now, kFMuted, Icons.close_rounded),
           Divider(height: 1, color: pal.line),
-          _mfRow(pal, 'FACT', r.fact.now, kFAccent, Icons.check_rounded),
+          _mfRow(pal, _t('FACT', 'सच').now, r.fact.now, kFAccent, Icons.check_rounded),
         ]),
       );
 

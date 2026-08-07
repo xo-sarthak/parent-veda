@@ -4,21 +4,21 @@
  "father_insight": {
   "title": {
    "en": "Ask what she is afraid of",
-   "hi": "Poochiye use kis baat ka dar hai"
+   "hi": "पूछिए उन्हें किस बात का डर है"
   },
   "body": {
    "en": "Not whether she is. She is. Asking what specifically makes it something the two of you can look at together instead of something she carries alone at night.",
-   "hi": "Yeh nahi ki dar hai ya nahi. Hai. Yeh poochna ki theek kis baat ka, use aisi cheez bana deta hai jise aap dono saath dekh sakte hain, bajaye iske ki woh raat ko akeli jhele."
+   "hi": "यह नहीं कि डर है या नहीं। है। ठीक किस बात का — यह पूछना उसे ऐसी चीज़ बना देता है जिसे आप दोनों साथ देख सकते हैं, बजाय इसके कि वे रात को अकेली उसे उठाती रहें।"
   }
  },
  "connecting_with_baby": {
   "title": {
    "en": "I can open and close my eyes, blink and respond to light. My brain is developing rapidly and my lungs continue preparing for life outside the womb.",
-   "hi": "Main apni aankhein khol aur band kar sakta hoon, blink kar sakta hoon aur roshni par react kar sakta hoon. Mera brain tezi se develop ho raha hai aur mere lungs womb ke bahar ki zindagi ke liye taiyaar ho rahe hain."
+   "hi": "मेरी आँखें अब खुलती और बंद होती हैं, पलकें झपकती हैं और रोशनी पर हरकत करती हैं। मेरा दिमाग़ तेज़ी से बढ़ रहा है और मेरे फेफड़े गर्भ के बाहर की ज़िंदगी की तैयारी कर रहे हैं।"
   },
   "body": {
    "en": "If a bright light shines on her bump, I may actually turn toward it.",
-   "hi": "Agar uske pet par tej roshni padti hai, to main sach mein uski taraf mud sakta hoon."
+   "hi": "अगर उनके पेट पर तेज़ रोशनी पड़े, तो हो सकता है मैं सच में उसी तरफ़ मुड़ जाऊँ।"
   }
  }
 }

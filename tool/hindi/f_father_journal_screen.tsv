@@ -1,0 +1,9 @@
+Memory	याद
+For baby	शिशु के लिए
+Photo	फ़ोटो
+Voice	आवाज़
+Week $wk	हफ़्ता $wk
+Memories	यादें
+${es.length}	${es.length}
+${d.day} ${S.now.monthShort(d.month)}	${d.day} ${S.now.monthShort(d.month)}
+${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap	${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap

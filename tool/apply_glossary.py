@@ -156,7 +156,7 @@ def skip(text):
             or not HAS_WORD.search(text)
             or DEVANAGARI.search(text)
             or IDENT.match(text)
-            or text.startswith(('package:', 'http', 'assets/'))
+            or text.startswith(('package:', 'dart:', 'http', 'assets/'))
             or text.endswith(('.dart', '.png', '.jpg', '.json')))
 
 

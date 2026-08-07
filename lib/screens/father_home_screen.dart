@@ -20,6 +20,8 @@ import '../theme/app_theme.dart';
 import '../widgets/father/father_modules.dart';
 import '../widgets/home/home_modules.dart' show ModeToggle;
 
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class FatherHomeScreen extends StatefulWidget {
   const FatherHomeScreen({
     super.key,
@@ -207,7 +209,7 @@ class _FatherPreviewBar extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                Text('PREVIEW · Wk $week · Day $dayInWeek',
+                Text(_t('PREVIEW · Wk $week · Day $dayInWeek', 'PREVIEW · Wk $week · Day $dayInWeek').now,
                     textAlign: TextAlign.center,
                     style: text.labelSmall?.copyWith(
                         color: AppTheme.fatherSlate700,

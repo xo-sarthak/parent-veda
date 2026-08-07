@@ -55,10 +55,23 @@ final RegExp _herBody = RegExp(
   caseSensitive: false,
 );
 
+/// The Hindi half of the same filter, in DEVANAGARI.
+///
+/// It used to match Latin-script Hinglish - `aapka sharir`, `tumhara pet` -
+/// against `t.hi`. Once the content became Devanagari it matched nothing, so
+/// this half of the safety filter had silently switched itself off and
+/// `_speaksToHer` was running on English alone. A day written about HER body
+/// would still be caught by `_herBody` on the English side, so the failure was
+/// invisible - right up until a day whose English is neutral and whose Hindi
+/// is not.
+///
+/// Nouns rather than possessive phrases on purpose: the old Hinglish list had
+/// to spell out each of aapka/aapke/tumhara because Roman script gave it no
+/// other handle. Matching the body word itself is both shorter and harder to
+/// slip past, and the possessive that matters is already caught in English.
 final RegExp _herBodyHi = RegExp(
-  r'(aapka sharir|aapke sharir|tumhara sharir|aapka pet|aapke pet|'
-  r'tumhara pet|aapki energy|tumhari energy)',
-  caseSensitive: false,
+  'शरीर|पेट|बच्चेदानी|गर्भाशय|कोख|स्तन|छाती|कमर|कूल्ह|टख[नन]|'
+  'हॉर्मोन|हार्मोन|ख़ून|खून|त्वचा|ऊर्जा|थकान',
 );
 
 bool _speaksToHer(LocalizedText t) =>

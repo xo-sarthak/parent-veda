@@ -21,6 +21,8 @@ import '../../widgets/storage_image.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class FatherJournalScreen extends StatefulWidget {
   const FatherJournalScreen(
       {super.key, required this.controller, this.embedded = false});
@@ -128,18 +130,18 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
             child: Row(children: [
-              _circle(Icons.edit_note_rounded, 'Memory',
+              _circle(Icons.edit_note_rounded, _t('Memory', 'याद').now,
                   () => _add(() => openJournalText(
                       context, c, JournalEntryType.memory,
                       onAdd: add, father: true))),
-              _circle(Icons.favorite_rounded, 'For baby',
+              _circle(Icons.favorite_rounded, _t('For baby', 'शिशु के लिए').now,
                   () => _add(() => openJournalText(
                       context, c, JournalEntryType.noteForBaby,
                       onAdd: add, father: true))),
-              _circle(Icons.add_a_photo_rounded, 'Photo',
+              _circle(Icons.add_a_photo_rounded, _t('Photo', 'फ़ोटो').now,
                   () => _add(() =>
                       openJournalAddPhoto(context, c, onAdd: add, father: true))),
-              _circle(Icons.mic_none_rounded, 'Voice',
+              _circle(Icons.mic_none_rounded, _t('Voice', 'आवाज़').now,
                   () => _add(() => openJournalRecordVoice(context, c,
                       onAdd: add, father: true))),
             ]),
@@ -189,7 +191,10 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(wk > 0 ? 'Week $wk' : 'Memories',
+          Text(
+              wk > 0
+                  ? _t('Week $wk', 'हफ़्ता $wk').now
+                  : _t('Memories', 'यादें').now,
               style: _serif(16, w: FontWeight.w700)),
           if (range.isNotEmpty) ...[
             const SizedBox(width: 10),
@@ -200,7 +205,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
             decoration: BoxDecoration(
                 color: kFAccentSoft, borderRadius: BorderRadius.circular(99)),
-            child: Text('${es.length}',
+            child: Text(_t('${es.length}', '${es.length}').now,
                 style: _body(11.5, w: FontWeight.w800, c: kFAccent)),
           ),
         ],
@@ -209,7 +214,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
   }
 
   String _rangeLabel(DateTime a, DateTime b) {
-    String md(DateTime d) => '${d.day} ${S.now.monthShort(d.month)}';
+    String md(DateTime d) => _t('${d.day} ${S.now.monthShort(d.month)}', '${d.day} ${S.now.monthShort(d.month)}').now;
     if (a.year == b.year && a.month == b.month && a.day == b.day) return md(a);
     return '${md(a)} – ${md(b)}';
   }
@@ -354,7 +359,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
     final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
     final m = d.minute.toString().padLeft(2, '0');
     final ap = d.hour < 12 ? 'AM' : 'PM';
-    return '${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap';
+    return _t('${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap', '${d.day} ${S.now.monthShort(d.month)} ${d.year} · $h:$m $ap').now;
   }
 }
 

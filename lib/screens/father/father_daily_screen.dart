@@ -42,6 +42,8 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 
 // ---- palettes ---------------------------------------------------------------
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
 class _Pal {
   const _Pal({
     required this.bg,
@@ -104,85 +106,85 @@ class _Detail {
 Map<String, _Detail> _kDetails = {
   'tip': _Detail(
     id: 'tip',
-    eyebrow: 'Daily tip for Dad',
+    eyebrow: _t('Daily tip for Dad', 'पापा के लिए आज की बात').now,
     title: S.now.uiTonightDonTFix2,
-    meta: '2 min · showing up',
+    meta: _t('2 min · showing up', '2 मिनट · साथ होना').now,
     paras: [
-      "When she can't sleep, the instinct is to solve it. Resist that. You don't need the right words.",
-      "Sit up with her. A hand on her back. Let the quiet do the work - that's the part she'll remember.",
+      _t("When she can't sleep, the instinct is to solve it. Resist that. You don't need the right words.", 'जब उन्हें नींद नहीं आती, मन करता है कुछ ठीक कर दें। मत कीजिए। सही शब्दों की ज़रूरत नहीं है।').now,
+      _t("Sit up with her. A hand on her back. Let the quiet do the work - that's the part she'll remember.", 'उनके साथ जागिए। पीठ पर एक हाथ रखिए। चुप्पी को अपना काम करने दीजिए — याद उन्हें यही रहेगा।').now,
     ],
     list: [
-      'Phone face-down',
-      'No advice unless she asks for it',
-      'Try: "Want me to stay up with you?"',
+      _t('Phone face-down', 'फ़ोन उलटा रखिए').now,
+      _t('No advice unless she asks for it', 'सलाह तभी, जब वे माँगें').now,
+      _t('Try: "Want me to stay up with you?"', 'कहिए: "मैं भी आपके साथ जागूँ?"').now,
     ],
-    cta: 'Mark as done today',
-    confirm: 'Nice. Showing up is the whole thing.',
+    cta: _t('Mark as done today', 'आज यह कर लिया').now,
+    confirm: _t('Nice. Showing up is the whole thing.', 'बढ़िया। साथ होना ही सब कुछ है।').now,
   ),
   'partner': _Detail(
     id: 'partner',
-    eyebrow: 'Support your partner',
+    eyebrow: _t('Support your partner', 'अपनी पार्टनर का साथ').now,
     title: S.now.uiWeekWhatSheS,
     paras: [
-      'Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.',
-      'Small, specific help lands bigger than grand gestures right now. You do not have to be asked - noticing first is the whole gift.',
+      _t('Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.', 'बंप बढ़ने के साथ उनका संतुलन बदल रहा है, और सारा ज़ोर कमर पर आ रहा है। शाम तक दर्द बढ़ जाता है।').now,
+      _t('Small, specific help lands bigger than grand gestures right now. You do not have to be asked - noticing first is the whole gift.', 'अभी बड़ी-बड़ी बातों से ज़्यादा छोटी, ठोस मदद काम आती है। माँगने का इंतज़ार मत कीजिए — पहले ख़ुद नोटिस कर लेना ही असली तोहफ़ा है।').now,
     ],
     list: [
-      'Take dinner off her plate - cook her favourite, or order it before she has to ask.',
-      'Rub her lower back for five minutes - no phone, no agenda.',
-      'Quietly handle a chore she usually does, without announcing it.',
-      'Keep water and a small snack by her side of the bed.',
-      'Ask "how are you feeling today?" and just listen - resist fixing it.',
-      'Take over the heavy lifting: groceries, laundry baskets, anything that strains her back.',
-      'Come to the next scan, and write down the questions together beforehand.',
-      'Let her nap without guilt - take the evening shift on the house.',
-      'Help her settle on her side with a pillow tucked behind her back.',
-      'Say the small things out loud - "you are doing something incredible."',
+      _t('Take dinner off her plate - cook her favourite, or order it before she has to ask.', 'रात का खाना उनके ज़िम्मे से हटा दीजिए — उनकी पसंद का बनाइए, या माँगने से पहले मँगा लीजिए।').now,
+      _t('Rub her lower back for five minutes - no phone, no agenda.', 'पाँच मिनट उनकी कमर सहलाइए — न फ़ोन, न कोई मक़सद।').now,
+      _t('Quietly handle a chore she usually does, without announcing it.', 'उनका कोई रोज़ का काम चुपचाप निपटा दीजिए, बिना बताए।').now,
+      _t('Keep water and a small snack by her side of the bed.', 'उनकी तरफ़ बिस्तर के पास पानी और कुछ हल्का खाने को रखिए।').now,
+      _t('Ask "how are you feeling today?" and just listen - resist fixing it.', 'पूछिए "आज कैसा लग रहा है?" और बस सुनिए — ठीक करने की कोशिश मत कीजिए।').now,
+      _t('Take over the heavy lifting: groceries, laundry baskets, anything that strains her back.', 'भारी काम अपने ज़िम्मे लीजिए: सामान, कपड़ों की टोकरी, जो कुछ भी कमर पर ज़ोर डाले।').now,
+      _t('Come to the next scan, and write down the questions together beforehand.', 'अगले स्कैन पर साथ जाइए, और सवाल पहले ही साथ बैठकर लिख लीजिए।').now,
+      _t('Let her nap without guilt - take the evening shift on the house.', 'उन्हें बेझिझक सोने दीजिए — शाम को घर आप सँभालिए।').now,
+      _t('Help her settle on her side with a pillow tucked behind her back.', 'करवट लेकर लेटने में मदद कीजिए, पीठ के पीछे एक तकिया लगा दीजिए।').now,
+      _t('Say the small things out loud - "you are doing something incredible."', 'छोटी बातें बोलकर कहिए — "आप कुछ कमाल कर रही हैं।"').now,
     ],
-    cta: "I'll handle dinner",
-    confirm: "Dinner's handled tonight. She'll feel it.",
+    cta: _t("I'll handle dinner", 'खाना मैं देखता हूँ').now,
+    confirm: _t("Dinner's handled tonight. She'll feel it.", 'आज का खाना आपके ज़िम्मे। उन्हें फ़र्क़ महसूस होगा।').now,
   ),
   'read': _Detail(
     id: 'read',
-    eyebrow: "Today's read",
+    eyebrow: _t("Today's read", 'आज का पाठ').now,
     title: S.now.uiWhatBabyCanHear,
-    meta: '4 min read · ParentVeda Reads',
+    meta: _t('4 min read · ParentVeda Reads', '4 मिनट का पाठ · ParentVeda Reads').now,
     paras: [
-      'Around now the tiny bones of the inner ear finish forming - and your voice, lower and slower than hers, carries especially well through the body.',
-      "Reading a few lines a day isn't sentimental. It's how your baby starts to know you before they ever see you.",
+      _t('Around now the tiny bones of the inner ear finish forming - and your voice, lower and slower than hers, carries especially well through the body.', 'इन्हीं दिनों भीतरी कान की नन्ही हड्डियाँ बनकर पूरी होती हैं — और आपकी आवाज़, उनकी आवाज़ से भारी और धीमी, शरीर के भीतर ख़ास तौर पर अच्छी पहुँचती है।').now,
+      _t("Reading a few lines a day isn't sentimental. It's how your baby starts to know you before they ever see you.", 'रोज़ चार पंक्तियाँ पढ़ना कोई भावुक बात नहीं है। देखने से पहले ही शिशु आपको इसी तरह पहचानने लगता है।').now,
     ],
-    cta: 'Done reading',
-    confirm: 'Nice - a few minutes well spent.',
+    cta: _t('Done reading', 'पढ़ लिया').now,
+    confirm: _t('Nice - a few minutes well spent.', 'बढ़िया — कुछ मिनट सही जगह लगे।').now,
   ),
   'talk': _Detail(
     id: 'talk',
-    eyebrow: 'Read to your baby',
+    eyebrow: _t('Read to your baby', 'अपने शिशु को सुनाइए').now,
     title: S.now.uiReadBabyTonight,
-    meta: 'Read aloud · 1 min',
+    meta: _t('Read aloud · 1 min', 'पढ़कर सुनाएँ · 1 मिनट').now,
     // [script] is injected at render time from the mother's Samvad read-aloud
     // set (see _readAloudToday) so Mom and Dad share the same words.
     paras: [
-      'Baby can recognise your voice now - lower and slower than hers, it carries especially well. Read it aloud, let your voice rise and fall, and play with the words.',
-      "A minute is plenty. It's the rhythm that reaches them, not the meaning.",
+      _t('Baby can recognise your voice now - lower and slower than hers, it carries especially well. Read it aloud, let your voice rise and fall, and play with the words.', 'शिशु अब आपकी आवाज़ पहचानने लगा है — उनकी आवाज़ से भारी और धीमी, यह ख़ास तौर पर अच्छी पहुँचती है। बोलकर पढ़िए, आवाज़ को चढ़ने-उतरने दीजिए, और शब्दों से खेलिए।').now,
+      _t("A minute is plenty. It's the rhythm that reaches them, not the meaning.", 'एक मिनट काफ़ी है। उन तक मतलब नहीं, लय पहुँचती है।').now,
     ],
-    cta: 'Done reading tonight',
-    confirm: 'Beautiful - your voice is a gift they already know.',
+    cta: _t('Done reading tonight', 'आज रात सुना दिया').now,
+    confirm: _t('Beautiful - your voice is a gift they already know.', 'बहुत बढ़िया — आपकी आवाज़ वह तोहफ़ा है जिसे शिशु पहले से जानता है।').now,
   ),
   'story': _Detail(
     id: 'story',
-    eyebrow: 'Stories, fables & mythology',
+    eyebrow: _t('Stories, fables & mythology', 'कहानियाँ, नीति-कथाएँ और पुराण').now,
     title: S.now.uiChurningOcean,
-    meta: 'A 3-minute myth · read aloud',
+    meta: _t('A 3-minute myth · read aloud', '3 मिनट की पौराणिक कथा · पढ़कर सुनाएँ').now,
     paras: [
-      'Long ago, gods and demons gripped the same great rope, coiled it around a mountain, and churned the sea of milk for the nectar of immortality.',
-      "Read it slow. The bump can't follow the plot yet - but it can feel the rise and fall of your voice.",
+      _t('Long ago, gods and demons gripped the same great rope, coiled it around a mountain, and churned the sea of milk for the nectar of immortality.', 'बहुत पहले, देवताओं और असुरों ने एक ही विशाल रस्सी थामी, उसे एक पर्वत के चारों ओर लपेटा, और अमृत के लिए क्षीरसागर का मंथन किया।').now,
+      _t("Read it slow. The bump can't follow the plot yet - but it can feel the rise and fall of your voice.", 'धीरे-धीरे पढ़िए। कहानी अभी बंप की समझ में नहीं आएगी — पर आपकी आवाज़ का चढ़ना-उतरना ज़रूर महसूस होगा।').now,
     ],
-    cta: 'Start reading',
-    confirm: 'Find a quiet spot and read it slow.',
+    cta: _t('Start reading', 'पढ़ना शुरू कीजिए').now,
+    confirm: _t('Find a quiet spot and read it slow.', 'कोई शांत कोना ढूँढिए और धीरे-धीरे पढ़िए।').now,
   ),
   'journal': _Detail(
     id: 'journal',
-    eyebrow: 'Your journal',
+    eyebrow: _t('Your journal', 'आपका जर्नल').now,
     title: S.now.uiNoteBaby,
   ),
 };
@@ -265,10 +267,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   bool _recorded = false;
   final _draft = TextEditingController();
   final List<_Entry> _entries = [
-    _Entry('Yesterday',
-        'Felt the first kick against my palm tonight. I actually teared up.'),
-    _Entry('Tuesday',
-        'Told her the nursery can wait - we just need each other right now.'),
+    _Entry(_t('Yesterday', 'कल').now,
+        _t('Felt the first kick against my palm tonight. I actually teared up.', 'आज रात पहली हलचल हथेली पर महसूस हुई। सच में आँख भर आई।').now),
+    _Entry(_t('Tuesday', 'मंगलवार').now,
+        _t('Told her the nursery can wait - we just need each other right now.', 'उनसे कह दिया कि नर्सरी रुक सकती है — अभी बस एक-दूसरे की ज़रूरत है।').now),
   ];
 
   String _toast = '';
@@ -362,14 +364,14 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   void _saveEntry() {
     final v = _draft.text.trim();
     if (v.isEmpty) {
-      _flash('Write something first');
+      _flash(_t('Write something first', 'पहले कुछ लिखिए').now);
       return;
     }
     setState(() {
-      _entries.insert(0, _Entry('Just now', v));
+      _entries.insert(0, _Entry(_t('Just now', 'अभी').now, v));
       _draft.clear();
     });
-    _flash('Saved to your journal');
+    _flash(_t('Saved to your journal', 'आपके जर्नल में सेव हो गया').now);
   }
 
   @override
@@ -478,9 +480,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(26, 10, 26, 2),
       child: Row(children: [
-        circle(Icons.child_care_rounded, 'Baby', () => _openWeek('baby')),
-        circle(Icons.favorite_rounded, 'Mother', () => _openWeek('mother')),
-        circle(Icons.event_note_rounded, "What's next", () => _openWeek('next')),
+        circle(Icons.child_care_rounded, _t('Baby', 'शिशु').now, () => _openWeek('baby')),
+        circle(Icons.favorite_rounded, _t('Mother', 'माँ').now, () => _openWeek('mother')),
+        circle(Icons.event_note_rounded, _t("What's next", 'आगे क्या').now, () => _openWeek('next')),
       ]),
     );
   }
@@ -514,7 +516,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             child: Text('P', style: _serif(16, p.cream)),
           ),
           const SizedBox(width: 9),
-          Text('ParentVeda', style: _serif(18, p.ink)),
+          Text(_t('ParentVeda', 'ParentVeda').now, style: _serif(18, p.ink)),
           const Spacer(),
           // Dev Slate/Teal palette toggle (moved here from the snapshot hero).
           GestureDetector(
@@ -567,7 +569,13 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   // ---- Weekly snapshot (full mirror of the mother's home hero, in Slate) ----
   Widget _weeklySnapshot(_Pal p) {
     final hour = DateTime.now().hour;
-    final part = hour < 12 ? 'morning' : (hour < 18 ? 'afternoon' : 'evening');
+    // Bilingual, because it is INTERPOLATED into the greeting. Left as an
+    // English word it produced 'शुभ evening, Arjun' - the sentence around
+    // it translated and the word inside it not, which is worse than
+    // leaving the whole line English.
+    final part = hour < 12
+        ? _t('morning', 'प्रभात')
+        : (hour < 18 ? _t('afternoon', 'दोपहर') : _t('evening', 'संध्या'));
     final lang = widget.controller.language;
     final summary = widget.controller
             .weekData(_week)
@@ -617,11 +625,11 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('Good $part, $_dadName',
+                                      Text(_t('Good $part, $_dadName', 'शुभ $part, $_dadName').now,
                                           style: _body(12.5,
                                               p.cream.withValues(alpha: 0.85))),
                                       const SizedBox(height: 6),
-                                      Text('Week $_week',
+                                      Text(_t('Week $_week', 'हफ़्ता $_week').now,
                                           style: _serif(26, p.cream,
                                               w: FontWeight.w600)),
                                       if (summary.isNotEmpty) ...[
@@ -662,11 +670,11 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                             color: Colors.white.withValues(alpha: 0.16)),
                         const SizedBox(height: 14),
                         Row(children: [
-                          _snapShortcut(p, Icons.child_care_rounded, 'Baby',
+                          _snapShortcut(p, Icons.child_care_rounded, _t('Baby', 'शिशु').now,
                               () => _openWeek('baby')),
-                          _snapShortcut(p, Icons.favorite_rounded, 'Mother',
+                          _snapShortcut(p, Icons.favorite_rounded, _t('Mother', 'माँ').now,
                               () => _openWeek('mother')),
-                          _snapShortcut(p, Icons.explore_rounded, "What's next",
+                          _snapShortcut(p, Icons.explore_rounded, _t("What's next", 'आगे क्या').now,
                               () => _openWeek('next')),
                         ]),
                       ]),
@@ -699,12 +707,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   valueColor: const AlwaysStoppedAnimation(Colors.white),
                 ),
               ),
-              Text('${(pct * 100).round()}%',
+              Text(_t('${(pct * 100).round()}%', '${(pct * 100).round()}%').now,
                   style: _body(13, p.cream, w: FontWeight.w700)),
             ]),
           ),
           const SizedBox(height: 5),
-          Text('$weeksToGo weeks to go',
+          Text(_t('$weeksToGo weeks to go', '$weeksToGo हफ़्ते बाक़ी').now,
               textAlign: TextAlign.center,
               style: _body(10.5, p.cream.withValues(alpha: 0.92),
                   w: FontWeight.w700, h: 1.15)),
@@ -743,8 +751,14 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   // ignore: unused_element
   Widget _greeting(_Pal p) {
     final hour = DateTime.now().hour;
-    final part = hour < 12 ? 'morning' : (hour < 18 ? 'afternoon' : 'evening');
-    const sub = 'your partner is halfway there';
+    // Bilingual, because it is INTERPOLATED into the greeting. Left as an
+    // English word it produced 'शुभ evening, Arjun' - the sentence around
+    // it translated and the word inside it not, which is worse than
+    // leaving the whole line English.
+    final part = hour < 12
+        ? _t('morning', 'प्रभात')
+        : (hour < 18 ? _t('afternoon', 'दोपहर') : _t('evening', 'संध्या'));
+    final sub = _t('your partner is halfway there', 'आपकी पार्टनर आधा सफ़र तय कर चुकी हैं');
     final pct = (_week / 40).clamp(0.04, 1.0);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 2),
@@ -752,10 +766,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Good $part, $_dadName', style: _serif(25, p.ink)),
+              Text(_t('Good $part, $_dadName', 'शुभ $part, $_dadName').now, style: _serif(25, p.ink)),
               const SizedBox(height: 6),
               Row(children: [
-                Text('Week $_week',
+                Text(_t('Week $_week', 'हफ़्ता $_week').now,
                     style: _body(13, p.accent, w: FontWeight.w700)),
                 const SizedBox(width: 8),
                 Container(
@@ -765,7 +779,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         color: p.muted.withValues(alpha: 0.5),
                         shape: BoxShape.circle)),
                 const SizedBox(width: 8),
-                Flexible(child: Text(sub, style: _body(13, p.muted))),
+                Flexible(child: Text(sub.now, style: _body(13, p.muted))),
               ]),
             ]),
           ),
@@ -930,7 +944,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   ]),
             ),
             const SizedBox(height: 14),
-            _arrowLink(p, 'Read more'),
+            _arrowLink(p, _t('Read more', 'और पढ़ें').now),
           ]),
         ),
       );
@@ -989,7 +1003,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: _serif(18, p.ink, w: FontWeight.w600)),
                 const SizedBox(height: 9),
-                Text('${r.readingTime} · ${r.category}',
+                Text(_t('${r.readingTime} · ${r.category}', '${r.readingTime} · ${r.category}').now,
                     style: _body(12.5, p.muted)),
               ]),
         ),
@@ -1050,7 +1064,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   color: p.accentSoft, borderRadius: BorderRadius.circular(15)),
               child: Text(
                   _readAloudToday == null
-                      ? 'Choose a few lines to read together.'
+                      ? _t('Choose a few lines to read together.', 'साथ पढ़ने के लिए कुछ पंक्तियाँ चुन लीजिए।').now
                       : '“${_readAloudToday!.body}”',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
@@ -1061,7 +1075,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       color: p.accent)),
             ),
             const SizedBox(height: 12),
-            _arrowLink(p, 'Read it aloud'),
+            _arrowLink(p, _t('Read it aloud', 'बोलकर पढ़िए').now),
             // PURE READ-ALOUD: the record/play control was removed from this card
             // per spec. Kept commented for easy revert.
             /*
@@ -1153,7 +1167,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 for (final a in appts) _fApptRow(p, a),
               ],
               const SizedBox(height: 6),
-              _tap(_openAllScans, _arrowLink(p, 'View all scans')),
+              _tap(_openAllScans, _arrowLink(p, _t('View all scans', 'सभी स्कैन देखें').now)),
             ]),
           );
         },
@@ -1176,7 +1190,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(m.title.of(lang),
                   style: _body(14.5, p.ink, w: FontWeight.w700)),
-              Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+              Text(m.rangeLabel?.of(lang) ?? _t('Week ${m.anchorWeek}', 'हफ़्ता ${m.anchorWeek}').now,
                   style: _body(12, p.muted)),
             ]),
           ),
@@ -1223,7 +1237,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   
   String _fmtApptDate(DateTime d) =>
-      '${d.day} ${S.now.monthShort(d.month)} ${d.year}';
+      _t('${d.day} ${S.now.monthShort(d.month)} ${d.year}', '${d.day} ${S.now.monthShort(d.month)} ${d.year}').now;
 
   // "View all scans" - a Slate sheet of every scan with a done tick, so he can
   // also clear older ones (handy if they joined the app late).
@@ -1302,7 +1316,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 children: [
                   Text(m.title.of(lang),
                       style: _body(14.5, p.ink, w: FontWeight.w700)),
-                  Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+                  Text(m.rangeLabel?.of(lang) ?? _t('Week ${m.anchorWeek}', 'हफ़्ता ${m.anchorWeek}').now,
                       style: _body(12, p.muted)),
                 ]),
           ),
@@ -1367,7 +1381,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       style: _serif(18, p.ink, w: FontWeight.w600)),
                   const SizedBox(height: 9),
                   Row(children: [
-                    Text('${fatherTaleKindTag(tale.kind)} · read aloud',
+                    Text(_t('${fatherTaleKindTag(tale.kind)} · read aloud', '${fatherTaleKindTag(tale.kind)} · पढ़कर सुनाएँ').now,
                         style: _body(13, p.accent, w: FontWeight.w600)),
                     const SizedBox(width: 6),
                     Text('→', style: _body(15, p.accent)),
@@ -1477,13 +1491,13 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           const SizedBox(height: 16),
           Row(children: [
             _journalCircle(
-                p, Icons.edit_note_rounded, 'Memory', () => _addJournal('memory')),
+                p, Icons.edit_note_rounded, _t('Memory', 'याद').now, () => _addJournal('memory')),
             _journalCircle(
-                p, Icons.favorite_rounded, 'For baby', () => _addJournal('baby')),
+                p, Icons.favorite_rounded, _t('For baby', 'शिशु के लिए').now, () => _addJournal('baby')),
             _journalCircle(
-                p, Icons.add_a_photo_rounded, 'Photo', () => _addJournal('photo')),
+                p, Icons.add_a_photo_rounded, _t('Photo', 'फ़ोटो').now, () => _addJournal('photo')),
             _journalCircle(
-                p, Icons.mic_none_rounded, 'Voice', () => _addJournal('voice')),
+                p, Icons.mic_none_rounded, _t('Voice', 'आवाज़').now, () => _addJournal('voice')),
           ]),
           AnimatedBuilder(
             animation: FatherJournalStore.instance,
@@ -1503,7 +1517,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       decoration: BoxDecoration(
                           color: p.warmSoft,
                           borderRadius: BorderRadius.circular(7)),
-                      child: Text(_journalKindLabel(recent).toUpperCase(),
+                      child: Text(_journalKindLabel(recent).now.toUpperCase(),
                           style: pvJakarta(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
@@ -1512,7 +1526,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     ),
                     const SizedBox(width: 11),
                     Expanded(
-                        child: Text('"${_journalPreview(recent)}"',
+                        child: Text(_t('"${_journalPreview(recent)}"', '"${_journalPreview(recent)}"').now,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: _body(13.5, p.ink, h: 1.45))),
@@ -1522,7 +1536,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             },
           ),
           const SizedBox(height: 16),
-          _tap(_openFatherJournal, _arrowLink(p, 'See all entries')),
+          _tap(_openFatherJournal, _arrowLink(p, _t('See all entries', 'सारी एंट्री देखें').now)),
         ]),
       );
 
@@ -1595,18 +1609,18 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     }
   }
 
-  String _journalKindLabel(JournalEntry e) {
-    if (e.images.isNotEmpty) return 'Photo';
-    if (e.audios.isNotEmpty) return 'Voice';
-    return e.type == JournalEntryType.noteForBaby ? 'For baby' : 'Memory';
+  LocalizedText _journalKindLabel(JournalEntry e) {
+    if (e.images.isNotEmpty) return _t('Photo', 'फ़ोटो');
+    if (e.audios.isNotEmpty) return _t('Voice', 'आवाज़');
+    return e.type == JournalEntryType.noteForBaby ? _t('For baby', 'शिशु के लिए') : _t('Memory', 'याद');
   }
 
   String _journalPreview(JournalEntry e) {
     if (e.title.trim().isNotEmpty) return e.title;
     if (e.description.trim().isNotEmpty) return e.description;
-    if (e.images.isNotEmpty) return 'Added a photo';
-    if (e.audios.isNotEmpty) return 'Recorded a voice note';
-    return 'A memory';
+    if (e.images.isNotEmpty) return _t('Added a photo', 'एक फ़ोटो जोड़ी').now;
+    if (e.audios.isNotEmpty) return _t('Recorded a voice note', 'एक वॉइस नोट रिकॉर्ड किया').now;
+    return _t('A memory', 'एक याद').now;
   }
 
   // ---- bottom tab bar ----
@@ -1621,12 +1635,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _tab(p, Icons.wb_sunny_outlined, 'Today', active: true),
-            _tab(p, Icons.menu_book_rounded, 'Reads', onTap: () => _openCard('read')),
-            _tab(p, Icons.auto_stories_rounded, 'Read', onTap: () => _openCard('talk')),
-            _tab(p, Icons.edit_outlined, 'Journal', onTap: _openFatherJournal),
-            _tab(p, Icons.person_outline_rounded, 'You',
-                onTap: () => _flash('That space is coming soon')),
+            _tab(p, Icons.wb_sunny_outlined, _t('Today', 'आज').now, active: true),
+            _tab(p, Icons.menu_book_rounded, _t('Reads', 'पाठ').now, onTap: () => _openCard('read')),
+            _tab(p, Icons.auto_stories_rounded, _t('Read', 'सुनाएँ').now, onTap: () => _openCard('talk')),
+            _tab(p, Icons.edit_outlined, _t('Journal', 'जर्नल').now, onTap: _openFatherJournal),
+            _tab(p, Icons.person_outline_rounded, _t('You', 'आप').now,
+                onTap: () => _flash(_t('That space is coming soon', 'वह जगह जल्द आ रही है').now)),
           ],
         ),
       );
@@ -1728,8 +1742,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final out = <Widget>[
       Text(isRead ? r!.title.now : d.title, style: _serif(27, p.ink)),
     ];
-    final metaStr =
-        isRead ? '${r!.readingTime.now} · ${r.category.now}' : d.meta;
+    final metaStr = isRead
+        ? '${r!.readingTime.now} · ${r.category.now}'
+        : d.meta;
     if (metaStr.isNotEmpty) {
       out.add(const SizedBox(height: 9));
       out.add(Text(metaStr, style: _body(13, p.muted, w: FontWeight.w500)));
@@ -1766,7 +1781,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           ],
           Text(
               today == null
-                  ? 'Choose a few lines to read together.'
+                  ? _t('Choose a few lines to read together.', 'साथ पढ़ने के लिए कुछ पंक्तियाँ चुन लीजिए।').now
                   : '“${today.body}”',
               style: pvFraunces(
                   fontSize: 18,
@@ -1906,10 +1921,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         const SizedBox(height: 12),
         Text(
             _recording
-                ? 'Recording… tap to stop'
+                ? _t('Recording… tap to stop', 'रिकॉर्ड हो रहा है… रोकने के लिए टैप करें').now
                 : (_recorded
-                    ? 'Saved · tap to re-record'
-                    : 'Tap to record your voice'),
+                    ? _t('Saved · tap to re-record', 'सेव हो गया · दोबारा रिकॉर्ड करने के लिए टैप करें').now
+                    : _t('Tap to record your voice', 'अपनी आवाज़ रिकॉर्ड करने के लिए टैप करें').now),
             style: _body(13, p.muted, w: FontWeight.w600)),
         const SizedBox(height: 12),
         _Waveform(
@@ -2046,7 +2061,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() => _momOpen = false);
-                      _flash("Mom's view lives in the other tab");
+                      _flash(_t("Mom's view lives in the other tab", 'माँ वाला रूप दूसरे टैब में है').now);
                     },
                     child: Container(
                       width: double.infinity,
@@ -2165,10 +2180,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 }
 
 // ignore: unused_element  (used only by the commented-out read-aloud record row)
-const List<double> _kWaveSmall = [
+final List<double> _kWaveSmall = [
   10, 18, 26, 14, 22, 12, 20, 28, 16, 22, 12, 18, 24, 14
 ];
-const List<double> _kWaveBig = [
+final List<double> _kWaveBig = [
   12, 22, 34, 18, 28, 40, 24, 34, 16, 26, 38, 20, 30, 14
 ];
 
@@ -2215,7 +2230,7 @@ class _FatherScanDetail extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 4),
-          Text(m.rangeLabel?.of(lang) ?? 'Week ${m.anchorWeek}',
+          Text(m.rangeLabel?.of(lang) ?? _t('Week ${m.anchorWeek}', 'हफ़्ता ${m.anchorWeek}').now,
               style: _b(12.5, c: kFMuted)),
           const SizedBox(height: 16),
           Text(
