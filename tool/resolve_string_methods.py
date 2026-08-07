@@ -60,6 +60,7 @@ def main():
     if not rows:
         print('nothing to do')
         return
+    review = []
     by_file = {}
     for r in rows:
         by_file.setdefault(r['file'], []).append(r)
@@ -80,8 +81,27 @@ def main():
         n_en = sum(1 for r in items if r['suffix'] == '.en')
         print(path + ': ' + str(n_en) + ' presence + .en, '
               + str(len(items) - n_en) + ' text + .now')
+        if '/data/' in path.replace(chr(92), '/'):
+            # Not refused - unlike resolve_read_sites, which never belongs in a
+            # data file. Here it sometimes does: ready_for_birth_data.whyPack()
+            # resolves internally by design, and that is correct.
+            #
+            # But it is also where resolving is most destructive, because a
+            # data file is the one place holding BOTH languages. The tool
+            # cannot tell a deliberate helper from a value it has just made
+            # single-language, so it names the sites and asks for eyes rather
+            # than reporting a clean run it has not earned.
+            for r in sorted(items, key=lambda x: x['line']):
+                review.append(path + ':' + str(r['line']) + '  '
+                              + r['name'] + ' + ' + r['suffix'])
         if not dry:
             open(path, 'w', encoding='utf-8', newline='').write(src)
+
+    if review:
+        print('\nREVIEW - these are inside lib/data, where resolving a')
+        print('language at the definition would lose the other half:')
+        for r in review:
+            print('  ' + r)
     if dry:
         print('(dry run - nothing written)')
 
