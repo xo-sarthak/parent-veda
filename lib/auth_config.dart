@@ -38,7 +38,8 @@ class AuthConfig {
   //
   // Get it from: Google Cloud console → APIs & Services → Credentials →
   // the OAuth 2.0 Client ID of type "Web application".
-  static const String googleWebClientId = '';
+  static const String googleWebClientId =
+      '957944807064-a7bm8iuitmb1rhv6iadar92vm55poa9p.apps.googleusercontent.com';
 
   /// iOS only. Left blank while we are Android-first; filled when the iOS
   /// OAuth client exists. Passed as `clientId` to GoogleSignIn.initialize.

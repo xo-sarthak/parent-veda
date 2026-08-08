@@ -126,17 +126,60 @@ enough for your own testing, not enough to ship.
 
 ---
 
-## 4. What is deliberately not done
+## 4. The iOS + Apple round (planned, not started)
 
-**Sign in with Apple.** Needs the Apple Developer Program — **$99/yr (≈ ₹8,300/yr)**
-— for the Services ID and signing key, plus a Mac to build iOS. The Apple button
-is still shown and says so when tapped, rather than being hidden.
+iOS **will** ship, so Apple is a scheduled round rather than a maybe.
 
-When you do get there, one rule to know in advance: **Apple's App Store
-guidelines require offering Sign in with Apple if you offer Google or Facebook
-login.** So the iOS build cannot ship with Google-only — Apple becomes mandatory
-the moment iOS becomes real, and `appleReady` plus `googleIosClientId` are the
-two switches waiting for it.
+**The rule that shapes the work:** Sign in with Apple must run on **Android too**,
+even though Apple only requires it on iOS. If a mother signs up with Apple on an
+iPhone and later opens the app on Android — new phone, or her partner's — Apple
+is the *only* door to her account. Without the Android half she is locked out of
+her own pregnancy data with no recovery path. So: **native on iOS, browser
+redirect on Android.** That is what the redirect machinery already in
+`SocialAuth._oauthRedirect` is for; today it has no live consumer.
+
+Your side:
+
+| Item | Cost |
+|---|---|
+| Apple Developer Program (Services ID + signing key) | **$99/yr (≈ ₹8,400/yr)** |
+| A Mac, or a cloud macOS runner (Codemagic / GitHub Actions have free tiers) | — |
+| Register `com.parentveda.app` as an App ID with Sign in with Apple enabled | — |
+| Supabase → Providers → Apple: **Services ID**, **Team ID**, **Key ID**, `.p8` key | — |
+| A *third* Google OAuth client, type **iOS** → goes in code as `googleIosClientId` | — |
+
+Code side:
+
+- `sign_in_with_apple` package; native on iOS, `_oauthRedirect` on Android
+- `ios/Runner/Info.plist` — **no `CFBundleURLTypes` exist at all today**; needs the
+  OAuth callback scheme and Google's reversed-client-id scheme
+- `AuthConfig.appleReady = true` — the button then appears on both platforms
+  automatically (see `_socialButtons` in `auth_flow_screen.dart`)
+
+## 5. What is deliberately not done
+
+**Facebook — parked, decided 2026-08-08.** §3 above stays as a runbook, but the
+console work is deliberately not being done. The reasoning:
+
+- **It adds almost no reach.** Every Android device in India is already signed
+  into a Google account — that is a precondition of using the Play Store. Google
+  login covers essentially the whole Android user base.
+- **It costs real work**: Meta App Review before public launch (privacy policy,
+  screencast, data-use questionnaire, periodic re-review), plus a data-deletion
+  callback endpoint to host and maintain.
+- **It adds an account-linking edge case** — the same email via Google and
+  Facebook, i.e. the duplicate-account trap below.
+- **Trust.** This app holds maternal health data. "Log in with Facebook" reads to
+  some users as "Meta learns I am pregnant". Not what happens technically, but a
+  strange perception cost for a door nobody needs.
+
+`facebookReady` stays `false` and the button is not rendered. Turning it on later
+is one boolean plus §3 — nothing to rebuild.
+
+**A better third door, if one is ever wanted: phone OTP.** India-first, no
+password to forget, and MSG91 is already wired for WhatsApp — so the provider
+relationship and the number-collection UX exist. It also overlaps with the
+forgot-password work.
 
 **Account linking across providers.** If someone signs up with Google
 (`x@gmail.com`) and later taps Facebook with the same address, Supabase's

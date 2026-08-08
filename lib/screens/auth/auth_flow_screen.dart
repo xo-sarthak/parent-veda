@@ -35,6 +35,7 @@ import '../referral/enter_code_sheet.dart';
 import '../enterprise/activation_flow_screen.dart';
 import '../../services/entitlement_store.dart';
 import '../../services/auth/social_auth.dart';
+import '../../auth_config.dart';
 
 import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
@@ -596,8 +597,12 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               _primaryBtn('Create account', () => _go('signup')),
               const SizedBox(height: 12),
               _outlineBtn('Log in', () => _go('login')),
-              _orDivider('OR CONTINUE WITH'),
-              _socialRow(),
+              // Divider and row travel together — a lone "OR CONTINUE WITH"
+              // above nothing is worse than neither.
+              if (_socialButtons.isNotEmpty) ...[
+                _orDivider('OR CONTINUE WITH'),
+                _socialRow(),
+              ],
             ]),
           ),
         ]),
@@ -648,8 +653,10 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             ),
             const SizedBox(height: 8),
             _primaryBtn('Log in', _submitLogin),
-            _orDivider('OR'),
-            _socialRow(),
+            if (_socialButtons.isNotEmpty) ...[
+              _orDivider('OR'),
+              _socialRow(),
+            ],
           ]),
         ),
         const SizedBox(height: 18),
@@ -2153,15 +2160,39 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ]),
       );
 
-  Widget _socialRow() => Row(children: [
-        Expanded(
-            child: _socialBtn('Google', _googleSvg, SocialProvider.google)),
-        const SizedBox(width: 10),
-        Expanded(child: _socialBtn('Apple', _appleSvg, SocialProvider.apple)),
-        const SizedBox(width: 10),
-        Expanded(
-            child: _socialBtn('Facebook', _facebookSvg, SocialProvider.facebook)),
-      ]);
+  /// The social buttons we can actually honour, gated on each provider's own
+  /// readiness rather than on the platform.
+  ///
+  /// WHY READINESS AND NOT PLATFORM: a dead button is worse than an absent one.
+  /// "Coming soon" on a login screen reads as an unfinished app at exactly the
+  /// moment we are asking a mother to trust us with a pregnancy — so a provider
+  /// we cannot complete is not shown at all.
+  ///
+  /// Apple is deliberately gated on `appleReady` rather than on `isIOS`, so that
+  /// when it lands it appears on BOTH platforms. That is not a styling choice:
+  /// if she signs up with Apple on an iPhone and later opens the app on Android,
+  /// Apple is the only door to her account, and hiding it there would lock her
+  /// out of her own pregnancy data with no recovery path. iOS gets the native
+  /// flow, Android the browser redirect — same account either way.
+  List<Widget> get _socialButtons => [
+        if (AuthConfig.googleReady)
+          _socialBtn('Google', _googleSvg, SocialProvider.google),
+        if (AuthConfig.appleReady)
+          _socialBtn('Apple', _appleSvg, SocialProvider.apple),
+        if (AuthConfig.facebookReady)
+          _socialBtn('Facebook', _facebookSvg, SocialProvider.facebook),
+      ];
+
+  Widget _socialRow() {
+    final btns = _socialButtons;
+    if (btns.isEmpty) return const SizedBox.shrink();
+    return Row(children: [
+      for (var i = 0; i < btns.length; i++) ...[
+        if (i > 0) const SizedBox(width: 10),
+        Expanded(child: btns[i]),
+      ],
+    ]);
+  }
 
   Widget _socialBtn(String label, String svg, SocialProvider provider) =>
       Material(
