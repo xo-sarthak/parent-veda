@@ -32,7 +32,11 @@ import 'father/father_daily_screen.dart';
 import 'father/father_journal_screen.dart';
 import 'father/father_read_aloud_screen.dart';
 import 'father/father_reads_screen.dart';
+// Kept: the revert line in the tab list constructs HomeScreenB directly, and
+// TodayHomeScreen's Classic branch is the live path to it.
+// ignore: unused_import
 import 'home_screen_b.dart';
+import 'today_home_screen.dart';
 import 'prepare/prepare_hub_screen.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
@@ -162,7 +166,16 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                     controller: widget.pregnancy, embedded: true),
               ]
             : [
-                HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
+                // TodayHomeScreen is a WRAPPER, not a replacement: it opens
+                // HomeScreenB by default and offers a Classic | Focus pill to
+                // preview the focus-ordered experiment. The shipped Today is
+                // untouched and is still what everyone lands on.
+                //
+                // Kept for revert — deleting today_home_screen.dart and
+                // restoring this line is the whole rollback:
+                // HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
+                TodayHomeScreen(
+                    pregnancy: widget.pregnancy, home: widget.home),
                 const PrepareHubScreen(),
                 ToolsHubScreen(controller: widget.pregnancy),
                 CalendarScreen(controller: widget.pregnancy),
