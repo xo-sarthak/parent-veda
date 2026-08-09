@@ -234,6 +234,38 @@ class SupabaseRepo {
     } catch (_) {/* offline - the local cache still holds the value */}
   }
 
+  /// Update the current user's profile row and REPORT whether it landed.
+  ///
+  /// The sibling above is fire-and-forget, which is the right default here: a
+  /// cloud write failing must never break a screen, and the local cache still
+  /// holds the value. The cost of that default is that it cannot distinguish
+  /// "wrote 1 row" from "RLS refused" from "offline" — all three return void.
+  ///
+  /// That is unacceptable when the CALLER IS ABOUT TO DISCARD ITS ONLY OTHER
+  /// COPY. `PendingProfile.flush` holds onboarding answers — her due date among
+  /// them — that exist nowhere else until this write succeeds; clearing them on
+  /// a write that quietly failed would lose them for good.
+  ///
+  /// `.select()` is what makes the difference: it makes Postgres return the rows
+  /// the update actually touched, so an empty list means the write matched
+  /// nothing (wrong id, or a policy refused it) even though no error was raised.
+  /// A silent zero-row update is the failure mode this repo has been bitten by
+  /// before, and it is invisible without asking for the rows back.
+  ///
+  /// Returns false when logged out, on any error, or when 0 rows changed.
+  static Future<bool> updateMyProfileConfirmed(
+      Map<String, dynamic> changes) async {
+    final uid = userId;
+    if (uid == null) return false;
+    try {
+      final rows =
+          await _client.from('profiles').update(changes).eq('id', uid).select();
+      return rows.isNotEmpty;
+    } catch (_) {
+      return false; // caller keeps its copy and retries later
+    }
+  }
+
   /// Fetch the current user's SINGLE row from [table] (for one-row-per-user
   /// tables like weight_profile / kegel_state). Returns null if none / logged out.
   static Future<Map<String, dynamic>?> fetchOne(String table) async {

@@ -692,14 +692,28 @@ void main() {
         );
       });
 
-      test('both ways out land on success', () {
+      test('both ways out move forward', () {
         // Someone who just activated must not be asked again, and someone who
         // was refused must not be stranded on the step that refused them.
+        //
+        // Both exits used to call _go('success') directly. They now go through
+        // _finishOnboarding(), because the destination depends on whether a
+        // session exists: with Supabase's "Confirm email" on, signUp returns no
+        // session, and "You're all set!" would be a lie immediately contradicted
+        // by the splash bouncing her back to log in. Same guarantee — neither
+        // exit strands her — decided in one place instead of two.
         final body = RegExp(r'Widget _employer\(\) =>(.*?)\n  // WhatsApp',
                 dotAll: true)
             .firstMatch(auth)!
             .group(1)!;
-        expect("_go('success')".allMatches(body).length, greaterThanOrEqualTo(2));
+        expect(
+          '_finishOnboarding'.allMatches(body).length,
+          greaterThanOrEqualTo(2),
+          reason: 'both the activate and the skip path must lead onward',
+        );
+        // ...and that shared exit must still be able to reach success.
+        expect(auth.contains("_go(_needsEmailConfirm ? 'confirm' : 'success')"),
+            isTrue);
       });
 
       test('the privacy answer comes before the ask, not after', () {

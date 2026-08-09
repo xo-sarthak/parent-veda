@@ -2564,6 +2564,66 @@ class S {
   String get socialCouldNotOpen => _p(
       'Couldn\'t open the sign-in page.', 'साइन-इन पेज नहीं खुल पाया।');
 
+  // Forgot password. `password`, `email` and `code` stay Latin — she reads them
+  // on the very screen she is filling in, and translating the label while the
+  // field beside it says "Password" helps nobody.
+  String get authEnterEmail => _p('Enter your email.', 'अपना email डालिए।');
+  // Deliberately does not say whether the account exists — see _sendResetCode.
+  String get authResetCodeSent => _p(
+      'If that email has an account, we\'ve sent a 6-digit code.',
+      'अगर उस email पर account है, तो हमने 6 अंकों का code भेज दिया है।');
+  String get authResetSendFailed => _p(
+      'Couldn\'t send the code. Please try again.',
+      'Code नहीं भेज पाए। फिर कोशिश कीजिए।');
+  String get authEnterFullCode =>
+      _p('Enter all 6 digits.', 'पूरे 6 अंक डालिए।');
+  String get authCodeCheckFailed => _p(
+      'Couldn\'t check the code. Please try again.',
+      'Code जाँच नहीं पाए। फिर कोशिश कीजिए।');
+  String get authPasswordTooShort => _p(
+      'Password must be at least 6 characters.',
+      'Password कम से कम 6 अक्षरों का होना चाहिए।');
+  String get authPasswordsDoNotMatch =>
+      _p('Both passwords must match.', 'दोनों password एक जैसे होने चाहिए।');
+  String get authPasswordUpdated =>
+      _p('Password updated ✓', 'Password बदल गया ✓');
+  String get authPasswordUpdateFailed => _p(
+      'Couldn\'t update the password. Please try again.',
+      'Password नहीं बदल पाए। फिर कोशिश कीजिए।');
+  String get authProfileSavedPending => _p(
+      'Saved. Confirm your email to finish.',
+      'सेव हो गया। पूरा करने के लिए अपना email confirm कीजिए।');
+
+  // Account deletion. Said plainly and without softening: this is the one
+  // action in the app that cannot be undone, and comforting wording here would
+  // be a kindness that costs her everything she has written.
+  String get deleteAccount => _p('Delete account', 'Account हटाइए');
+  String get deleteAccountBody => _p(
+      'This permanently deletes your account and everything in it — your '
+          'journal, your entries and your records. It cannot be undone.\n\n'
+          'Type DELETE to confirm.',
+      'इससे आपका account और उसमें रखा सब कुछ हमेशा के लिए हट जाएगा — आपकी '
+          'journal, आपकी entries और आपके records। यह वापस नहीं आ सकता।\n\n'
+          'पक्का करने के लिए DELETE लिखिए।');
+  // NOTE: the word she types to confirm is deliberately NOT in this table —
+  // it is compared against her input, not rendered, so a translated copy would
+  // silently stop matching the moment she switched language. It lives as a
+  // plain const, `kDeleteAccountKeyword` in services/auth/delete_account.dart.
+  String get deleteAccountConfirm => _p('Delete', 'हटाइए');
+  String get deleteAccountWorking =>
+      _p('Deleting your account…', 'आपका account हटाया जा रहा है…');
+  String get deleteAccountFailed => _p(
+      'Could not delete the account. Please try again.',
+      'Account नहीं हट पाया। फिर कोशिश कीजिए।');
+  String get cancelLabel => _p('Cancel', 'रहने दीजिए');
+  String get closeLabel => _p('Close', 'बंद कीजिए');
+  String get deleteAccountDoneTitle =>
+      _p('Account deleted', 'Account हट गया');
+  String get deleteAccountDoneBody => _p(
+      'Your account and everything in it have been deleted. ParentVeda will '
+          'close now.',
+      'आपका account और उसमें रखा सब कुछ हट गया है। ParentVeda अब बंद हो जाएगा।');
+
   String get whatsappUpdatesOn =>
       _p('WhatsApp updates on', 'WhatsApp अपडेट चालू');
   String get whatsappUpdatesOff =>

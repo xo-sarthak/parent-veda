@@ -20,6 +20,7 @@ import '../services/life_stage_store.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/remote/sync_registry.dart';
+import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
 // father_daily_screen import parked - the paired father now lands on the unified
@@ -68,14 +69,37 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _goHome() async {
     if (!mounted) return;
     final nav = Navigator.of(context); // capture before navigating
-    // First run shows the auth flow; once completed (local flag, no backend) we
-    // skip straight to the app on later launches.
+    // Entering the app requires TWO things to agree: the local flag saying
+    // onboarding finished, and a real Supabase session.
+    //
+    // The flag alone is not enough. It records "she got through onboarding
+    // once" and survives anything — including the session being revoked while
+    // the app was closed, where no auth event ever fires because nothing was
+    // listening. On the flag alone she would boot into a completely normal
+    // looking app in which `SupabaseRepo.userId` is null, so every cloud read
+    // returns [] and every write is skipped, silently, forever. Local-first
+    // hides it perfectly: her cached data is all still there.
+    //
+    // THE TRADE-OFF, stated plainly: requiring a session means a revoked
+    // session costs her one extra login. Trusting the flag means she can write
+    // months of journal entries that never leave the phone and discover it at
+    // reinstall, when the cache is gone and the cloud is the only copy. One is
+    // a small annoyance, the other is data loss — and only one of them is
+    // recoverable. Nothing local is deleted either way; signing back in
+    // reconnects her to the same rows.
+    //
+    // The other direction (session dies WHILE running) is covered by
+    // SessionWatch, which clears the flag on sign-out.
     var authed = false;
     var role = 'mother';
     String? stage;
     try {
       final prefs = await SharedPreferences.getInstance();
-      authed = prefs.getBool(kAuthCompletedKey) ?? false;
+      // `isLoggedIn` is false both when signed out AND when Supabase failed to
+      // initialise — which is the behaviour we want in both cases, and is why
+      // it never throws here.
+      authed = (prefs.getBool(kAuthCompletedKey) ?? false) &&
+          SupabaseRepo.isLoggedIn;
       role = prefs.getString(kUserRoleKey) ?? 'mother';
       // Read from prefs rather than LifeStageStore: the store loads
       // asynchronously from its constructor, so at splash time its `stage` may

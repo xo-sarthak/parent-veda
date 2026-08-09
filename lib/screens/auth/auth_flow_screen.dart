@@ -35,6 +35,7 @@ import '../referral/enter_code_sheet.dart';
 import '../enterprise/activation_flow_screen.dart';
 import '../../services/entitlement_store.dart';
 import '../../services/auth/social_auth.dart';
+import '../../services/auth/pending_profile.dart';
 import '../../auth_config.dart';
 
 import '../tools/due_date_calculator_screen.dart'
@@ -116,8 +117,20 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   final _code = TextEditingController(); // partner pairing code (father path)
   final _phone = TextEditingController(); // WhatsApp number (B2 opt-in)
   bool _waOptIn = false; // WhatsApp opt-in toggle (onboarding)
-  final _otp = List.generate(5, (_) => TextEditingController());
-  final _otpNodes = List.generate(5, (_) => FocusNode());
+  // True when signUp returned no session, i.e. Supabase's "Confirm email" is on
+  // and she has not clicked the link yet. Drives the 'confirm' screen instead
+  // of 'success', and makes the profile write go to PendingProfile.
+  bool _needsEmailConfirm = false;
+  // SIX boxes, because Supabase mints six-digit recovery codes. This was five
+  // for as long as the screen was a mock-up, and a five-box field for a
+  // six-digit code fails in the one place nothing catches it: she can type the
+  // code correctly and still be told it is wrong.
+  //
+  // NOTE: unrelated to the father's pairing code, which is a single free-text
+  // field (`_code`) on a different screen and goes to link_as_partner.
+  static const int _otpLength = 6;
+  final _otp = List.generate(_otpLength, (_) => TextEditingController());
+  final _otpNodes = List.generate(_otpLength, (_) => FocusNode());
   Timer? _pairTimer; // drives the "Pairing…" → "Paired!" auto-advance
 
   static const _backMap = {
@@ -130,6 +143,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     'forgot': 'login',
     'otp': 'forgot',
     'reset': 'otp',
+    'confirm': 'welcome',
     'success': 'welcome',
   };
 
@@ -186,12 +200,21 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     _toast('Creating your account…');
 
     try {
-      await Supabase.instance.client.auth.signUp(
+      final res = await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
       );
       if (!mounted) return; // the screen could be gone after the await
-      _go('role'); // success → continue to the role step
+
+      // A NULL SESSION IS NOT A FAILURE — it is Supabase saying "Confirm email
+      // is on, so this account is real but dormant until she clicks the link."
+      // The user object comes back either way, so the only way to tell the two
+      // modes apart is to look at the session. Remembered here because every
+      // step after this one behaves differently: the profile write has no id to
+      // aim at, and she must not be dropped into the app with no session.
+      _needsEmailConfirm = res.session == null;
+
+      _go('role'); // continue to the role step either way
     } on AuthException catch (e) {
       // Supabase's own message, e.g. "User already registered".
       if (mounted) _toast(e.message);
@@ -223,34 +246,42 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     final client = Supabase.instance.client;
     final userId = client.auth.currentUser?.id;
 
+    // Built once and used by BOTH paths, so the cloud write and the stashed
+    // copy can never describe different things.
+    final fields = <String, dynamic>{
+      'name': _name.text.trim(),
+      'role': 'mother',
+      'due_date': _pickedDue?.toIso8601String().split('T').first,
+      // WhatsApp opt-in (B2) captured on this step - same columns the
+      // Profile card writes; source distinguishes where consent began.
+      ...WhatsAppPrefs.fieldsFor(
+        optIn: _waOptIn,
+        phone: _phone.text,
+        source: 'onboarding',
+      ),
+    };
+
     try {
       if (userId == null) {
-        // No logged-in session → the security rules (RLS) won't let us write.
-        // This happens when "Confirm email" is ON (sign-up doesn't start a
-        // session until the emailed link is clicked).
-        if (mounted) {
-          _toast('Not logged in - turn OFF "Confirm email" & sign up fresh.',
-              ms: 9000);
-        }
+        // NO SESSION — which with "Confirm email" ON is the normal path, not an
+        // error: the account exists but stays dormant until she clicks the link.
+        // There is no id to write against and RLS would refuse anyway, so the
+        // answers are kept on the device and replayed at her first real login.
+        //
+        // This used to toast 'turn OFF "Confirm email"' — a developer's note in
+        // a user's clothing, and the reason that setting has had to stay off.
+        await PendingProfile.save(fields);
+        if (mounted) _toast(S.now.authProfileSavedPending, ms: 4000);
       } else {
         // .select() makes the update RETURN the rows it changed, so we can
         // confirm the write actually landed (0 rows = something blocked it).
-        final rows = await client
-            .from('profiles')
-            .update({
-              'name': _name.text.trim(),
-              'role': 'mother',
-              'due_date': _pickedDue?.toIso8601String().split('T').first,
-              // WhatsApp opt-in (B2) captured on this step - same columns the
-              // Profile card writes; source distinguishes where consent began.
-              ...WhatsAppPrefs.fieldsFor(
-                optIn: _waOptIn,
-                phone: _phone.text,
-                source: 'onboarding',
-              ),
-            })
-            .eq('id', userId)
-            .select();
+        final rows =
+            await client.from('profiles').update(fields).eq('id', userId).select();
+        if (rows.isEmpty) {
+          // Landed on nothing. Keep a local copy rather than losing her due
+          // date to a policy we cannot see from here.
+          await PendingProfile.save(fields);
+        }
         if (mounted) {
           _toast(
             rows.isEmpty
@@ -261,6 +292,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         }
       }
     } catch (e) {
+      // Network died mid-write. Same treatment: hold it, retry at next login.
+      await PendingProfile.save(fields);
       debugPrint('saveProfile error: $e'); // full error in the flutter terminal
       if (mounted) _toast('Save failed: $e', ms: 15000);
     } finally {
@@ -276,6 +309,45 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       }
     }
   }
+
+  /// The end of onboarding — and the one place that has to know whether she can
+  /// actually come in yet.
+  ///
+  /// With "Confirm email" off there is a session, so "You're all set!" is true.
+  /// With it on there is none, and showing that screen would be a lie followed
+  /// immediately by a contradiction: the splash now requires a real session, so
+  /// she would be bounced straight back to the login screen with no explanation.
+  /// Better to say plainly that one step is left.
+  void _finishOnboarding() => _go(_needsEmailConfirm ? 'confirm' : 'success');
+
+  // ===========================================================================
+  //  CONFIRM EMAIL — shown only when Supabase's "Confirm email" is on
+  // ===========================================================================
+  Widget _confirmEmail() => _formScroll([
+        _centeredHeader(
+          'Confirm your email',
+          'We sent a link to ${_email.text.trim()}. Tap it, then come back and '
+              'log in — everything you just told us is saved.',
+        ),
+        const SizedBox(height: 14),
+        _glass(
+          child: Column(children: [
+            // Straight to login rather than trying to detect the confirmation.
+            // Polling for it would mean guessing when she switched apps; she
+            // knows perfectly well when she has clicked the link.
+            _primaryBtn('I\'ve confirmed — log in', () => _go('login')),
+            const SizedBox(height: 12),
+            Center(
+              child: Text(
+                'Check your spam folder if it has not arrived.',
+                textAlign: TextAlign.center,
+                style: pvJakarta(
+                    fontSize: 12.5, fontWeight: FontWeight.w500, color: _muted2),
+              ),
+            ),
+          ]),
+        ),
+      ]);
 
   // Logs an EXISTING user in, then routes straight into the app based on their
   // saved profile (role + due date) - no need to re-pick role/due-date.
@@ -293,29 +365,152 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     try {
       await Supabase.instance.client.auth
           .signInWithPassword(email: email, password: password);
-
-      // Read the profile so we route to the correct home.
-      final uid = Supabase.instance.client.auth.currentUser?.id;
-      DateTime? due;
-      var isFather = false;
-      if (uid != null) {
-        final row = await Supabase.instance.client
-            .from('profiles')
-            .select()
-            .eq('id', uid)
-            .maybeSingle();
-        if (row != null) {
-          isFather = row['role'] == 'father';
-          final d = row['due_date'];
-          if (d != null) due = DateTime.tryParse(d.toString());
-        }
-      }
       if (!mounted) return;
-      widget.onDone(due, isFather);
+
+      // One routing path for all three doors — password, social, and password
+      // reset. This used to be a second copy that read `profiles` itself, and
+      // it differed in two ways that mattered: it never flushed a pending
+      // profile, and a user whose onboarding was unfinished (role still null)
+      // was dropped into the app half-configured rather than sent to finish it.
+      await _routeAfterSession();
     } on AuthException catch (e) {
       if (mounted) _toast(e.message); // e.g. "Invalid login credentials"
     } catch (_) {
       if (mounted) _toast('Login failed. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  // === Forgot password: send code → verify → set new password ==============
+  //
+  // A CODE, NOT A LINK — the decision worth recording.
+  //
+  // Supabase's recovery email ships as a magic link by default, which is right
+  // for a web app: the link opens a page. We have no web app. A link would have
+  // to deep-link into the APK, and that is fragile in exactly the ways that
+  // matter here — mail clients rewrite and wrap URLs for tracking, some strip
+  // custom schemes entirely, and if she reads her mail on a laptop the link has
+  // nowhere to go at all. Every one of those failures ends with a locked-out
+  // mother staring at a dead link.
+  //
+  // A six-digit code has none of those properties. It survives any mail client,
+  // any device, and being read aloud. It also matches the screen this flow
+  // already had: `forgot → otp → reset` was drawn for codes from the start.
+  //
+  // REQUIRES A DASHBOARD CHANGE: Supabase's "Reset Password" template must
+  // contain {{ .Token }}. The stock template only has {{ .ConfirmationURL }},
+  // and with that in place the mail arrives with no code in it — the flow then
+  // fails at the one step nothing here can detect. See docs/AUTH-SETUP.md §6.
+
+  /// The six boxes as one string.
+  String get _otpCode => _otp.map((c) => c.text.trim()).join();
+
+  Future<void> _sendResetCode({bool resend = false}) async {
+    final email = _email.text.trim();
+    if (email.isEmpty) {
+      _toast(S.now.authEnterEmail);
+      return;
+    }
+    if (_busy) return;
+    setState(() => _busy = true);
+
+    try {
+      await Supabase.instance.client.auth.resetPasswordForEmail(email);
+      if (!mounted) return;
+      for (final c in _otp) {
+        c.clear(); // a resend invalidates the old code; don't leave it on screen
+      }
+      if (!resend) _go('otp');
+      // DELIBERATELY VAGUE, and it is not sloppiness. Saying "no account with
+      // that email" would turn this screen into a free membership oracle:
+      // anyone could test addresses and learn who is pregnant. Supabase returns
+      // success either way for the same reason, so the wording matches what the
+      // server actually tells us.
+      _toast(S.now.authResetCodeSent, ms: 5000);
+      if (mounted) _otpNodes.first.requestFocus();
+    } on AuthException catch (e) {
+      // Real errors still surface — most often the per-hour email rate limit.
+      if (mounted) _toast(e.message, ms: 5000);
+    } catch (e) {
+      debugPrint('resetPasswordForEmail failed: $e');
+      if (mounted) _toast(S.now.authResetSendFailed, ms: 5000);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Exchanges the typed code for a real session.
+  ///
+  /// This is the step that authenticates her: `verifyOTP` with a recovery token
+  /// returns a session, which is what makes the password change on the next
+  /// screen permissible at all. Without it `updateUser` would have nobody to
+  /// update — which is precisely why the old stub could never have worked, no
+  /// matter what was typed into it.
+  Future<void> _verifyResetCode() async {
+    final code = _otpCode;
+    final email = _email.text.trim();
+    if (code.length < _otpLength) {
+      _toast(S.now.authEnterFullCode);
+      return;
+    }
+    if (_busy) return;
+    setState(() => _busy = true);
+
+    try {
+      await Supabase.instance.client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.recovery,
+      );
+      if (!mounted) return;
+      _password.clear(); // never carry the OLD password into the new-password form
+      _confirm.clear();
+      _go('reset');
+    } on AuthException catch (e) {
+      // "Token has expired or is invalid" — wrong code, or older than an hour.
+      if (mounted) _toast(e.message, ms: 5000);
+    } catch (e) {
+      debugPrint('verifyOTP failed: $e');
+      if (mounted) _toast(S.now.authCodeCheckFailed, ms: 5000);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Sets the new password, then walks straight into the app.
+  ///
+  /// She is ALREADY signed in by this point — `verifyOTP` established the
+  /// session — so sending her back to a login screen to type the password she
+  /// just chose would be theatre. Routing goes through the same
+  /// `_routeAfterSession` the social path uses.
+  Future<void> _submitNewPassword() async {
+    final pw = _password.text;
+    final confirm = _confirm.text;
+
+    if (pw.length < 6) {
+      _toast(S.now.authPasswordTooShort);
+      return;
+    }
+    if (pw != confirm) {
+      _toast(S.now.authPasswordsDoNotMatch);
+      return;
+    }
+    if (_busy) return;
+    setState(() => _busy = true);
+
+    try {
+      await Supabase.instance.client.auth
+          .updateUser(UserAttributes(password: pw));
+      if (!mounted) return;
+      _toast(S.now.authPasswordUpdated);
+      await _routeAfterSession();
+    } on AuthException catch (e) {
+      // Includes "New password should be different from the old password".
+      if (mounted) _toast(e.message, ms: 5000);
+    } catch (e) {
+      debugPrint('updateUser(password) failed: $e');
+      if (mounted) _toast(S.now.authPasswordUpdateFailed, ms: 5000);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -350,14 +545,19 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         _toast(result.message ?? S.now.socialSignInFailed(label), ms: 5000);
         return;
       }
-      await _routeAfterSocial();
+      await _routeAfterSession();
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
-  /// Decide where a freshly signed-in social user lands.
-  Future<void> _routeAfterSocial() async {
+  /// Decide where a user lands once a session exists — whichever door made it.
+  ///
+  /// Shared by social sign-in and by password reset, because past this point
+  /// they are the same situation: somebody is authenticated and we need to know
+  /// whether onboarding is still owed. Keeping one copy means the two can never
+  /// disagree about what "finished onboarding" means.
+  Future<void> _routeAfterSession() async {
     final client = Supabase.instance.client;
     final user = client.auth.currentUser;
     if (user == null) {
@@ -368,6 +568,13 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     // The provider already told us her name — carrying it across means the
     // profile step opens filled in rather than asking for something we were
     // just handed. Never overwrite something she typed herself.
+    // Anything onboarding collected while there was no session goes in now,
+    // BEFORE the profile is read below — otherwise a mother who signed up under
+    // "Confirm email" would be sent back through onboarding on her first login,
+    // asked again for answers we are holding in our hand. No-op when nothing is
+    // pending, so every session path can call it unconditionally.
+    await PendingProfile.flush();
+
     final meta = user.userMetadata ?? const <String, dynamic>{};
     final fromProvider =
         (meta['full_name'] ?? meta['name'] ?? '').toString().trim();
@@ -533,6 +740,8 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         return _otp_();
       case 'reset':
         return _reset();
+      case 'confirm':
+        return _confirmEmail();
       case 'success':
         return _success();
       default:
@@ -1228,7 +1437,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             _field(_email, 'Email', 'you@email.com',
                 keyboard: TextInputType.emailAddress),
             const SizedBox(height: 4),
-            _primaryBtn('Send reset code', () => _go('otp')),
+            _primaryBtn('Send reset code', _sendResetCode),
           ]),
         ),
         const SizedBox(height: 18),
@@ -1240,21 +1449,21 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // ===========================================================================
   Widget _otp_() => _formScroll([
         _centeredHeader(
-            "Verify it's you", 'Enter the 5-digit code we just sent.'),
+            "Verify it's you", 'Enter the 6-digit code we just sent.'),
         const SizedBox(height: 14),
         _glass(
           child: Column(children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (var i = 0; i < 5; i++) ...[
+                for (var i = 0; i < _otpLength; i++) ...[
                   _otpBox(i),
-                  if (i < 4) const SizedBox(width: 10),
+                  if (i < _otpLength - 1) const SizedBox(width: 8),
                 ],
               ],
             ),
             const SizedBox(height: 20),
-            _primaryBtn('Verify', () => _go('reset')),
+            _primaryBtn('Verify', _verifyResetCode),
             const SizedBox(height: 14),
             RichText(
               text: TextSpan(
@@ -1267,7 +1476,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     style: const TextStyle(
                         color: _purple, fontWeight: FontWeight.w800),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => _soon('Resend'),
+                      ..onTap = () => _sendResetCode(resend: true),
                   ),
                 ],
               ),
@@ -1277,7 +1486,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       ]);
 
   Widget _otpBox(int i) => SizedBox(
-        width: 48,
+        width: 44,
         height: 58,
         child: TextField(
           controller: _otp[i],
@@ -1287,7 +1496,9 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           maxLength: 1,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (v) {
-            if (v.isNotEmpty && i < 4) _otpNodes[i + 1].requestFocus();
+            if (v.isNotEmpty && i < _otpLength - 1) {
+              _otpNodes[i + 1].requestFocus();
+            }
             if (v.isEmpty && i > 0) _otpNodes[i - 1].requestFocus();
           },
           style: pvJakarta(
@@ -1321,7 +1532,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
             _field(_confirm, 'Confirm password', 'Re-enter password',
                 obscure: true),
             const SizedBox(height: 4),
-            _primaryBtn('Reset password', () => _go('success')),
+            _primaryBtn('Reset password', _submitNewPassword),
           ]),
         ),
       ]);
@@ -1734,11 +1945,11 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               // Straight on either way. Someone who just activated does not
               // need to be asked again, and someone who could not should not
               // be stuck on the step that refused them.
-              _go('success');
+              _finishOnboarding();
               if (ok) setState(() {});
             }),
             const SizedBox(height: 10),
-            _outlineBtn('Skip — my company does not', () => _go('success')),
+            _outlineBtn('Skip — my company does not', _finishOnboarding),
             const SizedBox(height: 12),
             Center(
               child: Text(

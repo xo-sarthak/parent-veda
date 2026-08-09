@@ -1034,7 +1034,132 @@ Before widening a field that already exists in a store:
 
 ---
 
-## 14. Reading list, in order
+## 14. Authentication: four failures that leave no trace
+
+Auth is where this codebase's favourite failure mode concentrates — **things
+that go wrong without producing a symptom.** Each of these was live, and none of
+them would have shown up in a crash report.
+
+### 14a. A cache that degrades silently is worse than one that fails loudly
+
+The app decided at launch whether you were logged in by reading one local
+boolean out of `shared_preferences`. That flag records *"onboarding finished
+once"*. What the app actually needs to know is *"there is a valid session right
+now"*. They agree almost always — and when they diverge, watch what happens:
+
+```
+refresh token revoked  →  SupabaseRepo.userId == null
+                       →  every store's cloud read returns []      (correct!)
+                       →  every store's cloud write is skipped     (correct!)
+                       →  local-first serves the cache instantly   (correct!)
+                       →  she keeps writing to a phone that syncs nowhere
+```
+
+Every individual step is behaving exactly as designed. That is what makes it
+invisible: there is no bug to see, only a premise that stopped being true.
+
+The general lesson travels well past this app. **Local-first is what makes the
+product feel instant, and it is the same property that hides a dead backend.**
+Anything that caches needs a way to answer *"am I still authoritative?"* — and
+that answer must come from the thing it is caching, not from a note it wrote
+about itself earlier.
+
+Two failure paths, so two mechanisms — neither sufficient alone:
+
+| The session dies… | Nothing fires because… | Covered by |
+|---|---|---|
+| while the app runs | — (an event does fire) | `SessionWatch` clears the flag |
+| while the app is closed | nothing was listening | splash re-checks at launch |
+
+`lib/services/auth/session_watch.dart`, `lib/screens/splash_screen.dart`.
+
+### 14b. `.select()` is how you find out a write did nothing
+
+Cloud writes here are fire-and-forget on purpose (`.catchError((_) {})`) — a
+failed sync must never break a screen, because the local cache still holds the
+value. The cost of that default is that it cannot tell three things apart:
+
+```
+wrote 1 row   ·   RLS refused   ·   offline
+```
+
+All three return `void`. Fine when there is a local copy. **Not fine when the
+caller is about to throw its only other copy away.**
+
+`PendingProfile` holds onboarding answers — her due date among them — that exist
+nowhere else until the write lands. So it uses a confirming variant:
+
+```dart
+final rows = await _client.from('profiles').update(changes).eq('id', uid).select();
+return rows.isNotEmpty;   // ← empty means "matched nothing", with NO error raised
+```
+
+`.select()` makes Postgres return the rows the update actually touched. **A
+zero-row update is not an error** — it is a successful statement that found
+nothing to change, which is precisely what an RLS refusal or a wrong id looks
+like. Without asking for the rows back, it is indistinguishable from success.
+
+Rule of thumb: **fire-and-forget when a local copy survives; confirm when you
+are about to discard one.**
+
+### 14c. Local-first applies to auth too
+
+With "Confirm email" on, `signUp` returns a user but **no session**. Everything
+onboarding collects after that point is gathered while logged out, so
+`.update().eq('id', uid)` has no `uid` — and the old code gave up, toasting
+`turn OFF "Confirm email"`. A developer's note wearing a user's clothes, and the
+reason that setting had to stay off, which in turn meant anyone could register
+with an address they did not own.
+
+The fix was not a new pattern but the house one: **an unconfirmed account is
+just another flavour of not-yet-reachable.** Write locally, replay when a
+session appears — the same thing all ~25 stores already do.
+
+One detail worth copying: `PendingProfile` stores **the exact map the write
+would have sent**, not a parsed model. Add a column to that write and it rides
+along for free, with no second place to remember. The trade is that it cannot
+validate what it holds — worth making for a payload written in one place and
+read in one place, not worth it for a shared schema.
+
+### 14d. Privileged endpoints take identity from the token, never the body
+
+Deleting an `auth.users` row needs the `service_role` key — which bypasses RLS
+across the entire project. That key can never ship in an APK, so the work moves
+to an edge function. Which raises the real question: **how does that function
+know whose account to delete?**
+
+```ts
+// Two clients, each with the least power its job needs.
+const caller = createClient(url, ANON_KEY,      // no more power than the app
+  { global: { headers: { Authorization: authHeader } } });
+const { data: { user } } = await caller.auth.getUser();   // ← who, proved
+
+const admin = createClient(url, SERVICE_ROLE_KEY);        // ← what, narrow
+await admin.auth.admin.deleteUser(user.id);
+```
+
+The body is **never read.** Accept an id from the request and any valid session
+could delete any account by naming a uuid — against an endpoint holding a key
+that would cheerfully comply. `test/auth_delete_account_test.dart` asserts
+`req.json()` does not appear in the file at all, because "we just won't use it"
+is not a security boundary.
+
+Also: deploy it **without** `--no-verify-jwt`. Two other functions here use that
+flag legitimately, so it is one careless copy-paste away from letting unsigned
+requests reach the service_role key.
+
+### 14e. A value that is compared is not copy
+
+`.en` is identity, `.now` is display — §13's rule, and auth found a fresh way to
+break it. The delete-account dialog asks her to type `DELETE`. Put that word in
+the string table and it gets translated, at which point the confirm button never
+enables in Hindi — no crash, no failing test, and only a mother ever finds out.
+
+It lives as `kDeleteAccountKeyword`, a plain const. **The dialog renders it as a
+hint so she is told what to type; only the constant decides whether it matched.**
+Rendering and comparing are different jobs even when they use the same word.
+
+## 15. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -1054,3 +1179,6 @@ Before widening a field that already exists in a store:
     there (§12).
 12. `lib/services/remote/supabase_repo.dart` + `cloud_synced_store.dart` — the
     client half of everything above.
+13. `lib/services/auth/session_watch.dart` + `pending_profile.dart` +
+    `supabase/functions/delete-account/index.ts` — the four auth failures that
+    leave no trace, and the confirm-before-you-discard write (§14).

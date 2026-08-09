@@ -51,6 +51,7 @@ import 'journal_screen.dart';
 import 'saved_hub_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../services/auth/social_auth.dart';
+import '../services/auth/delete_account.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -463,7 +464,27 @@ class ProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14)),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
+          // --- Delete account (permanent) ---------------------------------
+          // Play requires this to exist in-app. Placed BELOW sign out, quieter
+          // than it, and as a plain text button rather than a filled one — it
+          // must be findable without ever being the obvious thing to tap. The
+          // confirmation, not the styling, is what actually protects her.
+          Center(
+            child: TextButton(
+              onPressed: () => _deleteAccount(context),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFB3261E),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              ),
+              child: Text(s.deleteAccount,
+                  style: text.labelLarge?.copyWith(
+                      color: const Color(0xFFB3261E),
+                      fontWeight: FontWeight.w600)),
+            ),
+          ),
+          const SizedBox(height: 12),
           Center(
             child: Text(s.moreComingSoon, style: text.labelMedium),
           ),
@@ -471,6 +492,109 @@ class ProfileScreen extends StatelessWidget {
       ),
       ),
     );
+  }
+
+  /// Permanently delete the account, after a confirmation she has to mean.
+  ///
+  /// TYPE-TO-CONFIRM, not a yes/no dialog. Everything else in this app is
+  /// recoverable — this is the only action that destroys a pregnancy record
+  /// with no undo, and a two-tap confirm is muscle memory. Typing the word is a
+  /// deliberate speed bump, and it is the standard people already recognise
+  /// from GitHub and Stripe for exactly this class of action.
+  Future<void> _deleteAccount(BuildContext context) async {
+    final s = S.now;
+    final controller = TextEditingController();
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.deleteAccount),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(s.deleteAccountBody),
+            const SizedBox(height: 14),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: kDeleteAccountKeyword,
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(s.cancelLabel),
+          ),
+          // Listens so the destructive button stays disabled until the word is
+          // typed — an enabled button you must not press is a trap.
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (_, value, _) => TextButton(
+              onPressed: value.text.trim().toUpperCase() ==
+                      kDeleteAccountKeyword.toUpperCase()
+                  ? () => Navigator.of(ctx).pop(true)
+                  : null,
+              child: Text(s.deleteAccountConfirm,
+                  style: const TextStyle(color: Color(0xFFB3261E))),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(s.deleteAccountWorking)));
+
+    final ok = await DeleteAccount.run();
+
+    messenger.clearSnackBars();
+    if (!ok) {
+      // Still signed in, nothing lost, free to try again.
+      messenger.showSnackBar(SnackBar(content: Text(s.deleteAccountFailed)));
+      return;
+    }
+    if (!context.mounted) return;
+
+    // THE APP CLOSES, and that is the point rather than a shortcut.
+    //
+    // LocalWipe has emptied storage, but the ~25 singleton stores loaded in
+    // this process still hold her data in memory. They would re-persist it on
+    // the next write, and a new account created without restarting would be
+    // seeded from it — the exact bug LocalWipe exists to prevent, one layer up.
+    // Giving every store a reset hook is a lot of surface to keep correct for
+    // one rare path; ending the process is the version that cannot be got
+    // wrong. Next launch: empty storage, fresh singletons, nothing remembered.
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.deleteAccountDoneTitle),
+        content: Text(s.deleteAccountDoneBody),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              SystemNavigator.pop(); // close the app
+            },
+            child: Text(s.closeLabel),
+          ),
+        ],
+      ),
+    );
+    // If the dialog is somehow dismissed without closing, fall back to the
+    // first route so she is at least not left inside a deleted account.
+    nav.popUntil((r) => r.isFirst);
   }
 
   /// Testing: pick WHICH doctor to log in as, then enter doctor mode. A live

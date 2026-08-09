@@ -104,7 +104,16 @@ before starting Facebook.
 
 ---
 
-## 3. Meta / Facebook
+## 3. ~~Meta / Facebook~~ — NOT DOING THIS
+
+**Decided 2026-08-09: Facebook login is not being built.** Not deferred — ruled
+out. Reasoning is in §5. The runbook below is kept only so the decision can be
+reversed knowingly rather than rediscovered; **do not work through it.**
+
+<details>
+<summary>Superseded runbook (do not follow)</summary>
+
+### ~~Meta / Facebook~~
 
 1. developers.facebook.com → your app → **Add Product → Facebook Login → Settings**
 2. **Valid OAuth Redirect URIs:**
@@ -124,7 +133,55 @@ deep link in `android/app/src/parent/AndroidManifest.xml`.
 mode only accounts with a role on the app (admin/developer/tester) can log in —
 enough for your own testing, not enough to ship.
 
+</details>
+
 ---
+
+## 3b. Email templates — REQUIRED, or forgot-password silently breaks
+
+The app sends a **6-digit code**, not a magic link, because a link has nowhere
+to land when the product is an app (see `_sendResetCode` for the full reasoning).
+
+Supabase's stock **Reset Password** template contains only
+`{{ .ConfirmationURL }}`. Leave it that way and the mail arrives **with no code
+in it** — the flow then fails at a step nothing in the app can detect, because
+from our side everything succeeded.
+
+**Authentication → Emails → Reset Password**, make sure the body includes:
+
+```html
+<h2>Reset your ParentVeda password</h2>
+<p>Your code is:</p>
+<p style="font-size:28px;font-weight:700;letter-spacing:4px">{{ .Token }}</p>
+<p>It expires in an hour. If you didn't ask for this, ignore this email.</p>
+```
+
+`{{ .Token }}` is the six-digit code. Keep `{{ .ConfirmationURL }}` out — a link
+beside a code just invites her to click the one that cannot work.
+
+Do the same for **Confirm signup** if you enable email confirmation, though that
+one legitimately stays a link: it is clicked in a browser, not typed into the app.
+
+## 3c. Account deletion — one deploy, one web page
+
+Google Play rejects apps that offer account creation without in-app deletion
+**and** a web route. The in-app half is built (Profile → Delete account).
+
+**Deploy the function:**
+
+```bash
+supabase functions deploy delete-account
+```
+
+**Do NOT add `--no-verify-jwt`.** Two other functions in this repo use that flag
+legitimately; this one holds the `service_role` key, and an unsigned request must
+never be able to reach it. No secrets to configure — `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
+
+**The web route you still owe:** a page on `parentveda.in` explaining how to
+request deletion — what gets deleted, how long it takes, and an email address to
+write to. Play wants a URL reachable *without* installing the app. A static page
+is enough; it does not have to perform the deletion itself.
 
 ## 4. The iOS + Apple round (planned, not started)
 
@@ -158,8 +215,8 @@ Code side:
 
 ## 5. What is deliberately not done
 
-**Facebook — parked, decided 2026-08-08.** §3 above stays as a runbook, but the
-console work is deliberately not being done. The reasoning:
+**Facebook — ruled out, decided 2026-08-09.** Not parked, not "later": it is not
+being built. The reasoning:
 
 - **It adds almost no reach.** Every Android device in India is already signed
   into a Google account — that is a precondition of using the Play Store. Google
@@ -173,8 +230,11 @@ console work is deliberately not being done. The reasoning:
   some users as "Meta learns I am pregnant". Not what happens technically, but a
   strange perception cost for a door nobody needs.
 
-`facebookReady` stays `false` and the button is not rendered. Turning it on later
-is one boolean plus §3 — nothing to rebuild.
+`facebookReady` stays `false` and the button is not rendered. The few lines
+behind that flag are kept rather than deleted — partly per the house rule, and
+partly because they are not Facebook-specific: **the same browser-redirect path
+is what Sign in with Apple will use on Android.** The flag is the only thing
+that was ever Facebook.
 
 **A better third door, if one is ever wanted: phone OTP.** India-first, no
 password to forget, and MSG91 is already wired for WhatsApp — so the provider

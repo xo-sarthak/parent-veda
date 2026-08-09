@@ -76,10 +76,19 @@ class AuthConfig {
   /// True once the Google client id has been filled in above.
   static bool get googleReady => googleWebClientId.isNotEmpty;
 
-  /// Facebook needs no id in the app at all — the App ID and Secret live in the
-  /// Supabase dashboard. The only app-side requirement is the deep link, which
-  /// is compiled in. So this is a manual switch: flip it to true once the
-  /// provider is enabled in the Supabase dashboard.
+  /// **DECIDED AGAINST — 2026-08-09. Not "later", not "parked".**
+  ///
+  /// Facebook login will not be offered. Every Android device in India is
+  /// already signed into a Google account (a precondition of using the Play
+  /// Store), so it adds essentially no reach — while costing Meta App Review,
+  /// a hosted data-deletion callback, and one more duplicate-account path. For
+  /// an app holding maternal health data it also reads badly, whatever the
+  /// technical reality.
+  ///
+  /// The handful of lines behind this flag are KEPT rather than deleted, per
+  /// the house rule — and because they are not Facebook-specific: the same
+  /// browser-redirect path is what Sign in with Apple will use on Android. This
+  /// flag is the only thing that was ever Facebook.
   static const bool facebookReady = false;
 
   /// Sign in with Apple needs a paid Apple Developer account ($99/yr, about

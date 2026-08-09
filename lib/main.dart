@@ -22,6 +22,7 @@ import 'screens/post_pregnancy/pp_milestones_data.dart';
 import 'screens/post_pregnancy/pp_sleep_data.dart';
 import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
+import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
 import 'doctor/doctor_schedule_store.dart';
@@ -110,6 +111,13 @@ Future<void> main() async {
     url: SupabaseConfig.url,
     publishableKey: SupabaseConfig.publishableKey,
   );
+
+  // Watch the session for the whole life of the app, so the local "logged in"
+  // flag can never outlive the session it stands for. Started AFTER initialize
+  // so there is a client to listen to, and BEFORE runApp so no event that
+  // arrives during the first frame is missed. See session_watch.dart for what
+  // goes wrong without it.
+  SessionWatch.start();
 
   runApp(const ParentVedaApp());
 }
