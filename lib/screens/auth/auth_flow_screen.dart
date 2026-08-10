@@ -121,10 +121,18 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // and she has not clicked the link yet. Drives the 'confirm' screen instead
   // of 'success', and makes the profile write go to PendingProfile.
   bool _needsEmailConfirm = false;
-  // SIX boxes, because Supabase mints six-digit recovery codes. This was five
-  // for as long as the screen was a mock-up, and a five-box field for a
-  // six-digit code fails in the one place nothing catches it: she can type the
-  // code correctly and still be told it is wrong.
+  // SIX boxes — and this number is HALF OF A CONTRACT.
+  //
+  // The other half is Supabase → Authentication → Providers → Email → "Email
+  // OTP Length", which must also be 6. It is not the same by default: this
+  // project shipped set to 8, and the mismatch is invisible from here. She
+  // types all the digits she was sent, the field holds only six of them, the
+  // server says invalid, and every component behaves correctly on the way to
+  // locking her out. Nothing logs it, no test catches it, and the only person
+  // who ever finds out is her.
+  //
+  // The screen was five boxes for as long as it was a mock-up. Changing it to
+  // six was not the fix — agreeing with the dashboard is. See docs/AUTH-SETUP.md §3b.
   //
   // NOTE: unrelated to the father's pairing code, which is a single free-text
   // field (`_code`) on a different screen and goes to link_as_partner.

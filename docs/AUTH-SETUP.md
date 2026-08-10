@@ -156,8 +156,22 @@ from our side everything succeeded.
 <p>It expires in an hour. If you didn't ask for this, ignore this email.</p>
 ```
 
-`{{ .Token }}` is the six-digit code. Keep `{{ .ConfirmationURL }}` out — a link
-beside a code just invites her to click the one that cannot work.
+`{{ .Token }}` is the code. Keep `{{ .ConfirmationURL }}` out — a link beside a
+code just invites her to click the one that cannot work.
+
+### ⚠️ The code length is set in TWO places and they must agree
+
+**Authentication → Sign In / Providers → Email → Email OTP Length must be `6`.**
+
+The app draws a fixed row of boxes, `_otpLength` in `auth_flow_screen.dart`, and
+that constant is 6. If the dashboard mints a longer code — this project defaulted
+to **8** — she can type the whole thing correctly and still be told it is wrong,
+because the field physically cannot hold it.
+
+Nothing detects this. The app sends what it has, the server says invalid, and
+both are behaving correctly. It is the same shape as the bug where the field had
+five boxes for a six-digit token: a length that lives in two systems and is
+checked by neither. If you ever change one, change the other in the same sitting.
 
 Do the same for **Confirm signup** if you enable email confirmation, though that
 one legitimately stays a link: it is clicked in a browser, not typed into the app.
