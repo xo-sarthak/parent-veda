@@ -28,8 +28,23 @@
 //   2. It is what makes the safety filter below possible. 37 of the mother's
 //      259 `grow` blocks speak to her body — "Your Body Is Already Parenting" —
 //      and read to a father those are simply wrong, the same way week 22's
-//      "your heartbeat" was. No week has more than 3 such days out of 7, so
-//      walking the week for a clean one ALWAYS finds one.
+//      "your heartbeat" was. Walking the week for a clean day finds one.
+//
+//      ⚠️ THAT HEADROOM IS NOW THIN, and the reason is worth knowing. This note
+//      used to say "no week has more than 3 such days out of 7". That was
+//      measured when the content was Latin-script Hinglish and `_herBodyHi`
+//      therefore matched NOTHING — the filter was running on English alone.
+//      Translating lib/data/home to Devanagari woke the Hindi half up, and the
+//      worst week went from 3 flagged days to SIX. One clean day is left.
+//
+//      So the failure mode has inverted. It is no longer "the filter misses
+//      things"; it is "the filter hides so much that pickFatherSource runs out
+//      of days and falls back to the least-bad one" — at which point a father
+//      is shown her-body content anyway. Matching more eagerly is NOT the safe
+//      direction past this point. Before adding a word to `_herBodyHi`, run
+//      tool/check_her_body_filter.py and look at the worst-week number.
+//      Adding `ताक़त` for "energy", which looks obviously right, takes a week
+//      to 7/7 and breaks the fallback.
 //
 //  Deterministic, not random: the card must not change under him on a rebuild.
 //

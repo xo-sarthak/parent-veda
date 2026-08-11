@@ -84,6 +84,60 @@ def hollow_pairs(src):
     return n
 
 
+# JSON content bodies. Backups are listed so they are visibly EXCLUDED rather
+# than silently missed - weekContent.hinglish.json is the kept-verbatim
+# pre-migration copy ("comment out, never delete") and is Hinglish on purpose.
+JSON_GLOBS = ['lib/data/*.json', 'lib/data/home/*.json',
+              'lib/data/father/*.json']
+JSON_SKIP = ('weekContent.hinglish.json', 'weekContent_week5_original.json')
+
+
+def json_bodies():
+    """(path, pairs, devanagari, hinglish) per JSON content file.
+
+    This audit reported the app clean while lib/data/home/ - 37 files and 5,095
+    Hinglish pairs, the largest single body in the product - sat untouched,
+    because the file list was `lib/data/*.dart` plus weekContent.json and
+    nothing else.
+
+    A tool that only inspects where you remembered to look will always tell you
+    that you are finished.
+    """
+    import json as _json
+    dev_re = re.compile('[ऀ-ॿ]')
+    lat_re = re.compile(r'[A-Za-z]{3}')
+    rows = []
+    for pattern in JSON_GLOBS:
+        for path in sorted(glob.glob(pattern)):
+            if os.path.basename(path) in JSON_SKIP:
+                continue
+            counts = [0, 0, 0]
+
+            def walk(node):
+                if isinstance(node, dict):
+                    if 'en' in node and len(node) <= 2:
+                        counts[0] += 1
+                        hi = str(node.get('hi', ''))
+                        if dev_re.search(hi):
+                            counts[1] += 1
+                        elif lat_re.search(hi) and hi != node['en']:
+                            counts[2] += 1
+                        return
+                    for v in node.values():
+                        walk(v)
+                elif isinstance(node, list):
+                    for v in node:
+                        walk(v)
+
+            try:
+                walk(_json.load(open(path, encoding='utf-8')))
+            except Exception:
+                continue
+            if counts[0]:
+                rows.append((path, counts[0], counts[1], counts[2]))
+    return rows
+
+
 def main():
     files = sorted(glob.glob('lib/data/*.dart')) \
         + sorted(glob.glob('lib/data/father/*.dart'))
@@ -107,8 +161,25 @@ def main():
         if loose or owed or hollow:
             print(f'{name:<32}{loose:>9}{owed:>7}{hollow:>13}')
     print('-' * 61)
-    print(f'{"TOTAL":<32}{sum(r[1] for r in rows):>9}'
+    print(f'{"TOTAL (dart)":<32}{sum(r[1] for r in rows):>9}'
           f'{sum(r[2] for r in rows):>7}{sum(r[3] for r in rows):>13}')
+
+    jrows = [r for r in json_bodies() if r[3]]
+    if jrows:
+        print()
+        print(f'{"JSON body":<40}{"pairs":>8}{"hinglish":>10}')
+        print('-' * 61)
+        by_dir = {}
+        for path, pairs, _dev, hing in jrows:
+            d = os.path.dirname(path)
+            a = by_dir.setdefault(d, [0, 0])
+            a[0] += pairs
+            a[1] += hing
+        for d, (pairs, hing) in sorted(by_dir.items(), key=lambda x: -x[1][1]):
+            print(f'{d:<40}{pairs:>8}{hing:>10}')
+        print('-' * 61)
+        print(f'{"TOTAL Hinglish still in JSON":<40}'
+              f'{"":>8}{sum(a[1] for a in by_dir.values()):>10}')
 
 
 if __name__ == '__main__':
