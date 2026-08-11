@@ -64,6 +64,15 @@ supabase/.temp/
 # TSV would double the repo to preserve a scaffold. The house rules the
 # translators worked from are NOT derived and are committed.
 tool/hindi/h_batch*.tsv
+tool/hindi/d_batch*.tsv
+tool/hindi/d_all.tsv
+tool/hindi/e_owed*.tsv
+
+# Agent scratch. Subagents were told to use a private subdirectory to stop
+# them overwriting each other's temp files, and a relative path put it in the
+# REPO rather than the session temp dir. Ignored so it cannot be committed by
+# accident; the work itself always lands in lib/ or tool/hindi/.
+scratchpad/
 
 # Python bytecode from the tool/ scripts
 __pycache__/

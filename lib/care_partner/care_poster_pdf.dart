@@ -68,13 +68,24 @@ class CarePosterPdf {
     final sans = await _font(PdfGoogleFonts.manropeRegular);
     final sansBold = await _font(PdfGoogleFonts.manropeExtraBold);
 
+    // The fallback chain below listed only Manrope and Fraunces — three Latin
+    // faces, none with a single Devanagari glyph. So the chain could not do the
+    // one job its comment claims: the example it names, "a Devanagari word in
+    // an organisation's name", was precisely the case it dropped.
+    //
+    // Language-switching is wrong here. This poster is English chrome around a
+    // partner NAME, and the name's script has nothing to do with the reader's
+    // language setting — a clinic called मातृछाया prints the same in either.
+    // A fallback chain is the right shape; it was just missing a link.
+    final devanagari = await _font(PdfGoogleFonts.muktaRegular);
+
     final doc = pw.Document(
       // A fallback chain, so a glyph the display font lacks still prints
       // instead of becoming a blank box.
       theme: pw.ThemeData.withFont(
         base: sans,
         bold: sansBold,
-        fontFallback: [sans, sansBold, serif],
+        fontFallback: [sans, sansBold, serif, devanagari],
       ),
       title: 'ParentVeda — ${partner.name}',
       author: 'ParentVeda',

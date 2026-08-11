@@ -4130,6 +4130,13 @@ class S {
   String get uiSummarisedPlainLanguageFrom => _p('Summarised in plain language from independent sources. Always confirm anything important with your paediatrician.', 'स्वतंत्र स्रोतों से आसान भाषा में सार। कुछ भी ज़रूरी हो तो अपने बाल-रोग विशेषज्ञ से ज़रूर पुष्टि कीजिए।');
   String get uiAllRatings => _p('ALL RATINGS', 'सारी रेटिंग');
   String get uiNoRatingsMatchFilter => _p('No ratings match this filter yet.', 'इस फ़िल्टर से अभी कोई रेटिंग नहीं मिली।');
+  // Keepsake-card fallbacks, used when she has not named the baby yet. They sit
+  // in the calligraphy slot on a card she is likely to screenshot and send to
+  // her family, so they are warm rather than literal: "जो आने वाला है" carries
+  // the anticipation that "बच्चा रास्ते में है" does not.
+  String get uiMemoryBabyOnTheWay => _p('Baby on the way', 'जो आने वाला है');
+  String get uiMemoryOurLittleOne => _p('Our little one', 'हमारा नन्हा सा');
+
   String get uiPersonalizationAnalytics => _p('Personalization analytics', 'Personalization analytics');
   String get uiRecording => _p('Recording', 'दर्ज हो रहा है');
   String get uiAlwaysOpenToolAsk => _p('Always on. Open a tool with an ask strip and events appear below. Nothing leaves this device.', 'हमेशा चालू। कोई ask strip वाला टूल खोलिए और नीचे घटनाएँ दिखेंगी। कुछ भी इस फ़ोन से बाहर नहीं जाता।');

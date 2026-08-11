@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'memory_models.dart';
+import '../localization/app_language.dart';
 import '../theme/pv_fonts.dart';
 
 // ---------------------------------------------------------------------------
@@ -86,9 +87,13 @@ String _eyebrow(MemoryData d) =>
 
 String _title(MemoryData d) {
   if (d.type == MemoryType.expecting) {
-    return d.coupleNames.trim().isNotEmpty ? d.coupleNames.trim() : 'Baby on the way';
+    return d.coupleNames.trim().isNotEmpty
+        ? d.coupleNames.trim()
+        : S.now.uiMemoryBabyOnTheWay;
   }
-  return d.babyName.trim().isNotEmpty ? d.babyName.trim() : 'Our little one';
+  return d.babyName.trim().isNotEmpty
+      ? d.babyName.trim()
+      : S.now.uiMemoryOurLittleOne;
 }
 
 /// Small stat lines under the title (birth details / due month).
@@ -121,13 +126,41 @@ TextStyle _serif(double s, Color c, {FontWeight w = FontWeight.w500, double h = 
 TextStyle _sans(double s, Color c, {FontWeight w = FontWeight.w500, double ls = 0}) =>
     pvManrope(fontSize: s, color: c, fontWeight: w, letterSpacing: ls);
 
+/// Devanagari anywhere in the string.
+///
+/// Not "is the app in Hindi" — this asks about THIS text. The name on a
+/// keepsake card is whatever the mother typed, and she can type Devanagari
+/// while reading the app in English, or a Latin name while reading it in
+/// Hindi. The font has to follow the characters, not the setting.
+final RegExp _devanagari = RegExp('[ऀ-ॿ]');
+
 /// Calligraphy. Every announcement card in the reference set leans on a script
 /// for exactly one phrase — the name, or "Coming Soon" — and sets everything
 /// else in small caps. Used the same way here: one script line per card, never
 /// two, because two scripts on one card is where a keepsake starts to look like
 /// a template.
-TextStyle _script(double s, Color c, {double h = 1.0}) =>
-    GoogleFonts.parisienne(fontSize: s, color: c, height: h);
+///
+/// PARISIENNE HAS NO DEVANAGARI, and there is no calligraphic Devanagari face
+/// in the bundle to swap in — script faces for the script are rare and none
+/// carries the weight range the rest of this file assumes. So a Devanagari name
+/// falls back to the serif, which IS Devanagari-aware (Noto Serif Devanagari
+/// via pvFraunces).
+///
+/// Losing the calligraphy is a real cost, and it is the smaller one. Without
+/// this the card renders the mother's own baby's name in whatever the platform
+/// substitutes — tofu boxes on some devices — on the one screen in the app she
+/// is most likely to screenshot and send to her family.
+TextStyle _script(double s, Color c, {double h = 1.0, String? forText}) {
+  if (forText != null && _devanagari.hasMatch(forText)) {
+    return pvFraunces(
+      fontSize: s * 0.92,   // the serif runs larger on the body; match the eye
+      color: c,
+      height: h < 1.3 ? 1.35 : h,   // matras need the room, as in pv_fonts
+      fontWeight: FontWeight.w500,
+    );
+  }
+  return GoogleFonts.parisienne(fontSize: s, color: c, height: h);
+}
 
 /// The script version of the title. Falls back to the serif when the name is
 /// long enough that calligraphy stops being readable — a nine-letter name in
@@ -142,7 +175,7 @@ Widget _scriptTitle(MemoryData d, MemoryPalette p, double size, {Color? color}) 
     overflow: TextOverflow.ellipsis,
     style: long
         ? _serif(size * 0.62, color ?? p.ink, w: FontWeight.w500)
-        : _script(size, color ?? p.ink, h: 1.15),
+        : _script(size, color ?? p.ink, h: 1.15, forText: t),
   );
 }
 

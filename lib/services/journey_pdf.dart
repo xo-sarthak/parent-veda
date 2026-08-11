@@ -13,9 +13,9 @@ import 'dart:typed_data';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 import '../localization/app_language.dart';
+import 'pdf_fonts.dart';
 
 /// A week that has something worth keeping (text and/or photos).
 class JourneyWeek {
@@ -57,10 +57,13 @@ class JourneyPdf {
       author: s.appName,
     );
 
-    final serif = await PdfGoogleFonts.frauncesRegular();
-    final serifBold = await PdfGoogleFonts.frauncesSemiBold();
-    final bodyFont = await PdfGoogleFonts.nunitoRegular();
-    final bodyItalic = await PdfGoogleFonts.nunitoItalic();
+    // Fraunces and Nunito have no Devanagari — a Hindi booklet came out as
+    // blank boxes. PdfFontSet swaps the whole family by language.
+    final fonts = await PdfFontSet.load(lang);
+    final serif = fonts.serif;
+    final serifBold = fonts.serifBold;
+    final bodyFont = fonts.body;
+    final bodyItalic = fonts.bodyItalic;
 
     final content = [...weeks.where((w) => w.hasContent)]
       ..sort((a, b) => a.week.compareTo(b.week));
