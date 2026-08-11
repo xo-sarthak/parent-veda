@@ -12,6 +12,12 @@ import '../localization/app_language.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 final List<ProductCategory> kProductCategories = [
   ProductCategory(
     id: 'pregnancy_pillow',
@@ -108,7 +114,7 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_overall',
     categoryId: 'pregnancy_pillow',
-    name: _t('ComfyBump Full-Body Pillow', 'ComfyBump Full-Body Pillow'),
+    name: _same('ComfyBump Full-Body Pillow'),
     emoji: '🛏️',
     summary: _t('U-shaped support for bump, back and knees in one.', 'पेट, पीठ और घुटनों — तीनों के लिए एक ही U-आकार का सहारा।'),
     bestFor: _t('Most mothers', 'ज़्यादातर माँओं के लिए'),
@@ -143,7 +149,7 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_budget',
     categoryId: 'pregnancy_pillow',
-    name: _t('Snug Wedge Pillow', 'Snug Wedge Pillow'),
+    name: _same('Snug Wedge Pillow'),
     emoji: '🛏️',
     summary: _t('Compact wedge that supports the bump where you need it.', 'छोटा-सा wedge जो पेट को ठीक वहीं सहारा देता है जहाँ ज़रूरत है।'),
     bestFor: _t('Small beds and budgets', 'छोटे बिस्तर और कम बजट के लिए'),
@@ -156,7 +162,7 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_premium',
     categoryId: 'pregnancy_pillow',
-    name: _t('CloudNest Adjustable Pillow', 'CloudNest Adjustable Pillow'),
+    name: _same('CloudNest Adjustable Pillow'),
     emoji: '🛏️',
     summary: _t('Adjustable filling and a premium cover for tailored support.', 'भराव कम-ज़्यादा किया जा सकता है और premium कवर, ताकि सहारा आपके हिसाब से हो।'),
     bestFor: _t('Those who want the best', 'जो सबसे अच्छा चाहती हैं'),
@@ -170,7 +176,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_overall',
     categoryId: 'stretch_care',
-    name: _t('VedaGlow Belly Butter', 'VedaGlow Belly Butter'),
+    name: _same('VedaGlow Belly Butter'),
     emoji: '🧴',
     summary: _t('Rich, fragrance-free butter that absorbs without stickiness.', 'गाढ़ा, बिना ख़ुशबू वाला butter जो बिना चिपचिपाहट के त्वचा में समा जाता है।'),
     bestFor: _t('Daily use', 'रोज़ के इस्तेमाल के लिए'),
@@ -189,7 +195,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_sensitive',
     categoryId: 'stretch_care',
-    name: _t('PureSkin Calm Oil', 'PureSkin Calm Oil'),
+    name: _same('PureSkin Calm Oil'),
     emoji: '🧴',
     summary: _t('Gentle plant oil for reactive, sensitive skin.', 'नाज़ुक और जल्दी असर दिखाने वाली त्वचा के लिए कोमल वनस्पति तेल।'),
     bestFor: _t('Sensitive skin', 'नाज़ुक त्वचा के लिए'),
@@ -202,7 +208,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_budget',
     categoryId: 'stretch_care',
-    name: _t('EverySoft Lotion', 'EverySoft Lotion'),
+    name: _same('EverySoft Lotion'),
     emoji: '🧴',
     summary: _t('Everyday moisturiser at a friendly price.', 'रोज़ के लिए moisturiser, वाजिब क़ीमत में।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -216,7 +222,7 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_overall',
     categoryId: 'maternity_wear',
-    name: _t('EasyGrow Maternity Leggings', 'EasyGrow Maternity Leggings'),
+    name: _same('EasyGrow Maternity Leggings'),
     emoji: '👗',
     summary: _t('Soft over-bump leggings that stretch with you.', 'नरम over-bump leggings जो आपके साथ खिंचती हैं।'),
     bestFor: _t('Everyday comfort', 'रोज़ के आराम के लिए'),
@@ -229,7 +235,7 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_premium',
     categoryId: 'maternity_wear',
-    name: _t('Bloom Nursing Dress', 'Bloom Nursing Dress'),
+    name: _same('Bloom Nursing Dress'),
     emoji: '👗',
     summary: _t('Elegant dress with discreet nursing access.', 'सुंदर dress, जिसमें दूध पिलाने के लिए बिना दिखे खुलने की सुविधा है।'),
     bestFor: _t('Special days and nursing', 'ख़ास दिनों और दूध पिलाने के लिए'),
@@ -242,7 +248,7 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_budget',
     categoryId: 'maternity_wear',
-    name: _t('DailyEase Maternity Kurti', 'DailyEase Maternity Kurti'),
+    name: _same('DailyEase Maternity Kurti'),
     emoji: '👗',
     summary: _t('Roomy, breathable kurti for everyday wear.', 'खुली-खुली, साँस लेने वाली कुर्ती रोज़ पहनने के लिए।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -256,7 +262,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_overall',
     categoryId: 'belly_band',
-    name: _t('SteadyBump Support Band', 'SteadyBump Support Band'),
+    name: _same('SteadyBump Support Band'),
     emoji: '🤰',
     summary: _t('Adjustable band that eases bump and back strain.', 'कसा-ढीला होने वाला बैंड जो पेट और पीठ का ज़ोर कम करता है।'),
     bestFor: _t('Back relief', 'पीठ को राहत'),
@@ -269,7 +275,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_budget',
     categoryId: 'belly_band',
-    name: _t('LiteHold Belly Band', 'LiteHold Belly Band'),
+    name: _same('LiteHold Belly Band'),
     emoji: '🤰',
     summary: _t('Simple, low-cost everyday support.', 'रोज़ के लिए सरल और कम क़ीमत वाला सहारा।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -282,7 +288,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_premium',
     categoryId: 'belly_band',
-    name: _t('FlexCore Maternity Belt', 'FlexCore Maternity Belt'),
+    name: _same('FlexCore Maternity Belt'),
     emoji: '🤰',
     summary: _t('Firmer, contoured support for active days.', 'चलती-फिरती दिनचर्या के लिए ज़्यादा कसा, शरीर के आकार में ढला सहारा।'),
     bestFor: _t('Active mothers', 'सक्रिय माँओं के लिए'),
@@ -296,7 +302,7 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_overall',
     categoryId: 'compression_socks',
-    name: _t('FreshStep Compression Socks', 'FreshStep Compression Socks'),
+    name: _same('FreshStep Compression Socks'),
     emoji: '🧦',
     summary: _t('Graduated compression for swelling and tired legs.', 'सूजन और थकी टाँगों के लिए ऊपर से नीचे घटता compression।'),
     bestFor: _t('Daily swelling', 'रोज़ की सूजन के लिए'),
@@ -309,7 +315,7 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_budget',
     categoryId: 'compression_socks',
-    name: _t('DayLite Support Socks', 'DayLite Support Socks'),
+    name: _same('DayLite Support Socks'),
     emoji: '🧦',
     summary: _t('Light support at an easy price.', 'हल्का सहारा, आसान क़ीमत में।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -322,7 +328,7 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_premium',
     categoryId: 'compression_socks',
-    name: _t('AeroFlow Medical Socks', 'AeroFlow Medical Socks'),
+    name: _same('AeroFlow Medical Socks'),
     emoji: '🧦',
     summary: _t('Medical-grade compression for all-day wear.', 'पूरे दिन पहनने के लिए medical-grade compression।'),
     bestFor: _t('Long days on your feet', 'पूरे दिन पैरों पर रहने वालों के लिए'),
@@ -336,7 +342,7 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_overall',
     categoryId: 'nursing_bra',
-    name: _t('SoftClip Nursing Bra', 'SoftClip Nursing Bra'),
+    name: _same('SoftClip Nursing Bra'),
     emoji: '👚',
     summary: _t('Wireless support with easy one-hand clips.', 'बिना wire का सहारा, एक हाथ से खुलने वाली clip के साथ।'),
     bestFor: _t('Everyday comfort', 'रोज़ के आराम के लिए'),
@@ -349,7 +355,7 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_budget',
     categoryId: 'nursing_bra',
-    name: _t('DayEase Nursing Bra', 'DayEase Nursing Bra'),
+    name: _same('DayEase Nursing Bra'),
     emoji: '👚',
     summary: _t('Comfortable basics at a friendly price.', 'वाजिब क़ीमत में आरामदेह बुनियादी चीज़ें।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -362,7 +368,7 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_premium',
     categoryId: 'nursing_bra',
-    name: _t('Bloom Seamless Nursing Bra', 'Bloom Seamless Nursing Bra'),
+    name: _same('Bloom Seamless Nursing Bra'),
     emoji: '👚',
     summary: _t('Seamless premium comfort for day and night.', 'दिन और रात के लिए बिना सिलाई वाला premium आराम।'),
     bestFor: _t('All-day wear', 'पूरे दिन पहनने के लिए'),
@@ -376,7 +382,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_overall',
     categoryId: 'breast_pump',
-    name: _t('GentleFlow Electric Pump', 'GentleFlow Electric Pump'),
+    name: _same('GentleFlow Electric Pump'),
     emoji: '🍼',
     summary: _t('Quiet electric pump with a comfortable fit.', 'शांत electric pump, आरामदेह fit के साथ।'),
     bestFor: _t('Regular pumping', 'रोज़ pump करने के लिए'),
@@ -404,7 +410,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_budget',
     categoryId: 'breast_pump',
-    name: _t('EasyHand Manual Pump', 'EasyHand Manual Pump'),
+    name: _same('EasyHand Manual Pump'),
     emoji: '🍼',
     summary: _t('Simple manual pump for occasional use.', 'कभी-कभार इस्तेमाल के लिए सरल manual pump।'),
     bestFor: _t('Occasional use', 'कभी-कभार इस्तेमाल के लिए'),
@@ -417,7 +423,7 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_premium',
     categoryId: 'breast_pump',
-    name: _t('DualEase Double Pump', 'DualEase Double Pump'),
+    name: _same('DualEase Double Pump'),
     emoji: '🍼',
     summary: _t('Hospital-grade double pump to save time.', 'समय बचाने के लिए hospital-grade double pump।'),
     bestFor: _t('Frequent pumping', 'बार-बार pump करने के लिए'),
@@ -431,7 +437,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_overall',
     categoryId: 'swaddle',
-    name: _t('DreamWrap Muslin Swaddle', 'DreamWrap Muslin Swaddle'),
+    name: _same('DreamWrap Muslin Swaddle'),
     emoji: '👶',
     summary: _t('Breathable muslin that keeps newborns snug.', 'साँस लेने वाला muslin जो नवजात को आराम से लिपटा रखता है।'),
     bestFor: _t('Newborns', 'नवजात के लिए'),
@@ -444,7 +450,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_budget',
     categoryId: 'swaddle',
-    name: _t('CozyCotton Swaddle Pack', 'CozyCotton Swaddle Pack'),
+    name: _same('CozyCotton Swaddle Pack'),
     emoji: '👶',
     summary: _t('Value pack of soft cotton swaddles.', 'नरम सूती swaddle का किफ़ायती pack।'),
     bestFor: _t('Budgets', 'कम बजट के लिए'),
@@ -457,7 +463,7 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_premium',
     categoryId: 'swaddle',
-    name: _t('SnugZip Swaddle Sack', 'SnugZip Swaddle Sack'),
+    name: _same('SnugZip Swaddle Sack'),
     emoji: '👶',
     summary: _t('Zip swaddle for easy, secure wrapping.', 'आसान और सुरक्षित लपेटन के लिए zip वाला swaddle।'),
     bestFor: _t('Easy wrapping', 'आसान लपेटन'),

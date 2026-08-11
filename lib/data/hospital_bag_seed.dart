@@ -17,6 +17,12 @@ import '../services/hospital_bag_store.dart';
 // on both sides and therefore still visibly outstanding.
 LocalizedText _t(String en, [String? hi]) => LocalizedText(en: en, hi: hi ?? en);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 /// A template for a default item (resolved into a [BagItem] at generation time).
 class _Seed {
   const _Seed(this.id, this.category, this.name,
@@ -85,7 +91,7 @@ final List<_Seed> _seed = [
   // For Me During Labour ----------------------------------------------------
   _Seed('labour_gown', BagCategory.labour, _t('Loose nightwear / birthing gown', 'ढीले कपड़े / प्रसव गाउन')),
   _Seed('labour_socks', BagCategory.labour, _t('Warm socks', 'गर्म मोज़े')),
-  _Seed('labour_lipbalm', BagCategory.labour, _t('Lip balm', 'Lip balm')),
+  _Seed('labour_lipbalm', BagCategory.labour, _same('Lip balm')),
   _Seed('labour_hairties', BagCategory.labour, _t('Hair ties / clip', 'रबर बैंड / क्लिप')),
   _Seed('labour_water', BagCategory.labour, _t('Water bottle with straw', 'स्ट्रॉ वाली पानी की बोतल')),
   _Seed('labour_snacks', BagCategory.labour, _t('Light snacks / energy drinks', 'हल्का नाश्ता / energy drinks')),
@@ -93,11 +99,11 @@ final List<_Seed> _seed = [
   _Seed('labour_music', BagCategory.labour, _t('Calming music / playlist', 'सुकून देने वाला संगीत / playlist')),
 
   // For Me After Delivery ---------------------------------------------------
-  _Seed('after_pads', BagCategory.afterDelivery, _t('Maternity pads', 'Maternity pads'), rec: _recMaternityPads),
+  _Seed('after_pads', BagCategory.afterDelivery, _same('Maternity pads'), rec: _recMaternityPads),
   _Seed('after_underwear', BagCategory.afterDelivery, _t('Disposable / maternity underwear', 'एक बार के / maternity underwear')),
-  _Seed('after_nursingbra', BagCategory.afterDelivery, _t('Nursing bra', 'Nursing bra'), rec: _recNursingBra),
-  _Seed('after_breastpads', BagCategory.afterDelivery, _t('Breast pads', 'Breast pads'), rec: _recBreastPads),
-  _Seed('after_nipplecream', BagCategory.afterDelivery, _t('Nipple cream', 'Nipple cream'), rec: _recNippleCream),
+  _Seed('after_nursingbra', BagCategory.afterDelivery, _same('Nursing bra'), rec: _recNursingBra),
+  _Seed('after_breastpads', BagCategory.afterDelivery, _same('Breast pads'), rec: _recBreastPads),
+  _Seed('after_nipplecream', BagCategory.afterDelivery, _same('Nipple cream'), rec: _recNippleCream),
   _Seed('after_outfit', BagCategory.afterDelivery, _t('Comfortable going-home outfit', 'घर जाने के लिए आरामदेह कपड़े')),
   _Seed('after_toiletries', BagCategory.afterDelivery, _t('Toiletries (toothbrush, etc.)', 'रोज़ के सामान (ब्रश वग़ैरह)')),
   _Seed('after_towel', BagCategory.afterDelivery, _t('Towel', 'तौलिया')),
@@ -111,7 +117,7 @@ final List<_Seed> _seed = [
   _Seed('baby_mittens', BagCategory.baby, _t('Mittens & booties', 'दस्ताने और बूटी')),
   _Seed('baby_cap', BagCategory.baby, _t('Soft cap', 'नरम टोपी')),
   _Seed('baby_diapers', BagCategory.baby, _t('Newborn diapers', 'नवजात के diapers'), rec: _recDiapers),
-  _Seed('baby_wipes', BagCategory.baby, _t('Baby wipes', 'Baby wipes')),
+  _Seed('baby_wipes', BagCategory.baby, _same('Baby wipes')),
   _Seed('baby_blanket', BagCategory.baby, _t('Soft baby blanket', 'नरम शिशु कंबल')),
   _Seed('baby_towel', BagCategory.baby, _t('Baby towel', 'शिशु का तौलिया')),
   _Seed('baby_lotion', BagCategory.baby, _t('Mild baby lotion / oil', 'हल्का baby lotion / तेल')),
@@ -127,14 +133,14 @@ final List<_Seed> _seed = [
   // Documents ---------------------------------------------------------------
   _Seed('docs_id', BagCategory.documents, _t('ID proof (Aadhaar / passport)', 'पहचान पत्र (Aadhaar / passport)')),
   _Seed('docs_admission', BagCategory.documents, _t('Hospital registration / admission papers', 'अस्पताल के registration / भर्ती के काग़ज़')),
-  _Seed('docs_insurance', BagCategory.documents, _t('Insurance / TPA card', 'Insurance / TPA card')),
+  _Seed('docs_insurance', BagCategory.documents, _same('Insurance / TPA card')),
   _Seed('docs_records', BagCategory.documents, _t('Medical records & scan reports', 'इलाज के काग़ज़ और scan reports')),
   _Seed('docs_birthplan', BagCategory.documents, _t('Birth plan (if you have one)', 'Birth plan (अगर बनाया हो)')),
   _Seed('docs_contacts', BagCategory.documents, _t("Doctor's contact number", 'डॉक्टर का नंबर')),
 
   // Optional Comfort Items --------------------------------------------------
   _Seed('comfort_pillow', BagCategory.comfort, _t('Your own pillow', 'अपना तकिया')),
-  _Seed('comfort_eyemask', BagCategory.comfort, _t('Eye mask', 'Eye mask')),
+  _Seed('comfort_eyemask', BagCategory.comfort, _same('Eye mask')),
   _Seed('comfort_scent', BagCategory.comfort, _t('A familiar, comforting scent', 'कोई जानी-पहचानी, सुकून देने वाली ख़ुशबू')),
   _Seed('comfort_affirm', BagCategory.comfort, _t('Affirmation cards', 'हौसले के कार्ड')),
 ];
@@ -144,9 +150,9 @@ final List<_Seed> _seed = [
 // ---------------------------------------------------------------------------
 
 final List<_Seed> _suggested = [
-  _Seed('sugg_nursingpillow', BagCategory.afterDelivery, _t('Nursing pillow', 'Nursing pillow')),
+  _Seed('sugg_nursingpillow', BagCategory.afterDelivery, _same('Nursing pillow')),
   _Seed('sugg_extraoutfit', BagCategory.baby, _t('Extra newborn outfit', 'नवजात के लिए एक और जोड़ा')),
-  _Seed('sugg_compsocks', BagCategory.afterDelivery, _t('Compression socks', 'Compression socks')),
+  _Seed('sugg_compsocks', BagCategory.afterDelivery, _same('Compression socks')),
   _Seed('sugg_handfan', BagCategory.labour, _t('Handheld fan', 'छोटा पंखा')),
   _Seed('sugg_speaker', BagCategory.comfort, _t('Portable speaker', 'छोटा speaker')),
   _Seed('sugg_journal', BagCategory.comfort, _t('Journal', 'डायरी')),

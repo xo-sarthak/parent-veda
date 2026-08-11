@@ -11,6 +11,12 @@ import '../localization/app_language.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 final List<ReadItem> kReadItems = [
   // ---- Articles ----
   ReadItem(
@@ -413,7 +419,7 @@ final List<ReadItem> kReadItems = [
   // ---- Books ----
   ReadItem(
     id: 'book_what_to_expect',
-    title: _t('What to Expect When You\'re Expecting', 'What to Expect When You\'re Expecting'),
+    title: _same('What to Expect When You\'re Expecting'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 44,
@@ -437,9 +443,9 @@ final List<ReadItem> kReadItems = [
       authorIntro:
           _t('Heidi Murkoff created and leads the What to Expect franchise, one of the best-selling pregnancy guide series in publishing history.', 'Heidi Murkoff ने What to Expect श्रृंखला बनाई और उसे आगे बढ़ाया — प्रकाशन के इतिहास की सबसे ज़्यादा बिकने वाली गर्भावस्था गाइड श्रृंखलाओं में से एक।'),
       otherBooks: [
-        _t('What to Expect the First Year', 'What to Expect the First Year'),
-        _t('What to Expect the Toddler Years', 'What to Expect the Toddler Years'),
-        _t("What to Expect Before You're Expecting", 'What to Expect Before You\'re Expecting'),
+        _same('What to Expect the First Year'),
+        _same('What to Expect the Toddler Years'),
+        _same("What to Expect Before You're Expecting"),
       ],
       about:
           _t('Pregnancy floods parents with fear of the unknown: every twinge or missing symptom can feel like a crisis. What to Expect When You\'re Expecting became a nightstand staple by answering the question anxious minds ask at 2 a.m.: is this normal? Organised month-by-month rather than as one narrative, it lets a worried parent find their exact situation fast, treating uncertainty itself as pregnancy\'s real enemy.', 'गर्भावस्था माता-पिता को अनजाने के डर से भर देती है: हर हल्की-सी टीस या न दिखने वाला लक्षण किसी संकट जैसा लग सकता है। What to Expect When You\'re Expecting इसीलिए हर घर के सिरहाने रखी किताब बन गई, क्योंकि यह रात 2 बजे परेशान मन के उसी सवाल का जवाब देती है: क्या यह सामान्य है? एक कहानी की तरह नहीं, बल्कि महीने-दर-महीने सजी होने से यह चिंतित माता-पिता को उनकी अपनी हालत तुरंत ढूँढ़ लेने देती है — क्योंकि इसके हिसाब से गर्भावस्था का असली दुश्मन अनिश्चितता ही है।'),
@@ -609,7 +615,7 @@ final List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'book_whole_brain',
-    title: _t('The Whole-Brain Child', 'The Whole-Brain Child'),
+    title: _same('The Whole-Brain Child'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 44,
@@ -625,7 +631,7 @@ final List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'book_expecting_better',
-    title: _t('Expecting Better', 'Expecting Better'),
+    title: _same('Expecting Better'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,
@@ -641,7 +647,7 @@ final List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'book_first_forty',
-    title: _t('The First Forty Days', 'The First Forty Days'),
+    title: _same('The First Forty Days'),
     type: ReadType.book,
     weekStart: 28,
     weekEnd: 44,
@@ -657,7 +663,7 @@ final List<ReadItem> kReadItems = [
   ),
   ReadItem(
     id: 'book_garbh',
-    title: _t('Garbh Sanskar', 'Garbh Sanskar'),
+    title: _same('Garbh Sanskar'),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,

@@ -56,3 +56,50 @@ ${itemId}_value	composed product id
 ${itemId}_$key	composed product id
 Evening	ragaTimeBadge return token, compared with ==
 Morning	ragaTimeBadge return token, compared with ==
+#
+# =============================================================================
+#  Classified 2026-08-11, from tool/classify_untwinned.py
+# -----------------------------------------------------------------------------
+#  The audit reported 731 untwinned literals in lib/data as one number. Grouping
+#  them by the FIELD they sit in turned that into 27 judgements. Three kinds
+#  came out, and only one of them is work:
+#
+#    READ     code matches on it. Translating BREAKS it, silently. Listed below.
+#    NEITHER  proper nouns - a doctor's name, a book author, a brand, a mother's
+#             own post text. Nothing to translate; nothing to record.
+#    RENDERED real display copy, and English there is a bug. Handled separately.
+#
+#  The Can I? popular chips came out of this same bucket and WERE rendered -
+#  `label: 'Pineapple'` beside an entry holding hi: 'अनानास', so the chip and
+#  the page it opened disagreed. That is why these are classified rather than
+#  assumed: the bucket is genuinely mixed.
+#
+# ---- can_i_data.dart: `aliases` (114) ----------------------------------------
+#  Search aliases. canISearch() lowercases the query and asks whether any alias
+#  contains it. A Hindi alias would never match a Hindi query typed in
+#  Devanagari either - the fix for Hindi search is a Hindi ALIAS LIST, added
+#  alongside these, not a translation of them.
+raw papaya	can_i alias, matched by contains()
+ripe papaya	can_i alias, matched by contains()
+cottage cheese	can_i alias, matched by contains()
+#
+# ---- report_findings_data.dart: `aliases` (74) -------------------------------
+#  Matched against what a mother types from her scan report, which is printed in
+#  English. Translating them makes the lookup fail on the exact input it exists
+#  to accept.
+placenta previa	report alias, matched against an English report
+low placenta	report alias, matched against an English report
+breech baby	report alias, matched against an English report
+#
+# ---- veda_showcase.dart: `keywords` (41) -------------------------------------
+anomaly scan	showcase keyword, matched
+20 week scan	showcase keyword, matched
+mid pregnancy scan	showcase keyword, matched
+#
+# ---- symptom_data.dart: `keywords` (18) and `id` (6) -------------------------
+morning sickness	symptom keyword, matched
+low energy	symptom keyword, matched
+back ache	symptom keyword, matched
+backPain	symptom id
+troubleSleeping	symptom id
+moodSwings	symptom id

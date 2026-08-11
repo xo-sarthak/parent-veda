@@ -14,6 +14,12 @@ import '../localization/app_language.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 /// A purchasable product option shown under a sellable bag item.
 class BagProduct {
   const BagProduct({
@@ -65,32 +71,32 @@ final Map<String, _Cat> _catalog = {
       consider: [_t('Darker shades hide stains', 'गहरे रंग दाग़ छिपा लेते हैं')]),
   'labour_socks': _Cat('🧦', 199, _t('ParentVeda Grip Socks', 'ParentVeda पकड़ वाले मोज़े'),
       why: [_t('Warm for cold labour rooms', 'ठंडे प्रसव कक्ष में गर्म'), _t('Non-slip soles', 'न फिसलने वाले तले')]),
-  'labour_lipbalm': _Cat('🧴', 149, _t('ParentVeda Lip Balm', 'ParentVeda Lip Balm'),
+  'labour_lipbalm': _Cat('🧴', 149, _same('ParentVeda Lip Balm'),
       why: [_t('Heavy breathing dries lips fast', 'तेज़ साँस से होंठ जल्दी सूखते हैं'), _t('Natural, safe ingredients', 'क़ुदरती, सुरक्षित सामग्री')]),
   'labour_hairties': _Cat('🎀', 99, _t('ParentVeda Soft Scrunchies', 'ParentVeda नरम Scrunchies'),
       why: [_t('Keeps hair off your face', 'बाल चेहरे से दूर रखता है'), _t('Gentle, no-pull hold', 'हल्की पकड़, बाल नहीं खींचती')]),
   'labour_water': _Cat('🥤', 299, _t('ParentVeda Straw Bottle', 'ParentVeda स्ट्रॉ वाली बोतल'),
       why: [_t('Sip lying down without spills', 'लेटे-लेटे घूँट, बिना गिराए'), _t('Stays cool for hours', 'घंटों ठंडा रहता है')]),
-  'labour_snacks': _Cat('🍫', 199, _t('ParentVeda Energy Bites', 'ParentVeda Energy Bites'),
+  'labour_snacks': _Cat('🍫', 199, _same('ParentVeda Energy Bites'),
       why: [_t('Quick energy between contractions', 'संकुचन के बीच तुरंत ऊर्जा'), _t('Easy to digest', 'आसानी से पचने वाला')],
       consider: [_t('Check what your hospital allows', 'अपने अस्पताल से पूछ लीजिए क्या ले जा सकती हैं')]),
 
   // For me after delivery ---------------------------------------------------
-  'after_pads': _Cat('🩸', 349, _t('ParentVeda Maternity Pads', 'ParentVeda Maternity Pads'),
+  'after_pads': _Cat('🩸', 349, _same('ParentVeda Maternity Pads'),
       why: [_t('Extra-long, high absorbency', 'ज़्यादा लंबे, ज़्यादा सोखने वाले'), _t('Soft top layer for comfort', 'ऊपर की नरम परत, आराम के लिए')],
       consider: [_t('You will need more than you think', 'सोच से ज़्यादा लगेंगे')]),
-  'after_underwear': _Cat('🩲', 399, _t('ParentVeda Maternity Briefs', 'ParentVeda Maternity Briefs'),
+  'after_underwear': _Cat('🩲', 399, _same('ParentVeda Maternity Briefs'),
       why: [
         _t('High-waist, won’t press on stitches', 'ऊँची कमर, टाँकों पर दबाव नहीं'),
         _t('Soft, breathable & disposable', 'नरम, साँस लेने वाले और एक बार के')
       ],
       consider: [_t('Size up for comfort', 'आराम के लिए एक नाप बड़ा लीजिए')]),
-  'after_nursingbra': _Cat('👙', 799, _t('ParentVeda Nursing Bra', 'ParentVeda Nursing Bra'),
+  'after_nursingbra': _Cat('👙', 799, _same('ParentVeda Nursing Bra'),
       why: [_t('Soft, breathable fabric', 'नरम, साँस लेने वाला कपड़ा'), _t('Easy one-hand nursing access', 'एक हाथ से खुलने वाली, दूध पिलाने में आसान')],
       consider: [_t('Size up from your usual', 'अपने रोज़ के नाप से एक बड़ा')]),
-  'after_breastpads': _Cat('⚪', 299, _t('ParentVeda Breast Pads', 'ParentVeda Breast Pads'),
+  'after_breastpads': _Cat('⚪', 299, _same('ParentVeda Breast Pads'),
       why: [_t('Super absorbent, stay-dry', 'ख़ूब सोखने वाले, सूखा रखने वाले'), _t('Gentle on sensitive skin', 'नाज़ुक त्वचा पर हल्के')]),
-  'after_nipplecream': _Cat('🧴', 449, _t('ParentVeda Nipple Cream', 'ParentVeda Nipple Cream'),
+  'after_nipplecream': _Cat('🧴', 449, _same('ParentVeda Nipple Cream'),
       why: [_t('Soothes sore skin', 'दुखती त्वचा को आराम'), _t('Safe for baby - no need to wipe off', 'शिशु के लिए सुरक्षित — पोंछने की ज़रूरत नहीं')]),
   'after_outfit': _Cat('👗', 899, _t('ParentVeda Going-Home Set', 'ParentVeda घर जाने का सेट'),
       why: [_t('Loose & soft on a healing body', 'ठीक हो रहे शरीर पर ढीला और नरम'), _t('Easy nursing access', 'दूध पिलाने में आसान')]),
@@ -118,13 +124,13 @@ final Map<String, _Cat> _catalog = {
   'baby_diapers': _Cat('🧷', 499, _t('ParentVeda Newborn Diapers', 'ParentVeda नवजात Diapers'),
       why: [_t('Soft, snug newborn fit', 'नवजात पर नरम और ठीक बैठने वाली'), _t('Wetness indicator', 'गीलेपन का संकेत'), _t('Gentle on the cord stump', 'नाभि की ठूँठ पर हल्की')],
       consider: [_t('Newborn size lasts only a few weeks', 'नवजात का नाप कुछ ही हफ़्ते चलता है')]),
-  'baby_wipes': _Cat('🧻', 249, _t('ParentVeda Water Wipes', 'ParentVeda Water Wipes'),
+  'baby_wipes': _Cat('🧻', 249, _same('ParentVeda Water Wipes'),
       why: [_t('99% water, fragrance-free', '99% पानी, बिना ख़ुशबू के'), _t('Gentle on newborn skin', 'नवजात की त्वचा पर हल्के')]),
   'baby_blanket': _Cat('🛏️', 499, _t('ParentVeda Baby Blanket', 'ParentVeda शिशु कंबल'),
       why: [_t('Cozy & breathable', 'गर्म और साँस लेने वाला'), _t('Doubles as a cover', 'ओढ़नी के तौर पर भी काम आता है')]),
   'baby_towel': _Cat('🧖', 399, _t('ParentVeda Hooded Towel', 'ParentVeda टोपी वाला तौलिया'),
       why: [_t('Hooded, soft on delicate skin', 'टोपी वाला, नाज़ुक त्वचा पर नरम'), _t('Quick-drying', 'जल्दी सूखने वाला')]),
-  'baby_lotion': _Cat('🧴', 349, _t('ParentVeda Baby Lotion', 'ParentVeda Baby Lotion'),
+  'baby_lotion': _Cat('🧴', 349, _same('ParentVeda Baby Lotion'),
       why: [_t('Gentle, hypoallergenic', 'हल्का, एलर्जी की कम आशंका'), _t('Light & non-greasy', 'हल्का, चिपचिपा नहीं')],
       consider: [_t('Patch-test first', 'पहले थोड़ा सा लगाकर देख लीजिए')]),
   'baby_homeoutfit': _Cat('👕', 599, _t('ParentVeda First Outfit', 'ParentVeda पहला जोड़ा'),
@@ -134,23 +140,23 @@ final Map<String, _Cat> _catalog = {
   // For partner -------------------------------------------------------------
   'partner_snacks': _Cat('🍪', 199, _t('ParentVeda Snack Pack', 'ParentVeda नाश्ते का पैक'),
       why: [_t('Keeps your partner going', 'आपके पार्टनर को चलता रखता है'), _t('Long shelf life', 'लंबे समय तक ख़राब नहीं होता')]),
-  'partner_charger': _Cat('🔋', 999, _t('ParentVeda Power Bank', 'ParentVeda Power Bank'),
+  'partner_charger': _Cat('🔋', 999, _same('ParentVeda Power Bank'),
       why: [_t('Long cable for hospital beds', 'अस्पताल के बिस्तर के लिए लंबी तार'), _t('Backup power for long stays', 'लंबे ठहराव के लिए बैकअप पावर')]),
   'partner_toiletries': _Cat('🧼', 249, _t('ParentVeda Travel Kit', 'ParentVeda सफ़र किट'),
       why: [_t('Travel-size basics', 'सफ़र के छोटे पैक'), _t('Compact & light', 'छोटा और हल्का')]),
 
   // Comfort -----------------------------------------------------------------
-  'comfort_eyemask': _Cat('😴', 199, _t('ParentVeda Eye Mask', 'ParentVeda Eye Mask'),
+  'comfort_eyemask': _Cat('😴', 199, _same('ParentVeda Eye Mask'),
       why: [_t('Blocks out bright hospital lights', 'अस्पताल की तेज़ रोशनी रोकता है'), _t('Soft & gentle', 'नरम और हल्का')]),
   'comfort_affirm': _Cat('🃏', 299, _t('ParentVeda Affirmation Cards', 'ParentVeda हौसले के कार्ड'),
       why: [_t('Gentle focus during labour', 'प्रसव के दौरान हल्का ध्यान'), _t('Written for Indian mothers', 'भारतीय माँओं के लिए लिखा गया')]),
 
   // Suggested essentials ----------------------------------------------------
-  'sugg_nursingpillow': _Cat('🛋️', 1299, _t('ParentVeda Nursing Pillow', 'ParentVeda Nursing Pillow'),
+  'sugg_nursingpillow': _Cat('🛋️', 1299, _same('ParentVeda Nursing Pillow'),
       why: [_t('Supports baby at the breast', 'दूध पिलाते वक़्त शिशु को सहारा'), _t('Eases arm & back strain', 'बाँह और कमर का ज़ोर कम करता है')]),
   'sugg_extraoutfit': _Cat('👕', 599, _t('ParentVeda Extra Outfit', 'ParentVeda एक और जोड़ा'),
       why: [_t('A spare for the inevitable changes', 'एक अतिरिक्त, क्योंकि बदलना पड़ेगा ही'), _t('Soft newborn cotton', 'नवजात के लिए नरम सूती')]),
-  'sugg_compsocks': _Cat('🧦', 399, _t('ParentVeda Compression Socks', 'ParentVeda Compression Socks'),
+  'sugg_compsocks': _Cat('🧦', 399, _same('ParentVeda Compression Socks'),
       why: [_t('Eases swelling & aches', 'सूजन और दर्द में आराम'), _t('Comfortable all-day wear', 'दिन भर पहनने में आरामदेह')]),
   'sugg_handfan': _Cat('🌬️', 299, _t('ParentVeda Mini Fan', 'ParentVeda छोटा पंखा'),
       why: [_t('Cooling relief during labour', 'प्रसव के दौरान ठंडक'), _t('USB-rechargeable', 'USB से चार्ज होने वाला')]),

@@ -15,6 +15,12 @@ import '../localization/app_language.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 // ---- section models ---------------------------------------------------------
 class W5Snapshot {
   const W5Snapshot({required this.fruit, required this.length, required this.weight});
@@ -550,9 +556,9 @@ final Week5Full week5Full = Week5Full(
     ),
     // Current week to week+4; scans whose window has already closed are dropped.
     scans: [
-      W5Scan(name: _t('NT scan', 'NT scan'), window: _t('Week 11 to 14', 'हफ़्ता 11 से 14')),
+      W5Scan(name: _same('NT scan'), window: _t('Week 11 to 14', 'हफ़्ता 11 से 14')),
       W5Scan(
-        name: _t('Double marker test', 'Double marker test'),
+        name: _same('Double marker test'),
         window: _t('Week 11 to 14 · usually with the NT scan', 'हफ़्ता 11 से 14 · आम तौर पर NT scan के साथ'),
       ),
     ],

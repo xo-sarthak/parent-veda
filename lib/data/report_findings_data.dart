@@ -14,7 +14,7 @@
 import '../localization/app_language.dart';
 import '../models/report_finding.dart';
 
-/// `_t('English', 'English')` mirrors, `_t('English', 'हिन्दी')` translates.
+/// `_same('English')` mirrors, `_t('English', 'हिन्दी')` translates.
 ///
 /// The second argument is optional so the file can be translated a section at
 /// a time without a flag day: anything not yet given Hindi still renders its
@@ -22,6 +22,12 @@ import '../models/report_finding.dart';
 /// the subject is a mother reading her own test report.
 LocalizedText _t(String en, [String? hi]) =>
     LocalizedText(en: en, hi: hi ?? en);
+
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 // `_l` is gone: it mirrored a list of English strings into `hi`, which is
 // exactly what left the doctor questions and reassurances untranslated. Lists
@@ -42,7 +48,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'low_lying_placenta',
     name: _t('Low-Lying Placenta', 'नीचे बैठा Placenta'),
-    altName: _t('Placenta Previa', 'Placenta Previa'),
+    altName: _same('Placenta Previa'),
     weekFrom: 18,
     weekTo: 22,
     whatItMeans: _t('This means the placenta is sitting lower in the uterus than usual, near or over the cervix. In most cases it gradually moves upward and out of the way as the uterus grows.', 'इसका मतलब है कि placenta बच्चेदानी में सामान्य से नीचे, cervix के पास या उस पर बैठा है। ज़्यादातर मामलों में बच्चेदानी बढ़ने के साथ यह धीरे-धीरे ऊपर खिसक जाता है और रास्ते से हट जाता है।'),
@@ -84,7 +90,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'nuchal_cord',
     name: _t('Cord Around Neck', 'गर्दन के चारों ओर गर्भनाल'),
-    altName: _t('Nuchal Cord', 'Nuchal Cord'),
+    altName: _same('Nuchal Cord'),
     weekFrom: 36,
     whatItMeans: _t('This means the umbilical cord is looped around the baby\'s neck. Scans often pick this up, and in most pregnancies it does not cause problems - the cord is built to keep delivering oxygen.', 'इसका मतलब है कि गर्भनाल शिशु की गर्दन के चारों ओर लिपटी है। स्कैन में यह अक्सर दिख जाता है, और ज़्यादातर गर्भावस्थाओं में इससे कोई दिक़्क़त नहीं होती — गर्भनाल ऑक्सीजन पहुँचाती रहने के लिए ही बनी है।'),
     howCommon: _t('A nuchal cord is a frequent scan finding, especially closer to term. Many babies are born safely with a cord around the neck.', 'Nuchal cord स्कैन में अक्सर मिलता है, ख़ासकर पूरे समय के क़रीब। बहुत से शिशु गर्दन में गर्भनाल के साथ सुरक्षित जन्म लेते हैं।'),
@@ -104,7 +110,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'gestational_diabetes',
     name: _t('Gestational Diabetes', 'गर्भावस्था की डायबिटीज़'),
-    altName: _t('GDM', 'GDM'),
+    altName: _same('GDM'),
     weekFrom: 24,
     weekTo: 28,
     whatItMeans: _t('This means your body is having some trouble managing blood sugar during pregnancy. With the right steps it is usually well controlled, and it most often goes away after the baby is born.', 'इसका मतलब है कि गर्भावस्था के दौरान आपके शरीर को blood sugar सँभालने में थोड़ी दिक़्क़त हो रही है। सही क़दमों से यह आम तौर पर अच्छी तरह क़ाबू में रहती है, और ज़्यादातर शिशु के जन्म के बाद चली जाती है।'),
@@ -125,7 +131,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'low_fluid',
     name: _t('Low Amniotic Fluid', 'कम Amniotic Fluid'),
-    altName: _t('Oligohydramnios', 'Oligohydramnios'),
+    altName: _same('Oligohydramnios'),
     weekFrom: 30,
     weekTo: 40,
     whatItMeans: _t('This means the amount of fluid around your baby is on the lower side. The level can change, and your doctor will look at it alongside how your baby is growing and moving.', 'इसका मतलब है कि आपके शिशु के आस-पास तरल की मात्रा कुछ कम है। यह स्तर बदल सकता है, और आपके डॉक्टर इसे शिशु की बढ़त और हलचल के साथ मिलाकर देखेंगे।'),
@@ -145,7 +151,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'preeclampsia',
-    name: _t('Preeclampsia', 'Preeclampsia'),
+    name: _same('Preeclampsia'),
     weekFrom: 20,
     whatItMeans: _t('This means your blood pressure is raised during pregnancy, sometimes with other signs that your body needs closer attention. It is something doctors watch carefully and manage step by step.', 'इसका मतलब है कि गर्भावस्था में आपका ब्लड प्रेशर बढ़ा हुआ है, कभी-कभी कुछ और संकेतों के साथ जो बताते हैं कि शरीर पर ज़्यादा ध्यान चाहिए। डॉक्टर इस पर सावधानी से नज़र रखते हैं और क़दम-दर-क़दम सँभालते हैं।'),
     howCommon: _t('It is a recognised pregnancy finding that care teams screen for at routine visits - which is why your blood pressure and urine are checked each time.', 'यह गर्भावस्था का एक जाना-पहचाना नतीजा है जिसके लिए हर सामान्य विज़िट पर जाँच होती है — इसीलिए हर बार आपका ब्लड प्रेशर और पेशाब देखा जाता है।'),
@@ -165,7 +171,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'high_fluid',
     name: _t('High Amniotic Fluid', 'ज़्यादा Amniotic Fluid'),
-    altName: _t('Polyhydramnios', 'Polyhydramnios'),
+    altName: _same('Polyhydramnios'),
     weekFrom: 28,
     weekTo: 40,
     whatItMeans: _t('This means there is a little more fluid around your baby than average. In many cases no specific cause is found and the pregnancy continues well.', 'इसका मतलब है कि आपके शिशु के आस-पास औसत से थोड़ा ज़्यादा तरल है। कई बार कोई ख़ास वजह नहीं मिलती और गर्भावस्था अच्छी चलती रहती है।'),
@@ -302,7 +308,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'high_bp',
     name: _t('High Blood Pressure', 'ज़्यादा ब्लड प्रेशर'),
-    altName: _t('Gestational Hypertension', 'Gestational Hypertension'),
+    altName: _same('Gestational Hypertension'),
     weekFrom: 20,
     whatItMeans: _t('This means your blood pressure is higher than usual during pregnancy. It is something your care team watches closely and manages step by step.', 'इसका मतलब है कि गर्भावस्था में आपका ब्लड प्रेशर सामान्य से ज़्यादा है। आपकी देखभाल करने वाली टीम इस पर क़रीबी नज़र रखती है और क़दम-दर-क़दम सँभालती है।'),
     howCommon: _t('Raised blood pressure is a recognised pregnancy finding - which is why it is checked at every routine visit.', 'बढ़ा हुआ ब्लड प्रेशर गर्भावस्था का एक जाना-पहचाना नतीजा है — इसीलिए हर सामान्य विज़िट पर इसकी जाँच होती है।'),
@@ -343,7 +349,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'small_baby',
     name: _t('Small Baby For Gestational Age', 'उम्र के हिसाब से छोटा शिशु'),
-    altName: _t('SGA', 'SGA'),
+    altName: _same('SGA'),
     weekFrom: 28,
     weekTo: 40,
     whatItMeans: _t('This means your baby is measuring a little smaller than average for this stage. Babies come in many healthy sizes, and your doctor looks at the trend over time, not a single number.', 'इसका मतलब है कि आपका शिशु इस चरण के औसत से थोड़ा छोटा नाप रहा है। शिशु कई सेहतमंद आकारों में आते हैं, और आपके डॉक्टर एक अकेले नंबर के बजाय समय के साथ का रुझान देखते हैं।'),
@@ -364,7 +370,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'large_baby',
     name: _t('Large Baby For Gestational Age', 'उम्र के हिसाब से बड़ा शिशु'),
-    altName: _t('LGA', 'LGA'),
+    altName: _same('LGA'),
     weekFrom: 28,
     weekTo: 40,
     whatItMeans: _t('This means your baby is measuring a little larger than average for this stage. Scan size estimates are approximate, and a bigger baby is often simply a healthy, well-grown baby.', 'इसका मतलब है कि आपका शिशु इस चरण के औसत से थोड़ा बड़ा नाप रहा है। स्कैन में आकार का अंदाज़ा लगभग होता है, और बड़ा शिशु अक्सर बस एक सेहतमंद, अच्छी तरह बढ़ा हुआ शिशु होता है।'),
@@ -384,7 +390,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'subchorionic_hematoma',
-    name: _t('Subchorionic Hematoma', 'Subchorionic Hematoma'),
+    name: _same('Subchorionic Hematoma'),
     weekFrom: 6,
     weekTo: 20,
     whatItMeans: _t('This means a small collection of blood has formed between the pregnancy sac and the wall of the uterus. Many of these are small and resolve on their own.', 'इसका मतलब है कि गर्भ की थैली और बच्चेदानी की दीवार के बीच थोड़ा ख़ून जमा हो गया है। इनमें से कई छोटे होते हैं और अपने आप ठीक हो जाते हैं।'),
@@ -445,7 +451,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'single_umbilical_artery',
     name: _t('Single Umbilical Artery', 'गर्भनाल में एक ही धमनी'),
-    altName: _t('Two-Vessel Cord', 'Two-Vessel Cord'),
+    altName: _same('Two-Vessel Cord'),
     weekFrom: 18,
     weekTo: 22,
     whatItMeans: _t('This means the umbilical cord has one artery instead of the usual two (alongside the vein). On its own, this is often harmless and the baby develops normally.', 'इसका मतलब है कि गर्भनाल में सामान्य दो के बजाय एक धमनी है (नस के साथ)। अकेले में यह अक्सर हानिरहित होता है और शिशु सामान्य रूप से विकसित होता है।'),
@@ -486,7 +492,7 @@ final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'eif',
     name: _t('Echogenic Intracardiac Focus', 'दिल में चमकीला बिंदु'),
-    altName: _t('EIF', 'EIF'),
+    altName: _same('EIF'),
     weekFrom: 18,
     weekTo: 22,
     whatItMeans: _t('This means a tiny bright spot was seen in the baby\'s heart on the scan. It is a normal variation, does not affect how the heart works, and usually fades over time.', 'इसका मतलब है कि स्कैन में शिशु के दिल में एक नन्हा चमकीला बिंदु दिखा। यह एक सामान्य भिन्नता है, दिल के काम पर असर नहीं डालती, और आम तौर पर समय के साथ मिट जाती है।'),
@@ -546,8 +552,8 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'group_b_strep',
-    name: _t('Group B Strep', 'Group B Strep'),
-    altName: _t('GBS', 'GBS'),
+    name: _same('Group B Strep'),
+    altName: _same('GBS'),
     weekFrom: 35,
     weekTo: 37,
     whatItMeans: _t('This means a common bacteria called Group B Strep was found, which many healthy people carry naturally. It simply tells your doctor to take a simple precaution around delivery.', 'इसका मतलब है कि Group B Strep नाम का एक आम bacteria मिला है, जो बहुत से सेहतमंद लोग स्वाभाविक रूप से साथ रखते हैं। यह बस आपके डॉक्टर को बताता है कि डिलीवरी के आस-पास एक आसान एहतियात बरतनी है।'),

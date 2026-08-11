@@ -158,15 +158,30 @@ class CanIScreen extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 10,
                   children: [
+                    // The chip's WORDS come from the entry it opens, not from
+                    // the chip. `kCanIPopular` carries a plain English `label`,
+                    // so in Hindi the chip read "Pineapple" and the page it
+                    // opened read "अनानास" — the same thing named two ways on
+                    // two consecutive screens.
+                    //
+                    // Translating the label would have fixed the symptom and
+                    // kept the cause: two sources of truth for one name, free
+                    // to drift again the next time an entry is renamed. `id` is
+                    // the identity; the name is derived from it.
+                    //
+                    // `.now` is right here precisely because this is DISPLAY —
+                    // it is painted and never stored, compared or keyed on.
                     for (final p in kCanIPopular)
-                      _PopularChip(
-                        emoji: p.emoji,
-                        label: p.label,
-                        onTap: () {
-                          final e = canIById(p.id);
-                          if (e != null) _openAnswer(context, e, controller);
-                        },
-                      ),
+                      Builder(builder: (_) {
+                        final e = canIById(p.id);
+                        return _PopularChip(
+                          emoji: p.emoji,
+                          label: e?.name.now ?? p.label,
+                          onTap: () {
+                            if (e != null) _openAnswer(context, e, controller);
+                          },
+                        );
+                      }),
                   ],
                 ),
                 const SizedBox(height: 28),

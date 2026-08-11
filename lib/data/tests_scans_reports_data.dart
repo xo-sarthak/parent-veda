@@ -246,7 +246,7 @@ final List<TestScanInfo> kTestsScans = [
         'some of them. Here is what the common ones mean.', 'आपकी रिपोर्ट में कई values होती हैं, हर एक के साथ lab की reference range। हर lab की range थोड़ी अलग होती है, और गर्भावस्था कुछ को बदल भी देती है। आम values का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: _t('Hb (Haemoglobin)', 'Hb (Haemoglobin)'),
+        name: _same('Hb (Haemoglobin)'),
         measures:
             _t('The protein in red blood cells that carries oxygen around your body '
             'and to your baby.', 'red blood cells में मौजूद वह protein जो आपके शरीर में और शिशु तक oxygen पहुँचाता है।'),
@@ -265,7 +265,7 @@ final List<TestScanInfo> kTestsScans = [
             'hydration and overall picture.', 'Hb ज़्यादा होना कम देखने को मिलता है; डॉक्टर बस आपके पानी के स्तर और पूरी तस्वीर को देख लेंगे।'),
       ),
       ReportParameter(
-        name: _t('Serum Iron', 'Serum Iron'),
+        name: _same('Serum Iron'),
         measures: _t('The amount of iron circulating in your blood right now.', 'इस वक़्त आपके ख़ून में घूम रहे iron की मात्रा।'),
         whyImportant:
             _t('Iron is the building block your body needs to make haemoglobin and '
@@ -279,7 +279,7 @@ final List<TestScanInfo> kTestsScans = [
             'tests.', 'value ज़्यादा आना कम होता है और इसे बाक़ी iron जाँचों के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: _t('Ferritin', 'Ferritin'),
+        name: _same('Ferritin'),
         measures: _t('Your body\'s stored iron - the "reserve tank".', 'आपके शरीर में जमा iron — यानी "reserve tank"।'),
         whyImportant:
             _t('Ferritin shows iron reserves before haemoglobin drops, so it catches '
@@ -295,7 +295,7 @@ final List<TestScanInfo> kTestsScans = [
             'is read in context.', 'infection या सूजन में ferritin कुछ समय के लिए बढ़ सकता है, इसलिए इसे पूरे संदर्भ में देखा जाता है।'),
       ),
       ReportParameter(
-        name: _t('Calcium', 'Calcium'),
+        name: _same('Calcium'),
         measures: _t('The level of calcium in your blood.', 'आपके ख़ून में calcium का स्तर।'),
         whyImportant:
             _t('Calcium supports your baby\'s bones and teeth and your own bone '
@@ -307,7 +307,7 @@ final List<TestScanInfo> kTestsScans = [
         ifHigh: _t('A high value is uncommon and would simply be looked into.', 'value ज़्यादा आना कम होता है और डॉक्टर बस इसे देख लेंगे।'),
       ),
       ReportParameter(
-        name: _t('Vitamin D', 'Vitamin D'),
+        name: _same('Vitamin D'),
         measures: _t('Your vitamin D level (25-hydroxy vitamin D).', 'आपका vitamin D स्तर (25-hydroxy vitamin D)।'),
         whyImportant:
             _t('Vitamin D helps your body use calcium for your baby\'s bones. Low '
@@ -323,7 +323,7 @@ final List<TestScanInfo> kTestsScans = [
             'kept sensible.', 'बहुत ज़्यादा स्तर तभी होता है जब supplement ज़रूरत से ज़्यादा लिया जाए, इसलिए dose सोच-समझकर रखी जाती है।'),
       ),
       ReportParameter(
-        name: _t('TSH (Thyroid)', 'TSH (Thyroid)'),
+        name: _same('TSH (Thyroid)'),
         measures:
             _t('Thyroid Stimulating Hormone - a signal that reflects how your '
             'thyroid gland is working.', 'Thyroid Stimulating Hormone — एक संकेत जो बताता है कि आपकी thyroid ग्रंथि कैसे काम कर रही है।'),
@@ -354,7 +354,7 @@ final List<TestScanInfo> kTestsScans = [
   // -- Dating scan -----------------------------------------------------------
   TestScanInfo(
     id: 'dating_scan',
-    name: _t('Dating Scan', 'Dating Scan'),
+    name: _same('Dating Scan'),
     altName: _t('Viability / First-Trimester Ultrasound', 'Viability / पहली तिमाही का Ultrasound'),
     tag: TrimesterTag.t1,
     whatItIs:
@@ -380,7 +380,7 @@ final List<TestScanInfo> kTestsScans = [
         'they mean.', 'रिपोर्ट में शुरुआत के कुछ माप और observations लिखे होते हैं। उनका मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: _t('Gestational sac', 'Gestational sac'),
+        name: _same('Gestational sac'),
         measures: _t('The fluid-filled space your baby grows in.', 'पानी से भरी वह जगह जिसमें आपका शिशु बढ़ता है।'),
         whyImportant:
             _t('Seeing it inside the uterus confirms the pregnancy is in the right '
@@ -388,14 +388,14 @@ final List<TestScanInfo> kTestsScans = [
         note: _t('A normal early finding; its size helps confirm dates.', 'शुरुआत की एक सामान्य बात; इसका आकार तारीख़ें पक्की करने में मदद करता है।'),
       ),
       ReportParameter(
-        name: _t('CRL (Crown-Rump Length)', 'CRL (Crown-Rump Length)'),
+        name: _same('CRL (Crown-Rump Length)'),
         measures: _t('Your baby\'s length from head to bottom.', 'सिर से कूल्हे तक आपके शिशु की लंबाई।'),
         whyImportant:
             _t('This is the most accurate way to date a pregnancy this early.', 'इतनी जल्दी गर्भावस्था की तारीख़ तय करने का यही सबसे सटीक तरीक़ा है।'),
         note: _t('Used to set or confirm your estimated due date.', 'इसी से आपकी अनुमानित due date तय या पक्की की जाती है।'),
       ),
       ReportParameter(
-        name: _t('FHR / Cardiac activity', 'FHR / Cardiac activity'),
+        name: _same('FHR / Cardiac activity'),
         measures: _t('Your baby\'s heartbeat.', 'आपके शिशु की धड़कन।'),
         whyImportant: _t('A heartbeat is a reassuring sign of a healthy start.', 'धड़कन का दिखना स्वस्थ शुरुआत का भरोसा देने वाला संकेत है।'),
         typicalRange:
@@ -406,7 +406,7 @@ final List<TestScanInfo> kTestsScans = [
             'for worry on its own.', 'लगभग 6 हफ़्तों से पहले इसका न दिखना सिर्फ़ जल्दी होने की बात हो सकती है — अपने आप में चिंता की वजह नहीं।'),
       ),
       ReportParameter(
-        name: _t('EDD (Estimated Due Date)', 'EDD (Estimated Due Date)'),
+        name: _same('EDD (Estimated Due Date)'),
         measures: _t('Your expected delivery date, from the measurements.', 'मापों से निकली आपकी अनुमानित delivery की तारीख़।'),
         whyImportant:
             _t('It anchors the timing of every future scan, test and milestone.', 'आगे का हर scan, जाँच और पड़ाव इसी तारीख़ के हिसाब से तय होता है।'),
@@ -426,8 +426,8 @@ final List<TestScanInfo> kTestsScans = [
   // -- NT scan ---------------------------------------------------------------
   TestScanInfo(
     id: 'nt_scan',
-    name: _t('NT Scan', 'NT Scan'),
-    altName: _t('Nuchal Translucency + Double Marker', 'Nuchal Translucency + Double Marker'),
+    name: _same('NT Scan'),
+    altName: _same('Nuchal Translucency + Double Marker'),
     tag: TrimesterTag.t1,
     whatItIs:
         _t('A first-trimester screening test. An ultrasound measures a small pocket '
@@ -451,7 +451,7 @@ final List<TestScanInfo> kTestsScans = [
         'Here is what the pieces mean.', 'आपका नतीजा scan और ख़ून की values को मिलाकर एक कुल संभावना बताता है। हर हिस्से का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: _t('NT measurement (mm)', 'NT measurement (mm)'),
+        name: _same('NT measurement (mm)'),
         measures: _t('The fluid at the back of your baby\'s neck.', 'आपके शिशु की गर्दन के पीछे का पानी।'),
         whyImportant: _t('It is the main scan marker used in the calculation.', 'गणना में इस्तेमाल होने वाला यह मुख्य scan marker है।'),
         typicalRange: _t('Most babies measure under about 3.0-3.5 mm.', 'ज़्यादातर शिशुओं का माप लगभग 3.0-3.5 mm से नीचे रहता है।'),
@@ -460,7 +460,7 @@ final List<TestScanInfo> kTestsScans = [
             'anything - many babies with a slightly higher NT are perfectly well.', 'value ज़्यादा होने से निकाली गई संभावना बढ़ जाती है, पर इससे कुछ भी पक्का नहीं होता — थोड़े ज़्यादा NT वाले कई शिशु पूरी तरह स्वस्थ होते हैं।'),
       ),
       ReportParameter(
-        name: _t('Nasal bone', 'Nasal bone'),
+        name: _same('Nasal bone'),
         measures: _t('Whether the nasal bone is seen (present or absent).', 'nasal bone दिख रहा है या नहीं (present या absent)।'),
         whyImportant: _t('It is one of several soft markers considered together.', 'यह उन कई soft markers में से एक है जिन्हें साथ मिलाकर देखा जाता है।'),
         note:
@@ -468,7 +468,7 @@ final List<TestScanInfo> kTestsScans = [
             'its own it is not a diagnosis.', 'nasal bone न दिखे तो निकाली गई संभावना थोड़ी बढ़ सकती है; अकेले इसका मतलब कोई निदान नहीं।'),
       ),
       ReportParameter(
-        name: _t('Free β-hCG / PAPP-A', 'Free β-hCG / PAPP-A'),
+        name: _same('Free β-hCG / PAPP-A'),
         measures: _t('Two pregnancy hormones/proteins from the blood sample.', 'ख़ून के sample से निकले गर्भावस्था के दो hormones/proteins।'),
         whyImportant: _t('They feed into your overall screening chance.', 'ये आपकी कुल screening संभावना में जुड़ते हैं।'),
         note:
@@ -498,8 +498,8 @@ final List<TestScanInfo> kTestsScans = [
   // -- NIPT ------------------------------------------------------------------
   TestScanInfo(
     id: 'nipt',
-    name: _t('NIPT', 'NIPT'),
-    altName: _t('Non-Invasive Prenatal Test', 'Non-Invasive Prenatal Test'),
+    name: _same('NIPT'),
+    altName: _same('Non-Invasive Prenatal Test'),
     tag: TrimesterTag.t1,
     whatItIs:
         _t('An advanced blood test that looks at small fragments of your baby\'s DNA '
@@ -522,7 +522,7 @@ final List<TestScanInfo> kTestsScans = [
         'how to read it.', 'NIPT का नतीजा screening के रूप में आता है, हाँ/ना वाले निदान के रूप में नहीं। इसे ऐसे पढ़िए।'),
     parameters: [
       ReportParameter(
-        name: _t('Low risk / High risk', 'Low risk / High risk'),
+        name: _same('Low risk / High risk'),
         measures:
             _t('The screening result for each condition tested (e.g. trisomy 21).', 'जाँची गई हर स्थिति का screening नतीजा (जैसे trisomy 21)।'),
         whyImportant: _t('It guides whether a diagnostic test is worth discussing.', 'यह बताता है कि किसी diagnostic जाँच पर बात करना ज़रूरी है या नहीं।'),
@@ -532,7 +532,7 @@ final List<TestScanInfo> kTestsScans = [
             'is not the final answer.', '"low risk" नतीजा बहुत भरोसा देने वाला है। "high risk" आने पर भी पुष्टि के लिए एक diagnostic जाँच (जैसे amniocentesis) चाहिए — screening आख़िरी जवाब नहीं है।'),
       ),
       ReportParameter(
-        name: _t('Fetal fraction', 'Fetal fraction'),
+        name: _same('Fetal fraction'),
         measures: _t('How much of your baby\'s DNA was in the sample.', 'sample में आपके शिशु का DNA कितना था।'),
         whyImportant:
             _t('Enough fetal fraction is needed for a reliable result.', 'भरोसेमंद नतीजे के लिए fetal fraction का पर्याप्त होना ज़रूरी है।'),
@@ -563,7 +563,7 @@ final List<TestScanInfo> kTestsScans = [
   // -- Anomaly / TIFFA scan --------------------------------------------------
   TestScanInfo(
     id: 'anomaly_scan',
-    name: _t('Anomaly Scan', 'Anomaly Scan'),
+    name: _same('Anomaly Scan'),
     altName: _t('TIFFA / Level 2 / 20-Week Scan', 'TIFFA / Level 2 / 20 हफ़्ते का Scan'),
     tag: TrimesterTag.t2,
     whatItIs:
@@ -590,7 +590,7 @@ final List<TestScanInfo> kTestsScans = [
         '(biometry). Here are the measurements you will see.', 'रिपोर्ट में एक-एक अंग की observations के साथ बढ़त के माप (biometry) होते हैं। जो माप आपको दिखेंगे, वे ये हैं।'),
     parameters: [
       ReportParameter(
-        name: _t('BPD (Biparietal Diameter)', 'BPD (Biparietal Diameter)'),
+        name: _same('BPD (Biparietal Diameter)'),
         measures: _t('The width of your baby\'s head, side to side.', 'आपके शिशु के सिर की चौड़ाई, एक तरफ़ से दूसरी तरफ़।'),
         whyImportant: _t('One of the core measurements used to track head growth.', 'सिर की बढ़त पर नज़र रखने वाले मुख्य मापों में से एक।'),
         note:
@@ -598,13 +598,13 @@ final List<TestScanInfo> kTestsScans = [
             'not a single number.', 'आपके हफ़्तों के हिसाब से उम्मीद के आकार से मिलाया जाता है; इसे अकेले एक number की तरह नहीं, रुझान की तरह पढ़िए।'),
       ),
       ReportParameter(
-        name: _t('HC (Head Circumference)', 'HC (Head Circumference)'),
+        name: _same('HC (Head Circumference)'),
         measures: _t('The distance around your baby\'s head.', 'आपके शिशु के सिर की गोलाई।'),
         whyImportant: _t('Helps confirm the head is growing as expected.', 'यह पक्का करने में मदद करता है कि सिर उम्मीद के मुताबिक़ बढ़ रहा है।'),
         note: _t('Used with BPD to assess head growth and dating.', 'सिर की बढ़त और तारीख़ें आँकने के लिए BPD के साथ इस्तेमाल होता है।'),
       ),
       ReportParameter(
-        name: _t('AC (Abdominal Circumference)', 'AC (Abdominal Circumference)'),
+        name: _same('AC (Abdominal Circumference)'),
         measures: _t('The distance around your baby\'s tummy.', 'आपके शिशु के पेट की गोलाई।'),
         whyImportant:
             _t('The most useful single measure of your baby\'s overall growth and '
@@ -614,13 +614,13 @@ final List<TestScanInfo> kTestsScans = [
             'other measurements.', 'अनुमानित वज़न मुख्य रूप से AC और बाक़ी मापों को मिलाकर निकाला जाता है।'),
       ),
       ReportParameter(
-        name: _t('FL (Femur Length)', 'FL (Femur Length)'),
+        name: _same('FL (Femur Length)'),
         measures: _t('The length of your baby\'s thigh bone.', 'आपके शिशु की जाँघ की हड्डी की लंबाई।'),
         whyImportant: _t('Reflects the growth of your baby\'s long bones.', 'यह आपके शिशु की लंबी हड्डियों की बढ़त दिखाता है।'),
         note: _t('Read alongside HC and AC to build the growth picture.', 'बढ़त की पूरी तस्वीर बनाने के लिए इसे HC और AC के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: _t('Placenta', 'Placenta'),
+        name: _same('Placenta'),
         measures: _t('Where the placenta is lying (e.g. anterior, posterior, fundal).', 'placenta कहाँ लगा है (जैसे anterior, posterior, fundal)।'),
         whyImportant:
             _t('Its position matters for delivery planning if it sits low near the '
@@ -630,7 +630,7 @@ final List<TestScanInfo> kTestsScans = [
             'uterus grows - this is the common outcome.', 'अभी नीचे है तो आगे के scan में आमतौर पर दिखता है कि बच्चेदानी बढ़ने के साथ यह ऊपर खिसक गया — यही आम नतीजा है।'),
       ),
       ReportParameter(
-        name: _t('Amniotic Fluid (AFI)', 'Amniotic Fluid (AFI)'),
+        name: _same('Amniotic Fluid (AFI)'),
         measures: _t('The amount of fluid around your baby.', 'आपके शिशु के आसपास पानी की मात्रा।'),
         whyImportant:
             _t('Fluid cushions your baby and reflects wellbeing and kidney function.', 'यह पानी शिशु को गद्दी देता है और उसकी सेहत तथा गुर्दों के काम को दर्शाता है।'),
@@ -658,8 +658,8 @@ final List<TestScanInfo> kTestsScans = [
   // -- OGTT / glucose --------------------------------------------------------
   TestScanInfo(
     id: 'ogtt',
-    name: _t('OGTT (Glucose Test)', 'OGTT (Glucose Test)'),
-    altName: _t('Glucose Tolerance Test / GTT', 'Glucose Tolerance Test / GTT'),
+    name: _same('OGTT (Glucose Test)'),
+    altName: _same('Glucose Tolerance Test / GTT'),
     tag: TrimesterTag.t2,
     whatItIs:
         _t('A blood test that checks how your body handles sugar during pregnancy. '
@@ -686,7 +686,7 @@ final List<TestScanInfo> kTestsScans = [
         'lab\'s cut-offs. Here is what they mean.', 'आपकी रिपोर्ट हर समय-बिंदु की blood sugar value lab के cut-off के साथ दिखाती है। उनका मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: _t('Fasting glucose', 'Fasting glucose'),
+        name: _same('Fasting glucose'),
         measures: _t('Your blood sugar before the glucose drink.', 'glucose पीने से पहले आपका blood sugar।'),
         whyImportant: _t('A raised fasting value is one way GDM is picked up.', 'fasting value का बढ़ा होना GDM पकड़ में आने के तरीक़ों में से एक है।'),
         typicalRange:
@@ -713,7 +713,7 @@ final List<TestScanInfo> kTestsScans = [
             'monitoring and sometimes medication.', 'value बढ़ी हो तो यह gestational diabetes की ओर इशारा करती है — जो खानपान, निगरानी और कभी-कभी दवा से सँभल जाती है।'),
       ),
       ReportParameter(
-        name: _t('HbA1c', 'HbA1c'),
+        name: _same('HbA1c'),
         measures: _t('Your average blood sugar over the past few weeks.', 'पिछले कुछ हफ़्तों का आपका औसत blood sugar।'),
         whyImportant: _t('Sometimes added to give a fuller picture.', 'पूरी तस्वीर के लिए कभी-कभी इसे भी जोड़ लिया जाता है।'),
         note: _t('Not the main test for GDM but useful background context.', 'GDM की मुख्य जाँच यह नहीं है, पर पृष्ठभूमि समझने में काम आती है।'),
@@ -732,7 +732,7 @@ final List<TestScanInfo> kTestsScans = [
   // -- Growth scan -----------------------------------------------------------
   TestScanInfo(
     id: 'growth_scan',
-    name: _t('Growth Scan', 'Growth Scan'),
+    name: _same('Growth Scan'),
     altName: _t('Third-Trimester Ultrasound', 'तीसरी तिमाही का Ultrasound'),
     tag: TrimesterTag.t3,
     whatItIs:
@@ -758,7 +758,7 @@ final List<TestScanInfo> kTestsScans = [
         'at.', 'रिपोर्ट में मुख्य रूप से आकार, पानी और ख़ून के बहाव की बात होती है। देखने लायक़ बातें ये हैं।'),
     parameters: [
       ReportParameter(
-        name: _t('EFW (Estimated Fetal Weight)', 'EFW (Estimated Fetal Weight)'),
+        name: _same('EFW (Estimated Fetal Weight)'),
         measures: _t('An estimate of your baby\'s weight from the measurements.', 'मापों से निकला आपके शिशु के वज़न का अनुमान।'),
         whyImportant: _t('The headline number people focus on.', 'वही number जिस पर सबकी नज़र सबसे पहले जाती है।'),
         note:
@@ -775,7 +775,7 @@ final List<TestScanInfo> kTestsScans = [
             'small.', 'किसी एक centile से ज़्यादा मायने इसका है कि समय के साथ आपका शिशु अपनी ही curve पर चल रहा है। लगातार बढ़ता हुआ छोटा शिशु अक्सर बस स्वभाव से ही छोटा होता है।'),
       ),
       ReportParameter(
-        name: _t('AFI / Liquor', 'AFI / Liquor'),
+        name: _same('AFI / Liquor'),
         measures: _t('The amount of fluid around your baby.', 'आपके शिशु के आसपास पानी की मात्रा।'),
         whyImportant: _t('Reflects wellbeing and kidney function.', 'यह सेहत और गुर्दों के काम को दर्शाता है।'),
         typicalRange: _t('An AFI of roughly 8-18 cm is commonly considered normal.', 'लगभग 8-18 cm का AFI आमतौर पर सामान्य माना जाता है।'),
@@ -783,7 +783,7 @@ final List<TestScanInfo> kTestsScans = [
         ifHigh: _t('A higher level is often mild and simply followed up.', 'स्तर ज़्यादा हो तो अक्सर यह हल्का होता है और बस उस पर नज़र रखी जाती है।'),
       ),
       ReportParameter(
-        name: _t('Doppler (PI / RI)', 'Doppler (PI / RI)'),
+        name: _same('Doppler (PI / RI)'),
         measures: _t('Blood-flow readings in the cord and key vessels.', 'गर्भनाल और मुख्य नसों में ख़ून के बहाव की readings।'),
         whyImportant:
             _t('Normal flow is reassuring about the placenta and your baby\'s '
@@ -793,7 +793,7 @@ final List<TestScanInfo> kTestsScans = [
             'expected range for your weeks.', 'ये indices (PI/RI) के रूप में बताए जाते हैं; डॉक्टर इन्हें आपके हफ़्तों की उम्मीद वाली range से मिलाकर पढ़ते हैं।'),
       ),
       ReportParameter(
-        name: _t('Presentation', 'Presentation'),
+        name: _same('Presentation'),
         measures: _t('Which way up your baby is lying (cephalic / breech).', 'आपका शिशु किस ओर लेटा है (cephalic / breech)।'),
         whyImportant: _t('Relevant for delivery planning closer to term.', 'पूरे महीनों के पास आते-आते delivery की योजना के लिए यह मायने रखता है।'),
         note:
@@ -814,8 +814,8 @@ final List<TestScanInfo> kTestsScans = [
   // -- Doppler ---------------------------------------------------------------
   TestScanInfo(
     id: 'doppler',
-    name: _t('Doppler Scan', 'Doppler Scan'),
-    altName: _t('Colour Doppler / Umbilical Artery Doppler', 'Colour Doppler / Umbilical Artery Doppler'),
+    name: _same('Doppler Scan'),
+    altName: _same('Colour Doppler / Umbilical Artery Doppler'),
     tag: TrimesterTag.t3,
     whatItIs:
         _t('A special ultrasound setting that measures the speed and pattern of '
@@ -837,7 +837,7 @@ final List<TestScanInfo> kTestsScans = [
         _t('Doppler is reported as flow indices. Here is what they reflect.', 'Doppler का नतीजा बहाव के indices में आता है। वे क्या दिखाते हैं, यह रहा।'),
     parameters: [
       ReportParameter(
-        name: _t('Umbilical artery PI / RI', 'Umbilical artery PI / RI'),
+        name: _same('Umbilical artery PI / RI'),
         measures: _t('Resistance to blood flow in the cord.', 'गर्भनाल में ख़ून के बहाव के सामने आने वाली रुकावट।'),
         whyImportant: _t('A key indicator of how well the placenta is working.', 'यह बताने वाला अहम संकेत कि placenta कितना अच्छा काम कर रहा है।'),
         note:
@@ -845,7 +845,7 @@ final List<TestScanInfo> kTestsScans = [
             'reassuring.', 'आपके हफ़्तों की उम्मीद वाली range से मिलाकर पढ़ा जाता है; बहाव सामान्य हो तो भरोसा मिलता है।'),
       ),
       ReportParameter(
-        name: _t('MCA (Middle Cerebral Artery)', 'MCA (Middle Cerebral Artery)'),
+        name: _same('MCA (Middle Cerebral Artery)'),
         measures: _t('Blood flow to your baby\'s brain.', 'आपके शिशु के दिमाग़ तक ख़ून का बहाव।'),
         whyImportant:
             _t('Helps assess how your baby is coping, together with the cord '
@@ -853,7 +853,7 @@ final List<TestScanInfo> kTestsScans = [
         note: _t('Interpreted alongside the umbilical artery result.', 'इसे umbilical artery के नतीजे के साथ पढ़ा जाता है।'),
       ),
       ReportParameter(
-        name: _t('End-diastolic flow', 'End-diastolic flow'),
+        name: _same('End-diastolic flow'),
         measures: _t('Whether blood keeps flowing forward between heartbeats.', 'दो धड़कनों के बीच ख़ून आगे बहता रहता है या नहीं।'),
         whyImportant: _t('Present forward flow is a reassuring sign.', 'आगे की ओर बहाव बना रहना भरोसा देने वाला संकेत है।'),
         note:
@@ -875,8 +875,8 @@ final List<TestScanInfo> kTestsScans = [
   // -- GBS -------------------------------------------------------------------
   TestScanInfo(
     id: 'gbs',
-    name: _t('Group B Strep', 'Group B Strep'),
-    altName: _t('GBS Swab', 'GBS Swab'),
+    name: _same('Group B Strep'),
+    altName: _same('GBS Swab'),
     tag: TrimesterTag.t3,
     whatItIs:
         _t('A simple swab test for Group B Streptococcus, a common bacterium that '
@@ -896,7 +896,7 @@ final List<TestScanInfo> kTestsScans = [
         _t('The result is simply positive or negative. Here is what each means.', 'नतीजा बस positive या negative आता है। दोनों का मतलब यह है।'),
     parameters: [
       ReportParameter(
-        name: _t('Positive / Carrier', 'Positive / Carrier'),
+        name: _same('Positive / Carrier'),
         measures: _t('GBS was found on this swab.', 'इस swab में GBS मिला।'),
         whyImportant: _t('It tells your team to plan a simple precaution at delivery.', 'यह आपकी टीम को बताता है कि delivery पर एक आसान सी एहतियात की योजना बनानी है।'),
         note:
@@ -904,7 +904,7 @@ final List<TestScanInfo> kTestsScans = [
             'antibiotics during labour as a precaution.', 'यह आम है और आपमें कोई infection नहीं — एहतियातन प्रसव के दौरान आपको antibiotics दिए जाएँगे।'),
       ),
       ReportParameter(
-        name: _t('Negative', 'Negative'),
+        name: _same('Negative'),
         measures: _t('GBS was not found on this swab.', 'इस swab में GBS नहीं मिला।'),
         whyImportant: _t('No GBS precaution is needed based on this result.', 'इस नतीजे के आधार पर GBS को लेकर कोई एहतियात ज़रूरी नहीं।'),
         note: _t('Reassuring; routine care continues.', 'भरोसा देने वाली बात; सामान्य देखभाल जारी रहती है।'),
@@ -973,7 +973,7 @@ final List<FindingInfo> kFindings = [
   // -- Placenta previa -------------------------------------------------------
   FindingInfo(
     id: 'placenta_previa',
-    name: _t('Placenta Previa', 'Placenta Previa'),
+    name: _same('Placenta Previa'),
     tag: TrimesterTag.t3,
     whatIsIt:
         _t('The placenta is partly or fully covering the cervix in the later part of '
@@ -1112,7 +1112,7 @@ final List<FindingInfo> kFindings = [
   FindingInfo(
     id: 'low_afi',
     name: _t('Low Amniotic Fluid', 'Amniotic fluid की कमी'),
-    altName: _t('Oligohydramnios', 'Oligohydramnios'),
+    altName: _same('Oligohydramnios'),
     tag: TrimesterTag.t3,
     whatIsIt:
         _t('The amount of fluid around your baby is on the lower side. Fluid levels '
@@ -1156,7 +1156,7 @@ final List<FindingInfo> kFindings = [
   // -- Hypothyroidism --------------------------------------------------------
   FindingInfo(
     id: 'hypothyroid',
-    name: _t('Hypothyroidism', 'Hypothyroidism'),
+    name: _same('Hypothyroidism'),
     altName: _t('Underactive Thyroid', 'कम सक्रिय Thyroid'),
     tag: TrimesterTag.anytime,
     whatIsIt:
@@ -1203,7 +1203,7 @@ final List<FindingInfo> kFindings = [
   // -- Hyperthyroidism -------------------------------------------------------
   FindingInfo(
     id: 'hyperthyroid',
-    name: _t('Hyperthyroidism', 'Hyperthyroidism'),
+    name: _same('Hyperthyroidism'),
     altName: _t('Overactive Thyroid', 'ज़्यादा सक्रिय Thyroid'),
     tag: TrimesterTag.anytime,
     whatIsIt:
@@ -1250,8 +1250,8 @@ final List<FindingInfo> kFindings = [
   // -- Gestational diabetes --------------------------------------------------
   FindingInfo(
     id: 'gdm',
-    name: _t('Gestational Diabetes', 'Gestational Diabetes'),
-    altName: _t('GDM', 'GDM'),
+    name: _same('Gestational Diabetes'),
+    altName: _same('GDM'),
     tag: TrimesterTag.t2,
     whatIsIt:
         _t('Raised blood sugar that appears during pregnancy. Your body is having '
@@ -1298,7 +1298,7 @@ final List<FindingInfo> kFindings = [
   // -- Pre-eclampsia ---------------------------------------------------------
   FindingInfo(
     id: 'preeclampsia',
-    name: _t('Pre-eclampsia', 'Pre-eclampsia'),
+    name: _same('Pre-eclampsia'),
     altName: _t('High Blood Pressure in Pregnancy', 'गर्भावस्था में बढ़ा हुआ Blood Pressure'),
     tag: TrimesterTag.t3,
     whatIsIt:
@@ -1351,7 +1351,7 @@ final List<FindingInfo> kFindings = [
   FindingInfo(
     id: 'iugr',
     name: _t('Growth Restriction', 'बढ़त में रुकावट'),
-    altName: _t('IUGR / FGR', 'IUGR / FGR'),
+    altName: _same('IUGR / FGR'),
     tag: TrimesterTag.t3,
     whatIsIt:
         _t('Your baby is growing more slowly than expected and measuring smaller '
