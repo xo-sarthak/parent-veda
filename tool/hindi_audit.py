@@ -148,7 +148,16 @@ def main():
         loose = [t for s, e, t, _ in literal_runs(src, comment_spans(src))
                  if not skip(t)
                  and not any(a <= s and e <= b for a, b in spans)]
-        owed = src.count('_en(') - (1 if '_en(String s)' in src else 0)
+        # Count `_en(` in CODE only. A plain src.count() also counts the token
+        # inside doc comments, and the `_same` helper's own docstring explains
+        # itself by naming `_en()` - so adding that comment to seven files made
+        # the backlog appear to grow by seven while nothing changed. An audit
+        # that miscounts in the direction of "more work than there is" gets
+        # ignored just as fast as one that undercounts.
+        cspans = comment_spans(src)
+        owed = sum(1 for m in re.finditer(r'\b_en\(', src)
+                   if not any(a <= m.start() < b for a, b in cspans)) \
+            - (1 if '_en(String s)' in src else 0)
         hollow = hollow_pairs(src)
         if not loose and not owed and not hollow and not DEV.search(src):
             continue
@@ -163,6 +172,35 @@ def main():
     print('-' * 61)
     print(f'{"TOTAL (dart)":<32}{sum(r[1] for r in rows):>9}'
           f'{sum(r[2] for r in rows):>7}{sum(r[3] for r in rows):>13}')
+
+    # Dart OUTSIDE lib/data. This audit has now been wrong twice in the same
+    # way: it reported the app clean while lib/data/home held 5,095 Hinglish
+    # pairs, and again while lib/screens/week_flow_screen.dart held 173. Both
+    # times the tool was correct about everywhere it looked.
+    try:
+        from scan_live_hinglish import PAIR, DEV as SDEV, LATIN as SLAT
+        import glob as _g
+        live = {}
+        for p in _g.glob('lib/**/*.dart', recursive=True):
+            p = p.replace(os.sep, '/')
+            if '/post_pregnancy/' in p or '/ttc/' in p or p.startswith('lib/data/'):
+                continue
+            s = open(p, encoding='utf-8').read()
+            n = sum(1 for a, b in PAIR.findall(s)
+                    if a[1:-1] != b[1:-1] and b[1:-1].strip()
+                    and not SDEV.search(b) and SLAT.search(b))
+            if n:
+                live[p] = n
+        if live:
+            print()
+            print(f'{"Dart outside lib/data":<48}{"hinglish":>10}')
+            print('-' * 61)
+            for p, n in sorted(live.items(), key=lambda x: -x[1]):
+                print(f'{p:<48}{n:>10}')
+            print('-' * 61)
+            print(f'{"TOTAL still live":<48}{sum(live.values()):>10}')
+    except Exception as e:                       # never let the audit die here
+        print('\n(dart-outside-lib/data scan unavailable: %s)' % e)
 
     jrows = [r for r in json_bodies() if r[3]]
     if jrows:

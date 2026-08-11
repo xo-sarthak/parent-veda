@@ -39,12 +39,15 @@
 //
 //      So the failure mode has inverted. It is no longer "the filter misses
 //      things"; it is "the filter hides so much that pickFatherSource runs out
-//      of days and falls back to the least-bad one" — at which point a father
-//      is shown her-body content anyway. Matching more eagerly is NOT the safe
-//      direction past this point. Before adding a word to `_herBodyHi`, run
-//      tool/check_her_body_filter.py and look at the worst-week number.
-//      Adding `ताक़त` for "energy", which looks obviously right, takes a week
-//      to 7/7 and breaks the fallback.
+//      of clean days and falls back to the least-bad one" — and least-bad still
+//      speaks to her body, just less. The fallback degrades gracefully; it does
+//      not protect him. Matching more eagerly is NOT the safe direction past
+//      this point.
+//
+//      Adding `ताक़त` for "energy" — which looks obviously right, and closes
+//      the last two English-only gaps — takes a week to 7/7. Before adding any
+//      word to `_herBodyHi`, run tool/check_her_body_filter.py and read the
+//      worst-week line. father_day_derive_test.dart fails if any week hits 7.
 //
 //  Deterministic, not random: the card must not change under him on a rebuild.
 //
@@ -115,8 +118,13 @@ int _herScore(HomeDay d) {
 /// Pick which of the week's days a father reads on [day].
 ///
 /// Offset so he is rarely on the same card as her, then walk forward to the
-/// first day that reads cleanly to him. Falls back to the least-bad day, which
-/// in practice never happens — no week has 7 flagged days.
+/// first day that reads cleanly to him.
+///
+/// Falls back to the least-bad day when every day of the week is flagged. That
+/// is a real fallback, not dead code — the worst week is currently at 6 of 7,
+/// so it is one content change away from being the normal path, and least-bad
+/// still speaks to her body. `father_day_derive_test.dart` fails if any week
+/// reaches 7, which is the only thing keeping this honest.
 HomeDay pickFatherSource(int day, List<HomeDay> week) {
   if (week.isEmpty) throw ArgumentError('no days for this week');
   final ordered = [...week]..sort((a, b) => a.day.compareTo(b.day));
@@ -136,36 +144,36 @@ HomeDay pickFatherSource(int day, List<HomeDay> week) {
 LocalizedText _module(int week) {
   if (week <= 12) {
     return const LocalizedText(
-        en: 'BECOMING A FATHER', hi: 'PITA BANNE KI SHURUAAT');
+        en: 'BECOMING A FATHER', hi: 'पिता बनने की शुरुआत');
   }
   if (week <= 20) {
-    return const LocalizedText(en: 'SHOWING UP', hi: 'SAATH DENA');
+    return const LocalizedText(en: 'SHOWING UP', hi: 'साथ खड़े रहना');
   }
   if (week <= 27) {
-    return const LocalizedText(en: 'BUILDING THE BOND', hi: 'RISHTA BANANA');
+    return const LocalizedText(en: 'BUILDING THE BOND', hi: 'जुड़ाव बनाना');
   }
   if (week <= 36) {
-    return const LocalizedText(en: 'GETTING READY', hi: 'TAIYAARI');
+    return const LocalizedText(en: 'GETTING READY', hi: 'तैयारी');
   }
-  return const LocalizedText(en: 'THE ARRIVAL', hi: 'UNKA AANA');
+  return const LocalizedText(en: 'THE ARRIVAL', hi: 'उनका आना');
 }
 
 LocalizedText _intro(int week) {
   if (week <= 12) {
     return const LocalizedText(
       en: 'A moment to sit with what is happening.',
-      hi: 'Jo ho raha hai, uske saath thoda ruk kar baithne ka pal.',
+      hi: 'जो हो रहा है, उसके साथ थोड़ा ठहरने का पल।',
     );
   }
   if (week <= 27) {
     return const LocalizedText(
       en: 'A moment to build the father you want to be.',
-      hi: 'Woh pita banne ka pal jo aap banna chahte hain.',
+      hi: 'वह पिता बनने का पल, जो आप बनना चाहते हैं।',
     );
   }
   return const LocalizedText(
     en: 'A moment to get ready, in the way that matters.',
-    hi: 'Taiyaar hone ka pal, us tarah se jo maayne rakhta hai.',
+    hi: 'तैयार होने का पल, उस तरह से जो सच में मायने रखता है।',
   );
 }
 
@@ -173,18 +181,18 @@ LocalizedText _intro(int week) {
 /// sentence — so it cannot double as a heading.
 const _talkHeading = LocalizedText(
   en: 'Talk to your baby',
-  hi: 'Apne baby se baat kijiye',
+  hi: 'अपने शिशु से बात कीजिए',
 );
 
 /// The lead-in that turns her self-care into his action.
 LocalizedText _missionLead(NurtureType t) => switch (t) {
       NurtureType.breathe => const LocalizedText(
-          en: 'Do this with her today.', hi: 'Aaj yeh uske saath kijiye.'),
+          en: 'Do this with her today.', hi: 'आज यह उनके साथ कीजिए।'),
       NurtureType.affirm => const LocalizedText(
-          en: 'Say this to her today.', hi: 'Aaj yeh usse kahiye.'),
+          en: 'Say this to her today.', hi: 'आज यह उनसे कहिए।'),
       NurtureType.food => const LocalizedText(
           en: 'Make this happen for her today.',
-          hi: 'Aaj yeh uske liye kar dijiye.'),
+          hi: 'आज यह उनके लिए कर दीजिए।'),
     };
 
 LocalizedText _join(LocalizedText a, LocalizedText b) => LocalizedText(

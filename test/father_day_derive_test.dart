@@ -36,8 +36,23 @@ final _herBody = RegExp(
   caseSensitive: false,
 );
 
+/// The Devanagari half, mirroring `_herBodyHi` in father_day_derive.dart.
+///
+/// This test checked ONLY `.en` until now, which meant the half of the filter
+/// that runs on Hindi had no test at all — and that half spent the whole period
+/// after the Devanagari migration matching nothing, because the content was
+/// still Latin-script Hinglish. A green suite said nothing about it either way.
+final _herBodyHi = RegExp(
+  'शरीर|पेट|बच्चेदानी|गर्भाशय|कोख|स्तन|छाती|कमर|कूल्ह|टख[नन]|'
+  'हॉर्मोन|हार्मोन|ख़ून|खून|त्वचा|ऊर्जा|थकान',
+);
+
 /// The regex works on strings; every content leaf is a {en, hi} pair.
 bool _hits(LocalizedText t) => _herBody.hasMatch(t.en);
+
+/// Both halves, as the shipped filter asks it.
+bool _hitsEither(LocalizedText t) =>
+    _herBody.hasMatch(t.en) || _herBodyHi.hasMatch(t.hi);
 
 void main() {
   final weeks = {for (var w = _first; w <= _last; w++) w: _week(w)};
@@ -114,6 +129,77 @@ void main() {
       expect(offenders, isEmpty,
           reason: 'these would read as wrong, not just oddly voiced:\n'
               '${offenders.take(10).join('\n')}');
+    });
+
+    test('no derived father day mentions her body in HINDI either', () {
+      final offenders = <String>[];
+      for (var w = _first; w <= _last; w++) {
+        for (final src in weeks[w]!) {
+          final fd = fatherDayFromMother(src.day, w, weeks[w]!);
+          for (final entry in {
+            'learn.title': fd.learn.title,
+            'learn.insight': fd.learn.insight,
+            'learn.expanded': fd.learn.expanded,
+            'learn.remember': fd.learn.remember,
+            'talk.prompt': fd.talk.prompt,
+            'talk.motivation': fd.talk.motivation,
+            'mission.title': fd.mission.title,
+            'mission.action': fd.mission.action,
+          }.entries) {
+            if (_herBodyHi.hasMatch(entry.value.hi)) {
+              offenders.add('week $w day ${src.day} ${entry.key}: '
+                  '"${_herBodyHi.firstMatch(entry.value.hi)!.group(0)}"');
+            }
+          }
+        }
+      }
+      expect(offenders, isEmpty,
+          reason: 'a Hindi reader would see her-body content on his screen:\n'
+              '${offenders.take(10).join('\n')}');
+    });
+
+    test('every week still has at least one day that reads cleanly to him', () {
+      // pickFatherSource walks the week for an unflagged day and falls back to
+      // the LEAST-BAD one when all seven are flagged. That fallback is graceful
+      // but it is not safe: least-bad still speaks to her body, just less.
+      //
+      // This is a live risk rather than a theoretical one. The filter's design
+      // note said "no week has more than 3 such days out of 7" - true when the
+      // Hindi half matched nothing. Translating lib/data/home to Devanagari
+      // woke it up and the worst week went to SIX. Adding one more word to
+      // `_herBodyHi` - `ताक़त` for "energy" looks obviously right - takes a
+      // week to 7 and silently turns the fallback into the normal path.
+      //
+      // So the filter can now fail by matching too EAGERLY, and nothing else
+      // would tell us.
+      final tight = <String>[];
+      var worst = 0;
+      for (var w = _first; w <= _last; w++) {
+        var flagged = 0;
+        for (final d in weeks[w]!) {
+          final speaks = _hitsEither(d.grow.title) ||
+              _hitsEither(d.grow.insight) ||
+              _hitsEither(d.grow.expanded) ||
+              _hitsEither(d.grow.remember) ||
+              (d.grow.deepDive != null && _hitsEither(d.grow.deepDive!)) ||
+              _hitsEither(d.talk.title) ||
+              _hitsEither(d.talk.motivation) ||
+              _hitsEither(d.nurture.title) ||
+              _hitsEither(d.nurture.remember);
+          if (speaks) flagged++;
+        }
+        if (flagged > worst) worst = flagged;
+        if (flagged >= 7) tight.add('week $w: all 7 days flagged');
+      }
+      expect(tight, isEmpty,
+          reason: 'pickFatherSource has no clean day left in these weeks and '
+              'will fall back to showing her-body content:\n'
+              '${tight.join('\n')}');
+      // Headroom, reported so a slide from 5 to 6 is visible in the log rather
+      // than only discovered at 7.
+      expect(worst, lessThanOrEqualTo(6),
+          reason: 'worst week now has $worst of 7 days flagged - one more and '
+              'the fallback becomes the normal path');
     });
 
     test('the source data really does contain the problem — otherwise the '

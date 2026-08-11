@@ -21,9 +21,24 @@ import '../../localization/app_language.dart';
 /// the shared model can widen, but deliberately NOT `_t(x, x)`: an
 /// identical pair reads as finished work to anything counting pairs.
 /// `grep -c '_en('` is the size of what is left here.
+///
+/// UNUSED AS OF 2026-08-11 — every marker in this file has been translated, and
+/// that is exactly why it stays. It is the marker for the NEXT English-only
+/// string somebody adds, and deleting it would leave them reaching for
+/// `_t(x, x)`, which is the form that once let can_i_data be reported finished
+/// with 302 strings still English. `tool/hindi_audit.py` greps for this name.
+// ignore: unused_element
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
+/// Identical in both languages BY NATURE - a book title, an author, a brand.
+///
+/// The counterpart to `_en()` above and the reason both exist: they produce the
+/// SAME LocalizedText, so only the name records which kind of "no Hindi here"
+/// this is. `_en()` is a debt; this is a finished decision. Collapsing them
+/// would make `grep -c '_en('` stop being the size of what is left.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 final List<ReadItem> kFatherReadItems = [
   ReadItem(
@@ -37,11 +52,13 @@ final List<ReadItem> kFatherReadItems = [
     readingTime: _t('3 min', '3 मिनट'),
     category: _t('Bonding', 'जुड़ाव'),
     emoji: '👂',
-    body: _en('Around now the tiny bones of your baby\'s inner ear finish forming, and sound begins to reach them. Your voice - lower and slower than hers - carries especially well through the body.\n\n'
+    body: _t('Around now the tiny bones of your baby\'s inner ear finish forming, and sound begins to reach them. Your voice - lower and slower than hers - carries especially well through the body.\n\n'
         'Reading a few lines aloud each day is not sentimental; it is how your baby starts to know you before they ever see you. The rhythm matters more than the words.\n\n'
-        'A minute is plenty. Pick a short story, sit close to her bump, and let your voice rise and fall.'),
-    whyThisMatters: _en('Your baby learning your voice now is not a nice-to-have - it lays the first thread of attachment. Newborns turn toward voices they heard in the womb, and a father\'s lower pitch is one of the easiest for them to pick out. The minutes you spend reading aloud quietly build a recognition that pays off the day they are born.'),
-    researchSimplified: _en('Newborns calm to voices and rhymes they heard repeatedly before birth, and can tell their parents\' voices apart within days. Low-frequency sound travels through tissue better than high sound, so your voice reaches the womb clearly. In short: repetition plus your natural pitch equals a baby who already knows you.'),
+        'A minute is plenty. Pick a short story, sit close to her bump, and let your voice rise and fall.', 'इन्हीं दिनों शिशु के भीतरी कान की नन्ही हड्डियाँ बनकर पूरी होती हैं, और आवाज़ उन तक पहुँचने लगती है। आपकी आवाज़ — उनकी आवाज़ से भारी और धीमी — शरीर के भीतर से ख़ास तौर पर अच्छी तरह पहुँचती है।\n\n'
+        'रोज़ दो-चार पंक्तियाँ पढ़कर सुनाना कोई भावुक सी बात नहीं है; इसी तरह शिशु आपको देखने से पहले ही आपको जानने लगते हैं। शब्दों से ज़्यादा मायने लय रखती है।\n\n'
+        'एक मिनट भी काफ़ी है। कोई छोटी सी कहानी चुनिए, उनके बंप के पास बैठिए, और अपनी आवाज़ को चढ़ने-उतरने दीजिए।'),
+    whyThisMatters: _t('Your baby learning your voice now is not a nice-to-have - it lays the first thread of attachment. Newborns turn toward voices they heard in the womb, and a father\'s lower pitch is one of the easiest for them to pick out. The minutes you spend reading aloud quietly build a recognition that pays off the day they are born.', 'शिशु का अभी आपकी आवाज़ पहचानने लगना ऐसी चीज़ नहीं जो हो तो अच्छी, न हो तो चले — यहीं से लगाव का पहला धागा बँधता है। नवजात उन आवाज़ों की ओर मुड़ते हैं जो उन्होंने पेट के भीतर सुनी थीं, और पिता की भारी आवाज़ उनके लिए पहचानना सबसे आसान आवाज़ों में से एक है। पढ़कर सुनाने में लगाए आपके ये चंद मिनट चुपचाप एक पहचान बनाते रहते हैं, जो जन्म के दिन काम आती है।'),
+    researchSimplified: _t('Newborns calm to voices and rhymes they heard repeatedly before birth, and can tell their parents\' voices apart within days. Low-frequency sound travels through tissue better than high sound, so your voice reaches the womb clearly. In short: repetition plus your natural pitch equals a baby who already knows you.', 'जन्म से पहले बार-बार सुनी आवाज़ों और तुकबंदियों से नवजात शांत हो जाते हैं, और कुछ ही दिनों में अपने माँ-बाप की आवाज़ें अलग-अलग पहचानने लगते हैं। कम frequency वाली आवाज़ ऊँची आवाज़ के मुक़ाबले शरीर के भीतर से बेहतर गुज़रती है, इसलिए आपकी आवाज़ गर्भ तक साफ़ पहुँचती है। कुल मिलाकर: दोहराव और आपकी अपनी भारी आवाज़ — इन्हीं दोनों से शिशु जन्म से पहले ही आपको जानने लगता है।'),
     myth: _t('The baby cannot really hear me through the bump yet.', 'बंप के पार शिशु मुझे अभी सच में सुन नहीं सकता।'),
     fact: _t('By around 20 weeks the inner ear is working and low sounds - like your voice - reach your baby clearly.', 'क़रीब 20 हफ़्ते तक भीतरी कान काम करने लगता है और कम आवाज़ें — जैसे आपकी — शिशु तक साफ़ पहुँचती हैं।'),
   ),
@@ -77,7 +94,7 @@ final List<ReadItem> kFatherReadItems = [
         'You can usually go with her, and your presence matters more than you think - these appointments can carry quiet anxiety. Write down any questions beforehand so neither of you forgets them in the moment.\n\n'
         'Most findings are reassuring. If anything needs a closer look, the doctor will guide the next steps calmly - your job is simply to be steady beside her.', 'Anomaly scan, आम तौर पर 18–22 हफ़्ते के बीच, इस बात की बारीक जाँच है कि आपका शिशु कैसे बन रहा है — दिल, दिमाग़, रीढ़, हाथ-पैर और बाक़ी अंग। इसमें पिछले scan से ज़्यादा वक़्त लगता है।\n\nआप आम तौर पर उनके साथ जा सकते हैं, और आपका वहाँ होना आपके सोचने से कहीं ज़्यादा मायने रखता है — इन मुलाक़ातों में एक चुपचाप घबराहट रहती है। सवाल पहले से लिख लीजिए, ताकि मौक़े पर दोनों में से कोई भूल न जाए।\n\nज़्यादातर नतीजे तसल्ली देने वाले होते हैं। अगर किसी चीज़ को और क़रीब से देखने की ज़रूरत हुई, तो डॉक्टर शांति से आगे के क़दम बताएँगे — आपका काम बस उनके पास ठहरे हुए खड़े रहना है।'),
     whyThisMatters: _t('Scan days carry quiet anxiety even when everything is fine. Being there - steady, prepared, unhurried - is one of the clearest ways to show up. It also means you hear the same information she does, so you can talk it through together afterwards.', 'Scan वाले दिन एक चुपचाप घबराहट लिए आते हैं, तब भी जब सब ठीक हो। वहाँ होना — ठहरे हुए, तैयार, बिना जल्दबाज़ी के — साथ देने के सबसे साफ़ तरीक़ों में से एक है। इससे आप वही बात सुनते हैं जो वे सुनती हैं, तो बाद में दोनों मिलकर उस पर बात कर सकते हैं।'),
-    researchSimplified: _en('The anomaly scan checks the baby\'s anatomy in detail; the large majority come back reassuring. Partner presence at antenatal appointments is associated with lower maternal anxiety, and writing questions down beforehand improves how much couples remember and understand.'),
+    researchSimplified: _t('The anomaly scan checks the baby\'s anatomy in detail; the large majority come back reassuring. Partner presence at antenatal appointments is associated with lower maternal anxiety, and writing questions down beforehand improves how much couples remember and understand.', 'Anomaly scan में शिशु के शरीर की बनावट बारीकी से देखी जाती है; ज़्यादातर मामलों में इसके नतीजे तसल्ली देने वाले होते हैं। गर्भावस्था की जाँच वाली मुलाक़ातों में साथी का मौजूद रहना माँ की कम घबराहट से जुड़ा पाया गया है, और सवाल पहले से लिखकर ले जाने से दोनों को ज़्यादा याद रहता है और बात ज़्यादा समझ में आती है।'),
   ),
   ReadItem(
     id: 'f_back_ache',
@@ -110,7 +127,7 @@ final List<ReadItem> kFatherReadItems = [
     body: _t('Around now, the first flutters and kicks often arrive. At first they are faint - easy to miss - but they grow stronger over the coming weeks.\n\n'
         'Ask her to tell you when she feels one, and rest your hand gently on her bump. It may take patience; babies often go quiet when they sense a new pressure, then start again.\n\n'
         'The first time you feel that little nudge against your palm is a moment you will remember. Do not rush it - just be there for it.', 'इन्हीं दिनों पहली फड़कन और लातें अक्सर आ जाती हैं। शुरू में वे इतनी हल्की होती हैं कि छूट जाएँ — पर आने वाले हफ़्तों में मज़बूत होती जाती हैं।\n\nउनसे कहिए कि जब महसूस हो तो बताएँ, और अपना हाथ हल्के से उनके बंप पर रख दीजिए। सब्र लग सकता है; नया दबाव भाँपते ही शिशु अक्सर शांत हो जाते हैं, फिर दोबारा शुरू करते हैं।\n\nहथेली पर पहली बार वह नन्हा धक्का महसूस करना ऐसा पल है जो आपको याद रह जाएगा। इसमें जल्दी मत कीजिए — बस उसके लिए मौजूद रहिए।'),
-    whyThisMatters: _en('Feeling the first kick is often the moment a dad\'s bond becomes physical. Sharing it - hand on the bump, waiting together - turns a private sensation into something you both hold.'),
+    whyThisMatters: _t('Feeling the first kick is often the moment a dad\'s bond becomes physical. Sharing it - hand on the bump, waiting together - turns a private sensation into something you both hold.', 'पहली लात महसूस होना अक्सर वही पल होता है जब पिता का जुड़ाव छूकर महसूस होने लगता है। उसे साथ में बाँटना — बंप पर हाथ रखे, साथ मिलकर इंतज़ार करते हुए — एक ऐसे एहसास को, जो अब तक सिर्फ़ उनका था, आप दोनों का बना देता है।'),
     researchSimplified: _t('First movements (quickening) are usually felt by the mother before they are strong enough to feel from outside; external kicks tend to become palpable a few weeks later. Babies often still when they sense new pressure, then resume - so patience, not force, is the trick.', 'पहली हलचल (quickening) आम तौर पर माँ को तब महसूस होती है जब वह बाहर से महसूस होने लायक़ मज़बूत नहीं होती; बाहर से लातें कुछ हफ़्ते बाद हाथ पर लगने लगती हैं। नया दबाव भाँपते ही शिशु अक्सर ठहर जाते हैं, फिर शुरू कर देते हैं — इसलिए ज़ोर नहीं, सब्र ही तरकीब है।'),
   ),
 
@@ -143,9 +160,11 @@ final List<ReadItem> kFatherReadItems = [
     readingTime: _t('5 min', '5 मिनट'),
     category: _t('Research', 'शोध'),
     emoji: '📊',
-    body: _en('A father\'s involvement is not just sentimental - it correlates with concrete outcomes for mother and baby.\n\n'
+    body: _t('A father\'s involvement is not just sentimental - it correlates with concrete outcomes for mother and baby.\n\n'
         'Reviews link supportive partners to lower maternal stress, better antenatal-care attendance, and improved wellbeing. Some studies even associate strong partner support with healthier birth outcomes, likely through reduced stress and better self-care.\n\n'
-        'The mechanism is ordinary: presence at appointments, sharing the mental load, and steady emotional support. None of it requires expertise - just showing up.'),
+        'The mechanism is ordinary: presence at appointments, sharing the mental load, and steady emotional support. None of it requires expertise - just showing up.', 'पिता का साथ देना सिर्फ़ भावुक सी बात नहीं है — इसका माँ और शिशु दोनों के ठोस नतीजों से नाता दिखता है।\n\n'
+        'कई अध्ययनों को मिलाकर देखा गया है कि साथ देने वाला साथी हो तो माँ का तनाव कम रहता है, जाँच वाली मुलाक़ातें ज़्यादा नियम से होती हैं, और सेहत बेहतर रहती है। कुछ अध्ययनों में तो मज़बूत साथ का नाता जन्म के बेहतर नतीजों से भी जुड़ा मिला है — शायद कम तनाव और अपनी बेहतर देखभाल के रास्ते।\n\n'
+        'तरीक़ा बहुत मामूली सा है: जाँच के वक़्त साथ होना, दिमाग़ पर पड़ा बोझ बाँटना, और लगातार भावनात्मक सहारा देना। इसमें किसी विशेषज्ञता की ज़रूरत नहीं — बस मौजूद रहने की।'),
     whyThisMatters: _t('If you have ever wondered whether your involvement really moves the needle, the evidence says it does - and it tells you where to spend your effort.', 'अगर आपने कभी सोचा हो कि आपके साथ देने से सच में कोई फ़र्क़ पड़ता है या नहीं, तो सबूत कहते हैं कि पड़ता है — और यह भी बताते हैं कि मेहनत कहाँ लगानी है।'),
     researchSimplified: _t('Across studies, partner support tracks with lower stress, better care engagement and wellbeing. The effective inputs are practical and emotional support plus appointment attendance - not grand gestures.', 'अलग-अलग अध्ययनों में साथी का सहारा कम तनाव, बेहतर देखभाल और बेहतर सेहत के साथ चलता दिखता है। असर करने वाली चीज़ें हैं — व्यावहारिक और भावनात्मक सहारा, और मुलाक़ातों में साथ जाना; बड़े-बड़े इशारे नहीं।'),
   ),
@@ -153,7 +172,7 @@ final List<ReadItem> kFatherReadItems = [
   // ---- Book Summaries -----------------------------------------------------
   ReadItem(
     id: 'f_book_handbook',
-    title: _t("We're Pregnant! The First-Time Dad's Pregnancy Handbook", 'We\'re Pregnant! The First-Time Dad\'s Pregnancy Handbook'),
+    title: _same("We're Pregnant! The First-Time Dad's Pregnancy Handbook"),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,
@@ -173,7 +192,7 @@ final List<ReadItem> kFatherReadItems = [
   ),
   ReadItem(
     id: 'f_book_dude',
-    title: _t("Dude, You're Gonna Be a Dad!", 'Dude, You\'re Gonna Be a Dad!'),
+    title: _same("Dude, You're Gonna Be a Dad!"),
     type: ReadType.book,
     weekStart: 4,
     weekEnd: 40,

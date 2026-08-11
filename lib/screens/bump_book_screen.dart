@@ -34,6 +34,7 @@ import '../services/remote/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
+import '../services/pdf_fonts.dart';
 
 class BumpBookScreen extends StatefulWidget {
   const BumpBookScreen({super.key, required this.lang});
@@ -87,7 +88,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
             elevation: 0,
             iconTheme: const IconThemeData(color: _accentDeep),
             title: Text(
-              _t('My Bump Journey Book', 'Meri Bump Journey Book'),
+              _t('My Bump Journey Book', 'मेरे बंप सफ़र की किताब'),
               style: pvJakarta(
                   fontWeight: FontWeight.w700, color: _accentDeep, fontSize: 17),
             ),
@@ -119,7 +120,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                             const Icon(Icons.picture_as_pdf_rounded,
                                 size: 18, color: _accentDeep),
                             const SizedBox(width: 10),
-                            Text(_t('Download PDF', 'PDF Download')),
+                            Text(_t('Download PDF', 'PDF डाउनलोड कीजिए')),
                           ]),
                         ),
                         PopupMenuItem(
@@ -128,7 +129,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                             const Icon(Icons.menu_book_rounded,
                                 size: 18, color: _accentDeep),
                             const SizedBox(width: 10),
-                            Text(_t('Order printed copy', 'Print copy order')),
+                            Text(_t('Order printed copy', 'छपी हुई कॉपी मंगाइए')),
                           ]),
                         ),
                       ],
@@ -239,7 +240,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const Icon(Icons.spa_rounded, size: 34, color: _accent),
               const SizedBox(height: 22),
               Text(
-                _t('My Bump\nJourney', 'Meri Bump\nJourney'),
+                _t('My Bump\nJourney', 'मेरा बंप\nसफ़र'),
                 textAlign: TextAlign.center,
                 style: pvFraunces(
                     fontSize: 40,
@@ -252,7 +253,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 18),
               Text(
                 _t('A keepsake of every week we grew together.',
-                    'Har hafte ki ek pyaari yaad.'),
+                    'हर उस हफ़्ते की याद, जब हम साथ-साथ बढ़े।'),
                 textAlign: TextAlign.center,
                 style: pvManrope(
                     fontSize: 14,
@@ -262,7 +263,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               ),
               const SizedBox(height: 30),
               Text(
-                _t('${photos.length} weeks captured', '${photos.length} hafte'),
+                _t('${photos.length} weeks captured', '${photos.length} हफ़्ते सहेजे गए'),
                 style: pvManrope(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -360,7 +361,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 20),
               Text(
                 _t('The waiting was\nthe sweetest part.',
-                    'Intezaar bhi\nkitna pyaara tha.'),
+                    'यह इंतज़ार ही\nसबसे प्यारा था।'),
                 textAlign: TextAlign.center,
                 style: pvFraunces(
                     fontSize: 27,
@@ -373,7 +374,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 18),
               Text(
                 _t('Keep this book, share it, or hold it in print one day.',
-                    'Is book ko sambhaal ke rakhiye.'),
+                    'इस किताब को सहेजिए, किसी को दिखाइए, या किसी दिन छपी हुई हाथ में लीजिए।'),
                 textAlign: TextAlign.center,
                 style: pvManrope(
                     fontSize: 13.5, height: 1.5, color: _ink),
@@ -455,7 +456,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                       borderRadius: BorderRadius.circular(14)),
                 ),
                 icon: const Icon(Icons.menu_book_rounded, size: 18),
-                label: Text(_t('Order print', 'Print order'),
+                label: Text(_t('Order print', 'प्रिंट मंगाइए'),
                     style: pvManrope(fontWeight: FontWeight.w700)),
               ),
             ),
@@ -481,7 +482,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                _t('Your book is waiting', 'Aapki book taiyaar hai'),
+                _t('Your book is waiting', 'आपकी किताब इंतज़ार में है'),
                 textAlign: TextAlign.center,
                 style: pvFraunces(
                     fontSize: 23, fontWeight: FontWeight.w500, color: _accentDeep),
@@ -490,7 +491,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Text(
                 _t(
                     'Add a few bump photos to your journey first, and they will bloom into a keepsake book here.',
-                    'Pehle apni journey mein kuch bump photos add karein - yehi book ban jayengi.'),
+                    'पहले अपने सफ़र में कुछ बंप तस्वीरें जोड़िए, वही यहाँ एक प्यारी सी किताब बन जाएँगी।'),
                 textAlign: TextAlign.center,
                 style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral600),
@@ -500,7 +501,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 style: FilledButton.styleFrom(backgroundColor: _accentDeep),
                 onPressed: () => Navigator.of(context).maybePop(),
                 icon: const Icon(Icons.add_a_photo_rounded, size: 18),
-                label: Text(_t('Add bump photos', 'Bump photos add karein')),
+                label: Text(_t('Add bump photos', 'बंप तस्वीरें जोड़िए')),
               ),
             ],
           ),
@@ -541,7 +542,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
     } catch (_) {
       messenger.showSnackBar(SnackBar(
           content: Text(_t('Could not build the book. Please try again.',
-              'Book nahi ban payi. Dobara try karein.'))));
+              'किताब नहीं बन पाई। एक बार फिर कोशिश कीजिए।'))));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -554,13 +555,16 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
     const roseDeep = PdfColor.fromInt(0xFF9E5546);
     const ink = PdfColor.fromInt(0xFF4A3B36);
 
-    final serif = await PdfGoogleFonts.frauncesRegular();
-    final serifBold = await PdfGoogleFonts.frauncesSemiBold();
-    final body = await PdfGoogleFonts.nunitoRegular();
-    final bodyItalic = await PdfGoogleFonts.nunitoItalic();
+    // Fraunces and Nunito have no Devanagari — the Hindi book came out as
+    // blank boxes. PdfFontSet swaps the whole family by language.
+    final fonts = await PdfFontSet.load(widget.lang);
+    final serif = fonts.serif;
+    final serifBold = fonts.serifBold;
+    final body = fonts.body;
+    final bodyItalic = fonts.bodyItalic;
 
     final doc = pw.Document(
-        title: _t('My Bump Journey', 'Meri Bump Journey'), author: s.appName);
+        title: _t('My Bump Journey', 'मेरा बंप सफ़र'), author: s.appName);
 
     pw.Page decorated(pw.WidgetBuilder build) => pw.Page(
           pageFormat: PdfPageFormat.a4,
@@ -594,7 +598,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               pw.Text('*',
                   style: pw.TextStyle(font: serif, fontSize: 30, color: rose)),
               pw.SizedBox(height: 22),
-              pw.Text(_t('My Bump Journey', 'Meri Bump Journey'),
+              pw.Text(_t('My Bump Journey', 'मेरा बंप सफ़र'),
                   textAlign: pw.TextAlign.center,
                   style:
                       pw.TextStyle(font: serifBold, fontSize: 40, color: roseDeep)),
@@ -603,11 +607,11 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               pw.SizedBox(height: 18),
               pw.Text(
                   _t('A keepsake of every week we grew together.',
-                      'Har hafte ki ek pyaari yaad.'),
+                      'हर उस हफ़्ते की याद, जब हम साथ-साथ बढ़े।'),
                   textAlign: pw.TextAlign.center,
                   style: pw.TextStyle(font: bodyItalic, fontSize: 15, color: ink)),
               pw.SizedBox(height: 40),
-              pw.Text(_t('${pages.length} weeks captured', '${pages.length} hafte'),
+              pw.Text(_t('${pages.length} weeks captured', '${pages.length} हफ़्ते सहेजे गए'),
                   style: pw.TextStyle(font: body, fontSize: 12, color: rose)),
             ],
           ),
@@ -619,7 +623,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
-                pw.Text(_t('Week', 'Hafta'),
+                pw.Text(_t('Week', 'हफ़्ता'),
                     style: pw.TextStyle(font: serif, fontSize: 16, color: rose)),
                 pw.SizedBox(width: 8),
                 pw.Text('${pgi.week}',
@@ -659,7 +663,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               else
                 pw.Expanded(
                   child: pw.Center(
-                    child: pw.Text(_t('(photo unavailable)', '(photo nahi mili)'),
+                    child: pw.Text(_t('(photo unavailable)', '(तस्वीर नहीं मिली)'),
                         style: pw.TextStyle(
                             font: bodyItalic, fontSize: 12, color: rose)),
                   ),
@@ -683,7 +687,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                   style: pw.TextStyle(font: serif, fontSize: 24, color: rose)),
               pw.SizedBox(height: 20),
               pw.Text(_t('The waiting was the sweetest part.',
-                  'Intezaar bhi kitna pyaara tha.'),
+                  'यह इंतज़ार ही सबसे प्यारा था।'),
                   textAlign: pw.TextAlign.center,
                   style:
                       pw.TextStyle(font: serifBold, fontSize: 26, color: roseDeep)),
@@ -738,7 +742,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               const SizedBox(height: 16),
               Text(
                 _t('A printed hardcover, coming soon',
-                    'Printed hardcover, jald aa rahi hai'),
+                    'छपी हुई हार्डकवर किताब, जल्द आ रही है'),
                 style: pvFraunces(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -748,7 +752,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Text(
                 _t(
                     'We are crafting a beautiful lay-flat hardcover of your Bump Journey Book - printed on thick matte paper and delivered to your door. It is not quite ready yet, but we will let you know the moment it is.',
-                    'Hum aapki Bump Journey Book ki ek sundar hardcover taiyaar kar rahe hain - motay matte paper par, aapke ghar tak. Abhi taiyaar nahi, par ready hote hi aapko bata denge.'),
+                    'हम आपके बंप सफ़र की किताब का एक सुंदर हार्डकवर तैयार कर रहे हैं - मोटे मैट पेपर पर छपा हुआ, और सीधे आपके घर तक। अभी बस थोड़ा वक़्त और, तैयार होते ही हम आपको बता देंगे।'),
                 style: pvManrope(
                     fontSize: 13.5, height: 1.55, color: _ink),
               ),
@@ -762,7 +766,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(_t(
                             'We will notify you when printed copies are ready.',
-                            'Print copy ready hote hi hum aapko notify karenge.'))));
+                            'छपी हुई कॉपी तैयार होते ही हम आपको बता देंगे।'))));
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: _accentDeep,
@@ -771,7 +775,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                         borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.notifications_active_rounded, size: 18),
-                  label: Text(_t('Notify me', 'Mujhe notify karein'),
+                  label: Text(_t('Notify me', 'मुझे बता दीजिए'),
                       style: pvManrope(fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -779,7 +783,7 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
               Center(
                 child: Text(
                   _t('Ordering opens later - no charge today.',
-                      'Ordering baad mein - abhi koi charge nahi.'),
+                      'ऑर्डर बाद में शुरू होंगे - आज कोई पैसा नहीं लगेगा।'),
                   style: pvManrope(
                       fontSize: 11.5, color: AppTheme.neutral500),
                 ),

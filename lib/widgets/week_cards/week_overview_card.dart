@@ -1124,15 +1124,15 @@ class _MS {
 }
 
 const List<_MS> _milestones = [
-  _MS(6, '💓', LocalizedText(en: 'First heartbeat', hi: 'Pehli dhadkan'),
+  _MS(6, '💓', LocalizedText(en: 'First heartbeat', hi: 'पहली धड़कन'),
       LocalizedText(
           en: "Your baby's heart began to beat.",
           hi: 'Aapke baby ka dil dhadakna shuru hua.')),
-  _MS(12, '🤏', LocalizedText(en: 'First movements', hi: 'Pehli harkatein'),
+  _MS(12, '🤏', LocalizedText(en: 'First movements', hi: 'पहली हलचल'),
       LocalizedText(
           en: 'Baby started moving - still too small to feel.',
-          hi: 'Baby ne hilna shuru kiya - abhi mehsoos hone ke liye bahut chhota.')),
-  _MS(18, '👂', LocalizedText(en: 'Beginning to hear', hi: 'Sunna shuru'),
+          hi: 'हलचल शुरू हो चुकी है - अभी इतनी छोटी कि महसूस नहीं होती।')),
+  _MS(18, '👂', LocalizedText(en: 'Beginning to hear', hi: 'सुनना शुरू'),
       LocalizedText(
           en: "Baby's hearing is developing and picking up sound.",
           hi: 'Baby ki sunne ki shakti viksit ho rahi hai.')),
@@ -1140,18 +1140,18 @@ const List<_MS> _milestones = [
       20,
       '✨',
       LocalizedText(
-          en: 'Halfway & first flutters', hi: 'Aadha safar & pehli harkat'),
+          en: 'Halfway & first flutters', hi: 'आधा सफ़र और पहली हलचल'),
       LocalizedText(
           en: "You may feel the first kicks - and you're halfway there!",
           hi: 'Aap pehli kicks mehsoos kar sakti hain - aur aadha safar poora!')),
-  _MS(24, '🛡️', LocalizedText(en: 'Viability milestone', hi: 'Viability padaav'),
+  _MS(24, '🛡️', LocalizedText(en: 'Viability milestone', hi: 'एक अहम पड़ाव'),
       LocalizedText(
           en: "A major step in your baby's development.",
           hi: 'Aapke baby ke vikas mein ek bada kadam.')),
-  _MS(27, '🎵', LocalizedText(en: 'Knows your voice', hi: 'Aapki awaaz pehchaane'),
+  _MS(27, '🎵', LocalizedText(en: 'Knows your voice', hi: 'आपकी आवाज़ की पहचान'),
       LocalizedText(
           en: 'Baby begins to recognise and respond to your voice.',
-          hi: 'Baby aapki awaaz pehchaanne aur react karne lagta hai.')),
+          hi: 'इस दौर में शिशु आपकी आवाज़ पहचानने और जवाब देने लगते हैं।')),
 ];
 
 class WeekMilestoneCard extends StatelessWidget {

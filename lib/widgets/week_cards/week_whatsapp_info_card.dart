@@ -114,7 +114,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     _t('Your baby is about ${_clean(snap.fruit.of(lang))} this week.',
-                        'Aapka baby is hafte lagbhag ${_clean(snap.fruit.of(lang))} jitna hai.'),
+                        'इस हफ़्ते शिशु का आकार लगभग ${_clean(snap.fruit.of(lang))} जितना है।'),
                     style: pvManrope(
                         fontSize: 14, height: 1.5, color: AppTheme.neutral600),
                   ),
@@ -175,7 +175,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       color: father ? kFInk : AppTheme.primary900)),
               Text(_t('What we send you on WhatsApp',
-                  'Jo hum aapko WhatsApp par bhejte hain'),
+                  'WhatsApp पर हम आपको क्या भेजते हैं'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: pvManrope(
@@ -205,15 +205,15 @@ class _WeekWhatsAppSheet extends StatelessWidget {
     return Row(children: [
       Expanded(
           child: _MiniStat(
-              label: _t('SIZE', 'AAKAR'), value: _clean(snap.fruit.of(lang)), father: father)),
+              label: _t('SIZE', 'आकार'), value: _clean(snap.fruit.of(lang)), father: father)),
       const SizedBox(width: 10),
       Expanded(
           child: _MiniStat(
-              label: _t('LENGTH', 'LAMBAI'), value: _clean(snap.length.of(lang)), father: father)),
+              label: _t('LENGTH', 'लंबाई'), value: _clean(snap.length.of(lang)), father: father)),
       const SizedBox(width: 10),
       Expanded(
           child: _MiniStat(
-              label: _t('WEIGHT', 'VAZAN'), value: _clean(snap.weight.of(lang)), father: father)),
+              label: _t('WEIGHT', 'वज़न'), value: _clean(snap.weight.of(lang)), father: father)),
     ]);
   }
 
@@ -240,7 +240,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
       Flexible(
         child: Text(
           _t('ParentVeda - gentle, weekly, on WhatsApp',
-              'ParentVeda - har hafte, WhatsApp par'),
+              'ParentVeda - हर हफ़्ते, आराम से, WhatsApp पर'),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: pvManrope(

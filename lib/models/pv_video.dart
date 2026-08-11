@@ -65,10 +65,10 @@ const List<PvVideo> kVideos = [
     weekStart: 4,
     weekEnd: 12,
     duration: '4 min',
-    title: LocalizedText(en: 'Your First Trimester', hi: 'Aapki Pehli Trimester'),
+    title: LocalizedText(en: 'Your First Trimester', hi: 'आपकी पहली तिमाही'),
     reason: LocalizedText(
         en: 'A gentle look at what is happening in these early weeks.',
-        hi: 'In shuruaati hafton mein kya ho raha hai, ek pyaari jhalak.'),
+        hi: 'इन शुरुआती हफ़्तों में क्या हो रहा है, एक हल्की सी झलक।'),
   ),
   PvVideo(
     id: 'rec_scan1',
@@ -76,10 +76,10 @@ const List<PvVideo> kVideos = [
     weekStart: 6,
     weekEnd: 10,
     duration: '3 min',
-    title: LocalizedText(en: 'Your First Scan', hi: 'Aapka Pehla Scan'),
+    title: LocalizedText(en: 'Your First Scan', hi: 'आपका पहला स्कैन'),
     reason: LocalizedText(
         en: 'What the first ultrasound looks for, and how to prepare.',
-        hi: 'Pehla ultrasound kya dekhta hai, aur kaise taiyaari karein.'),
+        hi: 'पहला अल्ट्रासाउंड क्या देखता है, और आप कैसे तैयार हो सकती हैं।'),
   ),
   PvVideo(
     id: 'rec_sound',
@@ -88,10 +88,10 @@ const List<PvVideo> kVideos = [
     weekEnd: 27,
     duration: '5 min',
     title: LocalizedText(
-        en: 'How Babies Respond to Sound', hi: 'Baby Awaaz Par Kaise React Karte Hain'),
+        en: 'How Babies Respond to Sound', hi: 'आवाज़ सुनकर शिशु कैसे जवाब देते हैं'),
     reason: LocalizedText(
         en: 'Your baby is increasingly responsive to sounds at this stage.',
-        hi: 'Is stage par aapka baby awaazon par zyada react karne lagta hai.'),
+        hi: 'इस पड़ाव पर शिशु आवाज़ों पर और ज़्यादा जवाब देने लगते हैं।'),
   ),
   PvVideo(
     id: 'rec_movement',
@@ -99,10 +99,10 @@ const List<PvVideo> kVideos = [
     weekStart: 24,
     weekEnd: 31,
     duration: '4 min',
-    title: LocalizedText(en: 'Feeling Your Baby Move', hi: 'Baby Ki Harkat Mehsoos Karna'),
+    title: LocalizedText(en: 'Feeling Your Baby Move', hi: 'शिशु की हलचल महसूस करना'),
     reason: LocalizedText(
         en: 'Getting to know your baby\'s movement pattern.',
-        hi: 'Apne baby ke movement pattern ko jaan-na.'),
+        hi: 'शिशु की हलचल का तरीक़ा पहचानना।'),
   ),
   PvVideo(
     id: 'rec_labour',
@@ -110,10 +110,10 @@ const List<PvVideo> kVideos = [
     weekStart: 32,
     weekEnd: 40,
     duration: '6 min',
-    title: LocalizedText(en: 'Getting Ready for Labour', hi: 'Labour Ke Liye Taiyaari'),
+    title: LocalizedText(en: 'Getting Ready for Labour', hi: 'प्रसव के लिए तैयारी'),
     reason: LocalizedText(
         en: 'Signs to watch for as your due date comes closer.',
-        hi: 'Due date paas aane par kin baaton par dhyan dein.'),
+        hi: 'प्रसव की तारीख़ पास आते-आते किन बातों पर ध्यान देना है।'),
   ),
 
   // ---- Learn a skill --------------------------------------------------------
@@ -124,36 +124,36 @@ const List<PvVideo> kVideos = [
     title: LocalizedText(en: 'Kegel Exercises', hi: 'Kegel Exercises'),
     reason: LocalizedText(
         en: 'A gentle daily practice for your pelvic floor.',
-        hi: 'Aapke pelvic floor ke liye ek halka rozaana abhyas.'),
+        hi: 'आपके पेल्विक फ़्लोर के लिए एक हल्का सा रोज़ का अभ्यास।'),
   ),
   PvVideo(
     id: 'skill_breathing',
     category: VideoCategory.skill,
     duration: '4 min',
-    title: LocalizedText(en: 'Breathing for Calm', hi: 'Shaanti Ke Liye Saans'),
+    title: LocalizedText(en: 'Breathing for Calm', hi: 'शांति के लिए साँस'),
     reason: LocalizedText(
         en: 'Simple breathing to ease tension any time of day.',
-        hi: 'Kisi bhi waqt tanaav kam karne ke liye aasaan saans.'),
+        hi: 'दिन में कभी भी तनाव कम करने के लिए आसान साँस।'),
   ),
   PvVideo(
     id: 'skill_swaddle',
     category: VideoCategory.skill,
     weekStart: 28,
     duration: '3 min',
-    title: LocalizedText(en: 'How to Swaddle', hi: 'Swaddle Kaise Karein'),
+    title: LocalizedText(en: 'How to Swaddle', hi: 'शिशु को कैसे लपेटें'),
     reason: LocalizedText(
         en: 'A cosy, secure wrap for your newborn.',
-        hi: 'Aapke newborn ke liye ek aaraamdayak, surakshit lapet.'),
+        hi: 'नवजात के लिए एक आरामदायक और सुरक्षित लपेट।'),
   ),
   PvVideo(
     id: 'skill_bag',
     category: VideoCategory.skill,
     weekStart: 30,
     duration: '5 min',
-    title: LocalizedText(en: 'Packing Your Hospital Bag', hi: 'Hospital Bag Kaise Packein'),
+    title: LocalizedText(en: 'Packing Your Hospital Bag', hi: 'अस्पताल का बैग तैयार करना'),
     reason: LocalizedText(
         en: 'What to pack for you, your baby and your partner.',
-        hi: 'Aapke, baby aur partner ke liye kya pack karein.'),
+        hi: 'आपके, शिशु और आपके साथी के लिए क्या रखना है।'),
   ),
 
   // ---- Expert explains ------------------------------------------------------
@@ -163,10 +163,10 @@ const List<PvVideo> kVideos = [
     weekStart: 16,
     weekEnd: 24,
     duration: '5 min',
-    title: LocalizedText(en: 'Understanding the Anomaly Scan', hi: 'Anomaly Scan Ko Samajhna'),
+    title: LocalizedText(en: 'Understanding the Anomaly Scan', hi: 'Anomaly scan को समझना'),
     reason: LocalizedText(
         en: 'What this detailed scan checks, explained simply.',
-        hi: 'Yeh vistrit scan kya check karta hai, aasaan shabdon mein.'),
+        hi: 'यह पूरा स्कैन क्या-क्या देखता है, आसान शब्दों में।'),
   ),
   PvVideo(
     id: 'expert_gdm',
@@ -174,20 +174,20 @@ const List<PvVideo> kVideos = [
     weekStart: 22,
     weekEnd: 32,
     duration: '4 min',
-    title: LocalizedText(en: 'About Gestational Diabetes', hi: 'Gestational Diabetes Ke Baare Mein'),
+    title: LocalizedText(en: 'About Gestational Diabetes', hi: 'Gestational diabetes के बारे में'),
     reason: LocalizedText(
         en: 'What it is and how it is usually managed.',
-        hi: 'Yeh kya hai aur aam tor par ise kaise sambhaala jaata hai.'),
+        hi: 'यह क्या है और आम तौर पर इसे कैसे सँभाला जाता है।'),
   ),
   PvVideo(
     id: 'expert_labour',
     category: VideoCategory.expert,
     weekStart: 28,
     duration: '6 min',
-    title: LocalizedText(en: 'Labour, Explained', hi: 'Labour, Samjhaaya Gaya'),
+    title: LocalizedText(en: 'Labour, Explained', hi: 'प्रसव, आसान शब्दों में'),
     reason: LocalizedText(
         en: 'A doctor gently walks through what to expect.',
-        hi: 'Ek doctor pyaar se batate hain kya expect karein.'),
+        hi: 'एक डॉक्टर शांति से बताते हैं कि आगे क्या होने वाला है।'),
   ),
 
   // ---- Birth preparation (week 30+) ----------------------------------------
@@ -196,20 +196,20 @@ const List<PvVideo> kVideos = [
     category: VideoCategory.birth,
     weekStart: 30,
     duration: '4 min',
-    title: LocalizedText(en: 'Signs of Labour', hi: 'Labour Ke Sanket'),
+    title: LocalizedText(en: 'Signs of Labour', hi: 'प्रसव के संकेत'),
     reason: LocalizedText(
         en: 'How to tell when labour may be beginning.',
-        hi: 'Kaise pehchaanein ki labour shuru ho raha hai.'),
+        hi: 'कैसे पहचानें कि प्रसव शुरू हो सकता है।'),
   ),
   PvVideo(
     id: 'birth_pain',
     category: VideoCategory.birth,
     weekStart: 30,
     duration: '5 min',
-    title: LocalizedText(en: 'Pain Relief Options', hi: 'Dard Kam Karne Ke Vikalp'),
+    title: LocalizedText(en: 'Pain Relief Options', hi: 'दर्द कम करने के तरीक़े'),
     reason: LocalizedText(
         en: 'The choices available to you during birth.',
-        hi: 'Janm ke dauraan aapke paas kaunse vikalp hain.'),
+        hi: 'प्रसव के दौरान आपके पास कौन-कौन से रास्ते हैं।'),
   ),
 
   // ---- Newborn preparation (week 30+) --------------------------------------
@@ -218,19 +218,19 @@ const List<PvVideo> kVideos = [
     category: VideoCategory.newborn,
     weekStart: 30,
     duration: '5 min',
-    title: LocalizedText(en: 'Newborn Feeding Basics', hi: 'Newborn Feeding Ki Buniyaad'),
+    title: LocalizedText(en: 'Newborn Feeding Basics', hi: 'नवजात को दूध पिलाने की बुनियादी बातें'),
     reason: LocalizedText(
         en: 'Getting started with feeding your baby.',
-        hi: 'Apne baby ko feed karna shuru karna.'),
+        hi: 'शिशु को दूध पिलाने की शुरुआत।'),
   ),
   PvVideo(
     id: 'newborn_sleep',
     category: VideoCategory.newborn,
     weekStart: 30,
     duration: '3 min',
-    title: LocalizedText(en: 'Safe Sleep for Newborns', hi: 'Newborn Ke Liye Surakshit Neend'),
+    title: LocalizedText(en: 'Safe Sleep for Newborns', hi: 'नवजात के लिए सुरक्षित नींद'),
     reason: LocalizedText(
         en: 'Simple steps for safer baby sleep.',
-        hi: 'Baby ki surakshit neend ke liye aasaan kadam.'),
+        hi: 'शिशु की नींद को और सुरक्षित बनाने के आसान क़दम।'),
   ),
 ];

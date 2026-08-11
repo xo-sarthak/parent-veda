@@ -16,10 +16,22 @@ import '../localization/app_language.dart';
 // ---- shared value types -----------------------------------------------------
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// Identical in both languages BY NATURE - a brand, a drug name printed on
+/// a packet, an acronym a mother reads in Latin either way. Distinct from
+/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+/// work, and saying so is what keeps tool/hindi_audit.py honest.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 /// English-only, awaiting translation. Same shape as a translated pair so
 /// the model can widen, but deliberately NOT `_t(x, x)`: an identical pair
 /// reads as finished work to anything counting pairs.
 /// `grep -c '_en('` is the size of what is left here.
+///
+/// UNUSED AS OF 2026-08-11 — nothing in this file is English-owed any more, and
+/// that is the reason to keep it rather than to delete it: it is the marker for
+/// the next English-only string added here. Without it the obvious move is
+/// `_t(x, x)`, which reads as finished work to every audit.
+// ignore: unused_element
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
 class Coach {
@@ -96,18 +108,18 @@ final List<Masterclass> kMasterclasses = [
   Masterclass(
     id: 'mc_birth',
     featured: true,
-    title: _t('Birth Confidence Masterclass', 'Birth Confidence Masterclass'),
+    title: _same('Birth Confidence Masterclass'),
     badge: _t('Most-booked at 30 weeks', '30 हफ़्ते पर सबसे ज़्यादा बुक होने वाली'),
     price: '₹799',
     listDesc:
         _t('What labour really feels like: breathing, pain relief, C-section prep, and emotional readiness. 90 min live + lifetime recording.', 'लेबर असल में कैसा लगता है: साँस, दर्द से राहत, C-section की तैयारी, और मन की तैयारी। 90 min live + recording हमेशा के लिए।'),
     longDesc:
         _t('What labour really feels like - breathing, pain relief, C-section prep, and the emotional readiness no one talks about. One live evening that changes how you walk into the delivery room.', 'लेबर असल में कैसा लगता है — साँस, दर्द से राहत, C-section की तैयारी, और वह मन की तैयारी जिसकी बात कोई नहीं करता। एक live शाम, जो बदल देती है कि आप delivery room में किस भरोसे के साथ जाती हैं।'),
-    facts: [QuickFact(_t('90 min', '90 min'), _t('live', 'लाइव')), QuickFact(_t('Sun 13 Jul', 'रवि 13 Jul'), _t('8:00 pm', 'रात 8:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
+    facts: [QuickFact(_same('90 min'), _t('live', 'लाइव')), QuickFact(_t('Sun 13 Jul', 'रवि 13 Jul'), _t('8:00 pm', 'रात 8:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
     coaches: [
-      Coach(_t('Dr. Ananya Rao', 'Dr. Ananya Rao'), _t('Obstetrician · 15 years', 'Obstetrician · 15 साल'),
+      Coach(_same('Dr. Ananya Rao'), _t('Obstetrician · 15 years', 'Obstetrician · 15 साल'),
           _t("Has delivered over 3,000 babies across Delhi's leading hospitals. Known for calm, plain-language guidance.", 'दिल्ली के बड़े अस्पतालों में 3,000 से ज़्यादा शिशुओं की डिलीवरी करा चुकी हैं। शांत, सीधी-सादी भाषा में समझाने के लिए जानी जाती हैं।')),
-      Coach(_t('Deepti Sharma', 'Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
+      Coach(_same('Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
           _t('Has supported 400+ births. Brings the emotional side - fear, partners, and staying in control.', '400+ जन्मों में साथ रह चुकी हैं। भावनात्मक पक्ष सामने लाती हैं — डर, partner, और खुद पर पकड़ बनाए रखना।')),
     ],
     learn: [
@@ -119,10 +131,10 @@ final List<Masterclass> kMasterclasses = [
     testimonials: [
       Testimonial(
           _t('"I went in terrified and came out feeling like I could actually do this. The breathing section alone was worth it."', '"मैं डरी हुई गई थी और लौटी यह भरोसा लेकर कि मैं यह कर सकती हूँ। अकेले साँस वाला हिस्सा ही पूरे पैसे वसूल था।"'),
-          _t('Ananya P.', 'Ananya P.'),
+          _same('Ananya P.'),
           _t('delivered March 2025', 'डिलीवरी March 2025')),
       Testimonial(_t('"My husband finally understood how to help. We watched the recording together twice."', '"मेरे पति को आख़िरकार समझ आया कि मदद कैसे करनी है। हमने recording साथ में दो बार देखी।"'),
-          _t('Ritika M.', 'Ritika M.'), _t('34 weeks', '34 हफ़्ते')),
+          _same('Ritika M.'), _t('34 weeks', '34 हफ़्ते')),
     ],
     faqs: [
       Faq(_t("What if I can't attend live?", 'अगर मैं live नहीं जुड़ पाई तो?'),
@@ -134,15 +146,15 @@ final List<Masterclass> kMasterclasses = [
   ),
   Masterclass(
     id: 'mc_playbook',
-    title: _t('Pregnancy Playbook Workshop', 'Pregnancy Playbook Workshop'),
+    title: _same('Pregnancy Playbook Workshop'),
     price: '₹699',
     listChip: _t('Great to catch up on', 'पीछे से देखने के लिए बढ़िया'),
     listDesc: _t('The whole journey, trimester by trimester, with a practical action plan.', 'पूरा सफ़र, तिमाही दर तिमाही, और साथ में एक काम आने वाला action plan।'),
     longDesc:
         _t('The whole pregnancy journey, trimester by trimester - what to expect, how to prepare in body and mind, the common fears addressed head-on, and a practical action plan you will actually use.', 'गर्भावस्था का पूरा सफ़र, तिमाही दर तिमाही — क्या होने वाला है, शरीर और मन को कैसे तैयार करें, आम डरों का सीधा जवाब, और एक ऐसा action plan जो आप सच में इस्तेमाल करेंगी।'),
-    facts: [QuickFact(_t('120 min', '120 min'), _t('recorded', 'रिकॉर्डेड')), QuickFact(_t('On demand', 'जब चाहें'), _t('anytime', 'कभी भी')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('access', 'पहुँच'))],
+    facts: [QuickFact(_same('120 min'), _t('recorded', 'रिकॉर्डेड')), QuickFact(_t('On demand', 'जब चाहें'), _t('anytime', 'कभी भी')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('access', 'पहुँच'))],
     coaches: [
-      Coach(_t('Deepti Sharma', 'Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
+      Coach(_same('Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
           _t('Distils a whole pregnancy into a calm, do-this-next plan - warm, practical, and refreshingly non-preachy.', 'पूरी गर्भावस्था को एक शांत, "अब यह करें" वाले plan में समेट देती हैं — गर्मजोशी से भरी, काम की, और बिना कोई उपदेश दिए।')),
     ],
     learn: [
@@ -153,7 +165,7 @@ final List<Masterclass> kMasterclasses = [
     ],
     testimonials: [
       Testimonial(_t('"Finally something that told me what to actually do, not just what to worry about."', '"आख़िरकार कुछ ऐसा जिसने बताया कि करना क्या है, सिर्फ़ यह नहीं कि चिंता किस बात की करनी है।"'),
-          _t('Sneha K.', 'Sneha K.'), _t('18 weeks', '18 हफ़्ते')),
+          _same('Sneha K.'), _t('18 weeks', '18 हफ़्ते')),
     ],
     faqs: [
       Faq(_t('When should I take this?', 'इसे कब लेना चाहिए?'),
@@ -163,18 +175,18 @@ final List<Masterclass> kMasterclasses = [
   ),
   Masterclass(
     id: 'mc_first100',
-    title: _t('The First 100 Days with Baby', 'The First 100 Days with Baby'),
+    title: _same('The First 100 Days with Baby'),
     price: '₹999',
     listChip: _t('Coming up next', 'अगला यही है'),
     listChipIsCoral: true,
     listDesc: _t('Newborn survival: feeding, sleep, and the fourth trimester.', 'नवजात के दिन संभालना: दूध पिलाना, नींद, और चौथी तिमाही।'),
     longDesc:
         _t('Newborn survival, made calm: feeding rhythms, decoding those early sleep patterns, the fourth-trimester emotional rollercoaster, and setting up real help at home.', 'नवजात के दिन, शांति से: दूध पिलाने की लय, शुरुआती नींद के तौर-तरीक़े समझना, चौथी तिमाही का भावनात्मक उतार-चढ़ाव, और घर पर असली मदद खड़ी करना।'),
-    facts: [QuickFact(_t('120 min', '120 min'), _t('live', 'लाइव')), QuickFact(_t('Sat 26 Jul', 'शनि 26 Jul'), _t('6:00 pm', 'शाम 6:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
+    facts: [QuickFact(_same('120 min'), _t('live', 'लाइव')), QuickFact(_t('Sat 26 Jul', 'शनि 26 Jul'), _t('6:00 pm', 'शाम 6:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
     coaches: [
-      Coach(_t('Dr. Kabir Rao', 'Dr. Kabir Rao'), _t('Paediatrician · 12 years', 'Paediatrician · 12 साल'),
+      Coach(_same('Dr. Kabir Rao'), _t('Paediatrician · 12 years', 'Paediatrician · 12 साल'),
           _t('Guides new parents through the newborn weeks with steady, no-panic advice grounded in Indian homes.', 'नए माता-पिता को नवजात के हफ़्तों से पार लगाते हैं — भारतीय घरों को समझने वाली, शांत और घबराहट-रहित सलाह के साथ।')),
-      Coach(_t('Deepti Sharma', 'Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
+      Coach(_same('Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
           _t('Covers the mother\'s side of the fourth trimester - recovery, mood, and asking for help.', 'चौथी तिमाही का माँ वाला पक्ष सँभालती हैं — रिकवरी, मन का हाल, और मदद माँगना।')),
     ],
     learn: [
@@ -190,14 +202,14 @@ final List<Masterclass> kMasterclasses = [
   ),
   Masterclass(
     id: 'mc_bf',
-    title: _t('Breastfeeding Basics', 'Breastfeeding Basics'),
+    title: _same('Breastfeeding Basics'),
     price: '₹699',
     listDesc: _t('Latch, supply, and the first week - before baby arrives.', 'Latch, दूध की सप्लाई, और पहला हफ़्ता — शिशु के आने से पहले।'),
     longDesc:
         _t('Latch, supply, and the first tender week - everything you need to feel ready to breastfeed before baby arrives, from an IBCLC lactation expert.', 'Latch, दूध की सप्लाई, और वह नाज़ुक पहला हफ़्ता — शिशु के आने से पहले स्तनपान के लिए तैयार महसूस करने को जो चाहिए, एक IBCLC lactation विशेषज्ञ से।'),
-    facts: [QuickFact(_t('75 min', '75 min'), _t('live', 'लाइव')), QuickFact(_t('Wed 16 Jul', 'बुध 16 Jul'), _t('7:00 pm', 'शाम 7:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
+    facts: [QuickFact(_same('75 min'), _t('live', 'लाइव')), QuickFact(_t('Wed 16 Jul', 'बुध 16 Jul'), _t('7:00 pm', 'शाम 7:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
     coaches: [
-      Coach(_t('Sana Khan', 'Sana Khan'), _t('Lactation Consultant · IBCLC', 'Lactation Consultant · IBCLC'),
+      Coach(_same('Sana Khan'), _same('Lactation Consultant · IBCLC'),
           _t('An IBCLC who makes the first week feel far less daunting - practical, gentle, and judgement-free.', 'एक IBCLC जो पहले हफ़्ते का डर काफ़ी कम कर देती हैं — काम की बातें, नरमी से, बिना किसी फ़ैसले के।')),
     ],
     learn: [
@@ -259,8 +271,8 @@ final List<Specialist> kSpecialists = [
   Specialist(
     id: 'sp_ob',
     icon: Icons.medical_services_outlined,
-    role: _t('Obstetrician', 'Obstetrician'),
-    name: _t('Dr. Ananya Rao', 'Dr. Ananya Rao'),
+    role: _same('Obstetrician'),
+    name: _same('Dr. Ananya Rao'),
     cred: _t('MBBS, MD (OB-GYN) · 15 yrs', 'MBBS, MD (OB-GYN) · 15 साल'),
     fromPrice: _t('from ₹999', '₹999 से'),
     consultPrice: '₹999',
@@ -275,15 +287,15 @@ final List<Specialist> kSpecialists = [
       _t('Third-trimester aches, movements and warning signs', 'तीसरी तिमाही के दर्द, शिशु की हलचल और चेतावनी के संकेत'),
     ],
     reviews: [
-      Review(_t('Priya S.', 'Priya S.'), _t('30 weeks', '30 हफ़्ते'), _t('"She never rushed me. I finally understood my reports."', '"उन्होंने कभी जल्दी नहीं मचाई। मुझे आख़िरकार अपनी report समझ आईं।"')),
-      Review(_t('Neha R.', 'Neha R.'), _t('delivered Feb 2025', 'डिलीवरी Feb 2025'), _t('"Calm and clear. Worth every rupee."', '"शांत और साफ़। एक-एक रुपया वसूल।"')),
+      Review(_same('Priya S.'), _t('30 weeks', '30 हफ़्ते'), _t('"She never rushed me. I finally understood my reports."', '"उन्होंने कभी जल्दी नहीं मचाई। मुझे आख़िरकार अपनी report समझ आईं।"')),
+      Review(_same('Neha R.'), _t('delivered Feb 2025', 'डिलीवरी Feb 2025'), _t('"Calm and clear. Worth every rupee."', '"शांत और साफ़। एक-एक रुपया वसूल।"')),
     ],
   ),
   Specialist(
     id: 'sp_nutrition',
     icon: Icons.restaurant_outlined,
-    role: _t('Prenatal Nutritionist', 'Prenatal Nutritionist'),
-    name: _t('Ritu Malhotra', 'Ritu Malhotra'),
+    role: _same('Prenatal Nutritionist'),
+    name: _same('Ritu Malhotra'),
     cred: _t('RD · 10 yrs', 'RD · 10 साल'),
     fromPrice: _t('from ₹599', '₹599 से'),
     consultPrice: '₹599',
@@ -297,15 +309,15 @@ final List<Specialist> kSpecialists = [
       _t('Gestational-diabetes-friendly eating', 'Gestational diabetes के हिसाब से खाना'),
     ],
     reviews: [
-      Review(_t('Aditi V.', 'Aditi V.'), _t('22 weeks', '22 हफ़्ते'), _t('"Practical desi food swaps, not a boring diet chart."', '"काम के देसी खाने के बदल, कोई उबाऊ diet chart नहीं।"')),
-      Review(_t('Meghna T.', 'Meghna T.'), _t('delivered Jan 2025', 'डिलीवरी Jan 2025'), _t('"My sugar levels finally settled."', '"मेरा शुगर आख़िरकार सँभल गया।"')),
+      Review(_same('Aditi V.'), _t('22 weeks', '22 हफ़्ते'), _t('"Practical desi food swaps, not a boring diet chart."', '"काम के देसी खाने के बदल, कोई उबाऊ diet chart नहीं।"')),
+      Review(_same('Meghna T.'), _t('delivered Jan 2025', 'डिलीवरी Jan 2025'), _t('"My sugar levels finally settled."', '"मेरा शुगर आख़िरकार सँभल गया।"')),
     ],
   ),
   Specialist(
     id: 'sp_lactation',
     icon: Icons.child_care_outlined,
-    role: _t('Lactation Consultant', 'Lactation Consultant'),
-    name: _t('Sana Khan', 'Sana Khan'),
+    role: _same('Lactation Consultant'),
+    name: _same('Sana Khan'),
     cred: _t('IBCLC · 8 yrs', 'IBCLC · 8 साल'),
     fromPrice: _t('from ₹799', '₹799 से'),
     consultPrice: '₹799',
@@ -319,15 +331,15 @@ final List<Specialist> kSpecialists = [
       _t('Building and protecting your milk supply', 'दूध की सप्लाई बनाना और बनाए रखना'),
     ],
     reviews: [
-      Review(_t('Ishita R.', 'Ishita R.'), _t('36 weeks', '36 हफ़्ते'), _t('"I felt so much calmer about feeding after one call."', '"एक call के बाद दूध पिलाने को लेकर मैं बहुत शांत महसूस करने लगी।"')),
-      Review(_t('Pooja M.', 'Pooja M.'), _t('delivered Mar 2025', 'डिलीवरी Mar 2025'), _t('"Wish I had spoken to her even earlier."', '"काश मैंने उनसे और पहले बात की होती।"')),
+      Review(_same('Ishita R.'), _t('36 weeks', '36 हफ़्ते'), _t('"I felt so much calmer about feeding after one call."', '"एक call के बाद दूध पिलाने को लेकर मैं बहुत शांत महसूस करने लगी।"')),
+      Review(_same('Pooja M.'), _t('delivered Mar 2025', 'डिलीवरी Mar 2025'), _t('"Wish I had spoken to her even earlier."', '"काश मैंने उनसे और पहले बात की होती।"')),
     ],
   ),
   Specialist(
     id: 'sp_counsellor',
     icon: Icons.psychology_outlined,
-    role: _t('Prenatal Counsellor', 'Prenatal Counsellor'),
-    name: _t('Dr. Neha Verma', 'Dr. Neha Verma'),
+    role: _same('Prenatal Counsellor'),
+    name: _same('Dr. Neha Verma'),
     cred: _t('Clinical Psychologist · 11 yrs', 'Clinical Psychologist · 11 साल'),
     fromPrice: _t('from ₹899', '₹899 से'),
     consultPrice: '₹899',
@@ -341,15 +353,15 @@ final List<Specialist> kSpecialists = [
       _t('Fears about birth and becoming a mother', 'जन्म और माँ बनने को लेकर डर'),
     ],
     reviews: [
-      Review(_t('Ritika S.', 'Ritika S.'), _t('28 weeks', '28 हफ़्ते'), _t('"She made me feel normal, not broken."', '"उन्होंने मुझे महसूस कराया कि मैं ठीक हूँ, टूटी हुई नहीं।"')),
-      Review(_t('Kavita N.', 'Kavita N.'), _t('delivered Feb 2025', 'डिलीवरी Feb 2025'), _t('"Gentle, warm, and genuinely helpful."', '"सौम्य, गर्मजोशी भरी, और सच में मददगार।"')),
+      Review(_same('Ritika S.'), _t('28 weeks', '28 हफ़्ते'), _t('"She made me feel normal, not broken."', '"उन्होंने मुझे महसूस कराया कि मैं ठीक हूँ, टूटी हुई नहीं।"')),
+      Review(_same('Kavita N.'), _t('delivered Feb 2025', 'डिलीवरी Feb 2025'), _t('"Gentle, warm, and genuinely helpful."', '"सौम्य, गर्मजोशी भरी, और सच में मददगार।"')),
     ],
   ),
   Specialist(
     id: 'sp_physio',
     icon: Icons.accessibility_new_rounded,
-    role: _t('Physiotherapist', 'Physiotherapist'),
-    name: _t('Kavya Menon', 'Kavya Menon'),
+    role: _same('Physiotherapist'),
+    name: _same('Kavya Menon'),
     cred: _t("Women's-health PT · 9 yrs", 'महिला-स्वास्थ्य PT · 9 साल'),
     fromPrice: _t('from ₹699', '₹699 से'),
     consultPrice: '₹699',
@@ -363,8 +375,8 @@ final List<Specialist> kSpecialists = [
       _t('Safe posture and movement day to day', 'रोज़मर्रा में सुरक्षित मुद्रा और चलना-फिरना'),
     ],
     reviews: [
-      Review(_t('Divya P.', 'Divya P.'), _t('31 weeks', '31 हफ़्ते'), _t('"My back pain eased within a week of her exercises."', '"उनकी exercise से एक हफ़्ते में ही मेरा कमर दर्द कम हो गया।"')),
-      Review(_t('Anjali K.', 'Anjali K.'), _t('delivered Dec 2024', 'डिलीवरी Dec 2024'), _t('"The pelvic-floor prep made recovery easier."', '"pelvic-floor की तैयारी ने रिकवरी आसान कर दी।"')),
+      Review(_same('Divya P.'), _t('31 weeks', '31 हफ़्ते'), _t('"My back pain eased within a week of her exercises."', '"उनकी exercise से एक हफ़्ते में ही मेरा कमर दर्द कम हो गया।"')),
+      Review(_same('Anjali K.'), _t('delivered Dec 2024', 'डिलीवरी Dec 2024'), _t('"The pelvic-floor prep made recovery easier."', '"pelvic-floor की तैयारी ने रिकवरी आसान कर दी।"')),
     ],
   ),
 ];
@@ -415,13 +427,13 @@ final List<Cohort> kCohorts = [
   Cohort(
     id: 'ch_birthready',
     featured: true,
-    name: _t('Birth-Ready Bootcamp', 'Birth-Ready Bootcamp'),
+    name: _same('Birth-Ready Bootcamp'),
     price: '₹6,999',
     duration: _t('4 weeks', '4 हफ़्ते'),
     start: _t('starts Mon 6 Jul', 'शुरू सोम 6 Jul'),
     seats: _t('32 of 100 seats left', '100 में से 32 सीटें बाक़ी'),
     recommended: _t('Recommended · 30–34 weeks', 'सुझाया गया · 30–34 हफ़्ते'),
-    coachName: _t('Meera Nair', 'Meera Nair'),
+    coachName: _same('Meera Nair'),
     desc:
         _t('Labour prep, breathing, and partner training - a live coach plus a peer group of mums due right around when you are.', 'लेबर की तैयारी, साँस, और partner की ट्रेनिंग — एक live कोच, और वे माँएँ जिनकी डिलीवरी लगभग आपके साथ है।'),
     whatsInside: [
@@ -437,16 +449,16 @@ final List<Cohort> kCohorts = [
       _t('Week 4 · Your birth plan and the big day', 'Week 4 · आपका birth plan और वह बड़ा दिन'),
     ],
     reviews: [
-      Review(_t('Shreya M.', 'Shreya M.'), _t('delivered Apr 2025', 'डिलीवरी Apr 2025'), _t('"The peer group got me through the last month."', '"आख़िरी महीना उस समूह के सहारे ही निकला।"')),
+      Review(_same('Shreya M.'), _t('delivered Apr 2025', 'डिलीवरी Apr 2025'), _t('"The peer group got me through the last month."', '"आख़िरी महीना उस समूह के सहारे ही निकला।"')),
     ],
   ),
   Cohort(
     id: 'ch_first_tri',
-    name: _t('First-Trimester Foundations', 'First-Trimester Foundations'),
+    name: _same('First-Trimester Foundations'),
     price: '₹4,999',
     duration: _t('3 weeks', '3 हफ़्ते'),
     forWhen: _t('for 6–13 weeks', '6–13 हफ़्तों के लिए'),
-    coachName: _t('Deepti Sharma', 'Deepti Sharma'),
+    coachName: _same('Deepti Sharma'),
     desc: _t('Steady your first trimester - manage symptoms, quiet the early fears, and start pregnancy in control.', 'पहली तिमाही को सँभालें — लक्षणों को संभालना, शुरुआती डर को शांत करना, और गर्भावस्था की शुरुआत भरोसे के साथ करना।'),
     whatsInside: [
       _t('3 live weekly sessions', '3 live साप्ताहिक session'),
@@ -462,10 +474,10 @@ final List<Cohort> kCohorts = [
   ),
   Cohort(
     id: 'ch_fit',
-    name: _t('Fit & Strong Pregnancy', 'Fit & Strong Pregnancy'),
+    name: _same('Fit & Strong Pregnancy'),
     price: '₹7,999',
     duration: _t('6 weeks', '6 हफ़्ते'),
-    coachName: _t('Sana Kapoor', 'Sana Kapoor'),
+    coachName: _same('Sana Kapoor'),
     desc: _t('A guided prenatal fitness cohort - safe, progressive workouts scaled to your trimester by a certified coach.', 'एक guided prenatal fitness cohort — सुरक्षित, धीरे-धीरे बढ़ते workout, जो एक प्रमाणित कोच आपकी तिमाही के हिसाब से ढालती हैं।'),
     whatsInside: [
       _t('6 weeks of guided workouts', '6 हफ़्ते के guided workout'),
@@ -476,10 +488,10 @@ final List<Cohort> kCohorts = [
   ),
   Cohort(
     id: 'ch_fourth_tri',
-    name: _t('Fourth-Trimester Prep', 'Fourth-Trimester Prep'),
+    name: _same('Fourth-Trimester Prep'),
     price: '₹6,499',
     duration: _t('4 weeks', '4 हफ़्ते'),
-    coachName: _t('Dr. Kabir Rao', 'Dr. Kabir Rao'),
+    coachName: _same('Dr. Kabir Rao'),
     desc: _t('Get ready for the newborn weeks before they arrive - feeding, sleep, recovery, and support at home.', 'नवजात के हफ़्तों की तैयारी उनके आने से पहले — दूध पिलाना, नींद, रिकवरी, और घर पर मदद।'),
     whatsInside: [
       _t('4 live weekly sessions', '4 live साप्ताहिक session'),
@@ -530,75 +542,75 @@ class YogaSession {
 // real trimester/week range from the content team, distribute them precisely.
 final List<YogaSession> kYogaSessions = [
   // Month 1
-  YogaSession('yg_m1_settle', _t('Settling-in gentle flow', 'शुरुआत का सौम्य flow'), _t('12 min', '12 min'), _t('grounding', 'स्थिरता'),
+  YogaSession('yg_m1_settle', _t('Settling-in gentle flow', 'शुरुआत का सौम्य flow'), _same('12 min'), _t('grounding', 'स्थिरता'),
       _t('A soft, grounding sequence for the very first weeks - nothing strenuous, just breath and ease.', 'बिलकुल शुरुआती हफ़्तों के लिए एक नरम, ठहराव देने वाला क्रम — कुछ भी ज़ोरदार नहीं, बस साँस और सुकून।'),
       month: 1),
-  YogaSession('yg_m1_breath', _t('Breath awareness basics', 'साँस को पहचानने की बुनियाद'), _t('10 min', '10 min'), _t('breath', 'साँस'),
+  YogaSession('yg_m1_breath', _t('Breath awareness basics', 'साँस को पहचानने की बुनियाद'), _same('10 min'), _t('breath', 'साँस'),
       _t('Meet the calm, steady breath you will build on all pregnancy long.', 'उस शांत, ठहरी हुई साँस से मिलिए जिस पर आप पूरी गर्भावस्था टिकी रहेंगी।'),
       month: 1),
   // Month 2
-  YogaSession('yg_m2_nausea', _t('Ease for nausea days', 'मतली वाले दिनों की राहत'), _t('12 min', '12 min'), _t('relief', 'राहत'),
+  YogaSession('yg_m2_nausea', _t('Ease for nausea days', 'मतली वाले दिनों की राहत'), _same('12 min'), _t('relief', 'राहत'),
       _t('Slow, low movements and breathing to settle a queasy first-trimester tummy.', 'धीमी, नीचे रहकर की जाने वाली हरकतें और साँस — पहली तिमाही के उलझे पेट को शांत करने के लिए।'),
       month: 2),
-  YogaSession('yg_m2_stretch', _t('Gentle full-body stretch', 'पूरे शरीर की सौम्य stretch'), _t('15 min', '15 min'), _t('opening', 'खुलाव'),
+  YogaSession('yg_m2_stretch', _t('Gentle full-body stretch', 'पूरे शरीर की सौम्य stretch'), _same('15 min'), _t('opening', 'खुलाव'),
       _t('Wake up stiff joints kindly, keeping everything within a safe early range.', 'अकड़े जोड़ों को नरमी से जगाएँ, सब कुछ शुरुआती दिनों की सुरक्षित सीमा में रखते हुए।'),
       month: 2),
   // Month 3
-  YogaSession('yg_m3_hipsfound', _t('Hip-opener foundations', 'कूल्हे खोलने की बुनियाद'), _t('16 min', '16 min'), _t('opening', 'खुलाव'),
+  YogaSession('yg_m3_hipsfound', _t('Hip-opener foundations', 'कूल्हे खोलने की बुनियाद'), _same('16 min'), _t('opening', 'खुलाव'),
       _t('Begin the hip work that makes room as baby grows - built up slowly and safely.', 'कूल्हों का वह काम शुरू करें जो शिशु के बढ़ने पर जगह बनाता है — धीरे-धीरे और सुरक्षित तरीक़े से।'),
       month: 3),
-  YogaSession('yg_m3_calm', _t('Calm & steady wind-down', 'शांत और ठहरा हुआ समापन'), _t('14 min', '14 min'), _t('calm', 'शांति'),
+  YogaSession('yg_m3_calm', _t('Calm & steady wind-down', 'शांत और ठहरा हुआ समापन'), _same('14 min'), _t('calm', 'शांति'),
       _t('A soothing close to the first trimester to quiet body and mind.', 'पहली तिमाही का सुकून भरा समापन, शरीर और मन को शांत करने के लिए।'),
       month: 3),
   // Month 4
-  YogaSession('yg_m4_energy', _t('Second-trimester energy flow', 'दूसरी तिमाही का ऊर्जा flow'), _t('18 min', '18 min'), _t('strength', 'ताक़त'),
+  YogaSession('yg_m4_energy', _t('Second-trimester energy flow', 'दूसरी तिमाही का ऊर्जा flow'), _same('18 min'), _t('strength', 'ताक़त'),
       _t('As energy returns, a gently strengthening flow to feel capable and strong.', 'जैसे-जैसे ऊर्जा लौटती है, एक सौम्य मज़बूती वाला flow — ताकि आप सक्षम और मज़बूत महसूस करें।'),
       month: 4),
-  YogaSession('yg_m4_posture', _t('Posture & alignment', 'मुद्रा और सीध'), _t('15 min', '15 min'), _t('align', 'सीध'),
+  YogaSession('yg_m4_posture', _t('Posture & alignment', 'मुद्रा और सीध'), _same('15 min'), _t('align', 'सीध'),
       _t('Simple work to carry a growing bump with an easy, supported posture.', 'बढ़ते bump को आसान, सहारे वाली मुद्रा में सँभालने के लिए सरल अभ्यास।'),
       month: 4),
   // Month 5
-  YogaSession('yg_m5_back', _t('Back-care essentials', 'कमर की देखभाल की ज़रूरी बातें'), _t('15 min', '15 min'), _t('relief', 'राहत'),
+  YogaSession('yg_m5_back', _t('Back-care essentials', 'कमर की देखभाल की ज़रूरी बातें'), _same('15 min'), _t('relief', 'राहत'),
       _t('Supported movement to unload a tired lower back as your centre of gravity shifts.', 'जैसे-जैसे शरीर का संतुलन बदलता है, थकी हुई कमर का बोझ हल्का करने वाली सहारे भरी हरकतें।'),
       month: 5),
-  YogaSession('yg_m5_balance', _t('Steady balance & core', 'ठहरा संतुलन और core'), _t('16 min', '16 min'), _t('strength', 'ताक़त'),
+  YogaSession('yg_m5_balance', _t('Steady balance & core', 'ठहरा संतुलन और core'), _same('16 min'), _t('strength', 'ताक़त'),
       _t('Gentle balance and deep-core work, adapted for the mid-pregnancy body.', 'सौम्य संतुलन और गहरे core का अभ्यास, बीच की गर्भावस्था वाले शरीर के हिसाब से।'),
       month: 5),
   // Month 6
-  YogaSession('yg_m6_hips', _t('Hips & pelvis opener', 'कूल्हे और pelvis खोलने वाला क्रम'), _t('18 min', '18 min'), _t('opening', 'खुलाव'),
+  YogaSession('yg_m6_hips', _t('Hips & pelvis opener', 'कूल्हे और pelvis खोलने वाला क्रम'), _same('18 min'), _t('opening', 'खुलाव'),
       _t('Gentle openers to ease tightness in the hips and pelvis and make room as baby grows.', 'कूल्हों और pelvis की जकड़न कम करने वाली सौम्य क़वायदें, ताकि शिशु के बढ़ने पर जगह बने।'),
       month: 6),
-  YogaSession('yg_m6_evening', _t('Gentle evening wind-down', 'शाम का सौम्य समापन'), _t('20 min', '20 min'), _t('calm', 'शांति'),
+  YogaSession('yg_m6_evening', _t('Gentle evening wind-down', 'शाम का सौम्य समापन'), _same('20 min'), _t('calm', 'शांति'),
       _t('A soothing sequence to quiet the body and mind before sleep.', 'सोने से पहले शरीर और मन को शांत करने वाला सुकून भरा क्रम।'),
       month: 6),
   // Month 7
-  YogaSession('yg_m7_hips', _t('Third-trimester hip release', 'तीसरी तिमाही में कूल्हों की जकड़न ढीली करना'), _t('18 min', '18 min'), _t('opening', 'खुलाव'),
+  YogaSession('yg_m7_hips', _t('Third-trimester hip release', 'तीसरी तिमाही में कूल्हों की जकड़न ढीली करना'), _same('18 min'), _t('opening', 'खुलाव'),
       _t('Deeper, supported hip openers to ease the tightness that builds in the third trimester.', 'गहरी, सहारे वाली कूल्हा खोलने की क़वायदें — तीसरी तिमाही में जमा होती जकड़न के लिए।'),
       month: 7),
-  YogaSession('yg_m7_back', _t('Lower-back relief', 'कमर के निचले हिस्से को राहत'), _t('15 min', '15 min'), _t('relief', 'राहत'),
+  YogaSession('yg_m7_back', _t('Lower-back relief', 'कमर के निचले हिस्से को राहत'), _same('15 min'), _t('relief', 'राहत'),
       _t('Slow, supported movement to unload a tired lower back at the end of the day.', 'दिन के आख़िर में थकी कमर का बोझ हल्का करने वाली धीमी, सहारे भरी हरकतें।'),
       month: 7),
-  YogaSession('yg_m7_breath', _t('Breathing for labour', 'लेबर के लिए साँस'), _t('12 min', '12 min'), _t('breath', 'साँस'),
+  YogaSession('yg_m7_breath', _t('Breathing for labour', 'लेबर के लिए साँस'), _same('12 min'), _t('breath', 'साँस'),
       _t('Practise the calm, steady breath that will carry you through contractions.', 'उस शांत, ठहरी साँस का अभ्यास करें जो contractions के दौरान आपको सँभालेगी।'),
       month: 7),
   // Month 8
-  YogaSession('yg_m8_legsup', _t('Legs-up restorative', 'पैर ऊपर, पूरा आराम'), _t('10 min', '10 min'), _t('restore', 'विश्राम'),
+  YogaSession('yg_m8_legsup', _t('Legs-up restorative', 'पैर ऊपर, पूरा आराम'), _same('10 min'), _t('restore', 'विश्राम'),
       _t('A restful, restorative pose to ease swelling and reset your nervous system.', 'सूजन कम करने और नसों को शांत करने वाली एक आरामदेह मुद्रा।'),
       month: 8),
-  YogaSession('yg_m8_pelvic', _t('Pelvic-floor & birth prep', 'Pelvic floor और जन्म की तैयारी'), _t('16 min', '16 min'), _t('prepare', 'तैयारी'),
+  YogaSession('yg_m8_pelvic', _t('Pelvic-floor & birth prep', 'Pelvic floor और जन्म की तैयारी'), _same('16 min'), _t('prepare', 'तैयारी'),
       _t('Gentle pelvic-floor awareness and opening to prepare your body for birth.', 'pelvic floor की सौम्य पहचान और खुलाव, आपके शरीर को जन्म के लिए तैयार करने के लिए।'),
       month: 8),
-  YogaSession('yg_m8_evening', _t('Gentle evening wind-down', 'शाम का सौम्य समापन'), _t('20 min', '20 min'), _t('calm', 'शांति'),
+  YogaSession('yg_m8_evening', _t('Gentle evening wind-down', 'शाम का सौम्य समापन'), _same('20 min'), _t('calm', 'शांति'),
       _t('A soothing sequence to quiet the body and mind before sleep.', 'सोने से पहले शरीर और मन को शांत करने वाला सुकून भरा क्रम।'),
       month: 8),
   // Month 9
-  YogaSession('yg_m9_positions', _t('Labour positions practice', 'लेबर की मुद्राओं का अभ्यास'), _t('18 min', '18 min'), _t('prepare', 'तैयारी'),
+  YogaSession('yg_m9_positions', _t('Labour positions practice', 'लेबर की मुद्राओं का अभ्यास'), _same('18 min'), _t('prepare', 'तैयारी'),
       _t('Rehearse the positions and swaying that help labour progress and ease pain.', 'उन मुद्राओं और झूलने का अभ्यास जो लेबर को आगे बढ़ाती हैं और दर्द कम करती हैं।'),
       month: 9),
-  YogaSession('yg_m9_breath', _t('Final breathing rehearsal', 'साँस की आख़िरी रिहर्सल'), _t('12 min', '12 min'), _t('breath', 'साँस'),
+  YogaSession('yg_m9_breath', _t('Final breathing rehearsal', 'साँस की आख़िरी रिहर्सल'), _same('12 min'), _t('breath', 'साँस'),
       _t('One more calm run-through of the breath that will carry you through the big day.', 'उस साँस का एक और शांत अभ्यास, जो उस बड़े दिन आपको सँभालेगी।'),
       month: 9),
-  YogaSession('yg_m9_restore', _t('Deep rest & restore', 'गहरा आराम और बहाली'), _t('14 min', '14 min'), _t('restore', 'विश्राम'),
+  YogaSession('yg_m9_restore', _t('Deep rest & restore', 'गहरा आराम और बहाली'), _same('14 min'), _t('restore', 'विश्राम'),
       _t('A soft, restorative close for the final stretch - rest, release, and wait well.', 'आख़िरी दौर के लिए एक नरम, आराम भरा समापन — विश्राम, ढील, और सुकून से इंतज़ार।'),
       month: 9),
 ];
@@ -618,18 +630,18 @@ class BirthingClass {
 }
 
 final List<BirthingClass> kBirthingClasses = [
-  BirthingClass(1, _t('The stages of labour, demystified', 'लेबर के चरण, आसान भाषा में'), _t('22 min video', '22 min video'),
+  BirthingClass(1, _t('The stages of labour, demystified', 'लेबर के चरण, आसान भाषा में'), _same('22 min video'),
       _t('A calm walkthrough of early, active and transition labour - so nothing takes you by surprise.', 'शुरुआती, active और transition लेबर की शांत जानकारी — ताकि कुछ भी अचानक न लगे।'),
       free: true),
-  BirthingClass(2, _t('Breathing & relaxation that actually works', 'साँस और आराम — जो सच में काम आता है'), _t('18 min video', '18 min video'),
+  BirthingClass(2, _t('Breathing & relaxation that actually works', 'साँस और आराम — जो सच में काम आता है'), _same('18 min video'),
       _t('The breathing and relaxation tools that genuinely help when contractions build.', 'साँस और आराम के वे तरीक़े जो contractions बढ़ने पर सच में मदद करते हैं।')),
-  BirthingClass(3, _t('Positions & movement for an easier labour', 'आसान लेबर के लिए मुद्राएँ और हलचल'), _t('20 min video', '20 min video'),
+  BirthingClass(3, _t('Positions & movement for an easier labour', 'आसान लेबर के लिए मुद्राएँ और हलचल'), _same('20 min video'),
       _t('How to move, sway and rest in positions that help labour progress and ease pain.', 'कैसे चलें, झूलें और ऐसी मुद्राओं में आराम करें जो लेबर को आगे बढ़ाएँ और दर्द कम करें।')),
-  BirthingClass(4, _t('Pain relief - natural, epidural & C-section', 'दर्द से राहत — normal, epidural और C-section'), _t('24 min video', '24 min video'),
+  BirthingClass(4, _t('Pain relief - natural, epidural & C-section', 'दर्द से राहत — normal, epidural और C-section'), _same('24 min video'),
       _t('An honest look at every pain-relief option, so your choices are informed, not fearful.', 'दर्द से राहत के हर विकल्प पर एक ईमानदार नज़र, ताकि आपके फ़ैसले समझ से हों, डर से नहीं।')),
-  BirthingClass(5, _t('Your partner as birth support', 'जन्म के समय आपके partner का साथ'), _t('16 min video', '16 min video'),
+  BirthingClass(5, _t('Your partner as birth support', 'जन्म के समय आपके partner का साथ'), _same('16 min video'),
       _t('Exactly how your partner can help - from counter-pressure to knowing when to speak up.', 'आपके partner ठीक-ठीक कैसे मदद कर सकते हैं — कमर दबाने से लेकर यह जानने तक कि कब बोलना है।')),
-  BirthingClass(6, _t('The golden hour - the first hour after birth', 'Golden hour — जन्म के बाद का पहला घंटा'), _t('15 min video', '15 min video'),
+  BirthingClass(6, _t('The golden hour - the first hour after birth', 'Golden hour — जन्म के बाद का पहला घंटा'), _same('15 min video'),
       _t('Skin-to-skin, the first feed, and what really happens in the precious first hour.', 'Skin-to-skin, पहला दूध, और उस क़ीमती पहले घंटे में असल में क्या होता है।')),
 ];
 
@@ -660,14 +672,14 @@ enum PrepKind { course, cohort, masterclass }
 
 extension PrepKindX on PrepKind {
   LocalizedText get label => switch (this) {
-        PrepKind.course => _t('Course', 'Course'),
-        PrepKind.cohort => _t('Live cohort', 'Live cohort'),
-        PrepKind.masterclass => _t('Masterclass', 'Masterclass'),
+        PrepKind.course => _same('Course'),
+        PrepKind.cohort => _same('Live cohort'),
+        PrepKind.masterclass => _same('Masterclass'),
       };
   LocalizedText get filterLabel => switch (this) {
-        PrepKind.course => _t('Courses', 'Courses'),
-        PrepKind.cohort => _t('Cohorts', 'Cohorts'),
-        PrepKind.masterclass => _t('Masterclasses', 'Masterclasses'),
+        PrepKind.course => _same('Courses'),
+        PrepKind.cohort => _same('Cohorts'),
+        PrepKind.masterclass => _same('Masterclasses'),
       };
 }
 
@@ -757,11 +769,11 @@ class PrepProgram {
   bool get isLive => kind == PrepKind.cohort || isLiveScheduled;
 
   LocalizedText get heroTag {
-    if (kind == PrepKind.cohort) return startLabel ?? _t('Live cohort', 'Live cohort');
-    if (isLiveScheduled) return startLabel ?? _t('Live', 'Live');
+    if (kind == PrepKind.cohort) return startLabel ?? _same('Live cohort');
+    if (isLiveScheduled) return startLabel ?? _same('Live');
     return durationLabel.en.isNotEmpty
         ? durationLabel
-        : _t('Recorded', 'Recorded');
+        : _same('Recorded');
   }
 }
 
@@ -833,7 +845,7 @@ final List<LocalizedText> kPrepTopics = [
   _t('Nutrition', 'पोषण'),
   _t('Breastfeeding', 'स्तनपान'),
   _t('Newborn', 'नवजात'),
-  _t('Fitness', 'Fitness'),
+  _same('Fitness'),
   _t('Mind & Mood', 'मन और मिज़ाज'),
   _t('First Trimester', 'पहली तिमाही'),
 ];
@@ -843,17 +855,17 @@ final List<PrepProgram> _kPrepCourses = [
   PrepProgram(
     id: 'course_pregnancy_guide',
     kind: PrepKind.course,
-    instructorName: _t('Dr. Ananya Rao', 'Dr. Ananya Rao'),
+    instructorName: _same('Dr. Ananya Rao'),
     instructorRole: _t('Obstetrician · 15 yrs', 'Obstetrician · 15 साल'),
     instructorBio:
         _t("Senior obstetrician with 3,000+ deliveries. She scripts and hosts ParentVeda's flagship guide in calm, plain language.", '3,000+ डिलीवरी का अनुभव रखने वाली वरिष्ठ obstetrician। ParentVeda की सबसे बड़ी guide वही लिखती और पेश करती हैं, शांत और सीधी भाषा में।'),
-    title: _t('The Complete Pregnancy Guide', 'The Complete Pregnancy Guide'),
+    title: _same('The Complete Pregnancy Guide'),
     subtitle: _t('Week 1 to the first cry - every stage, taught properly, once.', 'हफ़्ता 1 से पहली किलकारी तक — हर पड़ाव, ढंग से, एक बार में।'),
     topics: [_t('First Trimester', 'पहली तिमाही'), _t('Birth & Labour', 'जन्म और लेबर'), _t('Newborn', 'नवजात')],
     accent: _pViolet,
     price: '₹2,999',
     status: PrepStatus.available,
-    durationLabel: _t('80+ lessons', '80+ lessons'),
+    durationLabel: _same('80+ lessons'),
     about:
         _t('A documentary-style course that unlocks as your pregnancy grows and stays yours for life. You only ever see the lessons for your current stage; earlier and later ones are a tap away. Told through ParentVeda\'s own animated guides, scripted from research and reviewed by obstetricians.', 'एक documentary जैसा course, जो आपकी गर्भावस्था के साथ खुलता जाता है और हमेशा के लिए आपका रहता है। आपको हर बार सिर्फ़ अपने मौजूदा पड़ाव के lessons दिखते हैं; पहले और बाद वाले एक tap दूर हैं। ParentVeda के अपने animated guides के ज़रिए, शोध से लिखे और obstetricians द्वारा जाँचे गए।'),
     rating: 4.9,
@@ -871,7 +883,7 @@ final List<PrepProgram> _kPrepCourses = [
       _t('A gentle on-ramp into the newborn weeks.', 'नवजात के हफ़्तों में एक सौम्य प्रवेश।'),
     ],
     reviews: [
-      Review(_t('Sneha K.', 'Sneha K.'), _t('28 weeks', '28 हफ़्ते'), _t('"The one place that told me what to actually do, stage by stage."', '"बस यही एक जगह थी जिसने बताया कि असल में करना क्या है, पड़ाव दर पड़ाव।"')),
+      Review(_same('Sneha K.'), _t('28 weeks', '28 हफ़्ते'), _t('"The one place that told me what to actually do, stage by stage."', '"बस यही एक जगह थी जिसने बताया कि असल में करना क्या है, पड़ाव दर पड़ाव।"')),
     ],
     featured: true,
     recency: 100,
@@ -879,16 +891,16 @@ final List<PrepProgram> _kPrepCourses = [
   PrepProgram(
     id: 'course_birthprep',
     kind: PrepKind.course,
-    instructorName: _t('Meera Nair', 'Meera Nair'),
-    instructorRole: _t('Childbirth educator', 'Childbirth educator'),
+    instructorName: _same('Meera Nair'),
+    instructorRole: _same('Childbirth educator'),
     instructorBio: _t('A certified, OB-reviewed childbirth educator who has prepared thousands of mothers for the big day.', 'एक प्रमाणित, OB द्वारा जाँची गई childbirth educator, जिन्होंने हज़ारों माँओं को उस बड़े दिन के लिए तैयार किया है।'),
-    title: _t('Birth Prep Essentials', 'Birth Prep Essentials'),
+    title: _same('Birth Prep Essentials'),
     subtitle: _t('A calm, self-paced walkthrough of everything the big day asks of you.', 'उस बड़े दिन आपसे जो कुछ चाहिए, उसकी शांत जानकारी — अपनी रफ़्तार से।'),
     topics: [_t('Birth & Labour', 'जन्म और लेबर'), _t('Breathing', 'साँस')],
     accent: _pBlue,
     price: '₹1,499',
     status: PrepStatus.available,
-    durationLabel: _t('6 lessons · ~90 min', '6 lessons · ~90 min'),
+    durationLabel: _same('6 lessons · ~90 min'),
     about:
         _t('The self-paced companion to our live Birthing Classes - the stages of labour, breathing and positions, pain-relief options and the golden hour, all in short lessons you can watch and rewatch at your own pace.', 'हमारी live Birthing Classes का अपनी रफ़्तार वाला साथी — लेबर के चरण, साँस और मुद्राएँ, दर्द से राहत के विकल्प और golden hour, सब छोटे lessons में, जिन्हें आप अपनी रफ़्तार से बार-बार देख सकती हैं।'),
     rating: 4.8,
@@ -910,16 +922,16 @@ final List<PrepProgram> _kPrepCourses = [
   PrepProgram(
     id: 'course_trimester_fit',
     kind: PrepKind.course,
-    instructorName: _t('Sana Kapoor', 'Sana Kapoor'),
-    instructorRole: _t('Certified prenatal instructor', 'Certified prenatal instructor'),
+    instructorName: _same('Sana Kapoor'),
+    instructorRole: _same('Certified prenatal instructor'),
     instructorBio: _t('A certified prenatal fitness instructor whose sessions are scaled safely to every trimester.', 'एक प्रमाणित prenatal fitness instructor, जिनके sessions हर तिमाही के हिसाब से सुरक्षित ढंग से ढाले जाते हैं।'),
-    title: _t('Trimester-Safe Fitness', 'Trimester-Safe Fitness'),
+    title: _same('Trimester-Safe Fitness'),
     subtitle: _t('Feel strong through pregnancy with movement scaled to your stage.', 'अपने पड़ाव के हिसाब से ढली हलचल के साथ पूरी गर्भावस्था मज़बूत महसूस करें।'),
-    topics: [_t('Fitness', 'Fitness')],
+    topics: [_same('Fitness')],
     accent: _pTeal,
     price: '₹1,299',
     status: PrepStatus.available,
-    durationLabel: _t('5 lessons · ~60 min', '5 lessons · ~60 min'),
+    durationLabel: _same('5 lessons · ~60 min'),
     about:
         _t('A short, practical course on staying safely strong and mobile through pregnancy - what to do, what to skip, and how to scale everything to how you feel that day.', 'गर्भावस्था भर सुरक्षित ढंग से मज़बूत और चलती-फिरती रहने पर एक छोटा, काम का course — क्या करें, क्या छोड़ें, और उस दिन के मिज़ाज के हिसाब से सब कैसे ढालें।'),
     rating: 4.8,
@@ -954,13 +966,13 @@ final Map<String,
           int seatsLeft, int recency})> _chMeta = {
   'ch_birthready': (topics: [_t('Birth & Labour', 'जन्म और लेबर'), _t('Breathing', 'साँस')], accent: _pBlue, status: PrepStatus.reserveOpen, seatsLeft: 32, recency: 98),
   'ch_first_tri': (topics: [_t('First Trimester', 'पहली तिमाही')], accent: _pAmber, status: PrepStatus.reserveOpen, seatsLeft: 14, recency: 74),
-  'ch_fit': (topics: [_t('Fitness', 'Fitness')], accent: _pTeal, status: PrepStatus.reserveOpen, seatsLeft: 20, recency: 66),
+  'ch_fit': (topics: [_same('Fitness')], accent: _pTeal, status: PrepStatus.reserveOpen, seatsLeft: 20, recency: 66),
   'ch_fourth_tri': (topics: [_t('Newborn', 'नवजात'), _t('Breastfeeding', 'स्तनपान')], accent: _pPlum, status: PrepStatus.reserveOpen, seatsLeft: 18, recency: 60),
 };
 
 PrepProgram _fromMasterclass(Masterclass m) {
   final meta = _mcMeta[m.id]!;
-  final coach = m.coaches.isNotEmpty ? m.coaches.first : Coach(_t('Your expert', 'आपकी विशेषज्ञ'), _t('ParentVeda expert', 'ParentVeda विशेषज्ञ'), _en(''));
+  final coach = m.coaches.isNotEmpty ? m.coaches.first : Coach(_t('Your expert', 'आपकी विशेषज्ञ'), _t('ParentVeda expert', 'ParentVeda विशेषज्ञ'), _same(''));
   final when = m.facts.length >= 2
       ? LocalizedText(
           en: '${m.facts[1].big.en} · ${m.facts[1].small.en}',
@@ -984,7 +996,7 @@ PrepProgram _fromMasterclass(Masterclass m) {
     price: m.price,
     status: meta.status,
     isLiveScheduled: meta.live,
-    startLabel: meta.live && when != null ? _t('LIVE · $when', 'LIVE · $when') : null,
+    startLabel: meta.live && when != null ? _same('LIVE · $when') : null,
     sessionTimes: meta.live && when != null ? [when] : const [],
     sessions: meta.live
         ? [
@@ -1013,7 +1025,7 @@ PrepProgram _fromCohort(Cohort c) {
     id: 'prog_${c.id}',
     kind: PrepKind.cohort,
     instructorName: c.coachName ?? _t('Your coach', 'आपकी कोच'),
-    instructorRole: _t('Childbirth educator', 'Childbirth educator'),
+    instructorRole: _same('Childbirth educator'),
     instructorBio: _t('Leads every live session and the private group.', 'हर live session और private group वही चलाती हैं।'),
     title: c.name,
     subtitle: c.desc,
@@ -1038,7 +1050,7 @@ PrepProgram _fromCohort(Cohort c) {
               hi: c.schedule[i].hi.replaceFirst(_kWeekPrefixHi, ''),
             )),
     ],
-    durationLabel: _t('${c.duration} · live', '${c.duration} · live'),
+    durationLabel: _same('${c.duration} · live'),
     about: c.desc,
     rating: 4.9,
     reviewsLabel: _t('${meta.seatsLeft * 20} mothers', '${meta.seatsLeft * 20} माँएँ'),
@@ -1121,7 +1133,7 @@ final List<NutriOption> kNutriTrimesters = [
 
 final List<NutriOption> kNutriGoals = [
   NutriOption('nausea', _t('Manage nausea', 'मतली संभालना')),
-  NutriOption('gd', _t('Gestational diabetes', 'Gestational diabetes')),
+  NutriOption('gd', _same('Gestational diabetes')),
   NutriOption('weight', _t('Healthy weight gain', 'सेहतमंद वज़न बढ़ना')),
   NutriOption('energy', _t('More energy', 'ज़्यादा ऊर्जा')),
   NutriOption('growth', _t("Baby's growth", 'शिशु की बढ़त')),
@@ -1131,7 +1143,7 @@ final List<NutriOption> kNutriDiets = [
   NutriOption('veg', _t('Vegetarian', 'शाकाहारी')),
   NutriOption('nonveg', _t('Non-vegetarian', 'मांसाहारी')),
   NutriOption('egg', _t('Eggetarian', 'अंडा खाने वाली')),
-  NutriOption('vegan', _t('Vegan', 'Vegan')),
+  NutriOption('vegan', _same('Vegan')),
 ];
 
 class NutritionPlan {
@@ -1166,7 +1178,7 @@ class NutritionPlan {
 final List<NutritionPlan> kNutritionPlans = [
   NutritionPlan(
     id: 'plan_settle',
-    name: _t('Settle & Nourish', 'Settle & Nourish'),
+    name: _same('Settle & Nourish'),
     tagline: _t('Gentle, tummy-friendly eating for queasy days.', 'मतली वाले दिनों के लिए सौम्य, पेट को रास आने वाला खाना।'),
     forGoals: ['nausea', 'energy'],
     accent: _pAmber,
@@ -1186,7 +1198,7 @@ final List<NutritionPlan> kNutritionPlans = [
   ),
   NutritionPlan(
     id: 'plan_balance',
-    name: _t('Balanced Bump', 'Balanced Bump'),
+    name: _same('Balanced Bump'),
     tagline: _t('Steady energy and healthy weight gain, Indian-first.', 'ठहरी हुई ऊर्जा और सेहतमंद वज़न, भारतीय खाने के साथ।'),
     forGoals: ['weight', 'energy', 'growth'],
     accent: _pViolet,
@@ -1206,7 +1218,7 @@ final List<NutritionPlan> kNutritionPlans = [
   ),
   NutritionPlan(
     id: 'plan_sugar',
-    name: _t('Sugar-Smart', 'Sugar-Smart'),
+    name: _same('Sugar-Smart'),
     tagline: _t('Gestational-diabetes-friendly eating that still tastes like home.', 'Gestational diabetes के हिसाब से खाना, जिसका स्वाद फिर भी घर जैसा हो।'),
     forGoals: ['gd', 'weight'],
     accent: _pTeal,
