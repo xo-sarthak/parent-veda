@@ -1897,6 +1897,11 @@ class S {
       "Always follow your healthcare provider's advice.",
       'हमेशा अपने डॉक्टर की सलाह मानें।');
   String get currentRoutineLabel => _p('Current routine', 'अभी का रूटीन');
+  /// Narration controls. Bilingual like everything else - the speaker sits
+  /// on a card the mother is already reading in her language.
+  String get listenLabel => _p('Listen', 'सुनिए');
+  String get stopLabel => _p('Stop', 'रोकिए');
+
   String get holdLabel => _p('Hold', 'रोकें');
   String get relaxLabel => _p('Relax', 'ढीला छोड़ें');
   String get repsLabel => _p('Repetitions', 'दोहराव');
@@ -2617,6 +2622,8 @@ class S {
       'Account नहीं हट पाया। फिर कोशिश कीजिए।');
   String get cancelLabel => _p('Cancel', 'रहने दीजिए');
   String get closeLabel => _p('Close', 'बंद कीजिए');
+  String get showPassword => _p('Show password', 'Password दिखाइए');
+  String get hidePassword => _p('Hide password', 'Password छिपाइए');
   String get deleteAccountDoneTitle =>
       _p('Account deleted', 'Account हट गया');
   String get deleteAccountDoneBody => _p(

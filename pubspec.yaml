@@ -168,6 +168,9 @@ flutter:
     - lib/data/home/
     - lib/data/father/
     - assets/audio/raga_drone.wav
+    # Staged narration for LOCAL testing only - this moves to R2.
+    - assets/narration/manifest_hi.json
+    - assets/narration/hi/
     - assets/baby/
     - assets/brand/
     - assets/brand/partners/

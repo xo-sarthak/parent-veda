@@ -12,6 +12,7 @@ import '../app_constants.dart';
 import '../localization/app_language.dart';
 import '../services/app_nav.dart';
 import '../services/baby_voice_service.dart';
+import '../services/narration_service.dart';
 import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
@@ -484,20 +485,34 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final lang = _c.language;
     String? text;
     String? card;
+    String? path;      // the JSON path in weekContent.json, for the audio key
+    String? english;   // used only if the device has no Hindi voice
     if (_cardIndex == 0) {
       text = data.snapshot.reveal.of(lang);
+      english = data.snapshot.reveal.en;
       card = 'size_reveal';
+      path = 'babySnapshot.reveal';
     } else if (_cardIndex == 2 && week != 20) {
       // Card 1 is the Weekly Video; Baby Update sits at index 2 - except week 20,
       // whose overview card folds Baby into an accordion (no separate card).
       text = data.development.whatImDoing.of(lang);
+      english = data.development.whatImDoing.en;
       card = 'baby_update';
+      path = 'babyDevelopment.whatImDoing';
     }
-    if (text == null || card == null) return;
-    final key = BabyVoiceService.keyFor(week, card);
+    if (text == null || card == null || path == null) return;
+    final key = NarrationService.weekKey(week, path);
     if (key == _lastAutoKey) return;
     _lastAutoKey = key;
-    BabyVoiceService.instance.autoPlay(text, cardKey: key, lang: lang);
+    // Through NarrationService, not BabyVoiceService: it plays the
+    // pre-generated recording where we have one and falls back to the device
+    // voice where we do not, so the screen does not have to know which.
+    NarrationService.instance.autoPlay(
+      key,
+      text: text,
+      lang: lang,
+      englishText: english,
+    );
   }
 
   /// The week-40 celebration finale (the keepsake-booklet entry), built so the

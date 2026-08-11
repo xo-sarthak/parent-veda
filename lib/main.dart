@@ -71,6 +71,7 @@ import 'services/medicine_store.dart';
 import 'services/memory_store.dart';
 import 'services/pregnancy_controller.dart';
 import 'services/product_checklist_store.dart';
+import 'services/narration_service.dart';
 import 'services/read_to_baby_saved_store.dart';
 import 'services/read_to_baby_store.dart';
 import 'services/size_view_pref.dart';
@@ -229,6 +230,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // Load Read-to-your-baby feed preferences + saved pieces.
     ReadToBabyStore.instance.init();
     ReadToBabySavedStore.instance.init();
+    // Loads the narration manifest. Safe to fail: a missing manifest
+    // just means every passage uses the device voice instead.
+    NarrationService.instance.init();
     // Load edited "when did this happen" dates for journey-map milestones.
     JourneyDatesStore.instance.init();
     // PARENTING: load the child profile(s). The keystone of the post-pregnancy
