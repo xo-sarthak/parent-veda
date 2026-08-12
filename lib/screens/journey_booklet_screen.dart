@@ -149,7 +149,7 @@ class _JourneyBookletScreenState extends State<JourneyBookletScreen> {
                           _MissingWeekRow(
                             label: widget.lang.isEnglish
                                 ? 'Week $w'
-                                : 'Hafta $w',
+                                : 'हफ़्ता $w',
                             range: widget.dateRanges[w] ?? '',
                             addLabel: s.addMemory,
                             onAdd: _busy ? null : () => _addMemory(w),

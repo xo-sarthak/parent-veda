@@ -190,7 +190,7 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
                 child: Text(
                   widget.lang.isEnglish
                       ? 'Week ${widget.week}'
-                      : 'Hafta ${widget.week}',
+                      : 'हफ़्ता ${widget.week}',
                   style: text.labelMedium?.copyWith(
                       color: AppTheme.primary600, fontWeight: FontWeight.w700),
                 ),

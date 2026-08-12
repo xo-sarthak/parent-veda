@@ -1548,7 +1548,19 @@ class S {
   String get profileSignOut => _p('Sign out', 'साइन आउट');
   String get languageLabel => _p('Language', 'भाषा');
   String get languageEnglish => 'English';
-  String get languageHinglish => 'Hinglish';
+  /// The LABEL on the language toggle. Devanagari, because it names a language
+  /// to the person who reads that language — "हिन्दी" is what she calls it.
+  ///
+  /// It said "Hinglish" until 2026-08-12, which by then was simply untrue: the
+  /// house style moved to Devanagari on 2026-08-03 and every string behind this
+  /// toggle is now Hindi. A mother looking for her language saw the name of a
+  /// style the app no longer uses, and one many people read as "broken English".
+  ///
+  /// The ENUM stays `AppLanguage.hinglish` on purpose — see CLAUDE.md. That is
+  /// an identifier, persisted in shared_preferences as the literal string
+  /// `hinglish`; renaming it would strand every mother who has already chosen
+  /// it. Identity and display, kept apart, exactly as `.en` and `.now` are.
+  String get languageHinglish => 'हिन्दी';
   String get moreComingSoon =>
       _p('More coming soon', 'और भी जल्द आ रहा है');
 
@@ -4297,6 +4309,13 @@ class S {
   String get uiNew => _p('NEW', 'नया');
   String get uiPlayBabyVoice => _p('Play baby voice', 'शिशु की आवाज़ चलाइए');
   String get uiFruit => _p('Fruit', 'फल');
+
+  // Found on a device, not by a scanner. These shipped as
+  // `lang.isEnglish ? 'Scans' : 'Scans'` — a ternary whose branches are
+  // identical, so the Hindi build rendered the English. Same defect as
+  // `_t(x, x)`, wearing a shape no audit here was looking for.
+  String get uiScans => _p('Scans', 'जाँचें');
+  String get uiSelfCare => _p('Self-care', 'अपनी देखभाल');
   String get uiBaby => _p('Baby', 'शिशु');
 
   // =========================================================================

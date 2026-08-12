@@ -120,7 +120,7 @@ class _LockedWeekViewState extends State<LockedWeekView>
                   Text(
                     widget.language.isEnglish
                         ? 'Week ${widget.week}'
-                        : 'Hafta ${widget.week}',
+                        : 'हफ़्ता ${widget.week}',
                     style: text.displaySmall?.copyWith(
                       color: AppTheme.primary700,
                     ),

@@ -156,7 +156,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                     decoration: BoxDecoration(
                         color: AppTheme.primary500,
                         borderRadius: BorderRadius.circular(99)),
-                    child: Text(_lang.isEnglish ? 'Got it' : 'Samajh gaya',
+                    child: Text(_lang.isEnglish ? 'Got it' : 'ठीक है',
                         style: pvManrope(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
@@ -246,7 +246,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_lang.isEnglish ? 'This week, baby is about a' : 'Is hafte, baby lagbhag ek',
+              Text(_lang.isEnglish ? 'This week, baby is about a' : 'इस हफ़्ते शिशु लगभग एक',
                   style: _body(AppTheme.neutral600)),
               const SizedBox(height: 2),
               Text(_tr(w.snapshot.fruit), style: _title),
@@ -255,8 +255,8 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         ]),
         const SizedBox(height: 18),
         Row(children: [
-          Expanded(child: _labelled(_lang.isEnglish ? 'Length' : 'Lambaai', _tr(w.snapshot.length))),
-          Expanded(child: _labelled(_lang.isEnglish ? 'Weight' : 'Wazan', _tr(w.snapshot.weight))),
+          Expanded(child: _labelled(_lang.isEnglish ? 'Length' : 'लंबाई', _tr(w.snapshot.length))),
+          Expanded(child: _labelled(_lang.isEnglish ? 'Weight' : 'वज़न', _tr(w.snapshot.weight))),
         ]),
       ]),
     );
@@ -266,15 +266,15 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   Widget _aboutBaby(Week5Full w) {
     return _plainCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_lang.isEnglish ? 'ABOUT YOUR BABY' : 'TUMHARE BABY KE BAARE MEIN', style: _eyebrow),
+        Text(_lang.isEnglish ? 'ABOUT YOUR BABY' : 'आपके शिशु के बारे में', style: _eyebrow),
         const SizedBox(height: 10),
         Text(_tr(w.about.teaser),
             style: pvFraunces(
                 fontSize: 18, height: 1.4, color: AppTheme.primary900, fontWeight: FontWeight.w500)),
         const SizedBox(height: 18),
-        _aboutBlock(_lang.isEnglish ? 'In my words' : 'Meri zubaani', _tr(w.about.opening)),
+        _aboutBlock(_lang.isEnglish ? 'In my words' : 'मेरी ज़ुबानी', _tr(w.about.opening)),
         const SizedBox(height: 14),
-        _aboutBlock(_lang.isEnglish ? 'How big am I' : 'Main kitna bada hoon', _tr(w.about.howBig)),
+        _aboutBlock(_lang.isEnglish ? 'How big am I' : 'अभी मेरा आकार कितना है', _tr(w.about.howBig)),
         const SizedBox(height: 14),
         _aboutBlock(_lang.isEnglish ? "What's happening this week" : 'Is hafte kya ho raha hai', _tr(w.about.whatsHappening)),
         // Behavioural highlights: inline heading + description, never a card.
@@ -317,15 +317,15 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
       const SizedBox(height: 14),
       _plainCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _aboutBlock(_lang.isEnglish ? 'How you might be feeling' : 'Tum kaisa mehsoos kar sakti ho', _tr(w.you.feeling)),
+          _aboutBlock(_lang.isEnglish ? 'How you might be feeling' : 'आप कैसा महसूस कर रही होंगी', _tr(w.you.feeling)),
           const SizedBox(height: 14),
-          _aboutBlock(_lang.isEnglish ? 'Your changing body' : 'Tumhara badalta body', _tr(w.you.changingBody)),
+          _aboutBlock(_lang.isEnglish ? 'Your changing body' : 'आपका बदलता शरीर', _tr(w.you.changingBody)),
           const SizedBox(height: 14),
-          _aboutBlock(_lang.isEnglish ? 'Be kind to yourself' : 'Apne saath naram raho', _tr(w.you.beKind)),
+          _aboutBlock(_lang.isEnglish ? 'Be kind to yourself' : 'अपने साथ नरमी बरतिए', _tr(w.you.beKind)),
         ]),
       ),
       const SizedBox(height: 16),
-      Text(_lang.isEnglish ? 'Highlights' : 'Khaas baatein', style: _cardTitle),
+      Text(_lang.isEnglish ? 'Highlights' : 'ख़ास बातें', style: _cardTitle),
       const SizedBox(height: 12),
       for (final h in w.you.highlights)
         _tapRow(
@@ -348,7 +348,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_lang.isEnglish ? 'Self-care' : 'Self-care', style: _cardTitle),
+              Text(S(_lang).uiSelfCare, style: _cardTitle),
               const SizedBox(height: 4),
               Text(_tr(w.you.selfCare), style: _body()),
             ]),
@@ -373,13 +373,13 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           onTap: () => _sheet(_tr(s.name), [
             Text(_tr(s.teaser), style: _body(AppTheme.neutral600)),
             const SizedBox(height: 16),
-            _sheetLabel(_lang.isEnglish ? 'HOW COMMON IS IT?' : 'YEH KITNA AAM HAI?'),
+            _sheetLabel(_lang.isEnglish ? 'HOW COMMON IS IT?' : 'यह कितना आम है'),
             Text(_tr(s.howCommon), style: _body()),
             const SizedBox(height: 14),
-            _sheetLabel(_lang.isEnglish ? 'WHY IT HAPPENS' : 'AISA KYUN HOTA HAI'),
+            _sheetLabel(_lang.isEnglish ? 'WHY IT HAPPENS' : 'ऐसा क्यों होता है'),
             Text(_tr(s.why), style: _body()),
             const SizedBox(height: 14),
-            _sheetLabel(_lang.isEnglish ? 'WHAT MAY HELP' : 'KYA MADAD KAR SAKTA HAI'),
+            _sheetLabel(_lang.isEnglish ? 'WHAT MAY HELP' : 'किससे आराम मिल सकता है'),
             for (final h in s.helps)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
@@ -402,7 +402,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(_lang.isEnglish ? 'WHEN TO CONTACT YOUR DOCTOR' : 'DOCTOR SE KAB SAMPARK KARO',
+                    Text(_lang.isEnglish ? 'WHEN TO CONTACT YOUR DOCTOR' : 'डॉक्टर से कब बात कीजिए',
                         style: pvManrope(
                             fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: AppTheme.danger)),
                     const SizedBox(height: 4),
@@ -443,7 +443,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
               colors: [Color(0xFFEAF5EC), Color(0xFFDDEFE0)]),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(_lang.isEnglish ? 'INDIAN SUPERFOOD OF THE WEEK' : 'IS HAFTE KA INDIAN SUPERFOOD',
+          Text(_lang.isEnglish ? 'INDIAN SUPERFOOD OF THE WEEK' : 'इस हफ़्ते का भारतीय सुपरफ़ूड',
               style: pvManrope(
                   fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: const Color(0xFF3E7D52))),
           const SizedBox(height: 8),
@@ -458,7 +458,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         ]),
       ),
       const SizedBox(height: 16),
-      Text(_lang.isEnglish ? 'Foods to favour this week' : 'Is hafte pasand karne wale khaane', style: _cardTitle),
+      Text(_lang.isEnglish ? 'Foods to favour this week' : 'इस हफ़्ते ये ज़रूर खाइए', style: _cardTitle),
       const SizedBox(height: 10),
       _plainCard(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
@@ -470,7 +470,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         ),
       ),
       const SizedBox(height: 16),
-      Text(_lang.isEnglish ? 'What to avoid' : 'Kis se bachna hai', style: _cardTitle),
+      Text(_lang.isEnglish ? 'What to avoid' : 'किन चीज़ों से बचिए', style: _cardTitle),
       const SizedBox(height: 10),
       _plainCard(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
@@ -565,13 +565,13 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
       const SizedBox(height: 14),
       _plainCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _aboutBlock(_lang.isEnglish ? 'Baby' : 'Baby', _tr(w.partner.baby)),
+          _aboutBlock(S(_lang).uiBaby, _tr(w.partner.baby)),
           const SizedBox(height: 14),
-          _aboutBlock(_lang.isEnglish ? 'Mother' : 'Maa', _tr(w.partner.mother)),
+          _aboutBlock(_lang.isEnglish ? 'Mother' : 'माँ', _tr(w.partner.mother)),
         ]),
       ),
       const SizedBox(height: 16),
-      Text(_lang.isEnglish ? 'Scans & appointments coming up' : 'Aane wale scans aur appointments', style: _cardTitle),
+      Text(_lang.isEnglish ? 'Scans & appointments coming up' : 'आने वाले स्कैन और अपॉइंटमेंट', style: _cardTitle),
       const SizedBox(height: 10),
       _plainCard(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
@@ -594,7 +594,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         ]),
       ),
       const SizedBox(height: 16),
-      Text(_lang.isEnglish ? 'How you can help' : 'Tum kaise madad kar sakte ho', style: _cardTitle),
+      Text(_lang.isEnglish ? 'How you can help' : 'आप कैसे मदद कर सकते हैं', style: _cardTitle),
       const SizedBox(height: 10),
       for (final h in w.partner.help)
         Padding(

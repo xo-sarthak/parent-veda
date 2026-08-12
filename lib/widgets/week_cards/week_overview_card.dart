@@ -39,7 +39,18 @@ const LinearGradient _pageGradient = LinearGradient(
 );
 
 /// Trims wordy prefixes so the stat cards read clean ("a banana" → "Banana",
-/// "about 25.7 cm" → "25.7 cm", "ek kela" → "Kela").
+/// "about 25.7 cm" → "25.7 cm", "एक केला" → "केला").
+///
+/// THE DEVANAGARI PREFIXES WERE MISSING. This list held `lagbhag ` and `ek ` —
+/// the Latin-script Hinglish that the migration replaced — so once the content
+/// became Devanagari nothing matched and the card read "लगभग 50.7 cm" where the
+/// English read "50.7 cm". Visible on a phone, invisible to every test: the
+/// function did exactly what it was told, against a vocabulary that no longer
+/// exists.
+///
+/// The Hinglish entries stay. `weekContent.hinglish.json` is kept verbatim as
+/// the pre-migration copy, and week 5's Full view still carries some, so a
+/// string in the old style can still reach here.
 String _statValue(String raw) {
   var v = raw.trim();
   const prefixes = [
@@ -51,6 +62,12 @@ String _statValue(String raw) {
     'a ',
     'the ',
     'ek ',
+    // Devanagari. `लगभग` is what weekContent.json now says for "about", and
+    // `एक` for the article.
+    'लगभग ',
+    'क़रीब ',
+    'करीब ',
+    'एक ',
   ];
   for (final p in prefixes) {
     if (v.toLowerCase().startsWith(p)) {
@@ -213,7 +230,7 @@ class WeekSizeHero extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 14),
-          _BabyFruitToggle(baby: baby, father: father),
+          _BabyFruitToggle(baby: baby, father: father, lang: lang),
           const SizedBox(height: 16),
           Row(children: [
             Expanded(
@@ -323,11 +340,19 @@ class _RingPainter extends CustomPainter {
 }
 
 class _BabyFruitToggle extends StatelessWidget {
-  const _BabyFruitToggle({required this.baby, this.father = false});
+  const _BabyFruitToggle(
+      {required this.baby, required this.lang, this.father = false});
   final bool baby;
   final bool father;
+
+  /// Passed in rather than read from the global `S.now`. A widget that
+  /// reads the current language from a static is not guaranteed to
+  /// rebuild when the language changes - which is how a toggle ends up
+  /// still saying Baby after the app has switched to Hindi.
+  final AppLanguage lang;
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     final accent = father ? kFAccent : AppTheme.primary500;
     Widget seg(String label, bool on, VoidCallback onTap) => Expanded(
           child: GestureDetector(
@@ -366,8 +391,10 @@ class _BabyFruitToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(children: [
-        seg('Baby', baby, () => SizeViewPref.set(true)),
-        seg('Fruit', !baby, () => SizeViewPref.set(false)),
+        // s.uiBaby and s.uiFruit already existed in the string table, unused,
+        // while this toggle rendered hardcoded English on the Hindi build.
+        seg(s.uiBaby, baby, () => SizeViewPref.set(true)),
+        seg(s.uiFruit, !baby, () => SizeViewPref.set(false)),
       ]),
     );
   }

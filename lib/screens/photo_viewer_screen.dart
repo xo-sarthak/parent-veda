@@ -48,7 +48,7 @@ class PhotoViewerScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    lang.isEnglish ? 'Week ${photo.week}' : 'Hafta ${photo.week}',
+                    lang.isEnglish ? 'Week ${photo.week}' : 'हफ़्ता ${photo.week}',
                     style: text.labelLarge?.copyWith(color: Colors.white),
                   ),
                   const SizedBox(width: 10),

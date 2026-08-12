@@ -89,7 +89,18 @@ class TrimesterProgressBar extends StatelessWidget {
       return Expanded(
         flex: flex,
         child: LayoutBuilder(builder: (context, c) {
-          return Stack(children: [
+          // Clip.none because the "you are here" dot is MEANT to sit proud of
+          // the bar: the track is 8px tall, the dot is 10px at top:-1, so it
+          // spans y -1..9 and hangs 1px below. Stack defaults to Clip.hardEdge,
+          // which both clipped that last pixel and painted the yellow-and-black
+          // overflow banner across the week label on every screen carrying this
+          // bar.
+          //
+          // Shrinking the dot or nudging `top` would silence the warning by
+          // giving up the design - the dot straddling the track is the whole
+          // point of it. The bug was never the geometry; it was clipping a
+          // child that is supposed to overhang.
+          return Stack(clipBehavior: Clip.none, children: [
             Container(
               height: 8,
               decoration: BoxDecoration(

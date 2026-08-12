@@ -1401,7 +1401,7 @@ class WeekFlowView extends StatelessWidget {
                       _whatsNextShortcut(
                           context,
                           Icons.child_care_rounded,
-                          lang.isEnglish ? 'Baby' : 'Baby',
+                          S(lang).uiBaby,
                           AppTheme.primary500,
                           () => openWeekBabyDetail(
                               context, controller, w.week, lang)),
@@ -1409,7 +1409,7 @@ class WeekFlowView extends StatelessWidget {
                       _whatsNextShortcut(
                           context,
                           Icons.favorite_rounded,
-                          lang.isEnglish ? 'Mom' : 'Maa',
+                          lang.isEnglish ? 'Mom' : 'माँ',
                           AppTheme.secondary500,
                           () => openWeekMotherDetail(
                               context, controller, w.week, lang)),
@@ -1417,7 +1417,7 @@ class WeekFlowView extends StatelessWidget {
                       _whatsNextShortcut(
                           context,
                           Icons.event_note_rounded,
-                          lang.isEnglish ? 'Scans' : 'Scans',
+                          S(lang).uiScans,
                           const Color(0xFF2E9C8E),
                           () => openWeekScans(context, controller, lang)),
                     ]),
@@ -3315,11 +3315,11 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
       // app_language.dart untouched). Old labels: Scans / For you / Milestones.
       child: Row(children: [
         seg(_wnTabBaby, Icons.child_care_rounded,
-            widget.lang.isEnglish ? 'Baby' : 'Baby'),
+            S(widget.lang).uiBaby),
         seg(_wnTabMom, Icons.favorite_rounded,
-            widget.lang.isEnglish ? 'Mom' : 'Maa'),
+            widget.lang.isEnglish ? 'Mom' : 'माँ'),
         seg(_wnTabScans, Icons.event_note_rounded,
-            widget.lang.isEnglish ? 'Scans' : 'Scans'),
+            S(widget.lang).uiScans),
       ]),
     );
   }
@@ -4327,7 +4327,7 @@ Widget _viewAllButton(BuildContext context, S s, VoidCallback onTap) {
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(s.lang.isEnglish ? 'View all' : 'Sab dekhein',
+      Text(s.lang.isEnglish ? 'View all' : 'सब देखिए',
           style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w800,
@@ -4635,8 +4635,8 @@ class _WeekNav extends StatelessWidget {
       {required bool isPrev, required int week, required VoidCallback onTap}) {
     final accent = father ? _fAccent : AppTheme.primary500;
     final caption = isPrev
-        ? (lang.isEnglish ? 'Previous week' : 'Pichhla hafta')
-        : (lang.isEnglish ? 'Next week' : 'Agla hafta');
+        ? (lang.isEnglish ? 'Previous week' : 'पिछला हफ़्ता')
+        : (lang.isEnglish ? 'Next week' : 'अगला हफ़्ता');
     final label = isPrev
         ? '← ${s.weekWord} $week'
         : '${s.weekWord} $week →';

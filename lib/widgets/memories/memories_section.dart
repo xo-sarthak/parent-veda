@@ -144,7 +144,7 @@ class _EntryCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Text(
-                lang.isEnglish ? 'Week ${entry.week}' : 'Hafta ${entry.week}',
+                lang.isEnglish ? 'Week ${entry.week}' : 'हफ़्ता ${entry.week}',
                 style: text.labelSmall?.copyWith(
                     color: AppTheme.primary700, fontWeight: FontWeight.w700),
               ),
@@ -478,7 +478,7 @@ class MemoryCollage extends StatelessWidget {
                 Icon(Icons.format_quote_rounded, size: 16, color: AppTheme.primary400),
                 const SizedBox(width: 6),
                 Text(
-                  lang.isEnglish ? 'Week ${e.week} · ${e.dateIso}' : 'Hafta ${e.week} · ${e.dateIso}',
+                  lang.isEnglish ? 'Week ${e.week} · ${e.dateIso}' : 'हफ़्ता ${e.week} · ${e.dateIso}',
                   style: text.labelSmall?.copyWith(color: AppTheme.primary600),
                 ),
               ]),

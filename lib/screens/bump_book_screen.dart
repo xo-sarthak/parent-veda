@@ -830,11 +830,11 @@ class _BumpBookPreviewScreen extends StatelessWidget {
         [XFile(filePath, mimeType: 'application/pdf')],
         text: lang.isEnglish
             ? 'My Bump Journey keepsake book'
-            : 'Meri Bump Journey book',
+            : 'मेरी बंप जर्नी की यादगार किताब',
       );
     } catch (_) {
       messenger.showSnackBar(SnackBar(
-          content: Text(lang.isEnglish ? 'Could not share.' : 'Share nahi hua.')));
+          content: Text(lang.isEnglish ? 'Could not share.' : 'शेयर नहीं हो पाया.')));
     }
   }
 
@@ -842,11 +842,11 @@ class _BumpBookPreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang.isEnglish ? 'My Bump Journey Book' : 'Bump Journey Book',
+        title: Text(lang.isEnglish ? 'My Bump Journey Book' : 'मेरी बंप जर्नी किताब',
             style: pvJakarta(fontWeight: FontWeight.w700)),
         actions: [
           IconButton(
-            tooltip: lang.isEnglish ? 'Share' : 'Share',
+            tooltip: S(lang).uiShare,
             onPressed: () => _share(context),
             icon: const Icon(Icons.share_rounded),
           ),
