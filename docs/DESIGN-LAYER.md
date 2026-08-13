@@ -36,7 +36,71 @@ it.** Brand colours stay — app and website remain in sync.
 
 ---
 
-## 1. ⭐ The one move that buys the most identity, and costs no new colour
+## 0a. The logo, actually looked at
+
+`assets/brand/pv-lockup.png`, `pv-mark.png`, `pv-mark-transparent.png`.
+
+**The mark is a parent and child forming a heart** — a violet adult figure (head and
+curved arm) embracing a coral child figure. Soft rounded terminals throughout. The
+wordmark "ParentVeda" is a heavy geometric **rounded sans**, one weight.
+
+Colours sampled from the lockup (not eyeballed):
+
+| | Sampled from logo | Code constant | Verdict |
+|---|---|---|---|
+| Violet | **`#6830B0`** — 45.5% of opaque pixels | `#6A30B6` | Faithful ✓ |
+| Coral | **`#F05070`** — 19.1% | `#FF5A79` | Faithful; logo's is slightly deeper ✓ |
+
+Three consequences that only became visible by looking:
+
+1. ⭐ **The coral is not decoration — it is the child.** Violet is the parent, coral is
+   the child, and the mark's whole meaning is one holding the other. This **supersedes**
+   the earlier "demote coral to the logo mark only" rule, which was written without
+   seeing the mark. A better rule falls out of the logo's own logic — see §2.
+2. ⚠️ **The wordmark and the type proposal disagree.** The lockup speaks in a friendly
+   geometric rounded sans; §3 proposes Fraunces, an editorial serif with a wonk axis.
+   Two different voices. Either the wordmark is eventually redrawn, or the system
+   knowingly carries a logo that speaks differently from the pages. **Named rather than
+   papered over; unresolved.**
+3. **Shape language is soft and rounded** — generous corner radii and rounded stroke
+   terminals, not sharp ones. An input the code constants could not provide.
+
+---
+
+## 1. Palette — DIRECTIONS, not a settled answer
+
+> ⚠️ **This section holds one worked direction and three alternatives. It is not
+> decided.** Keeping the brand colours (W05) does not determine what they sit *on*, and
+> the ground changes the feeling far more than the hue does. To be resolved by building
+> comparable swatches and looking, not by argument.
+
+| | Direction | Feeling | Risk |
+|---|---|---|---|
+| **A** | **Violet on warm paper** — unbleached bone and clay. Worked out below. | Editorial, calm, rooted. Furthest from the category. | Warm neutrals can drift towards "wellness brand" if the violet is not held firmly. |
+| **B** | **Violet on dark ground** — `#2D144C` as the *default* surface, not just inverted sections. | Premium, cinematic; the violet glows rather than sits. Spotify's model. | Harder for long-form reading, which matters for an SEO-first build. |
+| **C** | **Cool and clean** — essentially the current app, tightened. | Familiar, safe, ships fastest. | Least differentiation; nearest to iMumz. |
+| **D** | **Warm, hotter** — clay and terracotta rather than bone and cream. | Earthier, more Indian, more assertive. | Can fight the violet; a narrower path to get right. |
+
+**Direction A is worked out below because it is the current recommendation, not because
+the others were dismissed.** B is genuinely interesting for the marketing site paired
+with A for `/reads`.
+
+### ⭐ Direction A — and it is already built, in Father Mode
+
+> **Updated 2026-08-12 after the first firsthand look at the app** (`APP-AUDIT.md`).
+> Direction A stopped being a proposal the moment anyone opened the product.
+> **Father Mode already runs warm cream ground + serif display + one restrained accent
+> + circular line icons + calm empty states.** The mother's Prepare tab does the same.
+> The two best-looking surfaces in the app are already Direction A; only the mother's
+> Today screen is still lavender card-soup.
+>
+> So the recommendation is not "adopt a new direction" — it is **"bring the mother's
+> Today to the direction the product already found."** Cheaper, lower-risk, and
+> evidenced from inside the product rather than argued from outside it.
+>
+> Confirming tell: the Ask Veda FAB stays violet in Father Mode and is the one jarring
+> element on those screens — never re-themed, because a colour that means *important*
+> rather than *actionable* has nowhere to sit on a considered surface.
 
 **The neutrals are lavender-tinted:** `#FBF9FE`, `#F3EEF7`, `#ECE5F2`, `#C7BBD6`,
 `#5B5070`. Cool purple-greys — the same material iMumz's background wash is made of.
@@ -81,17 +145,32 @@ inverted sections read as ParentVeda.
 
 ---
 
-## 2. Colour discipline — one job each
+## 2. Colour discipline — ⭐ ONE LOUD, MANY QUIET
 
-The constraint: enhance usability, do not dilute identity, do not add so many colours
-that nothing is ownable. Seven hues are already in play. The fix is not deletion — it is
-**one stated job each, never decorative.**
+> **Decided 2026-08-14 (Q4). This is the governing rule; the job table below sits under
+> it.** The question is not *how many colours* but **how many are allowed to be LOUD.**
+
+**Exactly one loud colour: violet `#6A30B6`.** It means *"you can act on this"* and
+nothing else. Every other hue lives **quiet** — as soft card backgrounds in a controlled
+band where **saturation and lightness are held constant** and only the hue varies (Flo's
+technique, `FLO-TEARDOWN.md` §1).
+
+That buys visual variety without noise: a content grid can carry a dozen different soft
+grounds and still read as one system, because only one thing on screen is ever shouting.
+
+**It also fixes the measured defect:** the Tools hub currently carries ~7 accent hues at
+full strength in one 2-column grid (`APP-AUDIT.md` §3.5). Under this rule those become
+quiet grounds, and the only strong colour left is the one that tells her where to tap.
+
+The constraint behind it: enhance usability, do not dilute identity, do not add so many
+colours that nothing is ownable. The per-colour jobs below still hold — they say *what a
+hue means when it appears*; the rule above says *how loudly it is allowed to say it.*
 
 | Colour | Its ONE job | Never |
 |---|---|---|
 | **violet `#6A30B6`** | *You can act on this.* Links, buttons, active state. | Never "this is important". Never a gradient. Never a background wash. |
 | **ink-deep `#2D144C`** | The dark ground for inverted passages. | Not a text colour. |
-| **coral `#FF5A79`** | **Demoted — the logo mark, nothing else.** | Never a second accent. An undefined second accent is what makes a palette read as generic. |
+| **coral `#FF5A79`** | ⭐ **The child.** Wherever the content is about the baby rather than the mother — the size card, the growth line, the child's own profile. **Revised after looking at the mark** (§0a): the logo *is* a violet parent holding a coral child, so coral already carries meaning and should not be exiled to the logo. | Never a generic second accent — that is what makes a palette read as generic. Never used because a section "needs some colour". If it is not about the child, it is not coral. |
 | **brown `#7A4600`** | Structural warmth — rules, frames, margin ornament. | Never a button. |
 | green `#1F8A5B` | Done / safe / complete. | Never decorative. |
 | amber `#C98A2B` | Food, nutrition, warmth. | Never "warning" — we do not alarm. |
@@ -105,7 +184,9 @@ Restraint should be **verifiable by grep**, not asserted:
 - gradients in shipped CSS: **1** (the logo mark only)
 - easing curves: **1**
 - typefaces: **3 Latin + 2 Devanagari**, no more
-- accent hues on any single screen: **≤ 2**
+- **LOUD colours on any screen: 1** (violet). Quiet grounds are unlimited, provided they
+  stay inside the controlled saturation/lightness band.
+- **Dark-mode variants: 0** — light only, by decision (§7a)
 
 ---
 
@@ -117,9 +198,20 @@ the identity is not carrying.
 
 | Face | Role |
 |---|---|
-| **Fraunces** | All display and headline, **and article body on `/reads`**. `WONK` on at display sizes — the quirk is the signature. `WONK` off for body. |
-| **Plus Jakarta Sans** | UI — labels, buttons, navigation. |
+| **Fraunces** | **Display and headline only.** `WONK` on at display sizes — the quirk is the signature. *(Decided 2026-08-14, Q3 — supersedes the earlier proposal to set article body in Fraunces.)* |
+| **Plus Jakarta Sans** | **UI *and* long-form body** — labels, buttons, navigation, and article text. |
 | **Manrope** | Data and metadata — reading time, dates, category labels. |
+
+**Why body went to sans.** This is what Prepare and the whole TTC stage already do, and
+they are the two best mother-side surfaces in the app. Fraunces carries the identity where
+it is seen at size; Plus Jakarta Sans stays legible one-handed at 2am on a mid-range
+Android. Serif body was unproven at small sizes and a real risk in exactly the reading
+condition the product exists for.
+
+⚠️ **Coupling worth knowing:** the Devanagari pairing follows the Latin choice —
+`pv_fonts.dart` maps Fraunces → **Noto Serif Devanagari** and Plus Jakarta Sans → **Mukta**.
+Deciding the Latin display face decided the Hindi one too, and Hindi body text follows
+Mukta for the same legibility reason.
 
 - **Small-caps, wide-tracked metadata label** (Aeon's device): marks metadata without a
   pill, a box, or a colour.
@@ -148,16 +240,95 @@ Anything rendering Hindi goes through `PvType`, or it silently loses both.
 
 | Dimension | Rule | Source |
 |---|---|---|
-| **Composition** | Borrow miniature painting's framing logic — a contained aperture (a *jharokha* circle) rather than a full-bleed rectangle, for hero imagery. | Nicobar |
-| **Ornament** | A small hand-drawn botanical motif set living **in the margins at low opacity**, bleeding off the edge. Never centred, never a banner, never a section divider. | Good Earth |
-| **Palette** | The warm ground in §1 *is* the textile palette. Add petrol/teal only if a real need appears. | both |
+| **Ornament** | ⭐ **NONE.** Richness comes from imagery instead. *(Decided 2026-08-14, Q6 — supersedes the Good Earth margin-whisper proposal.)* | Flo; and TTC + Prepare already do this |
+| **Palette** | The warm ground in §1 *is* the textile palette. Add petrol/teal only if a real need appears. | Nicobar, Good Earth |
 | **Cadence** | Literary and seasonal in copy, in both languages. | Good Earth |
 | **Material** | Photograph texture close, in natural light — weave, block print, cane, paper. | both |
+| **Composition** | Full-bleed with one floating subject *(Q8 — see §4b)*. | Flo |
+
+**Why ornament went to zero.** The margin-whisper was a good idea with a real source, but
+three things beat it: Flo achieves richness with **no ornament at all**, purely through
+imagery; ParentVeda's two best mother-side surfaces (TTC, Prepare) already carry none; and
+ornament is the single highest kitsch risk in the system and needs an illustrator to get
+right. **Indian-ness comes from palette, composition, material and cadence — never from
+applied decoration.**
 
 **Never:** marigolds in corners, paisley borders, saffron gradients, rangoli dividers,
-mandala backgrounds.
+mandala backgrounds. *(Now enforced trivially, since there is no ornament layer at all.)*
+
+## 4b. Hero composition — full-bleed, one floating subject
+
+*(Decided 2026-08-14, Q8 — supersedes the Nicobar contained-aperture proposal.)*
+
+A soft gradient field, **one subject floating in it, one number.** Nothing competing.
+Flo's pregnancy hero is the reference (photoreal embryo, `2 days`, a Details button), and
+ParentVeda's parenting stage already does a version of it with its dark card.
+
+Chosen over the contained aperture because it **scales across every stage and content
+type**, and because putting the subject alone in a field is what makes it feel considered
+rather than arranged.
+
+## 4c. Photography of people — faces, cropped and softly lit
+
+*(Decided 2026-08-14, Q9 — supersedes the earlier "face is not the subject" rule.)*
+
+**Faces are allowed and encouraged**, on three conditions: **cropped tight**, **softly
+lit**, and **mid-experience rather than smiling at camera**. Flo uses faces heavily and it
+reads as warm rather than stock precisely because of those three.
+
+The earlier faces-not-the-subject rule was over-cautious — it protected against the
+AI-uncanny problem but risked reading as evasive on a product about people.
+
+**Assignment still governs** (§4a): faces for **emotion and symptom**; faceless for
+**objects and process**.
 
 ---
+
+## 4a. ⭐ The image system — medium chosen by subject, not by taste
+
+Derived from Flo (`DESIGN-BRIEF.md` §5.3a), which runs **six distinct image modes** and
+still reads as one system. This is the most directly copyable thing found in the whole
+reference pass, and it answers W09 ("fill every image hole") properly: **the answer is not
+"get images", it is "assign a medium to each content type, then produce within that."**
+
+### What holds six modes together
+
+1. **One background family.** Every image sits on a flat pastel field — mint, blush,
+   lavender, peach, sky, cream — all within a narrow lightness and saturation band.
+   Whatever technique sits on top, **the ground is constant.**
+2. **Everything is isolated on that ground.** No environmental scenes. Objects cut out,
+   people cropped tight, renders floating. One subject, one field.
+3. **Soft diffuse light everywhere.** Photos, renders and vectors share a lighting
+   temperature. Nothing dramatic or high-contrast.
+4. **Warm, skin-adjacent tones dominate**, including inside the vector illustrations.
+
+### The assignment table — the actual rule
+
+| Mode | Used for | Why that mode |
+|---|---|---|
+| **Flat vector illustration** | Bodies, positions, behaviours | Abstract enough not to embarrass; shows diverse skin tones without casting |
+| **Cut-out photography** | Objects she must recognise — food, supplements, kit | You cannot illustrate food she needs to identify |
+| **Photoreal 3D render** | The baby | Reverence + anatomical accuracy. A cartoon trivialises; a photo is impossible |
+| **Documentary photography** | Emotion and symptom — pain, touch, holding a newborn | Real feeling needs real faces |
+| **Ultrasound / clinical imagery** | Clinical truth | Nothing else can stand in |
+| **Conceptual 3D props** | Abstract ideas (a gold "0" balloon for *The Zero Symptoms Club*) | Gives an unpicturable concept a physical object |
+
+**Two traps this dodges by construction:** never draw a realistic baby *cutely*
+(trivialising), never photograph an intimate body part (embarrassing). The assignment
+avoids both without anyone having to exercise taste in the moment.
+
+**Label the medium on the card** — `▶ Video`, `▶ Video Course`, `▶ Animation`. Part of the
+visual variety is honest format signalling.
+
+### Where ParentVeda stands today
+
+**One mode for nearly everything: tinted icon squares in ~7 accent hues** (see
+`APP-AUDIT.md` §3.5). That is why the Tools grid reads flat while Flo's reads considered.
+
+**Production note:** six pipelines sounds expensive; three are cheap — cut-out object
+photography, generated 3D renders, and a vector system commissioned once as a set. The
+costly ones (documentary photography, clinical imagery) are also the ones needed least
+often.
 
 ## 5. Motion — unconstrained, with intent
 
@@ -210,6 +381,31 @@ seconds without reading a word:
 
 ---
 
+## 6a. ⭐ The content card — rich image, stripped metadata
+
+*(Decided 2026-08-14, Q2. This dissolves the contradiction between W01 (SEO-first) and the
+earlier austere-editorial proposal — we get both.)*
+
+**A card carries: a distinctive image, a title, and optionally a format badge.** That is
+all.
+
+**In the browse layer, never:** view counts · like counts · author avatars · dates ·
+"Read more" buttons · progress rings · anything that accrues.
+
+- The **image** does the pulling — which is what wins a tap from someone arriving from
+  search, and it is why the SEO-first decision does not force clutter.
+- The **stripped metadata** does the calming — which is what stops a grid reading as a
+  pile.
+- **Every image is visually distinct** (§4a). No repeated icon, no template.
+- Cards live in **named rails, two visible at a time**, titled in plain language a mother
+  would use — never a taxonomy label (`FLO-TEARDOWN.md` §2).
+
+**Author name and reading time still appear — inside the article, not on the card.**
+Accountability at the point of consumption, not decoration at the point of browsing.
+
+**Measured contrast:** ParentVeda's community currently shows view counts to 56.4K and its
+Tools cards repeat "Open →" 24 times (`APP-AUDIT.md` §3.5, §3.7). Both go.
+
 ## 7. The aesthetic vocabulary
 
 The additive counterweight the previous system never had. Eight terms, to be quoted in
@@ -227,6 +423,41 @@ briefs:
 8. **Legible at arm's length, at 2am, one-handed** — the actual reading condition.
 
 ---
+
+## 7a. Dark mode — light only, deliberately
+
+*(Decided 2026-08-14, Q5.)*
+
+**There is no dark mode, and that is a decision rather than an omission.**
+
+Warm paper (§1) **is** the identity. A dark variant halves its distinctiveness and doubles
+every palette, image and contrast decision — six image modes would each need to work on
+two grounds.
+
+The counter-argument is real and worth recording: the product's stated use case is a
+frightened woman reading at 2am, one-handed, which is the strongest possible case for a
+dark surface. It was weighed and declined. **Revisit only if users actually ask** — not
+because it feels like a gap.
+
+**Consequence for the countable invariants (§2): dark-mode variants = 0.**
+
+## 7b. ⭐ Positional consistency — the rule habit depends on
+
+The user's stated goal is that navigation becomes subconscious: *"you just know the
+clicks… it's on your fingers."* The mechanism is **positional consistency: the same thing
+is always in the same place, and the same gesture always does the same thing.**
+
+**Three measured violations to fix in the revamp:**
+
+1. **Three stages, three different bottom navs** — `Today · Prepare · Tools · Calendar ·
+   Community` (TTC and pregnancy) vs `My Child · Brain · Tools · Community · Products`
+   (parenting). She re-learns the app at the moment a newborn arrives.
+2. ⚠️ **The nav pill re-flows when the active tab changes.** Measured: "Today" sits at
+   x≈188 when active and x≈120 when not — **the target physically moves under her thumb.**
+3. **Floating chrome covers content**, so what sits under her thumb is not stable either.
+
+**Habit cannot form on a surface that moves.** This is not an aesthetic concern; it is the
+direct enemy of the quality the product is trying to have.
 
 ## 8. Patterns lifted from the reference set
 

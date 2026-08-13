@@ -307,6 +307,293 @@ From Nicobar **and** Good Earth independently:
 - **Cadence** literary and seasonal in the copy
 - **Material texture** photographed close, in natural light
 
+### 5.3a APP references — driven on a real device, 2026-08-12
+
+The website-only gap is now closed. Apps were **launched and driven on the user's Galaxy
+S21 FE**, not read about. Personal data on screen was ignored by agreement; only layout,
+hierarchy, navigation and type were recorded.
+
+> **Mobbin was attempted first and abandoned.** The account is free tier: Flo has 310
+> screens catalogued and **four are visible** — the splash and three onboarding screens.
+> Everything past that is blurred behind Pro (**₹800/month ≈ $9.50/month**). Onboarding
+> is the least useful part for our questions. The free tier *does* expose **flow names**
+> across the whole library (for Flo: `Onboarding · Completing account · Today · Logging
+> my symptoms · Subscribing to Flo pro · Logging my period`), which is genuine
+> structural information at no cost.
+
+**⭐ Flo — partner mode.** The closest analogue that exists to Father Mode, and to our
+stage question.
+- **The Today screen is one sentence.** *"Day 1 of her period"* then **"Ask if she'd like
+  a hot-water bottle for cramps"** in large type on a soft gradient, nothing competing.
+  One actionable thing per day.
+- **`Her` / `You` / `Both`** — three folded-corner tagged cards segmenting a couple's
+  content. ParentVeda's TTC stage independently arrived at the same idea
+  (`Me · Us · What's next`).
+- **No bottom nav at all** in partner mode — a single scrolling surface. Flo concluded
+  the partner does not need a tab structure; ParentVeda's Father Mode currently has five
+  tabs.
+- **Reading time on every article** (7 min, 4 min, 10 min) — same courtesy as Aeon.
+- ⭐ **The wedge, shipped by the category leader:** *"Your data is protected. We'll never
+  sell your data and you can delete it at anytime"* — on the settings screen, with a
+  shield, not buried in a policy. And **the whole app works with no account**; "add your
+  email" is a dismissible card in settings, not a gate.
+- **It did not interrupt on launch.**
+
+**⭐⭐ Flo — female side. THE answer to the stage-transition question.**
+
+The life-stage switcher lives in **Settings**, under the heading **"Your Flo
+experience"**, as a 2×2 grid of illustrated tiles:
+
+> **Track cycle · Get pregnant ✓ · Track pregnancy · Track perimenopause**
+
+Three decisions worth copying:
+
+1. **The stage is a SETTING, not a destination.** Not in the nav, not a card at the top
+   of Today, not inferred from data. She chooses it; the choice carries a checkmark.
+2. **The bottom nav never changes.** `Today · Insights · Secret Chats · Messages ·
+   Partner` is identical across all four stages. **Only the contents of Today change.**
+3. **The framing is "Your Flo *experience*"** — how the app behaves *for you*, not what
+   stage you are *in*. Switching reads as a preference, not a life event to declare.
+
+Flo spans **four** life stages — a longer arc than ParentVeda's three — with **one** nav
+and **one** setting. ParentVeda currently has three stages, **three different bottom
+navs**, and stage doors rendered as gradient promo cards at the top of Today.
+
+**Reported against interest: Flo has no differentiated centre button.** Five equal tabs
+across four life stages. Not proof the revamp's centre button is wrong — CRED's works,
+and ParentVeda is more action-oriented — but the category leader in our exact space
+solved this problem without one.
+
+Other findings from the female side:
+- **The Today screen is one number.** *"Best chances of conceiving are in **7 days**"* at
+  enormous size, nothing competing. Same discipline as partner mode's one sentence.
+- ⭐ **"Edit period dates"** sits directly under the prediction — *her observation
+  outranks our calculation*, turned into a button. Directly relevant to the truth
+  hierarchy in `lib/services/truth_hierarchy.dart`, where ParentVeda's own calculation
+  sits second from the bottom by design.
+- **"NOTE: Flo is not a diagnostic tool."** Stated inline, next to the symptom checker.
+- **But Flo labels cycles `ABNORMAL` / `IRREGULAR` with warning triangles** — a boundary
+  ParentVeda deliberately does not cross. A place where we are *more* conservative than
+  the category leader, on purpose.
+- **Content pattern worth stealing:** *"Up to 70% of people with PCOS don't know for sure
+  that they have it… Check which symptoms need your attention in 5 minutes, not 2 years —
+  the time it can take to get a diagnosis."* A number that reduces fear plus a time
+  comparison that makes the value concrete.
+- **Honest about the data exchange:** *"The more you share with us, the better Flo works.
+  Log 2 or more periods to get personalized analysis."*
+- **Price stated plainly:** Yearly ₹1,410 (₹117.50/mo) · Monthly ₹282 · "Not sure yet?
+  Enable free trial." **But locked insights render as greyed placeholder rows** — showing
+  the shape of what you cannot have. A tease pattern; note it as a choice we can decline.
+- A **"Hide content"** setting — privacy feature for a shared or observed phone. Worth
+  considering given the over-visibility finding (§3).
+
+**⭐⭐ Flo — pregnancy mode. Seen 2026-08-13, and it corrects a claim made above.**
+
+> **CORRECTION.** An earlier note in this file said Flo's bottom nav *never* changes
+> across stages. **That is wrong.** Cycle/conceiving mode has **five** tabs
+> (`Today · Insights · Secret Chats · Messages · Partner`); pregnancy mode has **four** —
+> **Messages is dropped.**
+>
+> The accurate finding is better than either framing: **retained tabs keep their names,
+> order and positions exactly; only a stage-irrelevant one disappears.** Muscle memory
+> survives while the nav still adapts. **This partially validates the revamp's design** —
+> four stable slots plus one that changes is close to what Flo actually ships.
+
+⭐ **The whole palette changes per life stage.** Cycle mode is **pink**. Pregnancy mode is
+**warm peach and terracotta**. The app re-skins entirely — while structure, type and
+behaviour stay identical.
+
+**This is a fourth option for the palette question (P03) that nobody had raised.** The
+assumption so far has been one palette for all stages, with Father Mode's slate as a
+deliberate exception for a *person*. **Flo differentiates by life stage, not by person** —
+and it works *because* everything underneath is unchanged. TTC, pregnancy and parenting
+could each carry their own warmth and remain unmistakably ParentVeda.
+
+**The hero is photorealistic, not cute.** A 3D render of the embryo at actual scale,
+glowing in a soft warm field. Not a fruit comparison, not a cartoon — it reads as
+**reverent rather than adorable**, a different emotional register from the whole category.
+Worth weighing against the existing per-week illustrations in `assets/baby/`.
+
+⭐ **The pregnancy Today screen DOES NOT SCROLL.** Verified across three different swipe
+origins. The entire daily surface is: week strip · photoreal hero · **one number**
+(`2 days`) · a `Details` button · a three-card `My daily insights` rail · four-tab nav.
+Everything else lives behind Details, Insights, Secret Chats or Partner.
+
+**Set against ParentVeda's pregnancy Today**, which scrolls through a tip card, a
+sponsored card, a referral banner, Today's Video, Garbh Sanskar, the journal, medication,
+Today's Read, research summaries, book summaries, a second sponsored card, a second
+referral, and product recommendations. **One screen versus a long scroll, for the same
+job on the same day of the same pregnancy.** The sharpest single contrast in this whole
+pass.
+
+> ⚠️ **BUT — correcting my own praise. "Details" leads to a PAYWALL, not to details.**
+> The button promises *"Get more expert info — each week you can learn how your baby and
+> your body are developing, according to medical professionals"* and delivers a price
+> (₹1,410/yr · ₹282/mo). The fruit-size comparisons (blueberry, corn) sit behind it as a
+> teaser carousel.
+>
+> **So the one-screen Today may be a shop window, not editorial restraint.** It is short
+> partly because most of the content is paid.
+>
+> **This reframes the comparison in ParentVeda's favour.** It is not "Flo is more
+> disciplined"; it is **"Flo has less to show for free."** ParentVeda gives away far more
+> — articles, videos, tools, community, Garbh Sanskar — which is exactly why its Today has
+> more to hold.
+>
+> **The design lesson survives; the moral one does not.** One screen still beats a long
+> scroll — but ParentVeda would achieve it by *choosing what leads*, not by locking the
+> rest. And note the mechanic is the one the review corpus indicts (*"All it has a paid
+> version only. But in ads they don't mention about it"*): a button labelled **Details**
+> that opens a price is a small dishonesty, however elegantly executed.
+
+Skeleton placeholder bars while loading. Launch animation is a pink splash with the
+feather mark, then straight to content.
+
+**Flo — pregnancy mode, remaining tabs (2026-08-13).**
+
+**Insights = the free browse layer.** Horizontal rails by theme: *Most popular in
+Pregnancy · Pregnancy sex and pleasure · Pregnancy body signs explained · Just added ·
+Nutrition need to know · All about your baby.*
+- ⭐ **The imagery IS the system.** Every card is visually unique — flat vector
+  illustrations of pregnant bodies across skin tones, cut-out photographic objects
+  (cheese, vegetables, a spoonful of pills, a smear of cream), photoreal renders. **No
+  repeated icon, no template.** This is what stops a content grid reading as generic.
+- ⭐ **Controlled pastel variety.** Each card sits on a different soft hue (mint, pink,
+  lavender, peach, blue) with **saturation and lightness held constant**. Colour variety
+  without chaos — directly applicable to ParentVeda's Tools grid, which currently carries
+  ~7 accent hues at full strength.
+- Frank about sex ("Pregnancy sex and pleasure" is a whole rail). Under-served territory;
+  a real question for the Indian market, though ParentVeda's TTC stage already carries
+  *"Do Sex Positions Matter?"*.
+- **Sharpens the free-content thesis:** Flo's *browse* layer is free and rich; the
+  paywall sits on **depth**. "Same quality for free" concretely means **open the
+  articles.**
+
+**Secret Chats adapts to stage** — categories become Postpartum · Beauty and wellness ·
+Sleep; post tags read `2nd trimester`, `Postpartum`.
+
+> ### ⚠️ The crisis post — anonymity's real argument, and its real obligation
+>
+> A post in pregnancy-mode Secret Chats:
+> *"Please help me. I have really bad backaches. I'm 14 weeks pregnant with twins, 23
+> years old. My husband got arrested for domestic violence. My family doesn't want me to
+> keep my babies. I have nobody to help with back pain…"*
+>
+> **This is the strongest argument for anonymity that exists** — she could not write it
+> under her real name, and nowhere else in her life is it sayable.
+>
+> **It is also a duty of care. The post has 3 likes and 1 comment.** The community did not
+> respond adequately. A design that invites disclosure of this severity owes a response
+> to it.
+>
+> **So the community proposal gains a third leg:** anonymous for the asker · verified for
+> the answer · **and a safety route for crisis posts.** ParentVeda already has red-flag
+> routing in Ask Veda and a clinical-escalation invariant; community is where such
+> disclosures actually surface, and **no competitor examined connects the two.** Treat
+> this as a differentiator *and* an obligation.
+
+**Partner tab re-skins to the stage palette** — warm amber in pregnancy, teal in
+conceiving. **The stage-temperature system runs through every tab, not just Today.**
+Benefits are rewritten per stage too ("Celebrate your baby's weekly milestones", "Geek
+out together on your body's biology").
+
+> ⭐ **The disclosure nobody else makes.** Under the partner testimonial:
+> *"Yasmin took part in Flo for Partners beta testing and **was paid for her time**."*
+> They disclose that the testimonial was compensated — volunteer-the-unflattering-thing,
+> executed on the exact surface where everyone else quietly does not. Rare, and cheap to
+> copy.
+
+**⭐⭐ Flo — Secret Chats. The community model to adopt.**
+
+Nav: `Today · Insights · Secret Chats · Messages · Partner` — five equal tabs, **no
+centre button**, unchanged across all four life stages.
+
+- **Anonymity via generated identity.** Posts come from *"Yellow Coast"* with a llama
+  avatar, a panda avatar — two-word pseudonyms and animal illustrations. No real names,
+  no photographs.
+- The top post states the value unprompted: *"Hey girl. Feels like this is the only place
+  that I can be brutally honest and hope you guys won't judge me."*
+
+> ⭐ **The synthesis that matters.** The strongest emotional finding in §3 is that the
+> Indian maternal stressor is **over-visibility** — too many watchers, too much advice.
+> **An anonymous community is that thesis expressed in social design.** Nobody is chasing
+> you; nobody is watching *who you are*. It is the same position, one layer down.
+
+**ParentVeda currently does the opposite:** named users (mum, Sneha, Aishwarya, Anjali),
+initial avatars, and **view counts up to 56.4K**.
+
+**But ParentVeda has something Flo does not: expert verification** — `Verified by Dr.
+Meera +240 experts` and an `Experts only` filter. Combining them yields a position
+neither has:
+
+> **Anonymous for the asker, verified for the answer.**
+
+She can ask the thing she is ashamed to ask and still get an answer that is not a
+stranger's guess. **Strongest single product idea to come out of this whole reference
+pass.**
+
+Other Secret Chats mechanics: topic tags on every post · followable topics · a
+photographic categories rail · **editorial prompt-posts** that seed discussion (*"Early
+pregnancy signs can be similar to PMS: What's your experience?"* — 165K comments) ·
+likes and comments shown but **no view counts** · a persistent `New post` pill.
+
+**Flo — Messages.** Not human messages: **content delivered as chat** from the app
+(*"Period support — It's that time, I've got some period topics you might find
+helpful."*). A conversational delivery channel, in-app — close to ParentVeda's WhatsApp
+concept.
+
+**⭐ Flo — Partner. "What your partner sees."**
+Before linking, Flo shows a **phone mockup of his actual screen** — the same Her/You/Both
+cards observed in partner mode. **Consent by preview.** For a product built on nobody
+watching you, showing exactly what will be shared *before* sharing it is precisely right.
+**ParentVeda's father pairing-code flow should adopt this.**
+Their testimonial names the benefit well: *"My partner now understands my fertile days
+without me telling him"* — the value is emotional labour removed, not data shared.
+
+**Noted and declined:** Flo's Insights tab is largely paywalled, and **locked content
+renders as greyed placeholder rows** — showing the shape of what you cannot have. The
+paywall card also sits **inline in the Today feed** with a `Continue` button. Prices are
+stated plainly (₹1,410/yr ≈ ₹117.50/mo · ₹282/mo), which is good, but the tease pattern
+is one we can decline.
+
+**Duolingo — the anti-model, and a precise one.** A notification nag banner (*"You're
+missing out on Duo's reminders!"*), four counters permanently on screen (language, flame,
+gems, energy), a **streak reading 0**, and a path of greyed locked nodes.
+**The dominant message the design communicates is *you have lapsed*.**
+Directly sharpens R02: for a child working at a skill, visible progress motivates; for a
+mother, "you have lapsed" is cruel, and that is exactly what a streak says on the days she
+could not manage it.
+
+**Strava.** Opened **straight into a full-screen subscription modal** over the map.
+
+**Swiggy / Zomato — density calibration and Indian craft.**
+- Swiggy opened with a **coach-mark overlay** ("Okay, Got It!"); a six-item bottom nav
+  with `NEW` badges and a `Win ₹1000` tile.
+- Zomato: a **circular photographic category rail** (All · Cake · Pizza · Biryani · Butter
+  Chicken) — the Indian pattern for dense category navigation, same shape language as
+  CRED's More grid but photographic rather than iconic. An `EXPLORE MORE` **rail** of
+  larger illustrated cards (Offers · Food on train · Plan a party · Collections) — a
+  "more" surface done as a rail rather than a grid.
+- ⭐ **Zomato's bottom bar switches *modes*, not sections** — `Home · Under ₹250 · Dining ·
+  Healthy Mode` are lenses on the same content. Relevant to R03: a centre control can
+  change *how* the content is filtered rather than *where* you are.
+- Both are far denser and more commercial than ParentVeda should be. Useful as
+  calibration and as an anti-model, not a target.
+
+### 5.3b ⭐ The interruption tally, now across websites AND apps
+
+**Thirteen references opened. Ten interrupted on arrival.**
+
+Did **not** interrupt: **Aeon** (built for reading) · **Nicobar** (one thin festival
+banner) · **Flo partner mode**.
+
+Interrupted: Lovevery · Maven · Aesop · Good Earth · Kinfolk · iMumz · Duolingo · Strava ·
+Swiggy · Zomato. *(ParentVeda's own parenting stage fires two consecutive modals — see
+`APP-AUDIT.md`.)*
+
+**Not interrupting remains unoccupied across both media, among companies with far more
+money and taste than ParentVeda has.** It is not a compromise forced by being small.
+
 ### 5.4 Not seen — recorded, not inferred
 
 - **Raw Mango** — `Page.captureScreenshot` timed out (30s) and wedged the renderer.
