@@ -11,12 +11,15 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
 class ConsultationsScreen extends StatelessWidget {
-  const ConsultationsScreen({super.key});
+  const ConsultationsScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
-    void open(Specialist s) => Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: s)));
+    final s = S(lang);
+    void open(Specialist sp) => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang)));
 
     return Scaffold(
       backgroundColor: kCanvas,
@@ -25,20 +28,20 @@ class ConsultationsScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
-            pvTopBar(context, backLabel: 'Prepare'),
+            pvTopBar(context, lang: lang, backLabel: s.uiPrepare),
             const SizedBox(height: 22),
-            pvEyebrow('Private & personal'),
+            pvEyebrow(s.prepEyebrowPrivate),
             const SizedBox(height: 10),
-            Text(S.now.uiConsultations, style: pvHeroStyle()),
+            Text(s.uiConsultations, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text(S.now.uiPrivateSessionRightExpert, style: pvSubStyle()),
+            Text(s.uiPrivateSessionRightExpert, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText(S.now.uiSomethingMindAfterWeek),
+              pvText(s.uiSomethingMindAfterWeek),
             ]),
             const SizedBox(height: 22),
 
             for (int i = 0; i < kSpecialists.length; i++)
-              _specialist(kSpecialists[i], () => open(kSpecialists[i]),
+              _specialist(s, kSpecialists[i], () => open(kSpecialists[i]),
                   bottom: i == kSpecialists.length - 1),
 
             const SizedBox(height: 22),
@@ -46,21 +49,20 @@ class ConsultationsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                pvEyebrow('How it works', color: kPurple),
+                pvEyebrow(s.prepHowItWorks, color: kPurple),
                 const SizedBox(height: 8),
-                Text(S.now.uiPickExpertPickSlot,
+                Text(s.uiPickExpertPickSlot,
                     style: pvBody(kInk, 14).copyWith(height: 1.6)),
               ]),
             ),
-            pvFooterNote(
-                'Verified specialists only - obstetric & paediatric, never generalists. Real ratings from real mothers. Transparent pricing, no surprises.'),
+            pvFooterNote(s.prepFooterConsultations),
           ],
         ),
       ),
     );
   }
 
-  Widget _specialist(Specialist s, VoidCallback onTap, {bool bottom = false}) {
+  Widget _specialist(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -108,7 +110,7 @@ class ConsultationsScreen extends StatelessWidget {
               Row(children: [
                 Text(s.rating, style: pvBody(kCoral, 12).copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(width: 10),
-                Text(S.now.uiHindiEnglish, style: pvBody(kMuted, 12)),
+                Text(str.uiHindiEnglish, style: pvBody(kMuted, 12)),
                 if (s.next != null) ...[
                   const SizedBox(width: 10),
                   Flexible(
@@ -123,7 +125,7 @@ class ConsultationsScreen extends StatelessWidget {
           const SizedBox(width: 10),
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: pvOutlineButton('Book', onTap),
+            child: pvOutlineButton(str.prepBook, onTap),
           ),
         ]),
       ),

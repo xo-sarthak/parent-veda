@@ -128,3 +128,4 @@ back ache	symptom keyword, matched
 backPain	symptom id
 troubleSleeping	symptom id
 moodSwings	symptom id
+^starts 	RegExp SOURCE in cohort_detail_screen.dart; strips the English "starts " prefix off a cohort start label. Hindi labels are written without it, so there is nothing to match there.

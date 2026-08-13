@@ -11,15 +11,18 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
 class CohortsScreen extends StatelessWidget {
-  const CohortsScreen({super.key});
+  const CohortsScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     final featured = kCohorts.firstWhere((c) => c.featured);
     final more = kCohorts.where((c) => !c.featured).toList();
 
-    void open(Cohort c) =>
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => CohortDetailScreen(cohort: c)));
+    void open(Cohort c) => Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => CohortDetailScreen(cohort: c, lang: lang)));
 
     return Scaffold(
       backgroundColor: kCanvas,
@@ -28,17 +31,17 @@ class CohortsScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
-            pvTopBar(context, backLabel: 'Prepare'),
+            pvTopBar(context, lang: lang, backLabel: s.uiPrepare),
             const SizedBox(height: 22),
-            pvEyebrow('Together, guided'),
+            pvEyebrow(s.prepEyebrowTogether),
             const SizedBox(height: 10),
-            Text(S.now.uiCohortPrograms, style: pvHeroStyle()),
+            Text(s.uiCohortPrograms, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text(S.now.uiSmallGroupsRealCoach, style: pvSubStyle()),
+            Text(s.uiSmallGroupsRealCoach, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText(S.now.uiRe),
-              pvBold('30 weeks'),
-              pvText(S.now.uiBirthReadyCohortStarts),
+              pvText(s.uiRe),
+              pvBold(s.prepThirtyWeeksBold),
+              pvText(s.uiBirthReadyCohortStarts),
             ]),
 
             // featured cohort
@@ -71,11 +74,11 @@ class CohortsScreen extends StatelessWidget {
                     Expanded(
                       child: Text.rich(
                         TextSpan(children: [
-                          pvText(S.now.uiWith),
+                          pvText(s.uiWith),
                           TextSpan(
-                              text: featured.coachName?.now ?? 'your coach',
+                              text: featured.coachName?.now ?? s.prepYourCoachFallback,
                               style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                          pvText(S.now.uiChildbirthEducator),
+                          pvText(s.uiChildbirthEducator),
                         ]),
                         style: pvBody(kSoft, 13),
                       ),
@@ -86,14 +89,14 @@ class CohortsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                     Text(featured.price, style: pvBody(kInk, 14).copyWith(fontWeight: FontWeight.w700)),
-                    pvPrimaryButton('Join the next cohort', () => open(featured)),
+                    pvPrimaryButton(s.uiJoinNextCohort, () => open(featured)),
                   ]),
                 ]),
               ),
             ),
 
             const SizedBox(height: 28),
-            Text(S.now.uiMorePrograms, style: pvTitleStyle(16)),
+            Text(s.uiMorePrograms, style: pvTitleStyle(16)),
             const SizedBox(height: 6),
             for (int i = 0; i < more.length; i++)
               _row(more[i], () => open(more[i]), bottom: i == more.length - 1),
@@ -103,18 +106,18 @@ class CohortsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                pvEyebrow("What's inside every cohort", color: kPurple),
+                pvEyebrow(s.prepWhatsInsideEveryCohort, color: kPurple),
                 const SizedBox(height: 10),
-                Text(S.now.uiLiveSessionsSmallPeer,
+                Text(s.uiLiveSessionsSmallPeer,
                     style: pvBody(kInk, 14).copyWith(height: 1.7)),
                 const SizedBox(height: 10),
                 Text.rich(
-                  TextSpan(children: [pvPurple('₹500 credit'), pvText(S.now.uiParentveda2)]),
+                  TextSpan(children: [pvPurple('₹500 credit'), pvText(s.uiParentveda2)]),
                   style: pvBody(kSoft, 13),
                 ),
               ]),
             ),
-            pvFooterNote('Small cohorts, real accountability - our most-loved way to prepare.'),
+            pvFooterNote(s.prepFooterCohorts),
           ],
         ),
       ),

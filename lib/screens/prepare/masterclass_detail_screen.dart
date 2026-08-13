@@ -13,12 +13,14 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 
 class MasterclassDetailScreen extends StatelessWidget {
-  const MasterclassDetailScreen({super.key, required this.m});
+  const MasterclassDetailScreen({super.key, required this.m, required this.lang});
 
   final Masterclass m;
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     final when = m.facts.length >= 2 ? '${m.facts[1].big} · ${m.facts[1].small}' : null;
 
     return Scaffold(
@@ -46,7 +48,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(999)),
-                      child: pvLangToggle(),
+                      child: pvLangToggle(lang),
                     ),
                   ]),
                 ),
@@ -54,7 +56,9 @@ class MasterclassDetailScreen extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => PrepareVideoScreen(
-                            title: '${m.title} - intro', subtitle: '90-sec preview'))),
+                            lang: lang,
+                            title: s.prepIntroOf('${m.title}'),
+                            subtitle: s.prepNinetySecPreview))),
                     child: Container(
                       width: 60,
                       height: 60,
@@ -80,7 +84,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                         color: kInk.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(999)),
-                    child: Text(S.now.uiWatchSecIntro,
+                    child: Text(s.uiWatchSecIntro,
                         style: pvManrope(
                             fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
@@ -107,12 +111,13 @@ class MasterclassDetailScreen extends StatelessWidget {
                 ]),
 
                 _divider(),
-                _sectionTitle("What you'll walk away with"),
+                _sectionTitle(s.prepWalkAwayWith),
                 const SizedBox(height: 12),
                 for (final l in m.learn) _check(l.now),
 
                 _divider(),
-                _sectionTitle(m.coaches.length > 1 ? 'Meet your coaches' : 'Meet your coach'),
+                _sectionTitle(
+                    m.coaches.length > 1 ? s.prepMeetYourCoaches : s.prepMeetYourCoach),
                 const SizedBox(height: 14),
                 for (int i = 0; i < m.coaches.length; i++) ...[
                   if (i > 0) const SizedBox(height: 16),
@@ -121,7 +126,7 @@ class MasterclassDetailScreen extends StatelessWidget {
 
                 if (m.testimonials.isNotEmpty) ...[
                   _divider(),
-                  _sectionTitle('What mothers say'),
+                  _sectionTitle(s.prepWhatMothersSay),
                   const SizedBox(height: 14),
                   for (int i = 0; i < m.testimonials.length; i++) ...[
                     if (i > 0) const SizedBox(height: 12),
@@ -131,7 +136,7 @@ class MasterclassDetailScreen extends StatelessWidget {
 
                 if (m.faqs.isNotEmpty) ...[
                   _divider(),
-                  _sectionTitle('Common questions'),
+                  _sectionTitle(s.prepCommonQuestions),
                   const SizedBox(height: 6),
                   for (int i = 0; i < m.faqs.length; i++)
                     m.faqs[i].a != null
@@ -139,7 +144,7 @@ class MasterclassDetailScreen extends StatelessWidget {
                         : _faqClosed(m.faqs[i].q.now, bottom: i == m.faqs.length - 1),
                 ],
 
-                pvFooterNote('Led by a verified expert. Free with ParentVeda+.'),
+                pvFooterNote(s.prepFooterMasterclassDetail),
               ]),
             ),
           ]),
@@ -150,20 +155,22 @@ class MasterclassDetailScreen extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: PvStickyCta(
+            lang: lang,
             id: m.id,
             price: m.price,
-            note: 'free on ParentVeda+',
+            note: s.prepFreeOnPlusShort,
             noteColor: kPurple,
-            label: S.now.uiReserveSeat,
-            bookedLabel: 'Reserved',
+            label: s.uiReserveSeat,
+            bookedLabel: s.prepReserved,
             onBook: () => showPrepareBooking(
               context,
+              lang: lang,
               id: m.id,
               title: m.title.now,
-              priceLabel: '${m.price} · free on ParentVeda+',
+              priceLabel: '${m.price} · ${s.prepFreeOnPlusShort}',
               whenLabel: when,
-              heading: 'Reserve your seat',
-              cta: 'Reserve my seat',
+              heading: s.prepReserveYourSeat,
+              cta: s.prepReserveMySeat,
             ),
           ),
         ),

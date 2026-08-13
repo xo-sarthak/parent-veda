@@ -13,23 +13,28 @@ import 'prepare_video_screen.dart';
 import '../../localization/app_language.dart';
 
 class BirthingClassesScreen extends StatelessWidget {
-  const BirthingClassesScreen({super.key});
+  const BirthingClassesScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   static const String courseId = 'course_birthing';
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     void playClass(BirthingClass c) => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PrepareVideoScreen(title: c.title.now, subtitle: c.duration.now, blurb: c.blurb.now)));
+        builder: (_) => PrepareVideoScreen(
+            lang: lang, title: c.title.now, subtitle: c.duration.now, blurb: c.blurb.now)));
 
     void enroll() => showPrepareBooking(
           context,
+          lang: lang,
           id: courseId,
-          title: S.now.uiCompleteBirthingCourse,
-          priceLabel: '₹1,499 · free on ParentVeda+',
-          whenLabel: '6 classes · self-paced + monthly live Q&A',
-          heading: 'Enroll in this course',
-          cta: 'Enroll now',
+          title: s.uiCompleteBirthingCourse,
+          priceLabel: '₹1,499 · ${s.prepFreeOnPlusShort}',
+          whenLabel: s.prepBirthingWhen,
+          heading: s.prepEnrollInCourse,
+          cta: s.prepEnrollNow,
         );
 
     return Scaffold(
@@ -43,17 +48,17 @@ class BirthingClassesScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               children: [
-                pvTopBar(context, backLabel: 'Prepare'),
+                pvTopBar(context, lang: lang, backLabel: s.uiPrepare),
                 const SizedBox(height: 22),
-                pvEyebrow('For the big day'),
+                pvEyebrow(s.prepEyebrowBigDay),
                 const SizedBox(height: 10),
-                Text(S.now.uiBirthingClasses, style: pvHeroStyle()),
+                Text(s.uiBirthingClasses, style: pvHeroStyle()),
                 const SizedBox(height: 12),
-                Text(S.now.uiEverythingBigDayTaught, style: pvSubStyle()),
+                Text(s.uiEverythingBigDayTaught, style: pvSubStyle()),
                 pvBanner(spans: [
-                  pvText(S.now.uiRe),
-                  pvBold('30 weeks'),
-                  pvText(S.now.uiExactlyWhenMostMums),
+                  pvText(s.uiRe),
+                  pvBold(s.prepThirtyWeeksBold),
+                  pvText(s.uiExactlyWhenMostMums),
                 ]),
 
                 // overview card
@@ -67,22 +72,29 @@ class BirthingClassesScreen extends StatelessWidget {
                     boxShadow: pvCardShadow,
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(S.now.uiCompleteBirthingCourse, style: pvTitleStyle(20)),
+                    Text(s.uiCompleteBirthingCourse, style: pvTitleStyle(20)),
                     const SizedBox(height: 6),
-                    Text(S.now.uiClassesSelfPacedVideo, style: pvBody(kSoft, 13)),
+                    Text(s.uiClassesSelfPacedVideo, style: pvBody(kSoft, 13)),
                     const SizedBox(height: 14),
                     Row(children: [
                       pvAvatar(34),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text.rich(
-                          TextSpan(children: const [
-                            TextSpan(text: 'With '),
-                            TextSpan(
+                          TextSpan(children: [
+                            // The instructor's name is a name - identical in
+                            // both languages - so it leads in both, and the
+                            // localized remainder carries the grammar. Hindi
+                            // puts "ke saath" AFTER the name, so a leading
+                            // "With " span would have had to translate to an
+                            // empty string.
+                            const TextSpan(
                                 text: 'Meera Nair',
                                 style: TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                            TextSpan(text: ', certified childbirth educator '),
-                            TextSpan(text: '(OB-reviewed)', style: TextStyle(color: kMuted)),
+                            TextSpan(text: s.prepCertifiedChildbirthEducator),
+                            TextSpan(
+                                text: s.prepObReviewed,
+                                style: const TextStyle(color: kMuted)),
                           ]),
                           style: pvBody(kSoft, 13),
                         ),
@@ -95,20 +107,22 @@ class BirthingClassesScreen extends StatelessWidget {
                       Flexible(
                         child: enrolled
                             ? Text.rich(
-                                TextSpan(children: const [
+                                TextSpan(children: [
                                   TextSpan(
-                                      text: '✓ Enrolled',
-                                      style: TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
+                                      text: s.prepEnrolledCheck,
+                                      style: const TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
                                 ]),
                                 style: pvBody(kInk, 14),
                               )
                             : Text.rich(
-                                TextSpan(children: const [
-                                  TextSpan(
+                                TextSpan(children: [
+                                  const TextSpan(
                                       text: '₹1,499',
                                       style: TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                                  TextSpan(text: ' · free on ', style: TextStyle(color: kMuted)),
                                   TextSpan(
+                                      text: s.prepFreeOn,
+                                      style: const TextStyle(color: kMuted)),
+                                  const TextSpan(
                                       text: 'ParentVeda+',
                                       style: TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
                                 ]),
@@ -116,7 +130,7 @@ class BirthingClassesScreen extends StatelessWidget {
                               ),
                       ),
                       const SizedBox(width: 10),
-                      pvPrimaryButton(enrolled ? 'Start watching' : 'Free preview',
+                      pvPrimaryButton(enrolled ? s.prepStartWatching : s.prepFreePreview,
                           () => playClass(kBirthingClasses.first),
                           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11)),
                     ]),
@@ -124,10 +138,11 @@ class BirthingClassesScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 28),
-                Text(S.now.uiClasses, style: pvTitleStyle(16)),
+                Text(s.uiClasses, style: pvTitleStyle(16)),
                 const SizedBox(height: 6),
                 for (int i = 0; i < kBirthingClasses.length; i++)
                   _classRow(
+                    s,
                     kBirthingClasses[i],
                     enrolled: enrolled,
                     bottom: i == kBirthingClasses.length - 1,
@@ -139,13 +154,12 @@ class BirthingClassesScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   SizedBox(
                     width: double.infinity,
-                    child: pvPrimaryButton('Enroll - unlock all 6 classes', enroll,
+                    child: pvPrimaryButton(s.prepEnrollUnlockAll, enroll,
                         padding: const EdgeInsets.symmetric(vertical: 15)),
                   ),
                 ],
 
-                pvFooterNote(
-                    'Taught by a certified childbirth educator, reviewed by an OB. Watch at your pace, rewatch anytime, and bring questions to the live Q&A.'),
+                pvFooterNote(s.prepFooterBirthing),
               ],
             );
           },
@@ -154,7 +168,7 @@ class BirthingClassesScreen extends StatelessWidget {
     );
   }
 
-  Widget _classRow(BirthingClass c,
+  Widget _classRow(S s, BirthingClass c,
       {required bool enrolled, required bool bottom, required VoidCallback onPlay, required VoidCallback onEnroll}) {
     final unlocked = c.free || enrolled;
     return GestureDetector(
@@ -183,7 +197,7 @@ class BirthingClassesScreen extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           if (c.free)
-            pvPill('Free preview')
+            pvPill(s.prepFreePreview)
           else if (enrolled)
             Container(
               width: 34,

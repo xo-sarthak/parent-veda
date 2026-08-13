@@ -18,7 +18,9 @@ import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
 
 class CoursesCohortsScreen extends StatefulWidget {
-  const CoursesCohortsScreen({super.key, this.topic});
+  const CoursesCohortsScreen({super.key, required this.lang, this.topic});
+
+  final AppLanguage lang;
 
   /// Open with one topic chip already selected (optional deep-link).
   final String? topic;
@@ -47,11 +49,12 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _open(PrepProgram p) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProgramDetailScreen(program: p)));
+  void _open(PrepProgram p) => Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ProgramDetailScreen(program: p, lang: widget.lang)));
 
   @override
   Widget build(BuildContext context) {
+    final s = S(widget.lang);
     final results = filterPrograms(kind: _kind, topic: _topic, query: _query);
 
     return Scaffold(
@@ -61,16 +64,16 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 96),
           children: [
-            _pad(pvTopBar(context, backLabel: 'Prepare')),
+            _pad(pvTopBar(context, lang: widget.lang, backLabel: s.uiPrepare)),
 
             const SizedBox(height: 22),
             _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              pvEyebrow('Learn with the experts'),
+              pvEyebrow(s.prepEyebrowLearnExperts),
               const SizedBox(height: 10),
-              Text(S.now.uiCoursesCohorts, style: pvHeroStyle()),
+              Text(s.uiCoursesCohorts, style: pvHeroStyle()),
               const SizedBox(height: 12),
               Text(
-                  S.now.uiSelfPacedCoursesSmall,
+                  s.uiSelfPacedCoursesSmall,
                   style: pvSubStyle()),
             ])),
 
@@ -78,7 +81,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
             const SizedBox(height: 18),
             _pad(pvSearchField(
               controller: _search,
-              hint: 'Search birth, breathing, an expert…',
+              hint: s.prepSearchHint,
               onChanged: (v) => setState(() => _query = v),
             )),
 
@@ -90,7 +93,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
-                  _kindPill(null, 'All'),
+                  _kindPill(null, s.prepAll),
                   for (final k in PrepKind.values) _kindPill(k, k.filterLabel.now),
                 ],
               ),
@@ -104,7 +107,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
-                  _topicChip(null, 'All topics'),
+                  _topicChip(null, s.prepAllTopics),
                   // Key on .en, label with .now: the chip must FILTER by a
                   // language-invariant value while READING in her language.
                   for (final t in kPrepTopics) _topicChip(t.en, t.now),
@@ -116,18 +119,18 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
             const SizedBox(height: 18),
             _pad(Text(
                 results.isEmpty
-                    ? 'NOTHING MATCHES YET'
-                    : '${results.length} ${results.length == 1 ? 'PROGRAM' : 'PROGRAMS'}',
+                    ? s.prepNothingMatchesYet
+                    : s.prepProgramCount(results.length),
                 style: pvBody(kMuted, 11).copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2))),
             const SizedBox(height: 14),
 
             if (results.isEmpty)
-              _pad(_emptyState())
+              _pad(_emptyState(s))
             else
               _pad(Column(children: [for (final p in results) _card(p)])),
 
             const SizedBox(height: 22),
-            _pad(Text(S.now.uiEveryProgramLedBy,
+            _pad(Text(s.uiEveryProgramLedBy,
                 textAlign: TextAlign.center, style: pvBody(kMuted, 12).copyWith(height: 1.55))),
           ],
         ),
@@ -214,7 +217,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
                   decoration: BoxDecoration(
                       color: p.isLive ? kCoral : kInk.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(7)),
-                  child: Text(p.isLive ? 'LIVE' : p.durationLabel.now,
+                  child: Text(p.isLive ? S(widget.lang).prepLiveBadge : p.durationLabel.now,
                       style: pvBody(Colors.white, 10).copyWith(fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -249,18 +252,18 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
         : p.topics.first.now;
   }
 
-  Widget _emptyState() => Container(
+  Widget _emptyState(S s) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 34),
         alignment: Alignment.center,
         decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(20)),
         child: Column(children: [
           const Icon(Icons.search_off_rounded, size: 30, color: kMuted),
           const SizedBox(height: 12),
-          Text(S.now.uiNoProgramsMatch, style: pvTitleStyle(16)),
+          Text(s.uiNoProgramsMatch, style: pvTitleStyle(16)),
           const SizedBox(height: 6),
-          Text(S.now.uiTryAnotherTopicClear, textAlign: TextAlign.center, style: pvBody(kSoft, 13)),
+          Text(s.uiTryAnotherTopicClear, textAlign: TextAlign.center, style: pvBody(kSoft, 13)),
           const SizedBox(height: 16),
-          pvPrimaryButton('Clear filters', () => setState(() {
+          pvPrimaryButton(s.prepClearFilters, () => setState(() {
                 _query = '';
                 _search.clear();
                 _topic = null;

@@ -15,17 +15,20 @@ import '../../localization/app_language.dart';
 class PrepareVideoScreen extends StatelessWidget {
   const PrepareVideoScreen({
     super.key,
+    required this.lang,
     required this.title,
     this.subtitle,
     this.blurb,
   });
 
+  final AppLanguage lang;
   final String title;
   final String? subtitle; // e.g. "18 min · opening"
   final String? blurb;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: SafeArea(
@@ -33,7 +36,7 @@ class PrepareVideoScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-            child: pvTopBar(context, backLabel: 'Back'),
+            child: pvTopBar(context, lang: lang, backLabel: s.prepBack),
           ),
           const SizedBox(height: 20),
 
@@ -68,7 +71,7 @@ class PrepareVideoScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: kInk.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(999)),
-                      child: Text(S.now.uiVideoComingSoon,
+                      child: Text(s.uiVideoComingSoon,
                           style: pvManrope(
                               fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
@@ -99,7 +102,7 @@ class PrepareVideoScreen extends StatelessWidget {
                   const Icon(Icons.movie_outlined, size: 18, color: kPurple),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(S.now.uiFullVideoLandsHere,
+                    child: Text(s.uiFullVideoLandsHere,
                         style: pvBody(kInk, 13).copyWith(height: 1.5)),
                   ),
                 ]),

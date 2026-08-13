@@ -15,13 +15,15 @@ import '../../localization/app_language.dart';
 final RegExp _kStartsPrefix = RegExp(r'^starts ');
 
 class CohortDetailScreen extends StatelessWidget {
-  const CohortDetailScreen({super.key, required this.cohort});
+  const CohortDetailScreen({super.key, required this.cohort, required this.lang});
 
   final Cohort cohort;
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
     final c = cohort;
+    final s = S(lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: Stack(children: [
@@ -30,7 +32,7 @@ class CohortDetailScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 100),
             children: [
-              pvTopBar(context, backLabel: 'Cohort Programs'),
+              pvTopBar(context, lang: lang, backLabel: s.uiCohortPrograms),
 
               const SizedBox(height: 22),
               Row(children: [
@@ -45,24 +47,25 @@ class CohortDetailScreen extends StatelessWidget {
 
               const SizedBox(height: 18),
               Row(children: [
-                _fact(c.duration.now, 'programme'),
+                _fact(c.duration.now, s.prepFactProgramme),
                 const SizedBox(width: 10),
-                _fact(c.start != null
-            ? c.start!.now.replaceFirst(_kStartsPrefix, '')
-            : (c.forWhen?.now ?? 'Flexible'),
-                    c.start != null ? 'start' : 'timing'),
+                _fact(
+                    c.start != null
+                        ? c.start!.now.replaceFirst(_kStartsPrefix, '')
+                        : (c.forWhen?.now ?? s.prepFlexible),
+                    c.start != null ? s.prepFactStart : s.prepFactTiming),
                 const SizedBox(width: 10),
-                _fact('Live', '+ peer group'),
+                _fact(s.prepLive, s.prepPlusPeerGroup),
               ]),
 
               _divider(),
-              _title("What's inside"),
+              _title(s.uiWhatSInside),
               const SizedBox(height: 12),
               for (final w in c.whatsInside) _check(w.now),
 
               if (c.schedule.isNotEmpty) ...[
                 _divider(),
-                _title('The plan'),
+                _title(s.prepThePlan),
                 const SizedBox(height: 8),
                 for (int i = 0; i < c.schedule.length; i++)
                   _weekRow(i + 1, c.schedule[i].now, bottom: i == c.schedule.length - 1),
@@ -70,7 +73,7 @@ class CohortDetailScreen extends StatelessWidget {
 
               if (c.coachName != null) ...[
                 _divider(),
-                _title('Your coach'),
+                _title(s.prepYourCoach),
                 const SizedBox(height: 14),
                 Row(children: [
                   pvAvatar(56),
@@ -79,7 +82,7 @@ class CohortDetailScreen extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(c.coachName!.now, style: pvTitleStyle(15)),
                       const SizedBox(height: 2),
-                      Text(S.now.uiLeadsEveryLiveSession,
+                      Text(s.uiLeadsEveryLiveSession,
                           style: pvBody(kSoft, 13).copyWith(height: 1.5)),
                     ]),
                   ),
@@ -88,7 +91,7 @@ class CohortDetailScreen extends StatelessWidget {
 
               if (c.reviews.isNotEmpty) ...[
                 _divider(),
-                _title('From mums who did it'),
+                _title(s.prepFromMumsWhoDidIt),
                 const SizedBox(height: 14),
                 for (int i = 0; i < c.reviews.length; i++)
                   _review(c.reviews[i], bottom: i == c.reviews.length - 1),
@@ -101,12 +104,12 @@ class CohortDetailScreen extends StatelessWidget {
                 child: Text.rich(
                   TextSpan(children: [
                     pvPurple('₹500 credit'),
-                    pvText(S.now.uiParentvedaMembersAnyCohort),
+                    pvText(s.uiParentvedaMembersAnyCohort),
                   ]),
                   style: pvBody(kInk, 14).copyWith(height: 1.5),
                 ),
               ),
-              pvFooterNote('Small cohorts, real accountability - our most-loved way to prepare.'),
+              pvFooterNote(s.prepFooterCohorts),
             ],
           ),
         ),
@@ -116,20 +119,22 @@ class CohortDetailScreen extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: PvStickyCta(
+            lang: lang,
             id: c.id,
             price: c.price,
             note: c.duration.now,
             noteColor: kMuted,
-            label: S.now.uiJoinNextCohort,
-            bookedLabel: 'Enrolled',
+            label: s.uiJoinNextCohort,
+            bookedLabel: s.prepEnrolled,
             onBook: () => showPrepareBooking(
               context,
+              lang: lang,
               id: c.id,
               title: c.name.now,
               priceLabel: '${c.price} · ${c.duration}',
               whenLabel: c.start?.now,
-              heading: 'Join this cohort',
-              cta: 'Join cohort',
+              heading: s.prepJoinThisCohort,
+              cta: s.prepJoinCohort,
             ),
           ),
         ),

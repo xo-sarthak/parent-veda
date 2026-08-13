@@ -22,7 +22,9 @@ import '../../localization/app_language.dart';
 //  Step 1 - Assessment
 // ---------------------------------------------------------------------------
 class NutritionScreen extends StatefulWidget {
-  const NutritionScreen({super.key});
+  const NutritionScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   @override
   State<NutritionScreen> createState() => _NutritionScreenState();
@@ -35,6 +37,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S(widget.lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: SafeArea(
@@ -42,30 +45,30 @@ class _NutritionScreenState extends State<NutritionScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
           children: [
-            pvTopBar(context, backLabel: 'Prepare'),
+            pvTopBar(context, lang: widget.lang, backLabel: s.uiPrepare),
             const SizedBox(height: 22),
-            pvEyebrow('Eat well, for two'),
+            pvEyebrow(s.prepEyebrowEatWell),
             const SizedBox(height: 10),
-            Text(S.now.uiNutrition, style: pvHeroStyle()),
+            Text(s.uiNutrition, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text(S.now.uiTwoMinuteCheckThen,
+            Text(s.uiTwoMinuteCheckThen,
                 style: pvSubStyle()),
             pvBanner(icon: Icons.eco_outlined, spans: [
-              pvText(S.now.uiAnswerFewQuestionsWe),
+              pvText(s.uiAnswerFewQuestionsWe),
             ]),
 
             const SizedBox(height: 26),
-            _q('Which trimester are you in?'),
+            _q(s.prepQTrimester),
             const SizedBox(height: 12),
             _chips(kNutriTrimesters, _trimester, (id) => setState(() => _trimester = id)),
 
             const SizedBox(height: 24),
-            _q("What's your main focus right now?"),
+            _q(s.prepQFocus),
             const SizedBox(height: 12),
             _chips(kNutriGoals, _goal, (id) => setState(() => _goal = id)),
 
             const SizedBox(height: 24),
-            _q('How do you eat?'),
+            _q(s.prepQDiet),
             const SizedBox(height: 12),
             _chips(kNutriDiets, _diet, (id) => setState(() => _diet = id)),
 
@@ -73,16 +76,16 @@ class _NutritionScreenState extends State<NutritionScreen> {
             SizedBox(
               width: double.infinity,
               child: pvPrimaryButton(
-                _goal == null ? 'Pick a focus to continue' : 'See my recommended plans',
+                _goal == null ? s.prepPickFocusToContinue : s.prepSeeMyPlans,
                 _goal == null
                     ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(S.now.uiChooseMainFocusFirst), behavior: SnackBarBehavior.floating))
+                        content: Text(s.uiChooseMainFocusFirst), behavior: SnackBarBehavior.floating))
                     : () => Navigator.of(context).push(MaterialPageRoute<void>(
-                        builder: (_) => NutritionPlansScreen(goalId: _goal))),
+                        builder: (_) => NutritionPlansScreen(goalId: _goal, lang: widget.lang))),
                 padding: const EdgeInsets.symmetric(vertical: 15),
               ),
             ),
-            pvFooterNote('Your answers only shape your recommendation - nothing is shared without you.'),
+            pvFooterNote(s.prepFooterNutritionAssessment),
           ],
         ),
       ),
@@ -119,11 +122,13 @@ class _NutritionScreenState extends State<NutritionScreen> {
 //  Step 2 - Recommended plans
 // ---------------------------------------------------------------------------
 class NutritionPlansScreen extends StatelessWidget {
-  const NutritionPlansScreen({super.key, this.goalId});
+  const NutritionPlansScreen({super.key, required this.lang, this.goalId});
   final String? goalId;
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     final plans = recommendPlans(goalId: goalId);
     return Scaffold(
       backgroundColor: kCanvas,
@@ -132,25 +137,25 @@ class NutritionPlansScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
           children: [
-            pvTopBar(context, backLabel: 'Nutrition'),
+            pvTopBar(context, lang: lang, backLabel: s.uiNutrition),
             const SizedBox(height: 22),
-            pvEyebrow('Matched to you'),
+            pvEyebrow(s.prepEyebrowMatchedToYou),
             const SizedBox(height: 10),
-            Text(S.now.uiRecommendedPlans, style: pvHeroStyle().copyWith(fontSize: 28)),
+            Text(s.uiRecommendedPlans, style: pvHeroStyle().copyWith(fontSize: 28)),
             const SizedBox(height: 12),
-            Text(S.now.uiBasedAnswersEachOne,
+            Text(s.uiBasedAnswersEachOne,
                 style: pvSubStyle()),
             const SizedBox(height: 22),
-            for (final p in plans) _planCard(context, p),
+            for (final p in plans) _planCard(context, s, p),
           ],
         ),
       ),
     );
   }
 
-  Widget _planCard(BuildContext context, NutritionPlan p) => GestureDetector(
-        onTap: () => Navigator.of(context)
-            .push(MaterialPageRoute<void>(builder: (_) => NutritionTrailerScreen(plan: p))),
+  Widget _planCard(BuildContext context, S s, NutritionPlan p) => GestureDetector(
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => NutritionTrailerScreen(plan: p, lang: lang))),
         behavior: HitTestBehavior.opaque,
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
@@ -180,7 +185,7 @@ class NutritionPlansScreen extends StatelessWidget {
                     TextSpan(text: '  ·  ${p.priceNote}', style: const TextStyle(color: kMuted)),
                   ]), style: pvBody(kInk, 13)),
                   const Spacer(),
-                  Text(S.now.uiPreview, style: pvBody(kPurple, 13).copyWith(fontWeight: FontWeight.w700)),
+                  Text(s.uiPreview, style: pvBody(kPurple, 13).copyWith(fontWeight: FontWeight.w700)),
                 ]),
               ]),
             ),
@@ -193,12 +198,14 @@ class NutritionPlansScreen extends StatelessWidget {
 //  Step 3 - Plan trailer / preview
 // ---------------------------------------------------------------------------
 class NutritionTrailerScreen extends StatelessWidget {
-  const NutritionTrailerScreen({super.key, required this.plan});
+  const NutritionTrailerScreen({super.key, required this.plan, required this.lang});
   final NutritionPlan plan;
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
     final p = plan;
+    final s = S(lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: Stack(children: [
@@ -207,7 +214,7 @@ class NutritionTrailerScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 110),
             children: [
-              pvTopBar(context, backLabel: 'Plans'),
+              pvTopBar(context, lang: lang, backLabel: s.prepBackPlans),
 
               const SizedBox(height: 18),
               // trailer surface
@@ -232,7 +239,7 @@ class NutritionTrailerScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(color: kInk.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(999)),
-                      child: Text(S.now.uiTrailerSec, style: pvBody(Colors.white, 11).copyWith(fontWeight: FontWeight.w700)),
+                      child: Text(s.uiTrailerSec, style: pvBody(Colors.white, 11).copyWith(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ]),
@@ -244,14 +251,14 @@ class NutritionTrailerScreen extends StatelessWidget {
               Text(p.tagline.now, style: pvSubStyle()),
 
               const SizedBox(height: 22),
-              Text(S.now.uiWhatSInside, style: pvTitleStyle(16)),
+              Text(s.uiWhatSInside, style: pvTitleStyle(16)),
               const SizedBox(height: 12),
               for (final h in p.highlights) _check(h.now),
 
               const SizedBox(height: 22),
-              Text(S.now.uiDayPlan, style: pvTitleStyle(16)),
+              Text(s.uiDayPlan, style: pvTitleStyle(16)),
               const SizedBox(height: 4),
-              Text(S.now.uiSampleNutritionistTailorsBody, style: pvBody(kMuted, 12)),
+              Text(s.uiSampleNutritionistTailorsBody, style: pvBody(kMuted, 12)),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
@@ -263,9 +270,9 @@ class NutritionTrailerScreen extends StatelessWidget {
               ),
 
               pvBanner(icon: Icons.verified_outlined, spans: [
-                pvText(S.now.uiEveryPlanFinalised),
-                pvPurple('registered nutritionist'),
-                pvText(S.now.uiConsultSoTrulyFits),
+                pvText(s.uiEveryPlanFinalised),
+                pvPurple(s.prepRegisteredNutritionist),
+                pvText(s.uiConsultSoTrulyFits),
               ]),
             ],
           ),
@@ -280,13 +287,13 @@ class NutritionTrailerScreen extends StatelessWidget {
             child: Row(children: [
               Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.price, style: pvBody(kInk, 16).copyWith(fontWeight: FontWeight.w700)),
-                Text(S.now.uiConsult, style: pvBody(kPurple, 11).copyWith(fontWeight: FontWeight.w600)),
+                Text(s.uiConsult, style: pvBody(kPurple, 11).copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(width: 14),
               Expanded(
                 child: SizedBox(
                   height: 52,
-                  child: pvPrimaryButton('Book my nutritionist', () => _book(context),
+                  child: pvPrimaryButton(s.prepBookMyNutritionist, () => _book(context),
                       padding: const EdgeInsets.symmetric(vertical: 15)),
                 ),
               ),
@@ -304,8 +311,9 @@ class NutritionTrailerScreen extends StatelessWidget {
     Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (_) => ConsultationDetailScreen(
         specialist: nutritionist,
+        lang: lang,
         onBooked: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => NutritionDietPlanScreen(plan: plan),
+          builder: (_) => NutritionDietPlanScreen(plan: plan, lang: lang),
         )),
       ),
     ));
@@ -345,12 +353,14 @@ class NutritionTrailerScreen extends StatelessWidget {
 //  Step 5 - Personalized diet plan (placeholder, reached after booking)
 // ---------------------------------------------------------------------------
 class NutritionDietPlanScreen extends StatelessWidget {
-  const NutritionDietPlanScreen({super.key, required this.plan});
+  const NutritionDietPlanScreen({super.key, required this.plan, required this.lang});
   final NutritionPlan plan;
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
     final p = plan;
+    final s = S(lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: SafeArea(
@@ -358,7 +368,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
           children: [
-            pvTopBar(context, backLabel: 'Back'),
+            pvTopBar(context, lang: lang, backLabel: s.prepBack),
             const SizedBox(height: 22),
             Center(
               child: Container(
@@ -370,11 +380,10 @@ class NutritionDietPlanScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Center(child: Text(S.now.uiPersonalizedDietPlan, textAlign: TextAlign.center, style: pvHeroStyle().copyWith(fontSize: 26))),
+            Center(child: Text(s.uiPersonalizedDietPlan, textAlign: TextAlign.center, style: pvHeroStyle().copyWith(fontSize: 26))),
             const SizedBox(height: 10),
             Center(
-              child: Text(
-                  'Built from ${p.name} and confirmed with your nutritionist. It updates after your consult.',
+              child: Text(s.prepBuiltFromPlan('${p.name}'),
                   textAlign: TextAlign.center,
                   style: pvSubStyle()),
             ),
@@ -387,14 +396,14 @@ class NutritionDietPlanScreen extends StatelessWidget {
                 const Icon(Icons.event_available_outlined, size: 20, color: kPurple),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(S.now.uiConsultBookedNutritionistWill,
+                  child: Text(s.uiConsultBookedNutritionistWill,
                       style: pvBody(kInk, 13.5).copyWith(height: 1.5)),
                 ),
               ]),
             ),
 
             const SizedBox(height: 24),
-            Text('${p.weeks} · your starting menu', style: pvTitleStyle(16)),
+            Text(s.prepStartingMenu('${p.weeks}'), style: pvTitleStyle(16)),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
@@ -423,7 +432,7 @@ class NutritionDietPlanScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 22),
-            Text(S.now.uiFocusPlan, style: pvTitleStyle(16)),
+            Text(s.uiFocusPlan, style: pvTitleStyle(16)),
             const SizedBox(height: 12),
             for (final h in p.highlights)
               Padding(
@@ -438,15 +447,17 @@ class NutritionDietPlanScreen extends StatelessWidget {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: pvPrimaryButton('Download full plan', () => pvComingSoon(context, 'Your plan PDF'),
+              child: pvPrimaryButton(
+                  s.prepDownloadFullPlan, () => pvComingSoon(context, lang, s.prepYourPlanPdf),
                   padding: const EdgeInsets.symmetric(vertical: 15)),
             ),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: pvOutlineButton('Back to Prepare', () => Navigator.of(context).popUntil((r) => r.isFirst)),
+              child: pvOutlineButton(
+                  s.prepBackToPrepare, () => Navigator.of(context).popUntil((r) => r.isFirst)),
             ),
-            pvFooterNote('This is a preview plan. Payments and full meal plans go live with the nutrition backend.'),
+            pvFooterNote(s.prepFooterDietPlan),
           ],
         ),
       ),

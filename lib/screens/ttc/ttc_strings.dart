@@ -1006,7 +1006,19 @@ class TtcS {
       'Trying naturally, PCOS, endometriosis, IVF, male fertility aur emotional support ke rooms - shaant, kabhi competitive nahi.');
 
   // ---- the doorway ----------------------------------------------------------
-  String get doorTitle => _p('Trying to conceive', 'Conceive karne ki koshish');
+  //
+  // DEVANAGARI, unlike the rest of this file, and the reason is where these two
+  // are RENDERED rather than where they are declared: `home_screen_b.dart` puts
+  // them on the PREGNANCY home, as the card offering the TTC stage. A mother
+  // reading a fully Devanagari home screen met two lines of Roman Hindi here.
+  //
+  // Every Hinglish scanner in tool/ skips `lib/screens/ttc/` by PATH, because
+  // CLAUDE.md says TTC keeps the old style on purpose. That exclusion is right
+  // for the stage and wrong for its doorway: visibility follows the render
+  // site, not the directory. Found by opening the app, not by any scan.
+  //
+  // The rest of this file stays Hinglish until TTC is migrated as a whole.
+  String get doorTitle => _p('Trying to conceive', 'बच्चे की तैयारी');
   String get doorBody => _p('Planning a baby? Start the journey here',
-      'Baby plan kar rahe hain? Safar yahin se shuru');
+      'बच्चे की सोच रहे हैं? सफ़र यहीं से शुरू कीजिए');
 }

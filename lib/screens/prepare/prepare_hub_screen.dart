@@ -36,10 +36,20 @@ import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
 
 class PrepareHubScreen extends StatelessWidget {
-  const PrepareHubScreen({super.key});
+  const PrepareHubScreen({super.key, required this.lang});
+
+  /// The language to render in.
+  ///
+  /// Passed down from MainScaffold, which builds this tab inside an
+  /// AnimatedBuilder on the PregnancyController - so flipping the language in
+  /// Profile repaints the hub immediately. Reading a global static here
+  /// instead would compile, render correctly on a cold start, and then fail
+  /// to repaint on a change, which is the bug this tab already had.
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     Widget pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
     void openSection(Widget s) =>
@@ -56,21 +66,21 @@ class PrepareHubScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 120),
           children: [
-            pad(pvTopBar(context, title: S.now.uiPrepare)),
+            pad(pvTopBar(context, lang: lang, title: s.uiPrepare)),
             const SizedBox(height: 22),
 
             // hero
             pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              pvEyebrow('30 weeks · third trimester'),
+              pvEyebrow(s.prepHubEyebrow),
               const SizedBox(height: 12),
-              Text(S.now.uiPrepareBabyNoneGuided, style: pvHeroStyle()),
+              Text(s.uiPrepareBabyNoneGuided, style: pvHeroStyle()),
               const SizedBox(height: 14),
-              Text(S.now.uiCoursesLiveCohortsExpert,
+              Text(s.uiCoursesLiveCohortsExpert,
                   style: pvSubStyle()),
             ])),
 
             const SizedBox(height: 26),
-            pad(Text(S.now.uiRecommendedWeeks,
+            pad(Text(s.uiRecommendedWeeks,
                 style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1))),
             const SizedBox(height: 14),
 
@@ -93,20 +103,22 @@ class PrepareHubScreen extends StatelessWidget {
                 children: [
                   if (railMasterclass != null)
                     _railCard(
-                      tag: 'Masterclass',
+                      tag: s.prepTagMasterclass,
                       tagColor: kPurple,
                       title: railMasterclass.title.now,
                       meta: '${railMasterclass.durationLabel} · ${railMasterclass.price}',
-                      onTap: () => openSection(ProgramDetailScreen(program: railMasterclass)),
+                      onTap: () =>
+                          openSection(ProgramDetailScreen(program: railMasterclass, lang: lang)),
                     ),
                   const SizedBox(width: 14),
                   if (railCohort != null)
                     _railCard(
-                      tag: 'Cohort · starts Mon',
+                      tag: s.prepTagCohortStartsMon,
                       tagColor: kCoral,
                       title: railCohort.title.now,
                       meta: '${railCohort.durationLabel} · ${railCohort.price}',
-                      onTap: () => openSection(ProgramDetailScreen(program: railCohort)),
+                      onTap: () =>
+                          openSection(ProgramDetailScreen(program: railCohort, lang: lang)),
                     ),
                 ],
               ),
@@ -116,28 +128,28 @@ class PrepareHubScreen extends StatelessWidget {
 
             // category tiles - the four sections
             pad(Column(children: [
-              _tile(context, Icons.school_outlined, 'Courses & Cohorts',
-                  'Self-paced courses, live cohorts & masterclasses.', '${kPrepPrograms.length} programs',
-                  top: true, onTap: () => openSection(const CoursesCohortsScreen())),
-              _tile(context, Icons.child_friendly_outlined, 'Birthing Classes', 'Everything for the big day.',
-                  '6-class course', onTap: () => openSection(const BirthingClassesScreen())),
+              _tile(context, Icons.school_outlined, s.uiCoursesCohorts,
+                  s.prepTileCoursesSub, s.prepProgramsCount(kPrepPrograms.length),
+                  top: true, onTap: () => openSection(CoursesCohortsScreen(lang: lang))),
+              _tile(context, Icons.child_friendly_outlined, s.uiBirthingClasses,
+                  s.prepTileBirthingSub, s.prepTileBirthingCount,
+                  onTap: () => openSection(BirthingClassesScreen(lang: lang))),
               // Yoga now uses the SAME cult.fit screen as the parenting side,
               // filtered to pregnancy categories — one UI both tabs. The old
               // month-tabbed PrenatalYogaScreen is retired (kept for revert).
-              _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe classes, live or recorded.',
-                  'Prenatal & breath', onTap: () => openSection(const YogaHomeScreen(
+              _tile(context, Icons.self_improvement_rounded, s.uiYoga, s.prepTileYogaSub,
+                  s.prepTileYogaCount, onTap: () => openSection(YogaHomeScreen(
                         categoryFilter: kPregnancyYogaCategories,
-                        backLabel: 'Prepare',
-                        eyebrow: 'ParentVeda Yoga',
-                        heroTitle: 'Prenatal yoga & classes',
-                        intro:
-                            'Trimester-safe movement, labour breathing and calm - live with a teacher, or on your own time.',
+                        backLabel: s.uiPrepare,
+                        eyebrow: s.prepYogaEyebrow,
+                        heroTitle: s.prepYogaHeroTitle,
+                        intro: s.prepYogaIntro,
                       ))),
               // _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
               //     '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),
-              _tile(context, Icons.restaurant_outlined, 'Nutrition',
-                  'A plan built around you, made yours by an expert.', 'Plan + consult',
-                  bottom: true, onTap: () => openSection(const NutritionScreen())),
+              _tile(context, Icons.restaurant_outlined, s.uiNutrition,
+                  s.prepTileNutritionSub, s.prepTileNutritionCount,
+                  bottom: true, onTap: () => openSection(NutritionScreen(lang: lang))),
               // --- retired standalone tiles (folded into the above) --------------
               // _tile(context, Icons.school_outlined, 'Masterclasses', 'Deep-dive live sessions with experts.',
               //     '4 sessions', onTap: () => openSection(const MasterclassesScreen())),
@@ -158,7 +170,7 @@ class PrepareHubScreen extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      pvText(S.now.uiMostFree),
+                      pvText(s.uiMostFree),
                       pvPurple('ParentVeda+'),
                       pvText('.'),
                     ]),

@@ -11,15 +11,18 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
 class MasterclassesScreen extends StatelessWidget {
-  const MasterclassesScreen({super.key});
+  const MasterclassesScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
+    final s = S(lang);
     final featured = kMasterclasses.firstWhere((m) => m.featured);
     final more = kMasterclasses.where((m) => !m.featured).toList();
 
     void open(Masterclass m) => Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => MasterclassDetailScreen(m: m)));
+        .push(MaterialPageRoute(builder: (_) => MasterclassDetailScreen(m: m, lang: lang)));
 
     return Scaffold(
       backgroundColor: kCanvas,
@@ -28,17 +31,17 @@ class MasterclassesScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
-            pvTopBar(context, backLabel: 'Prepare'),
+            pvTopBar(context, lang: lang, backLabel: s.uiPrepare),
             const SizedBox(height: 22),
-            pvEyebrow('Live with an expert'),
+            pvEyebrow(s.prepEyebrowLiveExpert),
             const SizedBox(height: 10),
-            Text(S.now.uiMasterclasses, style: pvHeroStyle()),
+            Text(s.uiMasterclasses, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text(S.now.uiDeepDiveLiveSessions, style: pvSubStyle()),
+            Text(s.uiDeepDiveLiveSessions, style: pvSubStyle()),
             pvBanner(spans: [
-              pvText(S.now.uiRe),
-              pvBold('30 weeks'),
-              pvText(S.now.uiBirthMindStartHere),
+              pvText(s.uiRe),
+              pvBold(s.prepThirtyWeeksBold),
+              pvText(s.uiBirthMindStartHere),
             ]),
 
             // featured
@@ -74,7 +77,7 @@ class MasterclassesScreen extends StatelessWidget {
                       Row(children: [
                         pvAvatar(36),
                         const SizedBox(width: 10),
-                        Expanded(child: Text(_coachLine(featured), style: pvBody(kSoft, 13))),
+                        Expanded(child: Text(_coachLine(s, featured), style: pvBody(kSoft, 13))),
                       ]),
                       const SizedBox(height: 18),
                       const Divider(height: 1, color: Color(0xFFF0EBF5)),
@@ -85,14 +88,14 @@ class MasterclassesScreen extends StatelessWidget {
                             TextSpan(
                                 text: featured.price,
                                 style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                            const TextSpan(text: ' · free on ', style: TextStyle(color: kMuted)),
+                            TextSpan(text: s.prepFreeOn, style: const TextStyle(color: kMuted)),
                             const TextSpan(
                                 text: 'ParentVeda+',
                                 style: TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
                           ]),
                           style: pvBody(kInk, 14),
                         ),
-                        pvPrimaryButton('Reserve a seat', () => open(featured)),
+                        pvPrimaryButton(s.uiReserveSeat, () => open(featured)),
                       ]),
                     ]),
                   ),
@@ -101,26 +104,26 @@ class MasterclassesScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 28),
-            Text(S.now.uiMoreMasterclasses, style: pvTitleStyle(16)),
+            Text(s.uiMoreMasterclasses, style: pvTitleStyle(16)),
             const SizedBox(height: 6),
             for (int i = 0; i < more.length; i++)
-              _row(more[i], () => open(more[i]), bottom: i == more.length - 1),
+              _row(s, more[i], () => open(more[i]), bottom: i == more.length - 1),
 
-            pvFooterNote(
-                'Always live with an expert. The recording is yours forever. Free for ParentVeda+.'),
+            pvFooterNote(s.prepFooterMasterclasses),
           ],
         ),
       ),
     );
   }
 
-  String _coachLine(Masterclass m) {
+  String _coachLine(S s, Masterclass m) {
     if (m.coaches.isEmpty) return '';
-    if (m.coaches.length == 1) return 'With ${m.coaches.first.name}';
-    return 'With ${m.coaches[0].name} & ${m.coaches[1].name.now.split(' ').first}';
+    if (m.coaches.length == 1) return s.prepWithCoach('${m.coaches.first.name}');
+    return s.prepWithCoaches(
+        '${m.coaches[0].name}', m.coaches[1].name.now.split(' ').first);
   }
 
-  Widget _row(Masterclass m, VoidCallback onTap, {bool bottom = false}) {
+  Widget _row(S s, Masterclass m, VoidCallback onTap, {bool bottom = false}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -147,7 +150,7 @@ class MasterclassesScreen extends StatelessWidget {
                   bg: chipBgFor(m.listChipIsCoral), fg: chipColorFor(m.listChipIsCoral)),
               const SizedBox(width: 8),
             ],
-            Text(S.now.uiLiveRecording, style: pvBody(kMuted, 12)),
+            Text(s.uiLiveRecording, style: pvBody(kMuted, 12)),
           ]),
         ]),
       ),

@@ -23,7 +23,9 @@ import '../../localization/app_language.dart';
 const int _kCurrentMonth = 7;
 
 class PrenatalYogaScreen extends StatefulWidget {
-  const PrenatalYogaScreen({super.key});
+  const PrenatalYogaScreen({super.key, required this.lang});
+
+  final AppLanguage lang;
 
   @override
   State<PrenatalYogaScreen> createState() => _PrenatalYogaScreenState();
@@ -52,6 +54,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S(widget.lang);
     final sessions = yogaSessionsForMonth(_month);
     return Scaffold(
       backgroundColor: kCanvas,
@@ -60,18 +63,18 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
-            pvTopBar(context, backLabel: 'Prepare'),
+            pvTopBar(context, lang: widget.lang, backLabel: s.uiPrepare),
             const SizedBox(height: 22),
-            pvEyebrow('Move with your month'),
+            pvEyebrow(s.prepEyebrowMoveWithMonth),
             const SizedBox(height: 10),
-            Text(S.now.uiYoga, style: pvHeroStyle()),
+            Text(s.uiYoga, style: pvHeroStyle()),
             const SizedBox(height: 12),
-            Text(S.now.uiTrimesterSafeMovementFeel,
+            Text(s.uiTrimesterSafeMovementFeel,
                 style: pvSubStyle()),
             pvBanner(icon: Icons.self_improvement_rounded, spans: [
-              pvText(S.now.uiRe2),
-              pvBold('month $_kCurrentMonth'),
-              pvText(S.now.uiWeVeOpenedYoga),
+              pvText(s.uiRe2),
+              pvBold(s.prepMonthBold(_kCurrentMonth)),
+              pvText(s.uiWeVeOpenedYoga),
             ]),
 
             // program card
@@ -90,18 +93,18 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(S.now.uiPregnancyYogaProgram, style: pvTitleStyle(18)),
+                    Text(s.uiPregnancyYogaProgram, style: pvTitleStyle(18)),
                     const SizedBox(height: 6),
-                    Text(S.now.uiMonthJourneySanaKapoor,
+                    Text(s.uiMonthJourneySanaKapoor,
                         style: pvBody(kSoft, 13)),
                     const SizedBox(height: 12),
                     Text.rich(
-                      TextSpan(children: const [
-                        TextSpan(text: '₹599', style: TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                        TextSpan(text: '  ·  ', style: TextStyle(color: kMuted)),
+                      TextSpan(children: [
+                        const TextSpan(text: '₹599', style: TextStyle(color: kInk, fontWeight: FontWeight.w700)),
+                        const TextSpan(text: '  ·  ', style: TextStyle(color: kMuted)),
                         TextSpan(
-                            text: 'Free with ParentVeda+',
-                            style: TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
+                            text: s.prepFreeWithPlus,
+                            style: const TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
                       ]),
                       style: pvBody(kInk, 14),
                     ),
@@ -112,7 +115,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
 
             // month tabs
             const SizedBox(height: 22),
-            Text(S.now.uiChooseMonth,
+            Text(s.uiChooseMonth,
                 style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1)),
             const SizedBox(height: 12),
             SizedBox(
@@ -120,41 +123,40 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
               child: ListView(
                 controller: _tabs,
                 scrollDirection: Axis.horizontal,
-                children: [for (int m = 1; m <= 9; m++) _monthTab(m)],
+                children: [for (int m = 1; m <= 9; m++) _monthTab(s, m)],
               ),
             ),
 
             const SizedBox(height: 20),
             Row(children: [
-              Text(_month == _kCurrentMonth ? 'This month for you' : 'Month $_month',
+              Text(_month == _kCurrentMonth ? s.prepThisMonthForYou : s.prepMonthN(_month),
                   style: pvTitleStyle(16)),
               const Spacer(),
-              Text('${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'}',
-                  style: pvBody(kMuted, 12)),
+              Text(s.prepSessionCount(sessions.length), style: pvBody(kMuted, 12)),
             ]),
             const SizedBox(height: 6),
 
             if (sessions.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Text(S.now.uiSessionsMonthAreComing,
+                child: Text(s.uiSessionsMonthAreComing,
                     style: pvBody(kSoft, 14).copyWith(fontStyle: FontStyle.italic)),
               )
             else
               for (int i = 0; i < sessions.length; i++)
-                _session(sessions[i], bottom: i == sessions.length - 1),
+                _session(s, sessions[i], bottom: i == sessions.length - 1),
 
             const SizedBox(height: 18),
-            Text(S.now.uiEverySessionFilteredMonth,
+            Text(s.uiEverySessionFilteredMonth,
                 style: pvBody(kSoft, 13).copyWith(fontStyle: FontStyle.italic, height: 1.6)),
-            pvFooterNote('Certified prenatal instructor. A calm, safe practice for all nine months.'),
+            pvFooterNote(s.prepFooterYoga),
           ],
         ),
       ),
     );
   }
 
-  Widget _monthTab(int m) {
+  Widget _monthTab(S s, int m) {
     final active = m == _month;
     final isNow = m == _kCurrentMonth;
     return GestureDetector(
@@ -170,7 +172,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           border: Border.all(color: active ? kPurple : kBorder),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('Month $m',
+          Text(s.prepMonthN(m),
               style: pvBody(active ? Colors.white : kInk, 13)
                   .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
           if (isNow) ...[
@@ -187,11 +189,14 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
     );
   }
 
-  Widget _session(YogaSession y, {bool bottom = false}) {
+  Widget _session(S s, YogaSession y, {bool bottom = false}) {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => PrepareVideoScreen(
-              title: y.title.now, subtitle: '${y.duration.now} · ${y.focus.now}', blurb: y.blurb.now))),
+              lang: widget.lang,
+              title: y.title.now,
+              subtitle: '${y.duration.now} · ${y.focus.now}',
+              blurb: y.blurb.now))),
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -218,7 +223,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             ]),
           ),
           const SizedBox(width: 10),
-          pvPill('Safe for you'),
+          pvPill(s.prepSafeForYou),
         ]),
       ),
     );

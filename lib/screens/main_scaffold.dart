@@ -176,7 +176,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 // HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
                 TodayHomeScreen(
                     pregnancy: widget.pregnancy, home: widget.home),
-                const PrepareHubScreen(),
+                PrepareHubScreen(lang: widget.pregnancy.language),
                 ToolsHubScreen(controller: widget.pregnancy),
                 CalendarScreen(controller: widget.pregnancy),
                 CommunityScreen(controller: widget.pregnancy),

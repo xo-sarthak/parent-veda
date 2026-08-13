@@ -11,9 +11,11 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
 class ConsultationDetailScreen extends StatefulWidget {
-  const ConsultationDetailScreen({super.key, required this.specialist, this.onBooked});
+  const ConsultationDetailScreen(
+      {super.key, required this.specialist, required this.lang, this.onBooked});
 
   final Specialist specialist;
+  final AppLanguage lang;
 
   /// Optional: when set, runs after a successful booking (once the confirmation
   /// sheet is dismissed). The Nutrition funnel uses this to flow on from the
@@ -30,6 +32,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final s = widget.specialist;
+    // `str` for the string table, `s` stays the specialist: renaming the
+    // specialist here would have touched forty lines for no gain.
+    final str = S(widget.lang);
     return Scaffold(
       backgroundColor: kCanvas,
       body: Stack(children: [
@@ -38,7 +43,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 100),
             children: [
-              pvTopBar(context, backLabel: 'Consultations'),
+              pvTopBar(context, lang: widget.lang, backLabel: str.uiConsultations),
 
               const SizedBox(height: 22),
               Row(children: [
@@ -54,34 +59,35 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                     Row(children: [
                       Text(s.rating, style: pvBody(kCoral, 12).copyWith(fontWeight: FontWeight.w700)),
                       const SizedBox(width: 10),
-                      Text('${s.reviews.length * 160} mothers', style: pvBody(kMuted, 12)),
+                      Text(str.prepMothersSeen(s.reviews.length * 160),
+                          style: pvBody(kMuted, 12)),
                     ]),
                   ]),
                 ),
               ]),
               const SizedBox(height: 16),
               Row(children: [
-                _chip('Hindi'),
+                _chip(str.prepLangHindi),
                 const SizedBox(width: 8),
-                _chip('English'),
+                _chip(str.prepLangEnglish),
                 const SizedBox(width: 8),
-                _chip('Video call'),
+                _chip(str.prepVideoCall),
               ]),
 
               _divider(),
-              _title('About ${s.name.now.split(' ').take(2).join(' ')}'),
+              _title(str.prepAbout(s.name.now.split(' ').take(2).join(' '))),
               const SizedBox(height: 10),
               Text(s.about.now, style: pvBody(kSoft, 14).copyWith(height: 1.65)),
 
               _divider(),
-              _title('She can help with'),
+              _title(str.prepSheCanHelpWith),
               const SizedBox(height: 12),
               for (final h in s.helps) _check(h.now),
 
               _divider(),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                _title('Choose a time'),
-                Text(S.now.uiTodayJul, style: pvBody(kMuted, 12)),
+                _title(str.prepChooseATime),
+                Text(str.uiTodayJul, style: pvBody(kMuted, 12)),
               ]),
               const SizedBox(height: 12),
               SizedBox(
@@ -92,9 +98,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
               ),
 
               _divider(),
-              _title("From mothers she's seen"),
+              _title(str.prepFromMothersSheSeen),
               const SizedBox(height: 4),
-              Text(S.now.uiBedsideMannerRatedBy, style: pvBody(kMuted, 12)),
+              Text(str.uiBedsideMannerRatedBy, style: pvBody(kMuted, 12)),
               const SizedBox(height: 14),
               for (int i = 0; i < s.reviews.length; i++)
                 _review(s.reviews[i], top: true, bottom: i == s.reviews.length - 1),
@@ -104,13 +110,13 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  pvEyebrow('How it works', color: kPurple),
+                  pvEyebrow(str.prepHowItWorks, color: kPurple),
                   const SizedBox(height: 8),
-                  Text(S.now.uiPickSlotPrivateVideo,
+                  Text(str.uiPickSlotPrivateVideo,
                       style: pvBody(kInk, 14).copyWith(height: 1.6)),
                 ]),
               ),
-              pvFooterNote('Verified specialist. Transparent pricing, no surprises.'),
+              pvFooterNote(str.prepFooterConsultDetail),
             ],
           ),
         ),
@@ -120,20 +126,22 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           right: 0,
           bottom: 0,
           child: PvStickyCta(
+            lang: widget.lang,
             id: s.id,
             price: s.consultPrice,
-            note: '30-min call',
+            note: str.prepThirtyMinCall,
             noteColor: kMuted,
-            label: 'Book for ${s.slots[_slot]}',
-            bookedLabel: 'Booked',
+            label: str.prepBookFor(s.slots[_slot]),
+            bookedLabel: str.prepBooked,
             onBook: () => showPrepareBooking(
               context,
+              lang: widget.lang,
               id: s.id,
               title: '${s.role} · ${s.name}',
-              priceLabel: '${s.consultPrice} · 30-min video call',
-              whenLabel: 'Today, 8 Jul · ${s.slots[_slot]}',
-              heading: 'Confirm your consult',
-              cta: 'Confirm booking',
+              priceLabel: '${s.consultPrice} · ${str.prepThirtyMinVideoCall}',
+              whenLabel: '${str.uiTodayJul} · ${s.slots[_slot]}',
+              heading: str.prepConfirmYourConsult,
+              cta: str.prepConfirmBooking,
               onConfirmed: widget.onBooked,
             ),
           ),

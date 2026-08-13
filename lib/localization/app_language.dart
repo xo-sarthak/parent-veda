@@ -4028,15 +4028,15 @@ class S {
   String get uiEverythingBigDayTaught => _p('Everything for the big day, taught by a childbirth educator.', 'बड़े दिन के लिए सब कुछ, एक childbirth educator से सीखिए।');
   String get uiRe => _p('You\'re ', 'आप');
   String get uiExactlyWhenMostMums => _p(' - exactly when most mums prepare for birth.', 'पर हैं — ठीक वही समय जब ज़्यादातर माँएँ जन्म की तैयारी करती हैं।');
-  String get uiCompleteBirthingCourse => _p('Complete Birthing Course', 'पूरा Birthing कोर्स');
+  String get uiCompleteBirthingCourse => _p('Complete Birthing Course', 'जन्म की तैयारी का पूरा कोर्स');
   String get uiClassesSelfPacedVideo => _p('6 classes · self-paced video + a monthly live Q&A', '6 क्लास · अपनी रफ़्तार से वीडियो + हर महीने एक लाइव सवाल-जवाब');
   String get uiClasses => _p('The 6 classes', 'छह क्लास');
   String get uiLeadsEveryLiveSession => _p('Leads every live session and the group.', 'हर लाइव सेशन और ग्रुप वही चलाती हैं।');
-  String get uiParentvedaMembersAnyCohort => _p(' for ParentVeda+ members on any cohort.', '— किसी भी cohort पर ParentVeda+ सदस्यों के लिए।');
-  String get uiJoinNextCohort => _p('Join the next cohort', 'अगले cohort में जुड़िए');
-  String get uiCohortPrograms => _p('Cohort Programs', 'Cohort प्रोग्राम');
+  String get uiParentvedaMembersAnyCohort => _p(' for ParentVeda+ members on any cohort.', '— किसी भी कोहॉर्ट पर ParentVeda+ सदस्यों के लिए।');
+  String get uiJoinNextCohort => _p('Join the next cohort', 'अगले कोहॉर्ट में जुड़िए');
+  String get uiCohortPrograms => _p('Cohort Programs', 'कोहॉर्ट प्रोग्राम');
   String get uiSmallGroupsRealCoach => _p('Small groups, a real coach, and mums due when you are.', 'छोटे समूह, एक असली कोच, और वे माँएँ जिनकी डिलीवरी आपके साथ है।');
-  String get uiBirthReadyCohortStarts => _p(' - the Birth-Ready cohort starts Monday.', 'पर हैं — Birth-Ready cohort सोमवार से शुरू है।');
+  String get uiBirthReadyCohortStarts => _p(' - the Birth-Ready cohort starts Monday.', 'पर हैं — Birth-Ready कोहॉर्ट सोमवार से शुरू है।');
   String get uiWith => _p('with ', 'साथ:');
   String get uiChildbirthEducator => _p(', childbirth educator', '— childbirth educator');
   String get uiMorePrograms => _p('More programs', 'और प्रोग्राम');
@@ -4049,18 +4049,18 @@ class S {
   String get uiPrivateSessionRightExpert => _p('A private session with the right expert, whenever you need one.', 'सही विशेषज्ञ के साथ एक निजी सेशन, जब भी ज़रूरत हो।');
   String get uiSomethingMindAfterWeek => _p('Something on your mind after your 30-week scan? Talk it through.', '30-हफ़्ते के स्कैन के बाद कुछ मन में है? बात कर लीजिए।');
   String get uiPickExpertPickSlot => _p('Pick an expert → pick a slot → private video call. Notes saved to your health record.', 'विशेषज्ञ चुनिए → स्लॉट चुनिए → निजी वीडियो कॉल। नोट आपके हेल्थ रिकॉर्ड में सेव।');
-  String get uiHindiEnglish => _p('Hindi / English', 'हिंदी / English');
-  String get uiCoursesCohorts => _p('Courses & Cohorts', 'कोर्स और Cohort');
-  String get uiSelfPacedCoursesSmall => _p('Self-paced courses, small live cohorts and one-evening masterclasses - all in one place. Search a topic, or browse everything below.', 'अपनी रफ़्तार वाले कोर्स, छोटे लाइव cohort और एक शाम की masterclass — सब एक जगह। कोई विषय खोजिए, या नीचे सब देखिए।');
+  String get uiHindiEnglish => _p('Hindi / English', 'हिंदी / अंग्रेज़ी');
+  String get uiCoursesCohorts => _p('Courses & Cohorts', 'कोर्स और कोहॉर्ट');
+  String get uiSelfPacedCoursesSmall => _p('Self-paced courses, small live cohorts and one-evening masterclasses - all in one place. Search a topic, or browse everything below.', 'अपनी रफ़्तार वाले कोर्स, छोटे लाइव कोहॉर्ट और एक शाम की मास्टरक्लास — सब एक जगह। कोई विषय खोजिए, या नीचे सब देखिए।');
   String get uiEveryProgramLedBy => _p('Every program is led by a verified expert. Free or included with ParentVeda+.', 'हर प्रोग्राम एक सत्यापित विशेषज्ञ चलाते हैं। मुफ़्त, या ParentVeda+ में शामिल।');
   String get uiNoProgramsMatch => _p('No programs match', 'कोई प्रोग्राम नहीं मिला');
   String get uiTryAnotherTopicClear => _p('Try another topic or clear your filters.', 'दूसरा विषय आज़माइए या फ़िल्टर हटाइए।');
   String get uiWatchSecIntro => _p('Watch the 90-sec intro', '90 सेकंड का परिचय देखिए');
   String get uiReserveSeat => _p('Reserve a seat', 'सीट रोकिए');
-  String get uiMasterclasses => _p('Masterclasses', 'Masterclass');
+  String get uiMasterclasses => _p('Masterclasses', 'मास्टरक्लास');
   String get uiDeepDiveLiveSessions => _p('Deep-dive live sessions with experts, on the moments that matter.', 'उन पलों पर विशेषज्ञों के साथ गहरे लाइव सेशन जो सबसे ज़्यादा मायने रखते हैं।');
   String get uiBirthMindStartHere => _p(' - birth is on your mind. Start here.', '— जन्म आपके मन में है। यहीं से शुरू कीजिए।');
-  String get uiMoreMasterclasses => _p('More masterclasses', 'और masterclass');
+  String get uiMoreMasterclasses => _p('More masterclasses', 'और मास्टरक्लास');
   String get uiLiveRecording => _p('live + recording', 'लाइव + रिकॉर्डिंग');
   String get uiNutrition => _p('Nutrition', 'पोषण');
   String get uiTwoMinuteCheckThen => _p('A two-minute check-in, then a plan built around you - and a nutritionist to make it yours.', 'दो मिनट की जाँच, फिर आपके हिसाब से बना एक प्लान — और उसे आपका बनाने के लिए एक nutritionist।');
@@ -4084,25 +4084,25 @@ class S {
   String get uiRe2 => _p('You\'re in ', 'आप');
   String get uiWeVeOpenedYoga => _p(' - we\'ve opened your yoga here. Every session is filtered safe for your stage.', 'में हैं — आपका योग यहीं खोल दिया है। हर सेशन आपके चरण के लिए सुरक्षित छाँटा गया है।');
   String get uiPregnancyYogaProgram => _p('Pregnancy Yoga Program', 'गर्भावस्था योग प्रोग्राम');
-  String get uiMonthJourneySanaKapoor => _p('9-month journey · with Sana Kapoor, certified prenatal instructor', '9 महीने का सफ़र · Sana Kapoor के साथ, प्रमाणित prenatal प्रशिक्षक');
+  String get uiMonthJourneySanaKapoor => _p('9-month journey · with Sana Kapoor, certified prenatal instructor', '9 महीने का सफ़र · Sana Kapoor के साथ, प्रमाणित गर्भावस्था-योग प्रशिक्षक');
   String get uiChooseMonth => _p('CHOOSE A MONTH', 'महीना चुनिए');
   String get uiSessionsMonthAreComing => _p('Sessions for this month are coming soon.', 'इस महीने के सेशन जल्द आ रहे हैं।');
   String get uiEverySessionFilteredMonth => _p('Every session is filtered for your month - nothing unsafe for where you are ever surfaces.', 'हर सेशन आपके महीने के हिसाब से छाँटा जाता है — जो आपके लिए सुरक्षित नहीं, वह कभी सामने नहीं आता।');
   String get uiWeLlHoldSpot => _p('We\'ll hold your spot and remind you before it starts. Payments aren\'t live yet - nothing is charged now.', 'हम आपकी जगह रोक लेंगे और शुरू होने से पहले याद दिला देंगे। भुगतान अभी चालू नहीं है — अभी कुछ नहीं कटेगा।');
   String get uiCancel => _p('Cancel this?', 'इसे रद्द करें?');
-  String get uiWillRemoveFromPrepare => _p('This will remove it from your Prepare list.', 'यह आपकी Prepare सूची से हट जाएगा।');
+  String get uiWillRemoveFromPrepare => _p('This will remove it from your Prepare list.', 'यह आपकी तैयारी सूची से हट जाएगा।');
   String get uiKeep => _p('Keep', 'रहने दें');
   String get uiCancel2 => _p('Cancel it', 'रद्द कर दें');
   String get uiPrepareBabyNoneGuided => _p(
       'Prepare for your baby,\none guided step at a time.',
       'अपने शिशु के लिए तैयार होइए,\nएक-एक क़दम, साथ-साथ।');
-  String get uiCoursesLiveCohortsExpert => _p('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.', 'कोर्स, लाइव cohort, विशेषज्ञ सेशन और सौम्य हलचल — ठीक वहीं के लिए चुने गए जहाँ आप हैं।');
+  String get uiCoursesLiveCohortsExpert => _p('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.', 'कोर्स, लाइव कोहॉर्ट, विशेषज्ञ सेशन और सौम्य हलचल — ठीक वहीं के लिए चुने गए जहाँ आप हैं।');
   String get uiRecommendedWeeks => _p('RECOMMENDED AT 30 WEEKS', '30 हफ़्ते पर सुझाया गया');
   String get uiMostFree => _p('Most of this is free with ', 'इसमें से ज़्यादातर मुफ़्त है —');
   String get uiPrepare => _p('Prepare', 'तैयारी');
   String get uiVideoComingSoon => _p('Video coming soon', 'वीडियो जल्द आ रहा है');
   String get uiFullVideoLandsHere => _p('The full video lands here soon. We\'ll notify you when it\'s ready to watch.', 'पूरा वीडियो जल्द यहाँ आएगा। देखने लायक़ होते ही हम बता देंगे।');
-  String get uiCohortHasAlreadyStarted => _p('This cohort has already started - reserve the next intake.', 'यह cohort शुरू हो चुका है — अगली बार के लिए जगह रोक लीजिए।');
+  String get uiCohortHasAlreadyStarted => _p('This cohort has already started - reserve the next intake.', 'यह कोहॉर्ट शुरू हो चुका है — अगली बार के लिए जगह रोक लीजिए।');
   String get uiWhatLlLearn => _p('What you\'ll learn', 'आप क्या सीखेंगी');
   String get uiShortLessonsOrderStart => _p('Short lessons, in order - start anywhere.', 'छोटे पाठ, क्रम में — कहीं से भी शुरू कीजिए।');
   String get uiWhatCovers => _p('What this covers', 'इसमें क्या शामिल है');
@@ -4323,4 +4323,309 @@ class S {
   // =========================================================================
   String get uiKmQxPdvr => _p('KM7QX2PDVR', 'KM7QX2PDVR');
   String get uiAbcd => _p('ABCD234', 'ABCD234');
+
+  // =========================================================================
+  //  PREPARE TAB - screen chrome
+  // -------------------------------------------------------------------------
+  //  The Prepare tab's DATA (lib/data/prepare_data.dart) was translated long
+  //  before its chrome was. Opening the app in Hindi showed Hindi programme
+  //  titles inside English scaffolding: English eyebrows, English buttons,
+  //  English footers. These are the ~150 literals that were sitting bare in
+  //  lib/screens/prepare/*.dart.
+  //
+  //  Prefixed `prep` rather than `ui` purely so the block stays greppable as
+  //  one feature; the shape is the same `_p(english, 'हिन्दी')` as everything
+  //  above it. Programme names, prices and brands are NOT here - they come
+  //  from data and are identical in both languages by nature.
+  // =========================================================================
+
+  // ---- shared / booking sheet ---------------------------------------------
+  String get prepBooking => _p('Booking', 'बुकिंग');
+  String get prepBack => _p('Back', 'वापस');
+  String get prepReserveYourSpot => _p('Reserve your spot', 'अपनी जगह रोक लीजिए');
+  String get prepConfirm => _p('Confirm', 'पक्का कीजिए');
+  String prepSavedToList(String title) => _p(
+      '“$title” is saved to your Prepare list. We\'ll remind you before it starts.',
+      '“$title” आपकी तैयारी सूची में सेव हो गया। शुरू होने से पहले हम याद दिला देंगे।');
+
+  // The bolded run inside the "You're at **30 weeks** - ..." banners. It is a
+  // separate span, so it needs its own pair; the surrounding halves are
+  // uiRe / uiExactlyWhenMostMums and friends above.
+  String get prepThirtyWeeksBold => _p('30 weeks', '30 हफ़्ते');
+  String prepMonthBold(int m) => _p('month $m', '$m वें महीने');
+
+  // ---- hub -----------------------------------------------------------------
+  String get prepHubEyebrow => _p('30 weeks · third trimester', '30 हफ़्ते · तीसरी तिमाही');
+  String get prepTagMasterclass => _p('Masterclass', 'मास्टरक्लास');
+  String get prepTagCohortStartsMon => _p('Cohort · starts Mon', 'कोहॉर्ट · सोमवार से');
+  String get prepTileCoursesSub =>
+      _p('Self-paced courses, live cohorts & masterclasses.',
+          'अपनी रफ़्तार वाले कोर्स, लाइव कोहॉर्ट और मास्टरक्लास।');
+  String prepProgramsCount(int n) => _p('$n programs', '$n प्रोग्राम');
+  String get prepTileBirthingSub =>
+      _p('Everything for the big day.', 'बड़े दिन के लिए सब कुछ।');
+  String get prepTileBirthingCount => _p('6-class course', '6 क्लास का कोर्स');
+  String get prepTileYogaSub => _p('Trimester-safe classes, live or recorded.',
+      'तिमाही के हिसाब से सुरक्षित क्लास — लाइव या रिकॉर्डेड।');
+  String get prepTileYogaCount => _p('Prenatal & breath', 'गर्भावस्था योग और साँस');
+  String get prepTileNutritionSub =>
+      _p('A plan built around you, made yours by an expert.',
+          'आपके हिसाब से बना प्लान, जिसे एक विशेषज्ञ आपका बनाती हैं।');
+  String get prepTileNutritionCount => _p('Plan + consult', 'प्लान + परामर्श');
+  String get prepYogaEyebrow => _p('ParentVeda Yoga', 'ParentVeda योग');
+  String get prepYogaHeroTitle => _p('Prenatal yoga & classes', 'गर्भावस्था योग और क्लास');
+  String get prepYogaIntro => _p(
+      'Trimester-safe movement, labour breathing and calm - live with a teacher, or on your own time.',
+      'तिमाही के हिसाब से सुरक्षित हलचल, प्रसव के लिए साँस और शांति — शिक्षिका के साथ लाइव, या अपने समय पर।');
+
+  // ---- masterclasses list ---------------------------------------------------
+  String get prepEyebrowLiveExpert => _p('Live with an expert', 'विशेषज्ञ के साथ लाइव');
+  String get prepFreeOn => _p(' · free on ', ' · मुफ़्त — ');
+  String get prepFreeOnPlusShort =>
+      _p('free on ParentVeda+', 'ParentVeda+ पर मुफ़्त');
+  String get prepFooterMasterclasses => _p(
+      'Always live with an expert. The recording is yours forever. Free for ParentVeda+.',
+      'हमेशा विशेषज्ञ के साथ लाइव। रिकॉर्डिंग हमेशा के लिए आपकी। ParentVeda+ पर मुफ़्त।');
+  String prepWithCoach(String name) => _p('With $name', '$name के साथ');
+  String prepWithCoaches(String a, String b) =>
+      _p('With $a & $b', '$a और $b के साथ');
+
+  // ---- consultations list ---------------------------------------------------
+  String get prepEyebrowPrivate => _p('Private & personal', 'निजी और आपकी अपनी');
+  String get prepHowItWorks => _p('How it works', 'यह कैसे चलता है');
+  String get prepBook => _p('Book', 'बुक कीजिए');
+  String get prepFooterConsultations => _p(
+      'Verified specialists only - obstetric & paediatric, never generalists. Real ratings from real mothers. Transparent pricing, no surprises.',
+      'सिर्फ़ सत्यापित विशेषज्ञ — obstetric और paediatric, कभी सामान्य डॉक्टर नहीं। असली माँओं की असली राय। क़ीमत साफ़-साफ़, कोई छिपी बात नहीं।');
+
+  // ---- cohorts list ---------------------------------------------------------
+  String get prepEyebrowTogether => _p('Together, guided', 'साथ-साथ, राह दिखाते हुए');
+  String get prepYourCoachFallback => _p('your coach', 'आपकी कोच');
+  String get prepWhatsInsideEveryCohort =>
+      _p('What\'s inside every cohort', 'हर कोहॉर्ट में क्या मिलता है');
+  String get prepFooterCohorts => _p(
+      'Small cohorts, real accountability - our most-loved way to prepare.',
+      'छोटे कोहॉर्ट, सच्ची ज़िम्मेदारी — तैयारी का हमारा सबसे पसंदीदा तरीक़ा।');
+
+  // ---- birthing classes -----------------------------------------------------
+  String get prepEyebrowBigDay => _p('For the big day', 'बड़े दिन के लिए');
+  String get prepBirthingWhen => _p('6 classes · self-paced + monthly live Q&A',
+      '6 क्लास · अपनी रफ़्तार से + हर महीने लाइव सवाल-जवाब');
+  String get prepEnrollInCourse =>
+      _p('Enroll in this course', 'इस कोर्स में दाख़िला लीजिए');
+  String get prepEnrollNow => _p('Enroll now', 'अभी दाख़िला लीजिए');
+  // The educator credit reads NAME-first in both languages. Hindi puts "के साथ"
+  // after the name, so a leading "With " span would have had to translate to an
+  // empty string - a hollow pair. Reordering keeps one span list for both.
+  String get prepCertifiedChildbirthEducator =>
+      _p(' — certified childbirth educator ', ' के साथ — प्रमाणित childbirth educator ');
+  String get prepObReviewed => _p('(OB-reviewed)', '(OB की जाँची हुई)');
+  String get prepEnrolledCheck => _p('✓ Enrolled', '✓ दाख़िला हो गया');
+  String get prepEnrolled => _p('Enrolled', 'दाख़िला हो गया');
+  String get prepStartWatching => _p('Start watching', 'देखना शुरू कीजिए');
+  String get prepFreePreview => _p('Free preview', 'मुफ़्त झलक');
+  String get prepEnrollUnlockAll =>
+      _p('Enroll - unlock all 6 classes', 'दाख़िला लीजिए — छहों क्लास खुल जाएँगी');
+  String get prepFooterBirthing => _p(
+      'Taught by a certified childbirth educator, reviewed by an OB. Watch at your pace, rewatch anytime, and bring questions to the live Q&A.',
+      'एक प्रमाणित childbirth educator सिखाती हैं, और एक OB ने जाँचा है। अपनी रफ़्तार से देखिए, जब चाहें दोबारा देखिए, और सवाल लाइव सवाल-जवाब में ले आइए।');
+
+  // ---- cohort detail --------------------------------------------------------
+  String get prepFactProgramme => _p('programme', 'प्रोग्राम');
+  String get prepFlexible => _p('Flexible', 'लचीला');
+  String get prepFactStart => _p('start', 'शुरुआत');
+  String get prepFactTiming => _p('timing', 'समय');
+  String get prepLive => _p('Live', 'लाइव');
+  String get prepPlusPeerGroup => _p('+ peer group', '+ साथी-समूह');
+  String get prepThePlan => _p('The plan', 'योजना');
+  String get prepYourCoach => _p('Your coach', 'आपकी कोच');
+  String get prepFromMumsWhoDidIt =>
+      _p('From mums who did it', 'जिन माँओं ने यह किया, उनसे');
+  String get prepJoinThisCohort => _p('Join this cohort', 'इस कोहॉर्ट में जुड़िए');
+  String get prepJoinCohort => _p('Join cohort', 'कोहॉर्ट में जुड़िए');
+
+  // ---- consultation detail --------------------------------------------------
+  String prepMothersSeen(int n) => _p('$n mothers', '$n माँएँ');
+  String get prepLangHindi => _p('Hindi', 'हिंदी');
+  String get prepLangEnglish => _p('English', 'अंग्रेज़ी');
+  String get prepVideoCall => _p('Video call', 'वीडियो कॉल');
+  String prepAbout(String name) => _p('About $name', '$name के बारे में');
+  String get prepSheCanHelpWith =>
+      _p('She can help with', 'वे इनमें मदद कर सकती हैं');
+  String get prepChooseATime => _p('Choose a time', 'समय चुनिए');
+  String get prepFromMothersSheSeen =>
+      _p('From mothers she\'s seen', 'जिन माँओं को उन्होंने देखा है, उनसे');
+  String get prepFooterConsultDetail => _p(
+      'Verified specialist. Transparent pricing, no surprises.',
+      'सत्यापित विशेषज्ञ। क़ीमत साफ़-साफ़, कोई छिपी बात नहीं।');
+  String get prepThirtyMinCall => _p('30-min call', '30 मिनट की कॉल');
+  String prepBookFor(String slot) => _p('Book for $slot', '$slot के लिए बुक कीजिए');
+  String get prepBooked => _p('Booked', 'बुक हो गया');
+  String get prepThirtyMinVideoCall =>
+      _p('30-min video call', '30 मिनट की वीडियो कॉल');
+  String get prepConfirmYourConsult =>
+      _p('Confirm your consult', 'अपना परामर्श पक्का कीजिए');
+  String get prepConfirmBooking => _p('Confirm booking', 'बुकिंग पक्की कीजिए');
+
+  // ---- masterclass detail ---------------------------------------------------
+  String prepIntroOf(String title) => _p('$title - intro', '$title — परिचय');
+  String get prepNinetySecPreview => _p('90-sec preview', '90 सेकंड की झलक');
+  String get prepWalkAwayWith =>
+      _p('What you\'ll walk away with', 'आप क्या लेकर जाएँगी');
+  String get prepMeetYourCoaches => _p('Meet your coaches', 'अपनी कोचों से मिलिए');
+  String get prepMeetYourCoach => _p('Meet your coach', 'अपनी कोच से मिलिए');
+  String get prepWhatMothersSay => _p('What mothers say', 'माँएँ क्या कहती हैं');
+  String get prepCommonQuestions => _p('Common questions', 'आम सवाल');
+  String get prepFooterMasterclassDetail => _p(
+      'Led by a verified expert. Free with ParentVeda+.',
+      'एक सत्यापित विशेषज्ञ चलाती हैं। ParentVeda+ के साथ मुफ़्त।');
+  String get prepReserved => _p('Reserved', 'जगह रुक गई');
+  String get prepReserveYourSeat =>
+      _p('Reserve your seat', 'अपनी सीट रोक लीजिए');
+  String get prepReserveMySeat => _p('Reserve my seat', 'मेरी सीट रोक दीजिए');
+
+  // ---- courses & cohorts ----------------------------------------------------
+  String get prepEyebrowLearnExperts =>
+      _p('Learn with the experts', 'विशेषज्ञों से सीखिए');
+  String get prepSearchHint => _p('Search birth, breathing, an expert…',
+      'जन्म, साँस, कोई विशेषज्ञ खोजिए…');
+  String get prepAll => _p('All', 'सब');
+  String get prepAllTopics => _p('All topics', 'सभी विषय');
+  String get prepNothingMatchesYet =>
+      _p('NOTHING MATCHES YET', 'अभी कुछ नहीं मिला');
+  String prepProgramCount(int n) =>
+      _p(n == 1 ? '1 PROGRAM' : '$n PROGRAMS', n == 1 ? '1 प्रोग्राम' : '$n प्रोग्राम');
+  String get prepLiveBadge => _p('LIVE', 'लाइव');
+  String get prepClearFilters => _p('Clear filters', 'फ़िल्टर हटाइए');
+
+  // ---- nutrition funnel -----------------------------------------------------
+  String get prepEyebrowEatWell => _p('Eat well, for two', 'दो के लिए अच्छा खाइए');
+  String get prepQTrimester =>
+      _p('Which trimester are you in?', 'आप कौन-सी तिमाही में हैं?');
+  String get prepQFocus => _p('What\'s your main focus right now?',
+      'अभी आपका मुख्य लक्ष्य क्या है?');
+  String get prepQDiet => _p('How do you eat?', 'आप कैसा खाना खाती हैं?');
+  String get prepPickFocusToContinue =>
+      _p('Pick a focus to continue', 'आगे बढ़ने के लिए एक लक्ष्य चुनिए');
+  String get prepSeeMyPlans =>
+      _p('See my recommended plans', 'मेरे लिए सुझाए प्लान देखिए');
+  String get prepFooterNutritionAssessment => _p(
+      'Your answers only shape your recommendation - nothing is shared without you.',
+      'आपके जवाब सिर्फ़ आपका सुझाव तय करते हैं — आपके बिना कुछ भी किसी से साझा नहीं होता।');
+  String get prepEyebrowMatchedToYou => _p('Matched to you', 'आपके लिए चुना हुआ');
+  String get prepBackPlans => _p('Plans', 'प्लान');
+  String get prepBookMyNutritionist =>
+      _p('Book my nutritionist', 'अपनी nutritionist बुक कीजिए');
+  // The purple run inside "Every plan is finalised with a **registered
+  // nutritionist** in a 1:1 consult". `nutritionist` stays Latin because it is
+  // a credential a mother reads off a clinic board, like `anomaly scan`, and
+  // because every shipped Hindi string around it already spells it that way.
+  // The qualifier is translated, so this is a real pair and not a hollow one.
+  String get prepRegisteredNutritionist =>
+      _p('registered nutritionist', 'रजिस्टर्ड nutritionist');
+  String prepBuiltFromPlan(String plan) => _p(
+      'Built from $plan and confirmed with your nutritionist. It updates after your consult.',
+      '$plan से बना है, और आपकी nutritionist ने इसे देखा है। परामर्श के बाद यह अपने आप बदल जाएगा।');
+  String prepStartingMenu(String weeks) =>
+      _p('$weeks · your starting menu', '$weeks · आपका शुरुआती मेन्यू');
+  String get prepDownloadFullPlan =>
+      _p('Download full plan', 'पूरा प्लान डाउनलोड कीजिए');
+  String get prepYourPlanPdf => _p('Your plan PDF', 'आपका प्लान PDF');
+  String get prepBackToPrepare => _p('Back to Prepare', 'तैयारी पर वापस');
+  String get prepFooterDietPlan => _p(
+      'This is a preview plan. Payments and full meal plans go live with the nutrition backend.',
+      'यह अभी एक झलक-प्लान है। भुगतान और पूरे खाने के प्लान जल्द चालू होंगे।');
+
+  // ---- program detail -------------------------------------------------------
+  String get prepAddToYourLibrary =>
+      _p('Add to your library', 'अपनी लाइब्रेरी में जोड़िए');
+  String get prepFactSeatsLeft => _p('seats left', 'सीटें बाक़ी');
+  String get prepFactLiveLower => _p('live', 'लाइव');
+  String get prepLiveQa => _p('Live Q&A', 'लाइव सवाल-जवाब');
+  String get prepIncludedLower => _p('included', 'शामिल');
+  String get prepForever => _p('Forever', 'हमेशा');
+  String get prepRecording => _p('recording', 'रिकॉर्डिंग');
+  String get prepRecorded => _p('recorded', 'रिकॉर्डेड');
+  String get prepRated => _p('rated', 'रेटिंग');
+  String get prepYours => _p('yours', 'आपका');
+  String get prepLessonsLabel => _p('lessons', 'पाठ');
+  String get prepMinutesLabel => _p('minutes', 'मिनट');
+  String get prepLifetime => _p('lifetime', 'हमेशा के लिए');
+  String get prepCourseLabel => _p('course', 'कोर्स');
+  String prepPreviewOf(String title) => _p('$title - preview', '$title — झलक');
+  String get prepYourInstructor => _p('Your instructor', 'आपकी शिक्षिका');
+  String get prepYourSchedule => _p('Your schedule', 'आपका कार्यक्रम');
+  String get prepWhenItRuns => _p('When it runs', 'यह कब चलता है');
+  String prepMinutes(int n) => _p('$n min', '$n मिनट');
+  String prepMinutesUnlocksLater(int n) => _p(
+      '$n min · unlocks later, open anyway', '$n मिनट · बाद में खुलेगा, फिर भी खोलिए');
+  String get prepIncluded => _p('Included', 'शामिल है');
+  String get prepOnParentVedaPlus => _p('on ParentVeda+', 'ParentVeda+ पर');
+  String prepLedByVerifiedExpert(String note) => _p(
+      'Led by a verified expert. $note.', 'एक सत्यापित विशेषज्ञ चलाती हैं। $note।');
+
+  // ---- prenatal yoga (retired from the hub, still reachable in the module) ---
+  String get prepEyebrowMoveWithMonth =>
+      _p('Move with your month', 'अपने महीने के साथ चलिए');
+  String get prepFreeWithPlus =>
+      _p('Free with ParentVeda+', 'ParentVeda+ के साथ मुफ़्त');
+  String get prepThisMonthForYou =>
+      _p('This month for you', 'इस महीने आपके लिए');
+  String prepMonthN(int m) => _p('Month $m', 'महीना $m');
+  String prepSessionCount(int n) =>
+      _p(n == 1 ? '1 session' : '$n sessions', n == 1 ? '1 सेशन' : '$n सेशन');
+  String get prepSafeForYou => _p('Safe for you', 'आपके लिए सुरक्षित');
+  String get prepFooterYoga => _p(
+      'Certified prenatal instructor. A calm, safe practice for all nine months.',
+      'प्रमाणित गर्भावस्था-योग प्रशिक्षक। नौ महीने के लिए एक शांत, सुरक्षित अभ्यास।');
+
+  // ---- progressive profiling (ProfileAskStrip + the pregnancy profile) ------
+  //  One question, its payoff, and the two ways out. Every strip states what
+  //  answering unlocks - a question that cannot explain itself is not asked -
+  //  so each `ask*Q` has an `ask*Why` beside it and they translate as a pair.
+  //  The pregnancy profile screen asks the SAME four questions in full-card
+  //  form, so both surfaces read from these rather than drifting apart.
+  String get askNotNow => _p('Not now', 'अभी नहीं');
+  /// Replaces "Not now" once she has picked something in a multi-select — at
+  /// that point the button no longer means "skip", and the Hindi has to move
+  /// too or the strip contradicts itself mid-answer.
+  String get askDone => _p('Done', 'हो गया');
+
+  String get askHealthQ => _p('Has your doctor mentioned anything to watch?',
+      'क्या आपके डॉक्टर ने ध्यान रखने लायक़ कुछ बताया है?');
+  String get askHealthWhy => _p(
+      'We use this to pick reads, foods and answers that fit you - and to skip the ones that do not.',
+      'इससे हम आपके लिए सही पढ़ने की चीज़ें, खाना और जवाब चुनते हैं — और जो आप पर लागू नहीं होते, वे छोड़ देते हैं।');
+
+  String get askPrioritiesQ => _p('What would you most like help with?',
+      'आप किस बात में सबसे ज़्यादा मदद चाहेंगी?');
+  String get askPrioritiesWhy => _p(
+      'The tools you pick move to the top of this page.',
+      'आप जो चुनेंगी, वे टूल इसी पन्ने पर सबसे ऊपर आ जाएँगे।');
+
+  String get askDietQ => _p('How do you eat?', 'आपका खानपान कैसा है?');
+  String get askDietWhy => _p(
+      'So the meals and foods we suggest are ones you would actually eat.',
+      'ताकि हम जो खाना सुझाएँ, वह वाक़ई वही हो जो आप खाती हैं।');
+
+  String get askParityQ =>
+      _p('Is this your first baby?', 'क्या यह आपका पहला गर्भ है?');
+  String get askParityWhy => _p(
+      'Changes how much we explain, and what we compare things to.',
+      'इससे तय होता है कि हम कितना समझाएँ, और किस से तुलना करें।');
+
+  // The pregnancy profile screen's fuller wording for the two multi-select
+  // cards. Same questions as the strips above, but a card has room to say
+  // "tap as many as apply", which a one-line strip does not.
+  String get askHealthQLong => _p('Has your doctor mentioned any of these?',
+      'क्या आपके डॉक्टर ने इनमें से कुछ बताया है?');
+  String get askHealthWhyLong => _p(
+      'We use these to pick articles, foods and answers that fit you. Tap any that apply.',
+      'इनसे हम आपके लिए सही लेख, खाना और जवाब चुनते हैं। जो भी लागू हो, उस पर टैप कीजिए।');
+  String get askPrioritiesWhyLong => _p(
+      'Pick as many as you like. These float to the top of your tools and reads.',
+      'जितने चाहें चुनिए। ये आपके टूल और पढ़ने की चीज़ों में ऊपर आ जाएँगे।');
+  String get askDietWhyLong => _p(
+      'Shapes recipes and food suggestions, now and after the baby arrives.',
+      'इससे रेसिपी और खाने के सुझाव तय होते हैं — अभी भी, और शिशु के आने के बाद भी।');
 }

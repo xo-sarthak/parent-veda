@@ -151,7 +151,11 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
       case BrandSlot.compareGuide:
         _push(const ProductsCompareScreen());
       case BrandSlot.liveSession:
-        _push(const PrepareHubScreen());
+        // A debug/showcase surface with no PregnancyController in scope.
+        // S.current is main.dart's mirror of the controller's language and is
+        // read here at TAP time, not inside a build - so the pushed hub gets
+        // the right language and still repaints from its own `lang` field.
+        _push(PrepareHubScreen(lang: S.current));
       default:
         _toast('Walk to: ${p.where}');
     }

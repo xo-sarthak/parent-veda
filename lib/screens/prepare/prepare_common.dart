@@ -49,18 +49,53 @@ const List<BoxShadow> pvCardShadow = [
   BoxShadow(color: Color(0x266A30B6), blurRadius: 26, spreadRadius: -12, offset: Offset(0, 14)),
 ];
 
-// ---- the EN · हिं toggle (visual only for now) ------------------------------
-Widget pvLangToggle() => Text.rich(
-      TextSpan(children: const [
-        TextSpan(text: 'EN', style: TextStyle(color: kPurple, fontWeight: FontWeight.w600)),
-        TextSpan(text: ' · ', style: TextStyle(color: Color(0xFFC7BBD6))),
-        TextSpan(text: 'हिं', style: TextStyle(color: kMuted, fontWeight: FontWeight.w600)),
-      ]),
-      style: pvManrope(fontSize: 12),
-    );
+// ---- the EN · हिं language indicator ----------------------------------------
+//
+//  This used to be hardcoded with EN highlighted and a comment saying "visual
+//  only for now", which meant a mother reading the app in Hindi was shown a
+//  control telling her she was in English. It now reflects the language
+//  actually in force.
+//
+//  It is an INDICATOR, not a control, and that is a deliberate choice.
+//  Switching needs `PregnancyController.setLanguage`, and this repo has no
+//  singleton controller - `main.dart` owns the only instance and passes it
+//  down. The Prepare screens are pushed routes that take `lang` by
+//  constructor, so even with a controller threaded in, a tap here would flip
+//  the app language while the screen showing the pill kept rendering the old
+//  one until it was popped. A truthful badge beats a control that appears to
+//  work on the hub and silently lies on the other thirteen screens. The real
+//  switch is one tap away in Profile → Language, and stays the single owner
+//  of that decision.
+//
+//  To make it a real toggle later: thread the controller (not just `lang`)
+//  from MainScaffold down through every Prepare route, wrap each screen's
+//  build in `AnimatedBuilder(animation: controller)` so a change repaints the
+//  screen you tapped on, then read `controller.language` instead of `lang`.
+Widget pvLangToggle(AppLanguage lang) {
+  final en = lang.isEnglish;
+  return Text.rich(
+    TextSpan(children: [
+      TextSpan(
+          text: 'EN',
+          style: TextStyle(
+              color: en ? kPurple : kMuted, fontWeight: FontWeight.w600)),
+      const TextSpan(text: ' · ', style: TextStyle(color: Color(0xFFC7BBD6))),
+      TextSpan(
+          text: 'हिं',
+          style: TextStyle(
+              color: en ? kMuted : kPurple, fontWeight: FontWeight.w600)),
+    ]),
+    style: pvManrope(fontSize: 12),
+  );
+}
 
 // ---- top bar: hub shows a title, sub-screens show a back row ----------------
-Widget pvTopBar(BuildContext context, {String? title, String? backLabel}) {
+//
+//  `lang` is required rather than defaulted so that adding a Prepare screen
+//  cannot quietly reintroduce a language-unaware top bar - the analyzer asks
+//  for it at every call site.
+Widget pvTopBar(BuildContext context,
+    {required AppLanguage lang, String? title, String? backLabel}) {
   final left = backLabel != null
       ? GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
@@ -74,7 +109,7 @@ Widget pvTopBar(BuildContext context, {String? title, String? backLabel}) {
       : Text(title ?? '', style: pvTitleStyle(15));
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [left, pvLangToggle()],
+    children: [left, pvLangToggle(lang)],
   );
 }
 
@@ -242,9 +277,16 @@ class _StripePainter extends CustomPainter {
 }
 
 // A gentle placeholder action for CTAs that don't have a real backend yet.
-void pvComingSoon(BuildContext context, [String what = 'Booking']) {
+//
+// `what` is nullable rather than defaulted to 'Booking': a default parameter
+// must be a compile-time constant, so it could never have been a translated
+// string. Resolving it inside the body is how a bilingual default is spelled.
+void pvComingSoon(BuildContext context, AppLanguage lang, [String? what]) {
+  final s = S(lang);
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(S.now.opensSoon(what)), behavior: SnackBarBehavior.floating),
+    SnackBar(
+        content: Text(s.opensSoon(what ?? s.prepBooking)),
+        behavior: SnackBarBehavior.floating),
   );
 }
 
@@ -276,16 +318,21 @@ const BoxDecoration pvBottomFade = BoxDecoration(
 // =============================================================================
 Future<void> showPrepareBooking(
   BuildContext context, {
+  required AppLanguage lang,
   required String id,
   required String title,
   required String priceLabel,
   String? whenLabel,
-  String heading = 'Reserve your spot',
-  String cta = 'Confirm',
+  // Nullable, not defaulted: a default parameter has to be a compile-time
+  // constant, which rules out a translated string. Resolved below against the
+  // caller's language.
+  String? heading,
+  String? cta,
   // Optional: run after the sheet is dismissed on success. Used by the Nutrition
   // funnel so booking the expert consult flows on to the personalized diet plan.
   VoidCallback? onConfirmed,
 }) {
+  final s = S(lang);
   // If this item is bridged to the booking engine, run the real buy -> pick a
   // slot -> booked flow (one history across both stages). Every Prepare booking
   // funnels through here, so this one interception wires the whole tab. Anything
@@ -299,12 +346,13 @@ Future<void> showPrepareBooking(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => _BookingSheet(
+      lang: lang,
       id: id,
       title: title,
       priceLabel: priceLabel,
       whenLabel: whenLabel,
-      heading: heading,
-      cta: cta,
+      heading: heading ?? s.prepReserveYourSpot,
+      cta: cta ?? s.prepConfirm,
       onConfirmed: onConfirmed,
     ),
   );
@@ -312,6 +360,7 @@ Future<void> showPrepareBooking(
 
 class _BookingSheet extends StatefulWidget {
   const _BookingSheet({
+    required this.lang,
     required this.id,
     required this.title,
     required this.priceLabel,
@@ -320,6 +369,7 @@ class _BookingSheet extends StatefulWidget {
     this.whenLabel,
     this.onConfirmed,
   });
+  final AppLanguage lang;
   final String id;
   final String title;
   final String priceLabel;
@@ -380,7 +430,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         ]),
       ),
       const SizedBox(height: 14),
-      Text(S.now.uiWeLlHoldSpot,
+      Text(S(widget.lang).uiWeLlHoldSpot,
           style: pvBody(kMuted, 12).copyWith(height: 1.5)),
       const SizedBox(height: 18),
       SizedBox(
@@ -419,12 +469,12 @@ class _BookingSheetState extends State<_BookingSheet> {
       ),
       const SizedBox(height: 16),
       Center(
-        child: Text(S.now.uiReAllSet,
+        child: Text(S(widget.lang).uiReAllSet,
             style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w500, color: kInk)),
       ),
       const SizedBox(height: 8),
       Center(
-        child: Text('“${widget.title}” is saved to your Prepare list. We\'ll remind you before it starts.',
+        child: Text(S(widget.lang).prepSavedToList(widget.title),
             textAlign: TextAlign.center, style: pvBody(kSoft, 14).copyWith(height: 1.55)),
       ),
       const SizedBox(height: 20),
@@ -441,7 +491,7 @@ class _BookingSheetState extends State<_BookingSheet> {
               widget.onConfirmed?.call();
             },
             child: Center(
-              child: Text(S.now.uiDone,
+              child: Text(S(widget.lang).uiDone,
                   style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
@@ -455,6 +505,7 @@ class _BookingSheetState extends State<_BookingSheet> {
 class PvStickyCta extends StatelessWidget {
   const PvStickyCta({
     super.key,
+    required this.lang,
     required this.id,
     required this.price,
     required this.note,
@@ -464,6 +515,7 @@ class PvStickyCta extends StatelessWidget {
     required this.onBook,
   });
 
+  final AppLanguage lang;
   final String id;
   final String price;
   final String note;
@@ -526,20 +578,23 @@ class PvStickyCta extends StatelessWidget {
   }
 
   void _confirmCancel(BuildContext context) {
+    // S(lang), not S.now: the dialog is built from the widget's own language,
+    // so it can never disagree with the screen that opened it.
+    final s = S(lang);
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: kCanvas,
-        title: Text(S.now.uiCancel, style: pvTitleStyle(18)),
-        content: Text(S.now.uiWillRemoveFromPrepare, style: pvBody(kSoft, 14)),
+        title: Text(s.uiCancel, style: pvTitleStyle(18)),
+        content: Text(s.uiWillRemoveFromPrepare, style: pvBody(kSoft, 14)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(S.now.uiKeep)),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(s.uiKeep)),
           TextButton(
             onPressed: () {
               PrepareStore.instance.cancel(id);
               Navigator.of(context).pop();
             },
-            child: Text(S.now.uiCancel2, style: TextStyle(color: kCoral)),
+            child: Text(s.uiCancel2, style: TextStyle(color: kCoral)),
           ),
         ],
       ),
