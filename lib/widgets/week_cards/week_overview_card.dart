@@ -1154,7 +1154,7 @@ const List<_MS> _milestones = [
   _MS(6, '💓', LocalizedText(en: 'First heartbeat', hi: 'पहली धड़कन'),
       LocalizedText(
           en: "Your baby's heart began to beat.",
-          hi: 'Aapke baby ka dil dhadakna shuru hua.')),
+          hi: 'शिशु का दिल धड़कना शुरू हो गया।')),
   _MS(12, '🤏', LocalizedText(en: 'First movements', hi: 'पहली हलचल'),
       LocalizedText(
           en: 'Baby started moving - still too small to feel.',
@@ -1162,7 +1162,7 @@ const List<_MS> _milestones = [
   _MS(18, '👂', LocalizedText(en: 'Beginning to hear', hi: 'सुनना शुरू'),
       LocalizedText(
           en: "Baby's hearing is developing and picking up sound.",
-          hi: 'Baby ki sunne ki shakti viksit ho rahi hai.')),
+          hi: 'सुनने की शक्ति बन रही है, आवाज़ें पहुँचने लगी हैं।')),
   _MS(
       20,
       '✨',
@@ -1170,11 +1170,11 @@ const List<_MS> _milestones = [
           en: 'Halfway & first flutters', hi: 'आधा सफ़र और पहली हलचल'),
       LocalizedText(
           en: "You may feel the first kicks - and you're halfway there!",
-          hi: 'Aap pehli kicks mehsoos kar sakti hain - aur aadha safar poora!')),
+          hi: 'आपको पहली हलचल महसूस हो सकती है - और आधा सफ़र पूरा!')),
   _MS(24, '🛡️', LocalizedText(en: 'Viability milestone', hi: 'एक अहम पड़ाव'),
       LocalizedText(
           en: "A major step in your baby's development.",
-          hi: 'Aapke baby ke vikas mein ek bada kadam.')),
+          hi: 'शिशु के विकास में एक बड़ा क़दम।')),
   _MS(27, '🎵', LocalizedText(en: 'Knows your voice', hi: 'आपकी आवाज़ की पहचान'),
       LocalizedText(
           en: 'Baby begins to recognise and respond to your voice.',

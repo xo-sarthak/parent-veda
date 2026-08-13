@@ -70,19 +70,19 @@ class _GameChrome extends StatelessWidget {
             : [
                 if (onReload != null)
                   IconButton(
-                    tooltip: hinglish ? 'Dobara shuru' : 'Reload',
+                    tooltip: hinglish ? 'फिर से शुरू' : 'Reload',
                     icon: const Icon(Icons.refresh_rounded),
                     onPressed: onReload,
                   ),
                 if (onNewPuzzle != null)
                   IconButton(
-                    tooltip: hinglish ? 'Naya puzzle' : 'New puzzle',
+                    tooltip: hinglish ? 'नई पहेली' : 'New puzzle',
                     icon: const Icon(Icons.casino_outlined),
                     onPressed: onNewPuzzle,
                   ),
                 if (onNext != null)
                   IconButton(
-                    tooltip: hinglish ? 'Agla puzzle' : 'Next puzzle',
+                    tooltip: hinglish ? 'अगली पहेली' : 'Next puzzle',
                     icon: const Icon(Icons.skip_next_rounded),
                     onPressed: onNext,
                   ),

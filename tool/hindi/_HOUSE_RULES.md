@@ -40,10 +40,25 @@ readers.
 Judgement call, and the test is: **would she read this word off a bottle, a
 prescription, or a report?** If yes, Latin.
 
-- Latin: `Folate`, `Vitamin D`, `Omega-3`, `Iron`, `Calcium`, `anomaly scan`,
-  `NT scan`, `Braxton Hicks`, `screen time`, brand and product names, and
-  research terms she would meet in English (`serve and return`).
-- Devanagari: everyday words — **पालक, दाल, नींद, थकान, दूध, खेल, कहानी**.
+The line that the shipped content actually draws — and it is sharper than
+"clinical terms stay Latin", which sent one pass the wrong way:
+
+- **A named compound with a letter or number code stays Latin.** `Folate`,
+  `Vitamin D`, `Vitamin B12`, `Omega-3`, `DHA`. She reads these off a strip or a
+  prescription with the code attached, and the code is the point.
+- **A nutrient she says out loud goes Devanagari** — **आयरन, कैल्शियम,
+  प्रोटीन, फ़ाइबर**. Measured in `weekContent.json` + `lib/data/home`: आयरन 41
+  vs `Iron` 9, कैल्शियम 16 vs 0, प्रोटीन 51 vs 0. The content settled this long
+  before the rule was written down.
+- **Procedures and conditions she hears named in English stay Latin**:
+  `anomaly scan`, `NT scan`, `Braxton Hicks`, `gestational diabetes`.
+- **Everyday words go Devanagari** — **पालक, दाल, नींद, थकान, दूध, खेल, कहानी,
+  स्क्रीन, फ़ोन, स्कैन**.
+
+⚠️ This rule and CLAUDE.md disagreed for a while — this file said `Iron` stays
+Latin while CLAUDE.md used आयरन as its Devanagari example, and a translator
+following the letter of each produced both in the same file. If you find them
+diverging again, the shipped content is the tiebreaker, not either document.
 - A whole English phrase inside Hindi prose is usually a failure to translate.
   `Developmental research` → **बाल-विकास पर हुए शोध**. But keep a term Latin when
   the Hindi would be an invention nobody says.

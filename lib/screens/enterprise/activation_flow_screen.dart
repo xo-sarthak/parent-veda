@@ -207,12 +207,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
       children: [
         EnterpriseHeading(
           _p('Your employer may already provide this.',
-              'Ho sakta hai aapki company yeh already de rahi ho.'),
+              'हो सकता है आपकी कंपनी यह पहले से दे रही हो।'),
           sub: _p(
               'Some companies pay for ParentVeda for their team. Enter your '
                   'work email and we will check.',
-              'Kuch companies apni team ke liye ParentVeda ka kharcha uthati '
-                  'hain. Apna work email daaliye, hum check kar lete hain.'),
+              'कुछ कंपनियाँ अपनी टीम के लिए ParentVeda का ख़र्च उठाती हैं। अपना ऑफ़िस वाला ईमेल डालिए, हम जाँच लेते हैं।'),
         ),
         const SizedBox(height: 22),
         EnterpriseCard(
@@ -227,7 +226,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               // close the screen. What they need to type is whichever address
               // their company gave us, which is what this says.
               Text(_p('The email your company has for you',
-                  'Jo email aapki company ke paas hai'),
+                  'जो ईमेल आपकी कंपनी के पास है'),
                   style: t.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               TextField(
@@ -258,9 +257,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                 _p('We have filled in your ParentVeda address — change it if '
                     'your company uses a different one for you. Either way we '
                     'check it once and never show it to them.',
-                    'Humne aapka ParentVeda address bhar diya hai — agar '
-                        'company koi aur email use karti hai to badal lijiye. '
-                        'Sirf ek baar check karte hain, unhe dikhate nahi.'),
+                    'हमने आपका ParentVeda वाला ईमेल भर दिया है — अगर कंपनी आपके लिए कोई और ईमेल इस्तेमाल करती है तो उसे बदल लीजिए। दोनों ही हाल में हम इसे एक बार जाँचते हैं, उन्हें कभी दिखाते नहीं।'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.45),
               ),
@@ -273,7 +270,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
         ],
         const SizedBox(height: 18),
         EnterpriseButton(
-          label: _p('Continue', 'Aage badho'),
+          label: _p('Continue', 'आगे बढ़िए'),
           busy: _busy,
           onTap: _requestCode,
         ),
@@ -291,12 +288,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         EnterpriseHeading(
-          _p('Check your work inbox.', 'Apna work inbox check karo.'),
+          _p('Check your work inbox.', 'अपना ऑफ़िस वाला इनबॉक्स देखिए।'),
           sub: _p(
               'We sent a six-digit code to ${_email.text.trim()}. It is good '
                   'for ten minutes.',
-              'Humne ${_email.text.trim()} par ek 6-digit code bheja hai. Woh '
-                  'das minute tak chalega.'),
+              'हमने ${_email.text.trim()} पर छह अंकों का कोड भेजा है। यह दस मिनट तक चलेगा।'),
         ),
         const SizedBox(height: 22),
         EnterpriseCard(
@@ -340,7 +336,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
         ],
         const SizedBox(height: 18),
         EnterpriseButton(
-          label: _p('Activate', 'Activate karo'),
+          label: _p('Activate', 'चालू कीजिए'),
           busy: _busy,
           onTap: _confirm,
         ),
@@ -350,9 +346,9 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
             onPressed: _busy ? null : _requestCode,
             child: Text(
               needsFreshCode(_lastCode)
-                  ? _p('Send a new code', 'Naya code bhejo')
+                  ? _p('Send a new code', 'नया कोड भेजिए')
                   : _p('Did not get it? Send again',
-                      'Nahi mila? Dobara bhejo'),
+                      'नहीं मिला? दोबारा भेजिए'),
               style: t.bodyMedium?.copyWith(color: AppTheme.primary600),
             ),
           ),
@@ -365,7 +361,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                       _step = _Step.email;
                       _notice = null;
                     }),
-            child: Text(_p('Use a different email', 'Doosri email use karo'),
+            child: Text(_p('Use a different email', 'कोई दूसरा ईमेल इस्तेमाल कीजिए'),
                 style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
           ),
         ),
@@ -378,7 +374,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
   Widget _welcomeStep() {
     final sponsor = EntitlementStore.instance.sponsor;
     final name = sponsor?.name ??
-        _p('your organisation', 'aapke organisation');
+        _p('your organisation', 'आपकी कंपनी');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,9 +392,9 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
         ),
         const SizedBox(height: 18),
         EnterpriseHeading(
-          _p("You're all set.", 'Sab set hai.'),
+          _p("You're all set.", 'सब हो गया।'),
           sub: _p('ParentVeda Premium, provided by $name.',
-              'ParentVeda Premium — $name ki taraf se.'),
+              'ParentVeda Premium, $name की तरफ़ से।'),
         ),
         const SizedBox(height: 22),
         // The privacy promise is the FIRST thing after the good news, not
@@ -408,7 +404,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
         _privacyPromise(company: name),
         const SizedBox(height: 20),
         EnterpriseButton(
-          label: _p('See what you get', 'Dekho kya mila'),
+          label: _p('See what you get', 'देखिए क्या-क्या मिला'),
           onTap: () => Navigator.of(context).pop(true),
         ),
       ],
@@ -416,14 +412,14 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
   }
 
   Widget _privacyPromise({bool compact = false, String? company}) {
-    final name = company ?? _p('your employer', 'aapka employer');
+    final name = company ?? _p('your employer', 'आपकी कंपनी');
     final t = Theme.of(context).textTheme;
     final lines = [
-      _p('Your pregnancy and your child', 'Aapki pregnancy aur aapka baby'),
-      _p('Your journal and your photos', 'Aapka journal aur photos'),
-      _p('Your Ask Veda questions', 'Aapke Ask Veda sawaal'),
-      _p('Anything you search or read', 'Jo bhi search ya read karte ho'),
-      _p('Your appointments and reports', 'Aapke appointments aur reports'),
+      _p('Your pregnancy and your child', 'आपकी गर्भावस्था और आपका शिशु'),
+      _p('Your journal and your photos', 'आपका जर्नल और आपकी तस्वीरें'),
+      _p('Your Ask Veda questions', 'Ask Veda पर आपके सवाल'),
+      _p('Anything you search or read', 'जो भी आप खोजती या पढ़ती हैं'),
+      _p('Your appointments and reports', 'आपके अपॉइंटमेंट और रिपोर्ट'),
     ];
 
     return EnterpriseCard(
@@ -438,7 +434,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
             Expanded(
               child: Text(
                 _p('What your employer never sees',
-                    'Aapka employer kya kabhi nahi dekhta'),
+                    'आपकी कंपनी को क्या कभी नहीं दिखता'),
                 style: t.titleSmall?.copyWith(fontWeight: FontWeight.w800),
               ),
             ),
@@ -467,15 +463,12 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
             compact
                 ? _p('They see how many people activated. Nothing about who, '
                     'and nothing about you.',
-                    'Unhe sirf yeh dikhta hai ki kitne logon ne activate kiya. '
-                        'Kaun, ya aapke baare mein kuch nahi.')
+                    'उन्हें दिखता है कि कितने लोगों ने चालू किया। कौन, यह नहीं — और आपके बारे में कुछ नहीं।')
                 : _p(
                     'All $name can see is how many people activated the benefit '
                         'and how many consultations were used across everyone. '
                         'Never who, never what.',
-                    '$name ko sirf itna dikhta hai ki kitne logon ne benefit '
-                        'activate kiya aur sab milakar kitni consultations use '
-                        'hui. Kaun ya kya — kabhi nahi.'),
+                    '$name को सिर्फ़ इतना दिखता है कि कितने लोगों ने यह सुविधा चालू की और सब मिलाकर कितने कंसल्टेशन इस्तेमाल हुए। कौन, यह कभी नहीं — क्या, यह भी कभी नहीं।'),
             style: t.bodySmall
                 ?.copyWith(color: AppTheme.neutral600, height: 1.45),
           ),

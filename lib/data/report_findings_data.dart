@@ -581,7 +581,7 @@ final List<ReportFinding> kReportFindings = [
     whatNext: _t('Your doctor will usually offer an injection (anti-D) at certain points, and after birth if needed. This is a standard, preventive measure.', 'आपके डॉक्टर आम तौर पर कुछ ख़ास मौक़ों पर, और ज़रूरत हो तो जन्म के बाद, एक इंजेक्शन (anti-D) देंगे। यह एक मानक, बचाव वाला क़दम है।'),
     questions: [
       _t('Will I need an anti-D injection, and when?', 'क्या मुझे anti-D इंजेक्शन लगेगा, और कब?'),
-      _t('Does my partner\'s blood type matter here?', 'क्या यहाँ मेरे पार्टनर का ब्लड ग्रुप मायने रखता है?'),
+      _t('Does my partner\'s blood type matter here?', 'क्या यहाँ मेरे साथी का ब्लड ग्रुप मायने रखता है?'),
       _t('Is there anything else to plan?', 'क्या और कुछ योजना बनानी है?'),
     ],
     remember: [

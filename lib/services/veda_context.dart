@@ -118,11 +118,11 @@ class VedaContext {
     final en = lang.isEnglish;
     switch (trimester) {
       case 1:
-        return en ? 'first trimester' : 'pehli trimester';
+        return en ? 'first trimester' : 'पहली तिमाही';
       case 2:
-        return en ? 'second trimester' : 'doosri trimester';
+        return en ? 'second trimester' : 'दूसरी तिमाही';
       default:
-        return en ? 'third trimester' : 'teesri trimester';
+        return en ? 'third trimester' : 'तीसरी तिमाही';
     }
   }
 
@@ -140,7 +140,7 @@ class VedaContext {
     if (includeWeekLead) {
       parts.add(en
           ? "You're in week $week (${_triName(lang)})."
-          : "Aap week $week mein hain (${_triName(lang)}).");
+          : "आप $weekवें हफ़्ते में हैं (${_triName(lang)})।");
     }
 
     final q = query.toLowerCase();
@@ -156,7 +156,7 @@ class VedaContext {
         final n = ls.symptom.name.of(lang);
         parts.add(en
             ? "You noted $n around week ${ls.week} - keep an eye on it and mention it at your next visit."
-            : "Aapne $n week ${ls.week} ke aas-paas note kiya tha - ispar nazar rakhein aur agli visit par doctor ko zaroor batayein.");
+            : "आपने ${ls.week}वें हफ़्ते के आसपास $n के बारे में बताया था — इस पर नज़र रखिए और अगली बार डॉक्टर से मिलें तो ज़िक्र ज़रूर कीजिए।");
         break;
       }
     }
@@ -166,7 +166,7 @@ class VedaContext {
       if (m.trim().length >= 3 && q.contains(m.toLowerCase())) {
         parts.add(en
             ? "You're tracking $m - check anything new against it with your doctor."
-            : "Aap $m track kar rahi hain - koi nayi cheez iske saath doctor se confirm kar lein.");
+            : "आप $m ले रही हैं — कोई भी नई चीज़ इसके साथ डॉक्टर से पूछकर ही लीजिए।");
         break;
       }
     }
@@ -179,7 +179,7 @@ class VedaContext {
       if (c.length >= 4 && q.contains(c.split(' ').first)) {
         parts.add(en
             ? "You've told us about $c - it's worth reading this with that in mind, and checking anything new with your doctor."
-            : "Aapne $c ke baare mein bataya tha - ise dhyan mein rakhkar padhein, aur koi nayi cheez doctor se confirm karein.");
+            : "आपने हमें $c के बारे में बताया था — इसे उसी बात को ध्यान में रखकर पढ़िए, और कुछ भी नया हो तो डॉक्टर से पूछ लीजिए।");
         break;
       }
     }
@@ -192,7 +192,7 @@ class VedaContext {
     if (foodish && diet != null) {
       parts.add(en
           ? "You eat $diet, so we've kept that in mind here."
-          : "Aap $diet khaati hain, isliye humne wahi dhyan mein rakha hai.");
+          : "आप $diet खाना खाती हैं, इसलिए हमने यहाँ वही ध्यान में रखा है।");
     }
 
     if (parts.isEmpty) return null;

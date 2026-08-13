@@ -107,7 +107,7 @@ class GarbhScreen extends StatelessWidget {
       // no-edit-app_language rule). Content inside SamvadScreen is unchanged.
       (
         id: 'samvad',
-        name: lang.isHinglish ? 'Samvad & Vichara' : 'Samvad & Vichara',
+        name: lang.isHinglish ? 'संवाद और विचार' : 'Samvad & Vichara',
         desc: s.gsSamvadDesc
       ),
       (id: 'kriya', name: s.gsKriya, desc: s.gsKriyaDesc),
@@ -725,7 +725,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
         children: [
           Text(
               widget.controller.language.isHinglish
-                  ? 'Har mahine ke liye chuni gayi listening sessions.'
+                  ? 'हर महीने के लिए चुने गए, सुनने के शांत पल।'
                   : 'Listening sessions gathered for each month.',
               style: text.bodyMedium?.copyWith(color: _muted)),
           const SizedBox(height: 14),
@@ -757,7 +757,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
                     ),
                     child: Text(
                       widget.controller.language.isHinglish
-                          ? 'Mahina $m'
+                          ? 'महीना $m'
                           : 'Month $m',
                       style: text.labelMedium?.copyWith(
                           color: selected ? Colors.white : _accShravan,
@@ -774,7 +774,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
               padding: const EdgeInsets.only(top: 6, bottom: 2),
               child: Text(
                   widget.controller.language.isHinglish
-                      ? 'Aap abhi yahan hain'
+                      ? 'आप अभी यहाँ हैं'
                       : 'You are here now',
                   style: text.labelSmall?.copyWith(
                       color: _accShravan, fontWeight: FontWeight.w800)),
@@ -783,7 +783,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
           if (sessions.isEmpty)
             Text(
                 widget.controller.language.isHinglish
-                    ? 'Is mahine ke liye abhi koi session nahi.'
+                    ? 'इस महीने के लिए अभी कुछ जोड़ा नहीं गया।'
                     : 'No sessions for this month yet.',
                 style: text.bodyMedium?.copyWith(color: _muted))
           else
@@ -1635,8 +1635,8 @@ class KriyaScreen extends StatelessWidget {
               unselectedLabelColor: _muted,
               indicatorColor: _accKriya,
               tabs: [
-                Tab(text: hinglish ? 'Saans & Dhyan' : 'Breathing & Meditation'),
-                Tab(text: hinglish ? 'Brain Fitness' : 'Brain Fitness'),
+                Tab(text: hinglish ? 'साँस और ध्यान' : 'Breathing & Meditation'),
+                Tab(text: hinglish ? 'दिमाग़ी कसरत' : 'Brain Fitness'),
               ],
             ),
           ),
@@ -1858,7 +1858,7 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
                                 Icon(Icons.play_circle_outline_rounded,
                                     size: 16, color: _accKriya),
                                 const SizedBox(width: 5),
-                                Text(hinglish ? 'Khelein' : 'Play',
+                                Text(hinglish ? 'खेलिए' : 'Play',
                                     style: text.labelSmall?.copyWith(
                                         color: _accKriya,
                                         fontWeight: FontWeight.w800)),

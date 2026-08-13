@@ -62,7 +62,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
             const SizedBox(height: 24),
             _footer(
               "This is for understanding, not diagnosis — your doctor is always the best guide.",
-              'Yeh samajhne ke liye hai, diagnosis ke liye nahi — tumhara doctor hamesha sabse accha maargdarshak hai.',
+              'यह समझने के लिए है, निदान के लिए नहीं — सही राह हमेशा आपके डॉक्टर ही बताएँगे।',
             ),
           ],
         );
@@ -276,7 +276,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
         const SizedBox(height: 14),
         _aboutBlock(_lang.isEnglish ? 'How big am I' : 'अभी मेरा आकार कितना है', _tr(w.about.howBig)),
         const SizedBox(height: 14),
-        _aboutBlock(_lang.isEnglish ? "What's happening this week" : 'Is hafte kya ho raha hai', _tr(w.about.whatsHappening)),
+        _aboutBlock(_lang.isEnglish ? "What's happening this week" : 'इस हफ़्ते क्या हो रहा है', _tr(w.about.whatsHappening)),
         // Behavioural highlights: inline heading + description, never a card.
         for (final b in w.about.behaviour) ...[
           const SizedBox(height: 14),
@@ -299,7 +299,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   Widget _babyScience(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _sectionHeader('Baby Science', 'Baby Science',
-          subEn: 'Tap any to understand it.', subHi: 'Samajhne ke liye kisi par bhi tap karo.'),
+          subEn: 'Tap any to understand it.', subHi: 'समझने के लिए किसी पर भी टैप कीजिए।'),
       const SizedBox(height: 14),
       for (final c in w.science)
         _tapRow(
@@ -313,7 +313,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   // ---- 4 · You This Week ----------------------------------------------------
   Widget _youThisWeek(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _sectionHeader('You This Week', 'Is Hafte Tum'),
+      _sectionHeader('You This Week', 'इस हफ़्ते आप'),
       const SizedBox(height: 14),
       _plainCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -361,9 +361,9 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   // ---- 5 · Health · Symptoms ------------------------------------------------
   Widget _symptoms(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _sectionHeader('Health this week · Symptoms', 'Is hafte sehat · Lakshan',
+      _sectionHeader('Health this week · Symptoms', 'इस हफ़्ते सेहत · लक्षण',
           subEn: 'Common, normal things you may notice now — tap any to understand it and what helps.',
-          subHi: 'Aam, normal cheezein jo abhi mehsoos ho sakti hain — samajhne ke liye kisi par bhi tap karo.'),
+          subHi: 'आम और सामान्य बातें जो अभी महसूस हो सकती हैं — समझने के लिए किसी पर भी टैप कीजिए, और जानिए क्या राहत देता है।'),
       const SizedBox(height: 14),
       for (final s in w.symptoms)
         _tapRow(
@@ -416,7 +416,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
       const SizedBox(height: 6),
       _footer(
         "If you notice any spotting, bleeding, or anything that does not feel right to you, please check with your doctor. It is always okay to ask.",
-        'Agar koi spotting, bleeding, ya kuch bhi jo theek na lage dikhe, to apne doctor se jaanch karwao. Poochhna hamesha theek hai.',
+        'अगर कभी स्पॉटिंग हो, ख़ून आए, या कुछ भी ठीक न लगे, तो अपने डॉक्टर से ज़रूर बात कीजिए। पूछना हमेशा ठीक है।',
       ),
     ]);
   }
@@ -429,7 +429,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   // ---- 6 · Health · Diet ----------------------------------------------------
   Widget _diet(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _sectionHeader('Health this week · Diet', 'Is hafte sehat · Diet'),
+      _sectionHeader('Health this week · Diet', 'इस हफ़्ते सेहत · खानपान'),
       const SizedBox(height: 14),
       // superfood
       Container(
@@ -505,7 +505,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   Widget _trimesterTips(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _sectionHeader('Trimester Tips', 'Trimester Tips',
-          subEn: 'Trimester 1 · Weeks 1–13', subHi: 'Trimester 1 · Week 1–13'),
+          subEn: 'Trimester 1 · Weeks 1–13', subHi: 'पहली तिमाही · हफ़्ते 1–13'),
       const SizedBox(height: 14),
       for (int i = 0; i < w.tips.length; i++) _tipTile(w.tips[i], i),
     ]);
@@ -560,8 +560,8 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   // ---- 8 · Share With Partner -----------------------------------------------
   Widget _partner(Week5Full w) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _sectionHeader('Share With Partner', 'Partner ke saath baanto',
-          subEn: 'Our Pregnancy Week: Week 5', subHi: 'Hamari Pregnancy Week: Week 5'),
+      _sectionHeader('Share With Partner', 'साथी के साथ साझा कीजिए',
+          subEn: 'Our Pregnancy Week: Week 5', subHi: 'हमारी गर्भावस्था का हफ़्ता 5'),
       const SizedBox(height: 14),
       _plainCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -109,17 +109,16 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
             EnterpriseHeading(
               store.error != null
                   ? _p('We could not load your programme.',
-                      'Programme load nahi ho paya.')
+                      'आपका प्रोग्राम लोड नहीं हो पाया।')
                   : _p('You do not administer a programme.',
-                      'Aap kisi programme ke admin nahi ho.'),
+                      'किसी प्रोग्राम की देखरेख का ज़िम्मा आपके पास नहीं है।'),
               sub: store.error != null
                   ? _p('Pull down to try again.',
-                      'Neeche kheench kar dobara try karo.')
+                      'नीचे खींचकर फिर कोशिश कीजिए।')
                   : _p(
                       'If you handle this benefit for your organisation, ask us '
                           'to give your account access.',
-                      'Agar aap apne organisation ke liye yeh benefit dekhte '
-                          'ho, humse apne account ko access dilwa lijiye.'),
+                      'अगर आपकी कंपनी में इस सुविधा का ज़िम्मा आपके पास है, तो हमसे कहिए कि आपके अकाउंट को इसकी पहुँच दी जाए।'),
             ),
         ],
       );
@@ -137,8 +136,8 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
         Text(
           d.renewalAt != null
               ? _p('Renews ${_date(d.renewalAt!)}',
-                  '${_date(d.renewalAt!)} ko renew')
-              : _p('No renewal date on file', 'Renewal date file mein nahi hai'),
+                  '${_date(d.renewalAt!)} को नवीनीकरण')
+              : _p('No renewal date on file', 'नवीनीकरण की कोई तारीख़ दर्ज नहीं है'),
           style: t.bodySmall?.copyWith(color: AppTheme.neutral600),
         ),
         const SizedBox(height: 18),
@@ -159,7 +158,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               Row(children: [
                 _stat(_p('Activated', 'Activated'), '${d.activated}'),
                 if (d.denominatorIsRoster)
-                  _stat(_p('On your list', 'Aapki list mein'),
+                  _stat(_p('On your list', 'आपकी सूची में'),
                       '${d.eligibleListed}')
                 else
                   _stat(
@@ -190,10 +189,9 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                       ? _p(
                           '${d.eligibleListed - d.activated} of the people you '
                               'listed have not activated yet',
-                          'Aapki list ke ${d.eligibleListed - d.activated} log '
-                              'abhi tak activate nahi hue')
+                          'आपकी सूची में से ${d.eligibleListed - d.activated} लोगों ने अभी तक चालू नहीं किया')
                       : _p('${d.seatsLeft ?? 0} seats left',
-                          '${d.seatsLeft ?? 0} seats bachi hain'),
+                          '${d.seatsLeft ?? 0} सीट बाक़ी हैं'),
                   style: t.labelSmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
@@ -201,7 +199,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 const SizedBox(height: 10),
                 Text(
                   _p('${d.activatedLast30d} joined in the last 30 days',
-                      'Pichhle 30 din mein ${d.activatedLast30d} log jude'),
+                      'पिछले 30 दिनों में ${d.activatedLast30d} लोग जुड़े'),
                   style: t.bodySmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
@@ -253,7 +251,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(_p('What this dashboard cannot show',
-                      'Yeh dashboard kya nahi dikha sakta'),
+                      'यह डैशबोर्ड क्या नहीं दिखा सकता'),
                       style:
                           t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 ),
@@ -266,11 +264,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                         'the app — we do not measure that last one at all, for '
                         'anyone. Take-up and totals are the whole picture, and '
                         'that is what makes people willing to activate.',
-                    'Kisi ek insaan ke baare mein kuch nahi. Kisne book kiya, '
-                        'kya padha, kya poocha, kitna time app mein bitaya — '
-                        'aakhri wala hum kisi ke liye measure hi nahi karte. '
-                        'Take-up aur totals hi poori picture hain, aur isi wajah '
-                        'se log activate karte hain.'),
+                    'किसी एक व्यक्ति के बारे में कुछ नहीं। किसने बुक किया, किसने क्या पढ़ा, किसने क्या पूछा, किसने ऐप में कितना समय बिताया — आख़िरी वाली बात तो हम किसी के लिए भी नापते ही नहीं। कितने लोगों ने लिया और कुल जोड़ — बस यही पूरी तस्वीर है, और इसी वजह से लोग इसे चालू करने को तैयार होते हैं।'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.5),
               ),
@@ -290,9 +284,9 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               onPressed: () => setState(() => _showRemoved = !_showRemoved),
               child: Text(
                 _showRemoved
-                    ? _p('Hide removed', 'Removed chhupao')
+                    ? _p('Hide removed', 'हटाए गए छिपाइए')
                     : _p('Show removed (${removed.length})',
-                        'Removed dekho (${removed.length})'),
+                        'हटाए गए दिखाइए (${removed.length})'),
                 style: t.bodySmall?.copyWith(color: AppTheme.primary600),
               ),
             ),
@@ -301,8 +295,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
         Text(
           _p('Eligibility only. Activation is all we record about a person '
               'here.',
-              'Sirf eligibility. Kisi bhi insaan ke baare mein bas activation '
-                  'record hota hai.'),
+              'सिर्फ़ पात्रता। यहाँ किसी व्यक्ति के बारे में हम बस इतना दर्ज करते हैं कि उसने चालू किया या नहीं।'),
           style: t.bodySmall?.copyWith(color: AppTheme.neutral600),
         ),
         const SizedBox(height: 12),
@@ -315,7 +308,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(_p('Nobody has activated yet.',
-                    'Abhi kisi ne activate nahi kiya.'),
+                    'अभी तक किसी ने चालू नहीं किया।'),
                     style:
                         t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 6),
@@ -323,8 +316,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                   _p(
                       'Employees activate inside the app with their work email. '
                           'Sharing that one line is usually all it takes.',
-                      'Employees app ke andar apni work email se activate karte '
-                          'hain. Bas yeh ek line share kar dijiye.'),
+                      'कर्मचारी ऐप के अंदर अपने ऑफ़िस वाले ईमेल से इसे चालू करते हैं। आम तौर पर बस इतनी सी बात बता देना काफ़ी होता है।'),
                   style: t.bodySmall
                       ?.copyWith(color: AppTheme.neutral600, height: 1.45),
                 ),
@@ -341,20 +333,20 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
   String _trendLabel(SponsorAdminStore store) {
     final change = store.activationChange3m;
     if (change == null) {
-      return _p('Take-up so far', 'Ab tak ka take-up');
+      return _p('Take-up so far', 'अब तक कितने लोगों ने लिया');
     }
     if (change > 0) {
       return _p('Up $change since three months ago',
-          'Teen mahine pehle se $change zyada');
+          'तीन महीने पहले से $change ज़्यादा');
     }
     if (change == 0) {
       return _p('Level with three months ago',
-          'Teen mahine pehle jitna hi');
+          'तीन महीने पहले जितना ही');
     }
     // Shown as plainly as growth is. A dashboard that only narrates good news
     // is one nobody trusts the good news on either.
     return _p('Down ${-change} since three months ago',
-        'Teen mahine pehle se ${-change} kam');
+        'तीन महीने पहले से ${-change} कम');
   }
 
   /// What the progress bar fills toward, or null when there is nothing to
@@ -379,7 +371,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(_p('Held back until $min people have activated',
-              '$min log activate karenge tab tak rok rakha hai'),
+              '$min लोगों के चालू करने तक यह नहीं दिखाया जाएगा'),
               style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           Text(
@@ -387,9 +379,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 'In a small group, "two consultations this month" is close '
                     'enough to a name. We would rather show you nothing than '
                     'show you someone.',
-                'Chhote group mein "is mahine do consultations" lagbhag ek naam '
-                    'hi hai. Aapko kuch na dikhana behtar hai, kisi ko dikhane '
-                    'se.'),
+                'छोटे समूह में — इस महीने दो कंसल्टेशन — यह कहना क़रीब-क़रीब नाम बता देने जैसा है। किसी एक इंसान को दिखा देने से बेहतर है कि हम आपको कुछ न दिखाएँ।'),
             style:
                 t.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.45),
           ),
@@ -436,9 +426,9 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 Text(
                   r.isActive
                       ? _p('Activated ${_date(r.activatedAt)}',
-                          '${_date(r.activatedAt)} ko activated')
+                          '${_date(r.activatedAt)} को चालू हुआ')
                       : _p('Removed ${_date(r.removedAt)}',
-                          '${_date(r.removedAt)} ko removed'),
+                          '${_date(r.removedAt)} को हटाया गया'),
                   style: t.labelSmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
@@ -446,7 +436,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
           ),
           if (r.isActive)
             IconButton(
-              tooltip: _p('Remove', 'Remove karo'),
+              tooltip: _p('Remove', 'हटाइए'),
               icon: const Icon(Icons.person_remove_outlined,
                   size: 19, color: AppTheme.neutral400),
               onPressed: () => _confirmRemove(r),
@@ -460,7 +450,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(_p('Remove ${r.workEmail}?', '${r.workEmail} hatayein?')),
+        title: Text(_p('Remove ${r.workEmail}?', '${r.workEmail} को हटाएँ?')),
         content: Text(
           // Say exactly what is lost and what is not. Someone who bought
           // Premium themselves keeps it — that is what `source` on the
@@ -469,9 +459,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               'Their seat is freed and the plan your organisation provides is '
                   'withdrawn. Anything they bought themselves is untouched, and '
                   'their journal, photos and records stay theirs.',
-              'Unki seat free ho jayegi aur organisation ka diya plan hat '
-                  'jayega. Jo unhone khud kharida hai woh waise hi rahega, aur '
-                  'unka journal, photos aur records unke hi rahenge.'),
+              'उनकी सीट ख़ाली हो जाएगी और आपकी कंपनी का दिया प्लान हट जाएगा। जो उन्होंने ख़ुद ख़रीदा है उसे कुछ नहीं होगा, और उनका जर्नल, तस्वीरें और रिकॉर्ड उनके ही रहेंगे।'),
         ),
         actions: [
           TextButton(
@@ -492,8 +480,8 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(res['ok'] == true
-          ? _p('${r.workEmail} removed.', '${r.workEmail} hata diya.')
-          : (res['message'] ?? _p('That did not work.', 'Yeh nahi hua.'))
+          ? _p('${r.workEmail} removed.', '${r.workEmail} हटा दिया गया।')
+          : (res['message'] ?? _p('That did not work.', 'यह नहीं हो पाया।'))
               .toString()),
     ));
   }

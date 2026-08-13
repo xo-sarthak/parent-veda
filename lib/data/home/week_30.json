@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Iron Feels Low", "hi": "जब Iron कम लगने लगे" },
-      "content": { "en": "If you feel more tired or breathless than usual now, your iron may be running low. Pair iron-rich foods like spinach, dates and lentils with a little lemon or amla — the vitamin C helps your body absorb the iron.", "hi": "अगर अब आप आम दिनों से ज़्यादा थकी या साँस फूलती महसूस करती हैं, तो हो सकता है आपका Iron कम चल रहा हो। Iron से भरपूर चीज़ें — पालक, खजूर और दाल — थोड़े नींबू या आँवले के साथ लीजिए; Vitamin C शरीर को Iron सोखने में मदद करता है।" },
-      "remember": { "en": "A squeeze of lemon helps your body take in more iron.", "hi": "थोड़ा-सा नींबू निचोड़ लेना शरीर को ज़्यादा Iron लेने में मदद करता है।" },
+      "title": { "en": "When Iron Feels Low", "hi": "जब आयरन कम लगने लगे" },
+      "content": { "en": "If you feel more tired or breathless than usual now, your iron may be running low. Pair iron-rich foods like spinach, dates and lentils with a little lemon or amla — the vitamin C helps your body absorb the iron.", "hi": "अगर अब आप आम दिनों से ज़्यादा थकी या साँस फूलती महसूस करती हैं, तो हो सकता है आपका आयरन कम चल रहा हो। आयरन से भरपूर चीज़ें — पालक, खजूर और दाल — थोड़े नींबू या आँवले के साथ लीजिए; Vitamin C शरीर को आयरन सोखने में मदद करता है।" },
+      "remember": { "en": "A squeeze of lemon helps your body take in more iron.", "hi": "थोड़ा-सा नींबू निचोड़ लेना शरीर को ज़्यादा आयरन लेने में मदद करता है।" },
       "durationMinutes": 0
     }
   },

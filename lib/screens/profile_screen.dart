@@ -963,14 +963,13 @@ class _EmployerBenefitsCard extends StatelessWidget {
           title: S.now.uiEmployerBenefits,
           subtitle: active
               ? (hinglish
-                  ? 'ParentVeda Premium — ${sponsor.name} ki taraf se.'
+                  ? 'ParentVeda Premium — ${sponsor.name} की तरफ़ से।'
                   : 'ParentVeda Premium, provided by ${sponsor.name}.')
               : (hinglish
-                  ? 'Ho sakta hai aapki company ParentVeda ka kharcha uthati '
-                      'ho. Work email se check kar lijiye.'
+                  ? 'हो सकता है आपकी कंपनी ParentVeda का ख़र्च उठाती हो। अपने ऑफ़िस की ईमेल से देख लीजिए।'
                   : 'Your employer may already provide ParentVeda. Check with '
                       'your work email.'),
-          trailing: active ? (hinglish ? 'Chalu' : 'Active') : '',
+          trailing: active ? (hinglish ? 'चालू' : 'Active') : '',
           icon: active
               ? Icons.workspace_premium_outlined
               : Icons.business_outlined,

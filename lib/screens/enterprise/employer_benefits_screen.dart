@@ -88,12 +88,11 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
         children: [
           EnterpriseHeading(
             _p('No employer benefit is active.',
-                'Koi employer benefit active nahi hai.'),
+                'कंपनी की कोई सुविधा अभी चालू नहीं है।'),
             sub: _p(
                 'If your company sponsors ParentVeda, activate it with your '
                     'work email.',
-                'Agar aapki company ParentVeda sponsor karti hai, work email se '
-                    'activate kar lijiye.'),
+                'अगर आपकी कंपनी ParentVeda का ख़र्च उठाती है, तो अपने ऑफ़िस वाले ईमेल से इसे चालू कीजिए।'),
           ),
         ],
       );
@@ -137,7 +136,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                   const SizedBox(height: 3),
                   Text(
                     _p('Provided by ${sponsor.name}',
-                        '${sponsor.name} ki taraf se'),
+                        '${sponsor.name} की तरफ़ से'),
                     style: t.bodySmall?.copyWith(color: AppTheme.neutral600),
                   ),
                 ],
@@ -179,14 +178,11 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                       ? _p(
                           'Book with any ParentVeda doctor or counsellor. Your '
                               'employer is not told who you saw or why.',
-                          'Kisi bhi ParentVeda doctor ya counsellor se book '
-                              'karo. Employer ko yeh nahi pata chalta ki kisse '
-                              'mile ya kyun.')
+                          'किसी भी ParentVeda डॉक्टर या काउंसलर से मिलने का समय बुक कीजिए। आपकी कंपनी को यह नहीं बताया जाता कि आप किससे मिलीं और क्यों।')
                       : _p(
                           'You have used this year\'s consultations. They renew '
                               'when your company renews.',
-                          'Is saal ki consultations use ho chuki hain. Company '
-                              'renew karegi to yeh bhi renew ho jayengi.'),
+                          'इस साल के कंसल्टेशन इस्तेमाल हो चुके हैं। जब आपकी कंपनी इसे फिर से लेगी, तब ये भी फिर से मिल जाएँगे।'),
                   style: t.bodySmall
                       ?.copyWith(color: AppTheme.neutral600, height: 1.45),
                 ),
@@ -197,7 +193,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                   const SizedBox(height: 6),
                   Text(
                     _p('$creditsSpent used so far.',
-                        'Ab tak $creditsSpent use hui.'),
+                        'अब तक $creditsSpent कंसल्टेशन इस्तेमाल हुए।'),
                     style: t.labelSmall?.copyWith(color: AppTheme.neutral400),
                   ),
                 ],
@@ -205,7 +201,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _p('Valid until ${_date(creditExpires)}',
-                        '${_date(creditExpires)} tak valid'),
+                        '${_date(creditExpires)} तक मान्य'),
                     style: t.labelSmall?.copyWith(color: AppTheme.neutral400),
                   ),
                 ],
@@ -221,7 +217,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
           icon: Icons.school_outlined,
           title: _p('Masterclasses', 'Masterclasses'),
           body: _p('Paid sessions, included in your plan.',
-              'Paid sessions, aapke plan mein included.'),
+              'जिन सेशन के पैसे लगते हैं, वे आपके प्लान में शामिल हैं।'),
         ),
         _capabilityRow(
           on: ent.can(Caps.sponsorEvents),
@@ -230,8 +226,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
           body: _p(
               'Sessions your organisation runs for its parents. Nothing is '
                   'scheduled yet — you will see them here.',
-              'Aapka organisation apne parents ke liye jo sessions rakhta hai. '
-                  'Abhi kuch schedule nahi hai — yahin dikhenge.'),
+              'आपकी कंपनी अपने यहाँ के माता-पिता के लिए जो सेशन रखती है। अभी कुछ तय नहीं हुआ है — जब होगा, यहीं दिखेगा।'),
         ),
         _capabilityRow(
           on: ent.can(Caps.sponsorResources),
@@ -240,8 +235,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
           body: _p(
               'Your organisation\'s own parenting policy and guides. Never '
                   'medical advice — that always comes from us or your doctor.',
-              'Aapke organisation ki apni parenting policy aur guides. Medical '
-                  'advice kabhi nahi — woh hamesha hamse ya aapke doctor se.'),
+              'आपकी कंपनी की अपनी परवरिश नीति और गाइड। डॉक्टरी सलाह कभी नहीं — वह हमेशा हमसे या आपके डॉक्टर से आती है।'),
         ),
 
         const SizedBox(height: 14),
@@ -273,7 +267,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                       const SizedBox(height: 3),
                       Text(
                         _p('Take-up across ${sponsor.name}.',
-                            '${sponsor.name} mein kitna use ho raha hai.'),
+                            '${sponsor.name} में अब तक कितने लोगों ने इसे लिया है।'),
                         style:
                             t.bodySmall?.copyWith(color: AppTheme.neutral600),
                       ),
@@ -296,7 +290,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(_p('Questions about the benefit',
-                    'Benefit ke baare mein sawaal'),
+                    'सुविधा के बारे में सवाल'),
                     style:
                         t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 6),
@@ -305,9 +299,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                       'Anything about seats, renewal or eligibility goes to '
                           '${sponsor.supportContact}. Anything about your '
                           'pregnancy or your baby stays with us.',
-                      'Seats, renewal ya eligibility ke liye '
-                          '${sponsor.supportContact}. Pregnancy ya baby ki baat '
-                          'hamare paas hi rehti hai.'),
+                      'सीट, नवीनीकरण या पात्रता से जुड़ी कोई भी बात ${sponsor.supportContact} पर पूछिए। आपकी गर्भावस्था या आपके शिशु से जुड़ी हर बात हमारे पास ही रहती है।'),
                   style: t.bodySmall
                       ?.copyWith(color: AppTheme.neutral600, height: 1.45),
                 ),
@@ -331,7 +323,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                     size: 18, color: AppTheme.primary600),
                 const SizedBox(width: 8),
                 Text(_p('What ${sponsor.name} sees',
-                    '${sponsor.name} kya dekhta hai'),
+                    '${sponsor.name} को क्या दिखता है'),
                     style:
                         t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
               ]),
@@ -342,9 +334,7 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
                         'used across everyone. That is the whole list. They '
                         'cannot see your pregnancy, your child, your journal, '
                         'your questions, your searches or your appointments.',
-                    'Kitne logon ne activate kiya, aur sab milakar kitni '
-                        'consultations use hui. Bas itna. Aapki pregnancy, baby, '
-                        'journal, sawaal, search ya appointments — kuch nahi.'),
+                    'कितने लोगों ने चालू किया, और सब मिलाकर कितने कंसल्टेशन इस्तेमाल हुए। बस इतनी ही सूची है। आपकी गर्भावस्था, आपका शिशु, आपका जर्नल, आपके सवाल, आपकी खोज या आपके अपॉइंटमेंट — इनमें से कुछ भी उन्हें नहीं दिखता।'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.5),
               ),

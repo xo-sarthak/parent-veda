@@ -211,7 +211,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  en ? 'My Bump Journey Book' : 'Meri Bump Journey Book',
+                  en ? 'My Bump Journey Book' : 'मेरे बंप की किताब',
                   style: pvJakarta(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
@@ -221,7 +221,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                 Text(
                   en
                       ? 'Flip through your weeks - view, download or print'
-                      : 'Apne hafte flip karein - view, download ya print',
+                      : 'अपने हफ़्ते पलटिए — देखिए, डाउनलोड कीजिए या प्रिंट कीजिए',
                   style: pvManrope(
                       fontSize: 12,
                       height: 1.3,

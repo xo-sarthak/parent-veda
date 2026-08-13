@@ -139,7 +139,7 @@ final Map<String, _Cat> _catalog = {
 
   // For partner -------------------------------------------------------------
   'partner_snacks': _Cat('🍪', 199, _t('ParentVeda Snack Pack', 'ParentVeda नाश्ते का पैक'),
-      why: [_t('Keeps your partner going', 'आपके पार्टनर को चलता रखता है'), _t('Long shelf life', 'लंबे समय तक ख़राब नहीं होता')]),
+      why: [_t('Keeps your partner going', 'आपके साथी को चलता रखता है'), _t('Long shelf life', 'लंबे समय तक ख़राब नहीं होता')]),
   'partner_charger': _Cat('🔋', 999, _same('ParentVeda Power Bank'),
       why: [_t('Long cable for hospital beds', 'अस्पताल के बिस्तर के लिए लंबी तार'), _t('Backup power for long stays', 'लंबे ठहराव के लिए बैकअप पावर')]),
   'partner_toiletries': _Cat('🧼', 249, _t('ParentVeda Travel Kit', 'ParentVeda सफ़र किट'),

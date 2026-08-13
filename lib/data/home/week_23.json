@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Iron Feels Low", "hi": "जब Iron कम पड़ने लगे" },
-      "content": { "en": "If you feel more tired or dizzy than usual, your body may be asking for more iron now. Pair iron-rich foods like spinach, dates, jaggery or lentils with a little lemon or amla — the vitamin C helps your body soak it up.", "hi": "अगर आप आम से ज़्यादा थकी या चक्कर जैसा महसूस करती हैं, तो हो सकता है आपका शरीर अभी और Iron माँग रहा हो। Iron से भरपूर चीज़ें — पालक, खजूर, गुड़ या दाल — थोड़े नींबू या आँवले के साथ लीजिए; उनका Vitamin C शरीर को उसे सोखने में मदद करता है।" },
-      "remember": { "en": "A little vitamin C helps iron do its quiet work.", "hi": "थोड़ा सा Vitamin C, Iron को उसका चुपचाप काम करने में मदद करता है।" },
+      "title": { "en": "When Iron Feels Low", "hi": "जब आयरन कम पड़ने लगे" },
+      "content": { "en": "If you feel more tired or dizzy than usual, your body may be asking for more iron now. Pair iron-rich foods like spinach, dates, jaggery or lentils with a little lemon or amla — the vitamin C helps your body soak it up.", "hi": "अगर आप आम से ज़्यादा थकी या चक्कर जैसा महसूस करती हैं, तो हो सकता है आपका शरीर अभी और आयरन माँग रहा हो। आयरन से भरपूर चीज़ें — पालक, खजूर, गुड़ या दाल — थोड़े नींबू या आँवले के साथ लीजिए; उनका Vitamin C शरीर को उसे सोखने में मदद करता है।" },
+      "remember": { "en": "A little vitamin C helps iron do its quiet work.", "hi": "थोड़ा सा Vitamin C, आयरन को उसका चुपचाप काम करने में मदद करता है।" },
       "durationMinutes": 0
     }
   },

@@ -104,7 +104,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   // Friendly WhatsApp-style opener.
                   Text(
                     _t("Hi! Here's your Week ${w.week} update 💜",
-                        'Namaste! Yeh raha aapka Hafta ${w.week} ka update 💜'),
+                        'नमस्ते! यह रहा आपका हफ़्ता ${w.week} का अपडेट 💜'),
                     style: pvJakarta(
                         fontSize: 16.5,
                         fontWeight: FontWeight.w700,
@@ -124,7 +124,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   _sectionLabel(
                       Icons.monitor_heart_rounded,
                       accent,
-                      _t("Baby's development", 'Baby ka vikas')),
+                      _t("Baby's development", 'शिशु का विकास')),
                   const SizedBox(height: 14),
                   for (int i = 0; i < stats.length; i++) ...[
                     _StatBar(stat: stats[i], accent: accent, lang: lang),
@@ -133,7 +133,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
                   if (tips.isNotEmpty) ...[
                     const SizedBox(height: 22),
                     _sectionLabel(Icons.tips_and_updates_rounded,
-                        AppTheme.tertiary500, _t("This week's tips", 'Is hafte ke tips')),
+                        AppTheme.tertiary500, _t("This week's tips", 'इस हफ़्ते के सुझाव')),
                     const SizedBox(height: 12),
                     for (final tip in tips)
                       Padding(
@@ -167,7 +167,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_t("This week's update", 'Is hafte ka update'),
+              Text(_t("This week's update", 'इस हफ़्ते का अपडेट'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: pvJakarta(

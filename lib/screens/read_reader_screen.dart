@@ -137,18 +137,18 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     final out = <(String, String)>[];
     if (a.hasCompanion) {
       final c = a.companion!;
-      if (c.about.en.isNotEmpty) out.add(('about', _tr('About the book', 'Book ke baare mein')));
-      if (c.philosophy.en.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'Mool vichaar')));
-      if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'Zaroori ideas')));
-      if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'Chapter dar chapter')));
-      if (c.perspective.en.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda ki raay')));
-      if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'Yaadgaar baatein')));
+      if (c.about.en.isNotEmpty) out.add(('about', _tr('About the book', 'किताब के बारे में')));
+      if (c.philosophy.en.isNotEmpty) out.add(('philosophy', _tr('Core philosophy', 'मूल विचार')));
+      if (c.ideas.isNotEmpty) out.add(('ideas', _tr('Key ideas', 'ज़रूरी बातें')));
+      if (c.chapters.isNotEmpty) out.add(('chapters', _tr('Chapter by chapter', 'अध्याय दर अध्याय')));
+      if (c.perspective.en.isNotEmpty) out.add(('perspective', _tr('ParentVeda\'s take', 'ParentVeda की राय')));
+      if (c.quotes.isNotEmpty) out.add(('quotes', _tr('Memorable lines', 'यादगार पंक्तियाँ')));
       return out;
     }
     out.add(('read',
-        a.type == ReadType.book ? _tr('Why we recommend it', 'Kyun recommend karte hain') : _tr('The read', 'Padhein')));
-    if (a.hasWhyThisMatters) out.add(('why', _tr('Why this matters', 'Yeh kyun zaroori hai')));
-    if (a.hasResearchSimplified) out.add(('research', _tr('Research simplified', 'Research aasan bhaasha mein')));
+        a.type == ReadType.book ? _tr('Why we recommend it', 'हम इसे क्यों सुझाते हैं') : _tr('The read', 'लेख')));
+    if (a.hasWhyThisMatters) out.add(('why', _tr('Why this matters', 'यह क्यों ज़रूरी है')));
+    if (a.hasResearchSimplified) out.add(('research', _tr('Research simplified', 'शोध, आसान भाषा में')));
     if (a.hasMythFact) out.add(('myth', _tr('Myth vs Fact', 'Myth vs Fact')));
     return out;
   }
@@ -237,7 +237,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           _anchor('why'),
           _pad(_infoBlock(t,
               icon: Icons.favorite_border_rounded,
-              title: _tr('Why this matters', 'Yeh kyun zaroori hai'),
+              title: _tr('Why this matters', 'यह क्यों ज़रूरी है'),
               body: a.whyThisMatters.now,
               tint: t.accent)),
           const SizedBox(height: 20),
@@ -246,7 +246,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           _anchor('research'),
           _pad(_infoBlock(t,
               icon: Icons.science_outlined,
-              title: _tr('Research simplified', 'Research aasan bhaasha mein'),
+              title: _tr('Research simplified', 'शोध, आसान भाषा में'),
               body: a.researchSimplified.now,
               tint: const Color(0xFF3FA56A))),
           const SizedBox(height: 20),
@@ -284,7 +284,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         _iconBtn(t, saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             () => ReadNextStore.instance.toggleSave(a.id),
             color: saved ? _progressColor : null),
-        _iconBtn(t, Icons.ios_share_rounded, () => _soon(_tr('Sharing coming soon', 'Sharing jald aa raha hai'))),
+        _iconBtn(t, Icons.ios_share_rounded, () => _soon(_tr('Sharing coming soon', 'शेयर करना जल्द आ रहा है'))),
       ]),
     );
   }
@@ -461,21 +461,21 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       if (a.hasRating) ...[_pad(_ratingRow(t)), const SizedBox(height: 18)],
       if (c.about.en.isNotEmpty) ...[
         _anchor('about'),
-        _pad(_secTitle(t, _tr('What this book is about', 'Yeh book kis baare mein hai'))),
+        _pad(_secTitle(t, _tr('What this book is about', 'यह किताब किस बारे में है'))),
         const SizedBox(height: 10),
         _pad(Text(c.about.now, style: _bodyStyle(t))),
         const SizedBox(height: 22),
       ],
       if (c.philosophy.en.isNotEmpty) ...[
         _anchor('philosophy'),
-        _pad(_infoBlock(t, icon: Icons.auto_awesome_outlined, title: _tr('Core philosophy', 'Mool vichaar'), body: c.philosophy.now, tint: t.accent)),
+        _pad(_infoBlock(t, icon: Icons.auto_awesome_outlined, title: _tr('Core philosophy', 'मूल विचार'), body: c.philosophy.now, tint: t.accent)),
         const SizedBox(height: 22),
       ],
       if (c.ideas.isNotEmpty) ...[
         _anchor('ideas'),
-        _pad(_secTitle(t, _tr('The most important ideas', 'Sabse zaroori ideas'))),
+        _pad(_secTitle(t, _tr('The most important ideas', 'सबसे ज़रूरी बातें'))),
         const SizedBox(height: 4),
-        _pad(Text(_tr('Tap any idea to open it.', 'Kisi bhi idea ko kholne ke liye tap karein.'),
+        _pad(Text(_tr('Tap any idea to open it.', 'किसी भी बात को खोलने के लिए उस पर टैप कीजिए।'),
             style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
         const SizedBox(height: 14),
         for (var i = 0; i < c.ideas.length; i++) _pad(_ideaCard(t, i, c.ideas[i])),
@@ -484,9 +484,9 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       // Chapters come before ParentVeda's take — the take is the closing note.
       if (c.chapters.isNotEmpty) ...[
         _anchor('chapters'),
-        _pad(_secTitle(t, _tr('Chapter by chapter', 'Chapter dar chapter'))),
+        _pad(_secTitle(t, _tr('Chapter by chapter', 'अध्याय दर अध्याय'))),
         const SizedBox(height: 4),
-        _pad(Text(_tr('Tap any chapter to open its key points.', 'Kisi bhi chapter ko kholne ke liye tap karein.'),
+        _pad(Text(_tr('Tap any chapter to open its key points.', 'किसी भी अध्याय की मुख्य बातें देखने के लिए उस पर टैप कीजिए।'),
             style: pvManrope(fontSize: 13 * _fs, height: 1.5, color: t.soft))),
         const SizedBox(height: 14),
         for (var i = 0; i < c.chapters.length; i++) _pad(_chapterCard(t, i, c.chapters[i])),
@@ -499,7 +499,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       ],
       if (c.quotes.isNotEmpty) ...[
         _anchor('quotes'),
-        _pad(_secTitle(t, _tr('Memorable lines', 'Yaadgaar baatein'))),
+        _pad(_secTitle(t, _tr('Memorable lines', 'यादगार पंक्तियाँ'))),
         const SizedBox(height: 12),
         for (final q in c.quotes) _pad(_quoteCard(t, q.now)),
       ],
@@ -515,13 +515,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         decoration: BoxDecoration(color: t.panel, borderRadius: BorderRadius.circular(15)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (c.recommendedFor.isNotEmpty) ...[
-            Text(_tr('BEST FOR', 'KISKE LIYE'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            Text(_tr('BEST FOR', 'किसके लिए'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
             Wrap(spacing: 7, runSpacing: 7, children: [for (final r in c.recommendedFor) _metaChip(t, r.now, t.accent)]),
           ],
           if (c.recommendedFor.isNotEmpty && c.themes.isNotEmpty) const SizedBox(height: 14),
           if (c.themes.isNotEmpty) ...[
-            Text(_tr('THEMES', 'VISHAY'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+            Text(_tr('THEMES', 'विषय'), style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
             const SizedBox(height: 8),
             Wrap(spacing: 7, runSpacing: 7, children: [for (final th in c.themes) _metaChip(t, th.now, t.soft)]),
           ],
@@ -613,7 +613,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           Row(children: [
             Icon(Icons.spa_outlined, size: 16, color: t.accent),
             const SizedBox(width: 8),
-            Text(_tr('PARENTVEDA\'S TAKE', 'PARENTVEDA KI RAAY'),
+            Text(_tr('PARENTVEDA\'S TAKE', 'ParentVeda की राय'),
                 style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.accent)),
           ]),
           const SizedBox(height: 11),
@@ -659,7 +659,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             style: pvManrope(fontSize: 13.5 * _fs, height: 1.55, color: t.soft)),
         if (open && ch.keyPoints.isNotEmpty) ...[
           const SizedBox(height: 14),
-          Text(_tr('KEY POINTS COVERED', 'MUKHYA BINDU'), style: _companionLabel(t)),
+          Text(_tr('KEY POINTS COVERED', 'मुख्य बातें'), style: _companionLabel(t)),
           const SizedBox(height: 8),
           // Chapters with a natural sub-structure ("Baby's Development", the
           // three stages of labour) group their points under a bold sub-label.
@@ -689,7 +689,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           behavior: HitTestBehavior.opaque,
           onTap: () => setState(() => open ? _expandedChapters.remove(index) : _expandedChapters.add(index)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(open ? _tr('Show less', 'Kam dikhayein') : _tr('Read more', 'Aur padhein'),
+            Text(open ? _tr('Show less', 'कम दिखाइए') : _tr('Read more', 'और पढ़िए'),
                 style: pvManrope(fontSize: 12.5 * _fs, fontWeight: FontWeight.w800, color: t.accent)),
             const SizedBox(width: 3),
             Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: t.accent),
@@ -787,10 +787,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     final next = _readNextItems();
     if (next.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(_tr('Read next', 'Aage padhein'),
+      Text(_tr('Read next', 'आगे पढ़िए'),
           style: pvFraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
-      Text(_tr('Keep reading - more on this, one after another.', 'Padhte rahein - isi par aur.'),
+      Text(_tr('Keep reading - more on this, one after another.', 'पढ़ते रहिए - इसी पर और भी, एक के बाद एक।'),
           style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
@@ -854,7 +854,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                     height: 4,
                     decoration: BoxDecoration(color: t.rule, borderRadius: BorderRadius.circular(999)))),
             const SizedBox(height: 16),
-            Text(_tr('In this read', 'Is read mein'),
+            Text(_tr('In this read', 'इस लेख में'),
                 style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
             const SizedBox(height: 12),
             for (final e in entries)

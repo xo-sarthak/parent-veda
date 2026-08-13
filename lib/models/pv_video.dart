@@ -113,7 +113,7 @@ const List<PvVideo> kVideos = [
     title: LocalizedText(en: 'Getting Ready for Labour', hi: 'प्रसव के लिए तैयारी'),
     reason: LocalizedText(
         en: 'Signs to watch for as your due date comes closer.',
-        hi: 'प्रसव की तारीख़ पास आते-आते किन बातों पर ध्यान देना है।'),
+        hi: 'डिलीवरी की तारीख़ पास आते-आते किन बातों पर ध्यान देना है।'),
   ),
 
   // ---- Learn a skill --------------------------------------------------------

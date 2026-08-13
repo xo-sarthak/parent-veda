@@ -343,9 +343,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       (CalEventCategory.appointment, s.calFilterAppointments),
       // Task 3: "Medical" is displayed as "Tests & Scans" (enum stays `medical`).
       (CalEventCategory.medical,
-          s.lang.isHinglish ? 'Tests & Scans' : 'Tests & Scans'),
+          s.lang.isHinglish ? 'जाँच और स्कैन' : 'Tests & Scans'),
       (CalEventCategory.program,
-          s.lang.isHinglish ? 'Programs' : 'Programs'),
+          s.lang.isHinglish ? 'प्रोग्राम' : 'Programs'),
       // (CalEventCategory.journal, s.calFilterJournal),
       // (CalEventCategory.personal, s.calFilterPersonal),
       // (CalEventCategory.parentveda, s.calFilterParentveda),
@@ -1266,7 +1266,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       (CalEventCategory.appointment, s.calMeanAppointment),
       (CalEventCategory.program,
           s.lang.isHinglish
-              ? 'Aapka enrolled program ya class'
+              ? 'कोई प्रोग्राम या क्लास जिसमें आपने नाम लिखवाया है'
               : 'A program or class you enrolled in'),
       (CalEventCategory.journal, s.calMeanJournal),
       (CalEventCategory.personal, s.calMeanPersonal),
@@ -1372,10 +1372,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
         CalEventCategory.milestone => s.calFilterMilestones,
         // Task 3: "Medical" displays as "Tests & Scans" (enum unchanged).
         CalEventCategory.medical =>
-          s.lang.isHinglish ? 'Tests & Scans' : 'Tests & Scans',
+          s.lang.isHinglish ? 'जाँच और स्कैन' : 'Tests & Scans',
         CalEventCategory.appointment => s.calFilterAppointments,
         CalEventCategory.program =>
-          s.lang.isHinglish ? 'Programs' : 'Programs',
+          s.lang.isHinglish ? 'प्रोग्राम' : 'Programs',
         CalEventCategory.journal => s.calFilterJournal,
         CalEventCategory.personal => s.calFilterPersonal,
         CalEventCategory.parentveda => s.calFilterParentveda,
@@ -1386,7 +1386,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         CalEventCategory.medical => s.calMeanMedical,
         CalEventCategory.appointment => s.calMeanAppointment,
         CalEventCategory.program => s.lang.isHinglish
-            ? 'Aapka enrolled program ya class'
+            ? 'कोई प्रोग्राम या क्लास जिसमें आपने नाम लिखवाया है'
             : 'A program or class you enrolled in',
         CalEventCategory.journal => s.calMeanJournal,
         CalEventCategory.personal => s.calMeanPersonal,

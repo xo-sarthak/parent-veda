@@ -33,7 +33,7 @@ String activationMessage(AppLanguage lang, Map<String, dynamic> res) {
   switch (code) {
     case 'invalid_email':
       return ep(lang, 'That does not look like an email address.',
-          'Yeh email address jaisa nahi lag raha.');
+          'यह ईमेल पते जैसा नहीं लग रहा।');
     case 'not_eligible':
       // Deliberately vague, and it must STAY vague. The server answers the
       // same way for an unknown domain and for a customer whose contract
@@ -44,49 +44,47 @@ String activationMessage(AppLanguage lang, Map<String, dynamic> res) {
           lang,
           'We could not find a benefit for that email address. Check with your '
               'HR team that they use the address you typed.',
-          'Is email par koi benefit nahi mila. Apni HR team se check karo ki '
-              'wahi address use hota hai jo aapne likha.');
+          'इस ईमेल पते पर कोई सुविधा नहीं मिली। अपनी HR टीम से पूछ लीजिए कि उनके पास वही पता है जो आपने लिखा।');
     case 'already_activated':
       return ep(
           lang,
           'This work email has already been used to activate the benefit.',
-          'Is work email se benefit pehle hi activate ho chuka hai.');
+          'इस ऑफ़िस वाले ईमेल से यह सुविधा पहले ही चालू की जा चुकी है।');
     case 'no_seats_left':
       return ep(
           lang,
           'All the seats your organisation purchased are in use. Your HR team '
               'can add more.',
-          'Aapke organisation ne jitni seats li thi, sab use ho chuki hain. HR '
-              'team aur add kar sakti hai.');
+          'आपकी कंपनी ने जितनी सीट ली थीं, सब इस्तेमाल में हैं। आपकी HR टीम और सीट जोड़ सकती है।');
     case 'too_many_requests':
       return ep(lang, 'Too many codes requested. Try again in an hour.',
-          'Bahut saare codes maang liye. Ek ghante baad try karo.');
+          'बहुत सारे कोड माँगे जा चुके हैं। एक घंटे बाद फिर कोशिश कीजिए।');
     case 'not_signed_in':
       return ep(lang, 'Sign in first, then activate your employer benefit.',
-          'Pehle sign in karo, phir employer benefit activate karo.');
+          'पहले साइन इन कीजिए, फिर कंपनी की सुविधा चालू कीजिए।');
     case 'no_pending_code':
       return ep(lang, 'That code has gone. Ask for a new one.',
-          'Woh code ab valid nahi hai. Naya mangao.');
+          'वह कोड अब काम का नहीं रहा। नया कोड माँग लीजिए।');
     case 'code_expired':
       return ep(lang, 'That code has expired. Ask for a new one.',
-          'Code expire ho gaya. Naya mangao.');
+          'उस कोड का समय ख़त्म हो गया। नया कोड माँग लीजिए।');
     case 'too_many_attempts':
       return ep(lang, 'Too many incorrect codes. Ask for a new one.',
-          'Bahut baar galat code. Naya mangao.');
+          'बहुत बार ग़लत कोड डाला गया। नया कोड माँग लीजिए।');
     case 'wrong_code':
-      return ep(lang, 'That code is not right.', 'Yeh code sahi nahi hai.');
+      return ep(lang, 'That code is not right.', 'यह कोड सही नहीं है।');
     case 'sponsor_inactive':
       return ep(lang, 'This benefit is no longer active.',
-          'Yeh benefit ab active nahi hai.');
+          'यह सुविधा अब चालू नहीं है।');
     case 'network_error':
       return ep(
           lang,
           'We could not reach ParentVeda. Check your connection and try again.',
-          'ParentVeda tak nahi pahunch paye. Connection check karke try karo.');
+          'ParentVeda तक पहुँच नहीं पाए। अपना कनेक्शन देखकर फिर कोशिश कीजिए।');
     default:
       return fallback.isEmpty
           ? ep(lang, 'Something went wrong. Try again.',
-              'Kuch galat ho gaya. Dobara try karo.')
+              'कुछ गड़बड़ हो गई। फिर कोशिश कीजिए।')
           : fallback;
   }
 }

@@ -31,7 +31,7 @@ const Map<int, List<TrimesterTip>> kTrimesterTipsV2 = {
           hi: 'अपने anomaly scan का पूरा फ़ायदा लीजिए'),
       body: LocalizedText(
           en: "Around weeks 18–22, this detailed scan checks your baby's heart, brain, spine and organs, and how they're growing. You can usually bring your partner - and it's perfectly fine to ask the sonographer to explain what they're measuring. Most findings are reassuring.",
-          hi: 'लगभग 18–22 हफ़्ते में यह विस्तृत स्कैन शिशु के दिल, दिमाग़, रीढ़ और अंगों की बढ़त जाँचता है। आप अपने पार्टनर को साथ ला सकती हैं — और sonographer से यह पूछना बिलकुल ठीक है कि वे क्या माप रहे हैं। ज़्यादातर नतीजे राहत देने वाले होते हैं।'),
+          hi: 'लगभग 18–22 हफ़्ते में यह विस्तृत स्कैन शिशु के दिल, दिमाग़, रीढ़ और अंगों की बढ़त जाँचता है। आप अपने साथी को साथ ला सकती हैं — और sonographer से यह पूछना बिलकुल ठीक है कि वे क्या माप रहे हैं। ज़्यादातर नतीजे राहत देने वाले होते हैं।'),
     ),
     TrimesterTip(
       emoji: '🛌',

@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Iron Feels Low", "hi": "जब Iron कम पड़ने लगे" },
-      "content": { "en": "If you feel more tired or pale than usual, your iron may be running low as your baby grows. Try adding iron-rich foods like leafy greens, lentils and jaggery, and pair them with a little vitamin C, like lemon or amla, to help your body absorb more.", "hi": "अगर आप आम से ज़्यादा थकी या पीली महसूस करती हैं, तो हो सकता है बच्चे के बढ़ने के साथ आपका Iron कम पड़ रहा हो। खाने में Iron से भरपूर चीज़ें जोड़िए — हरी पत्तेदार सब्ज़ियाँ, दाल और गुड़ — और उनके साथ थोड़ा Vitamin C भी लीजिए, जैसे नींबू या आँवला, ताकि शरीर उसे ज़्यादा सोख सके।" },
-      "remember": { "en": "A little vitamin C helps iron do its quiet work.", "hi": "थोड़ा सा Vitamin C, Iron को उसका चुपचाप वाला काम करने में मदद करता है।" },
+      "title": { "en": "When Iron Feels Low", "hi": "जब आयरन कम पड़ने लगे" },
+      "content": { "en": "If you feel more tired or pale than usual, your iron may be running low as your baby grows. Try adding iron-rich foods like leafy greens, lentils and jaggery, and pair them with a little vitamin C, like lemon or amla, to help your body absorb more.", "hi": "अगर आप आम से ज़्यादा थकी या पीली महसूस करती हैं, तो हो सकता है बच्चे के बढ़ने के साथ आपका आयरन कम पड़ रहा हो। खाने में आयरन से भरपूर चीज़ें जोड़िए — हरी पत्तेदार सब्ज़ियाँ, दाल और गुड़ — और उनके साथ थोड़ा Vitamin C भी लीजिए, जैसे नींबू या आँवला, ताकि शरीर उसे ज़्यादा सोख सके।" },
+      "remember": { "en": "A little vitamin C helps iron do its quiet work.", "hi": "थोड़ा सा Vitamin C, आयरन को उसका चुपचाप वाला काम करने में मदद करता है।" },
       "durationMinutes": 0
     }
   },

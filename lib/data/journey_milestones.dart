@@ -791,7 +791,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     sections: [
       CardSection(
         LocalizedText(en: 'What it does', hi: 'यह क्या करता है'),
-        LocalizedText(en: 'A ready checklist for your hospital bag - for you, your baby and your partner.', hi: 'आपके अस्पताल बैग के लिए तैयार चेकलिस्ट — आपके, शिशु और पार्टनर के लिए।'),
+        LocalizedText(en: 'A ready checklist for your hospital bag - for you, your baby and your partner.', hi: 'आपके अस्पताल बैग के लिए तैयार चेकलिस्ट — आपके, शिशु और साथी के लिए।'),
       ),
       CardSection(
         LocalizedText(en: 'Why it matters', hi: 'यह क्यों मायने रखता है'),

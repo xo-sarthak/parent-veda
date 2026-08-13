@@ -97,12 +97,19 @@ These are the ones most likely to make a proposal land or fail.
   Warm language is a contract: *emerging* not behind, *due now* not missed.
 - **Never a diagnosis.** Anything clinical ends with a disclaimer and routes
   calmly to a doctor.
-- **Bilingual from the first string** — English and warm spoken **Hindi in
-  Devanagari**, never retrofitted. आप for the mother, not textbook Hindi.
-  Clinical terms she reads off a bottle stay Latin (`Folate`, `Omega-3`);
-  everyday words go Devanagari. **Hinglish in Latin script was dropped on
-  2026-08-03** — if a document you were given asks for it, that document is
-  out of date.
+- **The app has exactly two languages: English in Latin script, Hindi in
+  Devanagari.** There is no third option. Bilingual from the first string,
+  never retrofitted. आप for the mother, warm spoken Hindi, not textbook Hindi.
+  Latin inside a Hindi string is allowed ONLY for what she reads in Latin
+  anyway — off a bottle, prescription or scan report (`Folate`, `Omega-3`,
+  `anomaly scan`) — plus brands and named research terms. Everyday loanwords
+  take Devanagari (स्क्रीन, फ़ोन, स्कैन), because the app narrates with the
+  `hi-IN` voice and **that voice cannot read Latin script at all**.
+  **Hinglish — Hindi in Latin script — was dropped on 2026-08-03** and fully
+  removed from the Pregnancy stage on 2026-08-12. If a document you were given
+  asks for "Round ligament mein takleef", that document is out of date.
+  Where English still appears in the Hindi build it is a **debt awaiting
+  translation**, not a style — every such string is expected to become Hindi.
 - **India-first**, not localised afterwards: real Indian kitchens, clinics,
   costs.
 - **No decorative emoji** in interface chrome.

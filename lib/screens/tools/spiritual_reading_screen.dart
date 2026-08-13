@@ -180,7 +180,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          chip(null, hinglish ? 'Sabhi' : 'All', ''),
+          chip(null, hinglish ? 'सभी' : 'All', ''),
           for (final t in traditions) chip(t.id, t.name.now, t.symbol),
         ],
       ),
@@ -447,7 +447,7 @@ class _SpiritualReadScreen extends StatelessWidget {
                             ? Icons.favorite_rounded
                             : Icons.favorite_border_rounded,
                         size: 17),
-                    label: Text(hinglish ? 'Pasand' : 'Interested',
+                    label: Text(hinglish ? 'पसंद है' : 'Interested',
                         style: const TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ),
@@ -471,7 +471,7 @@ class _SpiritualReadScreen extends StatelessWidget {
                             ? Icons.not_interested_rounded
                             : Icons.block_outlined,
                         size: 17),
-                    label: Text(hinglish ? 'Nahi chahiye' : 'Not interested',
+                    label: Text(hinglish ? 'पसंद नहीं' : 'Not interested',
                         style: const TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ),

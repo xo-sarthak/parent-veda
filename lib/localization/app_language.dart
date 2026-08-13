@@ -182,12 +182,12 @@ class S {
       'आपके गाइडेड राग और संकल्प जुड़ाव के दौर में शुरू होंगे। अभी के लिए, ऊपर दिया संकल्प प्यार से दोहराइए।');
 
   // ---- Card 7 · Partner ----------------------------------------------------
-  String get partnerEyebrow => _p('For your partner', 'आपके पार्टनर के लिए');
+  String get partnerEyebrow => _p('For your partner', 'आपके साथी के लिए');
   String get shareJourney => _p('Share the journey', 'सफ़र साझा करें');
   String get thisWeekTogether =>
       _p('This week, together', 'इस हफ़्ते, साथ में');
   String get forwardWhatsapp => _p(
-      'Forward to Partner via WhatsApp', 'पार्टनर को WhatsApp पर भेजें');
+      'Forward to Partner via WhatsApp', 'साथी को WhatsApp पर भेजें');
   String get partnerPrivacy => _p(
       'We never message anyone for you - you choose where it goes.',
       'हम आपकी तरफ़ से किसी को मैसेज नहीं करते — आप ख़ुद चुनती हैं कि यह कहाँ जाए।');
@@ -552,12 +552,12 @@ class S {
           'What are you grateful for today?',
         ]
       : const [
-          'Aaj kis baat ne aapko muskuraaya?',
-          'Abhi aap sabse zyada kis baat ke liye excited hain?',
-          'Aaj ke baare mein aap apne baby ko kya bataana chahengi?',
-          'Is hafte kis baat ne aapko hairaan kiya?',
-          'Apne baby ke liye ek message likhein.',
-          'Aaj aap kis baat ke liye shukrguzaar hain?',
+          'आज किस बात ने आपको मुस्कुरा दिया?',
+          'अभी आपको सबसे ज़्यादा किस बात का इंतज़ार है?',
+          'आज के बारे में आप अपने शिशु को क्या बताना चाहेंगी?',
+          'इस हफ़्ते किस बात ने आपको हैरान किया?',
+          'अपने शिशु के लिए एक संदेश लिखिए।',
+          'आज आप किस बात के लिए शुक्रगुज़ार हैं?',
         ];
   // Auto-entry titles.
   String jrWeekDone(int w) => _p('Week $w completed', 'हफ़्ता $w पूरा हुआ');
@@ -703,11 +703,11 @@ class S {
           'Our journey continues.',
         ]
       : const [
-          'Aaj main aur mazboot mehsoos kar rahi hoon.',
-          'Aadha safar poora ❤',
-          'Baby khoobsurati se badh raha hai.',
-          'Bahut excited feel ho raha hai.',
-          'Hamara safar jaari hai.',
+          'आज ख़ुद को और मज़बूत महसूस किया।',
+          'आधा सफ़र पूरा ❤',
+          'शिशु ख़ूबसूरती से बढ़ रहा है।',
+          'मन उत्साह से भरा है।',
+          'हमारा सफ़र जारी है।',
         ];
 
   // ===========================================================================
@@ -1199,12 +1199,12 @@ class S {
           'How can I sleep better?',
         ]
       : const [
-          'Kya main papaya kha sakti hoon?',
-          'Kya coffee safe hai?',
-          'Kya abhi kamar dard normal hai?',
-          'Acidity kam kaise karein?',
-          'Behtar neend kaise aaye?',
-          'Kya main pineapple kha sakti hoon?',
+          'क्या मैं पपीता खा सकती हूँ?',
+          'क्या कॉफ़ी पीना ठीक है?',
+          'क्या अभी कमर दर्द होना सामान्य है?',
+          'एसिडिटी कम कैसे करें?',
+          'बेहतर नींद कैसे आए?',
+          'क्या मैं अनानास खा सकती हूँ?',
         ];
 
   // ===========================================================================
@@ -1277,7 +1277,7 @@ class S {
   String get wfVideosSection => _p("This week's videos", 'इस हफ़्ते के वीडियो');
   String get wfArticlesSection => _p("This week's reads", 'इस हफ़्ते के reads');
   String get wfPartnerSection =>
-      _p('Share with your partner', 'पार्टनर के साथ साझा करें');
+      _p('Share with your partner', 'साथी के साथ साझा करें');
   String get wfTapExplore =>
       _p('Tap to explore', 'देखने के लिए टैप करें');
   String get wfBabyScience => _p('Baby Science', 'Baby Science');
@@ -1389,7 +1389,7 @@ class S {
       _p('Share update on WhatsApp', 'WhatsApp पर अपडेट भेजें');
   String get wfPartnerBlurb => _p(
       'Send your partner a crisp summary of this week - baby, you, scans and how they can help.',
-      'अपने पार्टनर को इस हफ़्ते का साफ़ ब्योरा भेजिए — शिशु, आप, स्कैन और वे कैसे मदद कर सकते हैं।');
+      'अपने साथी को इस हफ़्ते का साफ़ ब्योरा भेजिए — शिशु, आप, स्कैन और वे कैसे मदद कर सकते हैं।');
   String wfPartnerHeader(int week) =>
       _p('Our pregnancy · Week $week', 'हमारी गर्भावस्था · हफ़्ता $week');
   String get wfPartnerScans =>
@@ -2056,7 +2056,7 @@ class S {
   String get hb2CatLabour => _p('For labour', 'प्रसव के लिए');
   String get hb2CatAfter => _p('After delivery', 'डिलीवरी के बाद');
   String get hb2CatBaby => _p('For baby', 'शिशु के लिए');
-  String get hb2CatPartner => _p('For partner', 'पार्टनर के लिए');
+  String get hb2CatPartner => _p('For partner', 'साथी के लिए');
   String get hb2CatDocs => _p('Documents', 'काग़ज़ात');
   String get hb2CatComfort => _p('Comfort', 'आराम के लिए');
   String get hb2CatCustom => _p('My own', 'मेरे अपने');
@@ -2150,7 +2150,7 @@ class S {
       case 'baby':
         return _p('For baby', 'शिशु के लिए');
       case 'partner':
-        return _p('For partner', 'पार्टनर के लिए');
+        return _p('For partner', 'साथी के लिए');
       case 'documents':
         return _p('Documents', 'काग़ज़ात');
       case 'comfort':
@@ -2329,7 +2329,7 @@ class S {
   String get hbNothingHere =>
       _p('Nothing here yet.', 'यहाँ अभी कुछ नहीं।');
   // Partner share
-  String get hbSharePartner => _p('Share with partner', 'पार्टनर के साथ साझा करें');
+  String get hbSharePartner => _p('Share with partner', 'साथी के साथ साझा करें');
   String hbShareProgress(int p) => _p(
       'Our hospital bag is $p% ready ❤️',
       'हमारा अस्पताल बैग $p% तैयार है ❤️');
@@ -3029,7 +3029,7 @@ class S {
       'इस हफ़्ते, एक पिता की नज़र से।');
   String get fatherSecInsight => _p('Father Insight', 'पिता की सोच');
   String get fatherSecSupport =>
-      _p('Supporting Your Partner', 'अपनी पार्टनर का साथ');
+      _p('Supporting Your Partner', 'अपनी साथी का साथ');
   String get fatherSecConnect =>
       _p('Connecting With Your Baby', 'शिशु से जुड़ाव');
   String get fatherSecMission => _p("This Week's Mission", 'इस हफ़्ते का काम');
@@ -3884,9 +3884,9 @@ class S {
   String get uiAddDateAboveContinue => _p('Add the date above to continue — everything else is built around it.', 'ऊपर तारीख़ डालिए — बाक़ी सब उसी के हिसाब से बनता है।');
   String get uiSignAsWhichDoctor => _p('Sign in as which doctor?', 'किस डॉक्टर के रूप में साइन इन करें?');
   String get uiPairingCode => _p('Pairing code', 'जोड़ने का कोड');
-  String get uiPairingPartner => _p('Pairing you with your partner…', 'आपको आपके पार्टनर से जोड़ा जा रहा है…');
+  String get uiPairingPartner => _p('Pairing you with your partner…', 'आपको आपके साथी से जोड़ा जा रहा है…');
   String get uiReNowPairedNyour => _p("You're now paired with\nyour partner.",
-      'अब आप अपने पार्टनर से\nजुड़ गई हैं।');
+      'अब आप अपने साथी से\nजुड़ गई हैं।');
   String get uiWeReHereHelp => _p('We\'re here to help you support her and understand her journey better.', 'हम यहाँ हैं ताकि आप उनका साथ दे सकें और उनके सफ़र को बेहतर समझ सकें।');
   String get uiReAllSet => _p('You\'re all set!', 'सब तैयार है!');
   String get uiWelcomeParentvedaFamilyJourney => _p('Welcome to the ParentVeda family. Your journey begins now. 💜', 'ParentVeda परिवार में स्वागत है। आपका सफ़र अभी से शुरू। 💜');
@@ -3914,7 +3914,7 @@ class S {
   String get uiKeyPointsCovered => _p('KEY POINTS COVERED', 'मुख्य बातें');
   String get uiBack => _p('Back', 'वापस');
   String get uiFifteenPremiumBrandProducts => _p('Fifteen premium brand products, plus Certification. Every one is a real placement in the real app - tap "Show me" to go and see it in context.', 'पंद्रह प्रीमियम ब्रांड प्रोडक्ट, साथ में Certification। हर एक असली ऐप में असली जगह पर है — "दिखाइए" दबाकर उसे वहीं जाकर देखिए।');
-  String get uiDemoPartners => _p('DEMO PARTNERS', 'डेमो पार्टनर');
+  String get uiDemoPartners => _p('DEMO PARTNERS', 'डेमो साथी');
   String get uiNotRealPartnershipsPlaceholders => _p('Not real partnerships - placeholders for review.', 'असली साझेदारी नहीं — समीक्षा के लिए रखे गए नमूने।');
   String get uiShowMe => _p('Show me', 'दिखाइए');
   String get uiNotBuilt => _p('Not built', 'अभी बना नहीं');
@@ -3931,7 +3931,7 @@ class S {
   String get uiTonightDonTFix => _p('Tonight, don\'t fix it. Just sit with her.', 'आज रात हल मत ढूँढिए। बस उनके पास बैठिए।');
   String get uiWhenSheCanT => _p('When she can\'t sleep, presence beats solutions. A hand on her back says more than any advice.', 'जब नींद नहीं आती, तब सलाह से ज़्यादा साथ काम आता है। पीठ पर रखा एक हाथ किसी भी नसीहत से ज़्यादा कहता है।');
   String get uiReadTodaySTip => _p('Read today\'s tip · 2 min', 'आज की बात पढ़िए · 2 मिनट');
-  String get uiSupportPartner => _p('SUPPORT YOUR PARTNER', 'अपनी पार्टनर का साथ');
+  String get uiSupportPartner => _p('SUPPORT YOUR PARTNER', 'अपनी साथी का साथ');
   String get uiWeekWhatSheS => _p('Week 20 - what she\'s carrying', 'हफ़्ता 20 — वे क्या सँभाल रही हैं');
   String get uiHerLowerBackTaking => _p('Her lower back is taking the strain this week, and by evening it aches.', 'इस हफ़्ते सारा ज़ोर उनकी कमर पर है, और शाम तक दर्द बढ़ जाता है।');
   String get uiDoToday => _p('DO THIS TODAY', 'आज यह कीजिए');
@@ -4157,7 +4157,7 @@ class S {
   String get uiProfileCompleteness => _p('Profile completeness', 'प्रोफ़ाइल कितनी पूरी है');
   String get uiClear => _p('Clear', 'साफ़ करें');
   String get uiNoEventsYetOpen => _p('No events yet. Open Symptom Companion, the Weight Tracker, Tests & Scans or the Tools hub — the ask strip fires as soon as it renders.', 'अभी कोई घटना नहीं। लक्षण साथी, वज़न ट्रैकर, टेस्ट व स्कैन या Tools hub खोलिए — ask strip दिखते ही चल जाती है।');
-  String get uiPartnerAccount => _p('Partner account', 'पार्टनर खाता');
+  String get uiPartnerAccount => _p('Partner account', 'साथी खाता');
   String get uiInviteFriend => _p('Invite a friend', 'किसी सहेली को बुलाइए');
   String get uiBothGetFreeConsultation => _p('You both get a free consultation.', 'आप दोनों को एक मुफ़्त परामर्श मिलेगा।');
   String get uiMemories3 => _p('Memories', 'यादें');
@@ -4167,8 +4167,8 @@ class S {
   String get uiLogAsWhichDoctor => _p('Log in as which doctor?', 'किस डॉक्टर के रूप में लॉग इन करें?');
   String get uiResetWeekDueDate => _p('Reset to Week 20 - due date & pregnancy map cleared', 'हफ़्ता 20 पर रीसेट — डिलीवरी की तारीख़ और गर्भावस्था का नक़्शा हटा दिया गया');
   String get uiPairingCodeCopied => _p('Pairing code copied', 'जोड़ने का कोड कॉपी हो गया');
-  String get uiInvitePartner => _p('Invite your partner', 'अपने पार्टनर को जोड़िए');
-  String get uiShareCodeSoPartner => _p('Share this code so your partner can pair with your journey.', 'यह कोड साझा कीजिए ताकि आपके पार्टनर आपके सफ़र से जुड़ सकें।');
+  String get uiInvitePartner => _p('Invite your partner', 'अपने साथी को जोड़िए');
+  String get uiShareCodeSoPartner => _p('Share this code so your partner can pair with your journey.', 'यह कोड साझा कीजिए ताकि आपके साथी आपके सफ़र से जुड़ सकें।');
   String get uiShare => _p('Share', 'साझा करें');
   String get uiCopy => _p('Copy', 'कॉपी करें');
   String get uiWeeklyGuideRemindersTurn => _p('Weekly guide & reminders. Turn off anytime.', 'साप्ताहिक गाइड और रिमाइंडर। जब चाहें बंद कर दीजिए।');
