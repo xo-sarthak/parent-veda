@@ -110,45 +110,58 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
 
   // ---- sections -------------------------------------------------------------
 
+  //  This screen reads `S.now` / `.now` rather than taking a language, which is
+  //  how it was already written throughout: it is pushed from Profile, has no
+  //  controller in scope, and the toggle that could change the language lives
+  //  on the screen underneath it. Threading a language in would be a good
+  //  change and a separate one; mixing two conventions inside one file to make
+  //  half of it right is worse than either convention applied consistently.
   Widget _parity() => _card(
-        'Is this your first baby?',
-        'Changes how much we explain, and what we compare things to.',
+        S.now.askParityQ,
+        S.now.askParityWhy,
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final v in Parity.values)
-            _chip(v.label, _p.parity == v,
+            _chip(v.label.now, _p.parity == v,
                 () => _p.setParity(_p.parity == v ? null : v)),
         ]),
       );
 
   Widget _conditions() => _card(
-        'Has your doctor mentioned any of these?',
-        'We use these to pick articles, foods and answers that fit you. Tap any that apply.',
+        S.now.askHealthQLong,
+        S.now.askHealthWhyLong,
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final c in PregCondition.values)
-            _chip(c.label, _p.hasPregCondition(c),
+            _chip(c.label.now, _p.hasPregCondition(c),
                 () => _p.togglePregCondition(c)),
         ]),
       );
 
   Widget _priorities() => _card(
-        'What would you most like help with?',
-        'Pick as many as you like. These float to the top of your tools and reads.',
+        S.now.askPrioritiesQ,
+        S.now.askPrioritiesWhyLong,
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final p in PregPriority.values)
-            _chip(p.label, _p.wantsPreg(p), () => _p.togglePregPriority(p)),
+            _chip(p.label.now, _p.wantsPreg(p), () => _p.togglePregPriority(p)),
         ]),
       );
 
   Widget _diet() => _card(
-        'How do you eat?',
-        'Shapes recipes and food suggestions, now and after the baby arrives.',
+        S.now.askDietQ,
+        S.now.askDietWhyLong,
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final d in DietPreference.values)
-            _chip(d.label, _p.diet == d,
+            _chip(d.label.now, _p.diet == d,
                 () => _p.setDiet(_p.diet == d ? null : d)),
         ]),
       );
 
+  // DEBT, stated rather than hidden: this card is still English on both sides.
+  // LearningStyle is journey-agnostic - the parenting profile screen renders
+  // the same five chips - so translating it would put Devanagari into the
+  // parenting stage, which CLAUDE.md keeps deliberately unmigrated. It joins
+  // the others when parenting does. Leaving the whole card English is the
+  // lesser of the two evils: a Hindi question above English chips reads like a
+  // rendering failure, whereas a coherent English card reads like a gap.
   Widget _learning() => _card(
         'How do you prefer to learn?',
         'Some mothers want the science, some want the short version.',

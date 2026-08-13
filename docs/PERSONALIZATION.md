@@ -271,6 +271,24 @@ render path, which is better left settled immediately after a UI harmonisation.
   Reports, and the Tools hub (where the answer re-sorts the grid directly
   below). Rules: inline never modal, once ever whether answered or dismissed,
   states its payoff, one tap, visibly skippable.
+
+  **Bilingual, and the two halves are not the same string.** Every strip takes
+  an `AppLanguage` from its host screen — threaded, never read off `S.now`,
+  because a widget reading a static is not something Flutter can rebuild on.
+  The pregnancy vocabulary (`PregCondition`, `PregPriority`, `DietPreference`,
+  `Parity`) returns `LocalizedText`, so each call site had to answer
+  display-or-identity explicitly:
+
+  | Reader | Side | Why |
+  |---|---|---|
+  | The chip she taps | `.of(lang)` | display |
+  | `matchesSignal()` | `.en` | content tags are authored in English |
+  | `pregnancyAiContext()` | `.en` | a machine-readable summary, not copy |
+  | The analytics `value` column (§10) | `.en` | otherwise one answer becomes two rows and every rate halves |
+
+  The parenting vocabulary is deliberately still `String` — Hindi is rolling out
+  stage by stage and parenting is not in scope. The type is the marker: a
+  `String get label` means "not migrated yet".
 - **Diet strip placement.** `dietStrip()` is built and tested but not yet wired
   to a screen — the pregnancy nutrition surfaces live inside the weekly flow and
   want a careful insertion point rather than a quick one.

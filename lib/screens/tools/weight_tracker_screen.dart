@@ -282,7 +282,7 @@ class _Dashboard extends StatelessWidget {
         // read, so this is a relevant moment to ask. It sits on the
         // DASHBOARD rather than the one-time setup flow - a strip that
         // asks once, ever, is wasted on a screen she visits once.
-        pregHealthStrip('weight_tracker'),
+        pregHealthStrip(controller.language, 'weight_tracker'),
         // Hero: current weight (or empty state).
         Container(
           padding: const EdgeInsets.all(22),

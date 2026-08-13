@@ -67,7 +67,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           // The natural home for "what has your doctor said". Asks once, ever.
-          pregHealthStrip('tests_scans_reports'),
+          pregHealthStrip(p.language, 'tests_scans_reports'),
           Text(
             'A calm library of the tests, scans and findings you may meet in '
             'pregnancy - what each one means, and how to read your report.',

@@ -45,8 +45,16 @@ class VedaContext {
   //  Everything above is DERIVED from her data; these are things she TOLD us,
   //  so Ask Veda never re-asks what she has already said. Content only: they
   //  change what an answer mentions, never the app's structure.
-  final List<String> conditions; // e.g. "gestational diabetes"
-  final String? diet; // e.g. "vegetarian"
+  //
+  //  BILINGUAL, and they have to be. These are not carried around as data — they
+  //  are dropped straight into a sentence [personalLine] speaks back to her. As
+  //  plain English strings they produced "आप vegetarian खाना खाती हैं…": one
+  //  Latin word mid-Devanagari, which reads badly and which the hi-IN narration
+  //  voice cannot pronounce at all. Holding both sides lets the same field be
+  //  MATCHED on `.en` (the query terms and content tags are English) and SHOWN
+  //  with `.of(lang)`.
+  final List<LocalizedText> conditions; // e.g. "gestational diabetes"
+  final LocalizedText? diet; // e.g. "vegetarian" / "शाकाहारी"
   final bool? firstBaby;
 
   static const int _termWeeks = 40;
@@ -85,14 +93,21 @@ class VedaContext {
     // derived above. Defensive like every other read here: a store that has not
     // loaded, or throws under the test harness, degrades to no signals rather
     // than breaking an answer.
-    var conditions = const <String>[];
-    String? diet;
+    var conditions = const <LocalizedText>[];
+    LocalizedText? diet;
     bool? firstBaby;
     try {
       final fp = FamilyProfileStore.instance;
-      conditions =
-          fp.pregConditions.map((c) => c.label.toLowerCase()).toList();
-      diet = fp.diet?.label.toLowerCase();
+      // Lower-cased on the English side only. Hindi has no case, and applying
+      // toLowerCase() to Devanagari is a no-op that would only invite someone
+      // to "fix" it later; keeping it explicit says the casing is for matching.
+      conditions = fp.pregConditions
+          .map((c) => LocalizedText(en: c.label.en.toLowerCase(), hi: c.label.hi))
+          .toList();
+      final d = fp.diet?.label;
+      diet = d == null
+          ? null
+          : LocalizedText(en: d.en.toLowerCase(), hi: d.hi);
       firstBaby = fp.parity == null ? null : fp.parity == Parity.first;
     } catch (_) {/* no declared signals */}
 
@@ -176,10 +191,17 @@ class VedaContext {
     // than a standing condition - but it matters more than diet, so it comes
     // first of the declared signals.
     for (final c in conditions) {
-      if (c.length >= 4 && q.contains(c.split(' ').first)) {
+      // MATCH on both sides, SHOW one. The query is whatever she typed, so a
+      // Hindi question ("ख़ून की कमी में क्या खाऊँ") must be able to hit the same
+      // condition an English one does; matching `.en` alone would have made
+      // this whole branch dead code for every Hindi user.
+      final probes = <String>{c.en.split(' ').first, c.hi.split(' ').first}
+        ..removeWhere((t) => t.length < 4);
+      if (probes.any(q.contains)) {
+        final name = c.of(lang);
         parts.add(en
-            ? "You've told us about $c - it's worth reading this with that in mind, and checking anything new with your doctor."
-            : "आपने हमें $c के बारे में बताया था — इसे उसी बात को ध्यान में रखकर पढ़िए, और कुछ भी नया हो तो डॉक्टर से पूछ लीजिए।");
+            ? "You've told us about $name - it's worth reading this with that in mind, and checking anything new with your doctor."
+            : "आपने हमें $name के बारे में बताया था — इसे उसी बात को ध्यान में रखकर पढ़िए, और कुछ भी नया हो तो डॉक्टर से पूछ लीजिए।");
         break;
       }
     }
@@ -187,12 +209,29 @@ class VedaContext {
     // Diet, but only when the question is actually about food. Mentioning it
     // anywhere else would be the app showing off that it remembered, which is
     // the opposite of personalization feeling invisible.
-    final foodish = ['eat', 'food', 'diet', 'recipe', 'khana', 'khaana', 'nutrition', 'protein', 'iron', 'calcium']
+    //
+    // The keyword list stays as it is: `khana`/`khaana` are Latin-script Hindi,
+    // which the house style dropped for COPY - but this is not copy, it is a
+    // list of things a mother may type, and she still types Roman on a phone
+    // keyboard. `tool/hindi/_never_translate.tsv` is where strings code reads
+    // rather than renders belong. The Devanagari spellings are added beside
+    // them rather than replacing them, so both keyboards work.
+    final foodish = ['eat', 'food', 'diet', 'recipe', 'khana', 'khaana', 'nutrition', 'protein', 'iron', 'calcium',
+                     'खाना', 'खानपान', 'भोजन', 'रेसिपी', 'आयरन', 'प्रोटीन', 'कैल्शियम']
         .any((t) => q.contains(t));
-    if (foodish && diet != null) {
+    // Copied to a local because `diet` is a FIELD, and Dart will not promote a
+    // field to non-null across the closure boundary below - the analyzer is
+    // right to refuse: nothing stops another isolate reassigning it in general.
+    final dietText = diet;
+    if (foodish && dietText != null) {
+      // `.of(lang)`, not `.en`: this is DISPLAY. It is the fix for a Hindi
+      // sentence that used to read "आप vegetarian खाना खाती हैं…" - and it is
+      // why DietPreference's Hindi labels are adjectival (शाकाहारी, not
+      // "अंडा खाने वाली"), since they land in front of "खाना खाती हैं".
+      final d = dietText.of(lang);
       parts.add(en
-          ? "You eat $diet, so we've kept that in mind here."
-          : "आप $diet खाना खाती हैं, इसलिए हमने यहाँ वही ध्यान में रखा है।");
+          ? "You eat $d, so we've kept that in mind here."
+          : "आप $d खाना खाती हैं, इसलिए हमने यहाँ वही ध्यान में रखा है।");
     }
 
     if (parts.isEmpty) return null;

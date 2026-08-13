@@ -103,7 +103,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
           // Progressive profiling: she is already thinking about her body here,
           // so this is the natural place to ask what her doctor has flagged.
           // Asks once, ever - inline, dismissible, never blocking.
-          pregHealthStrip('symptom_companion'),
+          pregHealthStrip(lang, 'symptom_companion'),
           // search
           Container(
             decoration: BoxDecoration(

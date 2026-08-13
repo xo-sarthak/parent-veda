@@ -32,10 +32,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../localization/app_language.dart';
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'profile_analytics.dart';
 import 'ready_birth_context_store.dart';
 import 'remote/cloud_synced_store.dart';
+
+// ---- bilingual helpers ------------------------------------------------------
+//  The same three helpers every data file in lib/data/ uses, so the scanners in
+//  tool/ recognise these pairs and a translator meets one shape, not two.
+//    _t    a real translation
+//    _same identical in both BY NATURE (a term she reads off a report)
+//  There is deliberately no _en() here: everything this file translates is
+//  pregnancy vocabulary, and pregnancy is the migrated stage.
+LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 // ---- the signals ------------------------------------------------------------
 /// Things a paediatrician may have mentioned. Tapped, never typed.
@@ -53,6 +64,18 @@ enum LearningStyle { essentials, science, videos, stepByStep, detail }
 enum NotifyTopic { vaccinations, feeding, sleep, activities, articles, milestones, recipes, weekly }
 
 // ---- labels (UI-facing; content only) --------------------------------------
+//  TWO SHAPES IN ONE FILE, ON PURPOSE.
+//
+//  The PARENTING vocabulary below still returns a plain `String`. The PREGNANCY
+//  vocabulary further down returns [LocalizedText]. That is not drift — it is
+//  the migration boundary drawn where CLAUDE.md draws it: Hindi is being rolled
+//  out stage by stage and only Pregnancy is in scope, so "finishing the job"
+//  here would put Devanagari chips on English parenting screens.
+//
+//  The type is the marker. A `String get label` reads as "this vocabulary has
+//  not been migrated"; a `LocalizedText get label` reads as "it has, and every
+//  call site has already had to answer display-or-identity". When the parenting
+//  stage is migrated these join the same shape and the boundary disappears.
 extension HealthConditionX on HealthCondition {
   String get label => switch (this) {
         HealthCondition.eczema => 'Eczema',
@@ -155,44 +178,84 @@ enum Parity { first, subsequent }
 /// and the due date outlives the birth, so neither is a reliable marker.
 enum JourneyStage { tryingToConceive, pregnancy, parenting }
 
+// ---- pregnancy labels: bilingual -------------------------------------------
+//  ⚠️ `.en` is IDENTITY, `.of(lang)` is DISPLAY. These labels are read in both
+//  ways in this codebase, and the type cannot tell them apart:
+//
+//    display  → a chip a mother taps          → `.of(lang)`
+//    identity → matchesSignal(), the AI context strings, the analytics `value`
+//               column, the reco word index   → `.en`
+//
+//  Getting that backwards does not fail to compile and does not fail a test.
+//  It shows up as a topic filter that matches nothing in Hindi, or as an
+//  analytics column where the same answer arrives as two different strings and
+//  every rate is halved. Every call site was audited when these widened; see
+//  the comment at each one.
+//
+//  `.name` is untouched and remains the persisted/scored key — no stored
+//  profile, cloud row or recoBoosts weight depends on any of this text.
 extension PregConditionX on PregCondition {
-  String get label => switch (this) {
-        PregCondition.gestationalDiabetes => 'Gestational diabetes',
-        PregCondition.lowLyingPlacenta => 'Low-lying placenta',
-        PregCondition.anemia => 'Anemia',
-        PregCondition.thyroid => 'Thyroid',
-        PregCondition.hypertension => 'High blood pressure',
-        PregCondition.previousCsection => 'Previous C-section',
-        PregCondition.highRisk => 'High-risk pregnancy',
+  LocalizedText get label => switch (this) {
+        // Terms she meets in Latin on a report or from her doctor stay Latin
+        // (tool/hindi/_HOUSE_RULES.md, "what stays in Latin script" — it names
+        // gestational diabetes itself). `lib/data/prepare_data.dart` already
+        // ships this exact chip as _same('Gestational diabetes').
+        PregCondition.gestationalDiabetes => _same('Gestational diabetes'),
+        // प्लेसेंटा, not `Placenta`: CLAUDE.md lists it among the everyday
+        // loanwords that take Devanagari, because the hi-IN narration voice
+        // cannot read Latin script at all.
+        PregCondition.lowLyingPlacenta => _t('Low-lying placenta', 'नीचे बैठा प्लेसेंटा'),
+        // report_findings_data.dart ships 'गर्भावस्था में ख़ून की कमी'.
+        PregCondition.anemia => _t('Anemia', 'ख़ून की कमी'),
+        // Shipped content keeps Thyroid Latin everywhere (can_i_data,
+        // tests_scans_reports_data) — it is what the prescription says.
+        PregCondition.thyroid => _same('Thyroid'),
+        PregCondition.hypertension => _t('High blood pressure', 'ज़्यादा ब्लड प्रेशर'),
+        PregCondition.previousCsection => _t('Previous C-section', 'पहले C-section हुआ है'),
+        PregCondition.highRisk => _t('High-risk pregnancy', 'high-risk गर्भावस्था'),
       };
 }
 
 extension PregPriorityX on PregPriority {
-  String get label => switch (this) {
-        PregPriority.nutrition => 'Nutrition',
-        PregPriority.sleep => 'Sleep',
-        PregPriority.anxiety => 'Calm and anxiety',
-        PregPriority.birthPrep => 'Preparing for birth',
-        PregPriority.fitness => 'Staying active',
-        PregPriority.babyDevelopment => "Baby's development",
-        PregPriority.symptoms => 'Managing symptoms',
+  LocalizedText get label => switch (this) {
+        PregPriority.nutrition => _t('Nutrition', 'खानपान'),
+        PregPriority.sleep => _t('Sleep', 'नींद'),
+        PregPriority.anxiety => _t('Calm and anxiety', 'मन की शांति और घबराहट'),
+        PregPriority.birthPrep => _t('Preparing for birth', 'जन्म की तैयारी'),
+        PregPriority.fitness => _t('Staying active', 'सक्रिय रहना'),
+        // No gendered agreement for the baby: शिशु takes the neutral verb-less
+        // nominal form, so this reads the same whoever is arriving.
+        PregPriority.babyDevelopment => _t("Baby's development", 'शिशु का विकास'),
+        PregPriority.symptoms => _t('Managing symptoms', 'लक्षण सँभालना'),
       };
 }
 
 extension DietPreferenceX on DietPreference {
-  String get label => switch (this) {
-        DietPreference.vegetarian => 'Vegetarian',
-        DietPreference.nonVegetarian => 'Non-vegetarian',
-        DietPreference.eggetarian => 'Eggetarian',
-        DietPreference.jain => 'Jain',
-        DietPreference.vegan => 'Vegan',
+  /// These five are ADJECTIVAL in Hindi on purpose: [VedaContext.personalLine]
+  /// interpolates one into "आप $diet खाना खाती हैं…", so a label shaped like a
+  /// person ('अंडा खाने वाली') would produce a sentence that does not parse.
+  /// A label that only ever sat in a chip could be looser; this one cannot.
+  LocalizedText get label => switch (this) {
+        DietPreference.vegetarian => _t('Vegetarian', 'शाकाहारी'),
+        DietPreference.nonVegetarian => _t('Non-vegetarian', 'मांसाहारी'),
+        DietPreference.eggetarian => _t('Eggetarian', 'अंडा-शाकाहारी'),
+        DietPreference.jain => _t('Jain', 'जैन'),
+        // Deliberately वीगन and not `_same('Vegan')`, which is what
+        // prepare_data.dart's filter chip ships. That chip is only ever read
+        // with the eyes; this label is spoken aloud by the hi-IN voice inside a
+        // Hindi sentence, and that voice cannot pronounce Latin script.
+        DietPreference.vegan => _t('Vegan', 'वीगन'),
       };
 }
 
 extension ParityX on Parity {
-  String get label => switch (this) {
-        Parity.first => 'My first baby',
-        Parity.subsequent => "I've been pregnant before",
+  LocalizedText get label => switch (this) {
+        // "My first baby" would want पहला बच्चा, which is masculine agreement
+        // for a baby whose sex we must not imply. Naming the PREGNANCY instead
+        // of the baby sidesteps it entirely.
+        Parity.first => _t('My first baby', 'यह मेरी पहली गर्भावस्था है'),
+        Parity.subsequent =>
+          _t("I've been pregnant before", 'मैं पहले भी गर्भवती रह चुकी हूँ'),
       };
 }
 
@@ -400,6 +463,11 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
 
   /// LEVEL 2 — does this free-text topic/tag line match a family signal? A cheap
   /// helper for content filters ("show eczema articles first").
+  ///
+  /// IDENTITY, not display. [text] is a topic/tag line authored in English by
+  /// whoever wrote the content, so the pregnancy labels are matched on `.en`.
+  /// `.of(lang)` here would be the exact bug CLAUDE.md records twice already:
+  /// a filter that quietly matches nothing the moment she switches to Hindi.
   bool matchesSignal(String text) {
     final t = text.toLowerCase();
     for (final c in _conditions) {
@@ -409,10 +477,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
       if (t.contains(p.name.toLowerCase()) || t.contains(p.label.toLowerCase())) return true;
     }
     for (final c in _pregConditions) {
-      if (t.contains(c.name.toLowerCase()) || t.contains(c.label.toLowerCase())) return true;
+      if (t.contains(c.name.toLowerCase()) || t.contains(c.label.en.toLowerCase())) return true;
     }
     for (final p in _pregPriorities) {
-      if (t.contains(p.name.toLowerCase()) || t.contains(p.label.toLowerCase())) return true;
+      if (t.contains(p.name.toLowerCase()) || t.contains(p.label.en.toLowerCase())) return true;
     }
     return false;
   }
@@ -466,17 +534,24 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   /// NOT included: VedaContext already derives those from the due date, and
   /// repeating a signal we already hold is exactly what this engine avoids.
   /// Returns null when we know nothing declared, so callers can skip it cleanly.
+  ///
+  /// IDENTITY, and `.en` throughout. The surrounding scaffolding here ('noted:',
+  /// 'wants help with:') is already English because this string is fed to a
+  /// model, not shown to a mother — it is a machine-readable summary, and the
+  /// answer she reads is localised by whatever renders it. Swapping the labels
+  /// to `.of(lang)` would produce a half-English half-Hindi line that is worse
+  /// input than either language on its own.
   String? pregnancyAiContext() {
     final parts = <String>[];
     if (_parity != null) {
       parts.add(_parity == Parity.first ? 'first pregnancy' : 'has been pregnant before');
     }
     if (_pregConditions.isNotEmpty) {
-      parts.add('noted: ${_pregConditions.map((e) => e.label.toLowerCase()).join(', ')}');
+      parts.add('noted: ${_pregConditions.map((e) => e.label.en.toLowerCase()).join(', ')}');
     }
-    if (_diet != null) parts.add('diet: ${_diet!.label.toLowerCase()}');
+    if (_diet != null) parts.add('diet: ${_diet!.label.en.toLowerCase()}');
     if (_pregPriorities.isNotEmpty) {
-      parts.add('wants help with: ${_pregPriorities.map((e) => e.label.toLowerCase()).join(', ')}');
+      parts.add('wants help with: ${_pregPriorities.map((e) => e.label.en.toLowerCase()).join(', ')}');
     }
     return parts.isEmpty ? null : parts.join(' · ');
   }

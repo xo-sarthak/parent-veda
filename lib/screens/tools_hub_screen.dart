@@ -184,7 +184,7 @@ class ToolsHubScreen extends StatelessWidget {
             // Progressive profiling, asked exactly where the answer pays off:
             // whatever she picks here re-sorts the grid directly below, so the
             // benefit is visible in the same breath as the question.
-            pregPrioritiesStrip('tools_hub'),
+            pregPrioritiesStrip(controller.language, 'tools_hub'),
             const SizedBox(height: 16),
             LayoutBuilder(builder: (context, c) {
               const gap = 12.0;
