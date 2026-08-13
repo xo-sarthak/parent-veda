@@ -1017,6 +1017,74 @@ compiler has no opinion about comparing two unrelated types. If a warning
 describes something that can never be correct, make it fatal; it costs nothing
 and it would have caught this in seconds.
 
+### The comparison that stopped comparing anything
+
+Community posts carry `topics`, and the detail screen found related reading by
+asking which other posts shared one:
+
+```dart
+.where((p) => p.id != post.id && p.topics.any(post.topics.contains))
+```
+
+Widen `topics` from `List<String>` to `List<LocalizedText>` and that line does
+not change, does not warn, and does not work. Two things conspire:
+
+* **`List.contains` takes an `Object?`.** It is not generic in its argument, so
+  no type error is possible — this is the same hole `unrelated_type_equality_checks`
+  plugs for `==`, and nothing plugs for `contains`.
+* **`LocalizedText` has no `operator ==`.** So the comparison silently became
+  *reference* identity: are these two the same object in memory?
+
+The failure mode is worth naming, because it is not "wrong answer". It is
+**"empty answer, on one code path only"**. A vocabulary of `const LocalizedText`
+values, shared by every seed row, makes reference identity *hold* between two
+seed posts — so a test written against seed data passes. The posts that come
+back through `fromJson` are fresh instances, equal in value and identical to
+nothing, so the feature works in the fixture and fails for the one user whose
+data is real. `test/community_bilingual_test.dart` therefore compares a *stored*
+post against a *seed* post, deliberately.
+
+The fix is the same `.en` rule, applied to the whole collection at once rather
+than per element:
+
+```dart
+final topicIds = post.topics.map((t) => t.en).toSet();   // identity, hoisted
+.where((p) => p.topics.any((t) => topicIds.contains(t.en)))
+```
+
+**The general fact: when you widen a `String` into a value type, every
+collection operation that took the old type keeps compiling.** `contains`,
+`indexOf`, `remove`, `Set`, and a `Map` key all accept `Object?` or fall back to
+`==`/`hashCode`. Adding `operator ==` to the value type would fix the symptom
+everywhere at once and is tempting — we did not, because value equality would
+then make `.now`-based matching *work* in one language and fail across a toggle,
+which is a subtler bug than the loud emptiness we get now. An identity that is
+explicit at every call site is worth more than one that is implicit and
+occasionally right.
+
+### One vocabulary, keyed by the identity
+
+The second half of the same change: a topic used to be a bare string repeated at
+90 call sites. Translating it in place would have meant 90 chances to write a
+different Hindi for "Nutrition", and no way to tell a typo from a new topic.
+
+So the ids resolve through one table — `kTopicNames`, keyed by the English name
+— and the seeds hold `_topics(['Nutrition'])`, not a pair. Three things fall out
+that are worth stealing for any enum-shaped string:
+
+1. **The Hindi is written once.** A better translation lands everywhere,
+   including in rows already persisted, because rows carry ids.
+2. **A typo becomes testable.** Every seed id must be a key of the table, and a
+   test says so. Without the table there is nothing to check an id against.
+3. **The lookup's fallback is the migration.** `topicNamed(id)` returns
+   English-on-both-sides for an id it does not know, so a row written by an old
+   build — a bare `'Nutrition'` string — loads, keeps its tag, and *gains* its
+   Hindi half on the way in. No backfill, no version column, no script.
+
+The table lives in `models/`, beside the field it types, rather than in the seed
+file — so the model's `fromJson` can reach it without a `models → data` import
+cycle.
+
 ### What this cost, as a checklist
 
 Before widening a field that already exists in a store:

@@ -36,6 +36,10 @@ const _identityCalls = [
   'toggleInterested',
   'setNotInterested',
   'rank',
+  // A community poll vote is persisted under the option's text and synced to
+  // Supabase. Once PulseCard.options widened to LocalizedText, `vote(id, o)`
+  // would have filed the same answer under two names - one per language.
+  'vote',
 ];
 
 Iterable<File> _dartFiles(String root) => Directory(root)

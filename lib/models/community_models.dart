@@ -17,6 +17,106 @@ enum PostType { question, experience, poll, photo, milestone, expert, parentVeda
 /// Community-pulse card kinds (the lightweight "you are not alone" layer).
 enum PulseType { cohort, poll, trending, benchmark, expert }
 
+// ---------------------------------------------------------------------------
+//  TOPICS — one vocabulary, keyed by the ENGLISH name
+// ---------------------------------------------------------------------------
+//  A topic tag does three jobs at once: it is drawn as a chip, it is compared
+//  against other posts' tags to find related reading, and it is searched. Once
+//  the chip is bilingual those jobs stop agreeing, so they are split the way
+//  BACKEND-PATTERNS §13 splits any widened field:
+//
+//    identity  ->  `.en`   never changes, so matching and persistence survive
+//                          a language toggle and need no data migration
+//    display   ->  `.now`  may change per language, and only ever reaches a
+//                          Text() widget
+//
+//  The English half is the identity because every topic already persisted IS
+//  an English name: `inferTopics()` produces the keys of `_topicKeywords`, and
+//  those rows are already in prefs and in Supabase. Choosing `.en` makes the
+//  reader migrate itself (see `CommunityPost._topicFromJson`).
+//
+//  This table lives beside the field it types rather than in community_data.dart
+//  so `CommunityPost.fromJson` can reach it without a models -> data import
+//  cycle. The English keys are IDs, not copy — never translate a key.
+const Map<String, LocalizedText> kTopicNames = {
+  // --- Pregnancy ---
+  'Pregnancy Symptoms':
+      LocalizedText(en: 'Pregnancy Symptoms', hi: 'गर्भावस्था के लक्षण'),
+  'Labor': LocalizedText(en: 'Labor', hi: 'लेबर'),
+  'Nutrition': LocalizedText(en: 'Nutrition', hi: 'खानपान'),
+  'Brain Development':
+      LocalizedText(en: 'Brain Development', hi: 'दिमाग़ का विकास'),
+  'Breastfeeding': LocalizedText(en: 'Breastfeeding', hi: 'स्तनपान'),
+  // 'fitness' stays Latin: prepare_data.dart already treats it as a word she
+  // meets in English, and the Hindi would be an invention nobody says.
+  'Pregnancy Fitness':
+      LocalizedText(en: 'Pregnancy Fitness', hi: 'गर्भावस्था में fitness'),
+  'Vaccination': LocalizedText(en: 'Vaccination', hi: 'टीकाकरण'),
+  'Sleep': LocalizedText(en: 'Sleep', hi: 'नींद'),
+
+  // --- Trying to conceive ---
+  'Cycles': LocalizedText(en: 'Cycles', hi: 'मासिक चक्र'),
+  'Emotional': LocalizedText(en: 'Emotional', hi: 'भावनाएँ'),
+  // Identical by nature - acronyms and a term she reads off a report, not a
+  // translation we owe. The same judgement kSeedPosts makes with _same().
+  'PCOS': LocalizedText(en: 'PCOS', hi: 'PCOS'),
+  'Endometriosis': LocalizedText(en: 'Endometriosis', hi: 'Endometriosis'),
+  'IVF': LocalizedText(en: 'IVF', hi: 'IVF'),
+  'IUI': LocalizedText(en: 'IUI', hi: 'IUI'),
+  'Male fertility': LocalizedText(en: 'Male fertility', hi: 'पुरुष fertility'),
+  'Loss': LocalizedText(en: 'Loss', hi: 'खोना'),
+  'Partner': LocalizedText(en: 'Partner', hi: 'साथी'),
+  'Medical': LocalizedText(en: 'Medical', hi: 'डॉक्टरी सलाह'),
+
+  // --- Parenting ---
+  'Feeding': LocalizedText(en: 'Feeding', hi: 'दूध-खाना'),
+  'Milestones': LocalizedText(en: 'Milestones', hi: 'पड़ाव'),
+  'Behaviour': LocalizedText(en: 'Behaviour', hi: 'बर्ताव'),
+  'Health': LocalizedText(en: 'Health', hi: 'सेहत'),
+  'Development': LocalizedText(en: 'Development', hi: 'विकास'),
+};
+
+/// The bilingual name for a topic id.
+///
+/// An id we have no Hindi for comes back English on both sides rather than
+/// being dropped: a post must never lose a tag because the vocabulary is
+/// behind. That is a runtime fallback, not authored copy — the house rule
+/// against `_t(x, x)` is about pretending a translation is finished, and
+/// nothing counts this pair.
+LocalizedText topicNamed(String id) =>
+    kTopicNames[id] ?? LocalizedText(en: id, hi: id);
+
+/// A topic's IDENTITY as a hashtag — English, spaces removed.
+///
+/// [HashtagFeedScreen] matches this against `#tags` typed into post bodies and
+/// against other posts' topics, so it must not move when the language does.
+String topicTagId(LocalizedText topic) => topic.en.replaceAll(' ', '');
+
+/// A topic as she READS it, without the leading '#'.
+///
+/// English keeps the run-together hashtag convention (`PregnancySymptoms`) —
+/// a reader parses the capitals. Devanagari has no capitals to parse, so
+/// `गर्भावस्थाकेलक्षण` is simply unreadable and the spaces stay. Same value,
+/// two scripts, two typographic rules — exactly the per-language text surgery
+/// BACKEND-PATTERNS §13 warns a widening drags in.
+String topicTagLabel(LocalizedText topic, AppLanguage lang) =>
+    lang.isEnglish ? topicTagId(topic) : topic.hi;
+
+/// Does [t] contain [lowerQuery] in EITHER language?
+///
+/// Both halves, always. Searching only `.now` makes the box silently narrower
+/// in one language than the other, and the mismatch is invisible: she reads in
+/// Hindi, types the English word she saw on a bottle, and gets nothing. Same
+/// rule `prepare_data.filterPrograms` already follows.
+///
+/// Deliberately general and deliberately local: it says nothing about topics,
+/// so it also serves a room's `name`. It lives here rather than beside
+/// LocalizedText because community is the only caller today - move it up the
+/// moment a second feature wants it.
+bool localizedMatches(LocalizedText t, String lowerQuery) =>
+    t.en.toLowerCase().contains(lowerQuery) ||
+    t.hi.toLowerCase().contains(lowerQuery);
+
 @immutable
 class Community {
   const Community({
@@ -37,7 +137,10 @@ class Community {
 
   /// Auto-joined for the user's stage (cohort / trimester / location).
   final bool auto;
-  final List<String> topics;
+
+  /// Topic tags. Never serialised (a room is a static definition), but still
+  /// compared by `.en` so a room and a post agree on what "Nutrition" is.
+  final List<LocalizedText> topics;
 }
 
 @immutable
@@ -88,7 +191,11 @@ class CommunityPost {
   final String authorEmoji;
   final String text;
   final PostType type;
-  final List<String> topics;
+
+  /// Topic tags — bilingual for display, matched and persisted on `.en`.
+  /// See the kTopicNames note above; `text` deliberately stays a plain String,
+  /// because a post she wrote has no second language and never will.
+  final List<LocalizedText> topics;
   final String stage;
   final int likes;
   final int comments;
@@ -132,7 +239,14 @@ class CommunityPost {
         'authorEmoji': authorEmoji,
         'text': text,
         'type': type.name,
-        'topics': topics,
+        // BOTH halves, never the rendered one. A store that resolved a
+        // language here would write whichever script happened to be on screen
+        // at save time and throw the other away — permanently, and differently
+        // per row. That is BACKEND-PATTERNS §13 "the codec that silently kept
+        // one language", already learned twice.
+        'topics': [
+          for (final t in topics) {'en': t.en, 'hi': t.hi}
+        ],
         'stage': stage,
         'likes': likes,
         'comments': comments,
@@ -151,6 +265,17 @@ class CommunityPost {
         'createdAt': createdAt,
       };
 
+  /// Reads one topic out of a row, tolerating both shapes of the schema.
+  ///
+  /// A row written by an older build holds a bare English string, because
+  /// `inferTopics()` produced exactly a `kTopicNames` key. So the old value IS
+  /// the new field's lookup key, and the migration is a `??` in [topicNamed]:
+  /// nothing to backfill, no version column, and the row gains its Hindi half
+  /// the first time it is read. A row an even older build never tagged at all
+  /// comes back empty rather than throwing — a post must survive its metadata.
+  static LocalizedText _topicFromJson(Object? v) =>
+      v is Map ? LocalizedText.fromJson(v) : topicNamed(v?.toString() ?? '');
+
   factory CommunityPost.fromJson(Map<String, dynamic> j) => CommunityPost(
         id: j['id'] as String,
         communityId: j['communityId'] as String? ?? '',
@@ -159,7 +284,9 @@ class CommunityPost {
         text: j['text'] as String? ?? '',
         type: PostType.values.firstWhere((t) => t.name == j['type'],
             orElse: () => PostType.experience),
-        topics: (j['topics'] as List?)?.cast<String>() ?? const [],
+        topics: ((j['topics'] as List?) ?? const [])
+            .map(_topicFromJson)
+            .toList(),
         stage: j['stage'] as String? ?? 'Pregnancy',
         likes: j['likes'] as int? ?? 0,
         comments: j['comments'] as int? ?? 0,
@@ -189,8 +316,16 @@ class PulseCard {
     this.linkPostId,
   });
   final PulseType type;
-  final String title;
-  final String body;
-  final List<String> options; // poll options for PulseType.poll
+  final LocalizedText title;
+  final LocalizedText body;
+
+  /// Poll options for [PulseType.poll]. AUTHORED seed copy — there is no
+  /// user-creation path for a pulse card, so widening these carries none of
+  /// the risk `CommunityPost.pollOptions` would (that one is still a plain
+  /// String, and a vote is stored under the option's text).
+  ///
+  /// Rendering reads `.now`; the vote itself must be filed under `.en`, or the
+  /// same answer is recorded twice under two names.
+  final List<LocalizedText> options;
   final String? linkPostId; // for trending → opens a post
 }

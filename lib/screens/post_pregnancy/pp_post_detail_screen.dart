@@ -52,13 +52,20 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
           builder: (context, _) {
             final seed = ppSeedComments(post.id);
             final mine = store.userComments(post.id);
+            // Match on `.en` - the identity. `List.contains` takes an Object?,
+            // so `post.topics.contains` kept compiling after topics widened
+            // and would have quietly compared object references (LocalizedText
+            // has no operator ==), relating nothing to anything. The analyzer
+            // cannot see this one; only the reader can.
+            final topicIds = post.topics.map((t) => t.en).toSet();
             final related = ppFeed()
                 .where((p) =>
-                    p.id != post.id && p.topics.any(post.topics.contains))
+                    p.id != post.id &&
+                    p.topics.any((t) => topicIds.contains(t.en)))
                 .take(3)
                 .toList();
             final suggested = ppRecommendedCommunities()
-                .where((c) => c.topics.any(post.topics.contains))
+                .where((c) => c.topics.any((t) => topicIds.contains(t.en)))
                 .take(3)
                 .toList();
             return ListView(

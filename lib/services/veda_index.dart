@@ -355,7 +355,13 @@ class VedaIndex {
         sourceLabel: 'Community · ${post.cred}',
         title: '${post.author} · ${post.cred}',
         body: post.text,
-        keywords: post.topics,
+        // Both halves. A retrieval keyword is matched, not shown, so `.now`
+        // would make the index answer differently depending on which language
+        // happened to be on screen when it was built. Indexing both is the
+        // same choice community search makes, and costs one extra string.
+        keywords: [
+          for (final t in post.topics) ...[t.en, t.hi]
+        ],
       ));
     }
 

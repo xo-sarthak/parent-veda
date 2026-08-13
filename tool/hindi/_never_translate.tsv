@@ -22,6 +22,31 @@ blood pressure	_topicKeywords - matched with contains(), never rendered
 talk to baby	_topicKeywords - matched with contains(), never rendered
 read to	_topicKeywords - matched with contains(), never rendered
 flu shot	_topicKeywords - matched with contains(), never rendered
+# _topicKeywords KEYS, which are also the keys of kTopicNames in
+# models/community_models.dart. A topic id is the identity half of a
+# LocalizedText: it is what a post row persists, what related-post matching
+# compares, and what a hashtag feed opens on. The Hindi lives in kTopicNames -
+# translate it THERE, once, never at a call site.
+Pregnancy Symptoms	topic id - persisted, matched, opens a hashtag feed
+Brain Development	topic id - persisted, matched, opens a hashtag feed
+Pregnancy Fitness	topic id - persisted, matched, opens a hashtag feed
+Breastfeeding	topic id - persisted, matched, opens a hashtag feed
+Vaccination	topic id - persisted, matched, opens a hashtag feed
+Nutrition	topic id - persisted, matched, opens a hashtag feed
+Labor	topic id - persisted, matched, opens a hashtag feed
+Sleep	topic id - persisted, matched, opens a hashtag feed
+Male fertility	topic id - persisted, matched, opens a hashtag feed
+Endometriosis	topic id - persisted, matched, opens a hashtag feed
+Emotional	topic id - persisted, matched, opens a hashtag feed
+Medical	topic id - persisted, matched, opens a hashtag feed
+Cycles	topic id - persisted, matched, opens a hashtag feed
+Partner	topic id - persisted, matched, opens a hashtag feed
+Loss	topic id - persisted, matched, opens a hashtag feed
+Milestones	topic id - persisted, matched, opens a hashtag feed
+Behaviour	topic id - persisted, matched, opens a hashtag feed
+Development	topic id - persisted, matched, opens a hashtag feed
+Feeding	topic id - persisted, matched, opens a hashtag feed
+Health	topic id - persisted, matched, opens a hashtag feed
 # stage: values, compared with == in three post-pregnancy screens.
 Trying	stage: value compared with ==
 Parenting	stage: value compared with ==

@@ -382,7 +382,12 @@ void _showExpertsSheet(BuildContext context, S s, int total) {
                     title: Text(e.name,
                         style: pvJakarta(
                             fontWeight: FontWeight.w700, fontSize: 14)),
-                    subtitle: Text('${e.cred} · ${e.specialty}',
+                    // .now, spelled out: this is display, and `s` here is the
+                    // language the sheet was opened in. Interpolating the
+                    // LocalizedText directly would give the same answer via
+                    // toString(), which is exactly why it is written
+                    // explicitly - a reader must not have to know that.
+                    subtitle: Text('${e.cred} · ${e.specialty.of(s.lang)}',
                         style: pvManrope(
                             fontSize: 12, color: AppTheme.neutral500)),
                   ),
@@ -1525,7 +1530,10 @@ class _PulseCardView extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              card.title.toUpperCase(),
+              // Display: the language on screen. `.toUpperCase()` is a no-op
+              // on Devanagari, which has no case - the tracking-heavy caps
+              // style simply reads as normal Hindi, and that is fine.
+              card.title.of(lang).toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.labelSmall?.copyWith(
@@ -1538,7 +1546,7 @@ class _PulseCardView extends StatelessWidget {
         const SizedBox(height: 11),
         Expanded(
           child: Text(
-            card.body,
+            card.body.of(lang),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: text.titleSmall?.copyWith(
@@ -1560,10 +1568,19 @@ class _PulseCardView extends StatelessWidget {
       case PulseType.poll:
         final voted = store.votedOption(kPulseKicksPollId);
         if (voted != null) {
+          // The stored vote is an ENGLISH option (see the onTap below), so it
+          // is translated back for display rather than printed raw. Falling
+          // back to the stored string covers a vote cast before this card's
+          // options were what they are now.
+          final shownVote = card.options
+                  .where((o) => o.en == voted)
+                  .map((o) => o.of(lang))
+                  .firstOrNull ??
+              voted;
           return Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.check_circle_rounded, size: 16, color: color),
             const SizedBox(width: 6),
-            Text('${s.cmVoted} · $voted',
+            Text('${s.cmVoted} · $shownVote',
                 style: text.labelMedium?.copyWith(
                     color: AppTheme.neutral700, fontWeight: FontWeight.w700)),
           ]);
@@ -1574,7 +1591,10 @@ class _PulseCardView extends StatelessWidget {
           children: [
             for (final o in card.options)
               GestureDetector(
-                onTap: () => store.vote(kPulseKicksPollId, o),
+                // .en: a vote is PERSISTED, and synced. Storing the rendered
+                // label would file the same answer under two names and let one
+                // mother's vote count twice if she switched language.
+                onTap: () => store.vote(kPulseKicksPollId, o.en),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -1583,7 +1603,7 @@ class _PulseCardView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(color: color.withValues(alpha: 0.28)),
                   ),
-                  child: Text(o,
+                  child: Text(o.of(lang),
                       style: text.labelMedium
                           ?.copyWith(color: color, fontWeight: FontWeight.w700)),
                 ),
@@ -1770,12 +1790,16 @@ class CommunityPostCard extends StatelessWidget {
                         Wrap(spacing: 8, runSpacing: 4, children: [
                           for (final t in post.topics)
                             GestureDetector(
+                              // tag = IDENTITY (topicTagId, always English) so
+                              // the feed it opens matches the same posts in
+                              // either language; label = what she reads.
                               onTap: () => _push(
                                   context,
                                   HashtagFeedScreen(
-                                      tag: t.replaceAll(' ', ''),
+                                      tag: topicTagId(t),
+                                      label: topicTagLabel(t, lang),
                                       controller: controller)),
-                              child: Text('#${t.replaceAll(' ', '')}',
+                              child: Text('#${topicTagLabel(t, lang)}',
                                   style: pvManrope(
                                       fontSize: 12.5,
                                       color: _proPurpleDeep,
@@ -1953,8 +1977,18 @@ class _PostBodyTextState extends State<_PostBodyText> {
 
 class HashtagFeedScreen extends StatelessWidget {
   const HashtagFeedScreen(
-      {super.key, required this.tag, required this.controller});
-  final String tag; // without the leading '#'
+      {super.key, required this.tag, this.label, required this.controller});
+
+  /// The tag's IDENTITY, without the leading '#'. Always English with spaces
+  /// removed, because it is matched against `#tags` typed into post bodies and
+  /// against `topicTagId` on every post. Translating this would open a feed
+  /// that matches nothing - the exact failure the topic filter already had.
+  final String tag;
+
+  /// What the header shows, when that differs from [tag]. Null for a tag typed
+  /// into a post body: user text has no second language, so it is its own label.
+  final String? label;
+
   final PregnancyController controller;
 
   @override
@@ -1962,9 +1996,10 @@ class HashtagFeedScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final tagLower = tag.toLowerCase();
+    final shown = label ?? tag;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text('#$tag')),
+      appBar: AppBar(title: Text('#$shown')),
       body: AnimatedBuilder(
         animation: CommunityStore.instance,
         builder: (context, _) {
@@ -1974,13 +2009,16 @@ class HashtagFeedScreen extends StatelessWidget {
             final inText = _hashtagRe
                 .allMatches(p.text)
                 .any((m) => m.group(1)!.toLowerCase() == tagLower);
-            final inTopics = p.topics
-                .any((t) => t.replaceAll(' ', '').toLowerCase() == tagLower);
+            // topicTagId, not the rendered chip: a Hindi reader tapping
+            // "#गर्भावस्था के लक्षण" must land on the same posts an English
+            // reader tapping "#PregnancySymptoms" lands on.
+            final inTopics =
+                p.topics.any((t) => topicTagId(t).toLowerCase() == tagLower);
             return inText || inTopics;
           }).toList();
           if (posts.isEmpty) {
             return _emptyState(
-                context, Icons.tag_rounded, s.cmHashtagEmpty(tag));
+                context, Icons.tag_rounded, s.cmHashtagEmpty(shown));
           }
           return ListView(
             padding: const EdgeInsets.only(top: 8, bottom: 28),
@@ -2441,15 +2479,28 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           final store = CommunityStore.instance;
           final seed = seedCommentsFor(post.id);
           final mine = store.userComments(post.id);
+          // The topics this post is about, as IDS. Two reasons this is a set
+          // of `.en` strings rather than the LocalizedText list it came from:
+          //
+          //  1. `.en` is the identity - matching on `.now` would relate posts
+          //     only while the language stayed put, and relate nothing at all
+          //     once a seed row (Hindi) met a stored row (English).
+          //  2. LocalizedText has no `operator ==`, so the old
+          //     `post.topics.contains` was comparing object IDENTITY. Every
+          //     `_t(...)` call builds a new instance, so after the widening it
+          //     would have matched nothing, silently, forever - a fresh
+          //     instance of exactly the bug §13 keeps describing.
+          final topicIds = post.topics.map((t) => t.en).toSet();
           // related: other posts sharing a topic
           final related = store
               .feed()
-              .where((p) => p.id != post.id && p.topics.any(post.topics.contains))
+              .where((p) =>
+                  p.id != post.id && p.topics.any((t) => topicIds.contains(t.en)))
               .take(3)
               .toList();
           // suggested: recommended communities sharing a topic
           final suggested = store.recommendedCommunities
-              .where((c) => c.topics.any(post.topics.contains))
+              .where((c) => c.topics.any((t) => topicIds.contains(t.en)))
               .take(3)
               .toList();
           return ListView(
@@ -2598,7 +2649,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final List<String> _photos = [];
   String? _communityId;
   PostType _type = PostType.question;
-  List<String> _autoTags = const [];
+  List<LocalizedText> _autoTags = const [];
   bool _wantVerify = false; // "ask an expert to verify this"
   String _specialty = 'all'; // preferred expert specialty for verification
 
@@ -2931,7 +2982,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       color: _accent.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text('#$tag',
+                    // Display: the label she reads. The post keeps the whole
+                    // LocalizedText, so the tag it is filed under is the
+                    // English id regardless of what this chip shows.
+                    child: Text('#${topicTagLabel(tag, lang)}',
                         style: text.labelSmall
                             ?.copyWith(color: _accent, fontWeight: FontWeight.w700)),
                   ),
@@ -3093,16 +3147,21 @@ class _CommunitySearchDelegate extends SearchDelegate<void> {
     // after she has been joined to it.
     final comms = allCommunities(
             dueDate: controller.isDueDateSet ? controller.dueDate : null)
+        // Both halves of every bilingual field - name included. `.now` was
+        // matching only the language on screen, so an English room name was
+        // unfindable while reading in Hindi.
         .where((c) =>
-            c.name.now.toLowerCase().contains(q) ||
-            c.topics.any((t) => t.toLowerCase().contains(q)))
+            localizedMatches(c.name, q) ||
+            c.topics.any((t) => localizedMatches(t, q)))
         .toList();
     final posts = CommunityStore.instance
         .feed()
+        // `text` and `author` stay single-language on purpose: they carry what
+        // a mother typed and what she is called, and neither has a translation.
         .where((p) =>
             p.text.toLowerCase().contains(q) ||
             p.author.toLowerCase().contains(q) ||
-            p.topics.any((t) => t.toLowerCase().contains(q)))
+            p.topics.any((t) => localizedMatches(t, q)))
         .toList();
     return ListView(
       children: [
