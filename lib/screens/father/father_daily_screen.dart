@@ -123,7 +123,7 @@ Map<String, _Detail> _kDetails = {
   ),
   'partner': _Detail(
     id: 'partner',
-    eyebrow: _t('Support your partner', 'अपनी पार्टनर का साथ').now,
+    eyebrow: _t('Support your partner', 'अपनी साथी का साथ').now,
     title: S.now.uiWeekWhatSheS,
     paras: [
       _t('Her centre of gravity is shifting as the bump grows, and her lower back is taking the strain. By evening, it aches.', 'बंप बढ़ने के साथ उनका संतुलन बदल रहा है, और सारा ज़ोर कमर पर आ रहा है। शाम तक दर्द बढ़ जाता है।').now,
@@ -758,7 +758,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final part = hour < 12
         ? _t('morning', 'प्रभात')
         : (hour < 18 ? _t('afternoon', 'दोपहर') : _t('evening', 'संध्या'));
-    final sub = _t('your partner is halfway there', 'आपकी पार्टनर आधा सफ़र तय कर चुकी हैं');
+    final sub = _t('your partner is halfway there', 'आपकी साथी आधा सफ़र तय कर चुकी हैं');
     final pct = (_week / 40).clamp(0.04, 1.0);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 2),

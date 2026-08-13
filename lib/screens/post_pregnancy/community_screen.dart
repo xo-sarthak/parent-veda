@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/community_data.dart';
+import '../../localization/app_language.dart';
 import '../../models/community_models.dart';
 import '../../services/community_store.dart';
 import '../../services/expert_follow_store.dart';
@@ -326,7 +327,8 @@ void ppShowExpertsSheet(BuildContext context, int total) {
                   leading: _ppSeal(e.name, size: 38),
                   title: Text(e.name,
                       style: ppBody(14, color: ppInk, w: FontWeight.w700)),
-                  subtitle: Text('${e.cred} · ${e.specialty}',
+                  // .now spelled out - display, never an id.
+                  subtitle: Text('${e.cred} · ${e.specialty.now}',
                       style: ppBody(12, color: ppMuted)),
                 ),
               if (more > 0)
@@ -589,7 +591,9 @@ class PpCommunityPostCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Wrap(spacing: 8, runSpacing: 4, children: [
                     for (final t in post.topics)
-                      Text('#${t.replaceAll(' ', '')}',
+                      // Display only - the parenting card's chips are not
+                      // tappable, so there is no identity to preserve here.
+                      Text('#${topicTagLabel(t, S.current)}',
                           style: ppBody(12.5, color: ppPurple, w: FontWeight.w600)),
                   ]),
                 ],
@@ -1460,16 +1464,18 @@ class _PpSearchDelegate extends SearchDelegate<void> {
   Widget _results(BuildContext context) {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return const SizedBox.shrink();
+    // Both halves of every bilingual field, as on the pregnancy side: a Hindi
+    // reader typing an English word must still find the room.
     final comms = kParentingCommunities
         .where((c) =>
-            c.name.now.toLowerCase().contains(q) ||
-            c.topics.any((t) => t.toLowerCase().contains(q)))
+            localizedMatches(c.name, q) ||
+            c.topics.any((t) => localizedMatches(t, q)))
         .toList();
     final posts = ppFeed()
         .where((p) =>
             p.text.toLowerCase().contains(q) ||
             p.author.toLowerCase().contains(q) ||
-            p.topics.any((t) => t.toLowerCase().contains(q)))
+            p.topics.any((t) => localizedMatches(t, q)))
         .toList();
     return Container(
       color: ppBg,

@@ -35,7 +35,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
   final List<String> _photos = [];
   String _communityId = '';
   PostType _type = PostType.question;
-  List<String> _autoTags = const [];
+  List<LocalizedText> _autoTags = const [];
   bool _wantVerify = false;
   String _specialty = 'all';
 
@@ -321,7 +321,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                         decoration: BoxDecoration(
                             color: ppPurple.withValues(alpha: 0.10),
                             borderRadius: BorderRadius.circular(20)),
-                        child: Text('#${tag.replaceAll(' ', '')}',
+                        child: Text('#${topicTagLabel(tag, S.current)}',
                             style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
                       ),
                   ]),
