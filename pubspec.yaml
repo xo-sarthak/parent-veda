@@ -172,6 +172,11 @@ flutter:
     - assets/narration/manifest_hi.json
     - assets/narration/hi/
     - assets/baby/
+    # Hero block art for the V2 Focus experiment. Transparent PNGs, composited
+    # onto whichever palette ground is being tested — which is why they survive
+    # the palette decision. Trimmed, squared and downsized from the generated
+    # originals (7MB -> 668KB); regenerate from docs/IMAGE-PROMPTS.md.
+    - assets/blocks/
     - assets/brand/
     - assets/brand/partners/
 

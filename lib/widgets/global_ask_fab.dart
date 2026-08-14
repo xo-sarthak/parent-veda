@@ -165,28 +165,37 @@ class FabRouteObserver extends NavigatorObserver {
 
 final FabRouteObserver fabRouteObserver = FabRouteObserver();
 
+/// Open Ask Veda, picking the stage's own screen.
+///
+/// Extracted from the FAB so anything else that offers "ask a question" — the
+/// V2 block grid, for one — routes through the SAME three-way decision instead
+/// of importing three Ask Veda screens and re-deriving which one applies. A
+/// second copy of this logic is a second place for the stage routing to go
+/// wrong, and it has gone wrong here before.
+void openAskVeda(PregnancyController pregnancy) {
+  final nav = appNavigatorKey.currentState;
+  if (nav == null) return;
+  // Three-way: TTC first (it is the innermost stage stack), then parenting,
+  // then pregnancy as the default.
+  final ttc = FabState.instance.inTtc;
+  final parenting = FabState.instance.inParenting;
+  nav.push(MaterialPageRoute<void>(
+    settings: const RouteSettings(name: kAskVedaRoute),
+    builder: (_) => ttc
+        ? const ttc_av.TtcAskVedaScreen()
+        : parenting
+            ? const pp.AskVedaScreen()
+            : preg.AskVedaScreen(controller: pregnancy),
+  ));
+}
+
 class GlobalAskFab extends StatelessWidget {
   const GlobalAskFab({super.key, required this.pregnancy});
 
   /// Needed by the pregnancy Ask Veda (it answers from whole-app data).
   final PregnancyController pregnancy;
 
-  void _open() {
-    final nav = appNavigatorKey.currentState;
-    if (nav == null) return;
-    // Three-way: TTC first (it is the innermost stage stack), then parenting,
-    // then pregnancy as the default.
-    final ttc = FabState.instance.inTtc;
-    final parenting = FabState.instance.inParenting;
-    nav.push(MaterialPageRoute<void>(
-      settings: const RouteSettings(name: kAskVedaRoute),
-      builder: (_) => ttc
-          ? const ttc_av.TtcAskVedaScreen()
-          : parenting
-              ? const pp.AskVedaScreen()
-              : preg.AskVedaScreen(controller: pregnancy),
-    ));
-  }
+  void _open() => openAskVeda(pregnancy);
 
   @override
   Widget build(BuildContext context) {

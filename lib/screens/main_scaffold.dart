@@ -224,15 +224,26 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                   father: fatherMode,
                 ),
               ),
-              // TESTING-ONLY Mom | Dad switch - moved to the BOTTOM-RIGHT (floats
-              // above the pill tab bar) so the top-right is free for the profile
-              // avatar on both Mom and Dad. On the Today tab only. Remove before
-              // launch.
+              // TESTING-ONLY switch, bottom-right, Today tab only. Remove
+              // before launch.
+              //
+              // WHICH switch depends on which home is showing. Mom | Dad only
+              // means anything on Classic — the experimental homes are
+              // mother-side only, so on those the slot carries the version
+              // switch instead of a father toggle that would do nothing.
+              // One control in one place, rather than two competing for the
+              // same corner.
               if (AppNav.instance.index == 0)
                 Positioned(
                   right: 14,
                   bottom: 96,
-                  child: _modePill(fatherMode),
+                  child: ListenableBuilder(
+                    listenable: TodayVersionStore.instance,
+                    builder: (context, _) =>
+                        TodayVersionStore.instance.version == TodayVersion.classic
+                            ? _modePill(fatherMode)
+                            : const _V3Pill(),
+                  ),
                 ),
             ],
           ),
@@ -278,6 +289,73 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           seg('Mom', !father, () => FatherPreview.instance.on = false),
           seg('Dad', father, () => FatherPreview.instance.on = true),
+        ]),
+      ),
+    );
+  }
+}
+
+
+/// Focus | V3 switch, in the slot Mom | Dad occupies on Classic.
+///
+/// Testing chrome, same as the pill it replaces. It shows only on the
+/// experimental homes, so there is never a moment where both a father toggle
+/// and a version toggle are fighting for the same corner.
+class _V3Pill extends StatelessWidget {
+  const _V3Pill();
+
+  @override
+  Widget build(BuildContext context) {
+    // ⚠️ THIS LISTENER IS LOAD-BEARING, and it was missing.
+    //
+    // The pill read TodayVersionStore but never listened to it, so it only
+    // repainted when something ELSE rebuilt its parent. On the phone the body
+    // swapped to V3 while the pill went on showing Focus as the active segment
+    // — the control lying about the state it controls.
+    //
+    // Third time in this screen's history: the version pill in
+    // today_home_screen.dart and the art toggle read by v2_block_grid.dart both
+    // had it. The general rule, worth more than the fix: A STORE READ INSIDE
+    // build() IS A STORE THE WIDGET MUST LISTEN TO. Reading is not subscribing,
+    // and Flutter will not warn you — the value is simply the one from
+    // whenever this widget last happened to be rebuilt.
+    return ListenableBuilder(
+      listenable: TodayVersionStore.instance,
+      builder: (context, _) => _pill(),
+    );
+  }
+
+  Widget _pill() {
+    final store = TodayVersionStore.instance;
+    Widget seg(String label, TodayVersion v) {
+      final on = store.version == v;
+      return InkWell(
+        onTap: () => store.set(v),
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: on ? AppTheme.primary600 : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: on ? Colors.white : AppTheme.primary700)),
+        ),
+      );
+    }
+
+    return Material(
+      color: Colors.white,
+      elevation: 2,
+      borderRadius: BorderRadius.circular(999),
+      child: Padding(
+        padding: const EdgeInsets.all(3),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          seg('Focus', TodayVersion.focus),
+          seg('V3', TodayVersion.v3),
         ]),
       ),
     );

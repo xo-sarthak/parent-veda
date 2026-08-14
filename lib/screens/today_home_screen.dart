@@ -29,10 +29,11 @@ import '../services/landing_focus.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'home_focus_screen.dart';
+import 'home_v3_screen.dart';
 import 'home_screen_b.dart';
 
 /// Which Today is on screen. Session-only on purpose — see [TodayVersionStore].
-enum TodayVersion { classic, focus }
+enum TodayVersion { classic, focus, v3 }
 
 /// The toggle's state.
 ///
@@ -95,6 +96,13 @@ class _TodayHomeScreenState extends State<TodayHomeScreen> {
               home: widget.home,
             ),
           TodayVersion.focus => HomeFocusScreen(
+              pregnancy: widget.pregnancy,
+              home: widget.home,
+            ),
+          // Direction "2a" from the Claude Design pass. Sits beside the other
+          // two rather than replacing either — three versions on one phone is
+          // the only way to compare them honestly.
+          TodayVersion.v3 => HomeV3Screen(
               pregnancy: widget.pregnancy,
               home: widget.home,
             ),
