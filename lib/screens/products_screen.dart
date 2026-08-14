@@ -316,11 +316,23 @@ class _ProductCard extends StatelessWidget {
               width: 52,
               height: 52,
               alignment: Alignment.center,
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: AppTheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Text(product.emoji, style: const TextStyle(fontSize: 28)),
+              // A PHOTO, not an emoji. An emoji where a product picture belongs
+              // is the single loudest "this page is unfinished" signal in a
+              // shop — it says nobody has put the real thing here yet. The
+              // emoji stays as the fallback for when the image will not load.
+              child: Image.network(
+                productImageUrl(product),
+                fit: BoxFit.cover,
+                width: 52,
+                height: 52,
+                errorBuilder: (_, _, _) =>
+                    Text(product.emoji, style: const TextStyle(fontSize: 28)),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -756,8 +768,21 @@ class ProductDetailScreen extends StatelessWidget {
               border: Border.all(color: AppTheme.outlineVariant),
             ),
             child: Column(children: [
-              Text(product.emoji, style: const TextStyle(fontSize: 64)),
-              const SizedBox(height: 10),
+              // The hero of a product page cannot be an emoji. Same reasoning
+              // as the list tile above, and more so here: this is the screen
+              // where she decides whether to buy.
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  productImageUrl(product),
+                  height: 168,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Text(product.emoji,
+                      style: const TextStyle(fontSize: 64)),
+                ),
+              ),
+              const SizedBox(height: 14),
               if (productIsAffiliate(product)) ...[
                 Container(
                   padding:

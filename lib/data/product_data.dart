@@ -114,6 +114,8 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_overall',
     categoryId: 'pregnancy_pillow',
+    imageUrl:
+        'https://images.unsplash.com/photo-1564019472017-b51398323027?w=400&h=400&fit=crop',
     name: _same('ComfyBump Full-Body Pillow'),
     emoji: '🛏️',
     summary: _t('U-shaped support for bump, back and knees in one.', 'पेट, पीठ और घुटनों — तीनों के लिए एक ही U-आकार का सहारा।'),
@@ -149,6 +151,8 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_budget',
     categoryId: 'pregnancy_pillow',
+    imageUrl:
+        'https://images.unsplash.com/photo-1600414428640-f78a67c2aa3b?w=400&h=400&fit=crop',
     name: _same('Snug Wedge Pillow'),
     emoji: '🛏️',
     summary: _t('Compact wedge that supports the bump where you need it.', 'छोटा-सा wedge जो पेट को ठीक वहीं सहारा देता है जहाँ ज़रूरत है।'),
@@ -162,6 +166,8 @@ final List<Product> kProducts = [
   Product(
     id: 'pp_premium',
     categoryId: 'pregnancy_pillow',
+    imageUrl:
+        'https://images.unsplash.com/photo-1638127815875-d8c930a8d467?w=400&h=400&fit=crop',
     name: _same('CloudNest Adjustable Pillow'),
     emoji: '🛏️',
     summary: _t('Adjustable filling and a premium cover for tailored support.', 'भराव कम-ज़्यादा किया जा सकता है और premium कवर, ताकि सहारा आपके हिसाब से हो।'),
@@ -176,6 +182,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_overall',
     categoryId: 'stretch_care',
+    imageUrl:
+        'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400&h=400&fit=crop',
     name: _same('VedaGlow Belly Butter'),
     emoji: '🧴',
     summary: _t('Rich, fragrance-free butter that absorbs without stickiness.', 'गाढ़ा, बिना ख़ुशबू वाला butter जो बिना चिपचिपाहट के त्वचा में समा जाता है।'),
@@ -195,6 +203,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_sensitive',
     categoryId: 'stretch_care',
+    imageUrl:
+        'https://images.unsplash.com/photo-1626554873526-89b2c51ba12d?w=400&h=400&fit=crop',
     name: _same('PureSkin Calm Oil'),
     emoji: '🧴',
     summary: _t('Gentle plant oil for reactive, sensitive skin.', 'नाज़ुक और जल्दी असर दिखाने वाली त्वचा के लिए कोमल वनस्पति तेल।'),
@@ -208,6 +218,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sc_budget',
     categoryId: 'stretch_care',
+    imageUrl:
+        'https://images.unsplash.com/photo-1597931752949-98c74b5b159f?w=400&h=400&fit=crop',
     name: _same('EverySoft Lotion'),
     emoji: '🧴',
     summary: _t('Everyday moisturiser at a friendly price.', 'रोज़ के लिए moisturiser, वाजिब क़ीमत में।'),
@@ -222,6 +234,8 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_overall',
     categoryId: 'maternity_wear',
+    imageUrl:
+        'https://images.unsplash.com/photo-1504198458649-3128b932f49e?w=400&h=400&fit=crop',
     name: _same('EasyGrow Maternity Leggings'),
     emoji: '👗',
     summary: _t('Soft over-bump leggings that stretch with you.', 'नरम over-bump leggings जो आपके साथ खिंचती हैं।'),
@@ -235,6 +249,8 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_premium',
     categoryId: 'maternity_wear',
+    imageUrl:
+        'https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?w=400&h=400&fit=crop',
     name: _same('Bloom Nursing Dress'),
     emoji: '👗',
     summary: _t('Elegant dress with discreet nursing access.', 'सुंदर dress, जिसमें दूध पिलाने के लिए बिना दिखे खुलने की सुविधा है।'),
@@ -248,6 +264,8 @@ final List<Product> kProducts = [
   Product(
     id: 'mw_budget',
     categoryId: 'maternity_wear',
+    imageUrl:
+        'https://images.unsplash.com/photo-1773846012458-e6a66c26e49f?w=400&h=400&fit=crop',
     name: _same('DailyEase Maternity Kurti'),
     emoji: '👗',
     summary: _t('Roomy, breathable kurti for everyday wear.', 'खुली-खुली, साँस लेने वाली कुर्ती रोज़ पहनने के लिए।'),
@@ -262,6 +280,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_overall',
     categoryId: 'belly_band',
+    imageUrl:
+        'https://images.unsplash.com/photo-1543334270-24bb46642afe?w=400&h=400&fit=crop',
     name: _same('SteadyBump Support Band'),
     emoji: '🤰',
     summary: _t('Adjustable band that eases bump and back strain.', 'कसा-ढीला होने वाला बैंड जो पेट और पीठ का ज़ोर कम करता है।'),
@@ -275,6 +295,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_budget',
     categoryId: 'belly_band',
+    imageUrl:
+        'https://images.unsplash.com/photo-1528458909336-e7a0adfed0a5?w=400&h=400&fit=crop',
     name: _same('LiteHold Belly Band'),
     emoji: '🤰',
     summary: _t('Simple, low-cost everyday support.', 'रोज़ के लिए सरल और कम क़ीमत वाला सहारा।'),
@@ -288,6 +310,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bb_premium',
     categoryId: 'belly_band',
+    imageUrl:
+        'https://images.unsplash.com/photo-1643313262988-cdc5f50c6019?w=400&h=400&fit=crop',
     name: _same('FlexCore Maternity Belt'),
     emoji: '🤰',
     summary: _t('Firmer, contoured support for active days.', 'चलती-फिरती दिनचर्या के लिए ज़्यादा कसा, शरीर के आकार में ढला सहारा।'),
@@ -302,6 +326,8 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_overall',
     categoryId: 'compression_socks',
+    imageUrl:
+        'https://images.unsplash.com/photo-1615486364462-ef6363adbc18?w=400&h=400&fit=crop',
     name: _same('FreshStep Compression Socks'),
     emoji: '🧦',
     summary: _t('Graduated compression for swelling and tired legs.', 'सूजन और थकी टाँगों के लिए ऊपर से नीचे घटता compression।'),
@@ -315,6 +341,8 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_budget',
     categoryId: 'compression_socks',
+    imageUrl:
+        'https://images.unsplash.com/photo-1730448111621-c0524e75b0e8?w=400&h=400&fit=crop',
     name: _same('DayLite Support Socks'),
     emoji: '🧦',
     summary: _t('Light support at an easy price.', 'हल्का सहारा, आसान क़ीमत में।'),
@@ -328,6 +356,8 @@ final List<Product> kProducts = [
   Product(
     id: 'cs_premium',
     categoryId: 'compression_socks',
+    imageUrl:
+        'https://images.unsplash.com/photo-1613151848917-80e67f421fff?w=400&h=400&fit=crop',
     name: _same('AeroFlow Medical Socks'),
     emoji: '🧦',
     summary: _t('Medical-grade compression for all-day wear.', 'पूरे दिन पहनने के लिए medical-grade compression।'),
@@ -342,6 +372,8 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_overall',
     categoryId: 'nursing_bra',
+    imageUrl:
+        'https://images.unsplash.com/photo-1612654516785-0e1a96be21d1?w=400&h=400&fit=crop',
     name: _same('SoftClip Nursing Bra'),
     emoji: '👚',
     summary: _t('Wireless support with easy one-hand clips.', 'बिना wire का सहारा, एक हाथ से खुलने वाली clip के साथ।'),
@@ -355,6 +387,8 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_budget',
     categoryId: 'nursing_bra',
+    imageUrl:
+        'https://images.unsplash.com/photo-1615799998603-7c6270a45196?w=400&h=400&fit=crop',
     name: _same('DayEase Nursing Bra'),
     emoji: '👚',
     summary: _t('Comfortable basics at a friendly price.', 'वाजिब क़ीमत में आरामदेह बुनियादी चीज़ें।'),
@@ -368,6 +402,8 @@ final List<Product> kProducts = [
   Product(
     id: 'nb_premium',
     categoryId: 'nursing_bra',
+    imageUrl:
+        'https://images.unsplash.com/photo-1619459074324-33d5f591c53e?w=400&h=400&fit=crop',
     name: _same('Bloom Seamless Nursing Bra'),
     emoji: '👚',
     summary: _t('Seamless premium comfort for day and night.', 'दिन और रात के लिए बिना सिलाई वाला premium आराम।'),
@@ -382,6 +418,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_overall',
     categoryId: 'breast_pump',
+    imageUrl:
+        'https://images.unsplash.com/photo-1623707430616-d9f956bcac2b?w=400&h=400&fit=crop',
     name: _same('GentleFlow Electric Pump'),
     emoji: '🍼',
     summary: _t('Quiet electric pump with a comfortable fit.', 'शांत electric pump, आरामदेह fit के साथ।'),
@@ -410,6 +448,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_budget',
     categoryId: 'breast_pump',
+    imageUrl:
+        'https://images.unsplash.com/photo-1635258559918-ed56f88004de?w=400&h=400&fit=crop',
     name: _same('EasyHand Manual Pump'),
     emoji: '🍼',
     summary: _t('Simple manual pump for occasional use.', 'कभी-कभार इस्तेमाल के लिए सरल manual pump।'),
@@ -423,6 +463,8 @@ final List<Product> kProducts = [
   Product(
     id: 'bp_premium',
     categoryId: 'breast_pump',
+    imageUrl:
+        'https://images.unsplash.com/photo-1645273474679-87b95586294e?w=400&h=400&fit=crop',
     name: _same('DualEase Double Pump'),
     emoji: '🍼',
     summary: _t('Hospital-grade double pump to save time.', 'समय बचाने के लिए hospital-grade double pump।'),
@@ -437,6 +479,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_overall',
     categoryId: 'swaddle',
+    imageUrl:
+        'https://images.unsplash.com/photo-1591625591034-75d303d2e1a4?w=400&h=400&fit=crop',
     name: _same('DreamWrap Muslin Swaddle'),
     emoji: '👶',
     summary: _t('Breathable muslin that keeps newborns snug.', 'साँस लेने वाला muslin जो नवजात को आराम से लिपटा रखता है।'),
@@ -450,6 +494,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_budget',
     categoryId: 'swaddle',
+    imageUrl:
+        'https://images.unsplash.com/photo-1534639077088-d702bcf685e7?w=400&h=400&fit=crop',
     name: _same('CozyCotton Swaddle Pack'),
     emoji: '👶',
     summary: _t('Value pack of soft cotton swaddles.', 'नरम सूती swaddle का किफ़ायती pack।'),
@@ -463,6 +509,8 @@ final List<Product> kProducts = [
   Product(
     id: 'sw_premium',
     categoryId: 'swaddle',
+    imageUrl:
+        'https://images.unsplash.com/photo-1596433904500-97b901c5d274?w=400&h=400&fit=crop',
     name: _same('SnugZip Swaddle Sack'),
     emoji: '👶',
     summary: _t('Zip swaddle for easy, secure wrapping.', 'आसान और सुरक्षित लपेटन के लिए zip वाला swaddle।'),
@@ -492,12 +540,42 @@ Product? productById(String id) {
   return null;
 }
 
-/// A real photo URL for [p]: its own [Product.imageUrl] if set, else a stable
-/// placeholder photo (consistent per product) so cards show real images now.
-/// Swap in exact product/Amazon image URLs on the model later.
-String productImageUrl(Product p) => p.imageUrl.isNotEmpty
-    ? p.imageUrl
-    : 'https://picsum.photos/seed/pv_${p.id}/300/300';
+/// Keywords per category, used to fetch a RELEVANT stand-in photo.
+///
+/// The old fallback was `picsum.photos/seed/...`, which serves a random image
+/// per seed — stable, but stable nonsense. On a real device it put a deer in
+/// fog under "PureSkin Calm Oil" and a man holding a camera under "Bloom
+/// Nursing Dress". A wrong picture is worse than no picture: it tells her the
+/// product page has not been looked at.
+const Map<String, String> _kCategoryImageTerms = {
+  'pregnancy_pillow': 'pregnancy,pillow,bed',
+  'stretch_care': 'body,oil,skincare',
+  'maternity_wear': 'maternity,dress,pregnant',
+  'belly_band': 'pregnant,belly,support',
+  'compression_socks': 'socks,legs,textile',
+  'nursing_bra': 'lingerie,cotton,folded',
+  'breast_pump': 'baby,bottle,milk',
+  'swaddle': 'swaddle,newborn,blanket',
+};
+
+/// A photo URL for [p]: its own [Product.imageUrl] if set, else a keyword-
+/// matched stand-in so cards show something that at least belongs to the
+/// category.
+///
+/// ⚠️ STILL A STAND-IN, NOT THE PRODUCT. These are stock photographs of the
+/// category, not of the item being sold, and they must be replaced with real
+/// product shots before this is put in front of anyone who might buy. A
+/// plausible-looking photo of the wrong object is the visual version of the
+/// invented view count — it reads as fact and is not one.
+///
+/// `lock` keeps each product's photo stable between launches, so the shop does
+/// not reshuffle itself every time she opens it.
+String productImageUrl(Product p) {
+  if (p.imageUrl.isNotEmpty) return p.imageUrl;
+  final terms = _kCategoryImageTerms[p.categoryId] ?? 'baby,care';
+  final lock = p.id.codeUnits.fold<int>(7, (a, c) => (a * 31 + c) % 9973);
+  return 'https://loremflickr.com/300/300/$terms?lock=$lock';
+}
 
 /// An Amazon India search URL for [p] (used by affiliate Buy on Amazon).
 String amazonSearchUrl(Product p) =>
