@@ -23,8 +23,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../brand/brand_models.dart';
-import '../brand/launch_spotlight.dart';
+// brand_models / launch_spotlight imports removed with the LaunchSpotlight
+// block below. Restore both if that block is uncommented.
 import '../data/product_data.dart' show productImageUrl;
 import '../services/app_nav.dart';
 import '../services/app_structure.dart';
@@ -34,7 +34,8 @@ import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/scans_store.dart';
 import '../widgets/global_ask_fab.dart' show kAskFabReserve, openAskVeda;
-import 'referral/invite_nudge_card.dart';
+import '../referral/referral_store.dart';
+import 'referral/invite_friends_screen.dart';
 import 'today_home_screen.dart';
 import 'v2/v2_block_art.dart';
 import 'v2/v2_block_grid.dart';
@@ -51,6 +52,7 @@ import 'journal_screen.dart';
 import 'reminders_screen.dart' show showMedReminderEditor;
 import 'tools/medicine_tracker_screen.dart';
 import 'v2/v3_daily.dart';
+import 'v2/v3_daily_art.dart';
 import 'v2/v3_daily_tip.dart';
 import 'v2/v3_garbh.dart';
 import 'v2/v3_sections.dart';
@@ -82,12 +84,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
   // crash main_scaffold.dart documents for the Ask FAB.
   bool _tipQueued = false;
 
-  void _maybeShowTip(String line, int week, V2Palette p) {
+  void _maybeShowTip(String line, int week, int day, V2Palette p) {
     if (_tipQueued || line.trim().isEmpty) return;
     _tipQueued = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      showDailyTip(context, line: line, week: week, p: p);
+      showDailyTip(context,
+          line: line,
+          week: week,
+          day: day,
+          p: p);
     });
   }
 
@@ -135,7 +141,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     // The tip no longer has a section on this page — it arrives as a card in
     // the middle of the screen on open. See v2/v3_daily_tip.dart for why a
     // greeting is not the interstitial §16.3 bans.
-    _maybeShowTip(insight, week, p);
+    _maybeShowTip(insight, week, activeDay, p);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       // The clock, battery and signal now sit ON the photograph, so they have
@@ -338,23 +344,34 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             const SizedBox(height: 12),
             V3JournalSection(
               p: p,
+              // Four hues off the controlled-pastel wheel, same rule as the six
+              // doors: hue varies, saturation and lightness do not, so four
+              // different colours still read as one system.
               actions: [
                 V3QuickAction(
                     icon: Icons.edit_note_rounded,
+                    mark: V3DailyMark.memory,
+                    hue: 42,
                     label: 'Write a\nmemory',
                     onTap: () => openJournalText(
                         context, pregnancy, JournalEntryType.memory)),
                 V3QuickAction(
                     icon: Icons.favorite_border_rounded,
+                    mark: V3DailyMark.note,
+                    hue: 344,
                     label: 'Note for\nbaby',
                     onTap: () => openJournalText(
                         context, pregnancy, JournalEntryType.noteForBaby)),
                 V3QuickAction(
                     icon: Icons.photo_camera_outlined,
+                    mark: V3DailyMark.photo,
+                    hue: 206,
                     label: 'Add a\nphoto',
                     onTap: () => openJournalAddPhoto(context, pregnancy)),
                 V3QuickAction(
                     icon: Icons.mic_none_rounded,
+                    mark: V3DailyMark.voice,
+                    hue: 268,
                     label: 'Record\nvoice',
                     onTap: () => openJournalRecordVoice(context, pregnancy)),
               ],
@@ -419,12 +436,46 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             const SizedBox(height: 28),
 
             // ---- Commerce, after the content --------------------------------
-            LaunchSpotlight(
-              stage: BrandStage.pregnancy,
-              pregnancyWeek: week,
-              padding: const EdgeInsets.only(bottom: 14),
+            //
+            // ⚠️ LAUNCH SPOTLIGHT REMOVED FROM V3, kept commented per the
+            // repo's "comment out, never delete" rule.
+            //
+            // It is a sponsored brand card ("A PARENTVEDA LAUNCH — Calm Balm").
+            // The same brand moment is meant to arrive as a full-screen card on
+            // open, so carrying it at the foot of the page as well is the same
+            // promotion twice in one session — and a promotion she has already
+            // dismissed, reappearing, is the exact pattern §16.3 calls pursuit.
+            //
+            // NOTE FOR WHOEVER PICKS THIS UP: the full-screen version
+            // (widgets/launch_promo.dart) is currently NOT WIRED — its import
+            // in main_scaffold.dart is commented out, so nothing shows it on
+            // open today. Removing this leaves the brand slot with no surface
+            // at all on V3 until that is re-enabled. Stated rather than
+            // discovered, because a silently empty monetisation slot is the
+            // kind of gap that survives for months.
+            //
+            // LaunchSpotlight(
+            //   stage: BrandStage.pregnancy,
+            //   pregnancyWeek: week,
+            //   padding: const EdgeInsets.only(bottom: 14),
+            // ),
+            ListenableBuilder(
+              listenable: ReferralStore.instance,
+              builder: (context, _) {
+                final store = ReferralStore.instance;
+                if (!store.isLoaded || !store.config.enabled) {
+                  return const SizedBox.shrink();
+                }
+                return V3InviteBlock(
+                  p: p,
+                  inviterReward: store.config.inviterReward.label.toLowerCase(),
+                  inviteeReward: store.config.inviteeReward.label.toLowerCase(),
+                  onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                          builder: (_) => const InviteFriendsScreen())),
+                );
+              },
             ),
-            const InviteNudgeCard(padding: EdgeInsets.only(bottom: 6)),
             const SizedBox(height: 20),
             _ArtToggle(p: p),
                 ],
@@ -561,14 +612,14 @@ class _AlsoRow extends StatelessWidget {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(surface.label,
                       style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: p.ink1)),
                   if (surface.home != AppHome.today) ...[
                     const SizedBox(width: 6),
                     Text(surface.home.label,
                         style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: p.action.withValues(alpha: 0.7))),
                   ],
@@ -610,7 +661,7 @@ class _ArtToggle extends StatelessWidget {
               ),
               child: Text(label,
                   style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: on ? p.onAction : p.ink1)),
             ),
@@ -622,7 +673,7 @@ class _ArtToggle extends StatelessWidget {
           const SizedBox(height: 16),
           Text('DOOR MARKS — SANDBOX ONLY',
               style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
                   color: p.ink3)),
