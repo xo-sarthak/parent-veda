@@ -1903,3 +1903,70 @@ controls" — which is right, and is exactly why this waits.
 - `kPremiereAlwaysShow` and `kDailyPopupAlwaysShow` are still `true`.
 - **Pregnancy tools inside the parenting app** — Memories' "We're Expecting",
   Yoga leading with prenatal/IVF, Baby names. No restructuring for now.
+
+## 13.0 An expert's code means two different things — DECIDED 2026-08-04
+
+Raised while designing "let the parent type a doctor's code". The flow is one
+remembered code, offered at two moments and editable at both:
+
+| Situation | At sign-up | At course purchase |
+|---|---|---|
+| Came via QR | pre-filled | pre-filled, same code |
+| Typed it manually | typed | pre-filled from that |
+| Skipped | empty, skippable | empty, can type it here |
+
+Clean as a UI. The trap is that the same typed string **means something
+different at each point**, and the commercial terms already price them apart.
+
+**At sign-up it is ATTRIBUTION** — "Dr Neha introduced me." Permanent,
+`first_touch`, a 90-day earning window. Built: `partner_referrals`,
+`mint_partner_token()`, `care_partner_engine.dart`, `care_commission_rules`,
+`commission_ledger`, the poster PDF, the partner dashboard. The only missing
+piece is a screen to TYPE it — `holdToken()` has four call sites and three are
+the install referrer, the deep link, and a debug screen.
+
+**At purchase it is a COUPON** — "this SALE came through Dr Neha," which the
+Commercial Terms workbook prices differently:
+
+- Single-expert course through ParentVeda channels — **0.70 / 0.30**
+- Single-expert course through **her own coupon code** — **0.45 / 0.55**
+- Multi-expert via a specific expert's code — *"20% additional paid to the
+  expert applying her coupon code"*
+
+`programme_coupons` (0054) exists with a `preview_programme_coupon()` validator,
+is correctly not public-read, and has **no `expert_id` column** and **zero
+references in the app**. So today it cannot record whose code was used, which is
+exactly what those rows need.
+
+### THE DECISION: split, not refuse and not move
+
+A parent attributed to Dr A who enters Dr B's code at checkout:
+
+* **Dr A keeps the standing attribution.** `first_touch` is not overturned by a
+  later code — that rule exists so a partner who did the introducing is not
+  displaced by whoever happened to be nearest at the till.
+* **Dr B earns the coupon share on THAT SALE ONLY.** Nothing about the parent's
+  standing relationship changes.
+
+Rejected: **refuse** (then why is the field editable?) and **move** (contradicts
+`first_touch`, and rewards the last touch over the first).
+
+### What this needs, when it gets built
+
+1. `expert_id` on `programme_coupons`, so a redemption knows whose code it was.
+2. A per-sale attribution row — the ledger currently models a partner earning on
+   an attributed parent, not on a single transaction.
+3. Commission sources for the workbook's other rows: `care_commission_rules`
+   allows `consultation | masterclass | cohort | subscription | product |
+   course | referral | other`, with nothing for **ad revenue**, **affiliate**
+   or **brand sponsorship**.
+4. ⚠️ `rate_bps` is capped at **5000 (50%)**. The workbook's consultation split
+   gives the expert **80%**, rising to **85%** above 20 sessions a month. Both
+   are rejected by that CHECK. The cap is right for a *referral* commission and
+   wrong for a *delivery* share — more evidence they are two tables, not one.
+5. The 80% currently lives in `kDoctorSharePct` in `lib/doctor/doctor_earnings.dart`
+   — a client-side Dart constant, one global knob, no per-expert override and no
+   volume tier.
+
+None of this blocks the code-entry screen, which can ship against attribution
+alone. It blocks paying anyone correctly.

@@ -121,11 +121,25 @@ primary emphasis and the free content gets secondary, on the same row, repeated 
 list. For a product whose position is *you always know the price before the pitch*, this
 is backwards — and it is a one-line fix.
 
-### 3.4 Debug surfaces are shipping to users
+### 3.4 ~~Debug surfaces are shipping to users~~ — ⚠️ WRONG. Retracted 2026-08-14.
 
-The Tools hub — a normal user-facing screen — contains **"Brand Studio (debug)"** and
-**"Care Partner (debug)"** alongside real tools. A mother should not be able to reach
-either.
+**This finding was mine and it was incorrect.** Both tools are already gated:
+
+```dart
+if (kDebugMode)
+  _Tool('Brand Studio (debug)', …)
+if (kDebugMode)
+  _Tool('Care Partner (debug)', …)
+```
+
+— `lib/screens/tools_hub_screen.dart:124,131`. The parenting equivalent is commented out
+entirely. **A release build never shows them.** They appeared on the device because it is
+running a **debug build**.
+
+**How the error happened, because it is the same one this project keeps making:** I saw
+them on screen and wrote them up without reading the guard. Seeing is necessary and not
+sufficient — the phone tells you what a *debug* build does. Nothing was broken; the audit
+was.
 
 ### 3.5 The Tools grid carries ~7 accent hues at once
 
@@ -138,6 +152,24 @@ tappable — 24 identical redundant labels.
 
 `CLAUDE.md` states: *no decorative emoji in chrome; line icons.* Live: 🌷 🥗 on community
 cards; 👶 🧒 👨‍👩‍👧 as Ask Veda category headers; 💬 🤝 🎵 🌿 📖 as article row icons.
+
+### 3.6a ⚠️ The view count was FABRICATED — worse than logged, now removed
+
+Logged in §3.7 as "social metrics". On opening the code it was not a metric at all:
+
+```dart
+final v = post.likes * 247 + post.comments * 90 + 503;
+```
+
+**A number invented from two real ones and rendered beside them, so it read as
+measured.** 56.4K views on a post with 210 likes was arithmetic, not observation.
+
+On a product whose position is that a number on screen can be checked, this is not a
+cosmetic flourish — it is the single thing we say we do not do.
+
+**Removed 2026-08-14, and deliberately NOT commented out for revert.** The repo's
+*comment out, never delete* rule exists so a superseded **design** can return. This was
+not a design, and leaving it in the file is an invitation to un-comment it.
 
 ### 3.7 Social metrics in Community
 
