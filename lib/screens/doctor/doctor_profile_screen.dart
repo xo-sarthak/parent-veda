@@ -124,9 +124,9 @@ class DoctorProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Same trap as the home header: doctorInfoById() returns the FIRST doctor
-    // for an unknown id, so a hospital or lab would see a stranger's name and
-    // credential presented as its own.
+    // Same shape as the home header. doctorInfoById() now returns null for an
+    // unknown id instead of the first doctor in the list, so an unresolved
+    // identity falls through to the partner name rather than to a stranger's.
     final session = DoctorSession.instance;
     final e = session.consults ? doctorInfoById(session.expertId!) : null;
     final partner = PartnerDashboardStore.instance.partner;

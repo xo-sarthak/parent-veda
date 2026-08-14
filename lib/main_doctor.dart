@@ -16,12 +16,14 @@
 //
 //  main.dart initialises roughly forty stores — journal, bump, garbh, food,
 //  watch, leaps, recipes, reads, entitlements, referrals, brand campaigns. A
-//  doctor needs none of them. This boots four:
+//  doctor needs none of them. This boots five:
 //
 //      DoctorSession        who am I
 //      DoctorRoster         who is booked with me   (by DoctorScaffold)
 //      DoctorScheduleStore  when do I work
 //      NotificationService  the reminder before a call
+//      ExpertStore          the admin-panel experts, so a doctor onboarded
+//                           through Directus can be found at all
 //
 //  So it is genuinely a smaller app rather than the same app with things
 //  hidden. Nothing on this screen can navigate into the parent experience,
@@ -56,6 +58,7 @@ import 'doctor/doctor_schedule_store.dart';
 import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_auth_screen.dart';
 import 'screens/doctor/doctor_scaffold.dart';
+import 'services/expert_store.dart';
 import 'services/notification_service.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
@@ -106,6 +109,16 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
     DoctorSession.standalone = true;
     NotificationService.instance.init();
     DoctorScheduleStore.instance.init();
+    // FIVE stores, not four. ExpertStore holds the experts created in the admin
+    // panel (expert_profiles), and mergedExperts() folds them into the compiled
+    // catalogue. Without it this app sees ONLY the doctors hard-coded at build
+    // time — so a doctor onboarded through Directus signs in successfully, and
+    // is then invisible to the directory that resolves their own name.
+    //
+    // Harmless-looking while every test doctor happened to be in the compiled
+    // list. It would have failed on the first real onboarding, which is the
+    // worst possible moment to find out.
+    ExpertStore.instance.ensureLoaded();
     _resolve();
   }
 

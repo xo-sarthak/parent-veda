@@ -50,6 +50,17 @@ void main() {
     expect(find.text('UPCOMING CALLS'), findsOneWidget);
   });
 
+  // An unknown expert id used to return allDoctors().first — a REAL other
+  // doctor. A newly onboarded expert opening ParentVeda+ was greeted by a
+  // stranger's name and credential, with nothing failing anywhere. This is the
+  // regression guard: the honest answer to "who is xyz?" is nobody.
+  test('an unknown expert id resolves to nobody, not to another doctor', () {
+    expect(doctorInfoById('not_a_real_expert'), isNull);
+    // And the stage helper still answers, because that one picks a tab rather
+    // than claiming an identity.
+    expect(stageOf('not_a_real_expert'), DoctorStage.parenting);
+  });
+
   test('a consult booked with the doctor lands on their roster', () {
     final o = BookingCatalog.instance.offeringForCatalog('neha')!;
     store.purchase(o);
@@ -61,7 +72,8 @@ void main() {
   test('doctors exist on BOTH sides — a pregnancy specialist is bookable', () {
     // sp_ob is a pregnancy specialist (not in kExperts).
     final info = doctorInfoById('sp_ob');
-    expect(info.stage, DoctorStage.pregnancy);
+    expect(info, isNotNull);
+    expect(info!.stage, DoctorStage.pregnancy);
     expect(doctorsForStage(DoctorStage.pregnancy), isNotEmpty);
     expect(doctorsForStage(DoctorStage.parenting), isNotEmpty);
 

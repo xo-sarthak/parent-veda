@@ -38,8 +38,21 @@ class DoctorInfo {
 
 /// Every doctor a person could log in as — parenting experts (those who take
 /// consults) and pregnancy specialists.
+///
+/// ⚠️ THIS USED TO FILTER ON `timings`, and it silently excluded every doctor
+/// onboarded through the admin panel. The compiled catalogue carries a
+/// human-written "Mon–Sat, 10–1" string, so the filter looked like a harmless
+/// "does this expert publish hours?" test. But `expert_profiles` has no
+/// `timings` column ON PURPOSE — DIRECTUS-SETUP §4c states it, because real
+/// availability comes from `doctor_schedule`, not from prose. So a server
+/// expert arrived with an empty string, failed the filter, and vanished from
+/// the directory that resolves their own name.
+///
+/// The rule that replaces it: a doctor belongs here if they exist. Whether
+/// they are BOOKABLE is a different question, answered by `takes_consults` and
+/// by their schedule — not by whether someone typed an opening-hours sentence.
 List<DoctorInfo> allDoctors() => [
-      for (final e in mergedExperts().where((e) => e.timings.trim().isNotEmpty))
+      for (final e in mergedExperts())
         DoctorInfo(
           id: e.id,
           name: e.name,
@@ -64,16 +77,30 @@ List<DoctorInfo> allDoctors() => [
 List<DoctorInfo> doctorsForStage(DoctorStage stage) =>
     allDoctors().where((d) => d.stage == stage).toList();
 
-/// Resolve a doctor by id from either catalogue. Falls back to the first doctor
-/// so the dashboard always has someone to render.
-DoctorInfo doctorInfoById(String id) {
+/// Resolve a doctor by id from either catalogue, or null if there is no such
+/// doctor.
+///
+/// ⚠️ THIS USED TO RETURN `allDoctors().first` when the id was unknown, so the
+/// dashboard "always had someone to render". That someone was a REAL OTHER
+/// DOCTOR. A newly onboarded expert signing into ParentVeda+ for the first time
+/// would be greeted by a stranger's name, credential and blurb — no error, no
+/// crash, nothing in a log. Two screens already carried comments warning about
+/// the trap; neither could fix it, because the fallback was inside here.
+///
+/// Null is the honest answer, and it forces every caller to decide what an
+/// unknown expert looks like. "Always render something" is only a kindness
+/// when the something is true.
+DoctorInfo? doctorInfoById(String id) {
   for (final d in allDoctors()) {
     if (d.id == id) return d;
   }
-  return allDoctors().first;
+  return null;
 }
 
-DoctorStage stageOf(String id) => doctorInfoById(id).stage;
+/// Which stage an expert works in. Defaults to parenting for an unknown id —
+/// this one genuinely is a display default (it picks a tab), not an identity.
+DoctorStage stageOf(String id) =>
+    doctorInfoById(id)?.stage ?? DoctorStage.parenting;
 
 /// The first doctor of a stage — used by the testing stage toggle to jump to a
 /// representative doctor on the other side.

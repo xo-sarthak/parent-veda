@@ -34,11 +34,12 @@ class DoctorHomeScreen extends StatelessWidget {
       animation:
           Listenable.merge([DoctorSession.instance, DoctorRoster.instance]),
       builder: (context, _) {
-        // doctorInfoById() falls back to the FIRST doctor for an unknown id, so
-        // a referral-only partner — a hospital, lab or IVF centre, none of
-        // which belong in the compiled kExperts catalogue — would render
-        // somebody else's name as its own. Only resolve a doctor when this
-        // session actually has a consulting identity.
+        // doctorInfoById() now returns null for an unknown id rather than the
+        // first doctor in the list — it used to hand back a real stranger's
+        // name, which a referral-only partner (a hospital, lab or IVF centre)
+        // and every newly onboarded expert would see as their own. The guard
+        // below still matters: a partner with no consulting identity has no
+        // expert to look up at all, and falls through to their partner name.
         final session = DoctorSession.instance;
         final e = session.consults ? doctorInfoById(session.expertId!) : null;
         final partner = PartnerDashboardStore.instance.partner;
