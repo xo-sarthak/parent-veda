@@ -196,10 +196,48 @@ void main() {
         .where((l) => !l.trimLeft().startsWith('//'))
         .join('\n');
 
-    test('the route cards open something', () {
-      expect(live.contains('onTap: () => _open(context, surfaceId)'), isTrue,
-          reason: 'a card with a chevron and no handler is a picture');
-    });
+    // ⚠️ THIS TEST WAS REWRITTEN, and the reason is worth more than the fix.
+    //
+    // It used to grep for one literal — `onTap: () => _open(context, surfaceId)`
+    // — which was the handler on the route-card widget that existed when it was
+    // written. The Focus screen later replaced those cards with the block grid,
+    // every tile of which has a handler, and the test went red while the thing
+    // it protects was perfectly fine.
+    //
+    // The lesson: a source scan that asserts a STRING breaks whenever the code
+    // is refactored, and each false alarm makes the next real one easier to
+    // wave through. A source scan that asserts the SHAPE — "every tile declares
+    // a handler" — survives the refactor and still catches the bug it was
+    // written for, which was a tile that looked like a door and was a picture.
+    //
+    // Both grid-led homes are scanned. V3 carries the same grid, so the same
+    // failure is available to it, and a guard that only covers one of two
+    // identical surfaces is half a guard.
+    for (final file in const [
+      'lib/screens/home_focus_screen.dart',
+      'lib/screens/home_v3_screen.dart',
+    ]) {
+      test('every door in ${file.split('/').last} opens something', () {
+        final body = File(file)
+            .readAsStringSync()
+            .split('\n')
+            .where((l) => !l.trimLeft().startsWith('//'))
+            .join('\n');
+
+        // Split on the constructor and check each block's own argument list.
+        // Chunk 0 is whatever precedes the first block, so it is skipped.
+        final chunks = body.split('V2Block(');
+        expect(chunks.length, greaterThan(1),
+            reason: '$file declares no blocks — has the grid moved?');
+        for (var i = 1; i < chunks.length; i++) {
+          final label = RegExp(r"label:\s*'([^']*)'").firstMatch(chunks[i]);
+          expect(chunks[i].contains('onTap:'), isTrue,
+              reason: 'the "${label?.group(1) ?? 'block #$i'}" tile in $file '
+                  'has no handler — a tile with a label and no onTap is a '
+                  'picture of a door');
+        }
+      });
+    }
 
     test('the also chips open something', () {
       expect(live.contains('onTap: () => _open(context, id)'), isTrue);
