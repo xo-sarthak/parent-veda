@@ -81,6 +81,32 @@ class V3Hero extends StatelessWidget {
       child: SizedBox(
           height: 392,
           child: Stack(fit: StackFit.expand, children: [
+            // ---- HARD CUT. THE DISSOLVE IS REVERTED -----------------------
+            //
+            // Three attempts, all removed, and the record is worth keeping so
+            // nobody rebuilds one of them:
+            //
+            //   1. A page-coloured overlay ramping evenly across 88px. Read as
+            //      fog — white rising INTO the image rather than the image
+            //      ending.
+            //   2. The same overlay on a convex curve, clear for two thirds
+            //      then closing. Cleaner, still read as white arriving.
+            //   3. A ShaderMask fading the image's own alpha, which also faded
+            //      the black scrim so nothing was left to dirty the blend.
+            //      Technically the correct dissolve. Still wrong on the phone.
+            //
+            // WHY ALL THREE FAILED, which is the part that generalises: the
+            // bottom of this photograph is dark saturated red and the page is
+            // near-white. That is a long perceptual distance, and ANY gradual
+            // route across it spends 30–80px being neither — a band of
+            // in-between colour that the eye reads as a third substance. A
+            // blend only disappears when the two things being blended are close
+            // in luminance; these are as far apart as the app gets.
+            //
+            // A hard edge has none of that problem. One image ends, the next
+            // section begins, and the eye reads it as two things rather than as
+            // a smear between them. Reverted at the user's call after looking
+            // at all three, which is the right way to settle it.
             Image.asset('assets/baby/week_$ww.jpg',
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
@@ -107,6 +133,9 @@ class V3Hero extends StatelessWidget {
             Padding(
               // Top inset clears the status bar, which now sits over the
               // photograph rather than above it.
+              // Back to 22. It went to 86 to keep the type clear of the
+              // dissolve; with the dissolve gone the type has the foot of the
+              // image back, which is where it was designed to sit.
               padding: EdgeInsets.fromLTRB(
                   18, MediaQuery.of(context).padding.top + 14, 18, 22),
               child: Column(
@@ -127,7 +156,7 @@ class V3Hero extends StatelessWidget {
                             const SizedBox(height: 3),
                             Text(subtitle,
                                 style: pvJakarta(
-                                    fontSize: 12.5,
+                                    fontSize: 14,
                                     height: 1.4,
                                     color: Colors.white.withValues(alpha: 0.8))),
                           ]),
@@ -145,7 +174,7 @@ class V3Hero extends StatelessWidget {
                   const Spacer(),
                   Text('WEEK $week · DAY $day',
                       style: pvManrope(
-                          fontSize: 10.5,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.3,
                           color: Colors.white.withValues(alpha: 0.85))),
@@ -285,7 +314,7 @@ class V3ReadRow extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
-                            fontSize: 9.5,
+                            fontSize: 11.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.1,
                             color: p.ink3)),
@@ -346,7 +375,7 @@ class V3ProductRow extends StatelessWidget {
                       const SizedBox(height: 3),
                       Text('AFFILIATE',
                           style: pvManrope(
-                              fontSize: 8.5,
+                              fontSize: 10,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.1,
                               color: p.ink3)),
@@ -394,7 +423,7 @@ class V3SectionHead extends StatelessWidget {
           Row(children: [
             Text(eyebrow.toUpperCase(),
                 style: pvManrope(
-                    fontSize: 10.5,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
                     color: p.action.withValues(alpha: 0.85))),
@@ -402,7 +431,7 @@ class V3SectionHead extends StatelessWidget {
               const Spacer(),
               Text(note!.toUpperCase(),
                   style: pvManrope(
-                      fontSize: 9.5,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.1,
                       color: p.ink3)),

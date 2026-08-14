@@ -58,7 +58,7 @@ class V2SectionHead extends StatelessWidget {
         children: [
           Text(eyebrow.toUpperCase(),
               style: pvManrope(
-                  fontSize: 10.5,
+                  fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.3,
                   color: p.action.withValues(alpha: 0.85))),
@@ -185,7 +185,7 @@ class V2WeekHero extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('WEEK $week · DAY $day',
                   style: pvManrope(
-                      fontSize: 10.5,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.3,
                       color: Colors.white.withValues(alpha: 0.85))),
@@ -272,7 +272,7 @@ class V2PracticeCard extends StatelessWidget {
             if (garbh.durationMinutes > 0)
               Text('${garbh.durationMinutes} MIN',
                   style: pvManrope(
-                      fontSize: 10,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                       color: p.ink1.withValues(alpha: 0.55))),
@@ -365,7 +365,7 @@ class V2ReadsRail extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: pvManrope(
-                        fontSize: 9.5,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.1,
                         color: p.ink3)),
@@ -382,7 +382,7 @@ class V2ReadsRail extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(r.readingTime.en,
-                    style: pvManrope(fontSize: 11, color: p.ink3)),
+                    style: pvManrope(fontSize: 12.5, color: p.ink3)),
               ]),
             ),
           );
@@ -479,7 +479,7 @@ class V2PromptCard extends StatelessWidget {
             if (eyebrow != null) ...[
               Text(eyebrow!.toUpperCase(),
                   style: pvManrope(
-                      fontSize: 9.5,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
                       color: p.ink3)),
@@ -595,7 +595,7 @@ class V2ProductRail extends StatelessWidget {
                             borderRadius: BorderRadius.circular(999)),
                         child: Text('Affiliate',
                             style: pvManrope(
-                                fontSize: 8.5,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white)),
                       ),
@@ -606,14 +606,14 @@ class V2ProductRail extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: pvJakarta(
-                        fontSize: 12.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         height: 1.25,
                         color: p.ink1)),
                 const SizedBox(height: 3),
                 Text(it.price,
                     style: pvManrope(
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: p.ink2)),
               ]),
@@ -712,7 +712,7 @@ class V2ComingUp extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('COMING UP',
                     style: pvManrope(
-                        fontSize: 9.5,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
                         color: p.ink3)),
@@ -729,7 +729,7 @@ class V2ComingUp extends StatelessWidget {
             const SizedBox(width: 10),
             Text(when,
                 style: pvManrope(
-                    fontSize: 12.5, fontWeight: FontWeight.w700, color: p.action)),
+                    fontSize: 14, fontWeight: FontWeight.w700, color: p.action)),
           ]),
         );
       },
@@ -807,7 +807,7 @@ class V2VideoCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999)),
                 child: Text(video.duration,
                     style: pvManrope(
-                        fontSize: 11,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: Colors.white)),
               ),

@@ -127,7 +127,28 @@ class _Tile extends StatelessWidget {
               aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
-                  color: block.tint,
+                  // ---- A GRADIENT WELL, NOT A FLAT SWATCH -----------------
+                  //
+                  // The land band is gone from the marks (see v2_block_art),
+                  // and something had to replace what it was doing — which was
+                  // never "be a landscape", it was "give the object somewhere
+                  // to sit so it is not floating on a flat colour". A vertical
+                  // gradient does that without drawing a horizon: lighter at
+                  // the top, deeper at the foot, so the tile reads as a space
+                  // with air in it rather than as a rectangle of paint.
+                  //
+                  // The two ends are the SAME hue, ±6% lightness. Anything
+                  // wider becomes a visible gradient, and a visible gradient is
+                  // the slop tell DESIGN-LAYER bans. This one should be felt
+                  // and not seen.
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _shift(block.tint, 0.055),
+                      _shift(block.tint, -0.055),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 clipBehavior: Clip.antiAlias,
@@ -136,12 +157,21 @@ class _Tile extends StatelessWidget {
                 // isolated subjects and cropping one costs its silhouette,
                 // which at this size is the only thing telling them apart.
                 child: Padding(
+                  // A SMALL INSET IS BACK on the drawn set — 10, not the old
+                  // 14 and not 0. It went to 0 when the marks had a ground band
+                  // that was meant to reach the bottom corners; without the
+                  // band there is nothing that needs to touch an edge, and an
+                  // object running to the corners of its own well reads as
+                  // cropped rather than as large.
                   padding: EdgeInsets.all(
-                      V2BlockArtMode.instance.vector ? 14 : 6),
+                      V2BlockArtMode.instance.vector ? 10 : 6),
                   child: V2BlockArtMode.instance.vector && block.mark != null
                       ? V2BlockArt(
                           mark: block.mark!,
-                          color: palette.ink1.withValues(alpha: 0.72))
+                          // The tile's own pastel, not a grey. See the note on
+                          // V2BlockArt.tint for why the first restyle failed.
+                          tint: block.tint,
+                          ink: palette.ink1)
                       : block.asset != null
                           ? Image.asset(block.asset!,
                               fit: BoxFit.contain,
@@ -152,13 +182,17 @@ class _Tile extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 7),
+            const SizedBox(height: 8),
+            // 14 and 12, up from 12.5 and 11. iOS's base size is 17 and macOS's
+            // is 13 — type gets LARGER on the smaller screen, not smaller. The
+            // instinct that produced 12.5 here was "the screen shrank, so
+            // squeeze", and it is backwards. See the note in v3_sections.dart.
             Text(
               block.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 12.5,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
                 color: palette.ink1,
@@ -171,7 +205,7 @@ class _Tile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   height: 1.15,
                   color: palette.ink3,
                 ),
@@ -186,4 +220,16 @@ class _Tile extends StatelessWidget {
   Widget _icon() => Center(
         child: Icon(block.icon, size: 30, color: palette.ink1.withValues(alpha: 0.55)),
       );
+
+  /// Nudge a colour's lightness without touching its hue or saturation.
+  ///
+  /// HSL rather than `Color.lerp` towards white/black on purpose: lerping to
+  /// white desaturates as it lightens, so the top of the gradient would drift
+  /// grey and the two ends would no longer be the same colour. Lightness alone
+  /// keeps the hue identical, which is what makes the gradient read as depth
+  /// rather than as two colours meeting.
+  static Color _shift(Color c, double byLightness) {
+    final h = HSLColor.fromColor(c);
+    return h.withLightness((h.lightness + byLightness).clamp(0.0, 1.0)).toColor();
+  }
 }

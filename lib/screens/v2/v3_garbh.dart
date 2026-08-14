@@ -103,7 +103,7 @@ class V3GarbhSection extends StatelessWidget {
                   Row(children: [
                     Text('GARBH SANSKAR',
                         style: pvManrope(
-                            fontSize: 11,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.6,
                             color: const Color(0xFFF0C078))),
@@ -162,12 +162,23 @@ class V3GarbhSection extends StatelessWidget {
         // Each row is a DOOR with today's item named on it. A daily section is
         // used every day, so the whole value is being able to see what today
         // holds and reach it in one tap — not being told a category exists.
+        // ⚠️ NO CARD INSIDE THIS CARD. The rows used to carry their own border
+        // and radius, which put two frames around every pillar and charged
+        // 12px of padding on each side for the privilege. Padding on padding is
+        // the standard mobile-layout mistake: the screen is the scarcest thing
+        // you have, and a second container spends it saying something the first
+        // container already said.
+        //
+        // Grouped by whitespace and a hairline instead. The outer card is what
+        // says "these three belong together"; a divider is enough to say "and
+        // these are three separate things", at a cost of one pixel.
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+          padding: const EdgeInsets.fromLTRB(18, 6, 16, 10),
           child: Column(children: [
             for (final row in rows) ...[
               _PillarRow(row: row, p: p),
-              if (row != rows.last) const SizedBox(height: 8),
+              if (row != rows.last)
+                Divider(height: 1, thickness: 1, color: p.line),
             ],
           ]),
         ),
@@ -221,14 +232,9 @@ class _PillarRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
         onTap: row.onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-          decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: p.line),
-          ),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(children: [
             // The pillar mark. Its accent appears ONLY here, at 46px — the
             // pillars have their own colours and letting them fill anything
@@ -268,14 +274,14 @@ class _PillarRow extends StatelessWidget {
                         TextSpan(
                             text: row.name.toUpperCase(),
                             style: pvManrope(
-                                fontSize: 10,
+                                fontSize: 11.5,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.3,
                                 color: row.accent)),
                         TextSpan(
                             text: '  ·  ${row.tag.toUpperCase()}',
                             style: pvManrope(
-                                fontSize: 9,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.0,
                                 color: p.ink3)),
