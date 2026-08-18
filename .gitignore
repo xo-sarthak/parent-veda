@@ -132,3 +132,9 @@ ds-bundle/
 .design-sync/chunks.txt
 design-kit/node_modules/
 design-kit/dist/
+
+# Raw competitor review dumps - source data for research/*, not app content.
+# The Play Store CSVs alone run 15-52 MB each; committing them once already
+# added ~110 MB to history. Keep them local; the curated *-critical-reviews.xlsx
+# analysis files are small and stay tracked.
+research/competitors/**/*_reviews_raw.csv
